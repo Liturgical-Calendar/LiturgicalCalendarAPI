@@ -28,6 +28,15 @@ use LiturgicalCalendar\Api\Utilities;
  * This is the path that handles source data for national and diocesan calendars.
  * The source data for these calendars can be created (PUT), or updated (PATCH),
  * or retrieved (GET), or deleted (DELETE).
+ *
+ * @phpstan-import-type MetadataCalendarsObject from \LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars
+ * @phpstan-import-type LitCalItemObject from \LiturgicalCalendar\Api\Models\LitCalItem
+ * @phpstan-import-type DiocesanLitCalItemObject from \LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItem
+ * @phpstan-import-type NationalCalendarDataObject from \LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData
+ * @phpstan-import-type DiocesanCalendarDataObject from \LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData
+ * @phpstan-import-type WiderRegionCalendarDataObject from \LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData
+ * @phpstan-import-type LitCalItemCreateNewFixedObject from \LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed
+ * @phpstan-import-type LitCalItemCreateNewMobileObject from \LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile
  */
 final class RegionalDataPath
 {
@@ -44,9 +53,10 @@ final class RegionalDataPath
      */
     public function __construct()
     {
-        self::$Core              = new Core();
-        $this->params            = new RegionalDataParams();
-        $metadataObj             = Utilities::jsonUrlToObject(API_BASE_PATH . Route::CALENDARS->value);
+        self::$Core   = new Core();
+        $this->params = new RegionalDataParams();
+        $metadataObj  = Utilities::jsonUrlToObject(API_BASE_PATH . Route::CALENDARS->value);
+        /** @var \stdClass&object{litcal_metadata:MetadataCalendarsObject} $metadataObj */
         $this->CalendarsMetadata = MetadataCalendars::fromObject($metadataObj->litcal_metadata);
     }
 
@@ -189,6 +199,7 @@ final class RegionalDataPath
         }
 
         if (file_exists($calendarDataFile)) {
+            /** @var NationalCalendarDataObject|DiocesanCalendarDataObject|WiderRegionCalendarDataObject $CalendarData */
             $CalendarData = Utilities::jsonFileToObject($calendarDataFile);
 
             // If a locale was not requested, use the first valid locale for the current requested calendar data
@@ -230,9 +241,15 @@ final class RegionalDataPath
             }
             if (null !== $CalendarDataI18nFile) {
                 $localeData = Utilities::jsonFileToObject($CalendarDataI18nFile);
-                foreach ($CalendarData->litcal as $litCalItem) {
-                    if (property_exists($localeData, $litCalItem->liturgical_event->event_key)) {
-                        $litCalItem->liturgical_event->name = $localeData->{$litCalItem->liturgical_event->event_key};
+                /** @var array<LitCalItemObject|DiocesanLitCalItemObject> $litCalItems */
+                $litCalItems = $CalendarData->litcal;
+                foreach ($litCalItems as $litCalItem) {
+                    /** @var LitCalItemCreateNewFixedObject|LitCalItemCreateNewMobileObject $liturgicalEvent */
+                    $liturgicalEvent = $litCalItem->liturgical_event;
+                    /** @var string $eventKey */
+                    $eventKey = $liturgicalEvent->event_key;
+                    if (property_exists($localeData, $eventKey)) {
+                        $liturgicalEvent->name = $localeData->{$eventKey};
                     }
                 }
             } else {

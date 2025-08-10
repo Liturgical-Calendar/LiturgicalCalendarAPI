@@ -6,6 +6,66 @@ use LiturgicalCalendar\Api\Enum\CalEventAction;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 
+/**
+ * @phpstan-type DecreeItemLiturgicalEventObject \stdClass&object{
+ *      event_key:string,
+ *      name:string,
+ *      calendar:string,
+ *      grade?:int,
+ *      color?:string[],
+ *      common?:string[],
+ *      day?:int,
+ *      month?:int,
+ *      strtotime?:string
+ * }
+ * @phpstan-type UrlLangMapObject \stdClass&object<string,string>
+ * @phpstan-type DecreeItemMetadataObject \stdClass&object{
+ *      action:string,
+ *      since_year:int,
+ *      until_year?:int,
+ *      url:string,
+ *      reason?:string,
+ *      property?:string,
+ *      url_lang_map?:UrlLangMapObject
+ * }
+ * @phpstan-type DecreeItemFromObject \stdClass&object{
+ *      decree_id:string,
+ *      decree_date:string,
+ *      decree_protocol:string,
+ *      description:string,
+ *      liturgical_event:DecreeItemLiturgicalEventObject,
+ *      metadata:DecreeItemMetadataObject
+ * }
+ *
+ * @phpstan-type DecreeItemLiturgicalEventArray array{
+ *      event_key:string,
+ *      name:string,
+ *      calendar:string,
+ *      grade?:int,
+ *      color?:string[],
+ *      common?:string[],
+ *      day?:int,
+ *      month?:int,
+ *      strtotime?:string
+ * }
+ * @phpstan-type DecreeItemMetadataArray array{
+ *      action:string,
+ *      since_year:int,
+ *      until_year?:int,
+ *      url:string,
+ *      reason?:string,
+ *      property?:string,
+ *      url_lang_map?:array<string,string>
+ * }
+ * @phpstan-type DecreeItemFromArray array{
+ *      decree_id:string,
+ *      decree_date:string,
+ *      decree_protocol:string,
+ *      description:string,
+ *      liturgical_event:DecreeItemLiturgicalEventArray,
+ *      metadata:DecreeItemMetadataArray
+ * }
+ */
 final class DecreeItem extends AbstractJsonSrcData
 {
     public readonly string $decree_id;
@@ -102,7 +162,7 @@ final class DecreeItem extends AbstractJsonSrcData
      * - `setProperty`
      * - `makePatron`
      *
-     * @param \stdClass&object{liturgical_event:\stdClass&object{event_key:string,name:string,grade:int,color:string[],common:string[],day?:int,month?:int,strtotime?:string},metadata:\stdClass&object{action:string,since_year:int|null,until_year?:int|null,url?:string|null,reason?:string|null,property?:string|null,url_lang_map?:\stdClass&object<string,string>}} $data
+     * @param DecreeItemFromObject $data
      * @return static A new instance of DecreeItem.
      * @throws \ValueError If the required properties are not present in the associative array or if the properties have invalid types.
      */
@@ -136,8 +196,12 @@ final class DecreeItem extends AbstractJsonSrcData
     /**
      * Creates a new instance from an array.
      *
-     * @param array{liturgical_event:array{event_key:string,name:string,grade:int,color:string[],common:string[],day?:int,month?:int,strtotime?:string},metadata:array{action:string,since_year:int|null,until_year?:int|null,url?:string|null,reason?:string|null,property?:string|null,url_lang_map?:array<string,string>}} $data The data to use to create the new instance.
+     * @param DecreeItemFromArray $data The data to use to create the new instance.
      *                      Must have the following keys:
+     *                          - `decree_id`: The ID of the decree.
+     *                          - `decree_date`: The date of the decree.
+     *                          - `decree_protocol`: The protocol of the decree.
+     *                          - `description`: The description of the decree.
      *                          - `liturgical_event`: The liturgical event data. Must have the following keys:
      *                              -> `event_key`: The event key.
      *                              -> `name`: The name of the liturgical event.
@@ -159,17 +223,17 @@ final class DecreeItem extends AbstractJsonSrcData
     protected static function fromArrayInternal(array $data): static
     {
         if (
-            false === array_key_exists('decree_id', $data)
-            || false === array_key_exists('decree_date', $data)
-            || false === array_key_exists('decree_protocol', $data)
-            || false === array_key_exists('description', $data)
-            || false === array_key_exists('liturgical_event', $data)
-            || false === array_key_exists('metadata', $data)
+            false === isset($data['decree_id'])
+            || false === isset($data['decree_date'])
+            || false === isset($data['decree_protocol'])
+            || false === isset($data['description'])
+            || false === isset($data['liturgical_event'])
+            || false === isset($data['metadata'])
         ) {
             throw new \ValueError('`liturgical_event` and `metadata` parameters are required');
         }
 
-        if (false === array_key_exists('action', $data['metadata'])) {
+        if (false === isset($data['metadata']['action'])) {
             throw new \ValueError('metadata must have an `action` property');
         }
 

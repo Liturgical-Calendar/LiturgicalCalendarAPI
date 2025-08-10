@@ -49,7 +49,9 @@ final class UrlLangMap extends AbstractJsonSrcData
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
-        return new static((array) $data);
+        /** @var array<string,string> $dataArray */
+        $dataArray = (array) $data;
+        return new static($dataArray);
     }
 
     /**

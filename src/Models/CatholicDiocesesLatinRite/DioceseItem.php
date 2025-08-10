@@ -4,6 +4,12 @@ namespace LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite;
 
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 
+/** @phpstan-type DioceseData \stdClass&object{
+ *     diocese_name: string,
+ *     diocese_id: string,
+ *     province?: string
+ * }
+ */
 final class DioceseItem extends AbstractJsonSrcData
 {
     public readonly string $diocese_name;
@@ -48,17 +54,19 @@ final class DioceseItem extends AbstractJsonSrcData
      * The object should have the following properties:
      * - diocese_name (string): The name of the diocese.
      * - diocese_id (string): The unique identifier for the diocese.
-     * - province (string|null): The ecclesiastical province that the diocese belongs to, if applicable.
+     * - province (string): The ecclesiastical province that the diocese belongs to, if applicable.
      *
-     * @param \stdClass&object{diocese_name:string,diocese_id:string,province?:string|null} $data The object containing the properties of the class.
+     * @param DioceseData $data The object containing the properties of the class.
      * @return static A new instance of the class.
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
+        /** @var string|null $province */
+        $province = property_exists($data, 'province') ? $data->province : null;
         return new static(
             $data->diocese_name,
             $data->diocese_id,
-            property_exists($data, 'province') ? $data->province : null
+            $province
         );
     }
 }

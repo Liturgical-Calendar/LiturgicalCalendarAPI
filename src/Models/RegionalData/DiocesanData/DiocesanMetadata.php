@@ -5,6 +5,10 @@ namespace LiturgicalCalendar\Api\Models\RegionalData\DiocesanData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 
+/**
+ * @phpstan-type DiocesanMetadataObject \stdClass&object{nation:string,diocese_id:string,diocese_name:string,locales:string[],timezone:string}
+ * @phpstan-type DiocesanMetadataArray array{nation:string,diocese_id:string,diocese_name:string,locales:string[],timezone:string}
+ */
 final class DiocesanMetadata extends AbstractJsonSrcData
 {
     /** @var string[] */
@@ -45,11 +49,15 @@ final class DiocesanMetadata extends AbstractJsonSrcData
      * - locales (string[]): The locales supported by the diocese.
      * - timezone (string): The timezone for the diocese.
      *
-     * @param array{nation:string,diocese_id:string,diocese_name:string,locales:string[],timezone:string} $data
+     * @param DiocesanMetadataArray $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
     {
+        if (array_key_exists('calendar_id', $data)) {
+            throw new \RuntimeException('Perhaps you meant to use \LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem::fromArray?');
+        }
+
         if (!isset($data['locales']) || 0 === count($data['locales'])) {
             throw new \TypeError('locales parameter must be an array and must not be empty');
         }
@@ -93,11 +101,15 @@ final class DiocesanMetadata extends AbstractJsonSrcData
      * - locales (string[]): The locales supported by the diocese.
      * - timezone (string): The timezone for the diocese.
      *
-     * @param \stdClass&object{nation:string,diocese_id:string,diocese_name:string,locales:string[],timezone:string} $data The object containing the properties of the diocesan calendar.
+     * @param DiocesanMetadataObject $data The object containing the properties of the diocesan calendar.
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
+        if (property_exists($data, 'calendar_id')) {
+            throw new \RuntimeException('Perhaps you meant to use \LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem::fromObject?');
+        }
+
         if (!isset($data->locales) || 0 === count($data->locales)) {
             throw new \TypeError('locales parameter must be an array and must not be empty');
         }

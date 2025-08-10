@@ -25,7 +25,7 @@ use LiturgicalCalendar\Api\Utilities;
  * The class is initialized with a set of parameters passed in from the API request. These parameters
  * are used to determine which calendar data to retrieve or update or delete.
  *
- * @package LiturgicalCalendar\Api\Params
+ * @phpstan-import-type MetadataCalendarsObject from \LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars
  */
 class RegionalDataParams implements ParamsInterface
 {
@@ -51,6 +51,7 @@ class RegionalDataParams implements ParamsInterface
      */
     public function __construct()
     {
+        /** @var \stdClass&object{litcal_metadata:MetadataCalendarsObject} $metadata */
         $metadata = Utilities::jsonUrlToObject(API_BASE_PATH . Route::CALENDARS->value);
         if (property_exists($metadata, 'litcal_metadata')) {
             // let's remove the Vatican calendar from the list

@@ -8,7 +8,8 @@ use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
 
 /**
- * @phpstan-type NationalCalendarSettings \stdClass&object{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool}
+ * @phpstan-type NationalCalendarSettingsObject \stdClass&object{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool}
+ * @phpstan-type NationalCalendarSettingsArray array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool}
  */
 final class MetadataNationalCalendarSettings extends AbstractJsonRepresentation
 {
@@ -53,7 +54,7 @@ final class MetadataNationalCalendarSettings extends AbstractJsonRepresentation
      * - corpus_christi (string): when Corpus Christi is celebrated
      * - eternal_high_priest (bool): whether the Eternal High Priest is celebrated
      *
-     * @param array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool} $data
+     * @param NationalCalendarSettingsArray $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -75,7 +76,7 @@ final class MetadataNationalCalendarSettings extends AbstractJsonRepresentation
      * - corpus_christi (string): when Corpus Christi is celebrated
      * - eternal_high_priest (bool): whether the Eternal High Priest is celebrated
      *
-     * @param NationalCalendarSettings $data
+     * @param NationalCalendarSettingsObject $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static

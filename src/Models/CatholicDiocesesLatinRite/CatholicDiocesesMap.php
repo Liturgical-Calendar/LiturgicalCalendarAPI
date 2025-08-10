@@ -4,6 +4,21 @@ namespace LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite;
 
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 
+/**
+ * @phpstan-type Diocese \stdClass&object{
+ *     diocese_name: string,
+ *     diocese_id: string,
+ *     province?: string
+ * }
+ * @phpstan-type CatholicDioceseLatinRite \stdClass&object{
+ *     country_iso: string,
+ *     country_name_english: string,
+ *     dioceses: Diocese[]
+ * }
+ * @phpstan-type CatholicDiocesesLatinRite \stdClass&object{
+ *     catholic_dioceses_latin_rite: CatholicDioceseLatinRite[]
+ * }
+ */
 final class CatholicDiocesesMap extends AbstractJsonSrcData
 {
     /** @var array<string,CountryWithDiocesesItem> */
@@ -132,16 +147,20 @@ final class CatholicDiocesesMap extends AbstractJsonSrcData
      * The object must have the following property:
      * - catholic_dioceses_latin_rite (array<object>): The dioceses. Each object must have the same properties as CountryWithDioceses.
      *
-     * @param \stdClass&object{catholic_dioceses_latin_rite:\stdClass[]} $data
+     * @param CatholicDiocesesLatinRite $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
-        $countries    = array_map(
-            fn(\stdClass $item) => $item->country_iso,
+        $countries        = array_map(
+            fn(\stdClass $item): string => $item->country_iso,
             $data->catholic_dioceses_latin_rite
         );
-        $countryItems = array_map(fn (\stdClass $countryItem): CountryWithDiocesesItem => CountryWithDiocesesItem::fromObject($countryItem), $data->catholic_dioceses_latin_rite);
-        return new static(array_combine($countries, $countryItems));
+        $countryItems     = array_map(
+            fn (\stdClass $countryItem): CountryWithDiocesesItem => CountryWithDiocesesItem::fromObject($countryItem),
+            $data->catholic_dioceses_latin_rite
+        );
+        $associativeArray = array_combine($countries, $countryItems);
+        return new static($associativeArray);
     }
 }

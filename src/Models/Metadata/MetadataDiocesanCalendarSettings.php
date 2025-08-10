@@ -8,7 +8,8 @@ use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
 
 /**
- * @phpstan-type DiocesanCalendarSettings \stdClass&object{epiphany?:string,ascension?:string,corpus_christi?:string}
+ * @phpstan-type DiocesanCalendarSettingsObject \stdClass&object{epiphany?:string,ascension?:string,corpus_christi?:string}
+ * @phpstan-type DiocesanCalendarSettingsArray array{epiphany?:string,ascension?:string,corpus_christi?:string}
  * @implements \IteratorAggregate<string,Epiphany|Ascension|CorpusChristi>
  */
 final class MetadataDiocesanCalendarSettings extends AbstractJsonRepresentation implements \IteratorAggregate
@@ -51,7 +52,7 @@ final class MetadataDiocesanCalendarSettings extends AbstractJsonRepresentation 
     /**
      * Creates an instance of DiocesanCalendarSettings from an associative array.
      *
-     * @param array{epiphany?:string,ascension?:string,corpus_christi?:string} $data
+     * @param DiocesanCalendarSettingsArray $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -71,15 +72,15 @@ final class MetadataDiocesanCalendarSettings extends AbstractJsonRepresentation 
      * - ascension (string|null): when Ascension is celebrated
      * - corpus_christi (string|null): when Corpus Christi is celebrated
      *
-     * @param DiocesanCalendarSettings $data
+     * @param DiocesanCalendarSettingsObject $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
         return new static(
-            property_exists($data, 'epiphany') ? Epiphany::tryFrom($data->epiphany) : null,
-            property_exists($data, 'ascension') ? Ascension::tryFrom($data->ascension) : null,
-            property_exists($data, 'corpus_christi') ? CorpusChristi::tryFrom($data->corpus_christi) : null
+            isset($data->epiphany) ? Epiphany::tryFrom($data->epiphany) : null,
+            isset($data->ascension) ? Ascension::tryFrom($data->ascension) : null,
+            isset($data->corpus_christi) ? CorpusChristi::tryFrom($data->corpus_christi) : null
         );
     }
 

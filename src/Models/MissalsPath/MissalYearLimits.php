@@ -55,7 +55,7 @@ final class MissalYearLimits extends AbstractJsonRepresentation
     {
         return new static(
             $data['since_year'],
-            array_key_exists('until_year', $data) ? $data['until_year'] : null
+            isset($data['until_year']) ? $data['until_year'] : null
         );
     }
 
@@ -75,7 +75,7 @@ final class MissalYearLimits extends AbstractJsonRepresentation
     {
         return new static(
             $object->since_year,
-            property_exists($object, 'until_year') ? $object->until_year : null
+            isset($object->until_year) ? $object->until_year : null
         );
     }
 }

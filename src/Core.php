@@ -27,14 +27,15 @@ class Core
     private array $AllowedRequestMethods;
     /** @var RequestContentType[] */
     private array $AllowedRequestContentTypes;
-    /** @var string[] */
+    /** @var array<string,string> */
     private array $RequestHeaders                   = [];
     private ?RequestContentType $RequestContentType = null;
     private ?AcceptHeader $ResponseContentType      = null;
     private const ONLY_USEFUL_HEADERS               = [
         'Accept',
         'Accept-Language',
-        'X-Requested-With', 'Origin'
+        'X-Requested-With',
+        'Origin'
     ];
     private readonly string|false $JsonEncodedRequestHeaders;
 
@@ -55,6 +56,11 @@ class Core
 
         foreach (getallheaders() as $header => $value) {
             if (in_array($header, self::ONLY_USEFUL_HEADERS)) {
+                if (false === is_string($value)) {
+                    assert(is_bool($value) || is_float($value) || is_int($value) || is_resource($value) || is_null($value));
+                    $value = strval($value);
+                }
+                /** @var string $header */
                 $this->RequestHeaders[$header] = $value;
             }
         }
@@ -104,7 +110,7 @@ class Core
             if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
                 header('Access-Control-Allow-Methods: ' . implode(',', array_column($this->AllowedRequestMethods, 'value')));
             }
-            if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
+            if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']) && is_string($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
                 header("Access-Control-Allow-Headers: {$_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' ]}");
             }
         }
@@ -132,7 +138,8 @@ class Core
             $requestContentType = explode(';', $_SERVER['CONTENT_TYPE'])[0];
 
             if (false === in_array($requestContentType, $allowedRequestContentTypeValues)) {
-                header($_SERVER['SERVER_PROTOCOL'] . ' 415 Unsupported Media Type', true, 415);
+                $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+                header($serverProtocol . ' 415 Unsupported Media Type', true, 415);
                 $response        = new \stdClass();
                 $response->error = 'You seem to be forming a strange kind of request? Allowed Content Types are '
                                     . implode(' and ', $allowedRequestContentTypeValues)

@@ -7,12 +7,26 @@ use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarSettings;
 use LiturgicalCalendar\Api\Models\RegionalData\Translations;
 
 /**
- * @phpstan-import-type LiturgicalEventItem from \LiturgicalCalendar\Api\Models\LitCalItemCollection
+ * @phpstan-import-type LiturgicalEventArray from \LiturgicalCalendar\Api\Models\LitCalItemCollection
  * @phpstan-import-type LiturgicalEventObject from \LiturgicalCalendar\Api\Models\LitCalItemCollection
- * @phpstan-import-type DiocesanCalendarSettings from \LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarSettings
- * @phpstan-import-type DiocesanCalendarMetadata from \LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem
+ * @phpstan-import-type DiocesanCalendarSettingsObject from \LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarSettings
+ * @phpstan-import-type DiocesanCalendarSettingsArray from \LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarSettings
+ * @phpstan-import-type DiocesanMetadataObject from DiocesanMetadata
+ * @phpstan-import-type DiocesanMetadataArray from DiocesanMetadata
  * @phpstan-import-type TranslationMapObject from \LiturgicalCalendar\Api\Models\RegionalData\TranslationMap
  * @phpstan-import-type TranslationObject from \LiturgicalCalendar\Api\Models\RegionalData\Translations
+ * @phpstan-type DiocesanCalendarDataArray array{
+ *      litcal:LiturgicalEventArray[],
+ *      metadata:DiocesanMetadataArray,
+ *      settings?:DiocesanCalendarSettingsArray,
+ *      i18n?:array<string,string>
+ * }
+ * @phpstan-type DiocesanCalendarDataObject \stdClass&object{
+ *      litcal:LiturgicalEventObject[],
+ *      metadata:DiocesanMetadataObject,
+ *      settings?:DiocesanCalendarSettingsObject,
+ *      i18n?:TranslationObject
+ * }
  */
 final class DiocesanData extends AbstractJsonSrcData
 {
@@ -139,7 +153,7 @@ final class DiocesanData extends AbstractJsonSrcData
      * - settings (array|null): The settings for the diocesan calendar.
      * - i18n (array|null): The translations for the diocesan calendar.
      *
-     * @param array{litcal:LiturgicalEventItem[],metadata:array{diocese_id:string,diocese_name:string,nation:string,locales:string[],timezone:string,group?:string},settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string},i18n?:array<string,string>} $data
+     * @param DiocesanCalendarDataArray $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -163,7 +177,7 @@ final class DiocesanData extends AbstractJsonSrcData
      * - settings (\stdClass|null): The settings for the diocesan calendar.
      * - i18n (\stdClass|null): The translations for the diocesan calendar.
      *
-     * @param \stdClass&object{litcal:LiturgicalEventObject[],metadata:DiocesanCalendarMetadata,settings?:DiocesanCalendarSettings,i18n?:TranslationObject} $data The stdClass object containing the properties of the diocesan calendar.
+     * @param DiocesanCalendarDataObject $data The stdClass object containing the properties of the diocesan calendar.
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static
@@ -172,7 +186,7 @@ final class DiocesanData extends AbstractJsonSrcData
             DiocesanLitCalItemCollection::fromObject($data->litcal),
             DiocesanMetadata::fromObject($data->metadata),
             property_exists($data, 'settings') && $data->settings instanceof \stdClass ? MetadataDiocesanCalendarSettings::fromObject($data->settings) : null,
-            $data->i18n ?? null
+            isset($data->i18n) ? $data->i18n : null
         );
     }
 

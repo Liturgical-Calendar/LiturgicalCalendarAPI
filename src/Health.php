@@ -37,7 +37,7 @@ use LiturgicalCalendar\Api\Test\LitTestRunner;
  * @phpstan-type ExecuteValidationSourceFolder \stdClass&object{action:'executeValidation',category:'sourceDataCheck',validate:string,sourceFolder:string}
  * @phpstan-type ExecuteValidationSourceFile \stdClass&object{action:'executeValidation',category:'sourceDataCheck',validate:string,sourceFile:string}
  * @phpstan-type ExecuteValidationResource \stdClass&object{action:'executeValidation',category:'resourceDataCheck',validate:string,sourceFile:string}
- * @phpstan-type ValidateCalendar \stdClass&object{action:'validateCalendar',calendar:string,year:int,category:'sourceDataCheck',responsetype:'JSON'|'XML'|'ICS'|'YML'}
+ * @phpstan-type ValidateCalendar \stdClass&object{action:'validateCalendar',calendar:string,year:int,category:'nationalcalendar'|'diocesanCalendar',responsetype:'JSON'|'XML'|'ICS'|'YML'}
  * @phpstan-type ExecuteUnitTest \stdClass&object{action:'executeUnitTest',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar',test:string}
  *
  * @phpstan-import-type LiturgicalEvent from \LiturgicalCalendar\Api\Test\LitTestRunner
@@ -106,7 +106,12 @@ class Health implements MessageComponentInterface
     {
         // Store the new connection to send messages to later
         $this->clients->attach($conn);
-        echo "New connection! ({$conn->resourceId})\n";
+        if (false === is_int($conn->resourceId)) {
+            echo 'Error onOpen: expected an integer resourceId, got ' . gettype($conn->resourceId) . "\n";
+            return;
+        } else {
+            echo "New connection! ({$conn->resourceId})\n";
+        }
 
         if (false === isset(self::$metadata)) {
             $rawData = file_get_contents(API_BASE_PATH . '/calendars');
@@ -125,7 +130,12 @@ class Health implements MessageComponentInterface
                 echo 'Error loading metadata: expected stdClass, got ' . gettype($metadataObj) . "\n";
                 return;
             }
-            self::$metadata = MetadataCalendars::fromObject($metadataObj->litcal_metadata);
+            $litCalMetadata = $metadataObj->litcal_metadata;
+            if (false === $litCalMetadata instanceof \stdClass) {
+                echo 'Error loading metadata: expected stdClass, got ' . gettype($litCalMetadata) . "\n";
+                return;
+            }
+            self::$metadata = MetadataCalendars::fromObject($litCalMetadata);
         } else {
             if (isset(self::$metadata->diocesan_calendars) && false === empty(self::$metadata->diocesan_calendars)) {
                 echo "Metadata was already loaded and has required diocesan_calendars property\n";
@@ -173,7 +183,9 @@ class Health implements MessageComponentInterface
      */
     public function onMessage(ConnectionInterface $from, $msg): void
     {
-        echo sprintf('Receiving message from connection %d: %s', $from->resourceId, $msg);
+        /** @var int $resourceId */
+        $resourceId = $from->resourceId;
+        echo sprintf('Receiving message from connection %d: %s', $resourceId, $msg);
         /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest $messageReceived */
         $messageReceived = json_decode($msg);
         if (
@@ -184,9 +196,11 @@ class Health implements MessageComponentInterface
         ) {
             switch ($messageReceived->action) {
                 case 'executeValidation':
+                    /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $messageReceived */
                     $this->executeValidation($messageReceived, $from);
                     break;
                 case 'validateCalendar':
+                    /** @var ValidateCalendar $messageReceived */
                     $this->validateCalendar(
                         $messageReceived->calendar,
                         $messageReceived->year,
@@ -196,6 +210,7 @@ class Health implements MessageComponentInterface
                     );
                     break;
                 case 'executeUnitTest':
+                    /** @var ExecuteUnitTest $messageReceived */
                     $this->executeUnitTest(
                         $messageReceived->test,
                         $messageReceived->calendar,
@@ -222,11 +237,11 @@ class Health implements MessageComponentInterface
             } else {
                 $errorMsg = 'Unknown error';
             }
-            echo sprintf('Invalid message from connection %1$d: %2$s (%3$s)', $from->resourceId, $errorMsg, $msg);
+            echo sprintf('Invalid message from connection %1$d: %2$s (%3$s)', $resourceId, $errorMsg, $msg);
             $message           = new \stdClass();
             $message->type     = 'echobot';
             $message->errorMsg = $errorMsg;
-            $message->text     = sprintf('Invalid message from connection %d: %s', $from->resourceId, $msg);
+            $message->text     = sprintf('Invalid message from connection %d: %s', $resourceId, $msg);
             $this->sendMessage($from, $message);
         }
     }
@@ -245,8 +260,9 @@ class Health implements MessageComponentInterface
     {
         // The connection is closed, remove it, as we can no longer send it messages
         $this->clients->detach($conn);
-
-        echo "Connection {$conn->resourceId} has disconnected\n";
+        /** @var int $resourceId */
+        $resourceId = $conn->resourceId;
+        echo "Connection {$resourceId} has disconnected\n";
     }
 
     /**
@@ -441,10 +457,12 @@ class Health implements MessageComponentInterface
 
         // Source data checks validate data directly in the filesystem, not through the API
         if ($validation->category === 'sourceDataCheck') {
+            /** @var string $pathForSchema */
             $pathForSchema = $validation->validate;
             // Are we validating a single source file, or are we validating a folder of i18n files?
             if (property_exists($validation, 'sourceFolder')) {
                 // If the 'sourceFolder' property is set, then we are validating a folder of i18n files
+                /** @var ExecuteValidationSourceFolder $validation */
                 $dataPath = rtrim($validation->sourceFolder, '/');
                 $matches  = null;
                 if (preg_match('/^(wider\-region|national\-calendar|diocesan\-calendar)\-([A-Za-z_]+)\-i18n$/', $validation->validate, $matches)) {
@@ -485,6 +503,7 @@ class Health implements MessageComponentInterface
                 // If we are not validating a folder of i18n files, then we are validating a single source file,
                 // and the 'sourceFile' property is required in this case
                 if (property_exists($validation, 'sourceFile')) {
+                    /** @var ExecuteValidationSourceFile $validation */
                     $dataPath = $validation->sourceFile;
                     $matches  = null;
                     if (preg_match('/^(wider-region|national-calendar|diocesan-calendar)-([A-Z][a-z]+)$/', $validation->validate, $matches)) {
@@ -530,6 +549,7 @@ class Health implements MessageComponentInterface
         } else {
             // If it's not a sourceDataCheck, it's probably a resourceDataCheck
             // That is to say, an API path, and the 'sourceFile' property is required
+            /** @var ExecuteValidationResource $validation */
             if (property_exists($validation, 'sourceFile')) {
                 $pathForSchema = $validation->sourceFile;
                 $dataPath      = $validation->sourceFile;
@@ -544,6 +564,7 @@ class Health implements MessageComponentInterface
         // we will perform the actual validation either for all files in a folder, or for a single file
         if (property_exists($validation, 'sourceFolder')) {
             // If the 'sourceFolder' property is set, then we are validating a folder of i18n files
+            /** @var ExecuteValidationSourceFolder $validation */
             $files = glob($dataPath . '/*.json');
             if (false === $files || empty($files)) {
                 $message          = new \stdClass();
@@ -651,13 +672,16 @@ class Health implements MessageComponentInterface
             // If we are validating an API path, we check for a 200 OK HTTP response from the API
             // rather than checking for existence of the file in the filesystem
             if ($validation->category === 'resourceDataCheck') {
+                /** @var ExecuteValidationResource $validation */
                 assert(is_string($dataPath), 'Data path should be a string for resourceDataCheck category');
                 $headers = get_headers($dataPath);
                 assert(is_array($headers), 'Headers should be an array for resourceDataCheck category');
-                if (!$headers || strpos($headers[0], '200') === false) {
+                $headerOK = $headers[0];
+                assert(is_string($headerOK), 'OK Header should be a string for resourceDataCheck category');
+                if (!$headers || strpos($headerOK, '200 OK') === false) {
                     $message          = new \stdClass();
                     $message->type    = 'error';
-                    $message->text    = "URL $dataPath is giving an error: " . $headers[0];
+                    $message->text    = "URL $dataPath is giving an error: " . $headerOK;
                     $message->classes = ".$validation->validate.file-exists";
                     $this->sendMessage($to, $message);
 
@@ -971,8 +995,13 @@ class Health implements MessageComponentInterface
                             $message->type = 'error';
                             $errorStrings  = [];
                             foreach ($result as $error) {
-                                $errorLevel     = new ICSErrorLevel($error['level']);
-                                $errorStrings[] = $errorLevel . ': ' . $error['message'] . " at line {$error['node']->lineIndex} ({$error['node']->lineString})";
+                                /** @var array{level:int,message:string,node:VObject\Property} $error */
+                                $errorLevel = new ICSErrorLevel($error['level']);
+                                /** @var int $lineIndex The type is obvious, and declared, yet PHPStan seems to be a bit dumb on this one? */
+                                $lineIndex = $error['node']->lineIndex;
+                                /** @var string $lineString The type is obvious, and declared, yet PHPStan seems to be a bit dumb on this one? */
+                                $lineString     = $error['node']->lineString;
+                                $errorStrings[] = $errorLevel . ': ' . $error['message'] . " at line {$lineIndex} ({$lineString})";
                             }
                             $message->text    = implode('&#013;', $errorStrings);
                             $message->classes = ".calendar-$calendar.schema-valid.year-$year";

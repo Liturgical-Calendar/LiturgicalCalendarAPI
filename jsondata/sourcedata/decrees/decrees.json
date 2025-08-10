@@ -163,14 +163,7 @@
             "common": ["Pastors:For a Pope"],
             "calendar": "GENERAL ROMAN",
             "color": ["white"],
-            "type": "fixed",
-            "readings": {
-                "first_reading": "",
-                "responsorial_psalm": "",
-                "second_reading": "",
-                "alleluia_verse": "",
-                "gospel": ""
-            }
+            "type": "fixed"
         },
         "metadata": {
             "action": "createNew",

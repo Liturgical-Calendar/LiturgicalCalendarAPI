@@ -15,6 +15,20 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropert
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropertyName;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropertyNameMetadata;
 
+/**
+ * @phpstan-import-type LitCalItemCreateNewFixedObject from \LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed
+ * @phpstan-import-type LitCalItemCreateNewFixedArray from \LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed
+ * @phpstan-import-type LitCalItemCreateNewMobileObject from \LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile
+ * @phpstan-import-type LitCalItemCreateNewMobileArray from \LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile
+ * @phpstan-type LitCalItemObject \stdClass&object{
+ *      liturgical_event:LitCalItemCreateNewFixedObject|LitCalItemCreateNewMobileObject,
+ *      metadata:\stdClass&object{action:string,since_year:int|null,until_year?:int|null,url?:string|null,reason?:string|null,property?:string|null,url_lang_map?:\stdClass&object<string,string>}
+ * }
+ * @phpstan-type LitCalItemArray array{
+ *      liturgical_event:LitCalItemCreateNewFixedArray|LitCalItemCreateNewMobileArray,
+ *      metadata:array{action:string,since_year:int|null,until_year?:int|null,url?:string|null,reason?:string|null,property?:string|null,url_lang_map?:array<string,string>}
+ * }
+ */
 final class LitCalItem extends AbstractJsonSrcData
 {
     public readonly LiturgicalEventData $liturgical_event;
@@ -90,7 +104,7 @@ final class LitCalItem extends AbstractJsonSrcData
      * - `setProperty`
      * - `makePatron`
      *
-     * @param \stdClass&object{liturgical_event:\stdClass&object{event_key:string,name:string,grade:int,color:string[],common:string[],day?:int,month?:int,strtotime?:string},metadata:\stdClass&object{action:string,since_year:int|null,until_year?:int|null,url?:string|null,reason?:string|null,property?:string|null,url_lang_map?:\stdClass&object<string,string>}} $data The associative array containing the data for the liturgical event.
+     * @param LitCalItemObject $data The associative array containing the data for the liturgical event.
      * @return static A new instance of LitCalItem.
      * @throws \ValueError If the required properties are not present in the associative array or if the properties have invalid types.
      */
@@ -110,7 +124,7 @@ final class LitCalItem extends AbstractJsonSrcData
     /**
      * Creates a new instance from an array.
      *
-     * @param array{liturgical_event:array{event_key:string,name:string,grade:int,color:string[],common:string[],day?:int,month?:int,strtotime?:string},metadata:array{action:string,since_year:int|null,until_year?:int|null,url?:string|null,reason?:string|null,property?:string|null,url_lang_map?:array<string,string>}} $data The data to use to create the new instance.
+     * @param LitCalItemArray $data The data to use to create the new instance.
      *                      Must have the following keys:
      *                          - `liturgical_event`: The liturgical event data. Must have the following keys:
      *                              -> `event_key`: The event key.

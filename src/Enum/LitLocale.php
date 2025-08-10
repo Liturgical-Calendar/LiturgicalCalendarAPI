@@ -72,9 +72,11 @@ class LitLocale
             if ($getLocales === false) {
                 throw new \RuntimeException('Failed to retrieve locales from ResourceBundle.');
             }
-            self::$AllAvailableLocales = array_filter($getLocales, function ($value) {
+            /** @var string[] $getLocales */
+            $allAvailableLocales       = array_values(array_filter($getLocales, function (string $value): bool {
                 return strpos($value, 'POSIX') === false;
-            });
+            }));
+            self::$AllAvailableLocales = $allAvailableLocales;
         }
     }
 }

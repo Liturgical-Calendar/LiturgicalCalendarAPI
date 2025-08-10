@@ -35,6 +35,8 @@ use LiturgicalCalendar\Api\Models\Lectionary\ReadingsSeasonal;
 
 /**
  * Represents the collections of liturgical events that will be output in a final liturgical calendar.
+ *
+ * @phpstan-type StdClassLiturgicalEvent \stdClass&object{key:string,grade_lcl:string,event:LiturgicalEvent}
  */
 final class LiturgicalEventCollection
 {
@@ -1293,7 +1295,7 @@ final class LiturgicalEventCollection
      * It excludes specific liturgical events and date ranges, such as 'AllSouls', 'AshWednesday', and the period
      * between Palm Sunday and Easter.
      *
-     * @param LiturgicalEvent|\stdClass $litEvent The liturgical event object or a standard class instance representing the liturgical event.
+     * @param LiturgicalEvent|StdClassLiturgicalEvent $litEvent The liturgical event object or a standard class instance representing the liturgical event.
      * @return bool True if the liturgical event can have a vigil mass, false otherwise.
      */
     private function liturgicalEventCanHaveVigil(LiturgicalEvent|\stdClass $litEvent): bool
@@ -1370,7 +1372,7 @@ final class LiturgicalEventCollection
      * the Lord or the Blessed Virgin Mary, while the given liturgical event is not.
      *
      * @param LiturgicalEvent $litEvent The LiturgicalEvent object for which precedence is being evaluated.
-     * @param \stdClass&object{event:LiturgicalEvent,key:string,grade_lcl:string} $coincidingEvent The coinciding liturgical event object.
+     * @param StdClassLiturgicalEvent $coincidingEvent The coinciding liturgical event object.
      * @return bool True if the coinciding event takes precedence, false otherwise.
      */
     private function coincidingLiturgicalEventTakesPrecedenceOverVigil(LiturgicalEvent $litEvent, \stdClass $coincidingEvent): bool
@@ -1389,7 +1391,7 @@ final class LiturgicalEventCollection
      * the Lord or the Blessed Virgin Mary, while the coinciding event is not.
      *
      * @param LiturgicalEvent $litEvent The LiturgicalEvent object of the vigil event.
-     * @param \stdClass&object{event:LiturgicalEvent,key:string,grade_lcl:string} $coincidingEvent The coinciding event object.
+     * @param StdClassLiturgicalEvent $coincidingEvent The coinciding event object.
      * @return bool True if the vigil event takes precedence, false otherwise.
      */
     private function vigilTakesPrecedenceOverCoincidingLiturgicalEvent(LiturgicalEvent $litEvent, \stdClass $coincidingEvent): bool
@@ -1493,7 +1495,7 @@ final class LiturgicalEventCollection
                 $this->createVigilMassFor($litEvent, $VigilDate);
                 //if however the Vigil coincides with another Solemnity let's make a note of it!
                 if ($this->inSolemnities($VigilDate)) {
-                    /** @var \stdClass&object{key:string,grade_lcl:string,event:LiturgicalEvent} $coincidingEvent */
+                    /** @var StdClassLiturgicalEvent $coincidingEvent */
                     $coincidingEvent            = new \stdClass();
                     $coincidingEvent->grade_lcl = '';
                     $coincidingEvent->key       = $this->solemnityKeyFromDate($VigilDate);
@@ -1706,7 +1708,7 @@ final class LiturgicalEventCollection
      *
      * @param DateTime $currentLitEventDate The date to check for coinciding events.
      * @param string $key The key of the event that seems to coincide with a Sunday, Solemnity or feast.
-     * @return \stdClass holding {grade_lcl:string,event:LiturgicalEvent} An object containing the coinciding event and its grade.
+     * @return \stdClass&object{grade_lcl:string,event:LiturgicalEvent} An object containing the coinciding event and its grade.
      */
     public function determineSundaySolemnityOrFeast(DateTime $currentLitEventDate, string $key): \stdClass
     {
@@ -1748,6 +1750,7 @@ final class LiturgicalEventCollection
             throw new \Exception('No liturgical event found for ' . $currentLitEventDate->format('Y-m-d') . ', coinciding event key: ' . $key . ".\n" . $msg);
             // DEBUG END
         }
+        /** @var \stdClass&object{grade_lcl:string,event:LiturgicalEvent} $coincidingEvent */
         return $coincidingEvent;
     }
 

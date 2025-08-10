@@ -82,7 +82,10 @@ use LiturgicalCalendar\Api\Params\CalendarParams;
  *      dioceses: CatholicDioceseLatinRiteItem[]
  * }
  * @phpstan-type CatholicDiocesesLatinRite CatholicDioceseLatinRiteCountryItem[]
+ * @phpstan-type GitHubReleaseInfoSuccess \stdClass&object{status:'success',obj:\stdClass}
+ * @phpstan-type GitHubReleaseInfoError \stdClass&object{status:'error',message:string}
  * @phpstan-import-type CalendarParamsData from CalendarParams
+ * @phpstan-import-type DecreeItemFromObject from \LiturgicalCalendar\Api\Models\Decrees\DecreeItem
  */
 final class CalendarPath
 {
@@ -946,8 +949,9 @@ final class CalendarPath
             ['{locale}' => $locale]
         );
 
-        $names   = Utilities::jsonFileToArray($decreesI18nFile);
+        /** @var DecreeItemFromObject[] $decrees */
         $decrees = Utilities::jsonFileToObjectArray(JsonData::DECREES_FILE);
+        $names   = Utilities::jsonFileToArray($decreesI18nFile);
         if (array_filter(array_keys($names), 'is_string') !== array_keys($names)) {
             throw new \Exception('We expected all the keys of the array to be strings.');
         }
@@ -2347,10 +2351,10 @@ final class CalendarPath
     /**
      * Handles a coincidence of a liturgical event with a Sunday Solemnity or Feast.
      *
-     * @param \stdClass|PropriumDeTemporeEvent|PropriumDeSanctisEvent $potentialEvent the liturgical event that may be coinciding with a Sunday Solemnity or Feast
+     * @param PropriumDeTemporeEvent|PropriumDeSanctisEvent $potentialEvent the liturgical event that may be coinciding with a Sunday Solemnity or Feast
      * @param string $missal the edition of the Roman Missal to check against
      */
-    private function handleCoincidence(\stdClass|PropriumDeTemporeEvent|PropriumDeSanctisEvent $potentialEvent, string $missal = RomanMissal::EDITIO_TYPICA_1970): void
+    private function handleCoincidence(PropriumDeTemporeEvent|PropriumDeSanctisEvent $potentialEvent, string $missal = RomanMissal::EDITIO_TYPICA_1970): void
     {
         $coincidingLiturgicalEvent = $this->Cal->determineSundaySolemnityOrFeast($potentialEvent->date, $potentialEvent->event_key);
         switch ($missal) {
@@ -2389,9 +2393,7 @@ final class CalendarPath
          */
         $message          = _('The %1$s \'%2$s\', added in the %3$s of the Roman Missal since the year %4$d (%5$s) and usually celebrated on %6$s, is suppressed by the %7$s \'%8$s\' in the year %9$d.');
         $locale           = LitLocale::$PRIMARY_LANGUAGE;
-        $grade_str        = $potentialEvent->grade instanceof LitGrade
-                    ? LitGrade::i18n($potentialEvent->grade, $this->CalendarParams->Locale, false)
-                    : LitGrade::i18n(LitGrade::from($potentialEvent->grade), $this->CalendarParams->Locale, false);
+        $grade_str        = LitGrade::i18n($potentialEvent->grade, $this->CalendarParams->Locale, false);
         $this->Messages[] = sprintf(
             $message,
             $grade_str,
@@ -4517,7 +4519,7 @@ final class CalendarPath
      * API to retrieve the latest release. The response is then cached to the
      * file.
      *
-     * @return \stdClass containing the status of the operation and either the
+     * @return GitHubReleaseInfoSuccess|GitHubReleaseInfoError containing the status of the operation and either the
      *         Github API response or an error message.
      */
     private function getGithubReleaseInfo(): \stdClass
@@ -4526,7 +4528,9 @@ final class CalendarPath
         $ghReleaseCacheFile = $this->CachePath . 'GHRelease' . $this->CacheDuration . '.json';
 
         if (file_exists($ghReleaseCacheFile)) {
-            $GitHubReleasesObj = Utilities::jsonFileToObject($ghReleaseCacheFile);
+            /** @var GitHubReleaseInfoSuccess $returnObj */
+            $returnObj->status = 'success';
+            $returnObj->obj    = Utilities::jsonFileToObject($ghReleaseCacheFile);
         } else {
             // We always create a cache of the Github Release, even for localhost development,
             // to avoid sending too many requests
@@ -4556,16 +4560,19 @@ final class CalendarPath
             $ghCurrentReleaseInfo = curl_exec($ch);
 
             if (curl_errno($ch)) {
+                /** @var GitHubReleaseInfoError $returnObj */
                 $returnObj->status  = 'error';
                 $returnObj->message = curl_error($ch);
             } else {
                 /** @var string $ghCurrentReleaseInfo */
                 $GitHubReleasesObj = json_decode($ghCurrentReleaseInfo);
                 if (json_last_error() !== JSON_ERROR_NONE) {
+                    /** @var GitHubReleaseInfoError $returnObj */
                     $returnObj->status  = 'error';
                     $returnObj->message = json_last_error_msg();
                 } else {
                     /** @var \stdClass $GitHubReleasesObj */
+                    /** @var GitHubReleaseInfoSuccess $returnObj */
                     $returnObj->status    = 'success';
                     $returnObj->obj       = $GitHubReleasesObj;
                     $GitHubReleaseEncoded = json_encode($GitHubReleasesObj, JSON_PRETTY_PRINT);
@@ -4612,8 +4619,9 @@ final class CalendarPath
         $ical .= "X-WR-TIMEZONE:Europe/Vatican\r\n"; //perhaps allow this to be set through a GET or POST?
         $ical .= "X-PUBLISHED-TTL:PT1D\r\n";
 
-        /** @var LiturgicalEvent $liturgicalEvent */
-        foreach ($SerializeableLitCal->litcal as $liturgicalEvent) {
+        /** @var LiturgicalEvent[] $litcalArray */
+        $litcalArray = $SerializeableLitCal->litcal;
+        foreach ($litcalArray as $liturgicalEvent) {
             $displayGrade     = '';
             $displayGradeHTML = '';
 
@@ -4816,10 +4824,12 @@ final class CalendarPath
             case ReturnType::ICS:
                 $infoObj = $this->getGithubReleaseInfo();
                 if ($infoObj->status === 'success') {
+                    /** @var GitHubReleaseInfoSuccess $infoObj */
                     $response = $this->produceIcal($SerializeableLitCal, $infoObj->obj);
                 } else {
                     // if we cannot get the latest release info, we return an error
                     // and we do not produce the iCal file
+                    /** @var GitHubReleaseInfoError $infoObj */
                     $message = sprintf(
                         _('Error receiving or parsing info from github about latest release: %s.'),
                         $infoObj->message
@@ -4856,7 +4866,8 @@ final class CalendarPath
 
         header("Etag: \"{$responseHash}\"");
         if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 304 Not Modified');
+            $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+            header($serverProtocol . ' 304 Not Modified');
             header('Content-Length: 0');
             header('X-LitCal-Generated: ClientCache');
         } else {
@@ -5106,7 +5117,8 @@ final class CalendarPath
 
             header("Etag: \"{$responseHash}\"");
             if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
-                header($_SERVER['SERVER_PROTOCOL'] . ' 304 Not Modified');
+                $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+                header($serverProtocol . ' 304 Not Modified');
                 header('Content-Length: 0');
                 header('X-LitCal-Generated: ClientCache');
             } else {

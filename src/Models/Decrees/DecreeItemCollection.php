@@ -10,8 +10,8 @@ use LiturgicalCalendar\Api\Models\AbstractJsonSrcDataArray;
  * Represents a collection of liturgical calendar items from a JSON source.
  *
  * This class extends AbstractJsonSrcData and implements IteratorAggregate to provide iteration over the items in the collection.
- *
- * @phpstan-import-type LiturgicalEventItem from \LiturgicalCalendar\Api\Models\LitCalItemCollection
+ * @phpstan-import-type DecreeItemFromArray from DecreeItem
+ * @phpstan-import-type DecreeItemFromObject from DecreeItem
  * @implements \IteratorAggregate<DecreeItem>
  */
 final class DecreeItemCollection extends AbstractJsonSrcDataArray implements \IteratorAggregate, \Countable
@@ -59,7 +59,7 @@ final class DecreeItemCollection extends AbstractJsonSrcDataArray implements \It
      * calendar items and sets their name based on the translations available
      * for the specified event key.
      *
-     * @param array<\stdClass> $items An array of potential DecreeItem objects.
+     * @param DecreeItemFromObject[] $items An array of potential DecreeItem objects.
      * @param array<string, string> $names The translations to use for setting the names.
      */
     public static function setNames(array $items, array $names): void
@@ -112,7 +112,7 @@ final class DecreeItemCollection extends AbstractJsonSrcDataArray implements \It
      * The array must not be empty and must contain either an array of stdClass objects
      * or an array of associative arrays with the same keys as DecreeItem.
      *
-     * @param array<\stdClass|array{event_key:string,grade:string}> $data
+     * @param array<DecreeItemFromObject|DecreeItemFromArray> $data
      * @return static
      * @throws \TypeError If the array is empty or does not contain the expected types.
      */
@@ -122,10 +122,10 @@ final class DecreeItemCollection extends AbstractJsonSrcDataArray implements \It
             throw new \TypeError('litcal parameter must be an array and must not be empty');
         }
         if (reset($data) instanceof \stdClass) {
-            /** @var array<\stdClass> $data */
+            /** @var DecreeItemFromObject[] $data */
             $items = array_values(array_map(fn (\stdClass $decreeItem): DecreeItem => DecreeItem::fromObject($decreeItem), $data));
         } else {
-            /** @var array<LiturgicalEventItem> $data */
+            /** @var DecreeItemFromArray[] $data */
             $items = array_values(array_map(fn (array $decreeItem): DecreeItem => DecreeItem::fromArray($decreeItem), $data));
         }
         return new static($items);

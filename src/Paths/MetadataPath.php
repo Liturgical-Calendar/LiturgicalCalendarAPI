@@ -11,10 +11,13 @@ use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
+use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalMetadata;
 use LiturgicalCalendar\Api\Utilities;
 
 /**
  * @phpstan-import-type CatholicDiocesesLatinRite from \LiturgicalCalendar\Api\Paths\CalendarPath
+ * @phpstan-import-type NationalCalendarDataObject from \LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData
+ * @phpstan-import-type DiocesanCalendarDataObject from \LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData
  */
 final class MetadataPath
 {
@@ -66,9 +69,12 @@ final class MetadataPath
         /** @var string[] $countryISOs */
         $countryISOs = array_map('basename', $folderGlob);
         foreach ($countryISOs as $countryISO) {
-            $nationalCalendarDataFile                 = JsonData::NATIONAL_CALENDARS_FOLDER . "/$countryISO/$countryISO.json";
-            $nationalCalendarData                     = Utilities::jsonFileToObject($nationalCalendarDataFile);
-            $nationalCalendarData->metadata->settings = $nationalCalendarData->settings;
+            $nationalCalendarDataFile = JsonData::NATIONAL_CALENDARS_FOLDER . "/$countryISO/$countryISO.json";
+            /** @var NationalCalendarDataObject $nationalCalendarData */
+            $nationalCalendarData                        = Utilities::jsonFileToObject($nationalCalendarDataFile);
+            $nationalCalendarData->metadata->settings    = $nationalCalendarData->settings;
+            $nationalCalendarData->metadata->calendar_id = $nationalCalendarData->metadata->nation;
+            unset($nationalCalendarData->metadata->nation);
             $nationalCalendarData->metadata->dioceses = [];
             $metadataNationalCalendarItem             = MetadataNationalCalendarItem::fromObject($nationalCalendarData->metadata);
             self::$metadataCalendars->pushNationalCalendarMetadata($metadataNationalCalendarItem);
@@ -120,11 +126,13 @@ final class MetadataPath
                 }
                 $diocesanCalendarFile = JsonData::DIOCESAN_CALENDARS_FOLDER . "/$nation/$calendar_id/$dioceseName.json";
                 $diocesanCalendarData = Utilities::jsonFileToObject($diocesanCalendarFile);
-
+                /** @var DiocesanCalendarDataObject $diocesanCalendarData */
                 $diocesanCalendarData->metadata->diocese = $dioceseName;
                 if (property_exists($diocesanCalendarData, 'settings')) {
                     $diocesanCalendarData->metadata->settings = $diocesanCalendarData->settings;
                 }
+                $diocesanCalendarData->metadata->calendar_id = $diocesanCalendarData->metadata->diocese_id;
+                unset($diocesanCalendarData->metadata->diocese_id);
                 $metadataDiocesanCalendarItem = MetadataDiocesanCalendarItem::fromObject($diocesanCalendarData->metadata);
                 self::$metadataCalendars->pushDiocesanCalendarMetadata($metadataDiocesanCalendarItem);
             }
@@ -249,7 +257,8 @@ final class MetadataPath
 
         header("Etag: \"{$responseHash}\"");
         if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 304 Not Modified');
+            $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+            header($serverProtocol . ' 304 Not Modified');
             header('Content-Length: 0');
         } else {
             echo $response;
@@ -270,7 +279,7 @@ final class MetadataPath
             if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
                 header('Access-Control-Allow-Methods: OPTIONS,GET,POST');
             }
-            if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
+            if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']) && is_string($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
                 header("Access-Control-Allow-Headers: {$_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' ]}");
             }
         }

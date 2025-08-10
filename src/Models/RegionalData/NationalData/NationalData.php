@@ -8,9 +8,23 @@ use LiturgicalCalendar\Api\Models\LitCalItemCollection;
 use LiturgicalCalendar\Api\Models\RegionalData\Translations;
 
 /**
- * @phpstan-import-type NationalCalendarSettings from \LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarSettings
- * @phpstan-import-type NationalCalendarMetadataObject from \LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarItem
+ * @phpstan-import-type NationalCalendarSettingsObject from \LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarSettings
+ * @phpstan-import-type NationalCalendarSettingsArray from \LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarSettings
+ * @phpstan-import-type NationalMetadataObject from NationalMetadata
+ * @phpstan-import-type NationalMetadataArray from NationalMetadata
  * @phpstan-type LiturgicalEventObjectFixed \stdClass&object{event_key:string,day:int,month:int,color:string[],grade:int,common:string[]}
+ * @phpstan-type NationalCalendarDataObject \stdClass&object{
+ *      litcal:LiturgicalEventObjectFixed[],
+ *      settings:NationalCalendarSettingsObject,
+ *      metadata:NationalMetadataObject,
+ *      i18n?:\stdClass&object<string,string>
+ * }
+ * @phpstan-type NationalCalendarDataArray array{
+ *      litcal:array{event_key:string,day:int,month:int,color:string[],grade:int,common:string[]},
+ *      settings:NationalCalendarSettingsArray,
+ *      metadata:NationalMetadataArray,
+ *      i18n?:array<string,string>
+ * }
  */
 final class NationalData extends AbstractJsonSrcData
 {
@@ -22,7 +36,7 @@ final class NationalData extends AbstractJsonSrcData
 
     public Translations $i18n;
 
-    private const ALLOWED_PROPS = ['i18n', 'litcal', 'metadata', 'settings'];
+    private const REQUIRED_PROPS = ['litcal', 'metadata', 'settings'];
 
     private function __construct(LitCalItemCollection $litcal, MetadataNationalCalendarSettings $settings, NationalMetadata $metadata, ?\stdClass $i18n)
     {
@@ -139,22 +153,23 @@ final class NationalData extends AbstractJsonSrcData
      * - metadata (array): The metadata for the national calendar.
      * - i18n (array|unset): The translations for the national calendar.
      *
-     * @param array{litcal:array{event_key:string,day:int,month:int,color:string[],grade:int,common:string[]},settings:array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool},metadata:array{nation:string,wider_region:string,locales:string[],missals:string[]},i18n?:array<string,string>} $data
+     * @param NationalCalendarDataArray $data
      * @return static
      * @throws \ValueError if the keys of the data parameter do not match the expected keys.
      */
     protected static function fromArrayInternal(array $data): static
     {
         $keys        = array_keys($data);
-        $missingKeys = array_diff(self::ALLOWED_PROPS, $keys);
-        if (!empty($missingKeys) || count($keys) !== count(self::ALLOWED_PROPS)) {
-            throw new \ValueError('the keys of data parameter must match ' . implode(',', self::ALLOWED_PROPS));
+        $missingKeys = array_diff(self::REQUIRED_PROPS, $keys);
+        if (!empty($missingKeys) || count($keys) !== count(self::REQUIRED_PROPS)) {
+            throw new \ValueError('the keys of data parameter must match ' . implode(',', self::REQUIRED_PROPS));
         }
+
         return new static(
             LitCalItemCollection::fromArray($data['litcal']),
             MetadataNationalCalendarSettings::fromArray($data['settings']),
             NationalMetadata::fromArray($data['metadata']),
-            array_key_exists('i18n', $data) ? (object) $data['i18n'] : null
+            isset($data['i18n']) ? (object) $data['i18n'] : null
         );
     }
 
@@ -167,16 +182,22 @@ final class NationalData extends AbstractJsonSrcData
      * - metadata (\stdClass): The metadata for the national calendar.
      * - i18n (\stdClass|unset): The translations for the national calendar.
      *
-     * @param \stdClass&object{litcal:LiturgicalEventObjectFixed[],settings:NationalCalendarSettings,metadata:NationalCalendarMetadataObject,i18n?:\stdClass&object<string,string>} $data The stdClass object containing the properties of the national calendar.
+     * @param NationalCalendarDataObject $data The stdClass object containing the properties of the national calendar.
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
+        $keys        = array_keys(get_object_vars($data));
+        $missingKeys = array_diff(self::REQUIRED_PROPS, $keys);
+        if (!empty($missingKeys) || count($keys) !== count(self::REQUIRED_PROPS)) {
+            throw new \ValueError('The keys passed in the parameter must match ' . implode(', ', self::REQUIRED_PROPS) . ': we seem to be missing ' . implode(', ', $missingKeys));
+        }
+
         return new static(
             LitCalItemCollection::fromObject($data->litcal),
             MetadataNationalCalendarSettings::fromObject($data->settings),
             NationalMetadata::fromObject($data->metadata),
-            property_exists($data, 'i18n') ? $data->i18n : null
+            isset($data->i18n) ? $data->i18n : null
         );
     }
 

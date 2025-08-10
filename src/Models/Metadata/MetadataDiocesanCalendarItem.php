@@ -5,8 +5,27 @@ namespace LiturgicalCalendar\Api\Models\Metadata;
 use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
 
 /**
- * @phpstan-type DiocesanCalendarMetadata \stdClass&object{diocese_id:string,diocese_name:string,nation:string,locales:string[],timezone:string,group?:string}
- * @phpstan-import-type DiocesanCalendarSettings from MetadataDiocesanCalendarSettings
+ * @phpstan-import-type DiocesanCalendarSettingsObject from MetadataDiocesanCalendarSettings
+ * @phpstan-import-type DiocesanCalendarSettingsArray from MetadataDiocesanCalendarSettings
+ * @phpstan-type DiocesanCalendarMetadataObject \stdClass&object{
+ *      calendar_id:string,
+ *      diocese:string,
+ *      nation:string,
+ *      locales:string[],
+ *      timezone:string,
+ *      group?:string,
+ *      settings?:DiocesanCalendarSettingsObject
+ * }
+ *
+ * @phpstan-type DiocesanCalendarMetadataArray array{
+ *      calendar_id:string,
+ *      diocese:string,
+ *      nation:string,
+ *      locales:string[],
+ *      timezone:string,
+ *      group?:string,
+ *      settings?:DiocesanCalendarSettingsArray
+ * }
  */
 final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
 {
@@ -101,22 +120,28 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
      * - group (string|null): The group name for the Diocesan Calendar, if applicable.
      * - settings (string[]|null): The settings for the Diocesan Calendar, if applicable.
      *
-     * @param array{calendar_id:string,diocese:string,nation:string,locales:string[],timezone:string,group?:string,settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string}} $data
+     * @param DiocesanCalendarMetadataArray $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
     {
-        if (array_key_exists('settings', $data)) {
-            $data['settings'] = MetadataDiocesanCalendarSettings::fromArray($data['settings']);
+        if (array_key_exists('diocese_id', $data)) {
+            throw new \RuntimeException('Perhaps you meant to use \LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanMetadata::fromArray?');
         }
+
+        $settings = null;
+        if (isset($data['settings'])) {
+            $settings = MetadataDiocesanCalendarSettings::fromArray($data['settings']);
+        }
+
         return new static(
-            $data['calendar_id'] ?? $data['diocese_id'], // in the calendar source file, the calendar_id is called diocese_id
+            $data['calendar_id'],
             $data['diocese'],
             $data['nation'],
             $data['locales'],
             $data['timezone'],
             $data['group'] ?? null,
-            $data['settings'] ?? null
+            $settings
         );
     }
 
@@ -134,17 +159,22 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
      * - group (string|null): The group name for the Diocesan Calendar, if applicable.
      * - settings (string[]|null): The settings for the Diocesan Calendar, if applicable.
      *
-     * @param \stdClass&object{calendar_id:string,diocese:string,nation:string,locales:string[],timezone:string,group?:string,settings?:DiocesanCalendarSettings} $data
+     * @param DiocesanCalendarMetadataObject $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
+        if (property_exists($data, 'diocese_id')) {
+            throw new \RuntimeException('Perhaps you meant to use \LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanMetadata::fromObject?');
+        }
+
         $settings = null;
-        if (property_exists($data, 'settings')) {
+        if (isset($data->settings)) {
             $settings = MetadataDiocesanCalendarSettings::fromObject($data->settings);
         }
+
         return new static(
-            $data->calendar_id ?? $data->diocese_id, // in the calendar source file, the calendar_id is called diocese_id
+            $data->calendar_id,
             $data->diocese,
             $data->nation,
             $data->locales,

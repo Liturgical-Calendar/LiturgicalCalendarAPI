@@ -41,6 +41,7 @@ use LiturgicalCalendar\Api\Test\TestsMap;
  *      has_vesper_i?:bool,
  *      has_vesper_ii?:bool
  * }
+ * @phpstan-import-type TestDataObject from TestsMap
  */
 class LitTestRunner
 {
@@ -107,6 +108,7 @@ class LitTestRunner
                             try {
                                 $schema = Schema::import($jsonSchema);
                                 $schema->in($testInstructions);
+                                /** @var TestDataObject $testInstructions */
                                 self::$testCache->add($Test, $testInstructions);
                                 $this->readyState = true;
                             } catch (InvalidValue | \Exception $e) {

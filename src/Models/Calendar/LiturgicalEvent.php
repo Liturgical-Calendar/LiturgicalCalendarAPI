@@ -422,12 +422,22 @@ final class LiturgicalEvent implements \JsonSerializable
                 $obj->grade = LitGrade::tryFrom($obj->grade) ?? LitGrade::WEEKDAY;
             }
 
-            if (property_exists($obj, 'common')) {
-                $commons = self::transformCommons($obj->common);
+            if (property_exists($obj, 'common') && ( is_array($obj->common) || is_string($obj->common) )) {
+                if (is_array($obj->common)) {
+                    /** @var array<LitCommon|LitMassVariousNeeds|string> $common */
+                    $common = $obj->common;
+                } else {
+                    $common = [$obj->common];
+                }
+                $commons = self::transformCommons($common);
             } else {
                 // We ensure a default value
                 /** @var LitCommons $commons */
                 $commons = LitCommons::create([]);
+            }
+
+            if (false === isset($obj->grade_display)) {
+                $obj->grade_display = null;
             }
         } else {
             if (isset($obj->common)) {
@@ -457,8 +467,20 @@ final class LiturgicalEvent implements \JsonSerializable
             throw new \Exception('Invalid object provided to create LiturgicalEvent: grade is not an instance of LitGrade');
         }
 
+        if (false === $obj->type instanceof LitEventType) {
+            throw new \Exception('Invalid object provided to create LiturgicalEvent: type is not an instance of LitEventType');
+        }
+
         if (false === self::isValidCommonsConstructorValue($commons)) {
             throw new \Exception('Invalid object provided to create LiturgicalEvent...');
+        }
+
+        $grade_display = null;
+        if (property_exists($obj, 'grade_display')) {
+            if (false === is_string($obj->grade_display) && false === is_null($obj->grade_display)) {
+                throw new \Exception('Invalid object provided to create LiturgicalEvent: grade_display is not a string or null');
+            }
+            $grade_display = $obj->grade_display;
         }
 
         return new self(
@@ -468,57 +490,8 @@ final class LiturgicalEvent implements \JsonSerializable
             $obj->type,
             $obj->grade,
             $commons,
-            $obj->grade_display ?? null
+            $grade_display
         );
-    }
-
-    /**
-     * @template T
-     * @param array<mixed> $array
-     * @param class-string<T> $className
-     * @return bool
-     */
-    private static function allInstancesOf(array $array, string $className): bool
-    {
-        foreach ($array as $item) {
-            if (!$item instanceof $className) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Checks if the given value is a valid "Commons" value for construction of a LiturgicalEvent.
-     * A valid "Commons" value is one of the following:
-     * - An instance of LitCommons
-     * - An instance of LitCommon
-     * - An instance of LitMassVariousNeeds
-     * - An array containing one or more LitCommon and/or LitMassVariousNeeds instances
-     * If the value is not valid, an exception is thrown.
-     * @param mixed $commons The value to test.
-     * @return bool True if the value is valid, otherwise false.
-     */
-    private static function isValidCommonsConstructorValue(mixed $commons): bool
-    {
-        $isValid =
-            $commons instanceof LitCommons
-            || $commons instanceof LitCommon
-            || $commons instanceof LitMassVariousNeeds
-            || (
-                is_array($commons)
-                && array_is_list($commons)
-                && count($commons) > 0
-                && (
-                    self::allInstancesOf($commons, LitCommon::class)
-                    || self::allInstancesOf($commons, LitMassVariousNeeds::class)
-                )
-            );
-
-        if (false === $isValid) {
-            throw new \Exception('Invalid object provided to create LiturgicalEvent...');
-        }
-        return $isValid;
     }
 
 
@@ -546,7 +519,7 @@ final class LiturgicalEvent implements \JsonSerializable
      *     color?: LitColor|LitColor[]|string|string[],
      *     type?: LitEventType|string,
      *     common?: LitCommons|LitCommon[]|LitMassVariousNeeds[]|string[],
-     *     grade_display?: string,
+     *     grade_display?: string|null,
      * } $arr The associative array containing the required properties.
      * @return LiturgicalEvent A new LiturgicalEvent object.
      * @throws \InvalidArgumentException If the provided array does not contain the required properties or if the properties have invalid types.
@@ -626,6 +599,14 @@ final class LiturgicalEvent implements \JsonSerializable
             throw new \Exception('Invalid object provided to create LiturgicalEvent...');
         }
 
+        $grade_display = null;
+        if (array_key_exists('grade_display', $arr)) {
+            if (false === is_string($arr['grade_display']) && false === is_null($arr['grade_display'])) {
+                throw new \Exception('Invalid object provided to create LiturgicalEvent: grade_display is not a string or null');
+            }
+            $grade_display = $arr['grade_display'];
+        }
+
         return new self(
             $arr['name'],
             $arr['date'],
@@ -633,7 +614,7 @@ final class LiturgicalEvent implements \JsonSerializable
             $arr['type'],
             $arr['grade'],
             $commons,
-            isset($arr['grade_display']) ? $arr['grade_display'] : null
+            $grade_display
         );
     }
 
@@ -680,6 +661,55 @@ final class LiturgicalEvent implements \JsonSerializable
         }
 
         throw new \InvalidArgumentException('Invalid common value type provided to create LiturgicalEvent: expected an array of string, of LitCommon cases, or of LitMassVariousNeeds cases');
+    }
+
+    /**
+     * @template T
+     * @param array<mixed> $array
+     * @param class-string<T> $className
+     * @return bool
+     */
+    private static function allInstancesOf(array $array, string $className): bool
+    {
+        foreach ($array as $item) {
+            if (!$item instanceof $className) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Checks if the given value is a valid "Commons" value for construction of a LiturgicalEvent.
+     * A valid "Commons" value is one of the following:
+     * - An instance of LitCommons
+     * - An instance of LitCommon
+     * - An instance of LitMassVariousNeeds
+     * - An array containing one or more LitCommon and/or LitMassVariousNeeds instances
+     * If the value is not valid, an exception is thrown.
+     * @param mixed $commons The value to test.
+     * @return bool True if the value is valid, otherwise false.
+     */
+    private static function isValidCommonsConstructorValue(mixed $commons): bool
+    {
+        $isValid =
+            $commons instanceof LitCommons
+            || $commons instanceof LitCommon
+            || $commons instanceof LitMassVariousNeeds
+            || (
+                is_array($commons)
+                && array_is_list($commons)
+                && count($commons) > 0
+                && (
+                    self::allInstancesOf($commons, LitCommon::class)
+                    || self::allInstancesOf($commons, LitMassVariousNeeds::class)
+                )
+            );
+
+        if (false === $isValid) {
+            throw new \Exception('Invalid object provided to create LiturgicalEvent...');
+        }
+        return $isValid;
     }
 
     public function getCommonLcl(): string

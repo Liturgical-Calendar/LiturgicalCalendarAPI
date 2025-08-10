@@ -12,6 +12,8 @@ use LiturgicalCalendar\Api\Models\RelativeLiturgicalDate;
 
 /**
  * @phpstan-import-type StrToTime from \LiturgicalCalendar\Api\Models\RelativeLiturgicalDate
+ * @phpstan-type LitCalItemCreateNewMobileObject \stdClass&object{event_key:string,strtotime:string|StrToTime,color:string[],grade:int,common:string[]}
+ * @phpstan-type LitCalItemCreateNewMobileArray array{event_key:string,strtotime:string|array{day_of_the_week:string,relative_time:string,event_key:string},color:string[],grade:int,common:string[]}
  */
 final class LitCalItemCreateNewMobile extends LiturgicalEventData
 {
@@ -94,7 +96,7 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
      * - grade (integer): the liturgical grade of the event
      * - common (array): the liturgical common of the event, as an array of strings
      *
-     * @param \stdClass&object{event_key:string,strtotime:string|StrToTime,color:string[],grade:int,common:string[]} $data The stdClass object containing the properties of the class.
+     * @param LitCalItemCreateNewMobileObject $data The stdClass object containing the properties of the class.
      * @return static The newly created instance.
      * @throws \ValueError if the required properties are not present in the stdClass object or if the properties have invalid types.
      */
@@ -136,7 +138,7 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
      * - grade (integer): The liturgical grade of the event.
      * - common (array): The liturgical common of the event, as an array of strings.
      *
-     * @param array{event_key:string,strtotime:string|array{day_of_the_week:string,relative_time:string,event_key:string},color:string[],grade:int,common:string[]} $data The associative array containing the properties of the class.
+     * @param LitCalItemCreateNewMobileArray $data The associative array containing the properties of the class.
      * @return static The newly created instance.
      * @throws \ValueError if the required keys are not present in the array or have invalid values.
      */

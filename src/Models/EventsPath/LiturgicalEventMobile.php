@@ -173,6 +173,13 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
             throw new \InvalidArgumentException('Invalid grade provided to create LiturgicalEventMobile');
         }
 
+        // set some default values
+        /** @var LitCommons */
+        $commons = LitCommons::create([]);
+        $colors  = [LitColor::GREEN];
+        $type    = LitEventType::FIXED;
+        $grade   = LitGrade::WEEKDAY;
+
         // When we read data from a JSON file, $obj will be an instance of stdClass,
         // and we need to cast the values to types that will be accepted by the LiturgicalEventMobile constructor
         if ($obj instanceof \stdClass) {
@@ -180,45 +187,38 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
                 if (is_array($obj->color)) {
                     $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $obj->color)));
                     if (count($valueTypes) > 1) {
-                        throw new \InvalidArgumentException('Incoherent color value types provided to create LiturgicalEventMobile: found multiple types ' . implode(', ', $valueTypes));
+                        throw new \InvalidArgumentException('Incoherent color value types provided to create LiturgicalEventFixed: found multiple types ' . implode(', ', $valueTypes));
                     }
                     if ($valueTypes[0] === 'string') {
-                        /** @var string[] */
-                        $color      = $obj->color;
-                        $obj->color = static::colorStringArrayToLitColorArray($color);
+                        /** @var string[] $color */
+                        $color  = $obj->color;
+                        $colors = static::colorStringArrayToLitColorArray($color);
                     } elseif (false === $obj->color[0] instanceof LitColor) {
-                        throw new \InvalidArgumentException('Invalid color value types provided to create LiturgicalEventMobile. Expected type string or LitColor, found ' . $valueTypes[0]);
+                        throw new \InvalidArgumentException('Invalid color value types provided to create LiturgicalEventFixed. Expected type string or LitColor, found ' . $valueTypes[0]);
                     }
                 } elseif (is_string($obj->color)) {
-                    $obj->color = LitColor::from($obj->color);
+                    $colors = [LitColor::from($obj->color)];
                 } elseif ($obj->color instanceof LitColor) {
-                    // if it's already an instance of LitColor, we don't need to do anything,
-                    // however this should probably never be the case with a stdClass object?
+                    $colors = [$obj->color];
                 } else {
-                    throw new \InvalidArgumentException('Invalid color value type provided to create LiturgicalEventMobile');
+                    throw new \InvalidArgumentException('Invalid color value type provided to create LiturgicalEventFixed');
                 }
-            } else {
-                // We ensure a default value
-                $obj->color = LitColor::GREEN;
             }
 
             if (property_exists($obj, 'type')) {
                 if (false === $obj->type instanceof LitEventType && false === is_string($obj->type)) {
-                    throw new \InvalidArgumentException('Invalid type provided to create LiturgicalEventMobile');
+                    throw new \InvalidArgumentException('Invalid type provided to create LiturgicalEventFixed');
                 }
                 if (is_string($obj->type)) {
-                    $obj->type = LitEventType::from($obj->type);
+                    $type = LitEventType::from($obj->type);
                 }
-            } else {
-                // We ensure a default value
-                $obj->type = LitEventType::FIXED;
             }
 
             if (is_int($obj->grade)) {
-                $obj->grade = LitGrade::tryFrom($obj->grade) ?? LitGrade::WEEKDAY;
+                $grade = LitGrade::tryFrom($obj->grade) ?? LitGrade::WEEKDAY;
             }
 
-            if (property_exists($obj, 'common')) {
+            if (isset($obj->common)) {
                 $commons = self::transformCommons($obj->common);
             } else {
                 // We ensure a default value
@@ -242,10 +242,19 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
                 /** @var LitCommons */
                 $commons = LitCommons::create([]);
             }
+            if (isset($obj->color)) {
+                $colors = $obj->color;
+            }
+            if (isset($obj->type)) {
+                $type = $obj->type;
+            }
+            if (isset($obj->grade)) {
+                $grade = $obj->grade;
+            }
             $strtotime = $obj->strtotime;
         }
 
-        if (false === $obj->grade instanceof LitGrade) {
+        if (false === $grade instanceof LitGrade) {
             throw new \Exception('Invalid object provided to create LiturgicalEventMobile: grade is not an instance of LitGrade');
         }
 
@@ -253,9 +262,9 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
             $obj->event_key,
             $obj->name,
             $strtotime,
-            $obj->color,
-            $obj->type,
-            $obj->grade,
+            $colors,
+            $type,
+            $grade,
             $commons,
             $obj->grade_display ?? null
         );

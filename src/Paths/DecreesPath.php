@@ -12,6 +12,9 @@ use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCollection;
 use LiturgicalCalendar\Api\Utilities;
 use stdClass;
 
+/**
+ * @phpstan-import-type DecreeItemFromObject from \LiturgicalCalendar\Api\Models\Decrees\DecreeItem
+ */
 final class DecreesPath
 {
     public static Core $Core;
@@ -211,8 +214,9 @@ final class DecreesPath
             ['{locale}' => $baseLocale]
         );
 
-        $names   = Utilities::jsonFileToArray($decreesI18nFile);
+        /** @var DecreeItemFromObject[] $decrees */
         $decrees = Utilities::jsonFileToObjectArray(JsonData::DECREES_FILE);
+        $names   = Utilities::jsonFileToArray($decreesI18nFile);
         if (array_filter(array_keys($names), 'is_string') !== array_keys($names)) {
             throw new \Exception('We expected all the keys of the array to be strings.');
         }

@@ -7,7 +7,7 @@ namespace LiturgicalCalendar\Api\Models;
  *
  * This class extends AbstractJsonSrcData and implements IteratorAggregate to provide iteration over the items in the collection.
  *
- * @phpstan-type LiturgicalEventItem array{
+ * @phpstan-type LiturgicalEventArray array{
  *      event_key: string,
  *      missal: string,
  *      grade_lcl: string,
@@ -68,7 +68,7 @@ final class LitCalItemCollection extends AbstractJsonSrcDataArray implements \It
      * If the elements are associative arrays, they must have the same keys as the properties of LitCalItem.
      * If the elements are objects, they must have the same properties as LitCalItem.
      *
-     * @param array<LiturgicalEventItem|\stdClass> $data The associative array containing the properties of the class.
+     * @param array<LiturgicalEventArray|\stdClass> $data The associative array containing the properties of the class.
      * @return static The newly created instance.
      * @throws \TypeError if the array is empty.
      */
@@ -81,7 +81,7 @@ final class LitCalItemCollection extends AbstractJsonSrcDataArray implements \It
             /** @var array<\stdClass> $data */
             $items = array_values(array_map(fn (\stdClass $litcalItem): LitCalItem => LitCalItem::fromObject($litcalItem), $data));
         } else {
-            /** @var array<LiturgicalEventItem> $data */
+            /** @var array<LiturgicalEventArray> $data */
             $items = array_values(array_map(fn (array $litcalItem): LitCalItem => LitCalItem::fromArray($litcalItem), $data));
         }
         return new static($items);

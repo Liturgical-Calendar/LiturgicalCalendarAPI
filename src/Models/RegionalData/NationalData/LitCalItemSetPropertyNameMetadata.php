@@ -58,13 +58,13 @@ final class LitCalItemSetPropertyNameMetadata extends LiturgicalEventMetadata
      */
     protected static function fromArrayInternal(array $data): static
     {
-        if (false === array_key_exists('since_year', $data) || false === array_key_exists('property', $data) || $data['property'] !== 'name') {
+        if (false === isset($data['since_year']) || false === isset($data['property']) || $data['property'] !== 'name') {
             throw new \ValueError('`since_year` and `property` parameters are required, and `property` must have a value of `name`');
         }
 
         return new static(
             $data['since_year'],
-            $data['until_year'] ?? null
+            isset($data['until_year']) && is_int($data['until_year']) ? $data['until_year'] : null
         );
     }
 }

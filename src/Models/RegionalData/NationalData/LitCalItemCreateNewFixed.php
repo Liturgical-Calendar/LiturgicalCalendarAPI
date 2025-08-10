@@ -9,6 +9,10 @@ use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
 use LiturgicalCalendar\Api\Models\LiturgicalEventData;
 
+/**
+ * @phpstan-type LitCalItemCreateNewFixedObject \stdClass&object{event_key:string,day:int,month:int,color:string[],grade:int,common:string[]}
+ * @phpstan-type LitCalItemCreateNewFixedArray array{event_key:string,day:int,month:int,color:string[],grade:int,common:string[]}
+ */
 final class LitCalItemCreateNewFixed extends LiturgicalEventData
 {
     public readonly int $day;
@@ -106,7 +110,7 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
      * - grade (int): the liturgical grade of the event
      * - common (string[]): the liturgical common of the event, as an array of strings
      *
-     * @param \stdClass&object{event_key:string,day:int,month:int,color:string[],grade:int,common:string[]} $data The stdClass object containing the properties of the class.
+     * @param LitCalItemCreateNewFixedObject $data The stdClass object containing the properties of the class.
      * @return static The newly created instance.
      * @throws \ValueError if the required properties are not present in the stdClass object or if the properties have invalid types.
      */
@@ -139,7 +143,7 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
      * - grade (int): the liturgical grade of the event
      * - common (string[]): the liturgical common of the event, as an array of strings
      *
-     * @param array{event_key:string,day:int,month:int,color:string[],grade:int,common:string[]} $data The associative array containing the properties of the class.
+     * @param LitCalItemCreateNewFixedArray $data The associative array containing the properties of the class.
      * @return static The newly created instance.
      * @throws \ValueError if the keys of the data parameter do not match the expected keys.
      */

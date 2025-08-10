@@ -5,6 +5,11 @@ namespace LiturgicalCalendar\Api\Models\Decrees;
 use LiturgicalCalendar\Api\Enum\CalEventAction;
 use LiturgicalCalendar\Api\Models\RegionalData\UrlLangMap;
 
+/**
+ * @phpstan-import-type UrlLangMapObject from DecreeItem
+ * @phpstan-type DecreeItemSetPropertyGradeMetadataObject \stdClass&object{action:'setProperty',since_year:int,until_year?:int,url?:string,reason?:string,property:'grade',url_lang_map?:UrlLangMapObject}
+ * @phpstan-type DecreeItemSetPropertyGradeMetadataArray array{action:'setProperty',since_year:int,until_year?:int,url:string,reason?:string,property:'grade',url_lang_map?:array<string,string>}
+ */
 final class DecreeItemSetPropertyGradeMetadata extends DecreeEventMetadata
 {
     public readonly string $property;
@@ -26,23 +31,23 @@ final class DecreeItemSetPropertyGradeMetadata extends DecreeEventMetadata
      * Optional property:
      * - url_lang_map (object): Maps ISO 639-1 language codes to Vatican website language codes.
      *
-     * @param \stdClass&object{since_year:int,url:string,url_lang_map?:\stdClass&object<string,string>} $data The stdClass object containing the properties of the class.
+     * @param DecreeItemSetPropertyGradeMetadataObject $data The stdClass object containing the properties of the class.
      * @return static The newly created instance(s).
      * @throws \ValueError if the required properties are not present in the stdClass object or if the properties have invalid types.
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
         if (
-            false === property_exists($data, 'since_year')
-            || false === property_exists($data, 'url')
-            || false === property_exists($data, 'property')
+            false === isset($data->since_year)
+            || false === isset($data->url)
+            || false === isset($data->property)
             || $data->property !== 'grade'
         ) {
             throw new \ValueError('`since_year` and `property` parameters are required for an `action` of `setProperty`, and `property` must have a value of `grade`');
         }
 
         $url_lang_map = null;
-        if (property_exists($data, 'url_lang_map')) {
+        if (isset($data->url_lang_map)) {
             $url_lang_map = UrlLangMap::fromObject($data->url_lang_map);
         }
 
@@ -64,7 +69,7 @@ final class DecreeItemSetPropertyGradeMetadata extends DecreeEventMetadata
      * Optional keys:
      * - url_lang_map (array): Maps ISO 639-1 language codes to Vatican website language codes.
      *
-     * @param array{since_year:int,url:string,url_lang_map?:array<string,string>} $data
+     * @param DecreeItemSetPropertyGradeMetadataArray $data
      *     The associative array containing the properties of the class.
      *
      * @return static

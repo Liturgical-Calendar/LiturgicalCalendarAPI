@@ -2,6 +2,10 @@
 
 namespace LiturgicalCalendar\Api\Models\Decrees;
 
+/**
+ * @phpstan-import-type DecreeItemLiturgicalEventObject from DecreeItem
+ * @phpstan-import-type DecreeItemLiturgicalEventArray from DecreeItem
+ */
 final class DecreeItemSetPropertyName extends DecreeEventData
 {
     private function __construct(string $event_key, string $name, string $calendar)
@@ -18,7 +22,7 @@ final class DecreeItemSetPropertyName extends DecreeEventData
      * - `name` (string): The new name of the liturgical event.
      * - `calendar` (string): The calendar of the event.
      *
-     * @param \stdClass&object{event_key:string,calendar:string,name:string} $data The stdClass object containing the properties of the class.
+     * @param DecreeItemLiturgicalEventObject $data The stdClass object containing the properties of the class.
      * @return static The newly created instance.
      * @throws \ValueError if the required properties are not present in the stdClass object or if the properties have invalid types.
      */
@@ -51,7 +55,7 @@ final class DecreeItemSetPropertyName extends DecreeEventData
      * - `name` (string): The new name of the liturgical event.
      * - `calendar` (string): The calendar.
      *
-     * @param array{event_key:string,calendar:string,name:string} $data The associative array containing the properties of the class.
+     * @param DecreeItemLiturgicalEventArray $data The associative array containing the properties of the class.
      * @return static A new instance.
      * @throws \ValueError If the required keys are not present in the array or have invalid values.
      */

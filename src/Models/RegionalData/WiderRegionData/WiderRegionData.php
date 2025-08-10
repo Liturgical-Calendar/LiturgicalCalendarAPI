@@ -11,9 +11,21 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropert
 use LiturgicalCalendar\Api\Models\RegionalData\Translations;
 
 /**
- * @phpstan-import-type LiturgicalEventItem from \LiturgicalCalendar\Api\Models\LitCalItemCollection
+ * @phpstan-import-type LiturgicalEventArray from \LiturgicalCalendar\Api\Models\LitCalItemCollection
  * @phpstan-import-type LiturgicalEventObject from \LiturgicalCalendar\Api\Models\LitCalItemCollection
  * @phpstan-import-type TranslationMapObject from \LiturgicalCalendar\Api\Models\RegionalData\TranslationMap
+ * @phpstan-type WiderRegionCalendarDataArray array{
+ *      litcal:LiturgicalEventArray[],
+ *      national_calendars:array<string,string>,
+ *      metadata:array{locales:string[],wider_region:string},
+ *      i18n?:\stdClass
+ * }
+ * @phpstan-type WiderRegionCalendarDataObject \stdClass&object{
+ *      litcal:LiturgicalEventObject[],
+ *      national_calendars:\stdClass&object<string,string>,
+ *      metadata:\stdClass&object{locales:string[],wider_region:string},
+ *      i18n?:\stdClass
+ * }
  */
 final class WiderRegionData extends AbstractJsonSrcData
 {
@@ -55,7 +67,7 @@ final class WiderRegionData extends AbstractJsonSrcData
      * of these keys must map to a non-empty array. If any key is missing or
      * does not meet the criteria, an appropriate error is thrown.
      *
-     * @param array{litcal:LiturgicalEventItem[],national_calendars:array<string,string>,metadata:array{locales:string[],wider_region:string},i18n?:\stdClass} $data The associative array containing the data for the
+     * @param WiderRegionCalendarDataArray $data The associative array containing the data for the
      *                     WiderRegionData instance. It must include:
      *                     - 'litcal': An array representing liturgical calendar items.
      *                     - 'national_calendars': An associative array mapping national calendar identifiers to their names.
@@ -90,7 +102,7 @@ final class WiderRegionData extends AbstractJsonSrcData
             LitCalItemCollection::fromArray($data['litcal']),
             $data['national_calendars'],
             WiderRegionMetadata::fromArray($data['metadata']),
-            $data['i18n'] ?? null
+            isset($data['i18n']) ? (object) $data['i18n'] : null
         );
     }
 
@@ -103,7 +115,7 @@ final class WiderRegionData extends AbstractJsonSrcData
      * - metadata (object): The metadata for the wider region, with locales and wider_region properties.
      * - i18n (object|null): The translations for the wider region. If not provided, it will default to null.
      *
-     * @param \stdClass&object{litcal:LiturgicalEventObject[],national_calendars:\stdClass&object<string,string>,metadata:\stdClass&object{locales:string[],wider_region:string},i18n?:\stdClass} $data The object containing the properties of the wider region.
+     * @param WiderRegionCalendarDataObject $data The object containing the properties of the wider region.
      * @return static A new instance of WiderRegionData initialized with the provided data.
      *
      * @throws \ValueError If any of the required keys ('litcal', 'national_calendars', 'metadata') are not present.
@@ -123,6 +135,7 @@ final class WiderRegionData extends AbstractJsonSrcData
             throw new \TypeError('national_calendars parameter must be an object: ' . json_encode($data->national_calendars));
         }
 
+        /** @var array<string,string> $nationalCalendarsArray */
         $nationalCalendarsArray = (array) $data->national_calendars;
         if (0 === count($nationalCalendarsArray)) {
             throw new \TypeError('national_calendars parameter must be an array and must not be empty: ' . json_encode($data->national_calendars));
@@ -136,7 +149,7 @@ final class WiderRegionData extends AbstractJsonSrcData
             LitCalItemCollection::fromObject($data->litcal),
             $nationalCalendarsArray,
             WiderRegionMetadata::fromObject($data->metadata),
-            $data->i18n ?? null
+            isset($data->i18n) ? $data->i18n : null
         );
     }
 

@@ -62,7 +62,7 @@
                     "type": "array",
                     "items": {
                         "type": "string",
-                        "pattern": "^[a-z]{2}$"
+                        "pattern": "^[a-z]{2}(?:_[A-Z]{2})?$"
                     }
                 },
                 "api_path": {

@@ -5,6 +5,10 @@ namespace LiturgicalCalendar\Api\Models\Decrees;
 use LiturgicalCalendar\Api\Enum\CalEventAction;
 use LiturgicalCalendar\Api\Models\RegionalData\UrlLangMap;
 
+/**
+ * @phpstan-import-type DecreeItemMetadataObject from DecreeItem
+ * @phpstan-import-type DecreeItemMetadataArray from DecreeItem
+ */
 final class DecreeItemCreateNewMetadata extends DecreeEventMetadata
 {
     private function __construct(int $since_year, string $url, ?UrlLangMap $url_lang_map)
@@ -15,7 +19,7 @@ final class DecreeItemCreateNewMetadata extends DecreeEventMetadata
     /**
      * Creates an instance from a StdClass object.
      *
-     * @param \stdClass&object{since_year:int,url:string,url_lang_map?:\stdClass&object<string,string>} $data The StdClass object(s) to create an instance from.
+     * @param DecreeItemMetadataObject $data The StdClass object(s) to create an instance from.
      * It (they) must have the following properties:
      * - since_year (int): The year since when the liturgical event was added.
      * - url (string): The URL of the liturgical event.
@@ -27,12 +31,12 @@ final class DecreeItemCreateNewMetadata extends DecreeEventMetadata
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
-        if (false === property_exists($data, 'since_year') || false === property_exists($data, 'url')) {
+        if (false === isset($data->since_year) || false === isset($data->url)) {
             throw new \ValueError('`since_year` and `url` parameters are required');
         }
 
         $url_lang_map = null;
-        if (property_exists($data, 'url_lang_map')) {
+        if (isset($data->url_lang_map)) {
             $url_lang_map = UrlLangMap::fromObject($data->url_lang_map);
         }
 
@@ -53,19 +57,19 @@ final class DecreeItemCreateNewMetadata extends DecreeEventMetadata
      * Optional keys:
      * - url_lang_map (array): Maps ISO 639-1 language codes to Vatican website language codes.
      *
-     * @param array{since_year:int,url:string,url_lang_map?:array<string,string>} $data The associative array containing the properties of the class.
+     * @param DecreeItemMetadataArray $data The associative array containing the properties of the class.
      * @return static A new instance of the class.
      */
     protected static function fromArrayInternal(array $data): static
     {
-
-        if (false === array_key_exists('since_year', $data) || false === array_key_exists('url', $data)) {
+        if (false === isset($data['since_year']) || false === isset($data['url'])) {
             throw new \ValueError('`since_year` and `url` parameters are required');
         }
 
         $url_lang_map = null;
-        if (array_key_exists('url_lang_map', $data)) {
-            $url_lang_map = UrlLangMap::fromArray($data['url_lang_map']);
+        if (isset($data['url_lang_map'])) {
+            $urlLangMap   = $data['url_lang_map'];
+            $url_lang_map = UrlLangMap::fromArray($urlLangMap);
         }
 
         return new static(

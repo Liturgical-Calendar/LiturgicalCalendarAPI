@@ -4,6 +4,9 @@ namespace LiturgicalCalendar\Api\Test;
 
 use LiturgicalCalendar\Api\Test\TestItem;
 
+/**
+ * @phpstan-type TestDataObject \stdClass&object{name:string,description:string,test_type:string,event_key:string,assertions:array<object{year:int,expected_value:int,assert:string,assertion:string,comment:string}>}
+ */
 class TestsMap
 {
     /** @var array<string,TestItem> */ private array $testInstructions = [];
@@ -13,7 +16,7 @@ class TestsMap
      * Adds a test to the map.
      *
      * @param string $testName the name of the test
-     * @param \stdClass $testData the test data, which must be an object with the properties
+     * @param TestDataObject $testData the test data, which must be an object with the properties
      *                            expected by the {@see \LiturgicalCalendar\Api\Test\TestItem::__construct()} constructor.
      */
     public function add(string $testName, \stdClass $testData): void

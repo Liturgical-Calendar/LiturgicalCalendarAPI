@@ -21,8 +21,7 @@ use LiturgicalCalendar\Api\Utilities;
  * The class also provides a way to retrieve the last error message set by the class,
  * as well as to check if the parameters are valid.
  *
- * @package LiturgicalCalendar\Api\Params
- * @author John Romano D'Orazio <priest@johnromanodorazio.com>
+ * @phpstan-import-type MetadataCalendarsObject from \LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars
  */
 class EventsParams implements ParamsInterface
 {
@@ -75,6 +74,7 @@ class EventsParams implements ParamsInterface
      */
     public function __construct(array $params = [])
     {
+        /** @var \stdClass&object{litcal_metadata:MetadataCalendarsObject} $calendarsMetadataObj */
         $calendarsMetadataObj    = Utilities::jsonUrlToObject(API_BASE_PATH . Route::CALENDARS->value);
         $this->calendarsMetadata = MetadataCalendars::fromObject($calendarsMetadataObj->litcal_metadata);
 
@@ -142,7 +142,15 @@ class EventsParams implements ParamsInterface
                             self::$lastErrorMessage = "unknown value `$value` for nation parameter, supported national calendars are: ["
                                 . implode(',', $this->calendarsMetadata->national_calendars_keys) . ']';
                         }
-                        $this->NationalCalendar =  strtoupper($value);
+                        if ($value === 'VA') {
+                            $this->Locale                  = LitLocale::LATIN;
+                            $this->baseLocale              = LitLocale::LATIN_PRIMARY_LANGUAGE;
+                            $this->EternalHighPriest       = false;
+                            $params['eternal_high_priest'] = false;
+                            $params['locale']              = LitLocale::LATIN;
+                        } else {
+                            $this->NationalCalendar = strtoupper($value);
+                        }
                         break;
                     case 'diocesan_calendar':
                         if (false === $this->isValidDiocesanCalendar($value)) {

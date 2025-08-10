@@ -83,12 +83,12 @@ final class LitCalItemSetPropertyGradeMetadata extends LiturgicalEventMetadata
      */
     protected static function fromArrayInternal(array $data): static
     {
-        if (false === array_key_exists('since_year', $data) || false === array_key_exists('property', $data) || $data['property'] !== 'grade') {
+        if (false === isset($data['since_year']) || false === isset($data['property']) || $data['property'] !== 'grade') {
             throw new \ValueError('`since_year` and `property` parameters are required for an `action` of `setProperty`, and `property` must have a value of `grade`');
         }
 
         $url = null;
-        if (array_key_exists('url', $data)) {
+        if (isset($data['url'])) {
             if (false === is_string($data['url'])) {
                 throw new \ValueError('`url` must be a string');
             }
@@ -101,7 +101,7 @@ final class LitCalItemSetPropertyGradeMetadata extends LiturgicalEventMetadata
 
         return new static(
             $data['since_year'],
-            $data['until_year'] ?? null,
+            isset($data['until_year']) && is_int($data['until_year']) ? $data['until_year'] : null,
             $url
         );
     }

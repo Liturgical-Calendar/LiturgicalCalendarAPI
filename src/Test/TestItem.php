@@ -47,6 +47,18 @@ class TestItem
         'diocesan_calendar'
     ];
 
+    /**
+     * Constructs a new TestItem instance from the given test object.
+     *
+     * @param \stdClass&object{name:string,description:string,test_type:string,event_key:string,assertions:array<object{year:int,expected_value:int,assert:string,assertion:string,comment:string}>} $testObject An object representing a test, which must contain
+     *                              the required properties: 'name', 'event_key',
+     *                              'description', 'test_type', and 'assertions'.
+     *
+     * @throws \InvalidArgumentException If any of the required properties are missing,
+     *                                   if any of the string properties are not strings,
+     *                                   if 'year_since' or 'year_until' are not integers,
+     *                                   or if 'applies_to' or 'excludes' are not objects.
+     */
     public function __construct(\stdClass $testObject)
     {
         foreach (self::REQUIRED_PROPERTIES as $property) {

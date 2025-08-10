@@ -138,7 +138,7 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
      * - common (string[]): The liturgical common of the event, as an array of strings
      * - grade (int): The liturgical grade of the event
      *
-     * @param array{event_key:string,day:int,month:int,color:string[],common:string[],grade:int,grade_display:?string} $data
+     * @param array{event_key:string,day:int,month:int,color:string[],common:string[],grade:int,grade_display:?string,type:?string,calendar:?string} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -171,7 +171,7 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
      * - grade (int): The liturgical grade of the event.
      * - grade_display (string): The liturgical grade display of the event.
      *
-     * @param \stdClass&object{event_key:string,day:int,month:int,color:string[],common:string[],grade:int,grade_display:?string} $data The stdClass object or array containing event data.
+     * @param \stdClass&object{event_key:string,day:int,month:int,color:string[],common:string[],grade:int,grade_display:?string,type:?string,calendar:?string} $data The stdClass object or array containing event data.
      * @return static The newly created instance(s).
      */
     protected static function fromObjectInternal(\stdClass $data): static

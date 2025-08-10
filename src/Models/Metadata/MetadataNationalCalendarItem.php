@@ -5,8 +5,27 @@ namespace LiturgicalCalendar\Api\Models\Metadata;
 use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
 
 /**
- * @phpstan-import-type NationalCalendarSettings from MetadataNationalCalendarSettings
- * @phpstan-type NationalCalendarMetadataObject \stdClass&object{nation:string,wider_region:string,locales:string[],missals:string[]}
+ * @phpstan-import-type NationalCalendarSettingsObject from MetadataNationalCalendarSettings
+ * @phpstan-import-type NationalCalendarSettingsArray from MetadataNationalCalendarSettings
+ *
+ * @phpstan-type NationalCalendarMetadataObject \stdClass&object{
+ *      calendar_id:string,
+ *      locales:string[],
+ *      missals:string[],
+ *      settings:NationalCalendarSettingsObject,
+ *      wider_region?:string,
+ *      dioceses?:string[]
+ * }
+ *
+ * @phpstan-type NationalCalendarMetadataArray array{
+ *      calendar_id:string,
+ *      locales:string[],
+ *      missals:string[],
+ *      settings:NationalCalendarSettingsArray,
+ *      wider_region?:string,
+ *      dioceses?:string[]
+ * }
+ *
  */
 final class MetadataNationalCalendarItem extends AbstractJsonRepresentation
 {
@@ -23,7 +42,7 @@ final class MetadataNationalCalendarItem extends AbstractJsonRepresentation
     /** @var string[]|null */
     public ?array $dioceses;
 
-    public MetadataNationalCalendarSettings $settings;
+    public ?MetadataNationalCalendarSettings $settings;
 
 
     /**
@@ -40,7 +59,7 @@ final class MetadataNationalCalendarItem extends AbstractJsonRepresentation
         string $calendar_id,
         array $locales,
         array $missals,
-        MetadataNationalCalendarSettings $settings,
+        ?MetadataNationalCalendarSettings $settings,
         ?string $wider_region = null,
         ?array $dioceses = null
     ) {
@@ -68,6 +87,11 @@ final class MetadataNationalCalendarItem extends AbstractJsonRepresentation
      */
     public function jsonSerialize(): array
     {
+        // Whenever we are serializing the data, we expect settings to exist under metadata
+        if (false === $this->settings instanceof MetadataNationalCalendarSettings) {
+            throw new \RuntimeException('settings must be an instance of MetadataNationalCalendarSettings for serialization purposes');
+        }
+
         $retArr = [
             'calendar_id' => $this->calendar_id,
             'locales'     => $this->locales,
@@ -96,17 +120,22 @@ final class MetadataNationalCalendarItem extends AbstractJsonRepresentation
      * - wider_region (string|null): The wider region to which the National Calendar belongs, if applicable.
      * - dioceses (string[]|null): The dioceses that use the National Calendar, if applicable.
      *
-     * @param array{calendar_id:string,locales:string[],missals:string[],settings:array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool},wider_region?:string,dioceses?:string[]} $data
+     * @param NationalCalendarMetadataArray $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
     {
+        if (array_key_exists('nation', $data)) {
+            // in the calendar source file, the calendar_id is called nation
+            throw new \RuntimeException('Perhaps you meant to use \LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalMetadata::fromArray?');
+        }
+
         return new static(
-            $data['calendar_id'] ?? $data['nation'], // in the calendar source file, the calendar_id is called nation
+            $data['calendar_id'],
             $data['locales'],
             $data['missals'],
-            MetadataNationalCalendarSettings::fromArray($data['settings']),
-            $data['wider_region'] ?? null,
+            isset($data['settings']) ? MetadataNationalCalendarSettings::fromArray($data['settings']) : null,
+            isset($data['wider_region']) ? $data['wider_region'] : null,
             $data['dioceses'] ?? null
         );
     }
@@ -124,17 +153,22 @@ final class MetadataNationalCalendarItem extends AbstractJsonRepresentation
      * - wider_region (string|null): The wider region to which the National Calendar belongs, if applicable.
      * - dioceses (string[]|null): The dioceses that use the National Calendar, if applicable.
      *
-     * @param \stdClass&object{calendar_id:string,locales:string[],missals:string[],settings:NationalCalendarSettings,wider_region?:string,dioceses?:string[]} $data
+     * @param NationalCalendarMetadataObject $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
+        if (property_exists($data, 'nation')) {
+            // in the calendar source file, the calendar_id is called nation
+            throw new \RuntimeException('Perhaps you meant to use \LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalMetadata::fromObject?');
+        }
+
         return new static(
-            $data->calendar_id ?? $data->nation, // in the calendar source file, the calendar_id is called nation
+            $data->calendar_id,
             $data->locales,
             $data->missals,
-            MetadataNationalCalendarSettings::fromObject($data->settings),
-            $data->wider_region ?? null,
+            isset($data->settings) ? MetadataNationalCalendarSettings::fromObject($data->settings) : null,
+            isset($data->wider_region) ? $data->wider_region : null,
             $data->dioceses ?? null
         );
     }

@@ -34,6 +34,9 @@ use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 use LiturgicalCalendar\Api\Params\EventsParams;
 use LiturgicalCalendar\Api\Utilities;
 
+/**
+ * @phpstan-import-type DecreeItemFromObject from \LiturgicalCalendar\Api\Models\Decrees\DecreeItem
+ */
 final class EventsPath
 {
     public static Core $Core;
@@ -87,7 +90,7 @@ final class EventsPath
     {
         $params = null;
         if (false === in_array(self::$requestPathParts[0], ['nation', 'diocese'])) {
-            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'unknown resource path: ' . self::$requestPathParts[0]);
+            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'Unknown resource path: ' . self::$requestPathParts[0] . ', expected either /nation/{nation} or /diocese/{diocese_id}');
         }
         if (count(self::$requestPathParts) === 2) {
             if (self::$requestPathParts[0] === 'nation') {
@@ -104,7 +107,7 @@ final class EventsPath
                 }
             }
         } else {
-            $description = 'wrong number of path parameters, needed two but got ' . count(self::$requestPathParts) . ': [' . implode(',', self::$requestPathParts) . ']';
+            $description = 'Wrong number of path parameters, needed two but got ' . count(self::$requestPathParts) . ': [' . implode(',', self::$requestPathParts) . ']';
             self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $description);
         }
     }
@@ -454,10 +457,11 @@ final class EventsPath
      */
     private function processMemorialsFromDecreesData(): void
     {
-        $decreesFile = JsonData::DECREES_FILE;
         $I18nFile    = JsonData::DECREES_I18N_FOLDER . "/{$this->EventsParams->baseLocale}.json";
-        $decrees     = Utilities::jsonFileToObjectArray($decreesFile);
         $names       = Utilities::jsonFileToArray($I18nFile);
+        $decreesFile = JsonData::DECREES_FILE;
+        $decrees     = Utilities::jsonFileToObjectArray($decreesFile);
+        /** @var DecreeItemFromObject[] $decrees */
         /** @var array<string,string> $names */
         DecreeItemCollection::setNames($decrees, $names);
         $decreeItems = DecreeItemCollection::fromObject($decrees);
@@ -728,7 +732,8 @@ final class EventsPath
         $responseHash = md5($response);
         header("Etag: \"{$responseHash}\"");
         if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 304 Not Modified');
+            $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
+            header($serverProtocol . ' 304 Not Modified');
             header('Content-Length: 0');
         } else {
             switch (self::$Core->getResponseContentType()) {

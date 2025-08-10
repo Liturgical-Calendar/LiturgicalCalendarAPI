@@ -10,6 +10,8 @@
             </td>
             <td style="text-align:center;">
                 <a href="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/overview/development"><img src="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/badge/development" title="CodeFactor" /></a>
+                <br>
+                <a href="https://img.shields.io/badge/phpstan-level%2010-brightgreen?style=flat-square&logo=php"><img src="https://img.shields.io/badge/phpstan-level%2010-brightgreen?style=flat-square&logo=php" title="PHPStan Level 10"></a>
             </td>
             <td><a href="https://translate.johnromanodorazio.com/engage/liturgical-calendar/">
 <img src="https://translate.johnromanodorazio.com/widgets/liturgical-calendar/-/287x66-white.png" alt="Translation status" />

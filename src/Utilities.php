@@ -290,8 +290,8 @@ class Utilities
                         $xml->addChild($key, (string) $value);
                     }
                     elseif (is_null($value)) {
-                        $xml->addChild($key);
-                        $xml->{$key}->addAttribute('xsi:nil', 'true', 'http://www.w3.org/2001/XMLSchema-instance');
+                        $el = $xml->addChild($key);
+                        $el->addAttribute('xsi:nil', 'true', 'http://www.w3.org/2001/XMLSchema-instance');
                     }
                     else {
                         throw new \UnexpectedValueException('Key ' . $key . ' has an unexpected type: ' . gettype($value));

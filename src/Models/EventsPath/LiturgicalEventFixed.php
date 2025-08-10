@@ -219,8 +219,12 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
                 $grade = LitGrade::tryFrom($obj->grade) ?? LitGrade::WEEKDAY;
             }
 
-            if (property_exists($obj, 'common')) {
+            if (isset($obj->common)) {
                 $commons = self::transformCommons($obj->common);
+            } else {
+                // We ensure a default value
+                /** @var LitCommons */
+                $commons = LitCommons::create([]);
             }
         } else {
             if (isset($obj->common)) {

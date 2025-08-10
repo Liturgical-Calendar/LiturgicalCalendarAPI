@@ -32,7 +32,7 @@ abstract class AbstractJsonSrcDataArray
      *
      * The object is locked after creation.
      *
-     * @param array<string,mixed> $data The array containing the properties of the class.
+     * @param array<string,mixed>|array<array<string,mixed>> $data The array containing the properties of the class.
      * @return static The newly created instance.
      */
     public static function fromArray(array $data): static
@@ -48,7 +48,7 @@ abstract class AbstractJsonSrcDataArray
     /**
      * Creates an instance of a class that implements AbstractJsonSrcData from an array.
      *
-     * @param array<string,mixed> $data
+     * @param array<string,mixed>|array<array<string,mixed>> $data
      */
     abstract protected static function fromArrayInternal(array $data): static;
 

@@ -108,9 +108,7 @@ final class MissalsPath
     private static function initGetPostParams(?\stdClass $payload): array
     {
         $params = [];
-        if ($payload !== null && property_exists($payload, 'locale')) {
-            $params['locale'] = $payload->locale;
-        } elseif (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && is_string($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
+        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && is_string($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
             $locale = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
             if ($locale && LitLocale::isValid($locale)) {
                 $params['locale'] = $locale;
@@ -119,16 +117,20 @@ final class MissalsPath
             }
         }
         if ($payload !== null) {
-            if (property_exists($payload, 'region')) {
+            if (isset($payload->locale) && is_string($payload->locale) && LitLocale::isValid($payload->locale)) {
+                $params['locale'] = $payload->locale;
+            }
+            if (isset($payload->region) && is_string($payload->region)) {
                 $params['region'] = $payload->region;
             }
-            if (property_exists($payload, 'year')) {
+            if (isset($payload->year) && is_int($payload->year)) {
                 $params['year'] = $payload->year;
             }
-            if (property_exists($payload, 'include_empty')) {
+            if (isset($payload->include_empty) && is_bool($payload->include_empty)) {
                 $params['include_empty'] = $payload->include_empty;
             }
         }
+        /** @var array{locale?:string,region?:string,year?:int,include_empty?:bool} $params */
         return $params;
     }
 
@@ -207,6 +209,7 @@ final class MissalsPath
                 $i18nObj    = Utilities::jsonFileToObject($i18nFile);
                 $missalRows = Utilities::jsonFileToObjectArray($missalJsonFile);
 
+                /** @var array<int,\stdClass&object{month:int,day:int,event_key:string,grade:int,common:string[],calendar:string,color:string[],grade_display?:?string}> $missalRows */
                 foreach ($missalRows as $idx => $row) {
                     $key = $row->event_key;
                     if (property_exists($i18nObj, $key)) {

@@ -77,7 +77,7 @@ final class LitCalItemMakePatronMetadata extends LiturgicalEventMetadata
         }
 
         $url_lang_map = null;
-        if (property_exists($data, 'url_lang_map')) {
+        if (isset($data->url_lang_map)) {
             $url_lang_map = UrlLangMap::fromObject($data->url_lang_map);
         }
 
