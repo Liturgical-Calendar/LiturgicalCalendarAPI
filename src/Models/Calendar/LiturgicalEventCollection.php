@@ -1161,7 +1161,8 @@ final class LiturgicalEventCollection
                                 $readings = $readings->outside_easter_season;
                             }
                         }
-                        elseif (self::dateIsNotSunday($litEvent->date) && $litEvent->grade === LitGrade::FEAST_LORD && $readings instanceof ReadingsFestive) {
+
+                        if (self::dateIsNotSunday($litEvent->date) && $litEvent->grade === LitGrade::FEAST_LORD && $readings instanceof ReadingsFestive) {
                             // When Feasts of the Lord fall on weekdays, the Festive readings are reduced to Ferial readings
                             // (the second reading is appended as a second option for the first reading).
                             /** @var ReadingsFerial */
@@ -1195,9 +1196,9 @@ final class LiturgicalEventCollection
                                 $commonsReadings = new ReadingsCommons($litEvent->common);
                                 $litEvent->setReadings($commonsReadings);
                             } else {
-                                // N.B. Diocesan calendar events will have the diocese id prepended to them, we should remove it
-                                //      since the lectionary event_key does not have the diocese id preprended.
-                                //      All diocesan calendar events' lectionary readings are pushed to the Sanctorale map,
+                                // N.B. Diocesan calendar events have the diocese id prepended to the event_key; remove it
+                                //      since lectionary event_keys do not include the diocese id.
+                                //      All diocesan events' lectionary readings are pushed to the Sanctorale map,
                                 //      so we retrieve the readings from there.
                                 if (preg_match('/^[a-z]{6}_[a-z]{2}_/', $litEvent->event_key)) {
                                     $event_key = substr($litEvent->event_key, 10);
