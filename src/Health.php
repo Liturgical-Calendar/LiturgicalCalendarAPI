@@ -21,10 +21,6 @@ use LiturgicalCalendar\Api\Test\LitTestRunner;
  * This class provides a WebSocket-based interface for executing various tests
  * of the Liturgical Calendar API, such as JSON schema validation and unit tests.
  *
- * @package LiturgicalCalendar\Api
- * @author  John Romano D'Orazio <priest@johnromanodorazio.com>
- * @license https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
- * @link    https://litcal.johnromanodorazio.com
  * @phpstan-type DiocesanCalendarCollectionItem \stdClass&object{
  *      calendar_id: string,
  *      diocese: string,
@@ -271,9 +267,9 @@ class Health implements MessageComponentInterface
      * Logs the error message and closes the connection.
      *
      * @param ConnectionInterface $conn The connection on which the error occurred
-     * @param \Exception $e The exception that was thrown
+     * @param \Throwable $e The exception that was thrown
      */
-    public function onError(ConnectionInterface $conn, \Exception $e): void
+    public function onError(ConnectionInterface $conn, \Throwable $e): void
     {
         echo "An error has occurred: {$e->getMessage()}\n";
         $conn->close();

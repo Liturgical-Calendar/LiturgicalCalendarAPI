@@ -77,6 +77,16 @@ PHP_CLI_SERVER_WORKERS=2 php -S localhost:8000
 
 For convenience when using VSCode, a `tasks.json` has been defined so that you can simply type <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> (<kbd>CMD</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> on MacOS) to start the PHP builtin server and open the browser.
 
+The `composer.json` file also defines a couple scripts to simplify this process:
+* `composer start`: spawns six workers by calling `start-server.sh`
+* `composer stop`: stop the server by calling `stop-server.sh`
+
+You can also use the `start-server.sh` and `stop-server.sh` scripts directly to spawn and stop the server. Please ensure that both scripts are executable (`chmod +x`).
+The **start** script will write the server's PID to a file called `server.pid` in the current directory, and the **stop** script will remove the `server.pid` file.
+
+You can customize the port that the server will be running on by setting the `API_PORT` environment variable in the `.env` or `.env.local` file
+(the same file used by the API application to load environment variables).
+
 ## Using a docker container
 
 To further simplify your setup, without having to worry about getting all the system requirements in place, you can also launch the API in a docker container using the repo `Dockerfile`:
@@ -97,6 +107,67 @@ if we want to install system locales in order for `gettext` to work properly wit
 <a href="https://translate.johnromanodorazio.com/engage/liturgical-calendar/">
 <img src="https://translate.johnromanodorazio.com/widgets/liturgical-calendar/-/open-graph.png" alt="Translation status" />
 </a>
+
+# Testing
+
+To test the frontend locally, first install all package dependencies with `composer install`.
+
+## Static analysis
+To run static analysis tests, run `composer analyse`. You can even run this within VSCode's terminal,
+and have clickable links to the interested lines in thesource code, if you create a `phpstan.neon` file in the root directory
+alongside the `phpstan.neon.dist` file. For VSCode running under WSL, `phpstan.neon` should look like this:
+```yaml
+includes:
+    - phpstan.neon.dist
+
+parameters:
+    editorUrl: 'vscode://vscode-remote/wsl+Ubuntu-24.04/%%file%%:%%line%%'
+```
+Replace `Ubuntu-24.04` with the name of your WSL distribution.
+For other code editors, see the [PHPStan documentation here](https://phpstan.org/user-guide/output-format#opening-file-in-an-editor).
+
+## Integrity checks web interface
+There is a web interface that allows to run a number of integrity checks on the data output by the various routes.
+This interface has its own repository [Liturgical-Calendar/UnitTestInterface](https://github.com/Liturgical-Calendar/UnitTestInterface).
+
+You should clone this repository, and run `composer install` within the cloned repository folder.
+
+This web interface communicates with a Web Socket backend included in the API repository.
+In order to launch the websocket server, you can use <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> (`litcal-tests-websockets`) from VSCode,
+in the Liturgical Calendar API repository.
+
+Then launch the web interface with <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> (`litcal-tests-webui`) from VSCode,
+in the UnitTestInterface repository.
+
+To have all of the launch tasks available without having to open separate instances of VSCode,
+it can be convenient to create a `LiturgicalCalendar.code-workspace` file outside of either repository folder,
+and add both repository folders to it. For example:
+```json
+{
+        "folders": [
+                {
+                        "name": "LiturgicalCalendarAPI",
+                        "path": "LiturgicalCalendarAPI"
+                },
+                {
+                        "name": "LiturgicalCalendarFrontend",
+                        "path": "LiturgicalCalendarFrontend"
+                },
+                {
+                        "name": "UnitTestInterface",
+                        "path": "UnitTestInterface"
+                }
+        ]
+}
+```
+This will include the API repository, the frontend website repository, and the test interface repository all in the same workspace.
+If you run `code LiturgicalCalendar.code-workspace` from the command line in WSL, you will open the whole workspace in VSCode,
+with all of the folders for each repository and all of the launch tasks available in a single VSCode instance.
+
+## Unit tests
+A few Unit Tests are available for testing the various API routes and their available operations and parameters.
+
+To run unit tests, run `composer test`.
 
 # Changelog
 See [CHANGELOG.md](CHANGELOG.md).

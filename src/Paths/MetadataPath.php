@@ -2,16 +2,19 @@
 
 namespace LiturgicalCalendar\Api\Paths;
 
+use LiturgicalCalendar\Api\Core;
+use LiturgicalCalendar\Api\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\Route;
+use LiturgicalCalendar\Api\Enum\StatusCode;
 use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
-use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalMetadata;
 use LiturgicalCalendar\Api\Utilities;
 
 /**
@@ -21,11 +24,18 @@ use LiturgicalCalendar\Api\Utilities;
  */
 final class MetadataPath
 {
+    public static Core $Core;
+
     private static MetadataCalendars $metadataCalendars;
 
     private static CatholicDiocesesMap $worldDiocesesLatinRite;
 
     private const array FULLY_TRANSLATED_LOCALES = ['en', 'fr', 'it', 'nl', 'la'];
+
+    public function __construct()
+    {
+        self::$Core = new Core();
+    }
 
     /**
      * Scans the JsonData::NATIONAL_CALENDARS_FOLDER directory and builds an index of all National calendars,
@@ -246,7 +256,7 @@ final class MetadataPath
      *
      * @return never
      */
-    public static function response(): never
+    public static function produceResponse(): never
     {
         $response = json_encode(['litcal_metadata' => self::$metadataCalendars], JSON_PRETTY_PRINT);
         if (JSON_ERROR_NONE !== json_last_error() || false === $response) {
@@ -261,7 +271,65 @@ final class MetadataPath
             header($serverProtocol . ' 304 Not Modified');
             header('Content-Length: 0');
         } else {
-            echo $response;
+            MetadataPath::$Core->setResponseContentTypeHeader();
+
+            if (false === in_array(self::$Core->getRequestMethod(), self::$Core->getAllowedRequestMethods())) {
+                $description = 'Allowed Request Methods are '
+                    . implode(' and ', array_column(self::$Core->getAllowedRequestMethods(), 'value'))
+                    . ', but your Request Method was '
+                    . self::$Core->getRequestMethod()->value;
+                self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, $description);
+            }
+
+            switch (self::$Core->getResponseContentType()) {
+                case AcceptHeader::JSON:
+                    echo $response;
+                    break;
+                case AcceptHeader::YAML:
+                    echo yaml_emit(json_decode($response, true, 512, JSON_THROW_ON_ERROR), YAML_UTF8_ENCODING);
+                    break;
+                default:
+                    if (null === self::$Core->getResponseContentType()) {
+                        throw new \ValueError('Response content type was not set?');
+                    }
+                    throw new \ValueError('Response content type not allowed: ' . self::$Core->getResponseContentType()->value);
+            }
+        }
+        die();
+    }
+
+    /**
+     * Produce an error response with the given HTTP status code and description.
+     *
+     * The description is a short string that should be used to give more context to the error.
+     *
+     * The function will output the error in the response format specified by the Accept header
+     * of the request (JSON or YAML) and terminate the script execution with a call to die().
+     *
+     * @param int $statusCode the HTTP status code to return
+     * @param string $description a short description of the error
+     * @return never
+     */
+    public static function produceErrorResponse(int $statusCode, string $description): never
+    {
+        $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1 ';
+        header($serverProtocol . StatusCode::toString($statusCode), true, $statusCode);
+        $message              = new \stdClass();
+        $message->status      = 'ERROR';
+        $message->response    = $statusCode === 404 ? 'Resource not Found' : 'Resource unavailable';
+        $message->description = $description;
+        $response             = json_encode($message);
+        if ($response === false) {
+            $response = '{"status":"ERROR","response":"Internal Server Error","description":"Failed to encode error message to JSON"}';
+        }
+        switch (self::$Core->getResponseContentType()) {
+            case AcceptHeader::YAML:
+                $responseObj = json_decode($response, true);
+                echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
+                break;
+            case AcceptHeader::JSON:
+            default:
+                echo $response;
         }
         die();
     }
@@ -269,39 +337,24 @@ final class MetadataPath
     /**
      * Initialization function for the metadata API.
      *
-     * It sets the appropriate CORS headers and calls the `buildIndex` and `response` methods.
-     *
      * @return never
      */
-    public static function init(): never
+    public function init(): never
     {
-        if (isset($_SERVER['REQUEST_METHOD'])) {
-            if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
-                header('Access-Control-Allow-Methods: OPTIONS,GET,POST');
-            }
-            if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']) && is_string($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
-                header("Access-Control-Allow-Headers: {$_SERVER[ 'HTTP_ACCESS_CONTROL_REQUEST_HEADERS' ]}");
-            }
+        self::$Core->init();
+        if (self::$Core->getRequestMethod() === RequestMethod::OPTIONS) {
+            die();
         }
-
-        /*
-        $requestHeaders = getallheaders();
-        if (isset($requestHeaders[ "Origin" ])) {
-            header("Access-Control-Allow-Origin: {$requestHeaders[ "Origin" ]}");
-            header('Access-Control-Allow-Credentials: true');
+        if (self::$Core->getRequestMethod() === RequestMethod::GET) {
+            self::$Core->validateAcceptHeader(true);
         } else {
-            header('Access-Control-Allow-Origin: *');
+            self::$Core->validateAcceptHeader(false);
         }
-        */
-        header('Access-Control-Allow-Origin: *');
-        header('Access-Control-Max-Age: 86400');    // cache for 1 day
-        header('Cache-Control: must-revalidate, max-age=259200');
-        header('Content-Type: application/json');
 
         $indexResult = MetadataPath::buildIndex();
 
         if (200 === $indexResult) {
-            MetadataPath::response();
+            MetadataPath::produceResponse();
         } else {
             http_response_code($indexResult);
             die();

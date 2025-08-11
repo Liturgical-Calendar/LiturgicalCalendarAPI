@@ -5094,12 +5094,26 @@ final class CalendarPath
         if (self::$Core->getRequestMethod() === RequestMethod::OPTIONS) {
             die();
         }
+        if (self::$Core->getRequestMethod() === RequestMethod::GET) {
+            self::$Core->validateAcceptHeader(true);
+        } else {
+            self::$Core->validateAcceptHeader(false);
+        }
+
+        self::$Core->setResponseContentTypeHeader();
+        if (false === in_array(self::$Core->getRequestMethod(), self::$Core->getAllowedRequestMethods())) {
+            $description = 'Allowed Request Methods are '
+                . implode(' and ', array_column(self::$Core->getAllowedRequestMethods(), 'value'))
+                . ', but your Request Method was '
+                . self::$Core->getRequestMethod()->value;
+            self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, $description);
+        }
+
         $this->initParameterData($requestPathParts);
         $this->loadDiocesanCalendarData();
         $this->loadNationalCalendarData();
         $this->updateSettingsBasedOnNationalCalendar();
         $this->updateSettingsBasedOnDiocesanCalendar();
-        self::$Core->setResponseContentTypeHeader();
         $this->CachePath = 'engineCache/v' . str_replace('.', '_', self::API_VERSION) . '/';
 
         if (false === Router::isLocalhost() && $this->cacheFileIsAvailable()) {

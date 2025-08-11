@@ -3,7 +3,7 @@ LiturgicalCalendar.iml
 engineCache/*
 allowedOrigins.php
 vendor/*
-debug.log
+*.log
 ValidateTestsAgainstSchema.php
 .envrc
 debuginfo.php
@@ -11,5 +11,7 @@ testYaml.php
 .env
 .env.*
 !.env.example
-php-error.log
 phpstan.neon
+server.pid
+.phpunit.result.cache
+.phpunit.cache

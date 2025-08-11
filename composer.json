@@ -17,7 +17,9 @@
         "php-parallel-lint/php-parallel-lint": "^1.4",
         "php-parallel-lint/php-console-highlighter": "^1.0",
         "captainhook/captainhook-phar": "^5.25",
-        "captainhook/hook-installer": "^1.0"
+        "captainhook/hook-installer": "^1.0",
+        "phpunit/phpunit": "^12.4@dev",
+        "guzzlehttp/guzzle": "7.8.x-dev"
     },
     "license": "Apache-2.0",
     "autoload": {
@@ -25,6 +27,11 @@
             "LiturgicalCalendar\\Api\\": "src/"
         },
         "files": ["src/pgettext.php"]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LiturgicalCalendar\\Tests\\": "phpunit_tests/"
+        }
     },
     "authors": [
         {
@@ -43,7 +50,10 @@
         "lint": "phpcs src || echo 'Linting failed. Please run composer lint:fix to fix the linting issues.'",
         "lint:fix": "phpcbf src || echo 'Lint fixing failed. Please check the linting failures and fix them manually.'",
         "analyse": "phpstan analyse -c phpstan.neon",
-        "parallel-lint": "parallel-lint --exclude .git --exclude vendor ."
+        "parallel-lint": "parallel-lint --exclude .git --exclude vendor .",
+        "test": "phpunit",
+        "start": "./start-server.sh",
+        "stop": "./stop-server.sh"
     },
     "config": {
         "allow-plugins": {

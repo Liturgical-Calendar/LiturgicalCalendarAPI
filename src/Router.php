@@ -181,7 +181,16 @@ class Router
             case 'metadata':
                 // no break (intentional fallthrough)
             case 'calendars':
-                MetadataPath::init();
+                $Metadata = new MetadataPath();
+                // MetadataPath::$Core will not exist until the Metadata class is instantiated!
+                MetadataPath::$Core->setAllowedRequestMethods([
+                    RequestMethod::GET,
+                    RequestMethod::POST,
+                    RequestMethod::OPTIONS
+                ]);
+                MetadataPath::$Core->setAllowedRequestContentTypes([]);
+                MetadataPath::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                $Metadata->init();
                 // no break (always terminates)
             case 'tests':
                 TestsPath::init($requestPathParts);

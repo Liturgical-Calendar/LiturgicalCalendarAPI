@@ -598,7 +598,7 @@ class Core
      * @param bool $required Whether the request body is required or not.
      * @param bool $assoc Whether to return the object as an associative array or a stdClass object.
      *
-     * @return \stdClass|array<string,mixed>|null The request parameters, either as a stdClass object or an associative array, or null if the request body was not required and is empty.
+     * @return \stdClass|array<mixed,mixed>|null The request parameters, either as a stdClass object or an associative array, or null if the request body was not required and is empty.
      */
     public function readYamlBody(bool $required = false, bool $assoc = false): \stdClass|array|null
     {
@@ -614,23 +614,27 @@ class Core
             if ('' !== $rawData) {
                 set_error_handler([self::class, 'warningHandler'], E_WARNING);
 
-                // @phpstan-ignore deadCode.unreachable
                 try {
                     $data = yaml_parse($rawData);
                     // since we are converting the E_WARNING to an exception, and an Exception is thrown when the result is false,
                     // and we are catching the Exception, then we can assume that when no Exception is thrown,
                     // the $data variable is not false
                     if ($assoc) {
-                        /** @var array<string,string> $data */
+                        /** @var array<mixed,mixed> $data */
                         return $data;
                     } else {
-                        /** @var object|array<mixed> $data */
+                        /** @var object|array<mixed,mixed> $data */
                         $jsonData = json_encode($data);
                         if (false === $jsonData || json_last_error() !== JSON_ERROR_NONE) {
                             header($serverProtocol . ' 400 Bad Request', true, 400);
                             die('{"error":"Malformed YAML data received in the request: <' . $rawData . '>, ' . json_last_error_msg() . '"}');
                         }
-                        return json_decode($jsonData);
+                        $decodedJson = json_decode($jsonData);
+                        if (false === $decodedJson instanceof \stdClass && false === is_array($decodedJson)) {
+                            header($serverProtocol . ' 400 Bad Request', true, 400);
+                            die('{"error":"Malformed YAML data received in the request, expected an object or an array: <' . $rawData . '>, ' . json_last_error_msg() . '"}');
+                        }
+                        return $decodedJson;
                     }
                 } catch (\ErrorException $e) {
                     header($serverProtocol . ' 400 Bad Request', true, 400);

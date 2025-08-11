@@ -662,14 +662,29 @@ class Utilities
 
     /**
      * Function called after a successful installation of the Catholic Liturgical Calendar API.
-     * It prints a message of thanksgiving to God and a prayer for the Pope.
+     *
+     * It prints the typical motto of the Jesuits (see {@link https://it.cathopedia.org/wiki/Ad_Maiorem_Dei_Gloriam})
+     * and a prayer for the Pope (see {@link https://www.gregorianum.org/wiki/Oremus_pro_Pontifice}).
+     * It also ensures the `start-server.sh` and `stop-server.sh` scripts are executable,
+     * so that `composer start` and `composer stop` scripts will function correctly.
      *
      * @return void
      */
     public static function postInstall(): void
     {
+        $startScript = __DIR__ . '/../start-server.sh';
+        $stopScript  = __DIR__ . '/../stop-server.sh';
+
+        if (!is_executable($startScript)) {
+            chmod($startScript, 0755);
+        }
+
+        if (!is_executable($stopScript)) {
+            chmod($stopScript, 0755);
+        }
+
         printf("\t\033[4m\033[1;44mCatholic Liturgical Calendar\033[0m\n");
         printf("\t\033[0;33mAd Majorem Dei Gloriam\033[0m\n");
-        printf("\t\033[0;36mOremus pro Pontifice nostro Francisco Dominus\n\tconservet eum et vivificet eum et beatum faciat eum in terra\n\tet non tradat eum in animam inimicorum ejus\033[0m\n");
+        printf("\t\033[0;36mOrémus pro Pontifice nostro Leone.\n\tDóminus consérvet eum, et vivificet eum,\n\tet beátum fáciat eum in terra,\n\tet non tradat eum in ánimam inimicórum éius\033[0m\n");
     }
 }
