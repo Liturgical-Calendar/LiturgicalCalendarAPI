@@ -5100,6 +5100,8 @@ final class CalendarPath
             self::$Core->validateAcceptHeader(false);
         }
 
+        $this->initParameterData($requestPathParts);
+
         self::$Core->setResponseContentTypeHeader();
         if (false === in_array(self::$Core->getRequestMethod(), self::$Core->getAllowedRequestMethods())) {
             $description = 'Allowed Request Methods are '
@@ -5108,8 +5110,6 @@ final class CalendarPath
                 . self::$Core->getRequestMethod()->value;
             self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, $description);
         }
-
-        $this->initParameterData($requestPathParts);
         $this->loadDiocesanCalendarData();
         $this->loadNationalCalendarData();
         $this->updateSettingsBasedOnNationalCalendar();
