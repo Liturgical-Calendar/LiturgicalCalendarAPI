@@ -10,7 +10,7 @@ final class SchemasTest extends ApiTestCase
     {
         $response = $this->http->get('/schemas');
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
+        $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'));
 
         $data = json_decode((string) $response->getBody());
         $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
@@ -50,7 +50,7 @@ final class SchemasTest extends ApiTestCase
     {
         $response = $this->http->post('/schemas');
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
+        $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'));
 
         $data = json_decode((string) $response->getBody());
         $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
@@ -69,7 +69,7 @@ final class SchemasTest extends ApiTestCase
             'headers' => ['Accept' => 'application/yaml']
         ]);
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString('application/yaml', $response->getHeaderLine('Content-Type'));
+        $this->assertStringStartsWith('application/yaml', $response->getHeaderLine('Content-Type'));
     }
 
     public function testPutSchemasReturnsError(): void

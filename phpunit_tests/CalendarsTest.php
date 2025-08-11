@@ -20,7 +20,7 @@ final class CalendarsTest extends ApiTestCase
     {
         $response = $this->http->get('/calendars');
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
-        $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
+        $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'));
 
         // Decode JSON and check
         $data = json_decode((string) $response->getBody());
@@ -40,7 +40,7 @@ final class CalendarsTest extends ApiTestCase
 
         // Assert status code
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
-        $this->assertStringContainsString('application/yaml', $response->getHeaderLine('Content-Type'));
+        $this->assertStringStartsWith('application/yaml', $response->getHeaderLine('Content-Type'));
 
         // Decode YAML and check
         $yaml = yaml_parse((string) $response->getBody());
@@ -59,7 +59,7 @@ final class CalendarsTest extends ApiTestCase
 
         // Assert status code
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
-        $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
+        $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'));
 
         // Decode JSON and check
         $data = json_decode((string) $response->getBody());

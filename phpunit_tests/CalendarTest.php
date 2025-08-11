@@ -14,7 +14,7 @@ final class CalendarTest extends ApiTestCase
     {
         $response = $this->http->get('/calendar');
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
+        $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'));
 
         $data = json_decode((string) $response->getBody());
         $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
@@ -31,7 +31,7 @@ final class CalendarTest extends ApiTestCase
             'headers' => ['Accept' => 'application/yaml']
         ]);
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString('application/yaml', $response->getHeaderLine('Content-Type'));
+        $this->assertStringStartsWith('application/yaml', $response->getHeaderLine('Content-Type'));
 
         $yaml = yaml_parse((string) $response->getBody());
         $this->assertIsArray($yaml);
@@ -49,7 +49,7 @@ final class CalendarTest extends ApiTestCase
             'headers' => ['Accept' => 'text/calendar']
         ]);
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString('text/calendar', $response->getHeaderLine('Content-Type'));
+        $this->assertStringStartsWith('text/calendar', $response->getHeaderLine('Content-Type'));
         $data = (string) $response->getBody();
         $this->assertStringContainsString('BEGIN:VCALENDAR', $data);
         $this->assertStringContainsString('END:VCALENDAR', $data);
@@ -61,7 +61,7 @@ final class CalendarTest extends ApiTestCase
             'headers' => ['Accept' => 'application/xml']
         ]);
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString('application/xml', $response->getHeaderLine('Content-Type'));
+        $this->assertStringStartsWith('application/xml', $response->getHeaderLine('Content-Type'));
         libxml_use_internal_errors(true);
         $data       = (string) $response->getBody();
         $xml        = new \DOMDocument();
@@ -77,7 +77,7 @@ final class CalendarTest extends ApiTestCase
     {
         $response = $this->http->post('/calendar');
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
+        $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'));
 
         $data = json_decode((string) $response->getBody());
         $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
@@ -110,12 +110,12 @@ final class CalendarTest extends ApiTestCase
             foreach (self::$metadata->national_calendars_keys as $key) {
                 $response = $this->http->get("/calendar/nation/{$key}/{$year}");
                 $this->assertSame(200, $response->getStatusCode());
-                $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
+                $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'));
             }
             foreach (self::$metadata->diocesan_calendars_keys as $key) {
                 $response = $this->http->get("/calendar/diocese/{$key}/{$year}");
                 $this->assertSame(200, $response->getStatusCode());
-                $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
+                $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'));
             }
         }
     }
@@ -166,6 +166,8 @@ final class CalendarTest extends ApiTestCase
         parent::setUp();
 
         $response = $this->http->get('/calendars');
+        $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
+        $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'));
         try {
             $data = json_decode((string) $response->getBody());
             $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());

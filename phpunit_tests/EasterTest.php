@@ -10,7 +10,7 @@ final class EasterTest extends ApiTestCase
     {
         $response = $this->http->get('/easter');
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
+        $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'));
 
         $data = json_decode((string) $response->getBody());
         $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
