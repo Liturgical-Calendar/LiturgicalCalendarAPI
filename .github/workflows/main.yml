@@ -22,14 +22,53 @@ env:
 
   # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  codesniffer:
+  build:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Composer install
-        uses: php-actions/composer@v6
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+
+      # Restore vendor folder from cache if available
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      # Share vendor folder with other jobs in this run
+      - name: Upload vendor folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: vendor-folder
+          path: vendor
+          retention-days: 1
+
+  codesniffer:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+
+      - name: Download vendor folder from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: vendor-folder
+          path: vendor
 
       - name: PHP Code Sniffer
         uses: php-actions/phpcs@v1
@@ -39,12 +78,20 @@ jobs:
           standard: phpcs.xml
   static_analysis:
     runs-on: ubuntu-latest
-
+    needs: build
     steps:
       - uses: actions/checkout@v4
 
-      - name: Composer install
-        uses: php-actions/composer@v6
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+
+      - name: Download vendor folder from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: vendor-folder
+          path: vendor
 
       - name: PHPStan
         uses: php-actions/phpstan@v3
@@ -94,15 +141,24 @@ jobs:
           #directory: # default is .
   phpunit_tests:
     runs-on: ubuntu-latest
-
+    needs: build
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install required PHP modules
-        run: sudo apt-get update -y && sudo apt-get install -y php${PHP_VERSION}-yaml php${PHP_VERSION}-intl php${PHP_VERSION}-zip php${PHP_VERSION}-calendar gettext
+      - name: Install gettext
+        run: sudo apt-get update -y && sudo apt-get install -y gettext
 
-      - name: Composer install
-        uses: php-actions/composer@v6
+      - name: Setup PHP with PECL extension
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: yaml, intl, zip, calendar
+
+      - name: Download vendor folder from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: vendor-folder
+          path: vendor
 
       - name: Start the PHP web server
         run: composer start
@@ -113,3 +169,5 @@ jobs:
           php_version: ${{ env.PHP_VERSION }}
           configuration: phpunit.xml
 
+      - name: Stop the PHP web server
+        run: composer stop
