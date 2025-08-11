@@ -1,6 +1,6 @@
 #!/bin/bash
 set -euo pipefail
-@@
+
 if [ ! -f server.pid ]; then
   echo "No server.pid file found. Is the server running?"
   exit 1
