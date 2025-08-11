@@ -21,6 +21,16 @@ sleep 2
 if kill -0 "$pid" 2>/dev/null; then
   echo "Process $pid did not stop, sending SIGKILL"
   kill -9 "$pid"
+  # Give it a moment and verify again
+  sleep 1
+  if ! kill -0 "$pid" 2>/dev/null; then
+    echo "PHP server force-stopped."
+    rm -f server.pid
+    exit 0
+  else
+    echo "Process $pid is still running after SIGKILL"
+    exit 1
+  fi
 else
   echo "PHP server stopped."
   rm server.pid

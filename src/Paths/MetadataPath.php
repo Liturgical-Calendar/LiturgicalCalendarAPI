@@ -24,7 +24,7 @@ use LiturgicalCalendar\Api\Utilities;
  */
 final class MetadataPath
 {
-    public static Core $Core;
+    public Core $Core;
 
     private static MetadataCalendars $metadataCalendars;
 
@@ -34,7 +34,7 @@ final class MetadataPath
 
     public function __construct()
     {
-        self::$Core = new Core();
+        $this->Core = new Core();
     }
 
     /**
@@ -286,6 +286,9 @@ final class MetadataPath
                     echo $response;
                     break;
                 case AcceptHeader::YAML:
+                    if (!extension_loaded('yaml')) {
+                        self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'YAML extension not loaded');
+                    }
                     echo yaml_emit(json_decode($response, true, 512, JSON_THROW_ON_ERROR), YAML_UTF8_ENCODING);
                     break;
                 default:
@@ -324,6 +327,9 @@ final class MetadataPath
         }
         switch (self::$Core->getResponseContentType()) {
             case AcceptHeader::YAML:
+                if (!extension_loaded('yaml')) {
+                    self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'YAML extension not loaded');
+                }
                 $responseObj = json_decode($response, true);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
                 break;

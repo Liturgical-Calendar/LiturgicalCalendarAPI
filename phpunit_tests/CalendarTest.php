@@ -18,13 +18,22 @@ final class CalendarTest extends ApiTestCase
 
     public function testGetCalendarReturnsYaml(): void
     {
+        if (!extension_loaded('yaml')) {
+            $this->markTestSkipped('YAML extension is not installed');
+        }
+
         $response = $this->http->get('/calendar', [
             'headers' => ['Accept' => 'application/yaml']
         ]);
         $this->assertSame(200, $response->getStatusCode());
 
         $yaml = yaml_parse((string) $response->getBody());
-        $data = json_decode(json_encode($yaml));
+        $data = json_decode(
+            json_encode($yaml, JSON_THROW_ON_ERROR),
+            false,
+            512,
+            JSON_THROW_ON_ERROR
+        );
 
         $this->assertionsForCalendarObject($data);
     }
@@ -45,7 +54,7 @@ final class CalendarTest extends ApiTestCase
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
-    public function testPatchCalendarsReturnsError(): void
+    public function testPatchCalendarReturnsError(): void
     {
         $response = $this->http->patch('/calendar');
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');

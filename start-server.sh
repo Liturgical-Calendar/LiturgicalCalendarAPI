@@ -4,7 +4,7 @@ set -a  # automatic export
 load_env_file() {
   local file="$1"
   if [ -f "$file" ]; then
-    export $(grep -v '^\s*#' "$file" | grep -v '^\s*$' | xargs)
+    export $(grep -Ev '^[[:space:]]*#' "$file" | grep -Ev '^[[:space:]]*$' | xargs)
   fi
 }
 
@@ -21,5 +21,4 @@ set +a  # stop auto export
 : "${API_HOST:=localhost}"
 : "${API_PORT:=8000}"
 
-export $(grep -v '^#' .env.development | xargs)
 PHP_CLI_SERVER_WORKERS=6 php -S "${API_HOST}:${API_PORT}" > /dev/null 2>&1 & echo $! > server.pid

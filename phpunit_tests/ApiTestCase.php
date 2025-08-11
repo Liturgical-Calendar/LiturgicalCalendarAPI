@@ -14,6 +14,14 @@ abstract class ApiTestCase extends TestCase
 
     public static function setUpBeforeClass(): void
     {
+        // Validate required environment variables
+        $requiredEnvVars = ['API_PROTOCOL', 'API_HOST', 'API_PORT'];
+        foreach ($requiredEnvVars as $var) {
+            if (empty($_ENV[$var])) {
+                throw new \RuntimeException("Required environment variable {$var} is not set");
+            }
+        }
+
         $client = new Client([
             'base_uri'    => "{$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}",
             'http_errors' => false,
@@ -22,8 +30,8 @@ abstract class ApiTestCase extends TestCase
 
         try {
             // Simple check — adjust path if your API root needs authentication
-            $client->get('/');
-            self::$apiAvailable = true;
+            $response           = $client->get('/');
+            self::$apiAvailable = $response->getStatusCode() < 500;
         } catch (ConnectException $e) {
             self::$apiAvailable = false;
         }
@@ -32,6 +40,8 @@ abstract class ApiTestCase extends TestCase
     protected function setUp(): void
     {
         if (! self::$apiAvailable) {
+            // We use `fail` instead of `markSkipped` because we want the message to show without the `--debug` flag,
+            // but `markSkipped` only shows the message with `--debug`
             $this->fail(
                 "API is not running on {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']} — skipping integration tests. Maybe run `composer start` first?"
             );
