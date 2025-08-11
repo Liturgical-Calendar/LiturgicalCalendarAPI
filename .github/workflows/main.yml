@@ -159,8 +159,10 @@ jobs:
           name: vendor-folder
           path: vendor
 
-      - name: Fix permissions on vendor binaries
-        run: chmod +x vendor/bin/*
+      - name: Fix permissions on vendor binaries and copy env file
+        run: |
+          chmod +x vendor/bin/*
+          cp .env .env.local
 
       - name: Start the PHP web server
         run: composer start
