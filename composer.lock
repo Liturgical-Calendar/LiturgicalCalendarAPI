@@ -3315,12 +3315,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "cfa08bf028892a7914341683a8495f2f56cfd386"
+                "reference": "a561bbf7dd850c1bef4f8db7230ffa68ca6797af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/cfa08bf028892a7914341683a8495f2f56cfd386",
-                "reference": "cfa08bf028892a7914341683a8495f2f56cfd386",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/a561bbf7dd850c1bef4f8db7230ffa68ca6797af",
+                "reference": "a561bbf7dd850c1bef4f8db7230ffa68ca6797af",
                 "shasum": ""
             },
             "require": {
@@ -3413,7 +3413,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-08-11T05:53:14+00:00"
+            "time": "2025-08-11T14:02:49+00:00"
         },
         {
             "name": "psr/http-client",
@@ -4456,12 +4456,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-                "reference": "c0301bcbdc3701d7e0523dd466cc195286626ca5"
+                "reference": "321ff53b490737556ce0f49780f64e3ab2658700"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/c0301bcbdc3701d7e0523dd466cc195286626ca5",
-                "reference": "c0301bcbdc3701d7e0523dd466cc195286626ca5",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/321ff53b490737556ce0f49780f64e3ab2658700",
+                "reference": "321ff53b490737556ce0f49780f64e3ab2658700",
                 "shasum": ""
             },
             "require": {
@@ -4471,7 +4471,7 @@
                 "php": ">=7.2.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^8.0 || ^9.3.4 || ^10.5.32 || 11.3.3 - 11.5.28"
+                "phpunit/phpunit": "^8.0 || ^9.3.4 || ^10.5.32 || 11.3.3 - 11.5.28 || ^11.5.31"
             },
             "bin": [
                 "bin/phpcbf",
@@ -4532,7 +4532,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-08-10T23:12:59+00:00"
+            "time": "2025-08-11T12:22:09+00:00"
         },
         {
             "name": "staabm/side-effects-detector",

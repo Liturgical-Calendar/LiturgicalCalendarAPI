@@ -62,11 +62,15 @@ final class CalendarTest extends ApiTestCase
         ]);
         $this->assertSame(200, $response->getStatusCode());
         $this->assertStringContainsString('application/xml', $response->getHeaderLine('Content-Type'));
-        $data = (string) $response->getBody();
-        $this->assertStringContainsString('<?xml version="1.0" encoding="UTF-8"?>', $data);
-        $this->assertStringContainsString('<LiturgicalCalendar xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.bibleget.io/catholicliturgy" xmlns:cl="http://www.bibleget.io/catholicliturgy" xsi:schemaLocation="http://www.bibleget.io/catholicliturgy', $data);
-        $this->assertStringContainsString('<LitCal>', $data);
-        $this->assertStringContainsString('</LitCal>', $data);
+        libxml_use_internal_errors(true);
+        $data       = (string) $response->getBody();
+        $xml        = new \DOMDocument();
+        $loadResult = $xml->loadXML($data);
+        $this->assertTrue($loadResult);
+        $xmlSchema = __DIR__ . '/../jsondata/schemas/LiturgicalCalendar.xsd';
+        $this->assertFileExists($xmlSchema, 'File not found: ' . $xmlSchema);
+        $validationResult = $xml->schemaValidate($xmlSchema);
+        $this->assertTrue($validationResult);
     }
 
     public function testPostCalendarReturnsJson(): void
