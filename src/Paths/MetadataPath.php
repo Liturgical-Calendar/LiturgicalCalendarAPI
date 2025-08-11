@@ -256,7 +256,7 @@ final class MetadataPath
      *
      * @return never
      */
-    public static function produceResponse(): never
+    public function produceResponse(): never
     {
         $response = json_encode(['litcal_metadata' => self::$metadataCalendars], JSON_PRETTY_PRINT);
         if (JSON_ERROR_NONE !== json_last_error() || false === $response) {
@@ -271,17 +271,17 @@ final class MetadataPath
             header($serverProtocol . ' 304 Not Modified');
             header('Content-Length: 0');
         } else {
-            MetadataPath::$Core->setResponseContentTypeHeader();
+            $this->Core->setResponseContentTypeHeader();
 
-            if (false === in_array(self::$Core->getRequestMethod(), self::$Core->getAllowedRequestMethods())) {
+            if (false === in_array($this->Core->getRequestMethod(), $this->Core->getAllowedRequestMethods())) {
                 $description = 'Allowed Request Methods are '
-                    . implode(' and ', array_column(self::$Core->getAllowedRequestMethods(), 'value'))
+                    . implode(' and ', array_column($this->Core->getAllowedRequestMethods(), 'value'))
                     . ', but your Request Method was '
-                    . self::$Core->getRequestMethod()->value;
+                    . $this->Core->getRequestMethod()->value;
                 self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, $description);
             }
 
-            switch (self::$Core->getResponseContentType()) {
+            switch ($this->Core->getResponseContentType()) {
                 case AcceptHeader::JSON:
                     echo $response;
                     break;
@@ -292,10 +292,10 @@ final class MetadataPath
                     echo yaml_emit(json_decode($response, true, 512, JSON_THROW_ON_ERROR), YAML_UTF8_ENCODING);
                     break;
                 default:
-                    if (null === self::$Core->getResponseContentType()) {
+                    if (null === $this->Core->getResponseContentType()) {
                         throw new \ValueError('Response content type was not set?');
                     }
-                    throw new \ValueError('Response content type not allowed: ' . self::$Core->getResponseContentType()->value);
+                    throw new \ValueError('Response content type not allowed: ' . $this->Core->getResponseContentType()->value);
             }
         }
         die();
@@ -313,7 +313,7 @@ final class MetadataPath
      * @param string $description a short description of the error
      * @return never
      */
-    public static function produceErrorResponse(int $statusCode, string $description): never
+    public function produceErrorResponse(int $statusCode, string $description): never
     {
         $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1 ';
         header($serverProtocol . StatusCode::toString($statusCode), true, $statusCode);
@@ -325,7 +325,7 @@ final class MetadataPath
         if ($response === false) {
             $response = '{"status":"ERROR","response":"Internal Server Error","description":"Failed to encode error message to JSON"}';
         }
-        switch (self::$Core->getResponseContentType()) {
+        switch ($this->Core->getResponseContentType()) {
             case AcceptHeader::YAML:
                 if (!extension_loaded('yaml')) {
                     self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'YAML extension not loaded');
@@ -347,20 +347,20 @@ final class MetadataPath
      */
     public function init(): never
     {
-        self::$Core->init();
-        if (self::$Core->getRequestMethod() === RequestMethod::OPTIONS) {
+        $this->Core->init();
+        if ($this->Core->getRequestMethod() === RequestMethod::OPTIONS) {
             die();
         }
-        if (self::$Core->getRequestMethod() === RequestMethod::GET) {
-            self::$Core->validateAcceptHeader(true);
+        if ($this->Core->getRequestMethod() === RequestMethod::GET) {
+            $this->Core->validateAcceptHeader(true);
         } else {
-            self::$Core->validateAcceptHeader(false);
+            $this->Core->validateAcceptHeader(false);
         }
 
         $indexResult = MetadataPath::buildIndex();
 
         if (200 === $indexResult) {
-            MetadataPath::produceResponse();
+            $this->produceResponse();
         } else {
             http_response_code($indexResult);
             die();

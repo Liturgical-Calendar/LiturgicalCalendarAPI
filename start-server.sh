@@ -1,4 +1,15 @@
 #!/bin/bash
+if [ -f "server.pid" ]; then
+  pid=$(cat server.pid)
+  if kill -0 "$pid" 2>/dev/null; then
+    echo "Server already started"
+    exit 0
+  else
+    echo "No process with PID $pid found. Removing stale server.pid."
+    rm server.pid
+  fi
+fi
+
 set -a  # automatic export
 
 load_env_file() {
