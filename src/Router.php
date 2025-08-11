@@ -16,6 +16,7 @@ use LiturgicalCalendar\Api\Paths\RegionalDataPath;
 use LiturgicalCalendar\Api\Paths\MissalsPath;
 use LiturgicalCalendar\Api\Paths\DecreesPath;
 use LiturgicalCalendar\Api\Paths\SchemasPath;
+use Swaggest\JsonSchema\Schema;
 
 class Router
 {
@@ -304,7 +305,14 @@ class Router
                 EasterPath::init();
                 // no break (always terminates)
             case 'schemas':
-                SchemasPath::retrieve($requestPathParts);
+                $SchemasPath = new SchemasPath();
+                $SchemasPath->Core->setAllowedRequestMethods([
+                    RequestMethod::GET,
+                    RequestMethod::OPTIONS,
+                    RequestMethod::POST
+                ]);
+                $SchemasPath->Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                $SchemasPath->init($requestPathParts);
                 // no break (always terminates)
             case 'decrees':
                 DecreesPath::init($requestPathParts);
