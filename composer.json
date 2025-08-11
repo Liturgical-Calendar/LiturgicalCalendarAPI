@@ -47,9 +47,9 @@
         "post-update-cmd": [
             "LiturgicalCalendar\\Api\\Utilities::postInstall"
         ],
-        "lint": "phpcs src || echo 'Linting failed. Please run composer lint:fix to fix the linting issues.'",
-        "lint:fix": "phpcbf src || echo 'Lint fixing failed. Please check the linting failures and fix them manually.'",
-        "analyse": "phpstan analyse -c phpstan.neon",
+        "lint": "phpcs || echo 'Linting failed. Please run \"composer lint:fix\" to fix the linting issues.'",
+        "lint:fix": "phpcbf || echo 'Lint fixing failed. Please check the linting failures and fix them manually.'",
+        "analyse": "phpstan analyse",
         "parallel-lint": "parallel-lint --exclude .git --exclude vendor .",
         "test": "phpunit",
         "start": "./start-server.sh",
