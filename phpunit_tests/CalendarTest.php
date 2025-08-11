@@ -55,6 +55,20 @@ final class CalendarTest extends ApiTestCase
         $this->assertStringContainsString('END:VCALENDAR', $data);
     }
 
+    public function testGetCalendarReturnsXML(): void
+    {
+        $response = $this->http->get('/calendar', [
+            'headers' => ['Accept' => 'application/xml']
+        ]);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsString('application/xml', $response->getHeaderLine('Content-Type'));
+        $data = (string) $response->getBody();
+        $this->assertStringContainsString('<?xml version="1.0" encoding="UTF-8"?>', $data);
+        $this->assertStringContainsString('<LiturgicalCalendar xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.bibleget.io/catholicliturgy" xmlns:cl="http://www.bibleget.io/catholicliturgy" xsi:schemaLocation="http://www.bibleget.io/catholicliturgy', $data);
+        $this->assertStringContainsString('<LitCal>', $data);
+        $this->assertStringContainsString('</LitCal>', $data);
+    }
+
     public function testPostCalendarReturnsJson(): void
     {
         $response = $this->http->post('/calendar');
