@@ -92,3 +92,24 @@ jobs:
           force: 0
           # The working directory that will be used for git commands
           #directory: # default is .
+  phpunit_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install required PHP modules
+        run: sudo apt-get update -y && sudo apt-get install -y php${PHP_VERSION}-yaml php${PHP_VERSION}-intl php${PHP_VERSION}-zip php${PHP_VERSION}-calendar gettext
+
+      - name: Composer install
+        uses: php-actions/composer@v6
+
+      - name: Start the PHP web server
+        run: composer start
+
+      - name: PHPUnit
+        uses: php-actions/phpunit@v4
+        with:
+          php_version: ${{ env.PHP_VERSION }}
+          configuration: phpunit.xml
+
