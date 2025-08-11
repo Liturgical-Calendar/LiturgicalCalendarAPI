@@ -1,8 +1,8 @@
 <?php
 
-namespace LiturgicalCalendar\Tests;
+declare(strict_types=1);
 
-use LiturgicalCalendar\Tests\ApiTestCase;
+namespace LiturgicalCalendar\Tests;
 
 final class EasterTest extends ApiTestCase
 {
@@ -10,8 +10,10 @@ final class EasterTest extends ApiTestCase
     {
         $response = $this->http->get('/easter');
         $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
 
         $data = json_decode((string) $response->getBody());
+        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
         $this->assertIsObject($data);
         $this->assertObjectHasProperty('litcal_easter', $data);
         $this->assertIsArray($data->litcal_easter);
@@ -38,6 +40,8 @@ final class EasterTest extends ApiTestCase
         $this->assertIsString($data->lastCoincidenceString);
 
         $this->assertObjectHasProperty('lastCoincidence', $data);
+        // We don't worry about being limited to 32-bit integers,
+        // because both locally and on GitHub Actions, we have 64-bit PHP
         $this->assertIsInt($data->lastCoincidence);
         $this->assertEquals(22983264000, $data->lastCoincidence);
     }

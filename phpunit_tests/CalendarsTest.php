@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LiturgicalCalendar\Tests;
 
 final class CalendarsTest extends ApiTestCase
@@ -17,12 +19,12 @@ final class CalendarsTest extends ApiTestCase
     public function testGetCalendarsReturnsJson(): void
     {
         $response = $this->http->get('/calendars');
-
-        // Assert status code
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
+        $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
 
         // Decode JSON and check
         $data = json_decode((string) $response->getBody());
+        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
         $this->assertionsForCalendarObject($data);
     }
 
@@ -38,15 +40,16 @@ final class CalendarsTest extends ApiTestCase
 
         // Assert status code
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
+        $this->assertStringContainsString('application/yaml', $response->getHeaderLine('Content-Type'));
 
         // Decode YAML and check
         $yaml = yaml_parse((string) $response->getBody());
-        $data = json_decode(
-            json_encode($yaml, JSON_THROW_ON_ERROR),
-            false,
-            512,
-            JSON_THROW_ON_ERROR
-        );
+        $this->assertIsArray($yaml);
+        $encoded = json_encode($yaml);
+        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
+        $data = json_decode($encoded);
+        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
+        $this->assertIsObject($data);
         $this->assertionsForCalendarObject($data);
     }
 
@@ -56,9 +59,11 @@ final class CalendarsTest extends ApiTestCase
 
         // Assert status code
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
+        $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
 
         // Decode JSON and check
         $data = json_decode((string) $response->getBody());
+        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
         $this->assertionsForCalendarObject($data);
     }
 
@@ -316,12 +321,15 @@ final class CalendarsTest extends ApiTestCase
         parent::setUp();
 
         $filePath = __DIR__ . '/../jsondata/world_dioceses.json';
-        if (!file_exists($filePath)) {
-            throw new \RuntimeException("File not found: {$filePath}");
-        }
+        $this->assertFileExists($filePath, 'File not found: ' . $filePath);
+
         $catholicDiocesesRaw = file_get_contents($filePath);
-        $catholicDioceses    = json_decode($catholicDiocesesRaw, true);
-        $dioceseIDArray      = [];
+        $this->assertNotFalse($catholicDiocesesRaw, 'Failed to read file: ' . $filePath);
+
+        $catholicDioceses = json_decode($catholicDiocesesRaw, true);
+        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
+
+        $dioceseIDArray = [];
         foreach ($catholicDioceses['catholic_dioceses_latin_rite'] as $nation) {
             $nationID   = strtoupper($nation['country_iso']);
             $dioceseIDs = array_column($nation['dioceses'], 'diocese_id');

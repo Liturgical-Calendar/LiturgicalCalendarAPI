@@ -1,8 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace LiturgicalCalendar\Tests;
 
-use LiturgicalCalendar\Tests\ApiTestCase;
 use PHPUnit\Framework\Attributes\Group;
 
 final class CalendarTest extends ApiTestCase
@@ -13,9 +14,10 @@ final class CalendarTest extends ApiTestCase
     {
         $response = $this->http->get('/calendar');
         $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
 
         $data = json_decode((string) $response->getBody());
-
+        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
         $this->assertionsForCalendarObject($data);
     }
 
@@ -29,24 +31,38 @@ final class CalendarTest extends ApiTestCase
             'headers' => ['Accept' => 'application/yaml']
         ]);
         $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsString('application/yaml', $response->getHeaderLine('Content-Type'));
 
         $yaml = yaml_parse((string) $response->getBody());
-        $data = json_decode(
-            json_encode($yaml, JSON_THROW_ON_ERROR),
-            false,
-            512,
-            JSON_THROW_ON_ERROR
-        );
-
+        $this->assertIsArray($yaml);
+        $encoded = json_encode($yaml);
+        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
+        $data = json_decode($encoded);
+        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
+        $this->assertIsObject($data);
         $this->assertionsForCalendarObject($data);
+    }
+
+    public function testGetCalendarReturnsICS(): void
+    {
+        $response = $this->http->get('/calendar', [
+            'headers' => ['Accept' => 'text/calendar']
+        ]);
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsString('text/calendar', $response->getHeaderLine('Content-Type'));
+        $data = (string) $response->getBody();
+        $this->assertStringContainsString('BEGIN:VCALENDAR', $data);
+        $this->assertStringContainsString('END:VCALENDAR', $data);
     }
 
     public function testPostCalendarReturnsJson(): void
     {
         $response = $this->http->post('/calendar');
         $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
 
         $data = json_decode((string) $response->getBody());
+        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
 
         $this->assertionsForCalendarObject($data);
     }
@@ -76,10 +92,12 @@ final class CalendarTest extends ApiTestCase
             foreach (self::$metadata->national_calendars_keys as $key) {
                 $response = $this->http->get("/calendar/nation/{$key}/{$year}");
                 $this->assertSame(200, $response->getStatusCode());
+                $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
             }
             foreach (self::$metadata->diocesan_calendars_keys as $key) {
                 $response = $this->http->get("/calendar/diocese/{$key}/{$year}");
                 $this->assertSame(200, $response->getStatusCode());
+                $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
             }
         }
     }
@@ -131,7 +149,8 @@ final class CalendarTest extends ApiTestCase
 
         $response = $this->http->get('/calendars');
         try {
-            $data           = json_decode((string) $response->getBody(), false, 512, JSON_THROW_ON_ERROR);
+            $data = json_decode((string) $response->getBody());
+            $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
             self::$metadata = $data->litcal_metadata;
         } catch (\JsonException $e) {
             $this->markTestSkipped('Failed to decode calendars metadata JSON: ' . $e->getMessage());

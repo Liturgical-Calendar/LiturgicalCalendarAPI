@@ -1,8 +1,8 @@
 <?php
 
-namespace LiturgicalCalendar\Tests;
+declare(strict_types=1);
 
-use LiturgicalCalendar\Tests\ApiTestCase;
+namespace LiturgicalCalendar\Tests;
 
 final class SchemasTest extends ApiTestCase
 {
@@ -10,8 +10,10 @@ final class SchemasTest extends ApiTestCase
     {
         $response = $this->http->get('/schemas');
         $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
 
         $data = json_decode((string) $response->getBody());
+        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
         $this->assertIsObject($data);
         $this->assertObjectHasProperty('litcal_schemas', $data);
         $this->assertIsArray($data->litcal_schemas);
@@ -30,6 +32,7 @@ final class SchemasTest extends ApiTestCase
             $response = $this->http->get($schema);
             $this->assertSame(200, $response->getStatusCode());
             $data = json_decode((string) $response->getBody());
+            $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
             $this->assertIsObject($data);
             if (property_exists($data, 'openapi')) {
                 $this->assertIsString($data->openapi);
@@ -47,8 +50,10 @@ final class SchemasTest extends ApiTestCase
     {
         $response = $this->http->post('/schemas');
         $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsString('application/json', $response->getHeaderLine('Content-Type'));
 
         $data = json_decode((string) $response->getBody());
+        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
         $this->assertIsObject($data);
         $this->assertObjectHasProperty('litcal_schemas', $data);
         $this->assertIsArray($data->litcal_schemas);
@@ -56,10 +61,15 @@ final class SchemasTest extends ApiTestCase
 
     public function testGetSchemasReturnsYaml(): void
     {
+        if (!extension_loaded('yaml')) {
+            $this->markTestSkipped('YAML extension is not installed');
+        }
+
         $response = $this->http->get('/schemas', [
             'headers' => ['Accept' => 'application/yaml']
         ]);
         $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsString('application/yaml', $response->getHeaderLine('Content-Type'));
     }
 
     public function testPutSchemasReturnsError(): void
