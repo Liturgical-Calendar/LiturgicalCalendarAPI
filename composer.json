@@ -52,6 +52,7 @@
         "analyse": "phpstan analyse",
         "parallel-lint": "parallel-lint --exclude .git --exclude vendor .",
         "test": "phpunit",
+        "test:quick": "phpunit --exclude-group slow",
         "start": "./start-server.sh",
         "stop": "./stop-server.sh"
     },

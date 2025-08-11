@@ -3,9 +3,12 @@
 namespace LiturgicalCalendar\Tests;
 
 use LiturgicalCalendar\Tests\ApiTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
 final class CalendarTest extends ApiTestCase
 {
+    private static object $metadata;
+
     public function testGetCalendarReturnsJson(): void
     {
         $response = $this->http->get('/calendar');
@@ -66,6 +69,21 @@ final class CalendarTest extends ApiTestCase
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
+    #[Group('slow')]
+    public function testGetCalendarSampleAllCalendars(): void
+    {
+        for ($year = 1970; $year < 2050; $year++) {
+            foreach (self::$metadata->national_calendars_keys as $key) {
+                $response = $this->http->get("/calendar/nation/{$key}/{$year}");
+                $this->assertSame(200, $response->getStatusCode());
+            }
+            foreach (self::$metadata->diocesan_calendars_keys as $key) {
+                $response = $this->http->get("/calendar/diocese/{$key}/{$year}");
+                $this->assertSame(200, $response->getStatusCode());
+            }
+        }
+    }
+
     private function assertionsForCalendarObject(object $data): void
     {
         $this->assertIsObject($data);
@@ -104,6 +122,19 @@ final class CalendarTest extends ApiTestCase
             $this->assertObjectHasProperty('grade', $event);
             $this->assertObjectHasProperty('common', $event);
             $this->assertObjectHasProperty('liturgical_season', $event);
+        }
+    }
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $response = $this->http->get('/calendars');
+        try {
+            $data           = json_decode((string) $response->getBody(), false, 512, JSON_THROW_ON_ERROR);
+            self::$metadata = $data->litcal_metadata;
+        } catch (\JsonException $e) {
+            $this->markTestSkipped('Failed to decode calendars metadata JSON: ' . $e->getMessage());
         }
     }
 }
