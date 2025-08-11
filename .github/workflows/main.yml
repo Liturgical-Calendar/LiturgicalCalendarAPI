@@ -70,6 +70,9 @@ jobs:
           name: vendor-folder
           path: vendor
 
+      - name: Fix permissions on vendor binaries
+        run: chmod +x vendor/bin/*
+
       - name: PHP Code Sniffer
         run: composer lint
   static_analysis:
@@ -88,6 +91,9 @@ jobs:
         with:
           name: vendor-folder
           path: vendor
+
+      - name: Fix permissions on vendor binaries
+        run: chmod +x vendor/bin/*
 
       - name: PHPStan
         run: composer analyse
@@ -152,6 +158,9 @@ jobs:
         with:
           name: vendor-folder
           path: vendor
+
+      - name: Fix permissions on vendor binaries
+        run: chmod +x vendor/bin/*
 
       - name: Start the PHP web server
         run: composer start
