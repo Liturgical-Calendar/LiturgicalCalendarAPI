@@ -686,6 +686,8 @@ class Utilities
                 fprintf(STDERR, "Warning: unable to chmod +x %s\n", $stopScript);
             }
         }
+
+        setlocale(LC_ALL, 'en_US.UTF-8');
         printf("\t\033[4m\033[1;44mCatholic Liturgical Calendar\033[0m\n");
         printf("\t\033[0;33mAd Majorem Dei Gloriam\033[0m\n");
         printf("\t\033[0;36mOrémus pro Pontifice nostro Leone.\n\tDóminus consérvet eum, et vivificet eum,\n\tet beátum fáciat eum in terra,\n\tet non tradat eum in ánimam inimicórum éius\033[0m\n");

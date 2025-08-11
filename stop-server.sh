@@ -1,11 +1,16 @@
 #!/bin/bash
-
+set -euo pipefail
+@@
 if [ ! -f server.pid ]; then
   echo "No server.pid file found. Is the server running?"
   exit 1
 fi
 
 pid=$(cat server.pid)
+if ! [[ "$pid" =~ ^[0-9]+$ ]]; then
+  echo "Invalid PID in server.pid: $pid. Expected a number."
+  exit 1
+fi
 
 if ! kill -0 "$pid" 2>/dev/null; then
   echo "No process with PID $pid found. Removing stale server.pid."

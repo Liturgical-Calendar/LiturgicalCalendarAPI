@@ -288,13 +288,8 @@ class Health implements MessageComponentInterface
         if (gettype($msg) !== 'string') {
             $msg = json_encode($msg, JSON_PRETTY_PRINT);
         }
-        foreach ($this->clients as $client) {
-            if ($from === $client) {
-                // The message from sender will be echoed back only to the sender, not to other clients
-                /** @var string $msg */
-                $client->send($msg);
-            }
-        }
+        /** @var string $msg */
+        $from->send($msg);
     }
 
     /**
