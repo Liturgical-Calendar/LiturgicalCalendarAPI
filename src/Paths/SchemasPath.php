@@ -55,7 +55,7 @@ final class SchemasPath
                 foreach ($it as $f) {
                     $schemaIndex->litcal_schemas[] = API_BASE_PATH . Route::SCHEMAS->value . '/' . $f->getFilename();
                 }
-                $response = json_encode($schemaIndex, JSON_THROW_ON_ERROR);
+                $response = json_encode($schemaIndex);
                 if ($response === false) {
                     $this->produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'Failed to encode schema index to JSON');
                 }
@@ -80,6 +80,12 @@ final class SchemasPath
                     $this->produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'YAML extension not loaded');
                 }
                 $responseObj = json_decode($response, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    $this->produceErrorResponse(
+                        StatusCode::SERVICE_UNAVAILABLE,
+                        'Failed to decode JSON: ' . json_last_error_msg()
+                    );
+                }
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
                 break;
             case AcceptHeader::JSON:
@@ -116,7 +122,7 @@ final class SchemasPath
         switch ($this->Core->getResponseContentType()) {
             case AcceptHeader::YAML:
                 if (!extension_loaded('yaml')) {
-                    self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'YAML extension not loaded');
+                    $this->produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'YAML extension not loaded');
                 }
                 $responseObj = json_decode($response, true);
                 echo yaml_emit($responseObj, YAML_UTF8_ENCODING);

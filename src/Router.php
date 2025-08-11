@@ -16,7 +16,6 @@ use LiturgicalCalendar\Api\Paths\RegionalDataPath;
 use LiturgicalCalendar\Api\Paths\MissalsPath;
 use LiturgicalCalendar\Api\Paths\DecreesPath;
 use LiturgicalCalendar\Api\Paths\SchemasPath;
-use Swaggest\JsonSchema\Schema;
 
 class Router
 {

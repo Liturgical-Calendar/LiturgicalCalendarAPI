@@ -22,6 +22,8 @@ final class SchemasTest extends ApiTestCase
             $_ENV['API_HOST'],
             $_ENV['API_PORT']
         );
+
+        // There are not more than 20 schemas, so this shouldn't be too expensive
         foreach ($data->litcal_schemas as $schema) {
             $this->assertIsString($schema);
             $this->assertMatchesRegularExpression($regex, $schema);
@@ -45,6 +47,11 @@ final class SchemasTest extends ApiTestCase
     {
         $response = $this->http->post('/schemas');
         $this->assertSame(200, $response->getStatusCode());
+
+        $data = json_decode((string) $response->getBody());
+        $this->assertIsObject($data);
+        $this->assertObjectHasProperty('litcal_schemas', $data);
+        $this->assertIsArray($data->litcal_schemas);
     }
 
     public function testGetSchemasReturnsYaml(): void
