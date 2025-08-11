@@ -20,7 +20,7 @@ final class CalendarsTest extends ApiTestCase
     {
         $response = $this->http->get('/calendars');
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
-        $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'));
+        $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
         // Decode JSON and check
         $data = json_decode((string) $response->getBody());
@@ -40,16 +40,16 @@ final class CalendarsTest extends ApiTestCase
 
         // Assert status code
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
-        $this->assertStringStartsWith('application/yaml', $response->getHeaderLine('Content-Type'));
+        $this->assertStringStartsWith('application/yaml', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/yaml');
 
         // Decode YAML and check
         $yaml = yaml_parse((string) $response->getBody());
-        $this->assertIsArray($yaml);
+        $this->assertIsArray($yaml, 'YAML Response should be an array');
         $encoded = json_encode($yaml);
-        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
+        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'YAML Response should have been encoded to JSON ' . json_last_error_msg());
         $data = json_decode($encoded);
-        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
-        $this->assertIsObject($data);
+        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'JSON encoded YAML Response should have been decoded as an object: ' . json_last_error_msg());
+        $this->assertIsObject($data, 'Response should have been transformed to a JSON object');
         $this->assertionsForCalendarObject($data);
     }
 
@@ -59,7 +59,7 @@ final class CalendarsTest extends ApiTestCase
 
         // Assert status code
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
-        $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'));
+        $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
         // Decode JSON and check
         $data = json_decode((string) $response->getBody());
@@ -320,29 +320,46 @@ final class CalendarsTest extends ApiTestCase
     {
         parent::setUp();
 
-        $filePath = __DIR__ . '/../jsondata/world_dioceses.json';
-        $this->assertFileExists($filePath, 'File not found: ' . $filePath);
+        // Only load the data once
+        if (false === isset(self::$diocesesLatinRiteByNation)) {
+            $filePath = __DIR__ . '/../jsondata/world_dioceses.json';
 
-        $catholicDiocesesRaw = file_get_contents($filePath);
-        $this->assertNotFalse($catholicDiocesesRaw, 'Failed to read file: ' . $filePath);
+            // File existence and readability
+            if (!file_exists($filePath)) {
+                throw new \RuntimeException("File not found: {$filePath}");
+            }
+            if (!is_readable($filePath)) {
+                throw new \RuntimeException("File not readable: {$filePath}");
+            }
 
-        $catholicDioceses = json_decode($catholicDiocesesRaw, true);
-        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
+            // Load file
+            $catholicDiocesesRaw = file_get_contents($filePath);
+            if ($catholicDiocesesRaw === false) {
+                throw new \RuntimeException("Failed to read file: {$filePath}");
+            }
 
-        $dioceseIDArray = [];
-        foreach ($catholicDioceses['catholic_dioceses_latin_rite'] as $nation) {
-            $nationID   = strtoupper($nation['country_iso']);
-            $dioceseIDs = array_column($nation['dioceses'], 'diocese_id');
-            array_push($dioceseIDArray, ...$dioceseIDs);
-            self::$diocesesLatinRiteByNation[$nationID] = $dioceseIDs;
+            // Decode JSON with strict error handling
+            try {
+                $catholicDioceses = json_decode($catholicDiocesesRaw, true, 512, JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                throw new \RuntimeException("Invalid JSON in {$filePath}: " . $e->getMessage(), 0, $e);
+            }
+
+            $dioceseIDArray = [];
+            foreach ($catholicDioceses['catholic_dioceses_latin_rite'] as $nation) {
+                $nationID   = strtoupper($nation['country_iso']);
+                $dioceseIDs = array_column($nation['dioceses'], 'diocese_id');
+                array_push($dioceseIDArray, ...$dioceseIDs);
+                self::$diocesesLatinRiteByNation[$nationID] = $dioceseIDs;
+            }
+            self::$dioceseIDs = $dioceseIDArray;
+
+            self::$WIDER_REGION_API_PATH_PATTERN = sprintf(
+                '/^%s:\/\/%s:%d\/data\/widerregion\/(Europe|Africa|Asia|Oceania|Americas)\?locale=\{locale\}$/',
+                $_ENV['API_PROTOCOL'],
+                $_ENV['API_HOST'],
+                $_ENV['API_PORT']
+            );
         }
-        self::$dioceseIDs = $dioceseIDArray;
-
-        self::$WIDER_REGION_API_PATH_PATTERN = sprintf(
-            '/^%s:\/\/%s:%d\/data\/widerregion\/(Europe|Africa|Asia|Oceania|Americas)\?locale=\{locale\}$/',
-            $_ENV['API_PROTOCOL'],
-            $_ENV['API_HOST'],
-            $_ENV['API_PORT']
-        );
     }
 }

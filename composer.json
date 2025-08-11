@@ -51,8 +51,8 @@
         "lint:fix": "phpcbf || echo 'Lint fixing failed. Please check the linting failures and fix them manually.'",
         "analyse": "phpstan analyse",
         "parallel-lint": "parallel-lint --exclude .git --exclude vendor .",
-        "test": "phpunit",
-        "test:quick": "phpunit --exclude-group slow",
+        "test": "phpunit --testdox --display-warnings",
+        "test:quick": "phpunit --testdox --display-warnings --exclude-group slow",
         "start": "./start-server.sh",
         "stop": "./stop-server.sh"
     },

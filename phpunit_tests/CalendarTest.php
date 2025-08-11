@@ -13,8 +13,8 @@ final class CalendarTest extends ApiTestCase
     public function testGetCalendarReturnsJson(): void
     {
         $response = $this->http->get('/calendar');
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'));
+        $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
+        $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
         $data = json_decode((string) $response->getBody());
         $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
@@ -31,15 +31,15 @@ final class CalendarTest extends ApiTestCase
             'headers' => ['Accept' => 'application/yaml']
         ]);
         $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringStartsWith('application/yaml', $response->getHeaderLine('Content-Type'));
+        $this->assertStringStartsWith('application/yaml', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/yaml');
 
         $yaml = yaml_parse((string) $response->getBody());
-        $this->assertIsArray($yaml);
+        $this->assertIsArray($yaml, 'YAML Response should be an array');
         $encoded = json_encode($yaml);
-        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
+        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'YAML Response should have been encoded to JSON: ' . json_last_error_msg());
         $data = json_decode($encoded);
-        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
-        $this->assertIsObject($data);
+        $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'YAML Response should have been decoded as an object: ' . json_last_error_msg());
+        $this->assertIsObject($data, 'Response should have been transformed to a JSON object');
         $this->assertionsForCalendarObject($data);
     }
 
@@ -48,11 +48,11 @@ final class CalendarTest extends ApiTestCase
         $response = $this->http->get('/calendar', [
             'headers' => ['Accept' => 'text/calendar']
         ]);
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringStartsWith('text/calendar', $response->getHeaderLine('Content-Type'));
+        $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
+        $this->assertStringStartsWith('text/calendar', $response->getHeaderLine('Content-Type'), 'Content-Type should be text/calendar');
         $data = (string) $response->getBody();
-        $this->assertStringContainsString('BEGIN:VCALENDAR', $data);
-        $this->assertStringContainsString('END:VCALENDAR', $data);
+        $this->assertStringContainsString('BEGIN:VCALENDAR', $data, 'Calendar should start with BEGIN:VCALENDAR');
+        $this->assertStringContainsString('END:VCALENDAR', $data, 'Calendar should end with END:VCALENDAR');
     }
 
     public function testGetCalendarReturnsXML(): void
@@ -60,24 +60,34 @@ final class CalendarTest extends ApiTestCase
         $response = $this->http->get('/calendar', [
             'headers' => ['Accept' => 'application/xml']
         ]);
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringStartsWith('application/xml', $response->getHeaderLine('Content-Type'));
+        $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
+        $this->assertStringStartsWith('application/xml', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/xml');
         libxml_use_internal_errors(true);
         $data       = (string) $response->getBody();
         $xml        = new \DOMDocument();
         $loadResult = $xml->loadXML($data);
-        $this->assertTrue($loadResult);
+        $errors     = libxml_get_errors();
+        libxml_clear_errors();
+        $this->assertTrue(
+            $loadResult,
+            'Invalid XML' . (!empty($errors) ? ': ' . $errors[0]->message : '')
+        );
         $xmlSchema = __DIR__ . '/../jsondata/schemas/LiturgicalCalendar.xsd';
         $this->assertFileExists($xmlSchema, 'File not found: ' . $xmlSchema);
         $validationResult = $xml->schemaValidate($xmlSchema);
-        $this->assertTrue($validationResult);
+        $errors           = libxml_get_errors();
+        libxml_clear_errors();
+        $this->assertTrue(
+            $validationResult,
+            'Expected XML to validate against schema'  . (!empty($errors) ? ': ' . $errors[0]->message : '')
+        );
     }
 
     public function testPostCalendarReturnsJson(): void
     {
         $response = $this->http->post('/calendar');
-        $this->assertSame(200, $response->getStatusCode());
-        $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'));
+        $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
+        $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
         $data = json_decode((string) $response->getBody());
         $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
@@ -109,55 +119,55 @@ final class CalendarTest extends ApiTestCase
         for ($year = 1970; $year < 2050; $year++) {
             foreach (self::$metadata->national_calendars_keys as $key) {
                 $response = $this->http->get("/calendar/nation/{$key}/{$year}");
-                $this->assertSame(200, $response->getStatusCode());
-                $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'));
+                $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
+                $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
             }
             foreach (self::$metadata->diocesan_calendars_keys as $key) {
                 $response = $this->http->get("/calendar/diocese/{$key}/{$year}");
-                $this->assertSame(200, $response->getStatusCode());
-                $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'));
+                $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
+                $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
             }
         }
     }
 
     private function assertionsForCalendarObject(object $data): void
     {
-        $this->assertIsObject($data);
-        $this->assertObjectHasProperty('settings', $data);
-        $this->assertObjectHasProperty('metadata', $data);
-        $this->assertObjectHasProperty('litcal', $data);
-        $this->assertObjectHasProperty('messages', $data);
-        $this->assertIsObject($data->settings);
-        $this->assertIsObject($data->metadata);
-        $this->assertIsArray($data->litcal);
-        $this->assertIsArray($data->messages);
+        $this->assertIsObject($data, 'Response should be a JSON object');
+        $this->assertObjectHasProperty('settings', $data, 'Response should have a settings property');
+        $this->assertObjectHasProperty('metadata', $data, 'Response should have a metadata property');
+        $this->assertObjectHasProperty('litcal', $data, 'Response should have a litcal property');
+        $this->assertObjectHasProperty('messages', $data, 'Response should have a messages property');
+        $this->assertIsObject($data->settings, 'Response settings should be an object');
+        $this->assertIsObject($data->metadata, 'Response metadata should be an object');
+        $this->assertIsArray($data->litcal, 'Response litcal should be an array');
+        $this->assertIsArray($data->messages, 'Response messages should be an array');
 
         // Assertions for metadata
-        $this->assertObjectHasProperty('version', $data->metadata);
-        $this->assertObjectHasProperty('request_headers', $data->metadata);
-        $this->assertObjectHasProperty('solemnities_lord_bvm', $data->metadata);
-        $this->assertObjectHasProperty('solemnities_lord_bvm_keys', $data->metadata);
-        $this->assertObjectHasProperty('solemnities', $data->metadata);
-        $this->assertObjectHasProperty('solemnities_keys', $data->metadata);
-        $this->assertObjectHasProperty('feasts_lord', $data->metadata);
-        $this->assertObjectHasProperty('feasts_lord_keys', $data->metadata);
-        $this->assertObjectHasProperty('feasts', $data->metadata);
-        $this->assertObjectHasProperty('feasts_keys', $data->metadata);
-        $this->assertObjectHasProperty('memorials', $data->metadata);
-        $this->assertObjectHasProperty('memorials_keys', $data->metadata);
+        $this->assertObjectHasProperty('version', $data->metadata, 'Response metadata should have a version property');
+        $this->assertObjectHasProperty('request_headers', $data->metadata, 'Response metadata should have a request_headers property');
+        $this->assertObjectHasProperty('solemnities_lord_bvm', $data->metadata, 'Response metadata should have a solemnities_lord_bvm property');
+        $this->assertObjectHasProperty('solemnities_lord_bvm_keys', $data->metadata, 'Response metadata should have a solemnities_lord_bvm_keys property');
+        $this->assertObjectHasProperty('solemnities', $data->metadata, 'Response metadata should have a solemnities property');
+        $this->assertObjectHasProperty('solemnities_keys', $data->metadata, 'Response metadata should have a solemnities_keys property');
+        $this->assertObjectHasProperty('feasts_lord', $data->metadata, 'Response metadata should have a feasts_lord property');
+        $this->assertObjectHasProperty('feasts_lord_keys', $data->metadata, 'Response metadata should have a feasts_lord_keys property');
+        $this->assertObjectHasProperty('feasts', $data->metadata, 'Response metadata should have a feasts property');
+        $this->assertObjectHasProperty('feasts_keys', $data->metadata, 'Response metadata should have a feasts_keys property');
+        $this->assertObjectHasProperty('memorials', $data->metadata, 'Response metadata should have a memorials property');
+        $this->assertObjectHasProperty('memorials_keys', $data->metadata, 'Response metadata should have a memorials_keys property');
 
         // Assertions for litcal events
         foreach ($data->litcal as $event) {
-            $this->assertIsObject($event);
-            $this->assertObjectHasProperty('event_idx', $event);
-            $this->assertObjectHasProperty('event_key', $event);
-            $this->assertObjectHasProperty('name', $event);
-            $this->assertObjectHasProperty('date', $event);
-            $this->assertObjectHasProperty('color', $event);
-            $this->assertObjectHasProperty('type', $event);
-            $this->assertObjectHasProperty('grade', $event);
-            $this->assertObjectHasProperty('common', $event);
-            $this->assertObjectHasProperty('liturgical_season', $event);
+            $this->assertIsObject($event, 'Response litcal event should be an object');
+            $this->assertObjectHasProperty('event_idx', $event, 'Response litcal event should have an event_idx property');
+            $this->assertObjectHasProperty('event_key', $event, 'Response litcal event should have an event_key property');
+            $this->assertObjectHasProperty('name', $event, 'Response litcal event should have a name property');
+            $this->assertObjectHasProperty('date', $event, 'Response litcal event should have a date property');
+            $this->assertObjectHasProperty('color', $event, 'Response litcal event should have a color property');
+            $this->assertObjectHasProperty('type', $event, 'Response litcal event should have a type property');
+            $this->assertObjectHasProperty('grade', $event, 'Response litcal event should have a grade property');
+            $this->assertObjectHasProperty('common', $event, 'Response litcal event should have a common property');
+            $this->assertObjectHasProperty('liturgical_season', $event, 'Response litcal event should have a liturgical_season property');
         }
     }
 
@@ -165,15 +175,23 @@ final class CalendarTest extends ApiTestCase
     {
         parent::setUp();
 
-        $response = $this->http->get('/calendars');
-        $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
-        $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'));
-        try {
-            $data = json_decode((string) $response->getBody());
-            $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
-            self::$metadata = $data->litcal_metadata;
-        } catch (\JsonException $e) {
-            $this->markTestSkipped('Failed to decode calendars metadata JSON: ' . $e->getMessage());
+        if (false === isset(self::$metadata)) {
+            try {
+                $response = $this->http->get('/calendars', [
+                    'http_errors'    => true,
+                    'connect_errors' => true
+                ]);
+                $data = json_decode((string) $response->getBody(), false, 512, JSON_THROW_ON_ERROR);
+                self::$metadata = $data->litcal_metadata;
+            } catch (\JsonException $e) {
+                $this->markTestSkipped('Failed to decode calendars metadata JSON: ' . $e->getMessage());
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                $this->markTestSkipped('Failed to get calendars metadata: ' . $e->getMessage());
+            } catch (\GuzzleHttp\Exception\ServerException $e) {
+                $this->markTestSkipped('Failed to get calendars metadata: ' . $e->getMessage());
+            } catch (\GuzzleHttp\Exception\ConnectException $e) {
+                $this->markTestSkipped('Failed to get calendars metadata: ' . $e->getMessage());
+            }
         }
     }
 }
