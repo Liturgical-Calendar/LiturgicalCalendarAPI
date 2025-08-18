@@ -88,7 +88,7 @@ class Utilities
 
     /**
      * Used to keep track of the current request hash value.
-     * The value is set from the CalendarPath.php class representing the `/calendar` API path.
+     * The value is set from the CalendarHandler.php class representing the `/calendar` API path.
      * @var string
      */
     public static string $HASH_REQUEST = '';
@@ -544,10 +544,19 @@ class Utilities
      */
     public static function rawContentsFromUrl(string $url): string
     {
-        $rawContents = file_get_contents($url);
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'GET',
+                'header' => 'Accept: application/json',
+            ],
+        ]);
+
+        $rawContents = file_get_contents($url, false, $context);
+
         if (false === $rawContents) {
             throw new \RuntimeException('Unable to read URL ' . $url);
         }
+
         return $rawContents;
     }
 
@@ -614,7 +623,11 @@ class Utilities
     public static function jsonUrlToObject(string $url): \stdClass
     {
         $rawContents = self::rawContentsFromUrl($url);
-        $jsonObj     = json_decode($rawContents, false, 512, JSON_THROW_ON_ERROR);
+        try {
+            $jsonObj = json_decode($rawContents, false, 512, JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            die('Error decoding JSON from URL `' . $url . '`: ' . $e->getMessage() . '; ' . $rawContents);
+        }
         if (false === $jsonObj instanceof \stdClass) {
             throw new \JsonException('JSON URL ' . $url . ' does not contain an object');
         }

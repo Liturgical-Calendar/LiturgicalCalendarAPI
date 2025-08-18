@@ -3,10 +3,11 @@
 namespace LiturgicalCalendar\Api\Enum;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Router;
 
 class LitSchema
 {
-    private const SCHEMA_BASE_PATH = API_BASE_PATH . '/' . JsonData::SCHEMAS_FOLDER;
+    private const SCHEMA_BASE_PATH = JsonData::SCHEMAS_FOLDER->path();
     public const DIOCESAN          = self::SCHEMA_BASE_PATH . '/DiocesanCalendar.json';
     public const NATIONAL          = self::SCHEMA_BASE_PATH . '/NationalCalendar.json';
     public const PROPRIUMDESANCTIS = self::SCHEMA_BASE_PATH . '/PropriumDeSanctis.json';

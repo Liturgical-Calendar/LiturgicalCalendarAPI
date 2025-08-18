@@ -1,7 +1,7 @@
 LiturgicalCalendar.iml
 .idea
 engineCache/*
-allowedOrigins.php
+allowedOrigins.*
 vendor/*
 *.log
 ValidateTestsAgainstSchema.php

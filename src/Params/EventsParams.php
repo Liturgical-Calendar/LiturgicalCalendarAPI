@@ -6,6 +6,7 @@ use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\ParamError;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
+use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
 
 /**
@@ -75,7 +76,7 @@ class EventsParams implements ParamsInterface
     public function __construct(array $params = [])
     {
         /** @var \stdClass&object{litcal_metadata:MetadataCalendarsObject} $calendarsMetadataObj */
-        $calendarsMetadataObj    = Utilities::jsonUrlToObject(API_BASE_PATH . Route::CALENDARS->value);
+        $calendarsMetadataObj    = Utilities::jsonUrlToObject(Router::$apiPath . Route::CALENDARS->value);
         $this->calendarsMetadata = MetadataCalendars::fromObject($calendarsMetadataObj->litcal_metadata);
 
         //we need at least a default value for the current year and for the locale

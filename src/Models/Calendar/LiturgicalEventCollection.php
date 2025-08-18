@@ -7,7 +7,7 @@ use LiturgicalCalendar\Api\Enum\LitCommon;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\LitSeason;
-use LiturgicalCalendar\Api\Params\CalendarParams;
+use LiturgicalCalendar\Api\Params\CalendarParamsHandler;
 use LiturgicalCalendar\Api\Map\LiturgicalEventsMap;
 use LiturgicalCalendar\Api\Map\SolemnitiesLordBVMMap;
 use LiturgicalCalendar\Api\Map\SolemnitiesMap;
@@ -104,7 +104,7 @@ final class LiturgicalEventCollection
     private array $Messages;
 
     private \IntlDateFormatter $dayOfTheWeek;
-    private CalendarParams $CalendarParams;
+    private CalendarParamsHandler $CalendarParams;
 
     public static ReadingsGeneralRoman $lectionary;
 
@@ -139,11 +139,11 @@ final class LiturgicalEventCollection
      * Initializes various maps and settings required for generating
      * the liturgical calendar based on the provided CalendarParams.
      *
-     * @param CalendarParams $CalendarParams The parameters used to define the context
+     * @param CalendarParamsHandler $CalendarParams The parameters used to define the context
      *                                        for the liturgical events, including locale
      *                                        and other configurations.
      */
-    public function __construct(CalendarParams $CalendarParams)
+    public function __construct(CalendarParamsHandler $CalendarParams)
     {
         $this->CalendarParams = $CalendarParams;
         $dowFormatter         = \IntlDateFormatter::create(

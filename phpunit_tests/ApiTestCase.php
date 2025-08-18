@@ -58,4 +58,22 @@ abstract class ApiTestCase extends TestCase
     {
         $this->http = null;
     }
+
+    protected static function findProjectRoot(string $startDir = __DIR__, string $marker = 'composer.json'): ?string
+    {
+        $dir = $startDir;
+
+        while (true) {
+            if (file_exists($dir . DIRECTORY_SEPARATOR . $marker)) {
+                return $dir;
+            }
+
+            $parentDir = dirname($dir);
+            if ($parentDir === $dir) { // reached the project root
+                return null;
+            }
+
+            $dir = $parentDir;
+        }
+    }
 }

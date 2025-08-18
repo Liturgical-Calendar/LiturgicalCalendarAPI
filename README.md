@@ -63,8 +63,8 @@ _(See [usage.php#calSubscription](https://litcal.johnromanodorazio.com/usage.php
 
 System requirements:
 * PHP >= 8.4 (we make use of more modern PHP functions such as `array_find`)
-* PHP modules installed and enabled: `intl` * `zip` * `gettext` * `calendar` * `yaml`
-* System language packs for all the supported languages
+* PHP modules installed and enabled: `intl` * `zip` * `calendar` * `yaml`
+* System package `gettext` and language packs for all the supported languages
 
 ## Using PHP's builtin server
 
@@ -82,10 +82,11 @@ The `composer.json` file also defines a couple scripts to simplify this process:
 * `composer stop`: stop the server by calling `stop-server.sh`
 
 You can also use the `start-server.sh` and `stop-server.sh` scripts directly to spawn and stop the server. Please ensure that both scripts are executable (`chmod +x`).
-The **start** script will write the server's PID to a file called `server.pid` in the current directory, and the **stop** script will remove the `server.pid` file.
+The **start** script will write the server's PID to a file called `server.pid` in the current directory,
+and the **stop** script will terminate the process by its PID and remove the `server.pid` file.
 
 You can customize the port that the server will be running on by setting the `API_PORT` environment variable in the `.env` or `.env.local` file
-(the same file used by the API application to load environment variables).
+(the same files used by the PHP application to load environment variables).
 
 ## Using a docker container
 

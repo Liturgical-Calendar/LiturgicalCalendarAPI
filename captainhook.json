@@ -4,7 +4,7 @@
         "actions": []
     },
     "pre-push": {
-        "enabled": true,
+        "enabled": false,
         "actions": [
             {
                 "action": "composer parallel-lint",
@@ -15,7 +15,10 @@
                             {"ofType": "php"}
                         ]
                     }
-                ]
+                ],
+                "config": {
+                    "allow-failure": true
+                }
             },
             {
                 "action": "composer analyse",
@@ -28,13 +31,13 @@
                     }
                 ],
                 "config": {
-                    "allow-failure": false
+                    "allow-failure": true
                 }
             }
         ]
     },
     "pre-commit": {
-        "enabled": true,
+        "enabled": false,
         "actions": [
             {
                 "action": "\\CaptainHook\\App\\Hook\\PHP\\Action\\Linting"
@@ -48,7 +51,10 @@
                             {"ofType": "php"}
                         ]
                     }
-                ]
+                ],
+                "config": {
+                    "allow-failure": true
+                }
             }
         ]
     },

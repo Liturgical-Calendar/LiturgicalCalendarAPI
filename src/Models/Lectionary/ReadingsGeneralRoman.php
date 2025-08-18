@@ -33,47 +33,47 @@ final class ReadingsGeneralRoman
     {
         $filesToLoad = [
             'sanctorale'               => strtr(
-                JsonData::LECTIONARY_SAINTS_FILE,
+                JsonData::LECTIONARY_SAINTS_FILE->path(),
                 [ '{locale}' => $locale ]
             ),
             'sundaysSolemnitiesCycleA' => strtr(
-                JsonData::LECTIONARY_SUNDAYS_SOLEMNITIES_A_FILE,
+                JsonData::LECTIONARY_SUNDAYS_SOLEMNITIES_A_FILE->path(),
                 [ '{locale}' => $locale ]
             ),
             'sundaysSolemnitiesCycleB' => strtr(
-                JsonData::LECTIONARY_SUNDAYS_SOLEMNITIES_B_FILE,
+                JsonData::LECTIONARY_SUNDAYS_SOLEMNITIES_B_FILE->path(),
                 [ '{locale}' => $locale ]
             ),
             'sundaysSolemnitiesCycleC' => strtr(
-                JsonData::LECTIONARY_SUNDAYS_SOLEMNITIES_C_FILE,
+                JsonData::LECTIONARY_SUNDAYS_SOLEMNITIES_C_FILE->path(),
                 [ '{locale}' => $locale ]
             ),
             'weekdaysCycleI'           => strtr(
-                JsonData::LECTIONARY_WEEKDAYS_ORDINARY_I_FILE,
+                JsonData::LECTIONARY_WEEKDAYS_ORDINARY_I_FILE->path(),
                 [ '{locale}' => $locale ]
             ),
             'weekdaysCycleII'          => strtr(
-                JsonData::LECTIONARY_WEEKDAYS_ORDINARY_II_FILE,
+                JsonData::LECTIONARY_WEEKDAYS_ORDINARY_II_FILE->path(),
                 [ '{locale}' => $locale ]
             ),
             'weekdaysAdvent'           => strtr(
-                JsonData::LECTIONARY_WEEKDAYS_ADVENT_FILE,
+                JsonData::LECTIONARY_WEEKDAYS_ADVENT_FILE->path(),
                 [ '{locale}' => $locale ]
             ),
             'weekdaysChristmas'        => strtr(
-                JsonData::LECTIONARY_WEEKDAYS_CHRISTMAS_FILE,
+                JsonData::LECTIONARY_WEEKDAYS_CHRISTMAS_FILE->path(),
                 [ '{locale}' => $locale ]
             ),
             'weekdaysLent'             => strtr(
-                JsonData::LECTIONARY_WEEKDAYS_LENT_FILE,
+                JsonData::LECTIONARY_WEEKDAYS_LENT_FILE->path(),
                 [ '{locale}' => $locale ]
             ),
             'weekdaysEaster'           => strtr(
-                JsonData::LECTIONARY_WEEKDAYS_EASTER_FILE,
+                JsonData::LECTIONARY_WEEKDAYS_EASTER_FILE->path(),
                 [ '{locale}' => $locale ]
             ),
             'decreeReadings'           => strtr(
-                JsonData::LECTIONARY_DECREES_FILE,
+                JsonData::LECTIONARY_DECREES_FILE->path(),
                 [ '{locale}' => $locale ]
             )
         ];

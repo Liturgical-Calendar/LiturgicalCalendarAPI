@@ -4,6 +4,7 @@ namespace LiturgicalCalendar\Api\Enum;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadata;
+use LiturgicalCalendar\Api\Router;
 
 /**
  * Enum class for the different Roman Missals that are used in the Liturgical Calendar API.
@@ -43,7 +44,7 @@ class RomanMissal
      * @var string[]
      * @see \LiturgicalCalendar\Api\Enum\RomanMissal::isValid()
      */
-    public static array $values = [
+    private static array $values = [
         'EDITIO_TYPICA_1970',
         'EDITIO_TYPICA_1971',
         'EDITIO_TYPICA_1975',
@@ -64,7 +65,7 @@ class RomanMissal
      * @var array<string,string>
      * @see \LiturgicalCalendar\Api\Enum\RomanMissal::getName()
      */
-    public static array $names = [
+    private static array $names = [
         self::EDITIO_TYPICA_1970                 => 'Editio Typica 1970',
         self::REIMPRESSIO_EMENDATA_1971          => 'Reimpressio Emendata 1971',
         self::EDITIO_TYPICA_SECUNDA_1975         => 'Editio Typica Secunda 1975',
@@ -85,14 +86,14 @@ class RomanMissal
      * @var array<string,string|false>
      * @see \LiturgicalCalendar\Api\Enum\RomanMissal::getSanctoraleFileName()
      */
-    public static array $jsonFiles = [
-        self::EDITIO_TYPICA_1970                 => JsonData::MISSALS_FOLDER . '/propriumdesanctis_1970/propriumdesanctis_1970.json',
+    private static array $jsonFiles = [
+        self::EDITIO_TYPICA_1970                 => '/propriumdesanctis_1970/propriumdesanctis_1970.json',
         self::REIMPRESSIO_EMENDATA_1971          => false,
         self::EDITIO_TYPICA_SECUNDA_1975         => false,
-        self::EDITIO_TYPICA_TERTIA_2002          => JsonData::MISSALS_FOLDER . '/propriumdesanctis_2002/propriumdesanctis_2002.json',
-        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008 => JsonData::MISSALS_FOLDER . '/propriumdesanctis_2008/propriumdesanctis_2008.json',
-        self::USA_EDITION_2011                   => JsonData::MISSALS_FOLDER . '/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json',
-        self::ITALY_EDITION_1983                 => JsonData::MISSALS_FOLDER . '/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json',
+        self::EDITIO_TYPICA_TERTIA_2002          => '/propriumdesanctis_2002/propriumdesanctis_2002.json',
+        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008 => '/propriumdesanctis_2008/propriumdesanctis_2008.json',
+        self::USA_EDITION_2011                   => '/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json',
+        self::ITALY_EDITION_1983                 => '/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json',
         self::ITALY_EDITION_2020                 => false,
         self::NETHERLANDS_EDITION_1978           => false,
         self::CANADA_EDITION_2011                => false,
@@ -106,14 +107,14 @@ class RomanMissal
      * @var array<string,string|false>
      * @see \LiturgicalCalendar\Api\Enum\RomanMissal::getSanctoraleI18nFilePath()
      */
-    public static array $i18nPath = [
-        self::EDITIO_TYPICA_1970                 => JsonData::MISSALS_FOLDER . '/propriumdesanctis_1970/i18n/',
+    private static array $i18nPath = [
+        self::EDITIO_TYPICA_1970                 => '/propriumdesanctis_1970/i18n/',
         self::REIMPRESSIO_EMENDATA_1971          => false,
         self::EDITIO_TYPICA_SECUNDA_1975         => false,
-        self::EDITIO_TYPICA_TERTIA_2002          => JsonData::MISSALS_FOLDER . '/propriumdesanctis_2002/i18n/',
-        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008 => JsonData::MISSALS_FOLDER . '/propriumdesanctis_2008/i18n/',
-        self::USA_EDITION_2011                   => JsonData::MISSALS_FOLDER . '/propriumdesanctis_US_2011/i18n/',
-        self::ITALY_EDITION_1983                 => JsonData::MISSALS_FOLDER . '/propriumdesanctis_IT_1983/i18n/',
+        self::EDITIO_TYPICA_TERTIA_2002          => '/propriumdesanctis_2002/i18n/',
+        self::EDITIO_TYPICA_TERTIA_EMENDATA_2008 => '/propriumdesanctis_2008/i18n/',
+        self::USA_EDITION_2011                   => '/propriumdesanctis_US_2011/i18n/',
+        self::ITALY_EDITION_1983                 => '/propriumdesanctis_IT_1983/i18n/',
         self::ITALY_EDITION_2020                 => false,
         self::NETHERLANDS_EDITION_1978           => false,
         self::CANADA_EDITION_2011                => false,
@@ -127,14 +128,14 @@ class RomanMissal
      * @var array<string,string|false>
      * @see \LiturgicalCalendar\Api\Enum\RomanMissal::getLectionaryFilePath()
      */
-    public static array $lectionaryPath = [
+    private static array $lectionaryPath = [
         self::EDITIO_TYPICA_1970                 => false,
         self::REIMPRESSIO_EMENDATA_1971          => false,
         self::EDITIO_TYPICA_SECUNDA_1975         => false,
         self::EDITIO_TYPICA_TERTIA_2002          => false,
         self::EDITIO_TYPICA_TERTIA_EMENDATA_2008 => false,
-        self::USA_EDITION_2011                   => JsonData::MISSALS_FOLDER . '/propriumdesanctis_US_2011/lectionary/',
-        self::ITALY_EDITION_1983                 => JsonData::MISSALS_FOLDER . '/propriumdesanctis_IT_1983/lectionary/',
+        self::USA_EDITION_2011                   => '/propriumdesanctis_US_2011/lectionary/',
+        self::ITALY_EDITION_1983                 => '/propriumdesanctis_IT_1983/lectionary/',
         self::ITALY_EDITION_2020                 => false,
         self::NETHERLANDS_EDITION_1978           => false,
         self::CANADA_EDITION_2011                => false,
@@ -149,7 +150,7 @@ class RomanMissal
      * @var array<string,array{since_year:int,until_year?:int}>
      * @see \LiturgicalCalendar\Api\Enum\RomanMissal::getYearLimits()
      */
-    public static array $yearLimits = [
+    private static array $yearLimits = [
         self::EDITIO_TYPICA_1970                 => [ 'since_year' => 1970 ],
         self::REIMPRESSIO_EMENDATA_1971          => [ 'since_year' => 1971 ],
         self::EDITIO_TYPICA_SECUNDA_1975         => [ 'since_year' => 1975 ],
@@ -180,12 +181,12 @@ class RomanMissal
     /**
      * Checks if a given value is a Latin Missal (Editio Typica).
      *
-     * @param string $value the value to check
+     * @param string $missal_id the value to check
      * @return bool true if the value is a Latin Missal, false otherwise
      */
-    public static function isLatinMissal(string $value): bool
+    public static function isLatinMissal(string $missal_id): bool
     {
-        return in_array($value, self::$values) && str_starts_with($value, 'EDITIO_TYPICA_');
+        return in_array($missal_id, self::$values) && str_starts_with($missal_id, 'EDITIO_TYPICA_');
     }
 
     /**
@@ -197,7 +198,7 @@ class RomanMissal
      */
     public static function getName(string $missal_id): string
     {
-        if (false === RomanMissal::isValid($missal_id)) {
+        if (false === self::isValid($missal_id)) {
             throw new \InvalidArgumentException('Invalid missal_id: ' . $missal_id);
         }
         return self::$names[$missal_id];
@@ -211,7 +212,12 @@ class RomanMissal
      */
     public static function getSanctoraleFileName(string $missal_id): string|false|null
     {
-        return isset(self::$jsonFiles[$missal_id]) ? self::$jsonFiles[$missal_id] : null;
+        if (false === isset(self::$jsonFiles[$missal_id])) {
+            return null;
+        }
+        return is_string(self::$jsonFiles[$missal_id])
+            ? JsonData::MISSALS_FOLDER->path() . self::$jsonFiles[$missal_id]
+            : false;
     }
 
     /**
@@ -222,7 +228,12 @@ class RomanMissal
      */
     public static function getSanctoraleI18nFilePath(string $missal_id): string|false|null
     {
-        return isset(self::$i18nPath[$missal_id]) ? self::$i18nPath[$missal_id] : null;
+        if (false === isset(self::$i18nPath[$missal_id])) {
+            return null;
+        }
+        return is_string(self::$i18nPath[$missal_id])
+            ? JsonData::MISSALS_FOLDER->path() . self::$i18nPath[$missal_id]
+            : false;
     }
 
     /**
@@ -233,7 +244,12 @@ class RomanMissal
      */
     public static function getLectionaryFilePath(string $missal_id): string|false|null
     {
-        return isset(self::$lectionaryPath[$missal_id]) ? self::$lectionaryPath[$missal_id] : null;
+        if (false === isset(self::$lectionaryPath[$missal_id])) {
+            return null;
+        }
+        return is_string(self::$lectionaryPath[$missal_id])
+            ? JsonData::MISSALS_FOLDER->path() . self::$lectionaryPath[$missal_id]
+            : false;
     }
 
     /**
@@ -247,6 +263,26 @@ class RomanMissal
     public static function getYearLimits(string $missal_id): ?array
     {
         return isset(self::$yearLimits[$missal_id]) ? self::$yearLimits[$missal_id] : null;
+    }
+
+    /**
+     * Gets an array of all the valid Roman Missal enumeration constants.
+     *
+     * @return array<string> an array of all the valid Roman Missal enumeration constants
+     */
+    public static function getMissalIds(): array
+    {
+        return self::$values;
+    }
+
+    /**
+     * Gets an array of all the Latin Missal enumeration constants.
+     *
+     * @return array<string> an array of all the Latin Missal enumeration constants
+     */
+    public static function getLatinMissalIds(): array
+    {
+        return array_filter(self::$values, static fn (string $missal_id): bool => self::isLatinMissal($missal_id));
     }
 
     /**
@@ -302,7 +338,7 @@ class RomanMissal
                 'locales'        => $locales,
                 'year_limits'    => self::$yearLimits[$missal_id],
                 'year_published' => self::$yearLimits[$missal_id]['since_year'],
-                'api_path'       => self::getSanctoraleFileName($missal_id) ? API_BASE_PATH . "/missals/$missal_id" : null
+                'api_path'       => self::getSanctoraleFileName($missal_id) ? Router::$apiPath . "/missals/$missal_id" : null
             ];
 
             if ($obj) {
