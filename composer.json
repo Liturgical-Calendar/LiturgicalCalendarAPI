@@ -12,7 +12,9 @@
         "vlucas/phpdotenv": "^5.6",
         "nyholm/psr7": "^1.8@dev",
         "laminas/laminas-httphandlerrunner": "2.13.x-dev",
-        "nyholm/psr7-server": "dev-master"
+        "nyholm/psr7-server": "dev-master",
+        "psr/http-server-middleware": "^1.0@dev",
+        "psr/http-server-handler": "^1.0@dev"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^4.0",

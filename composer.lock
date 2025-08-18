@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b09042a7c6a6ccc2c2ba56925b111604",
+    "content-hash": "aa47cea70b522c3ceeb4ea9b39c636b5",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -788,6 +788,64 @@
                 "source": "https://github.com/php-fig/http-server-handler"
             },
             "time": "2023-11-16T18:17:39+00:00"
+        },
+        {
+            "name": "psr/http-server-middleware",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/http-server-middleware.git",
+                "reference": "459eeb7efeae55b4102a951c4ecc93a11ce58d0f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/http-server-middleware/zipball/459eeb7efeae55b4102a951c4ecc93a11ce58d0f",
+                "reference": "459eeb7efeae55b4102a951c4ecc93a11ce58d0f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0",
+                "psr/http-message": "^1.0 || ^2.0",
+                "psr/http-server-handler": "^1.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Http\\Server\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "https://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for HTTP server-side middleware",
+            "keywords": [
+                "http",
+                "http-interop",
+                "middleware",
+                "psr",
+                "psr-15",
+                "psr-7",
+                "request",
+                "response"
+            ],
+            "support": {
+                "issues": "https://github.com/php-fig/http-server-middleware/issues",
+                "source": "https://github.com/php-fig/http-server-middleware"
+            },
+            "time": "2023-09-22T11:17:21+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -4968,7 +5026,9 @@
     "stability-flags": {
         "laminas/laminas-httphandlerrunner": 20,
         "nyholm/psr7": 20,
-        "nyholm/psr7-server": 20
+        "nyholm/psr7-server": 20,
+        "psr/http-server-handler": 20,
+        "psr/http-server-middleware": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

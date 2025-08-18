@@ -10,7 +10,7 @@ use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\CacheDuration;
 use LiturgicalCalendar\Api\Handlers\CalendarHandler;
 use LiturgicalCalendar\Api\Handlers\EasterHandler;
-use LiturgicalCalendar\Api\Handlers\EventsPath;
+use LiturgicalCalendar\Api\Handlers\EventsHandler;
 use LiturgicalCalendar\Api\Handlers\MetadataHandler;
 use LiturgicalCalendar\Api\Handlers\TestsHandler;
 use LiturgicalCalendar\Api\Handlers\RegionalDataHandler;
@@ -18,52 +18,21 @@ use LiturgicalCalendar\Api\Handlers\MissalsHandler;
 use LiturgicalCalendar\Api\Handlers\DecreesHandler;
 use LiturgicalCalendar\Api\Handlers\SchemasHandler;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
+use LiturgicalCalendar\Api\Http\Middleware\ErrorHandlingMiddleware;
+use LiturgicalCalendar\Api\Http\Server\MiddlewarePipeline;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 class Router
 {
     public static string $apiBase;
     public static string $apiPath;
     public static string $apiFilePath;
-    public static Response $response;
-
-
-    /**
-     * Returns true if the server is running on localhost.
-     *
-     * @return bool true if the server is running on localhost, false otherwise
-     */
-    public static function isLocalhost(): bool
-    {
-        $localhostAddresses = ['127.0.0.1', '::1', '0.0.0.0'];
-        $localhostNames     = ['localhost', '127.0.0.1', '::1', '0.0.0.0'];
-        return in_array($_SERVER['SERVER_ADDR'] ?? '', $localhostAddresses) ||
-               in_array($_SERVER['REMOTE_ADDR'] ?? '', $localhostAddresses) ||
-               in_array($_SERVER['SERVER_NAME'] ?? '', $localhostNames);
-    }
-
-    private static function retrieveRequest(): ServerRequestInterface
-    {
-        $psr17Factory = new Psr17Factory();
-        $creator      = new ServerRequestCreator(
-            $psr17Factory, // ServerRequestFactory
-            $psr17Factory, // UriFactory
-            $psr17Factory, // UploadedFileFactory
-            $psr17Factory  // StreamFactory
-        );
-        return $creator->fromGlobals();
-    }
-
-    private static function emitResponse(ResponseInterface $response): never
-    {
-        $sapiEmitter = new SapiEmitter();
-        $sapiEmitter->emit($response);
-        die();
-    }
+    private static RequestHandlerInterface $handler;
 
     /**
      * This is the main entry point of the API. It takes care of determining which
@@ -104,10 +73,8 @@ class Router
                 $calendarHandler->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS, AcceptHeader::YAML ]);
                 $calendarHandler->setAllowedReturnTypes([ ReturnTypeParam::JSON, ReturnTypeParam::XML, ReturnTypeParam::ICS, ReturnTypeParam::YAML ]);
                 $calendarHandler->setCacheDuration(CacheDuration::MONTH);
-                $response = $calendarHandler->handle($request);
-                Router::emitResponse($response);
-                //$calendarHandler->init($requestPathParts);
-                // no break (always terminates)
+                self::$handler = $calendarHandler;
+                break;
             case 'metadata':
                 // no break (intentional fallthrough)
             case 'calendars':
@@ -118,9 +85,8 @@ class Router
                 ]);
                 $metadataHandler->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA, RequestContentType::MULTIPART ]);
                 $metadataHandler->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
-                $response = $metadataHandler->handle($request);
-                Router::emitResponse($response);
-                // no break (always terminates)
+                self::$handler = $metadataHandler;
+                break;
             case 'missals':
                 $missalsHandler = new MissalsHandler($requestPathParts);
                 $missalsHandler->setAllowedRequestMethods([
@@ -138,10 +104,8 @@ class Router
                 ) {
                     $missalsHandler->setAllowedOriginsFromFile('allowedOrigins.txt');
                 }
-
-                $respoonse = $missalsHandler->handle($request);
-                Router::emitResponse($respoonse);
-                // no break (always terminates)
+                self::$handler = $missalsHandler;
+                break;
             case 'decrees':
                 $decreesHandler = new DecreesHandler($requestPathParts);
                 $decreesHandler->setAllowedRequestMethods([
@@ -159,9 +123,8 @@ class Router
                 ) {
                     $decreesHandler->setAllowedOriginsFromFile('allowedOrigins.txt');
                 }
-                $response = $decreesHandler->handle($request);
-                 Router::emitResponse($response);
-                // no break (always terminates)
+                self::$handler = $decreesHandler;
+                break;
             /*
             case 'tests':
                 TestsHandler::init($requestPathParts);
@@ -257,6 +220,46 @@ class Router
                 $response = new Response(StatusCode::NOT_FOUND->value, [], null, $request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
                 Router::emitResponse($response);
         }
+
+        $pipeline     = new MiddlewarePipeline(self::$handler);
+        $psr17Factory = new Psr17Factory();
+        $debug        = ( Router::isLocalhost() || isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development' );
+        $pipeline->pipe(new ErrorHandlingMiddleware($psr17Factory, $debug)); // outermost middleware
+        $response = $pipeline->handle($request);
+        Router::emitResponse($response);
+    }
+
+    /**
+     * Returns true if the server is running on localhost.
+     *
+     * @return bool true if the server is running on localhost, false otherwise
+     */
+    public static function isLocalhost(): bool
+    {
+        $localhostAddresses = ['127.0.0.1', '::1', '0.0.0.0'];
+        $localhostNames     = ['localhost', '127.0.0.1', '::1', '0.0.0.0'];
+        return in_array($_SERVER['SERVER_ADDR'] ?? '', $localhostAddresses) ||
+               in_array($_SERVER['REMOTE_ADDR'] ?? '', $localhostAddresses) ||
+               in_array($_SERVER['SERVER_NAME'] ?? '', $localhostNames);
+    }
+
+    private static function retrieveRequest(): ServerRequestInterface
+    {
+        $psr17Factory = new Psr17Factory();
+        $creator      = new ServerRequestCreator(
+            $psr17Factory, // ServerRequestFactory
+            $psr17Factory, // UriFactory
+            $psr17Factory, // UploadedFileFactory
+            $psr17Factory  // StreamFactory
+        );
+        return $creator->fromGlobals();
+    }
+
+    private static function emitResponse(ResponseInterface $response): never
+    {
+        $sapiEmitter = new SapiEmitter();
+        $sapiEmitter->emit($response);
+        die();
     }
 
     private static function getApiPaths(): void

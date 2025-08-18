@@ -5099,7 +5099,7 @@ final class CalendarHandler extends AbstractHandler
                 $response = $this->prepareResponseBody($response);
             } else {
                 $this->Cal->sortLiturgicalEvents();
-                $$response = $this->prepareResponseBody($response);
+                $response = $this->prepareResponseBody($response);
             }
         }
 
