@@ -20,6 +20,7 @@ use LiturgicalCalendar\Api\Http\Exception\YamlException;
 use LiturgicalCalendar\Api\Http\Negotiator;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItem;
 use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadataMap;
+use Nyholm\Psr7\Response;
 
 abstract class AbstractHandler implements RequestHandlerInterface
 {
@@ -637,5 +638,16 @@ abstract class AbstractHandler implements RequestHandlerInterface
         return $response
             ->withStatus(StatusCode::OK->value, StatusCode::OK->reason())
             ->withBody(Stream::create($encodedResponse));
+    }
+
+    protected static function createResponse(ServerRequestInterface $request): ResponseInterface
+    {
+        return new Response(
+            StatusCode::PROCESSING->value,   // uncertain status,
+            [],                              // no headers,
+            null,                            // no body;
+            $request->getProtocolVersion(),  // and we always respond with the same HTTP protocol version used in the request.
+            StatusCode::PROCESSING->reason() // The corresponding 'reason' that accompanies the HTTP Status code
+        );
     }
 }

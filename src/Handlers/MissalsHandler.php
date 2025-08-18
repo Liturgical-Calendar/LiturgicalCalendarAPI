@@ -58,13 +58,7 @@ final class MissalsHandler extends AbstractHandler
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         // We instantiate a Response object with minimum state
-        $response = new Response(
-            StatusCode::PROCESSING->value,   // uncertain status,
-            [],                              // no headers,
-            null,                            // no body,
-            $request->getProtocolVersion(),  // and we always respond with the same HTTP protocol version used in the request.
-            StatusCode::PROCESSING->reason() // The corresponding 'reason' that accompanies the HTTP Status code
-        );
+        $response = static::createResponse($request);
 
         $method = RequestMethod::from($request->getMethod());
 
