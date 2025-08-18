@@ -24,6 +24,9 @@ use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Api\Http\Exception\YamlException;
 use LiturgicalCalendar\Api\Models\LitCalItem;
 use LiturgicalCalendar\Api\Models\LitCalItemCollection;
 use LiturgicalCalendar\Api\Models\MissalsMap;
@@ -550,16 +553,15 @@ final class CalendarHandler extends AbstractHandler
      * This method will set the response status code to **400 Bad Request error** if the year
      *   is earlier than 1970.
      */
-    private function validateMinYear(ResponseInterface $response): ResponseInterface
+    private function validateMinYear(): void
     {
         if ($this->CalendarParams->Year < 1970) {
             $message = sprintf(
                 _('Only years from 1970 and after are supported. You tried requesting the year %d.'),
                 $this->CalendarParams->Year
             );
-            return $response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody(Stream::create($message));
+            throw new ValidationException($message);
         }
-        return $response;
     }
 
     /**
@@ -4406,10 +4408,7 @@ final class CalendarHandler extends AbstractHandler
                         'Could not create cache directory: %s.',
                         $this->CachePath
                     );
-                    return $response
-                        ->withHeader('Content-Type', 'text/plain; charset=utf-8')
-                        ->withStatus(StatusCode::SERVICE_UNAVAILABLE->value, StatusCode::SERVICE_UNAVAILABLE->reason())
-                        ->withBody(Stream::create($message));
+                    throw new ServiceUnavailableException($message);
                 }
             }
         }
@@ -4417,7 +4416,7 @@ final class CalendarHandler extends AbstractHandler
         $responseBody = null;
         switch ($this->CalendarParams->ReturnType) {
             case ReturnTypeParam::JSON:
-                $responseBody = json_encode($SerializeableLitCal);
+                $responseBody = json_encode($SerializeableLitCal, JSON_THROW_ON_ERROR);
                 break;
             case ReturnTypeParam::XML:
                 $ns             = 'http://www.bibleget.io/catholicliturgy';
@@ -4435,10 +4434,7 @@ final class CalendarHandler extends AbstractHandler
                 $rawXML = $xml->asXML(); //this gives us non pretty XML, basically a single long string
                 if (false === $rawXML) {
                     $message = _('Error converting Liturgical Calendar to XML.');
-                    return $response
-                        ->withHeader('Content-Type', 'text/plain; charset=utf-8')
-                        ->withStatus(StatusCode::SERVICE_UNAVAILABLE->value, StatusCode::SERVICE_UNAVAILABLE->reason())
-                        ->withBody(Stream::create($message));
+                    throw new ServiceUnavailableException($message);
                 }
 
                 // finally let's pretty print the XML to make the cached file more readable
@@ -4457,22 +4453,9 @@ final class CalendarHandler extends AbstractHandler
                 try {
                     $responseBody = yaml_emit($jsonArr, YAML_UTF8_ENCODING);
                 } catch (\ErrorException $e) {
-                    $responseBodyObj          = new \stdClass();
-                    $responseBodyObj->status  = 'error';
-                    $responseBodyObj->message = 'Malformed YAML data received in the request';
-                    $responseBodyObj->error   = $e->getMessage();
-                    $responseBodyObj->line    = $e->getLine();
-                    $responseBodyObj->code    = $e->getCode();
-                    $responseBody             = json_encode($responseBodyObj);
-                    $response                 = $response
-                        ->withHeader('Content-Type', 'application/json; charset=utf-8')
-                        ->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())
-                        ->withBody(Stream::create($responseBody));
+                    throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
                 } finally {
                     restore_error_handler();
-                }
-                if ($response->getStatusCode() === StatusCode::BAD_REQUEST->value) {
-                    return $response;
                 }
                 break;
             case ReturnTypeParam::ICS:
@@ -4488,22 +4471,16 @@ final class CalendarHandler extends AbstractHandler
                         _('Error receiving or parsing info from github about latest release: %s.'),
                         $infoObj->message
                     );
-                    return $response
-                            ->withHeader('Content-Type', 'text/plain; charset=utf-8')
-                            ->withStatus(StatusCode::SERVICE_UNAVAILABLE->value, StatusCode::SERVICE_UNAVAILABLE->reason())
-                            ->withBody(Stream::create($message));
+                    throw new ServiceUnavailableException($message);
                 }
                 break;
             default:
-                $responseBody = json_encode($SerializeableLitCal);
+                $responseBody = json_encode($SerializeableLitCal, JSON_THROW_ON_ERROR);
         }
 
         if (false === $responseBody) {
             $message = _('Error serializing Liturgical Calendar.');
-            return $response
-                    ->withHeader('Content-Type', 'text/plain; charset=utf-8')
-                    ->withStatus(StatusCode::SERVICE_UNAVAILABLE->value, StatusCode::SERVICE_UNAVAILABLE->reason())
-                    ->withBody(Stream::create($message));
+            throw new ServiceUnavailableException($message);
         }
 
         // write the response body to the cache file
@@ -4897,10 +4874,7 @@ final class CalendarHandler extends AbstractHandler
 
         // For all other request methods, validate that they are supported by the endpoint
         //   and early exit if not
-        $response = $this->validateRequestMethod($request, $response);
-        if ($response->getStatusCode() === StatusCode::METHOD_NOT_ALLOWED->value) {
-            return $response;
-        }
+        $this->validateRequestMethod($request);
 
         // Validate that the Content-Type requested in the Accept header is supported by the endpoint,
         //   and if so set the corresponding 'Content-Type' header in the response
@@ -4941,18 +4915,7 @@ final class CalendarHandler extends AbstractHandler
                 $params = array_merge($params, $this->getScalarQueryParams($request));
                 break;
             default:
-                [
-                    'response' => $response,
-                    'params'   => $parsedBodyParams
-                ] = $this->parseBodyParams($request, $response, false);
-
-                // Early exit if the Content-Type is not supported or an invalid parameter value was supplied
-                if (
-                    $response->getStatusCode() === StatusCode::UNSUPPORTED_MEDIA_TYPE->value
-                    || $response->getStatusCode() === StatusCode::BAD_REQUEST->value
-                ) {
-                    return $response;
-                }
+                $parsedBodyParams = $this->parseBodyParams($request, false);
 
                 if (null !== $parsedBodyParams) {
                     /** @var array<string,scalar|null> $params */
@@ -4960,23 +4923,12 @@ final class CalendarHandler extends AbstractHandler
                 }
         }
 
-        $this->CalendarParams = new CalendarParamsHandler($response, $params, $this->requestPathParams);
-
-        // Early exit if the metadata was unable to be loaded
-        if ($this->CalendarParams->response->getStatusCode() === StatusCode::SERVICE_UNAVAILABLE->value) {
-            return $this->CalendarParams->response;
-        }
-
+        $this->CalendarParams = new CalendarParamsHandler();
         $this->CalendarParams->setAllowedReturnTypes($this->allowedReturnTypes);
-
-        $response = $this->CalendarParams->handle($request);
-
-        // Early exit if any parameters were invalid
-        if (
-            $response->getStatusCode() === StatusCode::SERVICE_UNAVAILABLE->value
-            || $response->getStatusCode() === StatusCode::BAD_REQUEST->value
-        ) {
-            return $response;
+        $this->CalendarParams->setParams($params);
+        if ($this->CalendarParams->ReturnType !== null) {
+            $responseContentType = $this->CalendarParams->ReturnType->toResponseContentType();
+            $response            = $response->withHeader('Content-Type', $responseContentType->value);
         }
 
         // Finally we set the parameters from the request path,
@@ -4984,12 +4936,7 @@ final class CalendarHandler extends AbstractHandler
         //   (perhaps also with the year)
         // If a national calendar or diocesan calendar is requested, these will override
         //   most of the other parameters (taken care of by the updateSettingsBasedOn[National|Diocesan]Calendar methods)
-        $response = $this->CalendarParams->initParamsFromRequestPath();
-
-        // Early exit if any parameters were invalid
-        if ($response->getStatusCode() === StatusCode::BAD_REQUEST->value) {
-            return $response;
-        }
+        $this->CalendarParams->initParamsFromRequestPath($this->requestPathParams);
 
         $this->loadDiocesanCalendarData();
         $this->loadNationalCalendarData();
@@ -5023,12 +4970,7 @@ final class CalendarHandler extends AbstractHandler
                     ->withBody(Stream::create($responseBody));
             }
         } else {
-            $response = $this->validateMinYear($response);
-
-            // Early exit if year requested is below the minimum
-            if ($response->getStatusCode() === StatusCode::BAD_REQUEST->value) {
-                return $response;
-            }
+            $this->validateMinYear();
 
             $this->prepareL10N(); // the result could be stored in a variable $localeThatWasSet if it were to prove useful
             LiturgicalEvent::setLocale($this->CalendarParams->Locale === LitLocale::LATIN ? LitLocale::LATIN_PRIMARY_LANGUAGE : $this->CalendarParams->Locale);

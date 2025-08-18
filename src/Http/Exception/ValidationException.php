@@ -6,13 +6,13 @@ use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 
 class ValidationException extends ApiException
 {
-    public function __construct(string $message = 'Validation failed')
+    public function __construct(string $message = 'Validation Error')
     {
         parent::__construct(
             $message,
             StatusCode::BAD_REQUEST->value,
             'https://example.com/problems/validation-error',
-            'Validation Error'
+            StatusCode::BAD_REQUEST->reason()
         );
     }
 }

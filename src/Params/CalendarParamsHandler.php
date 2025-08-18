@@ -8,15 +8,11 @@ use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\CorpusChristi;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\Route;
-use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
-use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-use Nyholm\Psr7\Stream;
 
 /**
  * This class is responsible for handling the parameters provided to the {@see \LiturgicalCalendar\Api\Handlers\CalendarHandler} class.
@@ -39,16 +35,8 @@ use Nyholm\Psr7\Stream;
  * }
  * @package LiturgicalCalendar\Api\Params
  */
-class CalendarParamsHandler implements RequestHandlerInterface
+class CalendarParamsHandler implements ParamsInterface
 {
-    public ResponseInterface $response;
-
-    /** @var array<string,scalar|null> */
-    private array $params;
-
-    /** @var array<string|int> */
-    private array $requestPathParams;
-
     public int $Year;
     public string $Locale;
     public YearType $YearType             = YearType::LITURGICAL;
@@ -92,38 +80,26 @@ class CalendarParamsHandler implements RequestHandlerInterface
      *
      * - loads calendars metadata
      * - sets the response status code to 503 Service Unavailable if the API was unable to load calendars metadata
-     * @param ResponseInterface $response
      * @param CalendarParamsData $params
      * @param array<string|int> $requestPathParams
      */
-    public function __construct(ResponseInterface $response, array $params = [], array $requestPathParams = [])
+    public function __construct()
     {
         // First of all we need the metadata about calendars that are available on the API,
         // in order to check parameters against those supported by each calendar,
         // whether General Roman, or national, or diocesan
-        $calendarsRoute = Route::CALENDARS->path();
+        $this->allowedReturnTypes = ReturnTypeParam::cases();
+        $this->Year               = (int) date('Y');
+        $this->Locale             = LitLocale::LATIN;
 
-        $metadata = Utilities::jsonUrlToObject($calendarsRoute);
+        $calendarsRoute = Route::CALENDARS->path();
+        $metadata       = Utilities::jsonUrlToObject($calendarsRoute);
 
         if (property_exists($metadata, 'litcal_metadata') && $metadata->litcal_metadata instanceof \stdClass) {
             $this->calendars = MetadataCalendars::fromObject($metadata->litcal_metadata);
-            $this->response  = $response;
         } else {
-            $this->response = $response->withStatus(StatusCode::SERVICE_UNAVAILABLE->value, StatusCode::SERVICE_UNAVAILABLE->reason());
+            throw new ServiceUnavailableException('Unable to load calendars metadata');
         }
-
-        $this->params             = $params;
-        $this->requestPathParams  = $requestPathParams;
-        $this->allowedReturnTypes = ReturnTypeParam::cases();
-    }
-
-    public function handle(ServerRequestInterface $request): ResponseInterface
-    {
-        // we set a couple defaults just to be sure we have the essentials,
-        // in case they're not set by other means
-        $this->Year   = (int) date('Y');
-        $this->Locale = LitLocale::LATIN;
-        return $this->setParams($this->params);
     }
 
     /**
@@ -154,11 +130,11 @@ class CalendarParamsHandler implements RequestHandlerInterface
      * All parameters are optional, and default values will be used if they are not provided.
      * @param CalendarParamsData $params an associative array of parameter keys to values
      */
-    public function setParams(array $params): ResponseInterface
+    public function setParams(array $params): void
     {
         if (count($params) === 0) {
             // If no parameters are provided, we can just return
-            return $this->response;
+            return;
         }
         foreach ($params as $key => $value) {
             if (in_array($key, self::ALLOWED_PARAMS)) {
@@ -209,19 +185,7 @@ class CalendarParamsHandler implements RequestHandlerInterface
                         break;
                 }
             }
-
-            // early exit from the foreach loop if a bad request error has already been produced
-            if (
-                $this->response->getStatusCode() === StatusCode::BAD_REQUEST->value
-                || $this->response->getStatusCode() === StatusCode::SERVICE_UNAVAILABLE->value
-            ) {
-                return $this->response;
-            }
         }
-        if ($this->ReturnType !== null) {
-            $this->response = $this->response->withHeader('Content-Type', $this->ReturnType->toResponseContentType()->value);
-        }
-        return $this->response;
     }
 
     /**
@@ -241,17 +205,14 @@ class CalendarParamsHandler implements RequestHandlerInterface
             if (is_numeric($value) && ctype_digit($value) && strlen($value) === 4) {
                 $this->Year = (int) $value;
             } else {
-                $description    = Stream::create('Year parameter is of type String, but is not a numeric String with 4 digits');
-                $this->response = $this->response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description);
-                return;
+                throw new ValidationException('Year parameter is of type String, but is not a numeric String with 4 digits');
             }
         } else {
             $this->Year = $value;
         }
 
         if ($this->Year < self::YEAR_LOWER_LIMIT || $this->Year > self::YEAR_UPPER_LIMIT) {
-            $description    = Stream::create('Parameter `year` out of bounds, must have a value betwen ' . self::YEAR_LOWER_LIMIT . ' and ' . self::YEAR_UPPER_LIMIT);
-            $this->response = $this->response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description);
+            throw new ValidationException('Parameter `year` out of bounds, must have a value betwen ' . self::YEAR_LOWER_LIMIT . ' and ' . self::YEAR_UPPER_LIMIT);
         }
     }
 
@@ -265,9 +226,7 @@ class CalendarParamsHandler implements RequestHandlerInterface
     private function validateEpiphanyParam(string $value): void
     {
         if (false === Epiphany::isValid($value)) {
-            $description    = Stream::create("Invalid value `{$value}` for parameter `epiphany`, valid values are: " . implode(', ', Epiphany::values()));
-            $this->response = $this->response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description);
-            return;
+            throw new ValidationException("Invalid value `{$value}` for parameter `epiphany`, valid values are: " . implode(', ', Epiphany::values()));
         }
         $this->Epiphany = Epiphany::from($value);
     }
@@ -282,9 +241,7 @@ class CalendarParamsHandler implements RequestHandlerInterface
     private function validateAscensionParam(string $value): void
     {
         if (false === Ascension::isValid($value)) {
-            $description    = Stream::create("Invalid value `{$value}` for parameter `ascension`, valid values are: " . implode(', ', Ascension::values()));
-            $this->response = $this->response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description);
-            return;
+            throw new ValidationException("Invalid value `{$value}` for parameter `ascension`, valid values are: " . implode(', ', Ascension::values()));
         }
         $this->Ascension = Ascension::from($value);
     }
@@ -294,14 +251,12 @@ class CalendarParamsHandler implements RequestHandlerInterface
      *
      * @param string $value a string indicating whether Corpus Christi should be calculated on a Sunday or on a Thursday.
      *
-     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see \LiturgicalCalendar\Api\Enum\CorpusChristi}::values().
+     * @throws ValidationException if the value is not one of the valid values in {@see \LiturgicalCalendar\Api\Enum\CorpusChristi}::values().
      */
     private function validateCorpusChristiParam(string $value): void
     {
         if (false === CorpusChristi::isValid($value)) {
-            $description    = Stream::create("Invalid value `{$value}` for parameter `corpus_christi`, valid values are: " . implode(', ', CorpusChristi::values()));
-            $this->response = $this->response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description);
-            return;
+            throw new ValidationException("Invalid value `{$value}` for parameter `corpus_christi`, valid values are: " . implode(', ', CorpusChristi::values()));
         }
         $this->CorpusChristi = CorpusChristi::from($value);
     }
@@ -311,22 +266,18 @@ class CalendarParamsHandler implements RequestHandlerInterface
      *
      * @param string $value a valid locale string that can be used to set the language of the response
      *
-     * Produces a 400 Bad Request error if the value is not a valid locale string
+     * @throws ValidationException
      */
     private function validateLocaleParam(string $value): void
     {
         $value = \Locale::canonicalize($value);
         if (null === $value) {
-            $description    = Stream::create('Invalid locale string: ' . $value . '. “If they were scattered abroad into foreign tongues, it was because their intention was profane. But now, by the distribution of tongues, the impiety is dissolved and the unity of the Spirit is restored.”
+            throw new ValidationException('Invalid locale string: ' . $value . '. “If they were scattered abroad into foreign tongues, it was because their intention was profane. But now, by the distribution of tongues, the impiety is dissolved and the unity of the Spirit is restored.”
 — St. Gregory of Nazianzus, Oration 41 (On Pentecost), §11');
-            $this->response = $this->response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description);
-            return;
         }
 
         if (false === LitLocale::isValid($value)) {
-            $description    = Stream::create("Invalid value `{$value}` for parameter `locale`, valid values are: la, la_VA, " . implode(', ', LitLocale::$AllAvailableLocales));
-            $this->response = $this->response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description);
-            return;
+            throw new ValidationException("Invalid value `{$value}` for parameter `locale`, valid values are: la, la_VA, " . implode(', ', LitLocale::$AllAvailableLocales));
         }
         $this->Locale = $value;
     }
@@ -342,14 +293,7 @@ class CalendarParamsHandler implements RequestHandlerInterface
     {
         $allowedReturnTypeValues = array_column($this->allowedReturnTypes, 'value');
         if (false === ReturnTypeParam::isValid($value) || false === in_array($value, $allowedReturnTypeValues, true)) {
-            $description    = Stream::create(
-                "Invalid value `{$value}` for parameter `return_type`, valid values are: " . implode(', ', $allowedReturnTypeValues)
-            );
-            $this->response = $this->response->withStatus(
-                StatusCode::BAD_REQUEST->value,
-                StatusCode::BAD_REQUEST->reason()
-            )->withBody($description);
-            return;
+            throw new ValidationException("Invalid value `{$value}` for parameter `return_type`, valid values are: " . implode(', ', $allowedReturnTypeValues));
         }
         $this->ReturnType = ReturnTypeParam::from($value);
     }
@@ -364,19 +308,15 @@ class CalendarParamsHandler implements RequestHandlerInterface
     private function validateNationalCalendarParam(string $value): void
     {
         if (null === $this->calendars) {
-            $description    = Stream::create('CalendarParamsHandler::$calendars is not initialized.');
-            $this->response = $this->response->withStatus(StatusCode::SERVICE_UNAVAILABLE->value, StatusCode::SERVICE_UNAVAILABLE->reason())->withBody($description);
-            return;
+            throw new ServiceUnavailableException('Calendars metadata is not initialized.');
         }
 
         if (
             false === in_array($value, $this->calendars->national_calendars_keys)
             && false === ( $value === 'VA' )
         ) {
-            $validVals      = implode(', ', $this->calendars->national_calendars_keys);
-            $description    = Stream::create("Invalid National calendar `{$value}`, valid national calendars are: $validVals.");
-            $this->response = $this->response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description);
-            return;
+            $validVals = implode(', ', $this->calendars->national_calendars_keys);
+            throw new ValidationException("Invalid value `{$value}` for parameter `national_calendar`, valid values are: " . $validVals);
         }
         $this->NationalCalendar = $value;
     }
@@ -391,16 +331,12 @@ class CalendarParamsHandler implements RequestHandlerInterface
     private function validateDiocesanCalendarParam(string $value): void
     {
         if (null === $this->calendars) {
-            $description    = Stream::create('CalendarParams::$calendars is not initialized.');
-            $this->response = $this->response->withStatus(StatusCode::SERVICE_UNAVAILABLE->value, StatusCode::SERVICE_UNAVAILABLE->reason())->withBody($description);
-            return;
+            throw new ServiceUnavailableException('Calendars metadata is not initialized.');
         }
 
         if (false === in_array($value, $this->calendars->diocesan_calendars_keys)) {
-            $description    = Stream::create("Invalid Diocesan calendar `{$value}`, valid diocesan calendars are: "
+            throw new ValidationException("Invalid Diocesan calendar `{$value}`, valid diocesan calendars are: "
                 . implode(', ', $this->calendars->diocesan_calendars_keys));
-            $this->response = $this->response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description);
-            return;
         }
         $this->DiocesanCalendar = $value;
     }
@@ -415,9 +351,7 @@ class CalendarParamsHandler implements RequestHandlerInterface
     private function validateYearTypeParam(string $value): void
     {
         if (false === YearType::isValid($value)) {
-            $description    = Stream::create("Invalid value `{$value}` for parameter `year_type`, valid values are: " . implode(', ', YearType::values()));
-            $this->response = $this->response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description);
-            return;
+            throw new ValidationException("Invalid value `{$value}` for parameter `year_type`, valid values are: " . implode(', ', YearType::values()));
         }
         $this->YearType = YearType::from($value);
     }
@@ -434,9 +368,7 @@ class CalendarParamsHandler implements RequestHandlerInterface
         if (gettype($value) !== 'boolean') {
             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
             if (null === $value) {
-                $description    = Stream::create('Invalid value for parameter `eternal_high_priest`, valid values are boolean `true` and `false`');
-                $this->response = $this->response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description);
-                return;
+                throw new ValidationException('Invalid value for parameter `eternal_high_priest`, valid values are boolean `true` and `false`');
             }
         }
         /** @var bool $value */
@@ -454,16 +386,12 @@ class CalendarParamsHandler implements RequestHandlerInterface
     private function validateStringValue(string $key, mixed $value): ?string
     {
         if (gettype($value) !== 'string') {
-            $description    = Stream::create("Expected value of type String for parameter `{$key}`, instead found type " . gettype($value));
-            $this->response = $this->response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description);
-            return null;
+            throw new ValidationException("Expected value of type String for parameter `{$key}`, instead found type " . gettype($value));
         }
 
         $filteredValue = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
         if (!$filteredValue) {
-            $description    = Stream::create("Could not correctly sanitize the value for parameter `{$key}`");
-            $this->response = $this->response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description);
-            return null;
+            throw new ValidationException("Could not correctly sanitize the value for parameter `{$key}`");
         }
 
         /** @var string */
@@ -476,69 +404,64 @@ class CalendarParamsHandler implements RequestHandlerInterface
      * 1) nation or diocese or year: a string indicating whether a national or diocesan calendar is requested, or an integer indicating the year for which the General Roman calendar should be calculated
      * 2) (when 1 is a string) a string indicating the national or diocesan calendar to produce
      * 3) (when 1 is a string) an integer indicating the year for which the national or diocesan calendar should be calculated
-     *
+     * @param array<string|int> $requestPathParams
      */
-    public function initParamsFromRequestPath(): ResponseInterface
+    public function initParamsFromRequestPath(array $requestPathParams): void
     {
-        $numPathParts = count($this->requestPathParams);
+        $numPathParts = count($requestPathParams);
         if ($numPathParts > 0) {
             $params = [];
             if ($numPathParts === 1) {
                 if (
-                    false === in_array(gettype($this->requestPathParams[0]), ['string', 'integer'])
+                    false === in_array(gettype($requestPathParams[0]), ['string', 'integer'])
                     || (
-                        gettype($this->requestPathParams[0]) === 'string'
+                        gettype($requestPathParams[0]) === 'string'
                         && (
-                            false === is_numeric($this->requestPathParams[0])
-                            || false === ctype_digit($this->requestPathParams[0])
-                            || strlen($this->requestPathParams[0]) !== 4
+                            false === is_numeric($requestPathParams[0])
+                            || false === ctype_digit($requestPathParams[0])
+                            || strlen($requestPathParams[0]) !== 4
                         )
                     )
                 ) {
-                    $description = Stream::create('path parameter expected to represent Year value but did not have type Integer or numeric String');
-                    return $this->response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description);
+                    throw new ValidationException('path parameter expected to represent Year value but did not have type Integer or numeric String');
                 } else {
-                    $params['year'] = (int) $this->requestPathParams[0];
+                    $params['year'] = (int) $requestPathParams[0];
                 }
             } elseif ($numPathParts > 3) {
-                $description = Stream::create('Expected at least one and at most three path parameters, instead found ' . $numPathParts);
-                return $this->response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description);
+                throw new ValidationException('Expected at least one and at most three path parameters, instead found ' . $numPathParts);
             } else {
-                if (false === in_array($this->requestPathParams[0], ['nation', 'diocese'])) {
-                    $description = Stream::create("Invalid value `{$this->requestPathParams[0]}` for path parameter in position 1,"
+                if (false === in_array($requestPathParams[0], ['nation', 'diocese'])) {
+                    throw new ValidationException("Invalid value `{$requestPathParams[0]}` for path parameter in position 1,"
                         . ' the first parameter should have a value of either `nation` or `diocese`');
-                    return $this->response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description);
                 } else {
-                    if ($this->requestPathParams[0] === 'nation') {
-                        $params['national_calendar'] = (string) $this->requestPathParams[1];
-                    } elseif ($this->requestPathParams[0] === 'diocese') {
-                        $params['diocesan_calendar'] = (string) $this->requestPathParams[1];
+                    if ($requestPathParams[0] === 'nation') {
+                        $params['national_calendar'] = (string) $requestPathParams[1];
+                    } elseif ($requestPathParams[0] === 'diocese') {
+                        $params['diocesan_calendar'] = (string) $requestPathParams[1];
                     }
                 }
                 if ($numPathParts === 3) {
                     if (
-                        false === in_array(gettype($this->requestPathParams[2]), ['string', 'integer'])
+                        false === in_array(gettype($requestPathParams[2]), ['string', 'integer'])
                         || (
-                            gettype($this->requestPathParams[2]) === 'string'
+                            gettype($requestPathParams[2]) === 'string'
                             && (
-                                false === is_numeric($this->requestPathParams[2])
-                                || false === ctype_digit($this->requestPathParams[2])
-                                || strlen($this->requestPathParams[2]) !== 4
+                                false === is_numeric($requestPathParams[2])
+                                || false === ctype_digit($requestPathParams[2])
+                                || strlen($requestPathParams[2]) !== 4
                             )
                         )
                     ) {
-                        $description = Stream::create('path parameter expected to represent Year value but did not have type Integer or numeric String');
-                        return $this->response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description);
+                        throw new ValidationException('path parameter expected to represent Year value but did not have type Integer or numeric String');
                     } else {
-                        $params['year'] = (int) $this->requestPathParams[2];
+                        $params['year'] = (int) $requestPathParams[2];
                     }
                 }
             }
             if (count($params)) {
-                return $this->setParams($params);
+                $this->setParams($params);
             }
         }
-        return $this->response;
     }
 
     /*private static function debugWrite(string $string)

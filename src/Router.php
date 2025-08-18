@@ -221,10 +221,12 @@ class Router
                 Router::emitResponse($response);
         }
 
-        $pipeline     = new MiddlewarePipeline(self::$handler);
         $psr17Factory = new Psr17Factory();
         $debug        = ( Router::isLocalhost() || isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development' );
+        $pipeline     = new MiddlewarePipeline(self::$handler);
         $pipeline->pipe(new ErrorHandlingMiddleware($psr17Factory, $debug)); // outermost middleware
+        //$pipeline->pipe(new LoggingMiddleware());       // innermost middleware
+
         $response = $pipeline->handle($request);
         Router::emitResponse($response);
     }

@@ -11,6 +11,12 @@ use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
+use LiturgicalCalendar\Api\Http\Exception\ImplementationException;
+use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
+use LiturgicalCalendar\Api\Http\Exception\NotAcceptableException;
+use LiturgicalCalendar\Api\Http\Exception\UnsupportedMediaTypeException;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Api\Http\Exception\YamlException;
 use LiturgicalCalendar\Api\Http\Negotiator;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItem;
 use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadataMap;
@@ -341,16 +347,37 @@ abstract class AbstractHandler implements RequestHandlerInterface
         return in_array($_SERVER['HTTP_REFERER'], $this->allowedReferers);
     }
 
-    protected function validateRequestMethod(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
-    {
-        if (!in_array($request->getMethod(), array_column($this->allowedRequestMethods, 'value'))) {
-            return $response->withStatus(StatusCode::METHOD_NOT_ALLOWED->value, StatusCode::METHOD_NOT_ALLOWED->reason());
-        }
-        return $response;
-    }
 
     /**
-     * Negotiates the best Content-Type for the response based on the Accept header in the request.
+     * Validates the request HTTP method against the list of allowed HTTP methods.
+     *
+     * This function checks if the request HTTP method is among the values that the API endpoint declares as acceptable.
+     * If the HTTP method is not allowed, a `MethodNotAllowedException` will be thrown.
+     *
+     * @throws MethodNotAllowedException If the request HTTP method is not allowed.
+     */
+    protected function validateRequestMethod(ServerRequestInterface $request): void
+    {
+        if (!in_array($request->getMethod(), array_column($this->allowedRequestMethods, 'value'))) {
+            throw new MethodNotAllowedException();
+        }
+    }
+
+
+    /**
+     * Validates the request Accept header against the list of allowed Accept headers.
+     *
+     * This function checks if the request Accept header is among the values that the API endpoint declares as acceptable.
+     * If the Accept header is empty or a value that the endpoint has not declared as acceptable,
+     * the endpoint will either return a `Response` with the first permissible Content-Type (usually `application/json`)
+     * or throw a `NotAcceptableException`, depending on the value of the `$acceptabilityLevel` parameter.
+     *
+     * @param ServerRequestInterface $request The request object.
+     * @param ResponseInterface $response The response object.
+     * @param AcceptabilityLevel $acceptabilityLevel The acceptability level of the Accept header.
+     * @return ResponseInterface The response object with the Content-Type header set to the first permissible Accept header value.
+     * @throws NotAcceptableException If the Accept header is empty or a value that the endpoint has not declared as acceptable,
+     *                                or if the acceptability level is `STRICT`.
      */
     protected function validateAcceptHeader(ServerRequestInterface $request, ResponseInterface $response, AcceptabilityLevel $acceptabilityLevel): ResponseInterface
     {
@@ -358,7 +385,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
         $acceptHeader       = $request->getHeaderLine('Accept');
         if ($acceptHeader === '') {
             if ($acceptabilityLevel === AcceptabilityLevel::STRICT) {
-                return $response->withStatus(StatusCode::NOT_ACCEPTABLE->value, StatusCode::NOT_ACCEPTABLE->reason());
+                throw new NotAcceptableException();
             }
             return $response->withHeader('Content-Type', $this->allowedAcceptHeaders[0]);
         }
@@ -381,16 +408,23 @@ abstract class AbstractHandler implements RequestHandlerInterface
         }
 
         // Catch all for all of the failed cases
-        return $response->withStatus(StatusCode::NOT_ACCEPTABLE->value, StatusCode::NOT_ACCEPTABLE->reason());
+        throw new NotAcceptableException();
     }
 
-    protected function validateRequestContentType(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    /**
+     * Validates the request Content-Type header against the list of allowed Content-Types.
+     *
+     * This function throws an `UnsupportedMediaTypeException` if the request Content-Type header is not
+     * among the list of allowed Content-Types.
+     *
+     * @throws UnsupportedMediaTypeException When the request Content-Type header is not among the list of allowed Content-Types.
+     */
+    protected function validateRequestContentType(ServerRequestInterface $request): void
     {
         $contentType = $request->getHeaderLine('Content-Type');
         if (!in_array($contentType, array_column($this->allowedRequestContentTypes, 'value'))) {
-            return $response->withStatus(StatusCode::UNSUPPORTED_MEDIA_TYPE->value, StatusCode::UNSUPPORTED_MEDIA_TYPE->reason());
+            throw new UnsupportedMediaTypeException();
         }
-        return $response;
     }
 
     /**
@@ -412,7 +446,10 @@ abstract class AbstractHandler implements RequestHandlerInterface
      *
      * This function acts as a custom error handler that converts warnings into `\ErrorException` exceptions.
      * It is registered as a warning handler to maintain consistent error handling using exceptions.
-     * Used by {@see \LiturgicalCalendar\Api\Core::readYamlBody()} method to handle warnings from the yaml_parse function.
+     * Used by the {@see \LiturgicalCalendar\Api\Handlers\AbstractHandler::parseBodyParams()},
+     * {@see \LiturgicalCalendar\Api\Handlers\AbstractHandler::parseBodyPayload()},
+     * and {@see \LiturgicalCalendar\Api\Handlers\AbstractHandler::encodeResponseBody()} methods
+     * to handle warnings from the `yaml_parse` and `yaml_emit` functions.
      *
      * @param int $errno The level of the error raised.
      * @param string $errstr The error message.
@@ -428,49 +465,30 @@ abstract class AbstractHandler implements RequestHandlerInterface
      * Parse the request body according to the request Content-Type,
      * and return the parsed parameters with only scalar values.
      *
-     * @return array{response:ResponseInterface,params:array<string,scalar|null>|null}
+     * @return array<string,scalar|null>
      */
-    protected function parseBodyParams(ServerRequestInterface $request, ResponseInterface $response, bool $required = false): array
+    protected function parseBodyParams(ServerRequestInterface $request, bool $required = false): ?array
     {
-        $response = $this->validateRequestContentType($request, $response);
-        // Early exit if the Content-Type is not supported
-        if ($response->getStatusCode() === StatusCode::UNSUPPORTED_MEDIA_TYPE->value) {
-            return [
-                'response' => $response,
-                'params'   => null
-            ];
-        }
+        $this->validateRequestContentType($request);
 
         // We parse the body according to the request Content-Type
         $mime = RequestContentType::from($request->getHeaderLine('Content-Type')) ?? null;
         if ($mime === null) {
             if ($required) {
-                return [
-                    'response' => $response->withStatus(StatusCode::UNSUPPORTED_MEDIA_TYPE->value, StatusCode::UNSUPPORTED_MEDIA_TYPE->reason()),
-                    'params'   => null
-                ];
+                throw new UnsupportedMediaTypeException();
             } else {
                 // silently discard a request with an unsupported Content-Type
-                return [
-                    'response' => $response,
-                    'params'   => null
-                ];
+                return null;
             }
         }
 
         $rawBodyContents = $request->getBody()->getContents();
         if ('' === $rawBodyContents) {
             if ($required) {
-                return [
-                    'response' => $response->withStatus(StatusCode::UNSUPPORTED_MEDIA_TYPE->value, StatusCode::UNSUPPORTED_MEDIA_TYPE->reason()),
-                    'params'   => null
-                ];
+                throw new ValidationException('Empty body content received in the request');
             } else {
                 // silently discard an empty body content
-                return [
-                    'response' => $response,
-                    'params'   => null
-                ];
+                return null;
             }
         }
 
@@ -479,21 +497,15 @@ abstract class AbstractHandler implements RequestHandlerInterface
                 $parsedBody = json_decode($rawBodyContents, true);
                 break;
             case RequestContentType::YAML:
+                if (!extension_loaded('yaml')) {
+                    throw new ImplementationException('YAML extension not loaded');
+                }
+
                 set_error_handler([self::class, 'warningHandler'], E_WARNING);
                 try {
                     $parsedBody = yaml_parse($rawBodyContents);
                 } catch (\ErrorException $e) {
-                    $responseBody          = new \stdClass();
-                    $responseBody->status  = 'error';
-                    $responseBody->message = 'Malformed YAML data received in the request';
-                    $responseBody->error   = $e->getMessage();
-                    $responseBody->line    = $e->getLine();
-                    $responseBody->code    = $e->getCode();
-                    $description           = Stream::create(json_encode($responseBody));
-                    return [
-                        'response' => $response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description),
-                        'params'   => null
-                    ];
+                    throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
                 } finally {
                     restore_error_handler();
                 }
@@ -504,31 +516,22 @@ abstract class AbstractHandler implements RequestHandlerInterface
                 $parsedBody = $request->getParsedBody();
                 break;
             default:
-                $parsedBody = null;
+                return null;
         }
 
         // We don't expect a single scalar value, only an array of scalar values,
         // so we discard a pure scalar value
         if (is_scalar($parsedBody) || $parsedBody === null) {
             if ($required) {
-                return [
-                    'response' => $response->withStatus(StatusCode::UNSUPPORTED_MEDIA_TYPE->value, StatusCode::UNSUPPORTED_MEDIA_TYPE->reason()),
-                    'params'   => null
-                ];
+                throw new UnsupportedMediaTypeException();
             } else {
                 // silently discard the parsed body content
-                return [
-                    'response' => $response,
-                    'params'   => null
-                ];
+                return null;
             }
         }
         /** @var array<string,scalar|null> $parsedBodyWithOnlyScalarValues */
         $parsedBodyWithOnlyScalarValues = array_filter($parsedBody, fn($value) => is_scalar($value) || $value === null);
-        return [
-            'response' => $response,
-            'params'   => $parsedBodyWithOnlyScalarValues
-        ];
+        return $parsedBodyWithOnlyScalarValues;
     }
 
     /**
@@ -537,41 +540,32 @@ abstract class AbstractHandler implements RequestHandlerInterface
      *
      * @param bool $assoc If true, the payload will be returned as an associative array, otherwise as a `\stdClass` object
      *
-     * @return array{response:ResponseInterface,payload:array<string,scalar|null>|null}
+     * @return array<string|int,mixed>|\stdClass|null
      */
-    protected function parseBodyPayload(ServerRequestInterface $request, ResponseInterface $response, bool $assoc = true): array
+    protected function parseBodyPayload(ServerRequestInterface $request, bool $assoc = true): array|\stdClass|null
     {
-        $response = $this->validateRequestContentType($request, $response);
-        // Early exit if the Content-Type is not supported
-        if ($response->getStatusCode() === StatusCode::UNSUPPORTED_MEDIA_TYPE->value) {
-            return [
-                'response' => $response,
-                'payload'  => null
-            ];
-        }
+        $this->validateRequestContentType($request);
 
         // We parse the body according to the request Content-Type
         $mime = RequestContentType::from($request->getHeaderLine('Content-Type')) ?? null;
         if ($mime === null) {
-            return [
-                'response' => $response->withStatus(StatusCode::UNSUPPORTED_MEDIA_TYPE->value, StatusCode::UNSUPPORTED_MEDIA_TYPE->reason()),
-                'payload'  => null
-            ];
+            throw new UnsupportedMediaTypeException();
         }
 
         $rawBodyContents = $request->getBody()->getContents();
         if ('' === $rawBodyContents) {
-            return [
-                'response' => $response->withStatus(StatusCode::UNSUPPORTED_MEDIA_TYPE->value, StatusCode::UNSUPPORTED_MEDIA_TYPE->reason()),
-                'payload'  => null
-            ];
+            throw new ValidationException('Empty body content received in the request');
         }
 
         switch ($mime) {
             case RequestContentType::JSON:
-                $parsedBody = json_decode($rawBodyContents, $assoc);
+                $parsedBody = json_decode($rawBodyContents, $assoc, 512, JSON_THROW_ON_ERROR);
                 break;
             case RequestContentType::YAML:
+                if (!extension_loaded('yaml')) {
+                    throw new ImplementationException('YAML extension not loaded');
+                }
+
                 set_error_handler([self::class, 'warningHandler'], E_WARNING);
                 try {
                     $parsedBody = yaml_parse($rawBodyContents);
@@ -579,17 +573,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
                         $parsedBody = json_decode(json_encode($parsedBody));
                     }
                 } catch (\ErrorException $e) {
-                    $responseBody          = new \stdClass();
-                    $responseBody->status  = 'error';
-                    $responseBody->message = 'Malformed YAML data received in the request';
-                    $responseBody->error   = $e->getMessage();
-                    $responseBody->line    = $e->getLine();
-                    $responseBody->code    = $e->getCode();
-                    $description           = Stream::create(json_encode($responseBody));
-                    return [
-                        'response' => $response->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())->withBody($description),
-                        'payload'  => null
-                    ];
+                    throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
                 } finally {
                     restore_error_handler();
                 }
@@ -600,22 +584,15 @@ abstract class AbstractHandler implements RequestHandlerInterface
                 $parsedBody = $request->getParsedBody();
                 break;
             default:
-                $parsedBody = null;
+                return null;
         }
 
-        // We don't expect a single scalar value, only an array of scalar values,
-        // so we discard a pure scalar value
+        // We don't expect a single scalar value, but either an array or an object
         if (is_scalar($parsedBody) || $parsedBody === null) {
-            return [
-                'response' => $response->withStatus(StatusCode::UNSUPPORTED_MEDIA_TYPE->value, StatusCode::UNSUPPORTED_MEDIA_TYPE->reason()),
-                'payload'  => null
-            ];
+            throw new ValidationException('Invalid body content received in the request: expected an array or an object but found a scalar value or null');
         }
 
-        return [
-            'response' => $response,
-            'payload'  => $parsedBody
-        ];
+        return $parsedBody;
     }
 
     /**
@@ -623,70 +600,39 @@ abstract class AbstractHandler implements RequestHandlerInterface
      * encoded body.
      *
      * @param ResponseInterface $response The response to which the body is to be encoded.
-     * @param array<string|int,mixed>|\stdClass|MissalMetadataMap $responseBody The response body to be encoded.
+     * @param array<string|int,mixed>|\stdClass|MissalMetadataMap|DecreeItem $responseBody The response body to be encoded.
      * @return ResponseInterface The response with the encoded body.
-     * @throws \Exception If there is an error encoding the response body as JSON or YAML.
+     * @throws \JsonException If there is an error encoding the response body as JSON.
+     * @throws YamlException If there is an error encoding the response body as YAML.
      */
     protected function encodeResponseBody(ResponseInterface $response, array|\stdClass|MissalMetadataMap|DecreeItem $responseBody): ResponseInterface
     {
         $contentType = AcceptHeader::from($response->getHeaderLine('Content-Type'));
         switch ($contentType) {
             case AcceptHeader::JSON:
-                $encodedResponse = json_encode($responseBody);
-                if (false === $encodedResponse) {
-                    return $response
-                        ->withStatus(StatusCode::SERVICE_UNAVAILABLE->value, StatusCode::SERVICE_UNAVAILABLE->reason())
-                        ->withBody(Stream::create('Could not encode response as JSON: ' . json_last_error_msg()));
-                }
+                $encodedResponse = json_encode($responseBody, JSON_THROW_ON_ERROR);
                 break;
             case AcceptHeader::YAML:
+                if (!extension_loaded('yaml')) {
+                    throw new ImplementationException('YAML extension not loaded');
+                }
                 // In order to emit YAML, we need to recast the response body as an array
                 // So first we encode the object as JSON
-                $jsonEncodedResponse = json_encode($responseBody);
-                if (false === $jsonEncodedResponse) {
-                    return $response
-                        ->withStatus(StatusCode::SERVICE_UNAVAILABLE->value, StatusCode::SERVICE_UNAVAILABLE->reason())
-                        ->withBody(Stream::create('Could not encode response as JSON before decoding as JSON associative array for yaml encoding: ' . json_last_error_msg()));
-                }
-
-                // Then we decode the JSON as an associative array
-                $recodedResponse = json_decode($jsonEncodedResponse, true);
-                if (null === $recodedResponse) {
-                    return $response
-                        ->withStatus(StatusCode::SERVICE_UNAVAILABLE->value, StatusCode::SERVICE_UNAVAILABLE->reason())
-                        ->withBody(Stream::create('Could not decode JSON as associative array for yaml encoding: ' . json_last_error_msg()));
-                }
+                $jsonEncodedResponse = json_encode($responseBody, JSON_THROW_ON_ERROR);
+                $recodedResponse     = json_decode($jsonEncodedResponse, true, 512, JSON_THROW_ON_ERROR);
 
                 // Then we attempt to encode the array as YAML
                 set_error_handler([static::class, 'warningHandler'], E_WARNING);
                 try {
                     $encodedResponse = yaml_emit($recodedResponse, YAML_UTF8_ENCODING);
                 } catch (\ErrorException $e) {
-                    $responseBodyObj          = new \stdClass();
-                    $responseBodyObj->status  = 'error';
-                    $responseBodyObj->message = 'Malformed YAML data received in the request';
-                    $responseBodyObj->error   = $e->getMessage();
-                    $responseBodyObj->line    = $e->getLine();
-                    $responseBodyObj->code    = $e->getCode();
-                    $responseBody             = json_encode($responseBodyObj, JSON_THROW_ON_ERROR);
-                    $response                 = $response
-                        ->withHeader('Content-Type', 'application/json; charset=utf-8')
-                        ->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())
-                        ->withBody(Stream::create($responseBody));
+                    throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
                 } finally {
                     restore_error_handler();
                 }
-                if ($response->getStatusCode() === StatusCode::BAD_REQUEST->value) {
-                    return $response;
-                }
                 break;
             default:
-                $encodedResponse = json_encode($responseBody);
-                if (false === $encodedResponse) {
-                    return $response
-                        ->withStatus(StatusCode::SERVICE_UNAVAILABLE->value, StatusCode::SERVICE_UNAVAILABLE->reason())
-                        ->withBody(Stream::create('Could not encode response as JSON: ' . json_last_error_msg()));
-                }
+                $encodedResponse = json_encode($responseBody, JSON_THROW_ON_ERROR);
         }
         return $response
             ->withStatus(StatusCode::OK->value, StatusCode::OK->reason())

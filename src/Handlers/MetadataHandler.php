@@ -10,6 +10,10 @@ use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
+use LiturgicalCalendar\Api\Http\Exception\ImplementationException;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\Http\Exception\UnsupportedMediaTypeException;
+use LiturgicalCalendar\Api\Http\Exception\YamlException;
 use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
@@ -243,17 +247,14 @@ final class MetadataHandler extends AbstractHandler
     /**
      * Builds an index of all National and Diocesan calendars,
      * and of locales supported for the General Roman Calendar
-     *
-     * @return int Returns the HTTP Status Code for the Response
      */
-    private static function buildIndex(): int
+    private static function buildIndex(): void
     {
         self::$metadataCalendars = new MetadataCalendars();
         MetadataHandler::buildNationalCalendarData();
         MetadataHandler::buildDiocesanCalendarData();
         MetadataHandler::buildWiderRegionData();
         MetadataHandler::buildLocales();
-        return 200;
     }
 
     /**
@@ -279,10 +280,7 @@ final class MetadataHandler extends AbstractHandler
 
         // For all other request methods, validate that they are supported by the endpoint
         //   and early exit if not
-        $response = $this->validateRequestMethod($request, $response);
-        if ($response->getStatusCode() === StatusCode::METHOD_NOT_ALLOWED->value) {
-            return $response;
-        }
+        $this->validateRequestMethod($request);
 
         // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint,
         //   and if so set the corresponding 'Content-Type' header in the response
@@ -294,72 +292,39 @@ final class MetadataHandler extends AbstractHandler
                 $response = $this->validateAcceptHeader($request, $response, AcceptabilityLevel::INTERMEDIATE);
         }
 
-        // Early exit if the Accept header is not supported
-        if ($response->getStatusCode() === StatusCode::NOT_ACCEPTABLE->value) {
-            return $response;
-        }
+        MetadataHandler::buildIndex();
 
-        $indexResult = MetadataHandler::buildIndex();
-        if (200 === $indexResult) {
-            $responseBody = json_encode(['litcal_metadata' => self::$metadataCalendars]);
-            if (JSON_ERROR_NONE !== json_last_error() || false === $responseBody) {
-                throw new \ValueError('JSON error: ' . json_last_error_msg());
-            }
+        $responseBody = json_encode(['litcal_metadata' => self::$metadataCalendars], JSON_THROW_ON_ERROR);
+        $responseHash = md5($responseBody);
+        $response     = $response->withHeader('ETag', "\"{$responseHash}\"");
 
-            $responseHash = md5($responseBody);
-            $response     = $response->withHeader('ETag', "\"{$responseHash}\"");
-
-            if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
-                return $response->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
-                                ->withHeader('Content-Length', '0');
-            } else {
-                switch ($response->getHeaderLine('Content-Type')) {
-                    case AcceptHeader::JSON->value:
-                        return $response->withStatus(StatusCode::OK->value, StatusCode::OK->reason())->withBody(Stream::create($responseBody));
-                        // no break needed
-                    case AcceptHeader::YAML->value:
-                        if (!extension_loaded('yaml')) {
-                            return $response->withStatus(StatusCode::NOT_IMPLEMENTED->value, StatusCode::NOT_IMPLEMENTED->reason());
-                        }
-                        try {
-                            $responseBodyObj = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
-                        } catch (\JsonException $e) {
-                            $description = Stream::create('JSON error: ' . $e->getMessage());
-                            return $response
-                                ->withHeader('Content-Type', 'text/plain')
-                                ->withStatus(StatusCode::SERVICE_UNAVAILABLE->value, StatusCode::SERVICE_UNAVAILABLE->reason())
-                                ->withBody($description);
-                        }
-
-                        set_error_handler([static::class, 'warningHandler'], E_WARNING);
-                        try {
-                            $$yamlEncodedResponse = yaml_emit($responseBodyObj, YAML_UTF8_ENCODING);
-                        } catch (\ErrorException $e) {
-                            $responseBodyObj          = new \stdClass();
-                            $responseBodyObj->status  = 'error';
-                            $responseBodyObj->message = 'Malformed YAML data received in the request';
-                            $responseBodyObj->error   = $e->getMessage();
-                            $responseBodyObj->line    = $e->getLine();
-                            $responseBodyObj->code    = $e->getCode();
-                            $responseBody             = json_encode($responseBodyObj);
-                            $response                 = $response
-                                ->withHeader('Content-Type', 'application/json; charset=utf-8')
-                                ->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())
-                                ->withBody(Stream::create($responseBody));
-                        } finally {
-                            restore_error_handler();
-                        }
-                        if ($response->getStatusCode() === StatusCode::BAD_REQUEST->value) {
-                            return $response;
-                        }
-                        return $response->withStatus(StatusCode::OK->value, StatusCode::OK->reason())->withBody(Stream::create($yamlEncodedResponse));
-                        // no break needed
-                    default:
-                        return $response->withStatus(StatusCode::UNSUPPORTED_MEDIA_TYPE->value, StatusCode::UNSUPPORTED_MEDIA_TYPE->reason());
-                }
-            }
+        if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
+            return $response->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
+                            ->withHeader('Content-Length', '0');
         } else {
-            return $response->withStatus($indexResult, StatusCode::from($indexResult)->reason());
+            switch ($response->getHeaderLine('Content-Type')) {
+                case AcceptHeader::JSON->value:
+                    return $response->withStatus(StatusCode::OK->value, StatusCode::OK->reason())->withBody(Stream::create($responseBody));
+                    // no break needed
+                case AcceptHeader::YAML->value:
+                    if (!extension_loaded('yaml')) {
+                        throw new ImplementationException('YAML extension not loaded');
+                    }
+                    $responseBodyObj = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
+
+                    set_error_handler([static::class, 'warningHandler'], E_WARNING);
+                    try {
+                        $$yamlEncodedResponse = yaml_emit($responseBodyObj, YAML_UTF8_ENCODING);
+                    } catch (\ErrorException $e) {
+                        throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
+                    } finally {
+                        restore_error_handler();
+                    }
+                    return $response->withStatus(StatusCode::OK->value, StatusCode::OK->reason())->withBody(Stream::create($yamlEncodedResponse));
+                    // no break needed
+                default:
+                    throw new UnsupportedMediaTypeException();
+            }
         }
     }
 }

@@ -4,7 +4,7 @@ namespace LiturgicalCalendar\Api\Http\Exception;
 
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 
-class ValidationException extends ApiException
+class MethodNotAllowedException extends ApiException
 {
     public function __construct(string $message = 'Method not allowed')
     {
@@ -12,7 +12,7 @@ class ValidationException extends ApiException
             $message,
             StatusCode::METHOD_NOT_ALLOWED->value,
             'https://example.com/problems/validation-error',
-            'Request Method Error'
+            StatusCode::METHOD_NOT_ALLOWED->reason()
         );
     }
 }

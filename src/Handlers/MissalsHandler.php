@@ -7,9 +7,12 @@ use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
-use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
+use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
+use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadata;
 use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadataMap;
 use LiturgicalCalendar\Api\Router;
@@ -72,10 +75,7 @@ final class MissalsHandler extends AbstractHandler
 
         // For all other request methods, validate that they are supported by the endpoint
         //  and early exit if not
-        $response = $this->validateRequestMethod($request, $response);
-        if ($response->getStatusCode() === StatusCode::METHOD_NOT_ALLOWED->value) {
-            return $response;
-        }
+        $this->validateRequestMethod($request);
 
         // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint,
         //   and if so set the corresponding 'Content-Type' header in the response
@@ -87,15 +87,7 @@ final class MissalsHandler extends AbstractHandler
                 $response = $this->validateAcceptHeader($request, $response, AcceptabilityLevel::INTERMEDIATE);
         }
 
-        // Early exit if the Accept header is not supported
-        if ($response->getStatusCode() === StatusCode::NOT_ACCEPTABLE->value) {
-            return $response;
-        }
-
-        $response = self::buildMissalsIndex($response);
-        if ($response->getStatusCode() !== StatusCode::PROCESSING->value) {
-            return $response;
-        }
+        self::buildMissalsIndex();
 
         // Initialize any parameters set in the request.
         // If there are any:
@@ -124,47 +116,17 @@ final class MissalsHandler extends AbstractHandler
         if ($method === RequestMethod::GET) {
             $params = array_merge($params, $this->getScalarQueryParams($request));
         } elseif ($method === RequestMethod::POST) {
-            [
-                'response' => $response,
-                'params'   => $parsedBodyParams
-            ] = $this->parseBodyParams($request, $response, false);
-
-            // Early exit if the Content-Type header is not supported or an invalid parameter value was found
-            if (
-                $response->getStatusCode() === StatusCode::UNSUPPORTED_MEDIA_TYPE->value
-                || $response->getStatusCode() === StatusCode::BAD_REQUEST->value
-            ) {
-                return $response;
-            }
+            $parsedBodyParams = $this->parseBodyParams($request, false);
 
             if (null !== $parsedBodyParams) {
                 /** @var array<string,scalar|null> $params */
                 $params = array_merge($params, $parsedBodyParams);
             }
         } elseif ($method === RequestMethod::PUT || $method === RequestMethod::PATCH) {
-            [
-                'response' => $response,
-                'payload'  => $params['payload']
-            ] = $this->parseBodyPayload($request, $response);
-
-            // Early exit if the Content-Type header is not supported or an invalid parameter value was found
-            if (
-                $response->getStatusCode() === StatusCode::UNSUPPORTED_MEDIA_TYPE->value
-                || $response->getStatusCode() === StatusCode::BAD_REQUEST->value
-            ) {
-                return $response;
-            }
+            $params['payload'] = $this->parseBodyPayload($request);
         }
 
-        $this->params = new MissalsParamsHandler($response, $params, $this->requestPathParams);
-        $response     = $this->params->handle($request);
-
-        // Early exit if any parameters were invalid, any problems were encountered,
-        //   Missal ID requested was not found,
-        //   or even if we already have an OK response
-        if ($response->getStatusCode() === StatusCode::BAD_REQUEST->value) {
-            return $response;
-        }
+        $this->params = new MissalsParamsHandler($params);
 
         switch ($method) {
             case RequestMethod::GET:
@@ -178,32 +140,26 @@ final class MissalsHandler extends AbstractHandler
             case RequestMethod::DELETE:
                 return $this->handleDeleteRequest($response);
             default:
-                return $response->withStatus(StatusCode::METHOD_NOT_ALLOWED->value, StatusCode::METHOD_NOT_ALLOWED->reason());
+                throw new MethodNotAllowedException();
         }
     }
 
-    private static function buildMissalsIndex(ResponseInterface $response): ResponseInterface
+    private static function buildMissalsIndex(): void
     {
         if (false === is_readable(JsonData::MISSALS_FOLDER->path())) {
             $description = 'Unable to read the ' . JsonData::MISSALS_FOLDER->path() . ' directory';
-            return $response
-                ->withStatus(StatusCode::SERVICE_UNAVAILABLE->value, StatusCode::SERVICE_UNAVAILABLE->reason())
-                ->withBody(Stream::create($description));
+            throw new ServiceUnavailableException($description);
         }
 
         $missalFolderPaths = glob(JsonData::MISSALS_FOLDER->path() . '/propriumdesanctis*', GLOB_ONLYDIR);
         if (false === $missalFolderPaths) {
             $description = 'Unable to read the ' . JsonData::MISSALS_FOLDER->path() . ' directory contents';
-            return $response
-                ->withStatus(StatusCode::SERVICE_UNAVAILABLE->value, StatusCode::SERVICE_UNAVAILABLE->reason())
-                ->withBody(Stream::create($description));
+            throw new ServiceUnavailableException($description);
         }
 
         if (count($missalFolderPaths) === 0) {
             $description = 'No Missals found';
-            return $response
-                ->withStatus(StatusCode::NOT_FOUND->value, StatusCode::NOT_FOUND->reason())
-                ->withBody(Stream::create($description));
+            throw new NotFoundException($description);
         }
 
         $missalFolderNames = array_map('basename', $missalFolderPaths);
@@ -219,9 +175,7 @@ final class MissalsHandler extends AbstractHandler
                     $missal['region']    = $matches[1];
                 } else {
                     $description = 'Unable to parse missal folder name: ' . $missalFolderName;
-                    return $response
-                        ->withStatus(StatusCode::SERVICE_UNAVAILABLE->value, StatusCode::SERVICE_UNAVAILABLE->reason())
-                        ->withBody(Stream::create($description));
+                    throw new ServiceUnavailableException($description);
                 }
 
                 if (is_readable(JsonData::MISSALS_FOLDER->path() . "/$missalFolderName/i18n")) {
@@ -244,7 +198,6 @@ final class MissalsHandler extends AbstractHandler
                 self::addMissalYear($missal['year_published']);
             }
         }
-        return $response;
     }
 
     /**
@@ -308,25 +261,19 @@ final class MissalsHandler extends AbstractHandler
                 return $this->encodeResponseBody($response, MissalsHandler::$missalsIndex);
             }
         } elseif ($numPathParams > 1) {
-            return $response
-                ->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())
-                ->withBody(Stream::create('Only one path parameter expected for the `/missals` path but ' . $numPathParams . ' path parameters were found'));
+            throw new ValidationException('Only one path parameter expected for the `/missals` path but ' . $numPathParams . ' path parameters were found');
         } else {
             // the only path parameter we expect is the ID of the Missal
             $missalId = $this->requestPathParams[0];
             if (MissalsHandler::$missalsIndex->hasMissal($missalId)) {
                 $missalMetadata = MissalsHandler::$missalsIndex->getMissalMetadata($missalId);
                 if (null === $missalMetadata) {
-                    return $response
-                        ->withStatus(StatusCode::NOT_FOUND->value, StatusCode::NOT_FOUND->reason())
-                        ->withBody(Stream::create('Unable to find missal metadata for missal ' . $missalId));
+                    throw new NotFoundException('Unable to find missal metadata for missal ' . $missalId);
                 }
 
                 $missalJsonFile = RomanMissal::getSanctoraleFileName($missalId);
                 if (false === $missalJsonFile) {
-                    return $response
-                        ->withStatus(StatusCode::NOT_FOUND->value, StatusCode::NOT_FOUND->reason())
-                        ->withBody(Stream::create('Unable to find missal file for missal ' . $missalId));
+                    throw new NotFoundException('Unable to find missal file for missal ' . $missalId);
                 }
 
                 $locale     = RomanMissal::isLatinMissal($missalId)
@@ -347,9 +294,7 @@ final class MissalsHandler extends AbstractHandler
                 return $this->encodeResponseBody($response, $missalRows);
             }
             $description = "Could not find a Missal with id '" . $missalId . "', available values are: " . implode(', ', MissalsHandler::$missalsIndex->getMissalIDs());
-            return $response
-                ->withStatus(StatusCode::NOT_FOUND->value, StatusCode::NOT_FOUND->reason())
-                ->withBody(Stream::create($description));
+            throw new NotFoundException($description);
         }
     }
 
@@ -357,21 +302,18 @@ final class MissalsHandler extends AbstractHandler
     private function handlePutRequest(ResponseInterface $response): ResponseInterface
     {
         // TODO: implement creation of a Missal resource
-        return $response
-            ->withStatus(StatusCode::METHOD_NOT_ALLOWED->value, StatusCode::METHOD_NOT_ALLOWED->reason());
+        throw new MethodNotAllowedException('Not yet implemented');
     }
 
     private function handlePatchRequest(ResponseInterface $response): ResponseInterface
     {
         // TODO: implement updating of a Missal resource
-        return $response
-            ->withStatus(StatusCode::METHOD_NOT_ALLOWED->value, StatusCode::METHOD_NOT_ALLOWED->reason());
+        throw new MethodNotAllowedException('Not yet implemented');
     }
 
     private function handleDeleteRequest(ResponseInterface $response): ResponseInterface
     {
         // TODO: implement deletion of a Missal resource
-        return $response
-            ->withStatus(StatusCode::METHOD_NOT_ALLOWED->value, StatusCode::METHOD_NOT_ALLOWED->reason());
+        throw new MethodNotAllowedException('Not yet implemented');
     }
 }

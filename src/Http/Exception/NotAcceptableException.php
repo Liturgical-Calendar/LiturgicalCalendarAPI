@@ -3,16 +3,17 @@
 namespace LiturgicalCalendar\Api\Http\Exception;
 
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
+use PHPUnit\Logging\OpenTestReporting\Status;
 
-class AcceptException extends ApiException
+class NotAcceptableException extends ApiException
 {
-    public function __construct(string $message = 'Unacceptable Accept header')
+    public function __construct(string $message = 'Not Acceptable')
     {
         parent::__construct(
             $message,
             StatusCode::NOT_ACCEPTABLE->value,
             'https://example.com/problems/validation-error',
-            'Accept Error'
+            StatusCode::NOT_ACCEPTABLE->reason()
         );
     }
 }

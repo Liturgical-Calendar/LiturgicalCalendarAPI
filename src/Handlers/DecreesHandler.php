@@ -7,6 +7,9 @@ use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
+use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
+use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCollection;
 use LiturgicalCalendar\Api\Params\DecreesParamsHandler;
 use LiturgicalCalendar\Api\Utilities;
@@ -101,10 +104,7 @@ final class DecreesHandler extends AbstractHandler
 
         // For all other request methods, validate that they are supported by the endpoint
         //  and early exit if not
-        $response = $this->validateRequestMethod($request, $response);
-        if ($response->getStatusCode() === StatusCode::METHOD_NOT_ALLOWED->value) {
-            return $response;
-        }
+        $this->validateRequestMethod($request);
 
         // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint,
         //   and if so set the corresponding 'Content-Type' header in the response
@@ -114,11 +114,6 @@ final class DecreesHandler extends AbstractHandler
                 break;
             default:
                 $response = $this->validateAcceptHeader($request, $response, AcceptabilityLevel::INTERMEDIATE);
-        }
-
-        // Early exit if the Accept header is not supported
-        if ($response->getStatusCode() === StatusCode::NOT_ACCEPTABLE->value) {
-            return $response;
         }
 
         // Initialize any parameters set in the request.
@@ -148,47 +143,17 @@ final class DecreesHandler extends AbstractHandler
         if ($method === RequestMethod::GET) {
             $params = array_merge($params, $this->getScalarQueryParams($request));
         } elseif ($method === RequestMethod::POST) {
-            [
-                'response' => $response,
-                'params'   => $parsedBodyParams
-            ] = $this->parseBodyParams($request, $response, false);
-
-            // Early exit if the Content-Type header is not supported or an invalid parameter value was found
-            if (
-                $response->getStatusCode() === StatusCode::UNSUPPORTED_MEDIA_TYPE->value
-                || $response->getStatusCode() === StatusCode::BAD_REQUEST->value
-            ) {
-                return $response;
-            }
+            $parsedBodyParams = $this->parseBodyParams($request, false);
 
             if (null !== $parsedBodyParams) {
                 /** @var array<string,scalar|null> $params */
                 $params = array_merge($params, $parsedBodyParams);
             }
         } elseif ($method === RequestMethod::PUT || $method === RequestMethod::PATCH) {
-            [
-                'response' => $response,
-                'payload'  => $params['payload']
-            ] = $this->parseBodyPayload($request, $response);
-
-            // Early exit if the Content-Type header is not supported or an invalid parameter value was found
-            if (
-                $response->getStatusCode() === StatusCode::UNSUPPORTED_MEDIA_TYPE->value
-                || $response->getStatusCode() === StatusCode::BAD_REQUEST->value
-            ) {
-                return $response;
-            }
+            $params['payload'] = $this->parseBodyPayload($request);
         }
 
-        $this->params = new DecreesParamsHandler($response, $params);
-        $response     = $this->params->handle($request);
-
-        // Early exit if any parameters were invalid, any problems were encountered,
-        //   Missal ID requested was not found,
-        //   or even if we already have an OK response
-        if ($response->getStatusCode() === StatusCode::BAD_REQUEST->value) {
-            return $response;
-        }
+        $this->params = new DecreesParamsHandler($params);
 
         switch ($method) {
             case RequestMethod::GET:
@@ -203,7 +168,7 @@ final class DecreesHandler extends AbstractHandler
             case RequestMethod::DELETE:
                 return $this->handleDeleteRequest($response);
             default:
-                return $response;
+                throw new MethodNotAllowedException();
         }
     }
 
@@ -242,9 +207,7 @@ final class DecreesHandler extends AbstractHandler
             $decreesIndex->litcal_decrees = self::$decreesIndex->decreeItems;
             return $this->encodeResponseBody($response, $decreesIndex);
         } elseif ($countPathParams > 1) {
-            return $response
-                ->withStatus(StatusCode::BAD_REQUEST->value, StatusCode::BAD_REQUEST->reason())
-                ->withBody(Stream::create('Only one path parameter expected on the `/decrees` path, instead ' . $countPathParams . ' found'));
+            throw new ValidationException('Only one path parameter expected on the `/decrees` path, instead ' . $countPathParams . ' found');
         } else {
             $decreeId = $this->requestPathParams[0];
             $decree   = array_find(self::$decreesIndex->decreeItems, fn ($decree) => $decree->decree_id === $decreeId);
@@ -253,9 +216,7 @@ final class DecreesHandler extends AbstractHandler
                 $error     = 'No Decree of the Congregation for Divine Worship found corresponding to '
                     . $decreeId
                     . ', valid values are found in the `decree_id` properties of the `litcal_decrees` collection: ' . implode(', ', $decreeIDs);
-                return $response
-                    ->withStatus(StatusCode::NOT_FOUND->value, StatusCode::NOT_FOUND->reason())
-                    ->withBody(Stream::create($error));
+                throw new NotFoundException($error);
             }
             return $this->encodeResponseBody($response, $decree);
         }
