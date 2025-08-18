@@ -21,6 +21,7 @@ use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Enum\YearType;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
+use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
@@ -4848,13 +4849,7 @@ final class CalendarHandler extends AbstractHandler
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         // We instantiate a Response object with minimum state
-        $response = new Response(
-            StatusCode::PROCESSING->value,   // uncertain status,
-            [],                              // no headers,
-            null,                            // no body;
-            $request->getProtocolVersion(),  // and we always respond with the same HTTP protocol version used in the request.
-            StatusCode::PROCESSING->reason() // The corresponding 'reason' that accompanies the HTTP Status code
-        );
+        $response = static::createResponse($request);
 
         $method = RequestMethod::from($request->getMethod());
 
@@ -4883,20 +4878,6 @@ final class CalendarHandler extends AbstractHandler
         //   and early exit if not
         $this->validateRequestMethod($request);
 
-        // Validate that the Content-Type requested in the Accept header is supported by the endpoint,
-        //   and if so set the corresponding 'Content-Type' header in the response
-        switch ($method) {
-            case RequestMethod::GET:
-                $response = $this->validateAcceptHeader($request, $response, AcceptabilityLevel::LAX);
-                break;
-            default:
-                $response = $this->validateAcceptHeader($request, $response, AcceptabilityLevel::INTERMEDIATE);
-        }
-
-        // Early exit if the Accept header is not supported
-        if ($response->getStatusCode() === StatusCode::NOT_ACCEPTABLE->value) {
-            return $response;
-        }
 
         // Initialize any parameters set in the request.
         // If there are any:
@@ -4909,6 +4890,22 @@ final class CalendarHandler extends AbstractHandler
 
         /** @var array<string,scalar|null> $params */
         $params = [];
+
+        // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint:
+        //   if set we negotiate the best Content-Type, if not set we default to the first supported by the current handler
+        switch ($method) {
+            case RequestMethod::GET:
+                $mime = $this->validateAcceptHeader($request, AcceptabilityLevel::LAX);
+                break;
+            default:
+                $mime = $this->validateAcceptHeader($request, AcceptabilityLevel::INTERMEDIATE);
+        }
+
+        // In this case we don't set the Content-Type on the response just yet,
+        //   because we may have a 'return_type' parameter that overrides this value,
+        //   so we just use the best mime type as a default 'return_type' value
+        $mimeWithoutCharset    = explode(';', $mime)[0];
+        $params['return_type'] = AcceptHeader::from($mimeWithoutCharset)->toReturnTypeParam()->value;
 
         // Second of all, we check if an Accept-Language header was set in the request
         $acceptLanguageHeader = $request->getHeaderLine('Accept-Language');

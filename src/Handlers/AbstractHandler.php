@@ -376,11 +376,11 @@ abstract class AbstractHandler implements RequestHandlerInterface
      * @param ServerRequestInterface $request The request object.
      * @param ResponseInterface $response The response object.
      * @param AcceptabilityLevel $acceptabilityLevel The acceptability level of the Accept header.
-     * @return ResponseInterface The response object with the Content-Type header set to the first permissible Accept header value.
+     * @return string The best pick mime type
      * @throws NotAcceptableException If the Accept header is empty or a value that the endpoint has not declared as acceptable,
      *                                or if the acceptability level is `STRICT`.
      */
-    protected function validateAcceptHeader(ServerRequestInterface $request, ResponseInterface $response, AcceptabilityLevel $acceptabilityLevel): ResponseInterface
+    protected function validateAcceptHeader(ServerRequestInterface $request, AcceptabilityLevel $acceptabilityLevel): string
     {
         $acceptHeaderValues = [];
         $acceptHeader       = $request->getHeaderLine('Accept');
@@ -388,14 +388,17 @@ abstract class AbstractHandler implements RequestHandlerInterface
             if ($acceptabilityLevel === AcceptabilityLevel::STRICT) {
                 throw new NotAcceptableException();
             }
-            return $response->withHeader('Content-Type', $this->allowedAcceptHeaders[0]->value);
+            // If the accept header is empty and the acceptability level is not STRICT,
+            //   set the first Content-Type header allowed by the current handler on the response
+            return $this->allowedAcceptHeaders[0]->value;
         }
 
+        // If the accept header is not empty, negotiate the best pick
         $mime               = Negotiator::pickMediaType($request, array_column($this->allowedAcceptHeaders, 'value'));
         $acceptHeaderValues = Negotiator::getAcceptValues();
 
         if ($mime !== null) {
-            return $response->withHeader('Content-Type', $mime);
+            return $mime;
         } else {
             // Requests from browser windows using the address bar will probably have an Accept header of `text/html`.
             // In order to not be too drastic, let's treat `text/html` as though it were `application/json` for GET and POST requests only,
@@ -404,7 +407,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
                 $acceptabilityLevel === AcceptabilityLevel::LAX
                 && ( in_array('text/html', $acceptHeaderValues) || in_array('text/plain', $acceptHeaderValues) || in_array('*/*', $acceptHeaderValues) )
             ) {
-                return $response->withHeader('Content-Type', $this->allowedAcceptHeaders[0]->value);
+                return $this->allowedAcceptHeaders[0]->value;
             }
         }
 

@@ -68,18 +68,19 @@ final class MissalsHandler extends AbstractHandler
         }
 
         // For all other request methods, validate that they are supported by the endpoint
-        //  and early exit if not
         $this->validateRequestMethod($request);
 
-        // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint,
-        //   and if so set the corresponding 'Content-Type' header in the response
+        // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint:
+        //   if set we negotiate the best Content-Type, if not set we default to the first supported by the current handler
         switch ($method) {
             case RequestMethod::GET:
-                $response = $this->validateAcceptHeader($request, $response, AcceptabilityLevel::LAX);
+                $mime = $this->validateAcceptHeader($request, AcceptabilityLevel::LAX);
                 break;
             default:
-                $response = $this->validateAcceptHeader($request, $response, AcceptabilityLevel::INTERMEDIATE);
+                $mime = $this->validateAcceptHeader($request, AcceptabilityLevel::INTERMEDIATE);
         }
+
+        $response = $response->withHeader('Content-Type', $mime);
 
         self::buildMissalsIndex();
 
