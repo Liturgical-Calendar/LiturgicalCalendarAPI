@@ -387,7 +387,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
             if ($acceptabilityLevel === AcceptabilityLevel::STRICT) {
                 throw new NotAcceptableException();
             }
-            return $response->withHeader('Content-Type', $this->allowedAcceptHeaders[0]);
+            return $response->withHeader('Content-Type', $this->allowedAcceptHeaders[0]->value);
         }
 
         $mime               = Negotiator::pickMediaType($request, array_column($this->allowedAcceptHeaders, 'value'));
