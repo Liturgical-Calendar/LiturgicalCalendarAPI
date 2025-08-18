@@ -309,7 +309,7 @@ final class MetadataHandler extends AbstractHandler
 
                     set_error_handler([static::class, 'warningHandler'], E_WARNING);
                     try {
-                        $$yamlEncodedResponse = yaml_emit($responseBodyObj, YAML_UTF8_ENCODING);
+                        $yamlEncodedResponse = yaml_emit($responseBodyObj, YAML_UTF8_ENCODING);
                     } catch (\ErrorException $e) {
                         throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
                     } finally {
