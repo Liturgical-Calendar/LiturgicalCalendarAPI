@@ -1,6 +1,6 @@
 LiturgicalCalendar.iml
 .idea
-engineCache/*
+**/engineCache/*
 allowedOrigins.*
 vendor/*
 *.log
