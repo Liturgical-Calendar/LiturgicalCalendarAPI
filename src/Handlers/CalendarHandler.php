@@ -553,11 +553,18 @@ final class CalendarHandler extends AbstractHandler
      * This method will set the response status code to **400 Bad Request error** if the year
      *   is earlier than 1970.
      */
-    private function validateMinYear(): void
+    private function validateMinMaxYear(): void
     {
         if ($this->CalendarParams->Year < 1970) {
             $message = sprintf(
                 _('Only years from 1970 and after are supported. You tried requesting the year %d.'),
+                $this->CalendarParams->Year
+            );
+            throw new ValidationException($message);
+        }
+        if ($this->CalendarParams->Year > 9999) {
+            $message = sprintf(
+                _('Only years until 9999 are supported. You tried requesting the year %d.'),
                 $this->CalendarParams->Year
             );
             throw new ValidationException($message);
@@ -4970,7 +4977,7 @@ final class CalendarHandler extends AbstractHandler
                     ->withBody(Stream::create($responseBody));
             }
         } else {
-            $this->validateMinYear();
+            $this->validateMinMaxYear();
 
             $this->prepareL10N(); // the result could be stored in a variable $localeThatWasSet if it were to prove useful
             LiturgicalEvent::setLocale($this->CalendarParams->Locale === LitLocale::LATIN ? LitLocale::LATIN_PRIMARY_LANGUAGE : $this->CalendarParams->Locale);

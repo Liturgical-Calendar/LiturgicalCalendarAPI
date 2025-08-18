@@ -419,7 +419,6 @@ class CalendarParamsHandler implements ParamsInterface
                         && (
                             false === is_numeric($requestPathParams[0])
                             || false === ctype_digit($requestPathParams[0])
-                            || strlen($requestPathParams[0]) !== 4
                         )
                     )
                 ) {
@@ -448,11 +447,10 @@ class CalendarParamsHandler implements ParamsInterface
                             && (
                                 false === is_numeric($requestPathParams[2])
                                 || false === ctype_digit($requestPathParams[2])
-                                || strlen($requestPathParams[2]) !== 4
                             )
                         )
                     ) {
-                        throw new ValidationException('path parameter expected to represent Year value but did not have type Integer or numeric String');
+                        throw new ValidationException('path parameter expected to represent Year value but did not have type Integer or numeric String: found type ' . gettype($requestPathParams[2]));
                     } else {
                         $params['year'] = (int) $requestPathParams[2];
                     }
