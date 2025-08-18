@@ -4486,7 +4486,7 @@ final class CalendarHandler extends AbstractHandler
                 $responseBody = json_encode($SerializeableLitCal, JSON_THROW_ON_ERROR);
         }
 
-        if (false === $responseBody) {
+        if (null === $responseBody) {
             $message = _('Error serializing Liturgical Calendar.');
             throw new ServiceUnavailableException($message);
         }

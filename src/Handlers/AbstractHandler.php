@@ -423,10 +423,13 @@ abstract class AbstractHandler implements RequestHandlerInterface
      *
      * @throws UnsupportedMediaTypeException When the request Content-Type header is not among the list of allowed Content-Types.
      */
-    protected function validateRequestContentType(ServerRequestInterface $request): void
+    protected function validateRequestContentType(ServerRequestInterface $request, bool $required = false): void
     {
         $contentType = $request->getHeaderLine('Content-Type');
-        if (!in_array($contentType, array_column($this->allowedRequestContentTypes, 'value'))) {
+        if ($required && $contentType === '') {
+            throw new UnsupportedMediaTypeException();
+        }
+        if ($required && !in_array($contentType, array_column($this->allowedRequestContentTypes, 'value'))) {
             throw new UnsupportedMediaTypeException();
         }
     }
@@ -473,10 +476,10 @@ abstract class AbstractHandler implements RequestHandlerInterface
      */
     protected function parseBodyParams(ServerRequestInterface $request, bool $required = false): ?array
     {
-        $this->validateRequestContentType($request);
+        $this->validateRequestContentType($request, $required);
 
         // We parse the body according to the request Content-Type
-        $mime = RequestContentType::from($request->getHeaderLine('Content-Type')) ?? null;
+        $mime = RequestContentType::tryFrom($request->getHeaderLine('Content-Type')) ?? null;
         if ($mime === null) {
             if ($required) {
                 throw new UnsupportedMediaTypeException();
@@ -548,7 +551,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
      */
     protected function parseBodyPayload(ServerRequestInterface $request, bool $assoc = true): array|\stdClass|null
     {
-        $this->validateRequestContentType($request);
+        $this->validateRequestContentType($request, true);
 
         // We parse the body according to the request Content-Type
         $mime = RequestContentType::from($request->getHeaderLine('Content-Type')) ?? null;
