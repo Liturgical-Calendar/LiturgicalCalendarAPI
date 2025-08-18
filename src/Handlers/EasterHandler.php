@@ -5,67 +5,45 @@ namespace LiturgicalCalendar\Api\Handlers;
 use LiturgicalCalendar\Api\Utilities;
 use LiturgicalCalendar\Api\LatinUtils;
 use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
+use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
+use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
+use LiturgicalCalendar\Api\Http\Enum\StatusCode;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\Params\EasterParams;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Nyholm\Psr7\Stream;
 
-final class EasterHandler
+final class EasterHandler extends AbstractHandler
 {
-    private static string $Locale     = LitLocale::LATIN;
-    private static string $baseLocale = LitLocale::LATIN_PRIMARY_LANGUAGE;
+    public EasterParams $params;
     private static \IntlDateFormatter $dayOfTheWeekDayMonthYear;
     private static \IntlDateFormatter $dayMonthYear;
     private static \IntlDateFormatter $dayOfTheWeek;
     private static object $EasterDates;
-    private const ALLOWED_METHODS = [ 'GET', 'OPTIONS' ];
 
-    private static function enforceAllowedMethods(): void
+    public function __construct()
     {
-        if (!in_array($_SERVER['REQUEST_METHOD'], self::ALLOWED_METHODS)) {
-            $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
-            header($serverProtocol . ' 405 Method Not Allowed', true, 405);
-            die();
-        }
     }
 
-    private static function handleRequestParams(): void
+    private function setLocale(): void
     {
-        self::$Locale = isset($_GET['locale']) && is_string($_GET['locale']) && LitLocale::isValid($_GET['locale']) ? $_GET['locale'] : LitLocale::LATIN;
-    }
-
-    private static function serveCachedFileIfExists(): void
-    {
-        if (file_exists('engineCache/easter/' . self::$baseLocale . '.json')) {
-            header('Content-Type: application/json');
-            echo Utilities::rawContentsFromFile('engineCache/easter/' . self::$baseLocale . '.json');
-            die();
-        }
-    }
-
-    private static function setLocale(): void
-    {
-        $baseLocale = self::$Locale !== LitLocale::LATIN ? \Locale::getPrimaryLanguage(self::$Locale) : LitLocale::LATIN_PRIMARY_LANGUAGE;
-        if (null === $baseLocale) {
-            throw new \RuntimeException(
-                '“It is therefore a very appropriate punishment that falls on Zacharias.'
-                . ' For his want of faith with regard to the birth of the voice, he is himself deprived of his voice.”'
-                . ' — Origen of Alexandria, Commentary on the Gospel of John'
-            );
-        }
-        self::$baseLocale = $baseLocale;
-
         $localeArray = [
-            self::$Locale . '.utf8',
-            self::$Locale . '.UTF-8',
-            self::$Locale,
-            self::$baseLocale . '_' . strtoupper(self::$baseLocale) . '.utf8',
-            self::$baseLocale . '_' . strtoupper(self::$baseLocale) . '.UTF-8',
-            self::$baseLocale . '_' . strtoupper(self::$baseLocale),
-            self::$baseLocale . '.utf8',
-            self::$baseLocale . '.UTF-8',
-            self::$baseLocale
+            $this->params->Locale . '.utf8',
+            $this->params->Locale . '.UTF-8',
+            $this->params->Locale,
+            $this->params->baseLocale . '_' . strtoupper($this->params->baseLocale) . '.utf8',
+            $this->params->baseLocale . '_' . strtoupper($this->params->baseLocale) . '.UTF-8',
+            $this->params->baseLocale . '_' . strtoupper($this->params->baseLocale),
+            $this->params->baseLocale . '.utf8',
+            $this->params->baseLocale . '.UTF-8',
+            $this->params->baseLocale
         ];
         setlocale(LC_ALL, $localeArray);
 
         $dayOfTheWeekDayMonthYear = \IntlDateFormatter::create(
-            self::$Locale,
+            $this->params->Locale,
             \IntlDateFormatter::FULL,
             \IntlDateFormatter::NONE,
             'UTC',
@@ -73,7 +51,7 @@ final class EasterHandler
             'EEEE d MMMM yyyy'
         );
         $dayMonthYear             = \IntlDateFormatter::create(
-            self::$Locale,
+            $this->params->Locale,
             \IntlDateFormatter::FULL,
             \IntlDateFormatter::NONE,
             'UTC',
@@ -81,7 +59,7 @@ final class EasterHandler
             'd MMMM yyyy'
         );
         $dayOfTheWeek             = \IntlDateFormatter::create(
-            self::$Locale,
+            $this->params->Locale,
             \IntlDateFormatter::FULL,
             \IntlDateFormatter::NONE,
             'UTC',
@@ -102,7 +80,7 @@ final class EasterHandler
         self::$dayOfTheWeek             = $dayOfTheWeek;
     }
 
-    private static function calculateEasterDates(): void
+    private function calculateEasterDates(): void
     {
         self::$EasterDates                = new \stdClass();
         self::$EasterDates->litcal_easter = [];
@@ -123,7 +101,7 @@ final class EasterHandler
                 $dateLastCoincidence = $gregorian_easter;
             }
 
-            switch (self::$baseLocale) {
+            switch ($this->params->baseLocale) {
                 case LitLocale::LATIN_PRIMARY_LANGUAGE:
                     $month                   = (int) $gregorian_easter->format('n'); //n      = 1-January to 12-December
                     $monthLatin              = LatinUtils::LATIN_MONTHS[$month];
@@ -170,23 +148,6 @@ final class EasterHandler
     }
 
     /**
-     * Save the calculated dates of Easter to cache and return them in JSON format.
-     * This function is never intended to return normally, so it's marked with a never return type.
-     * @return never
-     */
-    private static function produceResponse(): never
-    {
-        if (!is_dir('engineCache/easter/')) {
-            mkdir('engineCache/easter/', 0774, true);
-        }
-        file_put_contents('engineCache/easter/' . self::$baseLocale . '.json', json_encode(self::$EasterDates));
-
-        header('Content-Type: application/json');
-        echo json_encode(self::$EasterDates);
-        die();
-    }
-
-    /**
      * Initialize the EasterHandler process.
      *
      * This method performs the following steps:
@@ -196,16 +157,102 @@ final class EasterHandler
      * 4. Sets the locale for date formatting.
      * 5. Calculates the dates of Easter for the specified range.
      * 6. Produces a JSON response with the calculated data.
-     *
-     * @return never
      */
-    public static function init(): never
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        self::enforceAllowedMethods();
-        self::handleRequestParams();
-        self::serveCachedFileIfExists();
-        self::setLocale();
-        self::calculateEasterDates();
-        self::produceResponse();
+        // We instantiate a Response object with minimum state
+        $response = static::createResponse($request);
+
+        $method = RequestMethod::from($request->getMethod());
+
+        // OPTIONS method for CORS preflight requests is always allowed
+        if ($method === RequestMethod::OPTIONS) {
+            return $this->handlePreflightRequest($request, $response);
+        }
+
+        // For all other request methods, validate that they are supported by the endpoint
+        $this->validateRequestMethod($request);
+
+        // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint:
+        //   if set we negotiate the best Content-Type, if not set we default to the first supported by the current handler
+        switch ($method) {
+            case RequestMethod::GET:
+                $mime = $this->validateAcceptHeader($request, AcceptabilityLevel::LAX);
+                break;
+            default:
+                $mime = $this->validateAcceptHeader($request, AcceptabilityLevel::INTERMEDIATE);
+        }
+
+        $response           = $response->withHeader('Content-Type', $mime);
+        $mimeWithoutCharset = explode(';', $mime)[0];
+        $fileExtension      = strtolower(AcceptHeader::from($mimeWithoutCharset)->toReturnTypeParam()->value);
+
+        // Initialize any parameters set in the request.
+        // If there are any:
+        //   - for a GET request method, we expect them to be set in the URL
+        //   - for any other request methods, we expect them to be set in the body of the request
+        // Considering that this endpoint is readonly:
+        //   - for POST requests we will never have a payload in the request body,
+        //       only request parameters
+
+        /** @var array{locale?:string}|array{PAYLOAD:\stdClass} $params */
+        $params = [];
+
+        // Second of all, we check if an Accept-Language header was set in the request
+        $acceptLanguageHeader = $request->getHeaderLine('Accept-Language');
+        $locale               = '' !== $acceptLanguageHeader
+            ? \Locale::acceptFromHttp($acceptLanguageHeader)
+            : LitLocale::LATIN;
+
+        if ($locale && LitLocale::isValid($locale)) {
+            $params['locale'] = $locale;
+        } else {
+            $params['locale'] = LitLocale::LATIN;
+        }
+
+        if ($method === RequestMethod::GET) {
+            $params = array_merge($params, $this->getScalarQueryParams($request));
+        } elseif ($method === RequestMethod::POST) {
+            $parsedBodyParams = $this->parseBodyParams($request, false);
+
+            if (null !== $parsedBodyParams) {
+                /** @var array<string,scalar|null> $params */
+                $params = array_merge($params, $parsedBodyParams);
+            }
+        }
+
+        $this->params = new EasterParams($params);
+
+        $cacheFile = 'engineCache/easter/' . $this->params->baseLocale . '.' . $fileExtension;
+        if (file_exists($cacheFile)) {
+            $bodyContents = Utilities::rawContentsFromFile($cacheFile);
+            return $response
+                ->withStatus(StatusCode::OK->value, StatusCode::OK->reason())
+                ->withBody(Stream::create($bodyContents));
+        }
+
+        $this->setLocale();
+        $this->calculateEasterDates();
+
+        $response     = $this->encodeResponseBody($response, self::$EasterDates);
+        $body         = $response->getBody();
+        $contents     = $body->getContents();
+        $responseHash = md5($contents);
+        $response     = $response->withHeader('ETag', "\"{$responseHash}\"");
+
+        if (!is_dir('engineCache/easter/')) {
+            mkdir('engineCache/easter/', 0774, true);
+        }
+
+        if (false === file_put_contents($cacheFile, $contents)) {
+            throw new ServiceUnavailableException('Failed to write cache file');
+        }
+
+        if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
+            return $response->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
+                            ->withHeader('Content-Length', '0');
+        }
+
+        return $response;
     }
 }

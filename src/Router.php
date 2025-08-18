@@ -125,6 +125,16 @@ class Router
                 }
                 self::$handler = $decreesHandler;
                 break;
+            case 'easter':
+                $easterHandler = new EasterHandler();
+                $easterHandler->setAllowedRequestMethods([
+                    RequestMethod::GET,
+                    RequestMethod::POST
+                ]);
+                $easterHandler->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA, RequestContentType::MULTIPART ]);
+                $easterHandler->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                self::$handler = $easterHandler;
+                break;
             /*
             case 'tests':
                 TestsHandler::init($requestPathParts);
@@ -202,9 +212,6 @@ class Router
                     AcceptHeader::YAML
                 ]);
                 $RegionalData->init($requestPathParts);
-                // no break (always terminates)
-            case 'easter':
-                EasterHandler::init();
                 // no break (always terminates)
             case 'schemas':
                 $SchemasHandler = new SchemasHandler();

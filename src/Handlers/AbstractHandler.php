@@ -2,10 +2,6 @@
 
 namespace LiturgicalCalendar\Api\Handlers;
 
-use Nyholm\Psr7\Stream;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Enum\RequestContentType;
@@ -21,6 +17,10 @@ use LiturgicalCalendar\Api\Http\Negotiator;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItem;
 use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadataMap;
 use Nyholm\Psr7\Response;
+use Nyholm\Psr7\Stream;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 abstract class AbstractHandler implements RequestHandlerInterface
 {
@@ -617,7 +617,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
         $contentType = AcceptHeader::from($response->getHeaderLine('Content-Type'));
         switch ($contentType) {
             case AcceptHeader::JSON:
-                $encodedResponse = json_encode($responseBody, JSON_THROW_ON_ERROR);
+                $encodedResponse = json_encode($responseBody, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
                 break;
             case AcceptHeader::YAML:
                 if (!extension_loaded('yaml')) {
