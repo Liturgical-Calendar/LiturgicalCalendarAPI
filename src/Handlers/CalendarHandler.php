@@ -66,7 +66,7 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropert
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropertyNameMetadata;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
-use LiturgicalCalendar\Api\Params\CalendarParamsHandler;
+use LiturgicalCalendar\Api\Params\CalendarParams;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ServerRequestInterface;
@@ -98,7 +98,7 @@ final class CalendarHandler extends AbstractHandler
     /** @var ReturnTypeParam[] */
     private array $allowedReturnTypes = [];
     private static CatholicDiocesesMap $worldDiocesesLatinRite; // can only be set once, after which it will be read-only
-    private CalendarParamsHandler $CalendarParams;
+    private CalendarParams $CalendarParams;
     private \NumberFormatter $formatter;
     private \NumberFormatter $formatterFem;
     private \IntlDateFormatter $dayAndMonth;
@@ -4927,7 +4927,7 @@ final class CalendarHandler extends AbstractHandler
                 }
         }
 
-        $this->CalendarParams = new CalendarParamsHandler();
+        $this->CalendarParams = new CalendarParams();
         $this->CalendarParams->setAllowedReturnTypes($this->allowedReturnTypes);
         $this->CalendarParams->setParams($params);
         if ($this->CalendarParams->ReturnType !== null) {

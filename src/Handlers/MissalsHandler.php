@@ -2,7 +2,7 @@
 
 namespace LiturgicalCalendar\Api\Handlers;
 
-use LiturgicalCalendar\Api\Params\MissalsParamsHandler;
+use LiturgicalCalendar\Api\Params\MissalsParams;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Enum\JsonData;
@@ -24,7 +24,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 final class MissalsHandler extends AbstractHandler
 {
-    public MissalsParamsHandler $params;
+    public MissalsParams $params;
     public static MissalMetadataMap $missalsIndex;
     /** @var string[] */ public static array $availableLangs = [];
     /** @var string[] */ public static array $MissalRegions  = [];
@@ -121,7 +121,7 @@ final class MissalsHandler extends AbstractHandler
             $params['payload'] = $this->parseBodyPayload($request);
         }
 
-        $this->params = new MissalsParamsHandler($params);
+        $this->params = new MissalsParams($params);
 
         switch ($method) {
             case RequestMethod::GET:

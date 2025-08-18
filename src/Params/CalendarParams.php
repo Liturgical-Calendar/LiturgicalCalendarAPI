@@ -35,7 +35,7 @@ use LiturgicalCalendar\Api\Utilities;
  * }
  * @package LiturgicalCalendar\Api\Params
  */
-class CalendarParamsHandler implements ParamsInterface
+class CalendarParams implements ParamsInterface
 {
     public int $Year;
     public string $Locale;
@@ -76,7 +76,7 @@ class CalendarParamsHandler implements ParamsInterface
 
 
     /**
-     * Constructor for CalendarParamsHandler
+     * Constructor for CalendarParams
      *
      * - loads calendars metadata
      * - sets the response status code to 503 Service Unavailable if the API was unable to load calendars metadata

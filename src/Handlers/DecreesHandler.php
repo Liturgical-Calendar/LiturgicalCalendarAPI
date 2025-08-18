@@ -11,7 +11,7 @@ use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCollection;
-use LiturgicalCalendar\Api\Params\DecreesParamsHandler;
+use LiturgicalCalendar\Api\Params\DecreesParams;
 use LiturgicalCalendar\Api\Utilities;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\Stream;
@@ -24,7 +24,7 @@ use Psr\Http\Message\ServerRequestInterface;
 final class DecreesHandler extends AbstractHandler
 {
     public static DecreeItemCollection $decreesIndex;
-    public DecreesParamsHandler $params;
+    public DecreesParams $params;
 
     public function __construct(array $requestPathParams = [])
     {
@@ -147,7 +147,7 @@ final class DecreesHandler extends AbstractHandler
             $params['payload'] = $this->parseBodyPayload($request);
         }
 
-        $this->params = new DecreesParamsHandler($params);
+        $this->params = new DecreesParams($params);
 
         switch ($method) {
             case RequestMethod::GET:

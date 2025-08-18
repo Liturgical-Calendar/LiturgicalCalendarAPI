@@ -16,7 +16,7 @@ use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadata;
  *
  * @package LiturgicalCalendar\Api\Params
  */
-class MissalsParamsHandler implements ParamsInterface
+class MissalsParams implements ParamsInterface
 {
     public bool $IncludeEmpty  = false;
     public ?string $Region     = null;

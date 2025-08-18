@@ -13,7 +13,7 @@ use LiturgicalCalendar\Api\Http\Exception\ValidationException;
  *
  * @package LiturgicalCalendar\Api\Params
  */
-class DecreesParamsHandler implements ParamsInterface
+class DecreesParams implements ParamsInterface
 {
     public ?string $Locale = null;
     public \stdClass $Payload;
