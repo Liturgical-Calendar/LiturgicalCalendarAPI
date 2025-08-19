@@ -5,22 +5,34 @@ namespace LiturgicalCalendar\Api\Handlers;
 use Swaggest\JsonSchema\Schema;
 use Swaggest\JsonSchema\InvalidValue;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\PathCategory;
-use LiturgicalCalendar\Api\Enum\RequestContentType;
+use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
+use LiturgicalCalendar\Api\Http\Exception\ApiException;
+use LiturgicalCalendar\Api\Http\Exception\ImplementationException;
+use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
+use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarItem;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 use LiturgicalCalendar\Api\Params\RegionalDataParams;
-use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Nyholm\Psr7\Stream;
 
 /**
  * Handles the `/data` path of the API
@@ -38,59 +50,51 @@ use LiturgicalCalendar\Api\Utilities;
  * @phpstan-import-type LitCalItemCreateNewFixedObject from \LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed
  * @phpstan-import-type LitCalItemCreateNewMobileObject from \LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile
  */
-final class RegionalDataHandler
+final class RegionalDataHandler extends AbstractHandler
 {
     private readonly MetadataCalendars $CalendarsMetadata;
     private RegionalDataParams $params;
 
-    /**
-     * Constructor
-     *
-     * Initializes the RegionalData class.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function __construct(array $requestPathParams = [])
     {
-        $this->params = new RegionalDataParams();
-        $metadataObj  = Utilities::jsonUrlToObject(Router::$apiPath . Route::CALENDARS->value);
+        parent::__construct($requestPathParams);
         /** @var \stdClass&object{litcal_metadata:MetadataCalendarsObject} $metadataObj */
+        $metadataObj             = Utilities::jsonUrlToObject(Route::CALENDARS->path());
         $this->CalendarsMetadata = MetadataCalendars::fromObject($metadataObj->litcal_metadata);
+        // Initialize the list of available locales
+        LitLocale::init();
     }
 
     /**
      * Handle the request method.
      *
      * Depending on the request method, it will call the appropriate class method to handle the request.
-     *
-     * @return never
      */
-    private function handleRequestMethod(): never
+    private function handleRequestMethod(RequestMethod $method, ResponseInterface $response): ResponseInterface
     {
-        switch (self::$Core->getRequestMethod()) {
+        switch ($method) {
             case RequestMethod::GET:
                 // no break (intentional fallthrough)
             case RequestMethod::POST:
                 if (null !== $this->params->i18nRequest) {
                     // If a simple i18n data request was made, retrieve the i18n data
-                    $this->getI18nData();
+                    return $this->getI18nData($response);
                 } else {
                     // Else retrieve the calendar data
-                    $this->getCalendar();
+                    return $this->getCalendar($response);
                 }
                 // no break (always terminates)
             case RequestMethod::PUT:
-                $this->createCalendar();
+                return $this->createCalendar($response);
                 // no break (always terminates)
             case RequestMethod::PATCH:
-                $this->updateCalendar();
+                return $this->updateCalendar($response);
                 // no break (always terminates)
             case RequestMethod::DELETE:
-                $this->deleteCalendar();
+                return $this->deleteCalendar($response);
                 // no break (always terminates)
             default:
-                $serverRequestMethod = isset($_SERVER['REQUEST_METHOD']) && is_string($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : '???';
-                self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, 'The method ' . $serverRequestMethod . ' cannot be handled by this endpoint');
+                throw new MethodNotAllowedException();
         }
     }
 
@@ -105,10 +109,8 @@ final class RegionalDataHandler
      * The method will return the i18n data for the requested calendar in the requested locale.
      * If the requested resource exists, it will be returned as JSON.
      * If the resource does not exist, a 404 error will be returned.
-     *
-     * @return never
      */
-    private function getI18nData(): never
+    private function getI18nData(ResponseInterface $response): ResponseInterface
     {
         $i18nDataFile = null;
         switch ($this->params->category) {
@@ -117,7 +119,8 @@ final class RegionalDataHandler
                     return $el->calendar_id === $this->params->key;
                 });
                 if (null === $dioceseEntry) {
-                    self::produceErrorResponse(StatusCode::NOT_FOUND, "The requested resource {$this->params->key} was not found in the index");
+                    $description = "The requested resource {$this->params->key} was not found in the index";
+                    throw new NotFoundException($description);
                 }
                 $i18nDataFile = strtr(JsonData::DIOCESAN_CALENDAR_I18N_FILE->path(), [
                     '{nation}'  => $dioceseEntry->nation,
@@ -140,9 +143,17 @@ final class RegionalDataHandler
         }
         if (file_exists($i18nDataFile)) {
             $i18nDataFileContents = Utilities::rawContentsFromFile($i18nDataFile);
-            self::produceResponse($i18nDataFileContents);
+            if ($response->getHeaderLine('Content-Type') === AcceptHeader::JSON->value) {
+                return $response
+                    ->withStatus(StatusCode::OK->value, StatusCode::OK->reason())
+                    ->withBody(Stream::create($i18nDataFileContents));
+            } else {
+                $responseObj = json_decode($i18nDataFileContents, true, 512, JSON_THROW_ON_ERROR);
+                return $this->encodeResponseBody($response, $responseObj);
+            }
         } else {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "RegionalData::getI18nData: file $i18nDataFile does not exist");
+            $description = "The requested resource {$i18nDataFile} was not found";
+            throw new NotFoundException($description);
         }
     }
 
@@ -162,10 +173,8 @@ final class RegionalDataHandler
      * If the requested resource exists, it will be returned as JSON.
      * If the resource does not exist, a 404 error will be returned.
      * If the `category` or `locale` parameters are invalid, a 400 error will be returned.
-     *
-     * @return never
      */
-    private function getCalendar(): never
+    private function getCalendar(ResponseInterface $response): ResponseInterface
     {
         $calendarDataFile = null;
         $dioceseEntry     = null;
@@ -175,7 +184,8 @@ final class RegionalDataHandler
                     return $el->calendar_id === $this->params->key;
                 });
                 if (null === $dioceseEntry) {
-                    self::produceErrorResponse(StatusCode::NOT_FOUND, "The requested resource {$this->params->key} was not found in the index");
+                    $description = "The requested resource {$this->params->key} was not found in the index";
+                    throw new NotFoundException($description);
                 }
 
                 $calendarDataFile = strtr(JsonData::DIOCESAN_CALENDAR_FILE->path(), [
@@ -205,11 +215,9 @@ final class RegionalDataHandler
             if (null === $this->params->locale) {
                 $this->params->locale = $CalendarData->metadata->locales[0];
             } elseif (false === in_array($this->params->locale, $CalendarData->metadata->locales, true)) {
-                self::produceErrorResponse(
-                    StatusCode::BAD_REQUEST,
-                    "Invalid value `{$this->params->locale}` for param `locale`. Valid values for current requested Wider region calendar data `{$this->params->key}` are: "
-                        . implode(', ', $CalendarData->metadata->locales)
-                );
+                $description = "Invalid value `{$this->params->locale}` for param `locale`. Valid values for current requested Wider region calendar data `{$this->params->key}` are: "
+                        . implode(', ', $CalendarData->metadata->locales);
+                throw new ValidationException($description);
             }
 
             // Based on the locale requested, retrieve the appropriate locale data
@@ -237,6 +245,7 @@ final class RegionalDataHandler
                 default:
                     $CalendarDataI18nFile = null;
             }
+
             if (null !== $CalendarDataI18nFile) {
                 $localeData = Utilities::jsonFileToObject($CalendarDataI18nFile);
                 /** @var array<LitCalItemObject|DiocesanLitCalItemObject> $litCalItems */
@@ -251,15 +260,14 @@ final class RegionalDataHandler
                     }
                 }
             } else {
-                self::produceErrorResponse(StatusCode::NOT_FOUND, "RegionalData::getCalendar: file $CalendarDataI18nFile does not exist");
+                $description = "Requested file {$CalendarDataI18nFile} does not exist";
+                throw new NotFoundException($description);
             }
-            $jsonEncodedResponse = json_encode($CalendarData);
-            if (false === $jsonEncodedResponse) {
-                throw new \ValueError('JSON error: ' . json_last_error_msg());
-            }
-            self::produceResponse($jsonEncodedResponse);
+
+            return $this->encodeResponseBody($response, $CalendarData);
         } else {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "RegionalData::getCalendar: file $calendarDataFile does not exist");
+            $description = "Requested file {$calendarDataFile} does not exist";
+            throw new NotFoundException($description);
         }
     }
 
@@ -282,14 +290,12 @@ final class RegionalDataHandler
      * a 503 Service Unavailable response is sent.
      *
      * On success, a 201 Created response is sent containing a success message.
-     *
-     * @return never
      */
-    private function createDiocesanCalendar(): never
+    private function createDiocesanCalendar(ResponseInterface $response): ResponseInterface
     {
         $payload = $this->params->payload;
         if (false === $payload instanceof DiocesanData) {
-            throw new \Exception('Payload is not an instance of DiocesanData');
+            throw new UnprocessableContentException('Payload is not an instance of DiocesanData');
         }
 
         // Before creating a diocesan calendar, we verify that the diocese_id is a valid diocese identifier
@@ -302,18 +308,14 @@ final class RegionalDataHandler
 
         // Verify that the country ISO is valid
         if (false === $catholicDiocesesLatinRite->hasKey($nation)) {
-            self::produceErrorResponse(
-                StatusCode::BAD_REQUEST,
-                "Invalid nation identifier $nation. Valid identifiers are: " . implode(', ', $catholicDiocesesLatinRite->getKeys())
-            );
+            $description = "Invalid nation identifier $nation. Valid identifiers are: " . implode(', ', $catholicDiocesesLatinRite->getKeys());
+            throw new UnprocessableContentException($description);
         }
 
         // Verify that the diocese identifier is valid for the given country ISO
         if (false === $catholicDiocesesLatinRite->isValidDioceseIdForCountry($nation, $diocese_id)) {
-            self::produceErrorResponse(
-                StatusCode::BAD_REQUEST,
-                "Invalid diocese identifier: $diocese_id for diocese $diocese_name in nation $nation. Valid identifiers are: " . implode(', ', $catholicDiocesesLatinRite->getValidDioceseIdsForCountry($nation))
-            );
+            $description = "Invalid diocese identifier: $diocese_id for diocese $diocese_name in nation $nation. Valid identifiers are: " . implode(', ', $catholicDiocesesLatinRite->getValidDioceseIdsForCountry($nation));
+            throw new UnprocessableContentException($description);
         }
 
         // Ensure we have all the necessary folders in place
@@ -324,7 +326,10 @@ final class RegionalDataHandler
             '{diocese}' => $diocese_id
         ]);
         if (!file_exists($diocesanCalendarI18nFolder)) {
-            mkdir($diocesanCalendarI18nFolder, 0755, true);
+            if (false === mkdir($diocesanCalendarI18nFolder, 0755, true)) {
+                $description = "Failed to create directory {$diocesanCalendarI18nFolder}";
+                throw new ServiceUnavailableException($description);
+            }
         }
 
         foreach ($payload->i18n as $locale => $litCalEventsI18n) {
@@ -342,10 +347,8 @@ final class RegionalDataHandler
                     json_encode($litCalEventsI18n, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL
                 )
             ) {
-                self::produceErrorResponse(
-                    StatusCode::SERVICE_UNAVAILABLE,
-                    "RegionalData::createDiocesanCalendar: failed to write to file $diocesanCalendarI18nFile"
-                );
+                $description = "Failed to write to file {$diocesanCalendarI18nFile}";
+                throw new ServiceUnavailableException($description);
             }
         }
 
@@ -368,16 +371,14 @@ final class RegionalDataHandler
                 $calendarData . PHP_EOL
             )
         ) {
-            self::produceErrorResponse(
-                StatusCode::SERVICE_UNAVAILABLE,
-                "RegionalData::createDiocesanCalendar: failed to write to file $diocesanCalendarFile"
-            );
+            $description = "Failed to write to file {$diocesanCalendarFile}";
+            throw new ServiceUnavailableException($description);
         }
 
-        $response          = new \stdClass();
-        $response->success = "Calendar data created or updated for Diocese \"{$diocese_name}\" (Nation: \"{$payload->metadata->nation}\")";
-        $response->data    = $payload;
-        self::produceResponse(json_encode($response));
+        $responseObj          = new \stdClass();
+        $responseObj->success = "Calendar data created or updated for Diocese \"{$diocese_name}\" (Nation: \"{$payload->metadata->nation}\")";
+        $responseObj->data    = $payload;
+        return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
 
     /**
@@ -396,15 +397,12 @@ final class RegionalDataHandler
      *
      * On successful creation of the national calendar data,
      * a 201 Created response is sent containing a success message.
-     *
-     * @return never
      */
-    private function createNationalCalendar(): never
+    private function createNationalCalendar(ResponseInterface $response): ResponseInterface
     {
-        $response = new \stdClass();
-        $payload  = $this->params->payload;
+        $payload = $this->params->payload;
         if (false === $payload instanceof NationalData) {
-            throw new \Exception('Payload is not an instance of NationalData');
+            throw new UnprocessableContentException('Payload is not an instance of NationalData');
         }
 
         // Ensure we have all the necessary folders in place
@@ -414,7 +412,10 @@ final class RegionalDataHandler
             '{nation}' => $payload->metadata->nation
         ]);
         if (!file_exists($nationalCalendarI18nFolder)) {
-            mkdir($nationalCalendarI18nFolder, 0755, true);
+            if (false === mkdir($nationalCalendarI18nFolder, 0755, true)) {
+                $description = "Failed to create directory {$nationalCalendarI18nFolder}";
+                throw new ServiceUnavailableException($description);
+            }
         }
 
         foreach ($payload->i18n as $locale => $litCalEventsI18n) {
@@ -425,7 +426,15 @@ final class RegionalDataHandler
                     '{locale}' => $locale
                 ]
             );
-            file_put_contents($nationalCalendarI18nFile, json_encode($litCalEventsI18n, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL);
+            if (
+                false === file_put_contents(
+                    $nationalCalendarI18nFile,
+                    json_encode($litCalEventsI18n, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . PHP_EOL
+                )
+            ) {
+                $description = "Failed to write to file {$nationalCalendarI18nFile}";
+                throw new ServiceUnavailableException($description);
+            }
         }
 
         // We no longer need the i18n data, we can now remove it
@@ -439,15 +448,22 @@ final class RegionalDataHandler
         );
 
         $calendarData = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-        file_put_contents(
-            $nationalCalendarFile,
-            $calendarData . PHP_EOL
-        );
+        if (
+            false === file_put_contents(
+                $nationalCalendarFile,
+                $calendarData . PHP_EOL
+            )
+        ) {
+            $description = "Failed to write to file {$nationalCalendarFile}";
+            throw new ServiceUnavailableException($description);
+        }
+
         // get the nation name in English from the two letter iso code
-        $nationEnglish     = \Locale::getDisplayRegion('-' . $payload->metadata->nation, 'en');
-        $response->success = "Calendar data created or updated for Nation \"{$nationEnglish}\" (\"{$payload->metadata->nation}\")";
-        $response->data    = $payload;
-        self::produceResponse(json_encode($response));
+        $nationEnglish        = \Locale::getDisplayRegion('-' . $payload->metadata->nation, 'en');
+        $responseObj          = new \stdClass();
+        $responseObj->success = "Calendar data created or updated for Nation \"{$nationEnglish}\" (\"{$payload->metadata->nation}\")";
+        $responseObj->data    = $payload;
+        return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
 
     /**
@@ -457,19 +473,22 @@ final class RegionalDataHandler
      *
      * The resource is created in the `jsondata/sourcedata/calendars/wider_regions/` directory.
      * TODO: implement
-     *
-     * @return never
      */
-    private function createWiderRegionCalendar(): never
+    private function createWiderRegionCalendar(ResponseInterface $response): ResponseInterface
     {
-        $response = new \stdClass();
-        $payload  = $this->params->payload;
+        $payload = $this->params->payload;
         if (false === $payload instanceof WiderRegionData) {
-            throw new \Exception('Payload is not an instance of WiderRegionData');
+            $description = 'Payload is not an instance of WiderRegionData';
+            throw new UnprocessableContentException($description);
         }
 
-        // implementation here
-        self::produceResponse(json_encode($response));
+        throw new ImplementationException('Not yet implemented');
+        // implementation here (remove above exception once implemented)
+
+        $responseObj          = new \stdClass();
+        $responseObj->success = 'Calendar data created or updated for Wider Region';
+        $responseObj->data    = $payload;
+        return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
 
     /**
@@ -484,20 +503,21 @@ final class RegionalDataHandler
      * If the payload is valid according to the associated schema,
      * the resource creation will continue according to the calendar type.
      */
-    private function createCalendar(): never
+    private function createCalendar(ResponseInterface $response): ResponseInterface
     {
         switch ($this->params->category) {
             case PathCategory::DIOCESE:
-                $this->createDiocesanCalendar();
+                return $this->createDiocesanCalendar($response);
                 // no break (always terminates)
             case PathCategory::NATION:
-                $this->createNationalCalendar();
+                return $this->createNationalCalendar($response);
                 // no break (always terminates)
             case PathCategory::WIDERREGION:
-                $this->createWiderRegionCalendar();
+                return $this->createWiderRegionCalendar($response);
                 // no break (always terminates)
             default:
-                self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "Unknown calendar category \"{$this->params->category}\"");
+                $description = 'Unknown calendar category "' . $this->params->category->value . '"';
+                throw new ValidationException($description);
         }
     }
 
@@ -512,14 +532,13 @@ final class RegionalDataHandler
      * If the resource to update is not writable or the write was not successful, the response will be a JSON error response with a status code of 503 Service Unavailable.
      *
      * If the update is successful, the response will be a JSON success response with a status code of 201 Created.
-     *
-     * @return never
      */
-    private function updateNationalCalendar(): never
+    private function updateNationalCalendar(ResponseInterface $response): ResponseInterface
     {
         $payload = $this->params->payload;
         if (false === $payload instanceof NationalData) {
-            throw new \Exception('Payload is not an instance of NationalCalendarData');
+            $description = 'Payload is not an instance of NationalData';
+            throw new UnprocessableContentException($description);
         }
 
         $nationEntry = array_find($this->CalendarsMetadata->national_calendars, function ($item) {
@@ -527,7 +546,8 @@ final class RegionalDataHandler
         });
 
         if (null === $nationEntry) {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update unknown national calendar resource {$this->params->key}.");
+            $description = "Cannot update unknown national calendar resource {$this->params->key}.";
+            throw new NotFoundException($description);
         }
 
         foreach ($payload->i18n as $locale => $i18nData) {
@@ -539,8 +559,14 @@ final class RegionalDataHandler
                 ]
             );
 
-            if (file_exists($calendarI18nFile) && false === is_writable($calendarI18nFile)) {
-                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update national calendar i18n resource for {$this->params->key} at {$calendarI18nFile}, check file and folder permissions.");
+            if (false === file_exists($calendarI18nFile)) {
+                $description = "Cannot update unknown national calendar i18n resource {$this->params->key} for locale {$locale}, file {$calendarI18nFile} does not exist.";
+                throw new NotFoundException($description);
+            }
+
+            if (false === is_writable($calendarI18nFile)) {
+                $description = "Cannot update national calendar i18n resource {$this->params->key} for locale {$locale}, file {$calendarI18nFile} is not writable.";
+                throw new UnprocessableContentException($description);
             }
 
             // Update national calendar i18n data for locale
@@ -551,7 +577,8 @@ final class RegionalDataHandler
                     $calendarI18nData . PHP_EOL
                 )
             ) {
-                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update national calendar i18n resource {$this->params->key} in path {$calendarI18nFile}.");
+                $description = "Could not update national calendar i18n resource {$this->params->key} for locale {$locale}, file {$calendarI18nFile}.";
+                throw new ServiceUnavailableException($description);
             }
         }
 
@@ -566,13 +593,17 @@ final class RegionalDataHandler
         // Get all .json files in the folder
         $jsonFiles = glob("{$calendarI18nFolder}/*.json");
         if (false === $jsonFiles) {
-            throw new \Exception('Unable to list files in folder ' . $calendarI18nFolder);
+            $description = 'Unable to list national calendar i18n files in folder ' . $calendarI18nFolder;
+            throw new ServiceUnavailableException($description);
         }
 
         foreach ($jsonFiles as $jsonFile) {
             $filename = pathinfo($jsonFile, PATHINFO_FILENAME);
             if (false === in_array($filename, $payload->metadata->locales)) {
-                unlink($jsonFile);
+                if (false === unlink($jsonFile)) {
+                    $description = 'Unable to delete national calendar i18n file ' . $jsonFile;
+                    throw new ServiceUnavailableException($description);
+                }
             }
         }
 
@@ -586,11 +617,13 @@ final class RegionalDataHandler
         );
 
         if (false === file_exists($calendarFile)) {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update unknown national calendar resource for {$this->params->key} at {$calendarFile}, file not found.");
+            $description = "Cannot update unknown national calendar resource {$this->params->key}, file {$calendarFile} does not exist.";
+            throw new NotFoundException($description);
         }
 
         if (false === is_writable($calendarFile)) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update national calendar resource for {$this->params->key} at {$calendarFile}, check file and folder permissions.");
+            $description = "Cannot update national calendar resource {$this->params->key}, file {$calendarFile} is not writable.";
+            throw new ServiceUnavailableException($description);
         }
 
         $calendarData = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
@@ -600,13 +633,14 @@ final class RegionalDataHandler
                 $calendarData . PHP_EOL
             )
         ) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update national calendar resource {$this->params->key} in path {$calendarFile}.");
+            $description = "Could not update national calendar resource {$this->params->key}, file {$calendarFile}.";
+            throw new ServiceUnavailableException($description);
         }
 
-        $response          = new \stdClass();
-        $response->success = "Calendar data created or updated for Nation \"{$this->params->key}\"";
-        $response->data    = $payload;
-        self::produceResponse(json_encode($response));
+        $responseObj          = new \stdClass();
+        $responseObj->success = "Calendar data created or updated for Nation \"{$this->params->key}\"";
+        $responseObj->data    = $payload;
+        return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
 
     /**
@@ -620,14 +654,13 @@ final class RegionalDataHandler
      * If the resource to update is not writable or the write was not successful, the response will be a JSON error response with a status code of 503 Service Unavailable.
      *
      * If the update is successful, the response will be a JSON success response with a status code of 201 Created.
-     *
-     * @return never
      */
-    private function updateWiderRegionCalendar(): never
+    private function updateWiderRegionCalendar(ResponseInterface $response): ResponseInterface
     {
         $payload = $this->params->payload;
         if (false === $payload instanceof WiderRegionData) {
-            throw new \Exception('Payload is not an instance of WiderRegionData');
+            $description = 'Payload is not an instance of WiderRegionData';
+            throw new UnprocessableContentException($description);
         }
 
         $widerRegionEntry = array_find($this->CalendarsMetadata->wider_regions, function ($item) {
@@ -635,7 +668,8 @@ final class RegionalDataHandler
         });
 
         if (null === $widerRegionEntry) {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update unknown wider region calendar resource {$this->params->key}.");
+            $description = "Cannot update unknown wider region calendar resource {$this->params->key}.";
+            throw new NotFoundException($description);
         }
 
         foreach ($payload->i18n as $locale => $i18nData) {
@@ -647,8 +681,14 @@ final class RegionalDataHandler
                 ]
             );
 
-            if (file_exists($widerRegionI18nFile) && false === is_writable($widerRegionI18nFile)) {
-                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update wider region calendar i18n resource for {$this->params->key} at {$widerRegionI18nFile}, check file and folder permissions.");
+            if (false === file_exists($widerRegionI18nFile)) {
+                $description = "Cannot update wider region calendar i18n resource for {$this->params->key} at {$widerRegionI18nFile}, file does not exist.";
+                throw new NotFoundException($description);
+            }
+
+            if (false === is_writable($widerRegionI18nFile)) {
+                $description = "Cannot update wider region calendar i18n resource for {$this->params->key} at {$widerRegionI18nFile}, file is not writable.";
+                throw new ServiceUnavailableException($description);
             }
 
             // Update wider region calendar i18n data for locale
@@ -659,7 +699,8 @@ final class RegionalDataHandler
                     $widerRegionI18nData . PHP_EOL
                 )
             ) {
-                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update wider region calendar i18n resource {$this->params->key} in path {$widerRegionI18nFile}.");
+                $description = "Could not update wider region calendar i18n resource for {$this->params->key} at {$widerRegionI18nFile}.";
+                throw new ServiceUnavailableException($description);
             }
         }
 
@@ -674,13 +715,17 @@ final class RegionalDataHandler
         // Get all .json files in the folder
         $jsonFiles = glob($widerRegionI18nFolder . '/*.json');
         if (false === $jsonFiles) {
-            throw new \Exception('Unable to get list of files in ' . $widerRegionI18nFolder);
+            $description = 'Unable to get list of wider region i18n files in ' . $widerRegionI18nFolder;
+            throw new ServiceUnavailableException($description);
         }
 
         foreach ($jsonFiles as $file) {
             $filename = pathinfo($file, PATHINFO_FILENAME);
             if (false === in_array($filename, $payload->metadata->locales)) {
-                unlink($file);
+                if (false === unlink($file)) {
+                    $description = 'Unable to delete wider region i18n file ' . $file;
+                    throw new ServiceUnavailableException($description);
+                }
             }
         }
 
@@ -694,11 +739,13 @@ final class RegionalDataHandler
         );
 
         if (false === file_exists($widerRegionFile)) {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update unknown wider region calendar resource for {$this->params->key} at {$widerRegionFile}, file not found.");
+            $description = "Cannot update wider region calendar resource for {$this->params->key} at {$widerRegionFile}, file does not exist.";
+            throw new NotFoundException($description);
         }
 
         if (false === is_writable($widerRegionFile)) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update wider region calendar resource for {$this->params->key} at {$widerRegionFile}, check file and folder permissions.");
+            $description = "Cannot update wider region calendar resource for {$this->params->key} at {$widerRegionFile}, file is not writable.";
+            throw new ServiceUnavailableException($description);
         }
 
         $calendarData = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
@@ -708,13 +755,14 @@ final class RegionalDataHandler
                 $calendarData . PHP_EOL
             )
         ) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update wider region calendar resource {$this->params->key} in path {$widerRegionFile}.");
+            $description = "Could not update wider region calendar resource for {$this->params->key} at {$widerRegionFile}.";
+            throw new ServiceUnavailableException($description);
         }
 
-        $response          = new \stdClass();
-        $response->success = "Calendar data created or updated for Wider Region \"{$this->params->key}\"";
-        $response->data    = $payload;
-        self::produceResponse(json_encode($response));
+        $responseObj          = new \stdClass();
+        $responseObj->success = "Calendar data created or updated for Wider Region \"{$this->params->key}\"";
+        $responseObj->data    = $payload;
+        return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
 
     /**
@@ -728,14 +776,13 @@ final class RegionalDataHandler
      * If the resource to update is not writable or the write was not successful, the response will be a JSON error response with a status code of 503 Service Unavailable.
      *
      * If the update is successful, the response will be a JSON success response with a status code of 201 Created.
-     *
-     * @return never
      */
-    private function updateDiocesanCalendar(): never
+    private function updateDiocesanCalendar(ResponseInterface $response): ResponseInterface
     {
         $payload = $this->params->payload;
         if (false === $payload instanceof DiocesanData) {
-            throw new \Exception('Payload is not an instance of DiocesanCalendarData');
+            $description = 'Payload is not an instance of DiocesanData';
+            throw new UnprocessableContentException($description);
         }
 
         $dioceseEntry = array_find($this->CalendarsMetadata->diocesan_calendars, function ($item) {
@@ -743,7 +790,8 @@ final class RegionalDataHandler
         });
 
         if (null === $dioceseEntry) {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update unknown diocesan calendar resource {$this->params->key}.");
+            $description = "Cannot update unknown diocesan calendar resource {$this->params->key}.";
+            throw new NotFoundException($description);
         }
 
         foreach ($payload->i18n as $locale => $i18nData) {
@@ -756,8 +804,14 @@ final class RegionalDataHandler
                 ]
             );
 
-            if (file_exists($DiocesanCalendarI18nFile) && false === is_writable($DiocesanCalendarI18nFile)) {
-                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendar i18n resource for {$this->params->key} at {$DiocesanCalendarI18nFile}, check file and folder permissions.");
+            if (false === file_exists($DiocesanCalendarI18nFile)) {
+                $description = "Cannot update diocesan calendar i18n resource for {$this->params->key} at {$DiocesanCalendarI18nFile}, file not found.";
+                throw new NotFoundException($description);
+            }
+
+            if (false === is_writable($DiocesanCalendarI18nFile)) {
+                $description = "Cannot update diocesan calendar i18n resource for {$this->params->key} at {$DiocesanCalendarI18nFile}, file is not writable.";
+                throw new ServiceUnavailableException($description);
             }
 
             // Update diocesan calendar i18n data for locale
@@ -768,7 +822,8 @@ final class RegionalDataHandler
                     $calendarI18nData . PHP_EOL
                 )
             ) {
-                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update diocesan calendar i18n resource {$this->params->key} in path {$DiocesanCalendarI18nFile}.");
+                $description = "Could not update diocesan calendar i18n resource {$this->params->key} in path {$DiocesanCalendarI18nFile}.";
+                throw new ServiceUnavailableException($description);
             }
         }
 
@@ -784,13 +839,16 @@ final class RegionalDataHandler
         // Get all .json files in the folder
         $jsonFiles = glob($diocesanCalendarI18nFolder . '/*.json');
         if (false === $jsonFiles) {
-            throw new \RuntimeException('Diocesan calendar i18n folder glob failed');
+            $description = 'Unable to list diocesan calendar i18n files in path ' . $diocesanCalendarI18nFolder;
+            throw new ServiceUnavailableException($description);
         }
 
         foreach ($jsonFiles as $file) {
             $filename = pathinfo($file, PATHINFO_FILENAME);
             if (false === in_array($filename, $payload->metadata->locales)) {
-                unlink($file);
+                if (false === unlink($file)) {
+                    throw new ServiceUnavailableException("Could not delete diocesan calendar i18n resource {$this->params->key} in path {$file}.");
+                }
             }
         }
 
@@ -806,11 +864,13 @@ final class RegionalDataHandler
         );
 
         if (false === file_exists($DiocesanCalendarFile)) {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "Cannot update diocesan calendar resource at {$DiocesanCalendarFile}, file not found.");
+            $description = "Cannot update diocesan calendar resource at {$DiocesanCalendarFile}, file not found.";
+            throw new NotFoundException($description);
         }
 
         if (false === is_writable($DiocesanCalendarFile)) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Cannot update diocesan calendar resource for {$this->params->key} at {$DiocesanCalendarFile}, check file and folder permissions.");
+            $description = "Cannot update diocesan calendar resource for {$this->params->key} at {$DiocesanCalendarFile}, check file and folder permissions.";
+            throw new ServiceUnavailableException($description);
         }
 
         $calendarData = json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
@@ -820,13 +880,14 @@ final class RegionalDataHandler
                 $calendarData . PHP_EOL
             )
         ) {
-            self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "Could not update diocesan calendar resource {$this->params->key} in path {$DiocesanCalendarFile}.");
+            $description = "Could not update diocesan calendar resource {$this->params->key} in path {$DiocesanCalendarFile}.";
+            throw new ServiceUnavailableException($description);
         }
 
-        $response          = new \stdClass();
-        $response->success = "Calendar data created or updated for Diocese \"{$dioceseEntry->diocese}\" (Nation: \"{$dioceseEntry->nation}\")";
-        $response->data    = $payload;
-        self::produceResponse(json_encode($response));
+        $responseObj          = new \stdClass();
+        $responseObj->success = "Calendar data created or updated for Diocese \"{$dioceseEntry->diocese}\" (Nation: \"{$dioceseEntry->nation}\")";
+        $responseObj->data    = $payload;
+        return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
 
     /**
@@ -837,23 +898,22 @@ final class RegionalDataHandler
      * If the payload is invalid, the response will be a JSON error response with a 422 Unprocessable Content status code.
      *
      * If the payload is valid, the update process will continue according to the calendar type.
-     *
-     * @return never
      */
-    private function updateCalendar(): never
+    private function updateCalendar(ResponseInterface $response): ResponseInterface
     {
         switch ($this->params->category) {
             case PathCategory::DIOCESE:
-                $this->updateDiocesanCalendar();
+                return $this->updateDiocesanCalendar($response);
                 // no break (always terminates)
             case PathCategory::NATION:
-                $this->updateNationalCalendar();
+                return $this->updateNationalCalendar($response);
                 // no break (always terminates)
             case PathCategory::WIDERREGION:
-                $this->updateWiderRegionCalendar();
+                return $this->updateWiderRegionCalendar($response);
                 // no break (always terminates)
             default:
-                self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, "Unknown calendar category \"{$this->params->category}\"");
+                $description = 'Unknown calendar category "' . $this->params->category->value . '"';
+                throw new ValidationException($description);
         }
     }
 
@@ -880,7 +940,8 @@ final class RegionalDataHandler
                     return $el->calendar_id === $this->params->key;
                 });
                 if (null === $dioceseEntry) {
-                    self::produceErrorResponse(StatusCode::NOT_FOUND, "The resource requested for deletion {$this->params->key} is not known.");
+                    $description = "The resource requested for deletion {$this->params->key} is not known.";
+                    throw new NotFoundException($description);
                 }
                 $calendarDataFile   = strtr(
                     JsonData::DIOCESAN_CALENDAR_FILE->path(),
@@ -944,19 +1005,17 @@ final class RegionalDataHandler
      * containing a success message.
      *
      * If the resource does not exist, a 404 error will be returned.
-     *
-     * @return never
      */
-    private function deleteCalendar(): never
+    private function deleteCalendar(ResponseInterface $response): ResponseInterface
     {
-        $response            = new \stdClass();
         $dioceseNationFolder = null;
 
         [$calendarDataFile, $calendarI18nFolder] = $this->getPathsForCalendarDelete();
 
         if (file_exists($calendarDataFile) && file_exists($calendarI18nFolder)) {
             if (false === is_writable($calendarDataFile)) {
-                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, check file and folder permissions.");
+                $description = "The resource '{$this->params->key}' requested for deletion is not writable.";
+                throw new ServiceUnavailableException($description);
             }
 
             // We want to make sure to also remove the containing folder, let's get the parent folder for later removal
@@ -969,40 +1028,51 @@ final class RegionalDataHandler
             }
 
             if (false === unlink($calendarDataFile)) {
-                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully.");
+                $description = "The resource '{$this->params->key}' requested for deletion was not removed successfully.";
+                throw new ServiceUnavailableException($description);
             };
-            $calendarI18mFiles = glob($calendarI18nFolder . '/*.json');
-            if (false === $calendarI18mFiles) {
-                throw new \Exception('Unable to read json files from directory ' . $calendarI18nFolder);
+
+            $calendarI18nFiles = glob($calendarI18nFolder . '/*.json');
+            if (false === $calendarI18nFiles) {
+                $description = "Unable to list i18n files from the folder {$calendarI18nFolder}.";
+                throw new ServiceUnavailableException($description);
             }
 
-            foreach ($calendarI18mFiles as $file) {
+            foreach ($calendarI18nFiles as $file) {
                 if (false === is_writable($file)) {
-                    self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, check i18n file and folder permissions.");
+                    $description = "The i18n file '{$file}' is not writable, cannot remove.";
+                    throw new ServiceUnavailableException($description);
                 }
                 if (false === unlink($file)) {
-                    self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, i18n file could not be removed.");
+                    $description = "The i18n file '{$file}' could not be removed.";
+                    throw new ServiceUnavailableException($description);
                 };
             }
             if (false === rmdir($calendarI18nFolder)) {
-                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, i18n folder could not be removed.");
+                $description = "The i18n folder '{$calendarI18nFolder}' could not be removed.";
+                throw new ServiceUnavailableException($description);
             }
             if (false === rmdir($calendarDataFolder)) {
-                self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, data folder could not be removed.");
+                $description = "The resource '{$this->params->key}' requested for deletion was not removed successfully, data folder could not be removed.";
+                throw new ServiceUnavailableException($description);
             }
             if ($this->params->category === PathCategory::DIOCESE && $dioceseNationFolder !== null) {
                 // Check if the parent `nation_id` folder is empty, if it is, remove it too
                 if (count(scandir($dioceseNationFolder)) === 2) { // only . and ..
                     if (false === rmdir($dioceseNationFolder)) {
-                        self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The resource '{$this->params->key}' requested for deletion was not removed successfully, diocese nation folder could not be removed.");
+                        $description = "The resource '{$this->params->key}' requested for deletion was not removed successfully, diocese nation folder could not be removed.";
+                        throw new ServiceUnavailableException($description);
                     }
                 }
             }
         } else {
-            self::produceErrorResponse(StatusCode::NOT_FOUND, "The resource '{$this->params->key}' requested for deletion (or the relative i18n folder) was not found on this server.");
+            $description = "The resource '{$this->params->key}' requested for deletion (or the relative i18n folder) was not found on this server.";
+            throw new NotFoundException($description);
         }
-        $response->success = "Calendar data \"{$this->params->category->value}/{$this->params->key}\" deletion successful.";
-        self::produceResponse(json_encode($response));
+
+        $responseObj          = new \stdClass();
+        $responseObj->success = "Calendar data \"{$this->params->category->value}/{$this->params->key}\" deletion successful.";
+        return $this->encodeResponseBody($response, $responseObj, StatusCode::NO_CONTENT);
     }
 
 
@@ -1022,318 +1092,269 @@ final class RegionalDataHandler
             $schema->in($data);
             return true;
         } catch (InvalidValue | \Exception $e) {
-            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, LitSchema::ERROR_MESSAGES[$schemaUrl] . PHP_EOL . $e->getMessage());
+            throw new ApiException(
+                LitSchema::ERROR_MESSAGES[$schemaUrl],
+                StatusCode::UNPROCESSABLE_CONTENT->value,
+                'https://www.rfc-editor.org/rfc/rfc9110.html#name-422-unprocessable-content',
+                StatusCode::UNPROCESSABLE_CONTENT->reason(),
+                $e
+            );
         }
     }
 
-    /**
-     * Retrieves the payload from the request body, either JSON or YAML encoded, for PUT, PATCH, and POST requests.
-     *
-     * If the request method is POST, it will also retrieve the locale from the payload, if present, and set it on the
-     * `$data` object passed as argument.
-     *
-     * If the request method is PUT or PATCH, and the payload is not either JSON or YAML encoded,
-     * it will produce a 400 Bad Request error.
-     *
-     * @param array{category:PathCategory,key?:string,locale?:string,i18n?:string} $params the object on which to set the locale and payload
-     *
-     * @return array{category:PathCategory,key?:string,locale?:string,payload?:NationalData|DiocesanData|WiderRegionData} the associative array with the locale and payload set if applicable
-     */
-    private static function retrievePayloadFromPostPutPatchRequest(array $params): array
-    {
-        $payload  = null;
-        $required = self::$Core->getRequestMethod() !== RequestMethod::POST;
-        switch (self::$Core->getRequestContentType()) {
-            case RequestContentType::JSON:
-                $payload = self::$Core->readJsonBody($required);
-                break;
-            case RequestContentType::YAML:
-                $payload = self::$Core->readYamlBody($required);
-                break;
-            case RequestContentType::FORMDATA:
-                if ($required && count($_REQUEST) === 0) {
-                    self::produceErrorResponse(
-                        StatusCode::BAD_REQUEST,
-                        'Expected non empty payload in body of request, either JSON encoded or YAML encoded or form encoded.'
-                    );
-                }
-                $payload = (object) $_REQUEST;
-                break;
-            default:
-                if ($required) {
-                    // the payload MUST be in the body of the request, either JSON encoded or YAML encoded or form encoded
-                    self::produceErrorResponse(
-                        StatusCode::BAD_REQUEST,
-                        'Expected non empty payload in body of request, either JSON encoded or YAML encoded or form encoded.'
-                    );
-                }
-        }
 
-        if (self::$Core->getRequestMethod() === RequestMethod::POST && $payload instanceof \stdClass) {
-            if (property_exists($payload, 'locale') && is_string($payload->locale)) {
-                $params['locale'] = $payload->locale;
-            }
-            return $params;
-        }
-
-        if (self::$Core->getRequestMethod() === RequestMethod::PUT || self::$Core->getRequestMethod() === RequestMethod::PATCH) {
-            if (false === $payload instanceof \stdClass) {
-                throw new \Exception('Payload is not an object. Cannot create or update calendar, no data provided.');
-            }
-            switch ($params['category']) {
-                case PathCategory::DIOCESE:
-                    if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::DIOCESAN)) {
-                        $params['payload'] = DiocesanData::fromObject($payload);
-                        return $params;
-                    }
-                    break;
-                case PathCategory::NATION:
-                    if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::NATIONAL)) {
-                        $params['payload'] = NationalData::fromObject($payload);
-                        return $params;
-                    }
-                    break;
-                case PathCategory::WIDERREGION:
-                    if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::WIDERREGION)) {
-                        $params['payload'] = WiderRegionData::fromObject($payload);
-                        return $params;
-                    }
-                    break;
-                default:
-                    throw new \Exception("Invalid category: {$params['category']}");
-            }
-        }
-
-        return $params;
-    }
-
-    /**
-     * Set the category, key (if applicable), and locale (if applicable) based on the request path parts and method.
-     *
-     * @param string[] $requestPathParts the parts of the request path
-     *
-     * @return array{category:PathCategory,key?:string,locale?:string,i18n?:string,payload?:DiocesanData|NationalData|WiderRegionData} an associative array with the category, key, and locale set
-     */
-    private static function setParamsFromPath(array $requestPathParts): array
-    {
-        $params = [
-            'category' => PathCategory::from($requestPathParts[0]),
-        ];
-
-        if (self::$Core->getRequestMethod() !== RequestMethod::PUT) {
-            $params['key'] = $requestPathParts[1];
-        }
-
-        if (in_array(self::$Core->getRequestMethod(), [RequestMethod::GET, RequestMethod::POST], true)) {
-            // For GET and POST request, there may be an optional third path parameter (= locale),
-            // which will determine whether we are requesting calendar data or i18n data
-            if (isset($requestPathParts[2])) {
-                $params['i18n'] = $requestPathParts[2];
-            }
-            // For GET requests, we attempt to retrieve the locale from the query string if present
-            if (self::$Core->getRequestMethod() === RequestMethod::GET && isset($_GET['locale']) && is_string($_GET['locale'])) {
-                $locale = \Locale::canonicalize($_GET['locale']);
-                if ($locale !== null) {
-                    $params['locale'] = $locale;
-                }
-            }
-        }
-
-        // If the request method is PATCH, or PUT, we expect a payload with calendar data.
-        // For POST requests, there might be a payload with parameter data
-        //   (the only parameter that could be present in this case is 'locale').
-        // So in all these cases, we attempt to retrieve the payload from the request body if present
-        if (in_array(self::$Core->getRequestMethod(), [RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH], true)) {
-            $params = RegionalDataHandler::retrievePayloadFromPostPutPatchRequest($params);
-        }
-        return $params;
-    }
 
     /**
      * Validate the request path parts for the RegionalData resource.
      *
-     * Will produce a 400 Bad Request error response if the request path parts are invalid.
-     *
-     * @param string[] $requestPathParts the parts of the request path
+     * @throws ValidationExepction When the request path is invalid
      */
-    private static function validateRequestPath(array $requestPathParts): void
+    private function validateRequestPath(ServerRequestInterface $request): void
     {
-        // For GET and POST requests, we expect at least two path params (= category and key) for Calendar Data requests,
-        // and at most three path params (= category, key, and locale) for I18n Data requests
-        if (in_array(self::$Core->getRequestMethod(), [RequestMethod::GET, RequestMethod::POST], true)) {
-            if (count($requestPathParts) < 2 || count($requestPathParts) > 3) {
-                self::produceErrorResponse(
-                    StatusCode::BAD_REQUEST,
-                    'Expected at least two and at most three path params for GET and POST requests, received ' . count($requestPathParts)
-                );
-            }
-        }
-        // For PUT requests, we expect exactly one path param (= category)
-        elseif (self::$Core->getRequestMethod() === RequestMethod::PUT) {
-            if (count($requestPathParts) !== 1) {
-                self::produceErrorResponse(
-                    StatusCode::BAD_REQUEST,
-                    'Expected one path param for PUT requests, received ' . count($requestPathParts)
-                );
-            }
-        }
-        // For PATCH and DELETE requests, we expect exactly two path params
-        elseif (count($requestPathParts) !== 2) {
-            self::produceErrorResponse(
-                StatusCode::BAD_REQUEST,
-                'Expected two and exactly two path params for PATCH and DELETE requests, received ' . count($requestPathParts)
-            );
+        $method = RequestMethod::from($request->getMethod());
+
+        switch ($method) {
+            case RequestMethod::GET:
+                // no break (intentional fallthrough)
+            case RequestMethod::POST:
+                if (count($this->requestPathParams) < 2 || count($this->requestPathParams) > 3) {
+                    $description = 'Expected at least two and at most three path params for GET and POST requests, received ' . count($this->requestPathParams);
+                    throw new ValidationException($description);
+                }
+                break;
+            case RequestMethod::PUT:
+                if (count($this->requestPathParams) !== 1) {
+                    $description = 'Expected one path param for PUT requests, received ' . count($this->requestPathParams);
+                    throw new ValidationException($description);
+                }
+                break;
+            case RequestMethod::PATCH:
+                // no break (intentional fallthrough)
+            case RequestMethod::DELETE:
+                if (count($this->requestPathParams) !== 2) {
+                    $description = 'Expected two path params for PATCH and DELETE requests, received ' . count($this->requestPathParams);
+                    throw new ValidationException($description);
+                }
+                break;
+            default:
+                throw new ValidationException('Unexpected request method: ' . $method);
         }
 
         // In all cases, we check if the category param is valid
-        if (false === PathCategory::isValid($requestPathParts[0])) {
-            self::produceErrorResponse(
-                StatusCode::BAD_REQUEST,
-                "Unexpected path param {$requestPathParts[0]}, acceptable values are: "
-                    . implode(', ', PathCategory::values())
-            );
+        if (false === PathCategory::isValid($this->requestPathParams[0])) {
+            $description = "Unexpected path param {$this->requestPathParams[0]}, acceptable values are: "
+                . implode(', ', PathCategory::values());
+            throw new ValidationException($description);
         }
     }
 
     /**
-     * Handle the request parameters for the RegionalData resource.
+     * Validate the parameters provided to the RegionalData class for a National Calendar.
      *
-     * The request parameters are expected to be in the request path (or possibly in the request body when the request content type is JSON or YAML).
-     * The request body is expected to be a JSON or YAML encoded object, with the following properties:
-     * - category: a string indicating the category of the Regional Calendar data, one of the values in RegionalDataParams::EXPECTED_CATEGORIES
-     * - key: a string indicating the key of the Regional Calendar data
-     * - locale: a string indicating the locale of the Regional Calendar data, only applicable for the WIDERREGIONCALENDAR category
+     * The method checks the following, given that the `category` parameter is "NATIONALCALENDAR":
+     * - The `key` parameter is a valid nation.
+     * - The `locale` parameter is a valid locale for the given nation.
+     * - If the request method is PUT, the National Calendar data does not already exist.
+     * - If the request method is DELETE, the National Calendar data is not in use by a Diocesan calendar.
      *
-     * If the request parameters are invalid, it will produce an error response with a status code of 400.
-     *
-     * @param string[] $requestPathParts the parts of the request path
+     * If any of the checks fail, the method will produce an error response with a 400 status code.
      */
-    private function handleRequestParams(array $requestPathParts = []): void
+    private function checkNationalCalendarConditions(RequestMethod $method, RegionalDataParams $params): void
     {
-        RegionalDataHandler::validateRequestPath($requestPathParts);
-        $params = RegionalDataHandler::setParamsFromPath($requestPathParts);
-
-        // For PUT requests, the key is retrieved from the payload rather than from the path,
-        // whereas for PATCH requests, the key should already have been set from the path.
-        if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH], true)) {
-            if (false === isset($params['payload'])) {
-                throw new \Exception('Payload is not set');
+        if ($method === RequestMethod::PUT) {
+            // Cannot PUT National calendar data if it already exists
+            if (in_array($params->key, $this->CalendarsMetadata->national_calendars_keys)) {
+                $description = 'National calendar data already exists for nation with ID: ' . $params->key;
+                throw new UnprocessableContentException($description);
             }
-            switch ($params['category']) {
-                case PathCategory::DIOCESE:
-                    if (RequestMethod::PUT === self::$Core->getRequestMethod()) {
-                        if (false === $params['payload'] instanceof DiocesanData) {
-                            throw new \Exception('Payload is not of type DiocesanData');
-                        }
-                        $params['key'] = $params['payload']->metadata->diocese_id;
-                    }
-                    break;
-                case PathCategory::NATION:
-                    if (RequestMethod::PUT === self::$Core->getRequestMethod()) {
-                        if (false === $params['payload'] instanceof NationalData) {
-                            throw new \Exception('Payload is not of type NationalData');
-                        }
-                        $params['key'] = $params['payload']->metadata->nation;
-                    }
-                    break;
-                case PathCategory::WIDERREGION:
-                    if (RequestMethod::PUT === self::$Core->getRequestMethod()) {
-                        if (false === $params['payload'] instanceof WiderRegionData) {
-                            throw new \Exception('Payload is not of type WiderRegionData');
-                        }
-                        $params['key'] = $params['payload']->metadata->wider_region;
-                    }
-                    break;
+
+            $uniqueRegions = array_values(array_unique(array_map(fn (string $locale) => \Locale::getRegion($locale) !== '', LitLocale::$AllAvailableLocales)));
+            if (false === in_array($params->key, $uniqueRegions)) {
+                $description = "Cannot PUT National Calendar data for invalid nation ID {$params->key}. Valid nation IDs (as supported by the current server configuration) are: " . implode(', ', $uniqueRegions);
+                throw new UnprocessableContentException($description);
+            }
+        } elseif ($method === RequestMethod::DELETE) {
+            // Cannot DELETE a National calendar data if it is still in use by a Diocesan calendar
+            foreach ($this->CalendarsMetadata->diocesan_calendars as $diocesanCalendar) {
+                if ($diocesanCalendar->nation === $params->key) {
+                    $description = "Cannot DELETE National Calendar data while there are Diocesan calendars that depend on it. Currently, {$params['key']} is in use by Diocesan calendar {$diocesanCalendar->calendar_id}.";
+                    throw new UnprocessableContentException($description);
+                }
             }
         }
-        if (false === isset($params['key']) || false === is_string($params['key'])) {
-            throw new \Exception('Key is not a string, but should be set at this point');
+
+        // We must verify the `key` parameter for any request that is not PUT
+        $currentNation = null;
+        if ($method !== RequestMethod::PUT) {
+            if (false === in_array($params->key, $this->CalendarsMetadata->national_calendars_keys)) {
+                $validVals   = implode(', ', $this->CalendarsMetadata->national_calendars_keys);
+                $description = "Invalid value {$params->key} for param `key`, valid values are: {$validVals}";
+                throw new UnprocessableContentException($description);
+            } else {
+                $currentNation = array_find($this->CalendarsMetadata->national_calendars, fn (MetadataNationalCalendarItem $el) => $el->calendar_id === $params->key);
+                if (null === $currentNation) {
+                    $description = "Invalid value {$params['key']} for param `key`, valid values are: "
+                        . implode(', ', $this->CalendarsMetadata->national_calendars_keys);
+                    throw new UnprocessableContentException($description);
+                }
+            }
         }
-        /** @var array{category:PathCategory,key:string,locale?:string,i18n?:string,payload?:NationalData|DiocesanData|WiderRegionData} $params */
-        $this->params->setParams($params);
+
+
+        // we don't care about locale for DELETE or PUT requests
+        if (false === in_array($method, [RequestMethod::DELETE, RequestMethod::PUT], true)) {
+            /** @var MetadataNationalCalendarItem $currentNation */
+            $validLangs = $currentNation->locales;
+            if (isset($params->locale)) {
+                if (
+                    null === $this->params->i18nRequest // short circuit for i18n requests
+                    && false === in_array($params->locale, $validLangs, true)
+                ) {
+                    $message = "Invalid value {$params->locale} for param `locale`, valid values for nation {$params->key} are: "
+                                . implode(', ', $validLangs);
+                    throw new UnprocessableContentException($message);
+                }
+            } else {
+                if (null !== $this->params->i18nRequest) {
+                    $description = 'Missing param `locale`';
+                    throw new UnprocessableContentException($description);
+                }
+            }
+        }
     }
 
     /**
-     * Produce an error response with the given HTTP status code and description.
+     * Validate the parameters provided to the RegionalData class for a Diocesan Calendar.
      *
-     * The description is a short string that should be used to give more context to the error.
+     * The method checks the following, given that the `category` parameter is "DIOCESANCALENDAR":
+     * - The `key` parameter is a valid diocesan calendar key.
+     * - The `locale` parameter is a valid locale for the given diocesan calendar. ::TODO::
+     * - If the request method is PUT, the Diocesan Calendar data does not already exist.
      *
-     * The function will output the error in the response format specified by the Accept header
-     * of the request (JSON or YAML) and terminate the script execution with a call to die().
-     *
-     * @param int $statusCode the HTTP status code to return
-     * @param string $description a short description of the error
-     * @return never
+     * If any of the checks fail, the method will produce an error response with a 400 status code.
      */
-    public static function produceErrorResponse(int $statusCode, string $description): never
+    private function checkDiocesanCalendarConditions(RequestMethod $method, RegionalDataParams $params): void
     {
-        $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1 ';
-        header($serverProtocol . StatusCode::toString($statusCode), true, $statusCode);
-        $message         = new \stdClass();
-        $message->status = 'ERROR';
-        $statusMessage   = '';
-        switch (self::$Core->getRequestMethod()) {
-            case RequestMethod::PUT:
-                $statusMessage = 'Resource not Created';
-                break;
-            case RequestMethod::PATCH:
-                $statusMessage = 'Resource not Updated';
-                break;
-            case RequestMethod::DELETE:
-                $statusMessage = 'Resource not Deleted';
-                break;
-            default:
-                $statusMessage = 'Sorry what was it you wanted to do with this resource?';
+        if ($method === RequestMethod::PUT) {
+            // Cannot PUT Diocesan calendar data if it already exists
+            if (in_array($params->key, $this->CalendarsMetadata->diocesan_calendars_keys)) {
+                $description = 'Diocesan calendar data already exists for diocese with ID: ' . $params->key;
+                throw new UnprocessableContentException($description);
+            }
         }
-        $message->response    = $statusCode === 404 ? 'Resource not Found' : $statusMessage;
-        $message->description = $description;
-        $response             = json_encode($message);
-        if (JSON_ERROR_NONE !== json_last_error() || false === $response) {
-            throw new \Exception('Failed to encode error message');
+
+        // For all requests other than PUT, we expect the diocese_id to exist
+        $currentDiocese = null;
+        if ($method !== RequestMethod::PUT) {
+            if (false === in_array($params->key, $this->CalendarsMetadata->diocesan_calendars_keys)) {
+                $validVals   = implode(', ', $this->CalendarsMetadata->diocesan_calendars_keys);
+                $description = "Invalid value {$params->key} for param `key`, valid values are: {$validVals}";
+                throw new UnprocessableContentException($description);
+            } else {
+                $currentDiocese = array_find($this->CalendarsMetadata->diocesan_calendars, fn (MetadataDiocesanCalendarItem $el) => $el->calendar_id === $params->key);
+                if (null === $currentDiocese) {
+                    $description = "Invalid value {$params['key']} for param `key`, valid values are: "
+                        . implode(', ', $this->CalendarsMetadata->diocesan_calendars_keys);
+                    throw new UnprocessableContentException($description);
+                }
+            }
         }
-        switch (self::$Core->getResponseContentType()) {
-            case AcceptHeader::YAML:
-                $responseObj = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
-                echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
-                break;
-            case AcceptHeader::JSON:
-            default:
-                echo $response;
+
+        // we don't care about locale for DELETE or PUT requests
+        if (false === in_array($method, [RequestMethod::DELETE, RequestMethod::PUT], true)) {
+            /** @var MetadataDiocesanCalendarItem $currentDiocese */
+            $validLangs = $currentDiocese->locales;
+            if (isset($params->locale)) {
+                if (
+                    null === $this->params->i18nRequest // short circuit for i18n requests
+                    && false === in_array($params->locale, $validLangs, true)
+                ) {
+                    $message = "Invalid value {$params->locale} for param `locale`, valid values for nation {$params->key} are: "
+                                . implode(', ', $validLangs);
+                    throw new UnprocessableContentException($message);
+                }
+            } else {
+                if (null !== $this->params->i18nRequest) {
+                    $description = 'Missing param `locale`';
+                    throw new UnprocessableContentException($description);
+                }
+            }
         }
-        die();
     }
 
     /**
-     * Outputs the response for the /data endpoint.
+     * Validate the parameters provided to the RegionalData class for a Wider Region Calendar.
      *
-     * Outputs the response as either JSON or YAML, depending on the value of
-     * self::$Core->getResponseContentType(). If the request method was PUT or
-     * PATCH, it also sets a 201 Created status code.
+     * The method checks the following, given that the `category` parameter is "WIDERREGIONCALENDAR":
+     * - The `key` parameter is a valid wider region calendar key.
+     * - The `locale` parameter is a valid locale for the given wider region calendar.
+     * - If the request method is PUT, the Wider Region Calendar data does not already exist. ::TODO::
+     * - If the request method is DELETE, there are no national calendars that depend on the wider region calendar.
      *
-     * @param string $jsonEncodedResponse the response as a JSON encoded string
-     * @return never
+     * If any of the checks fail, the method will produce an error response with a 400 status code.
      */
-    private static function produceResponse(string|false $jsonEncodedResponse): never
+    private function checkWiderRegionCalendarConditions(RequestMethod $method, RegionalDataParams $params): void
     {
-        if (false === $jsonEncodedResponse) {
-            throw new \Exception('Failed to produce response');
+        if ($method === RequestMethod::PUT) {
+            // Cannot PUT Wider Region calendar data if it already exists
+            if (in_array($params->key, $this->CalendarsMetadata->wider_regions_keys)) {
+                $description = "Cannot create Wider Region calendar with id: {$params->key}, since there is already a resource with that id. Perhaps you meant to use PATCH?";
+                throw new UnprocessableContentException($description);
+            }
+        } elseif ($method === RequestMethod::DELETE) {
+            // Cannot DELETE Wider Region calendar data if there are national calendars that depend on it
+            $national_calendars_within_wider_region = array_values(array_filter(
+                $this->CalendarsMetadata->national_calendars,
+                fn ($el) => $el->wider_region === $params->key
+            ));
+            if (count($national_calendars_within_wider_region) > 0) {
+                $description = 'Cannot DELETE Wider Region calendar data while there are National calendars that depend on it. '
+                    . "Currently {$params->key} is in use by the National Calendars: " . implode(', ', array_map(fn ($el) => \Locale::getDisplayRegion('-' . $el->calendar_id, 'en'), $national_calendars_within_wider_region));
+                throw new UnprocessableContentException($description);
+            }
         }
 
-        if (in_array(self::$Core->getRequestMethod(), [RequestMethod::PUT, RequestMethod::PATCH], true)) {
-            $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
-            header($serverProtocol . ' 201 Created', true, 201);
+        // For methods other than PUT, check that the key is valid
+        $currentWiderRegion = null;
+        if ($method !== RequestMethod::PUT) {
+            if (
+                false === in_array($params->key, $this->CalendarsMetadata->wider_regions_keys, true)
+            ) {
+                $validVals   = implode(', ', $this->CalendarsMetadata->wider_regions_keys);
+                $description = "Invalid value {$params->key} for param `key`, valid values are: {$validVals}";
+                throw new UnprocessableContentException($description);
+            } else {
+                $currentWiderRegion = array_find($this->CalendarsMetadata->wider_regions, fn (MetadataWiderRegionItem $el) => $el->name === $params['key']);
+                if (null === $currentWiderRegion) {
+                    $description = "Could not find Wider Region metadata for wider region {$params->key}.";
+                    throw new UnprocessableContentException($description);
+                }
+            }
         }
-        switch (self::$Core->getResponseContentType()) {
-            case AcceptHeader::YAML:
-                $responseObj = json_decode($jsonEncodedResponse, true, 512, JSON_THROW_ON_ERROR);
-                echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
-                break;
-            case AcceptHeader::JSON:
-            default:
-                echo $jsonEncodedResponse;
+
+        // we don't care about locale for DELETE or PUT requests
+        if (false === in_array($method, [RequestMethod::DELETE, RequestMethod::PUT], true)) {
+            /** @var MetadataWiderRegionItem $currentWiderRegion */
+            $validLangs = $currentWiderRegion->locales;
+            if (isset($params->locale)) {
+                if (
+                    null === $this->params->i18nRequest // short circuit for i18n requests
+                    && false === in_array($params->locale, $validLangs, true)
+                ) {
+                    $message = "Invalid value {$params->locale} for param `locale`, valid values for nation {$params->key} are: "
+                                . implode(', ', $validLangs);
+                    throw new UnprocessableContentException($message);
+                }
+            } else {
+                if (null !== $this->params->i18nRequest) {
+                    $description = 'Missing param `locale`';
+                    throw new UnprocessableContentException($description);
+                }
+            }
         }
-        die();
     }
+
+
 
     /**
      * Initializes the RegionalData class.
@@ -1346,26 +1367,136 @@ final class RegionalDataHandler
      * - It will validate the request content type
      * - It will set the request headers
      * - It will load the Diocesan Calendars index
-     * - It will handle the request method (terminates)
-     * @return never
+     * - It will handle the request method
      */
-    public function init(array $requestPathParts = []): never
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        self::$Core->init();
+        // We instantiate a Response object with minimum state
+        $response = static::initResponse($request);
 
-        if (in_array(self::$Core->getRequestMethod(), [RequestMethod::GET, RequestMethod::OPTIONS], true)) {
-            self::$Core->validateAcceptHeader(true);
+        $method = RequestMethod::from($request->getMethod());
+
+        // OPTIONS method for CORS preflight requests is always allowed
+        if ($method === RequestMethod::OPTIONS) {
+            return $this->handlePreflightRequest($request, $response);
+        }
+
+        // For all other request methods, validate that they are supported by the endpoint
+        $this->validateRequestMethod($request);
+
+        // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint:
+        //   if set we negotiate the best Content-Type, if not set we default to the first supported by the current handler
+        switch ($method) {
+            case RequestMethod::GET:
+                $mime = $this->validateAcceptHeader($request, AcceptabilityLevel::LAX);
+                break;
+            default:
+                $mime = $this->validateAcceptHeader($request, AcceptabilityLevel::INTERMEDIATE);
+        }
+
+        $response = $response->withHeader('Content-Type', $mime);
+
+        // Initialize any parameters set in the request.
+        // If there are any:
+        //   - for a GET request method, we expect them to be set in the URL
+        //   - for any other request methods, we expect them to be set in the body of the request
+        // Considering that this endpoint is both read and write:
+        //   - for POST requests we will never have a payload in the request body,
+        //       only request parameters
+        //   - for PUT and PATCH requests we will have a payload in the request body
+        //   - for DELETE requests we will have neither payload nor request parameters, only path parameters
+
+        /** @var array{category:string,key:string,i18n?:string,locale?:string,payload?:DiocesanData|NationalData|WiderRegionData} */
+        $params = [];
+
+        // We always expect the category to be set in the request path
+        // We expect the key to be set in the request path for GET, POST, PATCH and DELETE requests
+        $this->validateRequestPath($request);
+
+        $params['category'] = PathCategory::from($this->requestPathParams[0]);
+        if (in_array($method, [RequestMethod::GET, RequestMethod::POST, RequestMethod::PATCH, RequestMethod::DELETE], true)) {
+            $params['key'] = $this->requestPathParams[1];
+        }
+
+        // Second of all, we check if an Accept-Language header was set in the request
+        $acceptLanguageHeader = $request->getHeaderLine('Accept-Language');
+        $locale               = '' !== $acceptLanguageHeader
+            ? \Locale::acceptFromHttp($acceptLanguageHeader)
+            : LitLocale::LATIN;
+        if ($locale && LitLocale::isValid($locale)) {
+            $params['locale'] = $locale;
         } else {
-            self::$Core->validateAcceptHeader(false);
+            $params['locale'] = LitLocale::LATIN;
         }
 
-        // We don't need to handle anything or formulate any Response for HTTP OPTIONS requests
-        if (self::$Core->getRequestMethod() === RequestMethod::OPTIONS) {
-            die();
+        if ($method === RequestMethod::GET) {
+            $params = array_merge($params, $this->getScalarQueryParams($request));
+        } elseif ($method === RequestMethod::POST) {
+            $parsedBodyParams = $this->parseBodyParams($request, false);
+
+            if (null !== $parsedBodyParams) {
+                /** @var array<string,scalar|null> $params */
+                $params = array_merge($params, $parsedBodyParams);
+            }
+        } elseif ($method === RequestMethod::PUT || $method === RequestMethod::PATCH) {
+            $payload = $this->parseBodyPayload($request);
+            switch ($params['category']) {
+                case PathCategory::DIOCESE:
+                    if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::DIOCESAN)) {
+                        $params['payload'] = DiocesanData::fromObject($payload);
+                        $key               = $params['payload']->metadata->diocese_id;
+                    }
+                    break;
+                case PathCategory::NATION:
+                    if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::NATIONAL)) {
+                        $params['payload'] = NationalData::fromObject($payload);
+                        $key               = $params['payload']->metadata->nation;
+                    }
+                    break;
+                case PathCategory::WIDERREGION:
+                    if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::WIDERREGION)) {
+                        $params['payload'] = WiderRegionData::fromObject($payload);
+                        $key               = $params['payload']->metadata->wider_region;
+                    }
+                    break;
+                default:
+                    throw new ValidationException("Invalid category: {$this->requestPathParams[0]}");
+            }
+            if ($method === RequestMethod::PUT) {
+                $params['key'] = $key;
+            } else {
+                if ($params['key'] !== $key) {
+                    throw new ValidationException('The key in the request path does not match the key in the payload');
+                }
+            }
         }
 
-        self::$Core->setResponseContentTypeHeader();
-        $this->handleRequestParams($requestPathParts);
-        $this->handleRequestMethod();
+        if (in_array($method, [RequestMethod::GET, RequestMethod::POST], true)) {
+            if (isset($this->requestPathParams[2])) {
+                $params['i18n']        = $this->requestPathParams[2];
+                $params['i18nRequest'] = $params['i18n'];
+            }
+        }
+
+        $this->params = new RegionalDataParams($params);
+
+        if (null === $this->CalendarsMetadata) {
+            $description = 'Failed to load calendar metadata or calendar metadata not initialized.';
+            throw new ServiceUnavailableException($description);
+        }
+
+        switch ($this->params->category) {
+            case PathCategory::NATION:
+                $this->checkNationalCalendarConditions($method, $this->params);
+                break;
+            case PathCategory::DIOCESE:
+                $this->checkDiocesanCalendarConditions($method, $this->params);
+                break;
+            case PathCategory::WIDERREGION:
+                $this->checkWiderRegionCalendarConditions($method, $this->params);
+                break;
+        }
+
+        return $this->handleRequestMethod($method, $response);
     }
 }

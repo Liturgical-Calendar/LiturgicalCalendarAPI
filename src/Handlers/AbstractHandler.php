@@ -612,7 +612,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
      * @throws \JsonException If there is an error encoding the response body as JSON.
      * @throws YamlException If there is an error encoding the response body as YAML.
      */
-    protected function encodeResponseBody(ResponseInterface $response, array|\stdClass|MissalMetadataMap|DecreeItem $responseBody): ResponseInterface
+    protected function encodeResponseBody(ResponseInterface $response, array|\stdClass|MissalMetadataMap|DecreeItem $responseBody, StatusCode $statusCode = StatusCode::OK): ResponseInterface
     {
         $contentType = AcceptHeader::from($response->getHeaderLine('Content-Type'));
         switch ($contentType) {
@@ -642,7 +642,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
                 $encodedResponse = json_encode($responseBody, JSON_THROW_ON_ERROR);
         }
         return $response
-            ->withStatus(StatusCode::OK->value, StatusCode::OK->reason())
+            ->withStatus($statusCode->value, $statusCode->reason())
             ->withBody(Stream::create($encodedResponse));
     }
 

@@ -44,7 +44,7 @@ final class CalendarTest extends ApiTestCase
         $this->assertionsForCalendarObject($data);
     }
 
-    public function testGetCalendarReturnsICS(): void
+    public function testGetCalendarReturnsIcal(): void
     {
         $response = $this->http->get('/calendar', [
             'headers' => ['Accept' => 'text/calendar']
@@ -71,7 +71,7 @@ final class CalendarTest extends ApiTestCase
         libxml_clear_errors();
         $this->assertTrue(
             $loadResult,
-            'Invalid XML' . (!empty($errors) ? ': ' . $errors[0]->message : '')
+            'Invalid XML' . ( !empty($errors) ? ': ' . $errors[0]->message : '' )
         );
         $root      = ApiTestCase::findProjectRoot();
         $xmlSchema = $root . '/jsondata/schemas/LiturgicalCalendar.xsd';
@@ -81,7 +81,7 @@ final class CalendarTest extends ApiTestCase
         libxml_clear_errors();
         $this->assertTrue(
             $validationResult,
-            'Expected XML to validate against schema'  . (!empty($errors) ? ': ' . $errors[0]->message : '')
+            'Expected XML to validate against schema'  . ( !empty($errors) ? ': ' . $errors[0]->message : '' )
         );
     }
 
@@ -179,11 +179,11 @@ final class CalendarTest extends ApiTestCase
 
         if (false === isset(self::$metadata)) {
             try {
-                $response = $this->http->get('/calendars', [
+                $response       = $this->http->get('/calendars', [
                     'http_errors'    => true,
                     'connect_errors' => true
                 ]);
-                $data = json_decode((string) $response->getBody(), false, 512, JSON_THROW_ON_ERROR);
+                $data           = json_decode((string) $response->getBody(), false, 512, JSON_THROW_ON_ERROR);
                 self::$metadata = $data->litcal_metadata;
             } catch (\JsonException $e) {
                 $this->markTestSkipped('Failed to decode calendars metadata JSON: ' . $e->getMessage());

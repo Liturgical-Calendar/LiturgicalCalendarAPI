@@ -11,7 +11,7 @@ class NotFoundException extends ApiException
         parent::__construct(
             $message,
             StatusCode::NOT_FOUND->value,
-            'https://example.com/problems/not-found',
+            'https://www.rfc-editor.org/rfc/rfc9110.html#name-404-not-found',
             StatusCode::NOT_FOUND->reason()
         );
     }

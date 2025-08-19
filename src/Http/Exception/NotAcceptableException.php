@@ -12,7 +12,7 @@ class NotAcceptableException extends ApiException
         parent::__construct(
             $message,
             StatusCode::NOT_ACCEPTABLE->value,
-            'https://example.com/problems/validation-error',
+            'https://www.rfc-editor.org/rfc/rfc9110.html#name-406-not-acceptable',
             StatusCode::NOT_ACCEPTABLE->reason()
         );
     }

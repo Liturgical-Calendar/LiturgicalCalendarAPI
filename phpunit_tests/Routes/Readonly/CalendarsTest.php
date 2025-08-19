@@ -21,7 +21,7 @@ final class CalendarsTest extends ApiTestCase
     public function testGetCalendarsReturnsJson(): void
     {
         $response = $this->http->get('/calendars');
-        $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
+        $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK, but found error: ' . $response->getBody());
         $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
         // Decode JSON and check

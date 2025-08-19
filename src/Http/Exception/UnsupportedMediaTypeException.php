@@ -11,7 +11,7 @@ class UnsupportedMediaTypeException extends ApiException
         parent::__construct(
             $message,
             StatusCode::UNSUPPORTED_MEDIA_TYPE->value,
-            'https://example.com/problems/validation-error',
+            'https://www.rfc-editor.org/rfc/rfc9110.html#name-415-unsupported-media-type',
             StatusCode::UNSUPPORTED_MEDIA_TYPE->reason()
         );
     }

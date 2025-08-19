@@ -11,7 +11,7 @@ class UnprocessableContentException extends ApiException
         parent::__construct(
             $message,
             StatusCode::UNPROCESSABLE_CONTENT->value,
-            'https://example.com/problems/service-unavailable-error',
+            'https://www.rfc-editor.org/rfc/rfc9110.html#name-422-unprocessable-content',
             StatusCode::UNPROCESSABLE_CONTENT->reason()
         );
     }

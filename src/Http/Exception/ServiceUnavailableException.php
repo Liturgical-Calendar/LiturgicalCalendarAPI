@@ -11,7 +11,7 @@ class ServiceUnavailableException extends ApiException
         parent::__construct(
             $message,
             StatusCode::SERVICE_UNAVAILABLE->value,
-            'https://example.com/problems/service-unavailable-error',
+            'https://www.rfc-editor.org/rfc/rfc9110.html#name-503-service-unavailable',
             StatusCode::SERVICE_UNAVAILABLE->reason()
         );
     }

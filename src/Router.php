@@ -69,9 +69,23 @@ class Router
                     RequestMethod::GET,
                     RequestMethod::POST
                 ]);
-                $calendarHandler->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA, RequestContentType::MULTIPART ]);
-                $calendarHandler->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::XML, AcceptHeader::ICS, AcceptHeader::YAML ]);
-                $calendarHandler->setAllowedReturnTypes([ ReturnTypeParam::JSON, ReturnTypeParam::XML, ReturnTypeParam::ICS, ReturnTypeParam::YAML ]);
+                $calendarHandler->setAllowedRequestContentTypes([
+                    RequestContentType::JSON,
+                    RequestContentType::YAML,
+                    RequestContentType::FORMDATA
+                ]);
+                $calendarHandler->setAllowedAcceptHeaders([
+                    AcceptHeader::JSON,
+                    AcceptHeader::XML,
+                    AcceptHeader::ICS,
+                    AcceptHeader::YAML
+                ]);
+                $calendarHandler->setAllowedReturnTypes([
+                    ReturnTypeParam::JSON,
+                    ReturnTypeParam::XML,
+                    ReturnTypeParam::ICS,
+                    ReturnTypeParam::YAML
+                ]);
                 $calendarHandler->setCacheDuration(CacheDuration::MONTH);
                 self::$handler = $calendarHandler;
                 break;
@@ -83,8 +97,15 @@ class Router
                     RequestMethod::GET,
                     RequestMethod::POST
                 ]);
-                $metadataHandler->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA, RequestContentType::MULTIPART ]);
-                $metadataHandler->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                $metadataHandler->setAllowedRequestContentTypes([
+                    RequestContentType::JSON,
+                    RequestContentType::YAML,
+                    RequestContentType::FORMDATA
+                ]);
+                $metadataHandler->setAllowedAcceptHeaders([
+                    AcceptHeader::JSON,
+                    AcceptHeader::YAML
+                ]);
                 self::$handler = $metadataHandler;
                 break;
             case 'missals':
@@ -96,8 +117,15 @@ class Router
                     RequestMethod::PATCH,
                     RequestMethod::DELETE
                 ]);
-                $missalsHandler->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA, RequestContentType::MULTIPART ]);
-                $missalsHandler->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                $missalsHandler->setAllowedRequestContentTypes([
+                    RequestContentType::JSON,
+                    RequestContentType::YAML,
+                    RequestContentType::FORMDATA
+                ]);
+                $missalsHandler->setAllowedAcceptHeaders([
+                    AcceptHeader::JSON,
+                    AcceptHeader::YAML
+                ]);
                 if (
                     in_array($request->getMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
                     && false === Router::isLocalhost()
@@ -115,8 +143,15 @@ class Router
                     RequestMethod::PATCH,
                     RequestMethod::DELETE
                 ]);
-                $decreesHandler->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA, RequestContentType::MULTIPART ]);
-                $decreesHandler->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                $decreesHandler->setAllowedRequestContentTypes([
+                    RequestContentType::JSON,
+                    RequestContentType::YAML,
+                    RequestContentType::FORMDATA
+                ]);
+                $decreesHandler->setAllowedAcceptHeaders([
+                    AcceptHeader::JSON,
+                    AcceptHeader::YAML
+                ]);
                 if (
                     in_array($request->getMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
                     && false === Router::isLocalhost()
@@ -131,8 +166,15 @@ class Router
                     RequestMethod::GET,
                     RequestMethod::POST
                 ]);
-                $easterHandler->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML, RequestContentType::FORMDATA, RequestContentType::MULTIPART ]);
-                $easterHandler->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+                $easterHandler->setAllowedRequestContentTypes([
+                    RequestContentType::JSON,
+                    RequestContentType::YAML,
+                    RequestContentType::FORMDATA
+                ]);
+                $easterHandler->setAllowedAcceptHeaders([
+                    AcceptHeader::JSON,
+                    AcceptHeader::YAML
+                ]);
                 self::$handler = $easterHandler;
                 break;
             case 'events':
@@ -141,21 +183,53 @@ class Router
                     RequestMethod::GET,
                     RequestMethod::POST
                 ]);
-                $eventsHandler->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA, RequestContentType::MULTIPART ]);
-                $eventsHandler->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
-
+                $eventsHandler->setAllowedRequestContentTypes([
+                    RequestContentType::JSON,
+                    RequestContentType::YAML,
+                    RequestContentType::FORMDATA
+                ]);
+                $eventsHandler->setAllowedAcceptHeaders([
+                    AcceptHeader::JSON,
+                    AcceptHeader::YAML
+                ]);
                 self::$handler = $eventsHandler;
                 break;
             case 'schemas':
-                $SchemasHandler = new SchemasHandler($requestPathParts);
-                $SchemasHandler->setAllowedRequestMethods([
+                $schemasHandler = new SchemasHandler($requestPathParts);
+                $schemasHandler->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST
                 ]);
-                $SchemasHandler->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA, RequestContentType::MULTIPART ]);
-                $SchemasHandler->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
-
-                self::$handler = $SchemasHandler;
+                $schemasHandler->setAllowedRequestContentTypes([
+                    RequestContentType::JSON,
+                    RequestContentType::YAML,
+                    RequestContentType::FORMDATA
+                ]);
+                $schemasHandler->setAllowedAcceptHeaders([
+                    AcceptHeader::JSON,
+                    AcceptHeader::YAML
+                ]);
+                self::$handler = $schemasHandler;
+                break;
+            case 'data':
+                $regionalDataHandler = new RegionalDataHandler($requestPathParts);
+                $regionalDataHandler->setAllowedRequestMethods([
+                    RequestMethod::GET,
+                    RequestMethod::POST,
+                    RequestMethod::PUT,
+                    RequestMethod::PATCH,
+                    RequestMethod::DELETE
+                ]);
+                $regionalDataHandler->setAllowedRequestContentTypes([
+                    RequestContentType::JSON,
+                    RequestContentType::YAML,
+                    RequestContentType::FORMDATA
+                ]);
+                $regionalDataHandler->setAllowedAcceptHeaders([
+                    AcceptHeader::JSON,
+                    AcceptHeader::YAML
+                ]);
+                self::$handler = $regionalDataHandler;
                 break;
             /*
             case 'tests':
@@ -176,40 +250,6 @@ class Router
                 TestsHandler::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML ]);
                 TestsHandler::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
                 TestsHandler::handleRequest();
-                // no break (always terminates)
-            case 'data':
-                $RegionalData = new RegionalDataHandler();
-                RegionalDataHandler::$Core->setAllowedRequestMethods([
-                    RequestMethod::GET,
-                    RequestMethod::POST,
-                    RequestMethod::PUT,
-                    RequestMethod::PATCH,
-                    RequestMethod::DELETE
-                ]);
-                if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
-                    if (
-                        in_array($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'], [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
-                        && false === Router::isLocalhost()
-                    ) {
-                        //RegionalDataHandler::$Core->setAllowedOrigins(self::$allowedOrigins);
-                    }
-                }
-                if (
-                    in_array(RegionalDataHandler::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
-                    && false === Router::isLocalhost()
-                ) {
-                    //RegionalDataHandler::$Core->setAllowedOrigins(self::$allowedOrigins);
-                }
-                RegionalDataHandler::$Core->setAllowedRequestContentTypes([
-                    RequestContentType::JSON,
-                    RequestContentType::YAML,
-                    RequestContentType::FORMDATA
-                ]);
-                RegionalDataHandler::$Core->setAllowedAcceptHeaders([
-                    AcceptHeader::JSON,
-                    AcceptHeader::YAML
-                ]);
-                $RegionalData->init($requestPathParts);
                 // no break (always terminates)
             */
             default:
