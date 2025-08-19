@@ -646,6 +646,9 @@ abstract class AbstractHandler implements RequestHandlerInterface
             ->withBody(Stream::create($encodedResponse));
     }
 
+    /**
+     * Factory method for instantiating a Response object with minimum state.
+     */
     protected static function initResponse(ServerRequestInterface $request): ResponseInterface
     {
         return new Response(

@@ -141,10 +141,21 @@ class Router
                     RequestMethod::GET,
                     RequestMethod::POST
                 ]);
-                $eventsHandler->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
+                $eventsHandler->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA, RequestContentType::MULTIPART ]);
                 $eventsHandler->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
 
                 self::$handler = $eventsHandler;
+                break;
+            case 'schemas':
+                $SchemasHandler = new SchemasHandler($requestPathParts);
+                $SchemasHandler->setAllowedRequestMethods([
+                    RequestMethod::GET,
+                    RequestMethod::POST
+                ]);
+                $SchemasHandler->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA, RequestContentType::MULTIPART ]);
+                $SchemasHandler->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+
+                self::$handler = $SchemasHandler;
                 break;
             /*
             case 'tests':
@@ -199,15 +210,6 @@ class Router
                     AcceptHeader::YAML
                 ]);
                 $RegionalData->init($requestPathParts);
-                // no break (always terminates)
-            case 'schemas':
-                $SchemasHandler = new SchemasHandler();
-                $SchemasHandler->Core->setAllowedRequestMethods([
-                    RequestMethod::GET,
-                    RequestMethod::POST
-                ]);
-                $SchemasHandler->Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
-                $SchemasHandler->init($requestPathParts);
                 // no break (always terminates)
             */
             default:
