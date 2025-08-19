@@ -135,6 +135,17 @@ class Router
                 $easterHandler->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
                 self::$handler = $easterHandler;
                 break;
+            case 'events':
+                $eventsHandler = new EventsHandler($requestPathParts);
+                $eventsHandler->setAllowedRequestMethods([
+                    RequestMethod::GET,
+                    RequestMethod::POST
+                ]);
+                $eventsHandler->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
+                $eventsHandler->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
+
+                self::$handler = $eventsHandler;
+                break;
             /*
             case 'tests':
                 TestsHandler::init($requestPathParts);
@@ -154,30 +165,6 @@ class Router
                 TestsHandler::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML ]);
                 TestsHandler::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
                 TestsHandler::handleRequest();
-                // no break (always terminates)
-            case 'events':
-                $Events = new EventsPath();
-                EventsPath::$Core->setAllowedRequestMethods([
-                    RequestMethod::GET,
-                    RequestMethod::POST
-                ]);
-                if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'])) {
-                    if (
-                        in_array($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_METHOD'], [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
-                        && false === Router::isLocalhost()
-                    ) {
-                        //EventsPath::$Core->setAllowedOrigins(self::$allowedOrigins);
-                    }
-                }
-                if (
-                    in_array(EventsPath::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
-                    && false === Router::isLocalhost()
-                ) {
-                    //EventsPath::$Core->setAllowedOrigins(self::$allowedOrigins);
-                }
-                EventsPath::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::FORMDATA ]);
-                EventsPath::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
-                $Events->init($requestPathParts);
                 // no break (always terminates)
             case 'data':
                 $RegionalData = new RegionalDataHandler();

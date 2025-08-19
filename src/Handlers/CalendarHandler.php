@@ -4849,7 +4849,7 @@ final class CalendarHandler extends AbstractHandler
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         // We instantiate a Response object with minimum state
-        $response = static::createResponse($request);
+        $response = static::initResponse($request);
 
         $method = RequestMethod::from($request->getMethod());
 

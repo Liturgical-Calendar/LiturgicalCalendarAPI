@@ -5,6 +5,7 @@ namespace LiturgicalCalendar\Api\Params;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\ParamError;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
@@ -29,11 +30,9 @@ class EventsParams implements ParamsInterface
     public int $Year;
     public string $Locale;
     public string $baseLocale;
-    public bool $EternalHighPriest            = false;
-    public ?string $NationalCalendar          = null;
-    public ?string $DiocesanCalendar          = null;
-    public static ParamError $lastErrorStatus = ParamError::NONE;
-    private static string $lastErrorMessage   = '';
+    public bool $EternalHighPriest   = false;
+    public ?string $NationalCalendar = null;
+    public ?string $DiocesanCalendar = null;
 
     public readonly MetadataCalendars $calendarsMetadata;
 
@@ -73,26 +72,15 @@ class EventsParams implements ParamsInterface
      *
      * Calls the setParams method to apply the values from $params to the corresponding properties.
      */
-    public function __construct(array $params = [])
+    public function __construct($params = [])
     {
         /** @var \stdClass&object{litcal_metadata:MetadataCalendarsObject} $calendarsMetadataObj */
-        $calendarsMetadataObj    = Utilities::jsonUrlToObject(Router::$apiPath . Route::CALENDARS->value);
+        $calendarsMetadataObj    = Utilities::jsonUrlToObject(Route::CALENDARS->path());
         $this->calendarsMetadata = MetadataCalendars::fromObject($calendarsMetadataObj->litcal_metadata);
 
-        //we need at least a default value for the current year and for the locale
+        // We need at least a default value for the current year and for the locale
+        //   (which we already took from the request headers)
         $this->Year = (int) date('Y');
-        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && is_string($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            $value        = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-            $this->Locale = $value && LitLocale::isValid($value) ? $value : LitLocale::LATIN;
-        } else {
-            $this->Locale = LitLocale::LATIN;
-        }
-        $baseLocale = \Locale::getPrimaryLanguage($this->Locale);
-        if (null === $baseLocale) {
-            throw new \RuntimeException('“Then the lame shall leap like a stag, and the mute tongue sing for joy.” — Isaiah 35:6');
-        }
-        $this->baseLocale = $baseLocale;
-
         $this->setParams($params);
     }
 
@@ -115,8 +103,6 @@ class EventsParams implements ParamsInterface
      */
     public function setParams(array $params = []): void
     {
-        self::$lastErrorStatus  = ParamError::NONE;
-        self::$lastErrorMessage = '';
         if (count($params) === 0) {
             // If no parameters are provided, we can just return
             return;
@@ -125,23 +111,24 @@ class EventsParams implements ParamsInterface
             if (in_array($key, self::ALLOWED_PARAMS)) {
                 switch ($key) {
                     case 'locale':
-                        $locale = \Locale::canonicalize($this->Locale);
+                        $locale = \Locale::canonicalize($value);
                         if (null === $locale) {
-                            throw new \ValueError('Invalid locale string: ' . $value);
+                            throw new ValidationException('Invalid locale string: ' . $value);
                         }
 
                         $this->Locale = LitLocale::isValid($locale) ? $locale : LitLocale::LATIN;
                         $baseLocale   = \Locale::getPrimaryLanguage($this->Locale);
                         if (null === $baseLocale) {
-                            throw new \RuntimeException('“The evil spirit had bound his tongue, and together with his tongue had fettered his soul.” — St. John Chrysostom, Homily 32 on Matthew');
+                            $description = '“The evil spirit had bound his tongue, and together with his tongue had fettered his soul.” — St. John Chrysostom, Homily 32 on Matthew';
+                            throw new ValidationException($description);
                         }
                         $this->baseLocale = $baseLocale;
                         break;
                     case 'national_calendar':
                         if (false === $this->isValidNationalCalendar($value)) {
-                            self::$lastErrorStatus  = ParamError::INVALID_REGION;
-                            self::$lastErrorMessage = "unknown value `$value` for nation parameter, supported national calendars are: ["
+                            $description = "Unknown value `$value` for nation parameter, supported national calendars are: ["
                                 . implode(',', $this->calendarsMetadata->national_calendars_keys) . ']';
+                            throw new ValidationException($description);
                         }
                         if ($value === 'VA') {
                             $this->Locale                  = LitLocale::LATIN;
@@ -155,28 +142,23 @@ class EventsParams implements ParamsInterface
                         break;
                     case 'diocesan_calendar':
                         if (false === $this->isValidDiocesanCalendar($value)) {
-                            self::$lastErrorStatus  = ParamError::INVALID_REGION;
-                            self::$lastErrorMessage = "unknown value `$value` for diocese parameter, supported diocesan calendars are: ["
+                            $description = "unknown value `$value` for diocese parameter, supported diocesan calendars are: ["
                                 . implode(',', $this->calendarsMetadata->diocesan_calendars_keys) . ']';
+                            throw new ValidationException($description);
                         }
                         $this->DiocesanCalendar = $value;
                         break;
                     case 'eternal_high_priest':
-                        $this->EternalHighPriest = filter_var($value, FILTER_VALIDATE_BOOLEAN);
+                        $filteredBoolValue = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                        if (null === $filteredBoolValue) {
+                            $description = "Invalid value `$value` for eternal_high_priest parameter, must be boolean";
+                            throw new ValidationException($description);
+                        }
+                        $this->EternalHighPriest = $filteredBoolValue;
                         break;
                 }
             }
         }
-    }
-
-    /**
-     * Retrieves the last error message set by the EventsParams class.
-     *
-     * @return string The last error message, or an empty string if no error has occurred.
-     */
-    public static function getLastErrorMessage(): string
-    {
-        return self::$lastErrorMessage;
     }
 
     private function isValidNationalCalendar(string $calendar): bool

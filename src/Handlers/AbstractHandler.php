@@ -617,7 +617,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
         $contentType = AcceptHeader::from($response->getHeaderLine('Content-Type'));
         switch ($contentType) {
             case AcceptHeader::JSON:
-                $encodedResponse = json_encode($responseBody, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
+                $encodedResponse = json_encode($responseBody, JSON_THROW_ON_ERROR);
                 break;
             case AcceptHeader::YAML:
                 if (!extension_loaded('yaml')) {
@@ -646,7 +646,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
             ->withBody(Stream::create($encodedResponse));
     }
 
-    protected static function createResponse(ServerRequestInterface $request): ResponseInterface
+    protected static function initResponse(ServerRequestInterface $request): ResponseInterface
     {
         return new Response(
             StatusCode::PROCESSING->value,   // uncertain status,

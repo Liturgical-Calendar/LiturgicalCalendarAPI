@@ -13,7 +13,6 @@ use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCollection;
 use LiturgicalCalendar\Api\Params\DecreesParams;
 use LiturgicalCalendar\Api\Utilities;
-use Nyholm\Psr7\Response;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -87,7 +86,7 @@ final class DecreesHandler extends AbstractHandler
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         // We instantiate a Response object with minimum state
-        $response = static::createResponse($request);
+        $response = static::initResponse($request);
 
         $method = RequestMethod::from($request->getMethod());
 
@@ -108,6 +107,7 @@ final class DecreesHandler extends AbstractHandler
             default:
                 $mime = $this->validateAcceptHeader($request, AcceptabilityLevel::INTERMEDIATE);
         }
+
         $response = $response->withHeader('Content-Type', $mime);
 
         // Initialize any parameters set in the request.

@@ -2,14 +2,15 @@
 
 namespace LiturgicalCalendar\Api\Handlers;
 
-use LiturgicalCalendar\Api\Core;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
-use LiturgicalCalendar\Api\Enum\StatusCode;
-use LiturgicalCalendar\Api\Enum\RequestMethod;
-use LiturgicalCalendar\Api\Enum\RequestContentType;
-use LiturgicalCalendar\Api\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\JsonData;
-use LiturgicalCalendar\Api\Enum\ParamError;
+use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
+use LiturgicalCalendar\Api\Http\Enum\StatusCode;
+use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
+use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
+use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCollection;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewMobile;
@@ -33,24 +34,23 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 use LiturgicalCalendar\Api\Params\EventsParams;
 use LiturgicalCalendar\Api\Utilities;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * @phpstan-import-type DecreeItemFromObject from \LiturgicalCalendar\Api\Models\Decrees\DecreeItem
  */
-final class EventsPath
+final class EventsHandler extends AbstractHandler
 {
-    public static Core $Core;
     /** @var LiturgicalEventMap */
     private static LiturgicalEventMap $liturgicalEvents;
-    /** @var string[] */
-    private static array $requestPathParts           = [];
-    private static ?WiderRegionData $WiderRegionData = null;
-    private static ?NationalData $NationalData       = null;
     private static ?DiocesanData $DiocesanData       = null;
+    private static ?NationalData $NationalData       = null;
+    private static ?WiderRegionData $WiderRegionData = null;
     private EventsParams $EventsParams;
 
     /**
-     * @param string[] $requestPathParts the path parameters from the request
+     * @param string[] $requestPathParams the path parameters from the request
      *
      * Initializes the Events class.
      *
@@ -59,17 +59,15 @@ final class EventsPath
      * - Set the request path parts
      * - Initialize a new EventsParams object
      * - Initialize the WorldDioceses object from the world_dioceses.json file
-     *
-     * @throws \Exception if there is an issue with reading the world_dioceses.json file
      */
-    public function __construct(array $requestPathParts = [])
+    public function __construct(array $requestPathParams = [])
     {
-        self::$Core             = new Core();
-        self::$requestPathParts = $requestPathParts;
-        $this->EventsParams     = new EventsParams();
-        if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
-            self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
+
+        if (count($requestPathParams)) {
+            parent::__construct($requestPathParams);
+            $this->validateRequestPathParams();
         }
+
         self::$liturgicalEvents = new LiturgicalEventMap();
     }
 
@@ -89,125 +87,24 @@ final class EventsPath
     private function validateRequestPathParams(): void
     {
         $params = null;
-        if (false === in_array(self::$requestPathParts[0], ['nation', 'diocese'])) {
-            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'Unknown resource path: ' . self::$requestPathParts[0] . ', expected either /nation/{nation} or /diocese/{diocese_id}');
+        if (false === in_array($this->requestPathParams[0], ['nation', 'diocese'])) {
+            throw new UnprocessableContentException('Unknown resource path: ' . $this->requestPathParams[0] . ', expected either /nation/{nation} or /diocese/{diocese_id}');
         }
-        if (count(self::$requestPathParts) === 2) {
-            if (self::$requestPathParts[0] === 'nation') {
-                $params = [ 'national_calendar' => self::$requestPathParts[1] ];
+        if (count($this->requestPathParams) === 2) {
+            if ($this->requestPathParams[0] === 'nation') {
+                $params = [ 'national_calendar' => $this->requestPathParams[1] ];
                 $this->EventsParams->setParams($params);
-                if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
-                }
             } else {
-                $params = [ 'diocesan_calendar' => self::$requestPathParts[1] ];
+                $params = [ 'diocesan_calendar' => $this->requestPathParams[1] ];
                 $this->EventsParams->setParams($params);
-                if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
-                }
             }
         } else {
-            $description = 'Wrong number of path parameters, needed two but got ' . count(self::$requestPathParts) . ': [' . implode(',', self::$requestPathParts) . ']';
-            self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, $description);
+            $description = 'Wrong number of path parameters, needed two but got ' . count($this->requestPathParams) . ': [' . implode(',', $this->requestPathParams) . ']';
+            throw new UnprocessableContentException($description);
         }
     }
 
-    /**
-     * Validate the POST request parameters.
-     *
-     * This method checks the content type of the request. If the content type is JSON,
-     * it reads the JSON input from the request body, decodes it, and validates it. If the
-     * JSON is malformed or the data is invalid, it produces a 400 Bad Request error response.
-     * If the content type is FORMDATA, it validates the POST data. If the data is invalid,
-     * it produces a 400 Bad Request error response.
-     *
-     * @return void
-     */
-    private function validatePostParams(): void
-    {
-        if (self::$Core->getRequestContentType() === RequestContentType::JSON) {
-            $rawJson = file_get_contents('php://input');
-            if (false !== $rawJson && '' !== $rawJson) {
-                $params = json_decode($rawJson, true);
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    $description = "Malformed JSON data received in the request: <$rawJson>, " . json_last_error_msg();
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
-                } else {
-                    /** @var array{locale?:string,national_calendar?:string,diocesan_calendar?:string,eternal_high_priest?:bool} $params */
-                    $this->EventsParams->setParams($params);
-                    if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
-                        self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
-                    }
-                }
-            }
-        } elseif (self::$Core->getRequestContentType() === RequestContentType::FORMDATA) {
-            if (count($_POST)) {
-                /** @var array{locale?:string,national_calendar?:string,diocesan_calendar?:string,eternal_high_priest?:bool} $_POST */
-                $this->EventsParams->setParams($_POST);
-                if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
-                    self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
-                }
-            }
-        }
-    }
 
-    /**
-     * Validate the GET request parameters.
-     *
-     * This method checks if there are any GET parameters present in the request.
-     * If there are, it attempts to set the data to the EventsParams object.
-     * If the data is invalid, it produces a 400 Bad Request error response
-     * with the last error message from EventsParams.
-     *
-     * @return void
-     */
-    private function validateGetParams(): void
-    {
-        if (count($_GET)) {
-            /** @var array{locale?:string,national_calendar?:string,diocesan_calendar?:string,eternal_high_priest?:bool} $_GET */
-            $this->EventsParams->setParams($_GET);
-            if (EventsParams::$lastErrorStatus !== ParamError::NONE) {
-                self::produceErrorResponse(StatusCode::BAD_REQUEST, EventsParams::getLastErrorMessage());
-            }
-        }
-    }
-
-    /**
-     * Handles the request parameters for the Events resource.
-     *
-     * This method examines the request path parts and validates them if present.
-     * It then validates the request parameters based on the HTTP request method.
-     * - For POST requests, it validates the POST parameters.
-     * - For GET requests, it validates the GET parameters.
-     * - For OPTIONS requests, it continues without validation.
-     * Produces a 405 Method Not Allowed error response if the request method is not supported.
-     *
-     * @return void
-     */
-    private function handleRequestParams(): void
-    {
-        if (count(self::$requestPathParts)) {
-            $this->validateRequestPathParams();
-        }
-
-        switch (self::$Core->getRequestMethod()) {
-            case RequestMethod::POST:
-                $this->validatePostParams();
-                break;
-            case RequestMethod::GET:
-                $this->validateGetParams();
-                break;
-            case RequestMethod::OPTIONS:
-                //continue
-                break;
-            default:
-                $description = 'You seem to be forming a strange kind of request? Allowed Request Methods are '
-                    . implode(' and ', array_column(self::$Core->getAllowedRequestMethods(), 'value'))
-                    . ', but your Request Method was '
-                    . self::$Core->getRequestMethod()->value;
-                self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, $description);
-        }
-    }
 
     /**
      * Loads the JSON data for the specified diocesan calendar.
@@ -255,7 +152,7 @@ final class EventsPath
             } else {
                 $description = "unknown diocese `{$this->EventsParams->DiocesanCalendar}`, supported values are: ["
                     . implode(',', $this->EventsParams->calendarsMetadata->diocesan_calendars_keys) . ']';
-                self::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+                throw new ValidationException($description);
             }
         }
     }
@@ -665,88 +562,6 @@ final class EventsPath
         }
     }
 
-    /**
-     * Produce an error response with the given HTTP status code and description.
-     *
-     * The description is a short string that should be used to give more context to the error.
-     *
-     * The function will output the error in the response format specified by the Accept header
-     * of the request (JSON or YAML) and terminate the script execution with a call to die().
-     *
-     * @param int $statusCode the HTTP status code to return
-     * @param string $description a short description of the error
-     * @return never
-     */
-    private static function produceErrorResponse(int $statusCode, string $description): never
-    {
-        $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1 ';
-        header($serverProtocol . StatusCode::toString($statusCode), true, $statusCode);
-        $message              = new \stdClass();
-        $message->status      = 'ERROR';
-        $message->response    = StatusCode::toString($statusCode);
-        $message->description = $description;
-        $errResponse          = json_encode($message);
-        if (JSON_ERROR_NONE !== json_last_error() || false === $errResponse) {
-            throw new \ValueError('JSON error: ' . json_last_error_msg());
-        }
-        switch (self::$Core->getResponseContentType()) {
-            case AcceptHeader::YAML:
-                $response = json_decode($errResponse, true, 512, JSON_THROW_ON_ERROR);
-                echo yaml_emit($response, YAML_UTF8_ENCODING);
-                break;
-            case AcceptHeader::JSON:
-            default:
-                echo $errResponse;
-        }
-        die();
-    }
-
-    /**
-     * Produce the response for the /events endpoint.
-     *
-     * The function will output the response in the response format specified by the Accept header
-     * of the request (JSON or YAML) and terminate the script execution with a call to die().
-     *
-     * @return never
-     */
-    private function produceResponse(): never
-    {
-        $responseObj = [
-            'litcal_events' => self::$liturgicalEvents->toCollection(),
-            'settings'      => [
-                'locale'            => $this->EventsParams->Locale,
-                'national_calendar' => $this->EventsParams->NationalCalendar,
-                'diocesan_calendar' => $this->EventsParams->DiocesanCalendar
-            ]
-        ];
-
-        $response = json_encode($responseObj);
-        if (JSON_ERROR_NONE !== json_last_error() || false === $response) {
-            throw new \ValueError('JSON error: ' . json_last_error_msg());
-        }
-
-        $responseHash = md5($response);
-        header("Etag: \"{$responseHash}\"");
-        if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
-            $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
-            header($serverProtocol . ' 304 Not Modified');
-            header('Content-Length: 0');
-        } else {
-            switch (self::$Core->getResponseContentType()) {
-                case AcceptHeader::YAML:
-                    // We must make sure that any nested stdClass objects are converted to associative arrays
-                    $responseStr = json_encode($responseObj, JSON_THROW_ON_ERROR);
-                    $responseObj = json_decode($responseStr, true);
-                    echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
-                    break;
-                case AcceptHeader::JSON:
-                default:
-                    echo $response;
-                    break;
-            }
-        }
-        die();
-    }
 
     /**
      * Initializes the Events class and processes the request.
@@ -763,18 +578,70 @@ final class EventsPath
      * - Handles request parameters and processes different types of calendar data,
      *   such as Missal, Proprium De Tempore, Memorials from Decrees, National,
      *   and Diocesan calendars.
-     * - Produces and sends the response to the client.
-     *
-     * @return never
      */
-    public function init(array $requestPathParts = []): never
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        self::$Core->init();
-        self::$Core->validateAcceptHeader(true);
-        self::$Core->setResponseContentTypeHeader();
+        $response = static::initResponse($request);
 
-        self::$requestPathParts = $requestPathParts;
-        $this->handleRequestParams();
+        $method = RequestMethod::from($request->getMethod());
+
+        // OPTIONS method for CORS preflight requests is always allowed
+        if ($method === RequestMethod::OPTIONS) {
+            return $this->handlePreflightRequest($request, $response);
+        }
+
+        // For all other request methods, validate that they are supported by the endpoint
+        $this->validateRequestMethod($request);
+
+        // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint:
+        //   if set we negotiate the best Content-Type, if not set we default to the first supported by the current handler
+        switch ($method) {
+            case RequestMethod::GET:
+                $mime = $this->validateAcceptHeader($request, AcceptabilityLevel::LAX);
+                break;
+            default:
+                $mime = $this->validateAcceptHeader($request, AcceptabilityLevel::INTERMEDIATE);
+        }
+
+        $response = $response->withHeader('Content-Type', $mime);
+
+        // Initialize any parameters set in the request.
+        // If there are any:
+        //   - for a GET request method, we expect them to be set in the URL
+        //   - for any other request methods, we expect them to be set in the body of the request
+        // Considering that this endpoint is both read and write:
+        //   - for POST requests we will never have a payload in the request body,
+        //       only request parameters
+        //   - for PUT and PATCH requests we will have a payload in the request body
+        //   - for DELETE requests we will have neither payload nor request parameters, only path parameters
+
+        /** @var array{locale?:string,national_calendar?:string,diocesan_calendar?:string,eternal_high_priest?:bool} $params */
+        $params = [];
+
+        // Second of all, we check if an Accept-Language header was set in the request
+        $acceptLanguageHeader = $request->getHeaderLine('Accept-Language');
+        $locale               = '' !== $acceptLanguageHeader
+            ? \Locale::acceptFromHttp($acceptLanguageHeader)
+            : LitLocale::LATIN;
+        if ($locale && LitLocale::isValid($locale)) {
+            $params['locale'] = $locale;
+        } else {
+            $params['locale'] = LitLocale::LATIN;
+        }
+
+        if ($method === RequestMethod::GET) {
+            $params = array_merge($params, $this->getScalarQueryParams($request));
+        } elseif ($method === RequestMethod::POST) {
+            $parsedBodyParams = $this->parseBodyParams($request, false);
+
+            if (null !== $parsedBodyParams) {
+                /** @var array<string,scalar|null> $params */
+                $params = array_merge($params, $parsedBodyParams);
+            }
+        }
+
+        $this->EventsParams = new EventsParams($params);
+
         $this->loadNationalAndWiderRegionData();
         $this->loadDiocesanData();
         $this->setLocale();
@@ -782,6 +649,24 @@ final class EventsPath
         $this->processMemorialsFromDecreesData();
         $this->processNationalCalendarData();
         $this->processDiocesanCalendarData();
-        self::produceResponse();
+
+        $responseObj  = [
+            'litcal_events' => self::$liturgicalEvents->toCollection(),
+            'settings'      => [
+                'locale'            => $this->EventsParams->Locale,
+                'national_calendar' => $this->EventsParams->NationalCalendar,
+                'diocesan_calendar' => $this->EventsParams->DiocesanCalendar
+            ]
+        ];
+        $responseBody = json_encode($responseObj, JSON_THROW_ON_ERROR);
+        $responseHash = md5($responseBody);
+        $response     = $response->withHeader('ETag', "\"{$responseHash}\"");
+
+        if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
+            return $response->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
+                            ->withHeader('Content-Length', '0');
+        }
+
+        return $this->encodeResponseBody($response, $responseObj);
     }
 }
