@@ -76,12 +76,12 @@ class Health implements MessageComponentInterface
     private static function getPathToSchemaFile(string $dataFile): ?string
     {
         return match ($dataFile) {
-            JsonData::MISSALS_FOLDER->path() . '/propriumdetempore/propriumdetempore.json'                 => LitSchema::PROPRIUMDETEMPORE->path(),
-            JsonData::MISSALS_FOLDER->path() . '/propriumdesanctis_1970/propriumdesanctis_1970.json'       => LitSchema::PROPRIUMDESANCTIS->path(),
-            JsonData::MISSALS_FOLDER->path() . '/propriumdesanctis_2002/propriumdesanctis_2002.json'       => LitSchema::PROPRIUMDESANCTIS->path(),
-            JsonData::MISSALS_FOLDER->path() . '/propriumdesanctis_2008/propriumdesanctis_2008.json'       => LitSchema::PROPRIUMDESANCTIS->path(),
-            JsonData::MISSALS_FOLDER->path() . '/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json' => LitSchema::PROPRIUMDESANCTIS->path(),
-            JsonData::MISSALS_FOLDER->path() . '/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json' => LitSchema::PROPRIUMDESANCTIS->path(),
+            JsonData::MISSALS_FOLDER->value . '/propriumdetempore/propriumdetempore.json'                 => LitSchema::PROPRIUMDETEMPORE->path(),
+            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_1970/propriumdesanctis_1970.json'       => LitSchema::PROPRIUMDESANCTIS->path(),
+            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_2002/propriumdesanctis_2002.json'       => LitSchema::PROPRIUMDESANCTIS->path(),
+            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_2008/propriumdesanctis_2008.json'       => LitSchema::PROPRIUMDESANCTIS->path(),
+            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json' => LitSchema::PROPRIUMDESANCTIS->path(),
+            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json' => LitSchema::PROPRIUMDESANCTIS->path(),
             Router::$apiPath . '/calendars'                                                                => LitSchema::METADATA->path(),
             Router::$apiPath . '/decrees'                                                                  => LitSchema::DECREES->path(),
             Router::$apiPath . '/events'                                                                   => LitSchema::EVENTS->path(),
@@ -690,18 +690,15 @@ class Health implements MessageComponentInterface
 
             $data = false;
             if (property_exists($validation, 'responsetype')) {
-                $responseType = $validation->responsetype;
-                //get the index of the responsetype from the ReturnType class
-                $responseTypeIdx = array_search($responseType, ReturnTypeParam::values());
-                //get the corresponding accept mime type
-                $acceptMimeType = AcceptHeader::values()[$responseTypeIdx];
-                $opts           = [
+                $returnTypeParam = ReturnTypeParam::from($responseType);
+                $acceptMimeType  = $returnTypeParam->toResponseContentType()->value;
+                $opts            = [
                     'http' => [
                         'method' => 'GET',
                         'header' => "Accept: $acceptMimeType\r\n"
                     ]
                 ];
-                $context        = stream_context_create($opts);
+                $context         = stream_context_create($opts);
                 // $dataPath is probably an API path in this case
                 assert(is_string($dataPath), 'Data path should be a string for resourceDataCheck category');
                 $data = file_get_contents($dataPath, false, $context);
@@ -873,17 +870,15 @@ class Health implements MessageComponentInterface
      */
     private function validateCalendar(string $calendar, int $year, string $category, string $responseType, ConnectionInterface $to): void
     {
-        //get the index of the responsetype from the ReturnType class
-        $responseTypeIdx = array_search($responseType, ReturnTypeParam::values());
-        //get the corresponding accept mime type
-        $acceptMimeType = AcceptHeader::values()[$responseTypeIdx];
-        $opts           = [
+        $returnTypeParam = ReturnTypeParam::from($responseType);
+        $acceptMimeType  = $returnTypeParam->toResponseContentType()->value;
+        $opts            = [
             'http' => [
                 'method' => 'GET',
                 'header' => "Accept: $acceptMimeType\r\n"
             ]
         ];
-        $context        = stream_context_create($opts);
+        $context         = stream_context_create($opts);
         if ($calendar === 'VA') {
             $req = "/$year?year_type=CIVIL";
         } else {
@@ -899,7 +894,7 @@ class Health implements MessageComponentInterface
                     $req = '/unknown';
             }
         }
-        $data = file_get_contents(Router::$apiPath . Route::CALENDAR->value . $req, false, $context);
+        $data = file_get_contents(Route::CALENDAR->path() . $req, false, $context);
         if ($data !== false) {
             $message          = new \stdClass();
             $message->type    = 'success';
@@ -921,7 +916,7 @@ class Health implements MessageComponentInterface
                         $errorString   = self::retrieveXmlErrors($errors, $xmlArr);
                         libxml_clear_errors();
                         $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                        . Router::$apiPath . Route::CALENDAR->value . $req . ' as XML: ' . $errorString;
+                                        . Route::CALENDAR->path() . $req . ' as XML: ' . $errorString;
                         $message->classes      = ".calendar-$calendar.json-valid.year-$year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
@@ -998,7 +993,7 @@ class Health implements MessageComponentInterface
                         $message               = new \stdClass();
                         $message->type         = 'error';
                         $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                        . Router::$apiPath . Route::CALENDAR->value . $req . ' as ICS: parsing resulted in type ' . gettype($vcalendar) . ' | ' . $vcalendar;
+                                        . Route::CALENDAR->path() . $req . ' as ICS: parsing resulted in type ' . gettype($vcalendar) . ' | ' . $vcalendar;
                         $message->classes      = ".calendar-$calendar.json-valid.year-$year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
@@ -1040,7 +1035,7 @@ class Health implements MessageComponentInterface
                         $message               = new \stdClass();
                         $message->type         = 'error';
                         $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                        . Router::$apiPath . Route::CALENDAR->value . $req . ' as YAML: ' . $ex->getMessage();
+                                        . Route::CALENDAR->path() . $req . ' as YAML: ' . $ex->getMessage();
                         $message->classes      = ".calendar-$calendar.json-valid.year-$year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
@@ -1071,16 +1066,17 @@ class Health implements MessageComponentInterface
                         $message               = new \stdClass();
                         $message->type         = 'error';
                         $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                        . Router::$apiPath . Route::CALENDAR->value . $req . ' as JSON: ' . json_last_error_msg();
+                                        . Route::CALENDAR->path() . $req . ' as JSON: ' . json_last_error_msg();
                         $message->classes      = ".calendar-$calendar.json-valid.year-$year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
                     }
             }
         } else {
+            $error            = error_get_last();
             $message          = new \stdClass();
             $message->type    = 'error';
-            $message->text    = "The $category of $calendar for the year $year does not exist at the URL " . Router::$apiPath . Route::CALENDAR->value . $req;
+            $message->text    = "The $category of $calendar for the year $year does not exist at the URL " . Route::CALENDAR->path() . $req . ' : ' . json_encode($error, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
             $message->classes = ".calendar-$calendar.file-exists.year-$year";
             $this->sendMessage($to, $message);
         }
@@ -1097,17 +1093,15 @@ class Health implements MessageComponentInterface
      */
     private function executeUnitTest(string $test, string $calendar, int $year, string $category, ConnectionInterface $to): void
     {
-        //get the index of the responsetype from the ReturnType class
-        $responseTypeIdx = array_search(ReturnTypeParam::JSON, ReturnTypeParam::cases());
-        //get the corresponding accept mime type
-        $acceptMimeType = AcceptHeader::values()[$responseTypeIdx];
-        $opts           = [
+        $returnTypeParam = ReturnTypeParam::JSON;
+        $acceptMimeType  = $returnTypeParam->toResponseContentType()->value;
+        $opts            = [
             'http' => [
                 'method' => 'GET',
                 'header' => "Accept: $acceptMimeType\r\n"
             ]
         ];
-        $context        = stream_context_create($opts);
+        $context         = stream_context_create($opts);
         if ($calendar === 'VA') {
             $req = "/$year?year_type=CIVIL";
         } else {
@@ -1123,7 +1117,7 @@ class Health implements MessageComponentInterface
                     $req = '/unknown';
             }
         }
-        $data = file_get_contents(Router::$apiPath . Route::CALENDAR->value . $req, false, $context);
+        $data = file_get_contents(Route::CALENDAR->path() . $req, false, $context);
         // We don't really need to check whether file_get_contents succeeded
         //  because this check already takes place in the validateCalendar test phase
         assert(is_string($data), 'Data should be a string for executeUnitTest method');

@@ -1321,7 +1321,7 @@ final class RegionalDataHandler extends AbstractHandler
                 $description = "Invalid value {$params->key} for param `key`, valid values are: {$validVals}";
                 throw new UnprocessableContentException($description);
             } else {
-                $currentWiderRegion = array_find($this->CalendarsMetadata->wider_regions, fn (MetadataWiderRegionItem $el) => $el->name === $params['key']);
+                $currentWiderRegion = array_find($this->CalendarsMetadata->wider_regions, fn (MetadataWiderRegionItem $el) => $el->name === $params->key);
                 if (null === $currentWiderRegion) {
                     $description = "Could not find Wider Region metadata for wider region {$params->key}.";
                     throw new UnprocessableContentException($description);

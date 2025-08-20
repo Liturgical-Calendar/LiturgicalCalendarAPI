@@ -63,9 +63,6 @@ final class EventsHandler extends AbstractHandler
     public function __construct(array $requestPathParams = [])
     {
         parent::__construct($requestPathParams);
-        if (count($requestPathParams)) {
-            $this->validateRequestPathParams();
-        }
 
         self::$liturgicalEvents = new LiturgicalEventMap();
     }
@@ -640,6 +637,9 @@ final class EventsHandler extends AbstractHandler
         }
 
         $this->EventsParams = new EventsParams($params);
+        if (count($this->requestPathParams)) {
+            $this->validateRequestPathParams();
+        }
 
         $this->loadNationalAndWiderRegionData();
         $this->loadDiocesanData();

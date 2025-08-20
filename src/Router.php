@@ -291,7 +291,7 @@ class Router
             $entryFile = realpath($_SERVER['argv'][0]);
             $entryDir  = dirname($entryFile);
 
-            $relIndexToParentOfSrc = self::relativePath($entryDir, dirname(__DIR__));
+            //$relIndexToParentOfSrc = self::relativePath($entryDir, dirname(__DIR__));
 
             // Build scheme + host + port from environment variables
             $scheme = getenv('API_PROTOCOL') ?: 'http';
@@ -308,7 +308,7 @@ class Router
 
             self::$apiBase     = $api_base_path;
             self::$apiPath     = rtrim($api_full_path . $api_base_path, '/');
-            self::$apiFilePath = $relIndexToParentOfSrc;
+            self::$apiFilePath = self::findProjectRoot($entryDir) . '/'; //$relIndexToParentOfSrc;
 
             return;
         }
@@ -380,7 +380,7 @@ class Router
     /**
      * Walk upward from a start path to find project root (where composer.json is).
      */
-    /*private static function findProjectRoot(string $startPath): ?string
+    private static function findProjectRoot(string $startPath): ?string
     {
         $path = realpath($startPath);
         while ($path !== false && $path !== DIRECTORY_SEPARATOR) {
@@ -390,7 +390,7 @@ class Router
             $path = dirname($path);
         }
         return null;
-    }*/
+    }
 
     /**
      * Calculate relative path from $from to $to
