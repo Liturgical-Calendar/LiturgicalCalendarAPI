@@ -68,19 +68,16 @@ class Router
                 $calendarHandler->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST
-                ]);
-                $calendarHandler->setAllowedRequestContentTypes([
+                ])->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
-                ]);
-                $calendarHandler->setAllowedAcceptHeaders([
+                ])->setAllowedAcceptHeaders([
                     AcceptHeader::JSON,
                     AcceptHeader::XML,
                     AcceptHeader::ICS,
                     AcceptHeader::YAML
-                ]);
-                $calendarHandler->setAllowedReturnTypes([
+                ])->setAllowedReturnTypes([
                     ReturnTypeParam::JSON,
                     ReturnTypeParam::XML,
                     ReturnTypeParam::ICS,
@@ -96,13 +93,11 @@ class Router
                 $metadataHandler->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST
-                ]);
-                $metadataHandler->setAllowedRequestContentTypes([
+                ])->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
-                ]);
-                $metadataHandler->setAllowedAcceptHeaders([
+                ])->setAllowedAcceptHeaders([
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);
@@ -116,18 +111,16 @@ class Router
                     RequestMethod::PUT,
                     RequestMethod::PATCH,
                     RequestMethod::DELETE
-                ]);
-                $missalsHandler->setAllowedRequestContentTypes([
+                ])->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
-                ]);
-                $missalsHandler->setAllowedAcceptHeaders([
+                ])->setAllowedAcceptHeaders([
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);
                 if (
-                    in_array($request->getMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
+                    in_array($request->getMethod(), [ RequestMethod::PUT->value, RequestMethod::PATCH->value, RequestMethod::DELETE->value ], true)
                     && false === Router::isLocalhost()
                 ) {
                     $missalsHandler->setAllowedOriginsFromFile('allowedOrigins.txt');
@@ -142,18 +135,16 @@ class Router
                     RequestMethod::PUT,
                     RequestMethod::PATCH,
                     RequestMethod::DELETE
-                ]);
-                $decreesHandler->setAllowedRequestContentTypes([
+                ])->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
-                ]);
-                $decreesHandler->setAllowedAcceptHeaders([
+                ])->setAllowedAcceptHeaders([
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);
                 if (
-                    in_array($request->getMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
+                    in_array($request->getMethod(), [ RequestMethod::PUT->value, RequestMethod::PATCH->value, RequestMethod::DELETE->value ], true)
                     && false === Router::isLocalhost()
                 ) {
                     $decreesHandler->setAllowedOriginsFromFile('allowedOrigins.txt');
@@ -165,13 +156,11 @@ class Router
                 $easterHandler->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST
-                ]);
-                $easterHandler->setAllowedRequestContentTypes([
+                ])->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
-                ]);
-                $easterHandler->setAllowedAcceptHeaders([
+                ])->setAllowedAcceptHeaders([
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);
@@ -182,13 +171,11 @@ class Router
                 $eventsHandler->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST
-                ]);
-                $eventsHandler->setAllowedRequestContentTypes([
+                ])->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
-                ]);
-                $eventsHandler->setAllowedAcceptHeaders([
+                ])->setAllowedAcceptHeaders([
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);
@@ -199,13 +186,11 @@ class Router
                 $schemasHandler->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST
-                ]);
-                $schemasHandler->setAllowedRequestContentTypes([
+                ])->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
-                ]);
-                $schemasHandler->setAllowedAcceptHeaders([
+                ])->setAllowedAcceptHeaders([
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);
@@ -219,39 +204,34 @@ class Router
                     RequestMethod::PUT,
                     RequestMethod::PATCH,
                     RequestMethod::DELETE
-                ]);
-                $regionalDataHandler->setAllowedRequestContentTypes([
+                ])->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
-                ]);
-                $regionalDataHandler->setAllowedAcceptHeaders([
+                ])->setAllowedAcceptHeaders([
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);
                 self::$handler = $regionalDataHandler;
                 break;
-            /*
             case 'tests':
-                TestsHandler::init($requestPathParts);
-                TestsHandler::$Core->setAllowedRequestMethods([
+                $testsHandler = new TestsHandler($requestPathParts);
+                $testsHandler->setAllowedRequestMethods([
                     RequestMethod::GET,
                     RequestMethod::POST,
                     RequestMethod::PUT,
                     RequestMethod::PATCH,
                     RequestMethod::DELETE
+                ])->setAllowedRequestContentTypes([
+                    RequestContentType::JSON,
+                    RequestContentType::YAML,
+                    RequestContentType::FORMDATA
+                ])->setAllowedAcceptHeaders([
+                    AcceptHeader::JSON,
+                    AcceptHeader::YAML
                 ]);
-                if (
-                    in_array(TestsHandler::$Core->getRequestMethod(), [ RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE ], true)
-                    && false === Router::isLocalhost()
-                ) {
-                    //TestsHandler::$Core->setAllowedOrigins(self::$allowedOrigins);
-                }
-                TestsHandler::$Core->setAllowedRequestContentTypes([ RequestContentType::JSON, RequestContentType::YAML ]);
-                TestsHandler::$Core->setAllowedAcceptHeaders([ AcceptHeader::JSON, AcceptHeader::YAML ]);
-                TestsHandler::handleRequest();
-                // no break (always terminates)
-            */
+                self::$handler = $testsHandler;
+                break;
             default:
                 $response = new Response(StatusCode::NOT_FOUND->value, [], null, $request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
                 Router::emitResponse($response);
@@ -274,11 +254,14 @@ class Router
      */
     public static function isLocalhost(): bool
     {
+        $serverAddress      = isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : '';
+        $remoteAddress      = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+        $serverName         = isset($_SERVER['SERVER_NAME']) ? $_SERVER['SERVER_NAME'] : '';
         $localhostAddresses = ['127.0.0.1', '::1', '0.0.0.0'];
         $localhostNames     = ['localhost', '127.0.0.1', '::1', '0.0.0.0'];
-        return in_array($_SERVER['SERVER_ADDR'] ?? '', $localhostAddresses) ||
-               in_array($_SERVER['REMOTE_ADDR'] ?? '', $localhostAddresses) ||
-               in_array($_SERVER['SERVER_NAME'] ?? '', $localhostNames);
+        return in_array($serverAddress, $localhostAddresses) ||
+               in_array($remoteAddress, $localhostAddresses) ||
+               in_array($serverName, $localhostNames);
     }
 
     private static function retrieveRequest(): ServerRequestInterface
@@ -300,8 +283,37 @@ class Router
         die();
     }
 
-    private static function getApiPaths(): void
+    public static function getApiPaths(): void
     {
+        // The websocket server will be running in CLI mode,
+        //   and there won't be any $_SERVER globals set (except for $_SERVER['argv'}?).
+        if (PHP_SAPI === 'cli') {
+            $entryFile = realpath($_SERVER['argv'][0]);
+            $entryDir  = dirname($entryFile);
+
+            $relIndexToParentOfSrc = self::relativePath($entryDir, dirname(__DIR__));
+
+            // Build scheme + host + port from environment variables
+            $scheme = getenv('API_PROTOCOL') ?: 'http';
+            $host   = getenv('API_HOST')   ?: 'localhost';
+            $port   = getenv('API_PORT')   ?: '8000';
+
+            $api_full_path = $scheme . '://' . $host;
+            if (!in_array($port, [ '80', '443' ])) {
+                $api_full_path .= ':' . $port;
+            }
+
+            // Path prefix — e.g. "/api/v1" if desired
+            $api_base_path = getenv('API_BASE_PATH') ?: '/';
+
+            self::$apiBase     = $api_base_path;
+            self::$apiPath     = rtrim($api_full_path . $api_base_path, '/');
+            self::$apiFilePath = $relIndexToParentOfSrc;
+
+            return;
+        }
+
+
         /**
          * Detect server Request Scheme
          */
@@ -368,8 +380,7 @@ class Router
     /**
      * Walk upward from a start path to find project root (where composer.json is).
      */
-    /*
-    private static function findProjectRoot(string $startPath): ?string
+    /*private static function findProjectRoot(string $startPath): ?string
     {
         $path = realpath($startPath);
         while ($path !== false && $path !== DIRECTORY_SEPARATOR) {
@@ -379,8 +390,7 @@ class Router
             $path = dirname($path);
         }
         return null;
-    }
-    */
+    }*/
 
     /**
      * Calculate relative path from $from to $to

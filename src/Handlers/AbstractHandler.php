@@ -217,7 +217,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
      *   the header is set to allow that specific origin.
      * Otherwise, the header is set to allow only the server's domain (only same domain requests allowed).
      */
-    private function setAccessControlAllowOriginHeader(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
+    protected function setAccessControlAllowOriginHeader(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $originHeader = $request->getHeaderLine('Origin');
 

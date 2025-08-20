@@ -25,6 +25,7 @@ final class EasterHandler extends AbstractHandler
 
     public function __construct()
     {
+        parent::__construct();
     }
 
     private function setLocale(): void

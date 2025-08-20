@@ -4856,6 +4856,8 @@ final class CalendarHandler extends AbstractHandler
         // OPTIONS method for CORS preflight requests is always allowed
         if ($method === RequestMethod::OPTIONS) {
             return $this->handlePreflightRequest($request, $response);
+        } else {
+            $response = $this->setAccessControlAllowOriginHeader($request, $response);
         }
 
         // Keep track of a few useful header values

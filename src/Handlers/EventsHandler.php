@@ -62,9 +62,8 @@ final class EventsHandler extends AbstractHandler
      */
     public function __construct(array $requestPathParams = [])
     {
-
+        parent::__construct($requestPathParams);
         if (count($requestPathParams)) {
-            parent::__construct($requestPathParams);
             $this->validateRequestPathParams();
         }
 
@@ -140,7 +139,7 @@ final class EventsHandler extends AbstractHandler
                     $this->EventsParams->Locale = self::$DiocesanData->metadata->locales[0];
                     $baseLocale                 = \Locale::getPrimaryLanguage($this->EventsParams->Locale);
                     if (null === $baseLocale) {
-                        throw new \RuntimeException(
+                        throw new ValidationException(
                             '"Names are not always the same among all men, but differ in each language;'
                             . ' yet all are trying to express the nature of things."'
                             . ' — Plato, Cratylus, 383a'

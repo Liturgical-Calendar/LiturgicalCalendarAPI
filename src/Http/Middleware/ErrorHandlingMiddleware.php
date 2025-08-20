@@ -3,8 +3,6 @@
 namespace LiturgicalCalendar\Api\Http\Middleware;
 
 use LiturgicalCalendar\Api\Http\Exception\ApiException;
-use Nyholm\Psr7\Response;
-use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -49,10 +47,13 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
             }
 
             $response = $this->responseFactory->createResponse($status);
-            $response->getBody()->write(json_encode($problem, JSON_PRETTY_PRINT));
+            $response
+                ->getBody()
+                ->write(json_encode($problem, JSON_PRETTY_PRINT));
 
             return $response
-                ->withHeader('Content-Type', 'application/problem+json');
+                ->withHeader('Content-Type', 'application/problem+json')
+                ->withHeader('Access-Control-Allow-Origin', '*');
         }
     }
 }

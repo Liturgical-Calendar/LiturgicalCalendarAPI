@@ -4,17 +4,25 @@ namespace LiturgicalCalendar\Api\Handlers;
 
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
-use LiturgicalCalendar\Api\Core;
-use LiturgicalCalendar\Api\Enum\StatusCode;
-use LiturgicalCalendar\Api\Enum\RequestMethod;
-use LiturgicalCalendar\Api\Enum\AcceptHeader;
+use LiturgicalCalendar\Api\Http\Enum\StatusCode;
+use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
+use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
+use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
+use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Api\Utilities;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Nyholm\Psr7\Stream;
 
-final class TestsHandler
+final class TestsHandler extends AbstractHandler
 {
-    public static Core $Core;
-    /** @var string[] */ private static array $requestPathParts = [];
-    /** @var string[] */ private static array $propsToSanitize  = [
+    /** @var string[] */
+    private static array $propsToSanitize = [
         'description',
         'applies_to',
         'excludes',
@@ -26,6 +34,13 @@ final class TestsHandler
         'assertion',
         'comment'
     ];
+
+    private \stdClass $payload;
+
+    public function __construct(array $requestPathParams = [])
+    {
+        parent::__construct($requestPathParams);
+    }
 
     /**
      * Sanitizes a given string by removing all HTML tags and converting special characters to HTML entities.
@@ -80,42 +95,52 @@ final class TestsHandler
      * If one path part is provided, this method returns the contents of the specified test file.
      * If more than one path part is provided, this method responds with a 400 error.
      * If the test file is not found, this method responds with a 404 error.
-     *
-     * @return string The response body, which is either the JSON index of tests or the contents of a specific test file.
      */
-    private static function handleGetRequest(): string
+    private function handleGetRequest(ResponseInterface $response): ResponseInterface
     {
-        if (count(self::$requestPathParts) === 0) {
+        if (count($this->requestPathParams) === 0) {
             try {
-                $response  = new \stdClass();
-                $testSuite = [];
-                $testFiles = new \DirectoryIterator('glob://' . JsonData::TESTS_FOLDER->path() . '/*Test.json');
+                $responseBody = new \stdClass();
+                $testSuite    = [];
+                $testFiles    = new \DirectoryIterator('glob://' . JsonData::TESTS_FOLDER->path() . '/*Test.json');
                 foreach ($testFiles as $f) {
                     $fileName     = $f->getFilename();
                     $testContents = file_get_contents(JsonData::TESTS_FOLDER->path() . "/$fileName");
                     if ($testContents === false) {
-                        return self::produceErrorResponse(StatusCode::NOT_FOUND, "Test {$fileName} was not readable");
+                        $description = "Test {$fileName} was not readable";
+                        throw new ServiceUnavailableException($description);
                     }
                     $testSuite[] = json_decode($testContents, true, 512, JSON_THROW_ON_ERROR);
                 }
-                $response->litcal_tests = $testSuite;
-                $jsonEncodedResponse    = json_encode($response, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
-                return $jsonEncodedResponse;
+                $responseBody->litcal_tests = $testSuite;
+                return $this->encodeResponseBody($response, $responseBody);
             } catch (\UnexpectedValueException $e) {
-                return self::produceErrorResponse(StatusCode::NOT_FOUND, 'Tests folder path cannot be opened: ' . $e->getMessage());
+                throw new ServiceUnavailableException(
+                    $description = 'Tests folder path cannot be opened: ' . $e->getMessage(),
+                    $e
+                );
             }
-        } elseif (count(self::$requestPathParts) > 1) {
-            return self::produceErrorResponse(StatusCode::BAD_REQUEST, 'Too many path parameters, only one is expected');
+        } elseif (count($this->requestPathParams) > 1) {
+            $description = 'Expected one path param for GET requests, received ' . count($this->requestPathParams);
+            throw new ValidationException($description);
         } else {
-            $testFile = array_shift(self::$requestPathParts);
+            $testFile = array_shift($this->requestPathParams);
             if (file_exists(JsonData::TESTS_FOLDER->path() . "/{$testFile}.json")) {
                 $testContents = file_get_contents(JsonData::TESTS_FOLDER->path() . "/{$testFile}.json");
                 if ($testContents === false) {
-                    return self::produceErrorResponse(StatusCode::NOT_FOUND, "Test {$testFile} was not readable");
+                    $description = "Test {$testFile} was not readable";
+                    throw new ServiceUnavailableException($description);
                 }
-                return $testContents;
+                if ($response->getHeaderLine('Content-Type') === AcceptHeader::JSON->value) {
+                    return $response
+                        ->withStatus(StatusCode::OK->value, StatusCode::OK->reason())
+                        ->withBody(Stream::create($testContents));
+                } else {
+                    return $this->encodeResponseBody($response, json_decode($testContents, true, 512, JSON_THROW_ON_ERROR));
+                }
             } else {
-                return self::produceErrorResponse(StatusCode::NOT_FOUND, "Test {$testFile} not found");
+                $description = "Test {$testFile} not found";
+                throw new NotFoundException($description);
             }
         }
     }
@@ -129,31 +154,25 @@ final class TestsHandler
      * the resource has been deleted. If the deletion fails, it returns a 503 Service Unavailable error.
      * If the test file does not exist, it returns a 404 Not Found error. If the request does not contain
      * exactly one path parameter, it returns a 400 Bad Request error.
-     *
-     * @return string JSON response indicating the result of the delete operation.
      */
-    private static function handleDeleteRequest(): string
+    private function handleDeleteRequest(ResponseInterface $response): ResponseInterface
     {
-        if (count(self::$requestPathParts) === 1) {
-            $testName = self::$requestPathParts[0];
+        if (count($this->requestPathParams) === 1) {
+            $testName = $this->requestPathParams[0];
             if (file_exists(JsonData::TESTS_FOLDER->path() . "/{$testName}.json")) {
                 if (unlink(JsonData::TESTS_FOLDER->path() . "/{$testName}.json")) {
-                    $message             = new \stdClass();
-                    $message->status     = 'OK';
-                    $message->response   = 'Resource Deleted';
-                    $jsonEncodedResponse = json_encode($message, JSON_PRETTY_PRINT);
-                    if (JSON_ERROR_NONE !== json_last_error() || false === $jsonEncodedResponse) {
-                        throw new \ValueError('JSON error: ' . json_last_error_msg());
-                    }
-                    return $jsonEncodedResponse;
+                    return $response->withStatus(StatusCode::NO_CONTENT->value, StatusCode::NO_CONTENT->reason());
                 } else {
-                    return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "For some reason the server did not succeed in deleting the Test $testName");
+                    $description = "Test {$testName} could not be deleted";
+                    throw new ServiceUnavailableException($description);
                 }
             } else {
-                return self::produceErrorResponse(StatusCode::NOT_FOUND, "Could not find test to delete {$testName}");
+                $description = "Test {$testName} not found, cannot DELETE.";
+                throw new NotFoundException($description);
             }
         } else {
-            return self::produceErrorResponse(StatusCode::BAD_REQUEST, 'Cannot process a DELETE request without one and only one path parameter containing the name of the Test to delete');
+            $description = 'Expected one and only one path param for DELETE requests, received ' . count($this->requestPathParams) . '.';
+            throw new ValidationException($description);
         }
     }
 
@@ -166,176 +185,108 @@ final class TestsHandler
      * object to disk as a file in the tests directory. If the write fails, it returns a 503 Service Unavailable
      * error response. If the write succeeds, it returns a 201 Created response with a JSON object indicating
      * the resource has been created or updated.
-     *
-     * @return string JSON response indicating the result of the create or update operation.
      */
-    private static function handlePutRequest(): string
+    private function handlePutRequest(ResponseInterface $response): ResponseInterface
     {
-        if (count(self::$requestPathParts)) {
-            return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'Path parameters not acceptable, please use the base path `/tests` for PUT or PATCH requests');
-        }
-        $rawJsonBody = file_get_contents('php://input');
-        if ($rawJsonBody === false) {
-            return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'Could not read the body of the request.');
-        }
-
-        $data = json_decode($rawJsonBody);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'The Unit Test you are attempting to create was not valid JSON:' . json_last_error_msg());
+        if (count($this->requestPathParams)) {
+            $description = 'Expected no path params for PUT requests, received ' . count($this->requestPathParams) . '. Please use the base /tests endpoint for PUT requests.';
+            throw new ValidationException($description);
         }
 
         // Validate incoming data against unit test schema
         $schemaFile     = JsonData::SCHEMAS_FOLDER->path() . '/LitCalTest.json';
-        $schemaContents = file_get_contents($schemaFile);
-        if ($schemaContents === false) {
-            return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'The Unit Test schema was not readable: ' . $schemaFile);
-        }
-        $jsonSchema = json_decode($schemaContents);
-
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'The server errored out while attempting to process your request; this a server error, not an error in the request. Please report the incident to the system administrator:' . json_last_error_msg());
-        }
+        $schemaContents = Utilities::rawContentsFromFile($schemaFile);
+        $jsonSchema     = json_decode($schemaContents, null, 512, JSON_THROW_ON_ERROR);
 
         try {
             $schema = Schema::import($jsonSchema);
-            $schema->in($data);
+            $schema->in($this->payload);
         } catch (InvalidValue | \Exception $e) {
-            return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'The Unit Test you are attempting to create was incorrectly validated against schema ' . $schemaFile . ': ' . $e->getMessage());
+            $description = 'The Unit Test you are attempting to create was incorrectly validated against schema ' . $schemaFile . ': ' . $e->getMessage();
+            throw new ValidationException($description);
         }
 
         // Sanitize data to avoid any possibility of script injection
-        if (false === $data instanceof \stdClass) {
-            return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'The Unit Test you are attempting to create must be an object.');
-        } else {
-            self::sanitizeObjectValues($data);
-        }
+        self::sanitizeObjectValues($data);
 
         if (false === property_exists($data, 'name') || false === is_string($data->name)) {
-            return self::produceErrorResponse(StatusCode::UNPROCESSABLE_CONTENT, 'The Unit Test you are attempting to create must have a valid name.');
+            $description = 'The Unit Test you are attempting to create must have a valid name.';
+            throw new UnprocessableContentException($description);
         }
-        $bytesWritten = file_put_contents(JsonData::TESTS_FOLDER->path() . '/' . $data->name . '.json', json_encode($data, JSON_PRETTY_PRINT));
+
+        $testFilePath = JsonData::TESTS_FOLDER->path() . '/' . $data->name . '.json';
+        if (file_exists($testFilePath)) {
+            $description = 'A Unit Test with the name ' . $data->name . ' already exists. Did you perhaps mean to use a PATCH request?';
+            throw new UnprocessableContentException($description);
+        }
+
+        $jsonEncodedTest = json_encode($data, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
+        $bytesWritten    = file_put_contents($testFilePath, $jsonEncodedTest);
         if (false === $bytesWritten) {
-            return self::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.');
+            $description = 'The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.';
+            throw new ServiceUnavailableException($description);
         } else {
-            $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1';
-            header($serverProtocol . ' 201 Created', true, 201);
-            $message             = new \stdClass();
-            $message->status     = 'OK';
-            $message->response   = self::$Core->getRequestMethod() === RequestMethod::PUT ? 'Resource Created' : 'Resource Updated';
-            $jsonEncodedResponse = json_encode($message, JSON_PRETTY_PRINT);
-            if (JSON_ERROR_NONE !== json_last_error() || false === $jsonEncodedResponse) {
-                throw new \ValueError('JSON error: ' . json_last_error_msg());
-            }
-            return $jsonEncodedResponse;
+            return $response->withStatus(StatusCode::CREATED->value, StatusCode::CREATED->reason());
         }
     }
 
     /**
-     * Handles the request for this endpoint.
+     * Handles PUT requests for creating or updating a specific test.
      *
-     * Depending on the request method, one of the following methods will be called to handle the request:
-     * - GET: LiturgicalCalendar\Api\Handlers.Tests.handleGetRequest
-     * - PUT|PATCH: LiturgicalCalendar\Api\Handlers.Tests.handlePutRequest
-     * - DELETE: LiturgicalCalendar\Api\Handlers.Tests.handleDeleteRequest
-     * - OPTIONS: handled by the LiturgicalCalendar\Core class
-     * - any other method: will return a 405 Method Not Allowed status code
-     *
-     * @return never
+     * This method expects no path parameters. The request body is expected to contain a JSON object
+     * which is validated against the LitCalTest JSON schema. If the validation fails, it returns a 422
+     * Unprocessable Content error response. If the validation succeeds, it attempts to write the JSON
+     * object to disk as a file in the tests directory. If the write fails, it returns a 503 Service Unavailable
+     * error response. If the write succeeds, it returns a 201 Created response with a JSON object indicating
+     * the resource has been created or updated.
      */
-    public static function handleRequest(): never
+    private function handlePatchRequest(ResponseInterface $response): ResponseInterface
     {
-        self::$Core->init();
-        self::$Core->validateAcceptHeader(true);
-        self::$Core->setResponseContentTypeHeader();
-        $response = '';
-        switch (self::$Core->getRequestMethod()) {
-            case RequestMethod::GET:
-                $response = self::handleGetRequest();
-                break;
-            case RequestMethod::PUT:
-                $response = self::handlePutRequest();
-                break;
-            case RequestMethod::PATCH:
-                $response = self::handlePutRequest();
-                break;
-            case RequestMethod::DELETE:
-                $response = self::handleDeleteRequest();
-                break;
-            case RequestMethod::OPTIONS:
-                // nothing to do here, should be handled by Core
-                break;
-            default:
-                $serverRequestMethod = isset($_SERVER['REQUEST_METHOD']) && is_string($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : '???';
-                $response            = self::produceErrorResponse(StatusCode::METHOD_NOT_ALLOWED, 'The method ' . $serverRequestMethod . ' cannot be handled by this endpoint');
+        if (count($this->requestPathParams) !== 1) {
+            $description = 'Expected one and only one path param for PATCH requests, received ' . count($this->requestPathParams) . '.';
+            throw new ValidationException($description);
         }
-        self::produceResponse($response);
-    }
 
-    /**
-     * Produce an error response with the given HTTP status code and description.
-     *
-     * The description is a short string that should be used to give more context to the error.
-     *
-     * The function will output the error in the response format specified by the Accept header
-     * of the request (JSON or YAML) and terminate the script execution with a call to die().
-     *
-     * @param int $statusCode the HTTP status code to return
-     * @param string $description a short description of the error
-     * @return string the error response as a JSON or YAML encoded string
-     */
-    private static function produceErrorResponse(int $statusCode, string $description): string
-    {
-        $serverProtocol = isset($_SERVER['SERVER_PROTOCOL']) && is_string($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1 ';
-        header($serverProtocol . StatusCode::toString($statusCode), true, $statusCode);
-        $message         = new \stdClass();
-        $message->status = 'ERROR';
-        $statusMessage   = '';
-        switch (self::$Core->getRequestMethod()) {
-            case RequestMethod::PUT:
-                $statusMessage = 'Resource not Created';
-                break;
-            case RequestMethod::PATCH:
-                $statusMessage = 'Resource not Updated';
-                break;
-            case RequestMethod::DELETE:
-                $statusMessage = 'Resource not Deleted';
-                break;
-            default:
-                $statusMessage = 'Sorry what was it you wanted to do with this resource?';
-        }
-        $message->response    = $statusCode === 404 ? 'Resource not Found' : $statusMessage;
-        $message->description = $description;
-        $jsonEncodedResponse  = json_encode($message, JSON_PRETTY_PRINT);
-        if (JSON_ERROR_NONE !== json_last_error() || false === $jsonEncodedResponse) {
-            throw new \ValueError('JSON error: ' . json_last_error_msg());
-        }
-        return $jsonEncodedResponse;
-    }
+        // Validate incoming data against unit test schema
+        $schemaFile     = JsonData::SCHEMAS_FOLDER->path() . '/LitCalTest.json';
+        $schemaContents = Utilities::rawContentsFromFile($schemaFile);
+        $jsonSchema     = json_decode($schemaContents, null, 512, JSON_THROW_ON_ERROR);
 
-    /**
-     * Outputs the response for the /tests endpoint.
-     *
-     * Outputs the response as either JSON or YAML, depending on the value of
-     * self::$Core->getResponseContentType(). If the request method was PUT or
-     * PATCH, it also sets a 201 Created status code.
-     *
-     * @param string $response the response as a JSON encoded string
-     *
-     * @return never
-     */
-    private static function produceResponse(string $response): never
-    {
-        switch (self::$Core->getResponseContentType()) {
-            case AcceptHeader::YAML:
-                $responseObj = json_decode($response, true, 512, JSON_THROW_ON_ERROR);
-                echo yaml_emit($responseObj, YAML_UTF8_ENCODING);
-                break;
-            case AcceptHeader::JSON:
-            default:
-                echo $response;
-                break;
+        try {
+            $schema = Schema::import($jsonSchema);
+            $schema->in($this->payload);
+        } catch (InvalidValue | \Exception $e) {
+            $description = 'The Unit Test you are attempting to update was incorrectly validated against schema ' . $schemaFile . ': ' . $e->getMessage();
+            throw new ValidationException($description);
         }
-        die();
+
+        // Sanitize data to avoid any possibility of script injection
+        self::sanitizeObjectValues($data);
+
+        if (false === property_exists($data, 'name') || false === is_string($data->name)) {
+            $description = 'The Unit Test you are attempting to update must have a valid name.';
+            throw new UnprocessableContentException($description);
+        }
+
+        $testFilePath = JsonData::TESTS_FOLDER->path() . '/' . $data->name . '.json';
+        if (false === file_exists($testFilePath)) {
+            $description = 'A Unit Test with the name ' . $data->name . ' does not exist. Did you perhaps mean to use a PUT request?';
+            throw new UnprocessableContentException($description);
+        }
+
+        if ($data->name !== $this->requestPathParams[0]) {
+            $description = 'You are attempting to update the Unit Test at /tests/' . $this->requestPathParams[0] . ' with a Unit Test that has the name ' . $data->name . ' in the request body. This is not allowed.';
+            throw new UnprocessableContentException($description);
+        }
+
+        $jsonEncodedTest = json_encode($data, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
+        $bytesWritten    = file_put_contents($testFilePath, $jsonEncodedTest);
+        if (false === $bytesWritten) {
+            $description = 'The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.';
+            throw new ServiceUnavailableException($description);
+        } else {
+            return $response->withStatus(StatusCode::CREATED->value, StatusCode::CREATED->reason());
+        }
     }
 
     /**
@@ -345,11 +296,63 @@ final class TestsHandler
      * - Initialize the instance of the Core class
      * - Set the request path parts
      *
-     * @param string[] $requestPathParts the path parameters from the request
      */
-    public static function init(array $requestPathParts = []): void
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        self::$Core             = new Core();
-        self::$requestPathParts = $requestPathParts;
+        // We instantiate a Response object with minimum state
+        $response = static::initResponse($request);
+
+        $method = RequestMethod::from($request->getMethod());
+
+        // OPTIONS method for CORS preflight requests is always allowed
+        if ($method === RequestMethod::OPTIONS) {
+            return $this->handlePreflightRequest($request, $response);
+        } else {
+            $response = $this->setAccessControlAllowOriginHeader($request, $response);
+        }
+
+        // For all other request methods, validate that they are supported by the endpoint
+        $this->validateRequestMethod($request);
+
+        // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint:
+        //   if set we negotiate the best Content-Type, if not set we default to the first supported by the current handler
+        switch ($method) {
+            case RequestMethod::GET:
+                $mime = $this->validateAcceptHeader($request, AcceptabilityLevel::LAX);
+                break;
+            default:
+                $mime = $this->validateAcceptHeader($request, AcceptabilityLevel::INTERMEDIATE);
+        }
+
+        $response = $response->withHeader('Content-Type', $mime);
+
+        switch ($method) {
+            case RequestMethod::GET:
+                return $this->handleGetRequest($response);
+                break;
+            case RequestMethod::PUT:
+                $payload = $this->parseBodyPayload($request);
+                if (false === $payload instanceof \stdClass) {
+                    $description = 'The Unit Test you are attempting to create must be an object. Received ' . gettype($payload) . '.';
+                    throw new UnprocessableContentException($description);
+                }
+                $this->payload = $payload;
+                return $this->handlePutRequest($response);
+                break;
+            case RequestMethod::PATCH:
+                $payload = $this->parseBodyPayload($request);
+                if (false === $payload instanceof \stdClass) {
+                    $description = 'The Unit Test you are attempting to create must be an object. Received ' . gettype($payload) . '.';
+                    throw new UnprocessableContentException($description);
+                }
+                $this->payload = $payload;
+                return $this->handlePatchRequest($response);
+                break;
+            case RequestMethod::DELETE:
+                return $this->handleDeleteRequest($response);
+                break;
+            default:
+                throw new MethodNotAllowedException();
+        }
     }
 }

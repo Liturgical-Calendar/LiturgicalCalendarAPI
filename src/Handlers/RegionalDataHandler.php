@@ -13,7 +13,6 @@ use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\PathCategory;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
-use LiturgicalCalendar\Api\Http\Exception\ApiException;
 use LiturgicalCalendar\Api\Http\Exception\ImplementationException;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
@@ -1092,11 +1091,9 @@ final class RegionalDataHandler extends AbstractHandler
             $schema->in($data);
             return true;
         } catch (InvalidValue | \Exception $e) {
-            throw new ApiException(
-                LitSchema::ERROR_MESSAGES[$schemaUrl],
-                StatusCode::UNPROCESSABLE_CONTENT->value,
-                'https://www.rfc-editor.org/rfc/rfc9110.html#name-422-unprocessable-content',
-                StatusCode::UNPROCESSABLE_CONTENT->reason(),
+            $litSchema = LitSchema::fromURL($schemaUrl);
+            throw new UnprocessableContentException(
+                $litSchema->error(),
                 $e
             );
         }
@@ -1442,19 +1439,19 @@ final class RegionalDataHandler extends AbstractHandler
             $payload = $this->parseBodyPayload($request);
             switch ($params['category']) {
                 case PathCategory::DIOCESE:
-                    if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::DIOCESAN)) {
+                    if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::DIOCESAN->path())) {
                         $params['payload'] = DiocesanData::fromObject($payload);
                         $key               = $params['payload']->metadata->diocese_id;
                     }
                     break;
                 case PathCategory::NATION:
-                    if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::NATIONAL)) {
+                    if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::NATIONAL->path())) {
                         $params['payload'] = NationalData::fromObject($payload);
                         $key               = $params['payload']->metadata->nation;
                     }
                     break;
                 case PathCategory::WIDERREGION:
-                    if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::WIDERREGION)) {
+                    if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::WIDERREGION->path())) {
                         $params['payload'] = WiderRegionData::fromObject($payload);
                         $key               = $params['payload']->metadata->wider_region;
                     }
