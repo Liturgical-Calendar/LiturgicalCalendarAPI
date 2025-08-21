@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # Ubuntu <priest@johnromanodorazio.com>, 2021.
 # John R. D'Orazio <priest@johnromanodorazio.com>, 2022, 2023.
-# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024.
+# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024, 2025.
 # Weblate Admin <admin@example.com>, 2024.
 # OpenAI <noreply-mt-openai@weblate.org>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-08-10 03:13+0000\n"
-"PO-Revision-Date: 2024-12-06 23:24+0000\n"
+"PO-Revision-Date: 2025-08-22 19:55+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/it/>\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.8.4\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:32
@@ -50,7 +50,7 @@ msgstr "rosa"
 #. translators: context = liturgical color: unsupported value
 #: src/Enum/LitColor.php:47
 msgid "unknown"
-msgstr ""
+msgstr "sconosciuto"
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
@@ -652,7 +652,7 @@ msgstr "Tempo Ordinario"
 #. translators: context = liturgical season: unsupported value
 #: src/Enum/LitSeason.php:46
 msgid "Unknown Season"
-msgstr ""
+msgstr "Stagione sconosciuta"
 
 #: src/Models/Calendar/LitCommons.php:195
 msgid "From the Common"
