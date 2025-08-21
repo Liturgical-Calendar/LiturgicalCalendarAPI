@@ -12,6 +12,8 @@ abstract class ApiTestCase extends TestCase
 {
     protected static bool $apiAvailable = false;
 
+    protected static ?int $transferStats = null;
+
     protected static ?Client $http = null;
 
     protected static ?CurlMultiHandler $multiHandler = null;
@@ -34,16 +36,22 @@ abstract class ApiTestCase extends TestCase
         self::$http = new Client([
             'base_uri'        => sprintf('%s://%s:%s', $_ENV['API_PROTOCOL'], $_ENV['API_HOST'], $_ENV['API_PORT']),
             'handler'         => $stack,
-            'timeout'         => 15,
+            'timeout'         => 60,
             'connect_timeout' => 5,
             'http_errors'     => false,
-            'headers'         => [ 'Connection' => 'keep-alive' ]
+            'headers'         => [ 'Connection' => 'keep-alive' ],
+            'curl'            => [ CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2_0 ]
         ]);
 
         try {
             // Simple check — adjust path if your API root needs authentication
-            $response           = self::$http->get('/');
+            $response           = self::$http->get('/', [
+                'on_stats' => function (\GuzzleHttp\TransferStats $stats) {
+                    self::$transferStats = $stats->getHandlerStat('http_version');
+                }
+            ]);
             self::$apiAvailable = $response->getStatusCode() < 500;
+            //$response           = self::$http->get('/');
         } catch (ConnectException $e) {
             self::$apiAvailable = false;
         }
@@ -56,6 +64,11 @@ abstract class ApiTestCase extends TestCase
             // but `markSkipped` only shows the message with `--debug`
             $this->fail(
                 "API is not running on {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']} — skipping integration tests. Maybe run `composer start` first?"
+            );
+        }
+        if (self::$transferStats === null) {
+            $this->fail(
+                'Expected HTTP2 transport, but got ' . ( self::$transferStats ?? 'unknown' )
             );
         }
     }

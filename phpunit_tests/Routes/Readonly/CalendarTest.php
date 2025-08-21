@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Tests\Routes\Readonly;
 
 use LiturgicalCalendar\Tests\ApiTestCase;
 use PHPUnit\Framework\Attributes\Group;
+use GuzzleHttp\Promise\EachPromise;
 
 final class CalendarTest extends ApiTestCase
 {
@@ -121,17 +122,58 @@ final class CalendarTest extends ApiTestCase
     #[Group('slow')]
     public function testGetCalendarSampleAllCalendars(): void
     {
+        $requests = [];
+
+        // Collect all requests first
         for ($year = 1970; $year < 2050; $year++) {
             foreach (self::$metadata->national_calendars_keys as $key) {
-                $response = self::$http->get("/calendar/nation/{$key}/{$year}");
-                $this->assertSame(200, $response->getStatusCode(), "Expected HTTP 200 OK for path {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}/calendar/nation/{$key}/{$year}. Response was " . $response->getBody());
-                $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), "Content-Type should be application/json for path {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}/calendar/nation/{$key}/{$year}");
+                $requests[] = [
+                    'uri'  => "/calendar/nation/{$key}/{$year}",
+                    'type' => 'national',
+                ];
             }
             foreach (self::$metadata->diocesan_calendars_keys as $key) {
-                $response = self::$http->get("/calendar/diocese/{$key}/{$year}");
-                $this->assertSame(200, $response->getStatusCode(), "Expected HTTP 200 OK for path {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}/calendar/diocese/{$key}/{$year}. Response was " . $response->getBody());
-                $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), "Content-Type should be application/json for path {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}/calendar/diocese/{$key}/{$year}");
+                $requests[] = [
+                    'uri'  => "/calendar/diocese/{$key}/{$year}",
+                    'type' => 'diocesan',
+                ];
             }
+        }
+
+        $failures = [];
+
+        // EachPromise lets you cap concurrency
+        $each = new EachPromise(
+            ( function () use ($requests) {
+                foreach ($requests as $req) {
+                    yield self::$http->getAsync($req['uri'])->then(
+                        function ($response) use ($req) {
+                            // Success assertions
+                            $this->assertSame(
+                                200,
+                                $response->getStatusCode(),
+                                "Expected HTTP 200 for {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}{$req['uri']}, got {$response->getStatusCode()}"
+                            );
+                            $this->assertStringStartsWith(
+                                'application/json',
+                                $response->getHeaderLine('Content-Type'),
+                                "Content-Type should be application/json for {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}{$req['uri']}"
+                            );
+                        },
+                        function ($reason) use ($req, &$failures) {
+                            // Capture failure
+                            $failures[] = "Request failed for {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}{$req['uri']}: {$reason}";
+                        }
+                    );
+                }
+            } )(),
+            [ 'concurrency' => 5 ] // <= number of PHP built-in server workers
+        );
+
+        $each->promise()->wait();
+
+        if ($failures) {
+            $this->fail(implode("\n", $failures));
         }
     }
 

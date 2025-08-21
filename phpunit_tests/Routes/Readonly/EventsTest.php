@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Tests\Routes\Readonly;
 
 use PHPUnit\Framework\Attributes\Group;
 use LiturgicalCalendar\Tests\ApiTestCase;
+use GuzzleHttp\Promise\EachPromise;
 
 final class EventsTest extends ApiTestCase
 {
@@ -34,6 +35,8 @@ final class EventsTest extends ApiTestCase
     #[Group('slow')]
     public function testGetEventsSampleAllPaths(): void
     {
+        $requests = [];
+
         foreach (self::$metadata->national_calendars_keys as $national_calendar_key) {
             $national_calendar_metadata = array_find(self::$metadata->national_calendars, function ($item) use ($national_calendar_key) {
                 return $item->calendar_id === $national_calendar_key;
@@ -41,15 +44,12 @@ final class EventsTest extends ApiTestCase
 
             $locales = $national_calendar_metadata->locales;
             foreach ($locales as $locale) {
-                $response = self::$http->get("/events/nation/{$national_calendar_key}", [
-                    'headers' => ['Accept-Language' => $locale]
-                ]);
-                $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
-                $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
-                $data = json_decode((string) $response->getBody());
-                $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
-                $this->assertIsObject($data, 'Response should be a JSON object');
-                $this->validateEventsObject($data, 'national_calendar', $national_calendar_key, $locale);
+                $requests[] = [
+                    'uri'    => "/events/nation/{$national_calendar_key}",
+                    'type'   => 'national_calendar',
+                    'key'    => $national_calendar_key,
+                    'locale' => $locale
+                ];
             }
         }
 
@@ -60,16 +60,47 @@ final class EventsTest extends ApiTestCase
 
             $locales = $diocesan_calendar_metadata->locales;
             foreach ($locales as $locale) {
-                $response = self::$http->get("/events/diocese/{$diocesan_calendar_key}", [
-                    'headers' => ['Accept-Language' => $locale]
-                ]);
-                $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
-                $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
-                $data = json_decode((string) $response->getBody());
-                $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
-                $this->assertIsObject($data, 'Response should be a JSON object');
-                $this->validateEventsObject($data, 'diocesan_calendar', $diocesan_calendar_key, $locale);
+                $requests[] = [
+                    'uri'    => "/events/diocese/{$national_calendar_key}",
+                    'type'   => 'diocesan_calendar',
+                    'key'    => $diocesan_calendar_key,
+                    'locale' => $locale
+                ];
             }
+        }
+
+        $failures = [];
+
+        // EachPromise lets you cap concurrency
+        $each = new EachPromise(
+            ( function () use ($requests) {
+                foreach ($requests as $req) {
+                    yield self::$http->getAsync($req['uri'], [
+                        'headers' => ['Accept-Language' => $req['locale']]
+                    ])->then(
+                        function ($response) use ($req) {
+                            // Success assertions
+                            $this->assertSame(200, $response->getStatusCode(), "Expected HTTP 200 OK for {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}{$req['uri']} with locale {$req['locale']}");
+                            $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), "Content-Type should be application/json for {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}{$req['uri']} with locale {$req['locale']}");
+                            $data = json_decode((string) $response->getBody());
+                            $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
+                            $this->assertIsObject($data, 'Response should be a JSON object');
+                            $this->validateEventsObject($data, $req['type'], $req['key'], $req['locale']);
+                        },
+                        function ($reason) use ($req, &$failures) {
+                            // Capture failure
+                            $failures[] = "Request failed for {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}{$req['uri']} with locale {$req['locale']}: {$reason}";
+                        }
+                    );
+                }
+            } )(),
+            [ 'concurrency' => 5 ] // <= number of PHP built-in server workers
+        );
+
+        $each->promise()->wait();
+
+        if ($failures) {
+            $this->fail(implode("\n", $failures));
         }
     }
 
