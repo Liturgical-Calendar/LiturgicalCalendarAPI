@@ -19,7 +19,7 @@ class RouterTest extends TestCase
         ApiRouter::getApiPaths();
 
         // Assert resulting URL
-        $this->assertEquals('http://localhost:8000/', ApiRouter::$apiPath);
+        $this->assertEquals('http://localhost:8000', ApiRouter::$apiPath);
 
         // Override environment variables
         putenv('API_PROTOCOL=https');
