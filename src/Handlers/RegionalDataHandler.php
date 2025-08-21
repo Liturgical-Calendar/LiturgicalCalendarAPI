@@ -1374,6 +1374,8 @@ final class RegionalDataHandler extends AbstractHandler
         // OPTIONS method for CORS preflight requests is always allowed
         if ($method === RequestMethod::OPTIONS) {
             return $this->handlePreflightRequest($request, $response);
+        } else {
+            $response = $this->setAccessControlAllowOriginHeader($request, $response);
         }
 
         // For all other request methods, validate that they are supported by the endpoint
