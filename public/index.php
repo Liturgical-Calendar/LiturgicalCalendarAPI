@@ -47,11 +47,11 @@ require_once $projectFolder . '/vendor/autoload.php';
 use LiturgicalCalendar\Api\Router;
 use Dotenv\Dotenv;
 
-$dotenv = Dotenv::createImmutable($projectFolder, ['.env', '.env.local', '.env.development', '.env.production'], false);
+$dotenv = Dotenv::createMutable($projectFolder, ['.env', '.env.local', '.env.development', '.env.production'], false);
 $dotenv->ifPresent(['API_PROTOCOL', 'API_HOST'])->notEmpty();
 $dotenv->ifPresent(['API_PORT'])->isInteger();
 $dotenv->ifPresent(['APP_ENV'])->notEmpty()->allowedValues(['development', 'production']);
-$dotenv->safeLoad();
+$dotenv->load();
 
 if (Router::isLocalhost() || isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development') {
     ini_set('display_errors', 1);

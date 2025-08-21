@@ -13,7 +13,7 @@ final class EventsTest extends ApiTestCase
 
     public function testGetEventsReturnsJson(): void
     {
-        $response = $this->http->get('/events');
+        $response = self::$http->get('/events');
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
         $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
         $data = json_decode((string) $response->getBody());
@@ -41,7 +41,7 @@ final class EventsTest extends ApiTestCase
 
             $locales = $national_calendar_metadata->locales;
             foreach ($locales as $locale) {
-                $response = $this->http->get("/events/nation/{$national_calendar_key}", [
+                $response = self::$http->get("/events/nation/{$national_calendar_key}", [
                     'headers' => ['Accept-Language' => $locale]
                 ]);
                 $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
@@ -60,7 +60,7 @@ final class EventsTest extends ApiTestCase
 
             $locales = $diocesan_calendar_metadata->locales;
             foreach ($locales as $locale) {
-                $response = $this->http->get("/events/diocese/{$diocesan_calendar_key}", [
+                $response = self::$http->get("/events/diocese/{$diocesan_calendar_key}", [
                     'headers' => ['Accept-Language' => $locale]
                 ]);
                 $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
@@ -159,7 +159,7 @@ final class EventsTest extends ApiTestCase
 
         if (false === isset(self::$metadata)) {
             try {
-                $response = $this->http->get('/calendars', [
+                $response = self::$http->get('/calendars', [
                     'http_errors'    => true,
                     'connect_errors' => true
                 ]);

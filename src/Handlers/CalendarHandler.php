@@ -25,6 +25,7 @@ use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
+use LiturgicalCalendar\Api\Http\Exception\ImplementationException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Exception\YamlException;
@@ -70,6 +71,7 @@ use LiturgicalCalendar\Api\Params\CalendarParams;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Sabre\Xml\Service;
 
 /**
  * Calendar request handler
@@ -733,7 +735,7 @@ final class CalendarHandler extends AbstractHandler
     private function createPropriumDeTemporeLiturgicalEventByKey(?string $key = null): LiturgicalEvent
     {
         if (null === $key || false === $this->PropriumDeTempore->offsetExists($key)) {
-            die("createPropriumDeTemporeLiturgicalEventByKey requires a key from the Proprium de Tempore, instead got $key");
+            throw new ServiceUnavailableException("createPropriumDeTemporeLiturgicalEventByKey requires a key from the Proprium de Tempore, instead got $key");
         }
         $event = LiturgicalEvent::fromObject($this->PropriumDeTempore[$key]);
         $this->Cal->addLiturgicalEvent($key, $event);
@@ -3842,7 +3844,7 @@ final class CalendarHandler extends AbstractHandler
                                 : $this->dayAndMonth->format($oldDate->format('U'))
                             );
                     } else {
-                        die("this is strange, {$event_key} is not suppressed? Where is it?");
+                        throw new ServiceUnavailableException("This is strange, {$event_key} is not suppressed? Where is it?");
                     }
                 }
             }
@@ -4448,6 +4450,9 @@ final class CalendarHandler extends AbstractHandler
                 $responseBody = $dom->saveXML();
                 break;
             case ReturnTypeParam::YAML:
+                if (!extension_loaded('yaml')) {
+                    throw new ImplementationException('YAML extension not loaded');
+                }
                 $jsonArr = Utilities::objectToArray($SerializeableLitCal);
                 set_error_handler([static::class, 'warningHandler'], E_WARNING);
                 try {
@@ -4485,19 +4490,22 @@ final class CalendarHandler extends AbstractHandler
 
         // write the response body to the cache file
         if (false === Router::isLocalhost()) {
-            file_put_contents($this->CacheFile, $responseBody);
+            $bytes = @file_put_contents($this->CacheFile, $responseBody, LOCK_EX);
+            if (false === $bytes) {
+                throw new ServiceUnavailableException(sprintf('Could not write cache file: %s.', $this->CacheFile));
+            }
         }
 
-        $responseHash = md5($responseBody);
-
+        $responseHash  = md5($responseBody);
+        $etag          = '"' . $responseHash . '"';
         $this->endTime = hrtime(true);
         $executionTime = $this->endTime - $this->startTime;
         $response      = $response->withHeader('X-LitCal-Starttime', $this->startTime . '')
                                   ->withHeader('X-LitCal-Endtime', $this->endTime . '')
                                   ->withHeader('X-LitCal-Executiontime', $executionTime . '')
-                                  ->withHeader('Etag', "\"{$responseHash}\"");
+                                  ->withHeader('Etag', $etag);
 
-        if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
+        if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH'], " \t\"") === $responseHash) {
             return $response->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
                                  ->withHeader('Content-Length', '0')
                                  ->withHeader('X-LitCal-Generated', 'ClientCache');
@@ -4812,13 +4820,13 @@ final class CalendarHandler extends AbstractHandler
             $ical .= 'UID:' . md5('LITCAL-' . $liturgicalEvent->event_key . '-' . $liturgicalEvent->date->format('Y')) . "\r\n";
             $ical .= 'CREATED:' . str_replace(':', '', str_replace('-', '', $publishDate)) . "\r\n";
 
-            $desc  = 'DESCRIPTION:' . str_replace(',', '\,', $description);
+            $desc  = 'DESCRIPTION:' . self::escapeIcal($description);
             $ical .= strlen($desc) > 75 ? rtrim(chunk_split($desc, 71, "\r\n\t")) . "\r\n" : "$desc\r\n";
             $ical .= 'LAST-MODIFIED:' . str_replace(':', '', str_replace('-', '', $publishDate)) . "\r\n";
 
             $normalizedLocale = str_replace('_', '-', $this->CalendarParams->Locale);
             $summaryLang      = ';LANGUAGE=' . $normalizedLocale;
-            $summary          = 'SUMMARY' . $summaryLang . ':' . str_replace(',', '\,', str_replace("\r\n", ' ', $liturgicalEvent->name));
+            $summary          = 'SUMMARY' . $summaryLang . ':' . self::escapeIcal(str_replace("\r\n", ' ', $liturgicalEvent->name));
 
             $ical .= strlen($summary) > 75 ? rtrim(chunk_split($summary, 75, "\r\n\t")) . "\r\n" : $summary . "\r\n";
             $ical .= "TRANSP:TRANSPARENT\r\n";
@@ -4856,14 +4864,10 @@ final class CalendarHandler extends AbstractHandler
         // Keep track of a few useful header values
         /** @var array<string,string> */
         $usefulHeaders = [];
-        foreach (getallheaders() as $header => $value) {
-            if (in_array($header, self::ONLY_USEFUL_HEADERS)) {
-                if (false === is_string($value)) {
-                    assert(is_bool($value) || is_float($value) || is_int($value) || is_resource($value) || is_null($value));
-                    $value = strval($value);
-                }
-                /** @var string $header */
-                $usefulHeaders[$header] = $value;
+        $allowed       = array_map('strtolower', self::ONLY_USEFUL_HEADERS);
+        foreach ($request->getHeaders() as $header => $values) {
+            if (in_array(strtolower($header), $allowed, true)) {
+                $usefulHeaders[$header] = implode(', ', $values);
             }
         }
         $this->requestHeaders = $usefulHeaders;
@@ -4951,15 +4955,16 @@ final class CalendarHandler extends AbstractHandler
             //  or even better, make the client use it's own cache copy!
             $responseBody  = Utilities::rawContentsFromFile($this->CacheFile);
             $responseHash  = md5($responseBody);
+            $etag          = '"' . $responseHash . '"';
             $this->endTime = hrtime(true);
             $executionTime = $this->endTime - $this->startTime;
             $response      = $response
                 ->withHeader('X-LitCal-Starttime', $this->startTime . '')
                 ->withHeader('X-LitCal-Endtime', $this->endTime . '')
                 ->withHeader('X-LitCal-Executiontime', $executionTime . '')
-                ->withHeader('Etag', "\"{$responseHash}\"");
+                ->withHeader('Etag', $etag);
 
-            if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
+            if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH'], " \t\"") === $responseHash) {
                 return $response
                     ->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
                     ->withHeader('Content-Length', '0')
@@ -5046,5 +5051,14 @@ final class CalendarHandler extends AbstractHandler
         }
 
         return $response;
+    }
+
+    private static function escapeIcal(string $s): string
+    {
+        return preg_replace("/\r\n|\r|\n/", '\\n', strtr($s, [
+            '\\' => '\\\\',
+            ';'  => '\;',
+            ','  => '\,',
+        ]));
     }
 }

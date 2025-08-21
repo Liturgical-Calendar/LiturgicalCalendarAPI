@@ -88,8 +88,15 @@ class RegionalDataParams implements ParamsInterface
 
         if (array_key_exists('locale', $params)) {
             $locale = \Locale::canonicalize($params['locale']);
-            if ($locale && LitLocale::isValid($locale)) {
+            if (null === $locale) {
+                $description = "Invalid value {$params['locale']} for param `locale`";
+                throw new ValidationException($description);
+            }
+            if (LitLocale::isValid($locale)) {
                 $this->locale = $locale;
+            } else {
+                $description = "Invalid value {$params['locale']} for param `locale`, valid values are: la, la_VA, " . implode(', ', LitLocale::$AllAvailableLocales);
+                throw new ValidationException($description);
             }
         }
     }

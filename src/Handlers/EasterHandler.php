@@ -241,8 +241,12 @@ final class EasterHandler extends AbstractHandler
         $this->setLocale();
         $this->calculateEasterDates();
 
-        $response     = $this->encodeResponseBody($response, self::$EasterDates);
-        $body         = $response->getBody();
+        $response = $this->encodeResponseBody($response, self::$EasterDates);
+        $body     = $response->getBody();
+
+        if ($body->isSeekable()) {
+            $body->rewind();
+        }
         $contents     = $body->getContents();
         $responseHash = md5($contents);
         $response     = $response->withHeader('ETag', "\"{$responseHash}\"");

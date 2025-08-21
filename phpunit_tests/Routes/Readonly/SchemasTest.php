@@ -10,7 +10,7 @@ final class SchemasTest extends ApiTestCase
 {
     public function testGetSchemasReturnsJson(): void
     {
-        $response = $this->http->get('/schemas');
+        $response = self::$http->get('/schemas');
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
         $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
@@ -31,7 +31,7 @@ final class SchemasTest extends ApiTestCase
         foreach ($data->litcal_schemas as $schema) {
             $this->assertIsString($schema, 'Schema should be a string');
             $this->assertMatchesRegularExpression($regex, $schema, 'Schema should be a valid URL');
-            $response = $this->http->get($schema);
+            $response = self::$http->get($schema);
             $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
             $data = json_decode((string) $response->getBody());
             $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
@@ -50,7 +50,7 @@ final class SchemasTest extends ApiTestCase
 
     public function testPostSchemasReturnsJson(): void
     {
-        $response = $this->http->post('/schemas');
+        $response = self::$http->post('/schemas');
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
         $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
@@ -67,7 +67,7 @@ final class SchemasTest extends ApiTestCase
             $this->markTestSkipped('YAML extension is not installed');
         }
 
-        $response = $this->http->get('/schemas', [
+        $response = self::$http->get('/schemas', [
             'headers' => ['Accept' => 'application/yaml']
         ]);
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
@@ -76,19 +76,19 @@ final class SchemasTest extends ApiTestCase
 
     public function testPutSchemasReturnsError(): void
     {
-        $response = $this->http->put('/schemas');
+        $response = self::$http->put('/schemas');
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
     public function testPatchSchemasReturnsError(): void
     {
-        $response = $this->http->patch('/schemas');
+        $response = self::$http->patch('/schemas');
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
     public function testDeleteSchemasReturnsError(): void
     {
-        $response = $this->http->delete('/schemas');
+        $response = self::$http->delete('/schemas');
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 }

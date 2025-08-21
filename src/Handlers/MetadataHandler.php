@@ -81,17 +81,6 @@ final class MetadataHandler extends AbstractHandler
             throw new \RuntimeException('MetadataHandler::buildNationalCalendarData: glob failed');
         }
 
-        /*
-        header('Content-Type: application/json');
-        $nationalCalendarsFolder = JsonData::NATIONAL_CALENDARS_FOLDER->path();
-        die(json_encode([
-            'national calendars folder'        => $nationalCalendarsFolder,
-            'national calendars folder exists' => is_dir($nationalCalendarsFolder),
-            'national calendars folderGlob'    => $folderGlob,
-            'cwd' => getcwd()
-        ]));
-        */
-
         /** @var string[] $countryISOs */
         $countryISOs = array_map('basename', $folderGlob);
         foreach ($countryISOs as $countryISO) {
@@ -232,7 +221,7 @@ final class MetadataHandler extends AbstractHandler
     {
         // Since we can't actually request the General Roman Calendar for locales that are not fully translated,
         // we remove those locales from the list of supported locales
-        $folderGlob = glob('i18n/*', GLOB_ONLYDIR);
+        $folderGlob = glob(Router::$apiFilePath . 'i18n/*', GLOB_ONLYDIR);
         if (false === $folderGlob) {
             throw new \RuntimeException('MetadataHandler::buildLocales: i18n folder glob failed');
         }
@@ -292,13 +281,15 @@ final class MetadataHandler extends AbstractHandler
 
         $responseBody = json_encode(['litcal_metadata' => self::$metadataCalendars], JSON_THROW_ON_ERROR);
         $responseHash = md5($responseBody);
-        $response     = $response->withHeader('ETag', "\"{$responseHash}\"");
+        $etag         = '"' . $responseHash . '"';
+        $response     = $response->withHeader('ETag', $etag);
 
-        if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
+        if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH'], " \t\"") === $responseHash) {
             return $response->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
                             ->withHeader('Content-Length', '0');
         } else {
-            switch ($response->getHeaderLine('Content-Type')) {
+            $contentType = explode(';', $response->getHeaderLine('Content-Type'))[0];
+            switch ($contentType) {
                 case AcceptHeader::JSON->value:
                     return $response->withStatus(StatusCode::OK->value, StatusCode::OK->reason())->withBody(Stream::create($responseBody));
                     // no break needed

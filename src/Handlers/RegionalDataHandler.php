@@ -1165,8 +1165,11 @@ final class RegionalDataHandler extends AbstractHandler
                 throw new UnprocessableContentException($description);
             }
 
-            $uniqueRegions = array_values(array_unique(array_map(fn (string $locale) => \Locale::getRegion($locale) !== '', LitLocale::$AllAvailableLocales)));
-            if (false === in_array($params->key, $uniqueRegions)) {
+            $uniqueRegions = array_values(array_unique(array_filter(
+                array_map(static fn (string $locale) => \Locale::getRegion($locale), LitLocale::$AllAvailableLocales),
+                static fn (string $r) => $r !== ''
+            )));
+            if (false === in_array($params->key, $uniqueRegions, true)) {
                 $description = "Cannot PUT National Calendar data for invalid nation ID {$params->key}. Valid nation IDs (as supported by the current server configuration) are: " . implode(', ', $uniqueRegions);
                 throw new UnprocessableContentException($description);
             }

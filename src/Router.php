@@ -382,12 +382,14 @@ class Router
          */
         if (Router::isLocalhost()) {
             $api_base_path = '/';
-            // Check if we have enough workers to handle the concurrent requests
-            $concurrentServiceWorkers = getenv('PHP_CLI_SERVER_WORKERS');
-            if (false === $concurrentServiceWorkers || (int) $concurrentServiceWorkers < 2) {
-                $pre1 = '<pre style="color:red;background-color:#EFEFEF;display:inline-block;padding: 5px;">PHP_CLI_SERVER_WORKERS</pre>';
-                $pre2 = sprintf('<pre style="color:red;background-color:#EFEFEF;display:inline-block;padding:5px;">PHP_CLI_SERVER_WORKERS=2 php -S %1$s -t public</pre>', $api_full_path);
-                die("Not enough concurrent service workers.<br>Perhaps set the {$pre1} environment variable to a value greater than 1? E.g. {$pre2}.");
+            // If we're using PHP's built-in server, check if we have enough workers to handle the concurrent requests
+            if (PHP_SAPI === 'cli-server') {
+                $concurrentServiceWorkers = getenv('PHP_CLI_SERVER_WORKERS');
+                if (false === $concurrentServiceWorkers || (int) $concurrentServiceWorkers < 2) {
+                    $pre1 = '<pre style="color:red;background-color:#EFEFEF;display:inline-block;padding: 5px;">PHP_CLI_SERVER_WORKERS</pre>';
+                    $pre2 = sprintf('<pre style="color:red;background-color:#EFEFEF;display:inline-block;padding:5px;">PHP_CLI_SERVER_WORKERS=2 php -S %1$s -t public</pre>', $api_full_path);
+                    throw new ServiceUnavailableException("Not enough concurrent service workers.<br>Perhaps set the {$pre1} environment variable to a value greater than 1? E.g. {$pre2}.");
+                }
             }
         } else {
             $api_full_path = $api_full_path . rtrim($api_base_path, '/');

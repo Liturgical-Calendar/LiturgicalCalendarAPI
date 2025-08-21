@@ -5,6 +5,7 @@ namespace LiturgicalCalendar\Api;
 use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitColor;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsMap;
 
 /**
@@ -619,18 +620,16 @@ class Utilities
      *
      * @param string $url The URL to the JSON data.
      * @return \stdClass The decoded JSON data as an object.
-     * @throws \JsonException If the URL does not exist, is not readable, contains invalid JSON, or does not contain an object.
+     * @throws ServiceUnavailableException if the URL does not exist or is not readable
+     * @throws \JsonException If the contents from the URL contain invalid JSON
+     * @throws ValidationException if the contents from the URL were not decoded as an object.
      */
     public static function jsonUrlToObject(string $url): \stdClass
     {
         $rawContents = self::rawContentsFromUrl($url);
-        try {
-            $jsonObj = json_decode($rawContents, false, 512, JSON_THROW_ON_ERROR);
-        } catch (\JsonException $e) {
-            die('Error decoding JSON from URL `' . $url . '`: ' . $e->getMessage() . '; ' . $rawContents);
-        }
+        $jsonObj     = json_decode($rawContents, false, 512, JSON_THROW_ON_ERROR);
         if (false === $jsonObj instanceof \stdClass) {
-            throw new \JsonException('JSON URL ' . $url . ' does not contain an object');
+            throw new ValidationException('JSON URL ' . $url . ' does not contain an object');
         }
         return $jsonObj;
     }

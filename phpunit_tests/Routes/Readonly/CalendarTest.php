@@ -13,7 +13,7 @@ final class CalendarTest extends ApiTestCase
 
     public function testGetCalendarReturnsJson(): void
     {
-        $response = $this->http->get('/calendar');
+        $response = self::$http->get('/calendar');
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
         $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
@@ -28,7 +28,7 @@ final class CalendarTest extends ApiTestCase
             $this->markTestSkipped('YAML extension is not installed');
         }
 
-        $response = $this->http->get('/calendar', [
+        $response = self::$http->get('/calendar', [
             'headers' => ['Accept' => 'application/yaml']
         ]);
         $this->assertSame(200, $response->getStatusCode());
@@ -46,7 +46,7 @@ final class CalendarTest extends ApiTestCase
 
     public function testGetCalendarReturnsIcal(): void
     {
-        $response = $this->http->get('/calendar', [
+        $response = self::$http->get('/calendar', [
             'headers' => ['Accept' => 'text/calendar']
         ]);
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
@@ -58,7 +58,7 @@ final class CalendarTest extends ApiTestCase
 
     public function testGetCalendarReturnsXML(): void
     {
-        $response = $this->http->get('/calendar', [
+        $response = self::$http->get('/calendar', [
             'headers' => ['Accept' => 'application/xml']
         ]);
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
@@ -73,7 +73,10 @@ final class CalendarTest extends ApiTestCase
             $loadResult,
             'Invalid XML' . ( !empty($errors) ? ': ' . $errors[0]->message : '' )
         );
-        $root      = ApiTestCase::findProjectRoot();
+        $root = ApiTestCase::findProjectRoot();
+        if ($root === null) {
+            $this->markTestSkipped('Project root not found (composer.json not located).');
+        }
         $xmlSchema = $root . '/jsondata/schemas/LiturgicalCalendar.xsd';
         $this->assertFileExists($xmlSchema, 'File not found: ' . $xmlSchema);
         $validationResult = $xml->schemaValidate($xmlSchema);
@@ -87,7 +90,7 @@ final class CalendarTest extends ApiTestCase
 
     public function testPostCalendarReturnsJson(): void
     {
-        $response = $this->http->post('/calendar');
+        $response = self::$http->post('/calendar');
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
         $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
@@ -99,19 +102,19 @@ final class CalendarTest extends ApiTestCase
 
     public function testPutCalendarReturnsError(): void
     {
-        $response = $this->http->put('/calendar');
+        $response = self::$http->put('/calendar');
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
     public function testPatchCalendarReturnsError(): void
     {
-        $response = $this->http->patch('/calendar');
+        $response = self::$http->patch('/calendar');
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
     public function testDeleteCalendarReturnsError(): void
     {
-        $response = $this->http->delete('/calendar');
+        $response = self::$http->delete('/calendar');
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
@@ -120,14 +123,14 @@ final class CalendarTest extends ApiTestCase
     {
         for ($year = 1970; $year < 2050; $year++) {
             foreach (self::$metadata->national_calendars_keys as $key) {
-                $response = $this->http->get("/calendar/nation/{$key}/{$year}");
-                $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
-                $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
+                $response = self::$http->get("/calendar/nation/{$key}/{$year}");
+                $this->assertSame(200, $response->getStatusCode(), "Expected HTTP 200 OK for path {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}/calendar/nation/{$key}/{$year}. Response was " . $response->getBody());
+                $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), "Content-Type should be application/json for path {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}/calendar/nation/{$key}/{$year}");
             }
             foreach (self::$metadata->diocesan_calendars_keys as $key) {
-                $response = $this->http->get("/calendar/diocese/{$key}/{$year}");
-                $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
-                $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
+                $response = self::$http->get("/calendar/diocese/{$key}/{$year}");
+                $this->assertSame(200, $response->getStatusCode(), "Expected HTTP 200 OK for path {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}/calendar/diocese/{$key}/{$year}. Response was " . $response->getBody());
+                $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), "Content-Type should be application/json for path {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}/calendar/diocese/{$key}/{$year}");
             }
         }
     }
@@ -179,9 +182,8 @@ final class CalendarTest extends ApiTestCase
 
         if (false === isset(self::$metadata)) {
             try {
-                $response       = $this->http->get('/calendars', [
-                    'http_errors'    => true,
-                    'connect_errors' => true
+                $response       = self::$http->get('/calendars', [
+                    'http_errors' => true
                 ]);
                 $data           = json_decode((string) $response->getBody(), false, 512, JSON_THROW_ON_ERROR);
                 self::$metadata = $data->litcal_metadata;

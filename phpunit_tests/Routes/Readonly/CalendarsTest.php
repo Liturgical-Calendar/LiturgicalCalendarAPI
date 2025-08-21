@@ -8,19 +8,19 @@ use LiturgicalCalendar\Tests\ApiTestCase;
 
 final class CalendarsTest extends ApiTestCase
 {
-    private static array $diocesesLatinRiteByNation;
-    private static array $dioceseIDs;
-    private const REGION_PATTERN       = '/^[A-Z]{2}$/';
-    private const LOCALE_PATTERN       = '/^[a-z]{2,3}(?:_[A-Z][a-z]{3})?(?:_[A-Z]{2}|\d{3})?(?:_[A-Za-z0-9]+)*$/';
-    private const MISSAL_ID_PATTERN    = '/^[A-Z0-9_]+$/';
-    private const TIMEZONE_PATTERN     = '/^[A-Z][a-z]+\/[A-Za-z_]+$/';
-    private const WIDER_REGION_PATTERN = '/^(Europe|Africa|Asia|Oceania|Americas)$/';
+    private static array $diocesesLatinRiteByNation = [];
+    private static array $dioceseIDs                = [];
+    private const REGION_PATTERN                    = '/^[A-Z]{2}$/';
+    private const LOCALE_PATTERN                    = '/^[a-z]{2,3}(?:_[A-Z][a-z]{3})?(?:_[A-Z]{2}|\d{3})?(?:_[A-Za-z0-9]+)*$/';
+    private const MISSAL_ID_PATTERN                 = '/^[A-Z0-9_]+$/';
+    private const TIMEZONE_PATTERN                  = '/^[A-Z][a-z]+\/[A-Za-z_]+$/';
+    private const WIDER_REGION_PATTERN              = '/^(Europe|Africa|Asia|Oceania|Americas)$/';
 
-    private static string $WIDER_REGION_API_PATH_PATTERN;
+    private static string $WIDER_REGION_API_PATH_PATTERN = '';
 
     public function testGetCalendarsReturnsJson(): void
     {
-        $response = $this->http->get('/calendars');
+        $response = self::$http->get('/calendars');
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK, but found error: ' . $response->getBody());
         $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
@@ -36,7 +36,7 @@ final class CalendarsTest extends ApiTestCase
             $this->markTestSkipped('YAML extension is not installed');
         }
 
-        $response = $this->http->get('/calendars', [
+        $response = self::$http->get('/calendars', [
             'headers' => ['Accept' => 'application/yaml'],
         ]);
 
@@ -57,7 +57,7 @@ final class CalendarsTest extends ApiTestCase
 
     public function testPostCalendarsReturnsJson(): void
     {
-        $response = $this->http->post('/calendars');
+        $response = self::$http->post('/calendars');
 
         // Assert status code
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
@@ -71,19 +71,19 @@ final class CalendarsTest extends ApiTestCase
 
     public function testPutCalendarsReturnsError(): void
     {
-        $response = $this->http->put('/calendars');
+        $response = self::$http->put('/calendars');
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
     public function testPatchCalendarsReturnsError(): void
     {
-        $response = $this->http->patch('/calendars');
+        $response = self::$http->patch('/calendars');
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
     public function testDeleteCalendarsReturnsError(): void
     {
-        $response = $this->http->delete('/calendars');
+        $response = self::$http->delete('/calendars');
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
@@ -323,7 +323,7 @@ final class CalendarsTest extends ApiTestCase
         parent::setUp();
 
         // Only load the data once
-        if (false === isset(self::$diocesesLatinRiteByNation)) {
+        if (empty(self::$diocesesLatinRiteByNation)) {
             $root     = ApiTestCase::findProjectRoot();
             $filePath = $root . '/jsondata/world_dioceses.json';
 
