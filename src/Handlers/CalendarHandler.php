@@ -4505,7 +4505,12 @@ final class CalendarHandler extends AbstractHandler
                                   ->withHeader('X-LitCal-Executiontime', $executionTime . '')
                                   ->withHeader('Etag', $etag);
 
-        if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH'], " \t\"") === $responseHash) {
+        if (
+            isset($_SERVER['HTTP_IF_NONE_MATCH'])
+            && is_string($_SERVER['HTTP_IF_NONE_MATCH'])
+            && !empty($_SERVER['HTTP_IF_NONE_MATCH'])
+            && trim($_SERVER['HTTP_IF_NONE_MATCH'], " \t\"") === $responseHash
+        ) {
             return $response->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
                                  ->withHeader('Content-Length', '0')
                                  ->withHeader('X-LitCal-Generated', 'ClientCache');
@@ -4865,7 +4870,9 @@ final class CalendarHandler extends AbstractHandler
         /** @var array<string,string> */
         $usefulHeaders = [];
         $allowed       = array_map('strtolower', self::ONLY_USEFUL_HEADERS);
-        foreach ($request->getHeaders() as $header => $values) {
+        /** @var array<string, string[]> $headers */
+        $headers = $request->getHeaders();
+        foreach ($headers as $header => $values) {
             if (in_array(strtolower($header), $allowed, true)) {
                 $usefulHeaders[$header] = implode(', ', $values);
             }
@@ -4964,7 +4971,12 @@ final class CalendarHandler extends AbstractHandler
                 ->withHeader('X-LitCal-Executiontime', $executionTime . '')
                 ->withHeader('Etag', $etag);
 
-            if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH'], " \t\"") === $responseHash) {
+            if (
+                isset($_SERVER['HTTP_IF_NONE_MATCH'])
+                && is_string($_SERVER['HTTP_IF_NONE_MATCH'])
+                && !empty($_SERVER['HTTP_IF_NONE_MATCH'])
+                && trim($_SERVER['HTTP_IF_NONE_MATCH'], " \t\"") === $responseHash
+            ) {
                 return $response
                     ->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
                     ->withHeader('Content-Length', '0')
@@ -5055,10 +5067,14 @@ final class CalendarHandler extends AbstractHandler
 
     private static function escapeIcal(string $s): string
     {
-        return preg_replace("/\r\n|\r|\n/", '\\n', strtr($s, [
+        $escaped = preg_replace("/\r\n|\r|\n/", '\\n', strtr($s, [
             '\\' => '\\\\',
             ';'  => '\;',
             ','  => '\,',
         ]));
+        if (null === $escaped) {
+            throw new ServiceUnavailableException('Unable to escape string: ' . $s . ' for ICAL value');
+        }
+        return $escaped;
     }
 }

@@ -32,6 +32,7 @@ use LiturgicalCalendar\Api\Utilities;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Nyholm\Psr7\Stream;
+use Sabre\Xml\Service;
 
 /**
  * Handles the `/data` path of the API
@@ -1166,8 +1167,14 @@ final class RegionalDataHandler extends AbstractHandler
             }
 
             $uniqueRegions = array_values(array_unique(array_filter(
-                array_map(static fn (string $locale) => \Locale::getRegion($locale), LitLocale::$AllAvailableLocales),
-                static fn (string $r) => $r !== ''
+                array_map(static function (string $locale): string {
+                    $region = \Locale::getRegion($locale);
+                    if (null === $region) {
+                        throw new ServiceUnavailableException('Unable to determine region for locale ' . $locale);
+                    }
+                    return $region;
+                }, LitLocale::$AllAvailableLocales),
+                static fn (string $r): bool => $r !== ''
             )));
             if (false === in_array($params->key, $uniqueRegions, true)) {
                 $description = "Cannot PUT National Calendar data for invalid nation ID {$params->key}. Valid nation IDs (as supported by the current server configuration) are: " . implode(', ', $uniqueRegions);

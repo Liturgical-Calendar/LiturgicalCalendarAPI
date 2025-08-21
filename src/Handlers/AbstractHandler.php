@@ -63,14 +63,6 @@ abstract class AbstractHandler implements RequestHandlerInterface
     /**
      * Set the allowed origins to restrict access to the API.
      *
-     * This function can read the allowed origins from a file that defines the
-     * ALLOWED_ORIGINS constant as an array of strings. If the file is not
-     * provided, the function will use the provided array of origins.
-     *
-     * If the file is provided, the function will merge the provided array of
-     * origins with the ones defined in the file. If the provided array is null,
-     * the function will use the array from the file.
-     *
      * @param string[] $origins The array of allowed origins.
      */
     public function setAllowedOrigins(array $origins): static
