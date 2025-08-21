@@ -60,7 +60,9 @@
         "test": "phpunit --testdox --display-warnings",
         "test:quick": "phpunit --testdox --display-warnings --exclude-group slow",
         "start": "./start-server.sh",
-        "stop": "./stop-server.sh"
+        "stop": "./stop-server.sh",
+        "ws:start": "./ws-start-server.sh",
+        "ws:stop": "./ws-stop-server.sh"
     },
     "config": {
         "allow-plugins": {

@@ -175,7 +175,7 @@ class Health implements MessageComponentInterface
     {
         /** @var int $resourceId */
         $resourceId = $from->resourceId;
-        echo sprintf('Receiving message from connection %d: %s', $resourceId, $msg);
+        echo sprintf('Receiving message from connection %d: %s', $resourceId, $msg . "\n");
         /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest $messageReceived */
         $messageReceived = json_decode($msg);
         if (
