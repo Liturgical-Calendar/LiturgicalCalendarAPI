@@ -5,6 +5,7 @@ namespace LiturgicalCalendar\Api\Models\Decrees;
 use LiturgicalCalendar\Api\Enum\CalEventAction;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
+use LiturgicalCalendar\Api\Router;
 
 /**
  * @phpstan-type DecreeItemLiturgicalEventObject \stdClass&object{
@@ -146,7 +147,7 @@ final class DecreeItem extends AbstractJsonSrcData
                 throw new \ValueError('metadata.action must be one of `createNew`, `setProperty` or `makeDoctor`'); //`moveEvent`,
         }
 
-        $this->api_path = API_BASE_PATH . Route::DECREES->value . '/' . $this->decree_id;
+        $this->api_path = Router::$apiPath . Route::DECREES->value . '/' . $this->decree_id;
     }
 
     /**

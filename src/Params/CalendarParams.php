@@ -2,21 +2,20 @@
 
 namespace LiturgicalCalendar\Api\Params;
 
-use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Enum\YearType;
 use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\CorpusChristi;
 use LiturgicalCalendar\Api\Enum\LitLocale;
-use LiturgicalCalendar\Api\Enum\ReturnType;
 use LiturgicalCalendar\Api\Enum\Route;
-use LiturgicalCalendar\Api\Enum\StatusCode;
-use LiturgicalCalendar\Api\Paths\CalendarPath;
+use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Utilities;
 
 /**
- * This class is responsible for handling the parameters provided to the {@see \LiturgicalCalendar\Api\Paths\CalendarPath} class.
+ * This class is responsible for handling the parameters provided to the {@see \LiturgicalCalendar\Api\Handlers\CalendarHandler} class.
  *
  * The class is initialized with a set of parameters passed in from the API request.
  * Some parameters come from the path itself, while others come either from the URL query parameters (GET) or from the request body (POST).
@@ -45,10 +44,13 @@ class CalendarParams implements ParamsInterface
     public Ascension $Ascension           = Ascension::THURSDAY;
     public CorpusChristi $CorpusChristi   = CorpusChristi::THURSDAY;
     public bool $EternalHighPriest        = false;
-    public ?ReturnType $ReturnType        = null;
+    public ?ReturnTypeParam $ReturnType   = null;
     public ?string $NationalCalendar      = null;
     public ?string $DiocesanCalendar      = null;
     private ?MetadataCalendars $calendars = null;
+
+    /** @var ReturnTypeParam[] */
+    private array $allowedReturnTypes;
 
     public const ALLOWED_PARAMS = [
         'year',
@@ -72,85 +74,40 @@ class CalendarParams implements ParamsInterface
     //The upper limit is determined by the limit of PHP in dealing with DateTime objects
     public const YEAR_UPPER_LIMIT = 9999;
 
-    /*private static function debugWrite(string $string)
-    {
-        file_put_contents("debug.log", $string . PHP_EOL, FILE_APPEND);
-    }*/
-
-    /**
-     * Validates parameter values that are expected to be strings.
-     * Produces a 400 Bad Request error if the value is not a string
-     *
-     * @param string $key
-     * @param mixed $value
-     * @return string
-     */
-    private static function validateStringValue(string $key, mixed $value): string
-    {
-        if (gettype($value) !== 'string') {
-            $description = __METHOD__ . "Expected value of type String for parameter `{$key}`, instead found type " . gettype($value);
-            CalendarPath::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
-        }
-
-        $filteredValue = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
-        if (!$filteredValue) {
-            $description = __METHOD__ . "Could not correctly sanitize the value for parameter `{$key}`";
-            CalendarPath::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
-        }
-
-        /** @var string */
-        return $filteredValue;
-    }
 
     /**
      * Constructor for CalendarParams
      *
-     * Produces a 503 Service Unavailable error if the API was unable to load calendars metadata
-     *
-     * - Loads calendars metadata
-     * - Sets a default value for the Year parameter, defaulting to current year
-     * - Sets a default value for language starting from Accept-Language header (a `locale` parameter can then override this value)
-     * - Applies the values from $params to the corresponding properties
-     * @param CalendarParamsData $params
+     * - loads calendars metadata
+     * - sets the response status code to 503 Service Unavailable if the API was unable to load calendars metadata
      */
-    public function __construct(array $params)
+    public function __construct()
     {
-        // API_BASE_PATH should have been defined in index.php
-        if (defined('API_BASE_PATH')) {
-            $calendarsRoute = API_BASE_PATH . Route::CALENDARS->value;
-        } else {
-            $calendarsRoute = Router::determineBasePath() . Route::CALENDARS->value;
-        }
+        // First of all we need the metadata about calendars that are available on the API,
+        // in order to check parameters against those supported by each calendar,
+        // whether General Roman, or national, or diocesan
+        $this->allowedReturnTypes = ReturnTypeParam::cases();
+        $this->Year               = (int) date('Y');
+        $this->Locale             = LitLocale::LATIN;
 
-        if (Router::isLocalhost()) {
-            $concurrentServiceWorkers = getenv('PHP_CLI_SERVER_WORKERS');
-            if ((int) $concurrentServiceWorkers < 2) {
-                $server_name = isset($_SERVER['SERVER_NAME']) && is_string($_SERVER['SERVER_NAME'])
-                                ? $_SERVER['SERVER_NAME']
-                                : (
-                                    isset($_SERVER['SERVER_ADDR']) && is_string($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : 'localhost'
-                                );
-                CalendarPath::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, "The API will be unable to load calendars metadata from {$calendarsRoute}, because there are not enough concurrent service workers. Perhaps set the `PHP_CLI_SERVER_WORKERS` environment variable to a value greater than 1? E.g. `PHP_CLI_SERVER_WORKERS=2 php -S $server_name`.");
-            }
-        }
+        $calendarsRoute = Route::CALENDARS->path();
+        $metadata       = Utilities::jsonUrlToObject($calendarsRoute);
 
-        $metadata = Utilities::jsonUrlToObject($calendarsRoute);
         if (property_exists($metadata, 'litcal_metadata') && $metadata->litcal_metadata instanceof \stdClass) {
             $this->calendars = MetadataCalendars::fromObject($metadata->litcal_metadata);
         } else {
-            CalendarPath::produceErrorResponse(StatusCode::SERVICE_UNAVAILABLE, 'The API was unable to initialize calendars metadata: ' . json_last_error_msg());
+            throw new ServiceUnavailableException('Unable to load calendars metadata');
         }
+    }
 
-        $this->Year = (int) date('Y');
-
-        if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE']) && is_string($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            $value        = \Locale::acceptFromHttp($_SERVER['HTTP_ACCEPT_LANGUAGE']);
-            $this->Locale = $value && LitLocale::isValid($value) ? $value : LitLocale::LATIN;
-        } else {
-            $this->Locale = LitLocale::LATIN;
-        }
-
-        $this->setParams($params);
+    /**
+     * Sets the allowed 'return_type' parameter values for the calendar.
+     *
+     * @param ReturnTypeParam[] $allowedReturnTypes An array of allowed 'return_type' parameter values.
+     */
+    public function setAllowedReturnTypes(array $allowedReturnTypes): void
+    {
+        $this->allowedReturnTypes = $allowedReturnTypes;
     }
 
     /**
@@ -171,7 +128,7 @@ class CalendarParams implements ParamsInterface
      * All parameters are optional, and default values will be used if they are not provided.
      * @param CalendarParamsData $params an associative array of parameter keys to values
      */
-    public function setParams(array $params = []): void
+    public function setParams(array $params): void
     {
         if (count($params) === 0) {
             // If no parameters are provided, we can just return
@@ -181,7 +138,7 @@ class CalendarParams implements ParamsInterface
             if (in_array($key, self::ALLOWED_PARAMS)) {
                 if ($key !== 'year' && $key !== 'eternal_high_priest') {
                     // all other parameters expect a string value
-                    $value = CalendarParams::validateStringValue($key, $value);
+                    $value = $this->validateStringValue($key, $value);
                 }
                 switch ($key) {
                     case 'year':
@@ -191,17 +148,14 @@ class CalendarParams implements ParamsInterface
                     case 'epiphany':
                         /** @var string $value */
                         $this->validateEpiphanyParam($value);
-                        $this->Epiphany = Epiphany::from($value);
                         break;
                     case 'ascension':
                         /** @var string $value */
                         $this->validateAscensionParam($value);
-                        $this->Ascension = Ascension::from($value);
                         break;
                     case 'corpus_christi':
                         /** @var string $value */
                         $this->validateCorpusChristiParam($value);
-                        $this->CorpusChristi = CorpusChristi::from($value);
                         break;
                     case 'locale':
                         /** @var string $value */
@@ -210,7 +164,6 @@ class CalendarParams implements ParamsInterface
                     case 'return_type':
                         /** @var string $value */
                         $this->validateReturnTypeParam($value);
-                        $this->ReturnType = ReturnType::from($value);
                         break;
                     case 'national_calendar':
                         /** @var string $value */
@@ -223,7 +176,6 @@ class CalendarParams implements ParamsInterface
                     case 'year_type':
                         /** @var string $value */
                         $this->validateYearTypeParam($value);
-                        $this->YearType = YearType::from($value);
                         break;
                     case 'eternal_high_priest':
                         /** @var bool $value */
@@ -251,16 +203,14 @@ class CalendarParams implements ParamsInterface
             if (is_numeric($value) && ctype_digit($value) && strlen($value) === 4) {
                 $this->Year = (int) $value;
             } else {
-                $description = 'Year parameter is of type String, but is not a numeric String with 4 digits';
-                CalendarPath::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+                throw new ValidationException('Year parameter is of type String, but is not a numeric String with 4 digits');
             }
         } else {
             $this->Year = $value;
         }
 
         if ($this->Year < self::YEAR_LOWER_LIMIT || $this->Year > self::YEAR_UPPER_LIMIT) {
-            $description = 'Parameter `year` out of bounds, must have a value betwen ' . self::YEAR_LOWER_LIMIT . ' and ' . self::YEAR_UPPER_LIMIT;
-            CalendarPath::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+            throw new ValidationException('Parameter `year` out of bounds, must have a value betwen ' . self::YEAR_LOWER_LIMIT . ' and ' . self::YEAR_UPPER_LIMIT);
         }
     }
 
@@ -274,9 +224,9 @@ class CalendarParams implements ParamsInterface
     private function validateEpiphanyParam(string $value): void
     {
         if (false === Epiphany::isValid($value)) {
-            $description = "Invalid value `{$value}` for parameter `epiphany`, valid values are: " . implode(', ', Epiphany::values());
-            CalendarPath::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+            throw new ValidationException("Invalid value `{$value}` for parameter `epiphany`, valid values are: " . implode(', ', Epiphany::values()));
         }
+        $this->Epiphany = Epiphany::from($value);
     }
 
     /**
@@ -289,9 +239,9 @@ class CalendarParams implements ParamsInterface
     private function validateAscensionParam(string $value): void
     {
         if (false === Ascension::isValid($value)) {
-            $description = "Invalid value `{$value}` for parameter `ascension`, valid values are: " . implode(', ', Ascension::values());
-            CalendarPath::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+            throw new ValidationException("Invalid value `{$value}` for parameter `ascension`, valid values are: " . implode(', ', Ascension::values()));
         }
+        $this->Ascension = Ascension::from($value);
     }
 
     /**
@@ -299,14 +249,14 @@ class CalendarParams implements ParamsInterface
      *
      * @param string $value a string indicating whether Corpus Christi should be calculated on a Sunday or on a Thursday.
      *
-     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see \LiturgicalCalendar\Api\Enum\CorpusChristi}::values().
+     * @throws ValidationException if the value is not one of the valid values in {@see \LiturgicalCalendar\Api\Enum\CorpusChristi}::values().
      */
     private function validateCorpusChristiParam(string $value): void
     {
         if (false === CorpusChristi::isValid($value)) {
-            $description = "Invalid value `{$value}` for parameter `corpus_christi`, valid values are: " . implode(', ', CorpusChristi::values());
-            CalendarPath::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+            throw new ValidationException("Invalid value `{$value}` for parameter `corpus_christi`, valid values are: " . implode(', ', CorpusChristi::values()));
         }
+        $this->CorpusChristi = CorpusChristi::from($value);
     }
 
     /**
@@ -314,22 +264,20 @@ class CalendarParams implements ParamsInterface
      *
      * @param string $value a valid locale string that can be used to set the language of the response
      *
-     * Produces a 400 Bad Request error if the value is not a valid locale string
+     * @throws ValidationException
      */
     private function validateLocaleParam(string $value): void
     {
         $value = \Locale::canonicalize($value);
         if (null === $value) {
-            throw new \ValueError('Invalid locale string: ' . $value . '. “If they were scattered abroad into foreign tongues, it was because their intention was profane. But now, by the distribution of tongues, the impiety is dissolved and the unity of the Spirit is restored.”
+            throw new ValidationException('Invalid locale string: ' . $value . '. “If they were scattered abroad into foreign tongues, it was because their intention was profane. But now, by the distribution of tongues, the impiety is dissolved and the unity of the Spirit is restored.”
 — St. Gregory of Nazianzus, Oration 41 (On Pentecost), §11');
         }
 
-        if (LitLocale::isValid($value)) {
-            $this->Locale = $value;
-        } else {
-            $description = "Invalid value `{$value}` for parameter `locale`, valid values are: la, la_VA, " . implode(', ', LitLocale::$AllAvailableLocales);
-            CalendarPath::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+        if (false === LitLocale::isValid($value)) {
+            throw new ValidationException("Invalid value `{$value}` for parameter `locale`, valid values are: la, la_VA, " . implode(', ', LitLocale::$AllAvailableLocales));
         }
+        $this->Locale = $value;
     }
 
     /**
@@ -337,14 +285,15 @@ class CalendarParams implements ParamsInterface
      *
      * @param string $value a string indicating the desired MIME type of the Response.
      *
-     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see \LiturgicalCalendar\Api\Enum\ReturnType}::values().
+     * Produces a 400 Bad Request error if the value is not one of the valid values in {@see \LiturgicalCalendar\Api\Http\Enum\ReturnType}::values().
      */
     private function validateReturnTypeParam(string $value): void
     {
-        if (false === ReturnType::isValid($value)) {
-            $description = "Invalid value `{$value}` for parameter `return_type`, valid values are: " . implode(', ', ReturnType::values());
-            CalendarPath::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+        $allowedReturnTypeValues = array_column($this->allowedReturnTypes, 'value');
+        if (false === ReturnTypeParam::isValid($value) || false === in_array($value, $allowedReturnTypeValues, true)) {
+            throw new ValidationException("Invalid value `{$value}` for parameter `return_type`, valid values are: " . implode(', ', $allowedReturnTypeValues));
         }
+        $this->ReturnType = ReturnTypeParam::from($value);
     }
 
     /**
@@ -357,19 +306,17 @@ class CalendarParams implements ParamsInterface
     private function validateNationalCalendarParam(string $value): void
     {
         if (null === $this->calendars) {
-            throw new \ValueError('CalendarParams::$calendars is not initialized.');
+            throw new ServiceUnavailableException('Calendars metadata is not initialized.');
         }
 
         if (
-            in_array($value, $this->calendars->national_calendars_keys)
-            || $value === 'VA'
+            false === in_array($value, $this->calendars->national_calendars_keys)
+            && false === ( $value === 'VA' )
         ) {
-            $this->NationalCalendar = $value;
-        } else {
-            $validVals   = implode(', ', $this->calendars->national_calendars_keys);
-            $description = "Invalid National calendar `{$value}`, valid national calendars are: $validVals.";
-            CalendarPath::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+            $validVals = implode(', ', $this->calendars->national_calendars_keys);
+            throw new ValidationException("Invalid value `{$value}` for parameter `national_calendar`, valid values are: " . $validVals);
         }
+        $this->NationalCalendar = $value;
     }
 
     /**
@@ -382,16 +329,14 @@ class CalendarParams implements ParamsInterface
     private function validateDiocesanCalendarParam(string $value): void
     {
         if (null === $this->calendars) {
-            throw new \ValueError('CalendarParams::$calendars is not initialized.');
+            throw new ServiceUnavailableException('Calendars metadata is not initialized.');
         }
 
-        if (in_array($value, $this->calendars->diocesan_calendars_keys)) {
-            $this->DiocesanCalendar = $value;
-        } else {
-            $description = "Invalid Diocesan calendar `{$value}`, valid diocesan calendars are: "
-                . implode(', ', $this->calendars->diocesan_calendars_keys);
-            CalendarPath::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+        if (false === in_array($value, $this->calendars->diocesan_calendars_keys)) {
+            throw new ValidationException("Invalid Diocesan calendar `{$value}`, valid diocesan calendars are: "
+                . implode(', ', $this->calendars->diocesan_calendars_keys));
         }
+        $this->DiocesanCalendar = $value;
     }
 
     /**
@@ -404,9 +349,9 @@ class CalendarParams implements ParamsInterface
     private function validateYearTypeParam(string $value): void
     {
         if (false === YearType::isValid($value)) {
-            $description = "Invalid value `{$value}` for parameter `year_type`, valid values are: " . implode(', ', YearType::values());
-            CalendarPath::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+            throw new ValidationException("Invalid value `{$value}` for parameter `year_type`, valid values are: " . implode(', ', YearType::values()));
         }
+        $this->YearType = YearType::from($value);
     }
 
     /**
@@ -421,11 +366,92 @@ class CalendarParams implements ParamsInterface
         if (gettype($value) !== 'boolean') {
             $value = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
             if (null === $value) {
-                $description = 'Invalid value for parameter `eternal_high_priest`, valid values are boolean `true` and `false`';
-                CalendarPath::produceErrorResponse(StatusCode::BAD_REQUEST, $description);
+                throw new ValidationException('Invalid value for parameter `eternal_high_priest`, valid values are boolean `true` and `false`');
             }
         }
-        /** @var boolean $value */
+        /** @var bool $value */
         $this->EternalHighPriest = $value;
     }
+
+    /**
+     * Validates parameter values that are expected to be strings.
+     * Produces a 400 Bad Request error if the value is not a string
+     */
+    private function validateStringValue(string $key, mixed $value): string
+    {
+        if (gettype($value) !== 'string') {
+            throw new ValidationException("Expected value of type String for parameter `{$key}`, instead found type " . gettype($value));
+        }
+
+        $filteredValue = filter_var($value, FILTER_SANITIZE_SPECIAL_CHARS);
+        if (!$filteredValue) {
+            throw new ValidationException("Could not correctly sanitize the value for parameter `{$key}`");
+        }
+
+        /** @var string */
+        return $filteredValue;
+    }
+
+    /**
+     * Initialize the CalendarParams object from the path parameters of the request.
+     * Expected path parameters are:
+     * 1) nation or diocese or year: a string indicating whether a national or diocesan calendar is requested, or an integer indicating the year for which the General Roman calendar should be calculated
+     * 2) (when 1 is a string) a string indicating the national or diocesan calendar to produce
+     * 3) (when 1 is a string) an integer indicating the year for which the national or diocesan calendar should be calculated
+     * @param string[] $requestPathParams
+     */
+    public function initParamsFromRequestPath(array $requestPathParams): void
+    {
+        $numPathParts = count($requestPathParams);
+        if ($numPathParts > 0) {
+            $params = [];
+            if ($numPathParts === 1) {
+                if (
+                    false === is_numeric($requestPathParams[0])
+                    || false === ctype_digit($requestPathParams[0])
+                ) {
+                    throw new ValidationException('path parameter expected to represent Year value but did not have type Integer or numeric String');
+                } else {
+                    $params['year'] = (int) $requestPathParams[0];
+                }
+            } elseif ($numPathParts > 3) {
+                throw new ValidationException('Expected at least one and at most three path parameters, instead found ' . $numPathParts);
+            } else {
+                if (false === in_array($requestPathParams[0], ['nation', 'diocese'])) {
+                    throw new ValidationException("Invalid value `{$requestPathParams[0]}` for path parameter in position 1,"
+                        . ' the first parameter should have a value of either `nation` or `diocese`');
+                } else {
+                    if ($requestPathParams[0] === 'nation') {
+                        $params['national_calendar'] = (string) $requestPathParams[1];
+                    } elseif ($requestPathParams[0] === 'diocese') {
+                        $params['diocesan_calendar'] = (string) $requestPathParams[1];
+                    }
+                }
+                if ($numPathParts === 3) {
+                    if (
+                        false === in_array(gettype($requestPathParams[2]), ['string', 'integer'])
+                        || (
+                            gettype($requestPathParams[2]) === 'string'
+                            && (
+                                false === is_numeric($requestPathParams[2])
+                                || false === ctype_digit($requestPathParams[2])
+                            )
+                        )
+                    ) {
+                        throw new ValidationException('path parameter expected to represent Year value but did not have type Integer or numeric String: found type ' . gettype($requestPathParams[2]));
+                    } else {
+                        $params['year'] = (int) $requestPathParams[2];
+                    }
+                }
+            }
+            if (count($params)) {
+                $this->setParams($params);
+            }
+        }
+    }
+
+    /*private static function debugWrite(string $string)
+    {
+        file_put_contents("debug.log", $string . PHP_EOL, FILE_APPEND);
+    }*/
 }

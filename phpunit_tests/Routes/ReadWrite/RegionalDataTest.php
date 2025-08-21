@@ -1,0 +1,139 @@
+<?php
+
+namespace LiturgicalCalendar\Tests\Routes\ReadWrite;
+
+use LiturgicalCalendar\Tests\ApiTestCase;
+use PHPUnit\Framework\Attributes\Group;
+
+#[Group('ReadWrite')]
+class RegionalDataTest extends ApiTestCase
+{
+    public function testGetOrPostWithoutPathParametersReturnsError(): void
+    {
+        $getResponse = self::$http->get('/data');
+        $this->validateGetPostNoPathParametersErrorResponse($getResponse);
+        $postResponse = self::$http->post('/data');
+        $this->validateGetPostNoPathParametersErrorResponse($postResponse);
+    }
+
+    public function testRequestWithUnacceptableHeaderReturnsError(): void
+    {
+        $getResponse = self::$http->get('/data/nation/IT', [
+            'headers' => ['Accept' => 'application/xml']
+        ]);
+        $this->assertSame(406, $getResponse->getStatusCode(), 'Expected HTTP 406 Not Acceptable');
+    }
+
+    public function testPutOrPatchOrDeleteWithoutPathParametersReturnsError(): void
+    {
+        $putResponse = self::$http->put('/data');
+        $this->validatePutNoPathParametersErrorResponse($putResponse);
+
+        $patchResponse = self::$http->patch('/data');
+        $this->validatePatchDeleteNoPathParametersErrorResponse($patchResponse);
+        $deleteResponse = self::$http->delete('/data');
+        $this->validatePatchDeleteNoPathParametersErrorResponse($deleteResponse);
+    }
+
+    public function testGetOrPostOrPatchOrDeleteWithoutKeyParameterInPathReturnsError(): void
+    {
+        $getResponse = self::$http->get('/data/nation');
+        $this->assertSame(400, $getResponse->getStatusCode(), 'Expected HTTP 400 Bad Request');
+        $this->validateGetPostNationalOrDiocesanCalendarDataNoIdentifierErrorResponse($getResponse);
+
+        $postResponse = self::$http->post('/data/nation');
+        $this->assertSame(400, $postResponse->getStatusCode(), 'Expected HTTP 400 Bad Request');
+        $this->validateGetPostNationalOrDiocesanCalendarDataNoIdentifierErrorResponse($postResponse);
+
+        $patchResponse = self::$http->patch('/data/nation');
+        $this->assertSame(400, $patchResponse->getStatusCode(), 'Expected HTTP 400 Bad Request');
+        $this->validatePatchDeleteNationalOrDiocesanCalendarDataNoIdentifierErrorResponse($patchResponse);
+
+        $deleteResponse = self::$http->delete('/data/nation');
+        $this->assertSame(400, $deleteResponse->getStatusCode(), 'Expected HTTP 400 Bad Request');
+        $this->validatePatchDeleteNationalOrDiocesanCalendarDataNoIdentifierErrorResponse($deleteResponse);
+
+        $getResponse = self::$http->get('/data/diocese');
+        $this->assertSame(400, $getResponse->getStatusCode(), 'Expected HTTP 400 Bad Request');
+        $this->validateGetPostNationalOrDiocesanCalendarDataNoIdentifierErrorResponse($getResponse);
+
+        $postResponse = self::$http->post('/data/diocese');
+        $this->assertSame(400, $postResponse->getStatusCode(), 'Expected HTTP 400 Bad Request');
+        $this->validateGetPostNationalOrDiocesanCalendarDataNoIdentifierErrorResponse($postResponse);
+
+        $patchResponse = self::$http->patch('/data/diocese');
+        $this->assertSame(400, $patchResponse->getStatusCode(), 'Expected HTTP 400 Bad Request');
+        $this->validatePatchDeleteNationalOrDiocesanCalendarDataNoIdentifierErrorResponse($patchResponse);
+
+        $deleteResponse = self::$http->delete('/data/diocese');
+        $this->assertSame(400, $deleteResponse->getStatusCode(), 'Expected HTTP 400 Bad Request');
+        $this->validatePatchDeleteNationalOrDiocesanCalendarDataNoIdentifierErrorResponse($deleteResponse);
+    }
+
+    public function testPutOrPatchWithoutContentTypeHeaderReturnsError(): void
+    {
+        $putResponse = self::$http->put('/data/nation');
+        $this->assertSame(415, $putResponse->getStatusCode(), 'Expected HTTP 415 Unsupported Media Type');
+        $patchResponse = self::$http->patch('/data/nation/IT');
+        $this->assertSame(415, $patchResponse->getStatusCode(), 'Expected HTTP 415 Unsupported Media Type');
+    }
+
+    /*
+    public function testGetNationalCalendarDataReturnsJson(): void
+    {
+        $response = self::$http->get('/data');
+        $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
+        $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
+        $data = (string) $response->getBody();
+        $this->assertJson($data);
+        $json = json_decode($data);
+        $this->assertIsObject($json);
+    }
+    */
+
+    private function validateRequestNoPathParametersErrorResponse(\Psr\Http\Message\ResponseInterface $response, string $content_type = 'application/problem+json'): string
+    {
+        $this->assertSame(400, $response->getStatusCode(), 'Expected HTTP 400 Bad Request');
+        $this->assertStringStartsWith($content_type, $response->getHeaderLine('Content-Type'), "Content-Type should be $content_type");
+        $data = (string) $response->getBody();
+        $this->assertJson($data);
+        $json = json_decode($data);
+        $this->assertIsObject($json);
+        $this->assertObjectHasProperty('type', $json);
+        $this->assertObjectHasProperty('title', $json);
+        $this->assertObjectHasProperty('status', $json);
+        $this->assertObjectHasProperty('detail', $json);
+        $this->assertSame(400, $json->status);
+        return $json->detail;
+    }
+
+    private function validateGetPostNoPathParametersErrorResponse(\Psr\Http\Message\ResponseInterface $response, string $content_type = 'application/problem+json'): void
+    {
+        $description = $this->validateRequestNoPathParametersErrorResponse($response, $content_type);
+        $this->assertSame('Expected at least two and at most three path params for GET and POST requests, received 0', $description);
+    }
+
+    private function validateGetPostNationalOrDiocesanCalendarDataNoIdentifierErrorResponse(\Psr\Http\Message\ResponseInterface $response, string $content_type = 'application/problem+json'): void
+    {
+        $description = $this->validateRequestNoPathParametersErrorResponse($response, $content_type);
+        $this->assertSame('Expected at least two and at most three path params for GET and POST requests, received 1', $description);
+    }
+
+    private function validatePatchDeleteNationalOrDiocesanCalendarDataNoIdentifierErrorResponse(\Psr\Http\Message\ResponseInterface $response, string $content_type = 'application/problem+json'): void
+    {
+        $description = $this->validateRequestNoPathParametersErrorResponse($response, $content_type);
+        $this->assertSame('Expected two path params for PATCH and DELETE requests, received 1', $description);
+    }
+
+    private function validatePutNoPathParametersErrorResponse(\Psr\Http\Message\ResponseInterface $response, string $content_type = 'application/problem+json'): void
+    {
+        $description = $this->validateRequestNoPathParametersErrorResponse($response, $content_type);
+        $this->assertSame('Expected one path param for PUT requests, received 0', $description);
+    }
+
+    private function validatePatchDeleteNoPathParametersErrorResponse(\Psr\Http\Message\ResponseInterface $response, string $content_type = 'application/problem+json'): void
+    {
+        $description = $this->validateRequestNoPathParametersErrorResponse($response, $content_type);
+        $this->assertSame('Expected two path params for PATCH and DELETE requests, received 0', $description);
+    }
+}

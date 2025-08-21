@@ -1,0 +1,19 @@
+<?php
+
+namespace LiturgicalCalendar\Api\Http\Exception;
+
+use LiturgicalCalendar\Api\Http\Enum\StatusCode;
+
+class UnsupportedMediaTypeException extends ApiException
+{
+    public function __construct(string $message = 'Content-Type of request is not supported', ?\Throwable $previous = null)
+    {
+        parent::__construct(
+            $message,
+            StatusCode::UNSUPPORTED_MEDIA_TYPE->value,
+            'https://www.rfc-editor.org/rfc/rfc9110.html#name-415-unsupported-media-type',
+            StatusCode::UNSUPPORTED_MEDIA_TYPE->reason(),
+            $previous
+        );
+    }
+}

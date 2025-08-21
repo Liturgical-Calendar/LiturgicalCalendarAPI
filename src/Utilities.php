@@ -4,6 +4,8 @@ namespace LiturgicalCalendar\Api;
 
 use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitColor;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsMap;
 
 /**
@@ -88,7 +90,7 @@ class Utilities
 
     /**
      * Used to keep track of the current request hash value.
-     * The value is set from the CalendarPath.php class representing the `/calendar` API path.
+     * The value is set from the CalendarHandler.php class representing the `/calendar` API path.
      * @var string
      */
     public static string $HASH_REQUEST = '';
@@ -504,7 +506,7 @@ class Utilities
                 $ordinal = $formatter->format($num);
         }
         if (false === $ordinal) {
-            throw new \Exception('Unable to get ordinal for ' . $num . ' in locale ' . $locale);
+            throw new ServiceUnavailableException('Unable to get ordinal for ' . $num . ' in locale ' . $locale);
         }
         return $ordinal;
     }
@@ -515,21 +517,21 @@ class Utilities
      *
      * @param string $filename The path to the file to read.
      * @return string The contents of the file.
-     * @throws \RuntimeException If the file does not exist, is not readable, or could not be read.
+     * @throws ServiceUnavailableException If the file does not exist, is not readable, or could not be read.
      */
     public static function rawContentsFromFile(string $filename): string
     {
         if (false === file_exists($filename)) {
-            throw new \RuntimeException('File ' . $filename . ' does not exist');
+            throw new ServiceUnavailableException('File ' . $filename . ' does not exist');
         }
 
         if (false === is_readable($filename)) {
-            throw new \RuntimeException('File ' . $filename . ' is not readable');
+            throw new ServiceUnavailableException('File ' . $filename . ' is not readable');
         }
 
         $rawContents = file_get_contents($filename);
         if (false === $rawContents) {
-            throw new \RuntimeException('Unable to read file ' . $filename);
+            throw new ServiceUnavailableException('Unable to read file ' . $filename);
         }
 
         return $rawContents;
@@ -540,14 +542,23 @@ class Utilities
      *
      * @param string $url The URL to read.
      * @return string The contents of the URL.
-     * @throws \RuntimeException If the URL could not be read.
+     * @throws ServiceUnavailableException If the URL could not be read.
      */
     public static function rawContentsFromUrl(string $url): string
     {
-        $rawContents = file_get_contents($url);
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'GET',
+                'header' => 'Accept: application/json',
+            ],
+        ]);
+
+        $rawContents = file_get_contents($url, false, $context);
+
         if (false === $rawContents) {
-            throw new \RuntimeException('Unable to read URL ' . $url);
+            throw new ServiceUnavailableException('Unable to read URL ' . $url);
         }
+
         return $rawContents;
     }
 
@@ -609,14 +620,16 @@ class Utilities
      *
      * @param string $url The URL to the JSON data.
      * @return \stdClass The decoded JSON data as an object.
-     * @throws \JsonException If the URL does not exist, is not readable, contains invalid JSON, or does not contain an object.
+     * @throws ServiceUnavailableException if the URL does not exist or is not readable
+     * @throws \JsonException If the contents from the URL contain invalid JSON
+     * @throws ValidationException if the contents from the URL were not decoded as an object.
      */
     public static function jsonUrlToObject(string $url): \stdClass
     {
         $rawContents = self::rawContentsFromUrl($url);
         $jsonObj     = json_decode($rawContents, false, 512, JSON_THROW_ON_ERROR);
         if (false === $jsonObj instanceof \stdClass) {
-            throw new \JsonException('JSON URL ' . $url . ' does not contain an object');
+            throw new ValidationException('JSON URL ' . $url . ' does not contain an object');
         }
         return $jsonObj;
     }

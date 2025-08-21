@@ -36,7 +36,7 @@
         {
             "label": "php-server",
             "type": "shell",
-            "command": "PHP_CLI_SERVER_WORKERS=6 php -S ${APP_HOST}:${APP_PORT}",
+            "command": "PHP_CLI_SERVER_WORKERS=6 php -S ${APP_HOST}:${APP_PORT} -t public",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -48,7 +48,7 @@
         {
             "label": "litcal-tests-websockets",
             "type": "shell",
-            "command": "php LitCalTestServer.php",
+            "command": "php public/LitCalTestServer.php",
             "group": {
                 "kind": "build",
                 "isDefault": true

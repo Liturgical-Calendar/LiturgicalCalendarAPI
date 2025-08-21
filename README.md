@@ -63,8 +63,8 @@ _(See [usage.php#calSubscription](https://litcal.johnromanodorazio.com/usage.php
 
 System requirements:
 * PHP >= 8.4 (we make use of more modern PHP functions such as `array_find`)
-* PHP modules installed and enabled: `intl` * `zip` * `gettext` * `calendar` * `yaml`
-* System language packs for all the supported languages
+* PHP modules installed and enabled: `intl` * `zip` * `calendar` * `yaml`
+* System package `gettext` and language packs for all the supported languages
 
 ## Using PHP's builtin server
 
@@ -82,10 +82,27 @@ The `composer.json` file also defines a couple scripts to simplify this process:
 * `composer stop`: stop the server by calling `stop-server.sh`
 
 You can also use the `start-server.sh` and `stop-server.sh` scripts directly to spawn and stop the server. Please ensure that both scripts are executable (`chmod +x`).
-The **start** script will write the server's PID to a file called `server.pid` in the current directory, and the **stop** script will remove the `server.pid` file.
+The **start** script will write the server's PID to a file called `server.pid` in the current directory,
+and the **stop** script will terminate the process by its PID and remove the `server.pid` file.
 
-You can customize the port that the server will be running on by setting the `API_PORT` environment variable in the `.env` or `.env.local` file
-(the same file used by the API application to load environment variables).
+The following environment variables can be set to configure the API:
+* `API_PROTOCOL`: The protocol to use for the API (default is `http`). Example: `API_PROTOCOL=https` to use the `https` protocol.
+* `API_HOST`: The hostname or IP address to use for the API (default is `localhost`). Example: `API_HOST=mydomain.com` to use the `mydomain.com` host.
+* `API_PORT`: The port to use for the API (default is `8000`). Example: `API_PORT=8080` to use port `8080`.
+* `API_BASE_PATH`: The base path to use for the API (default is `/`). Example: `API_BASE_PATH=/api/v1` to use the `/api/v1` base path.
+
+These environment variables should be set in a `.env` or `.env.local` file (the same files used by the PHP application to load environment variables).
+You can copy the `.env.example` file to `.env` or `.env.local` (or `.env.development` or `.env.production`) and edit it as needed.
+
+These environment variables are used when running the API in CLI mode, such as when using the `start-server.sh` script. The defaults are suitable for development and testing, but may need to be overridden for staging or production environments.
+
+For example, to run the API in production with a custom domain and HTTPS, you would set the following environment variables:
+```bash
+API_PROTOCOL=https
+API_HOST=mydomain.com
+API_PORT=443
+API_BASE_PATH=/api/v1
+```
 
 ## Using a docker container
 

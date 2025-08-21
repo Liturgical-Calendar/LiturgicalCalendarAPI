@@ -5,15 +5,24 @@ namespace LiturgicalCalendar\Tests;
 use PHPUnit\Framework\TestCase;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Handler\CurlMultiHandler;
+use GuzzleHttp\HandlerStack;
 
 abstract class ApiTestCase extends TestCase
 {
     protected static bool $apiAvailable = false;
 
-    protected ?Client $http = null;
+    protected static ?Client $http = null;
+
+    protected static ?CurlMultiHandler $multiHandler = null;
 
     public static function setUpBeforeClass(): void
     {
+        // Create a shared CurlMultiHandler that will persist connections
+        self::$multiHandler = new CurlMultiHandler(['max_handles' => 50]); // pool size; tune as needed
+
+        $stack = HandlerStack::create(self::$multiHandler);
+
         // Validate required environment variables
         $requiredEnvVars = ['API_PROTOCOL', 'API_HOST', 'API_PORT'];
         foreach ($requiredEnvVars as $var) {
@@ -22,15 +31,18 @@ abstract class ApiTestCase extends TestCase
             }
         }
 
-        $client = new Client([
-            'base_uri'    => "{$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}",
-            'http_errors' => false,
-            'timeout'     => 2.0,
+        self::$http = new Client([
+            'base_uri'        => sprintf('%s://%s:%s', $_ENV['API_PROTOCOL'], $_ENV['API_HOST'], $_ENV['API_PORT']),
+            'handler'         => $stack,
+            'timeout'         => 15,
+            'connect_timeout' => 5,
+            'http_errors'     => false,
+            'headers'         => [ 'Connection' => 'keep-alive' ]
         ]);
 
         try {
             // Simple check — adjust path if your API root needs authentication
-            $response           = $client->get('/');
+            $response           = self::$http->get('/');
             self::$apiAvailable = $response->getStatusCode() < 500;
         } catch (ConnectException $e) {
             self::$apiAvailable = false;
@@ -46,16 +58,47 @@ abstract class ApiTestCase extends TestCase
                 "API is not running on {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']} — skipping integration tests. Maybe run `composer start` first?"
             );
         }
-
-        $this->http = new Client([
-            'base_uri'    => "{$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}",
-            'http_errors' => false,
-            'timeout'     => 2.0,
-        ]);
     }
 
     protected function tearDown(): void
     {
-        $this->http = null;
+        // After each test method, tick until idle
+        if (self::$multiHandler) {
+            do {
+                $stillRunning = self::$multiHandler->tick();
+            } while ($stillRunning > 0);
+        }
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        if (self::$multiHandler) {
+            // Tick until all pending curl handles are processed
+            do {
+                $stillRunning = self::$multiHandler->tick();
+            } while ($stillRunning > 0);
+
+            self::$multiHandler = null;
+        }
+
+        self::$http = null;
+    }
+
+    protected static function findProjectRoot(string $startDir = __DIR__, string $marker = 'composer.json'): ?string
+    {
+        $dir = $startDir;
+
+        while (true) {
+            if (file_exists($dir . DIRECTORY_SEPARATOR . $marker)) {
+                return $dir;
+            }
+
+            $parentDir = dirname($dir);
+            if ($parentDir === $dir) { // reached the project root
+                return null;
+            }
+
+            $dir = $parentDir;
+        }
     }
 }

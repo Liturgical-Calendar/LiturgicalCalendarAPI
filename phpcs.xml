@@ -34,8 +34,9 @@
     <rule ref="Generic.WhiteSpace.SpreadOperatorSpacingAfter"/>
     <rule ref="Generic.ControlStructures.InlineControlStructure"/>
     <rule ref="Generic.Formatting.SpaceAfterCast"/>
-    <file>./</file> <!-- directory you want to analyze -->
-    <exclude-pattern>vendor/*</exclude-pattern>
+    <file>src</file> <!-- directory you want to analyze -->
+    <file>phpunit_tests</file>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
     <exclude-pattern>allowedOrigins.php</exclude-pattern>
     <arg name="encoding" value="utf-8"/>
     <arg name="extensions" value="php"/>
