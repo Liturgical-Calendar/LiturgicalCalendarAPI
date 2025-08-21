@@ -33,6 +33,7 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemMoveEvent;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 use LiturgicalCalendar\Api\Params\EventsParams;
+use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -253,7 +254,7 @@ final class EventsHandler extends AbstractHandler
             $this->EventsParams->baseLocale
         ];
         setlocale(LC_ALL, $localeArray);
-        bindtextdomain('litcal', 'i18n');
+        bindtextdomain('litcal', Router::$apiFilePath . 'i18n');
         textdomain('litcal');
         LiturgicalEventAbstract::setLocale($this->EventsParams->Locale);
     }

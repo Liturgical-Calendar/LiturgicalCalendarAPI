@@ -4539,10 +4539,11 @@ final class CalendarHandler extends AbstractHandler
             $baseLocale . '.UTF-8',
             $baseLocale
         ];
-        $localeThatWasSet            = setlocale(LC_ALL, $localeArray);
+
+        $localeThatWasSet = setlocale(LC_ALL, $localeArray);
 
         $this->createFormatters();
-        bindtextdomain('litcal', 'i18n');
+        bindtextdomain('litcal', Router::$apiFilePath . 'i18n');
         textdomain('litcal');
 
         $this->Cal = new LiturgicalEventCollection($this->CalendarParams);

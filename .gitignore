@@ -15,3 +15,4 @@ phpstan.neon
 server.pid
 .phpunit.result.cache
 .phpunit.cache
+php.supp

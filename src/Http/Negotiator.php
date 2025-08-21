@@ -536,6 +536,10 @@ final class Negotiator
      */
     public static function getAcceptValues(): array
     {
+        if (empty(self::$acceptValues)) {
+            return [];
+        }
+
         $column = array_key_exists('type', self::$acceptValues[0])
             ? 'type'
             : ( array_key_exists('token', self::$acceptValues[0])

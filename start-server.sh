@@ -32,4 +32,11 @@ set +a  # stop auto export
 : "${API_HOST:=localhost}"
 : "${API_PORT:=8000}"
 
-PHP_CLI_SERVER_WORKERS=6 php -S "${API_HOST}:${API_PORT}" -t public > /dev/null 2>&1 & echo $! > server.pid
+PHP_CLI_SERVER_WORKERS=6 php -S "${API_HOST}:${API_PORT}" -t public > /dev/null 2>&1 &
+
+# Save PID
+pid=$!
+echo "$pid" > server.pid
+
+# Feedback
+echo "Server successfully started at ${API_PROTOCOL}://${API_HOST}:${API_PORT}/ (PID: $pid)"
