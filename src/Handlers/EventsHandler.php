@@ -8,7 +8,7 @@ use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
-use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCollection;
@@ -82,15 +82,18 @@ final class EventsHandler extends AbstractHandler
      */
     private function validateRequestPathParams(): void
     {
-        $params = null;
+        /** @var array{locale?:string,national_calendar?:string,diocesan_calendar?:string,eternal_high_priest?:bool} */
+        $params = [];
         if (false === in_array($this->requestPathParams[0], ['nation', 'diocese'])) {
             throw new UnprocessableContentException('Unknown resource path: ' . $this->requestPathParams[0] . ', expected either /nation/{nation} or /diocese/{diocese_id}');
         }
         if (count($this->requestPathParams) === 2) {
             if ($this->requestPathParams[0] === 'nation') {
+                /** @var array{locale?:string,national_calendar:string,diocesan_calendar?:string,eternal_high_priest?:bool} */
                 $params = [ 'national_calendar' => $this->requestPathParams[1] ];
                 $this->EventsParams->setParams($params);
             } else {
+                /** @var array{locale?:string,national_calendar?:string,diocesan_calendar:string,eternal_high_priest?:bool} */
                 $params = [ 'diocesan_calendar' => $this->requestPathParams[1] ];
                 $this->EventsParams->setParams($params);
             }
@@ -294,13 +297,9 @@ final class EventsHandler extends AbstractHandler
             $MissalDataFile = RomanMissal::getSanctoraleFileName($LatinMissalId);
             $i18nPath       = RomanMissal::getSanctoraleI18nFilePath($LatinMissalId);
 
-            if (null === $MissalDataFile || null === $i18nPath) {
-                throw new \RuntimeException('Latin missal id ' . $LatinMissalId . ' is not valid');
-            }
-
             if (false !== $MissalDataFile) {
                 if (false === $i18nPath) {
-                    throw new \RuntimeException('Could not find translation file for Latin missal ' . $LatinMissalId);
+                    throw new ServiceUnavailableException('Could not find translation file for Latin missal ' . $LatinMissalId);
                 }
                 $i18nFile   = "{$i18nPath}{$this->EventsParams->baseLocale}.json";
                 $names      = Utilities::jsonFileToArray($i18nFile);
@@ -411,9 +410,6 @@ final class EventsHandler extends AbstractHandler
                 foreach (self::$NationalData->metadata->missals as $missalId) {
                     $missalDataFile = RomanMissal::getSanctoraleFileName($missalId);
                     $I18nPath       = RomanMissal::getSanctoraleI18nFilePath($missalId);
-                    if (null === $missalDataFile || null === $I18nPath) {
-                        throw new \Exception('Unknown missal id ' . $missalId . ', unable to process liturgical events. Valid missal ids are: ' . implode(', ', RomanMissal::getMissalIds()));
-                    }
                     if ($missalDataFile !== false) {
                         $I18nFile   = "{$I18nPath}{$this->EventsParams->Locale}.json";
                         $names      = Utilities::jsonFileToArray($I18nFile);
@@ -562,18 +558,12 @@ final class EventsHandler extends AbstractHandler
     /**
      * Initializes the Events class and processes the request.
      *
-     * @param string[] $requestPathParts The path parameters from the request.
-     *
      * This method performs the following actions:
-     * - Initializes the Core component and validates the Accept header.
-     * - Sets the response content type based on the request.
-     * - Retrieves and sets the request path parts.
-     * - Loads and processes various calendar and missal data, including Latin Missals,
-     *   Diocese Index, Diocesan Data, National and Wider Region Data.
+     * - Validates the Accept header.
+     * - Sets the response Content-ype based on the request and the best type available.
+     * - Retrieves and sets parameters from the request.
+     * - Loads and processes various calendar and missal and decree data.
      * - Sets the locale for the response.
-     * - Handles request parameters and processes different types of calendar data,
-     *   such as Missal, Proprium De Tempore, Memorials from Decrees, National,
-     *   and Diocesan calendars.
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -626,12 +616,13 @@ final class EventsHandler extends AbstractHandler
         }
 
         if ($method === RequestMethod::GET) {
+            /** @var array{locale?:string,national_calendar?:string,diocesan_calendar?:string,eternal_high_priest?:bool} $params */
             $params = array_merge($params, $this->getScalarQueryParams($request));
         } elseif ($method === RequestMethod::POST) {
             $parsedBodyParams = $this->parseBodyParams($request, false);
 
             if (null !== $parsedBodyParams) {
-                /** @var array<string,scalar|null> $params */
+                /** @var array{locale?:string,national_calendar?:string,diocesan_calendar?:string,eternal_high_priest?:bool} $params */
                 $params = array_merge($params, $parsedBodyParams);
             }
         }

@@ -34,12 +34,13 @@ final class EventsTest extends ApiTestCase
     #[Group('slow')]
     public function testGetEventsSampleAllPaths(): void
     {
-        foreach(self::$metadata->national_calendars_keys as $national_calendar_key) {
+        foreach (self::$metadata->national_calendars_keys as $national_calendar_key) {
             $national_calendar_metadata = array_find(self::$metadata->national_calendars, function ($item) use ($national_calendar_key) {
                 return $item->calendar_id === $national_calendar_key;
             });
+
             $locales = $national_calendar_metadata->locales;
-            foreach($locales as $locale) {
+            foreach ($locales as $locale) {
                 $response = $this->http->get("/events/nation/{$national_calendar_key}", [
                     'headers' => ['Accept-Language' => $locale]
                 ]);
@@ -52,12 +53,13 @@ final class EventsTest extends ApiTestCase
             }
         }
 
-        foreach(self::$metadata->diocesan_calendars_keys as $diocesan_calendar_key) {
+        foreach (self::$metadata->diocesan_calendars_keys as $diocesan_calendar_key) {
             $diocesan_calendar_metadata = array_find(self::$metadata->diocesan_calendars, function ($item) use ($diocesan_calendar_key) {
                 return $item->calendar_id === $diocesan_calendar_key;
             });
+
             $locales = $diocesan_calendar_metadata->locales;
-            foreach($locales as $locale) {
+            foreach ($locales as $locale) {
                 $response = $this->http->get("/events/diocese/{$diocesan_calendar_key}", [
                     'headers' => ['Accept-Language' => $locale]
                 ]);
@@ -94,6 +96,7 @@ final class EventsTest extends ApiTestCase
             $diocesan_calendar_metadata = array_find(self::$metadata->diocesan_calendars, function ($item) use ($calendar_id) {
                 return $item->calendar_id === $calendar_id;
             });
+
             $national_calendar = $diocesan_calendar_metadata->nation;
             $this->assertEquals($data->settings->national_calendar, $national_calendar, 'national_calendar should be ' . $national_calendar);
             $this->assertEquals($data->settings->diocesan_calendar, $calendar_id, 'diocesan_calendar should be ' . $calendar_id);
@@ -160,6 +163,7 @@ final class EventsTest extends ApiTestCase
                     'http_errors'    => true,
                     'connect_errors' => true
                 ]);
+
                 $data = json_decode((string) $response->getBody(), false, 512, JSON_THROW_ON_ERROR);
                 if (false === property_exists($data, 'litcal_metadata') || false === is_object($data->litcal_metadata)) {
                     throw new \RuntimeException('Failed to get `litcal_metadata` property from /calendars');

@@ -3,6 +3,7 @@
 namespace LiturgicalCalendar\Api\Http\Enum;
 
 use LiturgicalCalendar\Api\Enum\EnumToArrayTrait;
+use LiturgicalCalendar\Api\Http\Exception\UnsupportedCharsetException;
 
 /**
  * Represents all possible Charset values
@@ -44,9 +45,10 @@ enum Charset: string
     /**
      * Normalizes a given label to the canonical enum case, or null if unsupported.
      */
-    public static function fromLabel(string $label): ?self
+    public static function fromLabel(string $label): self
     {
-        static $map = [
+        $label = strtolower(trim($label));
+        return match ($label) {
             // === Unicode ===
             'utf-8'               => self::UTF8,
             'unicode-1-1-utf-8'   => self::UTF8,
@@ -182,10 +184,8 @@ enum Charset: string
             'cseuckr'             => self::EUCKR,
             'ks_c_5601-1987'      => self::EUCKR,
             'iso-ir-149'          => self::EUCKR,
-            'korean'              => self::EUCKR
-        ];
-
-        $label = strtolower(trim($label));
-        return $map[$label] ?? null;
+            'korean'              => self::EUCKR,
+            default               => throw new UnsupportedCharsetException($label),
+        };
     }
 }

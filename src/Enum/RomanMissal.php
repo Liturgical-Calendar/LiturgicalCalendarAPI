@@ -3,6 +3,7 @@
 namespace LiturgicalCalendar\Api\Enum;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadata;
 use LiturgicalCalendar\Api\Router;
 
@@ -193,13 +194,13 @@ class RomanMissal
      * Gets the name of the Roman Missal corresponding to the given Missal id.
      *
      * @param string $missal_id the id of the Roman Missal
-     * @return string the name of the Roman Missal, or null if missal_id not valid
-     * @throws \InvalidArgumentException if missal_id is not valid
+     * @return string the name of the Roman Missal
+     * @throws ValidationException if missal_id is not valid
      */
     public static function getName(string $missal_id): string
     {
         if (false === self::isValid($missal_id)) {
-            throw new \InvalidArgumentException('Invalid missal_id: ' . $missal_id);
+            throw new ValidationException('Invalid missal_id: ' . $missal_id);
         }
         return self::$names[$missal_id];
     }
@@ -208,12 +209,12 @@ class RomanMissal
      * Gets the path to the JSON file containing the sanctorale data for the given Roman Missal.
      *
      * @param string $missal_id the id of the Roman Missal
-     * @return string|false|null the path to the JSON file, or false if the Roman Missal does not have any JSON data, or null if missal_id not valid
+     * @return string|false the path to the JSON file, or false if the Roman Missal does not have any JSON data, or null if missal_id not valid
      */
-    public static function getSanctoraleFileName(string $missal_id): string|false|null
+    public static function getSanctoraleFileName(string $missal_id): string|false
     {
-        if (false === isset(self::$jsonFiles[$missal_id])) {
-            return null;
+        if (false === self::isValid($missal_id)) {
+            throw new ValidationException('Invalid missal_id: ' . $missal_id);
         }
         return is_string(self::$jsonFiles[$missal_id])
             ? JsonData::MISSALS_FOLDER->path() . self::$jsonFiles[$missal_id]
@@ -224,12 +225,12 @@ class RomanMissal
      * Gets the path to the i18n directory for the sanctorale of the given Roman Missal.
      *
      * @param string $missal_id the id of the Roman Missal
-     * @return string|false|null the path to the i18n directory, or false if the Roman Missal does not have any i18n data, or null if missal_id not valid
+     * @return string|false the path to the i18n directory, or false if the Roman Missal does not have any i18n data, or null if missal_id not valid
      */
-    public static function getSanctoraleI18nFilePath(string $missal_id): string|false|null
+    public static function getSanctoraleI18nFilePath(string $missal_id): string|false
     {
-        if (false === isset(self::$i18nPath[$missal_id])) {
-            return null;
+        if (false === self::isValid($missal_id)) {
+            throw new ValidationException('Invalid missal_id: ' . $missal_id);
         }
         return is_string(self::$i18nPath[$missal_id])
             ? JsonData::MISSALS_FOLDER->path() . self::$i18nPath[$missal_id]
@@ -240,12 +241,12 @@ class RomanMissal
      * Gets the path to the lectionary directory for the given Roman Missal.
      *
      * @param string $missal_id the id of the Roman Missal
-     * @return string|false|null the path to the lectionary directory, or false if the Roman Missal does not have any lectionary data, or null if missal_id not valid
+     * @return string|false the path to the lectionary directory, or false if the Roman Missal does not have any lectionary data, or null if missal_id not valid
      */
-    public static function getLectionaryFilePath(string $missal_id): string|false|null
+    public static function getLectionaryFilePath(string $missal_id): string|false
     {
-        if (false === isset(self::$lectionaryPath[$missal_id])) {
-            return null;
+        if (false === self::isValid($missal_id)) {
+            throw new ValidationException('Invalid missal_id: ' . $missal_id);
         }
         return is_string(self::$lectionaryPath[$missal_id])
             ? JsonData::MISSALS_FOLDER->path() . self::$lectionaryPath[$missal_id]
@@ -256,13 +257,16 @@ class RomanMissal
      * Gets the year limits for the given Roman Missal.
      *
      * @param string $missal_id the id of the Roman Missal
-     * @return ?array{since_year:int,until_year?:int} an associative array of the year limits
+     * @return array{since_year:int,until_year?:int} an associative array of the year limits
      *   for the given Roman Missal, with properties named 'since_year' and optionally 'until_year',
      *   or null if missal_id not valid
      */
-    public static function getYearLimits(string $missal_id): ?array
+    public static function getYearLimits(string $missal_id): array
     {
-        return isset(self::$yearLimits[$missal_id]) ? self::$yearLimits[$missal_id] : null;
+        if (false === self::isValid($missal_id)) {
+            throw new ValidationException('Invalid missal_id: ' . $missal_id);
+        }
+        return self::$yearLimits[$missal_id];
     }
 
     /**

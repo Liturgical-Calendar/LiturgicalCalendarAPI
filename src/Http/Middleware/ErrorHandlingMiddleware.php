@@ -49,7 +49,7 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
             $response = $this->responseFactory->createResponse($status);
             $response
                 ->getBody()
-                ->write(json_encode($problem, JSON_PRETTY_PRINT));
+                ->write(json_encode($problem, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
 
             return $response
                 ->withHeader('Content-Type', 'application/problem+json')

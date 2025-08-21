@@ -45,6 +45,7 @@
         }
     ],
     "minimum-stability": "dev",
+    "prefer-stable" : true,
     "scripts": {
         "post-install-cmd": [
             "LiturgicalCalendar\\Api\\Utilities::postInstall"

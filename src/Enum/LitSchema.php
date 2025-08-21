@@ -3,6 +3,7 @@
 namespace LiturgicalCalendar\Api\Enum;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 
 enum LitSchema: string
 {
@@ -72,7 +73,8 @@ enum LitSchema: string
             LitSchema::MISSALS->path()           => LitSchema::MISSALS,
             LitSchema::EASTER->path()            => LitSchema::EASTER,
             LitSchema::DATA->path()              => LitSchema::DATA,
-            LitSchema::SCHEMAS->path()           => LitSchema::SCHEMAS
+            LitSchema::SCHEMAS->path()           => LitSchema::SCHEMAS,
+            default                              => throw new ValidationException('Invalid schema URL: ' . $url)
         };
     }
 }

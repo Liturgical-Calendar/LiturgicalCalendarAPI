@@ -22,15 +22,19 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 final class Negotiator
 {
-    /** @var string[] */
+    /** @var array<array{type?:string,tag?:string,token?:string,params?:array<string,string|null>,raw:string,q:float,specificity:int,paramBonus?:int,index:int}> */
     private static array $acceptValues = [];
 
-    /** @var string[] */
+    /** @var array<array{type?:string,tag?:string,token?:string,params?:array<string,string|null>,raw:string,q:float,specificity:int,paramBonus?:int,index:int}> */
     private static array $filteredAcceptValues = [];
 
     /* ========================= Common utilities ========================= */
 
-    /** Split a header list on commas, honoring quoted strings. */
+    /**
+     * Split a header list on commas, honoring quoted strings.
+     * @link https://tools.ietf.org/html/rfc7231#section-5.3
+     * @return string[]
+     */
     private static function splitCommaSeparated(string $header): array
     {
         $items   = [];
@@ -82,7 +86,10 @@ final class Negotiator
         return $items;
     }
 
-    /** Split parameters on ';' outside quotes; return [value, params[]]. */
+    /**
+     * Split parameters on ';' outside quotes; return [value, params[]].
+     * @return array<int,string|array<lowercase-string,string|null>>
+     */
     private static function splitParameters(string $item): array
     {
         $parts   = [];
@@ -165,7 +172,10 @@ final class Negotiator
 
     /* ========================= Accept (media types) ========================= */
 
-    /** Parse Accept into structured entries. */
+    /**
+     * Parse Accept into structured entries.
+     * @return array<array{type:string,raw:string,params:array<string,string|null>,q:float,specificity:int,paramBonus:int,index:int}>
+     */
     public static function parseAccept(string $header): array
     {
         $items = self::splitCommaSeparated($header);
@@ -173,6 +183,10 @@ final class Negotiator
         $i     = 0;
 
         foreach ($items as $raw) {
+            /**
+             * @var array<string,string|null> $params
+             * @var lowercase-string $type
+             */
             [$type, $params] = self::splitParameters($raw);
             if ($type === '') {
                 continue;
@@ -195,8 +209,8 @@ final class Negotiator
             $paramBonus = max(0, count($params));
 
             $out[] = [
-                'raw'         => $raw,
                 'type'        => $type,
+                'raw'         => $raw,
                 'params'      => $params,
                 'q'           => $q,
                 'specificity' => $specificity,
@@ -213,16 +227,23 @@ final class Negotiator
         return $out;
     }
 
-    /** Pick best media type from server-supported list (e.g., ['application/json','text/html']). */
+    /**
+     * Pick best media type from server-supported list (e.g., ['application/json','text/html']).
+     * @param string[] $supported
+     */
     public static function pickMediaType(ServerRequestInterface $request, array $supported = []): ?string
     {
         $acceptHeader = $request->getHeaderLine('Accept');
         if (empty($supported)) {
-            $supportedMediaTypes = AcceptHeader::values();
+            /** @var string[] $supportedMediaTypes */
+            $supportedMediaTypes = array_values(AcceptHeader::values());
         } else {
-            $supportedMediaTypes = array_values(array_unique(array_map('strtolower', $supported)));
+            $lowercasedMediaTypes = array_map(fn($v) => strtolower($v), $supported);
+            $supportedMediaTypes  = array_values(array_unique($lowercasedMediaTypes));
         }
 
+        // If the request is coming from a browser, it won't be requesting JSON,
+        //   which is probably what we want; otherwise we will always wind up with XML in the browser
         if (self::isBrowserRequest($request)) {
             return $supportedMediaTypes[0] ?? null;
         }
@@ -231,13 +252,14 @@ final class Negotiator
         self::$filteredAcceptValues = array_filter(self::$acceptValues, fn ($v) => in_array($v['type'], $supportedMediaTypes, true));
 
         // If no Accept header, RFC allows */* with q=1 → pick first supported.
-        if ($acceptHeader === '' || $acceptHeader === null) {
+        if ($acceptHeader === '') {
             return $supportedMediaTypes[0] ?? null;
         }
 
         $best      = null;
         $bestScore = [-1, -1, -1, PHP_INT_MAX]; // q, specificity, paramBonus, index tie-breaker
 
+        /** @var string[] $supportedMediaTypes */
         foreach ($supportedMediaTypes as $sup) {
             [$sType, $sSub] = array_pad(explode('/', strtolower($sup), 2), 2, '*');
 
@@ -269,7 +291,10 @@ final class Negotiator
 
     /* ========================= Accept-Language ========================= */
 
-    /** Parse Accept-Language entries. */
+    /**
+     * Parse Accept-Language entries.
+     * @return array<array{tag:string,raw:string,q:float,specificity:int,index:int}>
+     */
     public static function parseAcceptLanguage(string $header): array
     {
         $items = self::splitCommaSeparated($header);
@@ -277,6 +302,10 @@ final class Negotiator
         $i     = 0;
 
         foreach ($items as $raw) {
+            /**
+             * @var array<string,string|null> $params
+             * @var lowercase-string $tag
+             */
             [$tag, $params] = self::splitParameters($raw);
             if ($tag === '') {
                 continue;
@@ -312,6 +341,7 @@ final class Negotiator
      *  - Exact match wins over prefix match (en-US vs en).
      *  - Prefix match: requested 'en' matches 'en-US' and 'en' (more specific supported preferred).
      *  - '*' matches anything.
+     * @param string[] $supported
      */
     public static function pickLanguage(ServerRequestInterface $request, array $supported = [], ?string $fallback = null): ?string
     {
@@ -319,13 +349,14 @@ final class Negotiator
         if (empty($supported)) {
             $supportedLocales = LitLocale::$AllAvailableLocales;
         } else {
-            $supportedLocales = array_values(array_unique(array_map('strtolower', $supported)));
+            $lowercaseSupported = array_map(fn($v) => strtolower($v), $supported);
+            $supportedLocales   = array_values(array_unique($lowercaseSupported));
         }
 
         self::$acceptValues         = self::parseAcceptLanguage($acceptLangHeader);
         self::$filteredAcceptValues = array_filter(self::$acceptValues, fn ($v) => in_array($v['tag'], $supportedLocales, true));
 
-        if ($acceptLangHeader === '' || $acceptLangHeader === null) {
+        if ($acceptLangHeader === '') {
             return $fallback ?? $supportedLocales[0];
         }
 
@@ -376,7 +407,10 @@ final class Negotiator
 
     /* ========================= Accept-Encoding ========================= */
 
-    /** Parse Accept-Encoding entries. */
+    /**
+     * Parse Accept-Encoding entries.
+     * @return array<array{token:string,raw:string,q:float,specificity:int,index:int}>
+     */
     public static function parseAcceptEncoding(string $header): array
     {
         $items = self::splitCommaSeparated($header);
@@ -384,6 +418,10 @@ final class Negotiator
         $i     = 0;
 
         foreach ($items as $raw) {
+            /**
+             * @var array<string,string|null> $params
+             * @var lowercase-string $token
+             */
             [$token, $params] = self::splitParameters($raw);
             $token            = strtolower(trim($token));
             if ($token === '') {
@@ -417,18 +455,21 @@ final class Negotiator
      * RFC notes:
      *  - If header is absent: act as if "identity;q=1.0, *;q=0" (identity allowed).
      *  - If 'identity' not present, it's implicitly q=1 unless explicitly q=0.
+     * @param string[] $supported
      */
     public static function pickEncoding(ServerRequestInterface $request, array $supported = []): ?string
     {
         $acceptEncHeader = $request->getHeaderLine('Accept-Encoding');
         if (empty($supported)) {
+            /** @var string[] $supportedEncodings */
             $supportedEncodings = ContentEncoding::values();
         } else {
-            $supportedEncodings = array_values(array_unique(array_map('strtolower', $supported)));
+            $lowercaseEncodings = array_map(fn($v) => strtolower($v), $supported);
+            $supportedEncodings = array_values(array_unique($lowercaseEncodings));
         }
 
         // Defaults when header missing: identity preferred if available.
-        if ($acceptEncHeader === '' || $acceptEncHeader === null) {
+        if ($acceptEncHeader === '') {
             // Prefer non-identity if you want compression by default; here we keep it literal:
             return in_array('identity', $supportedEncodings, true) ? 'identity' : $supportedEncodings[0];
         }
@@ -495,9 +536,20 @@ final class Negotiator
      */
     public static function getAcceptValues(): array
     {
-        return array_column(self::$acceptValues, 'type');
+        $column = array_key_exists('type', self::$acceptValues[0])
+            ? 'type'
+            : ( array_key_exists('token', self::$acceptValues[0])
+                ? 'token'
+                : 'tag'
+            );
+        return array_column(self::$acceptValues, $column);
     }
 
+    /**
+     * Return the list of accepted values (without weights) from the parsed Accept header.
+     *
+     * @return array<array{type?:string,tag?:string,token?:string,params?:array<string,string|null>,raw:string,q:float,specificity:int,paramBonus?:int,index:int}>
+     */
     public static function getFilteredAcceptValues(): array
     {
         return array_values(self::$filteredAcceptValues);

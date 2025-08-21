@@ -67,7 +67,6 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropert
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
 use LiturgicalCalendar\Api\Params\CalendarParams;
-use Nyholm\Psr7\Response;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -632,10 +631,6 @@ final class CalendarHandler extends AbstractHandler
         $propriumdesanctisI18nPath       = RomanMissal::getSanctoraleI18nFilePath($missal);
         $propriumdesanctisLectionaryPath = RomanMissal::getLectionaryFilePath($missal);
         $i18nData                        = null;
-
-        if (null === $propriumdesanctisFile || null === $propriumdesanctisI18nPath) {
-            throw new \InvalidArgumentException('Invalid Roman Missal id: ' . $missal);
-        }
 
         if (false === $propriumdesanctisFile || false === $propriumdesanctisI18nPath) {
             if (str_starts_with($missal, 'EDITIO_TYPICA_')) {
@@ -3689,9 +3684,6 @@ final class CalendarHandler extends AbstractHandler
                 // we get the sanctorale data for those Missals (if defined)
                 foreach ($NationalMetadata->missals as $missal) {
                     $yearLimits = RomanMissal::getYearLimits($missal);
-                    if (null === $yearLimits) {
-                        throw new \RuntimeException('Roman Missal ' . $missal . ' has no year limits! We expected at least a non null since_year value.');
-                    }
 
                     // Skip missals that only apply to years after the current requested year
                     if ($this->CalendarParams->Year < $yearLimits['since_year']) {
@@ -4486,7 +4478,7 @@ final class CalendarHandler extends AbstractHandler
                 $responseBody = json_encode($SerializeableLitCal, JSON_THROW_ON_ERROR);
         }
 
-        if (null === $responseBody) {
+        if (null === $responseBody || false === $responseBody) {
             $message = _('Error serializing Liturgical Calendar.');
             throw new ServiceUnavailableException($message);
         }
@@ -4500,9 +4492,9 @@ final class CalendarHandler extends AbstractHandler
 
         $this->endTime = hrtime(true);
         $executionTime = $this->endTime - $this->startTime;
-        $response      = $response->withHeader('X-LitCal-Starttime', $this->startTime)
-                                  ->withHeader('X-LitCal-Endtime', $this->endTime)
-                                  ->withHeader('X-LitCal-Executiontime', $executionTime)
+        $response      = $response->withHeader('X-LitCal-Starttime', $this->startTime . '')
+                                  ->withHeader('X-LitCal-Endtime', $this->endTime . '')
+                                  ->withHeader('X-LitCal-Executiontime', $executionTime . '')
                                   ->withHeader('Etag', "\"{$responseHash}\"");
 
         if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
@@ -4890,7 +4882,7 @@ final class CalendarHandler extends AbstractHandler
         //   only request parameters, and we should validate the body Content-Type
         //   and ensure that we have only scalar values for each parameter.
 
-        /** @var array<string,scalar|null> $params */
+        /** @var CalendarParamsData $params */
         $params = [];
 
         // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint:
@@ -4918,13 +4910,14 @@ final class CalendarHandler extends AbstractHandler
 
         switch ($method) {
             case RequestMethod::GET:
+                /** @var CalendarParamsData $params */
                 $params = array_merge($params, $this->getScalarQueryParams($request));
                 break;
             default:
                 $parsedBodyParams = $this->parseBodyParams($request, false);
 
                 if (null !== $parsedBodyParams) {
-                    /** @var array<string,scalar|null> $params */
+                    /** @var CalendarParamsData $params */
                     $params = array_merge($params, $parsedBodyParams);
                 }
         }
@@ -4960,9 +4953,9 @@ final class CalendarHandler extends AbstractHandler
             $this->endTime = hrtime(true);
             $executionTime = $this->endTime - $this->startTime;
             $response      = $response
-                ->withHeader('X-LitCal-Starttime', $this->startTime)
-                ->withHeader('X-LitCal-Endtime', $this->endTime)
-                ->withHeader('X-LitCal-Executiontime', $executionTime)
+                ->withHeader('X-LitCal-Starttime', $this->startTime . '')
+                ->withHeader('X-LitCal-Endtime', $this->endTime . '')
+                ->withHeader('X-LitCal-Executiontime', $executionTime . '')
                 ->withHeader('Etag', "\"{$responseHash}\"");
 
             if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {

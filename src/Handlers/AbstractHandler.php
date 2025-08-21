@@ -39,7 +39,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
     /** @var RequestContentType[] */
     protected array $allowedRequestContentTypes;
 
-    /** @var array<string|int> */
+    /** @var string[] */
     protected array $requestPathParams;
 
     abstract public function handle(ServerRequestInterface $request): ResponseInterface;
@@ -72,7 +72,6 @@ abstract class AbstractHandler implements RequestHandlerInterface
      * the function will use the array from the file.
      *
      * @param string[] $origins The array of allowed origins.
-     * @return void
      */
     public function setAllowedOrigins(array $origins): static
     {
@@ -108,6 +107,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
                 }
 
                 $projectFolder = $parentDir;
+                ++$level;
             }
         }
 
@@ -302,10 +302,12 @@ abstract class AbstractHandler implements RequestHandlerInterface
      *
      * @link https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Access-Control-Allow-Credentials
      */
+    /*
     private function setAccessControlAllowCredentialsHeader(ResponseInterface $response): ResponseInterface
     {
         return $response->withHeader('Access-Control-Allow-Credentials', 'true');
     }
+    */
 
     private function setAccessControlMaxAgeHeader(ResponseInterface $response): ResponseInterface
     {
@@ -374,7 +376,6 @@ abstract class AbstractHandler implements RequestHandlerInterface
      * or throw a `NotAcceptableException`, depending on the value of the `$acceptabilityLevel` parameter.
      *
      * @param ServerRequestInterface $request The request object.
-     * @param ResponseInterface $response The response object.
      * @param AcceptabilityLevel $acceptabilityLevel The acceptability level of the Accept header.
      * @return string The best pick mime type
      * @throws NotAcceptableException If the Accept header is empty or a value that the endpoint has not declared as acceptable,
@@ -442,10 +443,12 @@ abstract class AbstractHandler implements RequestHandlerInterface
      */
     protected function getScalarQueryParams(ServerRequestInterface $request): array
     {
-        return array_filter(
+        /** @var array<string,scalar|null> $filteredQueryParams */
+        $filteredQueryParams = array_filter(
             $request->getQueryParams(),
             fn($value) => is_scalar($value) || $value === null
         );
+        return $filteredQueryParams;
     }
 
     /**
@@ -528,7 +531,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
 
         // We don't expect a single scalar value, only an array of scalar values,
         // so we discard a pure scalar value
-        if (is_scalar($parsedBody) || $parsedBody === null) {
+        if (false === is_array($parsedBody)) {
             if ($required) {
                 throw new UnsupportedMediaTypeException();
             } else {
@@ -547,9 +550,9 @@ abstract class AbstractHandler implements RequestHandlerInterface
      *
      * @param bool $assoc If true, the payload will be returned as an associative array, otherwise as a `\stdClass` object
      *
-     * @return array<string|int,mixed>|\stdClass|null
+     * @return array<string|int,mixed>|\stdClass
      */
-    protected function parseBodyPayload(ServerRequestInterface $request, bool $assoc = true): array|\stdClass|null
+    protected function parseBodyPayload(ServerRequestInterface $request, bool $assoc = true): array|\stdClass
     {
         $this->validateRequestContentType($request, true);
 
@@ -567,6 +570,22 @@ abstract class AbstractHandler implements RequestHandlerInterface
         switch ($mime) {
             case RequestContentType::JSON:
                 $parsedBody = json_decode($rawBodyContents, $assoc, 512, JSON_THROW_ON_ERROR);
+                if ($assoc) {
+                    if (false === is_array($parsedBody) || empty($parsedBody)) {
+                        throw new ValidationException('Invalid body content received in the request: expected an associative array');
+                    }
+                    /** @var array<string|int,mixed> $parsedBody */
+                } else {
+                    if (is_array($parsedBody)) {
+                        if (empty($parsedBody) || !( $parsedBody[0] instanceof \stdClass )) {
+                            throw new ValidationException('Invalid body content received in the request: expected an array of objects');
+                        }
+                        /** @var list<\stdClass> $parsedBody */
+                    } elseif (!( $parsedBody instanceof \stdClass )) {
+                        throw new ValidationException('Invalid body content received in the request: expected an object');
+                    }
+                    /** @var list<\stdClass>|\stdClass $parsedBody */
+                }
                 break;
             case RequestContentType::YAML:
                 if (!extension_loaded('yaml')) {
@@ -576,8 +595,22 @@ abstract class AbstractHandler implements RequestHandlerInterface
                 set_error_handler([self::class, 'warningHandler'], E_WARNING);
                 try {
                     $parsedBody = yaml_parse($rawBodyContents);
+                    if (false === is_array($parsedBody) || empty($parsedBody)) {
+                        throw new YamlException('Invalid body content received in the request: expected an array', StatusCode::UNPROCESSABLE_CONTENT->value);
+                    }
+                    /** @var array<string|int,mixed> $parsedBody */
                     if (false === $assoc) {
-                        $parsedBody = json_decode(json_encode($parsedBody));
+                        $encodedJson = json_encode($parsedBody, JSON_THROW_ON_ERROR);
+                        $parsedBody  = json_decode($encodedJson, false, 512, JSON_THROW_ON_ERROR);
+                        if (is_array($parsedBody)) {
+                            if (empty($parsedBody) || !( $parsedBody[0] instanceof \stdClass )) {
+                                throw new YamlException('Invalid body content received in the request: expected an array of objects', StatusCode::UNPROCESSABLE_CONTENT->value);
+                            }
+                            /** @var list<\stdClass> $parsedBody */
+                        } elseif (!( $parsedBody instanceof \stdClass )) {
+                            throw new YamlException('Invalid body content received in the request: expected an object', StatusCode::UNPROCESSABLE_CONTENT->value);
+                        }
+                        /** @var list<\stdClass>|\stdClass $parsedBody */
                     }
                 } catch (\ErrorException $e) {
                     throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
@@ -585,20 +618,11 @@ abstract class AbstractHandler implements RequestHandlerInterface
                     restore_error_handler();
                 }
                 break;
-            case RequestContentType::FORMDATA:
-                // no break (intentional fallthrough)
-            case RequestContentType::MULTIPART:
-                $parsedBody = $request->getParsedBody();
-                break;
             default:
-                return null;
+                throw new UnsupportedMediaTypeException();
         }
 
-        // We don't expect a single scalar value, but either an array or an object
-        if (is_scalar($parsedBody) || $parsedBody === null) {
-            throw new ValidationException('Invalid body content received in the request: expected an array or an object but found a scalar value or null');
-        }
-
+        /** @var array<string|int,mixed>|\stdClass $parsedBody */
         return $parsedBody;
     }
 

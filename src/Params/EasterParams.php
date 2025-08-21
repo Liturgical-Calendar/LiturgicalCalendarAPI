@@ -16,7 +16,7 @@ use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 class EasterParams implements ParamsInterface
 {
     public ?string $Locale = null;
-    public string $baseLocale;
+    public ?string $baseLocale;
 
     /**
      * Constructor for DecreesParams

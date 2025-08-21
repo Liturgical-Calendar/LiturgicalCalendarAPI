@@ -30,8 +30,9 @@ class MissalsParams implements ParamsInterface
      *
      * Calls the setParams method to set the parameters provided in the $params array, in any.
      *
+     * @param array{locale?:string,year?:int,region?:string,include_empty?:bool,payload?:\stdClass} $params an associative array of parameter keys to values
      */
-    public function __construct($params)
+    public function __construct(array $params)
     {
         $this->setParams($params);
     }
@@ -39,14 +40,7 @@ class MissalsParams implements ParamsInterface
     /**
      * Initializes the MissalsParams class.
      *
-     * @var array{
-     *      locale?: string,
-     *      year?: int,
-     *      region?: string,
-     *      include_empty?: bool,
-     *      payload?: \stdClass
-     * } $params an associative array of parameter keys to values
-     *
+     * @param array{locale?:string,year?:int,region?:string,include_empty?:bool,payload?:\stdClass} $params an associative array of parameter keys to values
      */
     public function setParams(array $params): void
     {

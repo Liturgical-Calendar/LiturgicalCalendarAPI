@@ -37,6 +37,7 @@ final class TestsHandler extends AbstractHandler
 
     private \stdClass $payload;
 
+    /** @param string[] $requestPathParams */
     public function __construct(array $requestPathParams = [])
     {
         parent::__construct($requestPathParams);
@@ -136,7 +137,11 @@ final class TestsHandler extends AbstractHandler
                         ->withStatus(StatusCode::OK->value, StatusCode::OK->reason())
                         ->withBody(Stream::create($testContents));
                 } else {
-                    return $this->encodeResponseBody($response, json_decode($testContents, true, 512, JSON_THROW_ON_ERROR));
+                    $decodedContents = json_decode($testContents, false, 512, JSON_THROW_ON_ERROR);
+                    if (false === ( $decodedContents instanceof \stdClass )) {
+                        throw new ServiceUnavailableException("Failed to decode test {$testFile} as JSON");
+                    }
+                    return $this->encodeResponseBody($response, $decodedContents);
                 }
             } else {
                 $description = "Test {$testFile} not found";
@@ -207,20 +212,20 @@ final class TestsHandler extends AbstractHandler
         }
 
         // Sanitize data to avoid any possibility of script injection
-        self::sanitizeObjectValues($data);
+        self::sanitizeObjectValues($this->payload);
 
-        if (false === property_exists($data, 'name') || false === is_string($data->name)) {
+        if (false === property_exists($this->payload, 'name') || false === is_string($this->payload->name)) {
             $description = 'The Unit Test you are attempting to create must have a valid name.';
             throw new UnprocessableContentException($description);
         }
 
-        $testFilePath = JsonData::TESTS_FOLDER->path() . '/' . $data->name . '.json';
+        $testFilePath = JsonData::TESTS_FOLDER->path() . '/' . $this->payload->name . '.json';
         if (file_exists($testFilePath)) {
-            $description = 'A Unit Test with the name ' . $data->name . ' already exists. Did you perhaps mean to use a PATCH request?';
+            $description = 'A Unit Test with the name ' . $this->payload->name . ' already exists. Did you perhaps mean to use a PATCH request?';
             throw new UnprocessableContentException($description);
         }
 
-        $jsonEncodedTest = json_encode($data, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
+        $jsonEncodedTest = json_encode($this->payload, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
         $bytesWritten    = file_put_contents($testFilePath, $jsonEncodedTest);
         if (false === $bytesWritten) {
             $description = 'The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.';
@@ -261,25 +266,25 @@ final class TestsHandler extends AbstractHandler
         }
 
         // Sanitize data to avoid any possibility of script injection
-        self::sanitizeObjectValues($data);
+        self::sanitizeObjectValues($this->payload);
 
-        if (false === property_exists($data, 'name') || false === is_string($data->name)) {
+        if (false === property_exists($this->payload, 'name') || false === is_string($this->payload->name)) {
             $description = 'The Unit Test you are attempting to update must have a valid name.';
             throw new UnprocessableContentException($description);
         }
 
-        $testFilePath = JsonData::TESTS_FOLDER->path() . '/' . $data->name . '.json';
+        $testFilePath = JsonData::TESTS_FOLDER->path() . '/' . $this->payload->name . '.json';
         if (false === file_exists($testFilePath)) {
-            $description = 'A Unit Test with the name ' . $data->name . ' does not exist. Did you perhaps mean to use a PUT request?';
+            $description = 'A Unit Test with the name ' . $this->payload->name . ' does not exist. Did you perhaps mean to use a PUT request?';
             throw new UnprocessableContentException($description);
         }
 
-        if ($data->name !== $this->requestPathParams[0]) {
-            $description = 'You are attempting to update the Unit Test at /tests/' . $this->requestPathParams[0] . ' with a Unit Test that has the name ' . $data->name . ' in the request body. This is not allowed.';
+        if ($this->payload->name !== $this->requestPathParams[0]) {
+            $description = 'You are attempting to update the Unit Test at /tests/' . $this->requestPathParams[0] . ' with a Unit Test that has the name ' . $this->payload->name . ' in the request body. This is not allowed.';
             throw new UnprocessableContentException($description);
         }
 
-        $jsonEncodedTest = json_encode($data, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
+        $jsonEncodedTest = json_encode($this->payload, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
         $bytesWritten    = file_put_contents($testFilePath, $jsonEncodedTest);
         if (false === $bytesWritten) {
             $description = 'The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.';
@@ -329,28 +334,28 @@ final class TestsHandler extends AbstractHandler
         switch ($method) {
             case RequestMethod::GET:
                 return $this->handleGetRequest($response);
-                break;
+                // no break needed
             case RequestMethod::PUT:
-                $payload = $this->parseBodyPayload($request);
+                $payload = $this->parseBodyPayload($request, false);
                 if (false === $payload instanceof \stdClass) {
                     $description = 'The Unit Test you are attempting to create must be an object. Received ' . gettype($payload) . '.';
                     throw new UnprocessableContentException($description);
                 }
                 $this->payload = $payload;
                 return $this->handlePutRequest($response);
-                break;
+                // no break needed
             case RequestMethod::PATCH:
-                $payload = $this->parseBodyPayload($request);
+                $payload = $this->parseBodyPayload($request, false);
                 if (false === $payload instanceof \stdClass) {
                     $description = 'The Unit Test you are attempting to create must be an object. Received ' . gettype($payload) . '.';
                     throw new UnprocessableContentException($description);
                 }
                 $this->payload = $payload;
                 return $this->handlePatchRequest($response);
-                break;
+                // no break needed
             case RequestMethod::DELETE:
                 return $this->handleDeleteRequest($response);
-                break;
+                // no break needed
             default:
                 throw new MethodNotAllowedException();
         }

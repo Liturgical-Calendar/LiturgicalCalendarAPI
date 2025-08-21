@@ -54,6 +54,7 @@ final class RegionalDataHandler extends AbstractHandler
     private readonly MetadataCalendars $CalendarsMetadata;
     private RegionalDataParams $params;
 
+    /** @param string[] $requestPathParams */
     public function __construct(array $requestPathParams = [])
     {
         parent::__construct($requestPathParams);
@@ -147,6 +148,7 @@ final class RegionalDataHandler extends AbstractHandler
                     ->withStatus(StatusCode::OK->value, StatusCode::OK->reason())
                     ->withBody(Stream::create($i18nDataFileContents));
             } else {
+                /** @var array<string,string> $responseObj */
                 $responseObj = json_decode($i18nDataFileContents, true, 512, JSON_THROW_ON_ERROR);
                 return $this->encodeResponseBody($response, $responseObj);
             }
@@ -484,10 +486,12 @@ final class RegionalDataHandler extends AbstractHandler
         throw new ImplementationException('Not yet implemented');
         // implementation here (remove above exception once implemented)
 
+        /*
         $responseObj          = new \stdClass();
         $responseObj->success = 'Calendar data created or updated for Wider Region';
         $responseObj->data    = $payload;
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
+        */
     }
 
     /**
@@ -515,8 +519,7 @@ final class RegionalDataHandler extends AbstractHandler
                 return $this->createWiderRegionCalendar($response);
                 // no break (always terminates)
             default:
-                $description = 'Unknown calendar category "' . $this->params->category->value . '"';
-                throw new ValidationException($description);
+                throw new UnprocessableContentException('unknown calendar category');
         }
     }
 
@@ -911,8 +914,7 @@ final class RegionalDataHandler extends AbstractHandler
                 return $this->updateWiderRegionCalendar($response);
                 // no break (always terminates)
             default:
-                $description = 'Unknown calendar category "' . $this->params->category->value . '"';
-                throw new ValidationException($description);
+                throw new ValidationException('Unknown calendar category');
         }
     }
 
@@ -1079,12 +1081,12 @@ final class RegionalDataHandler extends AbstractHandler
     /**
      * Validate payload data against a schema
      *
-     * @param object $data Data to validate
+     * @param \stdClass $data Data to validate
      * @param string $schemaUrl  Schema to validate against
      *
      * @return boolean
      */
-    private static function validateDataAgainstSchema(object $data, string $schemaUrl): bool
+    private static function validateDataAgainstSchema(\stdClass $data, string $schemaUrl): bool
     {
         $schema = Schema::import($schemaUrl);
         try {
@@ -1104,7 +1106,7 @@ final class RegionalDataHandler extends AbstractHandler
     /**
      * Validate the request path parts for the RegionalData resource.
      *
-     * @throws ValidationExepction When the request path is invalid
+     * @throws ValidationException When the request path is invalid
      */
     private function validateRequestPath(ServerRequestInterface $request): void
     {
@@ -1133,8 +1135,6 @@ final class RegionalDataHandler extends AbstractHandler
                     throw new ValidationException($description);
                 }
                 break;
-            default:
-                throw new ValidationException('Unexpected request method: ' . $method);
         }
 
         // In all cases, we check if the category param is valid
@@ -1174,7 +1174,7 @@ final class RegionalDataHandler extends AbstractHandler
             // Cannot DELETE a National calendar data if it is still in use by a Diocesan calendar
             foreach ($this->CalendarsMetadata->diocesan_calendars as $diocesanCalendar) {
                 if ($diocesanCalendar->nation === $params->key) {
-                    $description = "Cannot DELETE National Calendar data while there are Diocesan calendars that depend on it. Currently, {$params['key']} is in use by Diocesan calendar {$diocesanCalendar->calendar_id}.";
+                    $description = "Cannot DELETE National Calendar data while there are Diocesan calendars that depend on it. Currently, {$params->key} is in use by Diocesan calendar {$diocesanCalendar->calendar_id}.";
                     throw new UnprocessableContentException($description);
                 }
             }
@@ -1190,7 +1190,7 @@ final class RegionalDataHandler extends AbstractHandler
             } else {
                 $currentNation = array_find($this->CalendarsMetadata->national_calendars, fn (MetadataNationalCalendarItem $el) => $el->calendar_id === $params->key);
                 if (null === $currentNation) {
-                    $description = "Invalid value {$params['key']} for param `key`, valid values are: "
+                    $description = "Invalid value {$params->key} for param `key`, valid values are: "
                         . implode(', ', $this->CalendarsMetadata->national_calendars_keys);
                     throw new UnprocessableContentException($description);
                 }
@@ -1250,7 +1250,7 @@ final class RegionalDataHandler extends AbstractHandler
             } else {
                 $currentDiocese = array_find($this->CalendarsMetadata->diocesan_calendars, fn (MetadataDiocesanCalendarItem $el) => $el->calendar_id === $params->key);
                 if (null === $currentDiocese) {
-                    $description = "Invalid value {$params['key']} for param `key`, valid values are: "
+                    $description = "Invalid value {$params->key} for param `key`, valid values are: "
                         . implode(', ', $this->CalendarsMetadata->diocesan_calendars_keys);
                     throw new UnprocessableContentException($description);
                 }
@@ -1356,8 +1356,6 @@ final class RegionalDataHandler extends AbstractHandler
     /**
      * Initializes the RegionalData class.
      *
-     * @param string[] $requestPathParts the path parameters from the request
-     *
      * This method will:
      * - Initialize the instance of the Core class
      * - If the $requestPathParts argument is not empty, it will set the request path parts
@@ -1403,7 +1401,7 @@ final class RegionalDataHandler extends AbstractHandler
         //   - for PUT and PATCH requests we will have a payload in the request body
         //   - for DELETE requests we will have neither payload nor request parameters, only path parameters
 
-        /** @var array{category:string,key:string,i18n?:string,locale?:string,payload?:DiocesanData|NationalData|WiderRegionData} */
+        /** @var array{category:PathCategory,key:string,i18n?:string,locale?:string,payload?:DiocesanData|NationalData|WiderRegionData} $params */
         $params = [];
 
         // We always expect the category to be set in the request path
@@ -1427,16 +1425,20 @@ final class RegionalDataHandler extends AbstractHandler
         }
 
         if ($method === RequestMethod::GET) {
+            /** @var array{category:PathCategory,key:string,i18n?:string,locale:string,payload?:DiocesanData|NationalData|WiderRegionData} $params */
             $params = array_merge($params, $this->getScalarQueryParams($request));
         } elseif ($method === RequestMethod::POST) {
             $parsedBodyParams = $this->parseBodyParams($request, false);
 
             if (null !== $parsedBodyParams) {
-                /** @var array<string,scalar|null> $params */
+                /** @var array{category:PathCategory,key:string,i18n?:string,locale:string,payload?:DiocesanData|NationalData|WiderRegionData} $params */
                 $params = array_merge($params, $parsedBodyParams);
             }
         } elseif ($method === RequestMethod::PUT || $method === RequestMethod::PATCH) {
-            $payload = $this->parseBodyPayload($request);
+            $payload = $this->parseBodyPayload($request, false);
+            if (false === ( $payload instanceof \stdClass )) {
+                throw new ValidationException('Invalid payload');
+            }
             switch ($params['category']) {
                 case PathCategory::DIOCESE:
                     if (RegionalDataHandler::validateDataAgainstSchema($payload, LitSchema::DIOCESAN->path())) {
@@ -1459,6 +1461,9 @@ final class RegionalDataHandler extends AbstractHandler
                 default:
                     throw new ValidationException("Invalid category: {$this->requestPathParams[0]}");
             }
+            if (false === isset($key)) {
+                throw new ValidationException('Invalid payload, could not extract diocese_id, nation or wider_region accordingly');
+            }
             if ($method === RequestMethod::PUT) {
                 $params['key'] = $key;
             } else {
@@ -1466,6 +1471,7 @@ final class RegionalDataHandler extends AbstractHandler
                     throw new ValidationException('The key in the request path does not match the key in the payload');
                 }
             }
+            /** @var array{category:PathCategory,key:string,i18n?:string,locale:string,payload:DiocesanData|NationalData|WiderRegionData} $params */
         }
 
         if (in_array($method, [RequestMethod::GET, RequestMethod::POST], true)) {
@@ -1473,14 +1479,9 @@ final class RegionalDataHandler extends AbstractHandler
                 $params['i18n']        = $this->requestPathParams[2];
                 $params['i18nRequest'] = $params['i18n'];
             }
+            /** @var array{category:PathCategory,key:string,i18n:string,locale:string,payload?:DiocesanData|NationalData|WiderRegionData} $params */
         }
-
         $this->params = new RegionalDataParams($params);
-
-        if (null === $this->CalendarsMetadata) {
-            $description = 'Failed to load calendar metadata or calendar metadata not initialized.';
-            throw new ServiceUnavailableException($description);
-        }
 
         switch ($this->params->category) {
             case PathCategory::NATION:

@@ -8,7 +8,6 @@ use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
-use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
@@ -17,8 +16,6 @@ use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadata;
 use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadataMap;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
-use Nyholm\Psr7\Response;
-use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -30,6 +27,7 @@ final class MissalsHandler extends AbstractHandler
     /** @var string[] */ public static array $MissalRegions  = [];
     /** @var int[]    */ public static array $MissalYears    = [];
 
+    /** @param string[] $requestPathParams */
     public function __construct(array $requestPathParams = [])
     {
         parent::__construct($requestPathParams);
@@ -96,7 +94,7 @@ final class MissalsHandler extends AbstractHandler
         //   - for PUT and PATCH requests we will have a payload in the request body
         //   - for DELETE requests we will have neither payload nor request parameters, only path parameters
 
-        /** @var array{locale?:string,region?:string,year?:int,include_empty?:bool}|array{PAYLOAD:\stdClass} $params */
+        /** @var array{locale?:string,region?:string,year?:int,include_empty?:bool}|array{payload:\stdClass} $params */
         $params = [];
 
         // Second of all, we check if an Accept-Language header was set in the request
@@ -111,16 +109,20 @@ final class MissalsHandler extends AbstractHandler
         }
 
         if ($method === RequestMethod::GET) {
+            /** @var array{locale?:string,region?:string,year?:int,include_empty?:bool}|array{payload:\stdClass} $params */
             $params = array_merge($params, $this->getScalarQueryParams($request));
         } elseif ($method === RequestMethod::POST) {
             $parsedBodyParams = $this->parseBodyParams($request, false);
 
             if (null !== $parsedBodyParams) {
-                /** @var array<string,scalar|null> $params */
+                /** @var array{locale?:string,region?:string,year?:int,include_empty?:bool}|array{payload:\stdClass} $params */
                 $params = array_merge($params, $parsedBodyParams);
             }
         } elseif ($method === RequestMethod::PUT || $method === RequestMethod::PATCH) {
-            $params['payload'] = $this->parseBodyPayload($request);
+            $params['payload'] = $this->parseBodyPayload($request, false);
+            if (false === ( $params['payload'] instanceof \stdClass )) {
+                throw new ValidationException('Invalid payload');
+            }
         }
 
         $this->params = new MissalsParams($params);
@@ -250,7 +252,7 @@ final class MissalsHandler extends AbstractHandler
 
                 if (null !== $this->params->Year) {
                     MissalsHandler::$missalsIndex->setYearFilter($this->params->Year);
-                    $response = $response->withHeader('X-Litcal-Missals-Year', $this->params->Year);
+                    $response = $response->withHeader('X-Litcal-Missals-Year', $this->params->Year . '');
                 }
 
                 // if filters are set, the results are internally filtered by the jsonSerializer

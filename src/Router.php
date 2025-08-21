@@ -18,6 +18,7 @@ use LiturgicalCalendar\Api\Handlers\MissalsHandler;
 use LiturgicalCalendar\Api\Handlers\DecreesHandler;
 use LiturgicalCalendar\Api\Handlers\SchemasHandler;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Middleware\ErrorHandlingMiddleware;
 use LiturgicalCalendar\Api\Http\Server\MiddlewarePipeline;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -288,8 +289,14 @@ class Router
         // The websocket server will be running in CLI mode,
         //   and there won't be any $_SERVER globals set (except for $_SERVER['argv'}?).
         if (PHP_SAPI === 'cli') {
-            $entryFile = realpath($_SERVER['argv'][0]);
-            $entryDir  = dirname($entryFile);
+            /** @var string[] */
+            $argv      = $_SERVER['argv'];
+            $entryFile = realpath($argv[0]);
+            if (false === $entryFile) {
+                throw new ServiceUnavailableException('Unable to determine entry file.');
+            }
+
+            $entryDir = dirname($entryFile);
 
             //$relIndexToParentOfSrc = self::relativePath($entryDir, dirname(__DIR__));
 
@@ -348,8 +355,22 @@ class Router
             $api_full_path .= ':' . $_SERVER['SERVER_PORT'];
         }
 
-        $api_base_path = explode(basename(__DIR__), $_SERVER['SCRIPT_NAME'])[0];
-        $indexPath     = $_SERVER['SCRIPT_FILENAME'];
+        $baseDir = basename(__DIR__);
+        if (empty($baseDir)) {
+            throw new ServiceUnavailableException('Unable to determine base directory.');
+        }
+        if (
+            false === isset($_SERVER['SCRIPT_NAME'])
+            || false === isset($_SERVER['SCRIPT_FILENAME'])
+            || false === is_string($_SERVER['SCRIPT_NAME'])
+            || false === is_string($_SERVER['SCRIPT_FILENAME'])
+        ) {
+            throw new ServiceUnavailableException('Unable to determine entry file.');
+        }
+        $scriptName     = $_SERVER['SCRIPT_NAME'];
+        $scriptFileName = $_SERVER['SCRIPT_FILENAME'];
+        $api_base_path  = explode($baseDir, $scriptName)[0];
+        $indexPath      = $scriptFileName;
         //$projectRoot   = self::findProjectRoot(dirname($indexPath)); // walk upward from index.php
         //$relRootToSrc  = self::relativePath($projectRoot, __DIR__);
         //$relIndexToSrc = self::relativePath(dirname($indexPath), __DIR__);
@@ -397,8 +418,13 @@ class Router
      */
     private static function relativePath(string $from, string $to): string
     {
-        $fromParts = explode(DIRECTORY_SEPARATOR, realpath($from));
-        $toParts   = explode(DIRECTORY_SEPARATOR, realpath($to));
+        $pathFrom = realpath($from);
+        $pathTo   = realpath($to);
+        if (false === $pathFrom || false === $pathTo) {
+            throw new ServiceUnavailableException('Unable to determine relative path.');
+        }
+        $fromParts = explode(DIRECTORY_SEPARATOR, $pathFrom);
+        $toParts   = explode(DIRECTORY_SEPARATOR, $pathTo);
 
         // Remove common base
         while (count($fromParts) && count($toParts) && ( $fromParts[0] === $toParts[0] )) {

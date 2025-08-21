@@ -80,8 +80,6 @@ class CalendarParams implements ParamsInterface
      *
      * - loads calendars metadata
      * - sets the response status code to 503 Service Unavailable if the API was unable to load calendars metadata
-     * @param CalendarParamsData $params
-     * @param array<string|int> $requestPathParams
      */
     public function __construct()
     {
@@ -107,7 +105,7 @@ class CalendarParams implements ParamsInterface
      *
      * @param ReturnTypeParam[] $allowedReturnTypes An array of allowed 'return_type' parameter values.
      */
-    public function setAllowedReturnTypes(array $allowedReturnTypes)
+    public function setAllowedReturnTypes(array $allowedReturnTypes): void
     {
         $this->allowedReturnTypes = $allowedReturnTypes;
     }
@@ -378,12 +376,8 @@ class CalendarParams implements ParamsInterface
     /**
      * Validates parameter values that are expected to be strings.
      * Produces a 400 Bad Request error if the value is not a string
-     *
-     * @param string $key
-     * @param mixed $value
-     * @return string
      */
-    private function validateStringValue(string $key, mixed $value): ?string
+    private function validateStringValue(string $key, mixed $value): string
     {
         if (gettype($value) !== 'string') {
             throw new ValidationException("Expected value of type String for parameter `{$key}`, instead found type " . gettype($value));
@@ -404,7 +398,7 @@ class CalendarParams implements ParamsInterface
      * 1) nation or diocese or year: a string indicating whether a national or diocesan calendar is requested, or an integer indicating the year for which the General Roman calendar should be calculated
      * 2) (when 1 is a string) a string indicating the national or diocesan calendar to produce
      * 3) (when 1 is a string) an integer indicating the year for which the national or diocesan calendar should be calculated
-     * @param array<string|int> $requestPathParams
+     * @param string[] $requestPathParams
      */
     public function initParamsFromRequestPath(array $requestPathParams): void
     {
@@ -413,14 +407,8 @@ class CalendarParams implements ParamsInterface
             $params = [];
             if ($numPathParts === 1) {
                 if (
-                    false === in_array(gettype($requestPathParams[0]), ['string', 'integer'])
-                    || (
-                        gettype($requestPathParams[0]) === 'string'
-                        && (
-                            false === is_numeric($requestPathParams[0])
-                            || false === ctype_digit($requestPathParams[0])
-                        )
-                    )
+                    false === is_numeric($requestPathParams[0])
+                    || false === ctype_digit($requestPathParams[0])
                 ) {
                     throw new ValidationException('path parameter expected to represent Year value but did not have type Integer or numeric String');
                 } else {

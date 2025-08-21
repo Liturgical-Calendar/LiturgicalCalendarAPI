@@ -26,6 +26,7 @@ use Nyholm\Psr7\Stream;
 
 final class SchemasHandler extends AbstractHandler
 {
+    /** @param string[] $requestPathParams */
     public function __construct(array $requestPathParams = [])
     {
         parent::__construct($requestPathParams);
@@ -76,7 +77,7 @@ final class SchemasHandler extends AbstractHandler
                     $schemaIndex->litcal_schemas[] = Route::SCHEMAS->path() . '/' . $f->getFilename();
                 }
                 return $this->encodeResponseBody($response, $schemaIndex);
-                break;
+                // no break needed
             case 1:
                 if (file_exists(JsonData::SCHEMAS_FOLDER->path() . '/' . $this->requestPathParams[0])) {
                     $schema = file_get_contents(JsonData::SCHEMAS_FOLDER->path() . '/' . $this->requestPathParams[0]);
@@ -90,12 +91,15 @@ final class SchemasHandler extends AbstractHandler
                             ->withBody(Stream::create($schema));
                     } else {
                         $schemaObj = json_decode($schema, false, 512, JSON_THROW_ON_ERROR);
+                        if (false === ( $schemaObj instanceof \stdClass )) {
+                            throw new ServiceUnavailableException("Schema file '{$this->requestPathParams[0]}' not parseable into JSON");
+                        }
                         return $this->encodeResponseBody($response, $schemaObj);
                     }
                 } else {
                     throw new NotFoundException("Schema file '{$this->requestPathParams[0]}' not found");
                 }
-                break;
+                // no break needed
             default:
                 throw new ValidationException('Invalid number of path parameters, expected at most 1, received ' . $pathParamCount);
         }

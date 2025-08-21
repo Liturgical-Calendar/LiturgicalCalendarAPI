@@ -21,7 +21,7 @@ final class EasterHandler extends AbstractHandler
     private static \IntlDateFormatter $dayOfTheWeekDayMonthYear;
     private static \IntlDateFormatter $dayMonthYear;
     private static \IntlDateFormatter $dayOfTheWeek;
-    private static object $EasterDates;
+    private static \stdClass $EasterDates;
 
     public function __construct()
     {
@@ -30,6 +30,9 @@ final class EasterHandler extends AbstractHandler
 
     private function setLocale(): void
     {
+        if (null === $this->params->Locale || null === $this->params->baseLocale) {
+            throw new ServiceUnavailableException('Locale parameter has not been initialized.');
+        }
         $localeArray = [
             $this->params->Locale . '.utf8',
             $this->params->Locale . '.UTF-8',
@@ -196,7 +199,7 @@ final class EasterHandler extends AbstractHandler
         //   - for POST requests we will never have a payload in the request body,
         //       only request parameters
 
-        /** @var array{locale?:string}|array{PAYLOAD:\stdClass} $params */
+        /** @var array{locale?:string,payload?:\stdClass} $params */
         $params = [];
 
         // Second of all, we check if an Accept-Language header was set in the request
@@ -212,12 +215,13 @@ final class EasterHandler extends AbstractHandler
         }
 
         if ($method === RequestMethod::GET) {
+            /** @var array{locale?:string,payload?:\stdClass} $params */
             $params = array_merge($params, $this->getScalarQueryParams($request));
         } elseif ($method === RequestMethod::POST) {
             $parsedBodyParams = $this->parseBodyParams($request, false);
 
             if (null !== $parsedBodyParams) {
-                /** @var array<string,scalar|null> $params */
+                /** @var array{locale?:string,payload?:\stdClass} $params */
                 $params = array_merge($params, $parsedBodyParams);
             }
         }

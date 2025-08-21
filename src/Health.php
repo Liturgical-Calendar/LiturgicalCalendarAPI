@@ -12,7 +12,6 @@ use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
-use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Test\LitTestRunner;
@@ -47,10 +46,6 @@ class Health implements MessageComponentInterface
      */
     protected \SplObjectStorage $clients;
 
-    private static string $apiBase;
-    private static string $apiPath;
-    private static string $apiFilePath;
-
     /**
      * Array of actions that the Health endpoint can execute.
      * Each key is an action name. The value is an array of strings that represent the names of the
@@ -70,8 +65,6 @@ class Health implements MessageComponentInterface
      * Mapping of data file paths to the LitSchema constants that their JSON data should validate against.
      * The paths are relative to the root of the project. The LitSchema constants are used to determine
      * which schema to use when validating the JSON data.
-     *
-     * @var string[] $dataFile
      */
     private static function getPathToSchemaFile(string $dataFile): ?string
     {
@@ -82,14 +75,14 @@ class Health implements MessageComponentInterface
             JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_2008/propriumdesanctis_2008.json'       => LitSchema::PROPRIUMDESANCTIS->path(),
             JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json' => LitSchema::PROPRIUMDESANCTIS->path(),
             JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json' => LitSchema::PROPRIUMDESANCTIS->path(),
-            Router::$apiPath . '/calendars'                                                                => LitSchema::METADATA->path(),
-            Router::$apiPath . '/decrees'                                                                  => LitSchema::DECREES->path(),
-            Router::$apiPath . '/events'                                                                   => LitSchema::EVENTS->path(),
-            Router::$apiPath . '/tests'                                                                    => LitSchema::TESTS->path(),
-            Router::$apiPath . '/easter'                                                                   => LitSchema::EASTER->path(),
-            Router::$apiPath . '/missals'                                                                  => LitSchema::MISSALS->path(),
-            Router::$apiPath . '/data'                                                                     => LitSchema::DATA->path(),
-            Router::$apiPath . '/schemas'                                                                  => LitSchema::SCHEMAS->path(),
+            Route::CALENDARS->path()                                                                      => LitSchema::METADATA->path(),
+            Route::DECREES->path()                                                                        => LitSchema::DECREES->path(),
+            Route::EVENTS->path()                                                                         => LitSchema::EVENTS->path(),
+            Route::TESTS->path()                                                                          => LitSchema::TESTS->path(),
+            Route::EASTER->path()                                                                         => LitSchema::EASTER->path(),
+            Route::MISSALS->path()                                                                        => LitSchema::MISSALS->path(),
+            Route::DATA->path()                                                                           => LitSchema::DATA->path(),
+            Route::SCHEMAS->path()                                                                        => LitSchema::SCHEMAS->path(),
             default => null
         };
     }

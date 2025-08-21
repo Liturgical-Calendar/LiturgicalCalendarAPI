@@ -25,6 +25,7 @@ final class DecreesHandler extends AbstractHandler
     public static DecreeItemCollection $decreesIndex;
     public DecreesParams $params;
 
+    /** @param string[] $requestPathParams */
     public function __construct(array $requestPathParams = [])
     {
         parent::__construct($requestPathParams);
@@ -122,7 +123,7 @@ final class DecreesHandler extends AbstractHandler
         //   - for PUT and PATCH requests we will have a payload in the request body
         //   - for DELETE requests we will have neither payload nor request parameters, only path parameters
 
-        /** @var array{locale?:string}|array{PAYLOAD:\stdClass} $params */
+        /** @var array{locale?:string,payload?:\stdClass} $params */
         $params = [];
 
         // Second of all, we check if an Accept-Language header was set in the request
@@ -137,18 +138,23 @@ final class DecreesHandler extends AbstractHandler
         }
 
         if ($method === RequestMethod::GET) {
+            /** @var array{locale?:string} $params */
             $params = array_merge($params, $this->getScalarQueryParams($request));
         } elseif ($method === RequestMethod::POST) {
             $parsedBodyParams = $this->parseBodyParams($request, false);
 
             if (null !== $parsedBodyParams) {
-                /** @var array<string,scalar|null> $params */
+                /** @var array{locale?:string} $params */
                 $params = array_merge($params, $parsedBodyParams);
             }
         } elseif ($method === RequestMethod::PUT || $method === RequestMethod::PATCH) {
-            $params['payload'] = $this->parseBodyPayload($request);
+            $params['payload'] = $this->parseBodyPayload($request, false);
+            if (false === ( $params['payload'] instanceof \stdClass )) {
+                throw new ValidationException('Invalid payload');
+            }
         }
 
+        /** @var array{locale?:string,payload?:\stdClass} $params */
         $this->params = new DecreesParams($params);
 
         switch ($method) {
