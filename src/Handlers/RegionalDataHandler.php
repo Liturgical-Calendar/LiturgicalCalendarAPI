@@ -16,6 +16,7 @@ use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Exception\ImplementationException;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
+use LiturgicalCalendar\Api\Http\Exception\ResourceConflictException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
@@ -32,7 +33,6 @@ use LiturgicalCalendar\Api\Utilities;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Nyholm\Psr7\Stream;
-use Sabre\Xml\Service;
 
 /**
  * Handles the `/data` path of the API
@@ -1163,7 +1163,7 @@ final class RegionalDataHandler extends AbstractHandler
             // Cannot PUT National calendar data if it already exists
             if (in_array($params->key, $this->CalendarsMetadata->national_calendars_keys)) {
                 $description = 'National calendar data already exists for nation with ID: ' . $params->key;
-                throw new UnprocessableContentException($description);
+                throw new ResourceConflictException($description);
             }
 
             $uniqueRegions = array_values(array_unique(array_filter(
@@ -1246,7 +1246,7 @@ final class RegionalDataHandler extends AbstractHandler
             // Cannot PUT Diocesan calendar data if it already exists
             if (in_array($params->key, $this->CalendarsMetadata->diocesan_calendars_keys)) {
                 $description = 'Diocesan calendar data already exists for diocese with ID: ' . $params->key;
-                throw new UnprocessableContentException($description);
+                throw new ResourceConflictException($description);
             }
         }
 
@@ -1306,7 +1306,7 @@ final class RegionalDataHandler extends AbstractHandler
             // Cannot PUT Wider Region calendar data if it already exists
             if (in_array($params->key, $this->CalendarsMetadata->wider_regions_keys)) {
                 $description = "Cannot create Wider Region calendar with id: {$params->key}, since there is already a resource with that id. Perhaps you meant to use PATCH?";
-                throw new UnprocessableContentException($description);
+                throw new ResourceConflictException($description);
             }
         } elseif ($method === RequestMethod::DELETE) {
             // Cannot DELETE Wider Region calendar data if there are national calendars that depend on it
@@ -1480,7 +1480,7 @@ final class RegionalDataHandler extends AbstractHandler
                 $params['key'] = $key;
             } else {
                 if ($params['key'] !== $key) {
-                    throw new ValidationException('The key in the request path does not match the key in the payload');
+                    throw new UnprocessableContentException('The key in the request path does not match the key in the payload');
                 }
             }
             /** @var array{category:PathCategory,key:string,i18n?:string,locale:string,payload:DiocesanData|NationalData|WiderRegionData} $params */

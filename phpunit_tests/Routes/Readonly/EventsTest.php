@@ -94,7 +94,7 @@ final class EventsTest extends ApiTestCase
                     );
                 }
             } )(),
-            [ 'concurrency' => 5 ] // <= number of PHP built-in server workers
+            [ 'concurrency' => 6 ] // <= number of PHP built-in server workers
         );
 
         $each->promise()->wait();

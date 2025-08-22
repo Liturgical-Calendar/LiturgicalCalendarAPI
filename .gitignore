@@ -5,12 +5,12 @@ vendor/*
 .env.*
 !.env.example
 phpstan.neon
-.phpunit.result.cache
-.phpunit.cache
-.idea
-*.php
+..idea
+/*.php
+/*.txt
+/*.js
+*.cache
 *.iml
-*.txt
 *.log
 *.pid
 *.supp

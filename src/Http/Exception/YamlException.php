@@ -14,7 +14,7 @@ class YamlException extends ApiException
         parent::__construct(
             $message,
             $status,
-            'https://www.rfc-editor.org/rfc/rfc9110.html#name-422-unprocessable-content',
+            'https://datatracker.ietf.org/doc/html/rfc9110#name-422-unprocessable-content',
             'Invalid YAML data',
             $previous
         );

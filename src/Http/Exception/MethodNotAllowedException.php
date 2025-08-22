@@ -11,7 +11,7 @@ class MethodNotAllowedException extends ApiException
         parent::__construct(
             $message,
             StatusCode::METHOD_NOT_ALLOWED->value,
-            'https://www.rfc-editor.org/rfc/rfc9110.html#name-406-not-acceptable',
+            'https://datatracker.ietf.org/doc/html/rfc9110#name-406-not-acceptable',
             StatusCode::METHOD_NOT_ALLOWED->reason(),
             $previous
         );

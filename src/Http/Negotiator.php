@@ -32,7 +32,7 @@ final class Negotiator
 
     /**
      * Split a header list on commas, honoring quoted strings.
-     * @link https://tools.ietf.org/html/rfc7231#section-5.3
+     * @link https://datatracker.ietf.org/doc/html/rfc9110#name-field-order
      * @return string[]
      */
     private static function splitCommaSeparated(string $header): array
@@ -88,6 +88,7 @@ final class Negotiator
 
     /**
      * Split parameters on ';' outside quotes; return [value, params[]].
+     * @link https://datatracker.ietf.org/doc/html/rfc9110#name-parameters
      * @return array<int,string|array<lowercase-string,string|null>>
      */
     private static function splitParameters(string $item): array
@@ -156,7 +157,11 @@ final class Negotiator
         return [$value, $params];
     }
 
-    /** Parse q-value per RFC 9110; invalid → 0.0 */
+    /**
+     * Parse q-value per RFC 9110; invalid → 0.0
+     * @link https://datatracker.ietf.org/doc/html/rfc9110#name-quality-values
+     * @return float
+     */
     private static function parseQ(?string $q): float
     {
         if ($q === null || $q === '') {
@@ -174,6 +179,7 @@ final class Negotiator
 
     /**
      * Parse Accept into structured entries.
+     * @link https://datatracker.ietf.org/doc/html/rfc9110#name-accept
      * @return array<array{type:string,raw:string,params:array<string,string|null>,q:float,specificity:int,paramBonus:int,index:int}>
      */
     public static function parseAccept(string $header): array
@@ -293,6 +299,7 @@ final class Negotiator
 
     /**
      * Parse Accept-Language entries.
+     * @link https://datatracker.ietf.org/doc/html/rfc9110#name-accept-language
      * @return array<array{tag:string,raw:string,q:float,specificity:int,index:int}>
      */
     public static function parseAcceptLanguage(string $header): array
@@ -409,6 +416,7 @@ final class Negotiator
 
     /**
      * Parse Accept-Encoding entries.
+     * @link https://datatracker.ietf.org/doc/html/rfc9110#name-accept-encoding
      * @return array<array{token:string,raw:string,q:float,specificity:int,index:int}>
      */
     public static function parseAcceptEncoding(string $header): array
@@ -518,6 +526,114 @@ final class Negotiator
             if ($bestForSup === null && $sup === 'identity' && $identityQ > 0.0) {
                 $bestForSup      = 'identity';
                 $bestForSupScore = [$identityQ, 1, 0];
+            }
+
+            if ($bestForSup !== null && $bestForSupScore > $bestScore) {
+                $bestScore = $bestForSupScore;
+                $best      = $bestForSup;
+            }
+        }
+
+        return $best;
+    }
+
+    /* ========================= Accept-Charset ========================= */
+
+    /**
+     * Parse Accept-Charset entries.
+     * @link https://datatracker.ietf.org/doc/html/rfc9110#name-accept-charset
+     * @return array<array{token:string,raw:string,q:float,specificity:int,index:int}>
+     */
+    public static function parseAcceptCharset(string $header): array
+    {
+        $items = self::splitCommaSeparated($header);
+        $out   = [];
+        $i     = 0;
+
+        foreach ($items as $raw) {
+            /**
+             * @var array<string,string|null> $params
+             * @var lowercase-string $token
+             */
+            [$token, $params] = self::splitParameters($raw);
+            $token            = strtolower(trim($token));
+            if ($token === '') {
+                continue;
+            }
+
+            $q = self::parseQ($params['q'] ?? null);
+
+            // Specificity: explicit charset > '*'
+            $specificity = ( $token === '*' ) ? 0 : 1;
+
+            $out[] = [
+                'raw'         => $raw,
+                'token'       => $token,
+                'q'           => $q,
+                'specificity' => $specificity,
+                'index'       => $i++,
+            ];
+        }
+
+        usort($out, function ($a, $b) {
+            return [$b['q'], $b['specificity'], $a['index']]
+                 <=> [$a['q'], $a['specificity'], $b['index']];
+        });
+
+        return $out;
+    }
+
+    /**
+     * Pick best charset from supported (e.g., ['utf-8','iso-8859-1']).
+     * RFC notes:
+     *  - If header is absent: all charsets are acceptable → pick first supported.
+     *  - '*' matches any charset.
+     *  - q=0 means not acceptable.
+     * @param string[] $supported
+     */
+    public static function pickCharset(ServerRequestInterface $request, array $supported = []): ?string
+    {
+        $acceptCharsetHeader = $request->getHeaderLine('Accept-Charset');
+        if (empty($supported)) {
+            // Default supported set; customize as needed for your app
+            $supportedCharsets = ['utf-8'];
+        } else {
+            $lowercaseCharsets = array_map(fn($v) => strtolower($v), $supported);
+            $supportedCharsets = array_values(array_unique($lowercaseCharsets));
+        }
+
+        // Header missing → any supported is acceptable
+        if ($acceptCharsetHeader === '') {
+            return $supportedCharsets[0] ?? null;
+        }
+
+        self::$acceptValues         = self::parseAcceptCharset($acceptCharsetHeader);
+        self::$filteredAcceptValues = array_filter(self::$acceptValues, fn ($v) => in_array($v['token'], $supportedCharsets, true) || $v['token'] === '*');
+
+        $best      = null;
+        $bestScore = [-1, -1, -1]; // q, specificity, -index
+
+        foreach ($supportedCharsets as $sup) {
+            $bestForSup      = null;
+            $bestForSupScore = [-1, -1, -PHP_INT_MAX];
+
+            foreach (self::$acceptValues as $acc) {
+                $q = $acc['q'];
+
+                $matches = false;
+                if ($acc['token'] === '*') {
+                    $matches = true;
+                } elseif ($acc['token'] === $sup) {
+                    $matches = true;
+                }
+
+                if ($matches && $q > 0.0) {
+                    $score = [$q, $acc['specificity'], -$acc['index']];
+                    if ($score > $bestForSupScore) {
+                        $bestForSupScore = $score;
+                        $bestForSup      = $sup;
+                    }
+                }
             }
 
             if ($bestForSup !== null && $bestForSupScore > $bestScore) {

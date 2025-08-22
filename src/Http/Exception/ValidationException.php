@@ -11,7 +11,7 @@ class ValidationException extends ApiException
         parent::__construct(
             $message,
             StatusCode::BAD_REQUEST->value,
-            'https://www.rfc-editor.org/rfc/rfc9110.html#name-400-bad-request',
+            'https://datatracker.ietf.org/doc/html/rfc9110#name-400-bad-request',
             StatusCode::BAD_REQUEST->reason(),
             $previous
         );
