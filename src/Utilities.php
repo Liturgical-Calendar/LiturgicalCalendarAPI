@@ -4,6 +4,7 @@ namespace LiturgicalCalendar\Api;
 
 use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitColor;
+use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsMap;
@@ -443,24 +444,26 @@ class Utilities
      * Converts an array of LitColor items to a string of localized color names.
      *
      * @param LitColor[] $colors An array of LitColor.
-     * @param string $LOCALE The locale to use when localizing the color names.
+     * @param string $locale The locale to use when localizing the color names.
      * @param bool $html If true, the result will be an HTML string with the color names in bold, italic font with the corresponding color.
      * @return string The localized color names, separated by spaces and the word "or".
      */
-    public static function parseColorToString(array $colors, string $LOCALE, bool $html = false): string
+    public static function parseColorToString(array $colors, string $locale, bool $html = false): string
     {
         if ($html === true) {
-            $colorStrings = array_map(function (LitColor $litColor) use ($LOCALE) {
-                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::colorToHex($litColor->value) . '">'
-                    . LitColor::i18n($litColor, $LOCALE)
+            $colorStrings = array_map(function (LitColor $litColor) use ($locale) {
+                return '<B><I><SPAN LANG=' . strtolower($locale) . '><FONT FACE="Calibri" COLOR="' . self::colorToHex($litColor->value) . '">'
+                    . LitColor::i18n($litColor, $locale)
                     . '</FONT></SPAN></I></B>';
             }, $colors);
             return implode(' <I><FONT FACE="Calibri">' . _('or') . '</FONT></I> ', $colorStrings);
         } else {
-            $colorStrings = array_map(function (LitColor $txt) use ($LOCALE) {
-                return LitColor::i18n($txt, $LOCALE);
+            $colorStrings = array_map(function (LitColor $txt) use ($locale) {
+                return LitColor::i18n($txt, $locale);
             }, $colors);
-            return implode(' ' . _('or') . ' ', $colorStrings);
+
+            $or = $locale === LitLocale::LATIN || $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'vel' : _('or');
+            return implode(' ' . $or . ' ', $colorStrings);
         }
     }
 

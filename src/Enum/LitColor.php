@@ -29,22 +29,22 @@ enum LitColor: string
         switch ($color) {
             case self::GREEN:
                 /**translators: context = liturgical color */
-                return $locale === LitLocale::LATIN ? 'viridis'     : _('green');
+                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'viridis'     : _('green');
             case self::PURPLE:
                 /**translators: context = liturgical color */
-                return $locale === LitLocale::LATIN ? 'purpura'     : _('purple');
+                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'purpura'     : _('purple');
             case self::WHITE:
                 /**translators: context = liturgical color */
-                return $locale === LitLocale::LATIN ? 'albus'       : _('white');
+                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'albus'       : _('white');
             case self::RED:
                 /**translators: context = liturgical color */
-                return $locale === LitLocale::LATIN ? 'ruber'       : _('red');
+                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'ruber'       : _('red');
             case self::PINK:
                 /**translators: context = liturgical color */
-                return $locale === LitLocale::LATIN ? 'rosea'       : _('pink');
+                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'rosea'       : _('pink');
             default:
                 /**translators: context = liturgical color: unsupported value */
-                return $locale === LitLocale::LATIN ? 'ignotus'     : _('unknown');
+                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'ignotus'     : _('unknown');
         }
     }
 }

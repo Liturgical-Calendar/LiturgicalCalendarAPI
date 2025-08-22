@@ -220,7 +220,8 @@ final class LitCommons implements \JsonSerializable
         }, $this->commons);
 
         /**translators: when there are multiple possible commons, this will be the glue "[; or] From the Common of..." */
-        return implode('; ' . _('or') . ' ', $commonsLcl);
+        $or = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'vel' : _('or');
+        return implode('; ' . $or . ' ', $commonsLcl);
     }
 
     /**

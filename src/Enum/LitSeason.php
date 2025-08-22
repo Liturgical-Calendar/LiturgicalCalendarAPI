@@ -25,25 +25,25 @@ enum LitSeason: string
         switch ($value) {
             case self::ADVENT:
                 /**translators: context = liturgical season */
-                return $locale === LitLocale::LATIN ? 'Tempus Adventus'     : _('Advent');
+                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Tempus Adventus'     : _('Advent');
             case self::CHRISTMAS:
                 /**translators: context = liturgical season */
-                return $locale === LitLocale::LATIN ? 'Tempus Nativitatis'  : _('Christmas');
+                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Tempus Nativitatis'  : _('Christmas');
             case self::LENT:
                 /**translators: context = liturgical season */
-                return $locale === LitLocale::LATIN ? 'Tempus Quadragesima' : _('Lent');
+                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Tempus Quadragesima' : _('Lent');
             case self::EASTER_TRIDUUM:
                 /**translators: context = liturgical season */
-                return $locale === LitLocale::LATIN ? 'Triduum Paschale'     : _('Easter Triduum');
+                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Triduum Paschale'     : _('Easter Triduum');
             case self::EASTER:
                 /**translators: context = liturgical season */
-                return $locale === LitLocale::LATIN ? 'Tempus Paschale'     : _('Easter');
+                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Tempus Paschale'     : _('Easter');
             case self::ORDINARY_TIME:
                 /**translators: context = liturgical season */
-                return $locale === LitLocale::LATIN ? 'Tempus per Annum'    : _('Ordinary Time');
+                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Tempus per Annum'    : _('Ordinary Time');
             default:
                 /**translators: context = liturgical season: unsupported value */
-                return $locale === LitLocale::LATIN ? 'Tempus Ignotum'     : _('Unknown Season');
+                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Tempus Ignotum'     : _('Unknown Season');
         }
     }
 }
