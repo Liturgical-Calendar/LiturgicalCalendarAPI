@@ -10,8 +10,6 @@
             </td>
             <td style="text-align:center;">
                 <a href="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/overview/development"><img src="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/badge/development" title="CodeFactor" /></a>
-                <br>
-                <a href="https://img.shields.io/badge/phpstan-level%2010-brightgreen?style=flat-square&logo=php"><img src="https://img.shields.io/badge/phpstan-level%2010-brightgreen?style=flat-square&logo=php" title="PHPStan Level 10"></a>
             </td>
             <td><a href="https://translate.johnromanodorazio.com/engage/liturgical-calendar/">
 <img src="https://translate.johnromanodorazio.com/widgets/liturgical-calendar/-/287x66-white.png" alt="Translation status" />
@@ -20,6 +18,10 @@
         </tr>
     </tbody>
 </table>
+
+![Codesniffer PHPStan POTs update](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/actions/workflows/main.yml/badge.svg?branch=development)
+![PHPStan level](https://img.shields.io/badge/phpstan-level%2010-brightgreen?style=flat-square&logo=php "PHPStan level 10")
+![PHPUnit](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/actions/workflows/phpunit.yml/badge.svg?branch=development)
 
 # Liturgical Calendar
 An API written in PHP that will generate the liturgical calendar for any given year, based on the General Roman Calendar, calculating the mobile festivities and the precedence of solemnities, feasts, memorials... Can also produce calendar data for nations, dioceses, or groups of dioceses. This calendar data can be served in various formats such as JSON, YAML, XML, or ICS. More information on the website https://litcal.johnromanodorazio.com/.

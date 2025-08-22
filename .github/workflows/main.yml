@@ -1,6 +1,4 @@
-# This is a basic workflow to help you get started with Actions
-
-name: Run CodeSniffer and update POTs
+name: Linting, static analysis, and POTs update
 
 # Controls when the workflow will run
 on:
@@ -10,12 +8,6 @@ on:
     paths: [ '**/*.php' ]
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
-concurrency:
-  # The ID of the concurrency group. This must be unique to this workflow.
-  group: ${{ github.workflow }}-${{ github.ref }}
-  # If true, cancel any previous runs in the same concurrency group.
-  cancel-in-progress: true
 
 env:
   PHP_VERSION: '8.4'
@@ -138,37 +130,3 @@ jobs:
           force: 0
           # The working directory that will be used for git commands
           #directory: # default is .
-  phpunit_tests:
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install gettext
-        run: sudo apt-get update -y && sudo apt-get install -y gettext
-
-      - name: Setup PHP with PECL extension
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ env.PHP_VERSION }}
-          extensions: yaml, intl, zip, calendar
-
-      - name: Download vendor folder from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: vendor-folder
-          path: vendor
-
-      - name: Fix permissions on vendor binaries and copy env file
-        run: |
-          chmod +x vendor/bin/*
-          cp .env.example .env.local
-
-      - name: Start the PHP web server
-        run: composer start
-
-      - name: PHPUnit
-        run: composer test:quick
-
-      - name: Stop the PHP web server
-        run: composer stop
