@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-21 14:15+0000\n"
+"POT-Creation-Date: 2025-08-22 15:48+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -649,9 +649,9 @@ msgstr ""
 #. translators: context alternate name for a liturgical event, e.g. Second Sunday of Easter `or` Divine Mercy Sunday
 #. translators: when there are multiple possible commons, this will be the glue "[; or] From the Common of..."
 #: src/Handlers/CalendarHandler.php:1053 src/Models/Calendar/LitCommons.php:223
-#: src/Models/Calendar/LiturgicalEvent.php:118
-#: src/Models/EventsPath/LiturgicalEventAbstract.php:93 src/Utilities.php:458
-#: src/Utilities.php:463
+#: src/Models/Calendar/LiturgicalEvent.php:121
+#: src/Models/EventsPath/LiturgicalEventAbstract.php:94 src/Utilities.php:459
+#: src/Utilities.php:465
 msgid "or"
 msgstr ""
 
