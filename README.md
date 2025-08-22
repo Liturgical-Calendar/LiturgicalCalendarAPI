@@ -63,7 +63,7 @@ _(See [usage.php#calSubscription](https://litcal.johnromanodorazio.com/usage.php
 
 System requirements:
 * PHP >= 8.4 (we make use of more modern PHP functions such as `array_find`)
-* PHP modules installed and enabled: `intl` * `zip` * `calendar` * `yaml`
+* PHP modules installed and enabled: `intl` * `zip` * `calendar` * `yaml` * `apcu`
 * System package `gettext` and language packs for all the supported languages
 
 ## Using PHP's builtin server

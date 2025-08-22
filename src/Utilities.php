@@ -569,8 +569,25 @@ class Utilities
      */
     public static function jsonFileToArray(string $filename): array
     {
+        $cacheKey = 'jsoncache_array_' . md5($filename);
+
+        // Try cache first
+        if (function_exists('apcu_fetch')) {
+            $data = apcu_fetch($cacheKey, $success);
+            if ($success && is_array($data)) {
+                /** @var array<string|int,mixed> $data */
+                return $data;
+            }
+        }
+
         $rawContents = self::rawContentsFromFile($filename);
         $jsonArr     = json_decode($rawContents, true, 512, JSON_THROW_ON_ERROR);
+
+        // Store in cache
+        if (function_exists('apcu_store')) {
+            apcu_store($cacheKey, $jsonArr, 300);
+        }
+
         /** @var array<string|int,mixed> $jsonArr */
         return $jsonArr;
     }
@@ -584,11 +601,28 @@ class Utilities
      */
     public static function jsonFileToObject(string $filename): \stdClass
     {
+        $cacheKey = 'jsoncache_object_' . md5($filename);
+
+        // Try cache first
+        if (function_exists('apcu_fetch')) {
+            $data = apcu_fetch($cacheKey, $success);
+            if ($success && $data instanceof \stdClass) {
+                return $data;
+            }
+        }
+
         $rawContents = self::rawContentsFromFile($filename);
         $jsonObj     = json_decode($rawContents, false, 512, JSON_THROW_ON_ERROR);
         if (false === $jsonObj instanceof \stdClass) {
             throw new \JsonException('JSON file ' . $filename . ' does not contain an object');
         }
+
+
+        // Store in cache
+        if (function_exists('apcu_store')) {
+            apcu_store($cacheKey, $jsonObj, 300);
+        }
+
         return $jsonObj;
     }
 
@@ -601,6 +635,17 @@ class Utilities
      */
     public static function jsonFileToObjectArray(string $filename): array
     {
+        $cacheKey = 'jsoncache_objectarray_' . md5($filename);
+
+        // Try cache first
+        if (function_exists('apcu_fetch')) {
+            $data = apcu_fetch($cacheKey, $success);
+            if ($success && is_array($data)) {
+                /** @var \stdClass[] $data */
+                return $data;
+            }
+        }
+
         $rawContents = self::rawContentsFromFile($filename);
         $jsonArr     = json_decode($rawContents, false, 512, JSON_THROW_ON_ERROR);
         if (false === is_array($jsonArr)) {
@@ -611,6 +656,12 @@ class Utilities
                 throw new \JsonException('The decoded JSON is not an array of objects: we found an instance of ' . gettype($item) . ' for item ' . json_encode($item) . '.');
             }
         }
+
+        // Store in cache
+        if (function_exists('apcu_store')) {
+            apcu_store($cacheKey, $jsonArr, 300);
+        }
+
         /** @var \stdClass[] $jsonArr */
         return $jsonArr;
     }
@@ -626,11 +677,27 @@ class Utilities
      */
     public static function jsonUrlToObject(string $url): \stdClass
     {
+        $cacheKey = 'jsoncache_object_' . md5($url);
+
+        // Try cache first
+        if (function_exists('apcu_fetch')) {
+            $data = apcu_fetch($cacheKey, $success);
+            if ($success && $data instanceof \stdClass) {
+                return $data;
+            }
+        }
+
         $rawContents = self::rawContentsFromUrl($url);
         $jsonObj     = json_decode($rawContents, false, 512, JSON_THROW_ON_ERROR);
         if (false === $jsonObj instanceof \stdClass) {
             throw new ValidationException('JSON URL ' . $url . ' does not contain an object');
         }
+
+        // Store in cache
+        if (function_exists('apcu_store')) {
+            apcu_store($cacheKey, $jsonObj, 300);
+        }
+
         return $jsonObj;
     }
 
