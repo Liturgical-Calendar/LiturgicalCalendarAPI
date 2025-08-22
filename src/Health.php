@@ -7,13 +7,12 @@ use Swaggest\JsonSchema\Schema;
 use Sabre\VObject;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
-use LiturgicalCalendar\Api\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\ICSErrorLevel;
 use LiturgicalCalendar\Api\Enum\LitSchema;
-use LiturgicalCalendar\Api\Enum\ReturnType;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
+use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Test\LitTestRunner;
 
@@ -21,10 +20,6 @@ use LiturgicalCalendar\Api\Test\LitTestRunner;
  * This class provides a WebSocket-based interface for executing various tests
  * of the Liturgical Calendar API, such as JSON schema validation and unit tests.
  *
- * @package LiturgicalCalendar\Api
- * @author  John Romano D'Orazio <priest@johnromanodorazio.com>
- * @license https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
- * @link    https://litcal.johnromanodorazio.com
  * @phpstan-type DiocesanCalendarCollectionItem \stdClass&object{
  *      calendar_id: string,
  *      diocese: string,
@@ -52,13 +47,6 @@ class Health implements MessageComponentInterface
     protected \SplObjectStorage $clients;
 
     /**
-     * The path that the health check will use to query the API.
-     *
-     * @var string $REQPATH
-     */
-    private const REQPATH = API_BASE_PATH . Route::CALENDAR->value;
-
-    /**
      * Array of actions that the Health endpoint can execute.
      * Each key is an action name. The value is an array of strings that represent the names of the
      * parameters that the action requires.
@@ -77,25 +65,27 @@ class Health implements MessageComponentInterface
      * Mapping of data file paths to the LitSchema constants that their JSON data should validate against.
      * The paths are relative to the root of the project. The LitSchema constants are used to determine
      * which schema to use when validating the JSON data.
-     *
-     * @var string[] $DATA_PATH_TO_SCHEMA
      */
-    public const DATA_PATH_TO_SCHEMA = [
-        JsonData::MISSALS_FOLDER . '/propriumdetempore/propriumdetempore.json'                 => LitSchema::PROPRIUMDETEMPORE,
-        JsonData::MISSALS_FOLDER . '/propriumdesanctis_1970/propriumdesanctis_1970.json'       => LitSchema::PROPRIUMDESANCTIS,
-        JsonData::MISSALS_FOLDER . '/propriumdesanctis_2002/propriumdesanctis_2002.json'       => LitSchema::PROPRIUMDESANCTIS,
-        JsonData::MISSALS_FOLDER . '/propriumdesanctis_2008/propriumdesanctis_2008.json'       => LitSchema::PROPRIUMDESANCTIS,
-        JsonData::MISSALS_FOLDER . '/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json' => LitSchema::PROPRIUMDESANCTIS,
-        JsonData::MISSALS_FOLDER . '/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json' => LitSchema::PROPRIUMDESANCTIS,
-        API_BASE_PATH . '/calendars'                                                           => LitSchema::METADATA,
-        API_BASE_PATH . '/decrees'                                                             => LitSchema::DECREES,
-        API_BASE_PATH . '/events'                                                              => LitSchema::EVENTS,
-        API_BASE_PATH . '/tests'                                                               => LitSchema::TESTS,
-        API_BASE_PATH . '/easter'                                                              => LitSchema::EASTER,
-        API_BASE_PATH . '/missals'                                                             => LitSchema::MISSALS,
-        API_BASE_PATH . '/data'                                                                => LitSchema::DATA,
-        API_BASE_PATH . '/schemas'                                                             => LitSchema::SCHEMAS
-    ];
+    private static function getPathToSchemaFile(string $dataFile): ?string
+    {
+        return match ($dataFile) {
+            JsonData::MISSALS_FOLDER->value . '/propriumdetempore/propriumdetempore.json'                 => LitSchema::PROPRIUMDETEMPORE->path(),
+            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_1970/propriumdesanctis_1970.json'       => LitSchema::PROPRIUMDESANCTIS->path(),
+            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_2002/propriumdesanctis_2002.json'       => LitSchema::PROPRIUMDESANCTIS->path(),
+            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_2008/propriumdesanctis_2008.json'       => LitSchema::PROPRIUMDESANCTIS->path(),
+            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json' => LitSchema::PROPRIUMDESANCTIS->path(),
+            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json' => LitSchema::PROPRIUMDESANCTIS->path(),
+            Route::CALENDARS->path()                                                                      => LitSchema::METADATA->path(),
+            Route::DECREES->path()                                                                        => LitSchema::DECREES->path(),
+            Route::EVENTS->path()                                                                         => LitSchema::EVENTS->path(),
+            Route::TESTS->path()                                                                          => LitSchema::TESTS->path(),
+            Route::EASTER->path()                                                                         => LitSchema::EASTER->path(),
+            Route::MISSALS->path()                                                                        => LitSchema::MISSALS->path(),
+            Route::DATA->path()                                                                           => LitSchema::DATA->path(),
+            Route::SCHEMAS->path()                                                                        => LitSchema::SCHEMAS->path(),
+            default => null
+        };
+    }
 
     /**
      * Called when a new client connection is established.
@@ -114,9 +104,9 @@ class Health implements MessageComponentInterface
         }
 
         if (false === isset(self::$metadata)) {
-            $rawData = file_get_contents(API_BASE_PATH . '/calendars');
+            $rawData = file_get_contents(Router::$apiPath . '/calendars');
             if ($rawData === false) {
-                echo 'Error reading metadata: could not read data from ' . API_BASE_PATH . "/calendars\n";
+                echo 'Error reading metadata: could not read data from ' . Router::$apiPath . "/calendars\n";
                 return;
             }
             $metadataObj = json_decode($rawData);
@@ -185,7 +175,7 @@ class Health implements MessageComponentInterface
     {
         /** @var int $resourceId */
         $resourceId = $from->resourceId;
-        echo sprintf('Receiving message from connection %d: %s', $resourceId, $msg);
+        echo sprintf('Receiving message from connection %d: %s', $resourceId, $msg . "\n");
         /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest $messageReceived */
         $messageReceived = json_decode($msg);
         if (
@@ -271,9 +261,9 @@ class Health implements MessageComponentInterface
      * Logs the error message and closes the connection.
      *
      * @param ConnectionInterface $conn The connection on which the error occurred
-     * @param \Exception $e The exception that was thrown
+     * @param \Throwable $e The exception that was thrown
      */
-    public function onError(ConnectionInterface $conn, \Exception $e): void
+    public function onError(ConnectionInterface $conn, \Throwable $e): void
     {
         echo "An error has occurred: {$e->getMessage()}\n";
         $conn->close();
@@ -292,13 +282,8 @@ class Health implements MessageComponentInterface
         if (gettype($msg) !== 'string') {
             $msg = json_encode($msg, JSON_PRETTY_PRINT);
         }
-        foreach ($this->clients as $client) {
-            if ($from === $client) {
-                // The message from sender will be echoed back only to the sender, not to other clients
-                /** @var string $msg */
-                $client->send($msg);
-            }
-        }
+        /** @var string $msg */
+        $from->send($msg);
     }
 
     /**
@@ -309,6 +294,7 @@ class Health implements MessageComponentInterface
     public function __construct()
     {
         $this->clients = new \SplObjectStorage();
+        Router::getApiPaths();
     }
 
     /**
@@ -339,47 +325,44 @@ class Health implements MessageComponentInterface
                         throw new \InvalidArgumentException('Invalid dataPath: ' . $dataPath . ', expected to match ' . $versionedPattern);
                     }
                     /** @var string $versionedDataPath */
-                    if (array_key_exists($versionedDataPath, Health::DATA_PATH_TO_SCHEMA)) {
-                        $tempSchemaPath = Health::DATA_PATH_TO_SCHEMA[$versionedDataPath];
-                        return preg_replace($versionedPattern, $versionedReplacement, $tempSchemaPath);
+                    $pathToSchemaFile = Health::getPathToSchemaFile($versionedDataPath);
+                    if (null !== $pathToSchemaFile) {
+                        return preg_replace($versionedPattern, $versionedReplacement, $pathToSchemaFile);
                     }
                 }
-                if (array_key_exists($dataPath, Health::DATA_PATH_TO_SCHEMA)) {
-                    return Health::DATA_PATH_TO_SCHEMA[$dataPath];
-                }
-                return null;
+                return Health::getPathToSchemaFile($dataPath);
             case 'nationalcalendar':
-                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::NATIONAL) : LitSchema::NATIONAL;
+                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::NATIONAL->path()) : LitSchema::NATIONAL->path();
             case 'diocesancalendar':
-                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::DIOCESAN) : LitSchema::DIOCESAN;
+                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::DIOCESAN->path()) : LitSchema::DIOCESAN->path();
             case 'widerregioncalendar':
-                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::WIDERREGION) : LitSchema::WIDERREGION;
+                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::WIDERREGION->path()) : LitSchema::WIDERREGION->path();
             case 'propriumdesanctis':
-                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS) : LitSchema::PROPRIUMDESANCTIS;
+                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS->path()) : LitSchema::PROPRIUMDESANCTIS->path();
             case 'resourceDataCheck':
                 if (
                     preg_match('/\/missals\/[_A-Z0-9]+$/', $dataPath)
                 ) {
-                    return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS) : LitSchema::PROPRIUMDESANCTIS;
+                    return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS->path()) : LitSchema::PROPRIUMDESANCTIS->path();
                 } elseif (
                     preg_match('/\/events\/(?:nation\/[A-Z]{2}|diocese\/[a-z]{6}_[a-z]{2})(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath)
                 ) {
-                    return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::EVENTS) : LitSchema::EVENTS;
+                    return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::EVENTS->path()) : LitSchema::EVENTS->path();
                 } elseif (
                     preg_match('/\/data\/(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/[A-Z][a-z]+)(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath, $matches)
                 ) {
-                    $schema = LitSchema::DATA;
+                    $schema = LitSchema::DATA->path();
                     foreach ($matches as $idx => $match) {
                         if ($idx > 0) {
                             switch ($match) {
                                 case 'nation':
-                                    $schema = LitSchema::NATIONAL;
+                                    $schema = LitSchema::NATIONAL->path();
                                     break;
                                 case 'diocese':
-                                    $schema = LitSchema::DIOCESAN;
+                                    $schema = LitSchema::DIOCESAN->path();
                                     break;
                                 case 'widerregion':
-                                    $schema = LitSchema::WIDERREGION;
+                                    $schema = LitSchema::WIDERREGION->path();
                                     break;
                             }
                         }
@@ -392,39 +375,36 @@ class Health implements MessageComponentInterface
                         throw new \InvalidArgumentException('Invalid dataPath: ' . $dataPath . ', expected to match ' . $versionedPattern);
                     }
                     /** @var string $versionedDataPath */
-                    if (array_key_exists($versionedDataPath, Health::DATA_PATH_TO_SCHEMA)) {
-                        $tempSchemaPath = Health::DATA_PATH_TO_SCHEMA[$versionedDataPath];
-                        return preg_replace($versionedPattern, $versionedReplacement, $tempSchemaPath);
+                    $pathToSchemaFile = Health::getPathToSchemaFile($versionedDataPath);
+                    if (null !== $pathToSchemaFile) {
+                        return preg_replace($versionedPattern, $versionedReplacement, $pathToSchemaFile);
                     }
                 }
-                if (array_key_exists($dataPath, Health::DATA_PATH_TO_SCHEMA)) {
-                    return Health::DATA_PATH_TO_SCHEMA[$dataPath];
-                }
-                return null;
+                return Health::getPathToSchemaFile($dataPath);
             case 'sourceDataCheck':
                 if (preg_match('/-i18n$/', $dataPath)) {
-                    return LitSchema::I18N;
+                    return LitSchema::I18N->path();
                 }
                 if (preg_match('/^memorials-from-decrees$/', $dataPath)) {
-                    return LitSchema::DECREES_SRC;
+                    return LitSchema::DECREES_SRC->path();
                 }
                 if (preg_match('/^proprium-de-sanctis(?:-[A-Z]{2})?-(?:1|2)(?:9|0)(?:7|8|9|0|1|2)[0-9]$/', $dataPath)) {
-                    return LitSchema::PROPRIUMDESANCTIS;
+                    return LitSchema::PROPRIUMDESANCTIS->path();
                 }
                 if (preg_match('/^proprium-de-tempore$/', $dataPath)) {
-                    return LitSchema::PROPRIUMDETEMPORE;
+                    return LitSchema::PROPRIUMDETEMPORE->path();
                 }
                 if (preg_match('/^wider-region-[A-Z][a-z]+$/', $dataPath)) {
-                    return LitSchema::WIDERREGION;
+                    return LitSchema::WIDERREGION->path();
                 }
                 if (preg_match('/^national-calendar-[A-Z]{2}$/', $dataPath)) {
-                    return LitSchema::NATIONAL;
+                    return LitSchema::NATIONAL->path();
                 }
                 if (preg_match('/^diocesan-calendar-[a-z]{6}_[a-z]{2}$/', $dataPath)) {
-                    return LitSchema::DIOCESAN;
+                    return LitSchema::DIOCESAN->path();
                 }
                 if (preg_match('/^tests-[a-zA-Z0-9_]+$/', $dataPath)) {
-                    return LitSchema::TEST_SRC;
+                    return LitSchema::TEST_SRC->path();
                 }
                 return null;
         }
@@ -469,13 +449,13 @@ class Health implements MessageComponentInterface
                     switch ($matches[1]) {
                         case 'wider-region':
                             $dataPath = strtr(
-                                JsonData::WIDER_REGION_I18N_FOLDER,
+                                JsonData::WIDER_REGION_I18N_FOLDER->path(),
                                 ['{wider_region}' => $matches[2]]
                             );
                             break;
                         case 'national-calendar':
                             $dataPath = strtr(
-                                JsonData::NATIONAL_CALENDAR_I18N_FOLDER,
+                                JsonData::NATIONAL_CALENDAR_I18N_FOLDER->path(),
                                 ['{nation}' => $matches[2]]
                             );
                             break;
@@ -486,7 +466,7 @@ class Health implements MessageComponentInterface
                             }
                             $nation   = $dioceseMetadata->nation;
                             $dataPath = strtr(
-                                JsonData::DIOCESAN_CALENDAR_I18N_FOLDER,
+                                JsonData::DIOCESAN_CALENDAR_I18N_FOLDER->path(),
                                 [
                                     '{diocese}' => $matches[2],
                                     '{nation}'  => $nation
@@ -497,7 +477,7 @@ class Health implements MessageComponentInterface
                 } elseif (preg_match('/^proprium\-de\-sanctis(?:\-([A-Z]{2}))?\-([1-2][0-9]{3})\-i18n$/', $validation->validate, $matches)) {
                     $region   = $matches[1] !== '' ? $matches[1] : 'EDITIO_TYPICA';
                     $year     = $matches[2];
-                    $dataPath = RomanMissal::$i18nPath["{$region}_{$year}"];
+                    $dataPath = RomanMissal::getSanctoraleI18nFilePath("{$region}_{$year}");
                 }
             } else {
                 // If we are not validating a folder of i18n files, then we are validating a single source file,
@@ -510,13 +490,13 @@ class Health implements MessageComponentInterface
                         switch ($matches[1]) {
                             case 'wider-region':
                                 $dataPath = strtr(
-                                    JsonData::WIDER_REGION_FILE,
+                                    JsonData::WIDER_REGION_FILE->path(),
                                     ['{wider_region}' => $matches[2]]
                                 );
                                 break;
                             case 'national-calendar':
                                 $dataPath = strtr(
-                                    JsonData::NATIONAL_CALENDAR_FILE,
+                                    JsonData::NATIONAL_CALENDAR_FILE->path(),
                                     ['{nation}' => $matches[2]]
                                 );
                                 break;
@@ -528,7 +508,7 @@ class Health implements MessageComponentInterface
                                 $nation      = $dioceseMetadata->nation;
                                 $dioceseName = $dioceseMetadata->diocese;
                                 $dataPath    = strtr(
-                                    JsonData::DIOCESAN_CALENDAR_FILE,
+                                    JsonData::DIOCESAN_CALENDAR_FILE->path(),
                                     [
                                         '{diocese}'      => $matches[2],
                                         '{nation}'       => $nation,
@@ -540,7 +520,7 @@ class Health implements MessageComponentInterface
                     } elseif (preg_match('/^proprium\-de\-sanctis(?:\-([A-Z]{2}))?\-([1-2][0-9]{3})$/', $validation->validate, $matches)) {
                         $region   = $matches[1] !== '' ? $matches[1] : 'EDITIO_TYPICA';
                         $year     = $matches[2];
-                        $dataPath = RomanMissal::$jsonFiles["{$region}_{$year}"];
+                        $dataPath = RomanMissal::getSanctoraleFileName("{$region}_{$year}");
                     }
                 } else {
                     throw new \InvalidArgumentException('sourceFile property is required for sourceDataCheck');
@@ -657,14 +637,14 @@ class Health implements MessageComponentInterface
                 }
                 $nation      = $dioceseMetadata->nation;
                 $dioceseName = $dioceseMetadata->diocese;
-                $dataPath    = strtr(JsonData::DIOCESAN_CALENDAR_FILE, [
+                $dataPath    = strtr(JsonData::DIOCESAN_CALENDAR_FILE->path(), [
                     '{nation}'       => $nation,
                     '{diocese}'      => $dioceseId,
                     '{diocese_name}' => $dioceseName
                 ]);
             } elseif (preg_match('/^national-calendar-([A-Z]{2})$/', $pathForSchema, $matches)) {
                 $nation   = $matches[1];
-                $dataPath = strtr(JsonData::NATIONAL_CALENDAR_FILE, [
+                $dataPath = strtr(JsonData::NATIONAL_CALENDAR_FILE->path(), [
                     '{nation}' => $nation
                 ]);
             }
@@ -703,18 +683,15 @@ class Health implements MessageComponentInterface
 
             $data = false;
             if (property_exists($validation, 'responsetype')) {
-                $responseType = $validation->responsetype;
-                //get the index of the responsetype from the ReturnType class
-                $responseTypeIdx = array_search($responseType, ReturnType::values());
-                //get the corresponding accept mime type
-                $acceptMimeType = AcceptHeader::values()[$responseTypeIdx];
-                $opts           = [
+                $returnTypeParam = ReturnTypeParam::from($responseType);
+                $acceptMimeType  = $returnTypeParam->toResponseContentType()->value;
+                $opts            = [
                     'http' => [
                         'method' => 'GET',
                         'header' => "Accept: $acceptMimeType\r\n"
                     ]
                 ];
-                $context        = stream_context_create($opts);
+                $context         = stream_context_create($opts);
                 // $dataPath is probably an API path in this case
                 assert(is_string($dataPath), 'Data path should be a string for resourceDataCheck category');
                 $data = file_get_contents($dataPath, false, $context);
@@ -886,17 +863,15 @@ class Health implements MessageComponentInterface
      */
     private function validateCalendar(string $calendar, int $year, string $category, string $responseType, ConnectionInterface $to): void
     {
-        //get the index of the responsetype from the ReturnType class
-        $responseTypeIdx = array_search($responseType, ReturnType::values());
-        //get the corresponding accept mime type
-        $acceptMimeType = AcceptHeader::values()[$responseTypeIdx];
-        $opts           = [
+        $returnTypeParam = ReturnTypeParam::from($responseType);
+        $acceptMimeType  = $returnTypeParam->toResponseContentType()->value;
+        $opts            = [
             'http' => [
                 'method' => 'GET',
                 'header' => "Accept: $acceptMimeType\r\n"
             ]
         ];
-        $context        = stream_context_create($opts);
+        $context         = stream_context_create($opts);
         if ($calendar === 'VA') {
             $req = "/$year?year_type=CIVIL";
         } else {
@@ -912,7 +887,7 @@ class Health implements MessageComponentInterface
                     $req = '/unknown';
             }
         }
-        $data = file_get_contents(self::REQPATH . $req, false, $context);
+        $data = file_get_contents(Route::CALENDAR->path() . $req, false, $context);
         if ($data !== false) {
             $message          = new \stdClass();
             $message->type    = 'success';
@@ -934,7 +909,7 @@ class Health implements MessageComponentInterface
                         $errorString   = self::retrieveXmlErrors($errors, $xmlArr);
                         libxml_clear_errors();
                         $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                        . self::REQPATH . $req . ' as XML: ' . $errorString;
+                                        . Route::CALENDAR->path() . $req . ' as XML: ' . $errorString;
                         $message->classes      = ".calendar-$calendar.json-valid.year-$year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
@@ -945,13 +920,13 @@ class Health implements MessageComponentInterface
                         $message->classes = ".calendar-$calendar.json-valid.year-$year";
                         $this->sendMessage($to, $message);
 
-                        $validationResult = $xml->schemaValidate(JsonData::SCHEMAS_FOLDER . '/LiturgicalCalendar.xsd');
+                        $validationResult = $xml->schemaValidate(JsonData::SCHEMAS_FOLDER->path() . '/LiturgicalCalendar.xsd');
                         if ($validationResult) {
                             $message          = new \stdClass();
                             $message->type    = 'success';
                             $message->text    = sprintf(
                                 "The $category of $calendar for the year $year was successfully validated against the Schema %s",
-                                JsonData::SCHEMAS_FOLDER . '/LiturgicalCalendar.xsd'
+                                JsonData::SCHEMAS_FOLDER->path() . '/LiturgicalCalendar.xsd'
                             );
                             $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
@@ -1011,7 +986,7 @@ class Health implements MessageComponentInterface
                         $message               = new \stdClass();
                         $message->type         = 'error';
                         $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                        . self::REQPATH . $req . ' as ICS: parsing resulted in type ' . gettype($vcalendar) . ' | ' . $vcalendar;
+                                        . Route::CALENDAR->path() . $req . ' as ICS: parsing resulted in type ' . gettype($vcalendar) . ' | ' . $vcalendar;
                         $message->classes      = ".calendar-$calendar.json-valid.year-$year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
@@ -1037,11 +1012,11 @@ class Health implements MessageComponentInterface
                             $message->classes = ".calendar-$calendar.json-valid.year-$year";
                             $this->sendMessage($to, $message);
 
-                            $validationResult = $this->validateDataAgainstSchema($yamlData, LitSchema::LITCAL);
+                            $validationResult = $this->validateDataAgainstSchema($yamlData, LitSchema::LITCAL->path());
                             if (gettype($validationResult) === 'boolean' && $validationResult === true) {
                                 $message          = new \stdClass();
                                 $message->type    = 'success';
-                                $message->text    = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL;
+                                $message->text    = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL->path();
                                 $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                                 $this->sendMessage($to, $message);
                             } elseif ($validationResult instanceof \stdClass) {
@@ -1053,7 +1028,7 @@ class Health implements MessageComponentInterface
                         $message               = new \stdClass();
                         $message->type         = 'error';
                         $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                        . self::REQPATH . $req . ' as YAML: ' . $ex->getMessage();
+                                        . Route::CALENDAR->path() . $req . ' as YAML: ' . $ex->getMessage();
                         $message->classes      = ".calendar-$calendar.json-valid.year-$year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
@@ -1069,11 +1044,11 @@ class Health implements MessageComponentInterface
                         $message->classes = ".calendar-$calendar.json-valid.year-$year";
                         $this->sendMessage($to, $message);
 
-                        $validationResult = $this->validateDataAgainstSchema($jsonData, LitSchema::LITCAL);
+                        $validationResult = $this->validateDataAgainstSchema($jsonData, LitSchema::LITCAL->path());
                         if (gettype($validationResult) === 'boolean' && $validationResult === true) {
                             $message          = new \stdClass();
                             $message->type    = 'success';
-                            $message->text    = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL;
+                            $message->text    = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL->path();
                             $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
                         } elseif ($validationResult instanceof \stdClass) {
@@ -1084,16 +1059,17 @@ class Health implements MessageComponentInterface
                         $message               = new \stdClass();
                         $message->type         = 'error';
                         $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                        . self::REQPATH . $req . ' as JSON: ' . json_last_error_msg();
+                                        . Route::CALENDAR->path() . $req . ' as JSON: ' . json_last_error_msg();
                         $message->classes      = ".calendar-$calendar.json-valid.year-$year";
                         $message->responsetype = $responseType;
                         $this->sendMessage($to, $message);
                     }
             }
         } else {
+            $error            = error_get_last();
             $message          = new \stdClass();
             $message->type    = 'error';
-            $message->text    = "The $category of $calendar for the year $year does not exist at the URL " . self::REQPATH . $req;
+            $message->text    = "The $category of $calendar for the year $year does not exist at the URL " . Route::CALENDAR->path() . $req . ' : ' . json_encode($error, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
             $message->classes = ".calendar-$calendar.file-exists.year-$year";
             $this->sendMessage($to, $message);
         }
@@ -1110,17 +1086,15 @@ class Health implements MessageComponentInterface
      */
     private function executeUnitTest(string $test, string $calendar, int $year, string $category, ConnectionInterface $to): void
     {
-        //get the index of the responsetype from the ReturnType class
-        $responseTypeIdx = array_search(ReturnType::JSON, ReturnType::cases());
-        //get the corresponding accept mime type
-        $acceptMimeType = AcceptHeader::values()[$responseTypeIdx];
-        $opts           = [
+        $returnTypeParam = ReturnTypeParam::JSON;
+        $acceptMimeType  = $returnTypeParam->toResponseContentType()->value;
+        $opts            = [
             'http' => [
                 'method' => 'GET',
                 'header' => "Accept: $acceptMimeType\r\n"
             ]
         ];
-        $context        = stream_context_create($opts);
+        $context         = stream_context_create($opts);
         if ($calendar === 'VA') {
             $req = "/$year?year_type=CIVIL";
         } else {
@@ -1136,7 +1110,7 @@ class Health implements MessageComponentInterface
                     $req = '/unknown';
             }
         }
-        $data = file_get_contents(self::REQPATH . $req, false, $context);
+        $data = file_get_contents(Route::CALENDAR->path() . $req, false, $context);
         // We don't really need to check whether file_get_contents succeeded
         //  because this check already takes place in the validateCalendar test phase
         assert(is_string($data), 'Data should be a string for executeUnitTest method');
@@ -1167,9 +1141,10 @@ class Health implements MessageComponentInterface
             $schema->in($data);
             $res = true;
         } catch (InvalidValue | \Exception $e) {
+            $litSchema     = LitSchema::fromURL($schemaUrl);
             $message       = new \stdClass();
             $message->type = 'error';
-            $message->text = LitSchema::ERROR_MESSAGES[$schemaUrl] . PHP_EOL . $e->getMessage();
+            $message->text = $litSchema->error() . PHP_EOL . $e->getMessage();
             return $message;
         }
         return $res;

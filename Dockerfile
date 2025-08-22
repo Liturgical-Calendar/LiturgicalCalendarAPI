@@ -5,7 +5,7 @@ FROM php:8.4-cli AS build
 RUN apt-get update -y && \
     apt-get install -y --no-install-suggests --no-install-recommends \
         libicu-dev libonig-dev libzip-dev gettext libyaml-dev && \
-    docker-php-ext-install intl zip gettext calendar && \
+    docker-php-ext-install intl zip gettext calendar apcu && \
     pecl install yaml && \
     docker-php-ext-enable intl zip gettext calendar yaml && \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
@@ -24,7 +24,7 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-d
 COPY ./src ./src
 COPY ./i18n ./i18n
 COPY ./jsondata ./jsondata
-COPY LitCalTestServer.php index.php ./
+COPY LitCalTestServer.php index.php ./public/
 
 # Stage 2: final build
 FROM php:8.4-cli AS main
@@ -51,4 +51,4 @@ ENV PHP_CLI_SERVER_WORKERS=6
 EXPOSE 8000
 
 # Command to run PHP's built-in server
-CMD ["php", "-S", "0.0.0.0:8000", "-t", "/var/www/html"]
+CMD ["php", "-S", "0.0.0.0:8000", "-t", "/var/www/html/public"]

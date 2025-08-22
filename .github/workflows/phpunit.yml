@@ -1,0 +1,54 @@
+name: PHPUnit
+
+on:
+  push:
+    branches: [ development ]
+    paths: [ '**/*.php' ]
+  workflow_dispatch:
+
+concurrency:
+  # The ID of the concurrency group. This must be unique to this workflow.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # If true, cancel any previous runs in the same concurrency group.
+  cancel-in-progress: true
+
+env:
+  PHP_VERSION: '8.4'
+
+jobs:
+  phpunit_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install gettext
+        run: sudo apt-get update -y && sudo apt-get install -y gettext
+
+      - name: Setup PHP with PECL extension
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: yaml, intl, zip, calendar, apcu
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Copy env file
+        run: cp .env.example .env.local
+
+      - name: Start the PHP web server
+        run: composer start
+
+      - name: PHPUnit
+        run: composer test
+
+      - name: Stop the PHP web server
+        run: composer stop

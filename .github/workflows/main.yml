@@ -1,6 +1,4 @@
-# This is a basic workflow to help you get started with Actions
-
-name: Run CodeSniffer and update POTs
+name: Linting, static analysis, and POTs update
 
 # Controls when the workflow will run
 on:
@@ -11,46 +9,86 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-concurrency:
-  # The ID of the concurrency group. This must be unique to this workflow.
-  group: ${{ github.workflow }}-${{ github.ref }}
-  # If true, cancel any previous runs in the same concurrency group.
-  cancel-in-progress: true
-
 env:
   PHP_VERSION: '8.4'
 
   # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+
+      # Restore vendor folder from cache if available
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            composer-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      # Share vendor folder with other jobs in this run
+      - name: Upload vendor folder
+        uses: actions/upload-artifact@v4
+        with:
+          name: vendor-folder
+          path: vendor
+          retention-days: 1
+
   codesniffer:
     runs-on: ubuntu-latest
-
+    needs: build
     steps:
       - uses: actions/checkout@v4
 
-      - name: Composer install
-        uses: php-actions/composer@v6
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+
+      - name: Download vendor folder from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: vendor-folder
+          path: vendor
+
+      - name: Fix permissions on vendor binaries
+        run: chmod +x vendor/bin/*
 
       - name: PHP Code Sniffer
-        uses: php-actions/phpcs@v1
-        with:
-          php_version: ${{ env.PHP_VERSION }}
-          path: src/
-          standard: phpcs.xml
+        run: composer lint
   static_analysis:
     runs-on: ubuntu-latest
-
+    needs: build
     steps:
       - uses: actions/checkout@v4
 
-      - name: Composer install
-        uses: php-actions/composer@v6
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+
+      - name: Download vendor folder from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: vendor-folder
+          path: vendor
+
+      - name: Fix permissions on vendor binaries
+        run: chmod +x vendor/bin/*
 
       - name: PHPStan
-        uses: php-actions/phpstan@v3
-        with:
-          php_version: ${{ env.PHP_VERSION }}
-          configuration: phpstan.neon
+        run: composer analyse
   gettext_update:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest

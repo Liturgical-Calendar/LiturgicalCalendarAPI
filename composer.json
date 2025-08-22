@@ -9,7 +9,12 @@
         "swaggest/json-schema": "~0.12",
         "cboden/ratchet": "~0.4",
         "sabre/vobject": "^4.5.5",
-        "vlucas/phpdotenv": "^5.6"
+        "vlucas/phpdotenv": "^5.6",
+        "nyholm/psr7": "^1.8",
+        "laminas/laminas-httphandlerrunner": "^2.12",
+        "nyholm/psr7-server": "^1.1",
+        "psr/http-server-middleware": "^1.0",
+        "psr/http-server-handler": "^1.0"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^4.0",
@@ -17,7 +22,9 @@
         "php-parallel-lint/php-parallel-lint": "^1.4",
         "php-parallel-lint/php-console-highlighter": "^1.0",
         "captainhook/captainhook-phar": "^5.25",
-        "captainhook/hook-installer": "^1.0"
+        "captainhook/hook-installer": "^1.0",
+        "phpunit/phpunit": "^12.4",
+        "guzzlehttp/guzzle": "7.8"
     },
     "license": "Apache-2.0",
     "autoload": {
@@ -26,6 +33,11 @@
         },
         "files": ["src/pgettext.php"]
     },
+    "autoload-dev": {
+        "psr-4": {
+            "LiturgicalCalendar\\Tests\\": "phpunit_tests/"
+        }
+    },
     "authors": [
         {
             "name": "John R. D'Orazio",
@@ -33,6 +45,7 @@
         }
     ],
     "minimum-stability": "dev",
+    "prefer-stable" : true,
     "scripts": {
         "post-install-cmd": [
             "LiturgicalCalendar\\Api\\Utilities::postInstall"
@@ -40,10 +53,16 @@
         "post-update-cmd": [
             "LiturgicalCalendar\\Api\\Utilities::postInstall"
         ],
-        "lint": "phpcs src || echo 'Linting failed. Please run composer lint:fix to fix the linting issues.'",
-        "lint:fix": "phpcbf src || echo 'Lint fixing failed. Please check the linting failures and fix them manually.'",
-        "analyse": "phpstan analyse -c phpstan.neon",
-        "parallel-lint": "parallel-lint --exclude .git --exclude vendor ."
+        "lint": "phpcs || echo 'Linting failed. Please run \"composer lint:fix\" to fix the linting issues.'",
+        "lint:fix": "phpcbf || echo 'Lint fixing failed. Please check the linting failures and fix them manually.'",
+        "analyse": "phpstan analyse",
+        "parallel-lint": "parallel-lint --exclude .git --exclude vendor .",
+        "test": "phpunit --testdox --display-warnings",
+        "test:quick": "phpunit --testdox --display-warnings --exclude-group slow",
+        "start": "./start-server.sh",
+        "stop": "./stop-server.sh",
+        "ws:start": "./ws-start-server.sh",
+        "ws:stop": "./ws-stop-server.sh"
     },
     "config": {
         "allow-plugins": {

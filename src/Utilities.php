@@ -4,6 +4,9 @@ namespace LiturgicalCalendar\Api;
 
 use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitColor;
+use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsMap;
 
 /**
@@ -88,7 +91,7 @@ class Utilities
 
     /**
      * Used to keep track of the current request hash value.
-     * The value is set from the CalendarPath.php class representing the `/calendar` API path.
+     * The value is set from the CalendarHandler.php class representing the `/calendar` API path.
      * @var string
      */
     public static string $HASH_REQUEST = '';
@@ -441,24 +444,26 @@ class Utilities
      * Converts an array of LitColor items to a string of localized color names.
      *
      * @param LitColor[] $colors An array of LitColor.
-     * @param string $LOCALE The locale to use when localizing the color names.
+     * @param string $locale The locale to use when localizing the color names.
      * @param bool $html If true, the result will be an HTML string with the color names in bold, italic font with the corresponding color.
      * @return string The localized color names, separated by spaces and the word "or".
      */
-    public static function parseColorToString(array $colors, string $LOCALE, bool $html = false): string
+    public static function parseColorToString(array $colors, string $locale, bool $html = false): string
     {
         if ($html === true) {
-            $colorStrings = array_map(function (LitColor $litColor) use ($LOCALE) {
-                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::colorToHex($litColor->value) . '">'
-                    . LitColor::i18n($litColor, $LOCALE)
+            $colorStrings = array_map(function (LitColor $litColor) use ($locale) {
+                return '<B><I><SPAN LANG=' . strtolower($locale) . '><FONT FACE="Calibri" COLOR="' . self::colorToHex($litColor->value) . '">'
+                    . LitColor::i18n($litColor, $locale)
                     . '</FONT></SPAN></I></B>';
             }, $colors);
             return implode(' <I><FONT FACE="Calibri">' . _('or') . '</FONT></I> ', $colorStrings);
         } else {
-            $colorStrings = array_map(function (LitColor $txt) use ($LOCALE) {
-                return LitColor::i18n($txt, $LOCALE);
+            $colorStrings = array_map(function (LitColor $txt) use ($locale) {
+                return LitColor::i18n($txt, $locale);
             }, $colors);
-            return implode(' ' . _('or') . ' ', $colorStrings);
+
+            $or = $locale === LitLocale::LATIN || $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'vel' : _('or');
+            return implode(' ' . $or . ' ', $colorStrings);
         }
     }
 
@@ -504,7 +509,7 @@ class Utilities
                 $ordinal = $formatter->format($num);
         }
         if (false === $ordinal) {
-            throw new \Exception('Unable to get ordinal for ' . $num . ' in locale ' . $locale);
+            throw new ServiceUnavailableException('Unable to get ordinal for ' . $num . ' in locale ' . $locale);
         }
         return $ordinal;
     }
@@ -515,21 +520,21 @@ class Utilities
      *
      * @param string $filename The path to the file to read.
      * @return string The contents of the file.
-     * @throws \RuntimeException If the file does not exist, is not readable, or could not be read.
+     * @throws ServiceUnavailableException If the file does not exist, is not readable, or could not be read.
      */
     public static function rawContentsFromFile(string $filename): string
     {
         if (false === file_exists($filename)) {
-            throw new \RuntimeException('File ' . $filename . ' does not exist');
+            throw new ServiceUnavailableException('File ' . $filename . ' does not exist');
         }
 
         if (false === is_readable($filename)) {
-            throw new \RuntimeException('File ' . $filename . ' is not readable');
+            throw new ServiceUnavailableException('File ' . $filename . ' is not readable');
         }
 
         $rawContents = file_get_contents($filename);
         if (false === $rawContents) {
-            throw new \RuntimeException('Unable to read file ' . $filename);
+            throw new ServiceUnavailableException('Unable to read file ' . $filename);
         }
 
         return $rawContents;
@@ -540,14 +545,23 @@ class Utilities
      *
      * @param string $url The URL to read.
      * @return string The contents of the URL.
-     * @throws \RuntimeException If the URL could not be read.
+     * @throws ServiceUnavailableException If the URL could not be read.
      */
     public static function rawContentsFromUrl(string $url): string
     {
-        $rawContents = file_get_contents($url);
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'GET',
+                'header' => 'Accept: application/json',
+            ],
+        ]);
+
+        $rawContents = file_get_contents($url, false, $context);
+
         if (false === $rawContents) {
-            throw new \RuntimeException('Unable to read URL ' . $url);
+            throw new ServiceUnavailableException('Unable to read URL ' . $url);
         }
+
         return $rawContents;
     }
 
@@ -558,8 +572,25 @@ class Utilities
      */
     public static function jsonFileToArray(string $filename): array
     {
+        $cacheKey = 'jsoncache_array_' . md5($filename);
+
+        // Try cache first
+        if (function_exists('apcu_fetch')) {
+            $data = apcu_fetch($cacheKey, $success);
+            if ($success && is_array($data)) {
+                /** @var array<string|int,mixed> $data */
+                return $data;
+            }
+        }
+
         $rawContents = self::rawContentsFromFile($filename);
         $jsonArr     = json_decode($rawContents, true, 512, JSON_THROW_ON_ERROR);
+
+        // Store in cache
+        if (function_exists('apcu_store')) {
+            apcu_store($cacheKey, $jsonArr, 300);
+        }
+
         /** @var array<string|int,mixed> $jsonArr */
         return $jsonArr;
     }
@@ -573,11 +604,28 @@ class Utilities
      */
     public static function jsonFileToObject(string $filename): \stdClass
     {
+        $cacheKey = 'jsoncache_object_' . md5($filename);
+
+        // Try cache first
+        if (function_exists('apcu_fetch')) {
+            $data = apcu_fetch($cacheKey, $success);
+            if ($success && $data instanceof \stdClass) {
+                return $data;
+            }
+        }
+
         $rawContents = self::rawContentsFromFile($filename);
         $jsonObj     = json_decode($rawContents, false, 512, JSON_THROW_ON_ERROR);
         if (false === $jsonObj instanceof \stdClass) {
             throw new \JsonException('JSON file ' . $filename . ' does not contain an object');
         }
+
+
+        // Store in cache
+        if (function_exists('apcu_store')) {
+            apcu_store($cacheKey, $jsonObj, 300);
+        }
+
         return $jsonObj;
     }
 
@@ -590,6 +638,17 @@ class Utilities
      */
     public static function jsonFileToObjectArray(string $filename): array
     {
+        $cacheKey = 'jsoncache_objectarray_' . md5($filename);
+
+        // Try cache first
+        if (function_exists('apcu_fetch')) {
+            $data = apcu_fetch($cacheKey, $success);
+            if ($success && is_array($data)) {
+                /** @var \stdClass[] $data */
+                return $data;
+            }
+        }
+
         $rawContents = self::rawContentsFromFile($filename);
         $jsonArr     = json_decode($rawContents, false, 512, JSON_THROW_ON_ERROR);
         if (false === is_array($jsonArr)) {
@@ -600,6 +659,12 @@ class Utilities
                 throw new \JsonException('The decoded JSON is not an array of objects: we found an instance of ' . gettype($item) . ' for item ' . json_encode($item) . '.');
             }
         }
+
+        // Store in cache
+        if (function_exists('apcu_store')) {
+            apcu_store($cacheKey, $jsonArr, 300);
+        }
+
         /** @var \stdClass[] $jsonArr */
         return $jsonArr;
     }
@@ -609,15 +674,33 @@ class Utilities
      *
      * @param string $url The URL to the JSON data.
      * @return \stdClass The decoded JSON data as an object.
-     * @throws \JsonException If the URL does not exist, is not readable, contains invalid JSON, or does not contain an object.
+     * @throws ServiceUnavailableException if the URL does not exist or is not readable
+     * @throws \JsonException If the contents from the URL contain invalid JSON
+     * @throws ValidationException if the contents from the URL were not decoded as an object.
      */
     public static function jsonUrlToObject(string $url): \stdClass
     {
+        $cacheKey = 'jsoncache_object_' . md5($url);
+
+        // Try cache first
+        if (function_exists('apcu_fetch')) {
+            $data = apcu_fetch($cacheKey, $success);
+            if ($success && $data instanceof \stdClass) {
+                return $data;
+            }
+        }
+
         $rawContents = self::rawContentsFromUrl($url);
         $jsonObj     = json_decode($rawContents, false, 512, JSON_THROW_ON_ERROR);
         if (false === $jsonObj instanceof \stdClass) {
-            throw new \JsonException('JSON URL ' . $url . ' does not contain an object');
+            throw new ValidationException('JSON URL ' . $url . ' does not contain an object');
         }
+
+        // Store in cache
+        if (function_exists('apcu_store')) {
+            apcu_store($cacheKey, $jsonObj, 300);
+        }
+
         return $jsonObj;
     }
 
@@ -662,14 +745,34 @@ class Utilities
 
     /**
      * Function called after a successful installation of the Catholic Liturgical Calendar API.
-     * It prints a message of thanksgiving to God and a prayer for the Pope.
+     *
+     * It prints the typical motto of the Jesuits (see {@link https://it.cathopedia.org/wiki/Ad_Maiorem_Dei_Gloriam})
+     * and a prayer for the Pope (see {@link https://www.gregorianum.org/wiki/Oremus_pro_Pontifice}).
+     * It also ensures the `start-server.sh` and `stop-server.sh` scripts are executable,
+     * so that `composer start` and `composer stop` scripts will function correctly.
      *
      * @return void
      */
     public static function postInstall(): void
     {
+        $startScript = __DIR__ . '/../start-server.sh';
+        $stopScript  = __DIR__ . '/../stop-server.sh';
+
+        if (is_file($startScript) && !is_executable($startScript)) {
+            if (@chmod($startScript, 0755) === false) {
+                fprintf(STDERR, "Warning: unable to chmod +x %s\n", $startScript);
+            }
+        }
+
+        if (is_file($stopScript) && !is_executable($stopScript)) {
+            if (@chmod($stopScript, 0755) === false) {
+                fprintf(STDERR, "Warning: unable to chmod +x %s\n", $stopScript);
+            }
+        }
+
+        setlocale(LC_ALL, 'en_US.UTF-8');
         printf("\t\033[4m\033[1;44mCatholic Liturgical Calendar\033[0m\n");
         printf("\t\033[0;33mAd Majorem Dei Gloriam\033[0m\n");
-        printf("\t\033[0;36mOremus pro Pontifice nostro Francisco Dominus\n\tconservet eum et vivificet eum et beatum faciat eum in terra\n\tet non tradat eum in animam inimicorum ejus\033[0m\n");
+        printf("\t\033[0;36mOrémus pro Pontifice nostro Leone.\n\tDóminus consérvet eum, et vivificet eum,\n\tet beátum fáciat eum in terra,\n\tet non tradat eum in ánimam inimicórum éius\033[0m\n");
     }
 }

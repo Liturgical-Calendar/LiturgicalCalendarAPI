@@ -88,9 +88,11 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
             $this->common_lcl = $commons->fullTranslate(self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE);
         } elseif ($litMassVariousNeedsArray) {
             /** @var LitMassVariousNeeds[] $commons */
-            $this->common     = $commons;
-            $commonsLcl       = array_map(fn($item) => $item->fullTranslate(self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE), $commons);
-            $this->common_lcl = implode('; ' . _('or') . ' ', $commonsLcl);
+            $this->common = $commons;
+            $commonsLcl   = array_map(fn($item) => $item->fullTranslate(self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE), $commons);
+            /**translators: when there are multiple possible commons, this will be the glue "[; or] From the Common of..." */
+            $or               = self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'vel' : _('or');
+            $this->common_lcl = implode('; ' . $or . ' ', $commonsLcl);
         } else {
             /** @var LitCommons $commons */
             $commons          = LitCommons::create([LitCommon::NONE]);

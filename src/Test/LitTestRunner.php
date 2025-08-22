@@ -93,17 +93,15 @@ class LitTestRunner
             self::$testCache = new TestsMap();
         }
         if (false === self::$testCache->has($Test)) {
-            $testPath = JsonData::TESTS_FOLDER . "/{$Test}.json";
+            $testPath = rtrim(JsonData::TESTS_FOLDER->path(), '/\\') . DIRECTORY_SEPARATOR . basename($Test) . '.json';
             if (file_exists($testPath)) {
                 $testInstructionsRaw = file_get_contents($testPath);
                 if ($testInstructionsRaw) {
                     $testInstructions = json_decode($testInstructionsRaw);
                     if (JSON_ERROR_NONE === json_last_error() && $testInstructions instanceof \stdClass) {
-                        $schemaFile     = JsonData::SCHEMAS_FOLDER . '/LitCalTest.json';
+                        $schemaFile     = rtrim(JsonData::SCHEMAS_FOLDER->path(), '/\\') . DIRECTORY_SEPARATOR . 'LitCalTest.json';
                         $schemaContents = file_get_contents($schemaFile);
-                        if (false === $schemaContents) {
-                            $this->setError("Test runner could not read schema file {$schemaFile}");
-                        } else {
+                        if (false !== $schemaContents) {
                             $jsonSchema = json_decode($schemaContents);
                             try {
                                 $schema = Schema::import($jsonSchema);
@@ -114,6 +112,8 @@ class LitTestRunner
                             } catch (InvalidValue | \Exception $e) {
                                 $this->setError("Cannot proceed with {$Test}, the Test instructions were incorrectly validated against schema " . $schemaFile . ': ' . $e->getMessage());
                             }
+                        } else {
+                            $this->setError("Test runner could not read schema file {$schemaFile}");
                         }
                     } else {
                         $this->setError("Test server could not decode Test instructions JSON data for {$Test}");

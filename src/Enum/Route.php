@@ -2,6 +2,8 @@
 
 namespace LiturgicalCalendar\Api\Enum;
 
+use LiturgicalCalendar\Api\Router;
+
 enum Route: string
 {
     case CALENDARS         = '/calendars';
@@ -20,4 +22,9 @@ enum Route: string
     case EASTER            = '/easter';
     case SCHEMAS           = '/schemas';
     case MISSALS           = '/missals';
+
+    public function path(): string
+    {
+        return Router::$apiPath . $this->value;
+    }
 }

@@ -10,8 +10,6 @@
             </td>
             <td style="text-align:center;">
                 <a href="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/overview/development"><img src="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/badge/development" title="CodeFactor" /></a>
-                <br>
-                <a href="https://img.shields.io/badge/phpstan-level%2010-brightgreen?style=flat-square&logo=php"><img src="https://img.shields.io/badge/phpstan-level%2010-brightgreen?style=flat-square&logo=php" title="PHPStan Level 10"></a>
             </td>
             <td><a href="https://translate.johnromanodorazio.com/engage/liturgical-calendar/">
 <img src="https://translate.johnromanodorazio.com/widgets/liturgical-calendar/-/287x66-white.png" alt="Translation status" />
@@ -20,6 +18,10 @@
         </tr>
     </tbody>
 </table>
+
+![Codesniffer PHPStan POTs update](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/actions/workflows/main.yml/badge.svg?branch=development)
+![PHPStan level](https://img.shields.io/badge/phpstan-level%2010-brightgreen?style=flat-square&logo=php "PHPStan level 10")
+![PHPUnit](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/actions/workflows/phpunit.yml/badge.svg?branch=development)
 
 # Liturgical Calendar
 An API written in PHP that will generate the liturgical calendar for any given year, based on the General Roman Calendar, calculating the mobile festivities and the precedence of solemnities, feasts, memorials... Can also produce calendar data for nations, dioceses, or groups of dioceses. This calendar data can be served in various formats such as JSON, YAML, XML, or ICS. More information on the website https://litcal.johnromanodorazio.com/.
@@ -63,8 +65,8 @@ _(See [usage.php#calSubscription](https://litcal.johnromanodorazio.com/usage.php
 
 System requirements:
 * PHP >= 8.4 (we make use of more modern PHP functions such as `array_find`)
-* PHP modules installed and enabled: `intl` * `zip` * `gettext` * `calendar` * `yaml`
-* System language packs for all the supported languages
+* PHP modules installed and enabled: `intl` * `zip` * `calendar` * `yaml` * `apcu`
+* System package `gettext` and language packs for all the supported languages
 
 ## Using PHP's builtin server
 
@@ -76,6 +78,33 @@ PHP_CLI_SERVER_WORKERS=2 php -S localhost:8000
 ```
 
 For convenience when using VSCode, a `tasks.json` has been defined so that you can simply type <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> (<kbd>CMD</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> on MacOS) to start the PHP builtin server and open the browser.
+
+The `composer.json` file also defines a couple scripts to simplify this process:
+* `composer start`: spawns six workers by calling `start-server.sh`
+* `composer stop`: stop the server by calling `stop-server.sh`
+
+You can also use the `start-server.sh` and `stop-server.sh` scripts directly to spawn and stop the server. Please ensure that both scripts are executable (`chmod +x`).
+The **start** script will write the server's PID to a file called `server.pid` in the current directory,
+and the **stop** script will terminate the process by its PID and remove the `server.pid` file.
+
+The following environment variables can be set to configure the API:
+* `API_PROTOCOL`: The protocol to use for the API (default is `http`). Example: `API_PROTOCOL=https` to use the `https` protocol.
+* `API_HOST`: The hostname or IP address to use for the API (default is `localhost`). Example: `API_HOST=mydomain.com` to use the `mydomain.com` host.
+* `API_PORT`: The port to use for the API (default is `8000`). Example: `API_PORT=8080` to use port `8080`.
+* `API_BASE_PATH`: The base path to use for the API (default is `/`). Example: `API_BASE_PATH=/api/v1` to use the `/api/v1` base path.
+
+These environment variables should be set in a `.env` or `.env.local` file (the same files used by the PHP application to load environment variables).
+You can copy the `.env.example` file to `.env` or `.env.local` (or `.env.development` or `.env.production`) and edit it as needed.
+
+These environment variables are used when running the API in CLI mode, such as when using the `start-server.sh` script. The defaults are suitable for development and testing, but may need to be overridden for staging or production environments.
+
+For example, to run the API in production with a custom domain and HTTPS, you would set the following environment variables:
+```bash
+API_PROTOCOL=https
+API_HOST=mydomain.com
+API_PORT=443
+API_BASE_PATH=/api/v1
+```
 
 ## Using a docker container
 
@@ -97,6 +126,67 @@ if we want to install system locales in order for `gettext` to work properly wit
 <a href="https://translate.johnromanodorazio.com/engage/liturgical-calendar/">
 <img src="https://translate.johnromanodorazio.com/widgets/liturgical-calendar/-/open-graph.png" alt="Translation status" />
 </a>
+
+# Testing
+
+To test the frontend locally, first install all package dependencies with `composer install`.
+
+## Static analysis
+To run static analysis tests, run `composer analyse`. You can even run this within VSCode's terminal,
+and have clickable links to the interested lines in thesource code, if you create a `phpstan.neon` file in the root directory
+alongside the `phpstan.neon.dist` file. For VSCode running under WSL, `phpstan.neon` should look like this:
+```yaml
+includes:
+    - phpstan.neon.dist
+
+parameters:
+    editorUrl: 'vscode://vscode-remote/wsl+Ubuntu-24.04/%%file%%:%%line%%'
+```
+Replace `Ubuntu-24.04` with the name of your WSL distribution.
+For other code editors, see the [PHPStan documentation here](https://phpstan.org/user-guide/output-format#opening-file-in-an-editor).
+
+## Integrity checks web interface
+There is a web interface that allows to run a number of integrity checks on the data output by the various routes.
+This interface has its own repository [Liturgical-Calendar/UnitTestInterface](https://github.com/Liturgical-Calendar/UnitTestInterface).
+
+You should clone this repository, and run `composer install` within the cloned repository folder.
+
+This web interface communicates with a Web Socket backend included in the API repository.
+In order to launch the websocket server, you can use <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> (`litcal-tests-websockets`) from VSCode,
+in the Liturgical Calendar API repository.
+
+Then launch the web interface with <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> (`litcal-tests-webui`) from VSCode,
+in the UnitTestInterface repository.
+
+To have all of the launch tasks available without having to open separate instances of VSCode,
+it can be convenient to create a `LiturgicalCalendar.code-workspace` file outside of either repository folder,
+and add both repository folders to it. For example:
+```json
+{
+        "folders": [
+                {
+                        "name": "LiturgicalCalendarAPI",
+                        "path": "LiturgicalCalendarAPI"
+                },
+                {
+                        "name": "LiturgicalCalendarFrontend",
+                        "path": "LiturgicalCalendarFrontend"
+                },
+                {
+                        "name": "UnitTestInterface",
+                        "path": "UnitTestInterface"
+                }
+        ]
+}
+```
+This will include the API repository, the frontend website repository, and the test interface repository all in the same workspace.
+If you run `code LiturgicalCalendar.code-workspace` from the command line in WSL, you will open the whole workspace in VSCode,
+with all of the folders for each repository and all of the launch tasks available in a single VSCode instance.
+
+## Unit tests
+A few Unit Tests are available for testing the various API routes and their available operations and parameters.
+
+To run unit tests, run `composer test`.
 
 # Changelog
 See [CHANGELOG.md](CHANGELOG.md).
