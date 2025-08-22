@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a1c741229ad06db38e77ca6642469756",
+    "content-hash": "6ca1e02bb1f5095d92aea5b42650902a",
     "packages": [
         {
             "name": "cboden/ratchet",
@@ -296,16 +296,16 @@
         },
         {
             "name": "laminas/laminas-httphandlerrunner",
-            "version": "2.13.x-dev",
+            "version": "2.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laminas/laminas-httphandlerrunner.git",
-                "reference": "12d17248a705c92e098ce34938e1a13dc77838ec"
+                "reference": "b14da3519c650e9436e410cfedee6f860312eff9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laminas/laminas-httphandlerrunner/zipball/12d17248a705c92e098ce34938e1a13dc77838ec",
-                "reference": "12d17248a705c92e098ce34938e1a13dc77838ec",
+                "url": "https://api.github.com/repos/laminas/laminas-httphandlerrunner/zipball/b14da3519c650e9436e410cfedee6f860312eff9",
+                "reference": "b14da3519c650e9436e410cfedee6f860312eff9",
                 "shasum": ""
             },
             "require": {
@@ -321,7 +321,6 @@
                 "psalm/plugin-phpunit": "^0.19.5",
                 "vimeo/psalm": "^6.10.3"
             },
-            "default-branch": true,
             "type": "library",
             "extra": {
                 "laminas": {
@@ -360,7 +359,7 @@
                     "type": "community_bridge"
                 }
             ],
-            "time": "2025-08-18T00:39:41+00:00"
+            "time": "2025-05-13T21:21:16+00:00"
         },
         {
             "name": "nyholm/psr7",
@@ -442,7 +441,7 @@
         },
         {
             "name": "nyholm/psr7-server",
-            "version": "dev-master",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Nyholm/psr7-server.git",
@@ -464,7 +463,6 @@
                 "nyholm/psr7": "^1.3",
                 "phpunit/phpunit": "^7.0 || ^8.5 || ^9.3"
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -4918,13 +4916,7 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": {
-        "laminas/laminas-httphandlerrunner": 20,
-        "nyholm/psr7": 20,
-        "nyholm/psr7-server": 20,
-        "psr/http-server-handler": 20,
-        "psr/http-server-middleware": 20
-    },
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
