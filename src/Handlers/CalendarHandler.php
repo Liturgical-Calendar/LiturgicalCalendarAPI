@@ -4879,12 +4879,6 @@ final class CalendarHandler extends AbstractHandler
         }
         $this->requestHeaders = $usefulHeaders;
 
-
-        // For all other request methods, validate that they are supported by the endpoint
-        //   and early exit if not
-        $this->validateRequestMethod($request);
-
-
         // Initialize any parameters set in the request.
         // If there are any:
         //   - for a GET request method, we expect them to be set in the URL
@@ -4948,6 +4942,8 @@ final class CalendarHandler extends AbstractHandler
         // If a national calendar or diocesan calendar is requested, these will override
         //   most of the other parameters (taken care of by the updateSettingsBasedOn[National|Diocesan]Calendar methods)
         $this->CalendarParams->initParamsFromRequestPath($this->requestPathParams);
+
+        $this->validateRequestMethod($request);
 
         $this->loadDiocesanCalendarData();
         $this->loadNationalCalendarData();

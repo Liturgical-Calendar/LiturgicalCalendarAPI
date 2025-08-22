@@ -281,7 +281,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
     {
         $headersHeader = $request->getHeaderLine('Access-Control-Request-Headers');
         if ($headersHeader !== '') {
-            return $response->withHeader('Access-Control-Allow-Headers', $headersHeader);
+            return $response->withHeader('Access-Control-Allow-Headers', ['Accept', 'Accept-Language', 'Accept-Encoding', 'Accept-Charset', 'Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Host', 'Referer', 'User-Agent', 'Connection']);
         }
         return $response;
     }
@@ -308,13 +308,23 @@ abstract class AbstractHandler implements RequestHandlerInterface
 
     protected function handlePreflightRequest(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
+        // if method == OPTIONS and "Origin" in headers and "Access-Control-Request-Method" in headers:
+        //   # This is a CORS preflight request
+        // if method == OPTIONS and not ("Origin" in headers or "Access-Control-Request-Method" in headers):
+        //   # This is a normal OPTIONS request
+        $isCorsRequest = ( $request->getMethod() === 'OPTIONS' && $request->getHeaderLine('Origin') !== '' && $request->getHeaderLine('Access-Control-Request-Method') !== '' );
+
         $response = $response->withStatus(StatusCode::OK->value, StatusCode::OK->reason());
-        $response = $this->setAccessControlAllowOriginHeader($request, $response);
-        $response = $this->setAccessControlAllowMethodsHeader($request, $response);
-        $response = $this->setAccessControlAllowHeadersHeader($request, $response);
-        // Since in the current implementation of the API we do not request credentials for any requests, we should omit this header.
-        // $response = $this->setAccessControlAllowCredentialsHeader($response);
-        $response = $this->setAccessControlMaxAgeHeader($response);
+        if ($isCorsRequest) {
+            $response = $this->setAccessControlAllowOriginHeader($request, $response);
+            $response = $this->setAccessControlAllowMethodsHeader($request, $response);
+            $response = $this->setAccessControlAllowHeadersHeader($request, $response);
+            // Since in the current implementation of the API we do not request credentials for any requests, we should omit this header.
+            // $response = $this->setAccessControlAllowCredentialsHeader($response);
+            $response = $this->setAccessControlMaxAgeHeader($response);
+        } else {
+            $response = $response->withHeader('Allow', implode(',', array_column($this->allowedRequestMethods, 'value')));
+        }
         return $response;
     }
 
