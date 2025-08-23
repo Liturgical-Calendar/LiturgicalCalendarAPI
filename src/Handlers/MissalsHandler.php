@@ -79,8 +79,6 @@ final class MissalsHandler extends AbstractHandler
 
         $response = $response->withHeader('Content-Type', $mime);
 
-        self::buildMissalsIndex();
-
         // Initialize any parameters set in the request.
         // If there are any:
         //   - for a GET request method, we expect them to be set in the URL
@@ -116,11 +114,15 @@ final class MissalsHandler extends AbstractHandler
                 $params = array_merge($params, $parsedBodyParams);
             }
         } elseif ($method === RequestMethod::PUT || $method === RequestMethod::PATCH) {
+            // Pre-validate for methods with bodies/side effects to avoid parsing on disallowed paths
+            $this->validateRequestMethod($request);
             $params['payload'] = $this->parseBodyPayload($request, false);
             if (false === ( $params['payload'] instanceof \stdClass )) {
                 throw new ValidationException('Invalid payload');
             }
         }
+
+        self::buildMissalsIndex();
 
         $this->params = new MissalsParams($params);
 

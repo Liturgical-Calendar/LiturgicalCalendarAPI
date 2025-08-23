@@ -284,16 +284,20 @@ abstract class AbstractHandler implements RequestHandlerInterface
             // Echo back only the subset of requested headers we allow; avoid forbidden headers per Fetch/CORS.
             $allowed   = ['Accept', 'Accept-Language', 'Content-Type', 'Authorization', 'X-Requested-With'];
             $requested = array_values(array_filter(array_map('trim', explode(',', $headersHeader))));
-            // Case-insensitive intersection while preserving canonical casing from $allowed
-            $allowedLower   = array_map('strtolower', $allowed);
-            $requestedLower = array_map('strtolower', $requested);
-            $approved       = [];
-            foreach ($requestedLower as $header) {
-                if (in_array($header, $allowedLower, true)) {
-                    $approved[] = $allowed[array_search($header, $allowedLower, true)];
+            // Case-insensitive intersection while preserving canonical casing and de-duplicating
+            $canonicalByLc  = array_combine(array_map('strtolower', $allowed), $allowed);
+            $approvedAssoc  = [];
+            foreach ($requested as $header) {
+                $lc = strtolower($header);
+                if (isset($canonicalByLc[$lc])) {
+                    $approvedAssoc[$canonicalByLc[$lc]] = true; // preserve casing, dedupe
                 }
             }
-            return $response->withHeader('Access-Control-Allow-Headers', implode(',', $approved));
+            if ($approvedAssoc === []) {
+                // No approved non-safelisted headers; omit ACAH entirely
+                return $response;
+            }
+            return $response->withHeader('Access-Control-Allow-Headers', implode(',', array_keys($approvedAssoc)));
         }
         return $response;
     }
@@ -328,8 +332,12 @@ abstract class AbstractHandler implements RequestHandlerInterface
 
         $response = $response->withStatus(StatusCode::OK->value, StatusCode::OK->reason());
         if ($isCorsRequest) {
+            // Preflight should not carry a body
+            $response = $response->withStatus(StatusCode::NO_CONTENT->value, StatusCode::NO_CONTENT->reason());
             $response = $this->setAccessControlAllowOriginHeader($request, $response);
-            $response = $response->withAddedHeader('Vary', 'Origin');
+            $response = $response->withAddedHeader('Vary', 'Origin')
+                                 ->withAddedHeader('Vary', 'Access-Control-Request-Method')
+                                 ->withAddedHeader('Vary', 'Access-Control-Request-Headers');
             $response = $this->setAccessControlAllowMethodsHeader($request, $response);
             $response = $this->setAccessControlAllowHeadersHeader($request, $response);
             // Since in the current implementation of the API we do not request credentials for any requests, we should omit this header.

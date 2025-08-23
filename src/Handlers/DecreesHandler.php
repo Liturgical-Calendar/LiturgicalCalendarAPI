@@ -145,6 +145,8 @@ final class DecreesHandler extends AbstractHandler
                 $params = array_merge($params, $parsedBodyParams);
             }
         } elseif ($method === RequestMethod::PUT || $method === RequestMethod::PATCH) {
+            // Pre-validate for methods with bodies/side effects to avoid parsing on disallowed paths
+            $this->validateRequestMethod($request);
             $params['payload'] = $this->parseBodyPayload($request, false);
             if (false === ( $params['payload'] instanceof \stdClass )) {
                 throw new ValidationException('Invalid payload');

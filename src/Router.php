@@ -2,7 +2,6 @@
 
 namespace LiturgicalCalendar\Api;
 
-use GuzzleHttp\Psr7\Request;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
@@ -36,8 +35,8 @@ class Router
     public static string $apiPath;
     public static string $apiFilePath;
     private static RequestHandlerInterface $handler;
-    private const MIN_YEAR = 1969;
-    private const MAX_YEAR = 10000;
+    private const MIN_YEAR = 1969;  // exlusive minimum (first year supported is 1970)
+    private const MAX_YEAR = 10000; // exclusive maximum (last year supported is 9999)
 
     /**
      * This is the main entry point of the API. It takes care of determining which
@@ -51,7 +50,9 @@ class Router
         self::getApiPaths();
         $request          = self::retrieveRequest();
         $path             = $request->getUri()->getPath();
-        $pathParams       = ltrim($path, self::$apiBase);
+        $pathParams = str_starts_with($path, self::$apiBase)
+            ? substr($path, strlen(self::$apiBase))
+            : $path;
         $pathParams       = rtrim($pathParams, '/');
         $requestPathParts = explode('/', $pathParams);
         $route            = array_shift($requestPathParts);
@@ -265,7 +266,7 @@ class Router
             case 'data':
                 $regionalDataHandler = new RegionalDataHandler($requestPathParts);
                 $pathCount           = count($requestPathParts);
-                $firstInCategory     = $pathCount > 0 && in_array($requestPathParts[0], PathCategory::values());
+                $firstInCategory     = $pathCount > 0 && in_array($requestPathParts[0], PathCategory::values(), true);
                 $allowedMethods      = match (true) {
                     $pathCount === 0 => [],
                     $pathCount === 1 && !$firstInCategory => [],
