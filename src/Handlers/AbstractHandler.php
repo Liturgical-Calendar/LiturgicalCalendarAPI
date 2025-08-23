@@ -335,8 +335,11 @@ abstract class AbstractHandler implements RequestHandlerInterface
             // Preflight should not carry a body
             $response = $response->withStatus(StatusCode::NO_CONTENT->value, StatusCode::NO_CONTENT->reason());
             $response = $this->setAccessControlAllowOriginHeader($request, $response);
-            $response = $response->withAddedHeader('Vary', 'Origin')
-                                 ->withAddedHeader('Vary', 'Access-Control-Request-Method')
+            // Optimize cache hit-rates by only adding Vary: Origin when Access-Control-Allow-Origin is not "*"
+            if ($response->getHeaderLine('Access-Control-Allow-Origin') !== '*') {
+                $response = $response->withAddedHeader('Vary', 'Origin');
+            }
+            $response = $response->withAddedHeader('Vary', 'Access-Control-Request-Method')
                                  ->withAddedHeader('Vary', 'Access-Control-Request-Headers');
             $response = $this->setAccessControlAllowMethodsHeader($request, $response);
             $response = $this->setAccessControlAllowHeadersHeader($request, $response);
