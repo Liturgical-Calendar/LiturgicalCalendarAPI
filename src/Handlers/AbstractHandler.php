@@ -285,8 +285,8 @@ abstract class AbstractHandler implements RequestHandlerInterface
             $allowed   = ['Accept', 'Accept-Language', 'Content-Type', 'Authorization', 'X-Requested-With'];
             $requested = array_values(array_filter(array_map('trim', explode(',', $headersHeader))));
             // Case-insensitive intersection while preserving canonical casing and de-duplicating
-            $canonicalByLc  = array_combine(array_map('strtolower', $allowed), $allowed);
-            $approvedAssoc  = [];
+            $canonicalByLc = array_combine(array_map('strtolower', $allowed), $allowed);
+            $approvedAssoc = [];
             foreach ($requested as $header) {
                 $lc = strtolower($header);
                 if (isset($canonicalByLc[$lc])) {

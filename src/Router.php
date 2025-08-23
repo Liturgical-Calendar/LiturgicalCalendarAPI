@@ -50,7 +50,7 @@ class Router
         self::getApiPaths();
         $request          = self::retrieveRequest();
         $path             = $request->getUri()->getPath();
-        $pathParams = str_starts_with($path, self::$apiBase)
+        $pathParams       = str_starts_with($path, self::$apiBase)
             ? substr($path, strlen(self::$apiBase))
             : $path;
         $pathParams       = rtrim($pathParams, '/');
