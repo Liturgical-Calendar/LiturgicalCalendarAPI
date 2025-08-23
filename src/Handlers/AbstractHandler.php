@@ -281,7 +281,19 @@ abstract class AbstractHandler implements RequestHandlerInterface
     {
         $headersHeader = $request->getHeaderLine('Access-Control-Request-Headers');
         if ($headersHeader !== '') {
-            return $response->withHeader('Access-Control-Allow-Headers', ['Accept', 'Accept-Language', 'Accept-Encoding', 'Accept-Charset', 'Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Host', 'Referer', 'User-Agent', 'Connection']);
+            // Echo back only the subset of requested headers we allow; avoid forbidden headers per Fetch/CORS.
+            $allowed   = ['Accept', 'Accept-Language', 'Content-Type', 'Authorization', 'X-Requested-With'];
+            $requested = array_values(array_filter(array_map('trim', explode(',', $headersHeader))));
+            // Case-insensitive intersection while preserving canonical casing from $allowed
+            $allowedLower   = array_map('strtolower', $allowed);
+            $requestedLower = array_map('strtolower', $requested);
+            $approved       = [];
+            foreach ($requestedLower as $header) {
+                if (in_array($header, $allowedLower, true)) {
+                    $approved[] = $allowed[array_search($header, $allowedLower, true)];
+                }
+            }
+            return $response->withHeader('Access-Control-Allow-Headers', implode(',', $approved));
         }
         return $response;
     }
@@ -317,6 +329,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
         $response = $response->withStatus(StatusCode::OK->value, StatusCode::OK->reason());
         if ($isCorsRequest) {
             $response = $this->setAccessControlAllowOriginHeader($request, $response);
+            $response = $response->withAddedHeader('Vary', 'Origin');
             $response = $this->setAccessControlAllowMethodsHeader($request, $response);
             $response = $this->setAccessControlAllowHeadersHeader($request, $response);
             // Since in the current implementation of the API we do not request credentials for any requests, we should omit this header.

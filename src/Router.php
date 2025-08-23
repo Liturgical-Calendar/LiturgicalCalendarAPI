@@ -2,6 +2,7 @@
 
 namespace LiturgicalCalendar\Api;
 
+use GuzzleHttp\Psr7\Request;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
@@ -35,6 +36,8 @@ class Router
     public static string $apiPath;
     public static string $apiFilePath;
     private static RequestHandlerInterface $handler;
+    private const MIN_YEAR = 1969;
+    private const MAX_YEAR = 10000;
 
     /**
      * This is the main entry point of the API. It takes care of determining which
@@ -52,9 +55,9 @@ class Router
         $requestPathParts = explode('/', $pathParams);
         // If a trailing slash was provided, remove the resulting empty value, unless it's the only value
         if (count($requestPathParts) > 0) {
-            $requestPathParts = array_filter($requestPathParts, function ($value) {
+            $requestPathParts = array_values(array_filter($requestPathParts, function ($value) {
                 return !empty($value);
-            });
+            }));
         }
         $route = array_shift($requestPathParts);
 
@@ -73,7 +76,7 @@ class Router
                         RequestMethod::GET,
                         RequestMethod::POST
                     ]);
-                } elseif (count($requestPathParts) === 1 && is_numeric($requestPathParts[0]) && $requestPathParts[0] > 1969 && $requestPathParts[0] < 10000) {
+                } elseif (count($requestPathParts) === 1 && is_numeric($requestPathParts[0]) && $requestPathParts[0] > self::MIN_YEAR && $requestPathParts[0] < self::MAX_YEAR) {
                     $calendarHandler->setAllowedRequestMethods([
                         RequestMethod::GET,
                         RequestMethod::POST
@@ -83,7 +86,7 @@ class Router
                         RequestMethod::GET,
                         RequestMethod::POST
                     ]);
-                } elseif (count($requestPathParts) === 3 && in_array($requestPathParts[0], PathCategory::values(), true) && is_numeric($requestPathParts[2]) && $requestPathParts[2] > 1969 && $requestPathParts[2] < 10000) {
+                } elseif (count($requestPathParts) === 3 && in_array($requestPathParts[0], PathCategory::values(), true) && is_numeric($requestPathParts[2]) && $requestPathParts[2] > self::MIN_YEAR && $requestPathParts[2] < self::MAX_YEAR) {
                     $calendarHandler->setAllowedRequestMethods([
                         RequestMethod::GET,
                         RequestMethod::POST
@@ -183,13 +186,6 @@ class Router
                 } else {
                     $decreesHandler->setAllowedRequestMethods([]);
                 }
-                $decreesHandler->setAllowedRequestMethods([
-                    RequestMethod::GET,
-                    RequestMethod::POST,
-                    RequestMethod::PUT,
-                    RequestMethod::PATCH,
-                    RequestMethod::DELETE
-                ]);
                 $decreesHandler->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
@@ -273,27 +269,25 @@ class Router
                 break;
             case 'data':
                 $regionalDataHandler = new RegionalDataHandler($requestPathParts);
-                if (count($requestPathParts) === 0) {
-                    $regionalDataHandler->setAllowedRequestMethods([]);
-                } elseif (count($requestPathParts) === 1 && false === in_array($requestPathParts[0], PathCategory::values())) {
-                    $regionalDataHandler->setAllowedRequestMethods([]);
-                } elseif (count($requestPathParts) === 1 && in_array($requestPathParts[0], PathCategory::values())) {
-                    $regionalDataHandler->setAllowedRequestMethods([RequestMethod::PUT]);
-                } elseif (count($requestPathParts) === 2 && in_array($requestPathParts[0], PathCategory::values())) {
-                    $regionalDataHandler->setAllowedRequestMethods([
+                $pathCount           = count($requestPathParts);
+                $firstInCategory     = $pathCount > 0 && in_array($requestPathParts[0], PathCategory::values());
+                $allowedMethods      = match (true) {
+                    $pathCount === 0 => [],
+                    $pathCount === 1 && !$firstInCategory => [],
+                    $pathCount === 1 && $firstInCategory => [RequestMethod::PUT],
+                    $pathCount === 2 && $firstInCategory => [
                         RequestMethod::GET,
                         RequestMethod::POST,
                         RequestMethod::PATCH,
                         RequestMethod::DELETE
-                    ]);
-                } elseif (count($requestPathParts) === 3 && in_array($requestPathParts[0], PathCategory::values())) {
-                    $regionalDataHandler->setAllowedRequestMethods([
+                    ],
+                    $pathCount === 3 && $firstInCategory => [
                         RequestMethod::GET,
                         RequestMethod::POST
-                    ]);
-                } else {
-                    $regionalDataHandler->setAllowedRequestMethods([]);
-                }
+                    ],
+                    default => []
+                };
+                $regionalDataHandler->setAllowedRequestMethods($allowedMethods);
                 $regionalDataHandler->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
