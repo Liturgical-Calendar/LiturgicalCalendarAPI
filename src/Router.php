@@ -52,14 +52,9 @@ class Router
         $request          = self::retrieveRequest();
         $path             = $request->getUri()->getPath();
         $pathParams       = ltrim($path, self::$apiBase);
+        $pathParams       = rtrim($pathParams, '/');
         $requestPathParts = explode('/', $pathParams);
-        // If a trailing slash was provided, remove the resulting empty value, unless it's the only value
-        if (count($requestPathParts) > 0) {
-            $requestPathParts = array_values(array_filter($requestPathParts, function ($value) {
-                return !empty($value);
-            }));
-        }
-        $route = array_shift($requestPathParts);
+        $route            = array_shift($requestPathParts);
 
         // The very first response that will need to be submitted by the API,
         // is the response to pre-flight requests.
