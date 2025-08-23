@@ -4357,7 +4357,7 @@ final class CalendarHandler extends AbstractHandler
      * the Liturgical Calendar. If the file does not exist or is stale, the function will re-calculate the Liturgical
      * Calendar and cache the response.
      */
-    private function prepareResponseBody(ResponseInterface $response): ResponseInterface
+    private function prepareResponseBody(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $SerializeableLitCal                                = new \stdClass();
         $SerializeableLitCal->litcal                        = $this->Cal->getLiturgicalEventsCollection();
@@ -4506,10 +4506,8 @@ final class CalendarHandler extends AbstractHandler
                                   ->withHeader('Etag', $etag);
 
         if (
-            isset($_SERVER['HTTP_IF_NONE_MATCH'])
-            && is_string($_SERVER['HTTP_IF_NONE_MATCH'])
-            && !empty($_SERVER['HTTP_IF_NONE_MATCH'])
-            && trim($_SERVER['HTTP_IF_NONE_MATCH'], " \t\"") === $responseHash
+            $request->getHeaderLine('If-None-Match') !== ''
+            && trim($request->getHeaderLine('If-None-Match'), " \t\"") === $responseHash
         ) {
             return $response->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
                                  ->withHeader('Content-Length', '0')
@@ -4968,10 +4966,8 @@ final class CalendarHandler extends AbstractHandler
                 ->withHeader('Etag', $etag);
 
             if (
-                isset($_SERVER['HTTP_IF_NONE_MATCH'])
-                && is_string($_SERVER['HTTP_IF_NONE_MATCH'])
-                && !empty($_SERVER['HTTP_IF_NONE_MATCH'])
-                && trim($_SERVER['HTTP_IF_NONE_MATCH'], " \t\"") === $responseHash
+                $request->getHeaderLine('If-None-Match') !== ''
+                && trim($request->getHeaderLine('If-None-Match'), " \t\"") === $responseHash
             ) {
                 return $response
                     ->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
@@ -5051,10 +5047,10 @@ final class CalendarHandler extends AbstractHandler
                 //   that fall outside of the range of the current liturgical year.
                 array_push($this->Messages, ...$Messages);
 
-                $response = $this->prepareResponseBody($response);
+                $response = $this->prepareResponseBody($request, $response);
             } else {
                 $this->Cal->sortLiturgicalEvents();
-                $response = $this->prepareResponseBody($response);
+                $response = $this->prepareResponseBody($request, $response);
             }
         }
 

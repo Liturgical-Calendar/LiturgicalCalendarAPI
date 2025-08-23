@@ -654,7 +654,10 @@ final class EventsHandler extends AbstractHandler
         $responseHash = md5($responseBody);
         $response     = $response->withHeader('ETag', "\"{$responseHash}\"");
 
-        if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
+        if (
+            $request->getHeaderLine('If-None-Match') !== ''
+            && trim($request->getHeaderLine('If-None-Match'), " \t\"") === $responseHash
+        ) {
             return $response->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
                             ->withHeader('Content-Length', '0');
         }

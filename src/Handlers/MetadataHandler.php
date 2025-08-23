@@ -285,10 +285,8 @@ final class MetadataHandler extends AbstractHandler
         $response     = $response->withHeader('ETag', $etag);
 
         if (
-            isset($_SERVER['HTTP_IF_NONE_MATCH'])
-            && is_string($_SERVER['HTTP_IF_NONE_MATCH'])
-            && !empty($_SERVER['HTTP_IF_NONE_MATCH'])
-            && trim($_SERVER['HTTP_IF_NONE_MATCH'], " \t\"") === $responseHash
+            $request->getHeaderLine('If-None-Match') !== ''
+            && trim($request->getHeaderLine('If-None-Match'), " \t\"") === $responseHash
         ) {
             return $response->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
                             ->withHeader('Content-Length', '0');
