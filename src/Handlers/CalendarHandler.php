@@ -4295,8 +4295,20 @@ final class CalendarHandler extends AbstractHandler
             // We always create a cache of the Github Release, even for localhost development,
             // to avoid sending too many requests
             if (false === realpath($this->CachePath)) {
+                if (false === is_writable(dirname($this->CachePath))) {
+                    $description = sprintf(
+                        'The cache folder %s does not exist, but we cannot create it because the parent folder is not writable.',
+                        dirname($this->CachePath)
+                    );
+                    throw new ServiceUnavailableException($description);
+                }
+
                 if (false === mkdir($this->CachePath, 0755, true)) {
-                    throw new \RuntimeException('Could not create cache folder ' . $this->CachePath);
+                    $description = sprintf(
+                        'Could not create cache folder: %s. Please ensure the path is writable.',
+                        $this->CachePath
+                    );
+                    throw new ServiceUnavailableException($description);
                 }
             }
 
@@ -4503,7 +4515,8 @@ final class CalendarHandler extends AbstractHandler
         $response      = $response->withHeader('X-LitCal-Starttime', $this->startTime . '')
                                   ->withHeader('X-LitCal-Endtime', $this->endTime . '')
                                   ->withHeader('X-LitCal-Executiontime', $executionTime . '')
-                                  ->withHeader('Etag', $etag);
+                                  ->withHeader('Etag', $etag)
+                                  ->withHeader('Vary', 'Accept, Accept-Language');
 
         if (
             $request->getHeaderLine('If-None-Match') !== ''

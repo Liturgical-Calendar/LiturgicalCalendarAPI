@@ -5,16 +5,13 @@ namespace LiturgicalCalendar\Api\Handlers;
 use LiturgicalCalendar\Api\Params\MissalsParams;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
-use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
-use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadata;
 use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadataMap;
-use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -22,15 +19,17 @@ use Psr\Http\Message\ServerRequestInterface;
 final class MissalsHandler extends AbstractHandler
 {
     public MissalsParams $params;
-    public static MissalMetadataMap $missalsIndex;
-    /** @var string[] */ public static array $availableLangs = [];
+    public static ?MissalMetadataMap $missalsIndex = null;
+
+    /** @var string[] */
+    public static array $availableLangs = [];
 
     /** @param string[] $requestPathParams */
     public function __construct(array $requestPathParams = [])
     {
         parent::__construct($requestPathParams);
 
-        if (false === isset(self::$missalsIndex)) {
+        if (null === self::$missalsIndex) {
             self::$missalsIndex = new MissalMetadataMap();
         }
     }
@@ -122,13 +121,22 @@ final class MissalsHandler extends AbstractHandler
             }
         }
 
-        if (self::$missalsIndex->isEmpty()) {
-            self::$missalsIndex->buildIndex();
+        try {
+            if (self::$missalsIndex->isEmpty()) {
+                self::$missalsIndex->buildIndex();
+            }
+        } catch (\Throwable $e) {
+            // Surface a 503 instead of a generic 500 on index build failures
+            throw new ServiceUnavailableException('Missals index temporarily unavailable', $e);
         }
 
         $this->params = new MissalsParams($params);
 
-        $this->validateRequestMethod($request);
+        // For PUT and PATCH requests we already validated the request method
+        // before parsing the body, for all other request methods we validate it here
+        if ($method !== RequestMethod::PUT && $method !== RequestMethod::PATCH) {
+            $this->validateRequestMethod($request);
+        }
 
         switch ($method) {
             case RequestMethod::GET:
