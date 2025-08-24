@@ -24,15 +24,15 @@ final class MissalsHandler extends AbstractHandler
     public MissalsParams $params;
     public static MissalMetadataMap $missalsIndex;
     /** @var string[] */ public static array $availableLangs = [];
-    /** @var string[] */ public static array $MissalRegions  = [];
-    /** @var int[]    */ public static array $MissalYears    = [];
 
     /** @param string[] $requestPathParams */
     public function __construct(array $requestPathParams = [])
     {
         parent::__construct($requestPathParams);
 
-        self::$missalsIndex = new MissalMetadataMap();
+        if (false === isset(self::$missalsIndex)) {
+            self::$missalsIndex = new MissalMetadataMap();
+        }
     }
 
 
@@ -122,7 +122,9 @@ final class MissalsHandler extends AbstractHandler
             }
         }
 
-        self::buildMissalsIndex();
+        if (self::$missalsIndex->isEmpty()) {
+            self::$missalsIndex->buildIndex();
+        }
 
         $this->params = new MissalsParams($params);
 
@@ -141,82 +143,6 @@ final class MissalsHandler extends AbstractHandler
                 return $this->handleDeleteRequest($response);
             default:
                 throw new MethodNotAllowedException();
-        }
-    }
-
-    private static function buildMissalsIndex(): void
-    {
-        if (false === is_readable(JsonData::MISSALS_FOLDER->path())) {
-            $description = 'Unable to read the ' . JsonData::MISSALS_FOLDER->path() . ' directory';
-            throw new ServiceUnavailableException($description);
-        }
-
-        $missalFolderPaths = glob(JsonData::MISSALS_FOLDER->path() . '/propriumdesanctis*', GLOB_ONLYDIR);
-        if (false === $missalFolderPaths) {
-            $description = 'Unable to read the ' . JsonData::MISSALS_FOLDER->path() . ' directory contents';
-            throw new ServiceUnavailableException($description);
-        }
-
-        if (count($missalFolderPaths) === 0) {
-            $description = 'No Missals found';
-            throw new NotFoundException($description);
-        }
-
-        $missalFolderNames = array_map('basename', $missalFolderPaths);
-        foreach ($missalFolderNames as $missalFolderName) {
-            if (file_exists(JsonData::MISSALS_FOLDER->path() . "/$missalFolderName/$missalFolderName.json")) {
-                $missal = [];
-
-                if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $missalFolderName, $matches)) {
-                    $missal['missal_id'] = "EDITIO_TYPICA_{$matches[1]}";
-                    $missal['region']    = 'VA';
-                } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $missalFolderName, $matches)) {
-                    $missal['missal_id'] = "{$matches[1]}_{$matches[2]}";
-                    $missal['region']    = $matches[1];
-                } else {
-                    $description = 'Unable to parse missal folder name: ' . $missalFolderName;
-                    throw new ServiceUnavailableException($description);
-                }
-
-                if (is_readable(JsonData::MISSALS_FOLDER->path() . "/$missalFolderName/i18n")) {
-                    $iterator = new \DirectoryIterator('glob://' . JsonData::MISSALS_FOLDER->path() . "/$missalFolderName/i18n/*.json");
-                    $locales  = [];
-                    foreach ($iterator as $f) {
-                        $locales[] = $f->getBasename('.json');
-                    }
-                    $missal['locales'] = $locales;
-                } else {
-                    $missal['locales'] = null;
-                }
-
-                $missal['name']           = RomanMissal::getName($missal['missal_id']);
-                $missal['year_limits']    = RomanMissal::getYearLimits($missal['missal_id']);
-                $missal['year_published'] = $missal['year_limits']['since_year'];
-                $missal['api_path']       = Router::$apiPath . "/missals/{$missal['missal_id']}";
-                self::$missalsIndex->addMissal(MissalMetadata::fromArray($missal));
-                self::addMissalRegion($missal['region']);
-                self::addMissalYear($missal['year_published']);
-            }
-        }
-    }
-
-    /**
-     * Adds a region to the list of valid regions for the requested missal.
-     */
-    public static function addMissalRegion(string $region): void
-    {
-        if (false === in_array($region, self::$MissalRegions)) {
-            self::$MissalRegions[] = $region;
-        }
-    }
-
-    /**
-     * Adds a year to the list of valid years for the requested missal.
-     */
-    public static function addMissalYear(int $year): void
-    {
-        if (false === in_array($year, self::$MissalYears)) {
-            self::$MissalYears[] = $year;
         }
     }
 

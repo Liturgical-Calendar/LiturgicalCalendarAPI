@@ -3,10 +3,8 @@
 namespace LiturgicalCalendar\Api\Params;
 
 use LiturgicalCalendar\Api\Enum\LitLocale;
-use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Handlers\MissalsHandler;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
-use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadata;
 
 /**
  * Class MissalsParams
@@ -77,20 +75,20 @@ class MissalsParams implements ParamsInterface
                     if (gettype($value) === 'string') {
                         $value = intval($value);
                     }
-                    if (in_array($value, MissalsHandler::$MissalYears)) {
+                    if (in_array($value, MissalsHandler::$missalsIndex->getMissalYears())) {
                         $this->Year = $value;
                     } else {
                         $description = "Invalid value `$value` for param `year`, valid values are: "
-                            . implode(', ', MissalsHandler::$MissalYears);
+                            . implode(', ', MissalsHandler::$missalsIndex->getMissalYears());
                         throw new ValidationException($description);
                     }
                     break;
                 case 'region':
-                    if (in_array($value, MissalsHandler::$MissalRegions)) {
+                    if (in_array($value, MissalsHandler::$missalsIndex->getMissalRegions())) {
                         $this->Region = $value;
                     } else {
                         $description = "Invalid value `$value` for param `region`, valid values are: "
-                            . implode(', ', MissalsHandler::$MissalRegions);
+                            . implode(', ', MissalsHandler::$missalsIndex->getMissalRegions());
                         throw new ValidationException($description);
                     }
                     break;
@@ -106,15 +104,7 @@ class MissalsParams implements ParamsInterface
                     // even if there is no data for them in the JsonData::MISSALS_FOLDER directory,
                     // we add them to the response.
                     if ($this->IncludeEmpty) {
-                        /** @var array<string,MissalMetadata> */
-                        $allMissals = RomanMissal::produceMetadata(true);
-                        foreach ($allMissals as $missal) {
-                            if (false === MissalsHandler::$missalsIndex->hasMissal($missal->missal_id)) {
-                                MissalsHandler::$missalsIndex->addMissal($missal);
-                                MissalsHandler::addMissalRegion($missal->region);
-                                MissalsHandler::addMissalYear($missal->year_published);
-                            }
-                        }
+                        MissalsHandler::$missalsIndex->setIncludeEmpty(true);
                     }
                     break;
                 case 'payload':

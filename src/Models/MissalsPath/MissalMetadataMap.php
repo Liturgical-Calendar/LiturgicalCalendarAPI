@@ -2,6 +2,12 @@
 
 namespace LiturgicalCalendar\Api\Models\MissalsPath;
 
+use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\RomanMissal;
+use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\Router;
+
 /**
  * Represents a collection of missals.
  *
@@ -11,13 +17,17 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
 {
     /** @var array<string,MissalMetadata> */
     private array $missals;
+    /** @var array<string,MissalMetadata> */
+    private array $allMissals;
 
     private string $regionFilter;
     private int $yearFilter;
+    private bool $includeEmpty = false;
 
     public function __construct()
     {
-        $this->missals = [];
+        $this->missals    = [];
+        $this->allMissals = [];
     }
 
     /**
@@ -120,5 +130,134 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
     public function getMissalIDs(): array
     {
         return array_keys($this->missals);
+    }
+
+    /**
+     * Retrieves an array of the regions of the MissalMetadata objects in the collection.
+     *
+     * @return string[] An array of regions.
+     */
+    public function getMissalRegions(): array
+    {
+        if ($this->includeEmpty) {
+            $regions = array_map(
+                fn (MissalMetadata $missal) => $missal->region,
+                $this->allMissals
+            );
+
+            return array_values(array_unique($regions));
+        }
+        $regions = array_map(
+            fn (MissalMetadata $missal) => $missal->region,
+            $this->missals
+        );
+
+        return array_values(array_unique($regions));
+    }
+
+    /**
+     * Retrieves an array of the publication years of the MissalMetadata objects in the collection.
+     *
+     * @return int[] An array of publication years, sorted in ascending order.
+     */
+    public function getMissalYears(): array
+    {
+        if ($this->includeEmpty) {
+            $years = array_map(
+                fn (MissalMetadata $missal) => $missal->year_published,
+                $this->allMissals
+            );
+
+            sort($years, SORT_NUMERIC);
+
+            return array_values(array_unique($years));
+        }
+        $years = array_map(
+            fn (MissalMetadata $missal) => $missal->year_published,
+            $this->missals
+        );
+
+        sort($years, SORT_NUMERIC);
+
+        return array_values(array_unique($years));
+    }
+
+    public function isEmpty(): bool
+    {
+        return empty($this->missals);
+    }
+
+    public function setIncludeEmpty(bool $includeEmpty): void
+    {
+        $this->includeEmpty = $includeEmpty;
+    }
+
+    public function buildIndex(): void
+    {
+        if (function_exists('apcu_fetch')) {
+            $cached = apcu_fetch('litcal_missals_index', $success);
+            if ($success && $cached instanceof MissalMetadataMap) {
+                $this->missals    = $cached->missals;
+                $this->allMissals = $cached->allMissals;
+                return;
+            }
+        }
+
+        if (false === is_readable(JsonData::MISSALS_FOLDER->path())) {
+            $description = 'Unable to read the ' . JsonData::MISSALS_FOLDER->path() . ' directory';
+            throw new ServiceUnavailableException($description);
+        }
+
+        $missalFolderPaths = glob(JsonData::MISSALS_FOLDER->path() . '/propriumdesanctis*', GLOB_ONLYDIR);
+        if (false === $missalFolderPaths) {
+            $description = 'Unable to read the ' . JsonData::MISSALS_FOLDER->path() . ' directory contents';
+            throw new ServiceUnavailableException($description);
+        }
+
+        if (count($missalFolderPaths) === 0) {
+            $description = 'No Missals found';
+            throw new NotFoundException($description);
+        }
+
+        $missalFolderNames = array_map('basename', $missalFolderPaths);
+        foreach ($missalFolderNames as $missalFolderName) {
+            if (file_exists(JsonData::MISSALS_FOLDER->path() . "/$missalFolderName/$missalFolderName.json")) {
+                $missal = [];
+
+                if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $missalFolderName, $matches)) {
+                    $missal['missal_id'] = "EDITIO_TYPICA_{$matches[1]}";
+                    $missal['region']    = 'VA';
+                } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $missalFolderName, $matches)) {
+                    $missal['missal_id'] = "{$matches[1]}_{$matches[2]}";
+                    $missal['region']    = $matches[1];
+                } else {
+                    $description = 'Unable to parse missal folder name: ' . $missalFolderName;
+                    throw new ServiceUnavailableException($description);
+                }
+
+                if (is_readable(JsonData::MISSALS_FOLDER->path() . "/$missalFolderName/i18n")) {
+                    $iterator = new \DirectoryIterator('glob://' . JsonData::MISSALS_FOLDER->path() . "/$missalFolderName/i18n/*.json");
+                    $locales  = [];
+                    foreach ($iterator as $f) {
+                        $locales[] = $f->getBasename('.json');
+                    }
+                    $missal['locales'] = $locales;
+                } else {
+                    $missal['locales'] = null;
+                }
+
+                $missal['name']           = RomanMissal::getName($missal['missal_id']);
+                $missal['year_limits']    = RomanMissal::getYearLimits($missal['missal_id']);
+                $missal['year_published'] = $missal['year_limits']['since_year'];
+                $missal['api_path']       = Router::$apiPath . "/missals/{$missal['missal_id']}";
+                $this->addMissal(MissalMetadata::fromArray($missal));
+            }
+        }
+
+        $this->allMissals = RomanMissal::produceMetadata();
+
+        if (function_exists('apcu_store')) {
+            apcu_store('litcal_missals_index', $this, 600);
+        }
     }
 }
