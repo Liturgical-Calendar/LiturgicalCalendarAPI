@@ -444,22 +444,14 @@ class Router
             $api_full_path .= ':' . $_SERVER['SERVER_PORT'];
         }
 
-        $baseDir = basename(__DIR__);
-        if (empty($baseDir)) {
-            throw new ServiceUnavailableException('Unable to determine base directory.');
-        }
         if (
-            false === isset($_SERVER['SCRIPT_NAME'])
-            || false === isset($_SERVER['SCRIPT_FILENAME'])
-            || false === is_string($_SERVER['SCRIPT_NAME'])
+            false === isset($_SERVER['SCRIPT_FILENAME'])
             || false === is_string($_SERVER['SCRIPT_FILENAME'])
         ) {
             throw new ServiceUnavailableException('Unable to determine entry file.');
         }
-        $scriptName     = $_SERVER['SCRIPT_NAME'];
-        $scriptFileName = $_SERVER['SCRIPT_FILENAME'];
-        $api_base_path  = explode($baseDir, $scriptName)[0];
-        $indexPath      = $scriptFileName;
+        $api_base_path = $_ENV['API_BASE_PATH'] ?? '/';
+        $indexPath     = $_SERVER['SCRIPT_FILENAME'];
         //$projectRoot   = self::findProjectRoot(dirname($indexPath)); // walk upward from index.php
         //$relRootToSrc  = self::relativePath($projectRoot, __DIR__);
         //$relIndexToSrc = self::relativePath(dirname($indexPath), __DIR__);
@@ -484,6 +476,10 @@ class Router
             $api_full_path = $api_full_path . rtrim($api_base_path, '/');
         }
 
+        // Ensure trailing slash on base path if not set in the environment
+        if (substr($api_base_path, -1) !== '/') {
+            $api_base_path .= '/';
+        }
         self::$apiBase     = $api_base_path;
         self::$apiPath     = $api_full_path;
         self::$apiFilePath = $relIndexToParentOfSrc;
