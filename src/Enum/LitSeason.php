@@ -34,7 +34,7 @@ enum LitSeason: string
                 return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Tempus Quadragesima' : _('Lent');
             case self::EASTER_TRIDUUM:
                 /**translators: context = liturgical season */
-                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Triduum Paschale'     : _('Easter Triduum');
+                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Triduum Paschale'    : _('Easter Triduum');
             case self::EASTER:
                 /**translators: context = liturgical season */
                 return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Tempus Paschale'     : _('Easter');
@@ -43,7 +43,7 @@ enum LitSeason: string
                 return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Tempus per Annum'    : _('Ordinary Time');
             default:
                 /**translators: context = liturgical season: unsupported value */
-                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Tempus Ignotum'     : _('Unknown Season');
+                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Tempus Ignotum'      : _('Unknown Season');
         }
     }
 }
