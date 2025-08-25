@@ -24,7 +24,7 @@
         "captainhook/captainhook-phar": "^5.25",
         "captainhook/hook-installer": "^1.0",
         "phpunit/phpunit": "^12.4",
-        "guzzlehttp/guzzle": "7.8"
+        "guzzlehttp/guzzle": "7.10.0"
     },
     "license": "Apache-2.0",
     "autoload": {
