@@ -48,12 +48,24 @@ use LiturgicalCalendar\Api\Router;
 use Dotenv\Dotenv;
 
 $dotenv = Dotenv::createMutable($projectFolder, ['.env', '.env.local', '.env.development', '.env.production'], false);
+
+if (false === Router::isLocalhost()) {
+    // In production environment these variables are required, in development they will be inferred if not set
+    $dotenv->required(['API_BASE_PATH']);
+}
+
 $dotenv->ifPresent(['API_PROTOCOL', 'API_HOST', 'API_BASE_PATH'])->notEmpty();
-$dotEnv->ifPresent(['API_PROTOCOL', 'API_BASE_PATH'])->isString();
-$dotEnv->ifPresent(['API_PROTOCOL'])->allowedValues(['http', 'https']);
+$dotenv->ifPresent(['API_PROTOCOL'])->allowedValues(['http', 'https']);
 $dotenv->ifPresent(['API_PORT'])->isInteger();
 $dotenv->ifPresent(['APP_ENV'])->notEmpty()->allowedValues(['development', 'production']);
-$dotenv->load();
+
+if (Router::isLocalhost()) {
+    // In development environment if no .env file is present we don't want to throw an error
+    $dotenv->safeLoad();
+} else {
+    // In production environment we want to throw an error if no .env file is present
+    $dotenv->load();
+}
 
 if (
     Router::isLocalhost()
