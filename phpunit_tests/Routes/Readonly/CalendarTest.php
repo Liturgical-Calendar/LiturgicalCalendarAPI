@@ -50,7 +50,7 @@ final class CalendarTest extends ApiTestCase
         $response = self::$http->get('/calendar', [
             'headers' => ['Accept' => 'text/calendar']
         ]);
-        $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
+        $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK, but found error: ' . $response->getBody());
         $this->assertStringStartsWith('text/calendar', $response->getHeaderLine('Content-Type'), 'Content-Type should be text/calendar');
         $data = (string) $response->getBody();
         $this->assertStringContainsString('BEGIN:VCALENDAR', $data, 'Calendar should start with BEGIN:VCALENDAR');
