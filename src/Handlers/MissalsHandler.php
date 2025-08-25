@@ -28,10 +28,6 @@ final class MissalsHandler extends AbstractHandler
     public function __construct(array $requestPathParams = [])
     {
         parent::__construct($requestPathParams);
-
-        if (null === self::$missalsIndex) {
-            self::$missalsIndex = new MissalMetadataMap();
-        }
     }
 
 
@@ -121,6 +117,10 @@ final class MissalsHandler extends AbstractHandler
             }
         }
 
+        if (null === self::$missalsIndex) {
+            self::$missalsIndex = new MissalMetadataMap();
+        }
+
         try {
             if (self::$missalsIndex->isEmpty()) {
                 self::$missalsIndex->buildIndex();
@@ -167,6 +167,9 @@ final class MissalsHandler extends AbstractHandler
     private function handleGetRequest(ResponseInterface $response): ResponseInterface
     {
         $numPathParams = count($this->requestPathParams);
+        if (null === MissalsHandler::$missalsIndex) {
+            throw new ServiceUnavailableException('Missals index temporarily unavailable');
+        }
 
         // If no path parameters are set, we are ready to produce the response
         if ($numPathParams === 0) {

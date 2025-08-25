@@ -450,11 +450,14 @@ class Router
         ) {
             throw new ServiceUnavailableException('Unable to determine entry file.');
         }
-        $api_base_path = $_ENV['API_BASE_PATH'] ?? '/';
-        $indexPath     = $_SERVER['SCRIPT_FILENAME'];
-        //$projectRoot   = self::findProjectRoot(dirname($indexPath)); // walk upward from index.php
-        //$relRootToSrc  = self::relativePath($projectRoot, __DIR__);
-        //$relIndexToSrc = self::relativePath(dirname($indexPath), __DIR__);
+        if (false === Router::isLocalhost() && ( false === isset($_ENV['API_BASE_PATH']) || false === is_string($_ENV['API_BASE_PATH']) || empty($_ENV['API_BASE_PATH']) )) {
+            throw new ServiceUnavailableException('The API_BASE_PATH environment variable must be set in production environments.');
+        } else {
+            /** @var string $api_base_path */
+            $api_base_path = $_ENV['API_BASE_PATH'];
+        }
+
+        $indexPath             = $_SERVER['SCRIPT_FILENAME'];
         $relIndexToParentOfSrc = self::relativePath(dirname($indexPath), dirname(__DIR__));
 
         /**

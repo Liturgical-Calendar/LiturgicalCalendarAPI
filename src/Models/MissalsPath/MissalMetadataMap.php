@@ -180,9 +180,23 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
     {
         if (function_exists('apcu_fetch')) {
             $cached = apcu_fetch('litcal_missals_index', $success);
-            if ($success && is_array($cached) && isset($cached['missals']) && isset($cached['allMissals'])) {
-                $this->missals    = $cached['missals'];
-                $this->allMissals = $cached['allMissals'];
+            if (
+                $success
+                && is_array($cached)
+                && isset($cached['missals'])
+                && is_array($cached['missals'])
+                && array_all($cached['missals'], fn ($item, $key): bool => is_string($key) && $item instanceof MissalMetadata)
+                && isset($cached['allMissals'])
+                && is_array($cached['allMissals'])
+                && array_all($cached['allMissals'], fn ($item, $key): bool => is_string($key) && $item instanceof MissalMetadata)
+            ) {
+                /** @var array<string,MissalMetadata> $missals */
+                $missals = $cached['missals'];
+                /** @var array<string,MissalMetadata> $allMissals */
+                $allMissals = $cached['allMissals'];
+
+                $this->missals    = $missals;
+                $this->allMissals = $allMissals;
                 return;
             }
         }
@@ -238,7 +252,9 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
             }
         }
 
-        $this->allMissals = RomanMissal::produceMetadata();
+        /** @var array<string,MissalMetadata> $allMissals */
+        $allMissals       = RomanMissal::produceMetadata();
+        $this->allMissals = $allMissals;
 
         apcu_store('litcal_missals_index', [
             'missals'    => $this->missals,

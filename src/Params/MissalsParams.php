@@ -4,6 +4,7 @@ namespace LiturgicalCalendar\Api\Params;
 
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Handlers\MissalsHandler;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 
 /**
@@ -45,6 +46,9 @@ class MissalsParams implements ParamsInterface
         if (count($params) === 0) {
             // If no parameters are provided, we can just return
             return;
+        }
+        if (null === MissalsHandler::$missalsIndex) {
+            throw new ServiceUnavailableException('Missals index temporarily unavailable');
         }
 
         foreach ($params as $key => $value) {
@@ -112,9 +116,6 @@ class MissalsParams implements ParamsInterface
                     // even if there is no data for them in the JsonData::MISSALS_FOLDER directory,
                     // we add them to the response.
                     if ($this->IncludeEmpty) {
-                        if (null === MissalsHandler::$missalsIndex) {
-                            throw new \RuntimeException('MissalsHandler::$missalsIndex is not initialized');
-                        }
                         MissalsHandler::$missalsIndex->setIncludeEmpty(true);
                     }
                     break;
