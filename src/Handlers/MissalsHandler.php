@@ -5,16 +5,13 @@ namespace LiturgicalCalendar\Api\Handlers;
 use LiturgicalCalendar\Api\Params\MissalsParams;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
-use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
-use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadata;
 use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadataMap;
-use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -22,17 +19,15 @@ use Psr\Http\Message\ServerRequestInterface;
 final class MissalsHandler extends AbstractHandler
 {
     public MissalsParams $params;
-    public static MissalMetadataMap $missalsIndex;
-    /** @var string[] */ public static array $availableLangs = [];
-    /** @var string[] */ public static array $MissalRegions  = [];
-    /** @var int[]    */ public static array $MissalYears    = [];
+    public static ?MissalMetadataMap $missalsIndex = null;
+
+    /** @var string[] */
+    public static array $availableLangs = [];
 
     /** @param string[] $requestPathParams */
     public function __construct(array $requestPathParams = [])
     {
         parent::__construct($requestPathParams);
-
-        self::$missalsIndex = new MissalMetadataMap();
     }
 
 
@@ -67,9 +62,6 @@ final class MissalsHandler extends AbstractHandler
             $response = $this->setAccessControlAllowOriginHeader($request, $response);
         }
 
-        // For all other request methods, validate that they are supported by the endpoint
-        $this->validateRequestMethod($request);
-
         // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint:
         //   if set we negotiate the best Content-Type, if not set we default to the first supported by the current handler
         switch ($method) {
@@ -81,8 +73,6 @@ final class MissalsHandler extends AbstractHandler
         }
 
         $response = $response->withHeader('Content-Type', $mime);
-
-        self::buildMissalsIndex();
 
         // Initialize any parameters set in the request.
         // If there are any:
@@ -119,13 +109,34 @@ final class MissalsHandler extends AbstractHandler
                 $params = array_merge($params, $parsedBodyParams);
             }
         } elseif ($method === RequestMethod::PUT || $method === RequestMethod::PATCH) {
+            // Pre-validate for methods with bodies/side effects to avoid parsing on disallowed paths
+            $this->validateRequestMethod($request);
             $params['payload'] = $this->parseBodyPayload($request, false);
             if (false === ( $params['payload'] instanceof \stdClass )) {
                 throw new ValidationException('Invalid payload');
             }
         }
 
+        if (null === self::$missalsIndex) {
+            self::$missalsIndex = new MissalMetadataMap();
+        }
+
+        try {
+            if (self::$missalsIndex->isEmpty()) {
+                self::$missalsIndex->buildIndex();
+            }
+        } catch (\Throwable $e) {
+            // Surface a 503 instead of a generic 500 on index build failures
+            throw new ServiceUnavailableException('Missals index temporarily unavailable', $e);
+        }
+
         $this->params = new MissalsParams($params);
+
+        // For PUT and PATCH requests we already validated the request method
+        // before parsing the body, for all other request methods we validate it here
+        if ($method !== RequestMethod::PUT && $method !== RequestMethod::PATCH) {
+            $this->validateRequestMethod($request);
+        }
 
         switch ($method) {
             case RequestMethod::GET:
@@ -143,82 +154,6 @@ final class MissalsHandler extends AbstractHandler
         }
     }
 
-    private static function buildMissalsIndex(): void
-    {
-        if (false === is_readable(JsonData::MISSALS_FOLDER->path())) {
-            $description = 'Unable to read the ' . JsonData::MISSALS_FOLDER->path() . ' directory';
-            throw new ServiceUnavailableException($description);
-        }
-
-        $missalFolderPaths = glob(JsonData::MISSALS_FOLDER->path() . '/propriumdesanctis*', GLOB_ONLYDIR);
-        if (false === $missalFolderPaths) {
-            $description = 'Unable to read the ' . JsonData::MISSALS_FOLDER->path() . ' directory contents';
-            throw new ServiceUnavailableException($description);
-        }
-
-        if (count($missalFolderPaths) === 0) {
-            $description = 'No Missals found';
-            throw new NotFoundException($description);
-        }
-
-        $missalFolderNames = array_map('basename', $missalFolderPaths);
-        foreach ($missalFolderNames as $missalFolderName) {
-            if (file_exists(JsonData::MISSALS_FOLDER->path() . "/$missalFolderName/$missalFolderName.json")) {
-                $missal = [];
-
-                if (preg_match('/^propriumdesanctis_([1-2][0-9][0-9][0-9])$/', $missalFolderName, $matches)) {
-                    $missal['missal_id'] = "EDITIO_TYPICA_{$matches[1]}";
-                    $missal['region']    = 'VA';
-                } elseif (preg_match('/^propriumdesanctis_([A-Z]+)_([1-2][0-9][0-9][0-9])$/', $missalFolderName, $matches)) {
-                    $missal['missal_id'] = "{$matches[1]}_{$matches[2]}";
-                    $missal['region']    = $matches[1];
-                } else {
-                    $description = 'Unable to parse missal folder name: ' . $missalFolderName;
-                    throw new ServiceUnavailableException($description);
-                }
-
-                if (is_readable(JsonData::MISSALS_FOLDER->path() . "/$missalFolderName/i18n")) {
-                    $iterator = new \DirectoryIterator('glob://' . JsonData::MISSALS_FOLDER->path() . "/$missalFolderName/i18n/*.json");
-                    $locales  = [];
-                    foreach ($iterator as $f) {
-                        $locales[] = $f->getBasename('.json');
-                    }
-                    $missal['locales'] = $locales;
-                } else {
-                    $missal['locales'] = null;
-                }
-
-                $missal['name']           = RomanMissal::getName($missal['missal_id']);
-                $missal['year_limits']    = RomanMissal::getYearLimits($missal['missal_id']);
-                $missal['year_published'] = $missal['year_limits']['since_year'];
-                $missal['api_path']       = Router::$apiPath . "/missals/{$missal['missal_id']}";
-                self::$missalsIndex->addMissal(MissalMetadata::fromArray($missal));
-                self::addMissalRegion($missal['region']);
-                self::addMissalYear($missal['year_published']);
-            }
-        }
-    }
-
-    /**
-     * Adds a region to the list of valid regions for the requested missal.
-     */
-    public static function addMissalRegion(string $region): void
-    {
-        if (false === in_array($region, self::$MissalRegions)) {
-            self::$MissalRegions[] = $region;
-        }
-    }
-
-    /**
-     * Adds a year to the list of valid years for the requested missal.
-     */
-    public static function addMissalYear(int $year): void
-    {
-        if (false === in_array($year, self::$MissalYears)) {
-            self::$MissalYears[] = $year;
-        }
-    }
-
     /**
      * Sets the list of available languages for the requested missal.
      *
@@ -232,6 +167,9 @@ final class MissalsHandler extends AbstractHandler
     private function handleGetRequest(ResponseInterface $response): ResponseInterface
     {
         $numPathParams = count($this->requestPathParams);
+        if (null === MissalsHandler::$missalsIndex) {
+            throw new ServiceUnavailableException('Missals index temporarily unavailable');
+        }
 
         // If no path parameters are set, we are ready to produce the response
         if ($numPathParams === 0) {

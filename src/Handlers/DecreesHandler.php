@@ -98,9 +98,6 @@ final class DecreesHandler extends AbstractHandler
             $response = $this->setAccessControlAllowOriginHeader($request, $response);
         }
 
-        // For all other request methods, validate that they are supported by the endpoint
-        $this->validateRequestMethod($request);
-
         // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint:
         //   if set we negotiate the best Content-Type, if not set we default to the first supported by the current handler
         switch ($method) {
@@ -148,6 +145,8 @@ final class DecreesHandler extends AbstractHandler
                 $params = array_merge($params, $parsedBodyParams);
             }
         } elseif ($method === RequestMethod::PUT || $method === RequestMethod::PATCH) {
+            // Pre-validate for methods with bodies/side effects to avoid parsing on disallowed paths
+            $this->validateRequestMethod($request);
             $params['payload'] = $this->parseBodyPayload($request, false);
             if (false === ( $params['payload'] instanceof \stdClass )) {
                 throw new ValidationException('Invalid payload');
@@ -156,6 +155,8 @@ final class DecreesHandler extends AbstractHandler
 
         /** @var array{locale?:string,payload?:\stdClass} $params */
         $this->params = new DecreesParams($params);
+
+        $this->validateRequestMethod($request);
 
         switch ($method) {
             case RequestMethod::GET:

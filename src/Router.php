@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\CacheDuration;
+use LiturgicalCalendar\Api\Enum\PathCategory;
 use LiturgicalCalendar\Api\Handlers\CalendarHandler;
 use LiturgicalCalendar\Api\Handlers\EasterHandler;
 use LiturgicalCalendar\Api\Handlers\EventsHandler;
@@ -34,6 +35,8 @@ class Router
     public static string $apiPath;
     public static string $apiFilePath;
     private static RequestHandlerInterface $handler;
+    private const MIN_YEAR = 1969;  // exlusive minimum (first year supported is 1970)
+    private const MAX_YEAR = 10000; // exclusive maximum (last year supported is 9999)
 
     /**
      * This is the main entry point of the API. It takes care of determining which
@@ -47,7 +50,10 @@ class Router
         self::getApiPaths();
         $request          = self::retrieveRequest();
         $path             = $request->getUri()->getPath();
-        $pathParams       = ltrim($path, self::$apiBase);
+        $pathParams       = str_starts_with($path, self::$apiBase)
+            ? substr($path, strlen(self::$apiBase))
+            : $path;
+        $pathParams       = rtrim($pathParams, '/');
         $requestPathParts = explode('/', $pathParams);
         $route            = array_shift($requestPathParts);
 
@@ -56,20 +62,35 @@ class Router
         // However the preflight response headers will depend on whether the endpoint sets allowed Request Methods,
         // so we should leave the responsibility of handling the preflight response to each endpoint.
 
-        /**
-         * N.B. Classes that can be instantiated and that use the Core,
-         * MUST be instantiated before calling Core methods,
-         * because the relative class constructors also instantiate the Core for the class.
-         */
         switch ($route) {
             case '':
                 // no break (intentional fallthrough)
             case 'calendar':
                 $calendarHandler = new CalendarHandler($requestPathParts);
-                $calendarHandler->setAllowedRequestMethods([
-                    RequestMethod::GET,
-                    RequestMethod::POST
-                ])->setAllowedRequestContentTypes([
+                if (count($requestPathParts) === 0) {
+                    $calendarHandler->setAllowedRequestMethods([
+                        RequestMethod::GET,
+                        RequestMethod::POST
+                    ]);
+                } elseif (count($requestPathParts) === 1 && is_numeric($requestPathParts[0]) && $requestPathParts[0] > self::MIN_YEAR && $requestPathParts[0] < self::MAX_YEAR) {
+                    $calendarHandler->setAllowedRequestMethods([
+                        RequestMethod::GET,
+                        RequestMethod::POST
+                    ]);
+                } elseif (count($requestPathParts) === 2 && in_array($requestPathParts[0], PathCategory::values(), true)) {
+                    $calendarHandler->setAllowedRequestMethods([
+                        RequestMethod::GET,
+                        RequestMethod::POST
+                    ]);
+                } elseif (count($requestPathParts) === 3 && in_array($requestPathParts[0], PathCategory::values(), true) && is_numeric($requestPathParts[2]) && $requestPathParts[2] > self::MIN_YEAR && $requestPathParts[2] < self::MAX_YEAR) {
+                    $calendarHandler->setAllowedRequestMethods([
+                        RequestMethod::GET,
+                        RequestMethod::POST
+                    ]);
+                } else {
+                    $calendarHandler->setAllowedRequestMethods([]);
+                }
+                $calendarHandler->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
@@ -91,10 +112,15 @@ class Router
                 // no break (intentional fallthrough)
             case 'calendars':
                 $metadataHandler = new MetadataHandler();
-                $metadataHandler->setAllowedRequestMethods([
-                    RequestMethod::GET,
-                    RequestMethod::POST
-                ])->setAllowedRequestContentTypes([
+                if (count($requestPathParts) === 0) {
+                    $metadataHandler->setAllowedRequestMethods([
+                        RequestMethod::GET,
+                        RequestMethod::POST
+                    ]);
+                } else {
+                    $metadataHandler->setAllowedRequestMethods([]);
+                }
+                $metadataHandler->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
@@ -106,13 +132,23 @@ class Router
                 break;
             case 'missals':
                 $missalsHandler = new MissalsHandler($requestPathParts);
-                $missalsHandler->setAllowedRequestMethods([
-                    RequestMethod::GET,
-                    RequestMethod::POST,
-                    RequestMethod::PUT,
-                    RequestMethod::PATCH,
-                    RequestMethod::DELETE
-                ])->setAllowedRequestContentTypes([
+                if (count($requestPathParts) === 0) {
+                    $missalsHandler->setAllowedRequestMethods([
+                        RequestMethod::GET,
+                        RequestMethod::POST,
+                        RequestMethod::PUT
+                    ]);
+                } elseif (count($requestPathParts) === 1) {
+                    $missalsHandler->setAllowedRequestMethods([
+                        RequestMethod::GET,
+                        RequestMethod::POST,
+                        RequestMethod::PATCH,
+                        RequestMethod::DELETE
+                    ]);
+                } else {
+                    $missalsHandler->setAllowedRequestMethods([]);
+                }
+                $missalsHandler->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
@@ -130,13 +166,23 @@ class Router
                 break;
             case 'decrees':
                 $decreesHandler = new DecreesHandler($requestPathParts);
-                $decreesHandler->setAllowedRequestMethods([
-                    RequestMethod::GET,
-                    RequestMethod::POST,
-                    RequestMethod::PUT,
-                    RequestMethod::PATCH,
-                    RequestMethod::DELETE
-                ])->setAllowedRequestContentTypes([
+                if (count($requestPathParts) === 0) {
+                    $decreesHandler->setAllowedRequestMethods([
+                        RequestMethod::GET,
+                        RequestMethod::POST,
+                        RequestMethod::PUT
+                    ]);
+                } elseif (count($requestPathParts) === 1) {
+                    $decreesHandler->setAllowedRequestMethods([
+                        RequestMethod::GET,
+                        RequestMethod::POST,
+                        RequestMethod::PATCH,
+                        RequestMethod::DELETE
+                    ]);
+                } else {
+                    $decreesHandler->setAllowedRequestMethods([]);
+                }
+                $decreesHandler->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
@@ -154,10 +200,15 @@ class Router
                 break;
             case 'easter':
                 $easterHandler = new EasterHandler();
-                $easterHandler->setAllowedRequestMethods([
-                    RequestMethod::GET,
-                    RequestMethod::POST
-                ])->setAllowedRequestContentTypes([
+                if (count($requestPathParts) === 0) {
+                    $easterHandler->setAllowedRequestMethods([
+                        RequestMethod::GET,
+                        RequestMethod::POST
+                    ]);
+                } else {
+                    $easterHandler->setAllowedRequestMethods([]);
+                }
+                $easterHandler->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
@@ -169,10 +220,20 @@ class Router
                 break;
             case 'events':
                 $eventsHandler = new EventsHandler($requestPathParts);
-                $eventsHandler->setAllowedRequestMethods([
-                    RequestMethod::GET,
-                    RequestMethod::POST
-                ])->setAllowedRequestContentTypes([
+                if (count($requestPathParts) === 0) {
+                    $eventsHandler->setAllowedRequestMethods([
+                        RequestMethod::GET,
+                        RequestMethod::POST
+                    ]);
+                } elseif (count($requestPathParts) === 2 && in_array($requestPathParts[0], [PathCategory::NATION->value, PathCategory::DIOCESE->value], true)) {
+                    $eventsHandler->setAllowedRequestMethods([
+                        RequestMethod::GET,
+                        RequestMethod::POST
+                    ]);
+                } else {
+                    $eventsHandler->setAllowedRequestMethods([]);
+                }
+                $eventsHandler->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
@@ -184,10 +245,15 @@ class Router
                 break;
             case 'schemas':
                 $schemasHandler = new SchemasHandler($requestPathParts);
-                $schemasHandler->setAllowedRequestMethods([
-                    RequestMethod::GET,
-                    RequestMethod::POST
-                ])->setAllowedRequestContentTypes([
+                if (count($requestPathParts) === 0 || count($requestPathParts) === 1) {
+                    $schemasHandler->setAllowedRequestMethods([
+                        RequestMethod::GET,
+                        RequestMethod::POST
+                    ]);
+                } else {
+                    $schemasHandler->setAllowedRequestMethods([]);
+                }
+                $schemasHandler->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
@@ -199,13 +265,26 @@ class Router
                 break;
             case 'data':
                 $regionalDataHandler = new RegionalDataHandler($requestPathParts);
-                $regionalDataHandler->setAllowedRequestMethods([
-                    RequestMethod::GET,
-                    RequestMethod::POST,
-                    RequestMethod::PUT,
-                    RequestMethod::PATCH,
-                    RequestMethod::DELETE
-                ])->setAllowedRequestContentTypes([
+                $pathCount           = count($requestPathParts);
+                $firstInCategory     = $pathCount > 0 && in_array($requestPathParts[0], PathCategory::values(), true);
+                $allowedMethods      = match (true) {
+                    $pathCount === 0 => [],
+                    $pathCount === 1 && !$firstInCategory => [],
+                    $pathCount === 1 && $firstInCategory => [RequestMethod::PUT],
+                    $pathCount === 2 && $firstInCategory => [
+                        RequestMethod::GET,
+                        RequestMethod::POST,
+                        RequestMethod::PATCH,
+                        RequestMethod::DELETE
+                    ],
+                    $pathCount === 3 && $firstInCategory => [
+                        RequestMethod::GET,
+                        RequestMethod::POST
+                    ],
+                    default => []
+                };
+                $regionalDataHandler->setAllowedRequestMethods($allowedMethods);
+                $regionalDataHandler->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
@@ -217,13 +296,23 @@ class Router
                 break;
             case 'tests':
                 $testsHandler = new TestsHandler($requestPathParts);
-                $testsHandler->setAllowedRequestMethods([
-                    RequestMethod::GET,
-                    RequestMethod::POST,
-                    RequestMethod::PUT,
-                    RequestMethod::PATCH,
-                    RequestMethod::DELETE
-                ])->setAllowedRequestContentTypes([
+                if (count($requestPathParts) === 0) {
+                    $testsHandler->setAllowedRequestMethods([
+                        RequestMethod::GET,
+                        RequestMethod::POST,
+                        RequestMethod::PUT
+                    ]);
+                } elseif (count($requestPathParts) === 1) {
+                    $testsHandler->setAllowedRequestMethods([
+                        RequestMethod::GET,
+                        RequestMethod::POST,
+                        RequestMethod::PATCH,
+                        RequestMethod::DELETE
+                    ]);
+                } else {
+                    $testsHandler->setAllowedRequestMethods([]);
+                }
+                $testsHandler->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
                     RequestContentType::YAML,
                     RequestContentType::FORMDATA
@@ -355,25 +444,20 @@ class Router
             $api_full_path .= ':' . $_SERVER['SERVER_PORT'];
         }
 
-        $baseDir = basename(__DIR__);
-        if (empty($baseDir)) {
-            throw new ServiceUnavailableException('Unable to determine base directory.');
-        }
         if (
-            false === isset($_SERVER['SCRIPT_NAME'])
-            || false === isset($_SERVER['SCRIPT_FILENAME'])
-            || false === is_string($_SERVER['SCRIPT_NAME'])
+            false === isset($_SERVER['SCRIPT_FILENAME'])
             || false === is_string($_SERVER['SCRIPT_FILENAME'])
         ) {
             throw new ServiceUnavailableException('Unable to determine entry file.');
         }
-        $scriptName     = $_SERVER['SCRIPT_NAME'];
-        $scriptFileName = $_SERVER['SCRIPT_FILENAME'];
-        $api_base_path  = explode($baseDir, $scriptName)[0];
-        $indexPath      = $scriptFileName;
-        //$projectRoot   = self::findProjectRoot(dirname($indexPath)); // walk upward from index.php
-        //$relRootToSrc  = self::relativePath($projectRoot, __DIR__);
-        //$relIndexToSrc = self::relativePath(dirname($indexPath), __DIR__);
+        if (false === Router::isLocalhost() && ( false === isset($_ENV['API_BASE_PATH']) || false === is_string($_ENV['API_BASE_PATH']) || empty($_ENV['API_BASE_PATH']) )) {
+            throw new ServiceUnavailableException('The API_BASE_PATH environment variable must be set in production environments.');
+        } else {
+            /** @var string $api_base_path */
+            $api_base_path = $_ENV['API_BASE_PATH'];
+        }
+
+        $indexPath             = $_SERVER['SCRIPT_FILENAME'];
         $relIndexToParentOfSrc = self::relativePath(dirname($indexPath), dirname(__DIR__));
 
         /**
@@ -395,6 +479,10 @@ class Router
             $api_full_path = $api_full_path . rtrim($api_base_path, '/');
         }
 
+        // Ensure trailing slash on base path if not set in the environment
+        if (substr($api_base_path, -1) !== '/') {
+            $api_base_path .= '/';
+        }
         self::$apiBase     = $api_base_path;
         self::$apiPath     = $api_full_path;
         self::$apiFilePath = $relIndexToParentOfSrc;

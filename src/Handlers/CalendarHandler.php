@@ -4295,8 +4295,20 @@ final class CalendarHandler extends AbstractHandler
             // We always create a cache of the Github Release, even for localhost development,
             // to avoid sending too many requests
             if (false === realpath($this->CachePath)) {
+                if (false === is_writable(dirname($this->CachePath))) {
+                    $description = sprintf(
+                        'The cache folder %s does not exist, but we cannot create it because the parent folder is not writable.',
+                        dirname($this->CachePath)
+                    );
+                    throw new ServiceUnavailableException($description);
+                }
+
                 if (false === mkdir($this->CachePath, 0755, true)) {
-                    throw new \RuntimeException('Could not create cache folder ' . $this->CachePath);
+                    $description = sprintf(
+                        'Could not create cache folder: %s. Please ensure the path is writable.',
+                        $this->CachePath
+                    );
+                    throw new ServiceUnavailableException($description);
                 }
             }
 
@@ -4357,7 +4369,7 @@ final class CalendarHandler extends AbstractHandler
      * the Liturgical Calendar. If the file does not exist or is stale, the function will re-calculate the Liturgical
      * Calendar and cache the response.
      */
-    private function prepareResponseBody(ResponseInterface $response): ResponseInterface
+    private function prepareResponseBody(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $SerializeableLitCal                                = new \stdClass();
         $SerializeableLitCal->litcal                        = $this->Cal->getLiturgicalEventsCollection();
@@ -4503,13 +4515,12 @@ final class CalendarHandler extends AbstractHandler
         $response      = $response->withHeader('X-LitCal-Starttime', $this->startTime . '')
                                   ->withHeader('X-LitCal-Endtime', $this->endTime . '')
                                   ->withHeader('X-LitCal-Executiontime', $executionTime . '')
-                                  ->withHeader('Etag', $etag);
+                                  ->withHeader('Etag', $etag)
+                                  ->withHeader('Vary', 'Accept, Accept-Language');
 
         if (
-            isset($_SERVER['HTTP_IF_NONE_MATCH'])
-            && is_string($_SERVER['HTTP_IF_NONE_MATCH'])
-            && !empty($_SERVER['HTTP_IF_NONE_MATCH'])
-            && trim($_SERVER['HTTP_IF_NONE_MATCH'], " \t\"") === $responseHash
+            $request->getHeaderLine('If-None-Match') !== ''
+            && trim($request->getHeaderLine('If-None-Match'), " \t\"") === $responseHash
         ) {
             return $response->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
                                  ->withHeader('Content-Length', '0')
@@ -4879,12 +4890,6 @@ final class CalendarHandler extends AbstractHandler
         }
         $this->requestHeaders = $usefulHeaders;
 
-
-        // For all other request methods, validate that they are supported by the endpoint
-        //   and early exit if not
-        $this->validateRequestMethod($request);
-
-
         // Initialize any parameters set in the request.
         // If there are any:
         //   - for a GET request method, we expect them to be set in the URL
@@ -4949,6 +4954,8 @@ final class CalendarHandler extends AbstractHandler
         //   most of the other parameters (taken care of by the updateSettingsBasedOn[National|Diocesan]Calendar methods)
         $this->CalendarParams->initParamsFromRequestPath($this->requestPathParams);
 
+        $this->validateRequestMethod($request);
+
         $this->loadDiocesanCalendarData();
         $this->loadNationalCalendarData();
         $this->updateSettingsBasedOnNationalCalendar();
@@ -4972,10 +4979,8 @@ final class CalendarHandler extends AbstractHandler
                 ->withHeader('Etag', $etag);
 
             if (
-                isset($_SERVER['HTTP_IF_NONE_MATCH'])
-                && is_string($_SERVER['HTTP_IF_NONE_MATCH'])
-                && !empty($_SERVER['HTTP_IF_NONE_MATCH'])
-                && trim($_SERVER['HTTP_IF_NONE_MATCH'], " \t\"") === $responseHash
+                $request->getHeaderLine('If-None-Match') !== ''
+                && trim($request->getHeaderLine('If-None-Match'), " \t\"") === $responseHash
             ) {
                 return $response
                     ->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
@@ -5055,10 +5060,10 @@ final class CalendarHandler extends AbstractHandler
                 //   that fall outside of the range of the current liturgical year.
                 array_push($this->Messages, ...$Messages);
 
-                $response = $this->prepareResponseBody($response);
+                $response = $this->prepareResponseBody($request, $response);
             } else {
                 $this->Cal->sortLiturgicalEvents();
-                $response = $this->prepareResponseBody($response);
+                $response = $this->prepareResponseBody($request, $response);
             }
         }
 

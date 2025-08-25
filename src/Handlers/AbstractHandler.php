@@ -281,7 +281,23 @@ abstract class AbstractHandler implements RequestHandlerInterface
     {
         $headersHeader = $request->getHeaderLine('Access-Control-Request-Headers');
         if ($headersHeader !== '') {
-            return $response->withHeader('Access-Control-Allow-Headers', $headersHeader);
+            // Echo back only the subset of requested headers we allow; avoid forbidden headers per Fetch/CORS.
+            $allowed   = ['Accept', 'Accept-Language', 'Content-Type', 'Authorization', 'X-Requested-With'];
+            $requested = array_values(array_filter(array_map('trim', explode(',', $headersHeader))));
+            // Case-insensitive intersection while preserving canonical casing and de-duplicating
+            $canonicalByLc = array_combine(array_map('strtolower', $allowed), $allowed);
+            $approvedAssoc = [];
+            foreach ($requested as $header) {
+                $lc = strtolower($header);
+                if (isset($canonicalByLc[$lc])) {
+                    $approvedAssoc[$canonicalByLc[$lc]] = true; // preserve casing, dedupe
+                }
+            }
+            if ($approvedAssoc === []) {
+                // No approved non-safelisted headers; omit ACAH entirely
+                return $response;
+            }
+            return $response->withHeader('Access-Control-Allow-Headers', implode(',', array_keys($approvedAssoc)));
         }
         return $response;
     }
@@ -308,13 +324,31 @@ abstract class AbstractHandler implements RequestHandlerInterface
 
     protected function handlePreflightRequest(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
+        // if method == OPTIONS and "Origin" in headers and "Access-Control-Request-Method" in headers:
+        //   # This is a CORS preflight request
+        // if method == OPTIONS and not ("Origin" in headers or "Access-Control-Request-Method" in headers):
+        //   # This is a normal OPTIONS request
+        $isCorsRequest = ( $request->getMethod() === 'OPTIONS' && $request->getHeaderLine('Origin') !== '' && $request->getHeaderLine('Access-Control-Request-Method') !== '' );
+
         $response = $response->withStatus(StatusCode::OK->value, StatusCode::OK->reason());
-        $response = $this->setAccessControlAllowOriginHeader($request, $response);
-        $response = $this->setAccessControlAllowMethodsHeader($request, $response);
-        $response = $this->setAccessControlAllowHeadersHeader($request, $response);
-        // Since in the current implementation of the API we do not request credentials for any requests, we should omit this header.
-        // $response = $this->setAccessControlAllowCredentialsHeader($response);
-        $response = $this->setAccessControlMaxAgeHeader($response);
+        if ($isCorsRequest) {
+            // Preflight should not carry a body
+            $response = $response->withStatus(StatusCode::NO_CONTENT->value, StatusCode::NO_CONTENT->reason());
+            $response = $this->setAccessControlAllowOriginHeader($request, $response);
+            // Optimize cache hit-rates by only adding Vary: Origin when Access-Control-Allow-Origin is not "*"
+            if ($response->getHeaderLine('Access-Control-Allow-Origin') !== '*') {
+                $response = $response->withAddedHeader('Vary', 'Origin');
+            }
+            $response = $response->withAddedHeader('Vary', 'Access-Control-Request-Method')
+                                 ->withAddedHeader('Vary', 'Access-Control-Request-Headers');
+            $response = $this->setAccessControlAllowMethodsHeader($request, $response);
+            $response = $this->setAccessControlAllowHeadersHeader($request, $response);
+            // Since in the current implementation of the API we do not request credentials for any requests, we should omit this header.
+            // $response = $this->setAccessControlAllowCredentialsHeader($response);
+            $response = $this->setAccessControlMaxAgeHeader($response);
+        } else {
+            $response = $response->withHeader('Allow', implode(',', array_column($this->allowedRequestMethods, 'value')));
+        }
         return $response;
     }
 

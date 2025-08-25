@@ -579,9 +579,6 @@ final class EventsHandler extends AbstractHandler
             $response = $this->setAccessControlAllowOriginHeader($request, $response);
         }
 
-        // For all other request methods, validate that they are supported by the endpoint
-        $this->validateRequestMethod($request);
-
         // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint:
         //   if set we negotiate the best Content-Type, if not set we default to the first supported by the current handler
         switch ($method) {
@@ -635,6 +632,8 @@ final class EventsHandler extends AbstractHandler
             $this->validateRequestPathParams();
         }
 
+        $this->validateRequestMethod($request);
+
         $this->loadNationalAndWiderRegionData();
         $this->loadDiocesanData();
         $this->setLocale();
@@ -655,7 +654,10 @@ final class EventsHandler extends AbstractHandler
         $responseHash = md5($responseBody);
         $response     = $response->withHeader('ETag', "\"{$responseHash}\"");
 
-        if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
+        if (
+            $request->getHeaderLine('If-None-Match') !== ''
+            && trim($request->getHeaderLine('If-None-Match'), " \t\"") === $responseHash
+        ) {
             return $response->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
                             ->withHeader('Content-Length', '0');
         }
