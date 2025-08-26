@@ -4295,10 +4295,11 @@ final class CalendarHandler extends AbstractHandler
             // We always create a cache of the Github Release, even for localhost development,
             // to avoid sending too many requests
             if (false === realpath($this->CachePath)) {
-                if (false === is_writable(dirname($this->CachePath))) {
+                if (false === is_writable(getcwd())) {
                     $description = sprintf(
-                        'The cache folder %s does not exist, but we cannot create it because the parent folder is not writable.',
-                        dirname($this->CachePath)
+                        'The cache folder %s does not exist, but we cannot create it because the parent folder %s is not writable.',
+                        dirname($this->CachePath),
+                        getcwd()
                     );
                     throw new ServiceUnavailableException($description);
                 }
@@ -4417,9 +4418,18 @@ final class CalendarHandler extends AbstractHandler
         // Ensure cache folder exists, except for localhost
         if (false === Router::isLocalhost()) {
             if (false === realpath($this->CachePath)) {
+                if (false === is_writable(getcwd())) {
+                    $description = sprintf(
+                        'The cache folder %s does not exist, but we cannot create it because the parent folder %s is not writable.',
+                        dirname($this->CachePath),
+                        getcwd()
+                    );
+                    throw new ServiceUnavailableException($description);
+                }
+
                 if (false === mkdir($this->CachePath, 0755, true)) {
                     $message = sprintf(
-                        'Could not create cache directory: %s.',
+                        'Could not create cache folder: %s.',
                         $this->CachePath
                     );
                     throw new ServiceUnavailableException($message);
