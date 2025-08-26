@@ -14,7 +14,7 @@ final class EventsTest extends ApiTestCase
 
     public function testGetEventsReturnsJson(): void
     {
-        $response = self::$http->get('/events');
+        $response = self::$http->get('/events', []);
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK, got ' . $response->getBody());
         $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
         $data = json_decode((string) $response->getBody());

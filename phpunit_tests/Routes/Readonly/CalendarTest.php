@@ -14,7 +14,7 @@ final class CalendarTest extends ApiTestCase
 
     public function testGetCalendarReturnsJson(): void
     {
-        $response = self::$http->get('/calendar');
+        $response = self::$http->get('/calendar', []);
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
         $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
@@ -91,7 +91,7 @@ final class CalendarTest extends ApiTestCase
 
     public function testPostCalendarReturnsJson(): void
     {
-        $response = self::$http->post('/calendar');
+        $response = self::$http->post('/calendar', []);
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
         $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
@@ -103,19 +103,19 @@ final class CalendarTest extends ApiTestCase
 
     public function testPutCalendarReturnsError(): void
     {
-        $response = self::$http->put('/calendar');
+        $response = self::$http->put('/calendar', []);
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
     public function testPatchCalendarReturnsError(): void
     {
-        $response = self::$http->patch('/calendar');
+        $response = self::$http->patch('/calendar', []);
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
     public function testDeleteCalendarReturnsError(): void
     {
-        $response = self::$http->delete('/calendar');
+        $response = self::$http->delete('/calendar', []);
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
@@ -146,7 +146,7 @@ final class CalendarTest extends ApiTestCase
         $each = new EachPromise(
             ( function () use ($requests) {
                 foreach ($requests as $req) {
-                    yield self::$http->getAsync($req['uri'])->then(
+                    yield self::$http->getAsync($req['uri'], [])->then(
                         function ($response) use ($req) {
                             // Success assertions
                             $this->assertSame(

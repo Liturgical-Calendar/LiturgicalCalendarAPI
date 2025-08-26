@@ -10,7 +10,7 @@ final class SchemasTest extends ApiTestCase
 {
     public function testGetSchemasReturnsJson(): void
     {
-        $response = self::$http->get('/schemas');
+        $response = self::$http->get('/schemas', []);
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
         $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
@@ -50,7 +50,7 @@ final class SchemasTest extends ApiTestCase
 
     public function testPostSchemasReturnsJson(): void
     {
-        $response = self::$http->post('/schemas');
+        $response = self::$http->post('/schemas', []);
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
         $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
@@ -76,19 +76,19 @@ final class SchemasTest extends ApiTestCase
 
     public function testPutSchemasReturnsError(): void
     {
-        $response = self::$http->put('/schemas');
+        $response = self::$http->put('/schemas', []);
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
     public function testPatchSchemasReturnsError(): void
     {
-        $response = self::$http->patch('/schemas');
+        $response = self::$http->patch('/schemas', []);
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
     public function testDeleteSchemasReturnsError(): void
     {
-        $response = self::$http->delete('/schemas');
+        $response = self::$http->delete('/schemas', []);
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 }
