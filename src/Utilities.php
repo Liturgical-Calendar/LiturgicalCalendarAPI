@@ -452,7 +452,8 @@ class Utilities
     {
         if ($html === true) {
             $colorStrings = array_map(function (LitColor $litColor) use ($locale) {
-                return '<B><I><SPAN LANG=' . strtolower($locale) . '><FONT FACE="Calibri" COLOR="' . self::colorToHex($litColor->value) . '">'
+                $langAttr = htmlspecialchars(strtolower($locale), ENT_QUOTES, 'UTF-8');
+                return '<B><I><SPAN LANG=' . $langAttr . '><FONT FACE="Calibri" COLOR="' . self::colorToHex($litColor->value) . '">'
                     . $litColor->i18n($locale)
                     . '</FONT></SPAN></I></B>';
             }, $colors);

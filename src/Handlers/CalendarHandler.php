@@ -1562,7 +1562,9 @@ final class CalendarHandler extends AbstractHandler
             } else {
                 $litEvent = $this->Cal->solemnityFromDate($firstOrdinaryDate) ?? $this->Cal->feastLordFromDate($firstOrdinaryDate);
                 if (null === $litEvent) {
-                    throw new ServiceUnavailableException('We were expecting to find either a Solemnity or a Feast of the Lord on ' . $firstOrdinaryDate->format('Y-m-d') . ' but no LiturgicalEvent was not found');
+                    throw new ServiceUnavailableException(
+                        'We were expecting to find either a Solemnity or a Feast of the Lord on ' . $firstOrdinaryDate->format('Y-m-d') . ' but no LiturgicalEvent was found'
+                    );
                 }
 
                 $this->Messages[] = sprintf(
@@ -1579,7 +1581,7 @@ final class CalendarHandler extends AbstractHandler
         }
 
         //Sundays of Ordinary Time in the Latter part of the year are numbered backwards from Christ the King ( 34th ) to Pentecost
-        $lastOrdinary = DateTime::fromFormat('25-12-' . $this->CalendarParams->Year)->modify('last Sunday')->sub(new \DateInterval('P' . ( 4 * 7 ) . 'D'));
+        $lastOrdinaryDate = DateTime::fromFormat('25-12-' . $this->CalendarParams->Year)->modify('last Sunday')->sub(new \DateInterval('P' . ( 4 * 7 ) . 'D'));
         //We take Trinity Sunday as the limit...
         //Here is ( Trinity Sunday + 7 ) since one more cycle will complete...
         $lastOrdinaryLowerLimit = Utilities::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P' . ( 7 * 9 ) . 'D'));
@@ -1590,13 +1592,13 @@ final class CalendarHandler extends AbstractHandler
             throw new ServiceUnavailableException('Christ the King was not found among the LiturgicalEvents');
         }
 
-        while ($lastOrdinary <= $ChristKing->date && $lastOrdinary > $lastOrdinaryLowerLimit) {
-            $lastOrdinary = DateTime::fromFormat('25-12-' . $this->CalendarParams->Year)->modify('last Sunday')->sub(new \DateInterval('P' . ( ++$ordSunCycle * 7 ) . 'D'));
+        while ($lastOrdinaryDate <= $ChristKing->date && $lastOrdinaryDate > $lastOrdinaryLowerLimit) {
+            $lastOrdinaryDate = DateTime::fromFormat('25-12-' . $this->CalendarParams->Year)->modify('last Sunday')->sub(new \DateInterval('P' . ( ++$ordSunCycle * 7 ) . 'D'));
             $ordSun--;
-            if (!$this->Cal->inSolemnities($lastOrdinary) && !$this->Cal->inFeastsLord($lastOrdinary)) {
+            if (!$this->Cal->inSolemnities($lastOrdinaryDate) && !$this->Cal->inFeastsLord($lastOrdinaryDate)) {
                 $this->Cal->addLiturgicalEvent('OrdSunday' . $ordSun, new LiturgicalEvent(
                     $this->PropriumDeTempore['OrdSunday' . $ordSun]->name,
-                    $lastOrdinary,
+                    $lastOrdinaryDate,
                     LitColor::GREEN,
                     LitEventType::MOBILE,
                     LitGrade::FEAST_LORD,
@@ -1604,9 +1606,11 @@ final class CalendarHandler extends AbstractHandler
                     ''
                 ));
             } else {
-                $litEvent = $this->Cal->solemnityFromDate($firstOrdinaryDate) ?? $this->Cal->feastLordFromDate($firstOrdinaryDate);
+                $litEvent = $this->Cal->solemnityFromDate($lastOrdinaryDate) ?? $this->Cal->feastLordFromDate($lastOrdinaryDate);
                 if (null === $litEvent) {
-                    throw new ServiceUnavailableException('We were expecting to find either a Solemnity or a Feast of the Lord on ' . $lastOrdinary->format('Y-m-d') . ' but no LiturgicalEvent was not found');
+                    throw new ServiceUnavailableException(
+                        'We were expecting to find either a Solemnity or a Feast of the Lord on ' . $lastOrdinaryDate->format('Y-m-d') . ' but no LiturgicalEvent was found'
+                    );
                 }
 
                 $this->Messages[] = sprintf(
@@ -1760,7 +1764,7 @@ final class CalendarHandler extends AbstractHandler
         $weekdayChristmasCnt = 1;
         $Christmas           = $this->Cal->getLiturgicalEvent('Christmas');
         if (null === $Christmas) {
-            throw new \Exception('There is no Santa Claus');
+            throw new ServiceUnavailableException('There is no Christmas in this calendar! Saint Nicholas seems to be on vacation...');
         }
 
         while (
@@ -2035,7 +2039,7 @@ final class CalendarHandler extends AbstractHandler
             if (null !== $key) {
                 $weekdayEpiphany = $this->Cal->getLiturgicalEvent($key);
                 if (null === $weekdayEpiphany) {
-                    throw new ServiceUnavailableException('The weekday of Epihany ' . $key . ' has been lost; as long as Paradise has not we will survive');
+                    throw new ServiceUnavailableException('The weekday of Epiphany ' . $key . ' has been lost; as long as Paradise has not we will survive');
                 }
 
                 /**translators:
@@ -3055,7 +3059,7 @@ final class CalendarHandler extends AbstractHandler
     private function loadWiderRegionData(): void
     {
         if (null === $this->NationalData) {
-            throw new ServiceUnavailableException('loadNationalCalendarData() seems to not have produces results?');
+            throw new ServiceUnavailableException('loadNationalCalendarData() appears not to have produced any results.');
         }
 
         $widerRegionDataFile = strtr(
@@ -3815,7 +3819,7 @@ final class CalendarHandler extends AbstractHandler
                         ? $litEvent->date->format('F jS')
                         : $this->dayAndMonth->format($litEvent->date->format('U'))
                     );
-                $this->Cal->moveLiturgicalEventDate($event_key, $litEvent->date);
+                $this->Cal->moveLiturgicalEventDate($event_key, $newDate);
             } else {
                 // If it was suppressed on the original date because of a higher ranking celebration,
                 //    we should recreate it on the new date
@@ -3827,17 +3831,19 @@ final class CalendarHandler extends AbstractHandler
                     if ($this->Cal->isSuppressed($event_key)) {
                         $suppressedEvent = $this->Cal->getSuppressedEventByKey($event_key);
                         if (null === $suppressedEvent) {
-                            throw new ServiceUnavailableException('Would you please make up your mind? First you tell me that the liturgical event ' . $event_key . ' is suppressed, ' .
-                                'then you go on to tell me that it is nowhere to be found among the suppressed events?');
+                            throw new ServiceUnavailableException(
+                                'He who was lost, ' . $event_key . ', and was suppressed, ' .
+                                'somehow has now been found. Miracle of miracles.'
+                            );
                         }
 
+                        $oldDate               = clone($suppressedEvent->date);
                         $suppressedEvent->date = $newDate;
                         $suppressedEvent->type = LitEventType::FIXED;
                         $this->Cal->addLiturgicalEvent($event_key, $suppressedEvent);
                         // if it was suppressed previously (which it should have been), we should remove from the suppressed events collection
                         $this->Cal->reinstateEvent($event_key);
-                        $oldDate    = $suppressedEvent->date;
-                        $oldDateStr = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                        $oldDateStr = in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE], true)
                             ? ( $oldDate->format('j') . ' ' . LatinUtils::LATIN_MONTHS[(int) $oldDate->format('n')] )
                             : ( $locale === 'en'
                                 ? $oldDate->format('F jS')

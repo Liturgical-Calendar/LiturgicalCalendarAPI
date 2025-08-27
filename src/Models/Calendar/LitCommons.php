@@ -249,7 +249,7 @@ final class LitCommons implements \JsonSerializable
      */
     public static function i18n(LitCommon $litCommon, string $locale): string
     {
-        return in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE])
+        return in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE], true)
             ? LitCommon::LATIN[$litCommon->name]
             : $litCommon->translate();
     }
@@ -265,9 +265,9 @@ final class LitCommons implements \JsonSerializable
      * @param string $locale the locale in which to get the possessive form
      * @return string the possessive form for the given liturgical common
      */
-    private static function getPossessive(LitCommon $litCommon, $locale): string
+    private static function getPossessive(LitCommon $litCommon, string $locale): string
     {
-        return $locale === LitLocale::LATIN || $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+        return in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE], true)
             ? ''
             : $litCommon->possessive();
     }

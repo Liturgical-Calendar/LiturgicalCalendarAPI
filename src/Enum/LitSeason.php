@@ -2,8 +2,6 @@
 
 namespace LiturgicalCalendar\Api\Enum;
 
-use LiturgicalCalendar\Api\Router;
-
 enum LitSeason: string
 {
     use EnumToArrayTrait;
@@ -23,19 +21,20 @@ enum LitSeason: string
      */
     public function i18n(string $locale): string
     {
+        $isLatin = in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE], true);
         return match ($this) {
             /**translators: context = liturgical season */
-            LitSeason::ADVENT         => in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'Tempus Adventus'     : _('Advent'),
+            LitSeason::ADVENT         => $isLatin ? 'Tempus Adventus'     : _('Advent'),
             /**translators: context = liturgical season */
-            LitSeason::CHRISTMAS      => in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'Tempus Nativitatis'  : _('Christmas'),
+            LitSeason::CHRISTMAS      => $isLatin ? 'Tempus Nativitatis'  : _('Christmas'),
             /**translators: context = liturgical season */
-            LitSeason::LENT           => in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'Tempus Quadragesima' : _('Lent'),
+            LitSeason::LENT           => $isLatin ? 'Tempus Quadragesima' : _('Lent'),
             /**translators: context = liturgical season */
-            LitSeason::EASTER_TRIDUUM => in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'Triduum Paschale'    : _('Easter Triduum'),
+            LitSeason::EASTER_TRIDUUM => $isLatin ? 'Triduum Paschale'    : _('Easter Triduum'),
             /**translators: context = liturgical season */
-            LitSeason::EASTER         => in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'Tempus Paschale'     : _('Easter'),
+            LitSeason::EASTER         => $isLatin ? 'Tempus Paschale'     : _('Easter'),
             /**translators: context = liturgical season */
-            LitSeason::ORDINARY_TIME  => in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'Tempus per Annum'    : _('Ordinary Time')
+            LitSeason::ORDINARY_TIME  => $isLatin ? 'Tempus per Annum'    : _('Ordinary Time')
         };
     }
 }

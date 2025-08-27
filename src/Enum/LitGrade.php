@@ -125,6 +125,8 @@ enum LitGrade: int
      */
     public function i18n(string $locale, bool $html = true, bool $abbreviate = false): string
     {
+        $isLatin = in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE], true);
+
         [
             'grade'     => $grade,
             'gradeAbbr' => $gradeAbbr,
@@ -132,65 +134,65 @@ enum LitGrade: int
         ] = match ($this) {
             LitGrade::WEEKDAY => [
                 /**translators: liturgical rank. Keep lowercase  */
-                'grade'     => ( in_array($locale, [LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'feria'             : _('weekday') ),
+                'grade'     => ( $isLatin ? 'feria'             : _('weekday') ),
                 /**translators: liturgical rank 'WEEKDAY' in abbreviated form */
-                'gradeAbbr' => ( in_array($locale, [LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'f'                 : _('w') ),
+                'gradeAbbr' => ( $isLatin ? 'f'                 : _('w') ),
                 'tags'      => ['<I>','</I>']
             ],
             LitGrade::COMMEMORATION => [
                 /**translators: liturgical rank. Keep lowercase  */
-                'grade'     => ( in_array($locale, [LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'commemoratio'      : _('commemoration') ),
+                'grade'     => ( $isLatin ? 'commemoratio'      : _('commemoration') ),
                 /**translators: liturgical rank 'COMMEMORATION' in abbreviated form */
-                'gradeAbbr' => ( in_array($locale, [LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'm*'                : _('m*') ),
+                'gradeAbbr' => ( $isLatin ? 'm*'                : _('m*') ),
                 'tags'      => ['<I>','</I>']
             ],
             LitGrade::MEMORIAL_OPT => [
-                /**translators: liturgical rank. Keep lowercsase  */
-                'grade'     => ( in_array($locale, [LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'memoria ad libitum' : _('optional memorial') ),
+                /**translators: liturgical rank. Keep lowercase  */
+                'grade'     => ( $isLatin ? 'memoria ad libitum' : _('optional memorial') ),
                 /**translators: liturgical rank 'OPTIONAL MEMORIAL' in abbreviated form */
-                'gradeAbbr' => ( in_array($locale, [LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'm'                  : _('m') ),
+                'gradeAbbr' => ( $isLatin ? 'm'                  : _('m') ),
                 'tags'      => ['','']
             ],
             LitGrade::MEMORIAL => [
                 /**translators: liturgical rank. Keep Capitalized  */
-                'grade'     => ( in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'Memoria obligatoria' : _('Memorial') ),
+                'grade'     => ( $isLatin ? 'Memoria obligatoria' : _('Memorial') ),
                 /**translators: liturgical rank 'MEMORIAL' in abbreviated form */
-                'gradeAbbr' => ( in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'M'                   : _('M') ),
+                'gradeAbbr' => ( $isLatin ? 'M'                   : _('M') ),
                 'tags'      => ['','']
             ],
             LitGrade::FEAST => [
                 /**translators: liturgical rank. Keep UPPERCASE  */
-                'grade'     => ( in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'FESTUM'            : _('FEAST') ),
+                'grade'     => ( $isLatin ? 'FESTUM'            : _('FEAST') ),
                 /**translators: liturgical rank 'FEAST' in abbreviated form */
-                'gradeAbbr' => ( in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'F'                 : _('F') ),
+                'gradeAbbr' => ( $isLatin ? 'F'                 : _('F') ),
                 'tags'      => ['','']
             ],
             LitGrade::FEAST_LORD => [
                 /**translators: liturgical rank. Keep UPPERCASE  */
-                'grade'     => ( in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'FESTUM DOMINI'     : _('FEAST OF THE LORD') ),
+                'grade'     => ( $isLatin ? 'FESTUM DOMINI'     : _('FEAST OF THE LORD') ),
                 /**translators: liturgical rank 'FEAST OF THE LORD' in abbreviated form */
-                'gradeAbbr' => ( in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'F✝'                : _('F✝') ),
+                'gradeAbbr' => ( $isLatin ? 'F✝'                : _('F✝') ),
                 'tags'      => ['<B>','</B>']
             ],
             LitGrade::SOLEMNITY => [
                 /**translators: liturgical rank. Keep UPPERCASE  */
-                'grade'     => ( in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'SOLLEMNITAS'       : _('SOLEMNITY') ),
+                'grade'     => ( $isLatin ? 'SOLLEMNITAS'       : _('SOLEMNITY') ),
                 /**translators: liturgical rank 'SOLEMNITY' in abbreviated form */
-                'gradeAbbr' => ( in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'S'                 : _('S') ),
+                'gradeAbbr' => ( $isLatin ? 'S'                 : _('S') ),
                 'tags'      => ['<B>','</B>']
             ],
             LitGrade::HIGHER_SOLEMNITY => [
                 /**translators: liturgical rank. Keep lowercase  */
-                'grade'     => ( in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'celebratio altioris ordinis quam sollemnitatis' : _('celebration with precedence over solemnities') ),
+                'grade'     => ( $isLatin ? 'celebratio altioris ordinis quam sollemnitatis' : _('celebration with precedence over solemnities') ),
                 /**translators: liturgical rank 'HIGHER SOLEMNITY' in abbreviated form */
-                'gradeAbbr' => ( in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'S✝'                : _('S✝') ),
+                'gradeAbbr' => ( $isLatin ? 'S✝'                : _('S✝') ),
                 'tags'      => ['<B><I>','</I></B>']
             ],
             LitGrade::INVALID => [
                 /**translators: liturgical rank. Keep lowercase  */
-                'grade'     => ( in_array($locale, [LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'ignotus'         : 'invalid value' ),
+                'grade'     => ( $isLatin ? 'ignotus'         : 'invalid value' ),
                 /**translators: liturgical rank 'INVALID' in abbreviated form */
-                'gradeAbbr' => ( in_array($locale, [LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'ign'               : '???' ),
+                'gradeAbbr' => ( $isLatin ? 'ign'               : '???' ),
                 'tags'      => ['','']
             ],
         };
