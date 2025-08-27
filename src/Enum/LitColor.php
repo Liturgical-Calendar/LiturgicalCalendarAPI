@@ -20,31 +20,22 @@ enum LitColor: string
      * translation; otherwise, it returns the translation in the current locale.
      * If the color value is not supported, a default "unknown" value is returned.
      *
-     * @param LitColor $color The liturgical color to translate.
      * @param string $locale The locale for the translation.
      * @return string The translated liturgical color.
      */
-    public static function i18n(LitColor $color, string $locale): string
+    public function i18n(string $locale): string
     {
-        switch ($color) {
-            case self::GREEN:
-                /**translators: context = liturgical color */
-                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'viridis'     : _('green');
-            case self::PURPLE:
-                /**translators: context = liturgical color */
-                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'purpura'     : _('purple');
-            case self::WHITE:
-                /**translators: context = liturgical color */
-                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'albus'       : _('white');
-            case self::RED:
-                /**translators: context = liturgical color */
-                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'ruber'       : _('red');
-            case self::PINK:
-                /**translators: context = liturgical color */
-                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'rosea'       : _('pink');
-            default:
-                /**translators: context = liturgical color: unsupported value */
-                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'ignotus'     : _('unknown');
-        }
+        return match ($this) {
+            /**translators: context = liturgical color */
+            LitColor::GREEN  => ( in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'viridis' : _('green') ),
+            /**translators: context = liturgical color */
+            LitColor::PURPLE => ( in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'purpura' : _('purple') ),
+            /**translators: context = liturgical color */
+            LitColor::WHITE  => ( in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'albus'   : _('white') ),
+            /**translators: context = liturgical color */
+            LitColor::RED    => ( in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'ruber'   : _('red') ),
+            /**translators: context = liturgical color */
+            LitColor::PINK   => ( in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'rosea'   : _('pink') )
+        };
     }
 }

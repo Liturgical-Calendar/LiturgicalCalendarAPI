@@ -97,11 +97,11 @@ final class LiturgicalEvent implements \JsonSerializable
         $this->name          = $name;
         $this->date          = $date; //DateTime object
         $this->color         = is_array($color) ? $color : [$color];
-        $this->color_lcl     = array_map(fn($item) => LitColor::i18n($item, self::$locale), $this->color);
+        $this->color_lcl     = array_map(fn(LitColor $item): string => $item->i18n(self::$locale), $this->color);
         $this->type          = $type;
         $this->grade         = $grade;
-        $this->grade_lcl     = LitGrade::i18n($this->grade, self::$locale, false, false);
-        $this->grade_abbr    = LitGrade::i18n($this->grade, self::$locale, false, true);
+        $this->grade_lcl     = $this->grade->i18n(self::$locale, false, false);
+        $this->grade_abbr    = $this->grade->i18n(self::$locale, false, true);
         $this->grade_display = $this->grade === LitGrade::HIGHER_SOLEMNITY ? '' : $displayGrade;
         $commons             = $common instanceof LitCommons || $common instanceof LitMassVariousNeeds || $litMassVariousNeedsArray
                                 ? $common
@@ -297,7 +297,7 @@ final class LiturgicalEvent implements \JsonSerializable
 
         if ($this->liturgical_season !== null) {
             $returnArr['liturgical_season']     = $this->liturgical_season->value;
-            $returnArr['liturgical_season_lcl'] = LitSeason::i18n($this->liturgical_season, self::$locale);
+            $returnArr['liturgical_season_lcl'] = $this->liturgical_season->i18n(self::$locale);
         }
 
         return $returnArr;
@@ -330,6 +330,8 @@ final class LiturgicalEvent implements \JsonSerializable
             self::$dayOfTheWeekLong  = $dowLongFormat;
             self::$monthShort        = $monthShortFormat;
             self::$monthLong         = $monthLongFormat;
+        } else {
+            throw new \InvalidArgumentException('The provided locale is not valid: ' . $locale . '.');
         }
     }
 

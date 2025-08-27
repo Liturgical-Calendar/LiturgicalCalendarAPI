@@ -330,7 +330,7 @@ final class LiturgicalEventCollection
             if ($litEvent->grade === LitGrade::FEAST_LORD) {
                 $this->feastsLord->addEvent($litEvent);
             } else {
-                throw new \InvalidArgumentException('Trying to add a non feast: ' . $key . ' to Feasts of the Lord, liturgical event has grade: ' . LitGrade::i18n($litEvent->grade, $this->CalendarParams->Locale, false, false));
+                throw new \InvalidArgumentException('Trying to add a non feast: ' . $key . ' to Feasts of the Lord, liturgical event has grade: ' . $litEvent->grade->i18n($this->CalendarParams->Locale, false, false));
             }
         }
     }
@@ -783,8 +783,8 @@ final class LiturgicalEventCollection
             throw new \InvalidArgumentException('Invalid key: ' . $key . ' for LiturgicalEvents, valid keys are: ' . implode(', ', $this->liturgicalEvents->getKeys()));
         }
         // Update the grade_lcl and grade_abbr properties
-        $litEvent->setGradeLocalization(LitGrade::i18n($newGradeValue, $this->CalendarParams->Locale, false, false));
-        $litEvent->setGradeAbbreviation(LitGrade::i18n($newGradeValue, $this->CalendarParams->Locale, false, true));
+        $litEvent->setGradeLocalization($newGradeValue->i18n($this->CalendarParams->Locale, false, false));
+        $litEvent->setGradeAbbreviation($newGradeValue->i18n($this->CalendarParams->Locale, false, true));
 
         if ($newGradeValue->value >= LitGrade::FEAST_LORD->value) {
             $this->solemnities->addEvent($litEvent);
@@ -1493,9 +1493,9 @@ final class LiturgicalEventCollection
             $litEventGradeLcl = $this->CalendarParams->Locale === LitLocale::LATIN ? 'Die Domini' : ucfirst($dayOfTheWeek);
         } else {
             if ($litEvent->grade->value > LitGrade::SOLEMNITY->value) {
-                $litEventGradeLcl = '<i>' . LitGrade::i18n($litEvent->grade, $this->CalendarParams->Locale, false) . '</i>';
+                $litEventGradeLcl = '<i>' . $litEvent->grade->i18n($this->CalendarParams->Locale, false) . '</i>';
             } else {
-                $litEventGradeLcl = LitGrade::i18n($litEvent->grade, $this->CalendarParams->Locale, false);
+                $litEventGradeLcl = $litEvent->grade->i18n($this->CalendarParams->Locale, false);
             }
         }
 
@@ -1533,8 +1533,8 @@ final class LiturgicalEventCollection
                         //it's a Feast of the Lord or a Solemnity
                         $coincidingEvent->grade_lcl = (
                             $coincidingEvent->event->grade->value > LitGrade::SOLEMNITY->value
-                                ? '<i>' . LitGrade::i18n($coincidingEvent->event->grade, $this->CalendarParams->Locale, false) . '</i>'
-                                : LitGrade::i18n($coincidingEvent->event->grade, $this->CalendarParams->Locale, false)
+                                ? '<i>' . $coincidingEvent->event->grade->i18n($this->CalendarParams->Locale, false) . '</i>'
+                                : $coincidingEvent->event->grade->i18n($this->CalendarParams->Locale, false)
                         );
                     }
 
@@ -1744,15 +1744,15 @@ final class LiturgicalEventCollection
             }
             $coincidingEvent->event     = $liturgicalEvent;
             $coincidingEvent->grade_lcl = ( $coincidingEvent->event->grade->value > LitGrade::SOLEMNITY->value
-                ? '<i>' . LitGrade::i18n($coincidingEvent->event->grade, $this->CalendarParams->Locale, false) . '</i>'
-                : LitGrade::i18n($coincidingEvent->event->grade, $this->CalendarParams->Locale, false) );
+                ? '<i>' . $coincidingEvent->event->grade->i18n($this->CalendarParams->Locale, false) . '</i>'
+                : $coincidingEvent->event->grade->i18n($this->CalendarParams->Locale, false) );
         } elseif ($this->inFeastsOrMemorials($currentLitEventDate)) {
             $liturgicalEvent = $this->feastOrMemorialFromDate($currentLitEventDate);
             if (null === $liturgicalEvent) {
                 throw new \RuntimeException('No Feast or Memorial found for ' . $currentLitEventDate->format('Y-m-d'));
             }
             $coincidingEvent->event     = $liturgicalEvent;
-            $coincidingEvent->grade_lcl = LitGrade::i18n($coincidingEvent->event->grade, $this->CalendarParams->Locale, false);
+            $coincidingEvent->grade_lcl = $coincidingEvent->event->grade->i18n($this->CalendarParams->Locale, false);
         } else {
             // DEBUG START
             $isSunday = self::dateIsSunday($currentLitEventDate);

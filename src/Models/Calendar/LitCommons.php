@@ -195,7 +195,7 @@ final class LitCommons implements \JsonSerializable
         $fromTheCommon = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'De Commune' : _('From the Common');
 
         /** @var string[] $commonsLcl */
-        $commonsLcl = array_map(function ($litCommonItem) use ($locale, $fromTheCommon): string {
+        $commonsLcl = array_map(function (LitCommonItem $litCommonItem) use ($locale, $fromTheCommon): string {
             $commonGeneralStringParts = [ $fromTheCommon ];
 
             $possessive = self::getPossessive($litCommonItem->commonGeneral, $locale);
@@ -249,7 +249,7 @@ final class LitCommons implements \JsonSerializable
      */
     public static function i18n(LitCommon $litCommon, string $locale): string
     {
-        return $locale === LitLocale::LATIN || $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+        return in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE])
             ? LitCommon::LATIN[$litCommon->name]
             : $litCommon->translate();
     }
