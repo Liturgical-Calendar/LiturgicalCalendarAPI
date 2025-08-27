@@ -4573,38 +4573,42 @@ final class CalendarHandler extends AbstractHandler
         );
 
         LitLocale::$PRIMARY_LANGUAGE = $baseLocale;
-        $localeArray                 = [
-            $this->CalendarParams->Locale . '.utf8',
-            $this->CalendarParams->Locale . '.UTF-8',
-            $this->CalendarParams->Locale,
-            $baseLocale . '_' . strtoupper($baseLocale) . '.utf8',
-            $baseLocale . '_' . strtoupper($baseLocale) . '.UTF-8',
-            $baseLocale . '_' . strtoupper($baseLocale),
-            $baseLocale . '.utf8',
-            $baseLocale . '.UTF-8',
-            $baseLocale
-        ];
+        if ($baseLocale !== LitLocale::LATIN_PRIMARY_LANGUAGE) {
+            $localeArray = [
+                $this->CalendarParams->Locale . '.utf8',
+                $this->CalendarParams->Locale . '.UTF-8',
+                $this->CalendarParams->Locale,
+                $baseLocale . '_' . strtoupper($baseLocale) . '.utf8',
+                $baseLocale . '_' . strtoupper($baseLocale) . '.UTF-8',
+                $baseLocale . '_' . strtoupper($baseLocale),
+                $baseLocale . '.utf8',
+                $baseLocale . '.UTF-8',
+                $baseLocale
+            ];
 
-        $runtimeLocale = setlocale(LC_ALL, $localeArray);
-        if (false === $runtimeLocale) {
-            throw new ServiceUnavailableException('Could not set locale to ' . $this->CalendarParams->Locale . '.');
+            $runtimeLocale = setlocale(LC_ALL, $localeArray);
+            if (false === $runtimeLocale) {
+                throw new ServiceUnavailableException('Could not set locale to ' . $this->CalendarParams->Locale . '.');
+            }
+
+            // Example: "it_IT.UTF-8" → "it_IT"
+            $normalizedLocale = strtok($runtimeLocale, '.') ?: $runtimeLocale;
+
+            $languageEnv = implode(':', array_unique([
+                $runtimeLocale,
+                $normalizedLocale,
+                $baseLocale,
+                'en'
+            ]));
+            putenv("LANGUAGE={$languageEnv}");
+
+            // also update ICU’s default locale
+            \Locale::setDefault($normalizedLocale);
+
+            LitLocale::$RUNTIME_LOCALE = $normalizedLocale;
+        } else {
+            LitLocale::$RUNTIME_LOCALE = LitLocale::LATIN_PRIMARY_LANGUAGE;
         }
-
-        // Example: "it_IT.UTF-8" → "it_IT"
-        $normalizedLocale = strtok($runtimeLocale, '.') ?: $runtimeLocale;
-
-        $languageEnv = implode(':', array_unique([
-            $runtimeLocale,
-            $normalizedLocale,
-            $baseLocale,
-            'en'
-        ]));
-        putenv("LANGUAGE={$languageEnv}");
-
-        LitLocale::$RUNTIME_LOCALE = $normalizedLocale;
-
-        // also update ICU’s default locale
-        \Locale::setDefault($normalizedLocale);
 
         $this->createFormatters();
 

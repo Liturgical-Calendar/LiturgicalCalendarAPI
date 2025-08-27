@@ -198,13 +198,13 @@ final class LitCommons implements \JsonSerializable
         $commonsLcl = array_map(function (LitCommonItem $litCommonItem) use ($locale, $fromTheCommon): string {
             $commonGeneralStringParts = [ $fromTheCommon ];
 
-            $possessive = self::getPossessive($litCommonItem->commonGeneral, $locale);
+            $possessive = LitCommons::getPossessive($litCommonItem->commonGeneral, $locale);
 
-            if ($possessive !== LitCommon::NONE->value) {
+            if ($possessive !== '') {
                 array_push($commonGeneralStringParts, $possessive);
             }
 
-            $commonGeneralLcl = self::i18n($litCommonItem->commonGeneral, $locale);
+            $commonGeneralLcl = LitCommons::i18n($litCommonItem->commonGeneral, $locale);
 
             if ($commonGeneralLcl !== LitCommon::NONE->value) {
                 array_push($commonGeneralStringParts, $commonGeneralLcl);
@@ -213,7 +213,7 @@ final class LitCommons implements \JsonSerializable
             $commonGeneralString = implode(' ', $commonGeneralStringParts);
 
             $commonSpecificLcl = $litCommonItem->commonSpecific !== null
-                ? ': ' . self::i18n($litCommonItem->commonSpecific, $locale)
+                ? ': ' . LitCommons::i18n($litCommonItem->commonSpecific, $locale)
                 : '';
 
             return $commonGeneralString . $commonSpecificLcl;
