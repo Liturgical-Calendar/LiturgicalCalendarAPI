@@ -4585,7 +4585,7 @@ final class CalendarHandler extends AbstractHandler
         }
 
         // Example: "it_IT.UTF-8" → "it_IT"
-        $normalizedLocale = strtok($runtimeLocale, '.');
+        $normalizedLocale = strtok($runtimeLocale, '.') ?: $runtimeLocale;
 
         $languageEnv = implode(':', array_unique([
             $runtimeLocale,
@@ -4606,7 +4606,6 @@ final class CalendarHandler extends AbstractHandler
             throw new ServiceUnavailableException('The i18n folder does not exist at path: ' . Router::$apiFilePath . 'i18n' . '.');
         }
 
-        $textDomain = null;
         if (false === bindtextdomain('litcal', Router::$apiFilePath . 'i18n')) {
             throw new ServiceUnavailableException('Could not bind text domain for translations to path: ' . Router::$apiFilePath . 'i18n' . '.');
         } else {
@@ -4614,7 +4613,7 @@ final class CalendarHandler extends AbstractHandler
             $textDomain = textdomain('litcal');
         }
 
-        if (null === $textDomain || $textDomain !== 'litcal') {
+        if ($textDomain !== 'litcal') {
             throw new ServiceUnavailableException('Could not set text domain for translations to \'litcal\'.');
         }
     }

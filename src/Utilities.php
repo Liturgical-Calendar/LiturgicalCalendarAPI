@@ -453,13 +453,13 @@ class Utilities
         if ($html === true) {
             $colorStrings = array_map(function (LitColor $litColor) use ($locale) {
                 return '<B><I><SPAN LANG=' . strtolower($locale) . '><FONT FACE="Calibri" COLOR="' . self::colorToHex($litColor->value) . '">'
-                    . LitColor::i18n($litColor, $locale)
+                    . $litColor->i18n($locale)
                     . '</FONT></SPAN></I></B>';
             }, $colors);
             return implode(' <I><FONT FACE="Calibri">' . _('or') . '</FONT></I> ', $colorStrings);
         } else {
             $colorStrings = array_map(function (LitColor $txt) use ($locale) {
-                return LitColor::i18n($txt, $locale);
+                return $txt->i18n($locale);
             }, $colors);
 
             $or = $locale === LitLocale::LATIN || $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'vel' : _('or');

@@ -185,7 +185,14 @@ enum LitGrade: int
                 /**translators: liturgical rank 'HIGHER SOLEMNITY' in abbreviated form */
                 'gradeAbbr' => ( in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'S✝'                : _('S✝') ),
                 'tags'      => ['<B><I>','</I></B>']
-            ]
+            ],
+            LitGrade::INVALID => [
+                /**translators: liturgical rank. Keep lowercase  */
+                'grade'     => ( in_array($locale, [LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'ignotus'         : 'invalid value' ),
+                /**translators: liturgical rank 'INVALID' in abbreviated form */
+                'gradeAbbr' => ( in_array($locale, [LitLocale::LATIN_PRIMARY_LANGUAGE]) ? 'ign'               : '???' ),
+                'tags'      => ['','']
+            ],
         };
         if ($abbreviate) {
             return $html ? $tags[0] . $gradeAbbr . $tags[1] : $gradeAbbr;
