@@ -2,9 +2,12 @@
 
 namespace LiturgicalCalendar\Tests\Routes\ReadWrite;
 
+use GuzzleHttp\Promise\EachPromise;
+use GuzzleHttp\Promise\PromiseInterface;
 use LiturgicalCalendar\Tests\ApiTestCase;
 use PHPUnit\Framework\Attributes\Group;
-use GuzzleHttp\Promise\Utils;
+use PHPUnit\Framework\AssertionFailedError;
+use Psr\Http\Message\ResponseInterface;
 
 #[Group('ReadWrite')]
 class RegionalDataTest extends ApiTestCase
@@ -93,27 +96,62 @@ JSON;
             [ 'uri' => '/data/diocese/', 'method' => 'DELETE' ],
         ];
 
-        $promises = [];
-        foreach ($requests as $request) {
-            $promises[] = self::$http
-                ->requestAsync($request['method'], $request['uri'], ['headers' => []])
-                ->then(function ($response) use ($request) {
-                    // status
-                    $this->assertSame(400, $response->getStatusCode(), 'Expected HTTP 400 Bad Request');
+        $responses = [];
+        $errors    = [];
 
-                    // method-aware detail check
-                    if (in_array($request['method'], ['PATCH', 'DELETE'], true)) {
-                        $this->validatePatchDeleteNationalOrDiocesanCalendarDataNoIdentifierErrorResponse($response);
-                    } else {
-                        $this->validateGetPostNationalOrDiocesanCalendarDataNoIdentifierErrorResponse($response);
-                    }
+        $each = new EachPromise(
+            ( function () use ($requests, &$responses, &$errors) {
+                foreach ($requests as $idx => $request) {
+                    yield self::$http
+                        ->requestAsync($request['method'], $request['uri'], [
+                            'http_errors' => false
+                        ])
+                        ->then(
+                            function (ResponseInterface $response) use ($idx, $request, &$responses) {
+                                $responses[$idx] = $response;
+                                if ($response->getStatusCode() !== 400) {
+                                    throw new \RuntimeException(
+                                        "Expected HTTP 400 for {$request['method']} {$request['uri']}, got {$response->getStatusCode()}"
+                                    );
+                                }
+                            },
+                            function ($reason) use ($idx, &$errors) {
+                                $errors[$idx] = $reason instanceof \Throwable
+                                    ? $reason
+                                    : new \RuntimeException((string) $reason);
+                            }
+                        );
+                }
+            } )(),
+            [ 'concurrency' => 6 ]
+        );
 
-                    return true; // keep chain fulfilled on success
-                });
+        $each->promise()->wait();
+
+        // Fail if we had transport-level errors
+        $this->assertEmpty($errors, 'Encountered transport-level errors: ' . implode('; ', array_map(
+            function ($e) {
+                return $e instanceof \Throwable ? $e->getMessage() : (string) $e;
+            },
+            $errors
+        )));
+
+        $this->assertCount(count($requests), $responses, 'Some requests did not complete successfully: expected ' . count($requests) . ', received ' . count($responses));
+
+        foreach ($responses as $idx => $response) {
+            $request = $requests[$idx];
+            $this->assertSame(
+                400,
+                $response->getStatusCode(),
+                "Expected HTTP 400 for {$request['method']} {$request['uri']}, got {$response->getStatusCode()}"
+            );
+            // method-aware detail check
+            if (in_array($request['method'], ['PATCH', 'DELETE'], true)) {
+                $this->validatePatchDeleteNationalOrDiocesanCalendarDataNoIdentifierErrorResponse($response);
+            } else {
+                $this->validateGetPostNationalOrDiocesanCalendarDataNoIdentifierErrorResponse($response);
+            }
         }
-
-        // fail-fast here on first rejected promise (e.g., any assertion failure)
-        Utils::all($promises)->wait();
     }
 
     public function testPutOrPatchWithoutContentTypeHeaderReturnsError(): void

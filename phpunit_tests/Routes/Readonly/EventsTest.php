@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Tests\Routes\Readonly;
 use PHPUnit\Framework\Attributes\Group;
 use LiturgicalCalendar\Tests\ApiTestCase;
 use GuzzleHttp\Promise\EachPromise;
+use Psr\Http\Message\ResponseInterface;
 
 final class EventsTest extends ApiTestCase
 {
@@ -61,7 +62,7 @@ final class EventsTest extends ApiTestCase
             $locales = $diocesan_calendar_metadata->locales;
             foreach ($locales as $locale) {
                 $requests[] = [
-                    'uri'    => "/events/diocese/{$national_calendar_key}",
+                    'uri'    => "/events/diocese/{$diocesan_calendar_key}",
                     'type'   => 'diocesan_calendar',
                     'key'    => $diocesan_calendar_key,
                     'locale' => $locale
@@ -69,27 +70,25 @@ final class EventsTest extends ApiTestCase
             }
         }
 
-        $failures = [];
+        $responses = [];
+        $errors    = [];
 
         // EachPromise lets you cap concurrency
         $each = new EachPromise(
-            ( function () use ($requests) {
-                foreach ($requests as $req) {
-                    yield self::$http->getAsync($req['uri'], [
-                        'headers' => ['Accept-Language' => $req['locale']]
+            ( function () use ($requests, &$responses, &$errors) {
+                foreach ($requests as $idx => $request) {
+                    yield self::$http->getAsync($request['uri'], [
+                        'headers'     => ['Accept-Language' => $request['locale']],
+                        'http_errors' => false
                     ])->then(
-                        function ($response) use ($req) {
-                            // Success assertions
-                            $this->assertSame(200, $response->getStatusCode(), "Expected HTTP 200 OK for {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}{$req['uri']} with locale {$req['locale']}");
-                            $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), "Content-Type should be application/json for {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}{$req['uri']} with locale {$req['locale']}");
-                            $data = json_decode((string) $response->getBody());
-                            $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
-                            $this->assertIsObject($data, 'Response should be a JSON object');
-                            $this->validateEventsObject($data, $req['type'], $req['key'], $req['locale']);
+                        function (ResponseInterface $response) use ($idx, $request, &$responses) {
+                            $responses[$idx] = $response;
                         },
-                        function ($reason) use ($req, &$failures) {
+                        function ($reason) use ($idx, &$errors) {
                             // Capture failure
-                            $failures[] = "Request failed for {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}{$req['uri']} with locale {$req['locale']}: {$reason}";
+                            $errors[$idx] = $reason instanceof \Throwable
+                                ? $reason
+                                : new \RuntimeException((string) $reason);
                         }
                     );
                 }
@@ -99,8 +98,23 @@ final class EventsTest extends ApiTestCase
 
         $each->promise()->wait();
 
-        if ($failures) {
-            $this->fail(implode("\n", $failures));
+        $this->assertEmpty($errors, 'Encountered transport-level errors: ' . implode('; ', array_map(
+            function ($e) {
+                return $e instanceof \Throwable ? $e->getMessage() : (string) $e;
+            },
+            $errors
+        )));
+
+        $this->assertCount(count($requests), $responses, 'Some requests did not complete successfully: expected ' . count($requests) . ', received ' . count($responses));
+
+        foreach ($responses as $idx => $response) {
+            $request = $requests[$idx];
+            $this->assertSame(200, $response->getStatusCode(), "Expected HTTP 200 OK for {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}{$request['uri']} with locale {$request['locale']}");
+            $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), "Content-Type should be application/json for {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}{$request['uri']} with locale {$request['locale']}");
+            $data = json_decode((string) $response->getBody());
+            $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'Invalid JSON: ' . json_last_error_msg());
+            $this->assertIsObject($data, 'Response should be a JSON object');
+            $this->validateEventsObject($data, $request['type'], $request['key'], $request['locale']);
         }
     }
 
