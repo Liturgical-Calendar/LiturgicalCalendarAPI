@@ -238,15 +238,10 @@ enum LitCommon: string
      * Returns glue string for use between "From the Common" and the actual common.
      *
      * If the LitCommon case is not one of the General Commons, an exception will be thrown.
-     *
      * For LitCommon::BEATAE_MARIAE_VIRGINIS, returns the singular feminine form "of the".
-     *
      * For LitCommon::VIRGINUM, returns the plural feminine form "of".
-     *
      * For LitCommon::MARTYRUM, LitCommon::PASTORUM, LitCommon::DOCTORUM, LitCommon::SANCTORUM_ET_SANCTARUM, returns the plural maculine form "of".
-     *
      * For LitCommon::DEDICATIONIS_ECCLESIAE, returns the singular feminine form "of the".
-     *
      * For all other cases (?), returns the singular masculine form "of the".
      * @return string
      */

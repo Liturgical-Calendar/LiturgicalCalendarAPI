@@ -69,11 +69,11 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
         $this->event_key     = $event_key;
         $this->name          = $name;
         $this->color         = is_array($color) ? $color : [$color];
-        $this->color_lcl     = array_map(fn($item) => LitColor::i18n($item, self::$locale), $this->color);
+        $this->color_lcl     = array_map(fn(LitColor $item): string => $item->i18n(self::$locale), $this->color);
         $this->type          = $type;
         $this->grade         = $grade;
-        $this->grade_lcl     = LitGrade::i18n($this->grade, self::$locale, false, false);
-        $this->grade_abbr    = LitGrade::i18n($this->grade, self::$locale, false, true);
+        $this->grade_lcl     = $this->grade->i18n(self::$locale, false, false);
+        $this->grade_abbr    = $this->grade->i18n(self::$locale, false, true);
         $this->grade_display = $this->grade === LitGrade::HIGHER_SOLEMNITY ? '' : $displayGrade;
         $commons             = $common instanceof LitCommons || $common instanceof LitMassVariousNeeds || $litMassVariousNeedsArray
                                 ? $common

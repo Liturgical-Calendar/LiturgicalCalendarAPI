@@ -16,34 +16,25 @@ enum LitSeason: string
     /**
      * Translate a liturgical season value into the specified locale.
      *
-     * @param LitSeason $value The liturgical season value to translate.
      * @param string $locale The locale for the translation.
      * @return string The translated liturgical season value.
      */
-    public static function i18n(LitSeason $value, string $locale): string
+    public function i18n(string $locale): string
     {
-        switch ($value) {
-            case self::ADVENT:
-                /**translators: context = liturgical season */
-                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Tempus Adventus'     : _('Advent');
-            case self::CHRISTMAS:
-                /**translators: context = liturgical season */
-                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Tempus Nativitatis'  : _('Christmas');
-            case self::LENT:
-                /**translators: context = liturgical season */
-                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Tempus Quadragesima' : _('Lent');
-            case self::EASTER_TRIDUUM:
-                /**translators: context = liturgical season */
-                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Triduum Paschale'    : _('Easter Triduum');
-            case self::EASTER:
-                /**translators: context = liturgical season */
-                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Tempus Paschale'     : _('Easter');
-            case self::ORDINARY_TIME:
-                /**translators: context = liturgical season */
-                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Tempus per Annum'    : _('Ordinary Time');
-            default:
-                /**translators: context = liturgical season: unsupported value */
-                return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'Tempus Ignotum'      : _('Unknown Season');
-        }
+        $isLatin = in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE], true);
+        return match ($this) {
+            /**translators: context = liturgical season */
+            LitSeason::ADVENT         => $isLatin ? 'Tempus Adventus'     : _('Advent'),
+            /**translators: context = liturgical season */
+            LitSeason::CHRISTMAS      => $isLatin ? 'Tempus Nativitatis'  : _('Christmas'),
+            /**translators: context = liturgical season */
+            LitSeason::LENT           => $isLatin ? 'Tempus Quadragesima' : _('Lent'),
+            /**translators: context = liturgical season */
+            LitSeason::EASTER_TRIDUUM => $isLatin ? 'Triduum Paschale'    : _('Easter Triduum'),
+            /**translators: context = liturgical season */
+            LitSeason::EASTER         => $isLatin ? 'Tempus Paschale'     : _('Easter'),
+            /**translators: context = liturgical season */
+            LitSeason::ORDINARY_TIME  => $isLatin ? 'Tempus per Annum'    : _('Ordinary Time')
+        };
     }
 }
