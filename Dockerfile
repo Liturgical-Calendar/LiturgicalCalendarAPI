@@ -5,9 +5,9 @@ FROM php:8.4-cli AS build
 RUN apt-get update -y && \
     apt-get install -y --no-install-suggests --no-install-recommends \
         libicu-dev libonig-dev libzip-dev gettext libyaml-dev && \
-    docker-php-ext-install intl zip gettext calendar apcu && \
+    docker-php-ext-install intl zip calendar apcu && \
     pecl install yaml && \
-    docker-php-ext-enable intl zip gettext calendar yaml && \
+    docker-php-ext-enable intl zip calendar yaml && \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
     rm -rf /var/lib/apt/lists/*
 

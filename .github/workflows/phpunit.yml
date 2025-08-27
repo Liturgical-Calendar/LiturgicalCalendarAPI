@@ -24,6 +24,9 @@ jobs:
       - name: Install gettext
         run: sudo apt-get update -y && sudo apt-get install -y gettext
 
+      - name: Install all locales
+        run : sudo apt-get install -y locales-all
+
       - name: Setup PHP with PECL extension
         uses: shivammathur/setup-php@v2
         with:
