@@ -183,7 +183,7 @@ final class CalendarTest extends ApiTestCase
             $this->assertSame(
                 200,
                 $response->getStatusCode(),
-                "Expected HTTP 200 for {$request['uri']}, got {$response->getStatusCode()}"
+                "Expected HTTP 200 for {$request['uri']}, got {$response->getStatusCode()}: {$response->getBody()}"
             );
             $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'));
         }
