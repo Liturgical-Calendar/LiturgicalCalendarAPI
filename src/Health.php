@@ -597,7 +597,7 @@ class Health implements MessageComponentInterface
                             } else {
                                 $message          = new \stdClass();
                                 $message->type    = 'error';
-                                $message->text    = "Unable to detect a schema for {$validation->validate} and category {$validation->category} (path for schema: $pathForSchema)";
+                                $message->text    = "executeValidation validation->sourceFolder: Unable to detect a schema for {$validation->validate} and category {$validation->category} (path for schema: $pathForSchema)";
                                 $message->classes = ".$validation->validate.schema-valid";
                                 $this->sendMessage($to, $message);
                             }
@@ -757,7 +757,7 @@ class Health implements MessageComponentInterface
                                 } else {
                                     $message          = new \stdClass();
                                     $message->type    = 'error';
-                                    $message->text    = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category} (path for schema: $pathForSchema)";
+                                    $message->text    = "executeValidation validation->sourceFile (YAML): Unable to detect schema for dataPath {$dataPath} and category {$validation->category} (path for schema: $pathForSchema)";
                                     $message->classes = ".$validation->validate.schema-valid";
                                     $this->sendMessage($to, $message);
                                 }
@@ -796,7 +796,7 @@ class Health implements MessageComponentInterface
                             } else {
                                 $message          = new \stdClass();
                                 $message->type    = 'error';
-                                $message->text    = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category} (path for schema: $pathForSchema)";
+                                $message->text    = "executeValidation validation->sourceFile (JSON): Unable to detect schema for dataPath {$dataPath} and category {$validation->category} (path for schema: $pathForSchema)";
                                 $message->classes = ".$validation->validate.schema-valid";
                                 $this->sendMessage($to, $message);
                             }
