@@ -105,4 +105,30 @@ class LatinUtils
         'November',
         'December'
     ];
+
+    public const LATIN_MONTHS_ABBR = [
+        '',
+        'Ian.',
+        'Feb.',
+        'Mart.',
+        'Apr.',
+        'Mai.',
+        'Iun.',
+        'Iul.',
+        'Aug.',
+        'Sept.',
+        'Oct.',
+        'Nov.',
+        'Dec.'
+    ];
+
+    public const LATIN_WEEKDAYS_ABBR = [
+        'Dom.',
+        'Fer. II',
+        'Fer. III',
+        'Fer. IV',
+        'Fer. V',
+        'Fer. VI',
+        'Sabb.'
+    ];
 }

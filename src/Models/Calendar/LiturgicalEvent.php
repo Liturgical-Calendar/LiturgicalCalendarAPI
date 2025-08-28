@@ -11,6 +11,7 @@ use LiturgicalCalendar\Api\Enum\LitCommon;
 use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Api\LatinUtils;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewMobile;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsAbstract;
@@ -258,12 +259,20 @@ final class LiturgicalEvent implements \JsonSerializable
             'date'                    => (int) $this->date->format('U'),
             'year'                    => (int) $this->date->format('Y'),
             'month'                   => (int) $this->date->format('n'), //1 for January, 12 for December
-            'month_short'             => self::$monthShort->format($this->date->format('U')),
-            'month_long'              => self::$monthLong->format($this->date->format('U')),
+            'month_short'             => LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE
+                                            ? LatinUtils::LATIN_MONTHS_ABBR[(int) $this->date->format('n')]
+                                            : self::$monthShort->format($this->date->format('U')),
+            'month_long'              => LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE
+                                            ? LatinUtils::LATIN_MONTHS[(int) $this->date->format('n')]
+                                            : self::$monthLong->format($this->date->format('U')),
             'day'                     => (int) $this->date->format('j'),
             'day_of_the_week_iso8601' => (int) $this->date->format('N'), //1 for Monday, 7 for Sunday
-            'day_of_the_week_short'   => self::$dayOfTheWeekShort->format($this->date->format('U')),
-            'day_of_the_week_long'    => self::$dayOfTheWeekLong->format($this->date->format('U')),
+            'day_of_the_week_short'   => LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE
+                                            ? LatinUtils::LATIN_WEEKDAYS_ABBR[$this->date->format('w')]
+                                            : self::$dayOfTheWeekShort->format($this->date->format('U')),
+            'day_of_the_week_long'    => LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE
+                                            ? LatinUtils::LATIN_DAYOFTHEWEEK[$this->date->format('w')]
+                                            : self::$dayOfTheWeekLong->format($this->date->format('U')),
             'readings'                => $this->readings->jsonSerialize()
         ];
 

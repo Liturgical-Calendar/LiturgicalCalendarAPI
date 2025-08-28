@@ -2,11 +2,11 @@
 
 /**
  * Liturgical Calendar API main script
- * PHP version 8.3
+ * PHP version 8.4
  * @author  John Romano D'Orazio <priest@johnromanodorazio.com>
  * @link    https://litcal.johnromanodorazio.com
  * @license Apache 2.0 License
- * @version 4.5
+ * @version 5.0
  * Date Created: 27 December 2017
  */
 
