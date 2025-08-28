@@ -796,7 +796,7 @@ class Health implements MessageComponentInterface
                             } else {
                                 $message          = new \stdClass();
                                 $message->type    = 'error';
-                                $message->text    = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category}";
+                                $message->text    = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category} (path for schema: $pathForSchema)";
                                 $message->classes = ".$validation->validate.schema-valid";
                                 $this->sendMessage($to, $message);
                             }
