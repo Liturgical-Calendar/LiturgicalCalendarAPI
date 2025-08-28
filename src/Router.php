@@ -461,8 +461,8 @@ class Router
         $relIndexToParentOfSrc = self::relativePath(dirname($indexPath), dirname(__DIR__));
 
         /**
-         * In a localhost instance, ensure that PHP_CLI_SERVER_WORKERS is set to at least 2.
-         * In a production instance add `/api/{api_version}` (following the schema of the current production server)
+         * In a localhost instance, we ensure that PHP_CLI_SERVER_WORKERS is set to at least 2. Recommend setting it to 6 for best results.
+         * In a production instance we add the environment API_BASE_PATH to the full path.
          */
         if (Router::isLocalhost()) {
             $api_base_path = '/';
