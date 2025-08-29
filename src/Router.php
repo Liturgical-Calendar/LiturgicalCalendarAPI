@@ -390,9 +390,9 @@ class Router
             //$relIndexToParentOfSrc = self::relativePath($entryDir, dirname(__DIR__));
 
             // Build scheme + host + port from environment variables
-            $scheme = getenv('API_PROTOCOL') ?: 'http';
-            $host   = getenv('API_HOST')   ?: 'localhost';
-            $port   = getenv('API_PORT')   ?: '8000';
+            $scheme = $_ENV['API_PROTOCOL'] ?: 'http';
+            $host   = $_ENV['API_HOST']   ?: 'localhost';
+            $port   = $_ENV['API_PORT']   ?: '8000';
 
             $api_full_path = $scheme . '://' . $host;
             if (!in_array($port, [ '80', '443' ])) {
@@ -400,7 +400,7 @@ class Router
             }
 
             // Path prefix — e.g. "/api/v1" if desired
-            $api_base_path = getenv('API_BASE_PATH') ?: '/';
+            $api_base_path = $_ENV['API_BASE_PATH'] ?: '/';
 
             self::$apiBase     = $api_base_path;
             self::$apiPath     = rtrim($api_full_path . $api_base_path, '/');
