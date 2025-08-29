@@ -112,9 +112,9 @@ To further simplify your setup, without having to worry about getting all the sy
 
 ```bash
 # If you haven't cloned the repo locally, you can build directly from the remote repo (replace `{branch}` with the branch or tag from which you want to build):
-docker build -t liturgy-api:{branch} https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI.git#{branch}
+DOCKER_BUILDKIT=1 docker build -t liturgy-api:{branch} https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI.git#{branch}
 # If instead you have cloned the repo locally, you can build from the local repo (replace `{branch}` with the branch or tag that you have checked out locally):
-docker build -t liturgy-api:{branch} .
+DOCKER_BUILDKIT=1 docker build -t liturgy-api:{branch} .
 docker run -p 8000:8000 -d liturgy-api:{branch}
 ```
 
