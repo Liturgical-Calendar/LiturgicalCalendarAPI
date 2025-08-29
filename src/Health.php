@@ -796,7 +796,7 @@ class Health implements MessageComponentInterface
                             } else {
                                 $message          = new \stdClass();
                                 $message->type    = 'error';
-                                $message->text    = "executeValidation validation->sourceFile (JSON): Unable to detect schema for dataPath {$dataPath} and category {$validation->category} (path for schema: $pathForSchema)";
+                                $message->text    = "executeValidation validation->sourceFile (JSON): Unable to detect schema for dataPath {$dataPath} and category {$validation->category} (path for schema: $pathForSchema, Route::CALENDARS->path(): " . Route::CALENDARS->path() . ', LitSchema::METADATA->path(): ' . LitSchema::METADATA->path() . ')';
                                 $message->classes = ".$validation->validate.schema-valid";
                                 $this->sendMessage($to, $message);
                             }
