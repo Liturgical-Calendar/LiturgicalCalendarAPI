@@ -373,6 +373,19 @@ class Router
         die();
     }
 
+    public static function detectRequestScheme(): string
+    {
+        if (
+            ( isset($_SERVER['REQUEST_SCHEME']) && !empty($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] == 'https' ) ||
+            ( isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ) ||
+            ( isset($_SERVER['SERVER_PORT']) && !empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443' )
+        ) {
+            return 'https';
+        }
+
+        return 'http';
+    }
+
     public static function getApiPaths(): void
     {
         // The websocket server will be running in CLI mode,
@@ -390,9 +403,9 @@ class Router
             //$relIndexToParentOfSrc = self::relativePath($entryDir, dirname(__DIR__));
 
             // Build scheme + host + port from environment variables
-            $scheme = $_ENV['API_PROTOCOL'] ?: 'http';
-            $host   = $_ENV['API_HOST']   ?: 'localhost';
-            $port   = $_ENV['API_PORT']   ?: '8000';
+            $scheme = isset($_ENV['API_PROTOCOL']) && is_string($_ENV['API_PROTOCOL']) ? $_ENV['API_PROTOCOL'] : self::detectRequestScheme();
+            $host   = isset($_ENV['API_HOST'])     && is_string($_ENV['API_HOST'])     ? $_ENV['API_HOST']     : 'localhost';
+            $port   = isset($_ENV['API_PORT'])     && is_int($_ENV['API_PORT'])        ? (string) $_ENV['API_PORT'] : '8000';
 
             $api_full_path = $scheme . '://' . $host;
             if (!in_array($port, [ '80', '443' ])) {
@@ -400,7 +413,7 @@ class Router
             }
 
             // Path prefix — e.g. "/api/v1" if desired
-            $api_base_path = $_ENV['API_BASE_PATH'] ?: '/';
+            $api_base_path = isset($_ENV['API_BASE_PATH']) && is_string($_ENV['API_BASE_PATH']) ? $_ENV['API_BASE_PATH'] : '/';
 
             self::$apiBase     = $api_base_path;
             self::$apiPath     = rtrim($api_full_path . $api_base_path, '/');
@@ -413,17 +426,7 @@ class Router
         /**
          * Detect server Request Scheme
          */
-        if (
-            ( isset($_SERVER['REQUEST_SCHEME']) && !empty($_SERVER['REQUEST_SCHEME']) && $_SERVER['REQUEST_SCHEME'] == 'https' ) ||
-            ( isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on' ) ||
-            ( isset($_SERVER['SERVER_PORT']) && !empty($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == '443' )
-        ) {
-            $server_request_scheme = 'https';
-        } else {
-            $server_request_scheme = 'http';
-        }
-
-        $api_full_path = $server_request_scheme . '://';
+        $api_full_path = self::detectRequestScheme() . '://';
 
         /**
          * Detect server name or server address if name is not available
