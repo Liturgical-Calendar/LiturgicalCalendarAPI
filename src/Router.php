@@ -408,11 +408,11 @@ class Router
             $port   = isset($_ENV['API_PORT'])     && is_string($_ENV['API_PORT'])     ? $_ENV['API_PORT']     : '8000';
 
             $api_full_path = $scheme . '://' . $host;
-            if (!in_array($port, [ '80', '443' ])) {
+            if (!in_array($port, [ '80', '443' ], true)) {
                 $api_full_path .= ':' . $port;
             }
 
-            // Path prefix — e.g. "/api/v1" if desired
+            // Path prefix — e.g. "/api/v1/" if desired
             $api_base_path = isset($_ENV['API_BASE_PATH']) && is_string($_ENV['API_BASE_PATH']) ? $_ENV['API_BASE_PATH'] : '/';
 
             self::$apiBase     = $api_base_path;

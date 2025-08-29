@@ -66,9 +66,9 @@ abstract class ApiTestCase extends TestCase
                 "API is not running on {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']} — skipping integration tests. Maybe run `composer start` first?"
             );
         }
-        if (self::$transferStats === null || self::$transferStats !== 2) {
+        if (self::$transferStats === null || ( self::$transferStats !== 2 && self::$transferStats !== 3 )) {
             $this->fail(
-                'Expected HTTP2 transport, but got ' . ( self::$transferStats ?? 'unknown' )
+                'Expected HTTP2 or HTTP3 transport, but got ' . ( self::$transferStats ?? 'unknown' )
             );
         }
     }
