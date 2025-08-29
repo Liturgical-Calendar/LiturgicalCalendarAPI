@@ -70,7 +70,7 @@ jobs:
         run: composer start
 
       - name: Wait for server to be ready
-        run: npx wait-on http://127.0.0.1:8000 --timeout 30000 --interval 1000
+        run: npx wait-on http://localhost:8000 --timeout 30000 --interval 1000
 
       - name: PHPUnit
         run: composer test
