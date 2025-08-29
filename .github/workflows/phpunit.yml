@@ -1,7 +1,7 @@
 name: PHPUnit
 
 on:
-  push:
+  pull_request:
     branches: [ master, development ]
     paths: [
       '**/*.php',
@@ -12,7 +12,7 @@ on:
       'jsondata/**',
       'i18n/**'
     ]
-  pull_request:
+  push:
     branches: [ master, development ]
     paths: [
       '**/*.php',
@@ -61,7 +61,7 @@ jobs:
             composer-
 
       - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-progress --no-suggest
 
       - name: Copy env file
         run: cp .env.example .env.local
