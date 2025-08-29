@@ -1,8 +1,23 @@
 #!/bin/bash
+# Check for VS Code PID file
+if [ -f "server.vscode.pid" ]; then
+  pid=$(cat server.vscode.pid)
+  if ! kill -0 "$pid" 2>/dev/null; then
+    echo "Found stale server.vscode.pid (no process with PID $pid). Removing."
+    rm -f server.vscode.pid
+  else
+    echo "Server already started in VSCode with PID $pid"
+    exit 0
+  fi
+fi
 if [ -f "server.pid" ]; then
   pid=$(cat server.pid)
   if kill -0 "$pid" 2>/dev/null; then
-    echo "Server already started"
+    if [ "$RUN_MODE" = "vscode" ]; then
+      echo "Server already started in background with PID $pid, please stop it from there before starting in VSCode."
+    else
+      echo "Server already started in background with PID $pid"
+    fi
     exit 0
   else
     echo "No process with PID $pid found. Removing stale server.pid."
@@ -32,11 +47,19 @@ set +a  # stop auto export
 : "${API_HOST:=localhost}"
 : "${API_PORT:=8000}"
 
-PHP_CLI_SERVER_WORKERS=6 php -S "${API_HOST}:${API_PORT}" -t public > /dev/null 2>&1 &
-
-# Save PID
-pid=$!
-echo "$pid" > server.pid
+if [ "$RUN_MODE" = "vscode" ]; then
+  # Run in foreground
+  # Save PID
+  pid=$$
+  echo "$pid" > server.vscode.pid
+  exec php -S "${API_HOST}:${API_PORT}" -t public
+else
+  # Run in background
+  PHP_CLI_SERVER_WORKERS=6 php -S "${API_HOST}:${API_PORT}" -t public > /dev/null 2>&1 &
+  # Save PID
+  pid=$!
+  echo "$pid" > server.pid
+fi
 
 # Feedback
 echo "Server successfully started at ${API_PROTOCOL}://${API_HOST}:${API_PORT}/ (PID: $pid)"

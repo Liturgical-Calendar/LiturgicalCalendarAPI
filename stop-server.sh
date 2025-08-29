@@ -1,6 +1,18 @@
 #!/bin/bash
 set -euo pipefail
 
+if [ -f "server.vscode.pid" ]; then
+  pid=$(cat server.vscode.pid)
+  if ! kill -0 "$pid" 2>/dev/null; then
+    echo "Found stale server.vscode.pid (no process with PID $pid). Removing."
+    rm -f server.vscode.pid
+    exit 0
+  else
+    echo "Server already started in VSCode with PID $pid, please stop it from there."
+    exit 0
+  fi
+fi
+
 if [ ! -f server.pid ]; then
   echo "No server.pid file found. Is the server running?"
   exit 1
