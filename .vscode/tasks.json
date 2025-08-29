@@ -12,10 +12,10 @@
             "label": "launch-browser",
             "type": "shell",
             "windows": {
-                "command": "${command:workbench.action.terminal.sendSequence}",
+                "command": "cmd",
                 "args": [
                     "/c",
-                    "if exist server.pid (echo Server already running, skipping browser launch) else start ${API_PROTOCOL}://${API_HOST}:${API_PORT}"
+                    "if exist server.pid (echo Server already running, skipping browser launch) else if exist server.vscode.pid (echo Server already running, skipping browser launch) else start ${API_PROTOCOL}://${API_HOST}:${API_PORT}"
                 ],
                 "problemMatcher": []
             },
@@ -52,7 +52,18 @@
                 "isDefault": true
             },
             "dependsOn": [ "launch-browser" ],
-            "dependsOrder": "sequence"
+            "dependsOrder": "sequence",
+            "windows": {
+                "command": "bash",
+                "args": [
+                    "-c",
+                    "./start-server.sh"
+                ],
+                "env": {
+                    "RUN_MODE": "vscode",
+                    "PHP_CLI_SERVER_WORKERS": "6"
+                }
+            }
         },
         {
             "label": "litcal-tests-websockets",
