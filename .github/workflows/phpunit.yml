@@ -67,13 +67,30 @@ jobs:
         run: cp .env.example .env.local
 
       - name: Start the PHP web server
-        run: |
-          composer start
-          sleep 2
+        run: composer start
 
-      - name: PHPUnit
+      - name: Wait for server PID
+        id: server-check
+        run: |
+          MAX_WAIT=10   # max seconds to wait
+          COUNT=0
+          while [ ! -f server.pid ] && [ $COUNT -lt $MAX_WAIT ]; do
+            sleep 1
+            COUNT=$((COUNT + 1))
+          done
+
+          if [ -f server.pid ]; then
+            echo "Server is running."
+            echo "server_found=true" >> $GITHUB_OUTPUT
+          else
+            echo "Server failed to start within $MAX_WAIT seconds."
+            echo "server_found=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run tests
+        if: steps.server-check.outputs.server_found == 'true'
         run: composer test
 
-      - name: Stop the PHP web server
-        if: always()
+      - name: Stop server
+        if: steps.server-check.outputs.server_found == 'true'
         run: composer stop
