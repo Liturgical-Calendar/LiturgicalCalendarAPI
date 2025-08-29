@@ -41,9 +41,8 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "dependsOn": [
-                "launch-browser"
-            ]
+            "dependsOn": [ "launch-browser" ],
+            "dependsOrder": "sequence"
         },
         {
             "label": "litcal-tests-websockets",

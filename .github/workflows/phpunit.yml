@@ -2,8 +2,27 @@ name: PHPUnit
 
 on:
   push:
-    branches: [ development ]
-    paths: [ '**/*.php' ]
+    branches: [ master, development ]
+    paths: [
+      '**/*.php',
+      'composer.json',
+      'composer.lock',
+      'phpunit.xml',
+      '.env.example',
+      'jsondata/**',
+      'i18n/**'
+    ]
+  pull_request:
+    branches: [ master, development ]
+    paths: [
+      '**/*.php',
+      'composer.json',
+      'composer.lock',
+      'phpunit.xml',
+      '.env.example',
+      'jsondata/**',
+      'i18n/**'
+    ]
   workflow_dispatch:
 
 concurrency:
@@ -25,7 +44,7 @@ jobs:
         run: sudo apt-get update -y && sudo apt-get install -y gettext
 
       - name: Install all locales
-        run : sudo apt-get install -y locales-all
+        run : sudo apt-get install -y locales-all libicu72
 
       - name: Setup PHP with PECL extension
         uses: shivammathur/setup-php@v2
@@ -50,8 +69,12 @@ jobs:
       - name: Start the PHP web server
         run: composer start
 
+      - name: Wait for server to be ready
+        run: npx wait-on http://127.0.0.1:8000 --timeout 30000 --interval 1000
+
       - name: PHPUnit
         run: composer test
 
       - name: Stop the PHP web server
+        if: always()
         run: composer stop
