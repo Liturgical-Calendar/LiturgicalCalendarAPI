@@ -4192,7 +4192,12 @@ final class CalendarHandler extends AbstractHandler
     private function applyDiocesanCalendar(): void
     {
         if ($this->DiocesanData === null) {
-            throw new ServiceUnavailableException('Don\'t go asking me to apply a diocesan calendar if I don\'t have one!');
+            throw new ServiceUnavailableException(
+                "“And that must end us, that must be our cure:\nTo be no more. Sad cure! For who would lose,\n"
+                . "Though full of pain, this intellectual being,\nThose thoughts that wander through eternity,\n"
+                . "To perish, rather, swallowed up and lost\nIn the wide womb of uncreated night\n"
+                . 'Devoid of sense and motion?” (John Milton, Paradise Lost, Book III, lines 1022-1028)'
+            );
         }
 
         foreach ($this->DiocesanData->litcal as $litCalItem) {

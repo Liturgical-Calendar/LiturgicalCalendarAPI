@@ -3,6 +3,7 @@
 namespace LiturgicalCalendar\Api\Models;
 
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewMobile as DiocesanLitCalItemCreateNewMobile;
 
 abstract class LiturgicalEventData extends AbstractJsonSrcData
 {
@@ -20,7 +21,7 @@ abstract class LiturgicalEventData extends AbstractJsonSrcData
      */
     public function isMobile(): bool
     {
-        return $this instanceof LitCalItemCreateNewMobile;
+        return ( $this instanceof LitCalItemCreateNewMobile || $this instanceof DiocesanLitCalItemCreateNewMobile );
     }
 
     /**

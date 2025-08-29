@@ -29,7 +29,7 @@ final class DiocesanLitCalItem extends AbstractJsonSrcData
             throw new \ValueError('litcalItem.liturgical_event must have an `event_key` property');
         }
 
-        if (property_exists($metadata, 'strtotime')) {
+        if (property_exists($liturgical_event, 'strtotime')) {
             $this->liturgical_event = LitCalItemCreateNewMobile::fromObject($liturgical_event);
         } else {
             $this->liturgical_event = LitCalItemCreateNewFixed::fromObject($liturgical_event);
