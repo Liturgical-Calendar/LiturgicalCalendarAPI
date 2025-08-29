@@ -405,7 +405,7 @@ class Router
             // Build scheme + host + port from environment variables
             $scheme = isset($_ENV['API_PROTOCOL']) && is_string($_ENV['API_PROTOCOL']) ? $_ENV['API_PROTOCOL'] : self::detectRequestScheme();
             $host   = isset($_ENV['API_HOST'])     && is_string($_ENV['API_HOST'])     ? $_ENV['API_HOST']     : 'localhost';
-            $port   = isset($_ENV['API_PORT'])     && is_int($_ENV['API_PORT'])        ? (string) $_ENV['API_PORT'] : '8000';
+            $port   = isset($_ENV['API_PORT'])     && is_string($_ENV['API_PORT'])     ? $_ENV['API_PORT']     : '8000';
 
             $api_full_path = $scheme . '://' . $host;
             if (!in_array($port, [ '80', '443' ])) {
