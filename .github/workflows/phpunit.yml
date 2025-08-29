@@ -67,10 +67,9 @@ jobs:
         run: cp .env.example .env.local
 
       - name: Start the PHP web server
-        run: composer start
-
-      - name: Wait for server to be ready
-        run: npx wait-on http://localhost:8000 --timeout 30000 --interval 1000
+        run: |
+          composer start
+          sleep 2
 
       - name: PHPUnit
         run: composer test
