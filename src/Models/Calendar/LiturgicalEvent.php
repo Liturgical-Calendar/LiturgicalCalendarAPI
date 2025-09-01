@@ -24,8 +24,8 @@ use LiturgicalCalendar\Api\Models\PropriumDeSanctisEvent;
 use LiturgicalCalendar\Api\Models\PropriumDeTemporeEvent;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile;
-use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewFixed as DiocesanLitCalItemCreateNewFixed;
-use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewMobile as DiocesanLitCalItemCreateNewMobile;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewFixed;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewMobile;
 
 final class LiturgicalEvent implements \JsonSerializable
 {
@@ -80,7 +80,7 @@ final class LiturgicalEvent implements \JsonSerializable
     public function __construct(
         string $name,
         DateTime $date,
-        LitColor|array $color = LitColor::GREEN,
+        LitColor|array $color = [LitColor::GREEN],
         LitEventType $type = LitEventType::FIXED,
         LitGrade $grade = LitGrade::WEEKDAY,
         LitCommons|LitCommon|LitMassVariousNeeds|array $common = LitCommon::NONE,
@@ -90,7 +90,9 @@ final class LiturgicalEvent implements \JsonSerializable
         if (is_array($common)) {
             $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $common)));
             if (count($valueTypes) > 1) {
-                throw new \InvalidArgumentException('Incoherent liturgical common value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes));
+                throw new \InvalidArgumentException(
+                    'Incoherent liturgical common value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes)
+                );
             }
             $litMassVariousNeedsArray = $common[0] instanceof LitMassVariousNeeds;
         }

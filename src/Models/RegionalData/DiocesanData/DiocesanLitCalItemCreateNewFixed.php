@@ -9,7 +9,7 @@ use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
 use LiturgicalCalendar\Api\Models\LiturgicalEventData;
 
-final class LitCalItemCreateNewFixed extends LiturgicalEventData
+final class DiocesanLitCalItemCreateNewFixed extends LiturgicalEventData
 {
     public readonly int $day;
 

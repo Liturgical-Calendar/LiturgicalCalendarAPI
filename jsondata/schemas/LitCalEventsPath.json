@@ -17,14 +17,15 @@
                   "national_calendar": {
                     "type": "string",
                     "pattern": "^[A-Z]{2}$",
-                    "description": "indicates the National Calendar used to produce the data in LitCalAllFestivities"
+                    "description": "indicates the National Calendar used to produce the data in `litcal_events`"
                   },
                   "diocesan_calendar": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId",
-                    "description": "indicates the Diocesan Calendar used to produce the data in LitCalAllFestivities"
+                    "description": "indicates the Diocesan Calendar used to produce the data in `litcal_events`"
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "required": [ "locale", "national_calendar", "diocesan_calendar" ]
               },
               {
                 "properties": {
@@ -34,13 +35,14 @@
                   "national_calendar": {
                     "type": "string",
                     "pattern": "^[A-Z]{2}$",
-                    "description": "indicates the National Calendar used to produce the data in LitCalAllFestivities"
+                    "description": "indicates the National Calendar used to produce the data in `litcal_events`"
                   },
                   "diocesan_calendar": {
                     "type": "null"
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "required": [ "locale", "national_calendar", "diocesan_calendar" ]
               },
               {
                 "properties": {
@@ -54,7 +56,8 @@
                     "type": "null"
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "required": [ "locale", "national_calendar", "diocesan_calendar" ]
               }
             ]
         }
@@ -119,7 +122,8 @@
                   "items": {
                       "type": "string"
                   },
-                  "minItems": 1
+                  "minItems": 1,
+                  "uniqueItems": true
                 },
                 "readings": {
                   "anyOf": [
@@ -142,7 +146,7 @@
                 },
                 "name": {
                   "type": "string",
-                  "description": "The actual name of the liturgical event as defined in the latest edition of the source Roman Missal indicated in the key `MISSAL` (i.e. if the Missal is the Latin edition of the Roman Missal, the name should be from the latest edition of the Latin Roman Missal)"
+                  "description": "The actual name of the liturgical event as defined in the latest edition of the source Roman Missal indicated in the property `missal` (i.e. if the Missal is the Latin edition of the Roman Missal, the name should be from the latest edition of the Latin Roman Missal)"
                 },
                 "type": {
                   "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitFeastType"
@@ -184,8 +188,7 @@
                               ]
                           },
                           "event_key": {
-                              "type": "string",
-                              "description": "Must be a valid key for a liturgical_event in the Universal Calendar"
+                              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
                           }
                       },
                       "required": [

@@ -51,8 +51,8 @@ use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyName;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyNameMetadata;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarSettings;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
-use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewFixed as DiocesanLitCalItemCreateNewFixed;
-use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewMobile as DiocesanLitCalItemCreateNewMobile;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewFixed;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewMobile;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMetadata;
@@ -71,7 +71,6 @@ use LiturgicalCalendar\Api\Params\CalendarParams;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Sabre\Xml\Service;
 
 /**
  * Calendar request handler
@@ -4508,7 +4507,7 @@ final class CalendarHandler extends AbstractHandler
                     // and we do not produce the iCal file
                     /** @var GitHubReleaseInfoError $infoObj */
                     $message = sprintf(
-                        _('Error receiving or parsing info from github about latest release: %s.'),
+                        _('Error receiving or parsing info from GitHub about latest release: %s.'),
                         $infoObj->message
                     );
                     throw new ServiceUnavailableException($message);

@@ -64,7 +64,7 @@
                 "vigil",
                 "day"
             ],
-            "title": "LiturgicalEventWithMass"
+            "title": "ReadingsWithVigil"
         },
         "ReadingsChristmas": {
             "type": "object",
@@ -89,7 +89,7 @@
                 "dawn",
                 "day"
             ],
-            "title": "LiturgicalEventChristmas"
+            "title": "ReadingsChristmas"
         },
         "Calendar": {
             "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Calendar"

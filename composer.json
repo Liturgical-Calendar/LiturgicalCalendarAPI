@@ -6,15 +6,34 @@
     "homepage": "https://litcal.johnromanodorazio.com",
     "require": {
         "php": ">=8.4",
+        "ext-apcu": "*",
+        "ext-calendar": "*",
+        "ext-ctype": "*",
+        "ext-curl": "*",
+        "ext-date": "*",
+        "ext-dom": "*",
+        "ext-gettext": "*",
+        "ext-intl": "*",
+        "ext-json": "*",
+        "ext-libxml": "*",
+        "ext-mbstring": "*",
+        "ext-simplexml": "*",
+        "ext-xml": "*",
+        "ext-yaml": "*",
+        "ext-zip": "*",
         "swaggest/json-schema": "~0.12",
         "cboden/ratchet": "~0.4",
-        "sabre/vobject": "^4.5.5",
+        "sabre/vobject": "^4.5",
         "vlucas/phpdotenv": "^5.6",
         "nyholm/psr7": "^1.8",
         "laminas/laminas-httphandlerrunner": "^2.12",
         "nyholm/psr7-server": "^1.1",
         "psr/http-server-middleware": "^1.0",
-        "psr/http-server-handler": "^1.0"
+        "psr/http-server-handler": "^1.0",
+        "guzzlehttp/guzzle": "7.10",
+        "react/filesystem": "0.2.x-dev",
+        "symfony/semaphore": "^7.3",
+        "symfony/lock": "^7.3"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^4.0",
@@ -23,8 +42,7 @@
         "php-parallel-lint/php-console-highlighter": "^1.0",
         "captainhook/captainhook-phar": "^5.25",
         "captainhook/hook-installer": "^1.0",
-        "phpunit/phpunit": "^12.4",
-        "guzzlehttp/guzzle": "7.10.0"
+        "phpunit/phpunit": "^12.4"
     },
     "license": "Apache-2.0",
     "autoload": {

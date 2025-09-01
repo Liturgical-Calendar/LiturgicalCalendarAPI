@@ -51,6 +51,7 @@ jobs:
         with:
           php-version: ${{ env.PHP_VERSION }}
           extensions: yaml, intl, zip, calendar, apcu
+          ini-values: apcu.enable_cli=1
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4

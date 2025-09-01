@@ -23,7 +23,7 @@
                 "command": "/bin/bash", // For Linux
                 "args": [
                     "-c",
-                    "if [ -f server.pid ] || [ -f server.vscode.pid ]; then echo \"Server already running, skipping browser launch\"; else if grep -q microsoft /proc/version; then powershell.exe Start-Process ${API_PROTOCOL}://${API_HOST}:${API_PORT}; else xdg-open ${API_PROTOCOL}://${API_HOST}:${API_PORT}; fi; fi"
+                    "if [ -f server.pid ] || [ -f server.vscode.pid ]; then echo \"Server already running, skipping browser launch\"; else if grep -q microsoft /proc/version; then powershell.exe Start-Process \"${API_PROTOCOL}://${API_HOST}:${API_PORT}\"; else xdg-open \"${API_PROTOCOL}://${API_HOST}:${API_PORT}\"; fi; fi"
                 ],
                 "problemMatcher": []
             },

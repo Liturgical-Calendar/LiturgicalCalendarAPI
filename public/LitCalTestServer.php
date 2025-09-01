@@ -50,14 +50,17 @@ if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development') {
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
+    ini_set('error_log', 'php-error-litcaltestserver.log');
     error_reporting(E_ALL);
 } else {
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
     ini_set('log_errors', 1);
+    ini_set('error_log', 'php-error-litcaltestserver.log');
     error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
 }
 
+$wsPort = isset($_ENV['WS_PORT']) ? (int) $_ENV['WS_PORT'] : 8080;
 
 $server = IoServer::factory(
     new HttpServer(
@@ -65,7 +68,7 @@ $server = IoServer::factory(
             new Health()
         )
     ),
-    $_ENV['WS_PORT'] ?? 8080
+    $wsPort
 );
 
 $server->run();

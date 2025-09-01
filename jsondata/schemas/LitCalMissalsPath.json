@@ -68,7 +68,7 @@
                 "api_path": {
                     "type": "string",
                     "format": "uri",
-                    "pattern": "^https?:\\\/\\\/(?:litcal\\.johnromanodorazio\\.com\\\/api\\\/(?:dev|v[3-9])|localhost(?:\\:\\d{4}))\\\/missals\\\/(EDITIO_TYPICA|IT|US|NL)_(19[7-9]|[2-9][0-9][0-9])[0-9]$"
+                    "pattern": "^https?:\\\/\\\/(?:litcal\\.johnromanodorazio\\.com\\\/api\\\/(?:dev|v[3-9]|[1-9]\\d+)|localhost(?:\\:\\d{4}))\\\/missals\\\/(EDITIO_TYPICA|IT|US|NL|CA)_(19[7-9]|[2-9][0-9][0-9])[0-9]$"
                 }
             },
             "required": [

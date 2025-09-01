@@ -13,7 +13,7 @@ use LiturgicalCalendar\Api\Models\RelativeLiturgicalDate;
 /**
  * @phpstan-import-type StrToTime from \LiturgicalCalendar\Api\Models\RelativeLiturgicalDate
  */
-final class LitCalItemCreateNewMobile extends LiturgicalEventData
+final class DiocesanLitCalItemCreateNewMobile extends LiturgicalEventData
 {
     public readonly string|RelativeLiturgicalDate $strtotime;
 

@@ -28,7 +28,6 @@
     ],
     "definitions": {
         "LitCal": {
-            "type": "object",
             "oneOf": [
                 {
                     "$ref": "#/definitions/LitCalCreateNew"
@@ -156,7 +155,7 @@
                 "url",
                 "url_lang_map"
             ],
-            "title": "Metadata"
+            "title": "MetadataCreateNew"
         },
         "MetadataMakePatron": {
             "type": "object",
@@ -186,7 +185,7 @@
                 "url",
                 "url_lang_map"
             ],
-            "title": "Metadata"
+            "title": "MetadataMakePatron"
         },
         "UrlLangMap": {
             "type": "object",

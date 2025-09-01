@@ -189,6 +189,24 @@
                     "Accept-Language": "it-IT,it;",
                     "Accept": "application/json"
                 },
+                "solemnities_lord_bvm": [
+                    {
+                        "event_key": "Christmas",
+                        "date": "2023-12-25T00:00:00+00:00",
+                        "timezone_type": 3,
+                        "timezone": "UTC"
+                    },
+                    {
+                        "event_key": "Assumption",
+                        "date": "2023-08-15T00:00:00+00:00",
+                        "timezone_type": 3,
+                        "timezone": "UTC"
+                    }
+                ],
+                "solemnities_lord_bvm_keys": [
+                    "Christmas",
+                    "Assumptionc"
+                ],
                 "solemnities": [
                     {
                         "event_key": "Christmas",
@@ -207,6 +225,15 @@
                     "Christmas",
                     "Advent1"
                 ],
+                "feasts_lord_bvm": {
+                    "$ref": "#/definitions/DateTimeObjectCollection"
+                },
+                "feasts_lord_bvm_keys": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                    }
+                },
                 "feasts": [
                     {
                         "event_key": "ConversionStPaul",
@@ -367,7 +394,9 @@
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
                 },
                 "type": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitFeastType"
@@ -408,7 +437,7 @@
                 "year": {
                     "type": "integer",
                     "minimum": 1969,
-                    "maxItems": 9999
+                    "maximum": 9999
                 },
                 "month_short": {
                     "type": "string"
@@ -456,6 +485,7 @@
             },
             "required": [
                 "event_idx",
+                "event_key",
                 "name",
                 "date",
                 "color",
@@ -507,7 +537,9 @@
                     "type": "array",
                     "items": {
                         "type": "string"
-                    }
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
                 },
                 "type": {
                     "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitFeastType"
@@ -548,7 +580,7 @@
                 "year": {
                     "type": "integer",
                     "minimum": 1969,
-                    "maxItems": 9999
+                    "maximum": 9999
                 },
                 "month_short": {
                     "type": "string"
@@ -599,6 +631,7 @@
             },
             "required": [
                 "event_idx",
+                "event_key",
                 "name",
                 "date",
                 "color",
