@@ -11,10 +11,9 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Handler\CurlMultiHandler;
 use React\Promise;
 use React\Promise\Deferred;
-use React\Promise\PromiseInterface as ReactPromiseInterface;
+use React\Promise\PromiseInterface;
 use React\Filesystem\Factory;
 use React\EventLoop\Loop;
-use GuzzleHttp\Promise\Utils;
 use LiturgicalCalendar\Api\Enum\ICSErrorLevel;
 use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\Route;
@@ -76,6 +75,7 @@ class Health implements MessageComponentInterface
 
     private int $maxConcurrency;
     private int $inFlight = 0;
+    /** @var list<array{url:string,options:array{headers?:array{Accept:string}},resolve:\Closure(ResponseInterface):void,reject:\Closure(\Throwable):void}> */
     private array $queue  = [];
     private bool $ticking = false;
 
@@ -136,7 +136,6 @@ class Health implements MessageComponentInterface
             }
         });
         */
-        $this->ensureTicking();
 
         if (extension_loaded('apcu')) {
             echo 'APCu extension loaded, will use for caching' . "\n";
@@ -153,6 +152,7 @@ class Health implements MessageComponentInterface
                 ]
             ];
 
+            /** @var PromiseInterface<string> $promise */
             $promise = $this->cachedGet(Route::CALENDARS->path(), $opts);
 
             $promise->then(
@@ -323,7 +323,7 @@ class Health implements MessageComponentInterface
     /**
      * Validate a data file by checking that it exists and that it is valid JSON that conforms to a specific schema.
      *
-     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest $validation The validation object. It should have the following properties:
+     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $validation The validation object. It should have the following properties:
      * - category: with a value of `sourceDataCheck` or `resourceDataCheck`
      * - sourceFile|sourceFolder: a string, the path to the data file or folder
      * - validate: a string with the identifier of the resource that we are validating;
@@ -343,18 +343,20 @@ class Health implements MessageComponentInterface
         $pathForSchema = null;
         $dataPath      = null;
         $responseType  = 'JSON';
+        $category      = (string) $validation->category;
+        $validate      = (string) $validation->validate;
 
         // Source data checks validate data directly in the filesystem, not through the API
-        if ($validation->category === 'sourceDataCheck') {
+        if ($category === 'sourceDataCheck') {
             /** @var string $pathForSchema */
-            $pathForSchema = $validation->validate;
+            $pathForSchema = $validate;
             // Are we validating a single source file, or are we validating a folder of i18n files?
             if (property_exists($validation, 'sourceFolder')) {
                 // If the 'sourceFolder' property is set, then we are validating a folder of i18n files
                 /** @var ExecuteValidationSourceFolder $validation */
                 $dataPath = rtrim($validation->sourceFolder, '/');
                 $matches  = null;
-                if (preg_match('/^(wider\-region|national\-calendar|diocesan\-calendar)\-([A-Za-z_]+)\-i18n$/', $validation->validate, $matches)) {
+                if (preg_match('/^(wider\-region|national\-calendar|diocesan\-calendar)\-([A-Za-z_]+)\-i18n$/', $validate, $matches)) {
                     switch ($matches[1]) {
                         case 'wider-region':
                             $dataPath = strtr(
@@ -383,19 +385,22 @@ class Health implements MessageComponentInterface
                             );
                             break;
                     }
-                } elseif (preg_match('/^proprium\-de\-sanctis(?:\-([A-Z]{2}))?\-([1-2][0-9]{3})\-i18n$/', $validation->validate, $matches)) {
+                } elseif (preg_match('/^proprium\-de\-sanctis(?:\-([A-Z]{2}))?\-([1-2][0-9]{3})\-i18n$/', $validate, $matches)) {
                     $region   = $matches[1] !== '' ? $matches[1] : 'EDITIO_TYPICA';
                     $year     = $matches[2];
                     $dataPath = RomanMissal::getSanctoraleI18nFilePath("{$region}_{$year}");
+                    if (false === is_string($dataPath)) {
+                        throw new \Exception("Could not determine i18n folder path for Proprium de Sanctis {$region} {$year}");
+                    }
                 }
             } else {
                 // If we are not validating a folder of i18n files, then we are validating a single source file,
                 // and the 'sourceFile' property is required in this case
                 if (property_exists($validation, 'sourceFile')) {
                     /** @var ExecuteValidationSourceFile $validation */
-                    $dataPath = $validation->sourceFile;
+                    $dataPath = (string) $validation->sourceFile;
                     $matches  = null;
-                    if (preg_match('/^(wider-region|national-calendar|diocesan-calendar)-([A-Z][a-z]+)$/', $validation->validate, $matches)) {
+                    if (preg_match('/^(wider-region|national-calendar|diocesan-calendar)-([A-Z][a-z]+)$/', $validate, $matches)) {
                         switch ($matches[1]) {
                             case 'wider-region':
                                 $dataPath = strtr(
@@ -414,8 +419,8 @@ class Health implements MessageComponentInterface
                                 if ($dioceseMetadata === null) {
                                     throw new \Exception("No diocese found for calendar id: {$matches[2]}");
                                 }
-                                $nation      = $dioceseMetadata->nation;
-                                $dioceseName = $dioceseMetadata->diocese;
+                                $nation      = (string) $dioceseMetadata->nation;
+                                $dioceseName = (string) $dioceseMetadata->diocese;
                                 $dataPath    = strtr(
                                     JsonData::DIOCESAN_CALENDAR_FILE->path(),
                                     [
@@ -426,10 +431,13 @@ class Health implements MessageComponentInterface
                                 );
                                 break;
                         }
-                    } elseif (preg_match('/^proprium\-de\-sanctis(?:\-([A-Z]{2}))?\-([1-2][0-9]{3})$/', $validation->validate, $matches)) {
+                    } elseif (preg_match('/^proprium\-de\-sanctis(?:\-([A-Z]{2}))?\-([1-2][0-9]{3})$/', $validate, $matches)) {
                         $region   = $matches[1] !== '' ? $matches[1] : 'EDITIO_TYPICA';
                         $year     = $matches[2];
                         $dataPath = RomanMissal::getSanctoraleFileName("{$region}_{$year}");
+                        if (false === is_string($dataPath)) {
+                            throw new \Exception("Could not determine file path for Proprium de Sanctis {$region} {$year}");
+                        }
                     }
                 } else {
                     throw new \InvalidArgumentException('sourceFile property is required for sourceDataCheck');
@@ -440,33 +448,38 @@ class Health implements MessageComponentInterface
             // That is to say, an API path, and the 'sourceFile' property is required
             /** @var ExecuteValidationResource $validation */
             if (property_exists($validation, 'sourceFile')) {
-                $pathForSchema = $validation->sourceFile;
-                $dataPath      = $validation->sourceFile;
+                $sourceFile    = (string) $validation->sourceFile;
+                $pathForSchema = $sourceFile;
+                $dataPath      = $sourceFile;
             } else {
                 throw new \InvalidArgumentException('sourceFile property is required for resourceDataCheck');
             }
         }
 
-        $schema = Health::retrieveSchemaForCategory($validation->category, $pathForSchema);
+        $schema = Health::retrieveSchemaForCategory($category, $pathForSchema);
 
         // Now that we have the correct schema to validate against,
         // we will perform the actual validation either for all files in a folder, or for a single file
         if (property_exists($validation, 'sourceFolder')) {
+            $sourceFolder = (string) $validation->sourceFolder;
             // If the 'sourceFolder' property is set, then we are validating a folder of i18n files
             /** @var ExecuteValidationSourceFolder $validation */
             $files = glob($dataPath . '/*.json');
             if (false === $files || empty($files)) {
                 $message          = new \stdClass();
                 $message->type    = 'error';
-                $message->text    = "Data folder $validation->sourceFolder ($dataPath) does not exist or does not contain any json files";
-                $message->classes = ".$validation->validate.file-exists";
+                $message->text    = "Data folder $sourceFolder ($dataPath) does not exist or does not contain any json files";
+                $message->classes = ".$validate.file-exists";
                 $this->sendMessage($to, $message);
                 return;
             }
+
             $fileExistsAndIsReadable = true;
             $jsonDecodable           = true;
             $schemaValidated         = true;
-            $promises                = [];
+
+            /** @var list<PromiseInterface<string>> $promises */
+            $promises = [];
 
             foreach ($files as $file) {
                 $filename = pathinfo($file, PATHINFO_BASENAME);
@@ -477,80 +490,94 @@ class Health implements MessageComponentInterface
                     $fileExistsAndIsReadable = false;
                     $message                 = new \stdClass();
                     $message->type           = 'error';
-                    $message->text           = "Data folder $validation->sourceFolder contains an invalid i18n json filename $filename";
-                    $message->classes        = ".$validation->validate.file-exists";
+                    $message->text           = "Data folder $sourceFolder contains an invalid i18n json filename $filename";
+                    $message->classes        = ".$validate.file-exists";
                     $this->sendMessage($to, $message);
                     continue;
                 }
 
-                $promises[] = $this->cachedFileGetContents($file)->then(
-                    function ($fileData) use ($to, $validation, $filename, $schema, $pathForSchema, &$jsonDecodable, &$schemaValidated) {
+                /** @var PromiseInterface<string> $promise */
+                $promise    = $this->cachedFileGetContents($file);
+                $promises[] = $promise->then(
+                    function (string $fileData) use ($to, $validation, $filename, $schema, $pathForSchema, &$jsonDecodable, &$schemaValidated) {
+                        $fileData = (string) $fileData; // force fresh string
+                        $validate = (string) $validation->validate;
+                        $category = (string) $validation->category;
                         $jsonData = json_decode($fileData);
                         if (json_last_error() !== JSON_ERROR_NONE) {
                             $jsonDecodable    = false;
                             $message          = new \stdClass();
                             $message->type    = 'error';
                             $message->text    = "The i18n json file $filename was not successfully decoded as JSON: " . json_last_error_msg();
-                            $message->classes = ".$validation->validate.json-valid";
+                            $message->classes = ".$validate.json-valid";
                             $this->sendMessage($to, $message);
                         } else {
                             if (null !== $schema) {
                                 $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
                                 if ($validationResult instanceof \stdClass) {
                                     $schemaValidated           = false;
-                                    $validationResult->classes = ".$validation->validate.schema-valid";
+                                    $validationResult->classes = ".$validate.schema-valid";
                                     $this->sendMessage($to, $validationResult);
                                 }
                             } else {
                                 $message          = new \stdClass();
                                 $message->type    = 'error';
-                                $message->text    = "executeValidation validation->sourceFolder: Unable to detect a schema for {$validation->validate} and category {$validation->category} (path for schema: $pathForSchema)";
-                                $message->classes = ".$validation->validate.schema-valid";
+                                $message->text    = "executeValidation validation->sourceFolder: Unable to detect a schema for {$validate} and category {$category} (path for schema: $pathForSchema)";
+                                $message->classes = ".$validate.schema-valid";
                                 $this->sendMessage($to, $message);
                             }
                         }
                     },
                     function (\Throwable $reason) use ($to, $validation, $filename, &$fileExistsAndIsReadable) {
                         $fileExistsAndIsReadable = false;
+                        $validate                = (string) $validation->validate;
+                        $sourceFolder            = (string) $validation->sourceFolder;
                         $message                 = new \stdClass();
                         $message->type           = 'error';
-                        $message->text           = "Data folder $validation->sourceFolder contains an unreadable i18n json file $filename: " . $reason->getMessage();
-                        $message->classes        = ".$validation->validate.file-exists";
+                        $message->text           = "Data folder $sourceFolder contains an unreadable i18n json file $filename: " . $reason->getMessage();
+                        $message->classes        = ".$validate.file-exists";
                         $this->sendMessage($to, $message);
                     }
-                );//->wait();
+                );
             }
 
-            $promise = Utils::all($promises);
+            $allPromises = Promise\all($promises);
 
-            $promise->then(function () use ($to, $validation, $schema, &$fileExistsAndIsReadable, &$jsonDecodable, &$schemaValidated) {
-                if ($fileExistsAndIsReadable) {
-                    $message = (object) [
-                        'type'    => 'success',
-                        'text'    => "The Data folder $validation->sourceFolder exists and contains valid i18n json files",
-                        'classes' => ".$validation->validate.file-exists"
-                    ];
-                    $this->sendMessage($to, $message);
-                }
+            $allPromises->then(
+                function () use ($to, $validation, $schema, $fileExistsAndIsReadable, $jsonDecodable, $schemaValidated) {
+                    $validate     = (string) $validation->validate;
+                    $sourceFolder = (string) $validation->sourceFolder;
+                    if ($fileExistsAndIsReadable) {
+                        $message = (object) [
+                            'type'    => 'success',
+                            'text'    => "The Data folder $sourceFolder exists and contains valid i18n json files",
+                            'classes' => ".$validate.file-exists"
+                        ];
+                        $this->sendMessage($to, $message);
+                    }
 
-                if ($jsonDecodable) {
-                    $message = (object) [
-                        'type'    => 'success',
-                        'text'    => "The i18n json files in Data folder $validation->sourceFolder were successfully decoded as JSON",
-                        'classes' => ".$validation->validate.json-valid"
-                    ];
-                    $this->sendMessage($to, $message);
-                }
+                    if ($jsonDecodable) {
+                        $message = (object) [
+                            'type'    => 'success',
+                            'text'    => "The i18n json files in Data folder $sourceFolder were successfully decoded as JSON",
+                            'classes' => ".$validate.json-valid"
+                        ];
+                        $this->sendMessage($to, $message);
+                    }
 
-                if ($schemaValidated) {
-                    $message = (object) [
-                        'type'    => 'success',
-                        'text'    => "The i18n json files in Data folder $validation->sourceFolder were successfully validated against the Schema $schema",
-                        'classes' => ".$validation->validate.schema-valid"
-                    ];
-                    $this->sendMessage($to, $message);
+                    if ($schemaValidated) {
+                        $message = (object) [
+                            'type'    => 'success',
+                            'text'    => "The i18n json files in Data folder $sourceFolder were successfully validated against the Schema $schema",
+                            'classes' => ".$validate.schema-valid"
+                        ];
+                        $this->sendMessage($to, $message);
+                    }
+                },
+                function (\Throwable $e) use ($validation) {
+                    echo 'Error verifying i18n folder for validation ' . json_encode($validation) . ': ' . $e->getMessage() . "\n";
                 }
-            });
+            );
         } else {
             // If the 'sourceFolder' property is not set, then we are validating a single source file or API path
             $matches = null;
@@ -576,9 +603,10 @@ class Health implements MessageComponentInterface
 
             // If we are validating an API path, we check for a 200 OK HTTP response from the API
             // rather than checking for existence of the file in the filesystem
-            if ($validation->category === 'resourceDataCheck') {
+            $category = (string) $validation->category;
+            $validate = (string) $validation->validate;
+            if ($category === 'resourceDataCheck') {
                 /** @var ExecuteValidationResource $validation */
-                assert(is_string($dataPath), 'Data path should be a string for resourceDataCheck category');
                 $headers = get_headers($dataPath);
                 assert(is_array($headers), 'Headers should be an array for resourceDataCheck category');
                 $headerOK = $headers[0];
@@ -587,19 +615,19 @@ class Health implements MessageComponentInterface
                     $message          = new \stdClass();
                     $message->type    = 'error';
                     $message->text    = "URL $dataPath is giving an error: " . $headerOK;
-                    $message->classes = ".$validation->validate.file-exists";
+                    $message->classes = ".$validate.file-exists";
                     $this->sendMessage($to, $message);
 
                     $message          = new \stdClass();
                     $message->type    = 'error';
                     $message->text    = "Could not decode the Data file $dataPath as JSON because it is not readable";
-                    $message->classes = ".$validation->validate.json-valid";
+                    $message->classes = ".$validate.json-valid";
                     $this->sendMessage($to, $message);
 
                     $message          = new \stdClass();
                     $message->type    = 'error';
-                    $message->text    = "Unable to verify schema for dataPath {$dataPath} and category {$validation->category} since Data file $dataPath does not exist or is not readable";
-                    $message->classes = ".$validation->validate.schema-valid";
+                    $message->text    = "Unable to verify schema for dataPath {$dataPath} and category {$category} since Data file $dataPath does not exist or is not readable";
+                    $message->classes = ".$validate.schema-valid";
                     $this->sendMessage($to, $message);
                     // early exit
                     return;
@@ -607,6 +635,7 @@ class Health implements MessageComponentInterface
             }
 
             if (property_exists($validation, 'responsetype')) {
+                $responseType    = (string) $validation->responsetype;
                 $returnTypeParam = ReturnTypeParam::from($responseType);
                 $acceptMimeType  = $returnTypeParam->toAcceptMimeType();
                 $opts            = [
@@ -616,16 +645,16 @@ class Health implements MessageComponentInterface
                 ];
 
                 // $dataPath is an API path in this case
-                assert(is_string($dataPath), 'Data path should be a string for resourceDataCheck category');
+                /** @var PromiseInterface<string> $promise */
                 $promise = $this->cachedGet($dataPath, $opts);
             } elseif (str_starts_with($dataPath, 'http://') || str_starts_with($dataPath, 'https://')) {
                 // $dataPath is an API path in this case
-                assert(is_string($dataPath), 'Data path should be a string for sourceDataCheck category');
+                /** @var PromiseInterface<string> $promise */
                 $promise = $this->cachedGet($dataPath);
             } else {
                 // $dataPath is probably a source file in the filesystem in this case
-                assert(is_string($dataPath), 'Data path should be a string for sourceDataCheck category');
                 echo 'Reading data from file ' . $dataPath . "\n";
+                /** @var PromiseInterface<string> $promise */
                 $promise = $this->cachedFileGetContents($dataPath);
             }
 
@@ -636,35 +665,44 @@ class Health implements MessageComponentInterface
                     $this->processValidationData($data, $to, $validation, $dataPath, $schema, $pathForSchema, $responseType);
                 },
                 function (\Throwable $e) use ($to, $validation, $dataPath) {
+                    $validate = (string) $validation->validate;
+                    $category = (string) $validation->category;
                     echo 'Error reading data: could not read data from ' . $dataPath . ': ' . $e->getMessage() . "\n";
                     $message          = new \stdClass();
                     $message->type    = 'error';
                     $message->text    = "Data file $dataPath is not readable: " . $e->getMessage();
-                    $message->classes = ".$validation->validate.file-exists";
+                    $message->classes = ".$validate.file-exists";
                     $this->sendMessage($to, $message);
 
                     $message          = new \stdClass();
                     $message->type    = 'error';
                     $message->text    = "Could not decode the Data file $dataPath as JSON because it is not readable";
-                    $message->classes = ".$validation->validate.json-valid";
+                    $message->classes = ".$validate.json-valid";
                     $this->sendMessage($to, $message);
 
                     $message          = new \stdClass();
                     $message->type    = 'error';
-                    $message->text    = "Unable to verify schema for dataPath {$dataPath} and category {$validation->category} since Data file $dataPath does not exist or is not readable";
-                    $message->classes = ".$validation->validate.schema-valid";
+                    $message->text    = "Unable to verify schema for dataPath {$dataPath} and category {$category} since Data file $dataPath does not exist or is not readable";
+                    $message->classes = ".$validate.schema-valid";
                     $this->sendMessage($to, $message);
                 }
             );
         }
     }
 
-    private function processValidationData($data, ConnectionInterface $to, \stdClass $validation, string $dataPath, ?string $schema, string $pathForSchema, string $responseType): void
+    /**
+     * Process the validation of data against a schema.
+     *
+     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $validation The validation object.
+     */
+    private function processValidationData(string $data, ConnectionInterface $to, \stdClass $validation, string $dataPath, ?string $schema, string $pathForSchema, string $responseType): void
     {
+        $validate         = (string) $validation->validate;
+        $category         = (string) $validation->category;
         $message          = new \stdClass();
         $message->type    = 'success';
         $message->text    = "The Data file $dataPath exists";
-        $message->classes = ".$validation->validate.file-exists";
+        $message->classes = ".$validate.file-exists";
         $this->sendMessage($to, $message);
 
         switch ($responseType) {
@@ -680,7 +718,7 @@ class Health implements MessageComponentInterface
                         $message          = new \stdClass();
                         $message->type    = 'success';
                         $message->text    = "The Data file $dataPath was successfully decoded as YAML";
-                        $message->classes = ".$validation->validate.json-valid";
+                        $message->classes = ".$validate.json-valid";
                         $this->sendMessage($to, $message);
 
                         if (null !== $schema) {
@@ -689,17 +727,17 @@ class Health implements MessageComponentInterface
                                 $message          = new \stdClass();
                                 $message->type    = 'success';
                                 $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
-                                $message->classes = ".$validation->validate.schema-valid";
+                                $message->classes = ".$validate.schema-valid";
                                 $this->sendMessage($to, $message);
                             } elseif ($validationResult instanceof \stdClass) {
-                                $validationResult->classes = ".$validation->validate.schema-valid";
+                                $validationResult->classes = ".$validate.schema-valid";
                                 $this->sendMessage($to, $validationResult);
                             }
                         } else {
                             $message          = new \stdClass();
                             $message->type    = 'error';
-                            $message->text    = "executeValidation validation->sourceFile (YAML): Unable to detect schema for dataPath {$dataPath} and category {$validation->category} (path for schema: $pathForSchema)";
-                            $message->classes = ".$validation->validate.schema-valid";
+                            $message->text    = "executeValidation validation->sourceFile (YAML): Unable to detect schema for dataPath {$dataPath} and category {$category} (path for schema: $pathForSchema)";
+                            $message->classes = ".$validate.schema-valid";
                             $this->sendMessage($to, $message);
                         }
                     }
@@ -707,7 +745,7 @@ class Health implements MessageComponentInterface
                     $message          = new \stdClass();
                     $message->type    = 'error';
                     $message->text    = "There was an error decoding the Data file $dataPath as YAML: " . $e->getMessage() . " :: Raw data = <<<JSON\n$data\n>>>";
-                    $message->classes = ".$validation->validate.json-valid";
+                    $message->classes = ".$validate.json-valid";
                     $this->sendMessage($to, $message);
                 }
                 break;
@@ -719,7 +757,7 @@ class Health implements MessageComponentInterface
                     $message          = new \stdClass();
                     $message->type    = 'success';
                     $message->text    = "The Data file $dataPath was successfully decoded as JSON";
-                    $message->classes = ".$validation->validate.json-valid";
+                    $message->classes = ".$validate.json-valid";
                     $this->sendMessage($to, $message);
 
                     if (null !== $schema) {
@@ -728,24 +766,24 @@ class Health implements MessageComponentInterface
                             $message          = new \stdClass();
                             $message->type    = 'success';
                             $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
-                            $message->classes = ".$validation->validate.schema-valid";
+                            $message->classes = ".$validate.schema-valid";
                             $this->sendMessage($to, $message);
                         } elseif ($validationResult instanceof \stdClass) {
-                            $validationResult->classes = ".$validation->validate.schema-valid";
+                            $validationResult->classes = ".$validate.schema-valid";
                             $this->sendMessage($to, $validationResult);
                         }
                     } else {
                         $message          = new \stdClass();
                         $message->type    = 'error';
-                        $message->text    = "executeValidation validation->sourceFile (JSON): Unable to detect schema for dataPath {$dataPath} and category {$validation->category} (path for schema: $pathForSchema, Route::CALENDARS->path(): " . Route::CALENDARS->path() . ', LitSchema::METADATA->path(): ' . LitSchema::METADATA->path() . ')';
-                        $message->classes = ".$validation->validate.schema-valid";
+                        $message->text    = "executeValidation validation->sourceFile (JSON): Unable to detect schema for dataPath {$dataPath} and category {$category} (path for schema: $pathForSchema, Route::CALENDARS->path(): " . Route::CALENDARS->path() . ', LitSchema::METADATA->path(): ' . LitSchema::METADATA->path() . ')';
+                        $message->classes = ".$validate.schema-valid";
                         $this->sendMessage($to, $message);
                     }
                 } else {
                     $message          = new \stdClass();
                     $message->type    = 'error';
                     $message->text    = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg() . ". Raw data = &lt;&lt;&lt;JSON\n" . $data . "\n&gt;&gt;&gt;";
-                    $message->classes = ".$validation->validate.json-valid";
+                    $message->classes = ".$validate.json-valid";
                     $this->sendMessage($to, $message);
                 }
                 break;
@@ -1071,86 +1109,145 @@ class Health implements MessageComponentInterface
         return $res;
     }
 
-    private function cachedFileGetContents(string $path, int $ttl = 300): ReactPromiseInterface
+    /**
+     * @return PromiseInterface<string>
+     */
+    private function cachedFileGetContents(string $path, int $ttl = 300): PromiseInterface
     {
         $key = 'fgc_' . md5($path);
 
         if (apcu_exists($key)) {
+            $deferred = new Deferred();
             echo "Cache hit for file $path\n";
-            return Promise\resolve(apcu_fetch($key));
+            $data = apcu_fetch($key);
+            if (is_string($data)) {
+                $deferred->resolve($data);
+            } else {
+                $deferred->reject(new \RuntimeException("Cache fetch for file $path returned non-string data"));
+            }
+            /** @var PromiseInterface<string> $deferredPromise */
+            $deferredPromise = $deferred->promise();
+            return $deferredPromise;
         }
 
         echo "Cache miss for file $path, reading from filesystem\n";
-        $filesystem = Factory::create(Loop::get());
+        $filesystem = Factory::create();
 
-        return $filesystem->file($path)->getContents()->then(
-            function ($data) use ($key, $ttl, $path) {
+        /** @var PromiseInterface<string> $fsPromise */
+        $fsPromise = $filesystem->file($path)->getContents()->then(
+            /** @param string $data @return string */
+            function (string $data) use ($key, $ttl, $path) {
                 $data = (string) $data;          // force fresh string
                 echo "Read file $path, caching contents\n";
                 $stored = apcu_store($key, $data, $ttl);
                 echo ( $stored ? "Stored file in cache\n" : "Failed to store file in cache\n" );
-                $info    = apcu_sma_info(true);
-                $total   = $info['seg_size'];
-                $free    = $info['avail_mem'];
-                $used    = $total - $free;
-                $percent = ( $used / $total ) * 100;
-                echo 'APCu used: ' . round($used / 1024 / 1024, 2) . ' MB of ' .
-                    round($total / 1024 / 1024, 2) . ' MB (' .
-                    round($percent, 2) . "%)\n";
+                /** @var array{seg_size:int,avail_mem:int} $info */
+                $info = apcu_sma_info(true);
+                if (false !== $info) {
+                    $total = isset($info['seg_size']) ? (int) $info['seg_size'] : 0;
+                    $free  = isset($info['avail_mem']) ? (int) $info['avail_mem'] : 0;
+                    if ($total > 0) { // avoid division by zero
+                        $used    = $total - $free;
+                        $percent = ( $used / $total ) * 100;
+
+                        echo 'APCu used: ' . round($used / 1024 / 1024, 2) . ' MB of ' .
+                            round($total / 1024 / 1024, 2) . ' MB (' .
+                            round($percent, 2) . "%)\n";
+                    }
+                }
                 //var_dump(apcu_exists($key), apcu_fetch($key));
                 return $data; // resolved promise
             },
-            function (\Exception $e) use ($path) {
+            /** @return never */
+            function (\Throwable $e) use ($path) {
                 throw new \RuntimeException("Unable to read file: $path", 0, $e);
             }
         );
+
+        return $fsPromise;
     }
 
-    private function cachedGet(string $url, array $options = [], int $ttl = 300): ReactPromiseInterface
+    /**
+     * @param array{headers?:array{Accept:string}} $options
+     *
+     * @return PromiseInterface<string>
+     */
+    private function cachedGet(string $url, array $options = [], int $ttl = 300): PromiseInterface
     {
-        $key = 'http_' . md5($url . serialize($options));
+        $key      = 'http_' . md5($url . serialize($options));
+        $deferred = new Deferred();
 
         // Return from cache if available
         if (apcu_exists($key)) {
             echo "Cache hit for $url\n";
-            return Promise\resolve(apcu_fetch($key));
+            $data = apcu_fetch($key);
+            if (is_string($data)) {
+                $deferred->resolve($data);
+            } else {
+                $deferred->reject(new \RuntimeException("Cache fetch for URL $url returned non-string data"));
+            }
+
+            /** @var PromiseInterface<string> $deferredPromise */
+            $deferredPromise = $deferred->promise();
+            return $deferredPromise;
         }
 
         echo "Cache miss for $url, making HTTP request\n";
-        $deferred = new Deferred();
-        $resolve  = function (ResponseInterface $response) use ($deferred, $key, $ttl, $url) {
+
+        $resolve = function (ResponseInterface $response) use ($deferred, $key, $ttl, $url) {
             echo "HTTP request completed for $url, caching response\n";
             $body   = (string) $response->getBody();
             $stored = apcu_store($key, $body, $ttl);
             echo ( $stored ? "Stored response body in cache\n" : "Failed to store response body in cache\n" );
-            $info    = apcu_sma_info(true);
-            $total   = $info['seg_size'];
-            $free    = $info['avail_mem'];
-            $used    = $total - $free;
-            $percent = ( $used / $total ) * 100;
-            echo 'APCu used: ' . round($used / 1024 / 1024, 2) . ' MB of ' .
-                round($total / 1024 / 1024, 2) . ' MB (' .
-                round($percent, 2) . "%)\n";
+            /** @var array{seg_size:int,avail_mem:int} $info */
+            $info = apcu_sma_info(true);
+            if (false !== $info) {
+                $total = isset($info['seg_size']) ? (int) $info['seg_size'] : 0;
+                $free  = isset($info['avail_mem']) ? (int) $info['avail_mem'] : 0;
+                if ($total > 0) { // avoid division by zero
+                    $used    = $total - $free;
+                    $percent = ( $used / $total ) * 100;
+
+                    echo 'APCu used: ' . round($used / 1024 / 1024, 2) . ' MB of ' .
+                        round($total / 1024 / 1024, 2) . ' MB (' .
+                        round($percent, 2) . "%)\n";
+                }
+            }
             //var_dump(apcu_exists($key), apcu_fetch($key));
             $this->inFlight--;
             $deferred->resolve($body);
         };
-        $reject   = function (\Throwable $e) use ($deferred) {
+
+        $reject = function (\Throwable $e) use ($deferred) {
             echo 'HTTP request failed: ' . $e->getMessage() . "\n";
             $this->inFlight--;
             $deferred->reject($e);
         };
 
-        $this->queue[] = [$url, $options, $resolve, $reject];
+        $this->queue[] = [
+            'url'     => $url,
+            'options' => $options,
+            'resolve' => $resolve,
+            'reject'  => $reject
+        ];
+
+        /** @var PromiseInterface<string> $deferredPromise */
+        $deferredPromise = $deferred->promise();
         $this->ensureTicking();
-        return $deferred->promise();
+        return $deferredPromise;
     }
 
     private function processQueue(): void
     {
         while ($this->inFlight < $this->maxConcurrency && !empty($this->queue)) {
-            [$url, $options, $resolve, $reject] = array_shift($this->queue);
-            $this->inFlight++;
+            [
+                'url'     => $url,
+                'options' => $options,
+                'resolve' => $resolve,
+                'reject'  => $reject
+            ] = array_shift($this->queue);
+
+            ++$this->inFlight;
 
             $this->http->getAsync($url, $options)
                 ->then(
@@ -1175,11 +1272,10 @@ class Health implements MessageComponentInterface
 
     private function drainHandler(): void
     {
-        $this->multiHandler->tick();
-
         if ($this->inFlight > 0 || !empty($this->queue)) {
             // keep ticking until no requests are left
             Loop::futureTick(function () {
+                $this->multiHandler->tick();
                 $this->processQueue();
             });
         } else {

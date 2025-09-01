@@ -93,7 +93,7 @@ final class DiocesanLitCalItemCreateNewMobile extends LiturgicalEventData
     }
 
     /**
-     * Creates an instance of LitCalItemCreateNewMobile from an object containing the required properties.
+     * Creates an instance of DiocesanLitCalItemCreateNewMobile from an object containing the required properties.
      *
      * The stdClass object must have the following properties:
      * - event_key (string): the key of the event
@@ -135,7 +135,7 @@ final class DiocesanLitCalItemCreateNewMobile extends LiturgicalEventData
     }
 
     /**
-     * Creates an instance of LitCalItemCreateNewMobile from an associative array.
+     * Creates an instance of DiocesanLitCalItemCreateNewMobile from an associative array.
      *
      * The array must have the following keys:
      * - event_key (string): The key of the event.

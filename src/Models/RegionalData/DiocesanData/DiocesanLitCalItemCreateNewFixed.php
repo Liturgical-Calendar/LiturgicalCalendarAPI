@@ -27,7 +27,7 @@ final class DiocesanLitCalItemCreateNewFixed extends LiturgicalEventData
     public private(set) DateTime $date;
 
     /**
-     * Creates a new LitCalItemCreateNewFixed object.
+     * Creates a new DiocesanLitCalItemCreateNewFixed object.
      *
      * The provided arguments must be valid. The object will be created with the provided values.
      *
@@ -103,7 +103,7 @@ final class DiocesanLitCalItemCreateNewFixed extends LiturgicalEventData
     }
 
     /**
-     * Creates an instance of LitCalItemCreateNewFixed from an object containing the required properties.
+     * Creates an instance of DiocesanLitCalItemCreateNewFixed from an object containing the required properties.
      *
      * The stdClass object must have the following properties:
      * - event_key (string): the key of the event
@@ -136,7 +136,7 @@ final class DiocesanLitCalItemCreateNewFixed extends LiturgicalEventData
     }
 
     /**
-     * Creates an instance of LitCalItemCreateNewFixed from an associative array.
+     * Creates an instance of DiocesanLitCalItemCreateNewFixed from an associative array.
      *
      * The array must have the following keys:
      * - event_key (string): the key of the event
