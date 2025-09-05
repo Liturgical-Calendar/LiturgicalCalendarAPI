@@ -72,8 +72,8 @@ ini_set('date.timezone', 'Europe/Vatican');
 
 $wsHost = $_ENV['WS_HOST'] ?? '127.0.0.1';
 $wsPort = filter_var($_ENV['WS_PORT'] ?? null, FILTER_VALIDATE_INT, [
-                'options' => ['min_range' => 1, 'max_range' => 65535],
-            ]) ?: 8080;
+    'options' => ['min_range' => 1, 'max_range' => 65535],
+]) ?: 8080;
 
 $server = IoServer::factory(
     new HttpServer(

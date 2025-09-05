@@ -102,7 +102,7 @@ jobs:
 
       - name: Run tests
         if: steps.server-check.outputs.server_found == 'true'
-        run: time composer test -- --parallel=auto
+        run: time composer test
 
       - name: Stop server
         if: steps.server-check.outputs.server_found == 'true'
