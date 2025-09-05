@@ -71,10 +71,8 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-progress
 
-      - name: Enable OPCache
-        run: |
-          echo "opcache.enable=1" >> $GITHUB_ENV
-          echo "opcache.enable_cli=1" >> $GITHUB_ENV
+      - name: Enable OPcache
+        run: echo "opcache.enable_cli=1" | sudo tee -a /etc/php/${{ env.PHP_VERSION }}/cli/conf.d/99-opcache.ini
 
       - name: Copy env file
         run: cp .env.example .env.local
@@ -102,7 +100,9 @@ jobs:
 
       - name: Run tests
         if: steps.server-check.outputs.server_found == 'true'
-        run: time composer test
+        run: |
+          composer dump-autoload --optimize
+          time composer test
 
       - name: Stop server
         if: steps.server-check.outputs.server_found == 'true'
