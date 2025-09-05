@@ -1,12 +1,19 @@
 #!/bin/bash
+
+# Colors
+RED='\033[0;31m'
+YELLOW='\033[0;33m'
+GREEN='\033[0;32m'
+NC='\033[0m' # No Color
+
 # Check for VS Code PID file
 if [ -f "server.vscode.pid" ]; then
-  pid=$(cat server.vscode.pid)
+  pid=$(cat "server.vscode.pid")
   if ! kill -0 "$pid" 2>/dev/null; then
-    echo "Found stale server.vscode.pid (no process with PID $pid). Removing."
-    rm -f server.vscode.pid
+    echo -e "${YELLOW}Found stale server.vscode.pid (no process with PID $pid). Removing.${NC}"
+    rm -f "server.vscode.pid"
   else
-    echo "Server already started in VSCode with PID $pid"
+    echo -e "${YELLOW}Server already started in VSCode with PID $pid${NC}"
     exit 0
   fi
 fi
@@ -14,13 +21,13 @@ if [ -f "server.pid" ]; then
   pid=$(cat server.pid)
   if kill -0 "$pid" 2>/dev/null; then
     if [ "$RUN_MODE" = "vscode" ]; then
-      echo "Server already started in background with PID $pid, please stop it from there before starting in VSCode."
+      echo -e "${YELLOW}Server already started in background with PID $pid, please stop it from there before starting in VSCode.${NC}"
     else
-      echo "Server already started in background with PID $pid"
+      echo -e "${YELLOW}Server already started in background with PID $pid${NC}"
     fi
     exit 0
   else
-    echo "No process with PID $pid found. Removing stale server.pid."
+    echo -e "${YELLOW}No process with PID $pid found. Removing stale server.pid.${NC}"
     rm server.pid
   fi
 fi
@@ -62,4 +69,4 @@ else
 fi
 
 # Feedback
-echo "Server successfully started at ${API_PROTOCOL}://${API_HOST}:${API_PORT}/ (PID: $pid)"
+echo "Server started successfully at ${API_PROTOCOL}://${API_HOST}:${API_PORT}/ (PID: $pid)"

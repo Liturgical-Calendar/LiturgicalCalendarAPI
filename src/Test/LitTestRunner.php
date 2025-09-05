@@ -2,7 +2,6 @@
 
 namespace LiturgicalCalendar\Api\Test;
 
-use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitEventTestAssertion;
@@ -85,7 +84,7 @@ class LitTestRunner
      * @param string $Test The name of the test.
      * @param \stdClass&object{settings:object{year:int,national_calendar?:string,diocesan_calendar?:string},litcal:LiturgicalEvent[]} $testData The test data object.
      */
-    public function __construct(string $Test, object $testData)
+    public function __construct(string $Test, \stdClass $testData)
     {
         $this->Test       = $Test;
         $this->dataToTest = $testData;
@@ -98,25 +97,22 @@ class LitTestRunner
                 $testInstructionsRaw = file_get_contents($testPath);
                 if ($testInstructionsRaw) {
                     $testInstructions = json_decode($testInstructionsRaw);
-                    if (JSON_ERROR_NONE === json_last_error() && $testInstructions instanceof \stdClass) {
-                        $schemaFile     = rtrim(JsonData::SCHEMAS_FOLDER->path(), '/\\') . DIRECTORY_SEPARATOR . 'LitCalTest.json';
-                        $schemaContents = file_get_contents($schemaFile);
-                        if (false !== $schemaContents) {
-                            $jsonSchema = json_decode($schemaContents);
-                            try {
-                                $schema = Schema::import($jsonSchema);
-                                $schema->in($testInstructions);
-                                /** @var TestDataObject $testInstructions */
-                                self::$testCache->add($Test, $testInstructions);
-                                $this->readyState = true;
-                            } catch (InvalidValue | \Exception $e) {
-                                $this->setError("Cannot proceed with {$Test}, the Test instructions were incorrectly validated against schema " . $schemaFile . ': ' . $e->getMessage());
-                            }
-                        } else {
-                            $this->setError("Test runner could not read schema file {$schemaFile}");
+                    $jsonLastError    = json_last_error();
+                    if (JSON_ERROR_NONE === $jsonLastError && $testInstructions instanceof \stdClass) {
+                        $schemaFile = rtrim(JsonData::SCHEMAS_FOLDER->path(), '/\\') . DIRECTORY_SEPARATOR . 'LitCalTest.json';
+                        try {
+                            $schema = Schema::import($schemaFile);
+                            $schema->in($testInstructions);
+                            /** @var TestDataObject $testInstructions */
+                            self::$testCache->add($Test, $testInstructions);
+                            $this->readyState = true;
+                        } catch (\Throwable $e) {
+                            $this->setError("Cannot proceed with {$Test}, the Test instructions were incorrectly validated against schema " . $schemaFile . ': ' . $e->getMessage());
                         }
                     } else {
-                        $this->setError("Test server could not decode Test instructions JSON data for {$Test}");
+                        $gettype          = gettype($testInstructions);
+                        $jsonErrorMessage = $jsonLastError !== JSON_ERROR_NONE ? ' (' . json_last_error_msg() . ')' : '';
+                        $this->setError("Test server could not decode Test instructions JSON data for {$Test}: expected stdClass but got {$gettype}{$jsonErrorMessage}");
                     }
                 }
             } else {

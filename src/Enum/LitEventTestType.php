@@ -1,6 +1,6 @@
 <?php
 
-namespace LiturgicalCalendar\Api\Test;
+namespace LiturgicalCalendar\Api\Enum;
 
 enum LitEventTestType: string
 {

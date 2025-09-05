@@ -64,6 +64,12 @@ $dotenv->ifPresent(['API_PROTOCOL'])->allowedValues(['http', 'https']);
 $dotenv->ifPresent(['API_PORT'])->isInteger();
 $dotenv->ifPresent(['APP_ENV'])->notEmpty()->allowedValues(['development', 'production']);
 
+$logsFolder = $projectFolder . DIRECTORY_SEPARATOR . 'logs';
+if (!file_exists($logsFolder)) {
+    mkdir($logsFolder);
+}
+$logFile = $logsFolder . DIRECTORY_SEPARATOR . 'php-error-litcalapi.log';
+
 if (
     Router::isLocalhost()
     || ( isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development' )
@@ -71,16 +77,19 @@ if (
     ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     ini_set('log_errors', 1);
-    ini_set('error_log', 'php-error-litcalapi.log');
+    ini_set('error_log', $logFile);
     error_reporting(E_ALL);
+    $pid = getmypid();
+    file_put_contents($logsFolder . DIRECTORY_SEPARATOR . 'litcal-pid.log', $pid . ' started ' . date('H:i:s.u') . PHP_EOL, FILE_APPEND);
 } else {
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
     ini_set('log_errors', 1);
-    ini_set('error_log', 'php-error-litcalapi.log');
+    ini_set('error_log', $logFile);
     error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
 }
 
 ini_set('date.timezone', 'Europe/Vatican');
 
-Router::route();
+$router = new Router();
+$router->route();

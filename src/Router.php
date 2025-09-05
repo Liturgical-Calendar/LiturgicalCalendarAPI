@@ -34,9 +34,37 @@ class Router
     public static string $apiBase;
     public static string $apiPath;
     public static string $apiFilePath;
-    private static RequestHandlerInterface $handler;
     private const MIN_YEAR = 1969;  // exlusive minimum (first year supported is 1970)
     private const MAX_YEAR = 10000; // exclusive maximum (last year supported is 9999)
+    private const RED      = "\033[0;31m";
+    private const GREEN    = "\033[0;32m";
+    private const YELLOW   = "\033[0;33m";
+    private const BLUE     = "\033[0;34m";
+    private const NC       = "\033[0m"; // No Color
+
+    private RequestHandlerInterface $handler;
+    private Psr17Factory $psr17Factory;
+    private ServerRequestInterface $request;
+    private ResponseInterface $response;
+    private static bool $debug;
+
+    public function __construct()
+    {
+        if (
+            false === isset(self::$apiBase)
+            || false === isset(self::$apiPath)
+            || false === isset(self::$apiFilePath)
+        ) {
+            self::getApiPaths();
+        }
+
+        if (false === isset(self::$debug)) {
+            self::$debug = ( Router::isLocalhost() || isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development' );
+        }
+
+        $this->psr17Factory = new Psr17Factory();
+        $this->request      = $this->retrieveRequest();
+    }
 
     /**
      * This is the main entry point of the API. It takes care of determining which
@@ -45,11 +73,9 @@ class Router
      *
      * @return never
      */
-    public static function route(): never
+    public function route(): never
     {
-        self::getApiPaths();
-        $request          = self::retrieveRequest();
-        $path             = $request->getUri()->getPath();
+        $path             = $this->request->getUri()->getPath();
         $pathParams       = str_starts_with($path, self::$apiBase)
             ? substr($path, strlen(self::$apiBase))
             : $path;
@@ -106,7 +132,7 @@ class Router
                     ReturnTypeParam::YAML
                 ]);
                 $calendarHandler->setCacheDuration(CacheDuration::MONTH);
-                self::$handler = $calendarHandler;
+                $this->handler = $calendarHandler;
                 break;
             case 'metadata':
                 // no break (intentional fallthrough)
@@ -128,7 +154,7 @@ class Router
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);
-                self::$handler = $metadataHandler;
+                $this->handler = $metadataHandler;
                 break;
             case 'missals':
                 $missalsHandler = new MissalsHandler($requestPathParts);
@@ -157,12 +183,12 @@ class Router
                     AcceptHeader::YAML
                 ]);
                 if (
-                    in_array($request->getMethod(), [ RequestMethod::PUT->value, RequestMethod::PATCH->value, RequestMethod::DELETE->value ], true)
+                    in_array($this->request->getMethod(), [ RequestMethod::PUT->value, RequestMethod::PATCH->value, RequestMethod::DELETE->value ], true)
                     && false === Router::isLocalhost()
                 ) {
                     $missalsHandler->setAllowedOriginsFromFile('allowedOrigins.txt');
                 }
-                self::$handler = $missalsHandler;
+                $this->handler = $missalsHandler;
                 break;
             case 'decrees':
                 $decreesHandler = new DecreesHandler($requestPathParts);
@@ -191,12 +217,12 @@ class Router
                     AcceptHeader::YAML
                 ]);
                 if (
-                    in_array($request->getMethod(), [ RequestMethod::PUT->value, RequestMethod::PATCH->value, RequestMethod::DELETE->value ], true)
+                    in_array($this->request->getMethod(), [ RequestMethod::PUT->value, RequestMethod::PATCH->value, RequestMethod::DELETE->value ], true)
                     && false === Router::isLocalhost()
                 ) {
                     $decreesHandler->setAllowedOriginsFromFile('allowedOrigins.txt');
                 }
-                self::$handler = $decreesHandler;
+                $this->handler = $decreesHandler;
                 break;
             case 'easter':
                 $easterHandler = new EasterHandler();
@@ -216,7 +242,7 @@ class Router
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);
-                self::$handler = $easterHandler;
+                $this->handler = $easterHandler;
                 break;
             case 'events':
                 $eventsHandler = new EventsHandler($requestPathParts);
@@ -241,7 +267,7 @@ class Router
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);
-                self::$handler = $eventsHandler;
+                $this->handler = $eventsHandler;
                 break;
             case 'schemas':
                 $schemasHandler = new SchemasHandler($requestPathParts);
@@ -261,7 +287,7 @@ class Router
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);
-                self::$handler = $schemasHandler;
+                $this->handler = $schemasHandler;
                 break;
             case 'data':
                 $regionalDataHandler = new RegionalDataHandler($requestPathParts);
@@ -292,7 +318,7 @@ class Router
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);
-                self::$handler = $regionalDataHandler;
+                $this->handler = $regionalDataHandler;
                 break;
             case 'tests':
                 $testsHandler = new TestsHandler($requestPathParts);
@@ -320,21 +346,19 @@ class Router
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);
-                self::$handler = $testsHandler;
+                $this->handler = $testsHandler;
                 break;
             default:
-                $response = new Response(StatusCode::NOT_FOUND->value, [], null, $request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
-                Router::emitResponse($response);
+                $this->response = new Response(StatusCode::NOT_FOUND->value, [], null, $this->request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
+                $this->emitResponse();
         }
 
-        $psr17Factory = new Psr17Factory();
-        $debug        = ( Router::isLocalhost() || isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development' );
-        $pipeline     = new MiddlewarePipeline(self::$handler);
-        $pipeline->pipe(new ErrorHandlingMiddleware($psr17Factory, $debug)); // outermost middleware
+        $pipeline = new MiddlewarePipeline($this->handler);
+        $pipeline->pipe(new ErrorHandlingMiddleware($this->psr17Factory, self::$debug)); // outermost middleware
         //$pipeline->pipe(new LoggingMiddleware());       // innermost middleware
 
-        $response = $pipeline->handle($request);
-        Router::emitResponse($response);
+        $this->response = $pipeline->handle($this->request);
+        $this->emitResponse();
     }
 
     /**
@@ -354,22 +378,46 @@ class Router
                in_array($serverName, $localhostNames);
     }
 
-    private static function retrieveRequest(): ServerRequestInterface
+    private function retrieveRequest(): ServerRequestInterface
     {
-        $psr17Factory = new Psr17Factory();
-        $creator      = new ServerRequestCreator(
-            $psr17Factory, // ServerRequestFactory
-            $psr17Factory, // UriFactory
-            $psr17Factory, // UploadedFileFactory
-            $psr17Factory  // StreamFactory
+        $creator = new ServerRequestCreator(
+            $this->psr17Factory, // ServerRequestFactory
+            $this->psr17Factory, // UriFactory
+            $this->psr17Factory, // UploadedFileFactory
+            $this->psr17Factory  // StreamFactory
         );
         return $creator->fromGlobals();
     }
 
-    private static function emitResponse(ResponseInterface $response): never
+    private function emitResponse(): never
     {
+        if (self::$debug) {
+            $debugMessage  = self::YELLOW . 'REQUEST HTTP/' . $this->request->getProtocolVersion() . ' ' . $this->request->getMethod() . ' ' . $this->request->getUri() . self::NC . PHP_EOL;
+            $debugMessage .= PHP_EOL;
+            $debugMessage .= self::BLUE . 'Incoming request headers' . self::NC . PHP_EOL;
+            foreach ($this->request->getHeaders() as $name => $values) {
+                $debugMessage .= $name . ': ' . implode(', ', $values) . PHP_EOL;
+            };
+
+            $color         = $this->response->getStatusCode() >= 400 ? self::RED : self::GREEN;
+            $debugMessage .= PHP_EOL;
+            $debugMessage .= self::YELLOW . 'RESPONSE HTTP/' . $this->response->getProtocolVersion() . ' ' . $color . $this->response->getStatusCode() . ' ' . $this->response->getReasonPhrase() . self::NC . PHP_EOL;
+            $debugMessage .= PHP_EOL;
+            $debugMessage .= self::BLUE . 'Outgoing response headers' . self::NC . PHP_EOL;
+            foreach ($this->response->getHeaders() as $name => $values) {
+                $debugMessage .= $name . ': ' . implode(', ', $values) . PHP_EOL;
+            };
+            $debugMessage   .= PHP_EOL;
+            $responseBody    = (string) $this->response->getBody();
+            $responseBodyLen = strlen($responseBody);
+            $debugMessage   .= self::BLUE . "Outgoing response body ({$responseBodyLen} bytes)" . self::NC . PHP_EOL;
+            $debugMessage   .= $responseBody . PHP_EOL;
+            $date            = date('Y-m-d_H-i-s-u');
+            file_put_contents(self::$apiFilePath . 'logs' . DIRECTORY_SEPARATOR . "api_request_response_{$date}.log", $debugMessage);
+        }
+
         $sapiEmitter = new SapiEmitter();
-        $sapiEmitter->emit($response);
+        $sapiEmitter->emit($this->response);
         die();
     }
 
@@ -395,12 +443,10 @@ class Router
             $argv      = $_SERVER['argv'];
             $entryFile = realpath($argv[0]);
             if (false === $entryFile) {
-                throw new ServiceUnavailableException('Unable to determine entry file.');
+                throw new \RuntimeException('Unable to determine entry file.');
             }
 
             $entryDir = dirname($entryFile);
-
-            //$relIndexToParentOfSrc = self::relativePath($entryDir, dirname(__DIR__));
 
             // Build scheme + host + port from environment variables
             $scheme = isset($_ENV['API_PROTOCOL']) && is_string($_ENV['API_PROTOCOL']) ? $_ENV['API_PROTOCOL'] : self::detectRequestScheme();
@@ -415,10 +461,13 @@ class Router
             // Path prefix — e.g. "/api/v1/" if desired
             $api_base_path = isset($_ENV['API_BASE_PATH']) && is_string($_ENV['API_BASE_PATH']) ? $_ENV['API_BASE_PATH'] : '/';
 
-            self::$apiBase     = $api_base_path;
-            self::$apiPath     = rtrim($api_full_path . $api_base_path, '/');
-            self::$apiFilePath = self::findProjectRoot($entryDir) . '/'; //$relIndexToParentOfSrc;
-
+            self::$apiBase = $api_base_path;
+            self::$apiPath = rtrim($api_full_path . $api_base_path, '/');
+            $projectRoot   = self::findProjectRoot($entryDir);
+            if (null === $projectRoot) {
+                throw new \RuntimeException('Unable to find project root folder.');
+            }
+            self::$apiFilePath = $projectRoot . DIRECTORY_SEPARATOR;
             return;
         }
 
@@ -496,14 +545,34 @@ class Router
      */
     private static function findProjectRoot(string $startPath): ?string
     {
-        $path = realpath($startPath);
-        while ($path !== false && $path !== DIRECTORY_SEPARATOR) {
-            if (file_exists($path . DIRECTORY_SEPARATOR . 'composer.json')) {
-                return $path;
-            }
-            $path = dirname($path);
+        $projectFolder = realpath($startPath);
+        if (false === $projectFolder) {
+            return null;
         }
-        return null;
+
+        $level = 0;
+        while (true) {
+            if (file_exists($projectFolder . DIRECTORY_SEPARATOR . 'composer.json')) {
+                break;
+            }
+
+            // Don't look more than 4 levels up
+            if ($level > 4) {
+                $projectFolder = null;
+                break;
+            }
+
+            $parentDir = dirname($projectFolder);
+            if ($parentDir === $projectFolder) { // reached the system root folder
+                $projectFolder = null;
+                break;
+            }
+
+            ++$level;
+            $projectFolder = $parentDir;
+        }
+
+        return $projectFolder;
     }
 
     /**

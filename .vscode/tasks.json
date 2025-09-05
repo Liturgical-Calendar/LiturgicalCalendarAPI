@@ -2,9 +2,9 @@
     "version": "2.0.0",
     "options": {
         "env": {
-            "API_PROTOCOL": "http",
-            "API_HOST": "localhost",
-            "API_PORT": "8000"
+            "APP_PROTOCOL": "http",
+            "APP_HOST": "localhost",
+            "APP_PORT": "8000"
         }
     },
     "tasks": [
@@ -15,29 +15,25 @@
                 "command": "cmd",
                 "args": [
                     "/c",
-                    "if exist server.pid (echo Server already running, skipping browser launch) else if exist server.vscode.pid (echo Server already running, skipping browser launch) else start ${API_PROTOCOL}://${API_HOST}:${API_PORT}"
+                    "start ${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}"
                 ],
                 "problemMatcher": []
             },
             "linux": {
-                "command": "/bin/bash", // For Linux
+                "command": "/bin/bash",
                 "args": [
                     "-c",
-                    "if [ -f server.pid ] || [ -f server.vscode.pid ]; then echo \"Server already running, skipping browser launch\"; else if grep -q microsoft /proc/version; then powershell.exe Start-Process \"${API_PROTOCOL}://${API_HOST}:${API_PORT}\"; else xdg-open \"${API_PROTOCOL}://${API_HOST}:${API_PORT}\"; fi; fi"
-                ],
+                    "if grep -q microsoft /proc/version; then powershell.exe Start-Process ${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}; else xdg-open ${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}; fi"
+                  ],
                 "problemMatcher": []
             },
             "osx": {
-                "command": "/bin/bash", // For macOS
-                "args": [
-                    "-c",
-                    "if [ -f server.pid ] || [ -f server.vscode.pid ]; then echo \"Server already running, skipping browser launch\"; else open ${API_PROTOCOL}://${API_HOST}:${API_PORT}; fi"
-                ],
+                "command": "open ${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}",
                 "problemMatcher": []
             }
         },
         {
-            "label": "php-server",
+            "label": "api-server",
             "type": "shell",
             "command": "./start-server.sh",
             "options": {
@@ -51,8 +47,9 @@
                 "kind": "build",
                 "isDefault": true
             },
-            "dependsOn": [ "launch-browser" ],
-            "dependsOrder": "sequence",
+            "dependsOn": [
+                "launch-browser"
+            ],
             "windows": {
                 "command": "bash",
                 "args": [

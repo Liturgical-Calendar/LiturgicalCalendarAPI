@@ -1,6 +1,6 @@
 {
     "SanVincenzoPallotti": {
-        "first_reading": "1 Tessalonicesi 2, 2B-8|1 Giovanni 4, 7-16",
+        "first_reading": "1 Tessalonicesi 2, 2b-8|1 Giovanni 4, 7-16",
         "responsorial_psalm": "Salmo 95 (96)|Salmo 102 (103)",
         "alleluia_verse": "Giovanni 14, 23",
         "gospel": "Giovanni 15, 9-17"
@@ -39,7 +39,7 @@
         "vigil": {
             "first_reading": "Atti 3, 1-10",
             "responsorial_psalm": "Salmo 18 (19)",
-            "second_reading": "Galatai 1, 11-20",
+            "second_reading": "Galati 1, 11-20",
             "alleluia_verse": "Giovanni 21, 17d",
             "gospel": "Giovanni 21, 15-19"
         },
@@ -74,7 +74,7 @@
     "SantiVescoviChiesaRomana": {
         "first_reading": "Sapienza 1, 1-7|Ebrei 13, 7-17",
         "responsorial_psalm": "Salmo 143 (142)",
-        "alleluia_verse": "Marco 1,17",
+        "alleluia_verse": "Marco 1, 17",
         "gospel": "Giovanni 21, 15-17"
     },
     "SantiPrimiMartiriChiesaRomana": {

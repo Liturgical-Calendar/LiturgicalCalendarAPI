@@ -81,7 +81,7 @@
         "event_key": "Advent3",
         "grade": 7,
         "type": "mobile",
-        "color": [ "pink", "purple" ]
+        "color": [ "rose", "purple" ]
     },
     {
         "event_key": "Advent4",
@@ -111,7 +111,7 @@
         "event_key": "Lent4",
         "grade": 7,
         "type": "mobile",
-        "color": [ "pink", "purple" ]
+        "color": [ "rose", "purple" ]
     },
     {
         "event_key": "Lent5",

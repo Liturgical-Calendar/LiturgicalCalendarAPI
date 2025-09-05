@@ -122,12 +122,14 @@ Any application could use the endpoint in a similar manner: an Android App, a pl
 System requirements:
 
 * PHP >= 8.4 (we make use of more modern PHP functions such as `array_find`)
-* PHP modules installed and enabled: `intl` • `zip` • `calendar` • `yaml` • `apcu`
+* PHP modules installed and enabled: `intl` • `zip` • `calendar` • `yaml` • `gettext`
 * System package `gettext` and language packs for all the supported languages
+* PHP module `apcu` is optional and currently under testing.
+  If enabled, it is also possible to test usage for the websocket server by setting `apc.enable_cli=1` in `php.ini`.
 
-## Using PHP's builtin server
+## Using PHP's built-in server
 
-To test the API locally, you can use PHP's builtin server.
+To test the API locally, you can use PHP's built-in server.
 However, you will need to spawn at least a couple of workers, since some routes will make a request internally to another route.
 For example, a request to the `/calendar` route will make a request internally to the `/calendars` route.
 To be on the safe side, you should spawn up to 6 workers.
@@ -137,7 +139,7 @@ PHP_CLI_SERVER_WORKERS=6 php -S localhost:8000
 ```
 
 For convenience when using VSCode, a `tasks.json` has been defined so that you can simply type <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd>
-(<kbd>CMD</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> on MacOS) to start the PHP builtin server and open the browser.
+(<kbd>CMD</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> on macOS) to start the PHP built-in server and open the browser.
 
 The `composer.json` file also defines a couple scripts to simplify this process:
 

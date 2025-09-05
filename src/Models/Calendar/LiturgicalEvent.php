@@ -80,7 +80,7 @@ final class LiturgicalEvent implements \JsonSerializable
     public function __construct(
         string $name,
         DateTime $date,
-        LitColor|array $color = [LitColor::GREEN],
+        LitColor|array $color = LitColor::GREEN,
         LitEventType $type = LitEventType::FIXED,
         LitGrade $grade = LitGrade::WEEKDAY,
         LitCommons|LitCommon|LitMassVariousNeeds|array $common = LitCommon::NONE,
@@ -88,19 +88,29 @@ final class LiturgicalEvent implements \JsonSerializable
     ) {
         $litMassVariousNeedsArray = false;
         if (is_array($common)) {
-            $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $common)));
-            if (count($valueTypes) > 1) {
-                throw new \InvalidArgumentException(
-                    'Incoherent liturgical common value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes)
-                );
+            if (count($common) === 0) {
+                $litMassVariousNeedsArray = false;
+            } else {
+                $uniqueValueTypes = array_values(array_unique(array_map('gettype', $common)));
+                if (count($uniqueValueTypes) > 1) {
+                    throw new \InvalidArgumentException(
+                        'Incoherent liturgical common value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $uniqueValueTypes)
+                    );
+                }
+                $litMassVariousNeedsArray = $common[0] instanceof LitMassVariousNeeds;
             }
-            $litMassVariousNeedsArray = $common[0] instanceof LitMassVariousNeeds;
         }
+
         $this->event_idx     = self::$internal_index++;
         $this->name          = $name;
         $this->date          = $date; //DateTime object
         $this->color         = is_array($color) ? $color : [$color];
-        $this->color_lcl     = array_map(fn(LitColor $item): string => $item->i18n(self::$locale), $this->color);
+        $this->color_lcl     = array_map(
+            function (LitColor $item): string {
+                return $item->i18n(self::$locale);
+            },
+            $this->color
+        );
         $this->type          = $type;
         $this->grade         = $grade;
         $this->grade_lcl     = $this->grade->i18n(self::$locale, false, false);
@@ -118,7 +128,12 @@ final class LiturgicalEvent implements \JsonSerializable
         } elseif ($litMassVariousNeedsArray) {
             /** @var LitMassVariousNeeds[] $commons */
             $this->common = $commons;
-            $commonsLcl   = array_map(fn($item) => $item->fullTranslate(self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE), $commons);
+            $commonsLcl   = array_map(
+                function (LitMassVariousNeeds $item): string {
+                    return $item->fullTranslate(self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE);
+                },
+                $commons
+            );
 
             /**translators: when there are multiple possible commons, this will be the glue "[; or] From the Common of..." */
             $or               = self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'vel' : _('or');
@@ -209,7 +224,7 @@ final class LiturgicalEvent implements \JsonSerializable
      *      event_idx: int,
      *      name: string,
      *      date: int,
-     *      color: array<'green'|'pink'|'purple'|'red'|'white'>,
+     *      color: array<'green'|'rose'|'purple'|'red'|'white'>,
      *      color_lcl: string[],
      *      type: 'fixed'|'mobile',
      *      grade: -1|0|1|2|3|4|5|6|7,
@@ -402,14 +417,19 @@ final class LiturgicalEvent implements \JsonSerializable
 
             if (property_exists($obj, 'color')) {
                 if (is_array($obj->color)) {
-                    $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $obj->color)));
+                    $valueTypes = array_values(array_unique(array_map('gettype', $obj->color)));
                     if (count($valueTypes) > 1) {
                         throw new \InvalidArgumentException('Incoherent color value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes));
                     }
                     if ($valueTypes[0] === 'string') {
                         /** @var string[] $colors */
                         $colors = $obj->color;
-                        $color  = array_values(array_map(fn(string $value): LitColor => LitColor::from($value), $colors));
+                        $color  = array_map(
+                            function (string $value): LitColor {
+                                return LitColor::from($value);
+                            },
+                            $colors
+                        );
                     } else {
                         throw new \InvalidArgumentException('Invalid color value types provided to create LiturgicalEvent. Expected type string or LitColor, found ' . $valueTypes[0]);
                     }
@@ -566,7 +586,7 @@ final class LiturgicalEvent implements \JsonSerializable
         $colors = LitColor::GREEN;
         if (array_key_exists('color', $arr)) {
             if (is_array($arr['color'])) {
-                $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $arr['color'])));
+                $valueTypes = array_values(array_unique(array_map('gettype', $arr['color'])));
                 if (count($valueTypes) > 1) {
                     throw new \InvalidArgumentException('Incoherent color value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes));
                 }
@@ -651,7 +671,7 @@ final class LiturgicalEvent implements \JsonSerializable
             return $commons;
         }
 
-        $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $common)));
+        $valueTypes = array_values(array_unique(array_map('gettype', $common)));
 
         if (count($valueTypes) > 1) {
             throw new \InvalidArgumentException('Incoherent liturgical common value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes));
@@ -659,11 +679,12 @@ final class LiturgicalEvent implements \JsonSerializable
 
         if ($valueTypes[0] === 'string') {
             /** @var string[] $common */
-            return LitCommons::create($common)
-                    ?? array_values(array_map(
-                        fn(string $value): LitMassVariousNeeds => LitMassVariousNeeds::from($value),
-                        $common
-                    ));
+            return LitCommons::create($common) ?? array_map(
+                function (string $value): LitMassVariousNeeds {
+                    return LitMassVariousNeeds::from($value);
+                },
+                $common
+            );
         }
 
         if (self::allInstancesOf($common, LitCommon::class)) {

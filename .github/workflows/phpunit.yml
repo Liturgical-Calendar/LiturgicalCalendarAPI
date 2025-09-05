@@ -61,8 +61,20 @@ jobs:
           restore-keys: |
             composer-
 
+      - name: Cache PHPUnit cache
+        uses: actions/cache@v4
+        with:
+          path: .phpunit.cache
+          key: phpunit-${{ hashFiles('phpunit.xml') }}
+          restore-keys: phpunit-
+
       - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-progress --no-suggest
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-progress
+
+      - name: Enable OPCache
+        run: |
+          echo "opcache.enable=1" >> $GITHUB_ENV
+          echo "opcache.enable_cli=1" >> $GITHUB_ENV
 
       - name: Copy env file
         run: cp .env.example .env.local
@@ -90,7 +102,7 @@ jobs:
 
       - name: Run tests
         if: steps.server-check.outputs.server_found == 'true'
-        run: composer test
+        run: time composer test -- --parallel=auto
 
       - name: Stop server
         if: steps.server-check.outputs.server_found == 'true'

@@ -35,12 +35,12 @@ final class LitCalItemMoveEvent extends LiturgicalEventData
             throw new \ValueError('`liturgical_event->event_key`, `liturgical_event->day` and `liturgical_event->month` parameters are required for a `metadata->action` of `moveEvent`');
         }
 
-        if (false === self::isValidMonthValue($data['month'])) {
+        if (false === static::isValidMonthValue($data['month'])) {
             throw new \ValueError('`liturgical_event.month` must be an integer between 1 and 12');
         }
 
-        if (false === self::isValidDayValueForMonth($data['month'], $data['day'])) {
-            throw new \ValueError('`liturgical_event.day` must be an integer between 1 and 31 and it must be a valid day value for the given month');
+        if (false === static::isValidDayValueForMonth($data['month'], $data['day'])) {
+            throw new \ValueError("`liturgical_event.day` must be a valid day integer for the given month {$data['month']}, got {$data['day']}");
         }
 
         return new static($data['event_key'], $data['day'], $data['month']);
@@ -64,12 +64,12 @@ final class LitCalItemMoveEvent extends LiturgicalEventData
             throw new \ValueError('`liturgical_event->event_key`, `liturgical_event->day` and `liturgical_event->month` properties are required for a `metadata->action` of `moveEvent`');
         }
 
-        if (false === self::isValidMonthValue($data->month)) {
+        if (false === static::isValidMonthValue($data->month)) {
             throw new \ValueError('`liturgical_event.month` must be an integer between 1 and 12');
         }
 
-        if (false === self::isValidDayValueForMonth($data->month, $data->day)) {
-            throw new \ValueError('`liturgical_event.day` must be an integer between 1 and 31 and it must be a valid day value for the given month');
+        if (false === static::isValidDayValueForMonth($data->month, $data->day)) {
+            throw new \ValueError("`liturgical_event.day` must be a valid day integer for the given month {$data->month}, got {$data->day}");
         }
 
         return new static($data->event_key, $data->day, $data->month);

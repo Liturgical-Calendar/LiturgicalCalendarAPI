@@ -122,7 +122,12 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
         return new static(
             $data->event_key,
             $strToTime,
-            array_map(fn($color) => LitColor::from($color), $data->color),
+            array_map(
+                function (string $color): LitColor {
+                    return LitColor::from($color);
+                },
+                $data->color
+            ),
             LitGrade::from($data->grade),
             $commons
         );
@@ -164,7 +169,12 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
         return new static(
             $data['event_key'],
             $strToTime,
-            array_map(fn($color) => LitColor::from($color), $data['color']),
+            array_map(
+                function (string $color): LitColor {
+                    return LitColor::from($color);
+                },
+                $data['color']
+            ),
             LitGrade::from($data['grade']),
             $commons
         );

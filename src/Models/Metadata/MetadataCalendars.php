@@ -148,12 +148,36 @@ final class MetadataCalendars extends AbstractJsonRepresentation
     public function jsonSerialize(): array
     {
         return [
-            'national_calendars'      => array_map(fn($nc) => $nc->jsonSerialize(), $this->national_calendars),
+            'national_calendars'      => array_map(
+                /** @return array{calendar_id:string,locales:string[],missals:string[],settings:array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool},wider_region?:string,dioceses?:string[]} */
+                function (MetadataNationalCalendarItem $nc): array {
+                    return $nc->jsonSerialize();
+                },
+                $this->national_calendars
+            ),
             'national_calendars_keys' => $this->national_calendars_keys,
-            'diocesan_calendars'      => array_map(fn($dc) => $dc->jsonSerialize(), $this->diocesan_calendars),
+            'diocesan_calendars'      => array_map(
+                /** @return array{calendar_id:string,diocese:string,nation:string,locales:string[],timezone:string,group?:string,settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string,eternal_high_priest?:bool}} */
+                function (MetadataDiocesanCalendarItem $dc): array {
+                    return $dc->jsonSerialize();
+                },
+                $this->diocesan_calendars
+            ),
             'diocesan_calendars_keys' => $this->diocesan_calendars_keys,
-            'diocesan_groups'         => array_map(fn($dg) => $dg->jsonSerialize(), $this->diocesan_groups),
-            'wider_regions'           => array_map(fn($wr) => $wr->jsonSerialize(), $this->wider_regions),
+            'diocesan_groups'         => array_map(
+                /** @return array{group_name:string,dioceses:string[]} */
+                function (MetadataDiocesanGroupItem $dg): array {
+                    return $dg->jsonSerialize();
+                },
+                $this->diocesan_groups
+            ),
+            'wider_regions'           => array_map(
+                /** @return array{name:string,locales:string[],api_path:string} */
+                function (MetadataWiderRegionItem $wr): array {
+                    return $wr->jsonSerialize();
+                },
+                $this->wider_regions
+            ),
             'wider_regions_keys'      => $this->wider_regions_keys,
             'locales'                 => $this->locales
         ];

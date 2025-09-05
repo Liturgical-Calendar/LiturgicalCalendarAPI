@@ -4658,14 +4658,14 @@
                           "red",
                           "white",
                           "purple",
-                          "pink"
+                          "rose"
                         ],
                         "examples": [
                           "green",
                           "red",
                           "white",
                           "purple",
-                          "pink"
+                          "rose"
                         ]
                       },
                       "idx": {
@@ -5629,7 +5629,7 @@
                         "white",
                         "red",
                         "green",
-                        "pink",
+                        "rose",
                         "purple"
                       ]
                     }

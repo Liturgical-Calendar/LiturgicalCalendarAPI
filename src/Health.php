@@ -21,6 +21,7 @@ use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Test\LitTestRunner;
 use Psr\Http\Message\ResponseInterface;
 
@@ -67,6 +68,12 @@ class Health implements MessageComponentInterface
         'executeUnitTest'   => ['category', 'calendar', 'year', 'test']
     ];
 
+    private const RED    = "\033[0;31m";
+    private const GREEN  = "\033[0;32m";
+    private const YELLOW = "\033[0;33m";
+    private const BLUE   = "\033[0;34m";
+    private const NC     = "\033[0m"; // No Color
+
     private static MetadataCalendars $metadata;
 
     private Client $http;
@@ -79,6 +86,9 @@ class Health implements MessageComponentInterface
     private array $queue  = [];
     private bool $ticking = false;
 
+    private static bool $cacheEnabled = false;
+    //private static PromiseInterface $metadataPromise;
+
     /**
      * Initializes the Health object with an empty SplObjectStorage.
      *
@@ -87,8 +97,6 @@ class Health implements MessageComponentInterface
     public function __construct()
     {
         $this->clients = new \SplObjectStorage();
-
-        Router::getApiPaths();
 
         // Create shared multi handler
         $multiHandler       = new CurlMultiHandler(['max_handles' => 50]);
@@ -125,23 +133,18 @@ class Health implements MessageComponentInterface
             echo 'Error onOpen: expected an integer resourceId, got ' . gettype($conn->resourceId) . "\n";
             return;
         } else {
-            echo "New connection! ({$conn->resourceId})\n";
+            echo "New connection! ({$conn->resourceId}) and current working directory is " . getcwd() . "\n";
         }
 
-        /*
-        Loop::get()->addPeriodicTimer(0.01, function () {
-            $this->multiHandler->tick();
-            if (!empty($this->queue)) {
-                $this->processQueue();
-            }
-        });
-        */
+        self::$cacheEnabled = ( extension_loaded('apcu') && function_exists('apcu_exists') && function_exists('apcu_store') && function_exists('apcu_fetch') );
 
-        if (extension_loaded('apcu')) {
+        if (self::$cacheEnabled) {
             echo 'APCu extension loaded, will use for caching' . "\n";
         } else {
             echo 'APCu extension not loaded, will not use for caching' . "\n";
         }
+
+        Router::getApiPaths();
 
         if (false === isset(self::$metadata)) {
             echo 'Metadata not yet loaded, loading now from ' . Route::CALENDARS->path() . "\n";
@@ -152,10 +155,11 @@ class Health implements MessageComponentInterface
                 ]
             ];
 
-            /** @var PromiseInterface<string> $promise */
-            $promise = $this->cachedGet(Route::CALENDARS->path(), $opts);
+            /** @var PromiseInterface<string> $metadataPromise */
+            $metadataPromise = $this->cachedGet(Route::CALENDARS->path(), $opts);
+            //self::$metadataPromise = $metadataPromise;
 
-            $promise->then(
+            $metadataPromise->then(
                 function (string $rawData) {
                     $rawData = (string) $rawData; // force fresh string
                     echo 'Fetched metadata: got ' . strlen($rawData) . " bytes\n";
@@ -170,9 +174,9 @@ class Health implements MessageComponentInterface
                     if (JSON_ERROR_NONE !== json_last_error()) {
                         echo 'Error loading metadata: ' . json_last_error_msg() . "\n";
                         return;
-                    } else {
-                        echo "Loaded metadata\n";
                     }
+
+                    echo "Loaded metadata\n";
 
                     $litCalMetadata = $metadataObj->litcal_metadata;
                     if (false === ( $litCalMetadata instanceof \stdClass )) {
@@ -370,7 +374,15 @@ class Health implements MessageComponentInterface
                             );
                             break;
                         case 'diocesan-calendar':
-                            $dioceseMetadata = array_find(self::$metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]);
+                            if (false === isset(self::$metadata)) {
+                                throw new \RuntimeException('Metadata not loaded yet; retry shortly');
+                            }
+                            $dioceseMetadata = array_find(
+                                self::$metadata->diocesan_calendars,
+                                function (MetadataDiocesanCalendarItem $el) use ($matches): bool {
+                                    return $el->calendar_id === $matches[2];
+                                }
+                            );
                             if ($dioceseMetadata === null) {
                                 throw new \Exception("No diocese found for calendar id: {$matches[2]}");
                             }
@@ -414,7 +426,15 @@ class Health implements MessageComponentInterface
                                 );
                                 break;
                             case 'diocesan-calendar':
-                                $dioceseMetadata = array_find(self::$metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]);
+                                if (false === isset(self::$metadata)) {
+                                    throw new \RuntimeException('Metadata not loaded yet; retry shortly');
+                                }
+                                $dioceseMetadata = array_find(
+                                    self::$metadata->diocesan_calendars,
+                                    function (MetadataDiocesanCalendarItem $el) use ($matches): bool {
+                                        return $el->calendar_id === $matches[2];
+                                    }
+                                );
                                 if ($dioceseMetadata === null) {
                                     throw new \Exception("No diocese found for calendar id: {$matches[2]}");
                                 }
@@ -581,8 +601,17 @@ class Health implements MessageComponentInterface
             // If the 'sourceFolder' property is not set, then we are validating a single source file or API path
             $matches = null;
             if (preg_match('/^diocesan-calendar-([a-z]{6}_[a-z]{2})$/', $pathForSchema, $matches)) {
-                $dioceseId       = $matches[1];
-                $dioceseMetadata = array_find(self::$metadata->diocesan_calendars, fn ($diocesan_calendar) => $diocesan_calendar->calendar_id === $dioceseId);
+                $dioceseId = $matches[1];
+                if (false === isset(self::$metadata)) {
+                    throw new \RuntimeException('Metadata not loaded yet; retry shortly');
+                }
+
+                $dioceseMetadata = array_find(
+                    self::$metadata->diocesan_calendars,
+                    function (MetadataDiocesanCalendarItem $diocesan_calendar) use ($dioceseId): bool {
+                        return $diocesan_calendar->calendar_id === $dioceseId;
+                    }
+                );
                 if (null === $dioceseMetadata) {
                     throw new \InvalidArgumentException("Invalid diocese ID $dioceseId");
                 }
@@ -604,34 +633,6 @@ class Health implements MessageComponentInterface
             // rather than checking for existence of the file in the filesystem
             $category = (string) $validation->category;
             $validate = (string) $validation->validate;
-            if ($category === 'resourceDataCheck') {
-                /** @var ExecuteValidationResource $validation */
-                $headers = get_headers($dataPath);
-                assert(is_array($headers), 'Headers should be an array for resourceDataCheck category');
-                $headerOK = $headers[0];
-                assert(is_string($headerOK), 'OK Header should be a string for resourceDataCheck category');
-                if (!$headers || strpos($headerOK, '200 OK') === false) {
-                    $message          = new \stdClass();
-                    $message->type    = 'error';
-                    $message->text    = "URL $dataPath is giving an error: " . $headerOK;
-                    $message->classes = ".$validate.file-exists";
-                    $this->sendMessage($to, $message);
-
-                    $message          = new \stdClass();
-                    $message->type    = 'error';
-                    $message->text    = "Could not decode the Data file $dataPath as JSON because it is not readable";
-                    $message->classes = ".$validate.json-valid";
-                    $this->sendMessage($to, $message);
-
-                    $message          = new \stdClass();
-                    $message->type    = 'error';
-                    $message->text    = "Unable to verify schema for dataPath {$dataPath} and category {$category} since Data file $dataPath does not exist or is not readable";
-                    $message->classes = ".$validate.schema-valid";
-                    $this->sendMessage($to, $message);
-                    // early exit
-                    return;
-                }
-            }
 
             if (str_starts_with($dataPath, 'http://') || str_starts_with($dataPath, 'https://')) {
                 // $dataPath is an API path in this case
@@ -749,7 +750,8 @@ class Health implements MessageComponentInterface
         $opts            = [
             'headers' => [
                 'Accept' => $acceptMimeType->value
-            ]
+            ],
+            'stream'  => true
         ];
 
         if ($calendar === 'VA') {
@@ -879,6 +881,10 @@ class Health implements MessageComponentInterface
                         break;
                     case 'YML':
                         try {
+                            if (!function_exists('yaml_parse')) {
+                                throw new \RuntimeException('PHP yaml extension not installed');
+                            }
+
                             /**
                              * TODO: perhaps we need to register a custom Exception handler, since yaml_parse() throws a warning instead of an exception
                              *       and we need to catch that warning as an exception {@see \LiturgicalCalendar\Api\Core::warningHandler()}
@@ -921,43 +927,55 @@ class Health implements MessageComponentInterface
                         break;
                     case 'JSON':
                     default:
-                        $jsonData = json_decode($data);
-                        if (false === ( $jsonData instanceof \stdClass )) {
+                        $jsonData         = json_decode($data);
+                        $jsonLastError    = json_last_error();
+                        $jsonLastErrorMsg = json_last_error_msg();
+                        if (false === ( $jsonData instanceof \stdClass ) || $jsonLastError !== JSON_ERROR_NONE) {
+                            $message          = new \stdClass();
+                            $message->type    = 'error';
+                            $message->text    = "There was an error decoding the $category of $calendar for the year $year from the URL "
+                                            . Route::CALENDAR->path() . $req . ' as JSON: data was decoded to type ' . gettype($jsonData);
+                            $message->classes = ".calendar-$calendar.json-valid.year-$year";
+                            if ($jsonLastError !== JSON_ERROR_NONE) {
+                                $message->text .= ' | ' . $jsonLastErrorMsg;
+                            }
+                            $message->responsetype = $responseType;
+                            $this->sendMessage($to, $message);
+                            break;
+                        }
+
+                        if (
+                            false === property_exists($jsonData, 'litcal')
+                            || false === property_exists($jsonData, 'settings')
+                            || false === property_exists($jsonData, 'metadata')
+                            || false === property_exists($jsonData, 'messages')
+                        ) {
                             $message               = new \stdClass();
                             $message->type         = 'error';
                             $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                            . Route::CALENDAR->path() . $req . ' as JSON: data was decoded to type ' . gettype($jsonData);
+                                                    . Route::CALENDAR->path() . $req . ' as JSON: response data was perhaps truncated?';
                             $message->classes      = ".calendar-$calendar.json-valid.year-$year";
                             $message->responsetype = $responseType;
                             $this->sendMessage($to, $message);
                             break;
                         }
-                        if (json_last_error() === JSON_ERROR_NONE) {
+
+                        $message          = new \stdClass();
+                        $message->type    = 'success';
+                        $message->text    = "The $category of $calendar for the year $year was successfully decoded as JSON";
+                        $message->classes = ".calendar-$calendar.json-valid.year-$year";
+                        $this->sendMessage($to, $message);
+
+                        $validationResult = $this->validateDataAgainstSchema($jsonData, LitSchema::LITCAL->path());
+                        if (gettype($validationResult) === 'boolean' && $validationResult === true) {
                             $message          = new \stdClass();
                             $message->type    = 'success';
-                            $message->text    = "The $category of $calendar for the year $year was successfully decoded as JSON";
-                            $message->classes = ".calendar-$calendar.json-valid.year-$year";
+                            $message->text    = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL->path();
+                            $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
-
-                            $validationResult = $this->validateDataAgainstSchema($jsonData, LitSchema::LITCAL->path());
-                            if (gettype($validationResult) === 'boolean' && $validationResult === true) {
-                                $message          = new \stdClass();
-                                $message->type    = 'success';
-                                $message->text    = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL->path();
-                                $message->classes = ".calendar-$calendar.schema-valid.year-$year";
-                                $this->sendMessage($to, $message);
-                            } elseif ($validationResult instanceof \stdClass) {
-                                $validationResult->classes = ".calendar-$calendar.schema-valid.year-$year";
-                                $this->sendMessage($to, $validationResult);
-                            }
-                        } else {
-                            $message               = new \stdClass();
-                            $message->type         = 'error';
-                            $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                            . Route::CALENDAR->path() . $req . ' as JSON: ' . json_last_error_msg();
-                            $message->classes      = ".calendar-$calendar.json-valid.year-$year";
-                            $message->responsetype = $responseType;
-                            $this->sendMessage($to, $message);
+                        } elseif ($validationResult instanceof \stdClass) {
+                            $validationResult->classes = ".calendar-$calendar.schema-valid.year-$year";
+                            $this->sendMessage($to, $validationResult);
                         }
                 }
             },
@@ -987,7 +1005,8 @@ class Health implements MessageComponentInterface
         $opts            = [
             'headers' => [
                 'Accept' => $acceptMimeType->value
-            ]
+            ],
+            'stream'  => true
         ];
 
         if ($calendar === 'VA') {
@@ -1007,7 +1026,7 @@ class Health implements MessageComponentInterface
         }
         $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts);
         $promise->then(
-            function (string $data) use ($to, $test) {
+            function (string $data) use ($to, $test, $year) {
                 $data = (string) $data; // force fresh string
                 /** @var \stdClass&object{settings:object{year:int,national_calendar?:string,diocesan_calendar?:string},litcal:LiturgicalEvent[]} $jsonData */
                 $jsonData = json_decode($data);
@@ -1017,7 +1036,20 @@ class Health implements MessageComponentInterface
                         $UnitTest->runTest();
                     }
                     $this->sendMessage($to, $UnitTest->getMessage());
+                } else {
+                    $message          = new \stdClass();
+                    $message->type    = 'error';
+                    $message->text    = "There was an error decoding JSON data for the test $test: " . json_last_error_msg();
+                    $message->classes = ".$test.year-{$year}.test-valid";
+                    $this->sendMessage($to, $message);
                 }
+            },
+            function (\Throwable $e) use ($to, $test, $year, $category, $calendar, $req) {
+                $message          = new \stdClass();
+                $message->type    = 'error';
+                $message->text    = "The $category of $calendar for the year $year was not retrieved at the URL " . Route::CALENDAR->path() . $req . ' : ' . $e->getMessage();
+                $message->classes = ".$test.year-{$year}.test-valid";
+                $this->sendMessage($to, $message);
             }
         );
     }
@@ -1054,50 +1086,52 @@ class Health implements MessageComponentInterface
     {
         $key = 'fgc_' . md5($path);
 
-        if (apcu_exists($key)) {
-            $deferred = new Deferred();
-            echo "Cache hit for file $path\n";
-            $data = apcu_fetch($key);
-            if (is_string($data)) {
-                $deferred->resolve($data);
-            } else {
-                $deferred->reject(new \RuntimeException("Cache fetch for file $path returned non-string data"));
+        if (self::$cacheEnabled) {
+            if (apcu_exists($key)) {
+                $deferred = new Deferred();
+                $data     = apcu_fetch($key, $success);
+                if ($success && is_string($data)) {
+                    echo "Cache hit for file $path\n";
+                    $deferred->resolve($data);
+                } else {
+                    $deferred->reject(new \RuntimeException("Cache fetch for file $path returned non-string data"));
+                }
+                /** @var PromiseInterface<string> $deferredPromise */
+                $deferredPromise = $deferred->promise();
+                return $deferredPromise;
             }
-            /** @var PromiseInterface<string> $deferredPromise */
-            $deferredPromise = $deferred->promise();
-            return $deferredPromise;
+            echo "Cache miss for file $path, reading from filesystem\n";
         }
 
-        echo "Cache miss for file $path, reading from filesystem\n";
         $filesystem = Factory::create();
 
         /** @var PromiseInterface<string> $fsPromise */
         $fsPromise = $filesystem->file($path)->getContents()->then(
-            /** @param string $data @return string */
-            function (string $data) use ($key, $ttl, $path) {
+            function (string $data) use ($key, $ttl, $path): string {
                 $data = (string) $data;          // force fresh string
-                echo "Read file $path, caching contents\n";
-                $stored = apcu_store($key, $data, $ttl);
-                echo ( $stored ? "Stored file in cache\n" : "Failed to store file in cache\n" );
-                /** @var array{seg_size:int,avail_mem:int} $info */
-                $info = apcu_sma_info(true);
-                if (false !== $info) {
-                    $total = isset($info['seg_size']) ? (int) $info['seg_size'] : 0;
-                    $free  = isset($info['avail_mem']) ? (int) $info['avail_mem'] : 0;
-                    if ($total > 0) { // avoid division by zero
-                        $used    = $total - $free;
-                        $percent = ( $used / $total ) * 100;
+                if (self::$cacheEnabled) {
+                    echo "Read file $path, caching contents\n";
+                    $stored = apcu_store($key, $data, $ttl);
+                    echo ( $stored ? "Stored file in cache\n" : "Failed to store file in cache\n" );
+                    /** @var array{seg_size:int,avail_mem:int} $info */
+                    $info = apcu_sma_info(true);
+                    if (false !== $info) {
+                        $total = isset($info['seg_size']) ? (int) $info['seg_size'] : 0;
+                        $free  = isset($info['avail_mem']) ? (int) $info['avail_mem'] : 0;
+                        if ($total > 0) { // avoid division by zero
+                            $used    = $total - $free;
+                            $percent = ( $used / $total ) * 100;
 
-                        echo 'APCu used: ' . round($used / 1024 / 1024, 2) . ' MB of ' .
-                            round($total / 1024 / 1024, 2) . ' MB (' .
-                            round($percent, 2) . "%)\n";
+                            echo 'APCu used: ' . round($used / 1024 / 1024, 2) . ' MB of ' .
+                                round($total / 1024 / 1024, 2) . ' MB (' .
+                                round($percent, 2) . "%)\n";
+                        }
                     }
+                    //var_dump(apcu_exists($key), apcu_fetch($key));
                 }
-                //var_dump(apcu_exists($key), apcu_fetch($key));
                 return $data; // resolved promise
             },
-            /** @return never */
-            function (\Throwable $e) use ($path) {
+            function (\Throwable $e) use ($path): never {
                 throw new \RuntimeException("Unable to read file: $path", 0, $e);
             }
         );
@@ -1116,49 +1150,68 @@ class Health implements MessageComponentInterface
         $deferred = new Deferred();
 
         // Return from cache if available
-        if (apcu_exists($key)) {
-            echo "Cache hit for $url\n";
-            $data = apcu_fetch($key);
-            if (is_string($data)) {
-                $deferred->resolve($data);
-            } else {
-                $deferred->reject(new \RuntimeException("Cache fetch for URL $url returned non-string data"));
-            }
+        if (self::$cacheEnabled) {
+            if (apcu_exists($key)) {
+                echo "Cache hit for $url\n";
+                $data = apcu_fetch($key, $success);
+                if ($success && is_string($data)) {
+                    $deferred->resolve($data);
+                } else {
+                    $deferred->reject(new \RuntimeException("Cache fetch for URL $url failed or returned non-string data"));
+                }
 
-            /** @var PromiseInterface<string> $deferredPromise */
-            $deferredPromise = $deferred->promise();
-            return $deferredPromise;
+                /** @var PromiseInterface<string> $deferredPromise */
+                $deferredPromise = $deferred->promise();
+                return $deferredPromise;
+            }
+            echo "Cache miss for $url, making HTTP request\n";
         }
 
-        echo "Cache miss for $url, making HTTP request\n";
 
         $resolve = function (ResponseInterface $response) use ($deferred, $key, $ttl, $url) {
-            echo "HTTP request completed for $url, caching response\n";
-            $body   = (string) $response->getBody();
-            $stored = apcu_store($key, $body, $ttl);
-            echo ( $stored ? "Stored response body in cache\n" : "Failed to store response body in cache\n" );
-            /** @var array{seg_size:int,avail_mem:int} $info */
-            $info = apcu_sma_info(true);
-            if (false !== $info) {
-                $total = isset($info['seg_size']) ? (int) $info['seg_size'] : 0;
-                $free  = isset($info['avail_mem']) ? (int) $info['avail_mem'] : 0;
-                if ($total > 0) { // avoid division by zero
-                    $used    = $total - $free;
-                    $percent = ( $used / $total ) * 100;
+            $body       = (string) $response->getBody();
+            $bodyLength = strlen($body);
+            echo "HTTP request completed for $url\n";
+            if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development') {
+                $date          = date('Y-m-d_H-i-s-u');
+                $color         = $response->getStatusCode() >= 400 ? self::RED : self::GREEN;
+                $debugMessage  = self::YELLOW . 'RESPONSE HTTP/' . $response->getProtocolVersion() . ' ' . $color . $response->getStatusCode() . ' ' . $response->getReasonPhrase() . " received from URL {$url}" . self::NC . PHP_EOL;
+                $debugMessage .= PHP_EOL;
+                $debugMessage .= self::BLUE . 'Incoming response headers' . self::NC . PHP_EOL;
+                foreach ($response->getHeaders() as $name => $values) {
+                    $debugMessage .= $name . ': ' . implode(', ', $values) . PHP_EOL;
+                };
+                $debugMessage .= PHP_EOL;
+                $debugMessage .= self::BLUE . "Incoming response body ({$bodyLength} bytes)" . self::NC . PHP_EOL;
+                $debugMessage .= $body . PHP_EOL . PHP_EOL;
+                file_put_contents(Router::$apiFilePath . 'logs' . DIRECTORY_SEPARATOR . "websocket_response_{$date}.log", $debugMessage);
+            }
 
-                    echo 'APCu used: ' . round($used / 1024 / 1024, 2) . ' MB of ' .
-                        round($total / 1024 / 1024, 2) . ' MB (' .
-                        round($percent, 2) . "%)\n";
+            if (self::$cacheEnabled) {
+                $stored = apcu_store($key, $body, $ttl);
+                echo ( $stored ? "Stored response body in cache\n" : "Failed to store response body in cache\n" );
+                /** @var array{seg_size:int,avail_mem:int} $info */
+                $info = apcu_sma_info(true);
+                if (false !== $info) {
+                    $total = isset($info['seg_size']) ? (int) $info['seg_size'] : 0;
+                    $free  = isset($info['avail_mem']) ? (int) $info['avail_mem'] : 0;
+                    if ($total > 0) { // avoid division by zero
+                        $used    = $total - $free;
+                        $percent = ( $used / $total ) * 100;
+
+                        echo 'APCu used: ' . round($used / 1024 / 1024, 2) . ' MB of ' .
+                            round($total / 1024 / 1024, 2) . ' MB (' .
+                            round($percent, 2) . "%)\n";
+                    }
                 }
             }
-            //var_dump(apcu_exists($key), apcu_fetch($key));
-            $this->inFlight--;
+            --$this->inFlight;
             $deferred->resolve($body);
         };
 
         $reject = function (\Throwable $e) use ($deferred) {
             echo 'HTTP request failed: ' . $e->getMessage() . "\n";
-            $this->inFlight--;
+            --$this->inFlight;
             $deferred->reject($e);
         };
 
@@ -1177,6 +1230,7 @@ class Health implements MessageComponentInterface
 
     private function processQueue(): void
     {
+        echo 'Processing queue, inFlight: ' . $this->inFlight . ', maxConcurrency: ' . $this->maxConcurrency . ', queue size: ' . count($this->queue) . "\n";
         while ($this->inFlight < $this->maxConcurrency && !empty($this->queue)) {
             [
                 'url'     => $url,
@@ -1186,6 +1240,12 @@ class Health implements MessageComponentInterface
             ] = array_shift($this->queue);
 
             ++$this->inFlight;
+
+            if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development') {
+                $date         = date('Y-m-d H:i:s.u');
+                $debugMessage = "{$date}\tREQUEST GET URL " . $url . "\n";
+                file_put_contents(Router::$apiFilePath . 'logs' . DIRECTORY_SEPARATOR . 'websocket_requests.log', $debugMessage, FILE_APPEND);
+            }
 
             $this->http->getAsync($url, $options)
                 ->then(
@@ -1199,8 +1259,10 @@ class Health implements MessageComponentInterface
     private function ensureTicking(): void
     {
         if ($this->ticking) {
+            echo 'Already ticking' . "\n";
             return;
         }
+        echo 'Starting to tick' . "\n";
         $this->ticking = true;
 
         Loop::futureTick(function () {
@@ -1211,6 +1273,7 @@ class Health implements MessageComponentInterface
     private function drainHandler(): void
     {
         if ($this->inFlight > 0 || !empty($this->queue)) {
+            echo 'Drain handler ensuring ticking, inFlight: ' . $this->inFlight . ', queued requests: ' . count($this->queue) . '' . "\n";
             // keep ticking until no requests are left
             Loop::futureTick(function () {
                 $this->multiHandler->tick();
@@ -1218,6 +1281,7 @@ class Health implements MessageComponentInterface
             });
         } else {
             // no active or queued requests
+            echo 'Stopping to tick, inFlight: ' . $this->inFlight . ', queue: ' . count($this->queue) . '' . "\n";
             $this->ticking = false;
         }
     }
@@ -1290,9 +1354,9 @@ class Health implements MessageComponentInterface
      */
     private static function retrieveSchemaForCategory(string $category, string $dataPath): ?string
     {
-        $versionedPattern     = '/\/api\/v[4-9]\//';
+        $versionedPattern     = '/\/api\/(?:v[4-9]|v[1-9]\\d+)\//';
         $versionedReplacement = '/api/dev/';
-        $isVersionedDataPath  = preg_match($versionedPattern, $dataPath) !== false;
+        $isVersionedDataPath  = preg_match($versionedPattern, $dataPath) === 1;
         switch ($category) {
             case 'universalcalendar':
                 if ($isVersionedDataPath) {
@@ -1412,7 +1476,7 @@ class Health implements MessageComponentInterface
             }
             $errorStr .= htmlspecialchars(trim($error->message))
                       . " (Line: $error->line, Column: $error->column, Src: "
-                      . htmlspecialchars(trim($xml[$error->line - 1])) . ')';
+                      . htmlspecialchars(trim($xml[$error->line - 1] ?? '')) . ')';
             if ($error->file) {
                 $errorStr .= " in file: $error->file";
             }

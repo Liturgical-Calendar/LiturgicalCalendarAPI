@@ -23,11 +23,13 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
     private string $regionFilter;
     private int $yearFilter;
     private bool $includeEmpty = false;
+    private bool $cacheEnabled = false;
 
     public function __construct()
     {
-        $this->missals    = [];
-        $this->allMissals = [];
+        $this->missals      = [];
+        $this->allMissals   = [];
+        $this->cacheEnabled = ( extension_loaded('apcu') && function_exists('apcu_exists') && function_exists('apcu_store') && function_exists('apcu_fetch') );
     }
 
     /**
@@ -178,7 +180,7 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
 
     public function buildIndex(): void
     {
-        if (function_exists('apcu_fetch')) {
+        if ($this->cacheEnabled && apcu_exists('litcal_missals_index')) {
             $cached = apcu_fetch('litcal_missals_index', $success);
             if (
                 $success
@@ -256,9 +258,11 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
         $allMissals       = RomanMissal::produceMetadata();
         $this->allMissals = $allMissals;
 
-        apcu_store('litcal_missals_index', [
-            'missals'    => $this->missals,
-            'allMissals' => $this->allMissals
-        ], 600);
+        if ($this->cacheEnabled) {
+            apcu_store('litcal_missals_index', [
+                'missals'    => $this->missals,
+                'allMissals' => $this->allMissals
+            ], 600);
+        }
     }
 }

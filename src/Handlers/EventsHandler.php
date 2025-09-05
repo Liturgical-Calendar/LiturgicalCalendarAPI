@@ -489,13 +489,13 @@ final class EventsHandler extends AbstractHandler
                 } elseif ($litCalItem->liturgical_event instanceof LitCalItemSetPropertyName) {
                     $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($key);
                     if (null === $existingLiturgicalEvent) {
-                        throw new \RuntimeException('');
+                        throw new \RuntimeException("Unknown event key '{$key}' when setting name from National calendar");
                     }
                     $existingLiturgicalEvent->name = $NationalCalendarI18nData[$key];
                 } elseif ($litCalItem->liturgical_event instanceof LitCalItemSetPropertyGrade) {
                     $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($key);
                     if (null === $existingLiturgicalEvent) {
-                        throw new \RuntimeException('');
+                        throw new \RuntimeException("Unknown event key '{$key}' when setting grade from National calendar");
                     }
                     $existingLiturgicalEvent->grade = $litCalItem->liturgical_event->grade;
                 } elseif ($litCalItem->liturgical_event instanceof LitCalItemMakePatron) {

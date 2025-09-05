@@ -272,7 +272,7 @@ class RomanMissal
     /**
      * Gets an array of all the valid Roman Missal enumeration constants.
      *
-     * @return array<string> an array of all the valid Roman Missal enumeration constants
+     * @return string[] an array of all the valid Roman Missal enumeration constants
      */
     public static function getMissalIds(): array
     {
@@ -282,11 +282,11 @@ class RomanMissal
     /**
      * Gets an array of all the Latin Missal enumeration constants.
      *
-     * @return array<string> an array of all the Latin Missal enumeration constants
+     * @return string[] an array of all the Latin Missal enumeration constants
      */
     public static function getLatinMissalIds(): array
     {
-        return array_filter(self::$values, static fn (string $missal_id): bool => self::isLatinMissal($missal_id));
+        return array_values(array_filter(self::$values, static fn (string $missal_id): bool => self::isLatinMissal($missal_id)));
     }
 
     /**

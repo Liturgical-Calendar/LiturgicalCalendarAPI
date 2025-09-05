@@ -1,5 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "./LitCal.json",
     "title": "LitCal",
     "type": "object",
     "additionalProperties": false,
@@ -47,7 +48,7 @@
                             "pattern": "(?:text/html|application/xml|application/json|text/calendar|application/yaml)"
                         },
                         "Accept-Language": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/AcceptLanguage"
+                            "$ref": "./CommonDef.json#/definitions/AcceptLanguage"
                         },
                         "X-Requested-With": {
                             "type": "string",
@@ -63,7 +64,7 @@
                 "solemnities_lord_bvm_keys": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                        "$ref": "./CommonDef.json#/definitions/EventKey"
                     }
                 },
                 "solemnities": {
@@ -72,7 +73,7 @@
                 "solemnities_keys": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                        "$ref": "./CommonDef.json#/definitions/EventKey"
                     }
                 },
                 "feasts_lord": {
@@ -81,7 +82,7 @@
                 "feasts_lord_keys": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                        "$ref": "./CommonDef.json#/definitions/EventKey"
                     }
                 },
                 "feasts": {
@@ -90,7 +91,7 @@
                 "feasts_keys": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                        "$ref": "./CommonDef.json#/definitions/EventKey"
                     }
                 },
                 "memorials": {
@@ -99,7 +100,7 @@
                 "memorials_keys": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                        "$ref": "./CommonDef.json#/definitions/EventKey"
                     }
                 },
                 "suppressed_events": {
@@ -108,7 +109,7 @@
                 "suppressed_events_keys": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                        "$ref": "./CommonDef.json#/definitions/EventKey"
                     }
                 },
                 "reinstated_events": {
@@ -117,7 +118,7 @@
                 "reinstated_events_keys": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                        "$ref": "./CommonDef.json#/definitions/EventKey"
                     }
                 },
                 "diocese_name": {
@@ -205,35 +206,44 @@
                 ],
                 "solemnities_lord_bvm_keys": [
                     "Christmas",
-                    "Assumptionc"
+                    "Assumption"
                 ],
                 "solemnities": [
                     {
-                        "event_key": "Christmas",
-                        "date": "2023-12-25T00:00:00+00:00",
+                        "event_key": "StsPeterPaulAp",
+                        "date": "2023-06-29T00:00:00+00:00",
                         "timezone_type": 3,
                         "timezone": "UTC"
                     },
                     {
-                        "event_key": "Advent1",
-                        "date": "2023-12-03T00:00:00+00:00",
+                        "event_key": "AllSaints",
+                        "date": "2023-11-01T00:00:00+00:00",
                         "timezone_type": 3,
                         "timezone": "UTC"
                     }
                 ],
                 "solemnities_keys": [
-                    "Christmas",
-                    "Advent1"
+                    "StsPeterPaulAp",
+                    "AllSaints"
                 ],
-                "feasts_lord_bvm": {
-                    "$ref": "#/definitions/DateTimeObjectCollection"
-                },
-                "feasts_lord_bvm_keys": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                "feasts_lord": [
+                    {
+                        "event_key": "BaptismLord",
+                        "date": "2023-01-08T00:00:00+00:00",
+                        "timezone_type": 3,
+                        "timezone": "UTC"
+                    },
+                    {
+                        "event_key": "Presentation",
+                        "date": "2023-02-02T00:00:00+00:00",
+                        "timezone_type": 3,
+                        "timezone": "UTC"
                     }
-                },
+                ],
+                "feasts_lord_keys": [
+                    "BaptismLord",
+                    "Presentation"
+                ],
                 "feasts": [
                     {
                         "event_key": "ConversionStPaul",
@@ -269,7 +279,27 @@
                 "memorials_keys": [
                     "ImmaculateHeart",
                     "StsBasilGreg"
-                ]
+                ],
+                "suppressed_events": [
+                    {
+                        "event_key": "ChairStPeter",
+                        "date": "2023-02-22T00:00:00+00:00",
+                        "timezone_type": 3,
+                        "timezone": "UTC"
+                    },
+                    {
+                        "event_key": "StMatthiasAp",
+                        "date": "2023-05-14T00:00:00+00:00",
+                        "timezone_type": 3,
+                        "timezone": "UTC"
+                    }
+                ],
+                "suppressed_events_keys": [
+                    "ChairStPeter",
+                    "StMatthiasAp"
+                ],
+                "reinstated_events" : [],
+                "reinstated_events_keys" : []
             },
             "litcal": [
                 {
@@ -353,7 +383,7 @@
                 "additionalProperties": false,
                 "properties": {
                     "event_key": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                        "$ref": "./CommonDef.json#/definitions/EventKey"
                     },
                     "date": {
                         "type": "string",
@@ -379,16 +409,16 @@
                     "maximum": 2000
                 },
                 "event_key": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKeyVigilMass"
+                    "$ref": "./CommonDef.json#/definitions/EventKeyVigilMass"
                 },
                 "name": {
                     "type": "string"
                 },
                 "date": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Timestamp"
+                    "$ref": "./CommonDef.json#/definitions/Timestamp"
                 },
                 "color": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
+                    "$ref": "./CommonDef.json#/definitions/LitColor"
                 },
                 "color_lcl": {
                     "type": "array",
@@ -399,10 +429,10 @@
                     "uniqueItems": true
                 },
                 "type": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitFeastType"
+                    "$ref": "./CommonDef.json#/definitions/LitFeastType"
                 },
                 "grade": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                    "$ref": "./CommonDef.json#/definitions/LitGrade"
                 },
                 "grade_lcl": {
                     "type": "string"
@@ -414,7 +444,7 @@
                     "type": ["string", "null"]
                 },
                 "common": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitCommon"
+                    "$ref": "./CommonDef.json#/definitions/LitCommon"
                 },
                 "common_lcl": {
                     "type": "string"
@@ -480,7 +510,7 @@
                     "maximum": 4
                 },
                 "readings": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                    "$ref": "./CommonDef.json#/definitions/Readings"
                 }
             },
             "required": [
@@ -522,16 +552,16 @@
                     "maximum": 2000
                 },
                 "event_key": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKeyNonVigilMass"
+                    "$ref": "./CommonDef.json#/definitions/EventKeyNonVigilMass"
                 },
                 "name": {
                     "type": "string"
                 },
                 "date": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Timestamp"
+                    "$ref": "./CommonDef.json#/definitions/Timestamp"
                 },
                 "color": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
+                    "$ref": "./CommonDef.json#/definitions/LitColor"
                 },
                 "color_lcl": {
                     "type": "array",
@@ -542,10 +572,10 @@
                     "uniqueItems": true
                 },
                 "type": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitFeastType"
+                    "$ref": "./CommonDef.json#/definitions/LitFeastType"
                 },
                 "grade": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                    "$ref": "./CommonDef.json#/definitions/LitGrade"
                 },
                 "grade_lcl": {
                     "type": "string"
@@ -557,7 +587,7 @@
                     "type": ["string", "null"]
                 },
                 "common": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitCommon"
+                    "$ref": "./CommonDef.json#/definitions/LitCommon"
                 },
                 "common_lcl": {
                     "type": "string"
@@ -626,7 +656,7 @@
                     "maximum": 4
                 },
                 "readings": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                    "$ref": "./CommonDef.json#/definitions/Readings"
                 }
             },
             "required": [
@@ -664,7 +694,7 @@
             "additionalProperties": false,
             "properties": {
                 "year": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Year"
+                    "$ref": "./CommonDef.json#/definitions/Year"
                 },
                 "year_type": {
                     "type": "string",
@@ -674,16 +704,16 @@
                     ]
                 },
                 "epiphany": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Epiphany"
+                    "$ref": "./CommonDef.json#/definitions/Epiphany"
                 },
                 "ascension": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Ascension"
+                    "$ref": "./CommonDef.json#/definitions/Ascension"
                 },
                 "corpus_christi": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/CorpusChristi"
+                    "$ref": "./CommonDef.json#/definitions/CorpusChristi"
                 },
                 "locale": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+                    "$ref": "./CommonDef.json#/definitions/Locale"
                 },
                 "return_type": {
                     "type": "string",
@@ -715,7 +745,7 @@
             "additionalProperties": false,
             "properties": {
                 "year": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Year"
+                    "$ref": "./CommonDef.json#/definitions/Year"
                 },
                 "year_type": {
                     "type": "string",
@@ -725,16 +755,16 @@
                     ]
                 },
                 "epiphany": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Epiphany"
+                    "$ref": "./CommonDef.json#/definitions/Epiphany"
                 },
                 "ascension": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Ascension"
+                    "$ref": "./CommonDef.json#/definitions/Ascension"
                 },
                 "corpus_christi": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/CorpusChristi"
+                    "$ref": "./CommonDef.json#/definitions/CorpusChristi"
                 },
                 "locale": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+                    "$ref": "./CommonDef.json#/definitions/Locale"
                 },
                 "return_type": {
                     "type": "string",
@@ -749,7 +779,7 @@
                     "type": "boolean"
                 },
                 "national_calendar": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Nation"
+                    "$ref": "./CommonDef.json#/definitions/Nation"
                 }
             },
             "required": [
@@ -770,7 +800,7 @@
             "additionalProperties": false,
             "properties": {
                 "year": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Year"
+                    "$ref": "./CommonDef.json#/definitions/Year"
                 },
                 "year_type": {
                     "type": "string",
@@ -780,16 +810,16 @@
                     ]
                 },
                 "epiphany": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Epiphany"
+                    "$ref": "./CommonDef.json#/definitions/Epiphany"
                 },
                 "ascension": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Ascension"
+                    "$ref": "./CommonDef.json#/definitions/Ascension"
                 },
                 "corpus_christi": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/CorpusChristi"
+                    "$ref": "./CommonDef.json#/definitions/CorpusChristi"
                 },
                 "locale": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+                    "$ref": "./CommonDef.json#/definitions/Locale"
                 },
                 "return_type": {
                     "type": "string",
@@ -804,10 +834,10 @@
                     "type": "boolean"
                 },
                 "national_calendar": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Nation"
+                    "$ref": "./CommonDef.json#/definitions/Nation"
                 },
                 "diocesan_calendar": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                    "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
                 }
             },
             "required": [
@@ -828,16 +858,16 @@
             "additionalProperties": false,
             "properties": {
                 "vigil": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                    "$ref": "./CommonDef.json#/definitions/Readings"
                 },
                 "night": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                    "$ref": "./CommonDef.json#/definitions/Readings"
                 },
                 "dawn": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                    "$ref": "./CommonDef.json#/definitions/Readings"
                 },
                 "day": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                    "$ref": "./CommonDef.json#/definitions/Readings"
                 }
             },
             "required": [

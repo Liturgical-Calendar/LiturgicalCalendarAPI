@@ -75,10 +75,10 @@ final class DiocesanLitCalItem extends AbstractJsonSrcData
         $metadata        = json_encode($data['metadata'], JSON_THROW_ON_ERROR);
 
         /** @var \stdClass */
-        $liturgicalEvent = json_decode($liturgicalEvent, true, 512, JSON_THROW_ON_ERROR);
+        $liturgicalEvent = json_decode($liturgicalEvent, false, 512, JSON_THROW_ON_ERROR);
 
         /** @var \stdClass */
-        $metadata = json_decode($metadata, true, 512, JSON_THROW_ON_ERROR);
+        $metadata = json_decode($metadata, false, 512, JSON_THROW_ON_ERROR);
         return new static($liturgicalEvent, $metadata);
     }
 

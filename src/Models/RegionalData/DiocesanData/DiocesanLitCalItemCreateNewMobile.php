@@ -80,6 +80,9 @@ final class DiocesanLitCalItemCreateNewMobile extends LiturgicalEventData
      */
     public function setGrade(LitGrade $grade): void
     {
+        if ($grade === LitGrade::HIGHER_SOLEMNITY || $grade === LitGrade::FEAST_LORD) {
+            throw new \ValueError('Diocesan events cannot have grade HIGHER_SOLEMNITY or FEAST_LORD');
+        }
         $this->unlock();
         $this->grade = $grade;
         $this->lock();
@@ -125,11 +128,21 @@ final class DiocesanLitCalItemCreateNewMobile extends LiturgicalEventData
             throw new \ValueError('invalid common: expected an array of LitCommon enum cases, LitCommon enum values, or LitMassVariousNeeds instances');
         }
 
+        $grade = LitGrade::from($data->grade);
+        if ($grade === LitGrade::HIGHER_SOLEMNITY || $grade === LitGrade::FEAST_LORD) {
+            throw new \ValueError('Diocesan events cannot have grade HIGHER_SOLEMNITY or FEAST_LORD');
+        }
+
         return new static(
             $data->event_key,
             $strToTime,
-            array_map(fn($color) => LitColor::from($color), $data->color),
-            LitGrade::from($data->grade),
+            array_map(
+                function (string $color): LitColor {
+                    return LitColor::from($color);
+                },
+                $data->color
+            ),
+            $grade,
             $commons
         );
     }
@@ -167,11 +180,21 @@ final class DiocesanLitCalItemCreateNewMobile extends LiturgicalEventData
             throw new \ValueError('invalid common: expected an array of LitCommon enum cases, LitCommon enum values, or LitMassVariousNeeds instances');
         }
 
+        $grade = LitGrade::from($data['grade']);
+        if ($grade === LitGrade::HIGHER_SOLEMNITY || $grade === LitGrade::FEAST_LORD) {
+            throw new \ValueError('Diocesan events cannot have grade HIGHER_SOLEMNITY or FEAST_LORD');
+        }
+
         return new static(
             $data['event_key'],
             $strToTime,
-            array_map(fn($color) => LitColor::from($color), $data['color']),
-            LitGrade::from($data['grade']),
+            array_map(
+                function (string $color): LitColor {
+                    return LitColor::from($color);
+                },
+                $data['color']
+            ),
+            $grade,
             $commons
         );
     }

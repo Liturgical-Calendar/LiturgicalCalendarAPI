@@ -104,23 +104,21 @@ abstract class AbstractHandler implements RequestHandlerInterface
         }
 
         if ('' === $originsFile) {
-            throw new \Exception("Allowed origins file '{$originsFile}' not found.");
+            throw new \RuntimeException("Allowed origins file '{$originsFile}' not found.");
         }
 
         $originsFileContents = file($originsFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         if (false === $originsFileContents) {
-            throw new \Exception("Allowed origins file '{$originsFile}' could not be read.");
+            throw new \RuntimeException("Allowed origins file '{$originsFile}' could not be read.");
         }
 
-        $originsFileStringContents = array_map(
-            fn($v): string => strval($v),
+        /** @var string[] $trimmedOriginsFileContents */
+        $trimmedOriginsFileContents = array_map(
+            function (string $v): string {
+                return trim($v);
+            },
             $originsFileContents
         );
-
-        $trimmedOriginsFileContents = array_values(array_map(
-            fn($v): string => trim($v),
-            $originsFileStringContents
-        ));
 
         $this->setAllowedOrigins($trimmedOriginsFileContents);
 
@@ -156,7 +154,9 @@ abstract class AbstractHandler implements RequestHandlerInterface
     {
         $this->allowedAcceptHeaders = array_values(array_filter(
             AcceptHeader::cases(),
-            fn(AcceptHeader $case) => in_array($case, $acceptHeaders, true)
+            function (AcceptHeader $case) use ($acceptHeaders): bool {
+                return in_array($case, $acceptHeaders, true);
+            }
         ));
 
         return $this;
@@ -174,7 +174,9 @@ abstract class AbstractHandler implements RequestHandlerInterface
     {
         $this->allowedRequestMethods = array_values(array_filter(
             RequestMethod::cases(),
-            fn(RequestMethod $case) => in_array($case, $requestMethods, true)
+            function (RequestMethod $case) use ($requestMethods): bool {
+                return in_array($case, $requestMethods, true);
+            }
         ));
 
         return $this;
@@ -193,7 +195,9 @@ abstract class AbstractHandler implements RequestHandlerInterface
     {
         $this->allowedRequestContentTypes = array_values(array_filter(
             RequestContentType::cases(),
-            fn(RequestContentType $case) => in_array($case, $requestContentTypes, true)
+            function (RequestContentType $case) use ($requestContentTypes): bool {
+                return in_array($case, $requestContentTypes, true);
+            }
         ));
 
         return $this;
@@ -472,7 +476,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
         /** @var array<string,scalar|null> $filteredQueryParams */
         $filteredQueryParams = array_filter(
             $request->getQueryParams(),
-            fn($value) => is_scalar($value) || $value === null
+            fn($value): bool => ( is_scalar($value) || $value === null )
         );
         return $filteredQueryParams;
     }
@@ -530,10 +534,10 @@ abstract class AbstractHandler implements RequestHandlerInterface
 
         switch ($mime) {
             case RequestContentType::JSON:
-                $parsedBody = json_decode($rawBodyContents, true);
+                $parsedBody = json_decode($rawBodyContents, true, 512, JSON_THROW_ON_ERROR);
                 break;
             case RequestContentType::YAML:
-                if (!extension_loaded('yaml')) {
+                if (!extension_loaded('yaml') || !function_exists('yaml_parse')) {
                     throw new ImplementationException('YAML extension not loaded');
                 }
 
@@ -557,16 +561,22 @@ abstract class AbstractHandler implements RequestHandlerInterface
 
         // We don't expect a single scalar value, only an array of scalar values,
         // so we discard a pure scalar value
-        if (false === is_array($parsedBody)) {
+        if (false === is_array($parsedBody) || empty($parsedBody)) {
             if ($required) {
-                throw new UnsupportedMediaTypeException();
+                throw new ValidationException();
             } else {
                 // silently discard the parsed body content
                 return null;
             }
         }
+
         /** @var array<string,scalar|null> $parsedBodyWithOnlyScalarValues */
-        $parsedBodyWithOnlyScalarValues = array_filter($parsedBody, fn($value) => is_scalar($value) || $value === null);
+        $parsedBodyWithOnlyScalarValues = array_filter(
+            $parsedBody,
+            function ($value): bool {
+                return ( is_scalar($value) || $value === null );
+            }
+        );
         return $parsedBodyWithOnlyScalarValues;
     }
 

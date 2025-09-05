@@ -10,7 +10,7 @@ enum LitColor: string
     case PURPLE = 'purple';
     case WHITE  = 'white';
     case RED    = 'red';
-    case PINK   = 'pink';
+    case ROSE   = 'rose';
 
     /**
      * Translates a liturgical color to the specified locale.
@@ -35,7 +35,7 @@ enum LitColor: string
             /**translators: context = liturgical color */
             LitColor::RED    => ( $isLatin ? 'ruber'   : _('red') ),
             /**translators: context = liturgical color */
-            LitColor::PINK   => ( $isLatin ? 'rosea'   : _('pink') )
+            LitColor::ROSE   => ( $isLatin ? 'rosea'   : _('rose') )
         };
     }
 }

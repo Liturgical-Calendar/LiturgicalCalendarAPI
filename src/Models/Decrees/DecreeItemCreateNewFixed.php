@@ -137,7 +137,12 @@ final class DecreeItemCreateNewFixed extends DecreeEventData
             $data->calendar,
             $data->day,
             $data->month,
-            array_map(fn($color) => LitColor::from($color), $data->color),
+            array_map(
+                function ($color): LitColor {
+                    return LitColor::from($color);
+                },
+                $data->color
+            ),
             LitGrade::from($data->grade),
             $commons
         );
@@ -184,7 +189,12 @@ final class DecreeItemCreateNewFixed extends DecreeEventData
             $data['calendar'],
             $data['day'],
             $data['month'],
-            array_map(fn($color) => LitColor::from($color), $data['color']),
+            array_map(
+                function (string $color): LitColor {
+                    return LitColor::from($color);
+                },
+                $data['color']
+            ),
             LitGrade::from($data['grade']),
             $commons
         );
