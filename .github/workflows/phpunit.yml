@@ -102,7 +102,7 @@ jobs:
               index index.php;
 
               location ${API_BASE_PATH} {
-                  try_files $uri /index.php$is_args$args;
+                  try_files $$uri /index.php$$is_args$$args;
               }
 
               location ~ \.php$ {
