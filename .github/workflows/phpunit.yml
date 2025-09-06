@@ -118,7 +118,7 @@ jobs:
           sudo systemctl restart php${{ env.PHP_VERSION }}-fpm
           sudo systemctl stop nginx || true
           sudo ln -s /etc/nginx/sites-available/app.conf /etc/nginx/sites-enabled/app.conf
-          sudo nginx -c $GITHUB_WORKSPACE/app.conf -g 'daemon off;' &
+          nginx -c "$GITHUB_WORKSPACE/app.conf" -g 'daemon off;' &
           sleep 2  # give nginx a moment to start
 
 #      - name: Start the PHP web server
