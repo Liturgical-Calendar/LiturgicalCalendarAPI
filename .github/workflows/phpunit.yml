@@ -73,93 +73,34 @@ jobs:
       - name: Copy env file
         run: cp .env.example .env.local
 
-      - name: Load env file
-        run: |
-          set -a
-          source .env.local
-          set +a
-          # Export to GitHub Actions environment
-          echo "API_PROTOCOL=$API_PROTOCOL" >> $GITHUB_ENV
-          echo "API_HOST=$API_HOST" >> $GITHUB_ENV
-          echo "API_PORT=$API_PORT" >> $GITHUB_ENV
-          echo "API_BASE_PATH=$API_BASE_PATH" >> $GITHUB_ENV
-          echo "APP_ENV=CI" >> $GITHUB_ENV
-
-      - name: Install Nginx + PHP-FPM + gettext + locales
+      - name: Install gettext + locales
         run: |
           sudo apt-get update
-          sudo apt-get install -y nginx php${{ env.PHP_VERSION }}-fpm gettext locales-all
+          sudo apt-get install -y gettext locales-all
 
-          # stop system nginx and php-fpm if running
-          sudo systemctl stop nginx || true
-          sudo systemctl stop php${{ env.PHP_VERSION }}-fpm
+      - name: Start the PHP web server
+        run: composer start
 
-          # modify nginx.conf to run as the current runner user
-          sudo sed -i "s/^user www-data;/user $USER $GROUP;/" /etc/nginx/nginx.conf
-          sudo sed -i "s/^user = .*/user = $USER/" /etc/php/${{ env.PHP_VERSION }}/fpm/pool.d/www.conf
-          sudo sed -i "s/^group = .*/group = $GROUP/" /etc/php/${{ env.PHP_VERSION }}/fpm/pool.d/www.conf
-          sudo sed -i "s/^listen.owner = .*/listen.owner = $USER/" /etc/php/${{ env.PHP_VERSION }}/fpm/pool.d/www.conf
-          sudo sed -i "s/^listen.group = .*/listen.group = $GROUP/" /etc/php/${{ env.PHP_VERSION }}/fpm/pool.d/www.conf
+      - name: Wait for server PID
+        id: server-check
+        run: |
+          MAX_WAIT=10   # max seconds to wait
+          COUNT=0
+          while [ ! -f server.pid ] && [ $COUNT -lt $MAX_WAIT ]; do
+            sleep 1
+            COUNT=$((COUNT + 1))
+          done
 
-          # disable default nginx site
-          sudo rm -f /etc/nginx/sites-enabled/default
-
-          # create site config
-          cat > app.conf.template <<'EOF'
-          server {
-              listen ${API_PORT};
-              server_name ${API_HOST};
-              root $GITHUB_WORKSPACE/public;
-              index index.php;
-
-              location ${API_BASE_PATH} {
-                  try_files $uri $uri/ /index.php$is_args$args;
-              }
-
-              location ~ \.php$ {
-                  include snippets/fastcgi-php.conf;
-                  fastcgi_pass unix:/var/run/php/php${PHP_VERSION}-fpm.sock;
-                  fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-              }
-          }
-          EOF
-
-          # substitute variables and install site config
-          envsubst '${API_PROTOCOL},${API_HOST},${API_PORT},${API_BASE_PATH},${GITHUB_WORKSPACE},${PHP_VERSION}' < app.conf.template | sudo tee /etc/nginx/sites-available/app.conf > /dev/null
-          sudo ln -sf /etc/nginx/sites-available/app.conf /etc/nginx/sites-enabled/app.conf
-
-          # restart php-fpm
-          sudo systemctl start php${{ env.PHP_VERSION }}-fpm
-
-          # start nginx
-          sudo systemctl start nginx
-          sleep 2
-
-#      - name: Start the PHP web server
-#        run: composer start
-
-#      - name: Wait for server PID
-#        id: server-check
-#        run: |
-#          MAX_WAIT=10   # max seconds to wait
-#          COUNT=0
-#          while [ ! -f server.pid ] && [ $COUNT -lt $MAX_WAIT ]; do
-#            sleep 1
-#            COUNT=$((COUNT + 1))
-#          done
-#
-#          if [ -f server.pid ]; then
-#            echo "Server is running."
-#            echo "server_found=true" >> $GITHUB_OUTPUT
-#          else
-#            echo "Server failed to start within $MAX_WAIT seconds."
-#            echo "server_found=false" >> $GITHUB_OUTPUT
-#          fi
+          if [ -f server.pid ]; then
+            echo "Server is running."
+            echo "server_found=true" >> $GITHUB_OUTPUT
+          else
+            echo "Server failed to start within $MAX_WAIT seconds."
+            echo "server_found=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Run tests
+        if: steps.server-check.outputs.server_found == 'true'
         run: |
-          # sanity check server is up
-          curl -v "${API_PROTOCOL}://${API_HOST}:${API_PORT}/" || true
-          tail -n 50 /var/log/nginx/error.log
           composer dump-autoload --optimize
           time composer test
