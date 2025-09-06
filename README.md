@@ -184,7 +184,7 @@ DOCKER_BUILDKIT=1 docker build -t liturgy-api:{branch} .
 docker run -p 8000:8000 -d liturgy-api:{branch}
 ```
 
-This will result in a docker image of about 1.09GB. Unfortunately this cannot be reduced by means of an alpine image,
+This typically results in a Docker image of ~1.1 GB (subject to change). Unfortunately this cannot be reduced by means of an alpine image,
 if we want to install system locales in order for `gettext` to work properly with all supported languages.
 
 # Translations

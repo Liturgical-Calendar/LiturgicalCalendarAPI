@@ -78,7 +78,7 @@
                     </xs:element>
                     <xs:element name="DayOfTheWeekLong" type="xs:string" />
                     <xs:element name="DayOfTheWeekShort" type="xs:string" />
-                    <xs:element name="EventIdx" type="xs:string" />
+                    <xs:element name="EventIdx" type="xs:integer" />
                     <xs:element name="EventKey" type="xs:string" />
                     <xs:element name="Grade">
                       <xs:simpleType>
@@ -483,7 +483,7 @@
     <xs:complexContent>
       <xs:extension base="cl:ReadingsType">
         <xs:sequence>
-          <xs:element name="OutsideEasterSeasonType" type="cl:ReadingsFerialType" minOccurs="1" maxOccurs="1" />
+          <xs:element name="OutsideEasterSeason" type="cl:ReadingsFerialType" minOccurs="1" maxOccurs="1" />
           <xs:element name="EasterSeason" type="cl:ReadingsFerialType" minOccurs="1" maxOccurs="1" />
         </xs:sequence>
         <xs:attribute name="readingsType" type="xs:string" use="required" fixed="seasonal" />

@@ -35,9 +35,9 @@
         "psr/http-server-middleware": "^1.0",
         "psr/http-server-handler": "^1.0",
         "guzzlehttp/guzzle": "7.10",
-        "react/filesystem": "0.2.x-dev",
         "symfony/semaphore": "^7.3",
-        "symfony/lock": "^7.3"
+        "symfony/lock": "^7.3",
+        "react/filesystem": "0.2.x-dev"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^4.0",

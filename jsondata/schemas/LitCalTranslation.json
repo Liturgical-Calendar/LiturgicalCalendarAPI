@@ -1,16 +1,11 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$schema": "https://json-schema.org/draft-07/schema#",
     "$id": "./LitCalTranslation.json",
     "title": "LitCalTranslation",
     "type": "object",
     "description": "a collection of key value pairs, in which the keys are the event_key ids for Liturgical events as defined in the Liturgical Calendar json definition being translated; the name of the current file is the two-letter ISO code (optionally with a region identifier) of the language for the translation",
-    "additionalProperties": false,
+    "additionalProperties":  { "type": "string" },
     "propertyNames": {
         "$ref": "./CommonDef.json#/definitions/EventKey"
-    },
-    "patternProperties": {
-        "": {
-            "type": "string"
-        }
     }
 }

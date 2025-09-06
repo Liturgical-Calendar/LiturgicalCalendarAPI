@@ -46,7 +46,7 @@
             "fileMatch": [
                 "/sourcedata/tests/*.json"
             ],
-            "url": "./jsondata/LitCalTest.json"
+            "url": "./jsondata/schemas/LitCalTest.json"
         },
         {
             "fileMatch": [

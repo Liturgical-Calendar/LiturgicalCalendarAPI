@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$schema": "https://json-schema.org/draft-07/schema#",
     "$id": "./LitCalMissalsPath.json",
     "title": "LitCalMissalsPath",
     "description": "A collection of the Missals from which sanctorale data is used to define one or another Liturgical Calendar",
@@ -63,7 +63,7 @@
                     "type": "array",
                     "items": {
                         "type": "string",
-                        "pattern": "^[a-z]{2}(?:_[A-Z]{2})?$"
+                        "pattern": "^[a-z]{2}(?:[_-][A-Z]{2})?$"
                     }
                 },
                 "api_path": {

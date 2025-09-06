@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$schema": "https://json-schema.org/draft-07/schema#",
     "$id": "./DiocesanCalendar.json",
     "title": "DiocesanCalendar",
     "type": "object",
@@ -60,7 +60,9 @@
                                 "type": "string"
                             },
                             "strtotime": {
-                                "type": "string"
+                                "type": "string",
+                                "description": "supports PHP strtotime string format",
+                                "minLength": 1
                             }
                         },
                         "required": [
@@ -119,12 +121,13 @@
                 "locales": {
                     "type": "array",
                     "uniqueItems": true,
+                    "minItems": 1,
                     "items": {
                         "$ref": "./CommonDef.json#/definitions/Locale"
                     }
                 },
                 "timezone": {
-                    "type": "string"
+                    "$ref": "./CommonDef.json#/definitions/Timezone"
                 },
                 "group": {
                     "type": "string"
@@ -141,23 +144,11 @@
         "CalendarI18n": {
             "type": "object",
             "description": "A JSON object of the form { \"locale\": { \"key\": \"value\" } }, used only in PUT and PATCH requests.",
-            "additionalProperties": false,
+            "additionalProperties": {
+                "$ref": "./LitCalTranslation.json"
+            },
             "propertyNames": {
                 "$ref": "./CommonDef.json#/definitions/Locale"
-            },
-            "patternProperties": {
-                "": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "propertyNames": {
-                        "$ref": "./CommonDef.json#/definitions/EventKey"
-                    },
-                    "patternProperties": {
-                        "": {
-                            "type": "string"
-                        }
-                    }
-                }
             }
         }
     }

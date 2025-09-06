@@ -15,7 +15,7 @@
                 "command": "cmd",
                 "args": [
                     "/c",
-                    "start ${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}"
+                    "start \"\" ${APP_PROTOCOL}://${APP_HOST}:${APP_PORT}"
                 ],
                 "problemMatcher": []
             },
@@ -43,24 +43,31 @@
                     "PHP_CLI_SERVER_WORKERS": "6"
                 }
             },
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "dependsOn": [
-                "launch-browser"
-            ],
             "windows": {
                 "command": "bash",
                 "args": [
                     "-c",
                     "./start-server.sh"
                 ],
-                "env": {
-                    "RUN_MODE": "vscode",
-                    "PHP_CLI_SERVER_WORKERS": "6"
+                "options": {
+                    "env": {
+                        "RUN_MODE": "vscode",
+                        "PHP_CLI_SERVER_WORKERS": "6"
+                    }
                 }
             }
+        },
+        {
+            "label": "litcal-api",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "dependsOn": [
+                "api-server",
+                "launch-browser"
+            ],
+            "dependsOrder": "sequence"
         },
         {
             "label": "litcal-tests-websockets",

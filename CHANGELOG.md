@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## [v5.0](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v5.0) (Unreleased)
+## [v5.0](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.0) (Unreleased)
 
 * add support for `PUT`, `PATCH` and `DELETE` requests (issues #284, #265, and #220)
 * fix "Feria VII is a bad translation for Sabbato" (issue #310)
@@ -8,28 +8,28 @@
 * implement lectionary readings (issues #321, #324, #326)
 * fix Feasts of the Lord not suppressing Sundays (issues #324, #327)
 
-## [v4.5](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v4.5) (March 25th 2025)
+## [v4.5](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v4.5) (March 25th 2025)
 
 * restore wider region calendar `PUT`, `PATCH` and `DELETE` requests with full support for all i18n languages (issues #284, #265, and #220)
 Happy Feast of the Annunciation!
 
-## [v4.4](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v4.4) (March 22nd 2025)
+## [v4.4](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v4.4) (March 22nd 2025)
 
 * restore national calendar `PUT`, `PATCH` and `DELETE` requests with full support for all i18n languages (issues #284, #265, and #220)
 
-## [v4.3](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v4.3) (January 26th 2025)
+## [v4.3](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v4.3) (January 26th 2025)
 
 * realign XML output with latest developments (issue #290)
 
-## [v4.2](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v4.2) (January 25th 2025)
+## [v4.2](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v4.2) (January 25th 2025)
 
 * realign ICS output with latest developments (issue #288)
 
-## [v4.1](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v4.1) (January 22nd 2025)
+## [v4.1](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v4.1) (January 22nd 2025)
 
 * restore diocesan calendar `PUT`, `PATCH` and `DELETE` requests with full support for all i18n languages (issue #284)
 
-## [v4.0](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v4.0) (January 3rd 2025)
+## [v4.0](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v4.0) (January 3rd 2025)
 
 * package the API source as a composer library for autoload functionality
 * move the endpoints from PHP scripts to resource paths, and create a router
@@ -56,7 +56,7 @@ Happy Feast of the Annunciation!
 * feature: all national and diocesan calendars are now multilingual by default, see issue [#150](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/150)
 * and a number of other bugfixes, features, and improvements
 
-## [v3.9](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.9) (April 9th 2024)
+## [v3.9](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v3.9) (April 9th 2024)
 
 * update PHP dependencies (`swaggest/json-schema`, `phpunit/phpunit`)
 * add swagger validation badge to README
@@ -85,7 +85,7 @@ Happy Feast of the Annunciation!
   * [update EternalHighPriest setting based on national calendar](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/256409be041825a1acc22dcc6c204e0d760578eb)
 * update schemas to account for new settings and new properties in response output
 
-## [v3.8](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.8) (February 1st 2023)
+## [v3.8](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v3.8) (February 1st 2023)
 
 * fix language for iCal / ICS format
 * fix bug in LitColor enum (static class variable)
@@ -94,14 +94,14 @@ Happy Feast of the Annunciation!
 * define Divine Mercy Sunday starting from the year 2000
 * update OpenAPI schema to v3.1
 
-## [v3.7](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.7) (December 14th 2022)
+## [v3.7](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v3.7) (December 14th 2022)
 
 * fix support for correct ordinal number spelling for any language
 * fix "Year I", "Year II" references which should only concern weekdays of Ordinary Time
 * fix: in cases where the diocesancalendar parameter was set, but the nationalcalendar parameter was not, the national calendar settings were not being picked up correctly
 * fix for Netherlands national calendar data (Ascension on Thursday)
 
-## [v3.6](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.6) (December 13th 2022)
+## [v3.6](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v3.6) (December 13th 2022)
 
 * allow Diocesan calendars to define mobile festivities
 * allow Diocesan calendars to define `untilYear` properties for festivities that may have changes after a given year
@@ -109,12 +109,12 @@ Happy Feast of the Annunciation!
 * allow for geographic locales, in order to better identify source data for a given national or diocesan calendar
 * remove hardcoding of supported national calendars, and automate the scan for existing calendars
 
-## [v3.5](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.5) (December 4th 2022)
+## [v3.5](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v3.5) (December 4th 2022)
 
 * Fix days before / after Epiphany (handled differently in different national calendars!)
 * Add Dutch translation for Netherlands, thanks to Steven van Roode
 
-## [v3.4](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.4) (June 6th 2022)
+## [v3.4](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v3.4) (June 6th 2022)
 
 * Fix issue with Saint Vincent deacon in national calendar for USA • [c27289f](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/c27289f3c893a184d605e8b1a495a48e2e76669d)
 * simplify calculation of Vigil Masses • [0afa39b](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/0afa39b838611554d32fd0d1c2a80a11a92ec696)
@@ -205,21 +205,21 @@ Happy Feast of the Annunciation!
 * add more data for National Calendars to the Metadata endpoint • [34ef54f](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/34ef54f06d5183b463cce0305f649c182edca2b3)
 * update translations
 
-## [v3.3](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.3) (January 27th 2022)
+## [v3.3](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v3.3) (January 27th 2022)
 
 * move liturgical event data from the 2008 Editio Typica Tertia emendata out from the `LitCalAPI.php`, to a JSON file
 * move data for festivities from Decrees of the Congregation of Divine Worship out from the `LitCalAPI.php`, to a JSON file
 
-## [v3.2](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.2) (January 23rd 2022)
+## [v3.2](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v3.2) (January 23rd 2022)
 
 * allow full CORS requests from enabled domains
 * allow Diocesan overrides for Epiphany, Ascension and Corpus Christi
 
-## [v3.1](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.1) (December 26th 2021)
+## [v3.1](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v3.1) (December 26th 2021)
 
 * bugfix which was missed in the v3.0 release: 86ee62ad68d58736880da2b5b39117dec7386dfc
 
-## [v3.0](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v3.0) (December 26th 2021)
+## [v3.0](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v3.0) (December 26th 2021)
 
 * all calendar data moved from a MySQL database to JSON files, that can be tracked in the repository
 * the Calendar data for the Universal Calendar, as contained in the JSON files, is now translatable to other languages through a Weblate project
@@ -232,20 +232,20 @@ Happy Feast of the Annunciation!
 * Data type can be set through the `Accept` header rather than the `returntype` parameter
 * Language can be set through the `Accept-Language` header rather than the `locale` parameter
 
-## [v2.9](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v2.9) (November 12th 2020)
+## [v2.9](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v2.9) (November 12th 2020)
 
 * adds Vigil Masses for Sundays and Solemnities, including occasional notes by the Congregation for Divine Worship
 * add Patron Saints of Europe, applicable for Italian Calendar (and eventually any other national calendar in Europe that may be added in the future)
 * add Saturday Memorial of the Blessed Virgin Mary
 
-## [v2.8](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v2.8) (August 11th 2020)
+## [v2.8](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v2.8) (August 11th 2020)
 
 * adds `diocesanpreset` and `nationalpreset` parameters with relative calendar data
 * adds all of the data from the recent Decrees of the Congregation for Divine Worship and verifies integrity with past Decrees
 * ensures `Messages` returned are as specific as possible, while trying to keep the code as clean as possible
 * adds FullCalendar example
 
-## [v2.7](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v2.7) (July 28th 2020)
+## [v2.7](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v2.7) (July 28th 2020)
 
 * adds `Messages` array to the data that is generated by the endpoint, justifying the calculations made for the generation of the requested calendar
 * fixes an issue with the memorial Saint Jane Frances de Chantal after 1999, when it was decided to move the memorial from Dec. 12 to Aug. 12
@@ -257,29 +257,29 @@ Happy Feast of the Annunciation!
 * update PHP example to fix parsing of Liturgical colors for memorials with more than one possible Common and more than one possible liturgical color
 * fix a few errors in the database as regards liturgical colors for some memorials with more than one possible Common
 
-## [v2.6](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v2.6) (July 26th 2020)
+## [v2.6](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v2.6) (July 26th 2020)
 
 * integrate the calculation of the liturgical cycle (YEAR A,B,C for festivities and YEAR I,II for weekdays) directly into the engine,
   so that applications that take care of elaborating the data for display don't have to worry about it
 * update both examples, PHP and Javascript, to use the new `liturgicalyear` property returned in the JSON data,
   and bring Javascript example up to par with the PHP example (add month cell that spans all events for that month)
 
-## [v2.5](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v2.5) (July 25th 2020)
+## [v2.5](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v2.5) (July 25th 2020)
 
 * make sure all endpoint parameters can have values with either uppercase or lowercase characters
 * fix a few small issues with the ICS data generation
 
-## [v2.4](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/v2.4) (July 24th 2020)
+## [v2.4](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v2.4) (July 24th 2020)
 
 * move as many festivities as possible to the MySQL tables to allow for localization (mobile feasts will be calculated in the script, but still need to be localized)
 * add ICS data generation (requires more localization strings, because it is already a form of final display of the data)
 
-## [v2.0](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/2.0) (January 8th 2018)
+## [v2.0](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/2.0) (January 8th 2018)
 
 * separate the display logic from the engine, so that the engine can act as an endpoint
 * make the engine return JSON or XML data that the display logic can use to generate a user-friendly representation of the data
 
-## [v1.0](https://github.com/JohnRDOrazio/LiturgicalCalendar/releases/tag/1.0) (July 26th 2017)
+## [v1.0](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/1.0) (July 26th 2017)
 
 * proof of concept for the correct generation of a liturgical calendar
 * create MySQL table for the Proper of the Saints

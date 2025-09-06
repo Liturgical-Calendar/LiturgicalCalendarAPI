@@ -8,7 +8,7 @@
   ],
   "info": {
     "description": "An API which allows to retrieve data about the **Roman Calendar** for any given year, between 1970 and 9999. The data strives for historical accuracy (memorials and feast days are only generated from the year in which they were effectively introduced). The data is based on original sources (Roman Missals, Decrees of the Congregation for Divine Worship, Mysterii Paschalis, etc.), not on data copied or retrieved from online sources which may not be accurate. The API offers multiple locales and multiple calendars, from the **General Roman Calendar** to national or diocesan calendars.",
-    "version": "4.5",
+    "version": "5.0",
     "title": "Liturgical Calendar",
     "contact": {
       "email": "priest@johnromanodorazio.com",
@@ -68,7 +68,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+              "$ref": "./CommonDef.json#/definitions/Locale"
             }
           },
           {
@@ -156,12 +156,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "text/calendar": {
@@ -181,19 +181,19 @@
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
-            "description": "Bad Request: invalid parameters or malformed data in request body"
+            "$ref": "#/components/responses/BadRequest400"
           },
           "405": {
-            "description": "Method Not Allowed"
+            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
-            "description": "Not Acceptable: Accept header requests a response Content Type which this API cannot produce"
+            "$ref": "#/components/responses/NotAcceptable406"
           },
           "415": {
-            "description": "Unsupported Media Type: Content Type of request not valid"
+            "$ref": "#/components/responses/UnsupportedMediaType415"
           },
           "418": {
-            "description": "I'm a teapot: request in this case must be an AJAX request, but AJAX request not detected"
+            "$ref": "#/components/responses/IMATeapot418"
           }
         }
       },
@@ -210,7 +210,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+              "$ref": "./CommonDef.json#/definitions/Locale"
             }
           },
           {
@@ -311,12 +311,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "text/calendar": {
@@ -336,19 +336,19 @@
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
-            "description": "Bad Request: invalid parameters or malformed data in request body"
+            "$ref": "#/components/responses/BadRequest400"
           },
           "405": {
-            "description": "Method Not Allowed"
+            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
-            "description": "Not Acceptable: Accept header requests a response Content Type which this API cannot produce"
+            "$ref": "#/components/responses/NotAcceptable406"
           },
           "415": {
-            "description": "Unsupported Media Type: Content Type of request not valid"
+            "$ref": "#/components/responses/UnsupportedMediaType415"
           },
           "418": {
-            "description": "I'm a teapot: request in this case must be an AJAX request, but AJAX request not detected"
+            "$ref": "#/components/responses/IMATeapot418"
           }
         }
       }
@@ -367,7 +367,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+              "$ref": "./CommonDef.json#/definitions/Locale"
             },
             "required": true
           },
@@ -467,12 +467,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "text/calendar": {
@@ -492,19 +492,19 @@
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
-            "description": "Bad Request: invalid parameters or malformed data in request body"
+            "$ref": "#/components/responses/BadRequest400"
           },
           "405": {
-            "description": "Method Not Allowed"
+            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
-            "description": "Not Acceptable: Accept header requests a response Content Type which this API cannot produce"
+            "$ref": "#/components/responses/NotAcceptable406"
           },
           "415": {
-            "description": "Unsupported Media Type: Content Type of request not valid"
+            "$ref": "#/components/responses/UnsupportedMediaType415"
           },
           "418": {
-            "description": "I'm a teapot: request in this case must be an AJAX request, but AJAX request not detected"
+            "$ref": "#/components/responses/IMATeapot418"
           }
         }
       },
@@ -521,7 +521,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+              "$ref": "./CommonDef.json#/definitions/Locale"
             }
           },
           {
@@ -633,12 +633,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "text/calendar": {
@@ -658,19 +658,19 @@
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
-            "description": "Bad Request: invalid parameters or malformed data in request body"
+            "$ref": "#/components/responses/BadRequest400"
           },
           "405": {
-            "description": "Method Not Allowed"
+            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
-            "description": "Not Acceptable: Accept header requests a response Content Type which this API cannot produce"
+            "$ref": "#/components/responses/NotAcceptable406"
           },
           "415": {
-            "description": "Unsupported Media Type: Content Type of request not valid"
+            "$ref": "#/components/responses/UnsupportedMediaType415"
           },
           "418": {
-            "description": "I'm a teapot: request in this case must be an AJAX request, but AJAX request not detected"
+            "$ref": "#/components/responses/IMATeapot418"
           }
         }
       }
@@ -689,7 +689,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+              "$ref": "./CommonDef.json#/definitions/Locale"
             }
           },
           {
@@ -781,12 +781,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "text/calendar": {
@@ -806,19 +806,19 @@
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
-            "description": "Bad Request: invalid parameters or malformed data in request body"
+            "$ref": "#/components/responses/BadRequest400"
           },
           "405": {
-            "description": "Method Not Allowed"
+            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
-            "description": "Not Acceptable: Accept header requests a response Content Type which this API cannot produce"
+            "$ref": "#/components/responses/NotAcceptable406"
           },
           "415": {
-            "description": "Unsupported Media Type: Content Type of request not valid"
+            "$ref": "#/components/responses/UnsupportedMediaType415"
           },
           "418": {
-            "description": "I'm a teapot: request in this case must be an AJAX request, but AJAX request not detected"
+            "$ref": "#/components/responses/IMATeapot418"
           }
         }
       },
@@ -835,7 +835,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+              "$ref": "./CommonDef.json#/definitions/Locale"
             }
           },
           {
@@ -943,12 +943,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "text/calendar": {
@@ -968,19 +968,19 @@
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
-            "description": "Bad Request: invalid parameters or malformed data in request body"
+            "$ref": "#/components/responses/BadRequest400"
           },
           "405": {
-            "description": "Method Not Allowed"
+            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
-            "description": "Not Acceptable: Accept header requests a response Content Type which this API cannot produce"
+            "$ref": "#/components/responses/NotAcceptable406"
           },
           "415": {
-            "description": "Unsupported Media Type: Content Type of request not valid"
+            "$ref": "#/components/responses/UnsupportedMediaType415"
           },
           "418": {
-            "description": "I'm a teapot: request in this case must be an AJAX request, but AJAX request not detected"
+            "$ref": "#/components/responses/IMATeapot418"
           }
         }
       }
@@ -999,7 +999,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+              "$ref": "./CommonDef.json#/definitions/Locale"
             }
           },
           {
@@ -1102,12 +1102,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "text/calendar": {
@@ -1127,19 +1127,19 @@
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
-            "description": "Bad Request: invalid parameters or malformed data in request body"
+            "$ref": "#/components/responses/BadRequest400"
           },
           "405": {
-            "description": "Method Not Allowed"
+            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
-            "description": "Not Acceptable: Accept header requests a response Content Type which this API cannot produce"
+            "$ref": "#/components/responses/NotAcceptable406"
           },
           "415": {
-            "description": "Unsupported Media Type: Content Type of request not valid"
+            "$ref": "#/components/responses/UnsupportedMediaType415"
           },
           "418": {
-            "description": "I'm a teapot: request in this case must be an AJAX request, but AJAX request not detected"
+            "$ref": "#/components/responses/IMATeapot418"
           }
         }
       },
@@ -1156,7 +1156,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+              "$ref": "./CommonDef.json#/definitions/Locale"
             }
           },
           {
@@ -1274,12 +1274,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "text/calendar": {
@@ -1299,19 +1299,19 @@
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
-            "description": "Bad Request: invalid parameters or malformed data in request body"
+            "$ref": "#/components/responses/BadRequest400"
           },
           "405": {
-            "description": "Method Not Allowed"
+            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
-            "description": "Not Acceptable: Accept header requests a response Content Type which this API cannot produce"
+            "$ref": "#/components/responses/NotAcceptable406"
           },
           "415": {
-            "description": "Unsupported Media Type: Content Type of request not valid"
+            "$ref": "#/components/responses/UnsupportedMediaType415"
           },
           "418": {
-            "description": "I'm a teapot: request in this case must be an AJAX request, but AJAX request not detected"
+            "$ref": "#/components/responses/IMATeapot418"
           }
         }
       }
@@ -1330,7 +1330,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+              "$ref": "./CommonDef.json#/definitions/Locale"
             }
           },
           {
@@ -1352,7 +1352,7 @@
             "name": "calendar_id",
             "required": true,
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
             }
           },
           {
@@ -1415,12 +1415,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "text/calendar": {
@@ -1440,19 +1440,19 @@
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
-            "description": "Bad Request: invalid parameters or malformed data in request body"
+            "$ref": "#/components/responses/BadRequest400"
           },
           "405": {
-            "description": "Method Not Allowed"
+            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
-            "description": "Not Acceptable: Accept header requests a response Content Type which this API cannot produce"
+            "$ref": "#/components/responses/NotAcceptable406"
           },
           "415": {
-            "description": "Unsupported Media Type: Content Type of request not valid"
+            "$ref": "#/components/responses/UnsupportedMediaType415"
           },
           "418": {
-            "description": "I'm a teapot: request in this case must be an AJAX request, but AJAX request not detected"
+            "$ref": "#/components/responses/IMATeapot418"
           }
         }
       },
@@ -1469,7 +1469,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+              "$ref": "./CommonDef.json#/definitions/Locale"
             }
           },
           {
@@ -1491,7 +1491,7 @@
             "name": "calendar_id",
             "required": true,
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
             }
           }
         ],
@@ -1570,12 +1570,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "text/calendar": {
@@ -1595,19 +1595,19 @@
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
-            "description": "Bad Request: invalid parameters or malformed data in request body"
+            "$ref": "#/components/responses/BadRequest400"
           },
           "405": {
-            "description": "Method Not Allowed"
+            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
-            "description": "Not Acceptable: Accept header requests a response Content Type which this API cannot produce"
+            "$ref": "#/components/responses/NotAcceptable406"
           },
           "415": {
-            "description": "Unsupported Media Type: Content Type of request not valid"
+            "$ref": "#/components/responses/UnsupportedMediaType415"
           },
           "418": {
-            "description": "I'm a teapot: request in this case must be an AJAX request, but AJAX request not detected"
+            "$ref": "#/components/responses/IMATeapot418"
           }
         }
       }
@@ -1626,7 +1626,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+              "$ref": "./CommonDef.json#/definitions/Locale"
             }
           },
           {
@@ -1648,7 +1648,7 @@
             "name": "calendar_id",
             "required": true,
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
             }
           },
           {
@@ -1722,12 +1722,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "text/calendar": {
@@ -1747,19 +1747,19 @@
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
-            "description": "Bad Request: invalid parameters or malformed data in request body"
+            "$ref": "#/components/responses/BadRequest400"
           },
           "405": {
-            "description": "Method Not Allowed"
+            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
-            "description": "Not Acceptable: Accept header requests a response Content Type which this API cannot produce"
+            "$ref": "#/components/responses/NotAcceptable406"
           },
           "415": {
-            "description": "Unsupported Media Type: Content Type of request not valid"
+            "$ref": "#/components/responses/UnsupportedMediaType415"
           },
           "418": {
-            "description": "I'm a teapot: request in this case must be an AJAX request, but AJAX request not detected"
+            "$ref": "#/components/responses/IMATeapot418"
           }
         }
       },
@@ -1776,7 +1776,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+              "$ref": "./CommonDef.json#/definitions/Locale"
             }
           },
           {
@@ -1798,7 +1798,7 @@
             "name": "calendar_id",
             "required": true,
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
             }
           },
           {
@@ -1888,12 +1888,12 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "application/yaml": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCal.json"
+                  "$ref": "./LitCal.json"
                 }
               },
               "text/calendar": {
@@ -1913,19 +1913,19 @@
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
-            "description": "Bad Request: invalid parameters or malformed data in request body"
+            "$ref": "#/components/responses/BadRequest400"
           },
           "405": {
-            "description": "Method Not Allowed"
+            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
-            "description": "Not Acceptable: Accept header requests a response Content Type which this API cannot produce"
+            "$ref": "#/components/responses/NotAcceptable406"
           },
           "415": {
-            "description": "Unsupported Media Type: Content Type of request not valid"
+            "$ref": "#/components/responses/UnsupportedMediaType415"
           },
           "418": {
-            "description": "I'm a teapot: request in this case must be an AJAX request, but AJAX request not detected"
+            "$ref": "#/components/responses/IMATeapot418"
           }
         }
       }
@@ -1953,10 +1953,10 @@
             "description": "304 Not Modified"
           },
           "404": {
-            "description": "404 Not Found: index file resource not found"
+            "$ref": "#/components/responses/NotFound404"
           },
           "503": {
-            "description": "503 Service Unavailable: could not read index file resource"
+            "$ref": "#/components/responses/ServiceUnavailable503"
           }
         }
       },
@@ -1982,10 +1982,10 @@
             "description": "304 Not Modified"
           },
           "404": {
-            "description": "404 Not Found: index file resource not found"
+            "$ref": "#/components/responses/NotFound404"
           },
           "503": {
-            "description": "503 Service Unavailable: could not read index file resource"
+            "$ref": "#/components/responses/ServiceUnavailable503"
           }
         }
       }
@@ -2003,7 +2003,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+              "$ref": "./CommonDef.json#/definitions/Locale"
             }
           }
         ],
@@ -2075,10 +2075,10 @@
             "description": "304 Not Modified"
           },
           "404": {
-            "description": "404 Not Found: resource file not found"
+            "$ref": "#/components/responses/NotFound404"
           },
           "503": {
-            "description": "503 Service Unavailable: could not decode resource files"
+            "$ref": "#/components/responses/ServiceUnavailable503"
           }
         }
       },
@@ -2094,7 +2094,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+              "$ref": "./CommonDef.json#/definitions/Locale"
             }
           }
         ],
@@ -2166,10 +2166,10 @@
             "description": "304 Not Modified"
           },
           "404": {
-            "description": "404 Not Found: resource file not found"
+            "$ref": "#/components/responses/NotFound404"
           },
           "503": {
-            "description": "503 Service Unavailable: could not decode resource files"
+            "$ref": "#/components/responses/ServiceUnavailable503"
           }
         }
       }
@@ -2187,7 +2187,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+              "$ref": "./CommonDef.json#/definitions/Locale"
             }
           },
           {
@@ -2273,10 +2273,10 @@
             "description": "304 Not Modified"
           },
           "404": {
-            "description": "404 Not Found: resource file not found"
+            "$ref": "#/components/responses/NotFound404"
           },
           "503": {
-            "description": "503 Service Unavailable: could not decode resource files"
+            "$ref": "#/components/responses/ServiceUnavailable503"
           }
         }
       },
@@ -2292,7 +2292,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+              "$ref": "./CommonDef.json#/definitions/Locale"
             }
           },
           {
@@ -2378,10 +2378,10 @@
             "description": "304 Not Modified"
           },
           "404": {
-            "description": "404 Not Found: resource file not found"
+            "$ref": "#/components/responses/NotFound404"
           },
           "503": {
-            "description": "503 Service Unavailable: could not decode resource files"
+            "$ref": "#/components/responses/ServiceUnavailable503"
           }
         }
       }
@@ -2399,7 +2399,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+              "$ref": "./CommonDef.json#/definitions/Locale"
             }
           },
           {
@@ -2407,7 +2407,7 @@
             "name": "calendar_id",
             "required": true,
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
             }
           }
         ],
@@ -2479,10 +2479,10 @@
             "description": "304 Not Modified"
           },
           "404": {
-            "description": "404 Not Found: resource file not found"
+            "$ref": "#/components/responses/NotFound404"
           },
           "503": {
-            "description": "503 Service Unavailable: could not decode resource files"
+            "$ref": "#/components/responses/ServiceUnavailable503"
           }
         }
       },
@@ -2498,7 +2498,7 @@
             "in": "header",
             "name": "Accept-Language",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+              "$ref": "./CommonDef.json#/definitions/Locale"
             }
           },
           {
@@ -2506,7 +2506,7 @@
             "name": "calendar_id",
             "required": true,
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
             }
           }
         ],
@@ -2578,10 +2578,10 @@
             "description": "304 Not Modified"
           },
           "404": {
-            "description": "404 Not Found: resource file not found"
+            "$ref": "#/components/responses/NotFound404"
           },
           "503": {
-            "description": "503 Service Unavailable: could not decode resource files"
+            "$ref": "#/components/responses/ServiceUnavailable503"
           }
         }
       }
@@ -2599,7 +2599,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/NationalCalendar.json"
+                "$ref": "./NationalCalendar.json"
               }
             }
           }
@@ -2628,47 +2628,10 @@
             }
           },
           "400": {
-            "description": "400 Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "examples": [
-                        "Not all required parameters were received (LitCal, Metadata, Settings|NationalCalendars OR LitCal, Diocese, Nation)",
-                        "Malformed data received in <LitCal> parameters"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest400"
           },
           "422": {
-            "description": "422 Unprocessable Entity. The request body does not conform to its defined schema",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "description": "the error message will contain the reason for which the request body does not conform to its defined schema"
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       }
@@ -2686,7 +2649,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/WiderRegionCalendar.json"
+                "$ref": "./WiderRegionCalendar.json"
               }
             }
           }
@@ -2715,47 +2678,10 @@
             }
           },
           "400": {
-            "description": "400 Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "examples": [
-                        "Not all required parameters were received (LitCal, Metadata, Settings|NationalCalendars OR LitCal, Diocese, Nation)",
-                        "Malformed data received in <LitCal> parameters"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest400"
           },
           "422": {
-            "description": "422 Unprocessable Entity. The request body does not conform to its defined schema",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "description": "the error message will contain the reason for which the request body does not conform to its defined schema"
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       }
@@ -2773,7 +2699,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/DiocesanCalendar.json"
+                "$ref": "./DiocesanCalendar.json"
               }
             }
           }
@@ -2802,47 +2728,10 @@
             }
           },
           "400": {
-            "description": "400 Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "examples": [
-                        "Not all required parameters were received (LitCal, Metadata, Settings|NationalCalendars OR LitCal, Diocese, Nation)",
-                        "Malformed data received in <LitCal> parameters"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest400"
           },
           "422": {
-            "description": "422 Unprocessable Entity. The request body does not conform to its defined schema",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "description": "the error message will contain the reason for which the request body does not conform to its defined schema"
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       }
@@ -2861,7 +2750,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Nation"
+              "$ref": "./CommonDef.json#/definitions/Nation"
             }
           }
         ],
@@ -2871,48 +2760,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/NationalCalendar.json"
+                  "$ref": "./NationalCalendar.json"
                 }
               }
             }
           },
           "400": {
-            "description": "400 Bad Request: missing required parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "example": {
-                  "error": "Missing required parameter(s) `category` and `key`"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest400"
           },
           "404": {
-            "description": "404 Not Found: the requested national or diocesan or wider region data resource was not found on the server",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "example": {
-                  "message": "file data/nations/US/Archdiocese of Milwaukee (Wisconsin).json does not exist"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound404"
           }
         }
       },
@@ -2929,7 +2786,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Nation"
+              "$ref": "./CommonDef.json#/definitions/Nation"
             }
           }
         ],
@@ -2939,48 +2796,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/NationalCalendar.json"
+                  "$ref": "./NationalCalendar.json"
                 }
               }
             }
           },
           "400": {
-            "description": "400 Bad Request: missing required parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "example": {
-                  "error": "Missing required parameter(s) `category` and `key`"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest400"
           },
           "404": {
-            "description": "404 Not Found: the requested national or diocesan or wider region data resource was not found on the server",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "example": {
-                  "message": "file data/nations/US/Archdiocese of Milwaukee (Wisconsin).json does not exist"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound404"
           }
         }
       },
@@ -3007,7 +2832,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/NationalCalendar.json"
+                "$ref": "./NationalCalendar.json"
               }
             }
           }
@@ -3038,47 +2863,10 @@
             }
           },
           "400": {
-            "description": "400 Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "examples": [
-                        "Not all required parameters were received (LitCal, Metadata, Settings|NationalCalendars OR LitCal, Diocese, Nation)",
-                        "Malformed data received in <LitCal> parameters"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest400"
           },
           "422": {
-            "description": "422 Unprocessable Entity. The request body does not conform to its defined schema",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "description": "the error message will contain the reason for which the request body does not conform to its defined schema"
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       },
@@ -3122,44 +2910,10 @@
             }
           },
           "400": {
-            "description": "400 Bad Request: missing required parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "const": "Required parameters were not received"
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest400"
           },
           "404": {
-            "description": "404 Not Found: the resource requested for deletion was not found on this server",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "const": "The resource requested for deletion was not found on this server"
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound404"
           }
         }
       }
@@ -3178,7 +2932,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
             }
           }
         ],
@@ -3188,48 +2942,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/DiocesanCalendar.json"
+                  "$ref": "./DiocesanCalendar.json"
                 }
               }
             }
           },
           "400": {
-            "description": "400 Bad Request: missing required parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "example": {
-                  "error": "Missing required parameter(s) `category` and `key`"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest400"
           },
           "404": {
-            "description": "404 Not Found: the requested national or diocesan or wider region data resource was not found on the server",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "example": {
-                  "message": "file data/nations/US/Archdiocese of Milwaukee (Wisconsin).json does not exist"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound404"
           }
         }
       },
@@ -3246,7 +2968,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
             }
           }
         ],
@@ -3256,48 +2978,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/DiocesanCalendar.json"
+                  "$ref": "./DiocesanCalendar.json"
                 }
               }
             }
           },
           "400": {
-            "description": "400 Bad Request: missing required parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "example": {
-                  "error": "Missing required parameter(s) `category` and `key`"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest400"
           },
           "404": {
-            "description": "404 Not Found: the requested national or diocesan or wider region data resource was not found on the server",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "example": {
-                  "message": "file data/nations/US/Archdiocese of Milwaukee (Wisconsin).json does not exist"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound404"
           }
         }
       },
@@ -3314,7 +3004,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
             }
           }
         ],
@@ -3323,7 +3013,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/DiocesanCalendar.json"
+                "$ref": "./DiocesanCalendar.json"
               }
             }
           }
@@ -3354,47 +3044,10 @@
             }
           },
           "400": {
-            "description": "400 Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "examples": [
-                        "Not all required parameters were received (LitCal, Metadata, Settings|NationalCalendars OR LitCal, Diocese, Nation)",
-                        "Malformed data received in <LitCal> parameters"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest400"
           },
           "422": {
-            "description": "422 Unprocessable Entity. The request body does not conform to its defined schema",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "description": "the error message will contain the reason for which the request body does not conform to its defined schema"
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       },
@@ -3411,7 +3064,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
             }
           }
         ],
@@ -3437,44 +3090,10 @@
             }
           },
           "400": {
-            "description": "400 Bad Request: missing required parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "const": "Required parameters were not received"
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest400"
           },
           "404": {
-            "description": "404 Not Found: the resource requested for deletion was not found on this server",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "const": "The resource requested for deletion was not found on this server"
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound404"
           }
         }
       }
@@ -3493,7 +3112,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
             }
           }
         ],
@@ -3503,48 +3122,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/WiderRegionCalendar.json"
+                  "$ref": "./WiderRegionCalendar.json"
                 }
               }
             }
           },
           "400": {
-            "description": "400 Bad Request: missing required parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "example": {
-                  "error": "Missing required parameter(s) `category` and `key`"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest400"
           },
           "404": {
-            "description": "404 Not Found: the requested national or diocesan or wider region data resource was not found on the server",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "example": {
-                  "message": "file data/nations/US/Archdiocese of Milwaukee (Wisconsin).json does not exist"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound404"
           }
         }
       },
@@ -3561,7 +3148,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
             }
           }
         ],
@@ -3571,48 +3158,16 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/WiderRegionCalendar.json"
+                  "$ref": "./WiderRegionCalendar.json"
                 }
               }
             }
           },
           "400": {
-            "description": "400 Bad Request: missing required parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "example": {
-                  "error": "Missing required parameter(s) `category` and `key`"
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest400"
           },
           "404": {
-            "description": "404 Not Found: the requested national or diocesan or wider region data resource was not found on the server",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string"
-                    }
-                  },
-                  "additionalProperties": false
-                },
-                "example": {
-                  "message": "file data/nations/US/Archdiocese of Milwaukee (Wisconsin).json does not exist"
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound404"
           }
         }
       },
@@ -3629,7 +3184,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
             }
           }
         ],
@@ -3638,7 +3193,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/WiderRegionCalendar.json"
+                "$ref": "./WiderRegionCalendar.json"
               }
             }
           }
@@ -3669,47 +3224,10 @@
             }
           },
           "400": {
-            "description": "400 Bad Request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "examples": [
-                        "Not all required parameters were received (LitCal, Metadata, Settings|NationalCalendars OR LitCal, Diocese, Nation)",
-                        "Malformed data received in <LitCal> parameters"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest400"
           },
           "422": {
-            "description": "422 Unprocessable Entity. The request body does not conform to its defined schema",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "description": "the error message will contain the reason for which the request body does not conform to its defined schema"
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       },
@@ -3726,7 +3244,7 @@
             "in": "path",
             "required": true,
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/WiderRegionNames"
+              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
             }
           }
         ],
@@ -3752,44 +3270,10 @@
             }
           },
           "400": {
-            "description": "400 Bad Request: missing required parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "const": "Required parameters were not received"
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/BadRequest400"
           },
           "404": {
-            "description": "404 Not Found: the resource requested for deletion was not found on this server",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "const": "The resource requested for deletion was not found on this server"
-                    }
-                  },
-                  "required": [
-                    "error"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound404"
           }
         }
       }
@@ -3907,7 +3391,7 @@
             }
           },
           "405": {
-            "description": "405 Method Not Allowed: this endpoint will only accept GET requests"
+            "$ref": "#/components/responses/MethodNotAllowed405"
           }
         }
       }
@@ -3932,7 +3416,7 @@
                     "litcal_missals": {
                       "type": "array",
                       "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCalMissalsPath.json#/definitions/Missal"
+                        "$ref": "./LitCalMissalsPath.json#/definitions/Missal"
                       }
                     }
                   }
@@ -3941,57 +3425,10 @@
             }
           },
           "404": {
-            "description": "404 Not Found: no Roman Missals defined",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "const": "ERROR"
-                    },
-                    "response": {
-                      "type": "string",
-                      "const": "404 Resource not Found"
-                    },
-                    "description": {
-                      "type": "string",
-                      "const": "No Missals found"
-                    }
-                  }
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound404"
           },
           "503": {
-            "description": "503 Service Unavailable: the server is not ready to handle the request",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "const": "ERROR"
-                    },
-                    "response": {
-                      "type": "string",
-                      "const": "503 Service Unavailable"
-                    },
-                    "description": {
-                      "type": "string",
-                      "enum": [
-                        "Unable to read the jsondata/sourcedata/missals directory",
-                        "Unable to read the jsondata/sourcedata/missals directory contents"
-                      ]
-                    }
-                  }
-                }
-              }
-            }
+            "$ref": "#/components/responses/ServiceUnavailable503"
           }
         }
       }
@@ -4009,7 +3446,7 @@
             "in": "path",
             "name": "missal_id",
             "schema": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/MissalID"
+              "$ref": "./CommonDef.json#/definitions/MissalID"
             },
             "required": true
           }
@@ -4020,34 +3457,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCalMissalsPath.json#/definitions/Missal"
+                  "$ref": "./LitCalMissalsPath.json#/definitions/Missal"
                 }
               }
             }
           },
           "404": {
-            "description": "404 Not Found: Roman Missal data not found for given {missal_id}",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "const": "ERROR"
-                    },
-                    "response": {
-                      "type": "string",
-                      "const": "Resource not Found"
-                    },
-                    "description": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound404"
           }
         }
       }
@@ -4072,7 +3488,7 @@
                     "litcal_decrees": {
                       "type": "array",
                       "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCalDecreesSource.json#/definitions/LitCalDecree"
+                        "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree"
                       }
                     }
                   }
@@ -4081,29 +3497,7 @@
             }
           },
           "404": {
-            "description": "404 Not Found: no Decrees defined",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "const": "ERROR"
-                    },
-                    "response": {
-                      "type": "string",
-                      "const": "404 Resource not Found"
-                    },
-                    "description": {
-                      "type": "string",
-                      "const": "No Decrees found"
-                    }
-                  }
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound404"
           }
         }
       }
@@ -4133,35 +3527,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCalDecreesSource.json#/definitions/LitCalDecree"
+                  "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree"
                 }
               }
             }
           },
           "404": {
-            "description": "404 Not Found: Decree not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "const": "ERROR"
-                    },
-                    "response": {
-                      "type": "string",
-                      "const": "404 Resource not Found"
-                    },
-                    "description": {
-                      "type": "string",
-                      "const": "Decree not found"
-                    }
-                  }
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound404"
           }
         }
       }
@@ -4312,30 +3684,7 @@
             }
           },
           "404": {
-            "description": "404 Not Found: tests folder path could not be opened",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "const": "ERROR"
-                    },
-                    "response": {
-                      "type": "string",
-                      "const": "Resource not Found"
-                    },
-                    "description": {
-                      "type": "string",
-                      "const": "Tests folder path cannot be opened"
-                    }
-                  },
-                  "required": [ "status", "response", "description" ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound404"
           }
         }
       },
@@ -4393,130 +3742,16 @@
             }
           },
           "405": {
-            "description": "405 Method Not Allowed",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "const": "ERROR"
-                    },
-                    "response": {
-                      "type": "string",
-                      "const": "Resource not Created"
-                    },
-                    "description": {
-                      "type": "string",
-                      "const": "This endpoint can only accept requests utilizing methods GET or PUT"
-                    }
-                  },
-                  "required": [
-                    "status",
-                    "response",
-                    "description"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "415": {
-            "description": "415 Unsupported Media Type: This endpoint can only handle PUT requests with Content Type application/json",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "const": "ERROR"
-                    },
-                    "response": {
-                      "type": "string",
-                      "const": "Resource not Created"
-                    },
-                    "description": {
-                      "type": "string",
-                      "example": "This endpoint can only handle PUT requests with Content Type application/json, instead the request had a Content Type of {CONTENT TYPE}"
-                    }
-                  },
-                  "required": [
-                    "status",
-                    "response",
-                    "description"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/UnsupportedMediaType415"
           },
           "422": {
-            "description": "422 Unprocessable Entity. The request body content is not valid JSON or does not conform to its defined schema",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "const": "ERROR"
-                    },
-                    "response": {
-                      "type": "string",
-                      "const": "Resource not Created"
-                    },
-                    "description": {
-                      "type": "string",
-                      "examples": [
-                        "The Unit Test you are attempting to create was not valid JSON",
-                        "The Unit Test you are attempting to create was incorrectly validated against schema {SCHEMA}: {ERROR MESSAGE}"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "status",
-                    "response",
-                    "description"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/UnprocessableEntity422"
           },
           "503": {
-            "description": "503 Service Unavailable",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "const": "ERROR"
-                    },
-                    "response": {
-                      "type": "string",
-                      "const": "Resource not Created"
-                    },
-                    "description": {
-                      "type": "string",
-                      "examples": [
-                        "The server errored out while attempting to process your request; this a server error, not an error in the request. Please report the incident to the system administrator.",
-                        "The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support."
-                      ]
-                    }
-                  },
-                  "required": [
-                    "status",
-                    "response",
-                    "description"
-                  ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/ServiceUnavailable503"
           }
         }
       }
@@ -4589,30 +3824,7 @@
             }
           },
           "404": {
-            "description": "404 Not Found: tests folder path could not be opened",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "const": "ERROR"
-                    },
-                    "response": {
-                      "type": "string",
-                      "const": "Resource not Found"
-                    },
-                    "description": {
-                      "type": "string",
-                      "const": "Tests folder path cannot be opened"
-                    }
-                  },
-                  "required": [ "status", "response", "description" ]
-                }
-              }
-            }
+            "$ref": "#/components/responses/NotFound404"
           }
         }
       }
@@ -5188,28 +4400,28 @@
                   "type": "object",
                   "properties": {
                     "calendar_id": {
-                      "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Nation"
+                      "$ref": "./CommonDef.json#/definitions/Nation"
                     },
                     "missals": {
                         "type": "array",
                         "items": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/MissalID"
+                            "$ref": "./CommonDef.json#/definitions/MissalID"
                         }
                     },
                     "wider_regions": {
                         "type": "array",
                         "items": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/WiderRegionNames"
+                            "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
                         }
                     },
                     "dioceses": {
                         "type": "array",
                         "items": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                            "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
                         }
                     },
                     "settings": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/CalendarSettings"
+                        "$ref": "./CommonDef.json#/definitions/CalendarSettings"
                     }
                   }
                 }
@@ -5227,7 +4439,7 @@
                   "type": "object",
                   "properties": {
                     "calendar_id": {
-                      "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                      "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
                     },
                     "nation": {
                       "type": "string",
@@ -5242,7 +4454,7 @@
                       "description": "Named group of diocesan calendars which can be pooled together"
                     },
                     "settings": {
-                      "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/CalendarSettings"
+                      "$ref": "./CommonDef.json#/definitions/CalendarSettings"
                     }
                   },
                   "additionalProperties": false,
@@ -5255,7 +4467,7 @@
               "diocesan_calendars_keys": {
                 "type": "array",
                 "items": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                  "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
                 }
               },
               "diocesan_groups": {
@@ -5270,7 +4482,7 @@
                     "dioceses": {
                       "type": "array",
                       "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId"
+                        "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
                       }
                     }
                   }
@@ -5282,12 +4494,12 @@
                   "type": "object",
                   "properties": {
                     "name": {
-                      "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/WiderRegionNames"
+                      "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
                     },
                     "locales": {
                       "type": "array",
                       "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+                        "$ref": "./CommonDef.json#/definitions/Locale"
                       }
                     },
                     "api_path": {
@@ -5300,7 +4512,7 @@
               "wider_regions_keys": {
                 "type": "array",
                 "items": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/WiderRegionNames"
+                  "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
                 }
               }
             }
@@ -5445,10 +4657,10 @@
             }
           },
           "applies_to": {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
+            "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
           },
           "excludes": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
+              "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
           }
         },
         "required": [
@@ -5504,10 +4716,10 @@
             }
           },
           "applies_to": {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
+            "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
           },
           "excludes": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
+              "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
           }
         },
         "required": [
@@ -5564,10 +4776,10 @@
             }
           },
           "applies_to": {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
+            "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
           },
           "excludes": {
-              "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/LitCalTest.json#/definitions/AppliesToOrExcludes"
+              "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
           }
         },
         "required": [
@@ -5888,6 +5100,88 @@
           "ascension": "SUNDAY",
           "corpus_christi": "THURSDAY",
           "eternal_high_priest": true
+        }
+      }
+    },
+    "responses": {
+      "UnprocessableEntity422": {
+        "description": "422 Unprocessable Entity. The request body does not conform to its defined schema",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "./Problem.json"
+            }
+          }
+        }
+      },
+      "BadRequest400": {
+        "description": "400 Bad Request. The request parameters do not conform to the defined schema",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "./Problem.json"
+            }
+          }
+        }
+      },
+      "NotFound404": {
+        "description": "404 Not Found. The resource requested or one of its dependencies was not found",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "./Problem.json"
+            }
+          }
+        }
+      },
+      "MethodNotAllowed405": {
+        "description": "405 Method Not Allowed",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "./Problem.json"
+            }
+          }
+        }
+      },
+      "NotAcceptable406": {
+        "description": "406 Not Acceptable",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "./Problem.json"
+            }
+          }
+        }
+      },
+      "UnsupportedMediaType415": {
+        "description": "415 Unsupported Media Type",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "./Problem.json"
+            }
+          }
+        }
+      },
+      "IMATeapot418": {
+        "description": "418 I'm a teapot",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "./Problem.json"
+            }
+          }
+        }
+      },
+      "ServiceUnavailable503": {
+        "description": "503 Service Unavailable",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "./Problem.json"
+            }
+          }
         }
       }
     }

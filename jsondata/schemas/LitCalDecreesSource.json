@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$schema": "https://json-schema.org/draft-07/schema#",
     "$id": "./LitCalDecreesSource.json",
     "title": "LitCalDecreesSource",
     "description": "Decrees issued by the Congregation for Divine Worship or Apostolic Letters and similar dispositions from the Supreme Pontiff that determine new data in the calculation of the Liturgical Calendar",
@@ -110,8 +110,7 @@
                                     ]
                                 },
                                 "event_key": {
-                                    "type": "string",
-                                    "description": "Must be a valid key for a liturgical_event in the Universal Calendar"
+                                    "$ref": "./CommonDef.json#/definitions/EventKey"
                                 }
                             },
                             "required": [

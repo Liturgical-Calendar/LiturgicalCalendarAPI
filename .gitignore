@@ -5,7 +5,9 @@ vendor/*
 .env.*
 !.env.example
 phpstan.neon
-..idea
+!phpstan.neon.dist
+phpunit.xml
+!phpunit.xml.dist
 /*.php
 /*.txt
 /*.js
