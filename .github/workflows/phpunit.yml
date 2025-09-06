@@ -107,12 +107,12 @@ jobs:
 
               location ~ \.php$ {
                   include snippets/fastcgi-php.conf;
-                  fastcgi_pass unix:/var/run/php/php${{ env.PHP_VERSION }}-fpm.sock;
+                  fastcgi_pass unix:/var/run/php/php${PHP_VERSION}-fpm.sock;
               }
           }
           EOF
 
-          envsubst '${API_PROTOCOL},${API_HOST},${API_PORT},${API_BASE_PATH},$GITHUB_WORKSPACE' < app.conf.template | sudo tee /etc/nginx/sites-available/app.conf
+          envsubst '${API_PROTOCOL},${API_HOST},${API_PORT},${API_BASE_PATH},${GITHUB_WORKSPACE},${PHP_VERSION}' < app.conf.template | sudo tee /etc/nginx/sites-available/app.conf
           sudo ln -s /etc/nginx/sites-available/app.conf /etc/nginx/sites-enabled/app.conf
 
           sudo systemctl restart php${{ env.PHP_VERSION }}-fpm
