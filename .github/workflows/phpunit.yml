@@ -102,7 +102,7 @@ jobs:
               index index.php;
 
               location ${API_BASE_PATH} {
-                  try_files $$uri /index.php$$is_args$$args;
+                  try_files $uri /index.php$is_args$args;
               }
 
               location ~ \.php$ {
@@ -112,7 +112,7 @@ jobs:
           }
           EOF
 
-          envsubst < app.conf.template | sudo tee /etc/nginx/sites-available/app.conf
+          envsubst '${API_PROTOCOL},${API_HOST},${API_PORT},${API_BASE_PATH}' < app.conf.template | sudo tee /etc/nginx/sites-available/app.conf
           sudo ln -s /etc/nginx/sites-available/app.conf /etc/nginx/sites-enabled/app.conf
 
           sudo systemctl restart php${{ env.PHP_VERSION }}-fpm
