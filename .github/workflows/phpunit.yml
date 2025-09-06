@@ -145,6 +145,7 @@ jobs:
       - name: Run tests
         run: |
           # sanity check server is up
-          curl -sSf "${API_PROTOCOL}://${API_HOST}:${API_PORT}/" || true
+          curl -v "${API_PROTOCOL}://${API_HOST}:${API_PORT}/" || true
+          tail -n 50 /var/log/nginx/error.log
           composer dump-autoload --optimize
           time composer test
