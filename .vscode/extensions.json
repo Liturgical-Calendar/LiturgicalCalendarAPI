@@ -1,5 +1,6 @@
 {
     "recommendations": [
-        "shevaua.phpcs"
+        "shevaua.phpcs",
+        "bmewburn.vscode-intelephense-client"
     ]
 }

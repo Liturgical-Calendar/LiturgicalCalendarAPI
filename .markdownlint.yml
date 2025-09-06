@@ -1,0 +1,10 @@
+MD013:
+  line_length: 180
+MD033: false
+MD041: false
+MD046:
+  style: fenced
+MD029:
+  style: one
+MD025:
+  front_matter_title: ""

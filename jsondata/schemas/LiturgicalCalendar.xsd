@@ -352,7 +352,7 @@
       <xs:enumeration value="red" />
       <xs:enumeration value="white" />
       <xs:enumeration value="purple" />
-      <xs:enumeration value="pink" />
+      <xs:enumeration value="rose" />
     </xs:restriction>
   </xs:simpleType>
   <xs:complexType name="LitCalEventType">

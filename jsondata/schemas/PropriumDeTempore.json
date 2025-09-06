@@ -1,5 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "./PropriumDeTempore.json",
     "title": "PropriumDeTempore",
     "type": "array",
     "items": {
@@ -11,16 +12,16 @@
             "additionalProperties": false,
             "properties": {
                 "event_key": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                    "$ref": "./CommonDef.json#/definitions/EventKey"
                 },
                 "grade": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                    "$ref": "./CommonDef.json#/definitions/LitGrade"
                 },
                 "type": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitFeastType"
+                    "$ref": "./CommonDef.json#/definitions/LitFeastType"
                 },
                 "color": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
+                    "$ref": "./CommonDef.json#/definitions/LitColor"
                 }
             },
             "required": [

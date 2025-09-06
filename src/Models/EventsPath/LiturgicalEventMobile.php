@@ -12,7 +12,7 @@ use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeEventData;
 use LiturgicalCalendar\Api\Models\LiturgicalEventData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile;
-use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewMobile as DiocesanLitCalItemCreateNewMobile;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewMobile;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewMobile;
 use LiturgicalCalendar\Api\Models\RelativeLiturgicalDate;
 
@@ -47,7 +47,7 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
         string $name,
         string|RelativeLiturgicalDate $strtotime,
         LitColor|array $color = LitColor::GREEN,
-        LitEventType $type = LitEventType::FIXED,
+        LitEventType $type = LitEventType::MOBILE,
         LitGrade $grade = LitGrade::WEEKDAY,
         LitCommons|LitCommon|LitMassVariousNeeds|array $common = LitCommon::NONE,
         ?string $displayGrade = null
@@ -87,7 +87,7 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
      *      event_idx: int,
      *      name: string,
      *      strtotime: string|array{day_of_the_week:string,relative_time:string,event_key:string},
-     *      color: array<'green'|'pink'|'purple'|'red'|'white'>,
+     *      color: array<'green'|'rose'|'purple'|'red'|'white'>,
      *      color_lcl: string[],
      *      grade: -1|0|1|2|3|4|5|6|7,
      *      grade_lcl: string,
@@ -129,9 +129,10 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
      * Creates a new LiturgicalEventMobile object from an object containing the required properties.
      *
      * The provided object must have the following properties:
+     * - event_key: The unique key of the liturgical event, as a string.
      * - name: The name of the liturgical event, as a string.
-     * - date: The date of the liturgical event, as a DateTime object or as an integer representing the Unix timestamp.
      * - grade: The grade of the liturgical event, as a LitGrade object or as an integer.
+     * - strtotime: string|\stdClass&object{day_of_the_week:string,relative_time:string,event_key:string}
      *
      * Optional properties are:
      * - color: The liturgical color of the liturgical event, as an array of strings or LitColor cases, or as a single string or single LitColor case.
@@ -162,7 +163,7 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
             && false === $obj instanceof DiocesanLitCalItemCreateNewMobile
             && false === $obj instanceof DecreeItemCreateNewMobile
         ) {
-            throw new \InvalidArgumentException('Invalid type provided to create LiturgicalEventFixed');
+            throw new \InvalidArgumentException('Invalid type provided to create LiturgicalEventMobile');
         }
 
         if (false === is_string($obj->name)) {
@@ -177,7 +178,7 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
         /** @var LitCommons */
         $commons = LitCommons::create([]);
         $colors  = [LitColor::GREEN];
-        $type    = LitEventType::FIXED;
+        $type    = LitEventType::MOBILE;
         $grade   = LitGrade::WEEKDAY;
 
         // When we read data from a JSON file, $obj will be an instance of stdClass,
@@ -185,29 +186,29 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
         if ($obj instanceof \stdClass) {
             if (property_exists($obj, 'color')) {
                 if (is_array($obj->color)) {
-                    $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $obj->color)));
+                    $valueTypes = array_values(array_unique(array_map('gettype', $obj->color)));
                     if (count($valueTypes) > 1) {
-                        throw new \InvalidArgumentException('Incoherent color value types provided to create LiturgicalEventFixed: found multiple types ' . implode(', ', $valueTypes));
+                        throw new \InvalidArgumentException('Incoherent color value types provided to create LiturgicalEventMobile: found multiple types ' . implode(', ', $valueTypes));
                     }
                     if ($valueTypes[0] === 'string') {
                         /** @var string[] $color */
                         $color  = $obj->color;
                         $colors = static::colorStringArrayToLitColorArray($color);
                     } elseif (false === $obj->color[0] instanceof LitColor) {
-                        throw new \InvalidArgumentException('Invalid color value types provided to create LiturgicalEventFixed. Expected type string or LitColor, found ' . $valueTypes[0]);
+                        throw new \InvalidArgumentException('Invalid color value types provided to create LiturgicalEventMobile. Expected type string or LitColor, found ' . $valueTypes[0]);
                     }
                 } elseif (is_string($obj->color)) {
                     $colors = [LitColor::from($obj->color)];
                 } elseif ($obj->color instanceof LitColor) {
                     $colors = [$obj->color];
                 } else {
-                    throw new \InvalidArgumentException('Invalid color value type provided to create LiturgicalEventFixed');
+                    throw new \InvalidArgumentException('Invalid color value type provided to create LiturgicalEventMobile');
                 }
             }
 
             if (property_exists($obj, 'type')) {
                 if (false === $obj->type instanceof LitEventType && false === is_string($obj->type)) {
-                    throw new \InvalidArgumentException('Invalid type provided to create LiturgicalEventFixed');
+                    throw new \InvalidArgumentException('Invalid type provided to create LiturgicalEventMobile');
                 }
                 if (is_string($obj->type)) {
                     $type = LitEventType::from($obj->type);
@@ -274,10 +275,10 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
      * Create a new LiturgicalEventMobile object from an associative array.
      *
      * The array must contain the following keys:
+     * - event_key: The key of the liturgical event, as a string.
      * - name: The name of the liturgical event, as a string.
-     * - month: The month of the liturgical event, as an integer.
-     * - day: The day of the liturgical event, as an integer.
      * - grade: The grade of the liturgical event, as a LitGrade object or as an integer.
+     * - strtotime: string|array{day_of_the_week:string,relative_time:string,event_key:string}
      *
      * Optional keys are:
      * - color: The liturgical color of the liturgical event, as an array of strings or LitColor cases, or as a single string or single LitColor case.
@@ -322,7 +323,7 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
         $colors = LitColor::GREEN;
         if (array_key_exists('color', $arr)) {
             if (is_array($arr['color'])) {
-                $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $arr['color'])));
+                $valueTypes = array_values(array_unique(array_map('gettype', $arr['color'])));
                 if (count($valueTypes) > 1) {
                     throw new \InvalidArgumentException('Incoherent color value types provided to create LiturgicalEventMobile: found multiple types ' . implode(', ', $valueTypes));
                 }
@@ -348,7 +349,7 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
                 $arr['type'] = LitEventType::from($arr['type']);
             }
         } else {
-            $arr['type'] = LitEventType::FIXED;
+            $arr['type'] = LitEventType::MOBILE;
         }
 
         if (is_int($arr['grade'])) {

@@ -1,5 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "./CommonDef.json",
     "definitions": {
         "EventKey": {
             "type": "string",
@@ -13,7 +14,7 @@
         },
         "EventKeyNonVigilMass": {
             "type": "string",
-            "pattern": "^([a-z]+_[a-z]+_)?[A-Z][a-zA-Z0-9]+(?:[A-Z][a-zA-Z0-9]+)*(?:_\\d+)?",
+            "pattern": "^([a-z]+_[a-z]+_)?[A-Z][a-zA-Z0-9]+(?:[A-Z][a-zA-Z0-9]+)*(?:_\\d+)?$",
             "description": "corresponds to the `event_key` property of Non-Vigil Mass liturgical events in the output of the LitCal API and similar endpoints"
         },
         "LitColor": {
@@ -26,7 +27,7 @@
                     "red",
                     "green",
                     "purple",
-                    "pink"
+                    "rose"
                 ]
             },
             "title": "LitColor"
@@ -283,7 +284,8 @@
                 "responsorial_psalm_epistle",
                 "alleluia_verse",
                 "gospel"
-            ]
+            ],
+            "title": "ReadingsEasterVigil"
         },
         "ReadingsChristmas": {
             "type": "object",
@@ -322,7 +324,7 @@
                 "evening"
             ],
             "title": "ReadingsWithEvening",
-            "description": "This schema is used for Easter Sunday, which also both a daytime and an evening Mass each with proper readings"
+            "description": "Used for Easter Sunday, which has both a daytime and an evening Mass, each with proper readings."
         },
         "ReadingsMultipleSchemas": {
             "type": "object",
@@ -344,12 +346,12 @@
                 "schema_three"
             ],
             "title": "ReadingsMultipleSchemas",
-            "description": "This schemas is used by All Souls Day (Commemoration of the Faithful Departed)"
+            "description": "Used for All Souls Day (Commemoration of the Faithful Departed)."
         },
         "ReadingsCommons": {
             "type": "string",
             "title": "ReadingsCommons",
-            "description": "This schema is used for memorials and optional memorials that do not have a Proper lectionary"
+            "description": "Used for memorials and optional memorials that do not have a Proper lectionary. The readings are taken from the Common of Saints, as appropriate."
         },
         "ReadingsSeasonal": {
             "type": "object",
@@ -367,7 +369,7 @@
                 "outside_easter_season"
             ],
             "title": "ReadingsSeasonal",
-            "description": "Lectionary readings that change depending on whether the liturgical event falls within the Easter season"
+            "description": "Lectionary readings that change depending on whether the liturgical event falls within the Easter season."
         },
         "Day": {
             "type": "integer",

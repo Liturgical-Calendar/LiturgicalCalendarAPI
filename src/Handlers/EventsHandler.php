@@ -26,8 +26,8 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewF
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropertyGrade;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropertyName;
-use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewFixed as DiocesanLitCalItemCreateNewFixed;
-use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewMobile as DiocesanLitCalItemCreateNewMobile;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewFixed;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewMobile;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemMakePatron;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemMoveEvent;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
@@ -489,13 +489,13 @@ final class EventsHandler extends AbstractHandler
                 } elseif ($litCalItem->liturgical_event instanceof LitCalItemSetPropertyName) {
                     $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($key);
                     if (null === $existingLiturgicalEvent) {
-                        throw new \RuntimeException('');
+                        throw new \RuntimeException("Unknown event key '{$key}' when setting name from National calendar");
                     }
                     $existingLiturgicalEvent->name = $NationalCalendarI18nData[$key];
                 } elseif ($litCalItem->liturgical_event instanceof LitCalItemSetPropertyGrade) {
                     $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($key);
                     if (null === $existingLiturgicalEvent) {
-                        throw new \RuntimeException('');
+                        throw new \RuntimeException("Unknown event key '{$key}' when setting grade from National calendar");
                     }
                     $existingLiturgicalEvent->grade = $litCalItem->liturgical_event->grade;
                 } elseif ($litCalItem->liturgical_event instanceof LitCalItemMakePatron) {

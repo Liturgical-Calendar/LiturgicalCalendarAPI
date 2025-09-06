@@ -1,7 +1,7 @@
 name: PHPUnit
 
 on:
-  push:
+  pull_request:
     branches: [ master, development ]
     paths: [
       '**/*.php',
@@ -12,7 +12,7 @@ on:
       'jsondata/**',
       'i18n/**'
     ]
-  pull_request:
+  push:
     branches: [ master, development ]
     paths: [
       '**/*.php',
@@ -38,19 +38,16 @@ jobs:
   phpunit_tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Install gettext
-        run: sudo apt-get update -y && sudo apt-get install -y gettext
 
-      - name: Install all locales
-        run: sudo apt-get install -y locales-all
-
-      - name: Setup PHP with PECL extension
+      - name: Setup PHP with PECL extensions
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ env.PHP_VERSION }}
-          extensions: yaml, intl, zip, calendar, apcu
+          extensions: yaml, intl, zip, calendar, apcu, opcache
+          ini-values: apcu.enable_cli=1
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4
@@ -60,11 +57,26 @@ jobs:
           restore-keys: |
             composer-
 
+      - name: Cache PHPUnit cache
+        uses: actions/cache@v4
+        with:
+          path: .phpunit.cache
+          key: phpunit-${{ hashFiles('phpunit.xml') }}
+          restore-keys: phpunit-
+
       - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-progress
+
+      - name: Enable OPcache
+        run: echo "opcache.enable_cli=1" | sudo tee -a /etc/php/${{ env.PHP_VERSION }}/cli/conf.d/99-opcache.ini
 
       - name: Copy env file
         run: cp .env.example .env.local
+
+      - name: Install gettext + locales
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gettext locales-all
 
       - name: Start the PHP web server
         run: composer start
@@ -89,8 +101,6 @@ jobs:
 
       - name: Run tests
         if: steps.server-check.outputs.server_found == 'true'
-        run: composer test
-
-      - name: Stop server
-        if: steps.server-check.outputs.server_found == 'true'
-        run: composer stop
+        run: |
+          composer dump-autoload --optimize
+          time composer test

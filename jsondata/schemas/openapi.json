@@ -2651,7 +2651,7 @@
             }
           },
           "422": {
-            "description": "422 Unprocessable Entity. The request body does not conform to it's defined schema",
+            "description": "422 Unprocessable Entity. The request body does not conform to its defined schema",
             "content": {
               "application/json": {
                 "schema": {
@@ -2660,7 +2660,7 @@
                   "properties": {
                     "error": {
                       "type": "string",
-                      "description": "the error message will contain the reason for which the request body does not conform to it's defined schema"
+                      "description": "the error message will contain the reason for which the request body does not conform to its defined schema"
                     }
                   },
                   "required": [
@@ -2738,7 +2738,7 @@
             }
           },
           "422": {
-            "description": "422 Unprocessable Entity. The request body does not conform to it's defined schema",
+            "description": "422 Unprocessable Entity. The request body does not conform to its defined schema",
             "content": {
               "application/json": {
                 "schema": {
@@ -2747,7 +2747,7 @@
                   "properties": {
                     "error": {
                       "type": "string",
-                      "description": "the error message will contain the reason for which the request body does not conform to it's defined schema"
+                      "description": "the error message will contain the reason for which the request body does not conform to its defined schema"
                     }
                   },
                   "required": [
@@ -2825,7 +2825,7 @@
             }
           },
           "422": {
-            "description": "422 Unprocessable Entity. The request body does not conform to it's defined schema",
+            "description": "422 Unprocessable Entity. The request body does not conform to its defined schema",
             "content": {
               "application/json": {
                 "schema": {
@@ -2834,7 +2834,7 @@
                   "properties": {
                     "error": {
                       "type": "string",
-                      "description": "the error message will contain the reason for which the request body does not conform to it's defined schema"
+                      "description": "the error message will contain the reason for which the request body does not conform to its defined schema"
                     }
                   },
                   "required": [
@@ -3061,7 +3061,7 @@
             }
           },
           "422": {
-            "description": "422 Unprocessable Entity. The request body does not conform to it's defined schema",
+            "description": "422 Unprocessable Entity. The request body does not conform to its defined schema",
             "content": {
               "application/json": {
                 "schema": {
@@ -3070,7 +3070,7 @@
                   "properties": {
                     "error": {
                       "type": "string",
-                      "description": "the error message will contain the reason for which the request body does not conform to it's defined schema"
+                      "description": "the error message will contain the reason for which the request body does not conform to its defined schema"
                     }
                   },
                   "required": [
@@ -3377,7 +3377,7 @@
             }
           },
           "422": {
-            "description": "422 Unprocessable Entity. The request body does not conform to it's defined schema",
+            "description": "422 Unprocessable Entity. The request body does not conform to its defined schema",
             "content": {
               "application/json": {
                 "schema": {
@@ -3386,7 +3386,7 @@
                   "properties": {
                     "error": {
                       "type": "string",
-                      "description": "the error message will contain the reason for which the request body does not conform to it's defined schema"
+                      "description": "the error message will contain the reason for which the request body does not conform to its defined schema"
                     }
                   },
                   "required": [
@@ -3692,7 +3692,7 @@
             }
           },
           "422": {
-            "description": "422 Unprocessable Entity. The request body does not conform to it's defined schema",
+            "description": "422 Unprocessable Entity. The request body does not conform to its defined schema",
             "content": {
               "application/json": {
                 "schema": {
@@ -3701,7 +3701,7 @@
                   "properties": {
                     "error": {
                       "type": "string",
-                      "description": "the error message will contain the reason for which the request body does not conform to it's defined schema"
+                      "description": "the error message will contain the reason for which the request body does not conform to its defined schema"
                     }
                   },
                   "required": [
@@ -4002,7 +4002,7 @@
           "Missals"
         ],
         "security": [{}],
-        "summary": "Retrieve a Roman Missal by it's ID",
+        "summary": "Retrieve a Roman Missal by its ID",
         "operationId": "missalGET",
         "parameters": [
           {
@@ -4453,7 +4453,7 @@
             }
           },
           "422": {
-            "description": "422 Unprocessable Entity. The request body content is not valid JSON or does not conform to it's defined schema",
+            "description": "422 Unprocessable Entity. The request body content is not valid JSON or does not conform to its defined schema",
             "content": {
               "application/json": {
                 "schema": {
@@ -4527,7 +4527,7 @@
           "Unit Tests"
         ],
         "security": [{}],
-        "summary": "Retrieve a single unit test defined in the API `tests` by it's name",
+        "summary": "Retrieve a single unit test defined in the API `tests` by its name",
         "operationId": "retrieveTestByNameGET",
         "parameters": [
           {
@@ -4658,14 +4658,14 @@
                           "red",
                           "white",
                           "purple",
-                          "pink"
+                          "rose"
                         ],
                         "examples": [
                           "green",
                           "red",
                           "white",
                           "purple",
-                          "pink"
+                          "rose"
                         ]
                       },
                       "idx": {
@@ -5008,7 +5008,7 @@
                       "Date": {
                         "type": "string",
                         "format": "date-time",
-                        "description": "the date of the liturgical event in the liturgical calendar for the given year (the time will be zeroed out because it is not of importance), in RFC 3339 fomat"
+                        "description": "the date of the liturgical event in the liturgical calendar for the given year (the time will be zeroed out because it is not of importance), in RFC 3339 format"
                       },
                       "TimezoneType": {
                         "type": "integer",
@@ -5629,7 +5629,7 @@
                         "white",
                         "red",
                         "green",
-                        "pink",
+                        "rose",
                         "purple"
                       ]
                     }

@@ -20,7 +20,7 @@ use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
  */
 final class DiocesanLitCalItem extends AbstractJsonSrcData
 {
-    public readonly LitCalItemCreateNewFixed|LitCalItemCreateNewMobile $liturgical_event;
+    public readonly DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile $liturgical_event;
     public readonly DiocesanLitCalItemMetadata $metadata;
 
     private function __construct(\stdClass $liturgical_event, \stdClass $metadata)
@@ -30,9 +30,9 @@ final class DiocesanLitCalItem extends AbstractJsonSrcData
         }
 
         if (property_exists($liturgical_event, 'strtotime')) {
-            $this->liturgical_event = LitCalItemCreateNewMobile::fromObject($liturgical_event);
+            $this->liturgical_event = DiocesanLitCalItemCreateNewMobile::fromObject($liturgical_event);
         } else {
-            $this->liturgical_event = LitCalItemCreateNewFixed::fromObject($liturgical_event);
+            $this->liturgical_event = DiocesanLitCalItemCreateNewFixed::fromObject($liturgical_event);
         }
         $this->metadata = DiocesanLitCalItemMetadata::fromObject($metadata);
     }
@@ -75,10 +75,10 @@ final class DiocesanLitCalItem extends AbstractJsonSrcData
         $metadata        = json_encode($data['metadata'], JSON_THROW_ON_ERROR);
 
         /** @var \stdClass */
-        $liturgicalEvent = json_decode($liturgicalEvent, true, 512, JSON_THROW_ON_ERROR);
+        $liturgicalEvent = json_decode($liturgicalEvent, false, 512, JSON_THROW_ON_ERROR);
 
         /** @var \stdClass */
-        $metadata = json_decode($metadata, true, 512, JSON_THROW_ON_ERROR);
+        $metadata = json_decode($metadata, false, 512, JSON_THROW_ON_ERROR);
         return new static($liturgicalEvent, $metadata);
     }
 

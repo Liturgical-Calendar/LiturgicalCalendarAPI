@@ -69,7 +69,12 @@ final class LitCommons implements \JsonSerializable
             /**
              * @var LitCommon[] $litCommons
              */
-            $commons = array_values(array_map(fn(LitCommon $litCommon) => new LitCommonItem($litCommon), $litCommons));
+            $commons = array_map(
+                function (LitCommon $litCommon): LitCommonItem {
+                    return new LitCommonItem($litCommon);
+                },
+                $litCommons
+            );
             return new static($commons);
         }
 

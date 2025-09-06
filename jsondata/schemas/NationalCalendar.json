@@ -1,5 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "./NationalCalendar.json",
     "title": "NationalCalendar",
     "type": "object",
     "additionalProperties": false,
@@ -54,22 +55,22 @@
                     "additionalProperties": false,
                     "properties": {
                         "event_key": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                            "$ref": "./CommonDef.json#/definitions/EventKey"
                         },
                         "color": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
+                            "$ref": "./CommonDef.json#/definitions/LitColor"
                         },
                         "grade": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                            "$ref": "./CommonDef.json#/definitions/LitGrade"
                         },
                         "day": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Day"
+                            "$ref": "./CommonDef.json#/definitions/Day"
                         },
                         "month": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Month"
+                            "$ref": "./CommonDef.json#/definitions/Month"
                         },
                         "common": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitCommon"
+                            "$ref": "./CommonDef.json#/definitions/LitCommon"
                         },
                         "name": {
                             "type": "string",
@@ -105,16 +106,16 @@
                     "additionalProperties": false,
                     "properties": {
                         "event_key": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                            "$ref": "./CommonDef.json#/definitions/EventKey"
                         },
                         "color": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
+                            "$ref": "./CommonDef.json#/definitions/LitColor"
                         },
                         "grade": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                            "$ref": "./CommonDef.json#/definitions/LitGrade"
                         },
                         "common": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitCommon"
+                            "$ref": "./CommonDef.json#/definitions/LitCommon"
                         },
                         "strtotime": {
                             "type": "string",
@@ -174,10 +175,10 @@
                     "additionalProperties": false,
                     "properties": {
                         "event_key": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                            "$ref": "./CommonDef.json#/definitions/EventKey"
                         },
                         "grade": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                            "$ref": "./CommonDef.json#/definitions/LitGrade"
                         },
                         "name": {
                             "type": "string"
@@ -233,7 +234,7 @@
                     "additionalProperties": false,
                     "properties": {
                         "event_key": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                            "$ref": "./CommonDef.json#/definitions/EventKey"
                         },
                         "name": {
                             "type": "string"
@@ -289,13 +290,13 @@
                     "additionalProperties": false,
                     "properties": {
                         "event_key": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                            "$ref": "./CommonDef.json#/definitions/EventKey"
                         },
                         "month": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Month"
+                            "$ref": "./CommonDef.json#/definitions/Month"
                         },
                         "day": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Day"
+                            "$ref": "./CommonDef.json#/definitions/Day"
                         },
                         "name": {
                             "type": "string"
@@ -322,7 +323,7 @@
                             "const": "moveEvent"
                         },
                         "missal": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/MissalID"
+                            "$ref": "./CommonDef.json#/definitions/MissalID"
                         },
                         "reason": {
                             "type": "string"
@@ -351,10 +352,10 @@
                     "additionalProperties": false,
                     "properties": {
                         "event_key": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                            "$ref": "./CommonDef.json#/definitions/EventKey"
                         },
                         "grade": {
-                            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                            "$ref": "./CommonDef.json#/definitions/LitGrade"
                         },
                         "name": {
                             "type": "string"
@@ -401,20 +402,20 @@
             "additionalProperties": false,
             "properties": {
                 "nation": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Nation"
+                    "$ref": "./CommonDef.json#/definitions/Nation"
                 },
                 "locales": {
                     "type": "array",
                     "uniqueItems": true,
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+                        "$ref": "./CommonDef.json#/definitions/Locale"
                     }
                 },
                 "wider_region": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/WiderRegionNames"
+                    "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
                 },
                 "missals": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Missals"
+                    "$ref": "./CommonDef.json#/definitions/Missals"
                 }
             },
             "required": [
@@ -426,7 +427,7 @@
             "title": "NationalCalendarMetadata"
         },
         "Settings": {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/CalendarSettings",
+            "$ref": "./CommonDef.json#/definitions/CalendarSettings",
             "title": "Settings"
         },
         "NationalCalendarI18n": {
@@ -434,14 +435,14 @@
             "description": "A JSON object of the form { \"locale\": { \"key\": \"value\" } }, used only in PUT and PATCH requests.",
             "additionalProperties": false,
             "propertyNames": {
-                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+                "$ref": "./CommonDef.json#/definitions/Locale"
             },
             "patternProperties": {
                 "": {
                     "type": "object",
                     "additionalProperties": false,
                     "propertyNames": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
+                        "$ref": "./CommonDef.json#/definitions/EventKey"
                     },
                     "patternProperties": {
                         "": {

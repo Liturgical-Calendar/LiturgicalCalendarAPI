@@ -1,6 +1,6 @@
 {
     "SanVincenzoPallotti": {
-        "first_reading": "1 Tessalonicesi 2, 2B-8|1 Giovanni 4, 7-16",
+        "first_reading": "1 Tessalonicesi 2, 2b-8|1 Giovanni 4, 7-16",
         "responsorial_psalm": "Salmo 95 (96)|Salmo 102 (103)",
         "alleluia_verse": "Giovanni 14, 23",
         "gospel": "Giovanni 15, 9-17"
@@ -9,7 +9,7 @@
         "first_reading": "Isaia 58, 6-11",
         "responsorial_psalm": "Salmo 145 (146)",
         "alleluia_verse": "Giovanni 13, 34",
-        "gospel": "Giovanni 25, 31-46|Giovanni 25, 31-40"
+        "gospel": "Matteo 25, 31-46|Matteo 25, 31-40"
     },
     "SanBenedettoGiuseppeLabre": {
         "first_reading": "Filippesi 3,8-14",
@@ -32,23 +32,23 @@
     "BeataAnnaMariaTaigi": {
         "first_reading": "Proverbi 31, 10-13.19-20.30-31",
         "responsorial_psalm": "Salmo 127 (128)",
-        "alleluia_verse": "Lc 8, 15",
+        "alleluia_verse": "Luca 8, 15",
         "gospel": "Luca 10, 38-42"
     },
     "SantiPietroePaoloApostoliPatroniChiesaRomana": {
         "vigil": {
-            "first_reading": "At 3, 1-10",
+            "first_reading": "Atti 3, 1-10",
             "responsorial_psalm": "Salmo 18 (19)",
-            "second_reading": "Gal 1, 11-20",
-            "alleluia_verse": "Gv 21, 17d",
-            "gospel": "Gv 21, 15-19"
+            "second_reading": "Galati 1, 11-20",
+            "alleluia_verse": "Giovanni 21, 17d",
+            "gospel": "Giovanni 21, 15-19"
         },
         "day": {
-            "first_reading": "At 12, 1-11",
+            "first_reading": "Atti 12, 1-11",
             "responsorial_psalm": "Salmo 33 (34)",
-            "second_reading": "2 Tm 4, 6-8.17-18",
-            "alleluia_verse": "Mt 16, 18",
-            "gospel": "Mt 16, 13-19"
+            "second_reading": "2 Timoteo 4, 6-8.17-18",
+            "alleluia_verse": "Matteo 16, 18",
+            "gospel": "Matteo 16, 13-19"
         }
     },
     "BeataVergineMariaSalusPopuliRomani": {
@@ -74,17 +74,17 @@
     "SantiVescoviChiesaRomana": {
         "first_reading": "Sapienza 1, 1-7|Ebrei 13, 7-17",
         "responsorial_psalm": "Salmo 143 (142)",
-        "alleluia_verse": "Marco 1,17",
+        "alleluia_verse": "Marco 1, 17",
         "gospel": "Giovanni 21, 15-17"
     },
     "SantiPrimiMartiriChiesaRomana": {
-        "first_reading": "Rm 8, 31b-39",
+        "first_reading": "Romani 8, 31b-39",
         "responsorial_psalm": "Salmo 123 (124)",
-        "alleluia_verse": "Mt 5, 10",
-        "gospel": "Mt 24, 4-13"
+        "alleluia_verse": "Matteo 5, 10",
+        "gospel": "Matteo 24, 4-13"
     },
     "SanGaspareBufalo": {
-        "first_reading": "Corinzi 3,2-6a",
+        "first_reading": "2 Corinzi 3, 2-6a",
         "responsorial_psalm": "Salmo 15 (16)",
         "alleluia_verse": "Luca 4, 18",
         "gospel": "Luca 4, 16-21"
@@ -103,7 +103,7 @@
         "gospel": "Giovanni 12, 23-26"
     },
     "DedicazioneBasilicaLateranense": {
-        "first_reading": "Ezekiele 47, 1-2.8-9.12",
+        "first_reading": "Ezechiele 47, 1-2.8-9.12",
         "responsorial_psalm": "Salmo 45 (46)",
         "second_reading": "1 Corinzi 3, 9c-11.16-17",
         "alleluia_verse": "2 Cronache 7, 16",

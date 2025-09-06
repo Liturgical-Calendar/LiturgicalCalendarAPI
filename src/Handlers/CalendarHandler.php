@@ -51,8 +51,8 @@ use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyName;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyNameMetadata;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarSettings;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
-use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewFixed as DiocesanLitCalItemCreateNewFixed;
-use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewMobile as DiocesanLitCalItemCreateNewMobile;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewFixed;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewMobile;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMetadata;
@@ -71,7 +71,8 @@ use LiturgicalCalendar\Api\Params\CalendarParams;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Sabre\Xml\Service;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * Calendar request handler
@@ -4326,26 +4327,20 @@ final class CalendarHandler extends AbstractHandler
             }
 
             $GithubReleasesAPI = 'https://api.github.com/repos/Liturgical-Calendar/LiturgicalCalendarAPI/releases/latest';
-            /*$GhRequestHeaders  = [
-                'Accept: application/vnd.github+json',
-                'User-Agent: Liturgical-Calendar/LiturgicalCalendarAPI',
-                'X-GitHub-Api-Version: 2022-11-28'
-            ];*/
 
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $GithubReleasesAPI);
-            curl_setopt($ch, CURLOPT_USERAGENT, 'LiturgicalCalendar');
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            //curl_setopt($ch, CURLOPT_HTTPHEADER, $GhRequestHeaders);
-            $ghCurrentReleaseInfo = curl_exec($ch);
+            $client = new Client([
+                'base_uri' => 'https://api.github.com',
+                'headers'  => [
+                    'Accept'               => 'application/vnd.github+json',
+                    'User-Agent'           => 'LiturgicalCalendar', // required by GitHub
+                    'X-GitHub-Api-Version' => '2022-11-28',
+                ],
+            ]);
 
-            if (curl_errno($ch)) {
-                /** @var GitHubReleaseInfoError $returnObj */
-                $returnObj->status  = 'error';
-                $returnObj->message = curl_error($ch);
-            } else {
-                /** @var string $ghCurrentReleaseInfo */
-                $GitHubReleasesObj = json_decode($ghCurrentReleaseInfo);
+            try {
+                $response             = $client->get($GithubReleasesAPI);
+                $ghCurrentReleaseInfo = $response->getBody()->getContents();
+                $GitHubReleasesObj    = json_decode($ghCurrentReleaseInfo);
                 if (json_last_error() !== JSON_ERROR_NONE) {
                     /** @var GitHubReleaseInfoError $returnObj */
                     $returnObj->status  = 'error';
@@ -4361,9 +4356,11 @@ final class CalendarHandler extends AbstractHandler
                     }
                     file_put_contents($ghReleaseCacheFile, $GitHubReleaseEncoded);
                 }
+            } catch (GuzzleException $e) {
+                /** @var GitHubReleaseInfoError $returnObj */
+                $returnObj->status  = 'error';
+                $returnObj->message = $e->getMessage();
             }
-
-            curl_close($ch);
         }
 
         return $returnObj;
@@ -4508,7 +4505,7 @@ final class CalendarHandler extends AbstractHandler
                     // and we do not produce the iCal file
                     /** @var GitHubReleaseInfoError $infoObj */
                     $message = sprintf(
-                        _('Error receiving or parsing info from github about latest release: %s.'),
+                        _('Error receiving or parsing info from GitHub about latest release: %s.'),
                         $infoObj->message
                     );
                     throw new ServiceUnavailableException($message);
@@ -4674,7 +4671,9 @@ final class CalendarHandler extends AbstractHandler
         } else {
             $this->allowedReturnTypes = array_values(array_filter(
                 ReturnTypeParam::cases(),
-                fn (ReturnTypeParam $returnType) => in_array($returnType, $returnTypes)
+                function (ReturnTypeParam $returnType) use ($returnTypes): bool {
+                    return in_array($returnType, $returnTypes);
+                }
             ));
         }
     }

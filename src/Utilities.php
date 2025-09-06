@@ -20,7 +20,7 @@ use LiturgicalCalendar\Api\Models\Lectionary\ReadingsMap;
 class Utilities
 {
     // NON_EVENT_KEYS are keys whose value is an array, but are not a LitCalEvent
-    private const NON_EVENT_KEYS = [
+    private const array NON_EVENT_KEYS = [
         'litcal',
         'settings',
         'messages',
@@ -54,7 +54,7 @@ class Utilities
     ];
 
     // EVENT_KEY_ELS are keys whose value is an array of LitCalEvents, and should become <Key> elements rather than <Option> elements
-    private const EVENT_KEY_ELS = [
+    private const array EVENT_KEY_ELS = [
         'solemnities_lord_bvm_keys',
         'solemnities_keys',
         'feasts_lord_keys',
@@ -76,14 +76,14 @@ class Utilities
      * All snake_case keys are automatically transformed to their PascalCase equivalent.
      * If any key needs a specific case transformation other than the automatic snake_case to PascalCase, add it to this array.
      */
-    private const CUSTOM_TRANSFORM_KEYS = [
+    private const array CUSTOM_TRANSFORM_KEYS = [
         'litcal'                    => 'LitCal',
         'has_vesper_ii'             => 'HasVesperII',
         'solemnities_lord_bvm'      => 'SolemnitiesLordBVM',
         'solemnities_lord_bvm_keys' => 'SolemnitiesLordBVMKeys'
     ];
 
-    private const READINGS_CHRISTMAS_KEYS = [
+    private const array READINGS_CHRISTMAS_KEYS = [
         'night',
         'dawn',
         'day'
@@ -431,7 +431,7 @@ class Utilities
             case 'purple':
                 $hex .= 'AA00AA';
                 break;
-            case 'pink':
+            case 'rose':
                 $hex .= 'FFAAAA';
                 break;
             default:
@@ -573,10 +573,11 @@ class Utilities
      */
     public static function jsonFileToArray(string $filename): array
     {
-        $cacheKey = 'jsoncache_array_' . md5($filename);
+        $cacheEnabled = ( extension_loaded('apcu') && function_exists('apcu_exists') && function_exists('apcu_store') && function_exists('apcu_fetch') );
+        $cacheKey     = 'jsoncache_array_' . md5($filename);
 
         // Try cache first
-        if (function_exists('apcu_fetch')) {
+        if ($cacheEnabled && apcu_exists($cacheKey)) {
             $data = apcu_fetch($cacheKey, $success);
             if ($success && is_array($data)) {
                 /** @var array<string|int,mixed> $data */
@@ -588,7 +589,7 @@ class Utilities
         $jsonArr     = json_decode($rawContents, true, 512, JSON_THROW_ON_ERROR);
 
         // Store in cache
-        if (function_exists('apcu_store')) {
+        if ($cacheEnabled) {
             apcu_store($cacheKey, $jsonArr, 300);
         }
 
@@ -605,10 +606,11 @@ class Utilities
      */
     public static function jsonFileToObject(string $filename): \stdClass
     {
-        $cacheKey = 'jsoncache_object_' . md5($filename);
+        $cacheEnabled = ( extension_loaded('apcu') && function_exists('apcu_exists') && function_exists('apcu_store') && function_exists('apcu_fetch') );
+        $cacheKey     = 'jsoncache_object_' . md5($filename);
 
         // Try cache first
-        if (function_exists('apcu_fetch')) {
+        if ($cacheEnabled && apcu_exists($cacheKey)) {
             $data = apcu_fetch($cacheKey, $success);
             if ($success && $data instanceof \stdClass) {
                 return $data;
@@ -623,7 +625,7 @@ class Utilities
 
 
         // Store in cache
-        if (function_exists('apcu_store')) {
+        if ($cacheEnabled) {
             apcu_store($cacheKey, $jsonObj, 300);
         }
 
@@ -639,10 +641,11 @@ class Utilities
      */
     public static function jsonFileToObjectArray(string $filename): array
     {
-        $cacheKey = 'jsoncache_objectarray_' . md5($filename);
+        $cacheEnabled = ( extension_loaded('apcu') && function_exists('apcu_exists') && function_exists('apcu_store') && function_exists('apcu_fetch') );
+        $cacheKey     = 'jsoncache_objectarray_' . md5($filename);
 
         // Try cache first
-        if (function_exists('apcu_fetch')) {
+        if ($cacheEnabled) {
             $data = apcu_fetch($cacheKey, $success);
             if ($success && is_array($data)) {
                 /** @var \stdClass[] $data */
@@ -662,7 +665,7 @@ class Utilities
         }
 
         // Store in cache
-        if (function_exists('apcu_store')) {
+        if ($cacheEnabled) {
             apcu_store($cacheKey, $jsonArr, 300);
         }
 
@@ -681,10 +684,11 @@ class Utilities
      */
     public static function jsonUrlToObject(string $url): \stdClass
     {
-        $cacheKey = 'jsoncache_object_' . md5($url);
+        $cacheEnabled = ( extension_loaded('apcu') && function_exists('apcu_exists') && function_exists('apcu_store') && function_exists('apcu_fetch') );
+        $cacheKey     = 'jsoncache_object_' . md5($url);
 
         // Try cache first
-        if (function_exists('apcu_fetch')) {
+        if ($cacheEnabled) {
             $data = apcu_fetch($cacheKey, $success);
             if ($success && $data instanceof \stdClass) {
                 return $data;
@@ -698,7 +702,7 @@ class Utilities
         }
 
         // Store in cache
-        if (function_exists('apcu_store')) {
+        if ($cacheEnabled) {
             apcu_store($cacheKey, $jsonObj, 300);
         }
 

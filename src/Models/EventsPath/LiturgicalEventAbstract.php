@@ -59,7 +59,7 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
     ) {
         $litMassVariousNeedsArray = false;
         if (is_array($common)) {
-            $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $common)));
+            $valueTypes = array_values(array_unique(array_map('gettype', $common)));
             if (count($valueTypes) > 1) {
                 throw new \InvalidArgumentException('Incoherent liturgical common value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes));
             }
@@ -69,7 +69,12 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
         $this->event_key     = $event_key;
         $this->name          = $name;
         $this->color         = is_array($color) ? $color : [$color];
-        $this->color_lcl     = array_map(fn(LitColor $item): string => $item->i18n(self::$locale), $this->color);
+        $this->color_lcl     = array_map(
+            function (LitColor $item): string {
+                return $item->i18n(self::$locale);
+            },
+            $this->color
+        );
         $this->type          = $type;
         $this->grade         = $grade;
         $this->grade_lcl     = $this->grade->i18n(self::$locale, false, false);
@@ -89,7 +94,12 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
         } elseif ($litMassVariousNeedsArray) {
             /** @var LitMassVariousNeeds[] $commons */
             $this->common = $commons;
-            $commonsLcl   = array_map(fn($item) => $item->fullTranslate(self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE), $commons);
+            $commonsLcl   = array_map(
+                function (LitMassVariousNeeds $item): string {
+                    return $item->fullTranslate(self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE);
+                },
+                $commons
+            );
             /**translators: when there are multiple possible commons, this will be the glue "[; or] From the Common of..." */
             $or               = self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'vel' : _('or');
             $this->common_lcl = implode('; ' . $or . ' ', $commonsLcl);
@@ -153,7 +163,7 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
             return $commons;
         }
 
-        $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $common)));
+        $valueTypes = array_values(array_unique(array_map('gettype', $common)));
 
         if (count($valueTypes) > 1) {
             throw new \InvalidArgumentException('Incoherent liturgical common value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes));
@@ -161,11 +171,12 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
 
         if ($valueTypes[0] === 'string') {
             /** @var string[] $common */
-            $commons = LitCommons::create($common)
-                    ?? array_values(array_map(
-                        fn(string $value): LitMassVariousNeeds => LitMassVariousNeeds::from($value),
-                        $common
-                    ));
+            $commons = LitCommons::create($common) ?? array_map(
+                function (string $value): LitMassVariousNeeds {
+                    return LitMassVariousNeeds::from($value);
+                },
+                $common
+            );
             if (false === $commons instanceof LitCommons && false === static::allInstancesOf($commons, LitMassVariousNeeds::class)) {
                 throw new \InvalidArgumentException('Invalid common value type provided to create LiturgicalEvent: expected an array of string, of LitCommon cases, or of LitMassVariousNeeds cases');
             }

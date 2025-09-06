@@ -3,7 +3,7 @@
 namespace LiturgicalCalendar\Api\Models;
 
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile;
-use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewMobile as DiocesanLitCalItemCreateNewMobile;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewMobile;
 
 abstract class LiturgicalEventData extends AbstractJsonSrcData
 {
@@ -31,7 +31,7 @@ abstract class LiturgicalEventData extends AbstractJsonSrcData
      *
      * @return bool Whether the month value is valid. A month value is valid if it is between 1 and 12 (inclusive).
      */
-    public static function isValidMonthValue(int $month): bool
+    protected static function isValidMonthValue(int $month): bool
     {
         return $month > 0 && $month < 13;
     }
@@ -44,16 +44,19 @@ abstract class LiturgicalEventData extends AbstractJsonSrcData
      * @param int $day The day value to check.
      * @return bool Whether the day value is valid for the given month.
      */
-    public static function isValidDayValueForMonth(int $month, int $day): bool
+    protected static function isValidDayValueForMonth(int $month, int $day): bool
     {
         switch ($month) {
             case 2:
                 // February
                 return $day > 0 && $day < 29;
-            case 4:
-            case 6:
-            case 9:
-            case 11:
+            case 1:
+            case 3:
+            case 5:
+            case 7:
+            case 8:
+            case 10:
+            case 12:
                 // January, March, May, July, August, October, December
                 return $day > 0 && $day < 32;
             default:
