@@ -90,11 +90,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y nginx php${{ env.PHP_VERSION }}-fpm gettext locales-all
 
-          # stop system nginx if running
+          # stop system nginx and php-fpm if running
           sudo systemctl stop nginx || true
+          sudo systemctl stop php${{ env.PHP_VERSION }}-fpm
 
           # modify nginx.conf to run as the current runner user
-          sudo sed -i "s/^user www-data;/user $USER;/" /etc/nginx/nginx.conf
+          sudo sed -i "s/^user www-data;/user $USER $GROUP;/" /etc/nginx/nginx.conf
+          sudo sed -i "s/^user = .*/user = $USER/" /etc/php/${{ env.PHP_VERSION }}/fpm/pool.d/www.conf
+          sudo sed -i "s/^group = .*/group = $GROUP/" /etc/php/${{ env.PHP_VERSION }}/fpm/pool.d/www.conf
+          sudo sed -i "s/^listen.owner = .*/listen.owner = $USER/" /etc/php/${{ env.PHP_VERSION }}/fpm/pool.d/www.conf
+          sudo sed -i "s/^listen.group = .*/listen.group = $GROUP/" /etc/php/${{ env.PHP_VERSION }}/fpm/pool.d/www.conf
 
           # disable default nginx site
           sudo rm -f /etc/nginx/sites-enabled/default
@@ -124,7 +129,7 @@ jobs:
           sudo ln -sf /etc/nginx/sites-available/app.conf /etc/nginx/sites-enabled/app.conf
 
           # restart php-fpm
-          sudo systemctl restart php${{ env.PHP_VERSION }}-fpm
+          sudo systemctl start php${{ env.PHP_VERSION }}-fpm
 
           # start nginx
           sudo systemctl start nginx
