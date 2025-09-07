@@ -7,7 +7,7 @@
     }
   ],
   "info": {
-    "description": "An API which allows to retrieve data about the **Roman Calendar** for any given year, between 1970 and 9999. The data strives for historical accuracy (memorials and feast days are only generated from the year in which they were effectively introduced). The data is based on original sources (Roman Missals, Decrees of the Congregation for Divine Worship, Mysterii Paschalis, etc.), not on data copied or retrieved from online sources which may not be accurate. The API offers multiple locales and multiple calendars, from the **General Roman Calendar** to national or diocesan calendars.",
+    "description": "An API which allows to retrieve data about the **Roman Calendar** for any given year, between 1970 and 9999. The data strives for historical accuracy (memorials and feast days are only generated from the year in which they were effectively introduced). The data is based on original sources (Roman Missals, Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments, Mysterii Paschalis, etc.), not on data copied or retrieved from online sources which may not be accurate. The API offers multiple locales and multiple calendars, from the **General Roman Calendar** to national or diocesan calendars.",
     "version": "5.0",
     "title": "Liturgical Calendar",
     "contact": {
@@ -42,7 +42,7 @@
     },
     {
       "name": "Decrees",
-      "description": "Retrieve / create / update / delete Decrees of the Congregation for Divine Worship"
+      "description": "Retrieve / create / update / delete Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments"
     },
     {
       "name": "Easter",
@@ -2792,7 +2792,7 @@
         "security": [
           {}
         ],
-        "summary": "Retrieve the index of defined Decrees of the Congregation for Divine Worship",
+        "summary": "Retrieve the index of defined Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments",
         "operationId": "decreesGET",
         "responses": {
           "200": {
@@ -2828,7 +2828,7 @@
         "security": [
           {}
         ],
-        "summary": "Retrieve the data for a Decree of the Congregation for Divine Worship",
+        "summary": "Retrieve the data for a Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments",
         "operationId": "decreeByIdGET",
         "parameters": [
           {
@@ -2880,7 +2880,7 @@
                   {
                     "name": "MaryMotherChurchTest",
                     "event_key": "MaryMotherChurch",
-                    "description": "The memorial 'Mary Mother of the Church' was added in 2018 by Decree of the Congregation for Divine Worship on the Monday after Pentecost",
+                    "description": "The memorial 'Mary Mother of the Church' was added in 2018 by Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments on the Monday after Pentecost",
                     "test_type": "exactCorrespondenceSince",
                     "year_since": 2018,
                     "assertions": [
@@ -3119,7 +3119,7 @@
                 "example": {
                   "name": "MaryMotherChurchTest",
                   "event_key": "MaryMotherChurch",
-                  "description": "The memorial 'Mary Mother of the Church' was added in 2018 by Decree of the Congregation for Divine Worship on the Monday after Pentecost",
+                  "description": "The memorial 'Mary Mother of the Church' was added in 2018 by Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments on the Monday after Pentecost",
                   "test_type": "exactCorrespondenceSince",
                   "year_since": 2018,
                   "assertions": [
@@ -3386,7 +3386,7 @@
                   },
                   "HasVigilMass": {
                     "type": "boolean",
-                    "description": "present for applicable events such as Solemnities or Sundays. Will have a boolean value of `true` if the expected Vigil Mass is confirmed, and of `false` if the expected Vigil Mass is superseded by another liturgical event. Sometimes this will be established from year to year for specific coincidences by the Congregation for Divine Worship.",
+                    "description": "present for applicable events such as Solemnities or Sundays. Will have a boolean value of `true` if the expected Vigil Mass is confirmed, and of `false` if the expected Vigil Mass is superseded by another liturgical event. Sometimes this will be established from year to year for specific coincidences by the Dicastery for Divine Worship and the Discipline of the Sacraments.",
                     "examples": [
                       0,
                       1
@@ -3394,7 +3394,7 @@
                   },
                   "HasVesperI": {
                     "type": "boolean",
-                    "description": "present for applicable events such as Solemnities or Sundays. Will have a boolean value of `true` if the expected First Vespers are confirmed, and of `false` if the expected First Vespers are superseded by another liturgical event. Sometimes this will be established from year to year for specific coincidences by the Congregation for Divine Worship.",
+                    "description": "present for applicable events such as Solemnities or Sundays. Will have a boolean value of `true` if the expected First Vespers are confirmed, and of `false` if the expected First Vespers are superseded by another liturgical event. Sometimes this will be established from year to year for specific coincidences by the Dicastery for Divine Worship and the Discipline of the Sacraments.",
                     "examples": [
                       0,
                       1
@@ -3402,7 +3402,7 @@
                   },
                   "HasVesperII": {
                     "type": "boolean",
-                    "description": "present for applicable events such as Solemnities or Sundays. Will have a boolean value of `true` if the expected Second Vespers are confirmed, and of `false` if the expected Second Vespers are superseded by another liturgical event. Sometimes this will be established from year to year for specific coincidences by the Congregation for Divine Worship.",
+                    "description": "present for applicable events such as Solemnities or Sundays. Will have a boolean value of `true` if the expected Second Vespers are confirmed, and of `false` if the expected Second Vespers are superseded by another liturgical event. Sometimes this will be established from year to year for specific coincidences by the Dicastery for Divine Worship and the Discipline of the Sacraments.",
                     "examples": [
                       0,
                       1
@@ -3687,7 +3687,7 @@
           },
           "Messages": {
             "type": "object",
-            "description": "an array containing all of the significant operations done in the calculation of the requested Liturgical Calendar, with links to the Decrees of the Congregation for Divine Worship where applicable. Useful for understanding how or why the calculations were done, and what changes have been applied in the generation of the Calendar for the specific year requested.",
+            "description": "an array containing all of the significant operations done in the calculation of the requested Liturgical Calendar, with links to the Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments where applicable. Useful for understanding how or why the calculations were done, and what changes have been applied in the generation of the Calendar for the specific year requested.",
             "properties": {
               "Message": {
                 "type": "string",

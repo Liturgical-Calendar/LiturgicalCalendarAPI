@@ -700,7 +700,7 @@ final class CalendarHandler extends AbstractHandler
     }
 
     /**
-     * Loads the Decrees of the Congregation for Divine Worship from the relative JSON file.
+     * Loads the Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments from the relative JSON file.
      *
      * Decrees establish new memorials, optional memorials, or modify existing liturgical events.
      * Decrees can also declare Doctors of the Church, whether as new liturgical events,
@@ -1237,7 +1237,7 @@ final class CalendarHandler extends AbstractHandler
                     }
 
                     $this->Messages[] = sprintf(
-                        /**translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship  */
+                        /**translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments  */
                         _('The Solemnity \'%1$s\' falls on %2$s in the year %3$d, the celebration has been transferred to %4$s (%5$s) as per the %6$s.'),
                         $tempLiturgicalEvent->name,
                         $coincidingSolemnity->name,
@@ -1250,7 +1250,7 @@ final class CalendarHandler extends AbstractHandler
                                 : $this->dayAndMonth->format($tempLiturgicalEvent->date->format('U'))
                             ),
                         '<a href="https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-42-(2006)/Notitiae-475-476-2006.pdf" target="_blank">'
-                            . _('Decree of the Congregation for Divine Worship')
+                            . _('Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments')
                         . '</a>'
                     );
                 } elseif ($propriumDeSanctisEvent->event_key === 'Annunciation' && $currentLitEventDate >= $PalmSun->date && $currentLitEventDate <= $Easter2->date) {
@@ -1262,7 +1262,7 @@ final class CalendarHandler extends AbstractHandler
                     }
 
                     $this->Messages[] = sprintf(
-                        /**translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship */
+                        /**translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments */
                         _('The Solemnity \'%1$s\' falls on %2$s in the year %3$d, the celebration has been transferred to %4$s (%5$s) as per the %6$s.'),
                         $tempLiturgicalEvent->name,
                         $coincidingSolemnity->name,
@@ -1275,7 +1275,7 @@ final class CalendarHandler extends AbstractHandler
                                 : $this->dayAndMonth->format($tempLiturgicalEvent->date->format('U'))
                             ),
                         '<a href="https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2000/notitiae-42-(2006)/Notitiae-475-476-2006.pdf" target="_blank">'
-                            . _('Decree of the Congregation for Divine Worship')
+                            . _('Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments')
                         . '</a>'
                     );
 
@@ -1317,7 +1317,7 @@ final class CalendarHandler extends AbstractHandler
                              * 3: Requested calendar year,
                              * 4: Explicatory string for the transferral,
                              * 5: actual date for the transferral,
-                             * 6: Decree of the Congregation for Divine Worship
+                             * 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
                              */
                             _('The Solemnity \'%1$s\' falls on %2$s in the year %3$d, the celebration has been transferred to %4$s (%5$s) as per the %6$s.'),
                             $tempLiturgicalEvent->name,
@@ -1330,7 +1330,7 @@ final class CalendarHandler extends AbstractHandler
                                         ? $tempLiturgicalEvent->date->format('F jS')
                                         : $this->dayAndMonth->format($tempLiturgicalEvent->date->format('U'))
                             ),
-                            '<a href="https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-284-285-1990.pdf" target="_blank">' . _('Decree of the Congregation for Divine Worship') . '</a>'
+                            '<a href="https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-284-285-1990.pdf" target="_blank">' . _('Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments') . '</a>'
                         );
                     }
                 } else {
@@ -1342,7 +1342,7 @@ final class CalendarHandler extends AbstractHandler
 
                     $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
                         /**translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year */
-                        _('The Solemnity \'%1$s\' coincides with the Solemnity \'%2$s\' in the year %3$d. We should ask the Congregation for Divine Worship what to do about this!'),
+                        _('The Solemnity \'%1$s\' coincides with the Solemnity \'%2$s\' in the year %3$d. We should ask the Dicastery for Divine Worship and the Discipline of the Sacraments what to do about this!'),
                         $propriumDeSanctisEvent->name,
                         $coincidingSolemnity->name,
                         $this->CalendarParams->Year
@@ -1368,7 +1368,7 @@ final class CalendarHandler extends AbstractHandler
                         $decree = '<a href="'
                             . 'https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf'
                             . '" target="_blank">'
-                            . _('Decree of the Congregation for Divine Worship')
+                            . _('Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments')
                             . '</a>';
 
                         $this->Messages[] =
@@ -1378,7 +1378,7 @@ final class CalendarHandler extends AbstractHandler
                              * 1: LiturgicalEvent name,
                              * 2: Coinciding LiturgicalEvent name,
                              * 3: Requested calendar year,
-                             * 4: Decree of the Congregation for Divine Worship
+                             * 4: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
                              */
                             _('Seeing that the Solemnity \'%1$s\' coincides with the Solemnity \'%2$s\' in the year %3$d, '
                                 . 'it has been anticipated by one day as per %4$s.'),
@@ -1664,7 +1664,7 @@ final class CalendarHandler extends AbstractHandler
             }
         }
 
-        // With the decree Apostolorum Apostola ( June 3rd 2016 ), the Congregation for Divine Worship
+        // With the decree Apostolorum Apostola ( June 3rd 2016 ), the Dicastery for Divine Worship and the Discipline of the Sacraments
         // with the approval of Pope Francis elevated the memorial of Saint Mary Magdalen to a Feast
         // source: https://www.vatican.va/roman_curia/congregations/ccdds/documents/articolo-roche-maddalena_it.pdf
         // This is taken care of ahead when the "memorials from decrees" are applied
@@ -1965,7 +1965,7 @@ final class CalendarHandler extends AbstractHandler
 
                             $propriumDeSanctisEvent->setDecree(
                                 "<a href=\"https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\" target=\"_blank\">"
-                                . _('Decree of the Congregation for Divine Worship')
+                                . _('Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments')
                                 . '</a>'
                             );
                             break;
@@ -2189,7 +2189,7 @@ final class CalendarHandler extends AbstractHandler
 
     /**
      * Adds a message to the list of messages for the calendar indicating that
-     * a liturgical event that would have been added to the calendar via a Decree of the Congregation for Divine Worship
+     * a liturgical event that would have been added to the calendar via a Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
      * is however superseded by a Sunday Solemnity or Feast.
      *
      * @param DecreeItem $decreeItem A decree has established a liturgical event with grade of memoriale,
@@ -2271,7 +2271,7 @@ final class CalendarHandler extends AbstractHandler
                         $propriumDeSanctisEvent->name,
                         $this->CalendarParams->Year,
                         '<a href="https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000630_memoria-immaculati-cordis-mariae-virginis_lt.html" target="_blank">'
-                            . _('Decree of the Congregation for Divine Worship')
+                            . _('Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments')
                             . '</a>'
                     );
                     $coincidence = true;
@@ -2386,7 +2386,7 @@ final class CalendarHandler extends AbstractHandler
 
 
     /**
-     * Creates a LiturgicalEvent object based on information from a Decree of the Congregation for Divine Worship
+     * Creates a LiturgicalEvent object based on information from a Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
      * and adds it to the calendar.
      * @param DecreeItem $decreeItem
      * @return void
@@ -2401,7 +2401,7 @@ final class CalendarHandler extends AbstractHandler
     }
 
     /**
-     * Sets a property of a liturgical event (name, grade) based on a Decree of the Congregation for Divine Worship
+     * Sets a property of a liturgical event (name, grade) based on a Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
      * and adds a message to the list of messages for the calendar indicating that the property has been changed.
      * @param DecreeItem $decreeItem
      * @return void
@@ -2475,7 +2475,7 @@ final class CalendarHandler extends AbstractHandler
     }
 
     /**
-     * This function takes the list of Decrees of the Congregation for Divine Worship
+     * This function takes the list of Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments
      * which have elevated a liturgical event to the rank of Doctor of the Church and
      * updates the calendar accordingly.
      *
@@ -2492,7 +2492,7 @@ final class CalendarHandler extends AbstractHandler
         /** @var array<DecreeItem> */
         $doctorDecrees = $this->decreeItems->getDoctorDecrees();
         if (count($doctorDecrees) === 0) {
-            throw new \InvalidArgumentException('There are no Decrees of the Congregation for Divine Worship for Doctors of the Church.');
+            throw new \InvalidArgumentException('There are no Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments for Doctors of the Church.');
         }
 
         foreach ($doctorDecrees as $doctorDecree) {
@@ -2534,7 +2534,7 @@ final class CalendarHandler extends AbstractHandler
 
 
     /**
-     * Applies memorials based on Decrees of the Congregation for Divine Worship to the calendar.
+     * Applies memorials based on Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments to the calendar.
      *
      * @param LitGrade $grade The grade of the liturgical event (e.g. 'memorial', 'feast', etc.)
      *                               Defaults to LitGrade::MEMORIAL if not provided.
@@ -2543,7 +2543,7 @@ final class CalendarHandler extends AbstractHandler
     private function applyDecrees(LitGrade $grade = LitGrade::MEMORIAL): void
     {
         if (count($this->decreeItems) === 0) {
-            throw new ServiceUnavailableException('We seem to be missing data for Decrees of the Congregation for Divine Worship: no data found!');
+            throw new ServiceUnavailableException('We seem to be missing data for Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments: no data found!');
         }
 
         // filterByGrade excludes Doctors of the Church through the `makeDoctor` action
@@ -2573,7 +2573,7 @@ final class CalendarHandler extends AbstractHandler
     }
 
     /**
-     * Creates a mobile LiturgicalEvent object based on information from a Decree of the Congregation for Divine Worship
+     * Creates a mobile LiturgicalEvent object based on information from a Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
      * and adds it to the calendar.
      * @param DecreeItem $decreeItem The row from the database containing the information about the liturgical event
      * @return void
@@ -2752,7 +2752,7 @@ final class CalendarHandler extends AbstractHandler
                     _('The optional memorial \'%1$s\' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d.'),
                     $litEvent->name,
                     "<a href=\"https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\" target=\"_blank\">"
-                        . _('Decree of the Congregation for Divine Worship')
+                        . _('Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments')
                         . '</a>',
                     $this->CalendarParams->Year
                 );
@@ -2768,7 +2768,7 @@ final class CalendarHandler extends AbstractHandler
                     _('The optional memorial \'%1$s\', which would have been superseded this year by a Sunday or Solemnity were it on Dec. 12, has however been transferred to Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d.'),
                     $litEvent->name,
                     "<a href=\"https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\" target=\"_blank\">"
-                        . _('Decree of the Congregation for Divine Worship')
+                        . _('Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments')
                         . '</a>',
                     $this->CalendarParams->Year
                 );
@@ -2786,7 +2786,7 @@ final class CalendarHandler extends AbstractHandler
                 _('The optional memorial \'%1$s\' has been transferred from Dec. 12 to Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d. However, it is superseded by the %4$s \'%5$s\' in the year %3$d.'),
                 $row->name,
                 "<a href=\"https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_$lang.html\" target=\"_blank\">"
-                    . _('Decree of the Congregation for Divine Worship')
+                    . _('Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments')
                     . '</a>',
                 $this->CalendarParams->Year,
                 $coincidingLiturgicalEvent->grade_lcl,
@@ -2799,7 +2799,7 @@ final class CalendarHandler extends AbstractHandler
     /**
      * The Conversion of St. Paul falls on a Sunday in the year 2009.
      * However, considering that it is the Year of Saint Paul,
-     * with decree of Jan 25 2008 the Congregation for Divine Worship gave faculty to the single churches
+     * with decree of Jan 25 2008 the Dicastery for Divine Worship and the Discipline of the Sacraments gave faculty to the single churches
      * to celebrate the Conversion of St. Paul anyways. So let's re-insert it as an optional memorial?
      * https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_la.html
      */
@@ -2825,7 +2825,7 @@ final class CalendarHandler extends AbstractHandler
                 _('The Feast \'%1$s\' would have been suppressed this year ( 2009 ) since it falls on a Sunday, however being the Year of the Apostle Paul, as per the %2$s it has been reinstated so that local churches can optionally celebrate the memorial.'),
                 '<i>' . $propriumDeSanctisEvent->name . '</i>',
                 "<a href=\"https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20080125_san-paolo_$lang.html\" target=\"_blank\">"
-                    . _('Decree of the Congregation for Divine Worship')
+                    . _('Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments')
                     . '</a>'
             );
         }

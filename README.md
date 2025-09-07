@@ -58,7 +58,8 @@ The API is packaged as a composer library: run `composer install` to setup the a
 Some characteristics of this API:
 
 * **The data is based on official sources**, not copied from random internet sources.
-  Sources used are the various editions of the **Roman Missal** in Latin, English, and Italian, **Magisterial documents**, and the **Decrees of the Congregation for Divine Worship**
+  Sources used are the various editions of the **Roman Missal** in Latin, English, and Italian, **Magisterial documents**,
+  and the **Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments**
   * Missale Romanum, Editio typica, 1970
   * Missale Romanum, Reimpressio emendata, 1971
   * Missale Romanum, Editio typica secunda, 1975
@@ -68,7 +69,7 @@ Some characteristics of this API:
   * [Decrees of the Congregation of Divine Worship](https://www.vatican.va/roman_curia/congregations/ccdds/index_it.htm)
 * **The data is historically accurate**, *i.e.* the liturgical calendar produced for the year 1979 will reflect the calendar as it was in that year,
   and not as it would be today (obviously future years will reflect the calendar as it is generated in the current year;
-  as new decrees are issued by the Congregation for Divine Worship or new editions of the Roman Missal are published,
+  as new decrees are issued by the Dicastery for Divine Worship and the Discipline of the Sacraments or new editions of the Roman Missal are published,
   the script will need to be updated to account for any new criteria)
 
 # Example applications

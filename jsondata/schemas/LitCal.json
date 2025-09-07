@@ -156,7 +156,7 @@
         },
         "messages": {
             "type": "array",
-            "description": "an array containing all of the significant operations done in the calculation of the requested Liturgical Calendar, with links to the Decrees of the Congregation for Divine Worship where applicable. Useful for understanding how or why the calculations were done, and what changes have been applied in the generation of the Calendar for the specific year requested.",
+            "description": "an array containing all of the significant operations done in the calculation of the requested Liturgical Calendar, with links to the Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments where applicable. Useful for understanding how or why the calculations were done, and what changes have been applied in the generation of the Calendar for the specific year requested.",
             "items": {
                 "type": "string"
             }
@@ -370,7 +370,7 @@
                 }
             ],
             "messages": [
-                "The Solemnity 'Sancti Ioseph Sponsi Beatæ Mariæ Virginis' falls on Dominica IV in Quadragesima in the year 2023, the celebration has been transferred to the following Monday (20 Martius) as per the <a href=\"http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/1990/284-285.html\">Decree of the Congregation for Divine Worship</a>.",
+                "The Solemnity 'Sancti Ioseph Sponsi Beatæ Mariæ Virginis' falls on Dominica IV in Quadragesima in the year 2023, the celebration has been transferred to the following Monday (20 Martius) as per the <a href=\"http://www.cultodivino.va/content/cultodivino/it/rivista-notitiae/indici-annate/1990/284-285.html\">Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments</a>.",
                 "'Dominica XVIII «Per Annum»' is superseded by the FESTUM DOMINI 'In Transfiguratione Domini' in the year 2023."
             ]
         }

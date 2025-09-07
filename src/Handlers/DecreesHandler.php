@@ -216,7 +216,7 @@ final class DecreesHandler extends AbstractHandler
             $decree   = array_find(self::$decreesIndex->decreeItems, fn ($decree) => $decree->decree_id === $decreeId);
             if (null === $decree) {
                 $decreeIDs = array_column(self::$decreesIndex->decreeItems, 'decree_id');
-                $error     = 'No Decree of the Congregation for Divine Worship found corresponding to '
+                $error     = 'No Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments found corresponding to '
                     . $decreeId
                     . ', valid values are found in the `decree_id` properties of the `litcal_decrees` collection: ' . implode(', ', $decreeIDs);
                 throw new NotFoundException($error);

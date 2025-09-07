@@ -35,7 +35,7 @@ class JsonDataConstants
     public const DECREES_FOLDER = JsonDataConstants::SOURCEDATA_FOLDER . '/decrees';
 
     /**
-     * The file containing the data with the Decrees of the Congregation for Divine Worship.
+     * The file containing the data with the Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments.
      * Evaluates to 'jsondata/sourcedata/decrees/decrees.json'.
      */
     public const DECREES_FILE = JsonDataConstants::DECREES_FOLDER . '/decrees.json';
@@ -47,7 +47,7 @@ class JsonDataConstants
     public const DECREES_I18N_FOLDER = JsonDataConstants::DECREES_FOLDER . '/i18n';
 
     /**
-     * The file containing the i18n data for the decrees of the Congregation for Divine Worship,
+     * The file containing the i18n data for the decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments,
      * with a placeholder for the locale.
      * Evaluates to 'jsondata/sourcedata/decrees/i18n/{locale}.json'.
      */

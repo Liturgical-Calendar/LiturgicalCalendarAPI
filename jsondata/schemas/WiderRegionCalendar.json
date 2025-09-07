@@ -524,11 +524,9 @@
                     "Zimbabwe"
                 ]
             },
-            "patternProperties": {
-                "": {
-                    "type": "string",
-                    "pattern": "[A-Z1-9]{2,3}"
-                }
+            "additionalProperties": {
+                "type": "string",
+                "pattern": "[A-Z1-9]{2,3}"
             },
             "minProperties": 1,
             "title": "NationalCalendars"

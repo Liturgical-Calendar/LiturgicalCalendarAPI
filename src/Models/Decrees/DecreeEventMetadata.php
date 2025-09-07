@@ -51,7 +51,7 @@ abstract class DecreeEventMetadata extends AbstractJsonRepresentation
             $vaticanLangCode = $this->url_lang_map->getBestLangFromMap(LitLocale::$PRIMARY_LANGUAGE);
             $url             = sprintf($this->url, $vaticanLangCode);
         }
-        return '<a href="' . $url . '" target="_blank">' . _('Decree of the Congregation for Divine Worship') . '</a>';
+        return '<a href="' . $url . '" target="_blank">' . _('Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments') . '</a>';
     }
 
     /**

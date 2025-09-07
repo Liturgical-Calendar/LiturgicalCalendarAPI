@@ -50,8 +50,8 @@ Happy Feast of the Annunciation!
 * use ISO 3166-1 Alpha-2 codes to identify nations, see issue [#231](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/231)
 * created an interface that allows to create Unit Tests, see issue [#205](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/205)
 * added an index of all dioceses of Latin rite, kudos to Gabriel Chow of gcatholic.org for the contribution
-* add Decree of the Congregation for Divine Worship for Italy: Immaculate Conception suppresses 2nd Sunday of Advent, see commit 191d3247838a4da18ce1ab7c0ca2f16a1b2d516e
-* add Decree of the Congregation for Divine Worship for Italy: Saint Nicholas obligatory memorial since 2020, see issue [#248](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/248)
+* add Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments for Italy: Immaculate Conception suppresses 2nd Sunday of Advent, see commit 191d3247838a4da18ce1ab7c0ca2f16a1b2d516e
+* add Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments for Italy: Saint Nicholas obligatory memorial since 2020, see issue [#248](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/248)
 * feature: discoverability of supported locales, see issue [#240](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/240)
 * feature: all national and diocesan calendars are now multilingual by default, see issue [#150](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/150)
 * and a number of other bugfixes, features, and improvements
@@ -234,14 +234,14 @@ Happy Feast of the Annunciation!
 
 ## [v2.9](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v2.9) (November 12th 2020)
 
-* adds Vigil Masses for Sundays and Solemnities, including occasional notes by the Congregation for Divine Worship
+* adds Vigil Masses for Sundays and Solemnities, including occasional notes by the Dicastery for Divine Worship and the Discipline of the Sacraments
 * add Patron Saints of Europe, applicable for Italian Calendar (and eventually any other national calendar in Europe that may be added in the future)
 * add Saturday Memorial of the Blessed Virgin Mary
 
 ## [v2.8](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v2.8) (August 11th 2020)
 
 * adds `diocesanpreset` and `nationalpreset` parameters with relative calendar data
-* adds all of the data from the recent Decrees of the Congregation for Divine Worship and verifies integrity with past Decrees
+* adds all of the data from the recent Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments and verifies integrity with past Decrees
 * ensures `Messages` returned are as specific as possible, while trying to keep the code as clean as possible
 * adds FullCalendar example
 

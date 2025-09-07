@@ -46,7 +46,7 @@ final class LitCalItemMakePatronMetadata extends LiturgicalEventMetadata
         } else {
             $url = $this->url;
         }
-        return '<a href="' . $url . '" target="_blank">' . _('Decree of the Congregation for Divine Worship') . '</a>';
+        return '<a href="' . $url . '" target="_blank">' . _('Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments') . '</a>';
     }
 
     /**

@@ -1444,7 +1444,7 @@ final class LiturgicalEventCollection
                     $coincidingEvent->grade_lcl,
                     $coincidingEvent->event->name,
                     $this->CalendarParams->Year,
-                    '<a href="https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf" target="_blank">' . _('Decree of the Congregation for Divine Worship') . '</a>'
+                    '<a href="https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/2020/notitiae-56-(2020)/Notitiae-597-NS-005-2020.pdf" target="_blank">' . _('Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments') . '</a>'
                 );
             }
         } else {
@@ -1548,7 +1548,7 @@ final class LiturgicalEventCollection
                             $this->handleVigilLiturgicalEventCoincidence($litEvent, $litEventGradeLcl, $coincidingEvent, 'YEAR2022');
                         } else {
                             $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
-                                _('The Vigil Mass for the %1$s \'%2$s\' coincides with the %3$s \'%4$s\' in the year %5$d. We should ask the Congregation for Divine Worship what to do about this!'),
+                                _('The Vigil Mass for the %1$s \'%2$s\' coincides with the %3$s \'%4$s\' in the year %5$d. We should ask the Dicastery for Divine Worship and the Discipline of the Sacraments what to do about this!'),
                                 $litEventGradeLcl,
                                 $litEvent->name,
                                 $coincidingEvent->grade_lcl,
