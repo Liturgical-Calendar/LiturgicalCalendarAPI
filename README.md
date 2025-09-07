@@ -5,28 +5,32 @@
             <th>Translation status</th>
             <th>OpenAPI validation</th>
         </tr>
-        <tr>
-            <th style="text-align:center;"><a href="https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/tree/master">main branch</a></th>
-            <th style="text-align:center;"><a href="https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/tree/development">development branch</a></th>
-            <th></th>
-            <th></th>
-        </tr>
     </thead>
     <tbody>
         <tr>
+            <th style="text-align:center;"><a href="https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/tree/master">stable branch</a></th>
             <td style="text-align:center;">
                 <a href="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/overview/master">
                     <img src="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/badge/master" title="CodeFactor" alt="CodeFactor" />
                 </a>
             </td>
-            <td style="text-align:center;">
-                <a href="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/overview/development">
-                    <img src="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/badge/development" title="CodeFactor" alt="CodeFactor" />
+            <td rowspan="2">
+                <a href="https://translate.johnromanodorazio.com/engage/liturgical-calendar/">
+                    <img src="https://translate.johnromanodorazio.com/widgets/liturgical-calendar/-/287x66-white.png" alt="Translation status" />
                 </a>
             </td>
             <td>
-                <a href="https://translate.johnromanodorazio.com/engage/liturgical-calendar/">
-                    <img src="https://translate.johnromanodorazio.com/widgets/liturgical-calendar/-/287x66-white.png" alt="Translation status" />
+                <a href="https://validator.swagger.io/validator?url=https://raw.githubusercontent.com/Liturgical-Calendar/LiturgicalCalendarAPI/master/jsondata/schemas/openapi.json">
+                    <img src="https://validator.swagger.io/validator?url=https://raw.githubusercontent.com/Liturgical-Calendar/LiturgicalCalendarAPI/master/jsondata/schemas/openapi.json"
+                         alt="OpenAPI validation result" />
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <th style="text-align:center;"><a href="https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/tree/development">dev branch</a></th>
+            <td style="text-align:center;">
+                <a href="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/overview/development">
+                    <img src="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/badge/development" title="CodeFactor" alt="CodeFactor" />
                 </a>
             </td>
             <td>

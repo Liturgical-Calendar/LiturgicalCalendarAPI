@@ -72,7 +72,11 @@
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "default": "la-VA"
+            "examples": [
+              "la-VA",
+              "it-IT",
+              "en-US"
+            ]
           },
           {
             "in": "header",
@@ -153,7 +157,12 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
-            }
+            },
+            "examples": [
+              "la-VA",
+              "it-IT",
+              "en-US"
+            ]
           },
           {
             "in": "header",
@@ -247,7 +256,11 @@
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "default": "la-VA"
+            "examples": [
+              "la-VA",
+              "it-IT",
+              "en-US"
+            ]
           },
           {
             "in": "header",
@@ -339,7 +352,12 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
-            }
+            },
+            "examples": [
+              "la-VA",
+              "it-IT",
+              "en-US"
+            ]
           },
           {
             "in": "header",
@@ -443,7 +461,12 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
-            }
+            },
+            "examples": [
+              "la-VA",
+              "it-IT",
+              "en-US"
+            ]
           },
           {
             "in": "header",
@@ -530,7 +553,12 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
-            }
+            },
+            "examples": [
+              "la-VA",
+              "it-IT",
+              "en-US"
+            ]
           },
           {
             "in": "header",
@@ -633,7 +661,12 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
-            }
+            },
+            "examples": [
+              "la-VA",
+              "it-IT",
+              "en-US"
+            ]
           },
           {
             "in": "header",
@@ -731,7 +764,12 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
-            }
+            },
+            "examples": [
+              "la-VA",
+              "it-IT",
+              "en-US"
+            ]
           },
           {
             "in": "header",
@@ -844,7 +882,12 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
-            }
+            },
+            "examples": [
+              "la-VA",
+              "it-IT",
+              "en-US"
+            ]
           },
           {
             "in": "header",
@@ -923,7 +966,12 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
-            }
+            },
+            "examples": [
+              "la-VA",
+              "it-IT",
+              "en-US"
+            ]
           },
           {
             "in": "header",
@@ -1018,7 +1066,12 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
-            }
+            },
+            "examples": [
+              "la-VA",
+              "it-IT",
+              "en-US"
+            ]
           },
           {
             "in": "header",
@@ -1108,7 +1161,12 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
-            }
+            },
+            "examples": [
+              "la-VA",
+              "it-IT",
+              "en-US"
+            ]
           },
           {
             "in": "header",
@@ -1277,7 +1335,12 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
-            }
+            },
+            "examples": [
+              "la-VA",
+              "it-IT",
+              "en-US"
+            ]
           }
         ],
         "responses": {
@@ -1368,7 +1431,12 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
-            }
+            },
+            "examples": [
+              "la-VA",
+              "it-IT",
+              "en-US"
+            ]
           }
         ],
         "responses": {
@@ -1463,7 +1531,12 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
-            }
+            },
+            "examples": [
+              "la-VA",
+              "it-IT",
+              "en-US"
+            ]
           },
           {
             "in": "path",
@@ -1571,7 +1644,12 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
-            }
+            },
+            "examples": [
+              "la-VA",
+              "it-IT",
+              "en-US"
+            ]
           },
           {
             "in": "path",
@@ -1681,7 +1759,12 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
-            }
+            },
+            "examples": [
+              "la-VA",
+              "it-IT",
+              "en-US"
+            ]
           },
           {
             "in": "path",
@@ -1782,7 +1865,12 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
-            }
+            },
+            "examples": [
+              "la-VA",
+              "it-IT",
+              "en-US"
+            ]
           },
           {
             "in": "path",
@@ -3669,7 +3757,9 @@
                   "Accept-Language": {
                     "type": "string",
                     "examples": [
-                      "it-IT,it;"
+                      "la-VA",
+                      "it-IT",
+                      "en-US"
                     ]
                   },
                   "Accept": {
