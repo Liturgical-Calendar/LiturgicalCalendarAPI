@@ -1,14 +1,14 @@
 <table>
     <thead>
         <tr>
-            <th colspan="2">Code quality</th>
-            <th>Translation status</th>
-            <th>OpenAPI validation</th>
+            <th colspan="2" scope="col">Code quality</th>
+            <th scope="col">Translation status</th>
+            <th scope="col">OpenAPI validation</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <th style="text-align:center;"><a href="https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/tree/master">stable branch</a></th>
+            <th style="text-align:center;" scope="row"><a href="https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/tree/master">stable branch</a></th>
             <td style="text-align:center;">
                 <a href="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/overview/master">
                     <img src="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/badge/master" title="CodeFactor" alt="CodeFactor" />
@@ -27,7 +27,7 @@
             </td>
         </tr>
         <tr>
-            <th style="text-align:center;"><a href="https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/tree/development">dev branch</a></th>
+            <th style="text-align:center;" scope="row"><a href="https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/tree/development">dev branch</a></th>
             <td style="text-align:center;">
                 <a href="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/overview/development">
                     <img src="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/badge/development" title="CodeFactor" alt="CodeFactor" />
