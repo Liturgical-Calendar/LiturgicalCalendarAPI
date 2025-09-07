@@ -392,7 +392,7 @@
         <xs:sequence>
           <xs:element name="FirstReading" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="ResponsorialPsalm" type="xs:string" minOccurs="1" maxOccurs="1" />
-          <xs:element name="AlleluiaVerse" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="GospelAcclamation" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="Gospel" type="xs:string" minOccurs="1" maxOccurs="1" />
         </xs:sequence>
         <xs:attribute name="readingsType" type="xs:string" use="required" fixed="ferial"/>
@@ -406,7 +406,7 @@
           <xs:element name="FirstReading" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="ResponsorialPsalm" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="SecondReading" type="xs:string" minOccurs="1" maxOccurs="1" />
-          <xs:element name="AlleluiaVerse" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="GospelAcclamation" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="Gospel" type="xs:string" minOccurs="1" maxOccurs="1" />
         </xs:sequence>
         <xs:attribute name="readingsType" type="xs:string" use="required" fixed="festive" />
@@ -421,7 +421,7 @@
           <xs:element name="FirstReading" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="ResponsorialPsalm" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="SecondReading" type="xs:string" minOccurs="1" maxOccurs="1" />
-          <xs:element name="AlleluiaVerse" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="GospelAcclamation" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="Gospel" type="xs:string" minOccurs="1" maxOccurs="1" />
         </xs:sequence>
         <xs:attribute name="readingsType" type="xs:string" use="required" fixed="palmSunday" />
@@ -448,7 +448,7 @@
           <xs:element name="ResponsorialPsalm7" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="Epistle" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="ResponsorialPsalmEpistle" type="xs:string" minOccurs="1" maxOccurs="1" />
-          <xs:element name="AlleluiaVerse" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="GospelAcclamation" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="Gospel" type="xs:string" minOccurs="1" maxOccurs="1" />
         </xs:sequence>
         <xs:attribute name="readingsType" type="xs:string" use="required" fixed="easterVigil" />
