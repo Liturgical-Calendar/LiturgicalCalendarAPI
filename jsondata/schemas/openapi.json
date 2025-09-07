@@ -1305,7 +1305,7 @@
                       "readings": {
                         "first_reading": "Efesini 4, 1-7.11-13",
                         "responsorial_psalm": "Salmo 23",
-                        "alleluia_verse": "Matteo 23, 9b.10b",
+                        "gospel_acclamation": "Matteo 23, 9b.10b",
                         "gospel": "Matteo 23, 8-12"
                       },
                       "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
@@ -1326,7 +1326,7 @@
                       "readings": {
                         "first_reading": "2 Corinzi 5, 14-20",
                         "responsorial_psalm": "Salmo 103",
-                        "alleluia_verse": "Matteo 24, 42a.44",
+                        "gospel_acclamation": "Matteo 24, 42a.44",
                         "gospel": "Luca 12, 35-40"
                       },
                       "name": "Sancti Raimundi de Penyafort, presbyteri",
@@ -1397,7 +1397,7 @@
                         "first_reading": "Ef 4, 1-7.11-13",
                         "responsorial_psalm": "Salmo 23",
                         "second_reading": "",
-                        "alleluia_verse": "Mt 23, 9b.10b",
+                        "gospel_acclamation": "Mt 23, 9b.10b",
                         "gospel": "Mt 23, 8-12"
                       },
                       "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
@@ -1419,7 +1419,7 @@
                         "first_reading": "2 Cor 5, 14-20",
                         "responsorial_psalm": "Salmo 103",
                         "second_reading": "",
-                        "alleluia_verse": "Mt 24, 42a.44",
+                        "gospel_acclamation": "Mt 24, 42a.44",
                         "gospel": "Lc 12, 35-40"
                       },
                       "name": "Sancti Raimundi de Penyafort, presbyteri",
@@ -1507,7 +1507,7 @@
                         "first_reading": "Ef 4, 1-7.11-13",
                         "responsorial_psalm": "Salmo 23",
                         "second_reading": "",
-                        "alleluia_verse": "Mt 23, 9b.10b",
+                        "gospel_acclamation": "Mt 23, 9b.10b",
                         "gospel": "Mt 23, 8-12"
                       },
                       "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
@@ -1529,7 +1529,7 @@
                         "first_reading": "2 Cor 5, 14-20",
                         "responsorial_psalm": "Salmo 103",
                         "second_reading": "",
-                        "alleluia_verse": "Mt 24, 42a.44",
+                        "gospel_acclamation": "Mt 24, 42a.44",
                         "gospel": "Lc 12, 35-40"
                       },
                       "name": "Sancti Raimundi de Penyafort, presbyteri",
@@ -1615,7 +1615,7 @@
                         "first_reading": "Ef 4, 1-7.11-13",
                         "responsorial_psalm": "Salmo 23",
                         "second_reading": "",
-                        "alleluia_verse": "Mt 23, 9b.10b",
+                        "gospel_acclamation": "Mt 23, 9b.10b",
                         "gospel": "Mt 23, 8-12"
                       },
                       "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
@@ -1637,7 +1637,7 @@
                         "first_reading": "2 Cor 5, 14-20",
                         "responsorial_psalm": "Salmo 103",
                         "second_reading": "",
-                        "alleluia_verse": "Mt 24, 42a.44",
+                        "gospel_acclamation": "Mt 24, 42a.44",
                         "gospel": "Lc 12, 35-40"
                       },
                       "name": "Sancti Raimundi de Penyafort, presbyteri",
@@ -1718,7 +1718,7 @@
                         "first_reading": "Efesini 4, 1-7.11-13",
                         "responsorial_psalm": "Salmo 23",
                         "second_reading": "",
-                        "alleluia_verse": "Matteo 23, 9b.10b",
+                        "gospel_acclamation": "Matteo 23, 9b.10b",
                         "gospel": "Matteo 23, 8-12"
                       },
                       "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
@@ -1740,7 +1740,7 @@
                         "first_reading": "2 Corinzi 5, 14-20",
                         "responsorial_psalm": "Salmo 103",
                         "second_reading": "",
-                        "alleluia_verse": "Matteo 24, 42a.44",
+                        "gospel_acclamation": "Matteo 24, 42a.44",
                         "gospel": "Luca 12, 35-40"
                       },
                       "name": "Sancti Raimundi de Penyafort, presbyteri",
@@ -1819,7 +1819,7 @@
                         "first_reading": "Ef 4, 1-7.11-13",
                         "responsorial_psalm": "Salmo 23",
                         "second_reading": "",
-                        "alleluia_verse": "Mt 23, 9b.10b",
+                        "gospel_acclamation": "Mt 23, 9b.10b",
                         "gospel": "Mt 23, 8-12"
                       },
                       "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
@@ -1841,7 +1841,7 @@
                         "first_reading": "2 Cor 5, 14-20",
                         "responsorial_psalm": "Salmo 103",
                         "second_reading": "",
-                        "alleluia_verse": "Mt 24, 42a.44",
+                        "gospel_acclamation": "Mt 24, 42a.44",
                         "gospel": "Lc 12, 35-40"
                       },
                       "name": "Sancti Raimundi de Penyafort, presbyteri",
@@ -4220,7 +4220,7 @@
                       "responsorial_psalm_epistle": {
                         "type": "string"
                       },
-                      "alleluia_verse": {
+                      "gospel_acclamation": {
                         "type": "string"
                       },
                       "gospel": {

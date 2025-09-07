@@ -4,10 +4,10 @@ namespace LiturgicalCalendar\Api\Models\Lectionary;
 
 final class ReadingsFerial extends ReadingsAbstract
 {
-    private const REQUIRED_PROPS = ['first_reading', 'responsorial_psalm', 'alleluia_verse', 'gospel'];
+    private const REQUIRED_PROPS = ['first_reading', 'responsorial_psalm', 'gospel_acclamation', 'gospel'];
 
     /**
-     * @param \stdClass&object{first_reading:string,responsorial_psalm:string,alleluia_verse:string,gospel:string} $data
+     * @param \stdClass&object{first_reading:string,responsorial_psalm:string,gospel_acclamation:string,gospel:string} $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static
@@ -17,7 +17,7 @@ final class ReadingsFerial extends ReadingsAbstract
         return new static(
             $data->first_reading,
             $data->responsorial_psalm,
-            $data->alleluia_verse,
+            $data->gospel_acclamation,
             $data->gospel
         );
     }
@@ -28,10 +28,10 @@ final class ReadingsFerial extends ReadingsAbstract
      * The array should have the following keys:
      * - first_reading (string): The first reading for a ferial day
      * - responsorial_psalm (string): The responsorial psalm for a ferial day
-     * - alleluia_verse (string): The alleluia verse for a ferial day
+     * - gospel_acclamation (string): The alleluia verse for a ferial day
      * - gospel (string): The gospel for a ferial day
      *
-     * @param array{first_reading:string,responsorial_psalm:string,alleluia_verse:string,gospel:string} $data
+     * @param array{first_reading:string,responsorial_psalm:string,gospel_acclamation:string,gospel:string} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -45,7 +45,7 @@ final class ReadingsFerial extends ReadingsAbstract
         return new static(
             $data['first_reading'],
             $data['responsorial_psalm'],
-            $data['alleluia_verse'],
+            $data['gospel_acclamation'],
             $data['gospel']
         );
     }
@@ -57,16 +57,16 @@ final class ReadingsFerial extends ReadingsAbstract
      * with the following keys:
      * - first_reading (string): The first reading for a ferial day
      * - responsorial_psalm (string): The responsorial psalm for a ferial day
-     * - alleluia_verse (string): The alleluia verse for a ferial day
+     * - gospel_acclamation (string): The alleluia verse for a ferial day
      * - gospel (string): The gospel for a ferial day
-     * @return array{first_reading:string,responsorial_psalm:string,alleluia_verse:string,gospel:string}
+     * @return array{first_reading:string,responsorial_psalm:string,gospel_acclamation:string,gospel:string}
      */
     public function jsonSerialize(): array
     {
         return [
             'first_reading'      => $this->first_reading,
             'responsorial_psalm' => $this->responsorial_psalm,
-            'alleluia_verse'     => $this->alleluia_verse,
+            'gospel_acclamation' => $this->gospel_acclamation,
             'gospel'             => $this->gospel
         ];
     }

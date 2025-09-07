@@ -8,7 +8,7 @@ final class ReadingsEasterVigil extends ReadingsAbstract
         'first_reading',
         'second_reading',
         'responsorial_psalm',
-        'alleluia_verse',
+        'gospel_acclamation',
         'gospel',
         'responsorial_psalm_2',
         'third_reading',
@@ -44,7 +44,7 @@ final class ReadingsEasterVigil extends ReadingsAbstract
         string $first_reading,
         string $second_reading,
         string $responsorial_psalm,
-        string $alleluia_verse,
+        string $gospel_acclamation,
         string $gospel,
         string $responsorial_psalm_2,
         string $third_reading,
@@ -63,7 +63,7 @@ final class ReadingsEasterVigil extends ReadingsAbstract
         parent::__construct(
             $first_reading,
             $responsorial_psalm,
-            $alleluia_verse,
+            $gospel_acclamation,
             $gospel
         );
 
@@ -84,7 +84,7 @@ final class ReadingsEasterVigil extends ReadingsAbstract
     }
 
     /**
-     * @param \stdClass&object{first_reading:string,second_reading:string,responsorial_psalm:string,alleluia_verse:string,gospel:string,responsorial_psalm_2:string,third_reading:string,responsorial_psalm_3:string,fourth_reading:string,responsorial_psalm_4:string,fifth_reading:string,responsorial_psalm_5:string,sixth_reading:string,responsorial_psalm_6:string,seventh_reading:string,responsorial_psalm_7:string,epistle:string,responsorial_psalm_epistle:string} $data
+     * @param \stdClass&object{first_reading:string,second_reading:string,responsorial_psalm:string,gospel_acclamation:string,gospel:string,responsorial_psalm_2:string,third_reading:string,responsorial_psalm_3:string,fourth_reading:string,responsorial_psalm_4:string,fifth_reading:string,responsorial_psalm_5:string,sixth_reading:string,responsorial_psalm_6:string,seventh_reading:string,responsorial_psalm_7:string,epistle:string,responsorial_psalm_epistle:string} $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static
@@ -95,7 +95,7 @@ final class ReadingsEasterVigil extends ReadingsAbstract
             $data->first_reading,
             $data->second_reading,
             $data->responsorial_psalm,
-            $data->alleluia_verse,
+            $data->gospel_acclamation,
             $data->gospel,
             $data->responsorial_psalm_2,
             $data->third_reading,
@@ -116,7 +116,7 @@ final class ReadingsEasterVigil extends ReadingsAbstract
     /**
      * Creates an instance of this class from an array.
      *
-     * @param array{first_reading:string,second_reading:string,responsorial_psalm:string,alleluia_verse:string,gospel:string,responsorial_psalm_2:string,third_reading:string,responsorial_psalm_3:string,fourth_reading:string,responsorial_psalm_4:string,fifth_reading:string,responsorial_psalm_5:string,sixth_reading:string,responsorial_psalm_6:string,seventh_reading:string,responsorial_psalm_7:string,epistle:string,responsorial_psalm_epistle:string} $data
+     * @param array{first_reading:string,second_reading:string,responsorial_psalm:string,gospel_acclamation:string,gospel:string,responsorial_psalm_2:string,third_reading:string,responsorial_psalm_3:string,fourth_reading:string,responsorial_psalm_4:string,fifth_reading:string,responsorial_psalm_5:string,sixth_reading:string,responsorial_psalm_6:string,seventh_reading:string,responsorial_psalm_7:string,epistle:string,responsorial_psalm_epistle:string} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -131,7 +131,7 @@ final class ReadingsEasterVigil extends ReadingsAbstract
             $data['first_reading'],
             $data['second_reading'],
             $data['responsorial_psalm'],
-            $data['alleluia_verse'],
+            $data['gospel_acclamation'],
             $data['gospel'],
             $data['responsorial_psalm_2'],
             $data['third_reading'],
@@ -170,9 +170,9 @@ final class ReadingsEasterVigil extends ReadingsAbstract
      * - responsorial_psalm_7 (string): The responsorial psalm for the seventh reading for the Easter Vigil
      * - epistle (string): The epistle for the Easter Vigil
      * - responsorial_psalm_epistle (string): The responsorial psalm for the epistle for the Easter Vigil
-     * - alleluia_verse (string): The alleluia verse for the Easter Vigil
+     * - gospel_acclamation (string): The alleluia verse for the Easter Vigil
      * - gospel (string): The gospel for the Easter Vigil
-     * @return array{first_reading:string,responsorial_psalm:string,second_reading:string,responsorial_psalm_2:string,third_reading:string,responsorial_psalm_3:string,fourth_reading:string,responsorial_psalm_4:string,fifth_reading:string,responsorial_psalm_5:string,sixth_reading:string,responsorial_psalm_6:string,seventh_reading:string,responsorial_psalm_7:string,epistle:string,responsorial_psalm_epistle:string,alleluia_verse:string,gospel:string}
+     * @return array{first_reading:string,responsorial_psalm:string,second_reading:string,responsorial_psalm_2:string,third_reading:string,responsorial_psalm_3:string,fourth_reading:string,responsorial_psalm_4:string,fifth_reading:string,responsorial_psalm_5:string,sixth_reading:string,responsorial_psalm_6:string,seventh_reading:string,responsorial_psalm_7:string,epistle:string,responsorial_psalm_epistle:string,gospel_acclamation:string,gospel:string}
      */
     public function jsonSerialize(): array
     {
@@ -193,7 +193,7 @@ final class ReadingsEasterVigil extends ReadingsAbstract
             'responsorial_psalm_7'       => $this->responsorial_psalm_7,
             'epistle'                    => $this->epistle,
             'responsorial_psalm_epistle' => $this->responsorial_psalm_epistle,
-            'alleluia_verse'             => $this->alleluia_verse,
+            'gospel_acclamation'         => $this->gospel_acclamation,
             'gospel'                     => $this->gospel
         ];
     }

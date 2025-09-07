@@ -128,7 +128,7 @@ final class PropriumDeSanctisMap extends AbstractJsonSrcDataArray implements \It
     /**
      * Creates an instance of PropriumDeTemporeCollection from an array of associative arrays.
      *
-     * @param array<array{event_key:string,grade:int,type:int,color:string[],readings:array{first_reading:string,responsorial_psalm:string,second_reading?:string,alleluia_verse:string,gospel:string,palm_gospel?:string,responsorial_psalm_2?:string}}> $data
+     * @param array<array{event_key:string,grade:int,type:int,color:string[],readings:array{first_reading:string,responsorial_psalm:string,second_reading?:string,gospel_acclamation:string,gospel:string,palm_gospel?:string,responsorial_psalm_2?:string}}> $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
