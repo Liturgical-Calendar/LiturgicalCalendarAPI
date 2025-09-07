@@ -130,7 +130,7 @@ System requirements:
 * PHP modules installed and enabled: `intl` • `zip` • `calendar` • `yaml` • `gettext`
 * System package `gettext` and language packs for all the supported languages
 * PHP module `apcu` is optional and currently under testing.
-  If enabled, it is also possible to test usage for the websocket server by setting `apc.enable_cli=1` in `php.ini`.
+  If enabled, it is also possible to test usage for the WebSocket server by setting `apc.enable_cli=1` in `php.ini`.
 
 ## Using PHP's built-in server
 
@@ -140,11 +140,12 @@ For example, a request to the `/calendar` route will make a request internally t
 To be on the safe side, you should spawn up to 6 workers.
 
 ```bash
-PHP_CLI_SERVER_WORKERS=6 php -S 127.0.0.1:8000 -t public
+PHP_CLI_SERVER_WORKERS=6 php -S localhost:8000 -t public
 ```
 
 For convenience when using VSCode, a `tasks.json` has been defined so that you can simply type <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd>
-(<kbd>CMD</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> on macOS) to start the PHP built-in server and open the browser.
+(<kbd>CMD</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> on macOS) to start the PHP built-in server and open the browser
+(`litcal-api-with-browser`, or `api-server-no-browser` to just start the server without opening the browser).
 
 The `composer.json` file also defines a couple scripts to simplify this process:
 
@@ -227,7 +228,7 @@ This interface has its own repository [Liturgical-Calendar/UnitTestInterface](ht
 You should clone this repository, and run `composer install` within the cloned repository folder.
 
 This web interface communicates with a Web Socket backend included in the API repository.
-In order to launch the websocket server, you can use <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> (`litcal-tests-websockets`) from VSCode,
+In order to launch the WebSocket server, you can use <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> (`litcal-tests-websockets`) from VSCode,
 in the Liturgical Calendar API repository.
 
 Then launch the web interface with <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd> (`litcal-tests-webui`) from VSCode,
