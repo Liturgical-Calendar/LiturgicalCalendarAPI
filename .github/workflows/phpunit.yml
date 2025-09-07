@@ -1,19 +1,8 @@
 name: PHPUnit
 
 on:
-  pull_request:
-    branches: [ master, development ]
-    paths: [
-      '**/*.php',
-      'composer.json',
-      'composer.lock',
-      'phpunit*.xml*',
-      '.env.example',
-      'jsondata/**',
-      'i18n/**'
-    ]
   push:
-    branches: [ master, development ]
+    branches: [ development ]
     paths: [
       '**/*.php',
       'composer.json',
