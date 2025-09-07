@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-06 16:33+0000\n"
+"POT-Creation-Date: 2025-09-07 02:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -650,15 +650,15 @@ msgstr ""
 msgid "Divine Mercy Sunday"
 msgstr ""
 
-#. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
-#. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Congregation for Divine Worship
+#. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
+#. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
 #. translators:
 #.  1: Solemnity name,
 #.  2: Coinciding Solemnity name,
 #.  3: Requested calendar year,
 #.  4: Explicatory string for the transferral,
 #.  5: actual date for the transferral,
-#.  6: Decree of the Congregation for Divine Worship
+#.  6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
 #.
 #: src/Handlers/CalendarHandler.php:1241 src/Handlers/CalendarHandler.php:1266
 #: src/Handlers/CalendarHandler.php:1322
@@ -680,7 +680,9 @@ msgstr ""
 #: src/Models/Calendar/LiturgicalEventCollection.php:1447
 #: src/Models/Decrees/DecreeEventMetadata.php:54
 #: src/Models/RegionalData/NationalData/LitCalItemMakePatronMetadata.php:49
-msgid "Decree of the Congregation for Divine Worship"
+msgid ""
+"Decree of the Dicastery for Divine Worship and the Discipline of the "
+"Sacraments"
 msgstr ""
 
 #: src/Handlers/CalendarHandler.php:1270
@@ -696,14 +698,15 @@ msgstr ""
 #, php-format
 msgid ""
 "The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year %3$d. "
-"We should ask the Congregation for Divine Worship what to do about this!"
+"We should ask the Dicastery for Divine Worship and the Discipline of the "
+"Sacraments what to do about this!"
 msgstr ""
 
 #. translators:
 #.  1: LiturgicalEvent name,
 #.  2: Coinciding LiturgicalEvent name,
 #.  3: Requested calendar year,
-#.  4: Decree of the Congregation for Divine Worship
+#.  4: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
 #.
 #: src/Handlers/CalendarHandler.php:1383
 #, php-format
@@ -1387,6 +1390,6 @@ msgstr ""
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
-"year %5$d. We should ask the Congregation for Divine Worship what to do "
-"about this!"
+"year %5$d. We should ask the Dicastery for Divine Worship and the Discipline "
+"of the Sacraments what to do about this!"
 msgstr ""
