@@ -51,34 +51,34 @@
             "additionalProperties": false,
             "properties": {
                 "event_key": {
-                    "type": "string"
+                    "$ref": "./CommonDef.json#/definitions/EventKey"
                 },
                 "name": {
                     "type": "string"
                 },
                 "grade": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                    "$ref": "./CommonDef.json#/definitions/LitGrade"
                 },
                 "common": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitCommon"
+                    "$ref": "./CommonDef.json#/definitions/LitCommon"
                 },
                 "calendar": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Calendar"
+                    "$ref": "./CommonDef.json#/definitions/Calendar"
                 },
                 "color": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
+                    "$ref": "./CommonDef.json#/definitions/LitColor"
                 },
                 "type": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitFeastType"
+                    "$ref": "./CommonDef.json#/definitions/LitFeastType"
                 },
                 "readings": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                    "$ref": "./CommonDef.json#/definitions/Readings"
                 },
                 "month": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Month"
+                    "$ref": "./CommonDef.json#/definitions/Month"
                 },
                 "day": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Day"
+                    "$ref": "./CommonDef.json#/definitions/Day"
                 },
                 "strtotime": {
                     "oneOf": [
