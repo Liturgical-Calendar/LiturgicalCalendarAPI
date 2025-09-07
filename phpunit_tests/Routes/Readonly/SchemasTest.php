@@ -41,7 +41,7 @@ final class SchemasTest extends ApiTestCase
                 $this->assertEquals('3.1.0', $data->openapi, 'openapi should be 3.1.0');
             } elseif (property_exists($data, '$schema')) {
                 $this->assertIsString($data->{'$schema'}, '$schema should be a string');
-                $this->assertEquals('http://json-schema.org/draft-07/schema#', $data->{'$schema'}, '$schema should be http://json-schema.org/draft-07/schema#');
+                $this->assertEquals('https://json-schema.org/draft-07/schema#', $data->{'$schema'}, '$schema should be https://json-schema.org/draft-07/schema#');
             } else {
                 $this->fail('Data object has neither openapi nor $schema property.');
             }
