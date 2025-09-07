@@ -1,4 +1,14 @@
-<table>
+<style>
+    .validations th {
+        background-color: lightgray;
+        color: black;
+    }
+    .validations td {
+        background-color: whitesmoke;
+        color: black;
+    }
+</style>
+<table class="validations">
     <thead>
         <tr>
             <th colspan="2" scope="col">Code quality</th>
