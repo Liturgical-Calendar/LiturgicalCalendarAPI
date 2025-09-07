@@ -77,7 +77,7 @@
             "additionalProperties": false,
             "properties": {
                 "event_key": {
-                    "type": "string"
+                    "$ref": "./CommonDef.json#/definitions/EventKey"
                 },
                 "color": {
                     "$ref": "./CommonDef.json#/definitions/LitColor"
@@ -113,7 +113,7 @@
             "additionalProperties": false,
             "properties": {
                 "event_key": {
-                    "type": "string"
+                    "$ref": "./CommonDef.json#/definitions/EventKey"
                 },
                 "grade": {
                     "$ref": "./CommonDef.json#/definitions/LitGrade"
