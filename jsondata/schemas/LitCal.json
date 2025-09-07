@@ -298,75 +298,87 @@
                     "ChairStPeter",
                     "StMatthiasAp"
                 ],
-                "reinstated_events" : [],
-                "reinstated_events_keys" : []
+                "reinstated_events": [],
+                "reinstated_events_keys": []
             },
             "litcal": [
                 {
-                    "event_idx": 1076,
-                    "event_key": "Advent1_vigil",
-                    "name": "Dominica Prima Adventus Missa in Vigilia",
-                    "date": 1701475200,
+                    "event_key": "MotherGod",
+                    "event_idx": 39,
+                    "name": "SOLLEMNITAS SANCTÆ DEI GENITRICIS MARIÆ",
                     "color": [
-                        "purple"
+                        "white"
                     ],
                     "color_lcl": [
-                        "purpura"
+                        "albus"
                     ],
-                    "type": "mobile",
-                    "grade": 7,
-                    "grade_lcl": "celebratio altioris ordinis quam sollemnitatis",
-                    "grade_abbr": "S✝",
-                    "grade_display": "",
+                    "grade": 6,
+                    "grade_lcl": "SOLLEMNITAS",
+                    "grade_abbr": "S",
+                    "grade_display": null,
                     "common": [],
                     "common_lcl": "",
-                    "day_of_the_week_iso8601": 6,
-                    "month": 12,
-                    "day": 2,
+                    "type": "fixed",
+                    "date": 1672531200,
                     "year": 2023,
-                    "month_short": "Dec",
-                    "month_long": "December",
-                    "day_of_the_week_short": "Sat",
-                    "day_of_the_week_long": "Saturday",
-                    "liturgical_year": "ANNUM B",
-                    "is_vigil_mass": true,
-                    "is_vigil_for": "Advent1",
-                    "liturgical_season": "ADVENT",
-                    "liturgical_season_lcl": "Tempus Adventus"
-                },
-                {
-                    "event_idx": 583,
-                    "event_key": "Advent1",
-                    "name": "Dominica Prima Adventus",
-                    "date": 1701561600,
-                    "color": [
-                        "purple"
-                    ],
-                    "color_lcl": [
-                        "purpura"
-                    ],
-                    "type": "mobile",
-                    "grade": 7,
-                    "grade_lcl": "celebratio altioris ordinis quam sollemnitatis",
-                    "grade_abbr": "S✝",
-                    "grade_display": "",
-                    "common": [],
-                    "common_lcl": "",
+                    "month": 1,
+                    "month_short": "Ian.",
+                    "month_long": "Ianuarius",
+                    "day": 1,
                     "day_of_the_week_iso8601": 7,
-                    "month": 12,
-                    "day": 3,
-                    "year": 2023,
-                    "month_short": "Dec",
-                    "month_long": "December",
-                    "day_of_the_week_short": "Sun",
-                    "day_of_the_week_long": "Sunday",
-                    "liturgical_year": "ANNUM B",
+                    "day_of_the_week_short": "Dom.",
+                    "day_of_the_week_long": "Dominica",
+                    "readings": {
+                        "first_reading": "Numeri 6:22-27",
+                        "responsorial_psalm": "Psalmo 66 (67)",
+                        "second_reading": "Galatas 4:4-7",
+                        "gospel_acclamation": "Hebræos 1:1-2",
+                        "gospel": "Lucam 2:16-21"
+                    },
                     "has_vigil_mass": true,
                     "has_vesper_i": true,
                     "has_vesper_ii": true,
-                    "psalter_week": 1,
-                    "liturgical_season": "ADVENT",
-                    "liturgical_season_lcl": "Tempus Adventus"
+                    "psalter_week": 0,
+                    "liturgical_season": "CHRISTMAS",
+                    "liturgical_season_lcl": "Tempus Nativitatis"
+                },
+                {
+                    "event_key": "StsBasilGreg",
+                    "event_idx": 154,
+                    "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
+                    "color": [
+                        "white"
+                    ],
+                    "color_lcl": [
+                        "albus"
+                    ],
+                    "grade": 3,
+                    "grade_lcl": "Memoria obligatoria",
+                    "grade_abbr": "M",
+                    "grade_display": null,
+                    "common": [
+                        "Proper"
+                    ],
+                    "common_lcl": "Proprio",
+                    "type": "fixed",
+                    "date": 1672617600,
+                    "year": 2023,
+                    "month": 1,
+                    "month_short": "Ian.",
+                    "month_long": "Ianuarius",
+                    "day": 2,
+                    "day_of_the_week_iso8601": 1,
+                    "day_of_the_week_short": "Fer. II",
+                    "day_of_the_week_long": "Feria II",
+                    "readings": {
+                        "first_reading": "Ephesios 4, 1-7.11-13",
+                        "responsorial_psalm": "Psalmo 23",
+                        "gospel_acclamation": "Matthæum 23, 9b.10b",
+                        "gospel": "Matthæum 23, 8-12"
+                    },
+                    "psalter_week": 0,
+                    "liturgical_season": "CHRISTMAS",
+                    "liturgical_season_lcl": "Tempus Nativitatis"
                 }
             ],
             "messages": [
@@ -441,7 +453,10 @@
                     "type": "string"
                 },
                 "grade_display": {
-                    "type": ["string", "null"]
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "common": {
                     "$ref": "./CommonDef.json#/definitions/LitCommon"
@@ -545,6 +560,7 @@
             "additionalProperties": false
         },
         "LiturgicalEvent": {
+            "type": "object",
             "properties": {
                 "event_idx": {
                     "type": "integer",
@@ -584,7 +600,10 @@
                     "type": "string"
                 },
                 "grade_display": {
-                    "type": ["string", "null"]
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "common": {
                     "$ref": "./CommonDef.json#/definitions/LitCommon"
