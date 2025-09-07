@@ -8,7 +8,7 @@ use LiturgicalCalendar\Api\Utilities;
  * @phpstan-type ReadingsFerialArray array{
  *     first_reading:string,
  *     responsorial_psalm:string,
- *     alleluia_verse:string,
+ *     gospel_acclamation:string,
  *     gospel:string
  * }
  *
@@ -16,7 +16,7 @@ use LiturgicalCalendar\Api\Utilities;
  *     first_reading:string,
  *     responsorial_psalm:string,
  *     second_reading:string,
- *     alleluia_verse:string,
+ *     gospel_acclamation:string,
  *     gospel:string
  * }
  *
@@ -25,7 +25,7 @@ use LiturgicalCalendar\Api\Utilities;
  *     first_reading:string,
  *     second_reading:string,
  *     responsorial_psalm:string,
- *     alleluia_verse:string,
+ *     gospel_acclamation:string,
  *     gospel:string
  * }
  *
@@ -46,7 +46,7 @@ use LiturgicalCalendar\Api\Utilities;
  *     responsorial_psalm_7:string,
  *     epistle:string,
  *     responsorial_psalm_epistle:string,
- *     alleluia_verse:string,
+ *     gospel_acclamation:string,
  *     gospel:string
  * }
  *
@@ -89,7 +89,7 @@ final class ReadingsMap implements \ArrayAccess
     private array $readings;
 
     /**
-     * @var array{0:'first_reading',1:'responsorial_psalm',2:'second_reading',3:'responsorial_psalm_2',4:'third_reading',5:'responsorial_psalm_3',6:'fourth_reading',7:'responsorial_psalm_4',8:'fifth_reading',9:'responsorial_psalm_5',10:'sixth_reading',11:'responsorial_psalm_6',12:'seventh_reading',13:'responsorial_psalm_7',14:'epistle',15:'responsorial_psalm_epistle',16:'alleluia_verse',17:'gospel'}
+     * @var array{0:'first_reading',1:'responsorial_psalm',2:'second_reading',3:'responsorial_psalm_2',4:'third_reading',5:'responsorial_psalm_3',6:'fourth_reading',7:'responsorial_psalm_4',8:'fifth_reading',9:'responsorial_psalm_5',10:'sixth_reading',11:'responsorial_psalm_6',12:'seventh_reading',13:'responsorial_psalm_7',14:'epistle',15:'responsorial_psalm_epistle',16:'gospel_acclamation',17:'gospel'}
      */
     public const EASTER_VIGIL_KEYS = [
         'first_reading',
@@ -108,22 +108,22 @@ final class ReadingsMap implements \ArrayAccess
         'responsorial_psalm_7',
         'epistle',
         'responsorial_psalm_epistle',
-        'alleluia_verse',
+        'gospel_acclamation',
         'gospel'
     ];
 
     /**
-     * @var array{0:'first_reading',1:'responsorial_psalm',2:'alleluia_verse',3:'gospel'}
+     * @var array{0:'first_reading',1:'responsorial_psalm',2:'gospel_acclamation',3:'gospel'}
      */
     public const FERIAL_KEYS = [
         'first_reading',
         'responsorial_psalm',
-        'alleluia_verse',
+        'gospel_acclamation',
         'gospel'
     ];
 
     /**
-     * @var array{0:'first_reading',1:'responsorial_psalm',2:'alleluia_verse',3:'gospel',4:'second_reading'}
+     * @var array{0:'first_reading',1:'responsorial_psalm',2:'gospel_acclamation',3:'gospel',4:'second_reading'}
      */
     public const FESTIVE_KEYS = [
         ...self::FERIAL_KEYS,
@@ -131,7 +131,7 @@ final class ReadingsMap implements \ArrayAccess
     ];
 
     /**
-     * @var array{0:'first_reading',1:'responsorial_psalm',2:'alleluia_verse',3:'gospel',4:'second_reading',5:'palm_gospel'}
+     * @var array{0:'first_reading',1:'responsorial_psalm',2:'gospel_acclamation',3:'gospel',4:'second_reading',5:'palm_gospel'}
      */
     public const PALM_SUNDAY_KEYS = [
         ...self::FESTIVE_KEYS,

@@ -4,18 +4,18 @@ namespace LiturgicalCalendar\Api\Models\Lectionary;
 
 final class ReadingsFestive extends ReadingsAbstract
 {
-    private const REQUIRED_PROPS = ['first_reading', 'second_reading', 'responsorial_psalm', 'alleluia_verse', 'gospel'];
+    private const REQUIRED_PROPS = ['first_reading', 'second_reading', 'responsorial_psalm', 'gospel_acclamation', 'gospel'];
 
     public readonly string $second_reading;
 
-    protected function __construct(string $first_reading, string $responsorial_psalm, string $second_reading, string $alleluia_verse, string $gospel)
+    protected function __construct(string $first_reading, string $responsorial_psalm, string $second_reading, string $gospel_acclamation, string $gospel)
     {
-        parent::__construct($first_reading, $responsorial_psalm, $alleluia_verse, $gospel);
+        parent::__construct($first_reading, $responsorial_psalm, $gospel_acclamation, $gospel);
         $this->second_reading = $second_reading;
     }
 
     /**
-     * @param \stdClass&object{first_reading:string,second_reading:string,responsorial_psalm:string,alleluia_verse:string,gospel:string} $data
+     * @param \stdClass&object{first_reading:string,second_reading:string,responsorial_psalm:string,gospel_acclamation:string,gospel:string} $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static
@@ -26,7 +26,7 @@ final class ReadingsFestive extends ReadingsAbstract
             $data->first_reading,
             $data->responsorial_psalm,
             $data->second_reading,
-            $data->alleluia_verse,
+            $data->gospel_acclamation,
             $data->gospel
         );
     }
@@ -38,10 +38,10 @@ final class ReadingsFestive extends ReadingsAbstract
      * - first_reading (string): The first reading for a festive day
      * - second_reading (string): The second reading for a festive day
      * - responsorial_psalm (string): The responsorial psalm for a festive day
-     * - alleluia_verse (string): The alleluia verse for a festive day
+     * - gospel_acclamation (string): The alleluia verse for a festive day
      * - gospel (string): The gospel for a festive day
      *
-     * @param array{first_reading:string,second_reading:string,responsorial_psalm:string,alleluia_verse:string,gospel:string} $data
+     * @param array{first_reading:string,second_reading:string,responsorial_psalm:string,gospel_acclamation:string,gospel:string} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -55,7 +55,7 @@ final class ReadingsFestive extends ReadingsAbstract
             $data['first_reading'],
             $data['responsorial_psalm'],
             $data['second_reading'],
-            $data['alleluia_verse'],
+            $data['gospel_acclamation'],
             $data['gospel']
         );
     }
@@ -76,7 +76,7 @@ final class ReadingsFestive extends ReadingsAbstract
         return new ReadingsFerial(
             $this->first_reading . '|' . $this->second_reading,
             $this->responsorial_psalm,
-            $this->alleluia_verse,
+            $this->gospel_acclamation,
             $this->gospel
         );
     }
@@ -89,9 +89,9 @@ final class ReadingsFestive extends ReadingsAbstract
      * - first_reading (string): The first reading for a festive day
      * - second_reading (string): The second reading for a festive day
      * - responsorial_psalm (string): The responsorial psalm for a festive day
-     * - alleluia_verse (string): The alleluia verse for a festive day
+     * - gospel_acclamation (string): The alleluia verse for a festive day
      * - gospel (string): The gospel for a festive day
-     * @return array{first_reading:string,second_reading:string,responsorial_psalm:string,alleluia_verse:string,gospel:string}
+     * @return array{first_reading:string,second_reading:string,responsorial_psalm:string,gospel_acclamation:string,gospel:string}
      */
     public function jsonSerialize(): array
     {
@@ -99,7 +99,7 @@ final class ReadingsFestive extends ReadingsAbstract
             'first_reading'      => $this->first_reading,
             'responsorial_psalm' => $this->responsorial_psalm,
             'second_reading'     => $this->second_reading,
-            'alleluia_verse'     => $this->alleluia_verse,
+            'gospel_acclamation' => $this->gospel_acclamation,
             'gospel'             => $this->gospel
         ];
     }

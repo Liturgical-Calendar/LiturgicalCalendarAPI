@@ -4,20 +4,20 @@ namespace LiturgicalCalendar\Api\Models\Lectionary;
 
 final class ReadingsPalmSunday extends ReadingsAbstract
 {
-    private const REQUIRED_PROPS = ['first_reading', 'second_reading', 'responsorial_psalm', 'alleluia_verse', 'gospel', 'palm_gospel'];
+    private const REQUIRED_PROPS = ['first_reading', 'second_reading', 'responsorial_psalm', 'gospel_acclamation', 'gospel', 'palm_gospel'];
 
     public readonly string $second_reading;
     public readonly string $palm_gospel;
 
-    private function __construct(string $first_reading, string $responsorial_psalm, string $second_reading, string $alleluia_verse, string $gospel, string $palm_gospel)
+    private function __construct(string $first_reading, string $responsorial_psalm, string $second_reading, string $gospel_acclamation, string $gospel, string $palm_gospel)
     {
-        parent::__construct($first_reading, $responsorial_psalm, $alleluia_verse, $gospel);
+        parent::__construct($first_reading, $responsorial_psalm, $gospel_acclamation, $gospel);
         $this->second_reading = $second_reading;
         $this->palm_gospel    = $palm_gospel;
     }
 
     /**
-     * @param \stdClass&object{first_reading:string,responsorial_psalm:string,second_reading:string,alleluia_verse:string,gospel:string,palm_gospel:string} $data
+     * @param \stdClass&object{first_reading:string,responsorial_psalm:string,second_reading:string,gospel_acclamation:string,gospel:string,palm_gospel:string} $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static
@@ -28,7 +28,7 @@ final class ReadingsPalmSunday extends ReadingsAbstract
             $data->first_reading,
             $data->responsorial_psalm,
             $data->second_reading,
-            $data->alleluia_verse,
+            $data->gospel_acclamation,
             $data->gospel,
             $data->palm_gospel
         );
@@ -41,11 +41,11 @@ final class ReadingsPalmSunday extends ReadingsAbstract
      * - first_reading (string): The first reading for Palm Sunday
      * - second_reading (string): The second reading for Palm Sunday
      * - responsorial_psalm (string): The responsorial psalm for Palm Sunday
-     * - alleluia_verse (string): The alleluia verse for Palm Sunday
+     * - gospel_acclamation (string): The alleluia verse for Palm Sunday
      * - gospel (string): The gospel for Palm Sunday
      * - palm_gospel (string): The gospel for the procession of the palms
      *
-     * @param array{first_reading:string,responsorial_psalm:string,second_reading:string,alleluia_verse:string,gospel:string,palm_gospel:string} $data
+     * @param array{first_reading:string,responsorial_psalm:string,second_reading:string,gospel_acclamation:string,gospel:string,palm_gospel:string} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -60,7 +60,7 @@ final class ReadingsPalmSunday extends ReadingsAbstract
             $data['first_reading'],
             $data['responsorial_psalm'],
             $data['second_reading'],
-            $data['alleluia_verse'],
+            $data['gospel_acclamation'],
             $data['gospel'],
             $data['palm_gospel']
         );
@@ -75,9 +75,9 @@ final class ReadingsPalmSunday extends ReadingsAbstract
      * - first_reading (string): The first reading for Palm Sunday
      * - second_reading (string): The second reading for Palm Sunday
      * - responsorial_psalm (string): The responsorial psalm for Palm Sunday
-     * - alleluia_verse (string): The alleluia verse for Palm Sunday
+     * - gospel_acclamation (string): The alleluia verse for Palm Sunday
      * - gospel (string): The gospel for Palm Sunday
-     * @return array{palm_gospel:string,first_reading:string,second_reading:string,responsorial_psalm:string,alleluia_verse:string,gospel:string}
+     * @return array{palm_gospel:string,first_reading:string,second_reading:string,responsorial_psalm:string,gospel_acclamation:string,gospel:string}
      */
     public function jsonSerialize(): array
     {
@@ -86,7 +86,7 @@ final class ReadingsPalmSunday extends ReadingsAbstract
             'first_reading'      => $this->first_reading,
             'responsorial_psalm' => $this->responsorial_psalm,
             'second_reading'     => $this->second_reading,
-            'alleluia_verse'     => $this->alleluia_verse,
+            'gospel_acclamation' => $this->gospel_acclamation,
             'gospel'             => $this->gospel
         ];
     }
