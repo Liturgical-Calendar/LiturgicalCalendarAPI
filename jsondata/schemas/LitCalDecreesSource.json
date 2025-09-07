@@ -1,7 +1,8 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "title": "LitCalDecreesPath",
-    "description": "Decrees issued by the Congregation for Divine Worship or Apostolic Letters and similar dispositions from the Supreme that determine new data in the calculation of the Liturgical Calendar",
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "$id": "./LitCalDecreesSource.json",
+    "title": "LitCalDecreesSource",
+    "description": "Decrees issued by the Dicastery for Divine Worship and the Discipline of the Sacraments or Apostolic Letters and similar dispositions from the Supreme Pontiff that determine new data in the calculation of the Liturgical Calendar",
     "type": "array",
     "items": {
         "$ref": "#/definitions/LitCalDecree"
@@ -13,7 +14,7 @@
             "properties": {
                 "decree_id": {
                     "type": "string",
-                    "pattern": "[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)"
+                    "pattern": "^[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)$"
                 },
                 "decree_date": {
                     "type": "string",
@@ -25,15 +26,15 @@
                 "description": {
                     "type": "string"
                 },
-                "festivity": {
-                    "$ref": "#/definitions/Festivity"
+                "liturgical_event": {
+                    "$ref": "#/definitions/LiturgicalEvent"
                 },
                 "metadata": {
                     "$ref": "#/definitions/Metadata"
                 },
                 "api_path": {
                     "type": "string",
-                    "pattern": "^https?:\\\/\\\/(?:litcal\\.johnromanodorazio\\.com\\\/api\\\/(?:dev|v[4-9])|localhost(?:\\:\\d+))\\\/decrees\\\/[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)$"
+                    "pattern": "^https?:\\\/\\\/(?:litcal\\.johnromanodorazio\\.com\\\/api\\\/(?:dev|v[4-9]|v[1-9]\\d+)|localhost(?:\\:\\d{4}))\\\/decrees\\\/[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)$"
                 }
             },
             "required": [
@@ -41,46 +42,61 @@
                 "decree_date",
                 "decree_protocol",
                 "description",
-                "festivity",
+                "liturgical_event",
                 "metadata"
             ]
         },
-        "Festivity": {
+        "LiturgicalEvent": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
                 "event_key": {
+                    "$ref": "./CommonDef.json#/definitions/EventKey"
+                },
+                "name": {
                     "type": "string"
                 },
                 "grade": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                    "$ref": "./CommonDef.json#/definitions/LitGrade"
                 },
                 "common": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitCommon"
+                    "$ref": "./CommonDef.json#/definitions/LitCommon"
                 },
                 "calendar": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Calendar"
+                    "$ref": "./CommonDef.json#/definitions/Calendar"
                 },
                 "color": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
+                    "$ref": "./CommonDef.json#/definitions/LitColor"
                 },
                 "type": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitFeastType"
+                    "$ref": "./CommonDef.json#/definitions/LitFeastType"
                 },
                 "readings": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                    "$ref": "./CommonDef.json#/definitions/Readings"
                 },
                 "month": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Month"
+                    "$ref": "./CommonDef.json#/definitions/Month"
                 },
                 "day": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Day"
+                    "$ref": "./CommonDef.json#/definitions/Day"
+                },
+                "strtotime": {
+                    "oneOf": [
+                        {
+                            "type": "string",
+                            "description": "supports PHP strtotime string format"
+                        },
+                        {
+                            "$ref": "./CommonDef.json#/definitions/RelativeDateObject"
+                        }
+                    ]
                 }
             },
             "required": [
-                "event_key"
+                "event_key",
+                "calendar"
             ],
-            "title": "Festivity"
+            "title": "LiturgicalEvent"
         },
         "Metadata": {
             "type": "object",
@@ -107,48 +123,6 @@
                 },
                 "since_year": {
                     "type": "integer"
-                },
-                "strtotime": {
-                    "oneOf": [
-                        {
-                            "type": "string",
-                            "description": "supports PHP strtotime string format"
-                        },
-                        {
-                            "type": "object",
-                            "additionalProperties": false,
-                            "properties": {
-                                "day_of_the_week": {
-                                    "type": "string",
-                                    "enum": [
-                                        "Sunday",
-                                        "Monday",
-                                        "Tuesday",
-                                        "Wednesday",
-                                        "Thursday",
-                                        "Friday",
-                                        "Saturday"
-                                    ]
-                                },
-                                "relative_time": {
-                                    "type": "string",
-                                    "enum": [
-                                        "before",
-                                        "after"
-                                    ]
-                                },
-                                "festivity_key": {
-                                    "type": "string",
-                                    "description": "Must be a valid key for a festivity in the Universal Calendar"
-                                }
-                            },
-                            "required": [
-                                "day_of_the_week",
-                                "relative_time",
-                                "festivity_key"
-                            ]
-                        }
-                    ]
                 }
             },
             "required": [
@@ -252,7 +226,7 @@
                     ]
                 }
             },
-            "description": "mapping between two-letter ISO code for a language, and the actual two-letter representation used in the Decree URL",
+            "description": "mapping between two-letter ISO code for a language, and the actual language token used in Vatican Decree URLs",
             "title": "DecreeLangs"
         }
     }

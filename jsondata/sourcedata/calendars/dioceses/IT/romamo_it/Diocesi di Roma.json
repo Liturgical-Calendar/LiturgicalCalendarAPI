@@ -1,7 +1,7 @@
 {
     "litcal": [
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -20,7 +20,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -39,7 +39,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -57,7 +57,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -76,7 +76,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -95,7 +95,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "red",
                     "white"
@@ -116,7 +116,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -135,7 +135,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -154,7 +154,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -173,7 +173,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -191,7 +191,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -210,7 +210,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -229,7 +229,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -248,7 +248,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "red"
                 ],
@@ -267,7 +267,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -285,7 +285,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "red"
                 ],
@@ -304,7 +304,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -324,7 +324,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -343,7 +343,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -362,7 +362,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -372,7 +372,7 @@
                 ],
                 "day": 21,
                 "month": 10,
-                "event_key": "SanGasparedelBufalo"
+                "event_key": "SanGaspareBufalo"
             },
             "metadata": {
                 "form_rownum": 13,
@@ -381,7 +381,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -400,7 +400,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -419,7 +419,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "red",
                     "white"
@@ -440,7 +440,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -459,7 +459,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -478,7 +478,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -497,7 +497,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -516,7 +516,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -535,7 +535,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "red",
                     "white"
@@ -556,7 +556,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -566,7 +566,7 @@
                 ],
                 "day": 22,
                 "month": 1,
-                "event_key": "SanVincenzoPallotti_1"
+                "event_key": "SanVincenzoPallotti"
             },
             "metadata": {
                 "since_year": 2024,
@@ -574,7 +574,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -592,7 +592,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -610,7 +610,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -628,7 +628,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -646,7 +646,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -664,7 +664,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -682,7 +682,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "red"
                 ],
@@ -700,7 +700,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -718,7 +718,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -736,7 +736,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -754,7 +754,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -772,7 +772,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],
@@ -790,7 +790,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "color": [
                     "white"
                 ],

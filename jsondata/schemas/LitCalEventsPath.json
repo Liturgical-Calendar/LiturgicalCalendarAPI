@@ -1,5 +1,6 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "$id": "./LitCalEventsPath.json",
     "title": "LitCalEventsPath",
     "type": "object",
     "properties": {
@@ -12,40 +13,42 @@
               {
                 "properties": {
                   "locale": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+                    "$ref": "./CommonDef.json#/definitions/Locale"
                   },
                   "national_calendar": {
                     "type": "string",
                     "pattern": "^[A-Z]{2}$",
-                    "description": "indicates the National Calendar used to produce the data in LitCalAllFestivities"
+                    "description": "indicates the National Calendar used to produce the data in `litcal_events`"
                   },
                   "diocesan_calendar": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/DiocesanCalendarId",
-                    "description": "indicates the Diocesan Calendar used to produce the data in LitCalAllFestivities"
+                    "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId",
+                    "description": "indicates the Diocesan Calendar used to produce the data in `litcal_events`"
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "required": [ "locale", "national_calendar", "diocesan_calendar" ]
               },
               {
                 "properties": {
                   "locale": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+                    "$ref": "./CommonDef.json#/definitions/Locale"
                   },
                   "national_calendar": {
                     "type": "string",
                     "pattern": "^[A-Z]{2}$",
-                    "description": "indicates the National Calendar used to produce the data in LitCalAllFestivities"
+                    "description": "indicates the National Calendar used to produce the data in `litcal_events`"
                   },
                   "diocesan_calendar": {
                     "type": "null"
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "required": [ "locale", "national_calendar", "diocesan_calendar" ]
               },
               {
                 "properties": {
                   "locale": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+                    "$ref": "./CommonDef.json#/definitions/Locale"
                   },
                   "national_calendar": {
                     "type": "null"
@@ -54,7 +57,8 @@
                     "type": "null"
                   }
                 },
-                "additionalProperties": false
+                "additionalProperties": false,
+                "required": [ "locale", "national_calendar", "diocesan_calendar" ]
               }
             ]
         }
@@ -70,6 +74,14 @@
             "items": {
               "type": "object",
               "properties": {
+                "event_key": {
+                  "$ref": "./CommonDef.json#/definitions/EventKey"
+                },
+                "event_idx": {
+                  "type": "integer",
+                  "format": "int32",
+                  "minimum": 0
+                },
                 "month": {
                   "type": "integer",
                   "format": "int32",
@@ -82,43 +94,51 @@
                   "minimum": 1,
                   "maximum": 31
                 },
-                "event_key": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
-                },
                 "grade": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                  "$ref": "./CommonDef.json#/definitions/LitGrade"
                 },
                 "grade_lcl": {
+                  "type": "string"
+                },
+                "grade_abbr": {
                   "type": "string"
                 },
                 "grade_display": {
                   "type": ["string", "null"]
                 },
                 "common": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitCommon"
+                  "$ref": "./CommonDef.json#/definitions/LitCommon"
                 },
                 "common_lcl": {
                   "type": "string"
                 },
                 "calendar": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Calendar"
+                  "$ref": "./CommonDef.json#/definitions/Calendar"
                 },
                 "color": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
+                  "$ref": "./CommonDef.json#/definitions/LitColor"
+                },
+                "color_lcl": {
+                  "type": "array",
+                  "items": {
+                      "type": "string"
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
                 },
                 "readings": {
                   "anyOf": [
                       {
-                          "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                          "$ref": "./CommonDef.json#/definitions/Readings"
                       },
                       {
                           "type": "object",
                           "properties": {
                               "vigil": {
-                                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                                  "$ref": "./CommonDef.json#/definitions/Readings"
                               },
                               "day": {
-                                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                                  "$ref": "./CommonDef.json#/definitions/Readings"
                               }
                           },
                           "additionalProperties": false
@@ -127,24 +147,32 @@
                 },
                 "name": {
                   "type": "string",
-                  "description": "The actual name of the liturgical event as defined in the latest edition of the source Roman Missal indicated in the key `MISSAL` (i.e. if the Missal is the Latin edition of the Roman Missal, the name should be from the latest edition of the Latin Roman Missal)"
+                  "description": "The actual name of the liturgical event as defined in the latest edition of the source Roman Missal indicated in the property `missal` (i.e. if the Missal is the Latin edition of the Roman Missal, the name should be from the latest edition of the Latin Roman Missal)"
                 },
                 "type": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitFeastType"
+                  "$ref": "./CommonDef.json#/definitions/LitFeastType"
                 },
                 "missal": {
-                  "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/MissalID"
+                  "$ref": "./CommonDef.json#/definitions/MissalID"
                 },
                 "decree": {
                   "type": "string",
                   "description": "When a liturgical event is defined ex-novo by a decree of the Congregation of Divine Worship rather than by a Roman Missal, this property will be present with a reference to the decree"
                 },
                 "strtotime": {
-                  "type": "string"
+                  "oneOf": [
+                    {
+                        "type": "string",
+                        "description": "supports PHP strtotime string format"
+                    },
+                    {
+                        "$ref": "./CommonDef.json#/definitions/RelativeDateObject"
+                    }
+                  ]
                 }
               },
               "additionalProperties": false,
-              "required": [ "event_key", "grade", "common", "common_lcl", "color", "name", "grade_lcl" ]
+              "required": [ "event_key", "event_idx", "grade", "grade_lcl", "grade_abbr", "grade_display", "common", "common_lcl", "color", "color_lcl", "name" ]
             }
         }
     }

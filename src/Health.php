@@ -2,136 +2,201 @@
 
 namespace LiturgicalCalendar\Api;
 
-use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
 use Sabre\VObject;
 use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
-use LiturgicalCalendar\Api\Enum\AcceptHeader;
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Handler\CurlMultiHandler;
+use React\Promise;
+use React\Promise\Deferred;
+use React\Promise\PromiseInterface;
+use React\Filesystem\Factory;
+use React\EventLoop\Loop;
 use LiturgicalCalendar\Api\Enum\ICSErrorLevel;
 use LiturgicalCalendar\Api\Enum\LitSchema;
-use LiturgicalCalendar\Api\Enum\ReturnType;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
+use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
+use LiturgicalCalendar\Api\Test\LitTestRunner;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * This class provides a WebSocket-based interface for executing various tests
  * of the Liturgical Calendar API, such as JSON schema validation and unit tests.
  *
- * @package LiturgicalCalendar\Api
- * @author  John Romano D'Orazio <priest@johnromanodorazio.com>
- * @license https://www.apache.org/licenses/LICENSE-2.0 Apache License 2.0
- * @version 3.9
- * @link    https://litcal.johnromanodorazio.com
+ * @phpstan-type DiocesanCalendarCollectionItem \stdClass&object{
+ *      calendar_id: string,
+ *      diocese: string,
+ *      nation: string,
+ *      locales: string[],
+ *      timezone: string,
+ *      group?: string
+ * }
+ *
+ * @phpstan-type ExecuteValidationSourceFolder \stdClass&object{action:'executeValidation',category:'sourceDataCheck',validate:string,sourceFolder:string}
+ * @phpstan-type ExecuteValidationSourceFile \stdClass&object{action:'executeValidation',category:'sourceDataCheck',validate:string,sourceFile:string}
+ * @phpstan-type ExecuteValidationResource \stdClass&object{action:'executeValidation',category:'resourceDataCheck',validate:string,sourceFile:string}
+ * @phpstan-type ValidateCalendar \stdClass&object{action:'validateCalendar',calendar:string,year:int,category:'nationalcalendar'|'diocesanCalendar',responsetype:'JSON'|'XML'|'ICS'|'YML'}
+ * @phpstan-type ExecuteUnitTest \stdClass&object{action:'executeUnitTest',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar',test:string}
+ *
+ * @phpstan-import-type LiturgicalEvent from \LiturgicalCalendar\Api\Test\LitTestRunner
  */
 class Health implements MessageComponentInterface
 {
     /**
      * A collection of connected clients.
      *
-     * @var \SplObjectStorage
+     * @var \SplObjectStorage<ConnectionInterface, null> $clients
      */
     protected \SplObjectStorage $clients;
-
-    /**
-     * The path that the health check will use to query the API.
-     *
-     * @var string $REQPATH
-     */
-    private const REQPATH = API_BASE_PATH . Route::CALENDAR->value;
 
     /**
      * Array of actions that the Health endpoint can execute.
      * Each key is an action name. The value is an array of strings that represent the names of the
      * parameters that the action requires.
      *
-     * @var array<string, string[]> $ACTION_PROPERTIES
+     * @var array<string,string[]> $ACTION_PROPERTIES
      */
     private const ACTION_PROPERTIES = [
-        "executeValidation" => ["validate", "sourceFile", "category"],
-        "validateCalendar"  => ["calendar", "year", "category", "responsetype"],
-        "executeUnitTest"   => ["calendar", "year", "category", "test"]
+        'executeValidation' => ['category', 'validate', 'sourceFile'],
+        'validateCalendar'  => ['category', 'calendar', 'year', 'responsetype'],
+        'executeUnitTest'   => ['category', 'calendar', 'year', 'test']
     ];
 
-    private static ?object $metadata = null;
+    private const RED    = "\033[0;31m";
+    private const GREEN  = "\033[0;32m";
+    private const YELLOW = "\033[0;33m";
+    private const BLUE   = "\033[0;34m";
+    private const NC     = "\033[0m"; // No Color
+
+    private static MetadataCalendars $metadata;
+
+    private Client $http;
+
+    private CurlMultiHandler $multiHandler;
+
+    private int $maxConcurrency;
+    private int $inFlight = 0;
+    /** @var list<array{url:string,options:array{headers?:array{Accept:string}},resolve:\Closure(ResponseInterface):void,reject:\Closure(\Throwable):void}> */
+    private array $queue  = [];
+    private bool $ticking = false;
+
+    private static bool $cacheEnabled = false;
+    //private static PromiseInterface $metadataPromise;
 
     /**
-     * Mapping of data file paths to the LitSchema constants that their JSON data should validate against.
-     * The paths are relative to the root of the project. The LitSchema constants are used to determine
-     * which schema to use when validating the JSON data.
+     * Initializes the Health object with an empty SplObjectStorage.
      *
-     * @var string[] $DATA_PATH_TO_SCHEMA
+     * The SplObjectStorage is used to store client connections.
      */
-    public const DATA_PATH_TO_SCHEMA = [
-        "jsondata/sourcedata/missals/propriumdetempore/propriumdetempore.json"              => LitSchema::PROPRIUMDETEMPORE,
-        "jsondata/sourcedata/missals/propriumdesanctis_1970/propriumdesanctis_1970.json"    => LitSchema::PROPRIUMDESANCTIS,
-        "jsondata/sourcedata/missals/propriumdesanctis_2002/propriumdesanctis_2002.json"    => LitSchema::PROPRIUMDESANCTIS,
-        "jsondata/sourcedata/missals/propriumdesanctis_2008/propriumdesanctis_2008.json"    => LitSchema::PROPRIUMDESANCTIS,
-        "jsondata/sourcedata/missals/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json"
-                                                                             => LitSchema::PROPRIUMDESANCTIS,
-        "jsondata/sourcedata/missals/propriumdesanctis_US_2011/propriumdesanctis_US_2011"   => LitSchema::PROPRIUMDESANCTIS,
-        API_BASE_PATH . '/calendars'                                         => LitSchema::METADATA,
-        API_BASE_PATH . '/decrees'                                           => LitSchema::DECREES,
-        API_BASE_PATH . '/events'                                            => LitSchema::EVENTS,
-        API_BASE_PATH . '/tests'                                             => LitSchema::TESTS,
-        API_BASE_PATH . '/easter'                                            => LitSchema::EASTER,
-        API_BASE_PATH . '/missals'                                           => LitSchema::MISSALS,
-        API_BASE_PATH . '/data'                                              => LitSchema::DATA,
-        API_BASE_PATH . '/schemas'                                           => LitSchema::SCHEMAS
-    ];
+    public function __construct()
+    {
+        $this->clients = new \SplObjectStorage();
+
+        // Create shared multi handler
+        $multiHandler       = new CurlMultiHandler(['max_handles' => 50]);
+        $this->multiHandler = $multiHandler;
+
+        $stack = HandlerStack::create($this->multiHandler);
+
+        $this->http = new Client([
+            'handler'         => $stack,
+            'timeout'         => 60,
+            'connect_timeout' => 5,
+            'http_errors'     => false,
+            'headers'         => [ 'Connection' => 'keep-alive' ],
+            'curl'            => [ CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2_0 ]
+        ]);
+
+        if (Router::isLocalhost() || ( isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development' )) {
+            $this->maxConcurrency = 4;
+        } else {
+            $this->maxConcurrency = 50;
+        }
+    }
 
     /**
      * Called when a new client connection is established.
      *
      * This stores the new connection to send messages to later.
      */
-    public function onOpen(ConnectionInterface $conn)
+    public function onOpen(ConnectionInterface $conn): void
     {
         // Store the new connection to send messages to later
         $this->clients->attach($conn);
-        echo "New connection! ({$conn->resourceId})\n";
-
-        if (null === self::$metadata) {
-            self::$metadata = json_decode(file_get_contents(API_BASE_PATH . '/calendars'));
-            if (JSON_ERROR_NONE === json_last_error()) {
-                echo "Loaded metadata\n";
-            } else {
-                echo "Error loading metadata: " . json_last_error_msg() . "\n";
-            }
+        if (false === is_int($conn->resourceId)) {
+            echo 'Error onOpen: expected an integer resourceId, got ' . gettype($conn->resourceId) . "\n";
+            return;
         } else {
-            if (property_exists(self::$metadata, 'litcal_metadata') && property_exists(self::$metadata->litcal_metadata, 'diocesan_calendars')) {
+            echo "New connection! ({$conn->resourceId}) and current working directory is " . getcwd() . "\n";
+        }
+
+        self::$cacheEnabled = ( extension_loaded('apcu') && function_exists('apcu_exists') && function_exists('apcu_store') && function_exists('apcu_fetch') );
+
+        if (self::$cacheEnabled) {
+            echo 'APCu extension loaded, will use for caching' . "\n";
+        } else {
+            echo 'APCu extension not loaded, will not use for caching' . "\n";
+        }
+
+        Router::getApiPaths();
+
+        if (false === isset(self::$metadata)) {
+            echo 'Metadata not yet loaded, loading now from ' . Route::CALENDARS->path() . "\n";
+
+            $opts = [
+                'headers' => [
+                    'Accept' => 'application/json'
+                ]
+            ];
+
+            /** @var PromiseInterface<string> $metadataPromise */
+            $metadataPromise = $this->cachedGet(Route::CALENDARS->path(), $opts);
+            //self::$metadataPromise = $metadataPromise;
+
+            $metadataPromise->then(
+                function (string $rawData) {
+                    $rawData = (string) $rawData; // force fresh string
+                    echo 'Fetched metadata: got ' . strlen($rawData) . " bytes\n";
+
+                    $metadataObj = json_decode($rawData);
+
+                    if (false === ( $metadataObj instanceof \stdClass )) {
+                        echo 'Error loading metadata: expected stdClass, got ' . gettype($metadataObj) . "\n";
+                        return;
+                    }
+
+                    if (JSON_ERROR_NONE !== json_last_error()) {
+                        echo 'Error loading metadata: ' . json_last_error_msg() . "\n";
+                        return;
+                    }
+
+                    echo "Loaded metadata\n";
+
+                    $litCalMetadata = $metadataObj->litcal_metadata;
+                    if (false === ( $litCalMetadata instanceof \stdClass )) {
+                        echo 'Error loading metadata: expected stdClass, got ' . gettype($litCalMetadata) . "\n";
+                        return;
+                    }
+                    self::$metadata = MetadataCalendars::fromObject($litCalMetadata);
+                },
+                function (\Throwable $e) {
+                    echo 'Error reading metadata: could not read data from ' . Route::CALENDARS->path() . ': ' . $e->getMessage() . "\n";
+                }
+            );
+        } else {
+            if (isset(self::$metadata->diocesan_calendars) && false === empty(self::$metadata->diocesan_calendars)) {
                 echo "Metadata was already loaded and has required diocesan_calendars property\n";
             } else {
                 echo "Error loading metadata: missing diocesan_calendars property\n";
-                echo json_encode(self::$metadata);
+                echo json_encode(self::$metadata, JSON_PRETTY_PRINT);
             }
         }
-    }
-
-    /**
-     * Validates the properties of a message object.
-     *
-     * This function checks the properties of a given message object to ensure
-     * they match the expected properties defined in ACTION_PROPERTIES for the
-     * specified action. If any expected property is missing from the message
-     * object, the function returns false, indicating the message is invalid.
-     *
-     * @param object $message The message object to validate.
-     * @return bool True if all required properties are present, false otherwise.
-     */
-    private static function validateMessageProperties(object $message): bool
-    {
-        $valid = true;
-        foreach (Health::ACTION_PROPERTIES[$message->action] as $prop) {
-            if (false === property_exists($message, $prop)) {
-                if ($prop === 'sourceFile' && $message->action === 'executeValidation' && property_exists($message, 'sourceFolder')) {
-                    continue;
-                }
-                return false;
-            }
-        }
-        return $valid;
     }
 
     /**
@@ -144,20 +209,26 @@ class Health implements MessageComponentInterface
      * @param ConnectionInterface $from The user who sent the message
      * @param string $msg The message that was sent
      */
-    public function onMessage(ConnectionInterface $from, $msg)
+    public function onMessage(ConnectionInterface $from, $msg): void
     {
-        echo sprintf('Receiving message from connection %d: %s', $from->resourceId, $msg);
+        /** @var int $resourceId */
+        $resourceId = $from->resourceId;
+        echo sprintf('Receiving message from connection %d: %s', $resourceId, $msg . "\n");
+        /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest $messageReceived */
         $messageReceived = json_decode($msg);
         if (
             json_last_error() === JSON_ERROR_NONE
+            && $messageReceived instanceof \stdClass
             && property_exists($messageReceived, 'action')
             && self::validateMessageProperties($messageReceived)
         ) {
             switch ($messageReceived->action) {
                 case 'executeValidation':
+                    /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $messageReceived */
                     $this->executeValidation($messageReceived, $from);
                     break;
                 case 'validateCalendar':
+                    /** @var ValidateCalendar $messageReceived */
                     $this->validateCalendar(
                         $messageReceived->calendar,
                         $messageReceived->year,
@@ -167,6 +238,7 @@ class Health implements MessageComponentInterface
                     );
                     break;
                 case 'executeUnitTest':
+                    /** @var ExecuteUnitTest $messageReceived */
                     $this->executeUnitTest(
                         $messageReceived->test,
                         $messageReceived->calendar,
@@ -176,24 +248,28 @@ class Health implements MessageComponentInterface
                     );
                     break;
                 default:
-                    $message = new \stdClass();
-                    $message->type = "echobot";
+                    $message       = new \stdClass();
+                    $message->type = 'echobot';
                     $message->text = $msg;
                     $this->sendMessage($from, $message);
             }
         } else {
             if (json_last_error() !== JSON_ERROR_NONE) {
                 $errorMsg = json_last_error_msg();
+            } elseif (!$messageReceived instanceof \stdClass) {
+                $errorMsg = 'Message is not an object';
             } elseif (!property_exists($messageReceived, 'action')) {
                 $errorMsg = 'No action specified';
             } elseif (!self::validateMessageProperties($messageReceived)) {
                 $errorMsg = 'Invalid message properties';
+            } else {
+                $errorMsg = 'Unknown error';
             }
-            echo sprintf('Invalid message from connection %1$d: %2$s (%3$s)', $from->resourceId, $errorMsg, $msg);
-            $message = new \stdClass();
-            $message->type = "echobot";
+            echo sprintf('Invalid message from connection %1$d: %2$s (%3$s)', $resourceId, $errorMsg, $msg);
+            $message           = new \stdClass();
+            $message->type     = 'echobot';
             $message->errorMsg = $errorMsg;
-            $message->text = sprintf('Invalid message from connection %d: %s', $from->resourceId, $msg);
+            $message->text     = sprintf('Invalid message from connection %d: %s', $resourceId, $msg);
             $this->sendMessage($from, $message);
         }
     }
@@ -208,12 +284,13 @@ class Health implements MessageComponentInterface
      * @param ConnectionInterface $conn The connection that was closed.
      * @return void
      */
-    public function onClose(ConnectionInterface $conn)
+    public function onClose(ConnectionInterface $conn): void
     {
         // The connection is closed, remove it, as we can no longer send it messages
         $this->clients->detach($conn);
-
-        echo "Connection {$conn->resourceId} has disconnected\n";
+        /** @var int $resourceId */
+        $resourceId = $conn->resourceId;
+        echo "Connection {$resourceId} has disconnected\n";
     }
 
     /**
@@ -222,9 +299,9 @@ class Health implements MessageComponentInterface
      * Logs the error message and closes the connection.
      *
      * @param ConnectionInterface $conn The connection on which the error occurred
-     * @param \Exception $e The exception that was thrown
+     * @param \Throwable $e The exception that was thrown
      */
-    public function onError(ConnectionInterface $conn, \Exception $e)
+    public function onError(ConnectionInterface $conn, \Throwable $e): void
     {
         echo "An error has occurred: {$e->getMessage()}\n";
         $conn->close();
@@ -238,543 +315,418 @@ class Health implements MessageComponentInterface
      * @param ConnectionInterface $from The client that sent the original message.
      * @param string|\stdClass $msg The message to send back to the client.
      */
-    private function sendMessage(ConnectionInterface $from, string|\stdClass $msg)
+    private function sendMessage(ConnectionInterface $from, string|\stdClass $msg): void
     {
         if (gettype($msg) !== 'string') {
-            $msg = json_encode($msg);
+            $msg = json_encode($msg, JSON_PRETTY_PRINT);
         }
-        foreach ($this->clients as $client) {
-            if ($from === $client) {
-                // The message from sender will be echoed back only to the sender, not to other clients
-                $client->send($msg);
-            }
-        }
-    }
-
-    /**
-     * Initializes the Health object with an empty SplObjectStorage.
-     *
-     * The SplObjectStorage is used to store client connections.
-     */
-    public function __construct()
-    {
-        $this->clients = new \SplObjectStorage();
-    }
-
-    /**
-     * Returns the appropriate schema for the given category and dataPath.
-     * If dataPath is null, it will return the schema for the category.
-     * If dataPath is not null, it will return the schema for the dataPath.
-     * If the category is 'universalcalendar', it will return the schema from the DATA_PATH_TO_SCHEMA array.
-     * If the category is 'nationalcalendar', 'diocesancalendar', 'widerregioncalendar', or 'propriumdesanctis',
-     * it will return the corresponding schema constant.
-     * If the category is 'resourceDataCheck', it will return the schema for the dataPath if it matches one of the patterns,
-     * otherwise it will return the schema from the DATA_PATH_TO_SCHEMA array.
-     * If the category is not recognized, it will return null.
-     *
-     * @param string $category The category of the data.
-     * @param string|null $dataPath The path to the data.
-     * @return string|null The schema for the given category and dataPath, or null if the category is not recognized.
-     */
-    private static function retrieveSchemaForCategory(string $category, ?string $dataPath = null): ?string
-    {
-        $versionedPattern = "/\/api\/v[4-9]\//";
-        $versionedReplacement = "/api/dev/";
-        $isVersionedDataPath = preg_match($versionedPattern, $dataPath) !== false;
-        switch ($category) {
-            case 'universalcalendar':
-                if ($isVersionedDataPath) {
-                    $versionedDataPath = preg_replace($versionedPattern, $versionedReplacement, $dataPath);
-                    if (array_key_exists($versionedDataPath, Health::DATA_PATH_TO_SCHEMA)) {
-                        $tempSchemaPath = Health::DATA_PATH_TO_SCHEMA[ $versionedDataPath ];
-                        return preg_replace($versionedPattern, $versionedReplacement, $tempSchemaPath);
-                    }
-                }
-                if (array_key_exists($dataPath, Health::DATA_PATH_TO_SCHEMA)) {
-                    return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
-                }
-                return null;
-            case 'nationalcalendar':
-                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::NATIONAL) : LitSchema::NATIONAL;
-            case 'diocesancalendar':
-                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::DIOCESAN) : LitSchema::DIOCESAN;
-            case 'widerregioncalendar':
-                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::WIDERREGION) : LitSchema::WIDERREGION;
-            case 'propriumdesanctis':
-                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS) : LitSchema::PROPRIUMDESANCTIS;
-            case 'resourceDataCheck':
-                if (
-                    preg_match("/\/missals\/[_A-Z0-9]+$/", $dataPath)
-                ) {
-                    return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS) : LitSchema::PROPRIUMDESANCTIS;
-                } elseif (
-                    preg_match("/\/events\/(?:nation\/[A-Z]{2}|diocese\/[a-z]{6}_[a-z]{2})(?:\?locale=[a-zA-Z0-9_]+)?$/", $dataPath)
-                ) {
-                    return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::EVENTS) : LitSchema::EVENTS;
-                } elseif (
-                    preg_match("/\/data\/(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/[A-Z][a-z]+)(?:\?locale=[a-zA-Z0-9_]+)?$/", $dataPath, $matches)
-                ) {
-                    $schema = LitSchema::DATA;
-                    foreach ($matches as $idx => $match) {
-                        if ($idx > 0) {
-                            switch ($match) {
-                                case 'nation':
-                                    $schema = LitSchema::NATIONAL;
-                                    break;
-                                case 'diocese':
-                                    $schema = LitSchema::DIOCESAN;
-                                    break;
-                                case 'widerregion':
-                                    $schema = LitSchema::WIDERREGION;
-                                    break;
-                            }
-                        }
-                    }
-                    return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, $schema) : $schema;
-                }
-                if ($isVersionedDataPath) {
-                    $versionedDataPath = preg_replace($versionedPattern, $versionedReplacement, $dataPath);
-                    if (array_key_exists($versionedDataPath, Health::DATA_PATH_TO_SCHEMA)) {
-                        $tempSchemaPath = Health::DATA_PATH_TO_SCHEMA[ $versionedDataPath ];
-                        return preg_replace($versionedPattern, $versionedReplacement, $tempSchemaPath);
-                    }
-                }
-                if (array_key_exists($dataPath, Health::DATA_PATH_TO_SCHEMA)) {
-                    return Health::DATA_PATH_TO_SCHEMA[ $dataPath ];
-                }
-                return null;
-                break;
-            case 'sourceDataCheck':
-                if (preg_match("/-i18n$/", $dataPath)) {
-                    return LitSchema::I18N;
-                }
-                if (preg_match("/^memorials-from-decrees$/", $dataPath)) {
-                    return LitSchema::DECREES_SRC;
-                }
-                if (preg_match("/^proprium-de-sanctis(?:-[A-Z]{2})?-(?:1|2)(?:9|0)(?:7|8|9|0|1|2)[0-9]$/", $dataPath)) {
-                    return LitSchema::PROPRIUMDESANCTIS;
-                }
-                if (preg_match("/^proprium-de-tempore$/", $dataPath)) {
-                    return LitSchema::PROPRIUMDETEMPORE;
-                }
-                if (preg_match("/^wider-region-[A-Z][a-z]+$/", $dataPath)) {
-                    return LitSchema::WIDERREGION;
-                }
-                if (preg_match("/^national-calendar-[A-Z]{2}$/", $dataPath)) {
-                    return LitSchema::NATIONAL;
-                }
-                if (preg_match("/^diocesan-calendar-[a-z]{6}_[a-z]{2}$/", $dataPath)) {
-                    return LitSchema::DIOCESAN;
-                }
-                if (preg_match("/^tests-[a-zA-Z0-9_]+$/", $dataPath)) {
-                    return LitSchema::TEST_SRC;
-                }
-                return null;
-        }
-        return null;
+        /** @var string $msg */
+        $from->send($msg);
     }
 
     /**
      * Validate a data file by checking that it exists and that it is valid JSON that conforms to a specific schema.
      *
-     * @param object $validation The validation object. It should have the following properties:
-     * - sourceFile: a string, the path to the data file
-     * - validate: an object with the following properties:
-     *   - file-exists: a string, the class name to add to the message if the file exists
-     *   - json-valid: a string, the class name to add to the message if the file is valid JSON
-     *   - schema-valid: a string, the class name to add to the message if the file is valid against the schema
+     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $validation The validation object. It should have the following properties:
+     * - category: with a value of `sourceDataCheck` or `resourceDataCheck`
+     * - sourceFile|sourceFolder: a string, the path to the data file or folder
+     * - validate: a string with the identifier of the resource that we are validating;
+     *             this corresponds to the CSS class in the Unit Test frontend
+     *             that identifies the cell that will show the results of the validation;
+     *             a further CSS class will be appended to identify the specific check being performed:
+     *             1. `.file-exists`: a string, the class name to add to the message if the file exists
+     *             2. `.json-valid`: a string, the class name to add to the message if the file is valid JSON
+     *             3. `.schema-valid`: a string, the class name to add to the message if the file is valid against the schema
      * @param ConnectionInterface $to The connection to send the validation message to
      */
-    private function executeValidation(object $validation, ConnectionInterface $to)
+    private function executeValidation(\stdClass $validation, ConnectionInterface $to): void
     {
         // First thing is try to determine the schema that we will be validating against,
         // and the path to the source file or folder that we will be validating against the schema.
         // Our purpose here is to set the $pathForSchema and $dataPath variables.
-        $pathForSchema      = null;
-        $dataPath           = null;
-        $responseType       = 'JSON';
+        $pathForSchema = null;
+        $dataPath      = null;
+        $category      = (string) $validation->category;
+        $validate      = (string) $validation->validate;
 
         // Source data checks validate data directly in the filesystem, not through the API
-        if ($validation->category === 'sourceDataCheck') {
-            $pathForSchema = $validation->validate;
+        if ($category === 'sourceDataCheck') {
+            /** @var string $pathForSchema */
+            $pathForSchema = $validate;
             // Are we validating a single source file, or are we validating a folder of i18n files?
             if (property_exists($validation, 'sourceFolder')) {
                 // If the 'sourceFolder' property is set, then we are validating a folder of i18n files
-                $dataPath       = rtrim($validation->sourceFolder, '/');
-                $matches = null;
-                if (preg_match("/^(wider\-region|national\-calendar|diocesan\-calendar)\-([A-Za-z_]+)\-i18n$/", $validation->validate, $matches)) {
+                /** @var ExecuteValidationSourceFolder $validation */
+                $dataPath = rtrim($validation->sourceFolder, '/');
+                $matches  = null;
+                if (preg_match('/^(wider\-region|national\-calendar|diocesan\-calendar)\-([A-Za-z_]+)\-i18n$/', $validate, $matches)) {
                     switch ($matches[1]) {
                         case 'wider-region':
                             $dataPath = strtr(
-                                JsonData::WIDER_REGIONS_I18N_FOLDER,
+                                JsonData::WIDER_REGION_I18N_FOLDER->path(),
                                 ['{wider_region}' => $matches[2]]
                             );
                             break;
                         case 'national-calendar':
                             $dataPath = strtr(
-                                JsonData::NATIONAL_CALENDARS_I18N_FOLDER,
+                                JsonData::NATIONAL_CALENDAR_I18N_FOLDER->path(),
                                 ['{nation}' => $matches[2]]
                             );
                             break;
                         case 'diocesan-calendar':
-                            $diocese = array_find(self::$metadata->litcal_metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]);
-                            $nation = $diocese->nation;
+                            if (false === isset(self::$metadata)) {
+                                throw new \RuntimeException('Metadata not loaded yet; retry shortly');
+                            }
+                            $dioceseMetadata = array_find(
+                                self::$metadata->diocesan_calendars,
+                                function (MetadataDiocesanCalendarItem $el) use ($matches): bool {
+                                    return $el->calendar_id === $matches[2];
+                                }
+                            );
+                            if ($dioceseMetadata === null) {
+                                throw new \Exception("No diocese found for calendar id: {$matches[2]}");
+                            }
+                            $nation   = $dioceseMetadata->nation;
                             $dataPath = strtr(
-                                JsonData::DIOCESAN_CALENDARS_I18N_FOLDER,
+                                JsonData::DIOCESAN_CALENDAR_I18N_FOLDER->path(),
                                 [
                                     '{diocese}' => $matches[2],
-                                    '{nation}' => $nation
+                                    '{nation}'  => $nation
                                 ]
                             );
                             break;
                     }
-                } elseif (preg_match("/^proprium\-de\-sanctis(?:\-([A-Z]{2}))?\-([1-2][0-9]{3})\-i18n$/", $validation->validate, $matches)) {
-                    $region = $matches[1] !== '' ? $matches[1] : 'EDITIO_TYPICA';
-                    $year = $matches[2];
-                    $dataPath = RomanMissal::$i18nPath["{$region}_{$year}"];
+                } elseif (preg_match('/^proprium\-de\-sanctis(?:\-([A-Z]{2}))?\-([1-2][0-9]{3})\-i18n$/', $validate, $matches)) {
+                    $region   = $matches[1] !== '' ? $matches[1] : 'EDITIO_TYPICA';
+                    $year     = $matches[2];
+                    $dataPath = RomanMissal::getSanctoraleI18nFilePath("{$region}_{$year}");
+                    if (false === is_string($dataPath)) {
+                        throw new \Exception("Could not determine i18n folder path for Proprium de Sanctis {$region} {$year}");
+                    }
                 }
             } else {
                 // If we are not validating a folder of i18n files, then we are validating a single source file,
                 // and the 'sourceFile' property is required in this case
                 if (property_exists($validation, 'sourceFile')) {
-                    $dataPath       = $validation->sourceFile;
-                    $matches = null;
-                    if (preg_match("/^(wider-region|national-calendar|diocesan-calendar)-([A-Z][a-z]+)$/", $validation->validate, $matches)) {
+                    /** @var ExecuteValidationSourceFile $validation */
+                    $dataPath = (string) $validation->sourceFile;
+                    $matches  = null;
+                    if (preg_match('/^(wider-region|national-calendar|diocesan-calendar)-([A-Z][a-z]+)$/', $validate, $matches)) {
                         switch ($matches[1]) {
                             case 'wider-region':
                                 $dataPath = strtr(
-                                    JsonData::WIDER_REGIONS_FILE,
+                                    JsonData::WIDER_REGION_FILE->path(),
                                     ['{wider_region}' => $matches[2]]
                                 );
                                 break;
                             case 'national-calendar':
                                 $dataPath = strtr(
-                                    JsonData::NATIONAL_CALENDARS_FILE,
+                                    JsonData::NATIONAL_CALENDAR_FILE->path(),
                                     ['{nation}' => $matches[2]]
                                 );
                                 break;
                             case 'diocesan-calendar':
-                                $diocese = array_find(self::$metadata->litcal_metadata->diocesan_calendars, fn ($el) => $el->calendar_id === $matches[2]);
-                                $nation = $diocese->nation;
-                                $dioceseName = $diocese->diocese;
-                                $dataPath = strtr(
-                                    JsonData::DIOCESAN_CALENDARS_FILE,
+                                if (false === isset(self::$metadata)) {
+                                    throw new \RuntimeException('Metadata not loaded yet; retry shortly');
+                                }
+                                $dioceseMetadata = array_find(
+                                    self::$metadata->diocesan_calendars,
+                                    function (MetadataDiocesanCalendarItem $el) use ($matches): bool {
+                                        return $el->calendar_id === $matches[2];
+                                    }
+                                );
+                                if ($dioceseMetadata === null) {
+                                    throw new \Exception("No diocese found for calendar id: {$matches[2]}");
+                                }
+                                $nation      = (string) $dioceseMetadata->nation;
+                                $dioceseName = (string) $dioceseMetadata->diocese;
+                                $dataPath    = strtr(
+                                    JsonData::DIOCESAN_CALENDAR_FILE->path(),
                                     [
-                                        '{diocese}' => $matches[2],
-                                        '{nation}' => $nation,
+                                        '{diocese}'      => $matches[2],
+                                        '{nation}'       => $nation,
                                         '{diocese_name}' => $dioceseName
                                     ]
                                 );
                                 break;
                         }
-                    } elseif (preg_match("/^proprium\-de\-sanctis(?:\-([A-Z]{2}))?\-([1-2][0-9]{3})$/", $validation->validate, $matches)) {
-                        $region = $matches[1] !== '' ? $matches[1] : 'EDITIO_TYPICA';
-                        $year = $matches[2];
-                        $dataPath = RomanMissal::$jsonFiles["{$region}_{$year}"];
+                    } elseif (preg_match('/^proprium\-de\-sanctis(?:\-([A-Z]{2}))?\-([1-2][0-9]{3})$/', $validate, $matches)) {
+                        $region   = $matches[1] !== '' ? $matches[1] : 'EDITIO_TYPICA';
+                        $year     = $matches[2];
+                        $dataPath = RomanMissal::getSanctoraleFileName("{$region}_{$year}");
+                        if (false === is_string($dataPath)) {
+                            throw new \Exception("Could not determine file path for Proprium de Sanctis {$region} {$year}");
+                        }
                     }
+                } else {
+                    throw new \InvalidArgumentException('sourceFile property is required for sourceDataCheck');
                 }
             }
         } else {
             // If it's not a sourceDataCheck, it's probably a resourceDataCheck
-            // That is to say, an API path
-            $pathForSchema      = $validation->sourceFile;
-            $dataPath           = $validation->sourceFile;
+            // That is to say, an API path, and the 'sourceFile' property is required
+            /** @var ExecuteValidationResource $validation */
+            if (property_exists($validation, 'sourceFile')) {
+                $sourceFile    = (string) $validation->sourceFile;
+                $pathForSchema = $sourceFile;
+                $dataPath      = $sourceFile;
+            } else {
+                throw new \InvalidArgumentException('sourceFile property is required for resourceDataCheck');
+            }
         }
 
-        $schema = Health::retrieveSchemaForCategory($validation->category, $pathForSchema);
+        $schema = Health::retrieveSchemaForCategory($category, $pathForSchema);
 
         // Now that we have the correct schema to validate against,
         // we will perform the actual validation either for all files in a folder, or for a single file
-        if (property_exists($validation, 'sourceFolder')) {
+        if (property_exists($validation, 'sourceFolder') && is_string($validation->sourceFolder)) {
+            $sourceFolder = (string) $validation->sourceFolder;
             // If the 'sourceFolder' property is set, then we are validating a folder of i18n files
+            /** @var ExecuteValidationSourceFolder $validation */
             $files = glob($dataPath . '/*.json');
             if (false === $files || empty($files)) {
-                $message = new \stdClass();
-                $message->type = "error";
-                $message->text = "Data folder $validation->sourceFolder ($dataPath) does not exist or does not contain any json files";
-                $message->classes = ".$validation->validate.file-exists";
+                $message          = new \stdClass();
+                $message->type    = 'error';
+                $message->text    = "Data folder $sourceFolder ($dataPath) does not exist or does not contain any json files";
+                $message->classes = ".$validate.file-exists";
                 $this->sendMessage($to, $message);
                 return;
             }
+
             $fileExistsAndIsReadable = true;
             $jsonDecodable           = true;
             $schemaValidated         = true;
+
+            /** @var list<PromiseInterface<string>> $promises */
+            $promises = [];
+
             foreach ($files as $file) {
                 $filename = pathinfo($file, PATHINFO_BASENAME);
 
-                $matchI8nFile = preg_match("/(?:[a-z]{2,3}(?:_[A-Z][a-z]{3})?(?:_[A-Z]{2})?|(?:ar|en|eo)_001|(?:en_150|es_419))\.json$/", $filename);
+                $matchI8nFile = preg_match('/(?:[a-z]{2,3}(?:_[A-Z][a-z]{3})?(?:_[A-Z]{2})?|(?:ar|en|eo)_001|(?:en_150|es_419))\.json$/', $filename);
+
                 if (false === $matchI8nFile || 0 === $matchI8nFile) {
                     $fileExistsAndIsReadable = false;
-                    $message = new \stdClass();
-                    $message->type    = "error";
-                    $message->text    = "Data folder $validation->sourceFolder contains an invalid i18n json filename $filename";
-                    $message->classes = ".$validation->validate.file-exists";
+                    $message                 = new \stdClass();
+                    $message->type           = 'error';
+                    $message->text           = "Data folder $sourceFolder contains an invalid i18n json filename $filename";
+                    $message->classes        = ".$validate.file-exists";
                     $this->sendMessage($to, $message);
-                } else {
-                    $fileData = file_get_contents($file);
-                    if (false === $fileData) {
-                        $fileExistsAndIsReadable = false;
-                        $message = new \stdClass();
-                        $message->type    = "error";
-                        $message->text    = "Data folder $validation->sourceFolder contains an unreadable i18n json file $filename";
-                        $message->classes = ".$validation->validate.file-exists";
-                        $this->sendMessage($to, $message);
-                    } else {
+                    continue;
+                }
+
+                /** @var PromiseInterface<string> $promise */
+                $promise    = $this->cachedFileGetContents($file);
+                $promises[] = $promise->then(
+                    function (string $fileData) use ($to, $validation, $filename, $schema, $pathForSchema, &$jsonDecodable, &$schemaValidated) {
+                        $fileData = (string) $fileData; // force fresh string
+                        $validate = (string) $validation->validate;
+                        $category = (string) $validation->category;
                         $jsonData = json_decode($fileData);
                         if (json_last_error() !== JSON_ERROR_NONE) {
-                            $jsonDecodable = false;
-                            $message = new \stdClass();
-                            $message->type    = "error";
+                            $jsonDecodable    = false;
+                            $message          = new \stdClass();
+                            $message->type    = 'error';
                             $message->text    = "The i18n json file $filename was not successfully decoded as JSON: " . json_last_error_msg();
-                            $message->classes = ".$validation->validate.json-valid";
+                            $message->classes = ".$validate.json-valid";
                             $this->sendMessage($to, $message);
                         } else {
                             if (null !== $schema) {
                                 $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
-                                if (gettype($validationResult) === 'object') {
-                                    $schemaValidated = false;
-                                    $validationResult->classes = ".$validation->validate.schema-valid";
+                                if ($validationResult instanceof \stdClass) {
+                                    $schemaValidated           = false;
+                                    $validationResult->classes = ".$validate.schema-valid";
                                     $this->sendMessage($to, $validationResult);
                                 }
                             } else {
-                                $message = new \stdClass();
-                                $message->type    = "error";
-                                $message->text    = "Unable to detect a schema for {$validation->validate} and category {$validation->category}";
-                                $message->classes = ".$validation->validate.schema-valid";
+                                $message          = new \stdClass();
+                                $message->type    = 'error';
+                                $message->text    = "executeValidation validation->sourceFolder: Unable to detect a schema for {$validate} and category {$category} (path for schema: $pathForSchema)";
+                                $message->classes = ".$validate.schema-valid";
                                 $this->sendMessage($to, $message);
                             }
                         }
+                    },
+                    function (\Throwable $reason) use ($to, $validation, $filename, &$fileExistsAndIsReadable) {
+                        $fileExistsAndIsReadable = false;
+                        $validate                = (string) $validation->validate;
+                        $sourceFolder            = (string) $validation->sourceFolder;
+                        $message                 = new \stdClass();
+                        $message->type           = 'error';
+                        $message->text           = "Data folder $sourceFolder contains an unreadable i18n json file $filename: " . $reason->getMessage();
+                        $message->classes        = ".$validate.file-exists";
+                        $this->sendMessage($to, $message);
                     }
+                );
+            }
+
+            $allPromises = Promise\all($promises);
+
+            $allPromises->then(
+                function () use ($to, $validation, $schema, $fileExistsAndIsReadable, $jsonDecodable, $schemaValidated) {
+                    $validate     = (string) $validation->validate;
+                    $sourceFolder = (string) $validation->sourceFolder;
+                    if ($fileExistsAndIsReadable) {
+                        $message = (object) [
+                            'type'    => 'success',
+                            'text'    => "The Data folder $sourceFolder exists and contains valid i18n json files",
+                            'classes' => ".$validate.file-exists"
+                        ];
+                        $this->sendMessage($to, $message);
+                    }
+
+                    if ($jsonDecodable) {
+                        $message = (object) [
+                            'type'    => 'success',
+                            'text'    => "The i18n json files in Data folder $sourceFolder were successfully decoded as JSON",
+                            'classes' => ".$validate.json-valid"
+                        ];
+                        $this->sendMessage($to, $message);
+                    }
+
+                    if ($schemaValidated) {
+                        $message = (object) [
+                            'type'    => 'success',
+                            'text'    => "The i18n json files in Data folder $sourceFolder were successfully validated against the Schema $schema",
+                            'classes' => ".$validate.schema-valid"
+                        ];
+                        $this->sendMessage($to, $message);
+                    }
+                },
+                function (\Throwable $e) use ($validation) {
+                    echo 'Error verifying i18n folder for validation ' . json_encode($validation) . ': ' . $e->getMessage() . "\n";
                 }
-            }
-            if ($fileExistsAndIsReadable) {
-                $message = new \stdClass();
-                $message->type    = "success";
-                $message->text    = "The Data folder $validation->sourceFolder exists and contains valid i18n json files";
-                $message->classes = ".$validation->validate.file-exists";
-                $this->sendMessage($to, $message);
-            }
-            if ($jsonDecodable) {
-                $message = new \stdClass();
-                $message->type    = "success";
-                $message->text    = "The i18n json files in Data folder $validation->sourceFolder were successfully decoded as JSON";
-                $message->classes = ".$validation->validate.json-valid";
-                $this->sendMessage($to, $message);
-            }
-            if ($schemaValidated) {
-                $message = new \stdClass();
-                $message->type    = "success";
-                $message->text    = "The i18n json files in Data folder $validation->sourceFolder were successfully validated against the Schema $schema";
-                $message->classes = ".$validation->validate.schema-valid";
-                $this->sendMessage($to, $message);
-            }
+            );
         } else {
             // If the 'sourceFolder' property is not set, then we are validating a single source file or API path
             $matches = null;
-            if (preg_match("/^diocesan-calendar-([a-z]{6}_[a-z]{2})$/", $pathForSchema, $matches)) {
-                $dioceseId   = $matches[1];
-                $dioceseData = array_find(self::$metadata->litcal_metadata->diocesan_calendars, fn ($diocesan_calendar) => $diocesan_calendar->calendar_id === $dioceseId);
-                $nation      = $dioceseData->nation;
-                $dioceseName = $dioceseData->diocese;
-                $dataPath    = strtr(JsonData::DIOCESAN_CALENDARS_FILE, [
+            if (preg_match('/^diocesan-calendar-([a-z]{6}_[a-z]{2})$/', $pathForSchema, $matches)) {
+                $dioceseId = $matches[1];
+                if (false === isset(self::$metadata)) {
+                    throw new \RuntimeException('Metadata not loaded yet; retry shortly');
+                }
+
+                $dioceseMetadata = array_find(
+                    self::$metadata->diocesan_calendars,
+                    function (MetadataDiocesanCalendarItem $diocesan_calendar) use ($dioceseId): bool {
+                        return $diocesan_calendar->calendar_id === $dioceseId;
+                    }
+                );
+                if (null === $dioceseMetadata) {
+                    throw new \InvalidArgumentException("Invalid diocese ID $dioceseId");
+                }
+                $nation      = $dioceseMetadata->nation;
+                $dioceseName = $dioceseMetadata->diocese;
+                $dataPath    = strtr(JsonData::DIOCESAN_CALENDAR_FILE->path(), [
                     '{nation}'       => $nation,
                     '{diocese}'      => $dioceseId,
                     '{diocese_name}' => $dioceseName
                 ]);
-            } elseif (preg_match("/^national-calendar-([A-Z]{2})$/", $pathForSchema, $matches)) {
+            } elseif (preg_match('/^national-calendar-([A-Z]{2})$/', $pathForSchema, $matches)) {
                 $nation   = $matches[1];
-                $dataPath = strtr(JsonData::NATIONAL_CALENDARS_FILE, [
+                $dataPath = strtr(JsonData::NATIONAL_CALENDAR_FILE->path(), [
                     '{nation}' => $nation
                 ]);
             }
 
             // If we are validating an API path, we check for a 200 OK HTTP response from the API
             // rather than checking for existence of the file in the filesystem
-            if ($validation->category === 'resourceDataCheck') {
-                $headers = get_headers($dataPath);
-                if (!$headers || strpos($headers[0], '200') === false) {
-                    $message = new \stdClass();
-                    $message->type    = "error";
-                    $message->text    = "URL $dataPath is giving an error: " . $headers[0];
-                    $message->classes = ".$validation->validate.file-exists";
-                    $this->sendMessage($to, $message);
+            $category = (string) $validation->category;
+            $validate = (string) $validation->validate;
 
-                    $message = new \stdClass();
-                    $message->type    = "error";
-                    $message->text    = "Could not decode the Data file $dataPath as JSON because it is not readable";
-                    $message->classes = ".$validation->validate.json-valid";
-                    $this->sendMessage($to, $message);
-
-                    $message = new \stdClass();
-                    $message->type    = "error";
-                    $message->text    = "Unable to verify schema for dataPath {$dataPath} and category {$validation->category} since Data file $dataPath does not exist or is not readable";
-                    $message->classes = ".$validation->validate.schema-valid";
-                    $this->sendMessage($to, $message);
-                    // early exit
-                    return;
-                }
-            }
-
-            $data = false;
-            if (property_exists($validation, 'responsetype')) {
-                $responseType = $validation->responsetype;
-                //get the index of the responsetype from the ReturnType class
-                $responseTypeIdx = array_search($responseType, ReturnType::$values);
-                //get the corresponding accept mime type
-                $acceptMimeType = AcceptHeader::$values[$responseTypeIdx];
-                $opts = [
-                    "http" => [
-                        "method" => "GET",
-                        "header" => "Accept: $acceptMimeType\r\n"
-                    ]
-                ];
-                $context = stream_context_create($opts);
-                // $dataPath is probably an API path in this case
-                $data    = file_get_contents($dataPath, false, $context);
+            if (str_starts_with($dataPath, 'http://') || str_starts_with($dataPath, 'https://')) {
+                // $dataPath is an API path in this case
+                echo 'Retrieving data from URL ' . $dataPath . "\n";
+                /** @var PromiseInterface<string> $promise */
+                $promise = $this->cachedGet($dataPath);
             } else {
                 // $dataPath is probably a source file in the filesystem in this case
-                $data    = file_get_contents($dataPath);
+                echo 'Reading data from file ' . $dataPath . "\n";
+                /** @var PromiseInterface<string> $promise */
+                $promise = $this->cachedFileGetContents($dataPath);
             }
 
-            if (false === $data) {
-                $message = new \stdClass();
-                $message->type    = "error";
-                $message->text    = "Data file $dataPath is not readable";
-                $message->classes = ".$validation->validate.file-exists";
-                $this->sendMessage($to, $message);
+            $promise->then(
+                function (string $data) use ($to, $validation, $dataPath, $schema, $pathForSchema) {
+                    $data = (string) $data; // force fresh string
+                    echo 'Fetched data for ' . $dataPath . ': got ' . strlen($data) . " bytes\n";
+                    $this->processValidationData($data, $to, $validation, $dataPath, $schema, $pathForSchema);
+                },
+                function (\Throwable $e) use ($to, $validation, $dataPath) {
+                    $validate = (string) $validation->validate;
+                    $category = (string) $validation->category;
+                    echo 'Error reading data: could not read data from ' . $dataPath . ': ' . $e->getMessage() . "\n";
+                    $message          = new \stdClass();
+                    $message->type    = 'error';
+                    $message->text    = "Data file $dataPath is not readable: " . $e->getMessage();
+                    $message->classes = ".$validate.file-exists";
+                    $this->sendMessage($to, $message);
 
-                $message = new \stdClass();
-                $message->type    = "error";
-                $message->text    = "Could not decode the Data file $dataPath as JSON because it is not readable";
-                $message->classes = ".$validation->validate.json-valid";
-                $this->sendMessage($to, $message);
+                    $message          = new \stdClass();
+                    $message->type    = 'error';
+                    $message->text    = "Could not decode the Data file $dataPath as JSON because it is not readable";
+                    $message->classes = ".$validate.json-valid";
+                    $this->sendMessage($to, $message);
 
-                $message = new \stdClass();
-                $message->type    = "error";
-                $message->text    = "Unable to verify schema for dataPath {$dataPath} and category {$validation->category} since Data file $dataPath does not exist or is not readable";
-                $message->classes = ".$validation->validate.schema-valid";
-                $this->sendMessage($to, $message);
-            } else {
-                $message = new \stdClass();
-                $message->type    = "success";
-                $message->text    = "The Data file $dataPath exists";
-                $message->classes = ".$validation->validate.file-exists";
-                $this->sendMessage($to, $message);
-
-                switch ($responseType) {
-                    case 'YML':
-                        try {
-                            $yamlData = json_decode(json_encode(yaml_parse($data)));
-                            if ($yamlData) {
-                                $message = new \stdClass();
-                                $message->type    = "success";
-                                $message->text    = "The Data file $dataPath was successfully decoded as YAML";
-                                $message->classes = ".$validation->validate.json-valid";
-                                $this->sendMessage($to, $message);
-
-                                if (null !== $schema) {
-                                    $validationResult = $this->validateDataAgainstSchema($yamlData, $schema);
-                                    if (gettype($validationResult) === 'boolean' && $validationResult === true) {
-                                        $message = new \stdClass();
-                                        $message->type    = "success";
-                                        $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
-                                        $message->classes = ".$validation->validate.schema-valid";
-                                        $this->sendMessage($to, $message);
-                                    } elseif (gettype($validationResult === 'object')) {
-                                        $validationResult->classes = ".$validation->validate.schema-valid";
-                                        $this->sendMessage($to, $validationResult);
-                                    }
-                                } else {
-                                    $message = new \stdClass();
-                                    $message->type    = "error";
-                                    $message->text    = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category}";
-                                    $message->classes = ".$validation->validate.schema-valid";
-                                    $this->sendMessage($to, $message);
-                                }
-                            }
-                        } catch (\Exception $ex) {
-                            $message = new \stdClass();
-                            $message->type    = "error";
-                            $message->text    = "There was an error decoding the Data file $dataPath as YAML: " . $ex->getMessage() . " :: Raw data = <<<JSON\n$data\n>>>";
-                            $message->classes = ".$validation->validate.json-valid";
-                            $this->sendMessage($to, $message);
-                        }
-                        break;
-                    case 'JSON':
-                        // no break
-                    default:
-                        $jsonData = json_decode($data);
-                        if (json_last_error() === JSON_ERROR_NONE) {
-                            $message = new \stdClass();
-                            $message->type    = "success";
-                            $message->text    = "The Data file $dataPath was successfully decoded as JSON";
-                            $message->classes = ".$validation->validate.json-valid";
-                            $this->sendMessage($to, $message);
-
-                            if (null !== $schema) {
-                                $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
-                                if (gettype($validationResult) === 'boolean' && $validationResult === true) {
-                                    $message = new \stdClass();
-                                    $message->type    = "success";
-                                    $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
-                                    $message->classes = ".$validation->validate.schema-valid";
-                                    $this->sendMessage($to, $message);
-                                } elseif (gettype($validationResult === 'object')) {
-                                    $validationResult->classes = ".$validation->validate.schema-valid";
-                                    $this->sendMessage($to, $validationResult);
-                                }
-                            } else {
-                                $message = new \stdClass();
-                                $message->type    = "error";
-                                $message->text    = "Unable to detect schema for dataPath {$dataPath} and category {$validation->category}";
-                                $message->classes = ".$validation->validate.schema-valid";
-                                $this->sendMessage($to, $message);
-                            }
-                        } else {
-                            $message = new \stdClass();
-                            $message->type    = "error";
-                            $message->text    = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg() . " :: Raw data = <<<JSON\n$data\n>>>";
-                            $message->classes = ".$validation->validate.json-valid";
-                            $this->sendMessage($to, $message);
-                        }
-                        break;
+                    $message          = new \stdClass();
+                    $message->type    = 'error';
+                    $message->text    = "Unable to verify schema for dataPath {$dataPath} and category {$category} since Data file $dataPath does not exist or is not readable";
+                    $message->classes = ".$validate.schema-valid";
+                    $this->sendMessage($to, $message);
                 }
-            }
+            );
         }
     }
 
     /**
-     * Takes an array of LIBXML errors and an array of XML lines
-     * and returns a string of the errors with line numbers and column numbers.
-     * @param array $errors Array of LIBXML errors
-     * @param array $xml Array of strings, each string is a line in the XML document
-     * @return string The errors with line numbers and column numbers
+     * Process the validation of data against a schema.
+     *
+     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $validation The validation object.
      */
-    private static function retrieveXmlErrors(array $errors, array $xml): string
+    private function processValidationData(string $data, ConnectionInterface $to, \stdClass $validation, string $dataPath, ?string $schema, string $pathForSchema): void
     {
-        $return = [];
-        foreach ($errors as $error) {
-            $errorStr = "";
-            switch ($error->level) {
-                case LIBXML_ERR_WARNING:
-                    $errorStr .= "Warning $error->code: ";
-                    break;
-                case LIBXML_ERR_ERROR:
-                    $errorStr .= "Error $error->code: ";
-                    break;
-                case LIBXML_ERR_FATAL:
-                    $errorStr .= "Fatal Error $error->code: ";
-                    break;
+        $validate         = (string) $validation->validate;
+        $category         = (string) $validation->category;
+        $message          = new \stdClass();
+        $message->type    = 'success';
+        $message->text    = "The Data file $dataPath exists";
+        $message->classes = ".$validate.file-exists";
+        $this->sendMessage($to, $message);
+
+        $jsonData = json_decode($data);
+        if (json_last_error() === JSON_ERROR_NONE) {
+            $message          = new \stdClass();
+            $message->type    = 'success';
+            $message->text    = "The Data file $dataPath was successfully decoded as JSON";
+            $message->classes = ".$validate.json-valid";
+            $this->sendMessage($to, $message);
+
+            if (null !== $schema) {
+                $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
+                if (gettype($validationResult) === 'boolean' && $validationResult === true) {
+                    $message          = new \stdClass();
+                    $message->type    = 'success';
+                    $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
+                    $message->classes = ".$validate.schema-valid";
+                    $this->sendMessage($to, $message);
+                } elseif ($validationResult instanceof \stdClass) {
+                    $validationResult->classes = ".$validate.schema-valid";
+                    $this->sendMessage($to, $validationResult);
+                }
+            } else {
+                $message          = new \stdClass();
+                $message->type    = 'error';
+                $message->text    = "executeValidation validation->sourceFile (JSON): Unable to detect schema for dataPath {$dataPath} and category {$category} (path for schema: $pathForSchema, Route::CALENDARS->path(): " . Route::CALENDARS->path() . ', LitSchema::METADATA->path(): ' . LitSchema::METADATA->path() . ')';
+                $message->classes = ".$validate.schema-valid";
+                $this->sendMessage($to, $message);
             }
-            $errorStr .= htmlspecialchars(trim($error->message))
-                      . " (Line: $error->line, Column: $error->column, Src: "
-                      . htmlspecialchars(trim($xml[$error->line - 1])) . ")";
-            if ($error->file) {
-                $errorStr .= " in file: $error->file";
-            }
-            array_push($return, $errorStr);
+        } else {
+            $message          = new \stdClass();
+            $message->type    = 'error';
+            $message->text    = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg() . ". Raw data = &lt;&lt;&lt;JSON\n" . $data . "\n&gt;&gt;&gt;";
+            $message->classes = ".$validate.json-valid";
+            $this->sendMessage($to, $message);
         }
-        return implode('&#013;', $return);
     }
 
     /**
@@ -793,17 +745,15 @@ class Health implements MessageComponentInterface
      */
     private function validateCalendar(string $calendar, int $year, string $category, string $responseType, ConnectionInterface $to): void
     {
-        //get the index of the responsetype from the ReturnType class
-        $responseTypeIdx = array_search($responseType, ReturnType::$values);
-        //get the corresponding accept mime type
-        $acceptMimeType = AcceptHeader::$values[$responseTypeIdx];
-        $opts = [
-            "http" => [
-                "method" => "GET",
-                "header" => "Accept: $acceptMimeType\r\n"
-            ]
+        $returnTypeParam = ReturnTypeParam::from($responseType);
+        $acceptMimeType  = $returnTypeParam->toAcceptMimeType();
+        $opts            = [
+            'headers' => [
+                'Accept' => $acceptMimeType->value
+            ],
+            'stream'  => true
         ];
-        $context = stream_context_create($opts);
+
         if ($calendar === 'VA') {
             $req = "/$year?year_type=CIVIL";
         } else {
@@ -816,179 +766,227 @@ class Health implements MessageComponentInterface
                     break;
                 default:
                     //we shouldn't ever get any other categories
+                    $req = '/unknown';
             }
         }
-        $data = file_get_contents(self::REQPATH . $req, false, $context);
-        if ($data !== false) {
-            $message = new \stdClass();
-            $message->type = "success";
-            $message->text = "The $category of $calendar for the year $year exists";
-            $message->classes = ".calendar-$calendar.file-exists.year-$year";
-            $this->sendMessage($to, $message);
 
-            switch ($responseType) {
-                case "XML":
-                    libxml_use_internal_errors(true);
-                    $xml = new \DOMDocument();
-                    $xml->loadXML($data);
-                    //$xml = simplexml_load_string( $data );
-                    $xmlArr = explode("\n", $data);
-                    if ($xml === false) {
-                        $message = new \stdClass();
-                        $message->type = "error";
-                        $errors = libxml_get_errors();
-                        $errorString = self::retrieveXmlErrors($errors, $xmlArr);
-                        libxml_clear_errors();
-                        $message->text = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                        . self::REQPATH . $req . " as XML: " . $errorString;
-                        $message->classes = ".calendar-$calendar.json-valid.year-$year";
-                        $message->responsetype = $responseType;
-                        $this->sendMessage($to, $message);
-                    } else {
-                        $message = new \stdClass();
-                        $message->type = "success";
-                        $message->text = "The $category of $calendar for the year $year was successfully decoded as XML";
-                        $message->classes = ".calendar-$calendar.json-valid.year-$year";
-                        $this->sendMessage($to, $message);
+        $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts);
+        $promise->then(
+            function (string $data) use ($to, $calendar, $year, $category, $req, $responseType) {
+                $data = (string) $data; // force fresh string
+                echo 'Fetched data for ' . Route::CALENDAR->path() . $req . ': got ' . strlen($data) . " bytes\n";
 
-                        $validationResult = $xml->schemaValidate('jsondata/schemas/LiturgicalCalendar.xsd');
-                        if ($validationResult) {
-                            $message = new \stdClass();
-                            $message->type = "success";
-                            $message->text = sprintf(
-                                "The $category of $calendar for the year $year was successfully validated against the Schema %s",
-                                "jsondata/schemas/LiturgicalCalendar.xsd"
-                            );
-                            $message->classes = ".calendar-$calendar.schema-valid.year-$year";
-                            $this->sendMessage($to, $message);
-                        } else {
-                            $errors = libxml_get_errors();
-                            $errorString = self::retrieveXmlErrors($errors, $xmlArr);
+                $message          = new \stdClass();
+                $message->type    = 'success';
+                $message->text    = "The $category of $calendar for the year $year exists";
+                $message->classes = ".calendar-$calendar.file-exists.year-$year";
+                $this->sendMessage($to, $message);
+
+                switch ($responseType) {
+                    case 'XML':
+                        libxml_use_internal_errors(true);
+                        $xmlArr     = explode("\n", $data);
+                        $xml        = new \DOMDocument();
+                        $loadResult = $xml->loadXML($data);
+                        //$xml = simplexml_load_string( $data );
+                        if ($loadResult === false) {
+                            $message       = new \stdClass();
+                            $message->type = 'error';
+                            $errors        = libxml_get_errors();
+                            $errorString   = self::retrieveXmlErrors($errors, $xmlArr);
                             libxml_clear_errors();
-                            $message = new \stdClass();
-                            $message->type = "error";
-                            $message->text = $errorString;
-                            $message->classes = ".calendar-$calendar.schema-valid.year-$year";
-                            $this->sendMessage($to, $message);
-                        }
-                    }
-                    break;
-                case "ICS":
-                    try {
-                        $vcalendar = VObject\Reader::read($data);
-                    } catch (VObject\ParseException $ex) {
-                        $vcalendar = json_encode($ex);
-                    }
-                    if ($vcalendar instanceof VObject\Document) {
-                        $message = new \stdClass();
-                        $message->type = "success";
-                        $message->text = "The $category of $calendar for the year $year was successfully decoded as ICS";
-                        $message->classes = ".calendar-$calendar.json-valid.year-$year";
-                        $this->sendMessage($to, $message);
-
-                        $result = $vcalendar->validate();
-                        if (count($result) === 0) {
-                            $message = new \stdClass();
-                            $message->type = "success";
-                            $message->text = sprintf(
-                                "The $category of $calendar for the year $year was successfully validated according the iCalendar Schema %s",
-                                "https://tools.ietf.org/html/rfc5545"
-                            );
-                            $message->classes = ".calendar-$calendar.schema-valid.year-$year";
+                            $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
+                                            . Route::CALENDAR->path() . $req . ' as XML: ' . $errorString;
+                            $message->classes      = ".calendar-$calendar.json-valid.year-$year";
+                            $message->responsetype = $responseType;
                             $this->sendMessage($to, $message);
                         } else {
-                            $message = new \stdClass();
-                            $message->type = "error";
-                            $errorStrings = [];
-                            foreach ($result as $error) {
-                                $errorLevel = new ICSErrorLevel($error['level']);
-                                //TODO: implement $error['node']->lineIndex and $error['node']->lineString if and when the PR is accepted upstream...
-                                $errorStrings[] = $errorLevel . ": " . $error['message'];// . " at line {$error['node']->lineIndex} ({$error['node']->lineString})"
-                            }
-                            $message->text = implode('&#013;', $errorStrings) || "validation encountered " . count($result) . " errors";
-                            $message->classes = ".calendar-$calendar.schema-valid.year-$year";
-                            $this->sendMessage($to, $message);
-                        }
-                    } else {
-                        $message = new \stdClass();
-                        $message->type = "error";
-                        $message->text = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                        . self::REQPATH . $req . " as ICS: parsing resulted in type " . gettype($vcalendar) . " | " . $vcalendar;
-                        $message->classes = ".calendar-$calendar.json-valid.year-$year";
-                        $message->responsetype = $responseType;
-                        $this->sendMessage($to, $message);
-                    }
-                    break;
-                case "YML":
-                    try {
-                        $yamlData = json_decode(json_encode(yaml_parse($data)));
-                        if ($yamlData) {
-                            $message = new \stdClass();
-                            $message->type = "success";
-                            $message->text = "The $category of $calendar for the year $year was successfully decoded as YAML";
+                            $message          = new \stdClass();
+                            $message->type    = 'success';
+                            $message->text    = "The $category of $calendar for the year $year was successfully decoded as XML";
                             $message->classes = ".calendar-$calendar.json-valid.year-$year";
                             $this->sendMessage($to, $message);
 
-                            $validationResult = $this->validateDataAgainstSchema($yamlData, LitSchema::LITCAL);
-                            if (gettype($validationResult) === 'boolean' && $validationResult === true) {
-                                $message = new \stdClass();
-                                $message->type = "success";
-                                $message->text = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL;
+                            $validationResult = $xml->schemaValidate(JsonData::SCHEMAS_FOLDER->path() . '/LiturgicalCalendar.xsd');
+                            if ($validationResult) {
+                                $message          = new \stdClass();
+                                $message->type    = 'success';
+                                $message->text    = sprintf(
+                                    "The $category of $calendar for the year $year was successfully validated against the Schema %s",
+                                    JsonData::SCHEMAS_FOLDER->path() . '/LiturgicalCalendar.xsd'
+                                );
                                 $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                                 $this->sendMessage($to, $message);
-                            } elseif (gettype($validationResult === 'object')) {
-                                $validationResult->classes = ".calendar-$calendar.schema-valid.year-$year";
-                                $this->sendMessage($to, $validationResult);
+                            } else {
+                                $errors      = libxml_get_errors();
+                                $errorString = self::retrieveXmlErrors($errors, $xmlArr);
+                                libxml_clear_errors();
+                                $message          = new \stdClass();
+                                $message->type    = 'error';
+                                $message->text    = $errorString;
+                                $message->classes = ".calendar-$calendar.schema-valid.year-$year";
+                                $this->sendMessage($to, $message);
                             }
                         }
-                    } catch (\Exception $ex) {
-                        $message = new \stdClass();
-                        $message->type = "error";
-                        $message->text = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                        . self::REQPATH . $req . " as YAML: " . $ex->getMessage();
-                        $message->classes = ".calendar-$calendar.json-valid.year-$year";
-                        $message->responsetype = $responseType;
-                        $this->sendMessage($to, $message);
-                    }
-                    break;
-                case "JSON":
-                default:
-                    $jsonData = json_decode($data);
-                    if (json_last_error() === JSON_ERROR_NONE) {
-                        $message = new \stdClass();
-                        $message->type = "success";
-                        $message->text = "The $category of $calendar for the year $year was successfully decoded as JSON";
+                        break;
+                    case 'ICS':
+                        try {
+                            $vcalendar = VObject\Reader::read($data);
+                        } catch (VObject\ParseException $e) {
+                            $vcalendar = json_encode($e);
+                        }
+                        if ($vcalendar instanceof VObject\Document) {
+                            $message          = new \stdClass();
+                            $message->type    = 'success';
+                            $message->text    = "The $category of $calendar for the year $year was successfully decoded as ICS";
+                            $message->classes = ".calendar-$calendar.json-valid.year-$year";
+                            $this->sendMessage($to, $message);
+
+                            $result = $vcalendar->validate();
+                            if (count($result) === 0) {
+                                $message          = new \stdClass();
+                                $message->type    = 'success';
+                                $message->text    = sprintf(
+                                    "The $category of $calendar for the year $year was successfully validated according the iCalendar Schema %s",
+                                    'https://tools.ietf.org/html/rfc5545'
+                                );
+                                $message->classes = ".calendar-$calendar.schema-valid.year-$year";
+                                $this->sendMessage($to, $message);
+                            } else {
+                                $message       = new \stdClass();
+                                $message->type = 'error';
+                                $errorStrings  = [];
+                                foreach ($result as $error) {
+                                    /** @var array{level:int,message:string,node:VObject\Property} $error */
+                                    $errorLevel = new ICSErrorLevel($error['level']);
+                                    /** @var int $lineIndex The type is obvious, and declared, yet PHPStan seems to be a bit dumb on this one? */
+                                    $lineIndex = $error['node']->lineIndex;
+                                    /** @var string $lineString The type is obvious, and declared, yet PHPStan seems to be a bit dumb on this one? */
+                                    $lineString     = $error['node']->lineString;
+                                    $errorStrings[] = $errorLevel . ': ' . $error['message'] . " at line {$lineIndex} ({$lineString})";
+                                }
+                                $message->text    = implode('&#013;', $errorStrings);
+                                $message->classes = ".calendar-$calendar.schema-valid.year-$year";
+                                $this->sendMessage($to, $message);
+                            }
+                        } else {
+                            $message               = new \stdClass();
+                            $message->type         = 'error';
+                            $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
+                                            . Route::CALENDAR->path() . $req . ' as ICS: parsing resulted in type ' . gettype($vcalendar) . ' | ' . $vcalendar;
+                            $message->classes      = ".calendar-$calendar.json-valid.year-$year";
+                            $message->responsetype = $responseType;
+                            $this->sendMessage($to, $message);
+                        }
+                        break;
+                    case 'YML':
+                        try {
+                            if (!function_exists('yaml_parse')) {
+                                throw new \RuntimeException('PHP yaml extension not installed');
+                            }
+
+                            /**
+                             * TODO: perhaps we need to register a custom Exception handler, since yaml_parse() throws a warning instead of an exception
+                             *       and we need to catch that warning as an exception {@see \LiturgicalCalendar\Api\Core::warningHandler()}
+                             */
+                            $yamlParsed = yaml_parse($data);
+                            if (false === $yamlParsed) {
+                                throw new \Exception('YAML parsing failed');
+                            }
+
+                            $jsonEncoded = json_encode($yamlParsed, JSON_THROW_ON_ERROR);
+                            $yamlData    = json_decode($jsonEncoded);
+                            if ($yamlData) {
+                                $message          = new \stdClass();
+                                $message->type    = 'success';
+                                $message->text    = "The $category of $calendar for the year $year was successfully decoded as YAML";
+                                $message->classes = ".calendar-$calendar.json-valid.year-$year";
+                                $this->sendMessage($to, $message);
+
+                                $validationResult = $this->validateDataAgainstSchema($yamlData, LitSchema::LITCAL->path());
+                                if (gettype($validationResult) === 'boolean' && $validationResult === true) {
+                                    $message          = new \stdClass();
+                                    $message->type    = 'success';
+                                    $message->text    = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL->path();
+                                    $message->classes = ".calendar-$calendar.schema-valid.year-$year";
+                                    $this->sendMessage($to, $message);
+                                } elseif ($validationResult instanceof \stdClass) {
+                                    $validationResult->classes = ".calendar-$calendar.schema-valid.year-$year";
+                                    $this->sendMessage($to, $validationResult);
+                                }
+                            }
+                        } catch (\Throwable $e) {
+                            $message               = new \stdClass();
+                            $message->type         = 'error';
+                            $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
+                                            . Route::CALENDAR->path() . $req . ' as YAML: ' . $e->getMessage();
+                            $message->classes      = ".calendar-$calendar.json-valid.year-$year";
+                            $message->responsetype = $responseType;
+                            $this->sendMessage($to, $message);
+                        }
+                        break;
+                    case 'JSON':
+                    default:
+                        $jsonData         = json_decode($data);
+                        $jsonLastError    = json_last_error();
+                        $jsonLastErrorMsg = json_last_error_msg();
+                        if (false === ( $jsonData instanceof \stdClass ) || $jsonLastError !== JSON_ERROR_NONE) {
+                            $message          = new \stdClass();
+                            $message->type    = 'error';
+                            $message->text    = "There was an error decoding the $category of $calendar for the year $year from the URL "
+                                            . Route::CALENDAR->path() . $req . ' as JSON: data was decoded to type ' . gettype($jsonData);
+                            $message->classes = ".calendar-$calendar.json-valid.year-$year";
+                            if ($jsonLastError !== JSON_ERROR_NONE) {
+                                $message->text .= ' | ' . $jsonLastErrorMsg;
+                            }
+                            $message->responsetype = $responseType;
+                            $this->sendMessage($to, $message);
+                            break;
+                        }
+
+                        if (
+                            false === property_exists($jsonData, 'litcal')
+                            || false === property_exists($jsonData, 'settings')
+                            || false === property_exists($jsonData, 'metadata')
+                            || false === property_exists($jsonData, 'messages')
+                        ) {
+                            $message               = new \stdClass();
+                            $message->type         = 'error';
+                            $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
+                                                    . Route::CALENDAR->path() . $req . ' as JSON: response data was perhaps truncated?';
+                            $message->classes      = ".calendar-$calendar.json-valid.year-$year";
+                            $message->responsetype = $responseType;
+                            $this->sendMessage($to, $message);
+                            break;
+                        }
+
+                        $message          = new \stdClass();
+                        $message->type    = 'success';
+                        $message->text    = "The $category of $calendar for the year $year was successfully decoded as JSON";
                         $message->classes = ".calendar-$calendar.json-valid.year-$year";
                         $this->sendMessage($to, $message);
 
-                        $validationResult = $this->validateDataAgainstSchema($jsonData, LitSchema::LITCAL);
+                        $validationResult = $this->validateDataAgainstSchema($jsonData, LitSchema::LITCAL->path());
                         if (gettype($validationResult) === 'boolean' && $validationResult === true) {
-                            $message = new \stdClass();
-                            $message->type = "success";
-                            $message->text = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL;
+                            $message          = new \stdClass();
+                            $message->type    = 'success';
+                            $message->text    = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL->path();
                             $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $message);
-                        } elseif (gettype($validationResult === 'object')) {
+                        } elseif ($validationResult instanceof \stdClass) {
                             $validationResult->classes = ".calendar-$calendar.schema-valid.year-$year";
                             $this->sendMessage($to, $validationResult);
                         }
-                    } else {
-                        $message = new \stdClass();
-                        $message->type = "error";
-                        $message->text = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                        . self::REQPATH . $req . " as JSON: " . json_last_error_msg();
-                        $message->classes = ".calendar-$calendar.json-valid.year-$year";
-                        $message->responsetype = $responseType;
-                        $this->sendMessage($to, $message);
-                    }
+                }
+            },
+            function (\Throwable $e) use ($to, $calendar, $year, $category, $req) {
+                $message          = new \stdClass();
+                $message->type    = 'error';
+                $message->text    = "The $category of $calendar for the year $year does not exist at the URL " . Route::CALENDAR->path() . $req . ' : ' . $e->getMessage();
+                $message->classes = ".calendar-$calendar.file-exists.year-$year";
+                $this->sendMessage($to, $message);
             }
-        } else {
-            $message = new \stdClass();
-            $message->type = "error";
-            $message->text = "The $category of $calendar for the year $year does not exist at the URL " . self::REQPATH . $req;
-            $message->classes = ".calendar-$calendar.file-exists.year-$year";
-            $this->sendMessage($to, $message);
-        }
+        );
     }
 
     /**
@@ -1002,17 +1000,15 @@ class Health implements MessageComponentInterface
      */
     private function executeUnitTest(string $test, string $calendar, int $year, string $category, ConnectionInterface $to): void
     {
-        //get the index of the responsetype from the ReturnType class
-        $responseTypeIdx = array_search("JSON", ReturnType::$values);
-        //get the corresponding accept mime type
-        $acceptMimeType = AcceptHeader::$values[$responseTypeIdx];
-        $opts = [
-            "http" => [
-                "method" => "GET",
-                "header" => "Accept: $acceptMimeType\r\n"
-            ]
+        $returnTypeParam = ReturnTypeParam::JSON;
+        $acceptMimeType  = $returnTypeParam->toResponseContentType();
+        $opts            = [
+            'headers' => [
+                'Accept' => $acceptMimeType->value
+            ],
+            'stream'  => true
         ];
-        $context = stream_context_create($opts);
+
         if ($calendar === 'VA') {
             $req = "/$year?year_type=CIVIL";
         } else {
@@ -1025,42 +1021,467 @@ class Health implements MessageComponentInterface
                     break;
                 default:
                     //we shouldn't ever get any other categories
+                    $req = '/unknown';
             }
         }
-        $data = file_get_contents(self::REQPATH . $req, false, $context);
-        // We don't really need to check whether file_get_contents succeeded
-        //  because this check already takes place in the validateCalendar test phase
-        $jsonData = json_decode($data);
-        if (json_last_error() === JSON_ERROR_NONE) {
-            $UnitTest = new LitTest($test, $jsonData);
-            if ($UnitTest->isReady()) {
-                $UnitTest->runTest();
+        $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts);
+        $promise->then(
+            function (string $data) use ($to, $test, $year) {
+                $data = (string) $data; // force fresh string
+                /** @var \stdClass&object{settings:object{year:int,national_calendar?:string,diocesan_calendar?:string},litcal:LiturgicalEvent[]} $jsonData */
+                $jsonData = json_decode($data);
+                if (json_last_error() === JSON_ERROR_NONE) {
+                    $UnitTest = new LitTestRunner($test, $jsonData);
+                    if ($UnitTest->isReady()) {
+                        $UnitTest->runTest();
+                    }
+                    $this->sendMessage($to, $UnitTest->getMessage());
+                } else {
+                    $message          = new \stdClass();
+                    $message->type    = 'error';
+                    $message->text    = "There was an error decoding JSON data for the test $test: " . json_last_error_msg();
+                    $message->classes = ".$test.year-{$year}.test-valid";
+                    $this->sendMessage($to, $message);
+                }
+            },
+            function (\Throwable $e) use ($to, $test, $year, $category, $calendar, $req) {
+                $message          = new \stdClass();
+                $message->type    = 'error';
+                $message->text    = "The $category of $calendar for the year $year was not retrieved at the URL " . Route::CALENDAR->path() . $req . ' : ' . $e->getMessage();
+                $message->classes = ".$test.year-{$year}.test-valid";
+                $this->sendMessage($to, $message);
             }
-            $this->sendMessage($to, $UnitTest->getMessage());
-        }
+        );
     }
 
     /**
      * Validate data against a specified schema.
      *
-     * @param object|array $data The data to validate.
+     * @param mixed $data The data to validate.
      * @param string $schemaUrl The URL of the schema to validate against.
      *
-     * @return bool|object Returns true if the data is valid, otherwise returns an error object with details.
+     * @return bool|\stdClass Returns true if the data is valid, otherwise returns an error object with details.
      */
-    private function validateDataAgainstSchema(object|array $data, string $schemaUrl): bool|object
+    private function validateDataAgainstSchema(mixed $data, string $schemaUrl): bool|\stdClass
     {
         $res = false;
         try {
             $schema = Schema::import($schemaUrl);
             $schema->in($data);
             $res = true;
-        } catch (InvalidValue | \Exception $e) {
-            $message = new \stdClass();
-            $message->type = "error";
-            $message->text = LitSchema::ERROR_MESSAGES[ $schemaUrl ] . PHP_EOL . $e->getMessage();
+        } catch (\Throwable $e) {
+            $litSchema     = LitSchema::fromURL($schemaUrl);
+            $message       = new \stdClass();
+            $message->type = 'error';
+            $message->text = $litSchema->error() . PHP_EOL . $e->getMessage();
             return $message;
         }
         return $res;
+    }
+
+    /**
+     * @return PromiseInterface<string>
+     */
+    private function cachedFileGetContents(string $path, int $ttl = 300): PromiseInterface
+    {
+        $key = 'fgc_' . md5($path);
+
+        if (self::$cacheEnabled) {
+            if (apcu_exists($key)) {
+                $deferred = new Deferred();
+                $data     = apcu_fetch($key, $success);
+                if ($success && is_string($data)) {
+                    echo "Cache hit for file $path\n";
+                    $deferred->resolve($data);
+                } else {
+                    $deferred->reject(new \RuntimeException("Cache fetch for file $path returned non-string data"));
+                }
+                /** @var PromiseInterface<string> $deferredPromise */
+                $deferredPromise = $deferred->promise();
+                return $deferredPromise;
+            }
+            echo "Cache miss for file $path, reading from filesystem\n";
+        }
+
+        $filesystem = Factory::create();
+
+        /** @var PromiseInterface<string> $fsPromise */
+        $fsPromise = $filesystem->file($path)->getContents()->then(
+            function (string $data) use ($key, $ttl, $path): string {
+                $data = (string) $data;          // force fresh string
+                if (self::$cacheEnabled) {
+                    echo "Read file $path, caching contents\n";
+                    $stored = apcu_store($key, $data, $ttl);
+                    echo ( $stored ? "Stored file in cache\n" : "Failed to store file in cache\n" );
+                    /** @var array{seg_size:int,avail_mem:int} $info */
+                    $info = apcu_sma_info(true);
+                    if (false !== $info) {
+                        $total = isset($info['seg_size']) ? (int) $info['seg_size'] : 0;
+                        $free  = isset($info['avail_mem']) ? (int) $info['avail_mem'] : 0;
+                        if ($total > 0) { // avoid division by zero
+                            $used    = $total - $free;
+                            $percent = ( $used / $total ) * 100;
+
+                            echo 'APCu used: ' . round($used / 1024 / 1024, 2) . ' MB of ' .
+                                round($total / 1024 / 1024, 2) . ' MB (' .
+                                round($percent, 2) . "%)\n";
+                        }
+                    }
+                    //var_dump(apcu_exists($key), apcu_fetch($key));
+                }
+                return $data; // resolved promise
+            },
+            function (\Throwable $e) use ($path): never {
+                throw new \RuntimeException("Unable to read file: $path", 0, $e);
+            }
+        );
+
+        return $fsPromise;
+    }
+
+    /**
+     * @param array{headers?:array{Accept:string}} $options
+     *
+     * @return PromiseInterface<string>
+     */
+    private function cachedGet(string $url, array $options = [], int $ttl = 300): PromiseInterface
+    {
+        $key      = 'http_' . md5($url . serialize($options));
+        $deferred = new Deferred();
+
+        // Return from cache if available
+        if (self::$cacheEnabled) {
+            if (apcu_exists($key)) {
+                echo "Cache hit for $url\n";
+                $data = apcu_fetch($key, $success);
+                if ($success && is_string($data)) {
+                    $deferred->resolve($data);
+                } else {
+                    $deferred->reject(new \RuntimeException("Cache fetch for URL $url failed or returned non-string data"));
+                }
+
+                /** @var PromiseInterface<string> $deferredPromise */
+                $deferredPromise = $deferred->promise();
+                return $deferredPromise;
+            }
+            echo "Cache miss for $url, making HTTP request\n";
+        }
+
+
+        $resolve = function (ResponseInterface $response) use ($deferred, $key, $ttl, $url) {
+            $body       = (string) $response->getBody();
+            $bodyLength = strlen($body);
+            echo "HTTP request completed for $url\n";
+            if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development') {
+                $date          = date('Y-m-d_H-i-s-u');
+                $color         = $response->getStatusCode() >= 400 ? self::RED : self::GREEN;
+                $debugMessage  = self::YELLOW . 'RESPONSE HTTP/' . $response->getProtocolVersion() . ' ' . $color . $response->getStatusCode() . ' ' . $response->getReasonPhrase() . " received from URL {$url}" . self::NC . PHP_EOL;
+                $debugMessage .= PHP_EOL;
+                $debugMessage .= self::BLUE . 'Incoming response headers' . self::NC . PHP_EOL;
+                foreach ($response->getHeaders() as $name => $values) {
+                    $debugMessage .= $name . ': ' . implode(', ', $values) . PHP_EOL;
+                };
+                $debugMessage .= PHP_EOL;
+                $debugMessage .= self::BLUE . "Incoming response body ({$bodyLength} bytes)" . self::NC . PHP_EOL;
+                $debugMessage .= $body . PHP_EOL . PHP_EOL;
+                file_put_contents(Router::$apiFilePath . 'logs' . DIRECTORY_SEPARATOR . "websocket_response_{$date}.log", $debugMessage);
+            }
+
+            if (self::$cacheEnabled) {
+                $stored = apcu_store($key, $body, $ttl);
+                echo ( $stored ? "Stored response body in cache\n" : "Failed to store response body in cache\n" );
+                /** @var array{seg_size:int,avail_mem:int} $info */
+                $info = apcu_sma_info(true);
+                if (false !== $info) {
+                    $total = isset($info['seg_size']) ? (int) $info['seg_size'] : 0;
+                    $free  = isset($info['avail_mem']) ? (int) $info['avail_mem'] : 0;
+                    if ($total > 0) { // avoid division by zero
+                        $used    = $total - $free;
+                        $percent = ( $used / $total ) * 100;
+
+                        echo 'APCu used: ' . round($used / 1024 / 1024, 2) . ' MB of ' .
+                            round($total / 1024 / 1024, 2) . ' MB (' .
+                            round($percent, 2) . "%)\n";
+                    }
+                }
+            }
+            --$this->inFlight;
+            $deferred->resolve($body);
+        };
+
+        $reject = function (\Throwable $e) use ($deferred) {
+            echo 'HTTP request failed: ' . $e->getMessage() . "\n";
+            --$this->inFlight;
+            $deferred->reject($e);
+        };
+
+        $this->queue[] = [
+            'url'     => $url,
+            'options' => $options,
+            'resolve' => $resolve,
+            'reject'  => $reject
+        ];
+
+        /** @var PromiseInterface<string> $deferredPromise */
+        $deferredPromise = $deferred->promise();
+        $this->ensureTicking();
+        return $deferredPromise;
+    }
+
+    private function processQueue(): void
+    {
+        echo 'Processing queue, inFlight: ' . $this->inFlight . ', maxConcurrency: ' . $this->maxConcurrency . ', queue size: ' . count($this->queue) . "\n";
+        while ($this->inFlight < $this->maxConcurrency && !empty($this->queue)) {
+            [
+                'url'     => $url,
+                'options' => $options,
+                'resolve' => $resolve,
+                'reject'  => $reject
+            ] = array_shift($this->queue);
+
+            ++$this->inFlight;
+
+            if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development') {
+                $date         = date('Y-m-d H:i:s.u');
+                $debugMessage = "{$date}\tREQUEST GET URL " . $url . "\n";
+                file_put_contents(Router::$apiFilePath . 'logs' . DIRECTORY_SEPARATOR . 'websocket_requests.log', $debugMessage, FILE_APPEND);
+            }
+
+            $this->http->getAsync($url, $options)
+                ->then(
+                    $resolve,
+                    $reject
+                );
+        }
+        $this->drainHandler();
+    }
+
+    private function ensureTicking(): void
+    {
+        if ($this->ticking) {
+            echo 'Already ticking' . "\n";
+            return;
+        }
+        echo 'Starting to tick' . "\n";
+        $this->ticking = true;
+
+        Loop::futureTick(function () {
+            $this->drainHandler();
+        });
+    }
+
+    private function drainHandler(): void
+    {
+        if ($this->inFlight > 0 || !empty($this->queue)) {
+            echo 'Drain handler ensuring ticking, inFlight: ' . $this->inFlight . ', queued requests: ' . count($this->queue) . '' . "\n";
+            // keep ticking until no requests are left
+            Loop::futureTick(function () {
+                $this->multiHandler->tick();
+                $this->processQueue();
+            });
+        } else {
+            // no active or queued requests
+            echo 'Stopping to tick, inFlight: ' . $this->inFlight . ', queue: ' . count($this->queue) . '' . "\n";
+            $this->ticking = false;
+        }
+    }
+
+    /**
+     * Mapping of data file paths to the LitSchema constants that their JSON data should validate against.
+     * The paths are relative to the root of the project. The LitSchema constants are used to determine
+     * which schema to use when validating the JSON data.
+     */
+    private static function getPathToSchemaFile(string $dataFile): ?string
+    {
+        return match ($dataFile) {
+            JsonData::MISSALS_FOLDER->value . '/propriumdetempore/propriumdetempore.json'                 => LitSchema::PROPRIUMDETEMPORE->path(),
+            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_1970/propriumdesanctis_1970.json'       => LitSchema::PROPRIUMDESANCTIS->path(),
+            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_2002/propriumdesanctis_2002.json'       => LitSchema::PROPRIUMDESANCTIS->path(),
+            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_2008/propriumdesanctis_2008.json'       => LitSchema::PROPRIUMDESANCTIS->path(),
+            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json' => LitSchema::PROPRIUMDESANCTIS->path(),
+            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json' => LitSchema::PROPRIUMDESANCTIS->path(),
+            Route::CALENDARS->path()                                                                      => LitSchema::METADATA->path(),
+            Route::DECREES->path()                                                                        => LitSchema::DECREES->path(),
+            Route::EVENTS->path()                                                                         => LitSchema::EVENTS->path(),
+            Route::TESTS->path()                                                                          => LitSchema::TESTS->path(),
+            Route::EASTER->path()                                                                         => LitSchema::EASTER->path(),
+            Route::MISSALS->path()                                                                        => LitSchema::MISSALS->path(),
+            Route::DATA->path()                                                                           => LitSchema::DATA->path(),
+            Route::SCHEMAS->path()                                                                        => LitSchema::SCHEMAS->path(),
+            default => null
+        };
+    }
+
+    /**
+     * Validates the properties of a message object.
+     *
+     * This function checks the properties of a given message object to ensure
+     * they match the expected properties defined in ACTION_PROPERTIES for the
+     * specified action. If any expected property is missing from the message
+     * object, the function returns false, indicating the message is invalid.
+     *
+     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest $message The message object to validate.
+     * @return bool True if all required properties are present, false otherwise.
+     */
+    private static function validateMessageProperties(\stdClass $message): bool
+    {
+        $valid = true;
+        foreach (Health::ACTION_PROPERTIES[$message->action] as $prop) {
+            if (false === property_exists($message, $prop)) {
+                if ($prop === 'sourceFile' && $message->action === 'executeValidation' && property_exists($message, 'sourceFolder')) {
+                    continue;
+                }
+                return false;
+            }
+        }
+        return $valid;
+    }
+
+    /**
+     * Returns the appropriate schema for the given category and dataPath.
+     * If dataPath is null, it will return the schema for the category.
+     * If dataPath is not null, it will return the schema for the dataPath.
+     * If the category is 'universalcalendar', it will return the schema from the DATA_PATH_TO_SCHEMA array.
+     * If the category is 'nationalcalendar', 'diocesancalendar', 'widerregioncalendar', or 'propriumdesanctis',
+     * it will return the corresponding schema constant.
+     * If the category is 'resourceDataCheck', it will return the schema for the dataPath if it matches one of the patterns,
+     * otherwise it will return the schema from the DATA_PATH_TO_SCHEMA array.
+     * If the category is not recognized, it will return null.
+     *
+     * @param string $category The category of the data.
+     * @param string $dataPath The path to the data.
+     * @return string|null The schema for the given category and dataPath, or null if the category is not recognized.
+     */
+    private static function retrieveSchemaForCategory(string $category, string $dataPath): ?string
+    {
+        $versionedPattern     = '/\/api\/(?:v[4-9]|v[1-9]\\d+)\//';
+        $versionedReplacement = '/api/dev/';
+        $isVersionedDataPath  = preg_match($versionedPattern, $dataPath) === 1;
+        switch ($category) {
+            case 'universalcalendar':
+                if ($isVersionedDataPath) {
+                    $versionedDataPath = preg_replace($versionedPattern, $versionedReplacement, $dataPath);
+                    if (null === $versionedDataPath) {
+                        throw new \InvalidArgumentException('Invalid dataPath: ' . $dataPath . ', expected to match ' . $versionedPattern);
+                    }
+                    /** @var string $versionedDataPath */
+                    $pathToSchemaFile = Health::getPathToSchemaFile($versionedDataPath);
+                    if (null !== $pathToSchemaFile) {
+                        return preg_replace($versionedPattern, $versionedReplacement, $pathToSchemaFile);
+                    }
+                }
+                return Health::getPathToSchemaFile($dataPath);
+            case 'nationalcalendar':
+                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::NATIONAL->path()) : LitSchema::NATIONAL->path();
+            case 'diocesancalendar':
+                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::DIOCESAN->path()) : LitSchema::DIOCESAN->path();
+            case 'widerregioncalendar':
+                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::WIDERREGION->path()) : LitSchema::WIDERREGION->path();
+            case 'propriumdesanctis':
+                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS->path()) : LitSchema::PROPRIUMDESANCTIS->path();
+            case 'resourceDataCheck':
+                if (
+                    preg_match('/\/missals\/[_A-Z0-9]+$/', $dataPath)
+                ) {
+                    return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS->path()) : LitSchema::PROPRIUMDESANCTIS->path();
+                } elseif (
+                    preg_match('/\/events\/(?:nation\/[A-Z]{2}|diocese\/[a-z]{6}_[a-z]{2})(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath)
+                ) {
+                    return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::EVENTS->path()) : LitSchema::EVENTS->path();
+                } elseif (
+                    preg_match('/\/data\/(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/[A-Z][a-z]+)(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath, $matches)
+                ) {
+                    $schema = LitSchema::DATA->path();
+                    foreach ($matches as $idx => $match) {
+                        if ($idx > 0) {
+                            switch ($match) {
+                                case 'nation':
+                                    $schema = LitSchema::NATIONAL->path();
+                                    break;
+                                case 'diocese':
+                                    $schema = LitSchema::DIOCESAN->path();
+                                    break;
+                                case 'widerregion':
+                                    $schema = LitSchema::WIDERREGION->path();
+                                    break;
+                            }
+                        }
+                    }
+                    return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, $schema) : $schema;
+                }
+                if ($isVersionedDataPath) {
+                    $versionedDataPath = preg_replace($versionedPattern, $versionedReplacement, $dataPath);
+                    if (null === $versionedDataPath) {
+                        throw new \InvalidArgumentException('Invalid dataPath: ' . $dataPath . ', expected to match ' . $versionedPattern);
+                    }
+                    /** @var string $versionedDataPath */
+                    $pathToSchemaFile = Health::getPathToSchemaFile($versionedDataPath);
+                    if (null !== $pathToSchemaFile) {
+                        return preg_replace($versionedPattern, $versionedReplacement, $pathToSchemaFile);
+                    }
+                }
+                return Health::getPathToSchemaFile($dataPath);
+            case 'sourceDataCheck':
+                if (preg_match('/-i18n$/', $dataPath)) {
+                    return LitSchema::I18N->path();
+                }
+                if (preg_match('/^memorials-from-decrees$/', $dataPath)) {
+                    return LitSchema::DECREES_SRC->path();
+                }
+                if (preg_match('/^proprium-de-sanctis(?:-[A-Z]{2})?-(?:1|2)(?:9|0)(?:7|8|9|0|1|2)[0-9]$/', $dataPath)) {
+                    return LitSchema::PROPRIUMDESANCTIS->path();
+                }
+                if (preg_match('/^proprium-de-tempore$/', $dataPath)) {
+                    return LitSchema::PROPRIUMDETEMPORE->path();
+                }
+                if (preg_match('/^wider-region-[A-Z][a-z]+$/', $dataPath)) {
+                    return LitSchema::WIDERREGION->path();
+                }
+                if (preg_match('/^national-calendar-[A-Z]{2}$/', $dataPath)) {
+                    return LitSchema::NATIONAL->path();
+                }
+                if (preg_match('/^diocesan-calendar-[a-z]{6}_[a-z]{2}$/', $dataPath)) {
+                    return LitSchema::DIOCESAN->path();
+                }
+                if (preg_match('/^tests-[a-zA-Z0-9_]+$/', $dataPath)) {
+                    return LitSchema::TEST_SRC->path();
+                }
+                return null;
+        }
+        return null;
+    }
+
+    /**
+     * Takes an array of LIBXML errors and an array of XML lines
+     * and returns a string of the errors with line numbers and column numbers.
+     * @param \LibXMLError[] $errors Array of LIBXML errors
+     * @param string[] $xml Array of strings, each string is a line in the XML document
+     * @return string The errors with line numbers and column numbers
+     */
+    private static function retrieveXmlErrors(array $errors, array $xml): string
+    {
+        $return = [];
+        foreach ($errors as $error) {
+            $errorStr = '';
+            switch ($error->level) {
+                case LIBXML_ERR_WARNING:
+                    $errorStr .= "Warning $error->code: ";
+                    break;
+                case LIBXML_ERR_ERROR:
+                    $errorStr .= "Error $error->code: ";
+                    break;
+                case LIBXML_ERR_FATAL:
+                    $errorStr .= "Fatal Error $error->code: ";
+                    break;
+            }
+            $errorStr .= htmlspecialchars(trim($error->message))
+                      . " (Line: $error->line, Column: $error->column, Src: "
+                      . htmlspecialchars(trim($xml[$error->line - 1] ?? '')) . ')';
+            if ($error->file) {
+                $errorStr .= " in file: $error->file";
+            }
+            array_push($return, $errorStr);
+        }
+        return implode('&#013;', $return);
     }
 }

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/12.4/phpunit.xsd"
+         bootstrap="phpunit_tests/bootstrap.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache"
+         >
+  <testsuites>
+    <testsuite name="REST API Test Suite">
+      <directory suffix="Test.php">phpunit_tests</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>

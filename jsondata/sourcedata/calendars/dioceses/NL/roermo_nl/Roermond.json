@@ -1,7 +1,7 @@
 {
   "litcal": [
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -19,7 +19,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -38,7 +38,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -57,7 +57,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -75,7 +75,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -93,7 +93,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -111,7 +111,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -129,7 +129,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -147,7 +147,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -165,7 +165,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -183,7 +183,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -201,7 +201,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -219,7 +219,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -237,7 +237,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -247,7 +247,7 @@
         ],
         "day": 13,
         "month": 5,
-        "event_key": "HServatiusbiscchop"
+        "event_key": "HServatiusbisschop"
       },
       "metadata": {
         "since_year": 1979,
@@ -255,7 +255,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -273,7 +273,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],
@@ -291,7 +291,7 @@
       }
     },
     {
-      "festivity": {
+      "liturgical_event": {
         "color": [
           "white"
         ],

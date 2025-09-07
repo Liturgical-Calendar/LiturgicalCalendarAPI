@@ -4,6 +4,10 @@ namespace LiturgicalCalendar\Api;
 
 use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitColor;
+use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsMap;
 
 /**
  * Class Utilities
@@ -16,13 +20,17 @@ use LiturgicalCalendar\Api\Enum\LitColor;
 class Utilities
 {
     // NON_EVENT_KEYS are keys whose value is an array, but are not a LitCalEvent
-    private const NON_EVENT_KEYS = [
+    private const array NON_EVENT_KEYS = [
         'litcal',
         'settings',
         'messages',
         'metadata',
+        'solemnities_lord_bvm',
+        'solemnities_lord_bvm_keys',
         'solemnities',
         'solemnities_keys',
+        'feasts_lord',
+        'feasts_lord_keys',
         'feasts',
         'feasts_keys',
         'memorials',
@@ -34,29 +42,56 @@ class Utilities
         'request_headers',
         'color',
         'color_lcl',
-        'common'
+        'common',
+        'readings',
+        'schema_one',
+        'schema_two',
+        'schema_three',
+        'night',
+        'dawn',
+        'day',
+        'evening'
+    ];
+
+    // EVENT_KEY_ELS are keys whose value is an array of LitCalEvents, and should become <Key> elements rather than <Option> elements
+    private const array EVENT_KEY_ELS = [
+        'solemnities_lord_bvm_keys',
+        'solemnities_keys',
+        'feasts_lord_keys',
+        'feasts_keys',
+        'memorials_keys',
+        'suppressed_events_keys',
+        'reinstated_events_keys'
     ];
 
     /**
      * Used to keep track of the current array type
      * when processing items of the array.
      * This way the items can be transformed to an appropriate XML element.
-     * @var string
+     * @var string|int
      */
-    private static string $LAST_ARRAY_KEY = '';
+    private static string|int $LAST_ARRAY_KEY = '';
 
     /**
      * All snake_case keys are automatically transformed to their PascalCase equivalent.
      * If any key needs a specific case transformation other than the automatic snake_case to PascalCase, add it to this array.
      */
-    private const CUSTOM_TRANSFORM_KEYS = [
-        "litcal" => "LitCal",
-        "has_vesper_ii" => "HasVesperII"
+    private const array CUSTOM_TRANSFORM_KEYS = [
+        'litcal'                    => 'LitCal',
+        'has_vesper_ii'             => 'HasVesperII',
+        'solemnities_lord_bvm'      => 'SolemnitiesLordBVM',
+        'solemnities_lord_bvm_keys' => 'SolemnitiesLordBVMKeys'
+    ];
+
+    private const array READINGS_CHRISTMAS_KEYS = [
+        'night',
+        'dawn',
+        'day'
     ];
 
     /**
      * Used to keep track of the current request hash value.
-     * The value is set from the Calendar.php class representing the `/calendar` API path.
+     * The value is set from the CalendarHandler.php class representing the `/calendar` API path.
      * @var string
      */
     public static string $HASH_REQUEST = '';
@@ -66,10 +101,10 @@ class Utilities
      * LitCalEvent keys are keys in the LitCal array that are associated with a LitCalEvent array.
      * This function is used to determine if a key is a 'special' key in the LitCal array,
      * such as 'metadata', 'settings', 'litcal', etc.
-     * @param string $key
+     * @param string|int $key
      * @return bool
      */
-    private static function isNotLitCalEventKey(string $key): bool
+    private static function isNotLitCalEventKey(string|int $key): bool
     {
         return in_array($key, self::NON_EVENT_KEYS);
     }
@@ -85,6 +120,12 @@ class Utilities
         return array_key_exists($key, self::CUSTOM_TRANSFORM_KEYS);
     }
 
+    /**
+     * Returns the PascalCase representation of a given snake_case key.
+     * If the key is present in the CUSTOM_TRANSFORM_KEYS array, its value is returned instead.
+     * @param string $key
+     * @return string
+     */
     private static function transformKey(string $key): string
     {
         if (self::isCustomTransformKey($key)) {
@@ -95,25 +136,115 @@ class Utilities
     }
 
     /**
+     * Calculates the xsi type of the lectionary readings object, based on its keys.
+     *
+     * This function is used when generating the XML representation of the Readings for a LitCalEvent.
+     *
+     * @param array<string,string> $value
+     * @return array<string,string>
+     */
+    private static function getReadingsType(array $value): array
+    {
+        $itemKeys     = array_keys($value);
+        $itemKeyCount = count($itemKeys);
+
+        // First we test for the two dimensional readings instances,
+        // starting from the most complex to the most simple.
+        // This is important to calculate correctly the diff between the keys!
+        // e.g. READINGS_CHRISTMAS_KEYS has more values than READINGS_WITH_VIGIL_KEYS
+
+        if ($itemKeyCount === count(ReadingsMap::READINGS_MULTIPLE_SCHEMAS_KEYS) && array_diff(ReadingsMap::READINGS_MULTIPLE_SCHEMAS_KEYS, $itemKeys) === []) {
+            return [
+                'attribute' => 'multipleSchemas',
+                'xsi'       => 'cl:ReadingsMultipleSchemasType'
+            ];
+        }
+
+        if ($itemKeyCount === count(self::READINGS_CHRISTMAS_KEYS) && array_diff(self::READINGS_CHRISTMAS_KEYS, $itemKeys) === []) {
+            return [
+                'attribute' => 'christmas',
+                'xsi'       => 'cl:ReadingsChristmasType'
+            ];
+        }
+
+        if ($itemKeyCount === count(ReadingsMap::READINGS_WITH_EVENING_MASS_KEYS) && array_diff(ReadingsMap::READINGS_WITH_EVENING_MASS_KEYS, $itemKeys) === []) {
+            return [
+                'attribute' => 'withEveningMass',
+                'xsi'       => 'cl:ReadingsWithEveningMassType'
+            ];
+        }
+
+        if ($itemKeyCount === count(ReadingsMap::READINGS_SEASONAL_KEYS) && array_diff(ReadingsMap::READINGS_SEASONAL_KEYS, $itemKeys) === []) {
+            return [
+                'attribute' => 'seasonal',
+                'xsi'       => 'cl:ReadingsSeasonalType'
+            ];
+        }
+
+        // Then we test for the one dimensional readings instances,
+        // starting from the most complex to the most simple.
+        // This is important to calculate correctly the diff between the keys!
+        // e.g. EASTER_VIGIL_KEYS has more values than PALM_SUNDAY_KEYS, and so on.
+
+        if ($itemKeyCount === count(ReadingsMap::EASTER_VIGIL_KEYS) && array_diff(ReadingsMap::EASTER_VIGIL_KEYS, $itemKeys) === []) {
+            return [
+                'attribute' => 'easterVigil',
+                'xsi'       => 'cl:ReadingsEasterVigilType'
+            ];
+        }
+        if ($itemKeyCount === count(ReadingsMap::PALM_SUNDAY_KEYS) && array_diff(ReadingsMap::PALM_SUNDAY_KEYS, $itemKeys) === []) {
+            return [
+                'attribute' => 'palmSunday',
+                'xsi'       => 'cl:ReadingsPalmSundayType'
+            ];
+        }
+        if ($itemKeyCount === count(ReadingsMap::FESTIVE_KEYS) && array_diff(ReadingsMap::FESTIVE_KEYS, $itemKeys) === []) {
+            return [
+                'attribute' => 'festive',
+                'xsi'       => 'cl:ReadingsFestiveType'
+            ];
+        }
+        if ($itemKeyCount === count(ReadingsMap::FERIAL_KEYS) && array_diff(ReadingsMap::FERIAL_KEYS, $itemKeys) === []) {
+            return [
+                'attribute' => 'ferial',
+                'xsi'       => 'cl:ReadingsFerialType'
+            ];
+        }
+        return [
+            'attribute' => '???',
+            'xsi'       => 'cl:ReadingsType'
+        ];
+    }
+
+    /**
      * Recursively convert an associative array to an XML object
-     * @param array $data
+     * @param array<string|int,mixed> $data
      * @param \SimpleXMLElement $xml
      * @return void
      */
-    public static function convertArray2XML(array $data, ?\SimpleXMLElement &$xml): void
+    public static function convertArray2XML(array $data, \SimpleXMLElement &$xml): void
     {
         foreach ($data as $key => $value) {
             if (is_array($value)) {
                 self::$LAST_ARRAY_KEY = $key;
                 //self::debugWrite( "value of key <$key> is an array" );
                 if (self::isNotLitCalEventKey($key)) {
-                    $key = self::transformKey($key);
+                    // the key will always be a string in this case,
+                    // but we pass it explicitly as a string to the transformKey function
+                    // which expects a string, to make phpstan happy
+                    $key        = self::transformKey($key . '');
                     $new_object = $xml->addChild($key);
+                    if (in_array($key, ['Readings', 'Night', 'Day', 'Dawn', 'Evening', 'SchemaOne', 'SchemaTwo', 'SchemaThree'])) {
+                        /** @var array<string, string> $value */
+                        ['attribute' => $attribute, 'xsi' => $xsi] = self::getReadingsType($value);
+                        $new_object->addAttribute('readingsType', $attribute);
+                        $new_object->addAttribute('xsi:type', $xsi, 'http://www.w3.org/2001/XMLSchema-instance');
+                    }
                 } else {
                     //self::debugWrite( "key <$key> is a LitCalEvent" );
-                    $new_object = $xml->addChild("LitCalEvent");
+                    $new_object = $xml->addChild('LitCalEvent');
                     if (is_numeric($key)) {
-                        $new_object->addAttribute("idx", $key);
+                        $new_object->addAttribute('idx', $key . '');
                     }
                 }
                 //self::debugWrite( "proceeding to convert array value of <$key> to xml sequence..." );
@@ -126,72 +257,104 @@ class Utilities
                 // so we determine the item element name based on the array to which the item belongs
                 if (is_numeric($key)) {
                     if (self::$LAST_ARRAY_KEY === 'messages') {
+                        if (false === is_string($value)) {
+                            throw new \UnexpectedValueException('Value of key ' . $key . ' must be a string');
+                        }
                         $el = $xml->addChild('Message', htmlspecialchars($value));
-                        $el->addAttribute("idx", $key);
-                    } elseif (in_array(self::$LAST_ARRAY_KEY, ['solemnities_keys','feasts_keys','memorials_keys','suppressed_events_keys','reinstated_events_keys'])) {
+                        $el->addAttribute('idx', $key . '');
+                    } elseif (in_array(self::$LAST_ARRAY_KEY, self::EVENT_KEY_ELS, true)) {
+                        if (false === is_string($value)) {
+                            throw new \UnexpectedValueException('Value of key ' . $key . ' must be a string');
+                        }
                         $el = $xml->addChild('Key', $value);
-                        $el->addAttribute("idx", $key);
+                        $el->addAttribute('idx', $key . '');
                     } else {
                         // color, color_lcl, and common array items will be converted to Option elements
+                        if (false === is_string($value)) {
+                            throw new \UnexpectedValueException('Value of key ' . $key . ' must be a string');
+                        }
                         $el = $xml->addChild('Option', $value);
-                        $el->addAttribute("idx", $key);
+                        $el->addAttribute('idx', $key . '');
                     }
                 } else {
                     $key = self::transformKey($key);
                     if (is_bool($value)) {
-                        $boolVal = $value ? 1 : 0;
+                        $boolVal = $value ? '1' : '0';
                         $xml->addChild($key, $boolVal);
                     }
                     elseif (gettype($value) === 'string') {
                         $xml->addChild($key, htmlspecialchars($value));
-                    } else {
-                        $xml->addChild($key, $value);
+                        if ('Readings' === $key) {
+                            $xml->Readings->addAttribute('readingsType', 'fromCommons');
+                            $xml->Readings->addAttribute('xsi:type', 'cl:ReadingsCommonsType', 'http://www.w3.org/2001/XMLSchema-instance');
+                        }
+                    }
+                    elseif (is_int($value)) {
+                        $xml->addChild($key, (string) $value);
+                    }
+                    elseif (is_null($value)) {
+                        $el = $xml->addChild($key);
+                        $el->addAttribute('xsi:nil', 'true', 'http://www.w3.org/2001/XMLSchema-instance');
+                    }
+                    else {
+                        throw new \UnexpectedValueException('Key ' . $key . ' has an unexpected type: ' . gettype($value));
                     }
                 }
             }
         }
     }
 
-    // https://en.wikipedia.org/wiki/Computus#Anonymous_Gregorian_algorithm
-    // aka Meeus/Jones/Butcher algorithm
+
+    /**
+     * Calculates the Gregorian Easter date for a given year.
+     * @link https://en.wikipedia.org/wiki/Computus#Anonymous_Gregorian_algorithm
+     * aka Meeus/Jones/Butcher algorithm
+     * @param int $Y The year for which to calculate the Easter date.
+     * @return DateTime The date of Easter in the Gregorian calendar for the given year.
+     */
     public static function calcGregEaster($Y): DateTime
     {
-        $a = $Y % 19;
-        $b = floor($Y / 100);
-        $c = $Y % 100;
-        $d = floor($b / 4);
-        $e = $b % 4;
-        $f = floor(($b + 8) / 25);
-        $g = floor(($b - $f + 1) / 3);
-        $h = (19 * $a + $b - $d - $g + 15) % 30;
-        $i = floor($c / 4);
-        $k = $c % 4;
-        $l = (32 + 2 * $e + 2 * $i - $h - $k) % 7;
-        $m = floor(($a + 11 * $h + 22 * $l) / 451);
-        $month = floor(($h + $l - 7 * $m + 114) / 31);
-        $day = (($h + $l - 7 * $m + 114) % 31) + 1;
+        $a     = $Y % 19;
+        $b     = floor($Y / 100);
+        $c     = $Y % 100;
+        $d     = floor($b / 4);
+        $e     = $b % 4;
+        $f     = floor(( $b + 8 ) / 25);
+        $g     = floor(( $b - $f + 1 ) / 3);
+        $h     = ( 19 * $a + $b - $d - $g + 15 ) % 30;
+        $i     = floor($c / 4);
+        $k     = $c % 4;
+        $l     = ( 32 + 2 * $e + 2 * $i - $h - $k ) % 7;
+        $m     = floor(( $a + 11 * $h + 22 * $l ) / 451);
+        $month = floor(( $h + $l - 7 * $m + 114 ) / 31);
+        $day   = ( ( $h + $l - 7 * $m + 114 ) % 31 ) + 1;
 
-        $dateObj   = DateTime::createFromFormat('!j-n-Y', $day . '-' . $month . '-' . $Y, new \DateTimeZone('UTC'));
-
-        return $dateObj;
+        return DateTime::fromFormat($day . '-' . $month . '-' . $Y);
     }
 
 
-    //https://en.wikipedia.org/wiki/Computus#Meeus.27_Julian_algorithm
-    //Meeus' Julian algorithm
-    //Also many javascript examples can be found here:
-    //https://web.archive.org/web/20150227133210/http://www.merlyn.demon.co.uk/estralgs.txt
+    /**
+     * Meeus' Julian algorithm
+     *
+     * See {@link https://en.wikipedia.org/wiki/Computus#Meeus.27_Julian_algorithm}.
+     * Also many javascript examples can be found here: {@link https://web.archive.org/web/20150227133210/http://www.merlyn.demon.co.uk/estralgs.txt}
+     *
+     * @param int $Y The year for which to calculate the Easter date.
+     * @param bool $gregCal If true, the resulting date is adjusted to the Gregorian calendar.
+     * @return DateTime The date of Easter in the Julian calendar for the given year.
+     * @throws \Exception
+     */
     public static function calcJulianEaster(int $Y, bool $gregCal = false): DateTime
     {
-        $a = $Y % 4;
-        $b = $Y % 7;
-        $c = $Y % 19;
-        $d = (19 * $c + 15) % 30;
-        $e = (2 * $a + 4 * $b - $d + 34) % 7;
-        $month = floor(($d + $e + 114) / 31);
-        $day = ( ($d + $e + 114) % 31 ) + 1;
+        $a     = $Y % 4;
+        $b     = $Y % 7;
+        $c     = $Y % 19;
+        $d     = ( 19 * $c + 15 ) % 30;
+        $e     = ( 2 * $a + 4 * $b - $d + 34 ) % 7;
+        $month = floor(( $d + $e + 114 ) / 31);
+        $day   = ( ( $d + $e + 114 ) % 31 ) + 1;
 
-        $dateObj   = DateTime::createFromFormat('!j-n-Y', $day . '-' . $month . '-' . $Y, new \DateTimeZone('UTC'));
+        $dateObj = DateTime::fromFormat($day . '-' . $month . '-' . $Y);
         if ($gregCal) {
             //from February 29th 2100 Julian (March 14th 2100 Gregorian),
             //the difference between the Julian and Gregorian calendars will increase to 14 days
@@ -199,19 +362,22 @@ class Utilities
             $dateDiff = 'P' . floor((intval(substr($Y,0,2)) / .75) - 1.25) . 'D';
             $dateObj->add(new DateInterval($dateDiff));
             */
-            $GregDateDiff = array();
-            $GregDateDiff[0] = [DateTime::createFromFormat('!j-n-Y', '4-10-1582'),"P10D"]; //add 10 == GREGORIAN CUTOVER DATE
-            $idx = 0;
-            $cc = 10;
+            $GregDateDiff    = [];
+            $gregDateObj     = DateTime::fromFormat('4-10-1582');
+            $GregDateDiff[0] = [$gregDateObj, 'P10D']; //add 10 = GREGORIAN CUTOVER DATE
+            $idx             = 0;
+            $cc              = 10;
             for ($cent = 17; $cent <= 99; $cent++) {
                 if ($cent % 4 > 0) {
-                    $GregDateDiff[++$idx] = [DateTime::createFromFormat('!j-n-Y', '28-2-' . $cent . '00'),"P" . ++$cc . "D"];
+                    $gregDateObj          = DateTime::fromFormat('28-2-' . $cent . '00');
+                    $GregDateDiff[++$idx] = [$gregDateObj, 'P' . ++$cc . 'D'];
                 }
             }
 
             for ($i = count($GregDateDiff); $i > 0; $i--) {
                 if ($dateObj > $GregDateDiff[$i - 1][0]) {
-                    $dateObj->add(new \DateInterval($GregDateDiff[$i - 1][1]));
+                    $dateInterval = new \DateInterval($GregDateDiff[$i - 1][1]);
+                    $dateObj->add($dateInterval);
                     break;
                 }
             }
@@ -232,12 +398,14 @@ class Utilities
         }
         return $dateObj;
     }
-    /**
-    private static function debugWrite( string $string ) {
-      $debugFile = "UtilitiesDebug_" . Utilities::$HASH_REQUEST . ".log";
-      file_put_contents( $debugFile, date('c') . "\t" . $string . PHP_EOL, FILE_APPEND );
+
+/**
+    private static function debugWrite(string $string): void
+    {
+        $debugFile = 'UtilitiesDebug_' . Utilities::$HASH_REQUEST . '.log';
+        file_put_contents($debugFile, date('c') . "\t" . $string . PHP_EOL, FILE_APPEND);
     }
-    */
+ */
 
     /**
      * Convert a color name to its corresponding hexadecimal value.
@@ -249,56 +417,55 @@ class Utilities
      */
     public static function colorToHex(string $color): string
     {
-        $hex = "#";
+        $hex = '#';
         switch ($color) {
-            case "red":
-                $hex .= "FF0000";
+            case 'red':
+                $hex .= 'FF0000';
                 break;
-            case "green":
-                $hex .= "00AA00";
+            case 'green':
+                $hex .= '00AA00';
                 break;
-            case "white":
-                $hex .= "AAAAAA";
+            case 'white':
+                $hex .= 'AAAAAA';
                 break;
-            case "purple":
-                $hex .= "AA00AA";
+            case 'purple':
+                $hex .= 'AA00AA';
                 break;
-            case "pink":
-                $hex .= "FFAAAA";
+            case 'rose':
+                $hex .= 'FFAAAA';
                 break;
             default:
-                $hex .= "000000";
+                $hex .= '000000';
         }
         return $hex;
     }
 
     /**
-     * Converts a string of colors to a string of localized color names.
+     * Converts an array of LitColor items to a string of localized color names.
      *
-     * @param string|array $colors A string of color names separated by commas, or an array of color names.
-     * @param string $LOCALE The locale to use when localizing the color names.
+     * @param LitColor[] $colors An array of LitColor.
+     * @param string $locale The locale to use when localizing the color names.
      * @param bool $html If true, the result will be an HTML string with the color names in bold, italic font with the corresponding color.
      * @return string The localized color names, separated by spaces and the word "or".
      */
-    public static function parseColorString(string|array $colors, string $LOCALE, bool $html = false): string
+    public static function parseColorToString(array $colors, string $locale, bool $html = false): string
     {
-        if (is_string($colors)) {
-            $colors = explode(",", $colors);
-        }
         if ($html === true) {
-            $colors = array_map(function ($txt) use ($LOCALE) {
-                return '<B><I><SPAN LANG=' . strtolower($LOCALE) . '><FONT FACE="Calibri" COLOR="' . self::colorToHex($txt) . '">'
-                    . LitColor::i18n($txt, $LOCALE)
+            $colorStrings = array_map(function (LitColor $litColor) use ($locale) {
+                $langAttr = htmlspecialchars(strtolower($locale), ENT_QUOTES, 'UTF-8');
+                return '<B><I><SPAN LANG=' . $langAttr . '><FONT FACE="Calibri" COLOR="' . self::colorToHex($litColor->value) . '">'
+                    . $litColor->i18n($locale)
                     . '</FONT></SPAN></I></B>';
             }, $colors);
-            return implode(' <I><FONT FACE="Calibri">' . _("or") . "</FONT></I> ", $colors);
+            return implode(' <I><FONT FACE="Calibri">' . _('or') . '</FONT></I> ', $colorStrings);
         } else {
-            $colors = array_map(function ($txt) use ($LOCALE) {
-                return LitColor::i18n($txt, $LOCALE);
+            $colorStrings = array_map(function (LitColor $txt) use ($locale) {
+                return $txt->i18n($locale);
             }, $colors);
-            return implode(" " . _("or") . " ", $colors);
+
+            $or = $locale === LitLocale::LATIN || $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'vel' : _('or');
+            return implode(' ' . $or . ' ', $colorStrings);
         }
-        return ""; //should never get here
     }
 
     /**
@@ -310,11 +477,11 @@ class Utilities
     public static function ordSuffix(int $ord): string
     {
         $ord_suffix = ''; //st, nd, rd, th
-        if ($ord === 1 || ($ord % 10 === 1  && $ord <> 11)) {
+        if ($ord === 1 || ( $ord % 10 === 1  && $ord <> 11 )) {
             $ord_suffix = 'st';
-        } elseif ($ord === 2 || ($ord % 10 === 2  && $ord <> 12)) {
+        } elseif ($ord === 2 || ( $ord % 10 === 2  && $ord <> 12 )) {
             $ord_suffix = 'nd';
-        } elseif ($ord === 3 || ($ord % 10 === 3  && $ord <> 13)) {
+        } elseif ($ord === 3 || ( $ord % 10 === 3  && $ord <> 13 )) {
             $ord_suffix = 'rd';
         } else {
             $ord_suffix = 'th';
@@ -330,31 +497,287 @@ class Utilities
      */
     public static function getOrdinal(int $num, string $locale, \NumberFormatter $formatter, array $latinOrdinals): string
     {
-        $ordinal = "";
+        $ordinal    = '';
         $baseLocale = \Locale::getPrimaryLanguage($locale);
         switch ($baseLocale) {
-            case "la":
+            case 'la':
                 $ordinal = $latinOrdinals[$num];
                 break;
-            case "en":
+            case 'en':
                 $ordinal = $num . self::ordSuffix($num);
                 break;
             default:
                 $ordinal = $formatter->format($num);
         }
+        if (false === $ordinal) {
+            throw new ServiceUnavailableException('Unable to get ordinal for ' . $num . ' in locale ' . $locale);
+        }
         return $ordinal;
     }
 
     /**
+     * Returns the raw contents of a file, or throws a RuntimeException if the file does not exist, is not readable, or
+     * could not be read.
+     *
+     * @param string $filename The path to the file to read.
+     * @return string The contents of the file.
+     * @throws ServiceUnavailableException If the file does not exist, is not readable, or could not be read.
+     */
+    public static function rawContentsFromFile(string $filename): string
+    {
+        if (false === file_exists($filename)) {
+            throw new ServiceUnavailableException('File ' . $filename . ' does not exist');
+        }
+
+        if (false === is_readable($filename)) {
+            throw new ServiceUnavailableException('File ' . $filename . ' is not readable');
+        }
+
+        $rawContents = file_get_contents($filename);
+        if (false === $rawContents) {
+            throw new ServiceUnavailableException('Unable to read file ' . $filename);
+        }
+
+        return $rawContents;
+    }
+
+    /**
+     * Returns the raw contents of a URL, or throws a RuntimeException if the URL could not be read.
+     *
+     * @param string $url The URL to read.
+     * @return string The contents of the URL.
+     * @throws ServiceUnavailableException If the URL could not be read.
+     */
+    public static function rawContentsFromUrl(string $url): string
+    {
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'GET',
+                'header' => 'Accept: application/json',
+            ],
+        ]);
+
+        $rawContents = file_get_contents($url, false, $context);
+
+        if (false === $rawContents) {
+            throw new ServiceUnavailableException('Unable to read URL ' . $url);
+        }
+
+        return $rawContents;
+    }
+
+    /**
+     * @param string $filename
+     * @return array<string|int,mixed>
+     * @throws \JsonException
+     */
+    public static function jsonFileToArray(string $filename): array
+    {
+        $cacheEnabled = ( extension_loaded('apcu') && function_exists('apcu_exists') && function_exists('apcu_store') && function_exists('apcu_fetch') );
+        $cacheKey     = 'jsoncache_array_' . md5($filename);
+
+        // Try cache first
+        if ($cacheEnabled && apcu_exists($cacheKey)) {
+            $data = apcu_fetch($cacheKey, $success);
+            if ($success && is_array($data)) {
+                /** @var array<string|int,mixed> $data */
+                return $data;
+            }
+        }
+
+        $rawContents = self::rawContentsFromFile($filename);
+        $jsonArr     = json_decode($rawContents, true, 512, JSON_THROW_ON_ERROR);
+
+        // Store in cache
+        if ($cacheEnabled) {
+            apcu_store($cacheKey, $jsonArr, 300);
+        }
+
+        /** @var array<string|int,mixed> $jsonArr */
+        return $jsonArr;
+    }
+
+    /**
+     * Reads a JSON file and converts its contents to an object.
+     *
+     * @param string $filename The path to the JSON file.
+     * @return \stdClass The decoded JSON data as an object.
+     * @throws \JsonException If the file does not exist, is not readable, contains invalid JSON, or does not contain an object.
+     */
+    public static function jsonFileToObject(string $filename): \stdClass
+    {
+        $cacheEnabled = ( extension_loaded('apcu') && function_exists('apcu_exists') && function_exists('apcu_store') && function_exists('apcu_fetch') );
+        $cacheKey     = 'jsoncache_object_' . md5($filename);
+
+        // Try cache first
+        if ($cacheEnabled && apcu_exists($cacheKey)) {
+            $data = apcu_fetch($cacheKey, $success);
+            if ($success && $data instanceof \stdClass) {
+                return $data;
+            }
+        }
+
+        $rawContents = self::rawContentsFromFile($filename);
+        $jsonObj     = json_decode($rawContents, false, 512, JSON_THROW_ON_ERROR);
+        if (false === $jsonObj instanceof \stdClass) {
+            throw new \JsonException('JSON file ' . $filename . ' does not contain an object');
+        }
+
+
+        // Store in cache
+        if ($cacheEnabled) {
+            apcu_store($cacheKey, $jsonObj, 300);
+        }
+
+        return $jsonObj;
+    }
+
+    /**
+     * Reads a JSON file and converts its contents to an array of objects.
+     *
+     * @param string $filename The path to the JSON file.
+     * @return \stdClass[] The decoded JSON data as an array of objects.
+     * @throws \JsonException If the file does not exist, is not readable, contains invalid JSON, or does not contain an array of objects.
+     */
+    public static function jsonFileToObjectArray(string $filename): array
+    {
+        $cacheEnabled = ( extension_loaded('apcu') && function_exists('apcu_exists') && function_exists('apcu_store') && function_exists('apcu_fetch') );
+        $cacheKey     = 'jsoncache_objectarray_' . md5($filename);
+
+        // Try cache first
+        if ($cacheEnabled) {
+            $data = apcu_fetch($cacheKey, $success);
+            if ($success && is_array($data)) {
+                /** @var \stdClass[] $data */
+                return $data;
+            }
+        }
+
+        $rawContents = self::rawContentsFromFile($filename);
+        $jsonArr     = json_decode($rawContents, false, 512, JSON_THROW_ON_ERROR);
+        if (false === is_array($jsonArr)) {
+            throw new \JsonException('JSON file ' . $filename . ' does not contain an array of objects');
+        }
+        foreach ($jsonArr as $item) {
+            if (!$item instanceof \stdClass) {
+                throw new \JsonException('The decoded JSON is not an array of objects: we found an instance of ' . gettype($item) . ' for item ' . json_encode($item) . '.');
+            }
+        }
+
+        // Store in cache
+        if ($cacheEnabled) {
+            apcu_store($cacheKey, $jsonArr, 300);
+        }
+
+        /** @var \stdClass[] $jsonArr */
+        return $jsonArr;
+    }
+
+    /**
+     * Reads a JSON URL and converts its contents to an object.
+     *
+     * @param string $url The URL to the JSON data.
+     * @return \stdClass The decoded JSON data as an object.
+     * @throws ServiceUnavailableException if the URL does not exist or is not readable
+     * @throws \JsonException If the contents from the URL contain invalid JSON
+     * @throws ValidationException if the contents from the URL were not decoded as an object.
+     */
+    public static function jsonUrlToObject(string $url): \stdClass
+    {
+        $cacheEnabled = ( extension_loaded('apcu') && function_exists('apcu_exists') && function_exists('apcu_store') && function_exists('apcu_fetch') );
+        $cacheKey     = 'jsoncache_object_' . md5($url);
+
+        // Try cache first
+        if ($cacheEnabled) {
+            $data = apcu_fetch($cacheKey, $success);
+            if ($success && $data instanceof \stdClass) {
+                return $data;
+            }
+        }
+
+        $rawContents = self::rawContentsFromUrl($url);
+        $jsonObj     = json_decode($rawContents, false, 512, JSON_THROW_ON_ERROR);
+        if (false === $jsonObj instanceof \stdClass) {
+            throw new ValidationException('JSON URL ' . $url . ' does not contain an object');
+        }
+
+        // Store in cache
+        if ($cacheEnabled) {
+            apcu_store($cacheKey, $jsonObj, 300);
+        }
+
+        return $jsonObj;
+    }
+
+    /**
+     * Converts an object to an array.
+     *
+     * The object should contain public properties.
+     * This method is useful for a deep conversion of an object to an array.
+     *
+     * @param \stdClass $object The object to convert.
+     * @return array<string|int,mixed> The array representation of the object.
+     * @throws \Exception If unable to encode or decode the object.
+     */
+    public static function objectToArray(\stdClass $object): array
+    {
+        $encoded = json_encode($object, JSON_THROW_ON_ERROR);
+        $decoded = json_decode($encoded, true, 512, JSON_THROW_ON_ERROR);
+        /** @var array<string|int,mixed> $decoded */
+        return $decoded;
+    }
+
+    public static function ucfirst(string|false $str): string
+    {
+        if (false === $str) {
+            throw new \InvalidArgumentException('value is false, cannot capitalize the first letter');
+        }
+        return \ucfirst($str);
+    }
+
+    /**
+     * @param mixed[] $arr
+     */
+    public static function allStrings(array $arr): bool
+    {
+        foreach ($arr as $v) {
+            if (!is_string($v)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Function called after a successful installation of the Catholic Liturgical Calendar API.
-     * It prints a message of thanksgiving to God and a prayer for the Pope.
+     *
+     * It prints the typical motto of the Jesuits (see {@link https://it.cathopedia.org/wiki/Ad_Maiorem_Dei_Gloriam})
+     * and a prayer for the Pope (see {@link https://www.gregorianum.org/wiki/Oremus_pro_Pontifice}).
+     * It also ensures the `start-server.sh` and `stop-server.sh` scripts are executable,
+     * so that `composer start` and `composer stop` scripts will function correctly.
      *
      * @return void
      */
     public static function postInstall(): void
     {
+        $startScript = __DIR__ . '/../start-server.sh';
+        $stopScript  = __DIR__ . '/../stop-server.sh';
+
+        if (is_file($startScript) && !is_executable($startScript)) {
+            if (@chmod($startScript, 0755) === false) {
+                fprintf(STDERR, "Warning: unable to chmod +x %s\n", $startScript);
+            }
+        }
+
+        if (is_file($stopScript) && !is_executable($stopScript)) {
+            if (@chmod($stopScript, 0755) === false) {
+                fprintf(STDERR, "Warning: unable to chmod +x %s\n", $stopScript);
+            }
+        }
+
+        setlocale(LC_ALL, 'en_US.UTF-8');
         printf("\t\033[4m\033[1;44mCatholic Liturgical Calendar\033[0m\n");
         printf("\t\033[0;33mAd Majorem Dei Gloriam\033[0m\n");
-        printf("\t\033[0;36mOremus pro Pontifice nostro Francisco Dominus\n\tconservet eum et vivificet eum et beatum faciat eum in terra\n\tet non tradat eum in animam inimicorum ejus\033[0m\n");
+        printf("\t\033[0;36mOrémus pro Pontifice nostro Leone.\n\tDóminus consérvet eum, et vivificet eum,\n\tet beátum fáciat eum in terra,\n\tet non tradat eum in ánimam inimicórum éius\033[0m\n");
     }
 }

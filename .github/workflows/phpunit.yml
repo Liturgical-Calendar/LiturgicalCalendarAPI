@@ -1,0 +1,98 @@
+name: PHPUnit
+
+on:
+  push:
+    branches: [ development ]
+    paths: [
+      '**/*.php',
+      'composer.json',
+      'composer.lock',
+      'phpunit*.xml*',
+      '.env.example',
+      'jsondata/**',
+      'i18n/**'
+    ]
+  workflow_dispatch:
+
+concurrency:
+  # The ID of the concurrency group. This must be unique to this workflow.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # If true, cancel any previous runs in the same concurrency group.
+  cancel-in-progress: true
+
+env:
+  PHP_VERSION: '8.4'
+
+jobs:
+  phpunit_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+      - name: Setup PHP with PECL extensions
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: yaml, intl, zip, calendar, gettext, apcu, opcache
+          ini-values: apcu.enable_cli=1, opcache.enable=1, opcache.enable_cli=1
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: |
+            composer-
+
+      - name: Cache PHPUnit cache
+        uses: actions/cache@v4
+        with:
+          path: .phpunit.cache
+          key: phpunit-${{ hashFiles('phpunit.xml.dist') }}
+          restore-keys: phpunit-
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-progress
+
+      - name: Copy env file
+        run: cp .env.example .env.local
+
+      - name: Install gettext + locales
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gettext locales-all
+
+      - name: Start the PHP web server
+        run: composer start
+
+      - name: Wait for server PID and HTTP readiness
+        id: server-check
+        run: |
+          MAX_WAIT=10   # max seconds to wait
+          COUNT=0
+          while [ ! -f server.pid ] && [ $COUNT -lt $MAX_WAIT ]; do
+            sleep 1
+            COUNT=$((COUNT + 1))
+          done
+
+          if [ -f server.pid ]; then
+            echo "Server is running."
+          else
+            echo "Server failed to start within $MAX_WAIT seconds."
+            exit 1
+          fi
+
+          for i in {1..30}; do
+            if curl -fsS http://localhost:8000/ > /dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          exit 1
+
+      - name: Run tests
+        run: |
+          composer dump-autoload --optimize
+          time composer test

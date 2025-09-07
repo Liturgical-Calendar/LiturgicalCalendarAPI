@@ -2,45 +2,79 @@
 
 namespace LiturgicalCalendar\Api\Enum;
 
-class LitSchema
-{
-    private const SCHEMA_BASE_PATH = API_BASE_PATH . '/jsondata/schemas';
-    public const DIOCESAN          = self::SCHEMA_BASE_PATH . "/DiocesanCalendar.json";
-    public const NATIONAL          = self::SCHEMA_BASE_PATH . "/NationalCalendar.json";
-    public const PROPRIUMDESANCTIS = self::SCHEMA_BASE_PATH . "/PropriumDeSanctis.json";
-    public const PROPRIUMDETEMPORE = self::SCHEMA_BASE_PATH . "/PropriumDeTempore.json";
-    public const WIDERREGION       = self::SCHEMA_BASE_PATH . "/WiderRegionCalendar.json";
-    public const DECREES           = self::SCHEMA_BASE_PATH . "/LitCalDecreesPath.json";
-    public const DECREES_SRC       = self::SCHEMA_BASE_PATH . "/LitCalDecreesSource.json";
-    public const I18N              = self::SCHEMA_BASE_PATH . "/LitCalTranslation.json";
-    public const METADATA          = self::SCHEMA_BASE_PATH . "/LitCalMetadata.json";
-    public const LITCAL            = self::SCHEMA_BASE_PATH . "/LitCal.json";
-    public const EVENTS            = self::SCHEMA_BASE_PATH . "/LitCalEventsPath.json";
-    public const TESTS             = self::SCHEMA_BASE_PATH . "/LitCalTestsPath.json";
-    public const TEST_SRC          = self::SCHEMA_BASE_PATH . "/LitCalTest.json";
-    public const MISSALS           = self::SCHEMA_BASE_PATH . "/LitCalMissalsPath.json";
-    public const EASTER            = self::SCHEMA_BASE_PATH . "/LitCalEasterPath.json";
-    public const DATA              = self::SCHEMA_BASE_PATH . "/LitCalDataPath.json";
-    public const SCHEMAS           = self::SCHEMA_BASE_PATH . "/LitCalSchemasPath.json";
+use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 
-    private const ERRMSG           = "Schema validation error: ";
-    public const ERROR_MESSAGES = [
-        LitSchema::DIOCESAN          => self::ERRMSG . "Diocesan Calendar not created / updated",
-        LitSchema::NATIONAL          => self::ERRMSG . "National Calendar not created / updated",
-        LitSchema::PROPRIUMDESANCTIS => self::ERRMSG . "Proprium de Sanctis data not created / updated",
-        LitSchema::PROPRIUMDETEMPORE => self::ERRMSG . "Proprium de Tempore data not created / updated",
-        LitSchema::WIDERREGION       => self::ERRMSG . "Wider Region data not created / updated",
-        LitSchema::DECREES           => self::ERRMSG . "Memorials from Decrees data not created / updated",
-        LitSchema::DECREES_SRC       => self::ERRMSG . "Memorials from Decrees Source data not created / updated",
-        LitSchema::I18N              => self::ERRMSG . "Translation data not created / updated",
-        LitSchema::METADATA          => self::ERRMSG . "LitCalMetadata not valid",
-        LitSchema::LITCAL            => self::ERRMSG . "LitCal not valid",
-        LitSchema::EVENTS            => self::ERRMSG . "Events path data not valid",
-        LitSchema::TESTS             => self::ERRMSG . "Tests path data not valid",
-        LitSchema::TEST_SRC          => self::ERRMSG . "Test data not valid",
-        LitSchema::MISSALS           => self::ERRMSG . "Missals path data not valid",
-        LitSchema::EASTER            => self::ERRMSG . "Easter path data not valid",
-        LitSchema::DATA              => self::ERRMSG . "Data path data not valid",
-        LitSchema::SCHEMAS           => self::ERRMSG . "Schemas path data not valid"
-    ];
+enum LitSchema: string
+{
+    case DIOCESAN          = '/DiocesanCalendar.json';
+    case NATIONAL          = '/NationalCalendar.json';
+    case PROPRIUMDESANCTIS = '/PropriumDeSanctis.json';
+    case PROPRIUMDETEMPORE = '/PropriumDeTempore.json';
+    case WIDERREGION       = '/WiderRegionCalendar.json';
+    case DECREES           = '/LitCalDecreesPath.json';
+    case DECREES_SRC       = '/LitCalDecreesSource.json';
+    case I18N              = '/LitCalTranslation.json';
+    case METADATA          = '/LitCalMetadata.json';
+    case LITCAL            = '/LitCal.json';
+    case EVENTS            = '/LitCalEventsPath.json';
+    case TESTS             = '/LitCalTestsPath.json';
+    case TEST_SRC          = '/LitCalTest.json';
+    case MISSALS           = '/LitCalMissalsPath.json';
+    case EASTER            = '/LitCalEasterPath.json';
+    case DATA              = '/LitCalDataPath.json';
+    case SCHEMAS           = '/LitCalSchemasPath.json';
+
+    public function path(): string
+    {
+        return JsonData::SCHEMAS_FOLDER->path() . $this->value;
+    }
+
+    public function error(): string
+    {
+        $ERRMSG = 'Schema validation error: ';
+        return match ($this) {
+            LitSchema::DIOCESAN          => $ERRMSG . 'Diocesan Calendar not created / updated',
+            LitSchema::NATIONAL          => $ERRMSG . 'National Calendar not created / updated',
+            LitSchema::PROPRIUMDESANCTIS => $ERRMSG . 'Proprium de Sanctis data not created / updated',
+            LitSchema::PROPRIUMDETEMPORE => $ERRMSG . 'Proprium de Tempore data not created / updated',
+            LitSchema::WIDERREGION       => $ERRMSG . 'Wider Region data not created / updated',
+            LitSchema::DECREES           => $ERRMSG . 'Memorials from Decrees data not created / updated',
+            LitSchema::DECREES_SRC       => $ERRMSG . 'Memorials from Decrees Source data not created / updated',
+            LitSchema::I18N              => $ERRMSG . 'Translation data not created / updated',
+            LitSchema::METADATA => $ERRMSG . 'LitCalMetadata not valid',
+            LitSchema::LITCAL   => $ERRMSG . 'LitCal not valid',
+            LitSchema::EVENTS   => $ERRMSG . 'Events path data not valid',
+            LitSchema::TESTS    => $ERRMSG . 'Tests path data not valid',
+            LitSchema::TEST_SRC => $ERRMSG . 'Test data not valid',
+            LitSchema::MISSALS  => $ERRMSG . 'Missals path data not valid',
+            LitSchema::EASTER   => $ERRMSG . 'Easter path data not valid',
+            LitSchema::DATA     => $ERRMSG . 'Data path data not valid',
+            LitSchema::SCHEMAS  => $ERRMSG . 'Schemas path data not valid'
+        };
+    }
+
+    public static function fromURL(string $url): LitSchema
+    {
+        return match ($url) {
+            LitSchema::DIOCESAN->path()          => LitSchema::DIOCESAN,
+            LitSchema::NATIONAL->path()          => LitSchema::NATIONAL,
+            LitSchema::PROPRIUMDESANCTIS->path() => LitSchema::PROPRIUMDESANCTIS,
+            LitSchema::PROPRIUMDETEMPORE->path() => LitSchema::PROPRIUMDETEMPORE,
+            LitSchema::WIDERREGION->path()       => LitSchema::WIDERREGION,
+            LitSchema::DECREES->path()           => LitSchema::DECREES,
+            LitSchema::DECREES_SRC->path()       => LitSchema::DECREES_SRC,
+            LitSchema::I18N->path()              => LitSchema::I18N,
+            LitSchema::METADATA->path()          => LitSchema::METADATA,
+            LitSchema::LITCAL->path()            => LitSchema::LITCAL,
+            LitSchema::EVENTS->path()            => LitSchema::EVENTS,
+            LitSchema::TESTS->path()             => LitSchema::TESTS,
+            LitSchema::TEST_SRC->path()          => LitSchema::TEST_SRC,
+            LitSchema::MISSALS->path()           => LitSchema::MISSALS,
+            LitSchema::EASTER->path()            => LitSchema::EASTER,
+            LitSchema::DATA->path()              => LitSchema::DATA,
+            LitSchema::SCHEMAS->path()           => LitSchema::SCHEMAS,
+            default                              => throw new ValidationException('Invalid schema URL: ' . $url)
+        };
+    }
 }

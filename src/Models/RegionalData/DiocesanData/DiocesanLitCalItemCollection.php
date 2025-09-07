@@ -1,0 +1,93 @@
+<?php
+
+namespace LiturgicalCalendar\Api\Models\RegionalData\DiocesanData;
+
+use LiturgicalCalendar\Api\Models\AbstractJsonSrcDataArray;
+
+/**
+ * Represents a collection of liturgical calendar items.
+ *
+ * @phpstan-import-type LiturgicalEventArray from \LiturgicalCalendar\Api\Models\LitCalItemCollection
+ * @phpstan-import-type LiturgicalEventObject from \LiturgicalCalendar\Api\Models\LitCalItemCollection
+ * @implements \IteratorAggregate<DiocesanLitCalItem>
+ */
+final class DiocesanLitCalItemCollection extends AbstractJsonSrcDataArray implements \IteratorAggregate
+{
+    /** @var DiocesanLitCalItem[] */
+    public readonly array $litcalItems;
+
+    /**
+     * Constructs a new LitCalItemCollection instance.
+     *
+     * This constructor initializes the collection with an array of liturgical calendar items.
+     * Each item in the array is converted into an instance of LitCalItem.
+     *
+     * @param DiocesanLitCalItem[] $litcalItems An array of liturgical calendar items.
+     */
+    private function __construct(array $litcalItems)
+    {
+        $this->litcalItems = $litcalItems;
+    }
+
+    /**
+     * @return \Traversable<DiocesanLitCalItem> An iterator for the items in the collection.
+     */
+    public function getIterator(): \Traversable
+    {
+        return new \ArrayIterator($this->litcalItems);
+    }
+
+
+    /**
+     * Creates an instance of DiocesanLitCalItemCollection from an associative array.
+     *
+     * The array must not be empty.
+     * The elements of the array can be either associative arrays or objects.
+     * If the elements are associative arrays, they must have the same keys as the properties of DiocesanLitCalItem.
+     * If the elements are objects, they must have the same properties as DiocesanLitCalItem.
+     *
+     * @param LiturgicalEventArray[] $data The associative array containing the properties of the class.
+     * @return static The newly created instance.
+     * @throws \TypeError if the array is empty.
+     */
+    protected static function fromArrayInternal(array $data): static
+    {
+        if (0 === count($data)) {
+            throw new \TypeError('litcal parameter must be an array and must not be empty');
+        }
+        if (reset($data) instanceof \stdClass) {
+            throw new \InvalidArgumentException('Perhaps you meant to use fromObject?');
+        } else {
+            /** @var LiturgicalEventArray[] $data */
+            $items = array_values(array_map(
+                /** @param LiturgicalEventArray $litCalItem */
+                fn (array $litcalItem): DiocesanLitCalItem => DiocesanLitCalItem::fromArray($litcalItem),
+                $data
+            ));
+        }
+        return new static($items);
+    }
+
+    /**
+     * Creates an instance of DiocesanLitCalItemCollection from an array of stdClass objects.
+     *
+     * The input array must be non-empty and contain stdClass objects that can be
+     * converted into DiocesanLitCalItem instances.
+     *
+     * @param LiturgicalEventObject[] $data An array of stdClass objects containing the properties of the class.
+     * @return static The newly created instance.
+     * @throws \TypeError If the array is empty.
+     * @throws \InvalidArgumentException If the elements are not stdClass objects.
+     */
+    protected static function fromObjectInternal(array $data): static
+    {
+        if (0 === count($data)) {
+            throw new \TypeError('litcal parameter must be an array and must not be empty');
+        }
+        if (reset($data) instanceof \stdClass) {
+            return new static(array_values(array_map(fn (\stdClass $litcalItem): DiocesanLitCalItem => DiocesanLitCalItem::fromObject($litcalItem), $data)));
+        } else {
+            throw new \InvalidArgumentException('Perhaps you meant to use fromArray?');
+        }
+    }
+}

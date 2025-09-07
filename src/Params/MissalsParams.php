@@ -3,138 +3,128 @@
 namespace LiturgicalCalendar\Api\Params;
 
 use LiturgicalCalendar\Api\Enum\LitLocale;
-use LiturgicalCalendar\Api\Enum\StatusCode;
-use LiturgicalCalendar\Api\Paths\Missals;
-
-class MissalsParams
-{
-    public bool $IncludeEmpty           = false;
-    public ?string $Region              = null;
-    public ?int $Year                   = null;
-    public ?string $Locale              = null;
-    public ?string $baseLocale          = null;
-    private array $availableLangs       = [];
-    private static array $MissalRegions = [];
-    private static array $MissalYears   = [];
-    public const int ERROR_NONE         = 0;
-    public const int ERROR              = 1;
-    private static int $last_error      = MissalsParams::ERROR_NONE;
-    private static StatusCode $last_error_status;
-    private static string $last_error_msg;
-
-    public function __construct(?array $DATA = null)
-    {
-        if (null !== $DATA) {
-            $this->setData($DATA);
-        }
-    }
-
-    public function setData(array $DATA = [])
-    {
-        if (count($DATA)) {
-            foreach ($DATA as $key => $value) {
-                switch ($key) {
-                    case 'locale':
-                        $value = \Locale::canonicalize($value);
-                        if (LitLocale::isValid($value)) {
-                            $this->Locale = $value;
-                            $this->baseLocale = \Locale::getPrimaryLanguage($value);
-                        } else {
-                            $error = "Locale `$value` set in param `locale` is not supported by this server, supported locales are: la, la_VA, "
-                                . implode(', ', LitLocale::$AllAvailableLocales);
-                            //$this->setLastError(StatusCode::BAD_REQUEST, $error);
-                            Missals::produceErrorResponse(StatusCode::BAD_REQUEST, $error);
-                        }
-                        if (count($this->availableLangs) && false === in_array($this->baseLocale, $this->availableLangs)) {
-                            $message = "Locale `$value` ({$this->baseLocale}) set in param `locale` is not a valid locale for the requested Missal, valid locales are: "
-                                    . implode(', ', $this->availableLangs);
-                            //$this->setLastError(StatusCode::BAD_REQUEST, $message);
-                            Missals::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
-                        }
-                        break;
-                    case 'year':
-                        if (gettype($value) === 'string') {
-                            $value = intval($value);
-                        }
-                        if (in_array($value, self::$MissalYears)) {
-                            $this->Year = $value;
-                        } else {
-                            $message = "Invalid value `$value` for param `year`, valid values are: "
-                                . implode(', ', self::$MissalYears);
-                            //$this->setLastError(StatusCode::BAD_REQUEST, $message);
-                            Missals::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
-                        }
-                        break;
-                    case 'region':
-                        if (in_array($value, self::$MissalRegions)) {
-                            $this->Region = $value;
-                        } else {
-                            $message = "Invalid value `$value` for param `region`, valid values are: "
-                                . implode(', ', self::$MissalRegions);
-                            //$this->setLastError(StatusCode::BAD_REQUEST, $message);
-                            Missals::produceErrorResponse(StatusCode::BAD_REQUEST, $message);
-                        }
-                        break;
-                    case 'include_empty':
-                        $this->IncludeEmpty = filter_var($value, FILTER_VALIDATE_BOOLEAN);
-                        break;
-                    default:
-                        // do nothing
-                        break;
-                }
-            }
-        }
-    }
-
+use LiturgicalCalendar\Api\Handlers\MissalsHandler;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 
 /**
- * Could consider using these functions to set error, rather than using the Missals class produceErrorMessage
- * Then the Missals class would check, every time it sets params data:
- *      if (self::$params->last_error() !== MissalsParams::ERROR_NONE) {
- *          self::produceErrorMessage(self::$params->last_error_status(), self::$params->last_error_msg());
- *      }
+ * Class MissalsParams
+ *
+ * This class handles the parameters for the Missals API endpoint.
+ * It validates and sets the locale, year, region, and whether to include empty entries.
+ *
+ * @package LiturgicalCalendar\Api\Params
  */
-    private function setLastError(StatusCode $status, string $message): void
+class MissalsParams implements ParamsInterface
+{
+    public bool $IncludeEmpty  = false;
+    public ?string $Region     = null;
+    public ?int $Year          = null;
+    public ?string $Locale     = null;
+    public ?string $baseLocale = null;
+    public \stdClass $Payload;
+
+    /**
+     * Initializes the MissalsParams class.
+     *
+     * Calls the setParams method to set the parameters provided in the $params array, in any.
+     *
+     * @param array{locale?:string,year?:int,region?:string,include_empty?:bool,payload?:\stdClass} $params an associative array of parameter keys to values
+     */
+    public function __construct(array $params)
     {
-        self::$last_error        = self::ERROR;
-        self::$last_error_status = $status;
-        self::$last_error_msg    = $message;
+        $this->setParams($params);
     }
 
-    //phpcs:ignore PSR1.Methods.CamelCapsMethodName
-    public function last_error()
+    /**
+     * Sets parameters on this instance and validates locale/year/region/include_empty.
+     *
+     * @param array{locale?:string,year?:int,region?:string,include_empty?:bool,payload?:\stdClass} $params an associative array of parameter keys to values
+     */
+    public function setParams(array $params): void
     {
-        return self::$last_error;
-    }
-
-    //phpcs:ignore PSR1.Methods.CamelCapsMethodName
-    public function last_error_msg()
-    {
-        return self::$last_error_msg;
-    }
-
-    //phpcs:ignore PSR1.Methods.CamelCapsMethodName
-    public function last_error_status(): StatusCode
-    {
-        return self::$last_error_status;
-    }
-
-    public function addMissalRegion(string $region)
-    {
-        if (false === in_array($region, self::$MissalRegions)) {
-            self::$MissalRegions[] = $region;
+        if (count($params) === 0) {
+            // If no parameters are provided, we can just return
+            return;
         }
-    }
-
-    public function addMissalYear(string $year)
-    {
-        if (false === in_array($year, self::$MissalYears)) {
-            self::$MissalYears[] = $year;
+        if (null === MissalsHandler::$missalsIndex) {
+            throw new ServiceUnavailableException('Missals index temporarily unavailable');
         }
-    }
 
-    public function setAvailableLangs(array $langs)
-    {
-        $this->availableLangs = $langs;
+        foreach ($params as $key => $value) {
+            switch ($key) {
+                case 'locale':
+                    $value = \Locale::canonicalize($value);
+                    if (null === $value) {
+                        $description = "Invalid locale `{$value}`";
+                        throw new ValidationException($description);
+                    }
+
+                    if (LitLocale::isValid($value)) {
+                        $this->Locale     = $value;
+                        $this->baseLocale = \Locale::getPrimaryLanguage($value);
+                    } else {
+                        $description = "Locale `$value` set in param `locale` is not supported by this server, supported locales are: la, la_VA, "
+                            . implode(', ', LitLocale::$AllAvailableLocales);
+                        throw new ValidationException($description);
+                    }
+
+                    if (count(MissalsHandler::$availableLangs) && false === in_array($this->baseLocale, MissalsHandler::$availableLangs)) {
+                        $description = "Locale `$value` ({$this->baseLocale}) set in param `locale` is not a valid locale for the requested Missal, valid locales are: "
+                                . implode(', ', MissalsHandler::$availableLangs);
+                        throw new ValidationException($description);
+                    }
+                    break;
+                case 'year':
+                    if (is_string($value)) {
+                        $validated = filter_var($value, FILTER_VALIDATE_INT);
+                        if (false === $validated) {
+                            $description = "Invalid value `$value` for param `year`, it must be an integer";
+                            throw new ValidationException($description);
+                        }
+                        $value = $validated;
+                    }
+                    $years = MissalsHandler::$missalsIndex->getMissalYears();
+
+                    if (in_array((int) $value, array_map('intval', $years), true)) {
+                        $this->Year = $value;
+                    } else {
+                        $description = "Invalid value `$value` for param `year`, valid values are: "
+                            . implode(', ', $years);
+                        throw new ValidationException($description);
+                    }
+                    break;
+                case 'region':
+                    $regions = MissalsHandler::$missalsIndex->getMissalRegions();
+                    if (in_array($value, $regions, true)) {
+                        $this->Region = $value;
+                    } else {
+                        $description = "Invalid value `$value` for param `region`, valid values are: "
+                            . implode(', ', $regions);
+                        throw new ValidationException($description);
+                    }
+                    break;
+                case 'include_empty':
+                    $boolVal = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                    if (null === $boolVal) {
+                        $description = "Invalid value `$value` for param `include_empty`, valid values are boolean `true` and `false`";
+                        throw new ValidationException($description);
+                    }
+                    $this->IncludeEmpty = $boolVal;
+
+                    // If an explicit request is made to include all Missals defined in the RomanMissal enum,
+                    // even if there is no data for them in the JsonData::MISSALS_FOLDER directory,
+                    // we add them to the response.
+                    if ($this->IncludeEmpty) {
+                        MissalsHandler::$missalsIndex->setIncludeEmpty(true);
+                    }
+                    break;
+                case 'payload':
+                    $this->Payload = $value;
+                    break;
+                default:
+                    // do nothing
+            }
+        }
     }
 }

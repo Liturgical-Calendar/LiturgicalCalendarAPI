@@ -2,14 +2,10 @@
 
 namespace LiturgicalCalendar\Api\Enum;
 
-class CorpusChristi
+enum CorpusChristi: string
 {
-    public const THURSDAY          = "THURSDAY";
-    public const SUNDAY            = "SUNDAY";
-    public static array $values = [ "THURSDAY", "SUNDAY" ];
+    use EnumToArrayTrait;
 
-    public static function isValid($value)
-    {
-        return in_array($value, self::$values);
-    }
+    case THURSDAY = 'THURSDAY';
+    case SUNDAY   = 'SUNDAY';
 }

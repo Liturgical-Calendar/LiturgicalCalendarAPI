@@ -1,7 +1,7 @@
 {
     "litcal": [
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StBenedict",
                 "grade": 4
             },
@@ -17,7 +17,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StsCyrilMethodius",
                 "grade": 4
             },
@@ -34,7 +34,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StBridget",
                 "grade": 4
             },
@@ -54,7 +54,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StCatherineSiena",
                 "grade": 4
             },
@@ -74,7 +74,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StEdithStein",
                 "color": [
                     "white",
@@ -86,14 +86,7 @@
                 "common": [
                     "Martyrs:For a Virgin Martyr",
                     "Virgins:For One Virgin"
-                ],
-                "readings": {
-                    "first_reading": "",
-                    "responsorial_psalm": "",
-                    "second_reading": "",
-                    "alleluia_verse": "",
-                    "gospel": ""
-                }
+                ]
             },
             "metadata": {
                 "action": "createNew",
@@ -112,7 +105,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StEdithStein",
                 "grade": 4
             },

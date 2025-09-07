@@ -1,0 +1,7 @@
+parameters:
+    level: 10
+    paths:
+        - src
+    universalObjectCratesClasses:
+        - Ratchet\ConnectionInterface
+    treatPhpDocTypesAsCertain: false

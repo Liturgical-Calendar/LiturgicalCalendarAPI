@@ -1,7 +1,7 @@
 {
     "litcal": [
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "StPeterCanisius",
                 "grade": 3
             },
@@ -12,7 +12,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "HLidwina",
                 "color": [
                     "white"
@@ -22,13 +22,7 @@
                 "month": 6,
                 "common": [
                     "Proper"
-                ],
-                "readings": {
-                    "first_reading": "",
-                    "responsorial_psalm": "",
-                    "alleluia_verse": "",
-                    "gospel": ""
-                }
+                ]
             },
             "metadata": {
                 "action": "createNew",
@@ -36,7 +30,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "MartelarenGorcum",
                 "color": [
                     "red"
@@ -46,13 +40,7 @@
                 "month": 7,
                 "common": [
                     "Proper"
-                ],
-                "readings": {
-                    "first_reading": "",
-                    "responsorial_psalm": "",
-                    "alleluia_verse": "",
-                    "gospel": ""
-                }
+                ]
             },
             "metadata": {
                 "action": "createNew",
@@ -60,7 +48,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "Brandsma",
                 "color": [
                     "red"
@@ -78,7 +66,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "VerjaardagWijdingKerken",
                 "color": [
                     "white"
@@ -88,13 +76,7 @@
                 "month": 10,
                 "common": [
                     "Proper"
-                ],
-                "readings": {
-                    "first_reading": "",
-                    "responsorial_psalm": "",
-                    "alleluia_verse": "",
-                    "gospel": ""
-                }
+                ]
             },
             "metadata": {
                 "action": "createNew",
@@ -102,7 +84,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "Verkondigers",
                 "color": [
                     "white"
@@ -112,13 +94,7 @@
                 "month": 11,
                 "common": [
                     "Proper"
-                ],
-                "readings": {
-                    "first_reading": "",
-                    "responsorial_psalm": "",
-                    "alleluia_verse": "",
-                    "gospel": ""
-                }
+                ]
             },
             "metadata": {
                 "action": "createNew",
@@ -126,7 +102,7 @@
             }
         },
         {
-            "festivity": {
+            "liturgical_event": {
                 "event_key": "Willibrord",
                 "color": [
                     "white"
@@ -136,13 +112,7 @@
                 "month": 11,
                 "common": [
                     "Proper"
-                ],
-                "readings": {
-                    "first_reading": "",
-                    "responsorial_psalm": "",
-                    "alleluia_verse": "",
-                    "gospel": ""
-                }
+                ]
             },
             "metadata": {
                 "action": "createNew",

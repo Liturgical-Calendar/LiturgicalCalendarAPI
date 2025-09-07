@@ -1,0 +1,128 @@
+{
+    "ChristmasWeekdayDec29": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "ChristmasWeekdayDec30": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "ChristmasWeekdayDec31": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "ChristmasWeekdayJan2": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "ChristmasWeekdayJan3": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "ChristmasWeekdayJan4": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "ChristmasWeekdayJan5": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "ChristmasWeekdayJan6": {
+        "first_reading": "1 Giovanni 5, 5-13",
+        "responsorial_psalm": "Salmo 147",
+        "gospel_acclamation": "Marco 9, 7",
+        "gospel": "Marco 1, 7-11|Luca 3, 23-38"
+    },
+    "ChristmasWeekdayJan7": {
+        "first_reading": "1 Giovanni 5, 14-21",
+        "responsorial_psalm": "Salmo 149",
+        "gospel_acclamation": "Luca 7, 16",
+        "gospel": "Giovanni 2, 1-11"
+    },
+    "DayAfterEpiphanyJan7": {
+        "first_reading": "1 Giovanni 3, 22–4, 6",
+        "responsorial_psalm": "Salmo 2",
+        "gospel_acclamation": "Matteo 4, 23",
+        "gospel": "Matteo 4, 12-17.23-25"
+    },
+    "DayAfterEpiphanyJan8": {
+        "first_reading": "1 Giovanni 4, 7-10",
+        "responsorial_psalm": "Salmo 71 (72)",
+        "gospel_acclamation": "Luca 4, 18",
+        "gospel": "Marco 6, 34-44"
+    },
+    "DayAfterEpiphanyJan9": {
+        "first_reading": "1 Giovanni 4, 11-18",
+        "responsorial_psalm": "Salmo 71 (72)",
+        "gospel_acclamation": "1 Timoteo 3, 16",
+        "gospel": "Marco 6, 45-52"
+    },
+    "DayAfterEpiphanyJan10": {
+        "first_reading": "1 Giovanni 4, 19–5, 4",
+        "responsorial_psalm": "Salmo 71 (72)",
+        "gospel_acclamation": "Luca 4, 18",
+        "gospel": "Luca 4, 14-22a"
+    },
+    "DayAfterEpiphanyJan11": {
+        "first_reading": "1 Giovanni 5, 5-13",
+        "responsorial_psalm": "Salmo 147",
+        "gospel_acclamation": "Matteo 4, 23",
+        "gospel": "Luca 5, 12-16"
+    },
+    "DayAfterEpiphanyJan12": {
+        "first_reading": "1 Giovanni 5, 14-21",
+        "responsorial_psalm": "Salmo 149",
+        "gospel_acclamation": "Matteo 4, 16",
+        "gospel": "Giovanni 3, 22-30"
+    },
+    "DayAfterEpiphanyMonday": {
+        "first_reading": "1 Giovanni 3, 22–4, 6",
+        "responsorial_psalm": "Salmo 2",
+        "gospel_acclamation": "Matteo 4, 23",
+        "gospel": "Matteo 4, 12-17.23-25"
+    },
+    "DayAfterEpiphanyTuesday": {
+        "first_reading": "1 Giovanni 4, 7-10",
+        "responsorial_psalm": "Salmo 71 (72)",
+        "gospel_acclamation": "Luca 4, 18",
+        "gospel": "Marco 6, 34-44"
+    },
+    "DayAfterEpiphanyWednesday": {
+        "first_reading": "1 Giovanni 4, 11-18",
+        "responsorial_psalm": "Salmo 71 (72)",
+        "gospel_acclamation": "1 Timoteo 3, 16",
+        "gospel": "Marco 6, 45-52"
+    },
+    "DayAfterEpiphanyThursday": {
+        "first_reading": "1 Giovanni 4, 19–5, 4",
+        "responsorial_psalm": "Salmo 71 (72)",
+        "gospel_acclamation": "Luca 4, 18",
+        "gospel": "Luca 4, 14-22a"
+    },
+    "DayAfterEpiphanyFriday": {
+        "first_reading": "1 Giovanni 5, 5-13",
+        "responsorial_psalm": "Salmo 147",
+        "gospel_acclamation": "Matteo 4, 23",
+        "gospel": "Luca 5, 12-16"
+    },
+    "DayAfterEpiphanySaturday": {
+        "first_reading": "1 Giovanni 5, 14-21",
+        "responsorial_psalm": "Salmo 149",
+        "gospel_acclamation": "Matteo 4, 16",
+        "gospel": "Giovanni 3, 22-30"
+    }
+}

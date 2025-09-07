@@ -12,7 +12,7 @@
             <xs:sequence>
               <xs:element name="LitCalEvent" maxOccurs="unbounded">
                 <xs:complexType>
-                  <xs:sequence>
+                  <xs:all>
                     <xs:element name="Color">
                       <xs:complexType>
                         <xs:sequence>
@@ -78,7 +78,7 @@
                     </xs:element>
                     <xs:element name="DayOfTheWeekLong" type="xs:string" />
                     <xs:element name="DayOfTheWeekShort" type="xs:string" />
-                    <xs:element name="EventIdx" type="xs:string" />
+                    <xs:element name="EventIdx" type="xs:unsignedShort" />
                     <xs:element name="EventKey" type="xs:string" />
                     <xs:element name="Grade">
                       <xs:simpleType>
@@ -95,8 +95,9 @@
                       </xs:simpleType>
                     </xs:element>
                     <xs:element name="GradeAbbr" type="xs:string" />
-                    <xs:element name="GradeDisplay" type="xs:string" />
+                    <xs:element name="GradeDisplay" type="xs:string" nillable="true" />
                     <xs:element name="GradeLcl" type="xs:string" />
+                    <xs:element name="Readings" type="cl:ReadingsType" />
                     <xs:element name="HasVesperI" minOccurs="0" type="xs:boolean" />
                     <xs:element name="HasVesperII" minOccurs="0" type="xs:boolean" />
                     <xs:element name="HasVigilMass" minOccurs="0" type="xs:boolean" />
@@ -143,7 +144,7 @@
                         </xs:restriction>
                       </xs:simpleType>
                     </xs:element>
-                  </xs:sequence>
+                  </xs:all>
                   <xs:attribute name="idx" type="xs:integer" use="required" />
                 </xs:complexType>
               </xs:element>
@@ -225,17 +226,45 @@
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
+              <xs:element name="SolemnitiesLordBVM">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="LitCalEvent" type="cl:LitCalEventType" minOccurs="10" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="SolemnitiesLordBVMKeys">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Key" type="cl:KeyType" minOccurs="10" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
               <xs:element name="Solemnities">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element name="LitCalEvent" type="cl:LitCalEventType" minOccurs="70" maxOccurs="unbounded" />
+                    <xs:element name="LitCalEvent" type="cl:LitCalEventType" minOccurs="40" maxOccurs="unbounded" />
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
               <xs:element name="SolemnitiesKeys">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element name="Key" type="cl:KeyType" minOccurs="70" maxOccurs="unbounded" />
+                    <xs:element name="Key" type="cl:KeyType" minOccurs="40" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="FeastsLord">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="LitCalEvent" type="cl:LitCalEventType" minOccurs="30" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="FeastsLordKeys">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Key" type="cl:KeyType" minOccurs="30" maxOccurs="unbounded" />
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
@@ -323,7 +352,7 @@
       <xs:enumeration value="red" />
       <xs:enumeration value="white" />
       <xs:enumeration value="purple" />
-      <xs:enumeration value="pink" />
+      <xs:enumeration value="rose" />
     </xs:restriction>
   </xs:simpleType>
   <xs:complexType name="LitCalEventType">
@@ -355,5 +384,128 @@
         <xs:attribute type="xs:short" name="idx" use="required" />
       </xs:extension>
     </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="ReadingsType" abstract="true" mixed="true" />
+  <xs:complexType name="ReadingsFerialType" mixed="true">
+    <xs:complexContent>
+      <xs:extension base="cl:ReadingsType">
+        <xs:sequence>
+          <xs:element name="FirstReading" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="ResponsorialPsalm" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="GospelAcclamation" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="Gospel" type="xs:string" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="readingsType" type="xs:string" use="required" fixed="ferial"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ReadingsFestiveType" mixed="true">
+    <xs:complexContent>
+      <xs:extension base="cl:ReadingsType">
+        <xs:sequence>
+          <xs:element name="FirstReading" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="ResponsorialPsalm" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="SecondReading" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="GospelAcclamation" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="Gospel" type="xs:string" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="readingsType" type="xs:string" use="required" fixed="festive" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ReadingsPalmSundayType" mixed="true">
+    <xs:complexContent>
+      <xs:extension base="cl:ReadingsType">
+        <xs:sequence>
+          <xs:element name="PalmGospel" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="FirstReading" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="ResponsorialPsalm" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="SecondReading" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="GospelAcclamation" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="Gospel" type="xs:string" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="readingsType" type="xs:string" use="required" fixed="palmSunday" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ReadingsEasterVigilType" mixed="true">
+    <xs:complexContent>
+      <xs:extension base="cl:ReadingsType">
+        <xs:sequence>
+          <xs:element name="FirstReading" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="ResponsorialPsalm" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="SecondReading" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="ResponsorialPsalm2" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="ThirdReading" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="ResponsorialPsalm3" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="FourthReading" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="ResponsorialPsalm4" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="FifthReading" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="ResponsorialPsalm5" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="SixthReading" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="ResponsorialPsalm6" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="SeventhReading" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="ResponsorialPsalm7" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="Epistle" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="ResponsorialPsalmEpistle" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="GospelAcclamation" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="Gospel" type="xs:string" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="readingsType" type="xs:string" use="required" fixed="easterVigil" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ReadingsChristmasType" mixed="true">
+    <xs:complexContent>
+      <xs:extension base="cl:ReadingsType">
+        <xs:sequence>
+          <xs:element name="Night" type="cl:ReadingsFestiveType" minOccurs="1" maxOccurs="1" />
+          <xs:element name="Dawn" type="cl:ReadingsFestiveType" minOccurs="1" maxOccurs="1" />
+          <xs:element name="Day" type="cl:ReadingsFestiveType" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="readingsType" type="xs:string" use="required" fixed="christmas" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ReadingsMultipleSchemasType" mixed="true"><!-- e.g. All Souls Day or Commemoration of the Faithful Departed -->
+    <xs:complexContent>
+      <xs:extension base="cl:ReadingsType">
+        <xs:sequence>
+          <xs:element name="SchemaOne" type="cl:ReadingsFestiveType" minOccurs="1" maxOccurs="1" />
+          <xs:element name="SchemaTwo" type="cl:ReadingsFestiveType" minOccurs="1" maxOccurs="1" />
+          <xs:element name="SchemaThree" type="cl:ReadingsFestiveType" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="readingsType" type="xs:string" use="required" fixed="multipleSchemas" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ReadingsSeasonalType" mixed="true">
+    <xs:complexContent>
+      <xs:extension base="cl:ReadingsType">
+        <xs:sequence>
+          <xs:element name="OutsideEasterSeason" type="cl:ReadingsFerialType" minOccurs="1" maxOccurs="1" />
+          <xs:element name="EasterSeason" type="cl:ReadingsFerialType" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="readingsType" type="xs:string" use="required" fixed="seasonal" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ReadingsWithEveningMassType" mixed="true"><!-- e.g. Easter Sunday -->
+    <xs:complexContent>
+      <xs:extension base="cl:ReadingsType">
+        <xs:sequence>
+          <xs:element name="Day" type="cl:ReadingsFestiveType" minOccurs="1" maxOccurs="1" />
+          <xs:element name="Evening" type="cl:ReadingsFestiveType" minOccurs="1" maxOccurs="1" />
+        </xs:sequence>
+        <xs:attribute name="readingsType" type="xs:string" use="required" fixed="withEveningMass" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="ReadingsCommonsType" mixed="true">
+    <xs:complexContent>
+      <xs:extension base="cl:ReadingsType">
+        <xs:attribute name="readingsType" type="xs:string" use="required" fixed="fromCommons" />
+      </xs:extension>
+    </xs:complexContent>
   </xs:complexType>
 </xs:schema>

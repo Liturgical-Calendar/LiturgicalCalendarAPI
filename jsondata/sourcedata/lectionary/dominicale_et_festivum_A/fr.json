@@ -1,0 +1,519 @@
+{
+    "Advent1": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "Advent2": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "Advent3": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "Advent4": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "Christmas": {
+        "vigil": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "gospel_acclamation": "",
+            "gospel": ""
+        },
+        "night": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "gospel_acclamation": "",
+            "gospel": ""
+        },
+        "dawn": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "gospel_acclamation": "",
+            "gospel": ""
+        },
+        "day": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "gospel_acclamation": "",
+            "gospel": ""
+        }
+    },
+    "HolyFamily": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "MotherGod": {
+        "first_reading": "Nombres 6:22-27",
+        "responsorial_psalm": "Psaume 66 (67)",
+        "second_reading": "Galates 4:4-7",
+        "gospel_acclamation": "Hébreux 1:1-2",
+        "gospel": "Luc 2:16-21"
+    },
+    "Christmas2": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "Epiphany": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "BaptismLord": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "Lent1": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "Lent2": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "Lent3": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "Lent4": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "Lent5": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "PalmSun": {
+        "palm_gospel": "",
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "HolyThursChrism": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "HolyThurs": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "GoodFri": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "EasterVigil": {
+        "first_reading": "Genèse 1:1-2:2|Genèse 1:1,26-31a",
+        "responsorial_psalm": "Psaume 104:1-2,5-6,10,12,13-14,24,35|Psaume 33:4-5,6-7,12-13,20,22",
+        "second_reading": "Genèse 22:1-18|Genèse 22:1-2,9,10-13,15-18",
+        "responsorial_psalm_2": "Psaume 16:5,8,9-10,11",
+        "third_reading": "Exode 14:15-15:1",
+        "responsorial_psalm_3": "Exode 15:1-2,3-4,5-6,17-18",
+        "fourth_reading": "Isaïe 54:5-14",
+        "responsorial_psalm_4": "Psaume 30:2,4,5-6,11-12,13",
+        "fifth_reading": "Isaïe 55:1-11",
+        "responsorial_psalm_5": "Isaïe 12:2-3,4,5-6",
+        "sixth_reading": "Baruch 3:9-15,32;4:4",
+        "responsorial_psalm_6": "Psaume 19:8,9,10,11",
+        "seventh_reading": "Ézéchiel 36:16-17,18-28",
+        "responsorial_psalm_7": "Psaume 42:3,5;43:3,4|Isaïe 12:2-3,4,5-6|Psaume 51:12-13,14-15,18-19",
+        "epistle": "Romains 6:3-11",
+        "responsorial_psalm_epistle": "Psaume 118:1-2,16-17,22-23",
+        "gospel_acclamation": "",
+        "gospel": "Luc 24:1-12"
+    },
+    "Easter": {
+        "day": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "gospel_acclamation": "",
+            "gospel": ""
+        },
+        "evening": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "gospel_acclamation": "",
+            "gospel": ""
+        }
+    },
+    "Easter2": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "Easter3": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "Easter4": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "Easter5": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "Easter6": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "Ascension": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "Easter7": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "Pentecost": {
+        "vigil": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "gospel_acclamation": "",
+            "gospel": ""
+        },
+        "day": {
+            "first_reading": "",
+            "responsorial_psalm": "",
+            "second_reading": "",
+            "gospel_acclamation": "",
+            "gospel": ""
+        }
+    },
+    "Trinity": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "CorpusChristi": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "SacredHeart": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday2": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday3": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday4": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday5": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday6": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday7": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday8": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday9": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday10": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday11": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday12": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday13": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday14": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday15": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday16": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday17": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday18": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday19": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday20": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday21": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday22": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday23": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday24": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday25": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday26": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday27": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday28": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday29": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday30": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday31": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday32": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "OrdSunday33": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "ChristKing": {
+        "first_reading": "",
+        "responsorial_psalm": "",
+        "second_reading": "",
+        "gospel_acclamation": "",
+        "gospel": ""
+    },
+    "JesusChristEternalHighPriest": {
+        "first_reading": "Genèse 22, 9-18",
+        "responsorial_psalm": "Psaume 39, 7-8a.8b-9.10-11ab.17",
+        "second_reading": "Hébreux 10, 4-10",
+        "gospel_acclamation": "Philippiens 2, 8-9",
+        "gospel": "Matthieu 26, 36-42"
+    }
+}
