@@ -59,7 +59,9 @@
         "tags": [
           "Main API endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve liturgical events for the General Roman Calendar for each day of the current year",
         "operationId": "retrieveGeneralRomanCalendarGET",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
@@ -69,7 +71,8 @@
             "name": "Accept-Language",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
-            }
+            },
+            "default": "la-VA"
           },
           {
             "in": "header",
@@ -101,90 +104,27 @@
               ]
             },
             "examples": {
-              "LiturgicalYearCalendar":
-                {
-                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
-                },
-              "CivilYearCalendar":
-                {
-                  "$ref": "#/components/examples/CivilYearRequestBody"
-                },
-              "GeneralRomanCalendarTweaked":
-                {
-                  "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
-                }
+              "LiturgicalYearCalendar": {
+                "$ref": "#/components/examples/LiturgicalYearRequestBody"
+              },
+              "CivilYearCalendar": {
+                "$ref": "#/components/examples/CivilYearRequestBody"
+              },
+              "GeneralRomanCalendarTweaked": {
+                "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
+              }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "OK: liturgical events for a given year according to the requested criteria",
-            "headers": {
-              "X-LitCal-Starttime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the start time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Endtime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the end time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Executiontime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "Total time in nanoseconds in which the calculation of the current liturgical calendar response was produced (difference between X-LitCal-Starttime and X-LitCal-Endtime, average is usually about 5ms!)"
-              },
-              "X-LitCal-Generated": {
-                "schema": {
-                  "type": "string",
-                  "enum": [
-                    "Calculation",
-                    "ClientCache",
-                    "ServerCache"
-                  ]
-                },
-                "description": "Indicates whether the current response was produced from: a fresh calculation since the response to the given request had not yet been calculated, or from client cache since the response has not changed since last request, or from server cache since the client had not yet made this same request but the calculation had already been done formerly on the server"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "application/yaml": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "text/calendar": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "BEGIN:VCALENDAR\nPRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-MS-OLK-FORCEINSPECTOROPEN:FALSE\nX-WR-CALNAME:Roman Catholic Universal Liturgical Calendar LA\nX-WR-TIMEZONE:Europe/Vatican\nX-PUBLISHED-TTL:PT1D\nBEGIN:VEVENT\nCLASS:PUBLIC\nDTSTART;VALUE=DATE:20291231\nDTSTAMP:20240422T062620Z\nUID:c0e7126a841a70761e4057e58b5e2d52\nCREATED:\nDESCRIPTION:\\nSOLLEMNITAS\\nalbus\nLAST-MODIFIED:\nSUMMARY;LANGUAGE=la:SOLLEMNITAS SANCTÆ DEI GENITRICIS MARIÆ Missa in Vigi\n  lia\nTRANSP:TRANSPARENT\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nX-MICROSOFT-DISALLOW-COUNTER:TRUE\nX-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.\n  2//EN\">\\n<HTML>\\n<BODY>\\n\\n<P DIR=LTR><BR><B>SOLLEMNITAS</B><BR><B><I><\n  SPAN LANG=la><FONT FACE=\"Calibri\" COLOR=\"#AAAAAA\">albus</FONT></SPAN></\n  I></B><BR>ANNUM B</P>\\n\\n</BODY>\\n</HTML>\nEND:VEVENT\nEND:VCALENDAR"
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/LitCalXML"
-                }
-              }
-            }
+            "$ref": "#/components/responses/LitCal200"
           },
           "304": {
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
             "$ref": "#/components/responses/NotAcceptable406"
@@ -201,7 +141,9 @@
         "tags": [
           "Main API endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve liturgical events for the General Roman Calendar for each day of the current year",
         "operationId": "retrieveGeneralRomanCalendarPOST",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
@@ -236,18 +178,15 @@
                 "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
               },
               "examples": {
-                "LiturgicalYearCalendar":
-                  {
-                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
-                  },
-                "CivilYearCalendar":
-                  {
-                    "$ref": "#/components/examples/CivilYearRequestBody"
-                  },
-                "GeneralRomanCalendarTweaked":
-                  {
-                    "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
-                  }
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                },
+                "GeneralRomanCalendarTweaked": {
+                  "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
+                }
               }
             },
             "application/json": {
@@ -255,91 +194,28 @@
                 "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
               },
               "examples": {
-                "LiturgicalYearCalendar":
-                  {
-                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
-                  },
-                "CivilYearCalendar":
-                  {
-                    "$ref": "#/components/examples/CivilYearRequestBody"
-                  },
-                "GeneralRomanCalendarTweaked":
-                  {
-                    "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
-                  }
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                },
+                "GeneralRomanCalendarTweaked": {
+                  "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK: liturgical events for a given year according to the requested criteria",
-            "headers": {
-              "X-LitCal-Starttime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the start time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Endtime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the end time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Executiontime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "Total time in nanoseconds in which the calculation of the current liturgical calendar response was produced (difference between X-LitCal-Starttime and X-LitCal-Endtime, average is usually about 5ms!)"
-              },
-              "X-LitCal-Generated": {
-                "schema": {
-                  "type": "string",
-                  "enum": [
-                    "Calculation",
-                    "ClientCache",
-                    "ServerCache"
-                  ]
-                },
-                "description": "Indicates whether the current response was produced from: a fresh calculation since the response to the given request had not yet been calculated, or from client cache since the response has not changed since last request, or from server cache since the client had not yet made this same request but the calculation had already been done formerly on the server"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "application/yaml": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "text/calendar": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "BEGIN:VCALENDAR\nPRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-MS-OLK-FORCEINSPECTOROPEN:FALSE\nX-WR-CALNAME:Roman Catholic Universal Liturgical Calendar LA\nX-WR-TIMEZONE:Europe/Vatican\nX-PUBLISHED-TTL:PT1D\nBEGIN:VEVENT\nCLASS:PUBLIC\nDTSTART;VALUE=DATE:20291231\nDTSTAMP:20240422T062620Z\nUID:c0e7126a841a70761e4057e58b5e2d52\nCREATED:\nDESCRIPTION:\\nSOLLEMNITAS\\nalbus\nLAST-MODIFIED:\nSUMMARY;LANGUAGE=la:SOLLEMNITAS SANCTÆ DEI GENITRICIS MARIÆ Missa in Vigi\n  lia\nTRANSP:TRANSPARENT\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nX-MICROSOFT-DISALLOW-COUNTER:TRUE\nX-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.\n  2//EN\">\\n<HTML>\\n<BODY>\\n\\n<P DIR=LTR><BR><B>SOLLEMNITAS</B><BR><B><I><\n  SPAN LANG=la><FONT FACE=\"Calibri\" COLOR=\"#AAAAAA\">albus</FONT></SPAN></\n  I></B><BR>ANNUM B</P>\\n\\n</BODY>\\n</HTML>\nEND:VEVENT\nEND:VCALENDAR"
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/LitCalXML"
-                }
-              }
-            }
+            "$ref": "#/components/responses/LitCal200"
           },
           "304": {
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
             "$ref": "#/components/responses/NotAcceptable406"
@@ -358,7 +234,9 @@
         "tags": [
           "Main API endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve liturgical events from the General Roman Calendar for each day of the given year",
         "operationId": "retrieveGeneralRomanCalendarForYearGET",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
@@ -369,7 +247,7 @@
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "required": true
+            "default": "la-VA"
           },
           {
             "in": "header",
@@ -412,90 +290,27 @@
               ]
             },
             "examples": {
-              "LiturgicalYearCalendar":
-                {
-                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
-                },
-              "CivilYearCalendar":
-                {
-                  "$ref": "#/components/examples/CivilYearRequestBody"
-                },
-              "GeneralRomanCalendarTweaked":
-                {
-                  "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
-                }
+              "LiturgicalYearCalendar": {
+                "$ref": "#/components/examples/LiturgicalYearRequestBody"
+              },
+              "CivilYearCalendar": {
+                "$ref": "#/components/examples/CivilYearRequestBody"
+              },
+              "GeneralRomanCalendarTweaked": {
+                "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
+              }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "OK: liturgical events for a given year according to the requested criteria",
-            "headers": {
-              "X-LitCal-Starttime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the start time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Endtime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the end time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Executiontime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "Total time in nanoseconds in which the calculation of the current liturgical calendar response was produced (difference between X-LitCal-Starttime and X-LitCal-Endtime, average is usually about 5ms!)"
-              },
-              "X-LitCal-Generated": {
-                "schema": {
-                  "type": "string",
-                  "enum": [
-                    "Calculation",
-                    "ClientCache",
-                    "ServerCache"
-                  ]
-                },
-                "description": "Indicates whether the current response was produced from: a fresh calculation since the response to the given request had not yet been calculated, or from client cache since the response has not changed since last request, or from server cache since the client had not yet made this same request but the calculation had already been done formerly on the server"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "application/yaml": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "text/calendar": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "BEGIN:VCALENDAR\nPRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-MS-OLK-FORCEINSPECTOROPEN:FALSE\nX-WR-CALNAME:Roman Catholic Universal Liturgical Calendar LA\nX-WR-TIMEZONE:Europe/Vatican\nX-PUBLISHED-TTL:PT1D\nBEGIN:VEVENT\nCLASS:PUBLIC\nDTSTART;VALUE=DATE:20291231\nDTSTAMP:20240422T062620Z\nUID:c0e7126a841a70761e4057e58b5e2d52\nCREATED:\nDESCRIPTION:\\nSOLLEMNITAS\\nalbus\nLAST-MODIFIED:\nSUMMARY;LANGUAGE=la:SOLLEMNITAS SANCTÆ DEI GENITRICIS MARIÆ Missa in Vigi\n  lia\nTRANSP:TRANSPARENT\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nX-MICROSOFT-DISALLOW-COUNTER:TRUE\nX-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.\n  2//EN\">\\n<HTML>\\n<BODY>\\n\\n<P DIR=LTR><BR><B>SOLLEMNITAS</B><BR><B><I><\n  SPAN LANG=la><FONT FACE=\"Calibri\" COLOR=\"#AAAAAA\">albus</FONT></SPAN></\n  I></B><BR>ANNUM B</P>\\n\\n</BODY>\\n</HTML>\nEND:VEVENT\nEND:VCALENDAR"
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/LitCalXML"
-                }
-              }
-            }
+            "$ref": "#/components/responses/LitCal200"
           },
           "304": {
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
             "$ref": "#/components/responses/NotAcceptable406"
@@ -512,7 +327,9 @@
         "tags": [
           "Main API endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve liturgical events from the General Roman Calendar for each day of the given year",
         "operationId": "retrieveGeneralRomanCalendarForYearPOST",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
@@ -558,18 +375,15 @@
                 "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
               },
               "examples": {
-                "LiturgicalYearCalendar":
-                  {
-                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
-                  },
-                "CivilYearCalendar":
-                  {
-                    "$ref": "#/components/examples/CivilYearRequestBody"
-                  },
-                "GeneralRomanCalendarTweaked":
-                  {
-                    "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
-                  }
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                },
+                "GeneralRomanCalendarTweaked": {
+                  "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
+                }
               }
             },
             "application/json": {
@@ -577,91 +391,28 @@
                 "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
               },
               "examples": {
-                "LiturgicalYearCalendar":
-                  {
-                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
-                  },
-                "CivilYearCalendar":
-                  {
-                    "$ref": "#/components/examples/CivilYearRequestBody"
-                  },
-                "GeneralRomanCalendarTweaked":
-                  {
-                    "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
-                  }
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                },
+                "GeneralRomanCalendarTweaked": {
+                  "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK: liturgical events for a given year according to the requested criteria",
-            "headers": {
-              "X-LitCal-Starttime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the start time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Endtime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the end time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Executiontime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "Total time in nanoseconds in which the calculation of the current liturgical calendar response was produced (difference between X-LitCal-Starttime and X-LitCal-Endtime, average is usually about 5ms!)"
-              },
-              "X-LitCal-Generated": {
-                "schema": {
-                  "type": "string",
-                  "enum": [
-                    "Calculation",
-                    "ClientCache",
-                    "ServerCache"
-                  ]
-                },
-                "description": "Indicates whether the current response was produced from: a fresh calculation since the response to the given request had not yet been calculated, or from client cache since the response has not changed since last request, or from server cache since the client had not yet made this same request but the calculation had already been done formerly on the server"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "application/yaml": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "text/calendar": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "BEGIN:VCALENDAR\nPRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-MS-OLK-FORCEINSPECTOROPEN:FALSE\nX-WR-CALNAME:Roman Catholic Universal Liturgical Calendar LA\nX-WR-TIMEZONE:Europe/Vatican\nX-PUBLISHED-TTL:PT1D\nBEGIN:VEVENT\nCLASS:PUBLIC\nDTSTART;VALUE=DATE:20291231\nDTSTAMP:20240422T062620Z\nUID:c0e7126a841a70761e4057e58b5e2d52\nCREATED:\nDESCRIPTION:\\nSOLLEMNITAS\\nalbus\nLAST-MODIFIED:\nSUMMARY;LANGUAGE=la:SOLLEMNITAS SANCTÆ DEI GENITRICIS MARIÆ Missa in Vigi\n  lia\nTRANSP:TRANSPARENT\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nX-MICROSOFT-DISALLOW-COUNTER:TRUE\nX-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.\n  2//EN\">\\n<HTML>\\n<BODY>\\n\\n<P DIR=LTR><BR><B>SOLLEMNITAS</B><BR><B><I><\n  SPAN LANG=la><FONT FACE=\"Calibri\" COLOR=\"#AAAAAA\">albus</FONT></SPAN></\n  I></B><BR>ANNUM B</P>\\n\\n</BODY>\\n</HTML>\nEND:VEVENT\nEND:VCALENDAR"
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/LitCalXML"
-                }
-              }
-            }
+            "$ref": "#/components/responses/LitCal200"
           },
           "304": {
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
             "$ref": "#/components/responses/NotAcceptable406"
@@ -680,7 +431,9 @@
         "tags": [
           "Main API endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given nation for each day of the current year",
         "operationId": "retrieveNationalCalendarGET",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
@@ -716,7 +469,8 @@
                 "IT",
                 "US",
                 "NL",
-                "VA"
+                "VA",
+                "CA"
               ],
               "summary": "uppercase two letter ISO 3166 code of a nation for which the liturgical calendar has been defined"
             }
@@ -730,86 +484,24 @@
               "$ref": "#/components/schemas/CivilOrLiturgicalYear"
             },
             "examples": {
-              "LiturgicalYearCalendar":
-                {
-                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
-                },
-              "CivilYearCalendar":
-                {
-                  "$ref": "#/components/examples/CivilYearRequestBody"
-                }
+              "LiturgicalYearCalendar": {
+                "$ref": "#/components/examples/LiturgicalYearRequestBody"
+              },
+              "CivilYearCalendar": {
+                "$ref": "#/components/examples/CivilYearRequestBody"
+              }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "OK: liturgical events for a given year according to the requested criteria",
-            "headers": {
-              "X-LitCal-Starttime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the start time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Endtime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the end time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Executiontime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "Total time in nanoseconds in which the calculation of the current liturgical calendar response was produced (difference between X-LitCal-Starttime and X-LitCal-Endtime, average is usually about 5ms!)"
-              },
-              "X-LitCal-Generated": {
-                "schema": {
-                  "type": "string",
-                  "enum": [
-                    "Calculation",
-                    "ClientCache",
-                    "ServerCache"
-                  ]
-                },
-                "description": "Indicates whether the current response was produced from: a fresh calculation since the response to the given request had not yet been calculated, or from client cache since the response has not changed since last request, or from server cache since the client had not yet made this same request but the calculation had already been done formerly on the server"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "application/yaml": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "text/calendar": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "BEGIN:VCALENDAR\nPRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-MS-OLK-FORCEINSPECTOROPEN:FALSE\nX-WR-CALNAME:Roman Catholic Universal Liturgical Calendar LA\nX-WR-TIMEZONE:Europe/Vatican\nX-PUBLISHED-TTL:PT1D\nBEGIN:VEVENT\nCLASS:PUBLIC\nDTSTART;VALUE=DATE:20291231\nDTSTAMP:20240422T062620Z\nUID:c0e7126a841a70761e4057e58b5e2d52\nCREATED:\nDESCRIPTION:\\nSOLLEMNITAS\\nalbus\nLAST-MODIFIED:\nSUMMARY;LANGUAGE=la:SOLLEMNITAS SANCTÆ DEI GENITRICIS MARIÆ Missa in Vigi\n  lia\nTRANSP:TRANSPARENT\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nX-MICROSOFT-DISALLOW-COUNTER:TRUE\nX-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.\n  2//EN\">\\n<HTML>\\n<BODY>\\n\\n<P DIR=LTR><BR><B>SOLLEMNITAS</B><BR><B><I><\n  SPAN LANG=la><FONT FACE=\"Calibri\" COLOR=\"#AAAAAA\">albus</FONT></SPAN></\n  I></B><BR>ANNUM B</P>\\n\\n</BODY>\\n</HTML>\nEND:VEVENT\nEND:VCALENDAR"
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/LitCalXML"
-                }
-              }
-            }
+            "$ref": "#/components/responses/LitCal200"
           },
           "304": {
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
             "$ref": "#/components/responses/NotAcceptable406"
@@ -826,7 +518,9 @@
         "tags": [
           "Main API endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given nation for each day of the current year",
         "operationId": "retrieveNationalCalendarPOST",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
@@ -862,7 +556,8 @@
                 "IT",
                 "US",
                 "NL",
-                "VA"
+                "VA",
+                "CA"
               ],
               "summary": "uppercase two letter ISO 3166 code of a nation for which the liturgical calendar has been defined"
             }
@@ -876,14 +571,12 @@
                 "$ref": "#/components/schemas/CivilOrLiturgicalYear"
               },
               "examples": {
-                "LiturgicalYearCalendar":
-                  {
-                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
-                  },
-                "CivilYearCalendar":
-                  {
-                    "$ref": "#/components/examples/CivilYearRequestBody"
-                  }
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
               }
             },
             "application/json": {
@@ -891,87 +584,25 @@
                 "$ref": "#/components/schemas/CivilOrLiturgicalYear"
               },
               "examples": {
-                "LiturgicalYearCalendar":
-                  {
-                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
-                  },
-                "CivilYearCalendar":
-                  {
-                    "$ref": "#/components/examples/CivilYearRequestBody"
-                  }
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK: liturgical events for a given year according to the requested criteria",
-            "headers": {
-              "X-LitCal-Starttime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the start time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Endtime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the end time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Executiontime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "Total time in nanoseconds in which the calculation of the current liturgical calendar response was produced (difference between X-LitCal-Starttime and X-LitCal-Endtime, average is usually about 5ms!)"
-              },
-              "X-LitCal-Generated": {
-                "schema": {
-                  "type": "string",
-                  "enum": [
-                    "Calculation",
-                    "ClientCache",
-                    "ServerCache"
-                  ]
-                },
-                "description": "Indicates whether the current response was produced from: a fresh calculation since the response to the given request had not yet been calculated, or from client cache since the response has not changed since last request, or from server cache since the client had not yet made this same request but the calculation had already been done formerly on the server"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "application/yaml": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "text/calendar": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "BEGIN:VCALENDAR\nPRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-MS-OLK-FORCEINSPECTOROPEN:FALSE\nX-WR-CALNAME:Roman Catholic Universal Liturgical Calendar LA\nX-WR-TIMEZONE:Europe/Vatican\nX-PUBLISHED-TTL:PT1D\nBEGIN:VEVENT\nCLASS:PUBLIC\nDTSTART;VALUE=DATE:20291231\nDTSTAMP:20240422T062620Z\nUID:c0e7126a841a70761e4057e58b5e2d52\nCREATED:\nDESCRIPTION:\\nSOLLEMNITAS\\nalbus\nLAST-MODIFIED:\nSUMMARY;LANGUAGE=la:SOLLEMNITAS SANCTÆ DEI GENITRICIS MARIÆ Missa in Vigi\n  lia\nTRANSP:TRANSPARENT\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nX-MICROSOFT-DISALLOW-COUNTER:TRUE\nX-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.\n  2//EN\">\\n<HTML>\\n<BODY>\\n\\n<P DIR=LTR><BR><B>SOLLEMNITAS</B><BR><B><I><\n  SPAN LANG=la><FONT FACE=\"Calibri\" COLOR=\"#AAAAAA\">albus</FONT></SPAN></\n  I></B><BR>ANNUM B</P>\\n\\n</BODY>\\n</HTML>\nEND:VEVENT\nEND:VCALENDAR"
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/LitCalXML"
-                }
-              }
-            }
+            "$ref": "#/components/responses/LitCal200"
           },
           "304": {
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
             "$ref": "#/components/responses/NotAcceptable406"
@@ -990,7 +621,9 @@
         "tags": [
           "Main API endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given nation for each day of a given year",
         "operationId": "retrieveNationalCalendarForYearGET",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
@@ -1026,7 +659,8 @@
                 "IT",
                 "US",
                 "NL",
-                "VA"
+                "VA",
+                "CA"
               ],
               "summary": "when {category} is 'nation'"
             }
@@ -1051,86 +685,24 @@
               "$ref": "#/components/schemas/CivilOrLiturgicalYear"
             },
             "examples": {
-              "LiturgicalYearCalendar":
-                {
-                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
-                },
-              "CivilYearCalendar":
-                {
-                  "$ref": "#/components/examples/CivilYearRequestBody"
-                }
+              "LiturgicalYearCalendar": {
+                "$ref": "#/components/examples/LiturgicalYearRequestBody"
+              },
+              "CivilYearCalendar": {
+                "$ref": "#/components/examples/CivilYearRequestBody"
+              }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "OK: liturgical events for a given year according to the requested criteria",
-            "headers": {
-              "X-LitCal-Starttime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the start time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Endtime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the end time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Executiontime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "Total time in nanoseconds in which the calculation of the current liturgical calendar response was produced (difference between X-LitCal-Starttime and X-LitCal-Endtime, average is usually about 5ms!)"
-              },
-              "X-LitCal-Generated": {
-                "schema": {
-                  "type": "string",
-                  "enum": [
-                    "Calculation",
-                    "ClientCache",
-                    "ServerCache"
-                  ]
-                },
-                "description": "Indicates whether the current response was produced from: a fresh calculation since the response to the given request had not yet been calculated, or from client cache since the response has not changed since last request, or from server cache since the client had not yet made this same request but the calculation had already been done formerly on the server"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "application/yaml": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "text/calendar": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "BEGIN:VCALENDAR\nPRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-MS-OLK-FORCEINSPECTOROPEN:FALSE\nX-WR-CALNAME:Roman Catholic Universal Liturgical Calendar LA\nX-WR-TIMEZONE:Europe/Vatican\nX-PUBLISHED-TTL:PT1D\nBEGIN:VEVENT\nCLASS:PUBLIC\nDTSTART;VALUE=DATE:20291231\nDTSTAMP:20240422T062620Z\nUID:c0e7126a841a70761e4057e58b5e2d52\nCREATED:\nDESCRIPTION:\\nSOLLEMNITAS\\nalbus\nLAST-MODIFIED:\nSUMMARY;LANGUAGE=la:SOLLEMNITAS SANCTÆ DEI GENITRICIS MARIÆ Missa in Vigi\n  lia\nTRANSP:TRANSPARENT\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nX-MICROSOFT-DISALLOW-COUNTER:TRUE\nX-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.\n  2//EN\">\\n<HTML>\\n<BODY>\\n\\n<P DIR=LTR><BR><B>SOLLEMNITAS</B><BR><B><I><\n  SPAN LANG=la><FONT FACE=\"Calibri\" COLOR=\"#AAAAAA\">albus</FONT></SPAN></\n  I></B><BR>ANNUM B</P>\\n\\n</BODY>\\n</HTML>\nEND:VEVENT\nEND:VCALENDAR"
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/LitCalXML"
-                }
-              }
-            }
+            "$ref": "#/components/responses/LitCal200"
           },
           "304": {
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
             "$ref": "#/components/responses/NotAcceptable406"
@@ -1147,7 +719,9 @@
         "tags": [
           "Main API endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given nation for each day of a given year",
         "operationId": "retrieveNationalCalendarForYearPOST",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
@@ -1183,7 +757,8 @@
                 "IT",
                 "US",
                 "NL",
-                "VA"
+                "VA",
+                "CA"
               ]
             }
           },
@@ -1207,14 +782,12 @@
                 "$ref": "#/components/schemas/CivilOrLiturgicalYear"
               },
               "examples": {
-                "LiturgicalYearCalendar":
-                  {
-                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
-                  },
-                "CivilYearCalendar":
-                  {
-                    "$ref": "#/components/examples/CivilYearRequestBody"
-                  }
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
               }
             },
             "application/json": {
@@ -1222,87 +795,25 @@
                 "$ref": "#/components/schemas/CivilOrLiturgicalYear"
               },
               "examples": {
-                "LiturgicalYearCalendar":
-                  {
-                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
-                  },
-                "CivilYearCalendar":
-                  {
-                    "$ref": "#/components/examples/CivilYearRequestBody"
-                  }
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK: liturgical events for a given year according to the requested criteria",
-            "headers": {
-              "X-LitCal-Starttime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the start time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Endtime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the end time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Executiontime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "Total time in nanoseconds in which the calculation of the current liturgical calendar response was produced (difference between X-LitCal-Starttime and X-LitCal-Endtime, average is usually about 5ms!)"
-              },
-              "X-LitCal-Generated": {
-                "schema": {
-                  "type": "string",
-                  "enum": [
-                    "Calculation",
-                    "ClientCache",
-                    "ServerCache"
-                  ]
-                },
-                "description": "Indicates whether the current response was produced from: a fresh calculation since the response to the given request had not yet been calculated, or from client cache since the response has not changed since last request, or from server cache since the client had not yet made this same request but the calculation had already been done formerly on the server"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "application/yaml": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "text/calendar": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "BEGIN:VCALENDAR\nPRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-MS-OLK-FORCEINSPECTOROPEN:FALSE\nX-WR-CALNAME:Roman Catholic Universal Liturgical Calendar LA\nX-WR-TIMEZONE:Europe/Vatican\nX-PUBLISHED-TTL:PT1D\nBEGIN:VEVENT\nCLASS:PUBLIC\nDTSTART;VALUE=DATE:20291231\nDTSTAMP:20240422T062620Z\nUID:c0e7126a841a70761e4057e58b5e2d52\nCREATED:\nDESCRIPTION:\\nSOLLEMNITAS\\nalbus\nLAST-MODIFIED:\nSUMMARY;LANGUAGE=la:SOLLEMNITAS SANCTÆ DEI GENITRICIS MARIÆ Missa in Vigi\n  lia\nTRANSP:TRANSPARENT\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nX-MICROSOFT-DISALLOW-COUNTER:TRUE\nX-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.\n  2//EN\">\\n<HTML>\\n<BODY>\\n\\n<P DIR=LTR><BR><B>SOLLEMNITAS</B><BR><B><I><\n  SPAN LANG=la><FONT FACE=\"Calibri\" COLOR=\"#AAAAAA\">albus</FONT></SPAN></\n  I></B><BR>ANNUM B</P>\\n\\n</BODY>\\n</HTML>\nEND:VEVENT\nEND:VCALENDAR"
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/LitCalXML"
-                }
-              }
-            }
+            "$ref": "#/components/responses/LitCal200"
           },
           "304": {
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
             "$ref": "#/components/responses/NotAcceptable406"
@@ -1321,7 +832,9 @@
         "tags": [
           "Main API endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given diocese for each day of the current year",
         "operationId": "retrieveDiocesanCalendarGET",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
@@ -1364,86 +877,24 @@
               "$ref": "#/components/schemas/CivilOrLiturgicalYear"
             },
             "examples": {
-              "LiturgicalYearCalendar":
-                {
-                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
-                },
-              "CivilYearCalendar":
-                {
-                  "$ref": "#/components/examples/CivilYearRequestBody"
-                }
+              "LiturgicalYearCalendar": {
+                "$ref": "#/components/examples/LiturgicalYearRequestBody"
+              },
+              "CivilYearCalendar": {
+                "$ref": "#/components/examples/CivilYearRequestBody"
+              }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "OK: liturgical events for a given year according to the requested criteria",
-            "headers": {
-              "X-LitCal-Starttime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the start time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Endtime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the end time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Executiontime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "Total time in nanoseconds in which the calculation of the current liturgical calendar response was produced (difference between X-LitCal-Starttime and X-LitCal-Endtime, average is usually about 5ms!)"
-              },
-              "X-LitCal-Generated": {
-                "schema": {
-                  "type": "string",
-                  "enum": [
-                    "Calculation",
-                    "ClientCache",
-                    "ServerCache"
-                  ]
-                },
-                "description": "Indicates whether the current response was produced from: a fresh calculation since the response to the given request had not yet been calculated, or from client cache since the response has not changed since last request, or from server cache since the client had not yet made this same request but the calculation had already been done formerly on the server"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "application/yaml": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "text/calendar": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "BEGIN:VCALENDAR\nPRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-MS-OLK-FORCEINSPECTOROPEN:FALSE\nX-WR-CALNAME:Roman Catholic Universal Liturgical Calendar LA\nX-WR-TIMEZONE:Europe/Vatican\nX-PUBLISHED-TTL:PT1D\nBEGIN:VEVENT\nCLASS:PUBLIC\nDTSTART;VALUE=DATE:20291231\nDTSTAMP:20240422T062620Z\nUID:c0e7126a841a70761e4057e58b5e2d52\nCREATED:\nDESCRIPTION:\\nSOLLEMNITAS\\nalbus\nLAST-MODIFIED:\nSUMMARY;LANGUAGE=la:SOLLEMNITAS SANCTÆ DEI GENITRICIS MARIÆ Missa in Vigi\n  lia\nTRANSP:TRANSPARENT\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nX-MICROSOFT-DISALLOW-COUNTER:TRUE\nX-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.\n  2//EN\">\\n<HTML>\\n<BODY>\\n\\n<P DIR=LTR><BR><B>SOLLEMNITAS</B><BR><B><I><\n  SPAN LANG=la><FONT FACE=\"Calibri\" COLOR=\"#AAAAAA\">albus</FONT></SPAN></\n  I></B><BR>ANNUM B</P>\\n\\n</BODY>\\n</HTML>\nEND:VEVENT\nEND:VCALENDAR"
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/LitCalXML"
-                }
-              }
-            }
+            "$ref": "#/components/responses/LitCal200"
           },
           "304": {
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
             "$ref": "#/components/responses/NotAcceptable406"
@@ -1460,7 +911,9 @@
         "tags": [
           "Main API endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given diocese for each day of the current year",
         "operationId": "retrieveDiocesanCalendarPOST",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
@@ -1503,14 +956,12 @@
                 "$ref": "#/components/schemas/CivilOrLiturgicalYear"
               },
               "examples": {
-                "LiturgicalYearCalendar":
-                  {
-                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
-                  },
-                "CivilYearCalendar":
-                  {
-                    "$ref": "#/components/examples/CivilYearRequestBody"
-                  }
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
               }
             },
             "application/json": {
@@ -1518,87 +969,25 @@
                 "$ref": "#/components/schemas/CivilOrLiturgicalYear"
               },
               "examples": {
-                "LiturgicalYearCalendar":
-                  {
-                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
-                  },
-                "CivilYearCalendar":
-                  {
-                    "$ref": "#/components/examples/CivilYearRequestBody"
-                  }
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK: liturgical events for a given year according to the requested criteria",
-            "headers": {
-              "X-LitCal-Starttime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the start time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Endtime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the end time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Executiontime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "Total time in nanoseconds in which the calculation of the current liturgical calendar response was produced (difference between X-LitCal-Starttime and X-LitCal-Endtime, average is usually about 5ms!)"
-              },
-              "X-LitCal-Generated": {
-                "schema": {
-                  "type": "string",
-                  "enum": [
-                    "Calculation",
-                    "ClientCache",
-                    "ServerCache"
-                  ]
-                },
-                "description": "Indicates whether the current response was produced from: a fresh calculation since the response to the given request had not yet been calculated, or from client cache since the response has not changed since last request, or from server cache since the client had not yet made this same request but the calculation had already been done formerly on the server"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "application/yaml": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "text/calendar": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "BEGIN:VCALENDAR\nPRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-MS-OLK-FORCEINSPECTOROPEN:FALSE\nX-WR-CALNAME:Roman Catholic Universal Liturgical Calendar LA\nX-WR-TIMEZONE:Europe/Vatican\nX-PUBLISHED-TTL:PT1D\nBEGIN:VEVENT\nCLASS:PUBLIC\nDTSTART;VALUE=DATE:20291231\nDTSTAMP:20240422T062620Z\nUID:c0e7126a841a70761e4057e58b5e2d52\nCREATED:\nDESCRIPTION:\\nSOLLEMNITAS\\nalbus\nLAST-MODIFIED:\nSUMMARY;LANGUAGE=la:SOLLEMNITAS SANCTÆ DEI GENITRICIS MARIÆ Missa in Vigi\n  lia\nTRANSP:TRANSPARENT\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nX-MICROSOFT-DISALLOW-COUNTER:TRUE\nX-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.\n  2//EN\">\\n<HTML>\\n<BODY>\\n\\n<P DIR=LTR><BR><B>SOLLEMNITAS</B><BR><B><I><\n  SPAN LANG=la><FONT FACE=\"Calibri\" COLOR=\"#AAAAAA\">albus</FONT></SPAN></\n  I></B><BR>ANNUM B</P>\\n\\n</BODY>\\n</HTML>\nEND:VEVENT\nEND:VCALENDAR"
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/LitCalXML"
-                }
-              }
-            }
+            "$ref": "#/components/responses/LitCal200"
           },
           "304": {
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
             "$ref": "#/components/responses/NotAcceptable406"
@@ -1617,7 +1006,9 @@
         "tags": [
           "Main API endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given diocese for each day of a given year",
         "operationId": "retrieveDiocesanCalendarForYearGET",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
@@ -1671,86 +1062,24 @@
               "$ref": "#/components/schemas/CivilOrLiturgicalYear"
             },
             "examples": {
-              "LiturgicalYearCalendar":
-                {
-                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
-                },
-              "CivilYearCalendar":
-                {
-                  "$ref": "#/components/examples/CivilYearRequestBody"
-                }
+              "LiturgicalYearCalendar": {
+                "$ref": "#/components/examples/LiturgicalYearRequestBody"
+              },
+              "CivilYearCalendar": {
+                "$ref": "#/components/examples/CivilYearRequestBody"
+              }
             }
           }
         ],
         "responses": {
           "200": {
-            "description": "OK: liturgical events for a given year according to the requested criteria",
-            "headers": {
-              "X-LitCal-Starttime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the start time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Endtime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the end time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Executiontime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "Total time in nanoseconds in which the calculation of the current liturgical calendar response was produced (difference between X-LitCal-Starttime and X-LitCal-Endtime, average is usually about 5ms!)"
-              },
-              "X-LitCal-Generated": {
-                "schema": {
-                  "type": "string",
-                  "enum": [
-                    "Calculation",
-                    "ClientCache",
-                    "ServerCache"
-                  ]
-                },
-                "description": "Indicates whether the current response was produced from: a fresh calculation since the response to the given request had not yet been calculated, or from client cache since the response has not changed since last request, or from server cache since the client had not yet made this same request but the calculation had already been done formerly on the server"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "application/yaml": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "text/calendar": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "BEGIN:VCALENDAR\nPRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-MS-OLK-FORCEINSPECTOROPEN:FALSE\nX-WR-CALNAME:Roman Catholic Universal Liturgical Calendar LA\nX-WR-TIMEZONE:Europe/Vatican\nX-PUBLISHED-TTL:PT1D\nBEGIN:VEVENT\nCLASS:PUBLIC\nDTSTART;VALUE=DATE:20291231\nDTSTAMP:20240422T062620Z\nUID:c0e7126a841a70761e4057e58b5e2d52\nCREATED:\nDESCRIPTION:\\nSOLLEMNITAS\\nalbus\nLAST-MODIFIED:\nSUMMARY;LANGUAGE=la:SOLLEMNITAS SANCTÆ DEI GENITRICIS MARIÆ Missa in Vigi\n  lia\nTRANSP:TRANSPARENT\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nX-MICROSOFT-DISALLOW-COUNTER:TRUE\nX-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.\n  2//EN\">\\n<HTML>\\n<BODY>\\n\\n<P DIR=LTR><BR><B>SOLLEMNITAS</B><BR><B><I><\n  SPAN LANG=la><FONT FACE=\"Calibri\" COLOR=\"#AAAAAA\">albus</FONT></SPAN></\n  I></B><BR>ANNUM B</P>\\n\\n</BODY>\\n</HTML>\nEND:VEVENT\nEND:VCALENDAR"
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/LitCalXML"
-                }
-              }
-            }
+            "$ref": "#/components/responses/LitCal200"
           },
           "304": {
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
             "$ref": "#/components/responses/NotAcceptable406"
@@ -1767,7 +1096,9 @@
         "tags": [
           "Main API endpoint"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given diocese for each day of a given year",
         "operationId": "retrieveDiocesanCalendarForYearPOST",
         "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
@@ -1821,14 +1152,12 @@
                 "$ref": "#/components/schemas/CivilOrLiturgicalYear"
               },
               "examples": {
-                "LiturgicalYearCalendar":
-                  {
-                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
-                  },
-                "CivilYearCalendar":
-                  {
-                    "$ref": "#/components/examples/CivilYearRequestBody"
-                  }
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
               }
             },
             "application/json": {
@@ -1836,87 +1165,25 @@
                 "$ref": "#/components/schemas/CivilOrLiturgicalYear"
               },
               "examples": {
-                "LiturgicalYearCalendar":
-                  {
-                    "$ref": "#/components/examples/LiturgicalYearRequestBody"
-                  },
-                "CivilYearCalendar":
-                  {
-                    "$ref": "#/components/examples/CivilYearRequestBody"
-                  }
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "OK: liturgical events for a given year according to the requested criteria",
-            "headers": {
-              "X-LitCal-Starttime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the start time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Endtime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "High resolution timestamp in nanoseconds that indicates the end time of the calculation of the current liturgical calendar response"
-              },
-              "X-LitCal-Executiontime": {
-                "schema": {
-                  "type": "integer",
-                  "format": "int64"
-                },
-                "description": "Total time in nanoseconds in which the calculation of the current liturgical calendar response was produced (difference between X-LitCal-Starttime and X-LitCal-Endtime, average is usually about 5ms!)"
-              },
-              "X-LitCal-Generated": {
-                "schema": {
-                  "type": "string",
-                  "enum": [
-                    "Calculation",
-                    "ClientCache",
-                    "ServerCache"
-                  ]
-                },
-                "description": "Indicates whether the current response was produced from: a fresh calculation since the response to the given request had not yet been calculated, or from client cache since the response has not changed since last request, or from server cache since the client had not yet made this same request but the calculation had already been done formerly on the server"
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "application/yaml": {
-                "schema": {
-                  "$ref": "./LitCal.json"
-                }
-              },
-              "text/calendar": {
-                "schema": {
-                  "type": "string"
-                },
-                "example": "BEGIN:VCALENDAR\nPRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-MS-OLK-FORCEINSPECTOROPEN:FALSE\nX-WR-CALNAME:Roman Catholic Universal Liturgical Calendar LA\nX-WR-TIMEZONE:Europe/Vatican\nX-PUBLISHED-TTL:PT1D\nBEGIN:VEVENT\nCLASS:PUBLIC\nDTSTART;VALUE=DATE:20291231\nDTSTAMP:20240422T062620Z\nUID:c0e7126a841a70761e4057e58b5e2d52\nCREATED:\nDESCRIPTION:\\nSOLLEMNITAS\\nalbus\nLAST-MODIFIED:\nSUMMARY;LANGUAGE=la:SOLLEMNITAS SANCTÆ DEI GENITRICIS MARIÆ Missa in Vigi\n  lia\nTRANSP:TRANSPARENT\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nX-MICROSOFT-DISALLOW-COUNTER:TRUE\nX-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.\n  2//EN\">\\n<HTML>\\n<BODY>\\n\\n<P DIR=LTR><BR><B>SOLLEMNITAS</B><BR><B><I><\n  SPAN LANG=la><FONT FACE=\"Calibri\" COLOR=\"#AAAAAA\">albus</FONT></SPAN></\n  I></B><BR>ANNUM B</P>\\n\\n</BODY>\\n</HTML>\nEND:VEVENT\nEND:VCALENDAR"
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/LitCalXML"
-                }
-              }
-            }
+            "$ref": "#/components/responses/LitCal200"
           },
           "304": {
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed405"
           },
           "406": {
             "$ref": "#/components/responses/NotAcceptable406"
@@ -1935,7 +1202,9 @@
         "tags": [
           "Calendars Index"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve an index of current supported national and diocesan calendars and relative locales, settings, etc.",
         "operationId": "retrieveMetadataGET",
         "responses": {
@@ -1964,7 +1233,9 @@
         "tags": [
           "Calendars Index"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve an index of current supported national and diocesan calendars and relative locales, settings, etc.",
         "operationId": "retrieveMetadataPOST",
         "responses": {
@@ -1995,7 +1266,9 @@
         "tags": [
           "Liturgical events"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve all possible liturgical events from the General Roman Calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
         "operationId": "retrieveEventsGET",
         "parameters": [
@@ -2030,11 +1303,10 @@
                         "white"
                       ],
                       "readings": {
-                        "first_reading": "Ef 4, 1-7.11-13",
+                        "first_reading": "Efesini 4, 1-7.11-13",
                         "responsorial_psalm": "Salmo 23",
-                        "second_reading": "",
-                        "alleluia_verse": "Mt 23, 9b.10b",
-                        "gospel": "Mt 23, 8-12"
+                        "alleluia_verse": "Matteo 23, 9b.10b",
+                        "gospel": "Matteo 23, 8-12"
                       },
                       "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
                       "missal": "VATICAN_1970"
@@ -2052,11 +1324,10 @@
                         "white"
                       ],
                       "readings": {
-                        "first_reading": "2 Cor 5, 14-20",
+                        "first_reading": "2 Corinzi 5, 14-20",
                         "responsorial_psalm": "Salmo 103",
-                        "second_reading": "",
-                        "alleluia_verse": "Mt 24, 42a.44",
-                        "gospel": "Lc 12, 35-40"
+                        "alleluia_verse": "Matteo 24, 42a.44",
+                        "gospel": "Luca 12, 35-40"
                       },
                       "name": "Sancti Raimundi de Penyafort, presbyteri",
                       "missal": "VATICAN_1970"
@@ -2086,7 +1357,9 @@
         "tags": [
           "Liturgical events"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve all possible liturgical events from the General Roman Calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
         "operationId": "retrieveEventsPOST",
         "parameters": [
@@ -2179,7 +1452,9 @@
         "tags": [
           "Liturgical events"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve all possible liturgical events from the given national calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
         "operationId": "retrieveEventsForNationalCalendarGET",
         "parameters": [
@@ -2200,7 +1475,8 @@
                 "IT",
                 "US",
                 "NL",
-                "VA"
+                "VA",
+                "CA"
               ]
             }
           }
@@ -2284,7 +1560,9 @@
         "tags": [
           "Liturgical events"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve all possible liturgical events from the given national calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
         "operationId": "retrieveEventsForNationalCalendarPOST",
         "parameters": [
@@ -2305,7 +1583,8 @@
                 "IT",
                 "US",
                 "NL",
-                "VA"
+                "VA",
+                "CA"
               ]
             }
           }
@@ -2391,7 +1670,9 @@
         "tags": [
           "Liturgical events"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve all possible liturgical events from the given diocesan calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
         "operationId": "retrieveEventsForDiocesanCalendarGET",
         "parameters": [
@@ -2434,11 +1715,11 @@
                         "white"
                       ],
                       "readings": {
-                        "first_reading": "Ef 4, 1-7.11-13",
+                        "first_reading": "Efesini 4, 1-7.11-13",
                         "responsorial_psalm": "Salmo 23",
                         "second_reading": "",
-                        "alleluia_verse": "Mt 23, 9b.10b",
-                        "gospel": "Mt 23, 8-12"
+                        "alleluia_verse": "Matteo 23, 9b.10b",
+                        "gospel": "Matteo 23, 8-12"
                       },
                       "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
                       "missal": "VATICAN_1970"
@@ -2456,11 +1737,11 @@
                         "white"
                       ],
                       "readings": {
-                        "first_reading": "2 Cor 5, 14-20",
+                        "first_reading": "2 Corinzi 5, 14-20",
                         "responsorial_psalm": "Salmo 103",
                         "second_reading": "",
-                        "alleluia_verse": "Mt 24, 42a.44",
-                        "gospel": "Lc 12, 35-40"
+                        "alleluia_verse": "Matteo 24, 42a.44",
+                        "gospel": "Luca 12, 35-40"
                       },
                       "name": "Sancti Raimundi de Penyafort, presbyteri",
                       "missal": "VATICAN_1970"
@@ -2490,7 +1771,9 @@
         "tags": [
           "Liturgical events"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve all possible liturgical events from the given diocesan calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
         "operationId": "retrieveEventsForDiocesanCalendarPOST",
         "parameters": [
@@ -2591,7 +1874,9 @@
         "tags": [
           "Calendar Source Data"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Create a national calendar data resource",
         "operationId": "nationalCalendarDataPUT",
         "requestBody": {
@@ -2641,7 +1926,9 @@
         "tags": [
           "Calendar Source Data"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Create a wider region data resource",
         "operationId": "widerregionDataPUT",
         "requestBody": {
@@ -2691,7 +1978,9 @@
         "tags": [
           "Calendar Source Data"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Create a diocesan calendar data resource",
         "operationId": "diocesanDataPUT",
         "requestBody": {
@@ -2741,7 +2030,9 @@
         "tags": [
           "Calendar Source Data"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve a national calendar data resource",
         "operationId": "nationalDataGET",
         "parameters": [
@@ -2777,7 +2068,9 @@
         "tags": [
           "Calendar Source Data"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve a national calendar data resource",
         "operationId": "nationalDataPOST",
         "parameters": [
@@ -2813,7 +2106,9 @@
         "tags": [
           "Calendar Source Data"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Update a national calendar data resource",
         "operationId": "nationalDataPATCH",
         "parameters": [
@@ -2874,7 +2169,9 @@
         "tags": [
           "Calendar Source Data"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Delete a national calendar data resource",
         "operationId": "nationalDataDELETE",
         "parameters": [
@@ -2923,7 +2220,9 @@
         "tags": [
           "Calendar Source Data"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve a diocesan calendar data resource",
         "operationId": "diocesanDataGET",
         "parameters": [
@@ -2959,7 +2258,9 @@
         "tags": [
           "Calendar Source Data"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve a diocesan calendar data resource",
         "operationId": "diocesanDataPOST",
         "parameters": [
@@ -2995,7 +2296,9 @@
         "tags": [
           "Calendar Source Data"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Update a diocesan calendar data resource",
         "operationId": "diocesanDataPATCH",
         "parameters": [
@@ -3055,7 +2358,9 @@
         "tags": [
           "Calendar Source Data"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Delete a wider region calendar data resource",
         "operationId": "diocesanDataDELETE",
         "parameters": [
@@ -3103,7 +2408,9 @@
         "tags": [
           "Calendar Source Data"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve a wider region calendar data resource",
         "operationId": "widerregionDataGET",
         "parameters": [
@@ -3139,7 +2446,9 @@
         "tags": [
           "Calendar Source Data"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve a wider region calendar data resource",
         "operationId": "widerregionDataPOST",
         "parameters": [
@@ -3175,7 +2484,9 @@
         "tags": [
           "Calendar Source Data"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Update a wider region calendar data resource",
         "operationId": "widerregionDataPATCH",
         "parameters": [
@@ -3235,7 +2546,9 @@
         "tags": [
           "Calendar Source Data"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Delete a wider region calendar data resource",
         "operationId": "widerregionDataDELETE",
         "parameters": [
@@ -3283,7 +2596,9 @@
         "tags": [
           "Easter"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve the date of Easter, both gregorian and julian, for the years 1583 to 1999",
         "operationId": "easterGET",
         "parameters": [
@@ -3389,9 +2704,6 @@
                 }
               }
             }
-          },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed405"
           }
         }
       }
@@ -3401,7 +2713,9 @@
         "tags": [
           "Missals"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve the index of defined Roman Missals",
         "operationId": "missalsGET",
         "responses": {
@@ -3438,7 +2752,9 @@
         "tags": [
           "Missals"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve a Roman Missal by its ID",
         "operationId": "missalGET",
         "parameters": [
@@ -3473,7 +2789,9 @@
         "tags": [
           "Decrees"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve the index of defined Decrees of the Congregation for Divine Worship",
         "operationId": "decreesGET",
         "responses": {
@@ -3507,7 +2825,9 @@
         "tags": [
           "Decrees"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve the data for a Decree of the Congregation for Divine Worship",
         "operationId": "decreeByIdGET",
         "parameters": [
@@ -3543,7 +2863,9 @@
         "tags": [
           "Unit Tests"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve all the unit tests defined in the API `tests` folder as an index useful for frontend processing",
         "operationId": "retrieveTestIndexGET",
         "responses": {
@@ -3692,7 +3014,9 @@
         "tags": [
           "Unit Tests"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Create a new unit test in the API `tests` folder",
         "operationId": "testsIndexPUT",
         "requestBody": {
@@ -3741,9 +3065,6 @@
               }
             }
           },
-          "405": {
-            "$ref": "#/components/responses/MethodNotAllowed405"
-          },
           "415": {
             "$ref": "#/components/responses/UnsupportedMediaType415"
           },
@@ -3761,7 +3082,9 @@
         "tags": [
           "Unit Tests"
         ],
-        "security": [{}],
+        "security": [
+          {}
+        ],
         "summary": "Retrieve a single unit test defined in the API `tests` by its name",
         "operationId": "retrieveTestByNameGET",
         "parameters": [
@@ -3794,32 +3117,32 @@
                   ]
                 },
                 "example": {
-                    "name": "MaryMotherChurchTest",
-                    "event_key": "MaryMotherChurch",
-                    "description": "The memorial 'Mary Mother of the Church' was added in 2018 by Decree of the Congregation for Divine Worship on the Monday after Pentecost",
-                    "test_type": "exactCorrespondenceSince",
-                    "year_since": 2018,
-                    "assertions": [
-                      {
-                        "year": 2017,
-                        "expected_value": null,
-                        "assert": "eventNotExists",
-                        "assertion": "The memorial 'Mary Mother of the Church' should not exist before the year 2018"
-                      },
-                      {
-                        "year": 2018,
-                        "expected_value": 1526860800,
-                        "assert": "eventExists AND hasExpectedTimestamp",
-                        "assertion": "The memorial 'Mary Mother of the Church' should be created on the expected date"
-                      },
-                      {
-                        "year": 2019,
-                        "expected_value": 1560124800,
-                        "assert": "eventExists AND hasExpectedTimestamp",
-                        "assertion": "The memorial 'Mary Mother of the Church' should be created on the expected date"
-                      }
-                    ]
-                  }
+                  "name": "MaryMotherChurchTest",
+                  "event_key": "MaryMotherChurch",
+                  "description": "The memorial 'Mary Mother of the Church' was added in 2018 by Decree of the Congregation for Divine Worship on the Monday after Pentecost",
+                  "test_type": "exactCorrespondenceSince",
+                  "year_since": 2018,
+                  "assertions": [
+                    {
+                      "year": 2017,
+                      "expected_value": null,
+                      "assert": "eventNotExists",
+                      "assertion": "The memorial 'Mary Mother of the Church' should not exist before the year 2018"
+                    },
+                    {
+                      "year": 2018,
+                      "expected_value": 1526860800,
+                      "assert": "eventExists AND hasExpectedTimestamp",
+                      "assertion": "The memorial 'Mary Mother of the Church' should be created on the expected date"
+                    },
+                    {
+                      "year": 2019,
+                      "expected_value": 1560124800,
+                      "assert": "eventExists AND hasExpectedTimestamp",
+                      "assertion": "The memorial 'Mary Mother of the Church' should be created on the expected date"
+                    }
+                  ]
+                }
               }
             }
           },
@@ -4403,25 +3726,25 @@
                       "$ref": "./CommonDef.json#/definitions/Nation"
                     },
                     "missals": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "./CommonDef.json#/definitions/MissalID"
-                        }
+                      "type": "array",
+                      "items": {
+                        "$ref": "./CommonDef.json#/definitions/MissalID"
+                      }
                     },
                     "wider_regions": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
-                        }
+                      "type": "array",
+                      "items": {
+                        "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+                      }
                     },
                     "dioceses": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
-                        }
+                      "type": "array",
+                      "items": {
+                        "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+                      }
                     },
                     "settings": {
-                        "$ref": "./CommonDef.json#/definitions/CalendarSettings"
+                      "$ref": "./CommonDef.json#/definitions/CalendarSettings"
                     }
                   }
                 }
@@ -4660,7 +3983,7 @@
             "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
           },
           "excludes": {
-              "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
+            "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
           }
         },
         "required": [
@@ -4719,7 +4042,7 @@
             "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
           },
           "excludes": {
-              "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
+            "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
           }
         },
         "required": [
@@ -4779,7 +4102,7 @@
             "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
           },
           "excludes": {
-              "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
+            "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
           }
         },
         "required": [
@@ -5043,7 +4366,12 @@
             "description": "any extra information about the significance of the expected value for this year compared to other years"
           }
         },
-        "required": [ "year", "expected_value", "assert", "assertion" ]
+        "required": [
+          "year",
+          "expected_value",
+          "assert",
+          "assertion"
+        ]
       },
       "EventNotExistsAssertion": {
         "title": "Event not exists",
@@ -5074,7 +4402,12 @@
             "description": "any extra information about the significance of the expected value for this year compared to other years"
           }
         },
-        "required": [ "year", "expected_value", "assert", "assertion" ]
+        "required": [
+          "year",
+          "expected_value",
+          "assert",
+          "assertion"
+        ]
       }
     },
     "examples": {
@@ -5180,6 +4513,66 @@
           "application/problem+json": {
             "schema": {
               "$ref": "./Problem.json"
+            }
+          }
+        }
+      },
+      "LitCal200": {
+        "description": "OK: liturgical events for a given year according to the requested criteria",
+        "headers": {
+          "X-LitCal-Starttime": {
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "High resolution timestamp in nanoseconds that indicates the start time of the calculation of the current liturgical calendar response"
+          },
+          "X-LitCal-Endtime": {
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "High resolution timestamp in nanoseconds that indicates the end time of the calculation of the current liturgical calendar response"
+          },
+          "X-LitCal-Executiontime": {
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Total time in nanoseconds in which the calculation of the current liturgical calendar response was produced (difference between X-LitCal-Starttime and X-LitCal-Endtime, average is usually about 5ms!)"
+          },
+          "X-LitCal-Generated": {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "Calculation",
+                "ClientCache",
+                "ServerCache"
+              ]
+            },
+            "description": "Indicates whether the current response was produced from: a fresh calculation since the response to the given request had not yet been calculated, or from client cache since the response has not changed since last request, or from server cache since the client had not yet made this same request but the calculation had already been done formerly on the server"
+          }
+        },
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "./LitCal.json"
+            }
+          },
+          "application/yaml": {
+            "schema": {
+              "$ref": "./LitCal.json"
+            }
+          },
+          "text/calendar": {
+            "schema": {
+              "type": "string"
+            },
+            "example": "BEGIN:VCALENDAR\nPRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-MS-OLK-FORCEINSPECTOROPEN:FALSE\nX-WR-CALNAME:Roman Catholic Universal Liturgical Calendar LA\nX-WR-TIMEZONE:Europe/Vatican\nX-PUBLISHED-TTL:PT1D\nBEGIN:VEVENT\nCLASS:PUBLIC\nDTSTART;VALUE=DATE:20291231\nDTSTAMP:20240422T062620Z\nUID:c0e7126a841a70761e4057e58b5e2d52\nCREATED:\nDESCRIPTION:\\nSOLLEMNITAS\\nalbus\nLAST-MODIFIED:\nSUMMARY;LANGUAGE=la:SOLLEMNITAS SANCTÆ DEI GENITRICIS MARIÆ Missa in Vigi\n  lia\nTRANSP:TRANSPARENT\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nX-MICROSOFT-DISALLOW-COUNTER:TRUE\nX-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.\n  2//EN\">\\n<HTML>\\n<BODY>\\n\\n<P DIR=LTR><BR><B>SOLLEMNITAS</B><BR><B><I><\n  SPAN LANG=la><FONT FACE=\"Calibri\" COLOR=\"#AAAAAA\">albus</FONT></SPAN></\n  I></B><BR>ANNUM B</P>\\n\\n</BODY>\\n</HTML>\nEND:VEVENT\nEND:VCALENDAR"
+          },
+          "application/xml": {
+            "schema": {
+              "$ref": "#/components/schemas/LitCalXML"
             }
           }
         }

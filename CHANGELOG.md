@@ -2,32 +2,32 @@
 
 ## [v5.0](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.0) (Unreleased)
 
-* add support for `PUT`, `PATCH` and `DELETE` requests (issues #284, #265, and #220)
-* fix "Feria VII is a bad translation for Sabbato" (issue #310)
-* refactor "festivity" to "liturgical_event" (issue #239)
-* implement lectionary readings (issues #321, #324, #326)
-* fix Feasts of the Lord not suppressing Sundays (issues #324, #327)
+* add support for `PUT`, `PATCH` and `DELETE` requests (issues [#284], [#265], and [#220])
+* fix "Feria VII is a bad translation for Sabbato" (issue [#310])
+* refactor "festivity" to "liturgical_event" (issue [#239])
+* implement lectionary readings (issues [#321], [#324], [#326])
+* fix Feasts of the Lord not suppressing Sundays (issues [#324], [#327])
 
 ## [v4.5](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v4.5) (March 25th 2025)
 
-* restore wider region calendar `PUT`, `PATCH` and `DELETE` requests with full support for all i18n languages (issues #284, #265, and #220)
+* restore wider region calendar `PUT`, `PATCH` and `DELETE` requests with full support for all i18n languages (issues [#284], [#265], and [#220])
 Happy Feast of the Annunciation!
 
 ## [v4.4](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v4.4) (March 22nd 2025)
 
-* restore national calendar `PUT`, `PATCH` and `DELETE` requests with full support for all i18n languages (issues #284, #265, and #220)
+* restore national calendar `PUT`, `PATCH` and `DELETE` requests with full support for all i18n languages (issues [#284], [#265], and [#220])
 
 ## [v4.3](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v4.3) (January 26th 2025)
 
-* realign XML output with latest developments (issue #290)
+* realign XML output with latest developments (issue [#290])
 
 ## [v4.2](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v4.2) (January 25th 2025)
 
-* realign ICS output with latest developments (issue #288)
+* realign ICS output with latest developments (issue [#288])
 
 ## [v4.1](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v4.1) (January 22nd 2025)
 
-* restore diocesan calendar `PUT`, `PATCH` and `DELETE` requests with full support for all i18n languages (issue #284)
+* restore diocesan calendar `PUT`, `PATCH` and `DELETE` requests with full support for all i18n languages (issue [#284])
 
 ## [v4.0](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v4.0) (January 3rd 2025)
 

@@ -61,7 +61,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .phpunit.cache
-          key: phpunit-${{ hashFiles('phpunit.xml') }}
+          key: phpunit-${{ hashFiles('phpunit.xml.dist') }}
           restore-keys: phpunit-
 
       - name: Install Composer dependencies
@@ -104,7 +104,6 @@ jobs:
           exit 1
 
       - name: Run tests
-        if: steps.server-check.outputs.server_found == 'true'
         run: |
           composer dump-autoload --optimize
           time composer test

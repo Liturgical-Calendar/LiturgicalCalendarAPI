@@ -47,8 +47,7 @@
                     "pattern": "^(?:[a-z_]+?_){0,1}[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
                 },
                 "event_key": {
-                    "type": "string",
-                    "pattern": "^(?:[a-z_]+?_){0,1}[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
+                    "$ref": "./CommonDef.json#/definitions/EventKey"
                 },
                 "description": {
                     "type": "string"
@@ -81,8 +80,7 @@
                     "pattern": "^(?:[a-z_]+?_){0,1}[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
                 },
                 "event_key": {
-                    "type": "string",
-                    "pattern": "^(?:[a-z_]+?_){0,1}[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
+                    "$ref": "./CommonDef.json#/definitions/EventKey"
                 },
                 "description": {
                     "type": "string"
@@ -115,8 +113,7 @@
                     "pattern": "^(?:[a-z_]+?_){0,1}[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?Test$"
                 },
                 "event_key": {
-                    "type": "string",
-                    "pattern": "^(?:[a-z_]+?_){0,1}[A-Z][a-zA-Z1-9]+[0-9]{0,2}(?:_vigil)?$"
+                    "$ref": "./CommonDef.json#/definitions/EventKey"
                 },
                 "description": {
                     "type": "string"
@@ -143,6 +140,7 @@
         },
         "Assertions": {
             "type": "array",
+            "minItems": 1,
             "items": {
                 "anyOf": [
                     {

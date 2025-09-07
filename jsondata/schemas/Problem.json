@@ -5,7 +5,8 @@
         "type": {
             "type": "string",
             "description": "A URI reference that identifies the problem type.",
-            "format": "uri",
+            "format": "uri-reference",
+            "default": "about:blank",
             "maxLength": 1024
         },
         "title": {

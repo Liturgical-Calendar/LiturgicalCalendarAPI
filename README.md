@@ -45,7 +45,7 @@
 
 # Liturgical Calendar
 
-An API written in PHP that will generate the liturgical calendar for any given year, based on the General Roman Calendar,
+An API (PSR‑7/15/17 compliant) written in PHP that will generate the liturgical calendar for any given year, based on the General Roman Calendar,
 calculating the mobile festivities and the precedence of solemnities, feasts, memorials...
 Can also produce calendar data for nations, dioceses, or groups of dioceses.
 This calendar data can be served in various formats such as JSON, YAML, XML, or ICS.
@@ -135,7 +135,7 @@ For example, a request to the `/calendar` route will make a request internally t
 To be on the safe side, you should spawn up to 6 workers.
 
 ```bash
-PHP_CLI_SERVER_WORKERS=6 php -S localhost:8000
+PHP_CLI_SERVER_WORKERS=6 php -S 127.0.0.1:8000 -t public
 ```
 
 For convenience when using VSCode, a `tasks.json` has been defined so that you can simply type <kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>B</kbd>

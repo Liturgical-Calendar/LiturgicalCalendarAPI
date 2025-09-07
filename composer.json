@@ -34,7 +34,7 @@
         "nyholm/psr7-server": "^1.1",
         "psr/http-server-middleware": "^1.0",
         "psr/http-server-handler": "^1.0",
-        "guzzlehttp/guzzle": "7.10",
+        "guzzlehttp/guzzle": "^7.10",
         "symfony/semaphore": "^7.3",
         "symfony/lock": "^7.3",
         "react/filesystem": "0.2.x-dev"

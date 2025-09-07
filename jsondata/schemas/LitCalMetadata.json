@@ -55,6 +55,7 @@
                 },
                 "national_calendars_keys": {
                     "type": "array",
+                    "uniqueItems": true,
                     "items": {
                         "$ref": "./CommonDef.json#/definitions/Nation"
                     }
@@ -539,12 +540,14 @@
                 },
                 "diocesan_calendars_keys": {
                     "type": "array",
+                    "uniqueItems": true,
                     "items": {
                         "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
                     }
                 },
                 "diocesan_groups": {
                     "type": "array",
+                    "uniqueItems": true,
                     "items": {
                         "type": "object",
                         "additionalProperties": false,
@@ -570,12 +573,15 @@
                 },
                 "wider_regions_keys": {
                     "type": "array",
+                    "uniqueItems": true,
                     "items": {
                         "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
                     }
                 },
                 "locales": {
                     "type": "array",
+                    "uniqueItems": true,
+                    "minItems": 1,
                     "items": {
                         "$ref": "./CommonDef.json#/definitions/Locale"
                     }
@@ -608,6 +614,7 @@
                 },
                 "api_path": {
                     "type": "string",
+                    "description": "Template URL for the wider region endpoint; {locale} must be substituted and path segments URL-encoded by clients.",
                     "pattern": "^https?:\\\/\\\/(?:litcal\\.johnromanodorazio\\.com\\\/api\\\/(?:dev|v[3-9]|v[1-9]\\d+)|localhost(?:\\:\\d{4}))\\\/data\\\/widerregion\\\/(?:Africa|Alsace|Americas|Anatolia|Antarctica|Asia|Australasia|Central Africa|Central America|Europe|Indies|Middle East|North Africa|Oceania|Scandinavia|South America|West Indies)\\?locale=\\{locale\\}$"
                 }
             },

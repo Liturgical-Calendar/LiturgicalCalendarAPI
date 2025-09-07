@@ -21,16 +21,19 @@ if [ -f "server.pid" ]; then
   pid=$(cat server.pid)
   if kill -0 "$pid" 2>/dev/null; then
     if [ "$RUN_MODE" = "vscode" ]; then
-      echo -e "${YELLOW}Server already started in background with PID $pid, please stop it from there before starting in VSCode.${NC}"
+      echo -e "❌ ${YELLOW}Server already started in background with PID $pid, please stop it from there before starting in VSCode.${NC}"
+      exit 1
     else
       echo -e "${YELLOW}Server already started in background with PID $pid${NC}"
+      exit 0
     fi
-    exit 0
   else
     echo -e "${YELLOW}No process with PID $pid found. Removing stale server.pid.${NC}"
     rm server.pid
   fi
 fi
+
+echo "Starting PHP built-in web server..."
 
 set -a  # automatic export
 

@@ -78,7 +78,7 @@
                     </xs:element>
                     <xs:element name="DayOfTheWeekLong" type="xs:string" />
                     <xs:element name="DayOfTheWeekShort" type="xs:string" />
-                    <xs:element name="EventIdx" type="xs:integer" />
+                    <xs:element name="EventIdx" type="xs:positiveInteger" />
                     <xs:element name="EventKey" type="xs:string" />
                     <xs:element name="Grade">
                       <xs:simpleType>
