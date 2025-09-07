@@ -1,12 +1,14 @@
 # CHANGELOG
 
-## [v5.0](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.0) (Unreleased)
+## [v5.0](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.0) (September 7th 2025)
 
 * add support for `PUT`, `PATCH` and `DELETE` requests (issues [#284], [#265], and [#220])
 * fix "Feria VII is a bad translation for Sabbato" (issue [#310])
 * refactor "festivity" to "liturgical_event" (issue [#239])
 * implement lectionary readings (issues [#321], [#324], [#326])
 * fix Feasts of the Lord not suppressing Sundays (issues [#324], [#327])
+
+Saints Carlos Acutis and Piergiorgio Frassati, pray for us! Released on the day of the canonizations of these saints.
 
 ## [v4.5](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v4.5) (March 25th 2025)
 
