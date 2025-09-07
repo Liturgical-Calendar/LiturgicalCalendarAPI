@@ -1,35 +1,27 @@
-<style>
-    .validations th {
-        background-color: lightgray;
-        color: black;
-    }
-    .validations td {
-        background-color: whitesmoke;
-        color: black;
-    }
-</style>
 <table class="validations">
     <thead>
         <tr>
-            <th colspan="2" scope="col">Code quality</th>
-            <th scope="col">Translation status</th>
-            <th scope="col">OpenAPI validation</th>
+            <th colspan="2" scope="col" style="background-color: lightgray; color: black;">Code quality</th>
+            <th scope="col" style="background-color: lightgray; color: black;">Translation status</th>
+            <th scope="col" style="background-color: lightgray; color: black;">OpenAPI validation</th>
         </tr>
     </thead>
     <tbody>
         <tr>
-            <th style="text-align:center;" scope="row"><a href="https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/tree/master">stable branch</a></th>
-            <td style="text-align:center;">
+            <th style="text-align: center; background-color: lightgray; color: black;" scope="row">
+                <a href="https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/tree/master">stable branch</a>
+            </th>
+            <td style="text-align:center; background-color: whitesmoke;">
                 <a href="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/overview/master">
                     <img src="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/badge/master" title="CodeFactor" alt="CodeFactor" />
                 </a>
             </td>
-            <td rowspan="2">
+            <td rowspan="2" style="text-align:center; background-color: whitesmoke;">
                 <a href="https://translate.johnromanodorazio.com/engage/liturgical-calendar/">
                     <img src="https://translate.johnromanodorazio.com/widgets/liturgical-calendar/-/287x66-white.png" alt="Translation status" />
                 </a>
             </td>
-            <td>
+            <td style="text-align:center; background-color: whitesmoke;">
                 <a href="https://validator.swagger.io/validator?url=https://raw.githubusercontent.com/Liturgical-Calendar/LiturgicalCalendarAPI/master/jsondata/schemas/openapi.json">
                     <img src="https://validator.swagger.io/validator?url=https://raw.githubusercontent.com/Liturgical-Calendar/LiturgicalCalendarAPI/master/jsondata/schemas/openapi.json"
                          alt="OpenAPI validation result" />
@@ -37,13 +29,15 @@
             </td>
         </tr>
         <tr>
-            <th style="text-align:center;" scope="row"><a href="https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/tree/development">dev branch</a></th>
-            <td style="text-align:center;">
+            <th style="text-align: center; background-color: lightgray; color: black;" scope="row">
+                <a href="https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/tree/development">dev branch</a>
+            </th>
+            <td style="text-align: center; background-color: whitesmoke;">
                 <a href="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/overview/development">
                     <img src="https://www.codefactor.io/repository/github/liturgical-calendar/liturgicalcalendarapi/badge/development" title="CodeFactor" alt="CodeFactor" />
                 </a>
             </td>
-            <td>
+            <td style="text-align: center; background-color: whitesmoke;">
                 <a href="https://validator.swagger.io/validator?url=https://raw.githubusercontent.com/Liturgical-Calendar/LiturgicalCalendarAPI/development/jsondata/schemas/openapi.json">
                     <img src="https://validator.swagger.io/validator?url=https://raw.githubusercontent.com/Liturgical-Calendar/LiturgicalCalendarAPI/development/jsondata/schemas/openapi.json"
                          alt="OpenAPI validation result" />
