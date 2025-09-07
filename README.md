@@ -1,9 +1,9 @@
 <table class="validations">
     <thead>
         <tr>
-            <th colspan="2" scope="col" style="background-color: lightgray; color: black;">Code quality</th>
-            <th scope="col" style="background-color: lightgray; color: black;">Translation status</th>
-            <th scope="col" style="background-color: lightgray; color: black;">OpenAPI validation</th>
+            <th colspan="2" scope="col" style="background-color: silver; color: black;">Code quality</th>
+            <th scope="col" style="background-color: silver; color: black;">Translation status</th>
+            <th scope="col" style="background-color: silver; color: black;">OpenAPI validation</th>
         </tr>
     </thead>
     <tbody>
