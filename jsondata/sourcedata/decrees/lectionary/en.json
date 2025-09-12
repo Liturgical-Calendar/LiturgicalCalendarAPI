@@ -52,5 +52,11 @@
         "responsorial_psalm": "",
         "gospel_acclamation": "",
         "gospel": ""
+    },
+    "StMotherTheresa": {
+        "first_reading": "Isaiah 58: 6-11",
+        "responsorial_psalm": "Psalm 33: 2-3, 4-5, 6-7, 8-9, 10-11",
+        "gospel_acclamation": "Matthew 11: 25",
+        "gospel": "Matthew 25: 31-46|Matthew 25: 31-40"
     }
 }

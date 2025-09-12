@@ -165,7 +165,8 @@
                     "enum": [
                         "de",
                         "ge",
-                        "tedeD"
+                        "tedeD",
+                        "tedesca"
                     ]
                 },
                 "en": {
@@ -173,7 +174,8 @@
                     "description": "English",
                     "enum": [
                         "en",
-                        "ingD"
+                        "ingD",
+                        "inglese"
                     ]
                 },
                 "es": {
@@ -182,7 +184,8 @@
                     "enum": [
                         "es",
                         "sp",
-                        "spagnD"
+                        "spagnD",
+                        "spagnola"
                     ]
                 },
                 "fr": {
@@ -190,7 +193,8 @@
                     "description": "French",
                     "enum": [
                         "fr",
-                        "francD"
+                        "francD",
+                        "francese"
                     ]
                 },
                 "it": {
@@ -198,7 +202,8 @@
                     "description": "Italian",
                     "enum": [
                         "it",
-                        "italD"
+                        "italD",
+                        "italiana"
                     ]
                 },
                 "la": {
@@ -206,14 +211,16 @@
                     "description": "Latin",
                     "enum": [
                         "la",
-                        "lat"
+                        "lat",
+                        "latina"
                     ]
                 },
                 "pl": {
                     "type": "string",
                     "description": "Polish",
                     "enum": [
-                        "pl"
+                        "pl",
+                        "polacca"
                     ]
                 },
                 "pt": {
@@ -222,7 +229,8 @@
                     "enum": [
                         "po",
                         "pt",
-                        "portD"
+                        "portD",
+                        "portoghese"
                     ]
                 }
             },

@@ -466,5 +466,44 @@
             "since_year": 2022,
             "url": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2022/01/21/0048/00099.html"
         }
+    },
+    {
+        "decree_id": "StMotherTheresa_Create",
+        "decree_date": "2024-12-24",
+        "decree_protocol": "B0125-XX.01 00250-LA.01",
+        "description": "il Sommo Pontefice Francesco, accogliendo le petizioni e i desideri di Pastori, di religiose e religiosi, come di associazioni di fedeli, considerato l’influsso esercitato dalla spiritualità di santa Teresa di Calcutta in diverse regioni del mondo, ha disposto che il nome di santa Teresa di Calcutta, vergine, sia iscritto nel Calendario Romano Generale e la sua memoria facoltativa sia celebrata da tutti il 5 settembre.",
+        "liturgical_event": {
+            "event_key": "StMotherTheresa",
+            "grade": 2,
+            "month": 9,
+            "day": 5,
+            "common": ["Virgins:For One Virgin", "Holy Men and Women:For Those Who Practiced Works of Mercy"],
+            "calendar": "GENERAL ROMAN",
+            "color": ["white"],
+            "type": "fixed"
+        },
+        "metadata": {
+            "action": "createNew",
+            "since_year": 2025,
+            "url": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2025/02/11/0125/00250.html#%s",
+            "url_lang_map": {
+                "la": "latina",
+                "it": "italiana",
+                "fr": "francese",
+                "en": "inglese",
+                "de": "tedesca",
+                "es": "spagnola",
+                "pt": "portoghese"
+            },
+            "urls_langs": {
+                "la": "https://press.vatican.va/content/salastampa/la/bollettino/pubblico/2025/02/11/0125/00250.html#latina",
+                "it": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2025/02/11/0125/00250.html#italiana",
+                "fr": "https://press.vatican.va/content/salastampa/fr/bollettino/pubblico/2025/02/11/0125/00250.html#francese",
+                "en": "https://press.vatican.va/content/salastampa/en/bollettino/pubblico/2025/02/11/0125/00250.html#inglese",
+                "de": "https://press.vatican.va/content/salastampa/de/bollettino/pubblico/2025/02/11/0125/00250.html#tedesca",
+                "es": "https://press.vatican.va/content/salastampa/es/bollettino/pubblico/2025/02/11/0125/00250.html#spagnola",
+                "pt": "https://press.vatican.va/content/salastampa/pt/bollettino/pubblico/2025/02/11/0125/00250.html#portoghese"
+            }
+        }
     }
 ]
