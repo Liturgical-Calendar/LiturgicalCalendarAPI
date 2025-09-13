@@ -6,6 +6,7 @@ use LiturgicalCalendar\Api\Enum\YearType;
 use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\CorpusChristi;
+use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
@@ -268,16 +269,67 @@ class CalendarParams implements ParamsInterface
      */
     private function validateLocaleParam(string $value): void
     {
-        $value = \Locale::canonicalize($value);
-        if (null === $value) {
-            throw new ValidationException('Invalid locale string: ' . $value . '. “If they were scattered abroad into foreign tongues, it was because their intention was profane. But now, by the distribution of tongues, the impiety is dissolved and the unity of the Spirit is restored.”
-— St. Gregory of Nazianzus, Oration 41 (On Pentecost), §11');
-        }
+        $value           = CalendarParams::normalizeLocale($value);
+        $primaryLanguage = \Locale::getPrimaryLanguage($value);
+        $region          = \Locale::getRegion($value);
 
-        if (false === LitLocale::isValid($value)) {
+        if (false === LitLocale::isValid($value) && false === LitLocale::isValid($primaryLanguage . ( $region ? '_' . $region : '' ))) {
             throw new ValidationException("Invalid value `{$value}` for parameter `locale`, valid values are: la, la_VA, " . implode(', ', LitLocale::$AllAvailableLocales));
         }
         $this->Locale = $value;
+    }
+
+    private static function hasRegion(string $locale): bool
+    {
+        $parts = explode('_', $locale);
+
+        // language only
+        if (count($parts) === 1) {
+            return false;
+        }
+
+        // check each subtag for region pattern
+        foreach ($parts as $part) {
+            if (preg_match('/^[A-Z]{2}$/', $part) || preg_match('/^[0-9]{3}$/', $part)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static function normalizeLocale(string $input): string
+    {
+        $locale = \Locale::canonicalize($input);
+        if (null === $locale) {
+            throw new ValidationException('Invalid locale string: ' . $input . '. “If they were scattered abroad into foreign tongues, it was because their intention was profane. But now, by the distribution of tongues, the impiety is dissolved and the unity of the Spirit is restored.”
+— St. Gregory of Nazianzus, Oration 41 (On Pentecost), §11');
+        }
+
+        if (!CalendarParams::hasRegion($locale)) {
+            $locale = CalendarParams::maximizeLocale($locale);
+        }
+
+        return $locale;
+    }
+
+    private static function maximizeLocale(string $language): string
+    {
+        static $likely = null;
+
+        if ($likely === null) {
+            $json   = file_get_contents(JsonData::FOLDER->path() . '/likelySubtags.json');
+            $data   = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+            $likely = $data['supplemental']['likelySubtags'];
+        }
+
+        // Try direct hit (e.g. "en")
+        if (isset($likely[$language])) {
+            return \Locale::canonicalize($likely[$language]);
+        }
+
+        // Otherwise just return the original base language
+        return $language;
     }
 
     /**

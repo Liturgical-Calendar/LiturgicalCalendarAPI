@@ -4388,7 +4388,7 @@ final class CalendarHandler extends AbstractHandler
         $SerializeableLitCal->settings->epiphany            = $this->CalendarParams->Epiphany;
         $SerializeableLitCal->settings->ascension           = $this->CalendarParams->Ascension;
         $SerializeableLitCal->settings->corpus_christi      = $this->CalendarParams->CorpusChristi;
-        $SerializeableLitCal->settings->locale              = $this->CalendarParams->Locale;
+        $SerializeableLitCal->settings->locale              = LitLocale::$RUNTIME_LOCALE;
         $SerializeableLitCal->settings->return_type         = $this->CalendarParams->ReturnType;
         $SerializeableLitCal->settings->year_type           = $this->CalendarParams->YearType;
         $SerializeableLitCal->settings->eternal_high_priest = $this->CalendarParams->EternalHighPriest;
@@ -4553,6 +4553,7 @@ final class CalendarHandler extends AbstractHandler
         }
     }
 
+
     /**
      * Set up the locale for this API request.
      *
@@ -4563,16 +4564,11 @@ final class CalendarHandler extends AbstractHandler
      */
     private function prepareL10N(): void
     {
+        $region     = \Locale::getRegion($this->CalendarParams->Locale);
         $baseLocale = \Locale::getPrimaryLanguage($this->CalendarParams->Locale);
         if (null === $baseLocale) {
             throw new ServiceUnavailableException('“Pride was the reason for the division of tongues, humility the reason they were reunited.” - St. Augustine, The City of God, Book XVI, Chapter 4');
         }
-
-        LiturgicalEvent::setLocale(
-            $this->CalendarParams->Locale === LitLocale::LATIN
-                ? LitLocale::LATIN_PRIMARY_LANGUAGE
-                : $this->CalendarParams->Locale
-        );
 
         LitLocale::$PRIMARY_LANGUAGE = $baseLocale;
         if ($baseLocale !== LitLocale::LATIN_PRIMARY_LANGUAGE) {
@@ -4580,9 +4576,9 @@ final class CalendarHandler extends AbstractHandler
                 $this->CalendarParams->Locale . '.utf8',
                 $this->CalendarParams->Locale . '.UTF-8',
                 $this->CalendarParams->Locale,
-                $baseLocale . '_' . strtoupper($baseLocale) . '.utf8',
-                $baseLocale . '_' . strtoupper($baseLocale) . '.UTF-8',
-                $baseLocale . '_' . strtoupper($baseLocale),
+                $baseLocale . '_' . $region . '.utf8',
+                $baseLocale . '_' . $region . '.UTF-8',
+                $baseLocale . '_' . $region,
                 $baseLocale . '.utf8',
                 $baseLocale . '.UTF-8',
                 $baseLocale
@@ -4611,6 +4607,8 @@ final class CalendarHandler extends AbstractHandler
         } else {
             LitLocale::$RUNTIME_LOCALE = LitLocale::LATIN_PRIMARY_LANGUAGE;
         }
+
+        LiturgicalEvent::setLocale(LitLocale::$RUNTIME_LOCALE);
 
         $this->createFormatters();
 
