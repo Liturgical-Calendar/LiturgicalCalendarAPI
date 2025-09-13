@@ -315,17 +315,18 @@ class CalendarParams implements ParamsInterface
 
     private static function maximizeLocale(string $language): string
     {
+        /** @var array<string,string>|null $likely */
         static $likely = null;
 
         if ($likely === null) {
-            $json   = file_get_contents(JsonData::FOLDER->path() . '/likelySubtags.json');
-            $data   = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+            /** @var array{supplemental:array{likelySubtags:array<string,string>}} $data */
+            $data   = Utilities::jsonFileToArray(JsonData::FOLDER->path() . '/likelySubtags.json');
             $likely = $data['supplemental']['likelySubtags'];
         }
 
         // Try direct hit (e.g. "en")
         if (isset($likely[$language])) {
-            return \Locale::canonicalize($likely[$language]);
+            return \Locale::canonicalize($likely[$language]) ?? $language;
         }
 
         // Otherwise just return the original base language
