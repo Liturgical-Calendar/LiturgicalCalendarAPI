@@ -69,7 +69,6 @@ class PrettyLineFormatter extends LineFormatter
             Level::Critical  => "\033[1;31m", // Bright Red
             Level::Alert     => "\033[1;33m", // Bright Yellow
             Level::Emergency => "\033[1;41m", // Red background
-            default          => self::NC      // No color
         };
     }
 
