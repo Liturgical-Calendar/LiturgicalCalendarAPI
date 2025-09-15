@@ -11,12 +11,16 @@ use Monolog\Processor\WebProcessor;
 
 class LoggerFactory
 {
-    public static function createApiLogger(string $logsFolder, bool $debug = false, ?RequestResponseProcessor $processor = null): Logger
+    public static function createApiLogger(string $logsFolder, bool $debug = false, ?RequestResponseProcessor $processor = null, int $maxFiles = 30): Logger
     {
+        if (empty($logsFolder) || !is_dir($logsFolder) || !is_writable($logsFolder)) {
+            throw new \InvalidArgumentException("Logs folder must be a valid, writable directory: {$logsFolder}");
+        }
+
         $logger = new Logger('litcalapi');
 
         // --- Plain text rotating file ---
-        $plainHandler   = new RotatingFileHandler($logsFolder . '/api.log', 30, $debug ? Level::Debug : Level::Info);
+        $plainHandler   = new RotatingFileHandler($logsFolder . '/api.log', $maxFiles, $debug ? Level::Debug : Level::Info);
         $plainFormatter = new PrettyLineFormatter(
             "[%datetime%] %level_name%: %message%\n",
             'Y-m-d H:i:s',
@@ -28,7 +32,7 @@ class LoggerFactory
         $logger->pushHandler($plainHandler);
 
         // --- JSON rotating file (for aggregation) ---
-        $jsonHandler   = new RotatingFileHandler($logsFolder . '/api.json.log', 30, $debug ? Level::Debug : Level::Info);
+        $jsonHandler   = new RotatingFileHandler($logsFolder . '/api.json.log', $maxFiles, $debug ? Level::Debug : Level::Info);
         $jsonFormatter = new JsonFormatter(JsonFormatter::BATCH_MODE_JSON, true);
         $jsonHandler->setFormatter($jsonFormatter);
         $logger->pushHandler($jsonHandler);

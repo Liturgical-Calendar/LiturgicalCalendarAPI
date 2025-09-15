@@ -81,11 +81,9 @@ if (
     ini_set('log_errors', 1);
     ini_set('error_log', $logFile);
     error_reporting(E_ALL);
-    // Get microtime as string "msec sec"
-    list($msec, $sec) = explode(' ', microtime(false));
-    // Create DateTime with microseconds
-    $usec = substr($msec, 2, 6);
-    $dt   = DateTimeImmutable::createFromFormat('U.u', $sec . '.' . $usec);
+    // Get current time with microseconds
+    $microtime = microtime(true);
+    $dt        = DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', $microtime));
     // Check for errors
     if ($dt === false) {
         $errors = DateTimeImmutable::getLastErrors();

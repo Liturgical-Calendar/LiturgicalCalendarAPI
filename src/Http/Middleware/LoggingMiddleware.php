@@ -22,7 +22,9 @@ class LoggingMiddleware implements MiddlewareInterface
         if (false === isset(self::$logsFolder)) {
             self::$logsFolder = Router::$apiFilePath . 'logs';
             if (!file_exists(self::$logsFolder)) {
-                mkdir(self::$logsFolder);
+                if (!mkdir(self::$logsFolder, 0755, true)) {
+                    throw new \RuntimeException('Failed to create logs directory: ' . self::$logsFolder);
+                }
             }
         }
 
@@ -37,11 +39,15 @@ class LoggingMiddleware implements MiddlewareInterface
         $this->processor->setRequest($request);
         $this->logger->debug('Incoming request', [
             'request_id' => $requestId,
-            'headers'    => $request->getHeaders(),
+            'pid'        => getmypid(),
             'query'      => $request->getQueryParams(),
             'body'       => (string) $request->getBody(),
+            'headers'    => [
+                'Accept'          => $request->getHeaderLine('Accept'),
+                'Accept-Language' => $request->getHeaderLine('Accept-Language'),
+                'User-Agent'      => $request->getHeaderLine('User-Agent'),
+            ],
             'type'       => 'request',
-            'pid'        => getmypid(),
         ]);
 
         $response = $handler->handle($request);
@@ -50,11 +56,11 @@ class LoggingMiddleware implements MiddlewareInterface
         $this->processor->setResponse($response);
         $this->logger->debug('Outgoing response', [
             'request_id' => $requestId,
-            'status'     => $response->getStatusCode(),
-            'headers'    => $response->getHeaders(),
-            'body'       => (string) $response->getBody(),
-            'type'       => 'response',
             'pid'        => getmypid(),
+            'status'     => $response->getStatusCode(),
+            'body'       => (string) $response->getBody(),
+            'headers'    => $response->getHeaders(),
+            'type'       => 'response',
         ]);
 
         return $response;

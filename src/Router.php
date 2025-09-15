@@ -87,6 +87,7 @@ class Router
             case E_USER_NOTICE:
             case E_DEPRECATED:
             case E_USER_DEPRECATED:
+            case E_RECOVERABLE_ERROR:
                 throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
 
             default:

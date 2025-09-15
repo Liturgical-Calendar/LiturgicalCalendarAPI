@@ -33,10 +33,10 @@ class RequestResponseProcessor
 
             // add extra fields
             $record = $record->with(extra: array_merge($record->extra, [
-                'request_id' => $this->request->getAttribute('request_id'),
-                'protocol'   => "HTTP/{$protocol}",
-                'headers'    => $this->request->getHeaders(),
                 'pid'        => getmypid(),
+                'protocol'   => "HTTP/{$protocol}",
+                //'headers'    => $this->request->getHeaders(),
+                'request_id' => $this->request->getAttribute('request_id'),
             ]));
 
             $coloredMessage = self::BLUE . $record->message . self::NC;
@@ -49,12 +49,16 @@ class RequestResponseProcessor
                 $protocol = $this->response->getProtocolVersion();
 
                 // add extra fields
-                $record = $record->with(extra: array_merge($record->extra, [
-                    'response_id' => $this->request->getAttribute('request_id'),
+                $extraFields = [
                     'status_code' => $status,
-                    'protocol'    => "HTTP/{$protocol}",
                     'pid'         => getmypid(),
-                ]));
+                    'protocol'    => "HTTP/{$protocol}",
+                    'headers'     => $this->response->getHeaders(),
+                ];
+                if ($this->request !== null) {
+                    $extraFields['response_id'] = $this->request->getAttribute('request_id');
+                }
+                $record = $record->with(extra: array_merge($record->extra, $extraFields));
 
                 // Change color depending on status
                 $coloredMessage = $record->message;

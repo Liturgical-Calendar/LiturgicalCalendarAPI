@@ -31,7 +31,9 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
         if (false === isset(self::$logsFolder)) {
             self::$logsFolder = Router::$apiFilePath . 'logs';
             if (!file_exists(self::$logsFolder)) {
-                mkdir(self::$logsFolder);
+                if (!mkdir(self::$logsFolder, 0755, true)) {
+                    throw new \RuntimeException('Failed to create logs directory: ' . self::$logsFolder);
+                }
             }
         }
 
@@ -57,15 +59,21 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
         $this->logger->pushHandler($jsonHandler);
 
         // Catch fatal errors
-        register_shutdown_function(function () {
+        $logger = $this->logger;
+        register_shutdown_function(function () use ($logger) {
             $error = error_get_last();
             if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
-                $this->logger->critical(sprintf(
-                    'Fatal error: %s in %s:%d',
-                    $error['message'],
-                    $error['file'],
-                    $error['line']
-                ));
+                try {
+                    $logger->critical(sprintf(
+                        'Fatal error: %s in %s:%d',
+                        $error['message'],
+                        $error['file'],
+                        $error['line']
+                    ));
+                } catch (\Throwable $e) {
+                    // Fallback to error_log if logger fails during shutdown
+                    error_log('Fatal error logging failed: ' . $e->getMessage());
+                }
             }
         });
     }
@@ -83,7 +91,6 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
                 $extra['method']     = $request->getMethod();
                 $extra['query']      = $request->getUri()->getQuery();
                 $extra['pid']        = getmypid();
-                //$extra['ip']         = $request->getServerParams()['REMOTE_ADDR'] ?? null;
 
                 // Selected headers
                 $headersToLog     = ['Accept', 'Accept-Language', 'User-Agent']; // 'Authorization'
