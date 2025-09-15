@@ -3,6 +3,13 @@
 namespace LiturgicalCalendar\Api\Http\Middleware;
 
 use LiturgicalCalendar\Api\Http\Exception\ApiException;
+use LiturgicalCalendar\Api\Http\Logs\PrettyLineFormatter;
+use LiturgicalCalendar\Api\Router;
+use Monolog\Logger;
+use Monolog\Level;
+use Monolog\LogRecord;
+use Monolog\Handler\RotatingFileHandler;
+use Monolog\Formatter\JsonFormatter;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -13,11 +20,54 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
 {
     private ResponseFactoryInterface $responseFactory;
     private bool $debug;
+    private static string $logsFolder;
+    private Logger $logger;
 
     public function __construct(ResponseFactoryInterface $responseFactory, bool $debug = false)
     {
         $this->responseFactory = $responseFactory;
         $this->debug           = $debug;
+
+        if (false === isset(self::$logsFolder)) {
+            self::$logsFolder = Router::$apiFilePath . 'logs';
+            if (!file_exists(self::$logsFolder)) {
+                mkdir(self::$logsFolder);
+            }
+        }
+
+        // === Rotating file handler with plain text ===
+        $plainHandler  = new RotatingFileHandler(self::$logsFolder . DIRECTORY_SEPARATOR . 'api-error.log', 30, Level::Info);
+        $lineFormatter = new PrettyLineFormatter(
+            "[%datetime%] %level_name%: %message%\n", // custom format
+            'Y-m-d H:i:s',                            // date format
+            true,                                     // allow inline breaks
+            true,                                     // ignore empty context/extra
+            false                                     // include stacktraces
+        );
+        $plainHandler->setFormatter($lineFormatter);
+
+        // === Rotating file handler with JSON formatting (better for log aggregation systems like ELK / Loki / CloudWatch) ===
+        $jsonHandler   = new RotatingFileHandler(self::$logsFolder . DIRECTORY_SEPARATOR . 'api-error.json.log', 30, Level::Debug);
+        $jsonFormatter = new JsonFormatter(JsonFormatter::BATCH_MODE_JSON, true);
+        $jsonHandler->setFormatter($jsonFormatter);
+
+        // === Logger setup ===
+        $this->logger = new Logger('litcalapi');
+        $this->logger->pushHandler($plainHandler);
+        $this->logger->pushHandler($jsonHandler);
+
+        // Catch fatal errors
+        register_shutdown_function(function () {
+            $error = error_get_last();
+            if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+                $this->logger->critical(sprintf(
+                    'Fatal error: %s in %s:%d',
+                    $error['message'],
+                    $error['file'],
+                    $error['line']
+                ));
+            }
+        });
     }
 
 
@@ -26,6 +76,36 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
         try {
             return $handler->handle($request);
         } catch (\Throwable $e) {
+            $this->logger->pushProcessor(function (LogRecord $record) use ($request): LogRecord {
+                $extra               = $record->extra;
+                $extra['request_id'] = $request->getAttribute('request_id');
+                $extra['route']      = $request->getUri()->getPath();
+                $extra['method']     = $request->getMethod();
+                $extra['query']      = $request->getUri()->getQuery();
+                $extra['pid']        = getmypid();
+                //$extra['ip']         = $request->getServerParams()['REMOTE_ADDR'] ?? null;
+
+                // Selected headers
+                $headersToLog     = ['Accept', 'Accept-Language', 'User-Agent']; // 'Authorization'
+                $extra['headers'] = [];
+                foreach ($headersToLog as $name) {
+                    $extra['headers'][$name] = $request->getHeaderLine($name);
+                }
+
+                return $record->with(extra: $extra);
+            });
+
+            $this->logger->error(
+                sprintf(
+                    "%s in %s:%d\nStack trace:\n%s",
+                    $e->getMessage(),
+                    $e->getFile(),
+                    $e->getLine(),
+                    $e->getTraceAsString()
+                ),
+                [ 'exception' => $e ] // 👈 only used by JSON handler
+            );
+
             // Default values
             $status  = 500;
             $problem = [

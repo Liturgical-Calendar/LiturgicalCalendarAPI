@@ -541,13 +541,10 @@ abstract class AbstractHandler implements RequestHandlerInterface
                     throw new ImplementationException('YAML extension not loaded');
                 }
 
-                set_error_handler([self::class, 'warningHandler'], E_WARNING);
                 try {
                     $parsedBody = yaml_parse($rawBodyContents);
                 } catch (\ErrorException $e) {
                     throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
-                } finally {
-                    restore_error_handler();
                 }
                 break;
             case RequestContentType::FORMDATA:
@@ -628,7 +625,6 @@ abstract class AbstractHandler implements RequestHandlerInterface
                     throw new ImplementationException('YAML extension not loaded');
                 }
 
-                set_error_handler([self::class, 'warningHandler'], E_WARNING);
                 try {
                     $parsedBody = yaml_parse($rawBodyContents);
                     if (false === is_array($parsedBody) || empty($parsedBody)) {
@@ -650,8 +646,6 @@ abstract class AbstractHandler implements RequestHandlerInterface
                     }
                 } catch (\ErrorException $e) {
                     throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
-                } finally {
-                    restore_error_handler();
                 }
                 break;
             default:
@@ -689,13 +683,10 @@ abstract class AbstractHandler implements RequestHandlerInterface
                 $recodedResponse     = json_decode($jsonEncodedResponse, true, 512, JSON_THROW_ON_ERROR);
 
                 // Then we attempt to encode the array as YAML
-                set_error_handler([static::class, 'warningHandler'], E_WARNING);
                 try {
                     $encodedResponse = yaml_emit($recodedResponse, YAML_UTF8_ENCODING);
                 } catch (\ErrorException $e) {
                     throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
-                } finally {
-                    restore_error_handler();
                 }
                 break;
             default:

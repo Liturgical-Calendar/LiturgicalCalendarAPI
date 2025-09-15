@@ -4486,13 +4486,10 @@ final class CalendarHandler extends AbstractHandler
                     throw new ImplementationException('YAML extension not loaded');
                 }
                 $jsonArr = Utilities::objectToArray($SerializeableLitCal);
-                set_error_handler([static::class, 'warningHandler'], E_WARNING);
                 try {
                     $responseBody = yaml_emit($jsonArr, YAML_UTF8_ENCODING);
                 } catch (\ErrorException $e) {
                     throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
-                } finally {
-                    restore_error_handler();
                 }
                 break;
             case ReturnTypeParam::ICS:

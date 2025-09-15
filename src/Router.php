@@ -21,6 +21,7 @@ use LiturgicalCalendar\Api\Handlers\SchemasHandler;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Middleware\ErrorHandlingMiddleware;
+use LiturgicalCalendar\Api\Http\Middleware\LoggingMiddleware;
 use LiturgicalCalendar\Api\Http\Server\MiddlewarePipeline;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
@@ -50,6 +51,9 @@ class Router
 
     public function __construct()
     {
+        // Escalate PHP warnings to exceptions so that they will be handled by our middleware
+        set_error_handler([self::class, 'errorHandler']);
+
         if (
             false === isset(self::$apiBase)
             || false === isset(self::$apiPath)
@@ -63,7 +67,32 @@ class Router
         }
 
         $this->psr17Factory = new Psr17Factory();
-        $this->request      = $this->retrieveRequest();
+        $request            = $this->retrieveRequest();
+        $requestId          = bin2hex(random_bytes(8)); // 16 hex chars
+        $this->request      = $request->withAttribute('request_id', $requestId);
+    }
+
+    public static function errorHandler(int $errno, string $errstr, string $errfile, int $errline): bool
+    {
+        // Respect current error_reporting
+        if (!( error_reporting() & $errno )) {
+            return false; // let PHP handle it (or ignore)
+        }
+
+        // Only escalate non-fatal errors
+        switch ($errno) {
+            case E_WARNING:
+            case E_NOTICE:
+            case E_USER_WARNING:
+            case E_USER_NOTICE:
+            case E_DEPRECATED:
+            case E_USER_DEPRECATED:
+                throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
+
+            default:
+                // For fatal errors, let PHP handle them (or use register_shutdown_function)
+                return false;
+        }
     }
 
     /**
@@ -355,7 +384,7 @@ class Router
 
         $pipeline = new MiddlewarePipeline($this->handler);
         $pipeline->pipe(new ErrorHandlingMiddleware($this->psr17Factory, self::$debug)); // outermost middleware
-        //$pipeline->pipe(new LoggingMiddleware());       // innermost middleware
+        $pipeline->pipe(new LoggingMiddleware(self::$debug));                            // innermost middleware
 
         $this->response = $pipeline->handle($this->request);
         $this->emitResponse();

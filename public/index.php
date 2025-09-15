@@ -68,7 +68,9 @@ $logsFolder = $projectFolder . DIRECTORY_SEPARATOR . 'logs';
 if (!file_exists($logsFolder)) {
     mkdir($logsFolder);
 }
-$logFile = $logsFolder . DIRECTORY_SEPARATOR . 'php-error-litcalapi.log';
+$logFile = $logsFolder . DIRECTORY_SEPARATOR . 'litcalapi-error.log';
+
+ini_set('date.timezone', 'Europe/Vatican');
 
 if (
     Router::isLocalhost()
@@ -79,8 +81,21 @@ if (
     ini_set('log_errors', 1);
     ini_set('error_log', $logFile);
     error_reporting(E_ALL);
-    $pid = getmypid();
-    file_put_contents($logsFolder . DIRECTORY_SEPARATOR . 'litcal-pid.log', $pid . ' started ' . date('H:i:s.u') . PHP_EOL, FILE_APPEND);
+    // Get microtime as string "msec sec"
+    list($msec, $sec) = explode(' ', microtime(false));
+    // Create DateTime with microseconds
+    $usec = substr($msec, 2, 6);
+    $dt   = DateTimeImmutable::createFromFormat('U.u', $sec . '.' . $usec);
+    // Check for errors
+    if ($dt === false) {
+        $errors = DateTimeImmutable::getLastErrors();
+        throw new RuntimeException('Failed to create DateTimeImmutable: ' . print_r($errors, true));
+    }
+    // Convert to Europe/Vatican timezone
+    $dt        = $dt->setTimezone(new DateTimeZone('Europe/Vatican'));
+    $timestamp = $dt->format('H:i:s.u');
+    $pid       = getmypid();
+    file_put_contents($logsFolder . DIRECTORY_SEPARATOR . 'litcal-pid.log', $pid . ' handled ' . $timestamp . PHP_EOL, FILE_APPEND);
 } else {
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
@@ -88,8 +103,6 @@ if (
     ini_set('error_log', $logFile);
     error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
 }
-
-ini_set('date.timezone', 'Europe/Vatican');
 
 $router = new Router();
 $router->route();
