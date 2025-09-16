@@ -46,6 +46,7 @@ require_once $projectFolder . '/vendor/autoload.php';
 
 use LiturgicalCalendar\Api\Router;
 use Dotenv\Dotenv;
+use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 
 $dotenv = Dotenv::createMutable($projectFolder, ['.env', '.env.local', '.env.development', '.env.production'], false);
 
@@ -66,9 +67,14 @@ $dotenv->ifPresent(['APP_ENV'])->notEmpty()->allowedValues(['development', 'prod
 
 $logsFolder = $projectFolder . DIRECTORY_SEPARATOR . 'logs';
 if (!file_exists($logsFolder)) {
-    mkdir($logsFolder);
+    if (!mkdir(self::$logsFolder, 0755, true)) {
+        throw new \RuntimeException('Failed to create logs directory: ' . self::$logsFolder);
+    }
 }
-$logFile = $logsFolder . DIRECTORY_SEPARATOR . 'php-error-litcalapi.log';
+
+$logFile = $logsFolder . DIRECTORY_SEPARATOR . 'litcalapi-error.log';
+
+ini_set('date.timezone', 'Europe/Vatican');
 
 if (
     Router::isLocalhost()
@@ -79,8 +85,20 @@ if (
     ini_set('log_errors', 1);
     ini_set('error_log', $logFile);
     error_reporting(E_ALL);
-    $pid = getmypid();
-    file_put_contents($logsFolder . DIRECTORY_SEPARATOR . 'litcal-pid.log', $pid . ' started ' . date('H:i:s.u') . PHP_EOL, FILE_APPEND);
+    // Get current time with microseconds
+    $microtime = microtime(true);
+    $dt        = DateTimeImmutable::createFromFormat('U.u', sprintf('%.6F', $microtime));
+    // Check for errors
+    if ($dt === false) {
+        $errors = DateTimeImmutable::getLastErrors();
+        throw new RuntimeException('Failed to create DateTimeImmutable: ' . print_r($errors, true));
+    }
+    // Convert to Europe/Vatican timezone
+    $dt        = $dt->setTimezone(new DateTimeZone('Europe/Vatican'));
+    $timestamp = $dt->format('H:i:s.u');
+    $pid       = getmypid();
+    $pidLogger = LoggerFactory::createPidLogger(true, 'api-pid', $logsFolder);
+    $pidLogger->info('Liturgical Calendar API handled by process with PID (' . $pid . ') at ' . $timestamp);
 } else {
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
@@ -88,8 +106,6 @@ if (
     ini_set('error_log', $logFile);
     error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
 }
-
-ini_set('date.timezone', 'Europe/Vatican');
 
 $router = new Router();
 $router->route();
