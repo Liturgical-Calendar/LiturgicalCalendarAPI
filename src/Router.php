@@ -37,11 +37,6 @@ class Router
     public static string $apiFilePath;
     private const MIN_YEAR = 1969;  // exlusive minimum (first year supported is 1970)
     private const MAX_YEAR = 10000; // exclusive maximum (last year supported is 9999)
-    private const RED      = "\033[0;31m";
-    private const GREEN    = "\033[0;32m";
-    private const YELLOW   = "\033[0;33m";
-    private const BLUE     = "\033[0;34m";
-    private const NC       = "\033[0m"; // No Color
 
     private RequestHandlerInterface $handler;
     private Psr17Factory $psr17Factory;

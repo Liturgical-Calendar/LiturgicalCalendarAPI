@@ -14,11 +14,11 @@ class LoggerFactory
 {
     /** @var Logger[] $apiLoggers */
     private static array $apiLoggers = [];
-    private static ?string $logsFolder;
+    private static string $logsFolder;
 
     /**
-     * @var ?string $logsFolder If a string is passed, it is expected to be a valid and existing folder;
-     *                          if null, will default to `Router::$apiFilePath . 'logs'`
+     * @param ?string $logsFolder If a string is passed, it is expected to be a valid and existing folder;
+     *                            if null, will default to `Router::$apiFilePath . 'logs'`
      */
     public static function createApiLogger(bool $debug = false, string $logName = 'api', ?string $logsFolder = null, int $maxFiles = 30): Logger
     {

@@ -57,6 +57,20 @@ class RequestResponseProcessor
         }
     }
 
+    /**
+     * Sanitizes an array of HTTP headers by replacing sensitive information with "[redacted]" string.
+     *
+     * Sensitive headers are:
+     *   - Authorization
+     *   - Cookie
+     *   - Set-Cookie
+     *   - Proxy-Authorization
+     *   - X-API-Key
+     *   - X-Auth-Token
+     *
+     * @param string[][] $headers an array of HTTP headers
+     * @return string[][] an array of sanitized HTTP headers
+     */
     private static function sanitizeHeaders(array $headers): array
     {
         $sensitive = ['authorization', 'cookie', 'set-cookie', 'proxy-authorization', 'x-api-key', 'x-auth-token'];

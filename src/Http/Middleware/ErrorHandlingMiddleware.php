@@ -107,13 +107,17 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
                 $problem['trace'] = explode("\n", $e->getTraceAsString());
             }
 
-            $response = $this->responseFactory->createResponse($status);
+            $response     = $this->responseFactory->createResponse($status);
+            $responseBody = json_encode($problem, JSON_PRETTY_PRINT | JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+            if (false === $responseBody) {
+                error_log('Failed to encode error to application/problem+json: ' . json_last_error_msg());
+                return $response;
+            }
+
             $response
                 ->getBody()
-                ->write(json_encode(
-                    $problem,
-                    JSON_PRETTY_PRINT | JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
-                ));
+                ->write($responseBody);
 
             return $response
                 ->withHeader('Content-Type', 'application/problem+json')
