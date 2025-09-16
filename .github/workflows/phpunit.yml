@@ -66,10 +66,6 @@ jobs:
 
       - name: Start the PHP web server
         run: composer start
-        env:
-          API_PROTOCOL: http
-          API_HOST: 127.0.0.1
-          API_PORT: 8000
 
       - name: Wait for server PID and HTTP readiness
         id: server-check
@@ -89,7 +85,7 @@ jobs:
           fi
 
           for i in {1..30}; do
-            if curl -fsS $API_PROTOCOL://$API_HOST:$API_PORT/ > /dev/null; then
+            if curl -fsS -4 http://localhost:8000/ > /dev/null; then
               exit 0
             fi
             sleep 1
