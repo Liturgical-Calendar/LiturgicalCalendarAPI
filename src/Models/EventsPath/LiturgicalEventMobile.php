@@ -25,7 +25,7 @@ use LiturgicalCalendar\Api\Models\RelativeLiturgicalDate;
  *     color?: LitColor|LitColor[]|string|string[],
  *     type?: LitEventType|string,
  *     common?: LitCommons|LitCommon[]|LitMassVariousNeeds[]|string[],
- *     grade_display?: string,
+ *     grade_display?: ?string,
  * }
  */
 final class LiturgicalEventMobile extends LiturgicalEventAbstract
@@ -259,6 +259,14 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
             throw new \Exception('Invalid object provided to create LiturgicalEventMobile: grade is not an instance of LitGrade');
         }
 
+        $gradeDisplay = null;
+        if (isset($obj->grade_display)) {
+            if (false === is_null($obj->grade_display) && false === is_string($obj->grade_display)) {
+                throw new \InvalidArgumentException('Invalid grade_display provided to create LiturgicalEventFixed');
+            }
+            $gradeDisplay = $obj->grade_display;
+        }
+
         return new self(
             $obj->event_key,
             $obj->name,
@@ -267,7 +275,7 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
             $type,
             $grade,
             $commons,
-            $obj->grade_display ?? null
+            $gradeDisplay
         );
     }
 
@@ -371,6 +379,14 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
             throw new \InvalidArgumentException('Invalid strtotime provided to create LiturgicalEventMobile');
         }
 
+        $gradeDisplay = null;
+        if (isset($arr['grade_display'])) {
+            if (false === is_null($arr['grade_display']) && false === is_string($arr['grade_display'])) {
+                throw new \InvalidArgumentException('Invalid grade_display provided to create LiturgicalEventFixed');
+            }
+            $gradeDisplay = $arr['grade_display'];
+        }
+
         return new self(
             $arr['event_key'],
             $arr['name'],
@@ -379,7 +395,7 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
             $arr['type'],
             $arr['grade'],
             $commons,
-            isset($arr['grade_display']) ? $arr['grade_display'] : null
+            $gradeDisplay
         );
     }
 }

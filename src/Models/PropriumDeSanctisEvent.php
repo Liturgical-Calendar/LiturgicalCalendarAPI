@@ -145,12 +145,12 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
     {
         static::validateRequiredKeys($data, static::REQUIRED_PROPS);
 
-        $litCommons = LitCommons::create($data['common']) ?? array_map(
+        $litCommons = LitCommons::create($data['common']) ?? array_values(array_map(
             function (string $value): LitMassVariousNeeds {
                 return LitMassVariousNeeds::from($value);
             },
             $data['common']
-        );
+        ));
 
         return new static(
             $data['event_key'],
@@ -190,17 +190,23 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
     {
         static::validateRequiredProps($data, static::REQUIRED_PROPS);
 
-        $litCommons = LitCommons::create($data->common) ?? array_map(
+        $litCommons = LitCommons::create($data->common) ?? array_values(array_map(
             function (string $value): LitMassVariousNeeds {
                 return LitMassVariousNeeds::from($value);
             },
             $data->common
-        );
+        ));
+
         return new static(
             $data->event_key,
             $data->day,
             $data->month,
-            array_map(fn (string $color): LitColor => LitColor::from($color), $data->color),
+            array_map(
+                function (string $color): LitColor {
+                    return LitColor::from($color);
+                },
+                $data->color
+            ),
             $litCommons,
             LitGrade::from($data->grade),
             isset($data->grade_display) ? $data->grade_display : null,

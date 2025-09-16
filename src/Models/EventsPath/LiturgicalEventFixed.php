@@ -25,7 +25,7 @@ use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCr
  *     color?: LitColor|LitColor[]|string|string[],
  *     type?: LitEventType|string,
  *     common?: LitCommons|LitCommon[]|LitMassVariousNeeds[]|string[],
- *     grade_display?: string,
+ *     grade_display?: ?string,
  * }
  */
 final class LiturgicalEventFixed extends LiturgicalEventAbstract
@@ -247,6 +247,14 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
             throw new \InvalidArgumentException('“Examine yourselves to see whether you are living in faith. Test yourselves. Do you not realize that Jesus Christ is in you?—unless, of course, you fail the test.” (1 Corinthians 13:5)');
         }
 
+        $gradeDisplay = null;
+        if (isset($obj->grade_display)) {
+            if (false === is_null($obj->grade_display) && false === is_string($obj->grade_display)) {
+                throw new \InvalidArgumentException('Invalid grade_display provided to create LiturgicalEventFixed');
+            }
+            $gradeDisplay = $obj->grade_display;
+        }
+
         return new self(
             $obj->event_key,
             $obj->name,
@@ -256,7 +264,7 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
             $type,
             $grade,
             $commons,
-            $obj->grade_display ?? null
+            $gradeDisplay
         );
     }
 
@@ -354,6 +362,14 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
             $commons = LitCommons::create([LitCommon::NONE]);
         }
 
+        $gradeDisplay = null;
+        if (isset($arr['grade_display'])) {
+            if (false === is_null($arr['grade_display']) && false === is_string($arr['grade_display'])) {
+                throw new \InvalidArgumentException('Invalid grade_display provided to create LiturgicalEventFixed');
+            }
+            $gradeDisplay = $arr['grade_display'];
+        }
+
         return new self(
             $arr['event_key'],
             $arr['name'],
@@ -363,7 +379,7 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
             $arr['type'],
             $arr['grade'],
             $commons,
-            isset($arr['grade_display']) ? $arr['grade_display'] : null
+            $gradeDisplay
         );
     }
 }

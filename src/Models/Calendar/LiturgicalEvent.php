@@ -478,6 +478,7 @@ final class LiturgicalEvent implements \JsonSerializable
             }
         } else {
             if (isset($obj->common)) {
+                /** @var LitCommons|LitMassVariousNeeds[] $commons */
                 $commons = $obj->common;
             } else {
                 // We ensure a default value
@@ -656,8 +657,8 @@ final class LiturgicalEvent implements \JsonSerializable
     }
 
     /**
-     * @param LitCommons|array<LitMassVariousNeeds|LitCommon|string> $common
-     * @return LitCommons|array<LitMassVariousNeeds>
+     * @param LitCommons|LitMassVariousNeeds[]|LitCommon[]|string[] $common
+     * @return LitCommons|LitMassVariousNeeds[]
      */
     private static function transformCommons(LitCommons|array $common): LitCommons|array
     {

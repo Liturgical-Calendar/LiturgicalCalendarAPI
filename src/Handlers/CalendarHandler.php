@@ -3398,7 +3398,7 @@ final class CalendarHandler extends AbstractHandler
                     ? $liturgicalEvent->date->format('F jS')
                     : $this->dayAndMonth->format($liturgicalEvent->date->format('U'))
                 );
-            $dateStr          = property_exists($liturgicalEvent, 'strtotime') && $liturgicalEvent->strtotime !== ''
+            $dateStr          = property_exists($liturgicalEvent, 'strtotime') && is_string($liturgicalEvent->strtotime) && $liturgicalEvent->strtotime !== ''
                 ? '<i>' . $liturgicalEvent->strtotime . '</i>'
                 : $formattedDateStr;
             $this->Messages[] = sprintf(
@@ -3426,7 +3426,7 @@ final class CalendarHandler extends AbstractHandler
                     ? $liturgicalEvent->date->format('F jS')
                     : $this->dayAndMonth->format($liturgicalEvent->date->format('U'))
                 );
-            $dateStr          = property_exists($liturgicalEvent, 'strtotime') && $liturgicalEvent->strtotime !== ''
+            $dateStr          = property_exists($liturgicalEvent, 'strtotime') && is_string($liturgicalEvent->strtotime) && $liturgicalEvent->strtotime !== ''
                 ? '<i>' . $liturgicalEvent->strtotime . '</i>'
                 : $formattedDateStr;
 
