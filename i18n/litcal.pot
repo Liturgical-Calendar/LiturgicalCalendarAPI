@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-07 02:15+0000\n"
+"POT-Creation-Date: 2025-09-16 19:17+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1338,12 +1338,12 @@ msgstr ""
 msgid "Error converting Liturgical Calendar to XML."
 msgstr ""
 
-#: src/Handlers/CalendarHandler.php:4508
+#: src/Handlers/CalendarHandler.php:4505
 #, php-format
 msgid "Error receiving or parsing info from GitHub about latest release: %s."
 msgstr ""
 
-#: src/Handlers/CalendarHandler.php:4519
+#: src/Handlers/CalendarHandler.php:4516
 msgid "Error serializing Liturgical Calendar."
 msgstr ""
 
