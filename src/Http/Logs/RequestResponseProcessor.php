@@ -8,74 +8,62 @@ use Psr\Http\Message\ResponseInterface;
 
 class RequestResponseProcessor
 {
-    private ?ServerRequestInterface $request = null;
-    private ?ResponseInterface $response     = null;
-    private const RED                        = "\033[0;31m";
-    private const GREEN                      = "\033[0;32m";
-    private const YELLOW                     = "\033[0;33m";
-    private const BLUE                       = "\033[0;34m";
-    private const NC                         = "\033[0m"; // No Color
-
-    public function setRequest(ServerRequestInterface $request): void
-    {
-        $this->request = $request;
-    }
-
-    public function setResponse(ResponseInterface $response): void
-    {
-        $this->response = $response;
-    }
-
     public function __invoke(LogRecord $record): LogRecord
     {
-        if (( $record->context['type'] ?? null ) === 'request' && $this->request) {
-            $protocol = $this->request->getProtocolVersion();
+        $ctx = $record->context ?? [];
+        if (isset($ctx['type'])) {
+            switch ($ctx['type']) {
+                case 'request':
+                    if (!isset($ctx['request']) || false === ( $ctx['request'] instanceof ServerRequestInterface )) {
+                        throw new \RuntimeException('Expected request object in context of RequestResponseProcessor when invoked with context of type request');
+                    }
+                    $request  = $ctx['request'];
+                    $protocol = $request->getProtocolVersion();
 
-            // add extra fields
-            $record = $record->with(extra: array_merge($record->extra, [
-                'pid'        => getmypid(),
-                'protocol'   => "HTTP/{$protocol}",
-                //'headers'    => $this->request->getHeaders(),
-                'request_id' => $this->request->getAttribute('request_id'),
-            ]));
+                    // add extra fields
+                    $record = $record->with(extra: array_merge($record->extra, [
+                        'pid'        => getmypid(),
+                        'protocol'   => "HTTP/{$protocol}",
+                        'headers'    => self::sanitizeHeaders($request->getHeaders()),
+                        'request_id' => $ctx['request_id'],
+                    ]));
 
-            $coloredMessage = self::BLUE . $record->message . self::NC;
-            $record         = $record->with(message: $coloredMessage);
-        }
+                    return $record;
+                    // no break needed
+                case 'response':
+                    if (!isset($ctx['response']) || false === ( $ctx['response'] instanceof ResponseInterface )) {
+                        throw new \RuntimeException('Expected response object in context of RequestResponseProcessor when invoked with context of type response');
+                    }
+                    $response = $ctx['response'];
+                    $status   = $response->getStatusCode();
+                    $protocol = $response->getProtocolVersion();
 
-        if (( $record->context['type'] ?? null ) === 'response') {
-            if ($this->response) {
-                $status   = $this->response->getStatusCode();
-                $protocol = $this->response->getProtocolVersion();
+                    // add extra fields
+                    $record = $record->with(extra: array_merge($record->extra, [
+                        'pid'         => getmypid(),
+                        'protocol'    => "HTTP/{$protocol}",
+                        'headers'     => self::sanitizeHeaders($response->getHeaders()),
+                        'status_code' => $status,
+                        'response_id' => $ctx['request_id']
+                    ]));
 
-                // add extra fields
-                $extraFields = [
-                    'status_code' => $status,
-                    'pid'         => getmypid(),
-                    'protocol'    => "HTTP/{$protocol}",
-                    'headers'     => $this->response->getHeaders(),
-                ];
-                if ($this->request !== null) {
-                    $extraFields['response_id'] = $this->request->getAttribute('request_id');
-                }
-                $record = $record->with(extra: array_merge($record->extra, $extraFields));
-
-                // Change color depending on status
-                $coloredMessage = $record->message;
-                if ($status >= 500) {
-                    $coloredMessage = self::RED . $record->message . self::NC;
-                } elseif ($status >= 400) {
-                    $coloredMessage = self::YELLOW . $record->message . self::NC;
-                } else {
-                    $coloredMessage = self::GREEN . $record->message . self::NC;
-                }
-                $record = $record->with(message: $coloredMessage);
-            } else {
-                // No response yet → just skip modification
-                return $record;
+                    return $record;
+                    // no break needed
+                default:
+                    throw new \RuntimeException('Cannot process either request or response for logging if context type is not set to either request or response');
             }
+        } else {
+            throw new \RuntimeException('Cannot process either request or response for logging if context type is not set to either request or response');
         }
+    }
 
-        return $record;
+    private static function sanitizeHeaders(array $headers): array
+    {
+        $sensitive = ['authorization', 'cookie', 'set-cookie', 'proxy-authorization', 'x-api-key', 'x-auth-token'];
+        $out       = [];
+        foreach ($headers as $name => $values) {
+            $out[$name] = in_array(strtolower($name), $sensitive, true) ? ['[redacted]'] : $values;
+        }
+        return $out;
     }
 }

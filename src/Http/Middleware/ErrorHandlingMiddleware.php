@@ -3,13 +3,9 @@
 namespace LiturgicalCalendar\Api\Http\Middleware;
 
 use LiturgicalCalendar\Api\Http\Exception\ApiException;
-use LiturgicalCalendar\Api\Http\Logs\PrettyLineFormatter;
+use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use LiturgicalCalendar\Api\Router;
 use Monolog\Logger;
-use Monolog\Level;
-use Monolog\LogRecord;
-use Monolog\Handler\RotatingFileHandler;
-use Monolog\Formatter\JsonFormatter;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -20,56 +16,36 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
 {
     private ResponseFactoryInterface $responseFactory;
     private bool $debug;
-    private static string $logsFolder;
-    private Logger $logger;
+    private Logger $debugLogger;
+    private Logger $errorLogger;
+
+    // Store the current request so processors can use it
+    private ?ServerRequestInterface $currentRequest = null;
 
     public function __construct(ResponseFactoryInterface $responseFactory, bool $debug = false)
     {
         $this->responseFactory = $responseFactory;
         $this->debug           = $debug;
-
-        if (false === isset(self::$logsFolder)) {
-            self::$logsFolder = Router::$apiFilePath . 'logs';
-            if (!file_exists(self::$logsFolder)) {
-                if (!mkdir(self::$logsFolder, 0755, true)) {
-                    throw new \RuntimeException('Failed to create logs directory: ' . self::$logsFolder);
-                }
-            }
-        }
-
-        // === Rotating file handler with plain text ===
-        $plainHandler  = new RotatingFileHandler(self::$logsFolder . DIRECTORY_SEPARATOR . 'api-error.log', 30, Level::Info);
-        $lineFormatter = new PrettyLineFormatter(
-            "[%datetime%] %level_name%: %message%\n", // custom format
-            'Y-m-d H:i:s',                            // date format
-            true,                                     // allow inline breaks
-            true,                                     // ignore empty context/extra
-            false                                     // include stacktraces
-        );
-        $plainHandler->setFormatter($lineFormatter);
-
-        // === Rotating file handler with JSON formatting (better for log aggregation systems like ELK / Loki / CloudWatch) ===
-        $jsonHandler   = new RotatingFileHandler(self::$logsFolder . DIRECTORY_SEPARATOR . 'api-error.json.log', 30, Level::Debug);
-        $jsonFormatter = new JsonFormatter(JsonFormatter::BATCH_MODE_JSON, true);
-        $jsonHandler->setFormatter($jsonFormatter);
-
-        // === Logger setup ===
-        $this->logger = new Logger('litcalapi');
-        $this->logger->pushHandler($plainHandler);
-        $this->logger->pushHandler($jsonHandler);
+        $debugLogger           = LoggerFactory::createApiLogger($debug);
+        $this->debugLogger     = $debugLogger;
+        $errorLogger           = LoggerFactory::createApiLogger($debug, 'api-error');
+        $this->errorLogger     = $errorLogger;
 
         // Catch fatal errors
-        $logger = $this->logger;
-        register_shutdown_function(function () use ($logger) {
+        register_shutdown_function(function () use ($errorLogger) {
             $error = error_get_last();
-            if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+            if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR], true)) {
                 try {
-                    $logger->critical(sprintf(
-                        'Fatal error: %s in %s:%d',
+                    $errorLogger->critical(sprintf(
+                        'Fatal error: %s in %s:%d | memory_peak_usage=%s',
                         $error['message'],
                         $error['file'],
-                        $error['line']
-                    ));
+                        $error['line'],
+                        self::formatBytes(memory_get_peak_usage(true))
+                    ), [
+                        // Pass along the request (if available) for processors
+                        'request' => $this->currentRequest,
+                    ]);
                 } catch (\Throwable $e) {
                     // Fallback to error_log if logger fails during shutdown
                     error_log('Fatal error logging failed: ' . $e->getMessage());
@@ -78,39 +54,37 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
         });
     }
 
-
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $this->currentRequest = $request;
+
         try {
             return $handler->handle($request);
         } catch (\Throwable $e) {
-            $this->logger->pushProcessor(function (LogRecord $record) use ($request): LogRecord {
-                $extra               = $record->extra;
-                $extra['request_id'] = $request->getAttribute('request_id');
-                $extra['route']      = $request->getUri()->getPath();
-                $extra['method']     = $request->getMethod();
-                $extra['query']      = $request->getUri()->getQuery();
-                $extra['pid']        = getmypid();
+            $logMessage = sprintf(
+                "%s in %s:%d\nStack trace:\n%s",
+                $e->getMessage(),
+                $e->getFile(),
+                $e->getLine(),
+                $e->getTraceAsString()
+            );
 
-                // Selected headers
-                $headersToLog     = ['Accept', 'Accept-Language', 'User-Agent']; // 'Authorization'
-                $extra['headers'] = [];
-                foreach ($headersToLog as $name) {
-                    $extra['headers'][$name] = $request->getHeaderLine($name);
-                }
+            // context is available to processors, but only used by JSON formatter for final output
+            $logContext = [
+                'type'       => 'request',
+                'request'    => $request,
+                'request_id' => $request->getAttribute('request_id'),
+                'exception'  => $e
+            ];
 
-                return $record->with(extra: $extra);
-            });
+            $this->debugLogger->error(
+                $logMessage,
+                $logContext
+            );
 
-            $this->logger->error(
-                sprintf(
-                    "%s in %s:%d\nStack trace:\n%s",
-                    $e->getMessage(),
-                    $e->getFile(),
-                    $e->getLine(),
-                    $e->getTraceAsString()
-                ),
-                [ 'exception' => $e ] // 👈 only used by JSON handler
+            $this->errorLogger->error(
+                $logMessage,
+                $logContext
             );
 
             // Default values
@@ -130,17 +104,27 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
                 // For non-ApiExceptions in debug mode, add trace info
                 $problem['file']  = $e->getFile();
                 $problem['line']  = $e->getLine();
-                $problem['trace'] = $e->getTrace();
+                $problem['trace'] = explode("\n", $e->getTraceAsString());
             }
 
             $response = $this->responseFactory->createResponse($status);
             $response
                 ->getBody()
-                ->write(json_encode($problem, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR));
+                ->write(json_encode(
+                    $problem,
+                    JSON_PRETTY_PRINT | JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+                ));
 
             return $response
                 ->withHeader('Content-Type', 'application/problem+json')
                 ->withHeader('Access-Control-Allow-Origin', '*');
         }
+    }
+
+    private static function formatBytes(int $bytes): string
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $power = $bytes > 0 ? floor(log($bytes, 1024)) : 0;
+        return number_format($bytes / ( 1024 ** $power ), 2) . ' ' . $units[$power];
     }
 }

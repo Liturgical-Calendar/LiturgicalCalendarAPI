@@ -421,31 +421,6 @@ class Router
 
     private function emitResponse(): never
     {
-        if (self::$debug) {
-            $debugMessage  = self::YELLOW . 'REQUEST HTTP/' . $this->request->getProtocolVersion() . ' ' . $this->request->getMethod() . ' ' . $this->request->getUri() . self::NC . PHP_EOL;
-            $debugMessage .= PHP_EOL;
-            $debugMessage .= self::BLUE . 'Incoming request headers' . self::NC . PHP_EOL;
-            foreach ($this->request->getHeaders() as $name => $values) {
-                $debugMessage .= $name . ': ' . implode(', ', $values) . PHP_EOL;
-            };
-
-            $color         = $this->response->getStatusCode() >= 400 ? self::RED : self::GREEN;
-            $debugMessage .= PHP_EOL;
-            $debugMessage .= self::YELLOW . 'RESPONSE HTTP/' . $this->response->getProtocolVersion() . ' ' . $color . $this->response->getStatusCode() . ' ' . $this->response->getReasonPhrase() . self::NC . PHP_EOL;
-            $debugMessage .= PHP_EOL;
-            $debugMessage .= self::BLUE . 'Outgoing response headers' . self::NC . PHP_EOL;
-            foreach ($this->response->getHeaders() as $name => $values) {
-                $debugMessage .= $name . ': ' . implode(', ', $values) . PHP_EOL;
-            };
-            $debugMessage   .= PHP_EOL;
-            $responseBody    = (string) $this->response->getBody();
-            $responseBodyLen = strlen($responseBody);
-            $debugMessage   .= self::BLUE . "Outgoing response body ({$responseBodyLen} bytes)" . self::NC . PHP_EOL;
-            $debugMessage   .= $responseBody . PHP_EOL;
-            $date            = date('Y-m-d_H-i-s-u');
-            file_put_contents(self::$apiFilePath . 'logs' . DIRECTORY_SEPARATOR . "api_request_response_{$date}.log", $debugMessage);
-        }
-
         $sapiEmitter = new SapiEmitter();
         $sapiEmitter->emit($this->response);
         die();

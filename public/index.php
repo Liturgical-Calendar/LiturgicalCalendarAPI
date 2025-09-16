@@ -46,6 +46,7 @@ require_once $projectFolder . '/vendor/autoload.php';
 
 use LiturgicalCalendar\Api\Router;
 use Dotenv\Dotenv;
+use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 
 $dotenv = Dotenv::createMutable($projectFolder, ['.env', '.env.local', '.env.development', '.env.production'], false);
 
@@ -66,8 +67,11 @@ $dotenv->ifPresent(['APP_ENV'])->notEmpty()->allowedValues(['development', 'prod
 
 $logsFolder = $projectFolder . DIRECTORY_SEPARATOR . 'logs';
 if (!file_exists($logsFolder)) {
-    mkdir($logsFolder);
+    if (!mkdir(self::$logsFolder, 0755, true)) {
+        throw new \RuntimeException('Failed to create logs directory: ' . self::$logsFolder);
+    }
 }
+
 $logFile = $logsFolder . DIRECTORY_SEPARATOR . 'litcalapi-error.log';
 
 ini_set('date.timezone', 'Europe/Vatican');
@@ -93,7 +97,8 @@ if (
     $dt        = $dt->setTimezone(new DateTimeZone('Europe/Vatican'));
     $timestamp = $dt->format('H:i:s.u');
     $pid       = getmypid();
-    file_put_contents($logsFolder . DIRECTORY_SEPARATOR . 'litcal-pid.log', $pid . ' handled ' . $timestamp . PHP_EOL, FILE_APPEND);
+    $pidLogger = LoggerFactory::createPidLogger(true, 'api-pid', $logsFolder);
+    $pidLogger->info('Liturgical Calendar API handled by process with PID (' . $pid . ') at ' . $timestamp);
 } else {
     ini_set('display_errors', 0);
     ini_set('display_startup_errors', 0);
