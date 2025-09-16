@@ -84,12 +84,17 @@ jobs:
             exit 1
           fi
 
-          for i in {1..30}; do
-            if curl -fsS -4 http://localhost:8000/ > /dev/null; then
+          # wait for the server to actually bind
+          MAX_TRIES=30
+          for i in $(seq 1 $MAX_TRIES); do
+            if nc -z localhost 8000; then
+              echo "Server is ready."
               exit 0
             fi
             sleep 1
           done
+
+          echo "Server did not respond on localhost:8000 after $MAX_TRIES seconds."
           exit 1
 
       - name: Run tests
