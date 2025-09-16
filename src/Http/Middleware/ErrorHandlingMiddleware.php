@@ -4,7 +4,6 @@ namespace LiturgicalCalendar\Api\Http\Middleware;
 
 use LiturgicalCalendar\Api\Http\Exception\ApiException;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
-use LiturgicalCalendar\Api\Router;
 use Monolog\Logger;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
