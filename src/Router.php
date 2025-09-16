@@ -63,8 +63,12 @@ class Router
 
         $this->psr17Factory = new Psr17Factory();
         $request            = $this->retrieveRequest();
-        $requestId          = bin2hex(random_bytes(8)); // 16 hex chars
-        $this->request      = $request->withAttribute('request_id', $requestId);
+        try {
+            $requestId = bin2hex(random_bytes(8)); // 16 hex chars
+        } catch (\Throwable) {
+            $requestId = uniqid('lit');
+        }
+        $this->request = $request->withAttribute('request_id', $requestId);
     }
 
     public static function errorHandler(int $errno, string $errstr, string $errfile, int $errline): bool
