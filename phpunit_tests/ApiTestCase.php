@@ -19,6 +19,7 @@ abstract class ApiTestCase extends TestCase
     protected static ?CurlMultiHandler $multiHandler = null;
 
     private static ?\Throwable $lastException = null;
+    private static int $lastStatusCode        = 0;
 
     private static bool $preferV4;
     private static string $addr;
@@ -41,11 +42,11 @@ abstract class ApiTestCase extends TestCase
         if (self::isIPAddress($_ENV['API_HOST'])) {
             // Already an IP — detect family directly
             if (filter_var($_ENV['API_HOST'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-                $preferV4   = false;
-                self::$addr = $_ENV['API_HOST'];
+                self::$preferV4 = false;
+                self::$addr     = $_ENV['API_HOST'];
             } elseif (filter_var($_ENV['API_HOST'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                $preferV4   = true;
-                self::$addr = $_ENV['API_HOST'];
+                self::$preferV4 = true;
+                self::$addr     = $_ENV['API_HOST'];
             }
         } else {
             // Hostname — detect preferred stack via DNS resolution
@@ -71,12 +72,13 @@ abstract class ApiTestCase extends TestCase
 
         try {
             // Simple check — adjust path if your API root needs authentication
-            $response           = self::$http->get('/', [
+            $response             = self::$http->get('/', [
                 'on_stats' => function (\GuzzleHttp\TransferStats $stats) {
                     self::$transferStats = $stats->getHandlerStat('http_version');
                 }
             ]);
-            self::$apiAvailable = $response->getStatusCode() < 500;
+            self::$lastStatusCode = $response->getStatusCode();
+            self::$apiAvailable   = self::$lastStatusCode < 500;
             //$response           = self::$http->get('/');
         } catch (ConnectException $e) {
             self::$apiAvailable  = false;
@@ -90,7 +92,7 @@ abstract class ApiTestCase extends TestCase
             // We use `fail` instead of `markSkipped` because we want the message to show without the `--debug` flag,
             // but `markSkipped` only shows the message with `--debug`
             $this->fail(
-                "API is not running on {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']} (bound to " . ( self::$preferV4 ? 'IPv4' : 'IPv6' ) . ' address ' . self::$addr . ') — skipping integration tests. Maybe run `composer start` first?' . PHP_EOL . ( self::$lastException ? 'Error: ' . self::$lastException->getMessage() : '' )
+                "API is not running on {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']} (bound to " . ( self::$preferV4 ? 'IPv4' : 'IPv6' ) . ' address ' . self::$addr . ') — skipping integration tests. Maybe run `composer start` first?' . PHP_EOL . ( self::$lastException ? 'Error: ' . self::$lastException->getMessage() : ( 'Last status code: ' . self::$lastStatusCode ) )
             );
         }
 
