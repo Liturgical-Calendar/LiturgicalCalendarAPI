@@ -49,20 +49,14 @@ abstract class ApiTestCase extends TestCase
             }
         } else {
             // Hostname — detect preferred stack via DNS resolution
-            $records  = dns_get_record($_ENV['API_HOST'], DNS_A + DNS_AAAA);
-            $preferV4 = false;
-            if ($records && !empty($records)) {
-                $first = $records[0];
-                if ($first['type'] === 'A') {
-                    $preferV4   = true;
-                    self::$addr = $first['ip'];
-                } elseif ($first['type'] === 'AAAA') {
-                    $preferV4   = false;
-                    self::$addr = $first['ipv6'];
-                }
+            $result = self::detectBinding($_ENV['API_HOST'], (int) $_ENV['API_PORT']);
+            if ($result['addr'] !== null) {
+                self::$preferV4 = $result['preferV4'];
+                self::$addr     = $result['addr'];
+            } else {
+                throw new \RuntimeException('Could not detect API binding on ' . sprintf('%s://%s:%s', $_ENV['API_PROTOCOL'], $_ENV['API_HOST'], $_ENV['API_PORT']));
             }
         }
-        self::$preferV4 = $preferV4;
 
         self::$http = new Client([
             'base_uri'         => sprintf('%s://%s:%s', $_ENV['API_PROTOCOL'], $_ENV['API_HOST'], $_ENV['API_PORT']),
@@ -157,5 +151,25 @@ abstract class ApiTestCase extends TestCase
         }
 
         return filter_var($host, FILTER_VALIDATE_IP) !== false;
+    }
+
+    private static function detectBinding(string $host, int $port): array
+    {
+        // Try IPv6 first
+        $sock6 = @fsockopen('tcp://[::1]', $port, $errno, $errstr, 0.5);
+        if ($sock6) {
+            fclose($sock6);
+            return ['preferV4' => false, 'addr' => '::1'];
+        }
+
+        // Then try IPv4
+        $sock4 = @fsockopen('tcp://127.0.0.1', $port, $errno, $errstr, 0.5);
+        if ($sock4) {
+            fclose($sock4);
+            return ['preferV4' => true, 'addr' => '127.0.0.1'];
+        }
+
+        // Neither reachable
+        return ['preferV4' => null, 'addr' => null];
     }
 }
