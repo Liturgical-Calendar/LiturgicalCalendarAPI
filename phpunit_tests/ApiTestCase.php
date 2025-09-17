@@ -33,14 +33,29 @@ abstract class ApiTestCase extends TestCase
             }
         }
 
+        // detect preferred stack
+        $records  = dns_get_record($_ENV['API_HOST'], DNS_A + DNS_AAAA);
+        $preferV4 = false;
+        foreach ($records as $r) {
+            if ($r['type'] === 'A' && $r['ip'] === '127.0.0.1') {
+                $preferV4 = true;
+                break;
+            }
+            if ($r['type'] === 'AAAA' && $r['ipv6'] === '::1') {
+                $preferV4 = false;
+                break;
+            }
+        }
+
         self::$http = new Client([
-            'base_uri'        => sprintf('%s://%s:%s', $_ENV['API_PROTOCOL'], $_ENV['API_HOST'], $_ENV['API_PORT']),
-            'handler'         => $stack,
-            'timeout'         => 60,
-            'connect_timeout' => 5,
-            'http_errors'     => false,
-            'headers'         => [ 'Connection' => 'keep-alive' ],
-            'curl'            => [ CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2_0 ]
+            'base_uri'         => sprintf('%s://%s:%s', $_ENV['API_PROTOCOL'], $_ENV['API_HOST'], $_ENV['API_PORT']),
+            'handler'          => $stack,
+            'timeout'          => 60,
+            'connect_timeout'  => 5,
+            'http_errors'      => false,
+            'headers'          => [ 'Connection' => 'keep-alive' ],
+            'curl'             => [ CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2_0 ],
+            'force_ip_resolve' => $preferV4 ? 'v4' : 'v6'
         ]);
 
         try {
