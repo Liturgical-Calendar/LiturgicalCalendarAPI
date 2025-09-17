@@ -66,7 +66,7 @@ abstract class ApiTestCase extends TestCase
             'http_errors'      => false,
             'headers'          => [ 'Connection' => 'keep-alive' ],
             'curl'             => [ CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2_0 ],
-            'force_ip_resolve' => $preferV4 ? 'v4' : 'v6'
+            'force_ip_resolve' => self::$preferV4 ? 'v4' : 'v6'
         ]);
 
         try {
