@@ -97,7 +97,15 @@ abstract class ApiTestCase extends TestCase
             $this->fail(
                 "API is not running on {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']} "
                 . '(bound to ' . ( self::$preferV4 ? 'IPv4' : 'IPv6' ) . ' address ' . self::$addr . ') — skipping integration tests. Maybe run `composer start` first?' . PHP_EOL
-                . ( self::$lastException ? 'Error: ' . self::$lastException->getMessage() : ( 'Last status code: ' . self::$lastStatusCode ) . ( self::$responseBody ? ' (response body: ' . self::$responseBody . ')' : '' ) )
+                . (
+                    self::$lastException
+                    ? 'Error: ' . self::$lastException->getMessage()
+                    : 'Last status code: ' . self::$lastStatusCode . (
+                        self::$responseBody
+                        ? ' (response body: ' . self::$responseBody . ')'
+                        : ''
+                    )
+                )
             );
         }
 
