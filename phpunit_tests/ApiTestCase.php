@@ -20,6 +20,7 @@ abstract class ApiTestCase extends TestCase
 
     private static ?\Throwable $lastException = null;
     private static int $lastStatusCode        = 0;
+    private static string $responseBody;
 
     private static bool $preferV4;
     private static string $addr;
@@ -79,7 +80,9 @@ abstract class ApiTestCase extends TestCase
             ]);
             self::$lastStatusCode = $response->getStatusCode();
             self::$apiAvailable   = self::$lastStatusCode < 500;
-            //$response           = self::$http->get('/');
+            if (false === self::$apiAvailable) {
+                self::$responseBody = (string) $response->getBody();
+            }
         } catch (ConnectException $e) {
             self::$apiAvailable  = false;
             self::$lastException = $e;
@@ -92,7 +95,9 @@ abstract class ApiTestCase extends TestCase
             // We use `fail` instead of `markSkipped` because we want the message to show without the `--debug` flag,
             // but `markSkipped` only shows the message with `--debug`
             $this->fail(
-                "API is not running on {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']} (bound to " . ( self::$preferV4 ? 'IPv4' : 'IPv6' ) . ' address ' . self::$addr . ') — skipping integration tests. Maybe run `composer start` first?' . PHP_EOL . ( self::$lastException ? 'Error: ' . self::$lastException->getMessage() : ( 'Last status code: ' . self::$lastStatusCode ) )
+                "API is not running on {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']} "
+                . '(bound to ' . ( self::$preferV4 ? 'IPv4' : 'IPv6' ) . ' address ' . self::$addr . ') — skipping integration tests. Maybe run `composer start` first?' . PHP_EOL
+                . ( self::$lastException ? 'Error: ' . self::$lastException->getMessage() : ( 'Last status code: ' . self::$lastStatusCode ) . ( self::$responseBody ? ' (response body: ' . self::$responseBody . ')' : '' ) )
             );
         }
 
