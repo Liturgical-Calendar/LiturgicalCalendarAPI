@@ -21,6 +21,7 @@ abstract class ApiTestCase extends TestCase
     private static ?\Throwable $lastException = null;
 
     private static bool $preferV4;
+    private static string $addr;
 
     public static function setUpBeforeClass(): void
     {
@@ -37,17 +38,28 @@ abstract class ApiTestCase extends TestCase
             }
         }
 
-        // detect preferred stack
-        $records  = dns_get_record($_ENV['API_HOST'], DNS_A + DNS_AAAA);
-        $preferV4 = false;
-        foreach ($records as $r) {
-            if ($r['type'] === 'A' && $r['ip'] === '127.0.0.1') {
-                $preferV4 = true;
-                break;
+        if (self::isIPAddress($_ENV['API_HOST'])) {
+            // Already an IP — detect family directly
+            if (filter_var($_ENV['API_HOST'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                $preferV4   = false;
+                self::$addr = $_ENV['API_HOST'];
+            } elseif (filter_var($_ENV['API_HOST'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                $preferV4   = true;
+                self::$addr = $_ENV['API_HOST'];
             }
-            if ($r['type'] === 'AAAA' && $r['ipv6'] === '::1') {
-                $preferV4 = false;
-                break;
+        } else {
+            // Hostname — detect preferred stack via DNS resolution
+            $records  = dns_get_record($_ENV['API_HOST'], DNS_A + DNS_AAAA);
+            $preferV4 = false;
+            if ($records && !empty($records)) {
+                $first = $records[0];
+                if ($first['type'] === 'A') {
+                    $preferV4   = true;
+                    self::$addr = $first['ip'];
+                } elseif ($first['type'] === 'AAAA') {
+                    $preferV4   = false;
+                    self::$addr = $first['ipv6'];
+                }
             }
         }
         self::$preferV4 = $preferV4;
@@ -84,7 +96,7 @@ abstract class ApiTestCase extends TestCase
             // We use `fail` instead of `markSkipped` because we want the message to show without the `--debug` flag,
             // but `markSkipped` only shows the message with `--debug`
             $this->fail(
-                "API is not running on {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']} (" . ( self::$preferV4 ? 'IPv4' : 'IPv6' ) . ') — skipping integration tests. Maybe run `composer start` first?' . PHP_EOL . ( self::$lastException ? 'Error: ' . self::$lastException->getMessage() : '' )
+                "API is not running on {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']} (bound to " . ( self::$preferV4 ? 'IPv4' : 'IPv6' ) . ' address ' . self::$addr . ') — skipping integration tests. Maybe run `composer start` first?' . PHP_EOL . ( self::$lastException ? 'Error: ' . self::$lastException->getMessage() : '' )
             );
         }
 
@@ -135,5 +147,15 @@ abstract class ApiTestCase extends TestCase
 
             $dir = $parentDir;
         }
+    }
+
+    private static function isIPAddress(string $host): bool
+    {
+        // Strip IPv6 brackets if present
+        if (str_starts_with($host, '[') && str_ends_with($host, ']')) {
+            $host = substr($host, 1, -1);
+        }
+
+        return filter_var($host, FILTER_VALIDATE_IP) !== false;
     }
 }
