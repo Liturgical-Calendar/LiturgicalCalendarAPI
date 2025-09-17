@@ -20,6 +20,8 @@ abstract class ApiTestCase extends TestCase
 
     private static ?\Throwable $lastException = null;
 
+    private static bool $preferV4;
+
     public static function setUpBeforeClass(): void
     {
         // Create a shared CurlMultiHandler that will persist connections
@@ -48,6 +50,7 @@ abstract class ApiTestCase extends TestCase
                 break;
             }
         }
+        self::$preferV4 = $preferV4;
 
         self::$http = new Client([
             'base_uri'         => sprintf('%s://%s:%s', $_ENV['API_PROTOCOL'], $_ENV['API_HOST'], $_ENV['API_PORT']),
@@ -81,7 +84,7 @@ abstract class ApiTestCase extends TestCase
             // We use `fail` instead of `markSkipped` because we want the message to show without the `--debug` flag,
             // but `markSkipped` only shows the message with `--debug`
             $this->fail(
-                "API is not running on {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']} — skipping integration tests. Maybe run `composer start` first?" . PHP_EOL . ( self::$lastException ? 'Error: ' . self::$lastException->getMessage() : '' )
+                "API is not running on {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']} (" . ( self::$preferV4 ? 'IPv4' : 'IPv6' ) . ') — skipping integration tests. Maybe run `composer start` first?' . PHP_EOL . ( self::$lastException ? 'Error: ' . self::$lastException->getMessage() : '' )
             );
         }
 
