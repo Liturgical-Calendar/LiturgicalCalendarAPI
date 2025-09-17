@@ -18,6 +18,8 @@ abstract class ApiTestCase extends TestCase
 
     protected static ?CurlMultiHandler $multiHandler = null;
 
+    private static ?\Throwable $lastException = null;
+
     public static function setUpBeforeClass(): void
     {
         // Create a shared CurlMultiHandler that will persist connections
@@ -68,7 +70,8 @@ abstract class ApiTestCase extends TestCase
             self::$apiAvailable = $response->getStatusCode() < 500;
             //$response           = self::$http->get('/');
         } catch (ConnectException $e) {
-            self::$apiAvailable = false;
+            self::$apiAvailable  = false;
+            self::$lastException = $e;
         }
     }
 
@@ -78,9 +81,10 @@ abstract class ApiTestCase extends TestCase
             // We use `fail` instead of `markSkipped` because we want the message to show without the `--debug` flag,
             // but `markSkipped` only shows the message with `--debug`
             $this->fail(
-                "API is not running on {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']} — skipping integration tests. Maybe run `composer start` first?"
+                "API is not running on {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']} — skipping integration tests. Maybe run `composer start` first?" . PHP_EOL . ( self::$lastException ? 'Error: ' . self::$lastException->getMessage() : '' )
             );
         }
+
         if (self::$transferStats === null || ( self::$transferStats !== 2 && self::$transferStats !== 3 )) {
             $this->fail(
                 'Expected HTTP2 or HTTP3 transport, but got ' . ( self::$transferStats ?? 'unknown' )
