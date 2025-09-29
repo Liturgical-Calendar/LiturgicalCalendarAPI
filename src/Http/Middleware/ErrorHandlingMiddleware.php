@@ -13,6 +13,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class ErrorHandlingMiddleware implements MiddlewareInterface
 {
+    /** @var resource */
+    private $stderr;
     private ResponseFactoryInterface $responseFactory;
     private bool $debug;
     private Logger $debugLogger;
@@ -29,6 +31,12 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
         $this->debugLogger     = $debugLogger;
         $errorLogger           = LoggerFactory::createApiLogger($debug, 'api-error');
         $this->errorLogger     = $errorLogger;
+        $stderr                = fopen('php://stderr', 'w');
+        if ($stderr === false) {
+            throw new \RuntimeException('Failed to open php://stderr for writing.');
+        }
+
+        $this->stderr = $stderr;
 
         // Catch fatal errors
         register_shutdown_function([$this, 'handleShutdown']);
@@ -169,6 +177,6 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
         $this->errorLogger->{$severity}($fullMessage, $context);
         $this->debugLogger->{$severity}($fullMessage, $context);
 
-        fwrite(STDERR, $fullMessage . PHP_EOL);
+        fwrite($this->stderr, $fullMessage . PHP_EOL);
     }
 }
