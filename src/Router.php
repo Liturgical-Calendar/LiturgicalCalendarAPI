@@ -46,9 +46,6 @@ class Router
 
     public function __construct()
     {
-        // Escalate PHP warnings to exceptions so that they will be handled by our middleware
-        set_error_handler([self::class, 'errorHandler']);
-
         if (
             false === isset(self::$apiBase)
             || false === isset(self::$apiPath)
@@ -69,30 +66,6 @@ class Router
             $requestId = uniqid('lit');
         }
         $this->request = $request->withAttribute('request_id', $requestId);
-    }
-
-    public static function errorHandler(int $errno, string $errstr, string $errfile, int $errline): bool
-    {
-        // Respect current error_reporting
-        if (!( error_reporting() & $errno )) {
-            return false; // let PHP handle it (or ignore)
-        }
-
-        // Only escalate non-fatal errors
-        switch ($errno) {
-            case E_WARNING:
-            case E_NOTICE:
-            case E_USER_WARNING:
-            case E_USER_NOTICE:
-            case E_DEPRECATED:
-            case E_USER_DEPRECATED:
-            case E_RECOVERABLE_ERROR:
-                throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
-
-            default:
-                // For fatal errors, let PHP handle them (or use register_shutdown_function)
-                return false;
-        }
     }
 
     /**

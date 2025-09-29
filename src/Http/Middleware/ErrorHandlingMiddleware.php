@@ -31,26 +31,13 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
         $this->errorLogger     = $errorLogger;
 
         // Catch fatal errors
-        register_shutdown_function(function () use ($errorLogger) {
-            $error = error_get_last();
-            if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR], true)) {
-                try {
-                    $errorLogger->critical(sprintf(
-                        'Fatal error: %s in %s:%d | memory_peak_usage=%s',
-                        $error['message'],
-                        $error['file'],
-                        $error['line'],
-                        self::formatBytes(memory_get_peak_usage(true))
-                    ), [
-                        // Pass along the request (if available) for processors
-                        'request' => $this->currentRequest,
-                    ]);
-                } catch (\Throwable $e) {
-                    // Fallback to error_log if logger fails during shutdown
-                    error_log('Fatal error logging failed: ' . $e->getMessage());
-                }
-            }
-        });
+        register_shutdown_function([$this, 'handleShutdown']);
+
+        // Catch uncaught exceptions globally
+        set_exception_handler([$this, 'handleUncaughtException']);
+
+        // Escalate PHP warnings/notices to exceptions
+        set_error_handler([$this, 'handlePhpWarning']);
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -60,31 +47,7 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
         try {
             return $handler->handle($request);
         } catch (\Throwable $e) {
-            $logMessage = sprintf(
-                "%s in %s:%d\nStack trace:\n%s",
-                $e->getMessage(),
-                $e->getFile(),
-                $e->getLine(),
-                $e->getTraceAsString()
-            );
-
-            // context is available to processors, but only used by JSON formatter for final output
-            $logContext = [
-                'type'       => 'request',
-                'request'    => $request,
-                'request_id' => $request->getAttribute('request_id'),
-                'exception'  => $e
-            ];
-
-            $this->debugLogger->error(
-                $logMessage,
-                $logContext
-            );
-
-            $this->errorLogger->error(
-                $logMessage,
-                $logContext
-            );
+            $this->logException($e, 'error');
 
             // Default values
             $status  = 500;
@@ -129,5 +92,83 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];
         $power = $bytes > 0 ? floor(log($bytes, 1024)) : 0;
         return number_format($bytes / ( 1024 ** $power ), 2) . ' ' . $units[$power];
+    }
+
+    /**
+     * Convert PHP warnings, notices, etc., into exceptions
+     */
+    public function handlePhpWarning(int $errno, string $errstr, string $errfile, int $errline): bool
+    {
+        if (!( error_reporting() & $errno )) {
+            return false; // respect current error_reporting
+        }
+
+        // Only escalate non-fatal errors
+        switch ($errno) {
+            case E_WARNING:
+            case E_NOTICE:
+            case E_USER_WARNING:
+            case E_USER_NOTICE:
+            case E_DEPRECATED:
+            case E_USER_DEPRECATED:
+            case E_RECOVERABLE_ERROR:
+                throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
+
+            default:
+                // For fatal errors, let PHP handle them (or use register_shutdown_function)
+                return false;
+        }
+    }
+
+
+    /**
+     * Catch fatal errors at shutdown
+     */
+    public function handleShutdown(): void
+    {
+        $error = error_get_last();
+        if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR], true)) {
+            $exception = new \ErrorException($error['message'], 0, $error['type'], $error['file'], $error['line']);
+            $this->logException($exception, 'critical');
+        }
+    }
+
+    /**
+     * Catch uncaught exceptions
+     */
+    public function handleUncaughtException(\Throwable $e): void
+    {
+        $this->logException($e, 'critical');
+        exit(1);
+    }
+
+    private function logException(\Throwable $e, string $severity = 'error'): void
+    {
+        $method = $this->currentRequest?->getMethod() ?? 'N/A';
+        $uri    = $this->currentRequest?->getUri()?->__toString() ?? 'N/A';
+
+        $fullMessage = sprintf(
+            "[%s %s] %s in %s:%d | memory_peak_usage=%s\nStack trace:\n%s",
+            $method,
+            $uri,
+            $e->getMessage(),
+            $e->getFile(),
+            $e->getLine(),
+            self::formatBytes(memory_get_peak_usage(true)),
+            $e->getTraceAsString()
+        );
+
+        // context is available to processors, but only used by JSON formatter for final output
+        $context = [
+            'type'       => 'request',
+            'request'    => $this->currentRequest,
+            'request_id' => $this->currentRequest?->getAttribute('request_id'),
+            'exception'  => $e,
+        ];
+
+        $this->errorLogger->{$severity}($fullMessage, $context);
+        $this->debugLogger->{$severity}($fullMessage, $context);
+
+        fwrite(STDERR, $fullMessage . PHP_EOL);
     }
 }
