@@ -112,7 +112,7 @@ final class CalendarHandler extends AbstractHandler
     private string $BaptismLordFmt;
     private string $BaptismLordMod;
 
-    public const API_VERSION                  = '5.0';
+    public const API_VERSION                  = '5.1';
     private string $CachePath                 = '';
     private string $CacheFile                 = '';
     private string $CacheDuration             = '';
