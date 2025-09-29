@@ -35,8 +35,6 @@
         "psr/http-server-middleware": "^1.0",
         "psr/http-server-handler": "^1.0",
         "guzzlehttp/guzzle": "^7.10",
-        "symfony/semaphore": "^7.3",
-        "symfony/lock": "^7.3",
         "react/filesystem": "0.2.x-dev",
         "psr/log": "^3.0",
         "monolog/monolog": "^3.9"
