@@ -67,8 +67,8 @@ $dotenv->ifPresent(['APP_ENV'])->notEmpty()->allowedValues(['development', 'prod
 
 $logsFolder = $projectFolder . DIRECTORY_SEPARATOR . 'logs';
 if (!file_exists($logsFolder)) {
-    if (!mkdir(self::$logsFolder, 0755, true)) {
-        throw new \RuntimeException('Failed to create logs directory: ' . self::$logsFolder);
+    if (!mkdir($logsFolder, 0755, true)) {
+        throw new RuntimeException('Failed to create logs directory: ' . self::$logsFolder);
     }
 }
 
