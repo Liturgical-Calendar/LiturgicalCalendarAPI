@@ -2936,16 +2936,16 @@
         },
         {
             "name": "symfony/semaphore",
-            "version": "v7.3.0",
+            "version": "v7.3.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/semaphore.git",
-                "reference": "99eb1e80db2b29fb5f986c9eae4ab686ad809127"
+                "reference": "f08314442a34ab3bbd4f330130e7f3b4498f185b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/semaphore/zipball/99eb1e80db2b29fb5f986c9eae4ab686ad809127",
-                "reference": "99eb1e80db2b29fb5f986c9eae4ab686ad809127",
+                "url": "https://api.github.com/repos/symfony/semaphore/zipball/f08314442a34ab3bbd4f330130e7f3b4498f185b",
+                "reference": "f08314442a34ab3bbd4f330130e7f3b4498f185b",
                 "shasum": ""
             },
             "require": {
@@ -2991,7 +2991,7 @@
                 "semaphore"
             ],
             "support": {
-                "source": "https://github.com/symfony/semaphore/tree/v7.3.0"
+                "source": "https://github.com/symfony/semaphore/tree/v7.3.4"
             },
             "funding": [
                 {
@@ -3003,11 +3003,15 @@
                     "type": "github"
                 },
                 {
+                    "url": "https://github.com/nicolas-grekas",
+                    "type": "github"
+                },
+                {
                     "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-03-08T15:49:38+00:00"
+            "time": "2025-09-11T10:12:26+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
