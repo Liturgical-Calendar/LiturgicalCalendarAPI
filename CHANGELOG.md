@@ -5,6 +5,8 @@
 * implement PSR-3 Logger Interface
 * fix OpenAPI validation (issue [#373])
 
+Saint Thérèse of Lisieux, pray for us! 🌹
+
 ## [v5.0](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.0) (September 7th 2025)
 
 * add support for `PUT`, `PATCH` and `DELETE` requests (issues [#284], [#265], and [#220])
@@ -14,12 +16,13 @@
 * fix Feasts of the Lord not suppressing Sundays (issues [#324], [#327])
 * implement PSR-7 HTTP Message Interfaces, PSR-15 HTTP Server Request Handlers (including Middleware), and PSR-17 HTTP Factories (issue [#337])
 
-Saints Carlos Acutis and Piergiorgio Frassati, pray for us! Released on the day of the canonizations of these saints.
+Saints Carlos Acutis 🧑‍💻 and Piergiorgio Frassati ⛰️, pray for us! Released on the day of the canonizations of these saints.
 
 ## [v4.5](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v4.5) (March 25th 2025)
 
 * restore wider region calendar `PUT`, `PATCH` and `DELETE` requests with full support for all i18n languages (issues [#284], [#265], and [#220])
-Happy Feast of the Annunciation!
+
+Happy Feast of the Annunciation! 🪽
 
 ## [v4.4](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v4.4) (March 22nd 2025)
 
@@ -33,9 +36,13 @@ Happy Feast of the Annunciation!
 
 * realign ICS output with latest developments (issue [#288])
 
+Conversion of Saint Paul 🤺 🏇 🤯
+
 ## [v4.1](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v4.1) (January 22nd 2025)
 
 * restore diocesan calendar `PUT`, `PATCH` and `DELETE` requests with full support for all i18n languages (issue [#284])
+
+Saint Vincent deacon and martyr, pray for us! 🧣🩸
 
 ## [v4.0](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v4.0) (January 3rd 2025)
 
@@ -63,6 +70,8 @@ Happy Feast of the Annunciation!
 * feature: discoverability of supported locales, see issue [#240](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/240)
 * feature: all national and diocesan calendars are now multilingual by default, see issue [#150](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/150)
 * and a number of other bugfixes, features, and improvements
+
+Most Holy Name of Jesus
 
 ## [v3.9](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v3.9) (April 9th 2024)
 
@@ -109,6 +118,8 @@ Happy Feast of the Annunciation!
 * fix: in cases where the diocesancalendar parameter was set, but the nationalcalendar parameter was not, the national calendar settings were not being picked up correctly
 * fix for Netherlands national calendar data (Ascension on Thursday)
 
+Saint John of the Cross, priest and doctor of the Church, pray for us! ✝
+
 ## [v3.6](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v3.6) (December 13th 2022)
 
 * allow Diocesan calendars to define mobile festivities
@@ -116,6 +127,8 @@ Happy Feast of the Annunciation!
 * remove hardcoding of English, Latin and the 5 main European languages and allow for any possible language
 * allow for geographic locales, in order to better identify source data for a given national or diocesan calendar
 * remove hardcoding of supported national calendars, and automate the scan for existing calendars
+
+Saint Lucy of Syracuse, Virgin and Martyr, pray for us! 👀🗡
 
 ## [v3.5](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v3.5) (December 4th 2022)
 
@@ -213,10 +226,14 @@ Happy Feast of the Annunciation!
 * add more data for National Calendars to the Metadata endpoint • [34ef54f](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/commit/34ef54f06d5183b463cce0305f649c182edca2b3)
 * update translations
 
+Blessed Virgin Mary Mother of the Church, pray for us! ⛪
+
 ## [v3.3](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v3.3) (January 27th 2022)
 
 * move liturgical event data from the 2008 Editio Typica Tertia emendata out from the `LitCalAPI.php`, to a JSON file
 * move data for festivities from Decrees of the Congregation of Divine Worship out from the `LitCalAPI.php`, to a JSON file
+
+Saint Angela Merici, Virgin, pray for us! 🌼
 
 ## [v3.2](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v3.2) (January 23rd 2022)
 
@@ -226,6 +243,8 @@ Happy Feast of the Annunciation!
 ## [v3.1](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v3.1) (December 26th 2021)
 
 * bugfix which was missed in the v3.0 release: 86ee62ad68d58736880da2b5b39117dec7386dfc
+
+Holy Family of Jesus, Mary and Joseph, pray for us! 👨‍👩‍👦
 
 ## [v3.0](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v3.0) (December 26th 2021)
 
@@ -240,11 +259,15 @@ Happy Feast of the Annunciation!
 * Data type can be set through the `Accept` header rather than the `returntype` parameter
 * Language can be set through the `Accept-Language` header rather than the `locale` parameter
 
+Holy Family of Jesus, Mary and Joseph, pray for us! 👨‍👩‍👦
+
 ## [v2.9](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v2.9) (November 12th 2020)
 
 * adds Vigil Masses for Sundays and Solemnities, including occasional notes by the Dicastery for Divine Worship and the Discipline of the Sacraments
 * add Patron Saints of Europe, applicable for Italian Calendar (and eventually any other national calendar in Europe that may be added in the future)
 * add Saturday Memorial of the Blessed Virgin Mary
+
+Saint Josaphat, Bishop and Martyr, pray for us! ☦️✝️
 
 ## [v2.8](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v2.8) (August 11th 2020)
 
@@ -252,6 +275,8 @@ Happy Feast of the Annunciation!
 * adds all of the data from the recent Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments and verifies integrity with past Decrees
 * ensures `Messages` returned are as specific as possible, while trying to keep the code as clean as possible
 * adds FullCalendar example
+
+Saint Clare, Virgin, pray for us! 🌟
 
 ## [v2.7](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v2.7) (July 28th 2020)
 
@@ -277,17 +302,25 @@ Happy Feast of the Annunciation!
 * make sure all endpoint parameters can have values with either uppercase or lowercase characters
 * fix a few small issues with the ICS data generation
 
+Saint James, Apostle, pray for us! 👨‍🦯‍➡️
+
 ## [v2.4](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v2.4) (July 24th 2020)
 
 * move as many festivities as possible to the MySQL tables to allow for localization (mobile feasts will be calculated in the script, but still need to be localized)
 * add ICS data generation (requires more localization strings, because it is already a form of final display of the data)
+
+Saint Sharbel Makhluf, Hermit, pray for us! 🧙‍♂️
 
 ## [v2.0](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/2.0) (January 8th 2018)
 
 * separate the display logic from the engine, so that the engine can act as an endpoint
 * make the engine return JSON or XML data that the display logic can use to generate a user-friendly representation of the data
 
+Feast of the Baptism of the Lord 🌊
+
 ## [v1.0](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/1.0) (July 26th 2017)
 
 * proof of concept for the correct generation of a liturgical calendar
 * create MySQL table for the Proper of the Saints
+
+Saints Joachim and Anne, Parents of the Blessed Virgin Mary, pray for us! 👴👵
