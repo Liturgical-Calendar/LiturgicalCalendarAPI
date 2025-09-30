@@ -130,12 +130,6 @@
             }
           }
         ],
-        "produces": [
-          "application/json",
-          "application/xml",
-          "application/yaml",
-          "text/calendar"
-        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -242,12 +236,6 @@
             }
           }
         },
-        "produces": [
-          "application/json",
-          "application/xml",
-          "application/yaml",
-          "text/calendar"
-        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -356,12 +344,6 @@
               }
             }
           }
-        ],
-        "produces": [
-          "application/json",
-          "application/xml",
-          "application/yaml",
-          "text/calendar"
         ],
         "responses": {
           "200": {
@@ -480,12 +462,6 @@
             }
           }
         },
-        "produces": [
-          "application/json",
-          "application/xml",
-          "application/yaml",
-          "text/calendar"
-        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -589,12 +565,6 @@
               }
             }
           }
-        ],
-        "produces": [
-          "application/json",
-          "application/xml",
-          "application/yaml",
-          "text/calendar"
         ],
         "responses": {
           "200": {
@@ -712,12 +682,6 @@
             }
           }
         },
-        "produces": [
-          "application/json",
-          "application/xml",
-          "application/yaml",
-          "text/calendar"
-        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -832,12 +796,6 @@
               }
             }
           }
-        ],
-        "produces": [
-          "application/json",
-          "application/xml",
-          "application/yaml",
-          "text/calendar"
         ],
         "responses": {
           "200": {
@@ -965,12 +923,6 @@
             }
           }
         },
-        "produces": [
-          "application/json",
-          "application/xml",
-          "application/yaml",
-          "text/calendar"
-        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -1066,12 +1018,6 @@
               }
             }
           }
-        ],
-        "produces": [
-          "application/json",
-          "application/xml",
-          "application/yaml",
-          "text/calendar"
         ],
         "responses": {
           "200": {
@@ -1181,12 +1127,6 @@
             }
           }
         },
-        "produces": [
-          "application/json",
-          "application/xml",
-          "application/yaml",
-          "text/calendar"
-        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -1293,12 +1233,6 @@
               }
             }
           }
-        ],
-        "produces": [
-          "application/json",
-          "application/xml",
-          "application/yaml",
-          "text/calendar"
         ],
         "responses": {
           "200": {
@@ -1419,12 +1353,6 @@
             }
           }
         },
-        "produces": [
-          "application/json",
-          "application/xml",
-          "application/yaml",
-          "text/calendar"
-        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -1457,9 +1385,6 @@
         ],
         "summary": "Retrieve an index of current supported national and diocesan calendars and relative locales, settings, etc.",
         "operationId": "retrieveMetadataGET",
-        "produces": [
-          "application/json"
-        ],
         "responses": {
           "200": {
             "description": "OK: An index of currently supported national and diocesan calendars and relative locales",
@@ -1491,9 +1416,6 @@
         ],
         "summary": "Retrieve an index of current supported national and diocesan calendars and relative locales, settings, etc.",
         "operationId": "retrieveMetadataPOST",
-        "produces": [
-          "application/json"
-        ],
         "responses": {
           "200": {
             "description": "OK: An index of currently supported national and diocesan calendars and relative locales",
@@ -1550,9 +1472,6 @@
               }
             }
           }
-        ],
-        "produces": [
-          "application/json"
         ],
         "responses": {
           "200": {
@@ -1659,9 +1578,6 @@
               }
             }
           }
-        ],
-        "produces": [
-          "application/json"
         ],
         "responses": {
           "200": {
@@ -1788,9 +1704,6 @@
             }
           }
         ],
-        "produces": [
-          "application/json"
-        ],
         "responses": {
           "200": {
             "description": "OK: A collection of all possible liturgical events that can be found in a liturgical calendar produced by the LitCal API",
@@ -1914,9 +1827,6 @@
             }
           }
         ],
-        "produces": [
-          "application/json"
-        ],
         "responses": {
           "200": {
             "description": "OK: A collection of all possible liturgical events that can be found in a liturgical calendar produced by the LitCal API",
@@ -2035,9 +1945,6 @@
             }
           }
         ],
-        "produces": [
-          "application/json"
-        ],
         "responses": {
           "200": {
             "description": "OK: A collection of all possible liturgical events that can be found in a liturgical calendar produced by the LitCal API",
@@ -2153,9 +2060,6 @@
               "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
             }
           }
-        ],
-        "produces": [
-          "application/json"
         ],
         "responses": {
           "200": {
