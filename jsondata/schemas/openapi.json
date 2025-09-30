@@ -69,14 +69,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -120,6 +130,12 @@
             }
           }
         ],
+        "produces": [
+          "application/json",
+          "application/xml",
+          "application/yaml",
+          "text/calendar"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -155,14 +171,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -216,6 +242,12 @@
             }
           }
         },
+        "produces": [
+          "application/json",
+          "application/xml",
+          "application/yaml",
+          "text/calendar"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -253,14 +285,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -315,6 +357,12 @@
             }
           }
         ],
+        "produces": [
+          "application/json",
+          "application/xml",
+          "application/yaml",
+          "text/calendar"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -350,14 +398,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -422,6 +480,12 @@
             }
           }
         },
+        "produces": [
+          "application/json",
+          "application/xml",
+          "application/yaml",
+          "text/calendar"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -459,14 +523,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -516,6 +590,12 @@
             }
           }
         ],
+        "produces": [
+          "application/json",
+          "application/xml",
+          "application/yaml",
+          "text/calendar"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -551,14 +631,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -622,6 +712,12 @@
             }
           }
         },
+        "produces": [
+          "application/json",
+          "application/xml",
+          "application/yaml",
+          "text/calendar"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -659,14 +755,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -727,6 +833,12 @@
             }
           }
         ],
+        "produces": [
+          "application/json",
+          "application/xml",
+          "application/yaml",
+          "text/calendar"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -762,14 +874,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -843,6 +965,12 @@
             }
           }
         },
+        "produces": [
+          "application/json",
+          "application/xml",
+          "application/yaml",
+          "text/calendar"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -880,14 +1008,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -929,6 +1067,12 @@
             }
           }
         ],
+        "produces": [
+          "application/json",
+          "application/xml",
+          "application/yaml",
+          "text/calendar"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -964,14 +1108,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -1027,6 +1181,12 @@
             }
           }
         },
+        "produces": [
+          "application/json",
+          "application/xml",
+          "application/yaml",
+          "text/calendar"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -1064,14 +1224,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -1124,6 +1294,12 @@
             }
           }
         ],
+        "produces": [
+          "application/json",
+          "application/xml",
+          "application/yaml",
+          "text/calendar"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -1159,14 +1335,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -1233,6 +1419,12 @@
             }
           }
         },
+        "produces": [
+          "application/json",
+          "application/xml",
+          "application/yaml",
+          "text/calendar"
+        ],
         "responses": {
           "200": {
             "$ref": "#/components/responses/LitCal200"
@@ -1265,6 +1457,9 @@
         ],
         "summary": "Retrieve an index of current supported national and diocesan calendars and relative locales, settings, etc.",
         "operationId": "retrieveMetadataGET",
+        "produces": [
+          "application/json"
+        ],
         "responses": {
           "200": {
             "description": "OK: An index of currently supported national and diocesan calendars and relative locales",
@@ -1296,6 +1491,9 @@
         ],
         "summary": "Retrieve an index of current supported national and diocesan calendars and relative locales, settings, etc.",
         "operationId": "retrieveMetadataPOST",
+        "produces": [
+          "application/json"
+        ],
         "responses": {
           "200": {
             "description": "OK: An index of currently supported national and diocesan calendars and relative locales",
@@ -1333,15 +1531,28 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           }
+        ],
+        "produces": [
+          "application/json"
         ],
         "responses": {
           "200": {
@@ -1429,15 +1640,28 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           }
+        ],
+        "produces": [
+          "application/json"
         ],
         "responses": {
           "200": {
@@ -1529,14 +1753,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "path",
@@ -1553,6 +1787,9 @@
               ]
             }
           }
+        ],
+        "produces": [
+          "application/json"
         ],
         "responses": {
           "200": {
@@ -1642,14 +1879,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "path",
@@ -1666,6 +1913,9 @@
               ]
             }
           }
+        ],
+        "produces": [
+          "application/json"
         ],
         "responses": {
           "200": {
@@ -1757,14 +2007,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "path",
@@ -1774,6 +2034,9 @@
               "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
             }
           }
+        ],
+        "produces": [
+          "application/json"
         ],
         "responses": {
           "200": {
@@ -1863,14 +2126,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "path",
@@ -1880,6 +2153,9 @@
               "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
             }
           }
+        ],
+        "produces": [
+          "application/json"
         ],
         "responses": {
           "200": {
