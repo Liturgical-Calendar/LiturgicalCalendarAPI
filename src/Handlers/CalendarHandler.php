@@ -50,6 +50,7 @@ use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyGradeMetadata;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyName;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyNameMetadata;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarSettings;
+use LiturgicalCalendar\Api\Models\ConditionalRule;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewMobile;
@@ -3121,6 +3122,54 @@ final class CalendarHandler extends AbstractHandler
     }
 
     /**
+     * Applies conditional rules to a liturgical event date
+     *
+     * @param DateTime $originalDate The original date of the liturgical event
+     * @param ConditionalRule[] $rules The conditional rules to apply
+     * @param string $eventKey The event key for logging purposes
+     * @return DateTime The potentially modified date
+     */
+    private function applyConditionalRules(DateTime $originalDate, array $rules, string $eventKey): DateTime
+    {
+        $currentDate = clone $originalDate;
+        
+        foreach ($rules as $rule) {
+            if ($rule->condition->matches($currentDate, $this->Cal)) {
+                $newDate = $rule->then->apply($currentDate);
+                
+                // Add a message about the rule application
+                $locale = LitLocale::$PRIMARY_LANGUAGE;
+                $originalDateStr = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                    ? ($originalDate->format('j') . ' ' . LatinUtils::LATIN_MONTHS[(int) $originalDate->format('n')])
+                    : ($locale === 'en'
+                        ? $originalDate->format('F jS')
+                        : $this->dayAndMonth->format($originalDate->format('U'))
+                    );
+                $newDateStr = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                    ? ($newDate->format('j') . ' ' . LatinUtils::LATIN_MONTHS[(int) $newDate->format('n')])
+                    : ($locale === 'en'
+                        ? $newDate->format('F jS')
+                        : $this->dayAndMonth->format($newDate->format('U'))
+                    );
+                
+                $this->Messages[] = sprintf(
+                    /**translators: 1: Event key, 2: Original date, 3: New date, 4: Requested calendar year */
+                    _('The liturgical event \'%1$s\' has been moved from %2$s to %3$s due to conditional rules in the year %4$d.'),
+                    $eventKey,
+                    $originalDateStr,
+                    $newDateStr,
+                    $this->CalendarParams->Year
+                );
+                
+                $currentDate = $newDate;
+                break; // Apply only the first matching rule
+            }
+        }
+        
+        return $currentDate;
+    }
+
+    /**
      * Handles a liturgical event for a National calendar that is missing from the calendar.
      * If the liturgical event is suppressed by a Sunday or a Solemnity,
      * a message is added to the Messages array, indicating what has happened.
@@ -4229,6 +4278,11 @@ final class CalendarHandler extends AbstractHandler
                     /** @var DiocesanLitCalItemCreateNewFixed $liturgicalEvent */
                     $liturgicalEvent     = $litCalItem->liturgical_event;
                     $currentLitEventDate = DateTime::fromFormat($liturgicalEvent->day . '-' . $liturgicalEvent->month . '-' . $this->CalendarParams->Year);
+                        
+                    // Apply conditional rules if they exist
+                    if (!empty($liturgicalEvent->rules)) {
+                        $currentLitEventDate = $this->applyConditionalRules($currentLitEventDate, $liturgicalEvent->rules, $liturgicalEvent->event_key);
+                    }
                 }
                 if ($currentLitEventDate !== false) {
                     $liturgicalEvent->setDate($currentLitEventDate);

@@ -7,11 +7,12 @@ use LiturgicalCalendar\Api\Enum\LitColor;
 use LiturgicalCalendar\Api\Enum\LitEventType;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
+use LiturgicalCalendar\Api\Models\ConditionalRule;
 use LiturgicalCalendar\Api\Models\LiturgicalEventData;
 
 /**
- * @phpstan-type LitCalItemCreateNewFixedObject \stdClass&object{event_key:string,day:int,month:int,color:string[],grade:int,common:string[]}
- * @phpstan-type LitCalItemCreateNewFixedArray array{event_key:string,day:int,month:int,color:string[],grade:int,common:string[]}
+ * @phpstan-type LitCalItemCreateNewFixedObject \stdClass&object{event_key:string,day:int,month:int,color:string[],grade:int,common:string[],rules?:\stdClass[]}
+ * @phpstan-type LitCalItemCreateNewFixedArray array{event_key:string,day:int,month:int,color:string[],grade:int,common:string[],rules?:array[]}
  */
 final class LitCalItemCreateNewFixed extends LiturgicalEventData
 {
@@ -30,6 +31,9 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
 
     public private(set) DateTime $date;
 
+    /** @var ConditionalRule[] */
+    public readonly array $rules;
+
     /**
      * Creates a new LitCalItemCreateNewFixed object.
      *
@@ -44,7 +48,7 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
      *
      * @throws \ValueError If the provided arguments are invalid.
      */
-    private function __construct(string $event_key, int $day, int $month, array $color, LitGrade $grade, LitCommons $common)
+    private function __construct(string $event_key, int $day, int $month, array $color, LitGrade $grade, LitCommons $common, array $rules = [])
     {
         if (false === static::isValidMonthValue($month)) {
             throw new \ValueError('`$month` must be an integer between 1 and 12');
@@ -64,6 +68,12 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
             }
         }
 
+        foreach ($rules as $rule) {
+            if (false === $rule instanceof ConditionalRule) {
+                throw new \ValueError('`$rules` must be an array of ConditionalRule instances');
+            }
+        }
+
         parent::__construct($event_key);
         $this->day    = $day;
         $this->month  = $month;
@@ -71,6 +81,7 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
         $this->grade  = $grade;
         $this->common = $common;
         $this->type   = LitEventType::FIXED;
+        $this->rules  = $rules;
     }
 
     /**
@@ -122,6 +133,13 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
             throw new \ValueError('invalid common: expected an array of LitCommon enum cases, LitCommon enum values, or LitMassVariousNeeds instances');
         }
 
+        $rules = [];
+        if (property_exists($data, 'rules') && is_array($data->rules)) {
+            foreach ($data->rules as $ruleData) {
+                $rules[] = ConditionalRule::fromObject($ruleData);
+            }
+        }
+
         return new static(
             $data->event_key,
             $data->day,
@@ -133,7 +151,8 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
                 $data->color
             ),
             LitGrade::from($data->grade),
-            $commons
+            $commons,
+            $rules
         );
     }
 
@@ -160,6 +179,13 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
             throw new \ValueError('invalid common: expected an array of LitCommon enum cases, LitCommon enum values, or LitMassVariousNeeds instances');
         }
 
+        $rules = [];
+        if (array_key_exists('rules', $data) && is_array($data['rules'])) {
+            foreach ($data['rules'] as $ruleData) {
+                $rules[] = ConditionalRule::fromObject((object) $ruleData);
+            }
+        }
+
         return new static(
             $data['event_key'],
             $data['day'],
@@ -171,7 +197,8 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
                 $data['color']
             ),
             LitGrade::from($data['grade']),
-            $commons
+            $commons,
+            $rules
         );
     }
 }
