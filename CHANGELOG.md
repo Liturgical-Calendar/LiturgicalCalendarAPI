@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## [v5.1](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.1) (October 1st 2025)
+
+* implement PSR-3 Logger Interface
+* fix OpenAPI validation (issue [#373])
+
 ## [v5.0](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.0) (September 7th 2025)
 
 * add support for `PUT`, `PATCH` and `DELETE` requests (issues [#284], [#265], and [#220])
@@ -7,6 +12,7 @@
 * refactor "festivity" to "liturgical_event" (issue [#239])
 * implement lectionary readings (issues [#321], [#324], [#326])
 * fix Feasts of the Lord not suppressing Sundays (issues [#324], [#327])
+* implement PSR-7 HTTP Message Interfaces, PSR-15 HTTP Server Request Handlers (including Middleware), and PSR-17 HTTP Factories (issue [#337])
 
 Saints Carlos Acutis and Piergiorgio Frassati, pray for us! Released on the day of the canonizations of these saints.
 
