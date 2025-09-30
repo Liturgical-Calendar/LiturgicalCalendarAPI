@@ -21,13 +21,13 @@ final class ConditionalRuleCondition
 
         if (property_exists($data, 'coincides_with')) {
             $coincidesWith = [];
-            if (property_exists($data->coincides_with, 'lit_grade')) {
-                if (is_array($data->coincides_with->lit_grade)) {
-                    foreach ($data->coincides_with->lit_grade as $grade) {
-                        $coincidesWith['lit_grade'][] = LitGrade::from($grade);
+            if (property_exists($data->coincides_with, 'grade')) {
+                if (is_array($data->coincides_with->grade)) {
+                    foreach ($data->coincides_with->grade as $grade) {
+                        $coincidesWith['grade'][] = LitGrade::from($grade);
                     }
                 } else {
-                    $coincidesWith['lit_grade'] = [LitGrade::from($data->coincides_with->lit_grade)];
+                    $coincidesWith['grade'] = [LitGrade::from($data->coincides_with->grade)];
                 }
             }
             if (property_exists($data->coincides_with, 'day_of_week')) {
@@ -54,9 +54,9 @@ final class ConditionalRuleCondition
 
         // Check coincides with condition
         if ($this->coincides_with !== null) {
-            if (isset($this->coincides_with['lit_grade'])) {
+            if (isset($this->coincides_with['grade'])) {
                 $hasCoincidence = false;
-                foreach ($this->coincides_with['lit_grade'] as $grade) {
+                foreach ($this->coincides_with['grade'] as $grade) {
                     switch ($grade) {
                         case LitGrade::SOLEMNITY:
                             if ($calendar->inSolemnities($date)) {
