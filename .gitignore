@@ -19,3 +19,4 @@ phpunit.xml
 public/*.php
 !public/index.php
 !public/LitCalTestServer.php
+.aider*
