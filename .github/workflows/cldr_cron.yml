@@ -44,17 +44,28 @@ jobs:
           echo "Remote: $remote_version"
           echo "Local:  $local_version"
 
-          if [ "$remote_version" = "$local_version" ]; then
-            echo "up_to_date=true" >> $GITHUB_OUTPUT
+          # Check if the remote version has a decimal point
+          if [[ $remote_version == *.* ]]; then
+            # If it does, extract the major part
+            remote_major=$(echo "$remote_version" | cut -d '.' -f 1)
+            # Compare the major part with the local version
+            if [[ $remote_major == $local_version ]]; then
+              echo "up_to_date=true" >> $GITHUB_OUTPUT
+            else
+              echo "up_to_date=false" >> $GITHUB_OUTPUT
+            fi
           else
-            echo "up_to_date=false" >> $GITHUB_OUTPUT
-            echo "remote_version=$remote_version" >> $GITHUB_OUTPUT
+            # If it doesn't, compare the remote version with the local version directly
+            if [[ $remote_version == $local_version ]]; then
+              echo "up_to_date=true" >> $GITHUB_OUTPUT
+            else
+              echo "up_to_date=false" >> $GITHUB_OUTPUT
+            fi
           fi
-
       - name: Download likelySubtags.json
         if: steps.compare.outputs.up_to_date == 'false'
         run: |
-          url="https://raw.githubusercontent.com/unicode-org/cldr-json/refs/tags/${{ steps.cldr.outputs.tag }}/cldr-core/supplemental/likelySubtags.json"
+          url="https://raw.githubusercontent.com/unicode-org/cldr-json/refs/tags/${{ steps.cldr.outputs.tag }}/cldr-json/cldr-core/supplemental/likelySubtags.json"
           curl -fsSL "$url" -o jsondata/likelySubtags.json
           # Validate downloaded file is valid JSON
           if ! jq empty jsondata/likelySubtags.json 2>/dev/null; then
