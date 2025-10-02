@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-09-16 23:16+0000\n"
+"POT-Creation-Date: 2025-10-02 17:42+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -577,7 +577,7 @@ msgstr ""
 msgid "For Giving Thanks to God"
 msgstr ""
 
-#: src/Enum/LitMassVariousNeeds.php:327
+#: src/Enum/LitMassVariousNeeds.php:328
 msgid "Masses and Prayers for Various Needs and Occasions"
 msgstr ""
 
@@ -791,7 +791,7 @@ msgstr ""
 #.  6. Requested calendar year
 #.
 #: src/Handlers/CalendarHandler.php:1898 src/Handlers/CalendarHandler.php:2369
-#: src/Handlers/CalendarHandler.php:2598 src/Handlers/CalendarHandler.php:3413
+#: src/Handlers/CalendarHandler.php:2598 src/Handlers/CalendarHandler.php:3417
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
@@ -1126,7 +1126,7 @@ msgstr ""
 #.  3. Day and month of the liturgical event
 #.  4. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3440
+#: src/Handlers/CalendarHandler.php:3444
 #, php-format
 msgid ""
 "The %1$s '%2$s' was not added to the calendar on %3$s because it conflicts "
@@ -1141,7 +1141,7 @@ msgstr ""
 #.  5. Year from which the name has been changed
 #.  6. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3509
+#: src/Handlers/CalendarHandler.php:3513
 #, php-format
 msgid ""
 "The name of the %1$s '%2$s' has been changed to '%3$s' in the national "
@@ -1155,7 +1155,7 @@ msgstr ""
 #.  4. Year from which the name has been changed
 #.  5. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3527
+#: src/Handlers/CalendarHandler.php:3531
 #, php-format
 msgid ""
 "The name of the celebration '%1$s' has been changed to '%2$s' in the "
@@ -1172,7 +1172,7 @@ msgstr ""
 #.  6. Source of the information
 #.  7. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3554
+#: src/Handlers/CalendarHandler.php:3558
 #, php-format
 msgid ""
 "The grade of the %1$s '%2$s' has been changed to '%3$s' in the national "
@@ -1186,7 +1186,7 @@ msgstr ""
 #.  4. Year from which the name has been changed
 #.  5. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3573
+#: src/Handlers/CalendarHandler.php:3577
 #, php-format
 msgid ""
 "The grade of the celebration '%1$s' has been changed to '%2$s' in the "
@@ -1203,7 +1203,7 @@ msgstr ""
 #.  6. ID of the national calendar
 #.  7. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3608
+#: src/Handlers/CalendarHandler.php:3612
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been moved from %3$s to %4$s since the year %5$d in the "
@@ -1217,7 +1217,7 @@ msgstr ""
 #.  4. ID of the national calendar
 #.  5. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3627
+#: src/Handlers/CalendarHandler.php:3631
 #, php-format
 msgid ""
 "The liturgical event '%1$s' has been moved to %2$s since the year %3$d in "
@@ -1232,7 +1232,7 @@ msgstr ""
 #.  4. ID of the national calendar
 #.  5. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3646
+#: src/Handlers/CalendarHandler.php:3650
 #, php-format
 msgid ""
 "The liturgical event '%1$s' has been moved to %2$s since the year %3$d in "
@@ -1242,13 +1242,13 @@ msgid ""
 msgstr ""
 
 #. translators: 1. Country name, 2. List of missals
-#: src/Handlers/CalendarHandler.php:3685
+#: src/Handlers/CalendarHandler.php:3689
 #, php-format
 msgid "Found Missals for region %1$s: %2$s."
 msgstr ""
 
 #. translators: Name of the Roman Missal
-#: src/Handlers/CalendarHandler.php:3709
+#: src/Handlers/CalendarHandler.php:3713
 #, php-format
 msgid "Found a sanctorale data file for %s"
 msgstr ""
@@ -1262,7 +1262,7 @@ msgstr ""
 #.  6. Superseding liturgical event name
 #.  7. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3756
+#: src/Handlers/CalendarHandler.php:3760
 #, php-format
 msgid ""
 "The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
@@ -1270,13 +1270,13 @@ msgid ""
 msgstr ""
 
 #. translators: Name of the Roman Missal
-#: src/Handlers/CalendarHandler.php:3771
+#: src/Handlers/CalendarHandler.php:3775
 #, php-format
 msgid "Could not find a sanctorale data file for %s"
 msgstr ""
 
 #. translators: 1. LiturgicalEvent grade, 2. LiturgicalEvent name, 3. New liturgical event name, 4: Requested calendar year, 5. Old date, 6. New date
-#: src/Handlers/CalendarHandler.php:3863
+#: src/Handlers/CalendarHandler.php:3867
 #, php-format
 msgid ""
 "The %1$s '%2$s' is transferred from %5$s to %6$s as per the %7$s, to make "
@@ -1284,7 +1284,7 @@ msgid ""
 msgstr ""
 
 #. translators: 1. LiturgicalEvent grade, 2. LiturgicalEvent name, 3. Old date, 4. New date, 5. Source of the information, 6. New liturgical event name, 7. Superseding liturgical event grade, 8. Superseding liturgical event name, 9: Requested calendar year
-#: src/Handlers/CalendarHandler.php:3887
+#: src/Handlers/CalendarHandler.php:3891
 #, php-format
 msgid ""
 "The %1$s '%2$s' would have been transferred from %3$s to %4$s as per the "
@@ -1293,7 +1293,7 @@ msgid ""
 msgstr ""
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
-#: src/Handlers/CalendarHandler.php:4076
+#: src/Handlers/CalendarHandler.php:4080
 #, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s' relative to liturgical event "
@@ -1301,7 +1301,7 @@ msgid ""
 msgstr ""
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. event_key of the liturgical event that it is relative to, 3. List of valid keywords
-#: src/Handlers/CalendarHandler.php:4092
+#: src/Handlers/CalendarHandler.php:4096
 #, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': the `strtotime.relative_time` "
@@ -1310,7 +1310,7 @@ msgid ""
 msgstr ""
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile liturgical event being created
-#: src/Handlers/CalendarHandler.php:4170
+#: src/Handlers/CalendarHandler.php:4174
 #, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': 'strtotime' property must be "
@@ -1318,7 +1318,7 @@ msgid ""
 msgstr ""
 
 #. translators: 1: LiturgicalEvent name, 2: Name of the diocese, 3: LiturgicalEvent date, 4: Coinciding liturgical event name, 5: Requested calendar year
-#: src/Handlers/CalendarHandler.php:4243
+#: src/Handlers/CalendarHandler.php:4247
 #, php-format
 msgid ""
 "The Solemnity '%1$s', proper to the calendar of the %2$s and usually "
@@ -1327,23 +1327,23 @@ msgid ""
 msgstr ""
 
 #. translators: 1: LiturgicalEvent grade, 2: LiturgicalEvent name, 3: Name of the diocese, 4: LiturgicalEvent date, 5: Coinciding liturgical event name, 6: Requested calendar year
-#: src/Handlers/CalendarHandler.php:4268
+#: src/Handlers/CalendarHandler.php:4272
 #, php-format
 msgid ""
 "The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
 "on %4$s, is suppressed by the %5$s %6$s in the year %7$d."
 msgstr ""
 
-#: src/Handlers/CalendarHandler.php:4470
+#: src/Handlers/CalendarHandler.php:4476
 msgid "Error converting Liturgical Calendar to XML."
 msgstr ""
 
-#: src/Handlers/CalendarHandler.php:4505
+#: src/Handlers/CalendarHandler.php:4511
 #, php-format
 msgid "Error receiving or parsing info from GitHub about latest release: %s."
 msgstr ""
 
-#: src/Handlers/CalendarHandler.php:4516
+#: src/Handlers/CalendarHandler.php:4522
 msgid "Error serializing Liturgical Calendar."
 msgstr ""
 
