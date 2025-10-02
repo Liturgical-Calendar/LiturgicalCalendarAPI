@@ -269,14 +269,21 @@ class CalendarParams implements ParamsInterface
      */
     private function validateLocaleParam(string $value): void
     {
-        $value           = CalendarParams::normalizeLocale($value);
-        $primaryLanguage = \Locale::getPrimaryLanguage($value);
-        $region          = \Locale::getRegion($value);
+        $normalized        = self::normalizeLocale($value);
+        $primaryLanguage   = \Locale::getPrimaryLanguage($normalized);
+        $region            = \Locale::getRegion($normalized);
+        $languageAndRegion = $primaryLanguage . ( $region ? '_' . $region : '' );
 
-        if (false === LitLocale::isValid($value) && false === LitLocale::isValid($primaryLanguage . ( $region ? '_' . $region : '' ))) {
-            throw new ValidationException("Invalid value `{$value}` for parameter `locale`, valid values are: la, la_VA, " . implode(', ', LitLocale::$AllAvailableLocales));
+        if (LitLocale::isValid($normalized)) {
+            $this->Locale = $normalized;
+            return;
         }
-        $this->Locale = $value;
+
+        if ($languageAndRegion !== '' && LitLocale::isValid($languageAndRegion)) {
+            $this->Locale = $languageAndRegion;
+            return;
+        }
+        throw new ValidationException("Invalid value `{$normalized}` for parameter `locale`, valid values are: la, la_VA, " . implode(', ', LitLocale::$AllAvailableLocales));
     }
 
     private static function hasRegion(string $locale): bool
@@ -306,8 +313,8 @@ class CalendarParams implements ParamsInterface
 — St. Gregory of Nazianzus, Oration 41 (On Pentecost), §11');
         }
 
-        if (!CalendarParams::hasRegion($locale)) {
-            $locale = CalendarParams::maximizeLocale($locale);
+        if (!self::hasRegion($locale)) {
+            $locale = self::maximizeLocale($locale);
         }
 
         return $locale;

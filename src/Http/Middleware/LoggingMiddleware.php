@@ -38,7 +38,7 @@ class LoggingMiddleware implements MiddlewareInterface
         $response       = $handler->handle($request);
         $resContentType = $response->getHeaderLine('Content-Type');
         $responseBody   = $response->getBody();
-        $safeResBody    = str_starts_with($resContentType, 'application/json') || str_starts_with($reqContentType, 'application/yaml') || str_starts_with($resContentType, 'text/')
+        $safeResBody    = str_starts_with($resContentType, 'application/json') || str_starts_with($resContentType, 'application/yaml') || str_starts_with($resContentType, 'text/')
             ? self::readBody($responseBody)
             : '[body omitted]';
 
