@@ -69,14 +69,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -155,14 +165,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -253,14 +273,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -350,14 +380,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -459,14 +499,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -551,14 +601,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -659,14 +719,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -762,14 +832,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -880,14 +960,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -964,14 +1054,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -1064,14 +1164,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -1159,14 +1269,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "header",
@@ -1333,14 +1453,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           }
         ],
         "responses": {
@@ -1429,14 +1559,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           }
         ],
         "responses": {
@@ -1529,14 +1669,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "path",
@@ -1642,14 +1792,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "path",
@@ -1757,14 +1917,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "path",
@@ -1863,14 +2033,24 @@
           {
             "in": "header",
             "name": "Accept-Language",
+            "description": "The header advertises which languages the client is able to understand, and which locale variant is preferred. (By languages, we mean natural languages, such as English, and not programming languages.)",
             "schema": {
               "$ref": "./CommonDef.json#/definitions/Locale"
             },
-            "examples": [
-              "la-VA",
-              "it-IT",
-              "en-US"
-            ]
+            "examples": {
+              "latin": {
+                "value": "la-VA",
+                "summary": "Latin (Vatican)"
+              },
+              "italian": {
+                "value": "it-IT",
+                "summary": "Italian (Italy)"
+              },
+              "english": {
+                "value": "en-US",
+                "summary": "English (United States)"
+              }
+            }
           },
           {
             "in": "path",

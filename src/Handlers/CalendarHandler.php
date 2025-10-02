@@ -112,7 +112,7 @@ final class CalendarHandler extends AbstractHandler
     private string $BaptismLordFmt;
     private string $BaptismLordMod;
 
-    public const API_VERSION                  = '5.0';
+    public const API_VERSION                  = '5.1';
     private string $CachePath                 = '';
     private string $CacheFile                 = '';
     private string $CacheDuration             = '';
@@ -3371,6 +3371,10 @@ final class CalendarHandler extends AbstractHandler
             return;
         }
 
+        $hasStrToTime = property_exists($liturgicalEvent, 'strtotime')
+            && is_string($liturgicalEvent->strtotime)
+            && $liturgicalEvent->strtotime !== '';
+
         if ($this->liturgicalEventCanBeCreated($liturgicalEvent)) {
             if ($this->liturgicalEventDoesNotCoincide($liturgicalEvent)) {
                 $newLitEvent = LiturgicalEvent::fromObject($liturgicalEvent);
@@ -3398,7 +3402,7 @@ final class CalendarHandler extends AbstractHandler
                     ? $liturgicalEvent->date->format('F jS')
                     : $this->dayAndMonth->format($liturgicalEvent->date->format('U'))
                 );
-            $dateStr          = property_exists($liturgicalEvent, 'strtotime') && $liturgicalEvent->strtotime !== ''
+            $dateStr          = ( $liturgicalEvent instanceof LitCalItemCreateNewMobile ) && $hasStrToTime
                 ? '<i>' . $liturgicalEvent->strtotime . '</i>'
                 : $formattedDateStr;
             $this->Messages[] = sprintf(
@@ -3426,7 +3430,7 @@ final class CalendarHandler extends AbstractHandler
                     ? $liturgicalEvent->date->format('F jS')
                     : $this->dayAndMonth->format($liturgicalEvent->date->format('U'))
                 );
-            $dateStr          = property_exists($liturgicalEvent, 'strtotime') && $liturgicalEvent->strtotime !== ''
+            $dateStr          = ( $liturgicalEvent instanceof LitCalItemCreateNewMobile ) && $hasStrToTime
                 ? '<i>' . $liturgicalEvent->strtotime . '</i>'
                 : $formattedDateStr;
 
@@ -4329,12 +4333,14 @@ final class CalendarHandler extends AbstractHandler
             $GithubReleasesAPI = 'https://api.github.com/repos/Liturgical-Calendar/LiturgicalCalendarAPI/releases/latest';
 
             $client = new Client([
-                'base_uri' => 'https://api.github.com',
-                'headers'  => [
+                'base_uri'        => 'https://api.github.com',
+                'headers'         => [
                     'Accept'               => 'application/vnd.github+json',
                     'User-Agent'           => 'LiturgicalCalendar', // required by GitHub
                     'X-GitHub-Api-Version' => '2022-11-28',
                 ],
+                'timeout'         => 5.0,   // total request timeout
+                'connect_timeout' => 2.0,   // TCP connect timeout
             ]);
 
             try {
@@ -4388,7 +4394,7 @@ final class CalendarHandler extends AbstractHandler
         $SerializeableLitCal->settings->epiphany            = $this->CalendarParams->Epiphany;
         $SerializeableLitCal->settings->ascension           = $this->CalendarParams->Ascension;
         $SerializeableLitCal->settings->corpus_christi      = $this->CalendarParams->CorpusChristi;
-        $SerializeableLitCal->settings->locale              = $this->CalendarParams->Locale;
+        $SerializeableLitCal->settings->locale              = LitLocale::$RUNTIME_LOCALE;
         $SerializeableLitCal->settings->return_type         = $this->CalendarParams->ReturnType;
         $SerializeableLitCal->settings->year_type           = $this->CalendarParams->YearType;
         $SerializeableLitCal->settings->eternal_high_priest = $this->CalendarParams->EternalHighPriest;
@@ -4486,13 +4492,10 @@ final class CalendarHandler extends AbstractHandler
                     throw new ImplementationException('YAML extension not loaded');
                 }
                 $jsonArr = Utilities::objectToArray($SerializeableLitCal);
-                set_error_handler([static::class, 'warningHandler'], E_WARNING);
                 try {
                     $responseBody = yaml_emit($jsonArr, YAML_UTF8_ENCODING);
                 } catch (\ErrorException $e) {
                     throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
-                } finally {
-                    restore_error_handler();
                 }
                 break;
             case ReturnTypeParam::ICS:
@@ -4553,6 +4556,7 @@ final class CalendarHandler extends AbstractHandler
         }
     }
 
+
     /**
      * Set up the locale for this API request.
      *
@@ -4563,16 +4567,11 @@ final class CalendarHandler extends AbstractHandler
      */
     private function prepareL10N(): void
     {
+        $region     = \Locale::getRegion($this->CalendarParams->Locale);
         $baseLocale = \Locale::getPrimaryLanguage($this->CalendarParams->Locale);
         if (null === $baseLocale) {
             throw new ServiceUnavailableException('“Pride was the reason for the division of tongues, humility the reason they were reunited.” - St. Augustine, The City of God, Book XVI, Chapter 4');
         }
-
-        LiturgicalEvent::setLocale(
-            $this->CalendarParams->Locale === LitLocale::LATIN
-                ? LitLocale::LATIN_PRIMARY_LANGUAGE
-                : $this->CalendarParams->Locale
-        );
 
         LitLocale::$PRIMARY_LANGUAGE = $baseLocale;
         if ($baseLocale !== LitLocale::LATIN_PRIMARY_LANGUAGE) {
@@ -4580,13 +4579,17 @@ final class CalendarHandler extends AbstractHandler
                 $this->CalendarParams->Locale . '.utf8',
                 $this->CalendarParams->Locale . '.UTF-8',
                 $this->CalendarParams->Locale,
-                $baseLocale . '_' . strtoupper($baseLocale) . '.utf8',
-                $baseLocale . '_' . strtoupper($baseLocale) . '.UTF-8',
-                $baseLocale . '_' . strtoupper($baseLocale),
                 $baseLocale . '.utf8',
                 $baseLocale . '.UTF-8',
                 $baseLocale
             ];
+            if ($region !== null && $region !== '') {
+                array_splice($localeArray, 3, 0, [
+                    $baseLocale . '_' . $region . '.utf8',
+                    $baseLocale . '_' . $region . '.UTF-8',
+                    $baseLocale . '_' . $region
+                ]);
+            }
 
             $runtimeLocale = setlocale(LC_ALL, $localeArray);
             if (false === $runtimeLocale) {
@@ -4595,6 +4598,9 @@ final class CalendarHandler extends AbstractHandler
 
             // Example: "it_IT.UTF-8" → "it_IT"
             $normalizedLocale = strtok($runtimeLocale, '.') ?: $runtimeLocale;
+            if ($normalizedLocale === 'C' || $normalizedLocale === 'POSIX') {
+                $normalizedLocale = $baseLocale;
+            }
 
             $languageEnv = implode(':', array_unique([
                 $runtimeLocale,
@@ -4611,6 +4617,8 @@ final class CalendarHandler extends AbstractHandler
         } else {
             LitLocale::$RUNTIME_LOCALE = LitLocale::LATIN_PRIMARY_LANGUAGE;
         }
+
+        LiturgicalEvent::setLocale(LitLocale::$RUNTIME_LOCALE);
 
         $this->createFormatters();
 

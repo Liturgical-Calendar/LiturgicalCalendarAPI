@@ -30,7 +30,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-
       - name: Setup PHP with PECL extensions
         uses: shivammathur/setup-php@v2
         with:
@@ -54,7 +53,7 @@ jobs:
           restore-keys: phpunit-
 
       - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-progress
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --classmap-authoritative --no-progress
 
       - name: Copy env file
         run: cp .env.example .env.local
@@ -84,15 +83,28 @@ jobs:
             exit 1
           fi
 
-          for i in {1..30}; do
-            if curl -fsS http://localhost:8000/ > /dev/null; then
+          # wait for the server to actually bind
+          MAX_TRIES=30
+          for i in $(seq 1 $MAX_TRIES); do
+            if nc -z localhost 8000; then
+              echo "Server is ready."
               exit 0
             fi
             sleep 1
           done
+
+          echo "Server did not respond on localhost:8000 after $MAX_TRIES seconds."
           exit 1
 
       - name: Run tests
+        run: time composer test
+
+      - name: Show logs on failure
+        if: failure()
         run: |
-          composer dump-autoload --optimize
-          time composer test
+          echo "=== Dumping logs ==="
+          if [ -d logs ]; then
+            find logs -type f -name "*.log" -print -exec cat {} \;
+          else
+            echo "No logs directory found"
+          fi

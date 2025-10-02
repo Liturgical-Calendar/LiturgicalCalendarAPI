@@ -25,7 +25,7 @@ use LiturgicalCalendar\Api\Models\RelativeLiturgicalDate;
  *     color?: LitColor|LitColor[]|string|string[],
  *     type?: LitEventType|string,
  *     common?: LitCommons|LitCommon[]|LitMassVariousNeeds[]|string[],
- *     grade_display?: string,
+ *     grade_display?: ?string,
  * }
  */
 final class LiturgicalEventMobile extends LiturgicalEventAbstract
@@ -140,14 +140,14 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
      * - common: The liturgical common of the liturgical event, as an array of strings or LitCommon cases, or as a single string or single LitCommon case.
      *   If not provided, defaults to LitCommon::NONE.
      * - type: The type of the liturgical event, as a LitEventType object or as a string.
-     *   If not provided, defaults to LitEventType::FIXED.
+     *   If not provided, defaults to LitEventType::MOBILE.
      * - grade_display: The grade display of the liturgical event, as a string. If not provided, defaults to null.
      *
-     * @param LiturgicalEventObj|LiturgicalEventData|DecreeEventData|AbstractJsonSrcData $obj
+     * @param LiturgicalEventObj|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewMobile|DecreeItemCreateNewMobile|AbstractJsonSrcData $obj
      * @return LiturgicalEventMobile A new LiturgicalEventMobile object.
      * @throws \InvalidArgumentException If the provided object does not contain the required properties or if the properties have invalid types.
      */
-    public static function fromObject(\stdClass|LiturgicalEventData|DecreeEventData|AbstractJsonSrcData $obj): static
+    public static function fromObject(\stdClass|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewMobile|DecreeItemCreateNewMobile|AbstractJsonSrcData $obj): static
     {
         $requiredProps = ['event_key', 'name', 'grade', 'strtotime'];
         $currentProps  = array_keys(get_object_vars($obj));
@@ -259,6 +259,14 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
             throw new \Exception('Invalid object provided to create LiturgicalEventMobile: grade is not an instance of LitGrade');
         }
 
+        $gradeDisplay = null;
+        if (property_exists($obj, 'grade_display')) {
+            if ($obj->grade_display !== null && false === is_string($obj->grade_display)) {
+                throw new \InvalidArgumentException('Invalid grade_display provided to create LiturgicalEventFixed');
+            }
+            $gradeDisplay = $obj->grade_display;
+        }
+
         return new self(
             $obj->event_key,
             $obj->name,
@@ -267,7 +275,7 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
             $type,
             $grade,
             $commons,
-            $obj->grade_display ?? null
+            $gradeDisplay
         );
     }
 
@@ -297,7 +305,7 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
      *     color?: LitColor|LitColor[]|string|string[],
      *     type?: LitEventType|string,
      *     common?: LitCommons|LitCommon[]|LitMassVariousNeeds[]|string[],
-     *     grade_display?: string,
+     *     grade_display?: ?string,
      * } $arr The associative array containing the required properties.
      * @return LiturgicalEventMobile A new LiturgicalEventMobile object.
      * @throws \InvalidArgumentException If the provided array does not contain the required properties or if the properties have invalid types.
@@ -371,6 +379,14 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
             throw new \InvalidArgumentException('Invalid strtotime provided to create LiturgicalEventMobile');
         }
 
+        $gradeDisplay = null;
+        if (array_key_exists('grade_display', $arr)) {
+            if ($arr['grade_display'] !== null && false === is_string($arr['grade_display'])) {
+                throw new \InvalidArgumentException('Invalid grade_display provided to create LiturgicalEventFixed');
+            }
+            $gradeDisplay = $arr['grade_display'];
+        }
+
         return new self(
             $arr['event_key'],
             $arr['name'],
@@ -379,7 +395,7 @@ final class LiturgicalEventMobile extends LiturgicalEventAbstract
             $arr['type'],
             $arr['grade'],
             $commons,
-            isset($arr['grade_display']) ? $arr['grade_display'] : null
+            $gradeDisplay
         );
     }
 }

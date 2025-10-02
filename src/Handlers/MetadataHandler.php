@@ -302,13 +302,10 @@ final class MetadataHandler extends AbstractHandler
                     }
                     $responseBodyObj = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
 
-                    set_error_handler([static::class, 'warningHandler'], E_WARNING);
                     try {
                         $yamlEncodedResponse = yaml_emit($responseBodyObj, YAML_UTF8_ENCODING);
                     } catch (\ErrorException $e) {
                         throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
-                    } finally {
-                        restore_error_handler();
                     }
                     return $response->withStatus(StatusCode::OK->value, StatusCode::OK->reason())->withBody(Stream::create($yamlEncodedResponse));
                     // no break needed

@@ -21,6 +21,7 @@ use LiturgicalCalendar\Api\Handlers\SchemasHandler;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Middleware\ErrorHandlingMiddleware;
+use LiturgicalCalendar\Api\Http\Middleware\LoggingMiddleware;
 use LiturgicalCalendar\Api\Http\Server\MiddlewarePipeline;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
@@ -36,15 +37,11 @@ class Router
     public static string $apiFilePath;
     private const MIN_YEAR = 1969;  // exlusive minimum (first year supported is 1970)
     private const MAX_YEAR = 10000; // exclusive maximum (last year supported is 9999)
-    private const RED      = "\033[0;31m";
-    private const GREEN    = "\033[0;32m";
-    private const YELLOW   = "\033[0;33m";
-    private const BLUE     = "\033[0;34m";
-    private const NC       = "\033[0m"; // No Color
 
     private RequestHandlerInterface $handler;
     private Psr17Factory $psr17Factory;
     private ServerRequestInterface $request;
+    private string $requestId;
     private ResponseInterface $response;
     private static bool $debug;
 
@@ -63,7 +60,13 @@ class Router
         }
 
         $this->psr17Factory = new Psr17Factory();
-        $this->request      = $this->retrieveRequest();
+        $request            = $this->retrieveRequest();
+        try {
+            $this->requestId = bin2hex(random_bytes(8)); // 16 hex chars
+        } catch (\Throwable) {
+            $this->requestId = uniqid('lit');
+        }
+        $this->request = $request->withAttribute('request_id', $this->requestId);
     }
 
     /**
@@ -355,9 +358,10 @@ class Router
 
         $pipeline = new MiddlewarePipeline($this->handler);
         $pipeline->pipe(new ErrorHandlingMiddleware($this->psr17Factory, self::$debug)); // outermost middleware
-        //$pipeline->pipe(new LoggingMiddleware());       // innermost middleware
+        $pipeline->pipe(new LoggingMiddleware(self::$debug));                            // innermost middleware
 
-        $this->response = $pipeline->handle($this->request);
+        $this->response = $pipeline->handle($this->request)
+            ->withHeader('X-Request-Id', $this->requestId);
         $this->emitResponse();
     }
 
@@ -391,31 +395,6 @@ class Router
 
     private function emitResponse(): never
     {
-        if (self::$debug) {
-            $debugMessage  = self::YELLOW . 'REQUEST HTTP/' . $this->request->getProtocolVersion() . ' ' . $this->request->getMethod() . ' ' . $this->request->getUri() . self::NC . PHP_EOL;
-            $debugMessage .= PHP_EOL;
-            $debugMessage .= self::BLUE . 'Incoming request headers' . self::NC . PHP_EOL;
-            foreach ($this->request->getHeaders() as $name => $values) {
-                $debugMessage .= $name . ': ' . implode(', ', $values) . PHP_EOL;
-            };
-
-            $color         = $this->response->getStatusCode() >= 400 ? self::RED : self::GREEN;
-            $debugMessage .= PHP_EOL;
-            $debugMessage .= self::YELLOW . 'RESPONSE HTTP/' . $this->response->getProtocolVersion() . ' ' . $color . $this->response->getStatusCode() . ' ' . $this->response->getReasonPhrase() . self::NC . PHP_EOL;
-            $debugMessage .= PHP_EOL;
-            $debugMessage .= self::BLUE . 'Outgoing response headers' . self::NC . PHP_EOL;
-            foreach ($this->response->getHeaders() as $name => $values) {
-                $debugMessage .= $name . ': ' . implode(', ', $values) . PHP_EOL;
-            };
-            $debugMessage   .= PHP_EOL;
-            $responseBody    = (string) $this->response->getBody();
-            $responseBodyLen = strlen($responseBody);
-            $debugMessage   .= self::BLUE . "Outgoing response body ({$responseBodyLen} bytes)" . self::NC . PHP_EOL;
-            $debugMessage   .= $responseBody . PHP_EOL;
-            $date            = date('Y-m-d_H-i-s-u');
-            file_put_contents(self::$apiFilePath . 'logs' . DIRECTORY_SEPARATOR . "api_request_response_{$date}.log", $debugMessage);
-        }
-
         $sapiEmitter = new SapiEmitter();
         $sapiEmitter->emit($this->response);
         die();

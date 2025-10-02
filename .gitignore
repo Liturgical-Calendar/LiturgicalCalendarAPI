@@ -19,3 +19,5 @@ phpunit.xml
 public/*.php
 !public/index.php
 !public/LitCalTestServer.php
+/.aider*
+.DS_Store
