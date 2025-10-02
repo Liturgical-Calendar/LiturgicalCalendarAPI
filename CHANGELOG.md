@@ -1,11 +1,11 @@
 # CHANGELOG
 
-## [v5.1](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.1) (October 1st 2025)
+## [v5.1](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.1) (October 2nd 2025)
 
 * implement PSR-3 Logger Interface
 * fix OpenAPI validation (issue [#373])
 
-Saint Thérèse of Lisieux, pray for us! 🌹
+Holy Guardian Angels, be our protection! 🪽🪽
 
 ## [v5.0](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.0) (September 7th 2025)
 
