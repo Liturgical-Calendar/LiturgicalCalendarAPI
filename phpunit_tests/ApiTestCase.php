@@ -20,10 +20,9 @@ abstract class ApiTestCase extends TestCase
 
     private static ?\Throwable $lastException = null;
     private static int $lastStatusCode        = 0;
-    private static string $responseBody;
-
-    private static bool $preferV4;
-    private static string $addr;
+    private static string $responseBody       = '';
+    private static bool $preferV4             = true; // default to IPv4 unless detected otherwise
+    private static string $addr               = '';
 
     public static function setUpBeforeClass(): void
     {
@@ -51,7 +50,7 @@ abstract class ApiTestCase extends TestCase
             }
         } else {
             // Hostname — detect preferred stack via DNS resolution
-            $result = self::detectBinding($_ENV['API_HOST'], (int) $_ENV['API_PORT']);
+            $result = self::detectBinding((int) $_ENV['API_PORT']);
             if ($result['addr'] !== null) {
                 self::$preferV4 = $result['preferV4'];
                 self::$addr     = $result['addr'];
@@ -96,7 +95,8 @@ abstract class ApiTestCase extends TestCase
             // but `markSkipped` only shows the message with `--debug`
             $this->fail(
                 "API is not running on {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']} "
-                . '(bound to ' . ( self::$preferV4 ? 'IPv4' : 'IPv6' ) . ' address ' . self::$addr . ') — skipping integration tests. Maybe run `composer start` first?' . PHP_EOL
+                . ( self::$addr !== '' ? '(bound to ' . ( self::$preferV4 ? 'IPv4' : 'IPv6' ) . ' address ' . self::$addr . ') ' : '' )
+                . '— skipping integration tests. Maybe run `composer start` first?' . PHP_EOL
                 . (
                     self::$lastException
                     ? 'Error: ' . self::$lastException->getMessage()
@@ -168,9 +168,9 @@ abstract class ApiTestCase extends TestCase
         return filter_var($host, FILTER_VALIDATE_IP) !== false;
     }
 
-    private static function detectBinding(string $host, int $port): array
+    private static function detectBinding(int $port): array
     {
-        // Try IPv6 first
+        // Bracket IPv6 host if needed
         $sock6 = @fsockopen('tcp://[::1]', $port, $errno, $errstr, 0.5);
         if ($sock6) {
             fclose($sock6);

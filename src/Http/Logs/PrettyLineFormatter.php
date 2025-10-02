@@ -60,7 +60,7 @@ class PrettyLineFormatter extends LineFormatter
                     $lines[] = $indent . $k . ':';
                     $lines[] = $this->prettyPrint($v, $level + 1, $maxDepth);
                 } else {
-                    $lines[] = $prefix . $this->prettyPrint($v, 0, $maxDepth);
+                    $lines[] = $prefix . $this->prettyPrint($v, $level, $maxDepth);
                 }
             }
             return implode("\n", $lines);

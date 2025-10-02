@@ -483,7 +483,7 @@ final class LiturgicalEvent implements \JsonSerializable
             } else {
                 // We ensure a default value
                 /** @var LitCommons $commons */
-                $commons = LitCommons::create([]);
+                $commons = LitCommons::create([LitCommon::NONE]);
             }
             if (isset($obj->color)) {
                 $color = $obj->color;

@@ -301,7 +301,7 @@ class CalendarParams implements ParamsInterface
     private static function normalizeLocale(string $input): string
     {
         $locale = \Locale::canonicalize($input);
-        if (null === $locale) {
+        if (null === $locale || '' === $locale) {
             throw new ValidationException('Invalid locale string: ' . $input . '. “If they were scattered abroad into foreign tongues, it was because their intention was profane. But now, by the distribution of tongues, the impiety is dissolved and the unity of the Spirit is restored.”
 — St. Gregory of Nazianzus, Oration 41 (On Pentecost), §11');
         }

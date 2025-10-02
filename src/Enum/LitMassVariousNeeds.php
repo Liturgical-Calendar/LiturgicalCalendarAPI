@@ -309,6 +309,7 @@ enum LitMassVariousNeeds: string
             LitMassVariousNeeds::IN_QUACUMQUE_NECESSITATE => _('In Any Need'),
             /**translators: context = Masses and Prayers for Various Needs and Occasions */
             LitMassVariousNeeds::PRO_GRATIIS_DEO_REDDENDIS => _('For Giving Thanks to God'),
+            // Intentionally English only, as this is a USA-specific category
             LitMassVariousNeeds::GIVING_THANKS_TO_GOD_FOR_THE_GIFT_OF_HUMAN_LIFE_USA => LitMassVariousNeeds::GIVING_THANKS_TO_GOD_FOR_THE_GIFT_OF_HUMAN_LIFE_USA->value
         };
     }

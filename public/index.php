@@ -68,7 +68,7 @@ $dotenv->ifPresent(['APP_ENV'])->notEmpty()->allowedValues(['development', 'prod
 $logsFolder = $projectFolder . DIRECTORY_SEPARATOR . 'logs';
 if (!file_exists($logsFolder)) {
     if (!mkdir($logsFolder, 0755, true)) {
-        throw new RuntimeException('Failed to create logs directory: ' . self::$logsFolder);
+        throw new RuntimeException('Failed to create logs directory: ' . $logsFolder);
     }
 }
 
@@ -97,7 +97,7 @@ if (
     $dt        = $dt->setTimezone(new DateTimeZone('Europe/Vatican'));
     $timestamp = $dt->format('H:i:s.u');
     $pid       = getmypid();
-    $pidLogger = LoggerFactory::createPidLogger(true, 'api-pid', $logsFolder);
+    $pidLogger = LoggerFactory::create('api-pid', $logsFolder, 30, true, false, false);
     $pidLogger->info('Liturgical Calendar API handled by process with PID (' . $pid . ') at ' . $timestamp);
 } else {
     ini_set('display_errors', 0);

@@ -3371,6 +3371,10 @@ final class CalendarHandler extends AbstractHandler
             return;
         }
 
+        $hasStrToTime = property_exists($liturgicalEvent, 'strtotime')
+            && is_string($liturgicalEvent->strtotime)
+            && $liturgicalEvent->strtotime !== '';
+
         if ($this->liturgicalEventCanBeCreated($liturgicalEvent)) {
             if ($this->liturgicalEventDoesNotCoincide($liturgicalEvent)) {
                 $newLitEvent = LiturgicalEvent::fromObject($liturgicalEvent);
@@ -3398,7 +3402,7 @@ final class CalendarHandler extends AbstractHandler
                     ? $liturgicalEvent->date->format('F jS')
                     : $this->dayAndMonth->format($liturgicalEvent->date->format('U'))
                 );
-            $dateStr          = property_exists($liturgicalEvent, 'strtotime') && is_string($liturgicalEvent->strtotime) && $liturgicalEvent->strtotime !== ''
+            $dateStr          = ( $liturgicalEvent instanceof LitCalItemCreateNewMobile ) && $hasStrToTime
                 ? '<i>' . $liturgicalEvent->strtotime . '</i>'
                 : $formattedDateStr;
             $this->Messages[] = sprintf(
@@ -3426,7 +3430,7 @@ final class CalendarHandler extends AbstractHandler
                     ? $liturgicalEvent->date->format('F jS')
                     : $this->dayAndMonth->format($liturgicalEvent->date->format('U'))
                 );
-            $dateStr          = property_exists($liturgicalEvent, 'strtotime') && is_string($liturgicalEvent->strtotime) && $liturgicalEvent->strtotime !== ''
+            $dateStr          = ( $liturgicalEvent instanceof LitCalItemCreateNewMobile ) && $hasStrToTime
                 ? '<i>' . $liturgicalEvent->strtotime . '</i>'
                 : $formattedDateStr;
 
@@ -4329,12 +4333,14 @@ final class CalendarHandler extends AbstractHandler
             $GithubReleasesAPI = 'https://api.github.com/repos/Liturgical-Calendar/LiturgicalCalendarAPI/releases/latest';
 
             $client = new Client([
-                'base_uri' => 'https://api.github.com',
-                'headers'  => [
+                'base_uri'        => 'https://api.github.com',
+                'headers'         => [
                     'Accept'               => 'application/vnd.github+json',
                     'User-Agent'           => 'LiturgicalCalendar', // required by GitHub
                     'X-GitHub-Api-Version' => '2022-11-28',
                 ],
+                'timeout'         => 5.0,   // total request timeout
+                'connect_timeout' => 2.0,   // TCP connect timeout
             ]);
 
             try {
@@ -4573,13 +4579,17 @@ final class CalendarHandler extends AbstractHandler
                 $this->CalendarParams->Locale . '.utf8',
                 $this->CalendarParams->Locale . '.UTF-8',
                 $this->CalendarParams->Locale,
-                $baseLocale . '_' . $region . '.utf8',
-                $baseLocale . '_' . $region . '.UTF-8',
-                $baseLocale . '_' . $region,
                 $baseLocale . '.utf8',
                 $baseLocale . '.UTF-8',
                 $baseLocale
             ];
+            if ($region !== null && $region !== '') {
+                array_splice($localeArray, 3, 0, [
+                    $baseLocale . '_' . $region . '.utf8',
+                    $baseLocale . '_' . $region . '.UTF-8',
+                    $baseLocale . '_' . $region
+                ]);
+            }
 
             $runtimeLocale = setlocale(LC_ALL, $localeArray);
             if (false === $runtimeLocale) {
@@ -4588,6 +4598,9 @@ final class CalendarHandler extends AbstractHandler
 
             // Example: "it_IT.UTF-8" → "it_IT"
             $normalizedLocale = strtok($runtimeLocale, '.') ?: $runtimeLocale;
+            if ($normalizedLocale === 'C' || $normalizedLocale === 'POSIX') {
+                $normalizedLocale = $baseLocale;
+            }
 
             $languageEnv = implode(':', array_unique([
                 $runtimeLocale,

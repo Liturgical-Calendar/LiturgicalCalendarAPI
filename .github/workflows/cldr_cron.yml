@@ -15,15 +15,20 @@ jobs:
       - name: Get latest CLDR release tag
         id: cldr
         run: |
-          latest=$(curl -s https://api.github.com/repos/unicode-org/cldr-json/releases/latest \
+          latest=$(curl -fsSL -H "Authorization: Bearer ${{ github.token }}" \
+            https://api.github.com/repos/unicode-org/cldr-json/releases/latest \
             | jq -r .tag_name)
+          if [ -z "$latest" ] || [ "$latest" = "null" ]; then
+            echo "Failed to get latest CLDR release tag"
+            exit 1
+          fi
           echo "tag=$latest" >> $GITHUB_OUTPUT
 
       - name: Check current version in repo
         id: local
         run: |
           if [ -f jsondata/likelySubtags.json ]; then
-            local_version=$(jq -r '.supplemental.version._cldrVersion' jsondata/likelySubtags.json)
+            local_version=$(jq -r '.supplemental.version._cldrVersion // "none"' jsondata/likelySubtags.json 2>/dev/null || echo "none")
           else
             local_version="none"
           fi
@@ -50,7 +55,12 @@ jobs:
         if: steps.compare.outputs.up_to_date == 'false'
         run: |
           url="https://raw.githubusercontent.com/unicode-org/cldr-json/refs/tags/${{ steps.cldr.outputs.tag }}/cldr-core/supplemental/likelySubtags.json"
-          curl -sSL "$url" -o jsondata/likelySubtags.json
+          curl -fsSL "$url" -o jsondata/likelySubtags.json
+          # Validate downloaded file is valid JSON
+          if ! jq empty jsondata/likelySubtags.json 2>/dev/null; then
+            echo "Downloaded likelySubtags.json is not valid JSON"
+            exit 1
+          fi
 
       - name: Commit changes
         if: steps.compare.outputs.up_to_date == 'false'
@@ -58,5 +68,10 @@ jobs:
         with:
           commit-message: "Update CLDR likelySubtags to ${{ steps.cldr.outputs.tag }}"
           title: "Update CLDR likelySubtags to ${{ steps.cldr.outputs.tag }}"
+          body: |
+            This PR updates the CLDR likelySubtags data from version ${{ steps.local.outputs.version }} to ${{ steps.compare.outputs.remote_version }}.
+
+            Release notes: https://github.com/unicode-org/cldr-json/releases/tag/${{ steps.cldr.outputs.tag }}
+          labels: dependencies, automated
           branch: update-cldr
           delete-branch: true

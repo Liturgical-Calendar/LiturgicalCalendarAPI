@@ -71,7 +71,7 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
     }
 
     /**
-     * Sets the name of the PropriumDeTemporeEvent.
+     * Sets the name of the PropriumDeSanctisEvent.
      *
      * @param string $name The name to set for the event.
      */
@@ -156,12 +156,12 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
             $data['event_key'],
             $data['day'],
             $data['month'],
-            array_map(
+            array_values(array_map(
                 function (string $color): LitColor {
                     return LitColor::from($color);
                 },
                 $data['color']
-            ),
+            )),
             $litCommons,
             LitGrade::from($data['grade']),
             isset($data['grade_display']) ? $data['grade_display'] : null,
@@ -171,9 +171,8 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
     }
 
     /**
-     * Creates an instance of the class from a stdClass object or an array.
+     * Creates an instance of the class from a stdClass object.
      *
-     * If the input is an array, an InvalidArgumentException is thrown.
      * The stdClass object must have the following properties:
      * - event_key (string): The event key.
      * - day (int): The day of the event.
@@ -201,12 +200,12 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
             $data->event_key,
             $data->day,
             $data->month,
-            array_map(
+            array_values(array_map(
                 function (string $color): LitColor {
                     return LitColor::from($color);
                 },
                 $data->color
-            ),
+            )),
             $litCommons,
             LitGrade::from($data->grade),
             isset($data->grade_display) ? $data->grade_display : null,

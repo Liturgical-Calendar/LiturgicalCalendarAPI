@@ -27,9 +27,9 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
     {
         $this->responseFactory = $responseFactory;
         $this->debug           = $debug;
-        $debugLogger           = LoggerFactory::createApiLogger($debug);
+        $debugLogger           = LoggerFactory::create('api', null, 30, $debug, true, true);
         $this->debugLogger     = $debugLogger;
-        $errorLogger           = LoggerFactory::createApiLogger($debug, 'api-error');
+        $errorLogger           = LoggerFactory::create('api-error', null, 30, $debug, true, true);
         $this->errorLogger     = $errorLogger;
         $stderr                = fopen('php://stderr', 'w');
         if ($stderr === false) {
@@ -82,7 +82,8 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
 
             if (false === $responseBody) {
                 error_log('Failed to encode error to application/problem+json: ' . json_last_error_msg());
-                return $response;
+                $response->getBody()->write('{"type":"about:blank","title":"Internal Server Error","status":500}');
+                return $response->withHeader('Content-Type', 'application/problem+json');
             }
 
             $response

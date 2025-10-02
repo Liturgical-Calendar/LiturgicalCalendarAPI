@@ -16,30 +16,38 @@ class LoggingMiddleware implements MiddlewareInterface
 
     public function __construct(bool $debug = false)
     {
-        $this->logger = LoggerFactory::createApiLogger($debug);
+        $this->logger = LoggerFactory::create('api', null, 30, $debug, true, true);
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $requestId   = $request->getAttribute('request_id');
-        $requestBody = $request->getBody();
+        $requestId      = $request->getAttribute('request_id');
+        $reqContentType = $request->getHeaderLine('Content-Type');
+        $requestBody    = $request->getBody();
+        $safeReqBody    = str_starts_with($reqContentType, 'application/json') || str_starts_with($reqContentType, 'application/yaml') || str_starts_with($reqContentType, 'text/')
+            ? self::readBody($requestBody)
+            : '[body omitted]';
 
         $this->logger->debug('Incoming request', [
             'request_id'   => $requestId,
             'type'         => 'request',
             'request'      => $request,
-            'request_body' => self::readBody($requestBody)
+            'request_body' => $safeReqBody
         ]);
 
-        $response     = $handler->handle($request);
-        $responseBody = $response->getBody();
+        $response       = $handler->handle($request);
+        $resContentType = $response->getHeaderLine('Content-Type');
+        $responseBody   = $response->getBody();
+        $safeResBody    = str_starts_with($resContentType, 'application/json') || str_starts_with($reqContentType, 'application/yaml') || str_starts_with($resContentType, 'text/')
+            ? self::readBody($responseBody)
+            : '[body omitted]';
 
-        // Add response context to log entries
+// Add response context to log entries
         $this->logger->debug('Outgoing response', [
             'request_id'    => $requestId,
             'type'          => 'response',
             'response'      => $response,
-            'response_body' => self::readBody($responseBody)
+            'response_body' => $safeResBody
         ]);
 
         return $response;

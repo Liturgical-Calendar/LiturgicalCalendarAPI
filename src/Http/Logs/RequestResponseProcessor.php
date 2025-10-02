@@ -29,7 +29,6 @@ class RequestResponseProcessor
                     ]));
 
                     return $record;
-                    // no break needed
                 case 'response':
                     if (!isset($ctx['response']) || false === ( $ctx['response'] instanceof ResponseInterface )) {
                         throw new \RuntimeException('Expected response object in context of RequestResponseProcessor when invoked with context of type response');
@@ -44,11 +43,10 @@ class RequestResponseProcessor
                         'protocol'    => "HTTP/{$protocol}",
                         'headers'     => self::sanitizeHeaders($response->getHeaders()),
                         'status_code' => $status,
-                        'response_id' => $ctx['request_id']
+                        'response_id' => $ctx['request_id'] // correlate with request
                     ]));
 
                     return $record;
-                    // no break needed
                 default:
                     throw new \RuntimeException('Cannot process either request or response for logging if context type is not set to either request or response');
             }

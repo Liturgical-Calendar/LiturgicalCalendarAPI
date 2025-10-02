@@ -41,6 +41,7 @@ class Router
     private RequestHandlerInterface $handler;
     private Psr17Factory $psr17Factory;
     private ServerRequestInterface $request;
+    private string $requestId;
     private ResponseInterface $response;
     private static bool $debug;
 
@@ -61,11 +62,11 @@ class Router
         $this->psr17Factory = new Psr17Factory();
         $request            = $this->retrieveRequest();
         try {
-            $requestId = bin2hex(random_bytes(8)); // 16 hex chars
+            $this->requestId = bin2hex(random_bytes(8)); // 16 hex chars
         } catch (\Throwable) {
-            $requestId = uniqid('lit');
+            $this->requestId = uniqid('lit');
         }
-        $this->request = $request->withAttribute('request_id', $requestId);
+        $this->request = $request->withAttribute('request_id', $this->requestId);
     }
 
     /**
@@ -359,7 +360,8 @@ class Router
         $pipeline->pipe(new ErrorHandlingMiddleware($this->psr17Factory, self::$debug)); // outermost middleware
         $pipeline->pipe(new LoggingMiddleware(self::$debug));                            // innermost middleware
 
-        $this->response = $pipeline->handle($this->request);
+        $this->response = $pipeline->handle($this->request)
+            ->withHeader('X-Request-Id', $this->requestId);
         $this->emitResponse();
     }
 
