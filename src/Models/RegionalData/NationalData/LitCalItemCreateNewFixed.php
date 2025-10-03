@@ -8,7 +8,6 @@ use LiturgicalCalendar\Api\Enum\LitEventType;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
 use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
-use LiturgicalCalendar\Api\Models\ConditionalRule;
 use LiturgicalCalendar\Api\Models\LiturgicalEventData;
 
 /**
@@ -18,7 +17,7 @@ use LiturgicalCalendar\Api\Models\LiturgicalEventData;
  *      month:int,
  *      color:string[],
  *      grade:int,
- *      grade_display?:?string,
+ *      grade_display?:string|null,
  *      common:string[]
  * }
  * @phpstan-type LitCalItemCreateNewFixedArray array{
@@ -27,7 +26,7 @@ use LiturgicalCalendar\Api\Models\LiturgicalEventData;
  *      month:int,
  *      color:string[],
  *      grade:int,
- *      grade_display?:?string,
+ *      grade_display?:string|null,
  *      common:string[]
  * }
  */
@@ -44,7 +43,7 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
 
     public readonly ?string $grade_display;
 
-    /** @var LitCommons|LitMassVariousNeeds[] $common */
+    /** @var LitCommons|LitMassVariousNeeds[] */
     public readonly LitCommons|array $common;
 
     public readonly LitEventType $type;
