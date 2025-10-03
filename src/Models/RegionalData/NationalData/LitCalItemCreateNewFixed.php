@@ -29,6 +29,8 @@ use LiturgicalCalendar\Api\Models\LiturgicalEventData;
  *      grade_display?:string|null,
  *      common:string[]
  * }
+ * N.B. `common` is a string array input, but will be converted to a LitCommons object or to an array of LitMassVariousNeeds enum cases upon deserialization;
+ *      similarly `color` is a string array input, but will be converted to an array of LitColor enum cases upon deserialization.
  */
 final class LitCalItemCreateNewFixed extends LiturgicalEventData
 {
