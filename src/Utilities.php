@@ -50,7 +50,8 @@ class Utilities
         'night',
         'dawn',
         'day',
-        'evening'
+        'evening',
+        'holydays_of_obligation'
     ];
 
     // EVENT_KEY_ELS are keys whose value is an array of LitCalEvents, and should become <Key> elements rather than <Option> elements
@@ -276,7 +277,7 @@ class Utilities
                 } else {
                     $key = self::transformKey($key);
                     if (is_bool($value)) {
-                        $boolVal = $value ? '1' : '0';
+                        $boolVal = $value ? 'true' : 'false';
                         $xml->addChild($key, $boolVal);
                     }
                     elseif (gettype($value) === 'string') {
