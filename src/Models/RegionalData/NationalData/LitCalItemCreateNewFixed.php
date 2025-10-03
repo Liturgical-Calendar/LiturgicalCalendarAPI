@@ -87,7 +87,6 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
             }
         }
 
-
         parent::__construct($event_key);
         $this->day           = $day;
         $this->month         = $month;

@@ -46,7 +46,6 @@ final class LitCalItemCreateNewMetadata extends LiturgicalEventMetadata
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
-
         $rules = [];
         if (property_exists($data, 'rules')) {
             if (!is_array($data->rules)) {
