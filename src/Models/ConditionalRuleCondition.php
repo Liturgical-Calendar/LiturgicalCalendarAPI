@@ -107,7 +107,7 @@ final class ConditionalRuleCondition extends AbstractJsonSrcData
         if ($this->if_weekday !== null) {
             // Check day of week condition
             $dayName = strtolower($date->format('l'));
-            if ($dayName === strtolower($this->if_weekday)) {
+            if ($dayName === $this->if_weekday) {
                 return true;
             }
         } elseif ($this->if_grade !== null) {
@@ -130,6 +130,8 @@ final class ConditionalRuleCondition extends AbstractJsonSrcData
                         $hasCoincidence = true;
                     }
                     break;
+                default:
+                    // No check for other grades (COMMEMORATION, FERIA, etc.)
             }
             return $hasCoincidence;
         }
