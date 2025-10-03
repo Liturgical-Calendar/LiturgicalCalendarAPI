@@ -8131,6 +8131,75 @@
                 "Pacific/Wake",
                 "Pacific/Wallis"
             ]
+        },
+        "ConditionalRule": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "condition": {
+                    "type": "object",
+                    "oneOf": [
+                        {
+                            "required": ["if_weekday"],
+                            "additionalProperties": false,
+                            "properties": {
+                                "if_weekday": {
+                                    "type": "string",
+                                    "enum": [
+                                        "sunday",
+                                        "monday",
+                                        "tuesday",
+                                        "wednesday",
+                                        "thursday",
+                                        "friday",
+                                        "saturday"
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            "required": ["if_grade"],
+                            "additionalProperties": false,
+                            "properties": {
+                                "if_grade": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 7
+                                }
+                            }
+                        }
+                    ]
+                },
+                "then": {
+                    "type": "object",
+                    "oneOf": [
+                        {
+                            "required": ["move"],
+                            "additionalProperties": false,
+                            "properties": {
+                                "move": {
+                                    "type": "string",
+                                    "pattern": "^\\-?P\\d+D$"
+                                }
+                            }
+                        },
+                        {
+                            "required": ["move_to"],
+                            "additionalProperties": false,
+                            "properties": {
+                                "move_to": {
+                                    "type": "string",
+                                    "pattern": "^(next|previous) (monday|tuesday|wednesday|thursday|friday|saturday|sunday)$"
+                                }
+                            }
+                        }
+                    ]
+                }
+            },
+            "required": [
+                "condition",
+                "then"
+            ]
         }
     }
 }

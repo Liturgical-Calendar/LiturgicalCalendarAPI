@@ -42,22 +42,6 @@
         ]
     },
     {
-        "month": 1,
-        "day": 22,
-        "event_key": "PrayerUnborn",
-        "grade": 3,
-        "grade_display": "National Day of Prayer",
-        "common": [
-            "For Giving Thanks to God for the Gift of Human Life [USA]",
-            "For the Preservation of Peace and Justice"
-        ],
-        "calendar": "US",
-        "color": [
-            "purple",
-            "white"
-        ]
-    },
-    {
         "month": 3,
         "day": 3,
         "event_key": "StKatharineDrexel",

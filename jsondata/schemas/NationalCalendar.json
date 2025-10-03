@@ -63,6 +63,12 @@
                         "grade": {
                             "$ref": "./CommonDef.json#/definitions/LitGrade"
                         },
+                        "grade_display": {
+                            "type": [
+                                "string",
+                                "null"
+                            ]
+                        },
                         "day": {
                             "$ref": "./CommonDef.json#/definitions/Day"
                         },
@@ -159,6 +165,13 @@
                 },
                 "until_year": {
                     "type": "integer"
+                },
+                "rules": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "./CommonDef.json#/definitions/ConditionalRule"
+                    },
+                    "description": "An array of conditional rules that apply to this event, for example moving the date if it falls on a Sunday."
                 }
             },
             "required": [

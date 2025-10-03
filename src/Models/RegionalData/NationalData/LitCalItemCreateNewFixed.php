@@ -6,12 +6,31 @@ use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitColor;
 use LiturgicalCalendar\Api\Enum\LitEventType;
 use LiturgicalCalendar\Api\Enum\LitGrade;
+use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
 use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
 use LiturgicalCalendar\Api\Models\LiturgicalEventData;
 
 /**
- * @phpstan-type LitCalItemCreateNewFixedObject \stdClass&object{event_key:string,day:int,month:int,color:string[],grade:int,common:string[]}
- * @phpstan-type LitCalItemCreateNewFixedArray array{event_key:string,day:int,month:int,color:string[],grade:int,common:string[]}
+ * @phpstan-type LitCalItemCreateNewFixedObject \stdClass&object{
+ *      event_key:string,
+ *      day:int,
+ *      month:int,
+ *      color:string[],
+ *      grade:int,
+ *      grade_display?:string|null,
+ *      common:string[]
+ * }
+ * @phpstan-type LitCalItemCreateNewFixedArray array{
+ *      event_key:string,
+ *      day:int,
+ *      month:int,
+ *      color:string[],
+ *      grade:int,
+ *      grade_display?:string|null,
+ *      common:string[]
+ * }
+ * N.B. `common` is a string array input, but will be converted to a LitCommons object or to an array of LitMassVariousNeeds enum cases upon deserialization;
+ *      similarly `color` is a string array input, but will be converted to an array of LitColor enum cases upon deserialization.
  */
 final class LitCalItemCreateNewFixed extends LiturgicalEventData
 {
@@ -24,11 +43,15 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
 
     public private(set) LitGrade $grade;
 
-    public readonly LitCommons $common;
+    public readonly ?string $grade_display;
+
+    /** @var LitCommons|LitMassVariousNeeds[] */
+    public readonly LitCommons|array $common;
 
     public readonly LitEventType $type;
 
     public private(set) DateTime $date;
+
 
     /**
      * Creates a new LitCalItemCreateNewFixed object.
@@ -40,11 +63,11 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
      * @param int $month The month of the event.
      * @param LitColor[] $color The liturgical color(s) of the event.
      * @param LitGrade $grade The liturgical grade of the event.
-     * @param LitCommons $common The liturgical common of the event.
+     * @param LitCommons|LitMassVariousNeeds[] $common The liturgical common for the event.
      *
      * @throws \ValueError If the provided arguments are invalid.
      */
-    private function __construct(string $event_key, int $day, int $month, array $color, LitGrade $grade, LitCommons $common)
+    private function __construct(string $event_key, int $day, int $month, array $color, LitGrade $grade, ?string $grade_display, LitCommons|array $common)
     {
         if (false === static::isValidMonthValue($month)) {
             throw new \ValueError('`$month` must be an integer between 1 and 12');
@@ -65,12 +88,13 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
         }
 
         parent::__construct($event_key);
-        $this->day    = $day;
-        $this->month  = $month;
-        $this->color  = $color;
-        $this->grade  = $grade;
-        $this->common = $common;
-        $this->type   = LitEventType::FIXED;
+        $this->day           = $day;
+        $this->month         = $month;
+        $this->color         = $color;
+        $this->grade         = $grade;
+        $this->grade_display = $grade_display;
+        $this->common        = $common;
+        $this->type          = LitEventType::FIXED;
     }
 
     /**
@@ -116,24 +140,34 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
      */
     protected static function fromObjectInternal(\stdClass $data): static
     {
-        $commons = LitCommons::create($data->common);
+        $commons = LitCommons::create($data->common) ?? array_values(array_map(
+            function (string $value): LitMassVariousNeeds {
+                return LitMassVariousNeeds::from($value);
+            },
+            $data->common
+        ));
 
-        if (null === $commons) {
-            throw new \ValueError('invalid common: expected an array of LitCommon enum cases, LitCommon enum values, or LitMassVariousNeeds instances');
+        $grade_display = null;
+        if (property_exists($data, 'grade_display')) {
+            if (!is_string($data->grade_display) && null !== $data->grade_display) {
+                throw new \ValueError('invalid grade_display: expected a string or null');
+            }
+            $grade_display = $data->grade_display;
         }
 
         return new static(
             $data->event_key,
             $data->day,
             $data->month,
-            array_map(
+            array_values(array_map(
                 function (string $color) {
                     return LitColor::from($color);
                 },
                 $data->color
-            ),
+            )),
             LitGrade::from($data->grade),
-            $commons
+            $grade_display,
+            $commons,
         );
     }
 
@@ -154,23 +188,33 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
      */
     protected static function fromArrayInternal(array $data): static
     {
-        $commons = LitCommons::create($data['common']);
+        $commons = LitCommons::create($data['common']) ?? array_values(array_map(
+            function (string $value): LitMassVariousNeeds {
+                return LitMassVariousNeeds::from($value);
+            },
+            $data['common']
+        ));
 
-        if (null === $commons) {
-            throw new \ValueError('invalid common: expected an array of LitCommon enum cases, LitCommon enum values, or LitMassVariousNeeds instances');
+        $grade_display = null;
+        if (array_key_exists('grade_display', $data)) {
+            if (!is_string($data['grade_display']) && null !== $data['grade_display']) {
+                throw new \ValueError('invalid grade_display: expected a string or null');
+            }
+            $grade_display = $data['grade_display'];
         }
 
         return new static(
             $data['event_key'],
             $data['day'],
             $data['month'],
-            array_map(
+            array_values(array_map(
                 function (string $color): LitColor {
                     return LitColor::from($color);
                 },
                 $data['color']
-            ),
+            )),
             LitGrade::from($data['grade']),
+            $grade_display,
             $commons
         );
     }
