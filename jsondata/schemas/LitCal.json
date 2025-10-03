@@ -526,6 +526,9 @@
                 },
                 "readings": {
                     "$ref": "./CommonDef.json#/definitions/Readings"
+                },
+                "holy_day_of_obligation": {
+                    "const": true
                 }
             },
             "required": [
@@ -748,6 +751,9 @@
                 },
                 "eternal_high_priest": {
                     "type": "boolean"
+                },
+                "holydays_of_obligation": {
+                    "$ref": "./CommonDef.json#/definitions/HolyDaysOfObligation"
                 }
             },
             "required": [
@@ -758,7 +764,8 @@
                 "locale",
                 "return_type",
                 "year_type",
-                "eternal_high_priest"
+                "eternal_high_priest",
+                "holydays_of_obligation"
             ]
         },
         "NationalCalendarSettings": {
@@ -800,6 +807,9 @@
                 "eternal_high_priest": {
                     "type": "boolean"
                 },
+                "holydays_of_obligation": {
+                    "$ref": "./CommonDef.json#/definitions/HolyDaysOfObligation"
+                },
                 "national_calendar": {
                     "$ref": "./CommonDef.json#/definitions/Nation"
                 }
@@ -813,7 +823,8 @@
                 "return_type",
                 "year_type",
                 "eternal_high_priest",
-                "national_calendar"
+                "national_calendar",
+                "holydays_of_obligation"
             ]
         },
         "DiocesanCalendarSettings": {
@@ -855,6 +866,9 @@
                 "eternal_high_priest": {
                     "type": "boolean"
                 },
+                "holydays_of_obligation": {
+                    "$ref": "./CommonDef.json#/definitions/HolyDaysOfObligation"
+                },
                 "national_calendar": {
                     "$ref": "./CommonDef.json#/definitions/Nation"
                 },
@@ -871,6 +885,7 @@
                 "return_type",
                 "year_type",
                 "eternal_high_priest",
+                "holydays_of_obligation",
                 "national_calendar",
                 "diocesan_calendar"
             ]
