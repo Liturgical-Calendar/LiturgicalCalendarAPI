@@ -3162,7 +3162,6 @@ final class CalendarHandler extends AbstractHandler
                 );
 
                 $currentDate = $newDate;
-                break; // Apply only the first matching rule
             }
         }
 
@@ -3420,7 +3419,10 @@ final class CalendarHandler extends AbstractHandler
             // Apply any conditional rules to the date
             if (!empty($liturgicalEventMetadata->rules)) {
                 $newDate = $this->applyConditionalRules($liturgicalEvent->date, $liturgicalEventMetadata->rules, $liturgicalEvent->event_key);
-                $liturgicalEvent->setDate($newDate);
+                if ($newDate != $liturgicalEvent->date) {
+                    // If the date has changed, we need to update the date in the liturgical event
+                    $liturgicalEvent->setDate($newDate);
+                }
             }
         } else {
             ob_start();

@@ -145,10 +145,6 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
             $data->common
         ));
 
-        if (null === $commons) {
-            throw new \ValueError('invalid common: expected an array of LitCommon enum cases, LitCommon enum values, or LitMassVariousNeeds instances');
-        }
-
         $grade_display = null;
         if (property_exists($data, 'grade_display')) {
             if (!is_string($data->grade_display) && null !== $data->grade_display) {
@@ -196,10 +192,6 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
             },
             $data['common']
         ));
-
-        if (null === $commons) {
-            throw new \ValueError('invalid common: expected an array of LitCommon enum cases, LitCommon enum values, or LitMassVariousNeeds instances');
-        }
 
         $grade_display = null;
         if (array_key_exists('grade_display', $data)) {

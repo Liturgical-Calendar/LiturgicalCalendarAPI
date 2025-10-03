@@ -32,6 +32,10 @@ final class ConditionalRuleCondition extends AbstractJsonSrcData
             throw new \InvalidArgumentException('ConditionalRuleCondition must have at least one of `if_weekday` or `if_grade` properties');
         }
 
+        if (property_exists($data, 'if_weekday') && property_exists($data, 'if_grade')) {
+            throw new \InvalidArgumentException('ConditionalRuleCondition cannot have both `if_weekday` and `if_grade` properties at the same time');
+        }
+
         $if_weekday = null;
         $if_grade   = null;
 
@@ -65,6 +69,10 @@ final class ConditionalRuleCondition extends AbstractJsonSrcData
             throw new \InvalidArgumentException('ConditionalRuleCondition must have at least one of `if_weekday` or `if_grade` properties');
         }
 
+        if (array_key_exists('if_weekday', $data) && array_key_exists('if_grade', $data)) {
+            throw new \InvalidArgumentException('ConditionalRuleCondition cannot have both `if_weekday` and `if_grade` properties at the same time');
+        }
+
         $if_weekday = null;
         $if_grade   = null;
 
@@ -87,16 +95,14 @@ final class ConditionalRuleCondition extends AbstractJsonSrcData
 
     public function matches(DateTime $date, LiturgicalEventCollection $calendar): bool
     {
-        // Check day of week condition
         if ($this->if_weekday !== null) {
+            // Check day of week condition
             $dayName = strtolower($date->format('l'));
             if ($dayName === strtolower($this->if_weekday)) {
                 return true;
             }
-        }
-
-        // Check liturgical grade condition
-        if ($this->if_grade !== null) {
+        } elseif ($this->if_grade !== null) {
+            // Check liturgical grade condition
             $hasCoincidence = false;
             switch ($this->if_grade) {
                 case LitGrade::SOLEMNITY:

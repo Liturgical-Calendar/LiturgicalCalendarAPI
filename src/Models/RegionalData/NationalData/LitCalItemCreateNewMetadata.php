@@ -34,10 +34,13 @@ final class LitCalItemCreateNewMetadata extends LiturgicalEventMetadata
     /**
      * Creates an instance from a StdClass object.
      *
-     * @param \stdClass&object{since_year:int,until_year?:int,rules:ConditionalRuleObject[]} $data The StdClass object to create an instance from.
-     * It must have the following properties:
-     * - since_year (int): The year since when the liturgical event was added.
-     * - until_year (int|null): The year until when the liturgical event was added.
+     * @param \stdClass&object{since_year:int,until_year?:int,rules?:ConditionalRuleObject[]} $data The StdClass object to create an instance from.
+     * It must have the following property:
+     * - since_year (int): The year from which the liturgical event is celebrated.
+     *
+     * Optional properties:
+     * - until_year (int|null): The year until which the liturgical event is celebrated.
+     * - rules (ConditionalRuleObject[]): An array of ConditionalRule objects defining conditions for the event.
      *
      * @return static A new instance created from the given data.
      */
@@ -66,8 +69,9 @@ final class LitCalItemCreateNewMetadata extends LiturgicalEventMetadata
      *
      * Optional keys:
      * - until_year (int|null): The year until when the liturgical event was added.
+     * - rules (ConditionalRuleArray[]): An array of ConditionalRule associative arrays defining conditions for the event.
      *
-     * @param array{since_year:int,until_year?:int,rules:ConditionalRuleArray[]} $data The associative array containing the properties of the class.
+     * @param array{since_year:int,until_year?:int,rules?:ConditionalRuleArray[]} $data The associative array containing the properties of the class.
      * @return static A new instance of the class.
      */
     protected static function fromArrayInternal(array $data): static

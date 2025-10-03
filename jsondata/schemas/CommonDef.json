@@ -8157,7 +8157,8 @@
                             "minimum": 0,
                             "maximum": 7
                         }
-                    }
+                    },
+                    "minProperties": 1
                 },
                 "then": {
                     "type": "object",
@@ -8165,13 +8166,14 @@
                     "properties": {
                         "move": {
                             "type": "string",
-                            "pattern": "^[PM]\\d+[DWMY]$"
+                            "pattern": "^\\-?P\\d+D$"
                         },
                         "move_to": {
                             "type": "string",
                             "pattern": "^(next|previous) (monday|tuesday|wednesday|thursday|friday|saturday|sunday)$"
                         }
-                    }
+                    },
+                    "minProperties": 1
                 }
             },
             "required": [

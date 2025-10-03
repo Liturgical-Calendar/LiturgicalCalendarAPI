@@ -27,7 +27,11 @@ final class ConditionalRuleAction extends AbstractJsonSrcData
     protected static function fromObjectInternal(\stdClass $data): static
     {
         if (!property_exists($data, 'move') && !property_exists($data, 'move_to')) {
-            throw new \InvalidArgumentException('ConditionalRuleAction must have either move or move_to properties');
+            throw new \InvalidArgumentException('ConditionalRuleAction must have either `move` or `move_to` properties');
+        }
+
+        if (property_exists($data, 'move') && property_exists($data, 'move_to')) {
+            throw new \InvalidArgumentException('ConditionalRuleAction cannot have both `move` and `move_to` properties at the same time');
         }
 
         $move   = null;
@@ -35,14 +39,14 @@ final class ConditionalRuleAction extends AbstractJsonSrcData
 
         if (property_exists($data, 'move')) {
             if (!is_string($data->move)) {
-                throw new \InvalidArgumentException('move must be a string or null');
+                throw new \InvalidArgumentException('`move` property must have a value of type string or null, received ' . gettype($data->move));
             }
             $move = $data->move;
         }
 
         if (property_exists($data, 'move_to')) {
             if (!is_string($data->move_to)) {
-                throw new \InvalidArgumentException('move_to must be a string or null');
+                throw new \InvalidArgumentException('`move_to` property must have a value of type string or null, received ' . gettype($data->move_to));
             }
             $moveTo = $data->move_to;
         }
@@ -57,7 +61,11 @@ final class ConditionalRuleAction extends AbstractJsonSrcData
     protected static function fromArrayInternal(array $data): static
     {
         if (!array_key_exists('move', $data) && !array_key_exists('move_to', $data)) {
-            throw new \InvalidArgumentException('ConditionalRuleAction must have either move or move_to properties');
+            throw new \InvalidArgumentException('ConditionalRuleAction must have either `move` or `move_to` properties');
+        }
+
+        if (array_key_exists('move', $data) && array_key_exists('move_to', $data)) {
+            throw new \InvalidArgumentException('ConditionalRuleAction cannot have both `move` and `move_to` properties at the same time');
         }
 
         $move   = null;
@@ -65,14 +73,14 @@ final class ConditionalRuleAction extends AbstractJsonSrcData
 
         if (array_key_exists('move', $data)) {
             if (!is_string($data['move'])) {
-                throw new \InvalidArgumentException('move must be a string or null');
+                throw new \InvalidArgumentException('`move` property must have a value of type string or null, received ' . gettype($data['move']));
             }
             $move = $data['move'];
         }
 
         if (array_key_exists('move_to', $data)) {
             if (!is_string($data['move_to'])) {
-                throw new \InvalidArgumentException('move_to must be a string or null');
+                throw new \InvalidArgumentException('`move_to` property must have a value of type string or null, received ' . gettype($data['move_to']));
             }
             $moveTo = $data['move_to'];
         }
@@ -93,10 +101,10 @@ final class ConditionalRuleAction extends AbstractJsonSrcData
             elseif (preg_match('/^-P\d+D$/', $this->move)) {
                 $interval = substr($this->move, 1); // Remove the minus sign
                 $newDate->sub(new \DateInterval($interval));
+            } else {
+                throw new \ValueError('Invalid move interval "' . $this->move . '"');
             }
-        }
-
-        if ($this->move_to !== null) {
+        } elseif ($this->move_to !== null) {
             // Handle relative date strings like "next monday", "previous friday"
             $newDate->modify($this->move_to);
         }
