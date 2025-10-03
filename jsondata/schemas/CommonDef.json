@@ -8138,42 +8138,62 @@
             "properties": {
                 "condition": {
                     "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                        "if_weekday": {
-                            "type": "string",
-                            "enum": [
-                                "sunday",
-                                "monday",
-                                "tuesday",
-                                "wednesday",
-                                "thursday",
-                                "friday",
-                                "saturday"
-                            ]
+                    "oneOf": [
+                        {
+                            "required": ["if_weekday"],
+                            "additionalProperties": false,
+                            "properties": {
+                                "if_weekday": {
+                                    "type": "string",
+                                    "enum": [
+                                        "sunday",
+                                        "monday",
+                                        "tuesday",
+                                        "wednesday",
+                                        "thursday",
+                                        "friday",
+                                        "saturday"
+                                    ]
+                                }
+                            }
                         },
-                        "if_grade": {
-                            "type": "integer",
-                            "minimum": 0,
-                            "maximum": 7
+                        {
+                            "required": ["if_grade"],
+                            "additionalProperties": false,
+                            "properties": {
+                                "if_grade": {
+                                    "type": "integer",
+                                    "minimum": 0,
+                                    "maximum": 7
+                                }
+                            }
                         }
-                    },
-                    "minProperties": 1
+                    ]
                 },
                 "then": {
                     "type": "object",
-                    "additionalProperties": false,
-                    "properties": {
-                        "move": {
-                            "type": "string",
-                            "pattern": "^\\-?P\\d+D$"
+                    "oneOf": [
+                        {
+                            "required": ["move"],
+                            "additionalProperties": false,
+                            "properties": {
+                                "move": {
+                                    "type": "string",
+                                    "pattern": "^\\-?P\\d+D$"
+                                }
+                            }
                         },
-                        "move_to": {
-                            "type": "string",
-                            "pattern": "^(next|previous) (monday|tuesday|wednesday|thursday|friday|saturday|sunday)$"
+                        {
+                            "required": ["move_to"],
+                            "additionalProperties": false,
+                            "properties": {
+                                "move_to": {
+                                    "type": "string",
+                                    "pattern": "^(next|previous) (monday|tuesday|wednesday|thursday|friday|saturday|sunday)$"
+                                }
+                            }
                         }
-                    },
-                    "minProperties": 1
+                    ]
                 }
             },
             "required": [

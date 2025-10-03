@@ -39,14 +39,14 @@ final class ConditionalRuleAction extends AbstractJsonSrcData
 
         if (property_exists($data, 'move')) {
             if (!is_string($data->move)) {
-                throw new \InvalidArgumentException('`move` property must have a value of type string or null, received ' . gettype($data->move));
+                throw new \InvalidArgumentException('`move` property must have a value of type string, received ' . gettype($data->move));
             }
             $move = $data->move;
         }
 
         if (property_exists($data, 'move_to')) {
             if (!is_string($data->move_to)) {
-                throw new \InvalidArgumentException('`move_to` property must have a value of type string or null, received ' . gettype($data->move_to));
+                throw new \InvalidArgumentException('`move_to` property must have a value of type string, received ' . gettype($data->move_to));
             }
             $moveTo = $data->move_to;
         }
@@ -73,14 +73,14 @@ final class ConditionalRuleAction extends AbstractJsonSrcData
 
         if (array_key_exists('move', $data)) {
             if (!is_string($data['move'])) {
-                throw new \InvalidArgumentException('`move` property must have a value of type string or null, received ' . gettype($data['move']));
+                throw new \InvalidArgumentException('`move` property must have a value of type string, received ' . gettype($data['move']));
             }
             $move = $data['move'];
         }
 
         if (array_key_exists('move_to', $data)) {
             if (!is_string($data['move_to'])) {
-                throw new \InvalidArgumentException('`move_to` property must have a value of type string or null, received ' . gettype($data['move_to']));
+                throw new \InvalidArgumentException('`move_to` property must have a value of type string, received ' . gettype($data['move_to']));
             }
             $moveTo = $data['move_to'];
         }

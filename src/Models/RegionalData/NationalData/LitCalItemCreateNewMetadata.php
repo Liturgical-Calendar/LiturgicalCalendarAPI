@@ -48,8 +48,14 @@ final class LitCalItemCreateNewMetadata extends LiturgicalEventMetadata
     {
 
         $rules = [];
-        if (property_exists($data, 'rules') && is_array($data->rules)) {
+        if (property_exists($data, 'rules')) {
+            if (!is_array($data->rules)) {
+                throw new \InvalidArgumentException('`rules` property must be an array if provided, received ' . gettype($data->rules));
+            }
             foreach ($data->rules as $ruleData) {
+                if (!( $ruleData instanceof \stdClass )) {
+                    throw new \InvalidArgumentException('Each item in `rules` property must be an object, received ' . gettype($ruleData));
+                }
                 $rules[] = ConditionalRule::fromObject($ruleData);
             }
         }
@@ -77,7 +83,10 @@ final class LitCalItemCreateNewMetadata extends LiturgicalEventMetadata
     protected static function fromArrayInternal(array $data): static
     {
         $rules = [];
-        if (array_key_exists('rules', $data) && is_array($data['rules'])) {
+        if (array_key_exists('rules', $data)) {
+            if (!is_array($data['rules'])) {
+                throw new \InvalidArgumentException('`rules` property must be an array if provided, received ' . gettype($data['rules']));
+            }
             foreach ($data['rules'] as $ruleData) {
                 $rules[] = ConditionalRule::fromArray($ruleData);
             }

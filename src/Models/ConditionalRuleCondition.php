@@ -41,17 +41,20 @@ final class ConditionalRuleCondition extends AbstractJsonSrcData
 
         if (property_exists($data, 'if_weekday')) {
             if (!is_string($data->if_weekday)) {
-                throw new \InvalidArgumentException('if_weekday must be a string');
+                throw new \InvalidArgumentException('`if_weekday` property must have a value of type string, received ' . gettype($data->if_weekday));
             }
             if (!in_array(strtolower($data->if_weekday), ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'], true)) {
-                throw new \InvalidArgumentException('if_weekday must be a valid weekday name');
+                throw new \InvalidArgumentException('`if_weekday` property must have a value that is a valid weekday name, received ' . $data->if_weekday);
             }
             $if_weekday = strtolower($data->if_weekday);
         }
 
         if (property_exists($data, 'if_grade')) {
             if (!is_int($data->if_grade)) {
-                throw new \InvalidArgumentException('if_grade must be an integer');
+                throw new \InvalidArgumentException('`if_grade` property must have a value of type int, received ' . gettype($data->if_grade));
+            }
+            if (!in_array($data->if_grade, LitGrade::values(), true)) {
+                throw new \InvalidArgumentException('`if_grade` property must have a value that is a valid LitGrade enum value, received ' . $data->if_grade);
             }
             $if_grade = LitGrade::from($data->if_grade);
         }
@@ -78,15 +81,21 @@ final class ConditionalRuleCondition extends AbstractJsonSrcData
 
         if (array_key_exists('if_weekday', $data)) {
             if (!is_string($data['if_weekday'])) {
-                throw new \InvalidArgumentException('if_weekday must be a string');
+                throw new \InvalidArgumentException('`if_weekday` property must have a value of type string, received ' . gettype($data['if_weekday']));
             }
             if (!in_array(strtolower($data['if_weekday']), ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'], true)) {
-                throw new \InvalidArgumentException('if_weekday must be a valid weekday name');
+                throw new \InvalidArgumentException('`if_weekday` property must have a value that is a valid weekday name, received ' . $data['if_weekday']);
             }
             $if_weekday = strtolower($data['if_weekday']);
         }
 
         if (array_key_exists('if_grade', $data)) {
+            if (!is_int($data['if_grade'])) {
+                throw new \InvalidArgumentException('`if_grade` property must have a value of type int, received ' . gettype($data['if_grade']));
+            }
+            if (!in_array($data['if_grade'], LitGrade::values(), true)) {
+                throw new \InvalidArgumentException('`if_grade` property must have a value that is a valid LitGrade enum value, received ' . $data['if_grade']);
+            }
             $if_grade = LitGrade::from($data['if_grade']);
         }
 

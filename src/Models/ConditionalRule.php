@@ -4,10 +4,10 @@ namespace LiturgicalCalendar\Api\Models;
 
 /**
  * Represents a conditional rule for liturgical events
- * @phpstan-type ConditionalRuleConditionObject \stdClass&object{if_weekday?:string,if_grade?:int}
- * @phpstan-type ConditionalRuleConditionArray array{if_weekday?:string,if_grade?:int}
- * @phpstan-type ConditionalRuleActionObject \stdClass&object{move?:string,move_to?:string}
- * @phpstan-type ConditionalRuleActionArray array{move?:string,move_to?:string}
+ * @phpstan-type ConditionalRuleConditionObject \stdClass&object{if_weekday?:?string,if_grade?:?int}
+ * @phpstan-type ConditionalRuleConditionArray array{if_weekday?:?string,if_grade?:?int}
+ * @phpstan-type ConditionalRuleActionObject \stdClass&object{move?:?string,move_to?:?string}
+ * @phpstan-type ConditionalRuleActionArray array{move?:?string,move_to?:?string}
  * @phpstan-type ConditionalRuleObject \stdClass&object{condition:ConditionalRuleConditionObject,then:ConditionalRuleActionObject}
  * @phpstan-type ConditionalRuleArray array{condition:ConditionalRuleConditionArray,then:ConditionalRuleActionArray}
  */
