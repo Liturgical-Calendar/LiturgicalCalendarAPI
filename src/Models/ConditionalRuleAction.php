@@ -102,11 +102,13 @@ final class ConditionalRuleAction extends AbstractJsonSrcData
                 $interval = substr($this->move, 1); // Remove the minus sign
                 $newDate->sub(new \DateInterval($interval));
             } else {
-                throw new \ValueError('Invalid move interval "' . $this->move . '"');
+                throw new \ValueError('Invalid `move` interval "' . $this->move . '"');
             }
         } elseif ($this->move_to !== null) {
             // Handle relative date strings like "next monday", "previous friday"
-            $newDate->modify($this->move_to);
+            if ($newDate->modify($this->move_to) === false) {
+                throw new \ValueError('Invalid `move_to` specification "' . $this->move_to . '"');
+            }
         }
 
         return $newDate;

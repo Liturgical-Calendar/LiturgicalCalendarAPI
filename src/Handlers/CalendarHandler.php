@@ -3135,15 +3135,16 @@ final class CalendarHandler extends AbstractHandler
 
         foreach ($rules as $rule) {
             if ($rule->condition->matches($currentDate, $this->Cal)) {
-                $newDate = $rule->then->apply($currentDate);
+                $previousDate = clone $currentDate;
+                $newDate      = $rule->then->apply($currentDate);
 
                 // Add a message about the rule application
                 $locale          = LitLocale::$PRIMARY_LANGUAGE;
-                $originalDateStr = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                    ? ( $originalDate->format('j') . ' ' . LatinUtils::LATIN_MONTHS[(int) $originalDate->format('n')] )
+                $previousDateStr = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                    ? ( $previousDate->format('j') . ' ' . LatinUtils::LATIN_MONTHS[(int) $previousDate->format('n')] )
                     : ( $locale === 'en'
-                        ? $originalDate->format('F jS')
-                        : $this->dayAndMonth->format($originalDate->format('U'))
+                        ? $previousDate->format('F jS')
+                        : $this->dayAndMonth->format($previousDate->format('U'))
                     );
                 $newDateStr      = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
                     ? ( $newDate->format('j') . ' ' . LatinUtils::LATIN_MONTHS[(int) $newDate->format('n')] )
@@ -3156,7 +3157,7 @@ final class CalendarHandler extends AbstractHandler
                     /**translators: 1: Event key, 2: Original date, 3: New date, 4: Requested calendar year */
                     _('The liturgical event \'%1$s\' has been moved from %2$s to %3$s due to conditional rules in the year %4$d.'),
                     $eventKey,
-                    $originalDateStr,
+                    $previousDateStr,
                     $newDateStr,
                     $this->CalendarParams->Year
                 );

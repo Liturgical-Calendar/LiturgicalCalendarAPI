@@ -18,6 +18,7 @@ use LiturgicalCalendar\Api\Models\LiturgicalEventData;
  *      month:int,
  *      color:string[],
  *      grade:int,
+ *      grade_display?:?string,
  *      common:string[]
  * }
  * @phpstan-type LitCalItemCreateNewFixedArray array{
@@ -26,6 +27,7 @@ use LiturgicalCalendar\Api\Models\LiturgicalEventData;
  *      month:int,
  *      color:string[],
  *      grade:int,
+ *      grade_display?:?string,
  *      common:string[]
  * }
  */
