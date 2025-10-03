@@ -127,7 +127,7 @@ final class LiturgicalEventCollection
         'CorpusChristi',
         'SacredHeart',
         'ChristKing',
-        'MotherGod',
+        'MaryMotherOfGod',
         'Annunciation',
         'ImmaculateConception',
         'Assumption',
@@ -1032,26 +1032,26 @@ final class LiturgicalEventCollection
     }
 
     /**
-     * Sets the liturgical seasons, year cycles, and vigil masses for each liturgical events in the collection.
+     * Sets the liturgical seasons for each liturgical event in the collection;
+     * also sets a marker on Holy Days of Obligation as per the current requested calendar.
      *
-     * This method iterates through all liturgical events and assigns them to a liturgical season
-     * based on their date. It also determines the liturgical year cycle for weekdays and Sundays,
-     * and calculates vigil masses for liturgical events that qualify.
+     * - iterates through all liturgical events and assigns them to a liturgical season based on their date
+     *   in relation to markers such as Ash Wednesday and Pentecost
      *
      * The liturgical seasons are defined as:
-     * - Advent: from Advent1 to before Christmas
-     * - Christmas: from Christmas to Baptism of the Lord
-     * - Lent: from Ash Wednesday to before Holy Thursday
-     * - Easter Triduum: from Holy Thursday to before Easter
-     * - Easter: from Easter to Pentecost
-     * - Ordinary Time: any other time
+     * - Advent: from Advent1 up to Christmas (excluded)
+     * - Christmas: from Christmas up to Baptism of the Lord (included)
+     * - Lent: from Ash Wednesday up to Holy Thursday (excluded)
+     * - Easter Triduum: from Holy Thursday up to Easter (excluded)
+     * - Easter: from Easter up to Pentecost (included)
+     * - Ordinary Time: all other dates
      *
-     * The year cycles are determined based on whether the liturgical events falls on a weekday or a Sunday/solemnity/feast.
-     * Vigil masses are calculated for eligible liturgical events.
+     * Holy Days of Obligation are defined in Can. 1246 of the Code of Canon Law but can be adapted based on local episcopal conference decisions
+     * (and even on a more local level such as diocesan concessions).
      *
      * @return void
      */
-    public function setCyclesVigilsSeasons()
+    public function setSeasonsAndHolyDaysOfObligation(): void
     {
         $Advent1      = $this->liturgicalEvents->getEvent('Advent1');
         $Christmas    = $this->liturgicalEvents->getEvent('Christmas');
@@ -1065,7 +1065,10 @@ final class LiturgicalEventCollection
             throw new \InvalidArgumentException('Missing liturgical events: Advent1, Christmas, Baptism of the Lord, Ash Wednesday, Holy Thursday, Easter, or Pentecost.');
         }
 
-        // DEFINE LITURGICAL SEASONS
+        // Since we are filtering for true values only, we can just take the keys of the resulting array
+        $HolyDaysofObligation = array_keys(array_filter($this->CalendarParams->HolyDaysOfObligation));
+
+        // DEFINE LITURGICAL SEASONS and set HDOB markers
         foreach ($this->liturgicalEvents as $litEvent) {
             if ($litEvent->date >= $Advent1->date && $litEvent->date < $Christmas->date) {
                 $litEvent->liturgical_season = LitSeason::ADVENT;
@@ -1080,11 +1083,29 @@ final class LiturgicalEventCollection
             } else {
                 $litEvent->liturgical_season = LitSeason::ORDINARY_TIME;
             }
-        }
 
+            if (in_array($litEvent->event_key, $HolyDaysofObligation)) {
+                $litEvent->holy_day_of_obligation = true;
+            }
+        }
+    }
+
+    /**
+     * Sets the festive and ferial year cycles, and vigil masses (where applicable) for each liturgical event in the collection.
+     * Also sets the Lectionary readings for each event based on its cycle (and liturgical grade etc.).
+     *
+     * The festive and ferial year cycles are determined based on whether the liturgical event falls on a weekday or a Sunday/solemnity/feast.
+     *
+     * Vigil masses are calculated for eligible liturgical events.
+     *
+     * @return void
+     */
+    public function setYearCyclesAndVigils()
+    {
         // DEFINE YEAR CYCLES, LECTIONARY READINGS, and VIGIL MASSES
-        // This has to be a separate cycle, because in order to correctly create Vigil Masses, we need to have already set the liturgical seasons,
-        // seeing that Vigil Masses inherit the season and the year cycle from their "parent" events
+        // This has to be a separate iteration compared to the iteration that sets liturgical seasons,
+        // because in order to correctly create Vigil Masses, we need to have already set the liturgical seasons,
+        // seeing that Vigil Masses inherit the season, year cycle and HDOB status from their "parent" events
         foreach ($this->liturgicalEvents as $litEvent) {
             if (self::dateIsNotSunday($litEvent->date) && $litEvent->grade === LitGrade::WEEKDAY) {
                 // STEP 1: First we deal with weekdays
@@ -1176,7 +1197,7 @@ final class LiturgicalEventCollection
                         // Christmas, Mother of God, Second Sunday of Christmas, Epiphany, Ash Wednesday.
                         // These liturgical events have the same readings every year and do not follow a cycle,
                         // so the liturgical cycle should not be set / displayed on the final event output
-                        if (false === in_array($litEvent->event_key, ['Christmas', 'MotherGod', 'Christmas2', 'Epiphany', 'AshWednesday'])) {
+                        if (false === in_array($litEvent->event_key, ['Christmas', 'MaryMotherOfGod', 'Christmas2', 'Epiphany', 'AshWednesday'])) {
                             $litEvent->liturgical_year = $liturgicalCycle;
                         }
 
@@ -1350,7 +1371,7 @@ final class LiturgicalEventCollection
     {
         $key = $eventForWhichIsVigilMass->event_key;
 
-        $litEvent                    = new LiturgicalEvent(
+        $litEvent = new LiturgicalEvent(
             $eventForWhichIsVigilMass->name . ' ' . $this->T['Vigil Mass'],
             $VigilDate,
             $eventForWhichIsVigilMass->color,
@@ -1359,12 +1380,15 @@ final class LiturgicalEventCollection
             $eventForWhichIsVigilMass->common,
             $eventForWhichIsVigilMass->grade_display
         );
-        $litEvent->event_key         = $key . '_vigil';
-        $litEvent->is_vigil_mass     = true;
-        $litEvent->is_vigil_for      = $key;
-        $litEvent->liturgical_year   = $eventForWhichIsVigilMass->liturgical_year;
-        $litEvent->liturgical_season = $eventForWhichIsVigilMass->liturgical_season;
-        $readings                    = ( $eventForWhichIsVigilMass->readings instanceof ReadingsFestiveWithVigil || $eventForWhichIsVigilMass->readings instanceof ReadingsChristmas )
+
+        $litEvent->event_key              = $key . '_vigil';
+        $litEvent->is_vigil_mass          = true;
+        $litEvent->is_vigil_for           = $key;
+        $litEvent->liturgical_year        = $eventForWhichIsVigilMass->liturgical_year;
+        $litEvent->liturgical_season      = $eventForWhichIsVigilMass->liturgical_season;
+        $litEvent->holy_day_of_obligation = $eventForWhichIsVigilMass->holy_day_of_obligation;
+
+        $readings = ( $eventForWhichIsVigilMass->readings instanceof ReadingsFestiveWithVigil || $eventForWhichIsVigilMass->readings instanceof ReadingsChristmas )
                                         ? $eventForWhichIsVigilMass->readings->vigil
                                         : $eventForWhichIsVigilMass->readings;
         $litEvent->setReadings($readings);

@@ -68,10 +68,22 @@ final class MetadataHandler extends AbstractHandler
                 'EDITIO_TYPICA_2008'
             ],
             'settings'    => [
-                'epiphany'            => Epiphany::JAN6->value,
-                'ascension'           => Ascension::THURSDAY->value,
-                'corpus_christi'      => Ascension::THURSDAY->value,
-                'eternal_high_priest' => false
+                'epiphany'               => Epiphany::JAN6->value,
+                'ascension'              => Ascension::THURSDAY->value,
+                'corpus_christi'         => Ascension::THURSDAY->value,
+                'eternal_high_priest'    => false,
+                'holydays_of_obligation' => [
+                    'Christmas'            => true,
+                    'Epiphany'             => true,
+                    'Ascension'            => true,
+                    'CorpusChristi'        => true,
+                    'MaryMotherOfGod'      => true,
+                    'ImmaculateConception' => true,
+                    'Assumption'           => true,
+                    'StJoseph'             => true,
+                    'StsPeterPaulAp'       => true,
+                    'AllSaints'            => true
+                ]
             ]
         ]);
         self::$metadataCalendars->pushNationalCalendarMetadata($metadataNationalCalendarItem);

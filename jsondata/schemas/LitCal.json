@@ -303,7 +303,7 @@
             },
             "litcal": [
                 {
-                    "event_key": "MotherGod",
+                    "event_key": "MaryMotherOfGod",
                     "event_idx": 39,
                     "name": "SOLLEMNITAS SANCTÆ DEI GENITRICIS MARIÆ",
                     "color": [
@@ -676,6 +676,9 @@
                 },
                 "readings": {
                     "$ref": "./CommonDef.json#/definitions/Readings"
+                },
+                "holy_day_of_obligation": {
+                    "const": true
                 }
             },
             "required": [
