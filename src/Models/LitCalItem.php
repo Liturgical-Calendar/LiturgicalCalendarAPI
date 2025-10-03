@@ -20,13 +20,33 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropert
  * @phpstan-import-type LitCalItemCreateNewFixedArray from \LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed
  * @phpstan-import-type LitCalItemCreateNewMobileObject from \LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile
  * @phpstan-import-type LitCalItemCreateNewMobileArray from \LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile
+ * @phpstan-import-type ConditionalRuleObject from \LiturgicalCalendar\Api\Models\ConditionalRule
+ * @phpstan-import-type ConditionalRuleArray from \LiturgicalCalendar\Api\Models\ConditionalRule
  * @phpstan-type LitCalItemObject \stdClass&object{
  *      liturgical_event:LitCalItemCreateNewFixedObject|LitCalItemCreateNewMobileObject,
- *      metadata:\stdClass&object{action:string,since_year:int|null,until_year?:int|null,url?:string|null,reason?:string|null,property?:string|null,url_lang_map?:\stdClass&object<string,string>}
+ *      metadata:\stdClass&object{
+ *          action:string,
+ *          since_year:int|null,
+ *          until_year?:int|null,
+ *          url?:string|null,
+ *          reason?:string|null,
+ *          property?:string|null,
+ *          url_lang_map?:\stdClass&object<string,string>,
+ *          rules?:list<ConditionalRuleObject>
+ *    }
  * }
  * @phpstan-type LitCalItemArray array{
  *      liturgical_event:LitCalItemCreateNewFixedArray|LitCalItemCreateNewMobileArray,
- *      metadata:array{action:string,since_year:int|null,until_year?:int|null,url?:string|null,reason?:string|null,property?:string|null,url_lang_map?:array<string,string>}
+ *      metadata:array{
+ *          action:string,
+ *          since_year:int|null,
+ *          until_year?:int|null,
+ *          url?:string|null,
+ *          reason?:string|null,
+ *          property?:string|null,
+ *          url_lang_map?:array<string,string>,
+ *          rules?:list<ConditionalRuleArray>
+ *     }
  * }
  */
 final class LitCalItem extends AbstractJsonSrcData
@@ -142,6 +162,8 @@ final class LitCalItem extends AbstractJsonSrcData
      *                                  -> `until_year`: The year until when the liturgical event was added.
      *                                  -> `url`: The URL of the document that introduces the liturgical event.
      *                                  -> `reason`: The reason why the liturgical event was introduced.
+     *                                  -> `rules`: An array of conditional rules.
+     *
      * @return static A new instance.
      */
     protected static function fromArrayInternal(array $data): static

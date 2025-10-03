@@ -3132,26 +3132,26 @@ final class CalendarHandler extends AbstractHandler
     private function applyConditionalRules(DateTime $originalDate, array $rules, string $eventKey): DateTime
     {
         $currentDate = clone $originalDate;
-        
+
         foreach ($rules as $rule) {
             if ($rule->condition->matches($currentDate, $this->Cal)) {
                 $newDate = $rule->then->apply($currentDate);
-                
+
                 // Add a message about the rule application
-                $locale = LitLocale::$PRIMARY_LANGUAGE;
+                $locale          = LitLocale::$PRIMARY_LANGUAGE;
                 $originalDateStr = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                    ? ($originalDate->format('j') . ' ' . LatinUtils::LATIN_MONTHS[(int) $originalDate->format('n')])
-                    : ($locale === 'en'
+                    ? ( $originalDate->format('j') . ' ' . LatinUtils::LATIN_MONTHS[(int) $originalDate->format('n')] )
+                    : ( $locale === 'en'
                         ? $originalDate->format('F jS')
                         : $this->dayAndMonth->format($originalDate->format('U'))
                     );
-                $newDateStr = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-                    ? ($newDate->format('j') . ' ' . LatinUtils::LATIN_MONTHS[(int) $newDate->format('n')])
-                    : ($locale === 'en'
+                $newDateStr      = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                    ? ( $newDate->format('j') . ' ' . LatinUtils::LATIN_MONTHS[(int) $newDate->format('n')] )
+                    : ( $locale === 'en'
                         ? $newDate->format('F jS')
                         : $this->dayAndMonth->format($newDate->format('U'))
                     );
-                
+
                 $this->Messages[] = sprintf(
                     /**translators: 1: Event key, 2: Original date, 3: New date, 4: Requested calendar year */
                     _('The liturgical event \'%1$s\' has been moved from %2$s to %3$s due to conditional rules in the year %4$d.'),
@@ -3160,12 +3160,12 @@ final class CalendarHandler extends AbstractHandler
                     $newDateStr,
                     $this->CalendarParams->Year
                 );
-                
+
                 $currentDate = $newDate;
                 break; // Apply only the first matching rule
             }
         }
-        
+
         return $currentDate;
     }
 
@@ -3398,6 +3398,9 @@ final class CalendarHandler extends AbstractHandler
             property_exists($liturgicalEvent, 'month')
             && property_exists($liturgicalEvent, 'day')
         ) {
+            /** @var LitCalItemCreateNewMetadata */
+            $liturgicalEventMetadata = $litEvent->metadata;
+
             /** @var LitCalItemCreateNewFixed $liturgicalEvent */
             $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $liturgicalEvent->month, $this->CalendarParams->Year);
             if ($liturgicalEvent->day > $daysInMonth) {
@@ -3409,8 +3412,16 @@ final class CalendarHandler extends AbstractHandler
                     $liturgicalEvent->month,
                     $this->CalendarParams->Year
                 );
+                return;
             }
+
             $liturgicalEvent->setDate(DateTime::fromFormat("{$liturgicalEvent->day}-{$liturgicalEvent->month}-{$this->CalendarParams->Year}"));
+
+            // Apply any conditional rules to the date
+            if (!empty($liturgicalEventMetadata->rules)) {
+                $newDate = $this->applyConditionalRules($liturgicalEvent->date, $liturgicalEventMetadata->rules, $liturgicalEvent->event_key);
+                $liturgicalEvent->setDate($newDate);
+            }
         } else {
             ob_start();
             var_dump($litEvent);
@@ -3784,38 +3795,26 @@ final class CalendarHandler extends AbstractHandler
                                 $litEvent = LiturgicalEvent::fromObject($propriumDeSanctisEvent);
                                 $this->Cal->addLiturgicalEvent($propriumDeSanctisEvent->event_key, $litEvent);
                             } else {
-                                if (self::dateIsSunday($currentLitEventDate) && $propriumDeSanctisEvent->event_key === 'PrayerUnborn') {
-                                    $propriumDeSanctisEvent->setName('[ USA ] ' . $propriumDeSanctisEvent->name);
-                                    $propriumDeSanctisEvent->setDate($currentLitEventDate->add(new \DateInterval('P1D')));
-                                    //$propriumDeSanctisEvent->type = LitEventType::FIXED;
-                                    $litEvent = LiturgicalEvent::fromObject($propriumDeSanctisEvent);
-                                    $this->Cal->addLiturgicalEvent($propriumDeSanctisEvent->event_key, $litEvent);
-                                    $this->Messages[] = sprintf(
-                                        'USA: The National Day of Prayer for the Unborn is set to Jan 22 as per the 2011 Roman Missal issued by the USCCB, however since it coincides with a Sunday or a Solemnity in the year %d, it has been moved to Jan 23',
-                                        $this->CalendarParams->Year
-                                    );
-                                } else {
-                                    $coincidingLiturgicalEvent = $this->Cal->determineSundaySolemnityOrFeast($currentLitEventDate, $propriumDeSanctisEvent->event_key);
-                                    $this->Messages[]          = sprintf(
-                                        /**translators:
-                                         * 1. LiturgicalEvent grade
-                                         * 2. LiturgicalEvent name
-                                         * 3. LiturgicalEvent date
-                                         * 4. Edition of the Roman Missal
-                                         * 5. Superseding liturgical event grade
-                                         * 6. Superseding liturgical event name
-                                         * 7. Requested calendar year
-                                         */
-                                        $Nation . ': ' . _('The %1$s \'%2$s\' (%3$s), added to the national calendar in the %4$s, is superseded by the %5$s \'%6$s\' in the year %7$d'),
-                                        $propriumDeSanctisEvent->grade->i18n($this->CalendarParams->Locale, false),
-                                        '<i>' . $propriumDeSanctisEvent->name . '</i>',
-                                        $this->dayAndMonth->format($currentLitEventDate->format('U')),
-                                        RomanMissal::getName($missal),
-                                        $coincidingLiturgicalEvent->grade_lcl,
-                                        $coincidingLiturgicalEvent->event->name,
-                                        $this->CalendarParams->Year
-                                    );
-                                }
+                                $coincidingLiturgicalEvent = $this->Cal->determineSundaySolemnityOrFeast($currentLitEventDate, $propriumDeSanctisEvent->event_key);
+                                $this->Messages[]          = sprintf(
+                                    /**translators:
+                                     * 1. LiturgicalEvent grade
+                                     * 2. LiturgicalEvent name
+                                     * 3. LiturgicalEvent date
+                                     * 4. Edition of the Roman Missal
+                                     * 5. Superseding liturgical event grade
+                                     * 6. Superseding liturgical event name
+                                     * 7. Requested calendar year
+                                     */
+                                    $Nation . ': ' . _('The %1$s \'%2$s\' (%3$s), added to the national calendar in the %4$s, is superseded by the %5$s \'%6$s\' in the year %7$d'),
+                                    $propriumDeSanctisEvent->grade->i18n($this->CalendarParams->Locale, false),
+                                    '<i>' . $propriumDeSanctisEvent->name . '</i>',
+                                    $this->dayAndMonth->format($currentLitEventDate->format('U')),
+                                    RomanMissal::getName($missal),
+                                    $coincidingLiturgicalEvent->grade_lcl,
+                                    $coincidingLiturgicalEvent->event->name,
+                                    $this->CalendarParams->Year
+                                );
                             }
                         }
                     } else {
@@ -4278,11 +4277,13 @@ final class CalendarHandler extends AbstractHandler
                     /** @var DiocesanLitCalItemCreateNewFixed $liturgicalEvent */
                     $liturgicalEvent     = $litCalItem->liturgical_event;
                     $currentLitEventDate = DateTime::fromFormat($liturgicalEvent->day . '-' . $liturgicalEvent->month . '-' . $this->CalendarParams->Year);
-                        
+
+                    /**
                     // Apply conditional rules if they exist
                     if (!empty($liturgicalEvent->rules)) {
                         $currentLitEventDate = $this->applyConditionalRules($currentLitEventDate, $liturgicalEvent->rules, $liturgicalEvent->event_key);
                     }
+                    **/
                 }
                 if ($currentLitEventDate !== false) {
                     $liturgicalEvent->setDate($currentLitEventDate);

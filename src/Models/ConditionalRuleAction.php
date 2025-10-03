@@ -2,35 +2,95 @@
 
 namespace LiturgicalCalendar\Api\Models;
 
+use LiturgicalCalendar\Api\DateTime;
+
 /**
  * Represents an action for a conditional rule
+ * @phpstan-import-type ConditionalRuleActionObject from \LiturgicalCalendar\Api\Models\ConditionalRule
+ * @phpstan-import-type ConditionalRuleActionArray from \LiturgicalCalendar\Api\Models\ConditionalRule
  */
-final class ConditionalRuleAction
+final class ConditionalRuleAction extends AbstractJsonSrcData
 {
-    public function __construct(
-        public readonly ?string $move = null,
-        public readonly ?string $move_to = null
-    ) {}
+    public readonly ?string $move;
+    public readonly ?string $move_to;
 
-    public static function fromObject(\stdClass $data): self
+    private function __construct(?string $move = null, ?string $moveTo = null)
     {
-        $move = property_exists($data, 'move') ? $data->move : null;
-        $moveTo = property_exists($data, 'move_to') ? $data->move_to : null;
-
-        return new self($move, $moveTo);
+        $this->move    = $move;
+        $this->move_to = $moveTo;
     }
 
-    public function apply(\DateTime $date): \DateTime
+    /**
+     * @param ConditionalRuleActionObject $data
+     * @return static
+     */
+    protected static function fromObjectInternal(\stdClass $data): static
+    {
+        if (!property_exists($data, 'move') && !property_exists($data, 'move_to')) {
+            throw new \InvalidArgumentException('ConditionalRuleAction must have either move or move_to properties');
+        }
+
+        $move   = null;
+        $moveTo = null;
+
+        if (property_exists($data, 'move')) {
+            if (!is_string($data->move)) {
+                throw new \InvalidArgumentException('move must be a string or null');
+            }
+            $move = $data->move;
+        }
+
+        if (property_exists($data, 'move_to')) {
+            if (!is_string($data->move_to)) {
+                throw new \InvalidArgumentException('move_to must be a string or null');
+            }
+            $moveTo = $data->move_to;
+        }
+
+        return new static($move, $moveTo);
+    }
+
+    /**
+     * @param ConditionalRuleActionArray $data
+     * @return static
+     */
+    protected static function fromArrayInternal(array $data): static
+    {
+        if (!array_key_exists('move', $data) && !array_key_exists('move_to', $data)) {
+            throw new \InvalidArgumentException('ConditionalRuleAction must have either move or move_to properties');
+        }
+
+        $move   = null;
+        $moveTo = null;
+
+        if (array_key_exists('move', $data)) {
+            if (!is_string($data['move'])) {
+                throw new \InvalidArgumentException('move must be a string or null');
+            }
+            $move = $data['move'];
+        }
+
+        if (array_key_exists('move_to', $data)) {
+            if (!is_string($data['move_to'])) {
+                throw new \InvalidArgumentException('move_to must be a string or null');
+            }
+            $moveTo = $data['move_to'];
+        }
+
+        return new static($move, $moveTo);
+    }
+
+    public function apply(DateTime $date): DateTime
     {
         $newDate = clone $date;
 
         if ($this->move !== null) {
             // Handle DateInterval format (P1D, P7D, etc.)
-            if (preg_match('/^P\d+[DWMY]$/', $this->move)) {
+            if (preg_match('/^P\d+D$/', $this->move)) {
                 $newDate->add(new \DateInterval($this->move));
             }
             // Handle negative intervals
-            elseif (preg_match('/^-P\d+[DWMY]$/', $this->move)) {
+            elseif (preg_match('/^-P\d+D$/', $this->move)) {
                 $interval = substr($this->move, 1); // Remove the minus sign
                 $newDate->sub(new \DateInterval($interval));
             }

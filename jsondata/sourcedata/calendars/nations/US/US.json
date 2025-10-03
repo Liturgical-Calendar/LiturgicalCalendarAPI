@@ -87,6 +87,37 @@
                 "reason": "Independence Day",
                 "since_year": 1970
             }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "PrayerUnborn",
+                "day": 22,
+                "month": 1,
+                "grade": 3,
+                "grade_display": "National Day of Prayer",
+                "common": [
+                    "For Giving Thanks to God for the Gift of Human Life [USA]",
+                    "For the Preservation of Peace and Justice"
+                ],
+                "color": [
+                    "purple",
+                    "white"
+                ]
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2011,
+                "rules": [
+                    {
+                        "condition": {
+                            "if_weekday": "sunday"
+                        },
+                        "then": {
+                            "move": "P1D"
+                        }
+                    }
+                ]
+            }
         }
     ],
     "settings": {

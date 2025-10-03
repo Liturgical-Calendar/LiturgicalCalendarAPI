@@ -2,96 +2,123 @@
 
 namespace LiturgicalCalendar\Api\Models;
 
+use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitGrade;
+use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
 
 /**
  * Represents a condition for a conditional rule
+ * @phpstan-import-type ConditionalRuleConditionObject from \LiturgicalCalendar\Api\Models\ConditionalRule
+ * @phpstan-import-type ConditionalRuleConditionArray from \LiturgicalCalendar\Api\Models\ConditionalRule
  */
-final class ConditionalRuleCondition
+final class ConditionalRuleCondition extends AbstractJsonSrcData
 {
-    public function __construct(
-        public readonly ?array $coincides_with = null,
-        public readonly ?string $day_of_week = null
-    ) {}
+    public readonly ?string $if_weekday;
+    public readonly ?LitGrade $if_grade;
 
-    public static function fromObject(\stdClass $data): self
+    private function __construct(?string $if_weekday = null, ?LitGrade $if_grade = null)
     {
-        $coincidesWith = null;
-        $dayOfWeek = null;
-
-        if (property_exists($data, 'coincides_with')) {
-            $coincidesWith = [];
-            if (property_exists($data->coincides_with, 'grade')) {
-                if (is_array($data->coincides_with->grade)) {
-                    foreach ($data->coincides_with->grade as $grade) {
-                        $coincidesWith['grade'][] = LitGrade::from($grade);
-                    }
-                } else {
-                    $coincidesWith['grade'] = [LitGrade::from($data->coincides_with->grade)];
-                }
-            }
-            if (property_exists($data->coincides_with, 'day_of_week')) {
-                $coincidesWith['day_of_week'] = $data->coincides_with->day_of_week;
-            }
-        }
-
-        if (property_exists($data, 'day_of_week')) {
-            $dayOfWeek = $data->day_of_week;
-        }
-
-        return new self($coincidesWith, $dayOfWeek);
+        $this->if_weekday = $if_weekday;
+        $this->if_grade   = $if_grade;
     }
 
-    public function matches(\DateTime $date, $calendar): bool
+    /**
+     * @param ConditionalRuleConditionObject $data
+     * @return static
+     */
+    protected static function fromObjectInternal(\stdClass $data): static
+    {
+        if (!property_exists($data, 'if_weekday') && !property_exists($data, 'if_grade')) {
+            throw new \InvalidArgumentException('ConditionalRuleCondition must have at least one of `if_weekday` or `if_grade` properties');
+        }
+
+        $if_weekday = null;
+        $if_grade   = null;
+
+        if (property_exists($data, 'if_weekday')) {
+            if (!is_string($data->if_weekday)) {
+                throw new \InvalidArgumentException('if_weekday must be a string');
+            }
+            if (!in_array(strtolower($data->if_weekday), ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'], true)) {
+                throw new \InvalidArgumentException('if_weekday must be a valid weekday name');
+            }
+            $if_weekday = strtolower($data->if_weekday);
+        }
+
+        if (property_exists($data, 'if_grade')) {
+            if (!is_int($data->if_grade)) {
+                throw new \InvalidArgumentException('if_grade must be an integer');
+            }
+            $if_grade = LitGrade::from($data->if_grade);
+        }
+
+        return new static($if_weekday, $if_grade);
+    }
+
+    /**
+     * @param ConditionalRuleConditionArray $data
+     * @return static
+     */
+    protected static function fromArrayInternal(array $data): static
+    {
+        if (!array_key_exists('if_weekday', $data) && !array_key_exists('if_grade', $data)) {
+            throw new \InvalidArgumentException('ConditionalRuleCondition must have at least one of `if_weekday` or `if_grade` properties');
+        }
+
+        $if_weekday = null;
+        $if_grade   = null;
+
+        if (array_key_exists('if_weekday', $data)) {
+            if (!is_string($data['if_weekday'])) {
+                throw new \InvalidArgumentException('if_weekday must be a string');
+            }
+            if (!in_array(strtolower($data['if_weekday']), ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'], true)) {
+                throw new \InvalidArgumentException('if_weekday must be a valid weekday name');
+            }
+            $if_weekday = strtolower($data['if_weekday']);
+        }
+
+        if (array_key_exists('if_grade', $data)) {
+            $if_grade = LitGrade::from($data['if_grade']);
+        }
+
+        return new static($if_weekday, $if_grade);
+    }
+
+    public function matches(DateTime $date, LiturgicalEventCollection $calendar): bool
     {
         // Check day of week condition
-        if ($this->day_of_week !== null) {
+        if ($this->if_weekday !== null) {
             $dayName = strtolower($date->format('l'));
-            if ($dayName !== strtolower($this->day_of_week)) {
-                return false;
+            if ($dayName === strtolower($this->if_weekday)) {
+                return true;
             }
         }
 
-        // Check coincides with condition
-        if ($this->coincides_with !== null) {
-            if (isset($this->coincides_with['grade'])) {
-                $hasCoincidence = false;
-                foreach ($this->coincides_with['grade'] as $grade) {
-                    switch ($grade) {
-                        case LitGrade::SOLEMNITY:
-                            if ($calendar->inSolemnities($date)) {
-                                $hasCoincidence = true;
-                                break 2;
-                            }
-                            break;
-                        case LitGrade::FEAST:
-                        case LitGrade::FEAST_LORD:
-                            if ($calendar->inFeasts($date) || $calendar->inFeastsLord($date)) {
-                                $hasCoincidence = true;
-                                break 2;
-                            }
-                            break;
-                        case LitGrade::MEMORIAL:
-                            if ($calendar->inMemorials($date)) {
-                                $hasCoincidence = true;
-                                break 2;
-                            }
-                            break;
+        // Check liturgical grade condition
+        if ($this->if_grade !== null) {
+            $hasCoincidence = false;
+            switch ($this->if_grade) {
+                case LitGrade::SOLEMNITY:
+                    if ($calendar->inSolemnities($date)) {
+                        $hasCoincidence = true;
                     }
-                }
-                if (!$hasCoincidence && isset($this->coincides_with['day_of_week'])) {
-                    $dayName = strtolower($date->format('l'));
-                    $hasCoincidence = ($dayName === strtolower($this->coincides_with['day_of_week']));
-                }
-                return $hasCoincidence;
+                    break;
+                case LitGrade::FEAST:
+                case LitGrade::FEAST_LORD:
+                    if ($calendar->inFeasts($date) || $calendar->inFeastsLord($date)) {
+                        $hasCoincidence = true;
+                    }
+                    break;
+                case LitGrade::MEMORIAL:
+                    if ($calendar->inMemorials($date)) {
+                        $hasCoincidence = true;
+                    }
+                    break;
             }
-            
-            if (isset($this->coincides_with['day_of_week'])) {
-                $dayName = strtolower($date->format('l'));
-                return ($dayName === strtolower($this->coincides_with['day_of_week']));
-            }
+            return $hasCoincidence;
         }
 
-        return true;
+        return false;
     }
 }
