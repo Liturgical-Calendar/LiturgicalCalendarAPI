@@ -63,6 +63,7 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
      * @param int $month The month of the event.
      * @param LitColor[] $color The liturgical color(s) of the event.
      * @param LitGrade $grade The liturgical grade of the event.
+     * @param string|null $grade_display The display string for the liturgical grade, if any.
      * @param LitCommons|LitMassVariousNeeds[] $common The liturgical common for the event.
      *
      * @throws \ValueError If the provided arguments are invalid.
