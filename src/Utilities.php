@@ -50,7 +50,8 @@ class Utilities
         'night',
         'dawn',
         'day',
-        'evening'
+        'evening',
+        'holydays_of_obligation'
     ];
 
     // EVENT_KEY_ELS are keys whose value is an array of LitCalEvents, and should become <Key> elements rather than <Option> elements
@@ -227,7 +228,6 @@ class Utilities
         foreach ($data as $key => $value) {
             if (is_array($value)) {
                 self::$LAST_ARRAY_KEY = $key;
-                //self::debugWrite( "value of key <$key> is an array" );
                 if (self::isNotLitCalEventKey($key)) {
                     // the key will always be a string in this case,
                     // but we pass it explicitly as a string to the transformKey function
@@ -241,13 +241,11 @@ class Utilities
                         $new_object->addAttribute('xsi:type', $xsi, 'http://www.w3.org/2001/XMLSchema-instance');
                     }
                 } else {
-                    //self::debugWrite( "key <$key> is a LitCalEvent" );
                     $new_object = $xml->addChild('LitCalEvent');
                     if (is_numeric($key)) {
                         $new_object->addAttribute('idx', $key . '');
                     }
                 }
-                //self::debugWrite( "proceeding to convert array value of <$key> to xml sequence..." );
                 self::convertArray2XML($value, $new_object);
             } else {
                 // For simple values
@@ -279,7 +277,7 @@ class Utilities
                 } else {
                     $key = self::transformKey($key);
                     if (is_bool($value)) {
-                        $boolVal = $value ? '1' : '0';
+                        $boolVal = $value ? 'true' : 'false';
                         $xml->addChild($key, $boolVal);
                     }
                     elseif (gettype($value) === 'string') {
@@ -398,14 +396,6 @@ class Utilities
         }
         return $dateObj;
     }
-
-/**
-    private static function debugWrite(string $string): void
-    {
-        $debugFile = 'UtilitiesDebug_' . Utilities::$HASH_REQUEST . '.log';
-        file_put_contents($debugFile, date('c') . "\t" . $string . PHP_EOL, FILE_APPEND);
-    }
- */
 
     /**
      * Convert a color name to its corresponding hexadecimal value.
@@ -622,7 +612,6 @@ class Utilities
         if (false === $jsonObj instanceof \stdClass) {
             throw new \JsonException('JSON file ' . $filename . ' does not contain an object');
         }
-
 
         // Store in cache
         if ($cacheEnabled) {

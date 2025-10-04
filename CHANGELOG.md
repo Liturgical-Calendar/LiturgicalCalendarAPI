@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## [v5.2](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.2) (October 4th 2025)
+
+* implement conditional rules for national calendar liturgical events (was previously hardcoded into the API for USA National Day of Prayer for the Unborn; issue [#206])
+* implement Holy Days of Obligation (can be set on a per Bishops Conference basis; issue [#296])
+
+Saint Francis of Assisi, pray for us! 🕊️
+
 ## [v5.1](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.1) (October 2nd 2025)
 
 * implement PSR-3 Logger Interface

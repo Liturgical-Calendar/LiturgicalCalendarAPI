@@ -50,6 +50,7 @@ use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyGradeMetadata;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyName;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyNameMetadata;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarSettings;
+use LiturgicalCalendar\Api\Models\ConditionalRule;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewMobile;
@@ -112,7 +113,7 @@ final class CalendarHandler extends AbstractHandler
     private string $BaptismLordFmt;
     private string $BaptismLordMod;
 
-    public const API_VERSION                  = '5.1';
+    public const API_VERSION                  = '5.2';
     private string $CachePath                 = '';
     private string $CacheFile                 = '';
     private string $CacheDuration             = '';
@@ -305,22 +306,6 @@ final class CalendarHandler extends AbstractHandler
         $this->CacheDuration = '_' . CacheDuration::MONTH->value . date('m');
     }
 
-    /**
-     * Debugging function to write a string to a debug log file.
-     * This function is currently commented out, but can be used for debugging purposes.
-     *
-     * @param string $string the string to write to the debug log
-     * @return void
-     */
-/**
-    private static function debugWrite(string $string)
-    {
-        file_put_contents("debug.log", $string . PHP_EOL, FILE_APPEND);
-    }
-*/
-
-
-
 
     /**
      * Updates the CalendarParams object based on the settings defined in the NationalData object for the
@@ -337,11 +322,23 @@ final class CalendarHandler extends AbstractHandler
         }
 
         if ($this->CalendarParams->NationalCalendar === 'VA') {
-            $this->CalendarParams->Epiphany          = Epiphany::JAN6;
-            $this->CalendarParams->Ascension         = Ascension::THURSDAY;
-            $this->CalendarParams->CorpusChristi     = CorpusChristi::THURSDAY;
-            $this->CalendarParams->Locale            = LitLocale::LATIN;
-            $this->CalendarParams->EternalHighPriest = false;
+            $this->CalendarParams->Epiphany             = Epiphany::JAN6;
+            $this->CalendarParams->Ascension            = Ascension::THURSDAY;
+            $this->CalendarParams->CorpusChristi        = CorpusChristi::THURSDAY;
+            $this->CalendarParams->Locale               = LitLocale::LATIN;
+            $this->CalendarParams->EternalHighPriest    = false;
+            $this->CalendarParams->HolyDaysOfObligation = [
+                'Christmas'            => true,
+                'Epiphany'             => true,
+                'Ascension'            => true,
+                'CorpusChristi'        => true,
+                'MaryMotherOfGod'      => true,
+                'ImmaculateConception' => true,
+                'Assumption'           => true,
+                'StJoseph'             => true,
+                'StsPeterPaulAp'       => true,
+                'AllSaints'            => true
+            ];
         } else {
             if ($this->NationalData === null) {
                 throw new ServiceUnavailableException(
@@ -349,10 +346,11 @@ final class CalendarHandler extends AbstractHandler
                     . ' — Pseudo-Dionysius the Areopagite, Mystical Theology, Chapter 1'
                 );
             }
-            $this->CalendarParams->Epiphany          = $this->NationalData->settings->epiphany;
-            $this->CalendarParams->Ascension         = $this->NationalData->settings->ascension;
-            $this->CalendarParams->CorpusChristi     = $this->NationalData->settings->corpus_christi;
-            $this->CalendarParams->EternalHighPriest = $this->NationalData->settings->eternal_high_priest;
+            $this->CalendarParams->Epiphany             = $this->NationalData->settings->epiphany;
+            $this->CalendarParams->Ascension            = $this->NationalData->settings->ascension;
+            $this->CalendarParams->CorpusChristi        = $this->NationalData->settings->corpus_christi;
+            $this->CalendarParams->EternalHighPriest    = $this->NationalData->settings->eternal_high_priest;
+            $this->CalendarParams->HolyDaysOfObligation = $this->NationalData->settings->holydays_of_obligation;
         }
     }
 
@@ -1166,8 +1164,8 @@ final class CalendarHandler extends AbstractHandler
     {
         // Even though Mary Mother of God is a fixed date solemnity,
         // it is however found in the Proprium de Tempore and not in the Proprium de Sanctis
-        $this->PropriumDeTempore['MotherGod']->setDate(DateTime::fromFormat('1-1-' . $this->CalendarParams->Year));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('MotherGod');
+        $this->PropriumDeTempore['MaryMotherOfGod']->setDate(DateTime::fromFormat('1-1-' . $this->CalendarParams->Year));
+        $this->createPropriumDeTemporeLiturgicalEventByKey('MaryMotherOfGod');
 
         $propriumDeSanctisSolemnities = $this->missalsMap[RomanMissal::EDITIO_TYPICA_1970]->filterByGrade(LitGrade::SOLEMNITY);
 
@@ -1936,8 +1934,6 @@ final class CalendarHandler extends AbstractHandler
             if (self::dateIsNotSunday($propriumDeSanctisEvent->date) && $this->Cal->notInSolemnitiesFeastsOrMemorials($propriumDeSanctisEvent->date)) {
                 //$propriumDeSanctisEvent->type          = LitEventType::FIXED;
                 $newLiturgicalEvent = LiturgicalEvent::fromObject($propriumDeSanctisEvent);
-                //Calendar::debugWrite( "adding new memorial '$propriumDeSanctisEvent->name', common vartype = " . gettype( $propriumDeSanctisEvent->common ) . ", common = " . implode(', ', $propriumDeSanctisEvent->common) );
-                //Calendar::debugWrite( ">>> added new memorial '$newLiturgicalEvent->name', common vartype = " . gettype( $newLiturgicalEvent->common ) . ", common = " . implode(', ', $newLiturgicalEvent->common) );
 
                 $this->Cal->addLiturgicalEvent($propriumDeSanctisEvent->event_key, $newLiturgicalEvent);
 
@@ -1958,7 +1954,7 @@ final class CalendarHandler extends AbstractHandler
                             $propriumDeSanctisEvent->setDecree(RomanMissal::getName($missal));
                             break;
                         /**both of the following event keys refer to the same decree, no need for a break between them */
-                        case 'LadyGuadalupe':
+                        case 'OurLadyOfGuadalupe':
                         case 'JuanDiego':
                             $langs = ['la' => 'lt', 'es' => 'es'];
                             $lang  = in_array(LitLocale::$PRIMARY_LANGUAGE, array_keys($langs)) ? $langs[LitLocale::$PRIMARY_LANGUAGE] : 'lt';
@@ -3121,6 +3117,54 @@ final class CalendarHandler extends AbstractHandler
     }
 
     /**
+     * Applies conditional rules to a liturgical event date
+     *
+     * @param DateTime $originalDate The original date of the liturgical event
+     * @param ConditionalRule[] $rules The conditional rules to apply
+     * @param string $eventKey The event key for logging purposes
+     * @return DateTime The potentially modified date
+     */
+    private function applyConditionalRules(DateTime $originalDate, array $rules, string $eventKey): DateTime
+    {
+        $currentDate = clone $originalDate;
+
+        foreach ($rules as $rule) {
+            if ($rule->condition->matches($currentDate, $this->Cal)) {
+                $previousDate = clone $currentDate;
+                $newDate      = $rule->then->apply($currentDate);
+
+                // Add a message about the rule application
+                $locale          = LitLocale::$PRIMARY_LANGUAGE;
+                $previousDateStr = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                    ? ( $previousDate->format('j') . ' ' . LatinUtils::LATIN_MONTHS[(int) $previousDate->format('n')] )
+                    : ( $locale === 'en'
+                        ? $previousDate->format('F jS')
+                        : $this->dayAndMonth->format($previousDate->format('U'))
+                    );
+                $newDateStr      = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+                    ? ( $newDate->format('j') . ' ' . LatinUtils::LATIN_MONTHS[(int) $newDate->format('n')] )
+                    : ( $locale === 'en'
+                        ? $newDate->format('F jS')
+                        : $this->dayAndMonth->format($newDate->format('U'))
+                    );
+
+                $this->Messages[] = sprintf(
+                    /**translators: 1: Event key, 2: Original date, 3: New date, 4: Requested calendar year */
+                    _('The liturgical event \'%1$s\' has been moved from %2$s to %3$s due to conditional rules in the year %4$d.'),
+                    $eventKey,
+                    $previousDateStr,
+                    $newDateStr,
+                    $this->CalendarParams->Year
+                );
+
+                $currentDate = $newDate;
+            }
+        }
+
+        return $currentDate;
+    }
+
+    /**
      * Handles a liturgical event for a National calendar that is missing from the calendar.
      * If the liturgical event is suppressed by a Sunday or a Solemnity,
      * a message is added to the Messages array, indicating what has happened.
@@ -3349,6 +3393,9 @@ final class CalendarHandler extends AbstractHandler
             property_exists($liturgicalEvent, 'month')
             && property_exists($liturgicalEvent, 'day')
         ) {
+            /** @var LitCalItemCreateNewMetadata */
+            $liturgicalEventMetadata = $litEvent->metadata;
+
             /** @var LitCalItemCreateNewFixed $liturgicalEvent */
             $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $liturgicalEvent->month, $this->CalendarParams->Year);
             if ($liturgicalEvent->day > $daysInMonth) {
@@ -3360,8 +3407,19 @@ final class CalendarHandler extends AbstractHandler
                     $liturgicalEvent->month,
                     $this->CalendarParams->Year
                 );
+                return;
             }
+
             $liturgicalEvent->setDate(DateTime::fromFormat("{$liturgicalEvent->day}-{$liturgicalEvent->month}-{$this->CalendarParams->Year}"));
+
+            // Apply any conditional rules to the date
+            if (!empty($liturgicalEventMetadata->rules)) {
+                $newDate = $this->applyConditionalRules($liturgicalEvent->date, $liturgicalEventMetadata->rules, $liturgicalEvent->event_key);
+                if ($newDate != $liturgicalEvent->date) {
+                    // If the date has changed, we need to update the date in the liturgical event
+                    $liturgicalEvent->setDate($newDate);
+                }
+            }
         } else {
             ob_start();
             var_dump($litEvent);
@@ -3735,38 +3793,26 @@ final class CalendarHandler extends AbstractHandler
                                 $litEvent = LiturgicalEvent::fromObject($propriumDeSanctisEvent);
                                 $this->Cal->addLiturgicalEvent($propriumDeSanctisEvent->event_key, $litEvent);
                             } else {
-                                if (self::dateIsSunday($currentLitEventDate) && $propriumDeSanctisEvent->event_key === 'PrayerUnborn') {
-                                    $propriumDeSanctisEvent->setName('[ USA ] ' . $propriumDeSanctisEvent->name);
-                                    $propriumDeSanctisEvent->setDate($currentLitEventDate->add(new \DateInterval('P1D')));
-                                    //$propriumDeSanctisEvent->type = LitEventType::FIXED;
-                                    $litEvent = LiturgicalEvent::fromObject($propriumDeSanctisEvent);
-                                    $this->Cal->addLiturgicalEvent($propriumDeSanctisEvent->event_key, $litEvent);
-                                    $this->Messages[] = sprintf(
-                                        'USA: The National Day of Prayer for the Unborn is set to Jan 22 as per the 2011 Roman Missal issued by the USCCB, however since it coincides with a Sunday or a Solemnity in the year %d, it has been moved to Jan 23',
-                                        $this->CalendarParams->Year
-                                    );
-                                } else {
-                                    $coincidingLiturgicalEvent = $this->Cal->determineSundaySolemnityOrFeast($currentLitEventDate, $propriumDeSanctisEvent->event_key);
-                                    $this->Messages[]          = sprintf(
-                                        /**translators:
-                                         * 1. LiturgicalEvent grade
-                                         * 2. LiturgicalEvent name
-                                         * 3. LiturgicalEvent date
-                                         * 4. Edition of the Roman Missal
-                                         * 5. Superseding liturgical event grade
-                                         * 6. Superseding liturgical event name
-                                         * 7. Requested calendar year
-                                         */
-                                        $Nation . ': ' . _('The %1$s \'%2$s\' (%3$s), added to the national calendar in the %4$s, is superseded by the %5$s \'%6$s\' in the year %7$d'),
-                                        $propriumDeSanctisEvent->grade->i18n($this->CalendarParams->Locale, false),
-                                        '<i>' . $propriumDeSanctisEvent->name . '</i>',
-                                        $this->dayAndMonth->format($currentLitEventDate->format('U')),
-                                        RomanMissal::getName($missal),
-                                        $coincidingLiturgicalEvent->grade_lcl,
-                                        $coincidingLiturgicalEvent->event->name,
-                                        $this->CalendarParams->Year
-                                    );
-                                }
+                                $coincidingLiturgicalEvent = $this->Cal->determineSundaySolemnityOrFeast($currentLitEventDate, $propriumDeSanctisEvent->event_key);
+                                $this->Messages[]          = sprintf(
+                                    /**translators:
+                                     * 1. LiturgicalEvent grade
+                                     * 2. LiturgicalEvent name
+                                     * 3. LiturgicalEvent date
+                                     * 4. Edition of the Roman Missal
+                                     * 5. Superseding liturgical event grade
+                                     * 6. Superseding liturgical event name
+                                     * 7. Requested calendar year
+                                     */
+                                    $Nation . ': ' . _('The %1$s \'%2$s\' (%3$s), added to the national calendar in the %4$s, is superseded by the %5$s \'%6$s\' in the year %7$d'),
+                                    $propriumDeSanctisEvent->grade->i18n($this->CalendarParams->Locale, false),
+                                    '<i>' . $propriumDeSanctisEvent->name . '</i>',
+                                    $this->dayAndMonth->format($currentLitEventDate->format('U')),
+                                    RomanMissal::getName($missal),
+                                    $coincidingLiturgicalEvent->grade_lcl,
+                                    $coincidingLiturgicalEvent->event->name,
+                                    $this->CalendarParams->Year
+                                );
                             }
                         }
                     } else {
@@ -4229,6 +4275,13 @@ final class CalendarHandler extends AbstractHandler
                     /** @var DiocesanLitCalItemCreateNewFixed $liturgicalEvent */
                     $liturgicalEvent     = $litCalItem->liturgical_event;
                     $currentLitEventDate = DateTime::fromFormat($liturgicalEvent->day . '-' . $liturgicalEvent->month . '-' . $this->CalendarParams->Year);
+
+                    /**
+                    // Apply conditional rules if they exist
+                    if (!empty($liturgicalEvent->rules)) {
+                        $currentLitEventDate = $this->applyConditionalRules($currentLitEventDate, $liturgicalEvent->rules, $liturgicalEvent->event_key);
+                    }
+                    **/
                 }
                 if ($currentLitEventDate !== false) {
                     $liturgicalEvent->setDate($currentLitEventDate);
@@ -4387,17 +4440,18 @@ final class CalendarHandler extends AbstractHandler
      */
     private function prepareResponseBody(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $SerializeableLitCal                                = new \stdClass();
-        $SerializeableLitCal->litcal                        = $this->Cal->getLiturgicalEventsCollection();
-        $SerializeableLitCal->settings                      = new \stdClass();
-        $SerializeableLitCal->settings->year                = $this->CalendarParams->Year;
-        $SerializeableLitCal->settings->epiphany            = $this->CalendarParams->Epiphany;
-        $SerializeableLitCal->settings->ascension           = $this->CalendarParams->Ascension;
-        $SerializeableLitCal->settings->corpus_christi      = $this->CalendarParams->CorpusChristi;
-        $SerializeableLitCal->settings->locale              = LitLocale::$RUNTIME_LOCALE;
-        $SerializeableLitCal->settings->return_type         = $this->CalendarParams->ReturnType;
-        $SerializeableLitCal->settings->year_type           = $this->CalendarParams->YearType;
-        $SerializeableLitCal->settings->eternal_high_priest = $this->CalendarParams->EternalHighPriest;
+        $SerializeableLitCal                                   = new \stdClass();
+        $SerializeableLitCal->litcal                           = $this->Cal->getLiturgicalEventsCollection();
+        $SerializeableLitCal->settings                         = new \stdClass();
+        $SerializeableLitCal->settings->year                   = $this->CalendarParams->Year;
+        $SerializeableLitCal->settings->epiphany               = $this->CalendarParams->Epiphany;
+        $SerializeableLitCal->settings->ascension              = $this->CalendarParams->Ascension;
+        $SerializeableLitCal->settings->corpus_christi         = $this->CalendarParams->CorpusChristi;
+        $SerializeableLitCal->settings->locale                 = LitLocale::$RUNTIME_LOCALE;
+        $SerializeableLitCal->settings->return_type            = $this->CalendarParams->ReturnType;
+        $SerializeableLitCal->settings->year_type              = $this->CalendarParams->YearType;
+        $SerializeableLitCal->settings->eternal_high_priest    = $this->CalendarParams->EternalHighPriest;
+        $SerializeableLitCal->settings->holydays_of_obligation = $this->CalendarParams->HolyDaysOfObligation;
         if ($this->CalendarParams->NationalCalendar !== null) {
             $SerializeableLitCal->settings->national_calendar = $this->CalendarParams->NationalCalendar;
         }
@@ -5080,7 +5134,10 @@ final class CalendarHandler extends AbstractHandler
                 $this->applyDiocesanCalendar();
             }
 
-            $this->Cal->setCyclesVigilsSeasons();
+            $this->Cal->setSeasonsAndHolyDaysOfObligation();
+
+            $this->Cal->setYearCyclesAndVigils();
+
             // For any celebrations that do not yet have a psalter_week property, make an attempt to calculate the value if applicable
             $this->Cal->calculatePsalterWeek();
 
@@ -5108,7 +5165,8 @@ final class CalendarHandler extends AbstractHandler
                     $this->applyDiocesanCalendar();
                 }
 
-                $this->Cal->setCyclesVigilsSeasons();
+                $this->Cal->setSeasonsAndHolyDaysOfObligation();
+                $this->Cal->setYearCyclesAndVigils();
                 $this->Cal->calculatePsalterWeek();
                 $this->Cal->sortLiturgicalEvents();
 

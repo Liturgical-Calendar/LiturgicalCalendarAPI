@@ -4,10 +4,8 @@ namespace LiturgicalCalendar\Api\Params;
 
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\Route;
-use LiturgicalCalendar\Api\Enum\ParamError;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
-use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
 
 /**
@@ -51,11 +49,6 @@ class EventsParams implements ParamsInterface
 
     //The upper limit is determined by the limit of PHP in dealing with DateTime objects
     public const YEAR_UPPER_LIMIT = 9999;
-
-    /*private static function debugWrite(string $string)
-    {
-        file_put_contents("debug.log", $string . PHP_EOL, FILE_APPEND);
-    }*/
 
     /**
      * Constructor for EventsParams
