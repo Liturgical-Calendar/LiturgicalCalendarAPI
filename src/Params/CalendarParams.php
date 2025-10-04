@@ -175,7 +175,7 @@ class CalendarParams implements ParamsInterface
         }
         foreach ($params as $key => $value) {
             if (in_array($key, self::ALLOWED_PARAMS)) {
-                if ($key !== 'year' && $key !== 'eternal_high_priest') {
+                if (!in_array($key, ['year', 'eternal_high_priest', 'holydays_of_obligation'], true)) {
                     // all other parameters expect a string value
                     $value = $this->validateStringValue($key, $value);
                 }
