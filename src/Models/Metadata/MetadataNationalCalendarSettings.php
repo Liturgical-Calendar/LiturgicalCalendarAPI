@@ -34,7 +34,18 @@ final class MetadataNationalCalendarSettings extends AbstractJsonRepresentation
     public bool $eternal_high_priest;
 
     /** @var array<string,bool> */
-    public array $holydays_of_obligation = [];
+    public array $holydays_of_obligation = [
+        'Christmas'            => true,
+        'Epiphany'             => true,
+        'Ascension'            => true,
+        'CorpusChristi'        => true,
+        'MaryMotherOfGod'      => true,
+        'ImmaculateConception' => true,
+        'Assumption'           => true,
+        'StJoseph'             => true,
+        'StsPeterPaulAp'       => true,
+        'AllSaints'            => true
+    ];
 
     /**
      * Creates a new MetadataNationalCalendarSettings object.
@@ -52,13 +63,13 @@ final class MetadataNationalCalendarSettings extends AbstractJsonRepresentation
         string $ascension,
         string $corpus_christi,
         bool $eternal_high_priest,
-        array $holydays_of_obligation = []
+        array $holydays_of_obligation
     ) {
         $this->epiphany               = Epiphany::from($epiphany);
         $this->ascension              = Ascension::from($ascension);
         $this->corpus_christi         = CorpusChristi::from($corpus_christi);
         $this->eternal_high_priest    = $eternal_high_priest;
-        $this->holydays_of_obligation = $holydays_of_obligation;
+        $this->holydays_of_obligation = array_merge($this->holydays_of_obligation, $holydays_of_obligation);
     }
 
     /**
@@ -96,8 +107,9 @@ final class MetadataNationalCalendarSettings extends AbstractJsonRepresentation
         $holydays_of_obligation = [];
         if (array_key_exists('holydays_of_obligation', $data)) {
             if (!is_array($data['holydays_of_obligation'])) {
-                throw new \ValueError('Invalid type for holydays_of_obligation: expected an array of event_key strings, got ' . gettype($data['holydays_of_obligation']) . ' instead, with value: ' . print_r($data['holydays_of_obligation'], true));
+                throw new \ValueError('Invalid type for holydays_of_obligation: expected an array of event_key strings, got ' . gettype($data['holydays_of_obligation']));
             }
+
             foreach ($data['holydays_of_obligation'] as $key => $value) {
                 if (!is_string($key) || $key === '') {
                     throw new \ValueError('Invalid key in holydays_of_obligation: expected a non-empty string');
@@ -137,8 +149,9 @@ final class MetadataNationalCalendarSettings extends AbstractJsonRepresentation
         $holydays_of_obligation = [];
         if (property_exists($data, 'holydays_of_obligation')) {
             if (!is_object($data->holydays_of_obligation)) {
-                throw new \ValueError('Invalid type for holydays_of_obligation: expected an object, got ' . gettype($data->holydays_of_obligation) . ' instead, with value: ' . print_r($data->holydays_of_obligation, true));
+                throw new \ValueError('Invalid type for holydays_of_obligation: expected an object, got ' . gettype($data->holydays_of_obligation));
             }
+
             foreach ((array) $data->holydays_of_obligation as $key => $value) {
                 if (!is_string($key) || $key === '') {
                     throw new \ValueError('Invalid key in holydays_of_obligation: expected a non-empty string');
