@@ -124,7 +124,19 @@
         "epiphany": "SUNDAY_JAN2_JAN8",
         "ascension": "SUNDAY",
         "corpus_christi": "SUNDAY",
-        "eternal_high_priest": false
+        "eternal_high_priest": false,
+        "holydays_of_obligation": {
+            "Christmas": true,
+            "Epiphany": false,
+            "Ascension": true,
+            "CorpusChristi": false,
+            "MaryMotherOfGod": true,
+            "ImmaculateConception": true,
+            "Assumption": true,
+            "StJoseph": false,
+            "StsPeterPaulAp": false,
+            "AllSaints": true
+        }
     },
     "metadata": {
         "nation": "US",

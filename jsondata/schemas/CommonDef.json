@@ -420,6 +420,45 @@
         "EternalHighPriest": {
             "type": "boolean"
         },
+        "HolyDaysOfObligation": {
+            "type": "object",
+            "properties": {
+                "Christmas": {
+                    "type": "boolean"
+                },
+                "Epiphany": {
+                    "type": "boolean"
+                },
+                "Ascension": {
+                    "type": "boolean"
+                },
+                "CorpusChristi": {
+                    "type": "boolean"
+                },
+                "MaryMotherOfGod": {
+                    "type": "boolean"
+                },
+                "ImmaculateConception": {
+                    "type": "boolean"
+                },
+                "Assumption": {
+                    "type": "boolean"
+                },
+                "StJoseph": {
+                    "type": "boolean"
+                },
+                "StsPeterPaulAp": {
+                    "type": "boolean"
+                },
+                "AllSaints": {
+                    "type": "boolean"
+                }
+            },
+            "additionalProperties": {
+                "const": true
+            },
+            "description": "Which of the standard holy days of obligation are observed in this calendar, plus any additional holy days of obligation proper to the calendar"
+        },
         "CalendarSettings": {
             "type": "object",
             "additionalProperties": false,
@@ -435,6 +474,9 @@
                 },
                 "eternal_high_priest": {
                     "$ref": "#/definitions/EternalHighPriest"
+                },
+                "holydays_of_obligation": {
+                    "$ref": "#/definitions/HolyDaysOfObligation"
                 }
             }
         },

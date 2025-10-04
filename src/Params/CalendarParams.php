@@ -41,14 +41,51 @@ class CalendarParams implements ParamsInterface
     public int $Year;
     public string $Locale;
     public YearType $YearType             = YearType::LITURGICAL;
-    public Epiphany $Epiphany             = Epiphany::JAN6;
-    public Ascension $Ascension           = Ascension::THURSDAY;
-    public CorpusChristi $CorpusChristi   = CorpusChristi::THURSDAY;
-    public bool $EternalHighPriest        = false;
     public ?ReturnTypeParam $ReturnType   = null;
     public ?string $NationalCalendar      = null;
     public ?string $DiocesanCalendar      = null;
     private ?MetadataCalendars $calendars = null;
+
+    public Epiphany $Epiphany           = Epiphany::JAN6;
+    public Ascension $Ascension         = Ascension::THURSDAY;
+    public CorpusChristi $CorpusChristi = CorpusChristi::THURSDAY;
+    public bool $EternalHighPriest      = false;
+
+    /**
+     * **1983 Code of Canon Law**
+     *
+     * **Can. 1246. §1.**
+     * Sunday, on which—by apostolic tradition—the paschal mystery is celebrated,
+     * must be observed in the universal Church as the primordial holy day of obligation.
+     * The following days must also be observed:
+     *  - the Nativity of our Lord Jesus Christ,
+     *  - the Epiphany,
+     *  - the Ascension,
+     *  - the Body and Blood of Christ,
+     *  - Holy Mary the Mother of God,
+     *  - her Immaculate Conception,
+     *  - her Assumption,
+     *  - Saint Joseph,
+     *  - Saint Peter and Saint Paul the Apostles,
+     *  - and All Saints.
+     *
+     * **§2.**
+     * With the prior approval of the Apostolic See, however,
+     * the conference of bishops can suppress some of the holy days of obligation or transfer them to a Sunday.
+     * @var array<string,bool>
+     */
+    public array $HolyDaysOfObligation = [
+        'Christmas'            => true,
+        'Epiphany'             => true,
+        'Ascension'            => true,
+        'CorpusChristi'        => true,
+        'MaryMotherOfGod'      => true,
+        'ImmaculateConception' => true,
+        'Assumption'           => true,
+        'StJoseph'             => true,
+        'StsPeterPaulAp'       => true,
+        'AllSaints'            => true
+    ];
 
     /** @var ReturnTypeParam[] */
     private array $allowedReturnTypes;
@@ -60,6 +97,7 @@ class CalendarParams implements ParamsInterface
         'ascension',
         'corpus_christi',
         'eternal_high_priest',
+        'holydays_of_obligation',
         'locale',
         'return_type',
         'national_calendar',
@@ -137,7 +175,7 @@ class CalendarParams implements ParamsInterface
         }
         foreach ($params as $key => $value) {
             if (in_array($key, self::ALLOWED_PARAMS)) {
-                if ($key !== 'year' && $key !== 'eternal_high_priest') {
+                if (!in_array($key, ['year', 'eternal_high_priest', 'holydays_of_obligation'], true)) {
                     // all other parameters expect a string value
                     $value = $this->validateStringValue($key, $value);
                 }
@@ -181,6 +219,10 @@ class CalendarParams implements ParamsInterface
                     case 'eternal_high_priest':
                         /** @var bool $value */
                         $this->validateEternalHighPriestParam($value);
+                        break;
+                    case 'holydays_of_obligation':
+                        /** @var array<string,bool> $value */
+                        $this->validateHolyDaysOfObligationParam($value);
                         break;
                 }
             }
@@ -434,6 +476,74 @@ class CalendarParams implements ParamsInterface
     }
 
     /**
+     * Validate the holydays_of_obligation parameter.
+     *
+     * @param array<string,bool> $value an associative array where the keys are valid holydays_of_obligation keys and the values are booleans
+     *
+     * @throws ValidationException if any of the keys or values are invalid.
+     *
+     * Produces a 400 Bad Request error if the value is not an associative array
+     * with valid holydays_of_obligation keys and boolean values.
+     * TODO: national calendars might add additional holy days of obligation, so we shouldn't exclude those keys,
+     *       we will however need access to those keys to validate them
+     *       Examples:
+     *          - Bahrain with StThomasAp and NativityVirginMary;
+     *          - Dominican Republic with OurLadyAltagracia and OurLadyOfMercy;
+     *          - Germany with StStephen;
+     *          - India with StThomasAp;
+     *          - Indonesia with GoodFriday;
+     *          - Ireland with StPatrick;
+     *          - Kuwait with StThomas and NativityVirginMary;
+     *          - Malta with ShipwreckOfStPaul;
+     *          - Mexico with OurLadyOfGuadalupe;
+     *          - Moldova with StStephen;
+     *          - Peru with StRoseLima;
+     *          - Qatar with StThomasAp and NativityVirginMary;
+     *          - Spain with StJamesAp;
+     *          - Switzerland with EasterMonday and WhitMonday and StStephen;
+     *          - Ukraine with PresentationLord, Annunciation, Transfiguration, ExaltationCross, PresentationMary
+     */
+    private function validateHolyDaysOfObligationParam(array $value): void
+    {
+        // Any calendar that specifies holydays_of_obligation must specify at least the keys indicated in Canon 1246 §1.
+        // Additional keys may be specified, but the following keys must be present (with boolean values)
+        $requiredKeys = [
+            'Christmas',
+            'Epiphany',
+            'Ascension',
+            'CorpusChristi',
+            'MaryMotherOfGod',
+            'ImmaculateConception',
+            'Assumption',
+            'StJoseph',
+            'StsPeterPaulAp',
+            'AllSaints'
+        ];
+
+        $missingKeys = array_diff($requiredKeys, array_keys($value));
+        if (!empty($missingKeys)) {
+            throw new ValidationException('Parameter `holydays_of_obligation` is missing required keys: ' . implode(', ', $missingKeys));
+        }
+
+        foreach ($value as $key => $val) {
+            // TODO: allow additional keys that are valid event_keys in the calendar being used
+            if (false === array_key_exists($key, $this->HolyDaysOfObligation)) {
+                throw new ValidationException("Invalid key `{$key}` in parameter `holydays_of_obligation`, valid keys are: " . implode(', ', array_keys($this->HolyDaysOfObligation)));
+            }
+
+            if (gettype($val) !== 'boolean') {
+                $val = filter_var($val, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                if (null === $val) {
+                    throw new ValidationException("Invalid value for key `{$key}` in parameter `holydays_of_obligation`, valid values are boolean `true` and `false`");
+                }
+            }
+
+            /** @var bool $val */
+            $this->HolyDaysOfObligation[$key] = $val;
+        }
+    }
+
+    /**
      * Validates parameter values that are expected to be strings.
      * Produces a 400 Bad Request error if the value is not a string
      */
@@ -509,9 +619,4 @@ class CalendarParams implements ParamsInterface
             }
         }
     }
-
-    /*private static function debugWrite(string $string)
-    {
-        file_put_contents("debug.log", $string . PHP_EOL, FILE_APPEND);
-    }*/
 }

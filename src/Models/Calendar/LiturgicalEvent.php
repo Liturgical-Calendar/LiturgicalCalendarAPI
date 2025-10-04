@@ -53,6 +53,7 @@ final class LiturgicalEvent implements \JsonSerializable
     public ?string $is_vigil_for         = null;
     public ?string $liturgical_year      = null;
     public ?LitSeason $liturgical_season = null;
+    public bool $holy_day_of_obligation  = false;
 
     /** The following properties are set based on properties passed in the constructor or on other properties */
     private string $grade_lcl;
@@ -179,15 +180,11 @@ final class LiturgicalEvent implements \JsonSerializable
         $this->readings = $readings;
     }
 
-    /*
-    private static function debugWrite( string $string ) {
-        file_put_contents( "debug.log", $string . PHP_EOL, FILE_APPEND );
-    }
-    */
-
     /**
-     * This function is used to finalize the output of the object for serialization as a JSON string.
-     * It returns an associative array with the following keys:
+     * {@inheritDoc}
+     *
+     * Finalizes the output of the liturgical event for serialization as a JSON string.
+     * Returns an associative array with the following keys:
      * - event_key: a unique key for the liturgical event
      * - event_idx: the index of the event in the array of liturgical events
      * - name: the name of the liturgical event
@@ -219,6 +216,8 @@ final class LiturgicalEvent implements \JsonSerializable
      * - psalter_week: the psalter week of the liturgical event, if applicable
      * - liturgical_season: the liturgical season of the liturgical event, if applicable
      * - liturgical_season_lcl: the liturgical season of the liturgical event, translated according to the current locale
+     * - holy_day_of_obligation: a boolean value of true indicating that the liturgical event is a holy day of obligation, if applicable
+     *
      * @return array{
      *      event_key: string,
      *      event_idx: int,
@@ -249,7 +248,8 @@ final class LiturgicalEvent implements \JsonSerializable
      *      has_vesper_ii?: ?bool,
      *      psalter_week?: ?int,
      *      liturgical_season?: ?string,
-     *      liturgical_season_lcl?: string
+     *      liturgical_season_lcl?: string,
+     *      holy_day_of_obligation?: bool
      * }
      */
     public function jsonSerialize(): array
@@ -324,6 +324,10 @@ final class LiturgicalEvent implements \JsonSerializable
         if ($this->liturgical_season !== null) {
             $returnArr['liturgical_season']     = $this->liturgical_season->value;
             $returnArr['liturgical_season_lcl'] = $this->liturgical_season->i18n(self::$locale);
+        }
+
+        if ($this->holy_day_of_obligation) {
+            $returnArr['holy_day_of_obligation'] = true;
         }
 
         return $returnArr;
