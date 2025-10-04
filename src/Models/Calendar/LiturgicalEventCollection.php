@@ -1073,6 +1073,8 @@ final class LiturgicalEventCollection
             if ($litEvent->date >= $Advent1->date && $litEvent->date < $Christmas->date) {
                 $litEvent->liturgical_season = LitSeason::ADVENT;
             } elseif ($litEvent->date >= $Christmas->date || $litEvent->date <= $BaptismLord->date) {
+                // This condition uses an "or" because Christmas season spans the end of one year and the beginning of the next,
+                // but we are calculating the calendar for a single civil year at a time
                 $litEvent->liturgical_season = LitSeason::CHRISTMAS;
             } elseif ($litEvent->date >= $AshWednesday->date && $litEvent->date < $HolyThurs->date) {
                 $litEvent->liturgical_season = LitSeason::LENT;
