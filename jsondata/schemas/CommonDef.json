@@ -8204,9 +8204,7 @@
                             "additionalProperties": false,
                             "properties": {
                                 "if_grade": {
-                                    "type": "integer",
-                                    "minimum": 0,
-                                    "maximum": 7
+                                    "$ref": "#/definitions/LitGrade"
                                 }
                             }
                         }
