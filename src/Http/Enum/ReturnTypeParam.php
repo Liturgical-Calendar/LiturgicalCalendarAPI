@@ -40,6 +40,10 @@ enum ReturnTypeParam: string
     case VIDEO_WEBM = 'VIDEO_WEBM';
     case ATTACHMENT = 'ATTACHMENT';
 
+    /**
+     * Return the corresponding Content-Type for the response based on the ReturnTypeParam
+     * @return AcceptHeader The response Content-Type associated with this return type parameter
+     */
     public function toResponseContentType(): AcceptHeader
     {
         return match ($this) {
@@ -69,5 +73,14 @@ enum ReturnTypeParam: string
             ReturnTypeParam::VIDEO_WEBM => AcceptHeader::VIDEO_WEBM,
             ReturnTypeParam::ATTACHMENT => AcceptHeader::ATTACHMENT
         };
+    }
+
+    /**
+     * Alias for {@see \LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam::toResponseContentType()}
+     * @return AcceptHeader the HTTP Accept header associated with this return type parameter
+     */
+    public function toAcceptMimeType(): AcceptHeader
+    {
+        return $this->toResponseContentType();
     }
 }

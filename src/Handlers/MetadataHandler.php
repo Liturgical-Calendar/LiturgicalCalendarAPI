@@ -68,10 +68,22 @@ final class MetadataHandler extends AbstractHandler
                 'EDITIO_TYPICA_2008'
             ],
             'settings'    => [
-                'epiphany'            => Epiphany::JAN6->value,
-                'ascension'           => Ascension::THURSDAY->value,
-                'corpus_christi'      => Ascension::THURSDAY->value,
-                'eternal_high_priest' => false
+                'epiphany'               => Epiphany::JAN6->value,
+                'ascension'              => Ascension::THURSDAY->value,
+                'corpus_christi'         => Ascension::THURSDAY->value,
+                'eternal_high_priest'    => false,
+                'holydays_of_obligation' => [
+                    'Christmas'            => true,
+                    'Epiphany'             => true,
+                    'Ascension'            => true,
+                    'CorpusChristi'        => true,
+                    'MaryMotherOfGod'      => true,
+                    'ImmaculateConception' => true,
+                    'Assumption'           => true,
+                    'StJoseph'             => true,
+                    'StsPeterPaulAp'       => true,
+                    'AllSaints'            => true
+                ]
             ]
         ]);
         self::$metadataCalendars->pushNationalCalendarMetadata($metadataNationalCalendarItem);
@@ -285,10 +297,8 @@ final class MetadataHandler extends AbstractHandler
         $response     = $response->withHeader('ETag', $etag);
 
         if (
-            isset($_SERVER['HTTP_IF_NONE_MATCH'])
-            && is_string($_SERVER['HTTP_IF_NONE_MATCH'])
-            && !empty($_SERVER['HTTP_IF_NONE_MATCH'])
-            && trim($_SERVER['HTTP_IF_NONE_MATCH'], " \t\"") === $responseHash
+            $request->getHeaderLine('If-None-Match') !== ''
+            && trim($request->getHeaderLine('If-None-Match'), " \t\"") === $responseHash
         ) {
             return $response->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
                             ->withHeader('Content-Length', '0');
@@ -304,13 +314,10 @@ final class MetadataHandler extends AbstractHandler
                     }
                     $responseBodyObj = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
 
-                    set_error_handler([static::class, 'warningHandler'], E_WARNING);
                     try {
                         $yamlEncodedResponse = yaml_emit($responseBodyObj, YAML_UTF8_ENCODING);
                     } catch (\ErrorException $e) {
                         throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
-                    } finally {
-                        restore_error_handler();
                     }
                     return $response->withStatus(StatusCode::OK->value, StatusCode::OK->reason())->withBody(Stream::create($yamlEncodedResponse));
                     // no break needed

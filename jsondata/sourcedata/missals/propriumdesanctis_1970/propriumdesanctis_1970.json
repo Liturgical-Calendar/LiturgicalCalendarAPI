@@ -290,7 +290,7 @@
     {
         "month": 2,
         "day": 11,
-        "event_key": "LadyLourdes",
+        "event_key": "OurLadyOfLourdes",
         "grade": 2,
         "common": [
             "Blessed Virgin Mary"
@@ -1197,7 +1197,7 @@
     {
         "month": 7,
         "day": 16,
-        "event_key": "LadyMountCarmel",
+        "event_key": "OurLadyOfMountCarmel",
         "grade": 2,
         "common": [
             "Blessed Virgin Mary"
@@ -1703,7 +1703,7 @@
     {
         "month": 9,
         "day": 15,
-        "event_key": "LadySorrows",
+        "event_key": "OurLadyOfSorrows",
         "grade": 3,
         "common": [
             "Proper"
@@ -1891,7 +1891,7 @@
     {
         "month": 10,
         "day": 7,
-        "event_key": "LadyRosary",
+        "event_key": "OurLadyOfTheRosary",
         "grade": 3,
         "common": [
             "Proper"

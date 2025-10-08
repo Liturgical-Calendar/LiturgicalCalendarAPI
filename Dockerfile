@@ -2,12 +2,14 @@
 FROM php:8.4-cli AS build
 
 # Install necessary PHP extensions and Composer in one step to minimize layers
-RUN apt-get update -y && \
+RUN --mount=type=cache,target=/var/cache/apt \
+    --mount=type=cache,target=/var/lib/apt \
+    apt-get update -y && \
     apt-get install -y --no-install-suggests --no-install-recommends \
         libicu-dev libonig-dev libzip-dev gettext libyaml-dev && \
-    docker-php-ext-install intl zip gettext calendar apcu && \
-    pecl install yaml && \
-    docker-php-ext-enable intl zip gettext calendar yaml && \
+    docker-php-ext-install intl zip calendar gettext && \
+    pecl install apcu yaml && \
+    docker-php-ext-enable intl zip calendar apcu yaml gettext && \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
     rm -rf /var/lib/apt/lists/*
 
@@ -18,13 +20,16 @@ WORKDIR /var/www/html
 COPY composer.json composer.lock ./
 
 # Run composer install to install dependencies
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+RUN --mount=type=cache,target=/tmp/composer \
+    composer install --no-interaction --prefer-dist \
+    --optimize-autoloader --no-dev
 
 # Copy the rest of the application code (.dockerignore not working when building from docker compose and remote repo)
 COPY ./src ./src
 COPY ./i18n ./i18n
 COPY ./jsondata ./jsondata
-COPY LitCalTestServer.php index.php ./public/
+COPY ./public/LitCalTestServer.php ./public/index.php ./public/
+COPY ./.env.example ./.env.local
 
 # Stage 2: final build
 FROM php:8.4-cli AS main
@@ -35,7 +40,7 @@ WORKDIR /var/www/html
 # Install runtime dependencies (not the -dev packages)
 RUN apt-get update -y && \
     apt-get install -y --no-install-suggests --no-install-recommends \
-    libyaml-0-2 libzip4 locales-all && \
+    libyaml-0-2 libicu-dev libzip-dev locales-all && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy the compiled PHP extensions from the build stage

@@ -2,55 +2,61 @@
     "MaryMotherChurch": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJohnXXIII": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJohnPaulII": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "LadyLoreto": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StPaulVI": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StFaustinaKowalska": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StGregoryNarek": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJohnAvila": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StHildegardBingen": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
+    },
+    "StMotherTeresa": {
+        "first_reading": "Isaïe 58, 6-11",
+        "responsorial_psalm": "Psaume 33, 2-3. 4-5. 6-7. 8-9. 10-11",
+        "gospel_acclamation": "Matthieu 11, 25",
+        "gospel": "Matthieu 25, 31-46|Matthieu 25, 31-40"
     }
 }

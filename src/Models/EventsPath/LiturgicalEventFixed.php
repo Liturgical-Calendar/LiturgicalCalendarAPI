@@ -13,7 +13,7 @@ use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\LiturgicalEventData;
 use LiturgicalCalendar\Api\Models\PropriumDeSanctisEvent;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed;
-use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewFixed as DiocesanLitCalItemCreateNewFixed;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewFixed;
 
 /**
  * @phpstan-type LiturgicalEventObject \stdClass&object{
@@ -25,7 +25,7 @@ use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewF
  *     color?: LitColor|LitColor[]|string|string[],
  *     type?: LitEventType|string,
  *     common?: LitCommons|LitCommon[]|LitMassVariousNeeds[]|string[],
- *     grade_display?: string,
+ *     grade_display?: ?string,
  * }
  */
 final class LiturgicalEventFixed extends LiturgicalEventAbstract
@@ -92,7 +92,7 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
      *      name: string,
      *      month: int,
      *      day: int,
-     *      color: array<'green'|'pink'|'purple'|'red'|'white'>,
+     *      color: array<'green'|'rose'|'purple'|'red'|'white'>,
      *      color_lcl: string[],
      *      type: 'fixed'|'mobile',
      *      grade: -1|0|1|2|3|4|5|6|7,
@@ -130,8 +130,9 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
      *
      * The provided object must have the following properties:
      * - name: The name of the liturgical event, as a string.
-     * - date: The date of the liturgical event, as a DateTime object or as an integer representing the Unix timestamp.
      * - grade: The grade of the liturgical event, as a LitGrade object or as an integer.
+     * - month: The month of the liturgical event, as an integer.
+     * - day: The day of the month of the liturgical event, as an integer.
      *
      * Optional properties are:
      * - color: The liturgical color of the liturgical event, as an array of strings or LitColor cases, or as a single string or single LitColor case.
@@ -186,7 +187,7 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
         if ($obj instanceof \stdClass) {
             if (property_exists($obj, 'color')) {
                 if (is_array($obj->color)) {
-                    $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $obj->color)));
+                    $valueTypes = array_values(array_unique(array_map('gettype', $obj->color)));
                     if (count($valueTypes) > 1) {
                         throw new \InvalidArgumentException('Incoherent color value types provided to create LiturgicalEventFixed: found multiple types ' . implode(', ', $valueTypes));
                     }
@@ -243,7 +244,15 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
         }
 
         if (false === $grade instanceof LitGrade) {
-            throw new \Exception('“Examine yourselves to see whether you are living in faith. Test yourselves. Do you not realize that Jesus Christ is in you?—unless, of course, you fail the test.” (1 Corinthians 13:5)');
+            throw new \InvalidArgumentException('“Examine yourselves to see whether you are living in faith. Test yourselves. Do you not realize that Jesus Christ is in you?—unless, of course, you fail the test.” (1 Corinthians 13:5)');
+        }
+
+        $gradeDisplay = null;
+        if (isset($obj->grade_display)) {
+            if (false === is_null($obj->grade_display) && false === is_string($obj->grade_display)) {
+                throw new \InvalidArgumentException('Invalid grade_display provided to create LiturgicalEventFixed');
+            }
+            $gradeDisplay = $obj->grade_display;
         }
 
         return new self(
@@ -255,7 +264,7 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
             $type,
             $grade,
             $commons,
-            $obj->grade_display ?? null
+            $gradeDisplay
         );
     }
 
@@ -265,9 +274,9 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
      * The array must contain the following keys:
      * - event_key: A unique key for the liturgical event, as a string.
      * - name: The name of the liturgical event, as a string.
-     * - month: The month of the liturgical event, as an integer.
-     * - day: The day of the liturgical event, as an integer.
      * - grade: The grade of the liturgical event, as a LitGrade object or as an integer.
+     * - month: The month of the liturgical event, as an integer.
+     * - day: The day of the month of the liturgical event, as an integer.
      *
      * Optional keys are:
      * - color: The liturgical color of the liturgical event, as an array of strings or LitColor cases, or as a single string or single LitColor case.
@@ -313,7 +322,7 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
         $colors = LitColor::GREEN;
         if (array_key_exists('color', $arr)) {
             if (is_array($arr['color'])) {
-                $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $arr['color'])));
+                $valueTypes = array_values(array_unique(array_map('gettype', $arr['color'])));
                 if (count($valueTypes) > 1) {
                     throw new \InvalidArgumentException('Incoherent color value types provided to create LiturgicalEventFixed: found multiple types ' . implode(', ', $valueTypes));
                 }
@@ -353,6 +362,14 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
             $commons = LitCommons::create([LitCommon::NONE]);
         }
 
+        $gradeDisplay = null;
+        if (isset($arr['grade_display'])) {
+            if (false === is_null($arr['grade_display']) && false === is_string($arr['grade_display'])) {
+                throw new \InvalidArgumentException('Invalid grade_display provided to create LiturgicalEventFixed');
+            }
+            $gradeDisplay = $arr['grade_display'];
+        }
+
         return new self(
             $arr['event_key'],
             $arr['name'],
@@ -362,7 +379,7 @@ final class LiturgicalEventFixed extends LiturgicalEventAbstract
             $arr['type'],
             $arr['grade'],
             $commons,
-            isset($arr['grade_display']) ? $arr['grade_display'] : null
+            $gradeDisplay
         );
     }
 }

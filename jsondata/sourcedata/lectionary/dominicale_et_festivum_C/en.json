@@ -3,28 +3,28 @@
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "Advent2": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "Advent3": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "Advent4": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "Christmas": {
@@ -32,28 +32,28 @@
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
-            "alleluia_verse": "",
+            "gospel_acclamation": "",
             "gospel": ""
         },
         "night": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
-            "alleluia_verse": "",
+            "gospel_acclamation": "",
             "gospel": ""
         },
         "dawn": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
-            "alleluia_verse": "",
+            "gospel_acclamation": "",
             "gospel": ""
         },
         "day": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
-            "alleluia_verse": "",
+            "gospel_acclamation": "",
             "gospel": ""
         }
     },
@@ -61,70 +61,70 @@
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
-    "MotherGod": {
+    "MaryMotherOfGod": {
         "first_reading": "Numbers 6:22-27",
         "responsorial_psalm": "Psalm 66 (67)",
         "second_reading": "Galatians 4:4-7",
-        "alleluia_verse": "Hebrews 1:1-2",
+        "gospel_acclamation": "Hebrews 1:1-2",
         "gospel": "Luke 2:16-21"
     },
     "Christmas2": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "Epiphany": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "BaptismLord": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "Lent1": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "Lent2": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "Lent3": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "Lent4": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "Lent5": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "PalmSun": {
@@ -132,28 +132,28 @@
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "HolyThursChrism": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "HolyThurs": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "GoodFri": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "EasterVigil": {
@@ -173,7 +173,7 @@
         "responsorial_psalm_7": "Psalm 42:3,5;43:3,4|Isaiah 12:2-3,4,5-6|Psalm 51:12-13,14-15,18-19",
         "epistle": "Romans 6:3-11",
         "responsorial_psalm_epistle": "Psalm 118:1-2,16-17,22-23",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": "Luke 24:1-12"
     },
     "Easter": {
@@ -181,14 +181,14 @@
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
-            "alleluia_verse": "",
+            "gospel_acclamation": "",
             "gospel": ""
         },
         "evening": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
-            "alleluia_verse": "",
+            "gospel_acclamation": "",
             "gospel": ""
         }
     },
@@ -196,49 +196,49 @@
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "Easter3": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "Easter4": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "Easter5": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "Easter6": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "Ascension": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "Easter7": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "Pentecost": {
@@ -246,14 +246,14 @@
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
-            "alleluia_verse": "",
+            "gospel_acclamation": "",
             "gospel": ""
         },
         "day": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
-            "alleluia_verse": "",
+            "gospel_acclamation": "",
             "gospel": ""
         }
     },
@@ -261,259 +261,259 @@
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "CorpusChristi": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "SacredHeart": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday2": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday3": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday4": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday5": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday6": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday7": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday8": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday9": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday10": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday11": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday12": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday13": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday14": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday15": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday16": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday17": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday18": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday19": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday20": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday21": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday22": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday23": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday24": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday25": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday26": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday27": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday28": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday29": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday30": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday31": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday32": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "OrdSunday33": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "ChristKing": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "JesusChristEternalHighPriest": {
         "first_reading": "Isaiah 6:1-4,8",
         "responsorial_psalm": "Psalm 22:2-3,5,6",
         "second_reading": "Hebrews 2:10-18",
-        "alleluia_verse": "Ezekiel 36:25a,26a",
+        "gospel_acclamation": "Ezekiel 36:25a,26a",
         "gospel": "John 17:1-2,9,14-26"
     }
 }

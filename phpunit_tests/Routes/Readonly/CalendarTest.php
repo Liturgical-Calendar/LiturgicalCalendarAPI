@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Routes\Readonly;
 
+use GuzzleHttp\Promise\EachPromise;
 use LiturgicalCalendar\Tests\ApiTestCase;
 use PHPUnit\Framework\Attributes\Group;
-use GuzzleHttp\Promise\EachPromise;
+use Psr\Http\Message\ResponseInterface;
 
 final class CalendarTest extends ApiTestCase
 {
@@ -14,7 +15,7 @@ final class CalendarTest extends ApiTestCase
 
     public function testGetCalendarReturnsJson(): void
     {
-        $response = self::$http->get('/calendar');
+        $response = self::$http->get('/calendar', []);
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
         $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
@@ -50,7 +51,7 @@ final class CalendarTest extends ApiTestCase
         $response = self::$http->get('/calendar', [
             'headers' => ['Accept' => 'text/calendar']
         ]);
-        $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
+        $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK, but found error: ' . $response->getBody());
         $this->assertStringStartsWith('text/calendar', $response->getHeaderLine('Content-Type'), 'Content-Type should be text/calendar');
         $data = (string) $response->getBody();
         $this->assertStringContainsString('BEGIN:VCALENDAR', $data, 'Calendar should start with BEGIN:VCALENDAR');
@@ -91,7 +92,7 @@ final class CalendarTest extends ApiTestCase
 
     public function testPostCalendarReturnsJson(): void
     {
-        $response = self::$http->post('/calendar');
+        $response = self::$http->post('/calendar', []);
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
         $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
@@ -103,19 +104,19 @@ final class CalendarTest extends ApiTestCase
 
     public function testPutCalendarReturnsError(): void
     {
-        $response = self::$http->put('/calendar');
+        $response = self::$http->put('/calendar', []);
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
     public function testPatchCalendarReturnsError(): void
     {
-        $response = self::$http->patch('/calendar');
+        $response = self::$http->patch('/calendar', []);
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
     public function testDeleteCalendarReturnsError(): void
     {
-        $response = self::$http->delete('/calendar');
+        $response = self::$http->delete('/calendar', []);
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
@@ -140,40 +141,55 @@ final class CalendarTest extends ApiTestCase
             }
         }
 
-        $failures = [];
+        $responses = [];
+        $errors    = [];
 
-        // EachPromise lets you cap concurrency
         $each = new EachPromise(
-            ( function () use ($requests) {
-                foreach ($requests as $req) {
-                    yield self::$http->getAsync($req['uri'])->then(
-                        function ($response) use ($req) {
-                            // Success assertions
-                            $this->assertSame(
-                                200,
-                                $response->getStatusCode(),
-                                "Expected HTTP 200 for {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}{$req['uri']}, got {$response->getStatusCode()}"
-                            );
-                            $this->assertStringStartsWith(
-                                'application/json',
-                                $response->getHeaderLine('Content-Type'),
-                                "Content-Type should be application/json for {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}{$req['uri']}"
-                            );
-                        },
-                        function ($reason) use ($req, &$failures) {
-                            // Capture failure
-                            $failures[] = "Request failed for {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']}{$req['uri']}: {$reason}";
-                        }
-                    );
+            ( function () use ($requests, &$responses, &$errors) {
+                foreach ($requests as $idx => $request) {
+                    yield self::$http
+                        ->getAsync($request['uri'], [
+                            'http_errors' => false
+                        ])
+                        ->then(
+                            function (ResponseInterface $response) use ($idx, $request, &$responses) {
+                                $responses[$idx] = $response;
+                            },
+                            function ($reason) use ($idx, &$errors) {
+                                $errors[$idx] = $reason instanceof \Throwable
+                                    ? $reason
+                                    : new \RuntimeException((string) $reason);
+                            }
+                        );
                 }
             } )(),
-            [ 'concurrency' => 6 ] // <= number of PHP built-in server workers
+            [ 'concurrency' => 6 ]
         );
 
         $each->promise()->wait();
 
-        if ($failures) {
-            $this->fail(implode("\n", $failures));
+        // Fail if we had transport-level errors
+        $this->assertEmpty($errors, 'Encountered transport-level errors: ' . implode('; ', array_map(
+            function ($e) {
+                return $e instanceof \Throwable ? $e->getMessage() : (string) $e;
+            },
+            $errors
+        )));
+
+        $this->assertCount(count($requests), $responses, 'Some requests did not complete successfully: expected ' . count($requests) . ', received ' . count($responses));
+
+        foreach ($responses as $idx => $response) {
+            $request = $requests[$idx];
+            $this->assertSame(
+                200,
+                $response->getStatusCode(),
+                "Expected HTTP 200 for {$request['uri']}, got {$response->getStatusCode()}: {$response->getBody()}"
+            );
+            $this->assertStringStartsWith(
+                'application/json',
+                $response->getHeaderLine('Content-Type'),
+                "Expected Content-Type application/json for {$request['uri']}, got {$response->getHeaderLine('Content-Type')}: {$response->getBody()}"
+            );
         }
     }
 

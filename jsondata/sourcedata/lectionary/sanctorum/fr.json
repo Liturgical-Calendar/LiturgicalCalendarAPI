@@ -1,78 +1,78 @@
 {
     "Presentation": {
-        "first_reading": "Mal 3, 1-4",
-        "responsorial_psalm": "Sal 24",
-        "second_reading": "Eb 2, 14-18",
-        "alleluia_verse": "Lc 2, 30.32",
-        "gospel": "Lc 2, 22-40|Lc 2, 22-32"
+        "first_reading": "Malachie 3, 1-4",
+        "responsorial_psalm": "Psaume 24",
+        "second_reading": "Hébreux 2, 14-18",
+        "gospel_acclamation": "Luc 2, 30.32",
+        "gospel": "Luc 2, 22-40|Luc 2, 22-32"
     },
     "NativityJohnBaptist": {
         "vigil": {
-            "first_reading": "Ger 1, 4-10",
-            "responsorial_psalm": "Salmo 71",
-            "second_reading": "1Pt 1, 8-12",
-            "alleluia_verse": " Gv 1, 7; Lc 1, 17",
-            "gospel": "Lc 1, 5-17"
+            "first_reading": "Jérémie 1, 4-10",
+            "responsorial_psalm": "Psaume 71",
+            "second_reading": "1 Pierre 1, 8-12",
+            "gospel_acclamation": "Jean 1, 7; Luc 1, 17",
+            "gospel": "Luc 1, 5-17"
         },
         "day": {
-            "first_reading": "Ger 1, 4-10",
-            "responsorial_psalm": "Salmo 71",
-            "second_reading": "1Pt 1, 8-12",
-            "alleluia_verse": " Gv 1, 7; Lc 1, 17",
-            "gospel": "Lc 1, 5-17"
+            "first_reading": "Jérémie 1, 4-10",
+            "responsorial_psalm": "Psaume 71",
+            "second_reading": "1 Pierre 1, 8-12",
+            "gospel_acclamation": "Jean 1, 7; Luc 1, 17",
+            "gospel": "Luc 1, 5-17"
         }
     },
     "StsPeterPaulAp": {
         "vigil": {
-            "first_reading": "At 3, 1-10",
-            "responsorial_psalm": "Salmo 18 (19)",
-            "second_reading": "Gal 1, 11-20",
-            "alleluia_verse": "Gv 21, 17d",
-            "gospel": "Gv 21, 15-19"
+            "first_reading": "Actes 3, 1-10",
+            "responsorial_psalm": "Psaume 18 (19)",
+            "second_reading": "Galates 1, 11-20",
+            "gospel_acclamation": "Jean 21, 17d",
+            "gospel": "Jean 21, 15-19"
         },
         "day": {
-            "first_reading": "At 12, 1-11",
-            "responsorial_psalm": "Salmo 33 (34)",
-            "second_reading": "2 Tm 4, 6-8.17-18",
-            "alleluia_verse": "Mt 16, 18",
-            "gospel": "Mt 16, 13-19"
+            "first_reading": "Actes 12, 1-11",
+            "responsorial_psalm": "Psaume 33 (34)",
+            "second_reading": "2 Timothée 4, 6-8.17-18",
+            "gospel_acclamation": "Matthieu 16, 18",
+            "gospel": "Matthieu 16, 13-19"
         }
     },
     "Transfiguration": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "Assumption": {
         "vigil": {
-            "first_reading": "At 3, 1-10",
-            "responsorial_psalm": "Salmo 18 (19)",
-            "second_reading": "Gal 1, 11-20",
-            "alleluia_verse": "Gv 21, 17d",
-            "gospel": "Gv 21, 15-19"
+            "first_reading": "Actes 3, 1-10",
+            "responsorial_psalm": "Psaume 18 (19)",
+            "second_reading": "Galates 1, 11-20",
+            "gospel_acclamation": "Jean 21, 17d",
+            "gospel": "Jean 21, 15-19"
         },
         "day": {
-            "first_reading": "At 12, 1-11",
-            "responsorial_psalm": "Salmo 33 (34)",
-            "second_reading": "2 Tm 4, 6-8.17-18",
-            "alleluia_verse": "Mt 16, 18",
-            "gospel": "Mt 16, 13-19"
+            "first_reading": "Actes 12, 1-11",
+            "responsorial_psalm": "Psaume 33 (34)",
+            "second_reading": "2 Timothée 4, 6-8.17-18",
+            "gospel_acclamation": "Matthieu 16, 18",
+            "gospel": "Matthieu 16, 13-19"
         }
     },
     "ExaltationCross": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "AllSaints": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "AllSouls": {
@@ -80,21 +80,21 @@
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
-            "alleluia_verse": "",
+            "gospel_acclamation": "",
             "gospel": ""
         },
         "schema_two": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
-            "alleluia_verse": "",
+            "gospel_acclamation": "",
             "gospel": ""
         },
         "schema_three": {
             "first_reading": "",
             "responsorial_psalm": "",
             "second_reading": "",
-            "alleluia_verse": "",
+            "gospel_acclamation": "",
             "gospel": ""
         }
     },
@@ -102,1216 +102,1216 @@
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "ImmaculateConception": {
         "first_reading": "",
         "responsorial_psalm": "",
         "second_reading": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "ImmaculateHeart": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StsBasilGreg": {
-        "first_reading": "Ef 4, 1-7.11-13",
-        "responsorial_psalm": "Salmo 23",
-        "alleluia_verse": "Mt 23, 9b.10b",
-        "gospel": "Mt 23, 8-12"
+        "first_reading": "Éphésiens 4, 1-7.11-13",
+        "responsorial_psalm": "Psaume 23",
+        "gospel_acclamation": "Matthieu 23, 9b.10b",
+        "gospel": "Matthieu 23, 8-12"
     },
     "StRayPenyafort": {
-        "first_reading": "2 Cor 5, 14-20",
-        "responsorial_psalm": "Salmo 103",
-        "alleluia_verse": "Mt 24, 42a.44",
-        "gospel": "Lc 12, 35-40"
+        "first_reading": "2 Corinthiens 5, 14-20",
+        "responsorial_psalm": "Psaume 103",
+        "gospel_acclamation": "Matthieu 24, 42a.44",
+        "gospel": "Luc 12, 35-40"
     },
     "StHilaryPoitiers": {
-        "first_reading": "1Gv 2, 18-25",
-        "responsorial_psalm": "Salmo 110",
-        "alleluia_verse": "Mt 5, 16",
-        "gospel": "Mt 5, 13-19"
+        "first_reading": "1 Jean 2, 18-25",
+        "responsorial_psalm": "Psaume 110",
+        "gospel_acclamation": "Matthieu 5, 16",
+        "gospel": "Matthieu 5, 13-19"
     },
     "StAnthonyEgypt": {
-        "first_reading": "Ef 6, 10-13.18",
-        "responsorial_psalm": "Salmo 16",
-        "alleluia_verse": "Gv 8, 31b-32",
-        "gospel": "Mt 19, 16-26"
+        "first_reading": "Éphésiens 6, 10-13.18",
+        "responsorial_psalm": "Psaume 16",
+        "gospel_acclamation": "Jean 8, 31b-32",
+        "gospel": "Matthieu 19, 16-26"
     },
     "StFabianPope": {
-        "first_reading": "1 Pt 5, 1-4",
-        "responsorial_psalm": "Salmo 40",
-        "alleluia_verse": "Gv 10, 14",
-        "gospel": "Gv 21, 15-17"
+        "first_reading": "1 Pierre 5, 1-4",
+        "responsorial_psalm": "Psaume 40",
+        "gospel_acclamation": "Jean 10, 14",
+        "gospel": "Jean 21, 15-17"
     },
     "StSebastian": {
-        "first_reading": "1 Pt 3, 14-17",
-        "responsorial_psalm": "Salmo 34",
-        "alleluia_verse": "2 Cor 1, 3b-4a",
-        "gospel": "Mt 10, 28-33"
+        "first_reading": "1 Pierre 3, 14-17",
+        "responsorial_psalm": "Psaume 34",
+        "gospel_acclamation": "2 Corinthiens 1, 3b-4a",
+        "gospel": "Matthieu 10, 28-33"
     },
     "StAgnes": {
-        "first_reading": "1Cor 1, 26-31",
-        "responsorial_psalm": "Salmo 23",
-        "alleluia_verse": "Gv 15, 9b.5b",
-        "gospel": "Mt 13, 44-46"
+        "first_reading": "1 Corinthiens 1, 26-31",
+        "responsorial_psalm": "Psaume 23",
+        "gospel_acclamation": "Jean 15, 9b.5b",
+        "gospel": "Matthieu 13, 44-46"
     },
     "StVincentDeacon": {
-        "first_reading": "2 Cor 4, 7-15",
-        "responsorial_psalm": "Salmo 33 (34)",
-        "alleluia_verse": "",
-        "gospel": "Mt 10, 17-22"
+        "first_reading": "2 Corinthiens 4, 7-15",
+        "responsorial_psalm": "Psaume 33 (34)",
+        "gospel_acclamation": "",
+        "gospel": "Matthieu 10, 17-22"
     },
-    "StFrancisDeSales": {
-        "first_reading": "Ef 3, 8-12",
-        "responsorial_psalm": "Salmo 37",
-        "alleluia_verse": "Gv 13, 34",
-        "gospel": "Gv 15, 9-17"
+    "StFrancisDePsaumees": {
+        "first_reading": "Éphésiens 3, 8-12",
+        "responsorial_psalm": "Psaume 37",
+        "gospel_acclamation": "Jean 13, 34",
+        "gospel": "Jean 15, 9-17"
     },
     "ConversionStPaul": {
-        "first_reading": "At 22 3-16|At 9, 1-22",
-        "responsorial_psalm": "Salmo 117",
-        "alleluia_verse": "Gv 15, 16",
-        "gospel": "Mc 16, 15-18"
+        "first_reading": "Actes 22 3-16|Actes 9, 1-22",
+        "responsorial_psalm": "Psaume 117",
+        "gospel_acclamation": "Jean 15, 16",
+        "gospel": "Marc 16, 15-18"
     },
     "StsTimothyTitus": {
-        "first_reading": "2Tim 1, 1-8|Tito 1, 1-5",
-        "responsorial_psalm": "Salmo 96",
-        "alleluia_verse": "Lc 4, 18",
-        "gospel": "Lc 10, 1-9"
+        "first_reading": "2 Timothée 1, 1-8|Tite 1, 1-5",
+        "responsorial_psalm": "Psaume 96",
+        "gospel_acclamation": "Luc 4, 18",
+        "gospel": "Luc 10, 1-9"
     },
     "StAngelaMerici": {
-        "first_reading": "1 Pt 4, 7-11",
-        "responsorial_psalm": "Salmo 148",
-        "alleluia_verse": "Mt 23, 11.12b",
-        "gospel": "Mc 9, 33-37"
+        "first_reading": "1 Pierre 4, 7-11",
+        "responsorial_psalm": "Psaume 148",
+        "gospel_acclamation": "Matthieu 23, 11.12b",
+        "gospel": "Marc 9, 33-37"
     },
     "StThomasAquinas": {
-        "first_reading": "Sap 7, 7-10.15-16",
-        "responsorial_psalm": "Salmo 119",
-        "alleluia_verse": "Mt 23, 9b.10b",
-        "gospel": "Mt 23, 8-12"
+        "first_reading": "Sagesse 7, 7-10.15-16",
+        "responsorial_psalm": "Psaume 119",
+        "gospel_acclamation": "Matthieu 23, 9b.10b",
+        "gospel": "Matthieu 23, 8-12"
     },
     "StJohnBosco": {
-        "first_reading": "Fil 4, 4-9",
-        "responsorial_psalm": "Salmo 103",
-        "alleluia_verse": "Mt 11, 25",
-        "gospel": "Mt 18, 1-5"
+        "first_reading": "Philippiens 4, 4-9",
+        "responsorial_psalm": "Psaume 103",
+        "gospel_acclamation": "Matthieu 11, 25",
+        "gospel": "Matthieu 18, 1-5"
     },
     "StBlase": {
-        "first_reading": "Rm 5, 1-5",
-        "responsorial_psalm": "Salmo 117",
-        "alleluia_verse": "Mt 28, 19a.20b",
-        "gospel": "Mc 16, 15-20"
+        "first_reading": "Romains 5, 1-5",
+        "responsorial_psalm": "Psaume 117",
+        "gospel_acclamation": "Matthieu 28, 19a.20b",
+        "gospel": "Marc 16, 15-20"
     },
     "StAnsgar": {
-        "first_reading": "Is 52, 7-10",
-        "responsorial_psalm": "Salmo 96",
-        "alleluia_verse": "Mc 1, 17",
-        "gospel": "Mc 1, 14-20"
+        "first_reading": "Isaïe 52, 7-10",
+        "responsorial_psalm": "Psaume 96",
+        "gospel_acclamation": "Marc 1, 17",
+        "gospel": "Marc 1, 14-20"
     },
     "StAgatha": {
-        "first_reading": "1Cor 1, 26-31",
-        "responsorial_psalm": "Salmo 31",
-        "alleluia_verse": "1 Pt 4, 14",
-        "gospel": "Lc 9, 23-26"
+        "first_reading": "1 Corinthiens 1, 26-31",
+        "responsorial_psalm": "Psaume 31",
+        "gospel_acclamation": "1 Pierre 4, 14",
+        "gospel": "Luc 9, 23-26"
     },
     "StsPaulMiki": {
-        "first_reading": "Gal 2, 19-20",
-        "responsorial_psalm": "Salmo 126",
-        "alleluia_verse": "Mt 28, 19a.20b",
-        "gospel": "Mt 28, 16-20"
+        "first_reading": "Galates 2, 19-20",
+        "responsorial_psalm": "Psaume 126",
+        "gospel_acclamation": "Matthieu 28, 19a.20b",
+        "gospel": "Matthieu 28, 16-20"
     },
     "StJeromeEmiliani": {
-        "first_reading": "Tb 12, 6-13",
-        "responsorial_psalm": "Salmo 34",
-        "alleluia_verse": "Mt 5,3",
-        "gospel": "Mc 10, 17-30"
+        "first_reading": "Tobie 12, 6-13",
+        "responsorial_psalm": "Psaume 34",
+        "gospel_acclamation": "Matthieu 5,3",
+        "gospel": "Marc 10, 17-30"
     },
     "StScholastica": {
-        "first_reading": "Ct 8, 6-7",
-        "responsorial_psalm": "Salmo 148",
-        "alleluia_verse": "Gv 14, 23",
-        "gospel": "Lc 10, 38-42"
+        "first_reading": "Cantique 8, 6-7",
+        "responsorial_psalm": "Psaume 148",
+        "gospel_acclamation": "Jean 14, 23",
+        "gospel": "Luc 10, 38-42"
     },
-    "LadyLourdes": {
-        "first_reading": "Is 66, 10-14c",
-        "responsorial_psalm": "Gdt Gdt 13, 18-19",
-        "alleluia_verse": "Lc 1, 45",
-        "gospel": "Gv 2, 1-11"
+    "OurLadyOfLourdes": {
+        "first_reading": "Isaïe 66, 10-14c",
+        "responsorial_psalm": "Judith 13, 18-19",
+        "gospel_acclamation": "Luc 1, 45",
+        "gospel": "Jean 2, 1-11"
     },
     "StsCyrilMethodius": {
-        "first_reading": "At 13, 46-49|Is 52, 7-10",
-        "responsorial_psalm": "Salmo 117",
-        "alleluia_verse": "Lc 4, 18cd",
-        "gospel": "Lc 10, 1-9"
+        "first_reading": "Actes 13, 46-49|Isaïe 52, 7-10",
+        "responsorial_psalm": "Psaume 117",
+        "gospel_acclamation": "Luc 4, 18cd",
+        "gospel": "Luc 10, 1-9"
     },
     "SevenHolyFounders": {
-        "first_reading": "Rm 8, 26-30",
-        "responsorial_psalm": "Salmo 34",
-        "alleluia_verse": "Mt 5, 3",
-        "gospel": "Mt 19, 27-29"
+        "first_reading": "Romains 8, 26-30",
+        "responsorial_psalm": "Psaume 34",
+        "gospel_acclamation": "Matthieu 5, 3",
+        "gospel": "Matthieu 19, 27-29"
     },
     "StPeterDamian": {
-        "first_reading": "2 Tm 4, 1-5",
-        "responsorial_psalm": "Salmo 16",
-        "alleluia_verse": "Gv 15, 4a.5b",
-        "gospel": "Gv 15, 1-8"
+        "first_reading": "2 Timothée 4, 1-5",
+        "responsorial_psalm": "Psaume 16",
+        "gospel_acclamation": "Jean 15, 4a.5b",
+        "gospel": "Jean 15, 1-8"
     },
     "ChairStPeter": {
-        "first_reading": "1Pt 5, 1-4",
-        "responsorial_psalm": "Salmo 23",
-        "alleluia_verse": "Mt 16, 18",
-        "gospel": "Mt 16, 13-19"
+        "first_reading": "1 Pierre 5, 1-4",
+        "responsorial_psalm": "Psaume 23",
+        "gospel_acclamation": "Matthieu 16, 18",
+        "gospel": "Matthieu 16, 13-19"
     },
     "StPolycarp": {
-        "first_reading": "Ap 2, 8-11",
-        "responsorial_psalm": "Salmo 31",
-        "alleluia_verse": "",
-        "gospel": "Gv 15, 18-21"
+        "first_reading": "Apocalypse 2, 8-11",
+        "responsorial_psalm": "Psaume 31",
+        "gospel_acclamation": "",
+        "gospel": "Jean 15, 18-21"
     },
     "StCasimir": {
-        "first_reading": "Fil 3, 8-14",
-        "responsorial_psalm": "Salmo 15",
-        "alleluia_verse": "Gv 14, 23",
-        "gospel": "Gv 15, 9-17"
+        "first_reading": "Philippiens 3, 8-14",
+        "responsorial_psalm": "Psaume 15",
+        "gospel_acclamation": "Jean 14, 23",
+        "gospel": "Jean 15, 9-17"
     },
     "StsPerpetuaFelicity": {
-        "first_reading": "Rm 8, 31b-39",
-        "responsorial_psalm": "Salmo 124",
-        "alleluia_verse": "Mt 5, 10",
-        "gospel": "Mt 10, 34-39"
+        "first_reading": "Romains 8, 31b-39",
+        "responsorial_psalm": "Psaume 124",
+        "gospel_acclamation": "Matthieu 5, 10",
+        "gospel": "Matthieu 10, 34-39"
     },
     "StJohnGod": {
-        "first_reading": "1 Gv 3, 14-18",
-        "responsorial_psalm": "Salmo 111 (112)",
-        "alleluia_verse": "Cf. Gv 13, 34",
-        "gospel": "Mt 25, 31-40"
+        "first_reading": "1 Jean 3, 14-18",
+        "responsorial_psalm": "Psaume 111 (112)",
+        "gospel_acclamation": "Cf. Jean 13, 34",
+        "gospel": "Matthieu 25, 31-40"
     },
     "StFrancesRome": {
-        "first_reading": "Pr 31, 10-13.19-20.30-31",
-        "responsorial_psalm": "Salmo 33 (34)",
-        "alleluia_verse": "Gv 14, 23",
-        "gospel": "Mt 22, 34-40"
+        "first_reading": "Proverbes 31, 10-13.19-20.30-31",
+        "responsorial_psalm": "Psaume 33 (34)",
+        "gospel_acclamation": "Jean 14, 23",
+        "gospel": "Matthieu 22, 34-40"
     },
     "StPatrick": {
-        "first_reading": "1 Pt 4, 7-11",
-        "responsorial_psalm": "Salmo 96",
-        "alleluia_verse": "Mc 1, 17",
-        "gospel": "Lc 5, 1-11"
+        "first_reading": "1 Pierre 4, 7-11",
+        "responsorial_psalm": "Psaume 96",
+        "gospel_acclamation": "Marc 1, 17",
+        "gospel": "Luc 5, 1-11"
     },
     "StCyrilJerusalem": {
-        "first_reading": "1 Gv 5, 1-5",
-        "responsorial_psalm": "Salmo 19",
-        "alleluia_verse": "Gv 15, 4a.5b",
-        "gospel": "Gv 15, 1-8"
+        "first_reading": "1 Jean 5, 1-5",
+        "responsorial_psalm": "Psaume 19",
+        "gospel_acclamation": "Jean 15, 4a.5b",
+        "gospel": "Jean 15, 1-8"
     },
     "StJoseph": {
-        "first_reading": "2Sam 7, 4-5a.12-14a.16",
-        "responsorial_psalm": "Salmo 89",
-        "second_reading": "Rm 4, 13.16-18.22",
-        "alleluia_verse": "Salmo 84,5",
-        "gospel": "Mt 1, 16.18-21.24a|Lc 2, 41-51a"
+        "first_reading": "2 Samuel 7, 4-5a.12-14a.16",
+        "responsorial_psalm": "Psaume 89",
+        "second_reading": "Romains 4, 13.16-18.22",
+        "gospel_acclamation": "Psaume 84,5",
+        "gospel": "Matthieu 1, 16.18-21.24a|Luc 2, 41-51a"
     },
     "StTuribius": {
-        "first_reading": "2 Tm 1, 13-14; 2, 1-3",
-        "responsorial_psalm": "Salmo 96",
-        "alleluia_verse": "Gv 10, 14",
-        "gospel": "Mt 9, 35-38"
+        "first_reading": "2 Timothée 1, 13-14; 2, 1-3",
+        "responsorial_psalm": "Psaume 96",
+        "gospel_acclamation": "Jean 10, 14",
+        "gospel": "Matthieu 9, 35-38"
     },
     "Annunciation": {
-        "first_reading": "Is 7, 10-14; 8, 10c",
-        "responsorial_psalm": "Salmo 40",
-        "second_reading": "Eb 10, 4-10",
-        "alleluia_verse": "Gv 1, 14ab",
-        "gospel": "Lc 1, 26-38"
+        "first_reading": "Isaïe 7, 10-14; 8, 10c",
+        "responsorial_psalm": "Psaume 40",
+        "second_reading": "Hébreux 10, 4-10",
+        "gospel_acclamation": "Jean 1, 14ab",
+        "gospel": "Luc 1, 26-38"
     },
     "StFrancisPaola": {
-        "first_reading": "Fil 3, 8-14",
-        "responsorial_psalm": "Salmo 16",
-        "alleluia_verse": "Cf. Mt 6, 19a.21",
-        "gospel": "Lc 12, 32-34"
+        "first_reading": "Philippiens 3, 8-14",
+        "responsorial_psalm": "Psaume 16",
+        "gospel_acclamation": "Cf. Matthieu 6, 19a.21",
+        "gospel": "Luc 12, 32-34"
     },
     "StIsidore": {
-        "first_reading": "2 Cor 4, 1-2.5-7",
-        "responsorial_psalm": "Salmo 37",
-        "alleluia_verse": "Gv 15, 5",
-        "gospel": "Lc 6, 43-45"
+        "first_reading": "2 Corinthiens 4, 1-2.5-7",
+        "responsorial_psalm": "Psaume 37",
+        "gospel_acclamation": "Jean 15, 5",
+        "gospel": "Luc 6, 43-45"
     },
     "StVincentFerrer": {
-        "first_reading": "2 Tm 4, 1-5",
-        "responsorial_psalm": "Salmo 40",
-        "alleluia_verse": "Mt 24, 42a.44",
-        "gospel": "Lc 12, 35-40"
+        "first_reading": "2 Timothée 4, 1-5",
+        "responsorial_psalm": "Psaume 40",
+        "gospel_acclamation": "Matthieu 24, 42a.44",
+        "gospel": "Luc 12, 35-40"
     },
-    "StJohnBaptistDeLaSalle": {
-        "first_reading": "1Tim 1, 13-14; 2, 1-3",
-        "responsorial_psalm": "Salmo 1",
-        "alleluia_verse": "Mt 23, 11.12b",
-        "gospel": "Mt 18, 1-5"
+    "StJohnBaptistDeLaPsaumele": {
+        "first_reading": "1 Timothée 1, 13-14; 2, 1-3",
+        "responsorial_psalm": "Psaume 1",
+        "gospel_acclamation": "Matthieu 23, 11.12b",
+        "gospel": "Matthieu 18, 1-5"
     },
     "StStanislaus": {
-        "first_reading": "Ap 12, 10-12a",
-        "responsorial_psalm": "Salmo 34",
-        "alleluia_verse": "2 Cor 1, 3b-4a",
-        "gospel": "Gv 17, 11b-19"
+        "first_reading": "Apocalypse 12, 10-12a",
+        "responsorial_psalm": "Psaume 34",
+        "gospel_acclamation": "2 Corinthiens 1, 3b-4a",
+        "gospel": "Jean 17, 11b-19"
     },
     "StMartinPope": {
-        "first_reading": "2 Tm 2, 8-13; 3, 10-12",
-        "responsorial_psalm": "Salmo 126",
-        "alleluia_verse": "Mt 5, 10",
-        "gospel": "Gv 15, 18-21"
+        "first_reading": "2 Timothée 2, 8-13; 3, 10-12",
+        "responsorial_psalm": "Psaume 126",
+        "gospel_acclamation": "Matthieu 5, 10",
+        "gospel": "Jean 15, 18-21"
     },
     "StAnselm": {
-        "first_reading": "Ef 3, 14-19",
-        "responsorial_psalm": "Salmo 34",
-        "alleluia_verse": "Cf. Gv 6, 63c.68c",
-        "gospel": "Mt 7, 21-29"
+        "first_reading": "Éphésiens 3, 14-19",
+        "responsorial_psalm": "Psaume 34",
+        "gospel_acclamation": "Cf. Jean 6, 63c.68c",
+        "gospel": "Matthieu 7, 21-29"
     },
     "StGeorge": {
-        "first_reading": "Ap 21, 5-7",
-        "responsorial_psalm": "Salmo 126",
-        "alleluia_verse": "1 Pt 4, 14",
-        "gospel": "Lc 9, 23-26"
+        "first_reading": "Apocalypse 21, 5-7",
+        "responsorial_psalm": "Psaume 126",
+        "gospel_acclamation": "1 Pierre 4, 14",
+        "gospel": "Luc 9, 23-26"
     },
     "StFidelisSigmaringen": {
-        "first_reading": "Col 1, 24-29",
-        "responsorial_psalm": "Salmo 34",
-        "alleluia_verse": "Mt 11, 28",
-        "gospel": "Gv 17, 20-26"
+        "first_reading": "Colossiens 1, 24-29",
+        "responsorial_psalm": "Psaume 34",
+        "gospel_acclamation": "Matthieu 11, 28",
+        "gospel": "Jean 17, 20-26"
     },
     "StMarkEvangelist": {
-        "first_reading": "1Pt 5, 5b-14",
-        "responsorial_psalm": "Salmo 89",
-        "alleluia_verse": "1 Cor 1, 23a.24b",
-        "gospel": "Mc 16, 15-20"
+        "first_reading": "1 Pierre 5, 5b-14",
+        "responsorial_psalm": "Psaume 89",
+        "gospel_acclamation": "1 Corinthiens 1, 23a.24b",
+        "gospel": "Marc 16, 15-20"
     },
     "StPeterChanel": {
-        "first_reading": "1 Cor 1, 18-25",
-        "responsorial_psalm": "Salmo 117",
-        "alleluia_verse": "Mc 1, 17",
-        "gospel": "Mc 1, 14-20"
+        "first_reading": "1 Corinthiens 1, 18-25",
+        "responsorial_psalm": "Psaume 117",
+        "gospel_acclamation": "Marc 1, 17",
+        "gospel": "Marc 1, 14-20"
     },
     "StCatherineSiena": {
-        "first_reading": "1Gv 1, 5 – 2, 2",
-        "responsorial_psalm": "Salmo 103",
-        "alleluia_verse": "Mt 11, 25",
-        "gospel": "Mt 11, 25-30"
+        "first_reading": "1 Jean 1, 5 – 2, 2",
+        "responsorial_psalm": "Psaume 103",
+        "gospel_acclamation": "Matthieu 11, 25",
+        "gospel": "Matthieu 11, 25-30"
     },
     "StPiusV": {
-        "first_reading": "1 Cor 4, 1-5",
-        "responsorial_psalm": "Salmo 110",
-        "alleluia_verse": "Gv 10, 14",
-        "gospel": "Gv 21, 15-17"
+        "first_reading": "1 Corinthiens 4, 1-5",
+        "responsorial_psalm": "Psaume 110",
+        "gospel_acclamation": "Jean 10, 14",
+        "gospel": "Jean 21, 15-17"
     },
     "StJosephWorker": {
-        "first_reading": "Gen 1, 26 – 2, 3|Col 3, 14-15.17.23-24",
-        "responsorial_psalm": "Salmo 90",
-        "alleluia_verse": "Salmo 68, 20",
-        "gospel": "Mt 13, 54-58"
+        "first_reading": "Genèse 1, 26 – 2, 3|Colossiens 3, 14-15.17.23-24",
+        "responsorial_psalm": "Psaume 90",
+        "gospel_acclamation": "Psaume 68, 20",
+        "gospel": "Matthieu 13, 54-58"
     },
-    "StAthanasius": {
-        "first_reading": "1Gv 5, 1-5",
-        "responsorial_psalm": "Salmo 37",
-        "alleluia_verse": "Mt 5, 10",
-        "gospel": "Mt 10, 22-25a"
+    "StActeshanasius": {
+        "first_reading": "1 Jean 5, 1-5",
+        "responsorial_psalm": "Psaume 37",
+        "gospel_acclamation": "Matthieu 5, 10",
+        "gospel": "Matthieu 10, 22-25a"
     },
     "StsPhilipJames": {
-        "first_reading": "1Cor 15, 1-8a",
-        "responsorial_psalm": "Salmo 19",
-        "alleluia_verse": "Gv 14, 6b.9c",
-        "gospel": "Gv 14, 6-14"
+        "first_reading": "1 Corinthiens 15, 1-8a",
+        "responsorial_psalm": "Psaume 19",
+        "gospel_acclamation": "Jean 14, 6b.9c",
+        "gospel": "Jean 14, 6-14"
     },
     "StsNereusAchilleus": {
-        "first_reading": "Ap 7, 9-17",
-        "responsorial_psalm": "Salmo 124",
-        "alleluia_verse": "",
-        "gospel": "Mt 10, 17-22"
+        "first_reading": "Apocalypse 7, 9-17",
+        "responsorial_psalm": "Psaume 124",
+        "gospel_acclamation": "",
+        "gospel": "Matthieu 10, 17-22"
     },
     "StPancras": {
-        "first_reading": "Ap 19, 1.5-9a",
-        "responsorial_psalm": "Salmo 103",
-        "alleluia_verse": "Cf. Mt 11, 25",
-        "gospel": "Mt 11, 25-30"
+        "first_reading": "Apocalypse 19, 1.5-9a",
+        "responsorial_psalm": "Psaume 103",
+        "gospel_acclamation": "Cf. Matthieu 11, 25",
+        "gospel": "Matthieu 11, 25-30"
     },
     "StMatthiasAp": {
-        "first_reading": "At 1, 15-17.20-26",
-        "responsorial_psalm": "Salmo 113",
-        "alleluia_verse": "Gv 15, 16",
-        "gospel": "Gv 15, 9-17"
+        "first_reading": "Actes 1, 15-17.20-26",
+        "responsorial_psalm": "Psaume 113",
+        "gospel_acclamation": "Jean 15, 16",
+        "gospel": "Jean 15, 9-17"
     },
     "StJohnIPope": {
-        "first_reading": "Ap 3, 14b.20-22",
-        "responsorial_psalm": "Salmo 23",
-        "alleluia_verse": "Gv 15, 15b",
-        "gospel": "Lc 22, 24-30"
+        "first_reading": "Apocalypse 3, 14b.20-22",
+        "responsorial_psalm": "Psaume 23",
+        "gospel_acclamation": "Jean 15, 15b",
+        "gospel": "Luc 22, 24-30"
     },
     "StBernardineSiena": {
-        "first_reading": "At 4, 8-12",
-        "responsorial_psalm": "Salmo 40",
-        "alleluia_verse": "Gv 8, 12",
-        "gospel": "Lc 9, 57-62"
+        "first_reading": "Actes 4, 8-12",
+        "responsorial_psalm": "Psaume 40",
+        "gospel_acclamation": "Jean 8, 12",
+        "gospel": "Luc 9, 57-62"
     },
     "StBedeVenerable": {
-        "first_reading": "1 Cor 2, 10b-16",
-        "responsorial_psalm": "Salmo 119",
-        "alleluia_verse": "Cf. Gv 6, 63c.68c",
-        "gospel": "Mt 7, 21-29"
+        "first_reading": "1 Corinthiens 2, 10b-16",
+        "responsorial_psalm": "Psaume 119",
+        "gospel_acclamation": "Cf. Jean 6, 63c.68c",
+        "gospel": "Matthieu 7, 21-29"
     },
     "StGregoryVII": {
-        "first_reading": "At 20, 17-18a.28-32.36",
-        "responsorial_psalm": "Salmo 110",
-        "alleluia_verse": "Gv 10, 14",
-        "gospel": "Mt 16, 13-19"
+        "first_reading": "Actes 20, 17-18a.28-32.36",
+        "responsorial_psalm": "Psaume 110",
+        "gospel_acclamation": "Jean 10, 14",
+        "gospel": "Matthieu 16, 13-19"
     },
     "StMaryMagdalenePazzi": {
-        "first_reading": "1 Cor 7, 25-35",
-        "responsorial_psalm": "Salmo 148",
-        "alleluia_verse": "Cf. Gv 8, 31b-32",
-        "gospel": "Mc 3, 31-35"
+        "first_reading": "1 Corinthiens 7, 25-35",
+        "responsorial_psalm": "Psaume 148",
+        "gospel_acclamation": "Cf. Jean 8, 31b-32",
+        "gospel": "Marc 3, 31-35"
     },
     "StPhilipNeri": {
-        "first_reading": "Fil 4, 4-9",
-        "responsorial_psalm": "Salmo 34",
-        "alleluia_verse": "Gv 15, 9b.5b",
-        "gospel": "Gv 17, 20-26"
+        "first_reading": "Philippiens 4, 4-9",
+        "responsorial_psalm": "Psaume 34",
+        "gospel_acclamation": "Jean 15, 9b.5b",
+        "gospel": "Jean 17, 20-26"
     },
     "StAugustineCanterbury": {
-        "first_reading": "1 Ts 2, 2b-8",
-        "responsorial_psalm": "Salmo 96",
-        "alleluia_verse": "Gv 10, 14",
-        "gospel": "Mt 9, 35-38"
+        "first_reading": "1 Thessaloniciens 2, 2b-8",
+        "responsorial_psalm": "Psaume 96",
+        "gospel_acclamation": "Jean 10, 14",
+        "gospel": "Matthieu 9, 35-38"
     },
     "Visitation": {
-        "first_reading": "Sof 3, 14-18|Rm 12, 9-16b",
-        "responsorial_psalm": "Is 12, 2-6",
-        "alleluia_verse": "Lc 1, 45",
-        "gospel": "Lc 1, 39-56"
+        "first_reading": "Sophonie 3, 14-18|Romains 12, 9-16b",
+        "responsorial_psalm": "Isaïe 12, 2-6",
+        "gospel_acclamation": "Luc 1, 45",
+        "gospel": "Luc 1, 39-56"
     },
     "StJustinMartyr": {
-        "first_reading": "1Cor 1, 18-25",
-        "responsorial_psalm": "Salmo 34",
-        "alleluia_verse": "Mt 5, 16",
-        "gospel": "Mt 5, 13-19"
+        "first_reading": "1 Corinthiens 1, 18-25",
+        "responsorial_psalm": "Psaume 34",
+        "gospel_acclamation": "Matthieu 5, 16",
+        "gospel": "Matthieu 5, 13-19"
     },
     "StsMarcellinusPeter": {
-        "first_reading": "2 Cor 6, 4-10",
-        "responsorial_psalm": "Salmo 124",
-        "alleluia_verse": "Gv 17, 19",
-        "gospel": "Gv 17, 11b-19"
+        "first_reading": "2 Corinthiens 6, 4-10",
+        "responsorial_psalm": "Psaume 124",
+        "gospel_acclamation": "Jean 17, 19",
+        "gospel": "Jean 17, 11b-19"
     },
     "StsCharlesLwanga": {
-        "first_reading": "Macc 7, 1-2.9-14",
-        "responsorial_psalm": "Salmo 124",
-        "alleluia_verse": "Mt 5, 3",
-        "gospel": "Mt 5, 1-12a"
+        "first_reading": "Maccabées 7, 1-2.9-14",
+        "responsorial_psalm": "Psaume 124",
+        "gospel_acclamation": "Matthieu 5, 3",
+        "gospel": "Matthieu 5, 1-12a"
     },
     "StBoniface": {
-        "first_reading": "At 26, 19-23",
-        "responsorial_psalm": "Salmo 117",
-        "alleluia_verse": "Gv 10, 14",
-        "gospel": "Gv 10, 11-16"
+        "first_reading": "Actes 26, 19-23",
+        "responsorial_psalm": "Psaume 117",
+        "gospel_acclamation": "Jean 10, 14",
+        "gospel": "Jean 10, 11-16"
     },
     "StNorbert": {
-        "first_reading": "Ez 34, 11-16",
-        "responsorial_psalm": "Salmo 23",
-        "alleluia_verse": "Gv 15, 9b.5b",
-        "gospel": "Lc 14, 25-33"
+        "first_reading": "Ézéchiel 34, 11-16",
+        "responsorial_psalm": "Psaume 23",
+        "gospel_acclamation": "Jean 15, 9b.5b",
+        "gospel": "Luc 14, 25-33"
     },
     "StEphrem": {
-        "first_reading": "Col 3, 12-17",
-        "responsorial_psalm": "Salmo 37",
-        "alleluia_verse": "Gv 15, 5",
-        "gospel": "Lc 6, 43-45"
+        "first_reading": "Colossiens 3, 12-17",
+        "responsorial_psalm": "Psaume 37",
+        "gospel_acclamation": "Jean 15, 5",
+        "gospel": "Luc 6, 43-45"
     },
     "StBarnabasAp": {
-        "first_reading": "At 11, 21b-26; 13, 1-3",
-        "responsorial_psalm": "Salmo 98",
-        "alleluia_verse": "Mt 28, 19a.20b",
-        "gospel": "Mt 10, 7-13"
+        "first_reading": "Actes 11, 21b-26; 13, 1-3",
+        "responsorial_psalm": "Psaume 98",
+        "gospel_acclamation": "Matthieu 28, 19a.20b",
+        "gospel": "Matthieu 10, 7-13"
     },
     "StAnthonyPadua": {
-        "first_reading": "Is 61, 1-3a",
-        "responsorial_psalm": "Salmo 89",
-        "alleluia_verse": "Lc 4, 18cd",
-        "gospel": "Lc 10, 1-9"
+        "first_reading": "Isaïe 61, 1-3a",
+        "responsorial_psalm": "Psaume 89",
+        "gospel_acclamation": "Luc 4, 18cd",
+        "gospel": "Luc 10, 1-9"
     },
     "StRomuald": {
-        "first_reading": "Fil 3, 8-10",
-        "responsorial_psalm": "Salmo 131",
-        "alleluia_verse": "Gv 15, 9b.5b",
-        "gospel": "Lc 14, 25-33"
+        "first_reading": "Philippiens 3, 8-10",
+        "responsorial_psalm": "Psaume 131",
+        "gospel_acclamation": "Jean 15, 9b.5b",
+        "gospel": "Luc 14, 25-33"
     },
     "StAloysiusGonzaga": {
-        "first_reading": "1Gv 5, 1-5",
-        "responsorial_psalm": "Salmo 16",
-        "alleluia_verse": "Gv 13, 34",
-        "gospel": "Mt 22, 34-40"
+        "first_reading": "1 Jean 5, 1-5",
+        "responsorial_psalm": "Psaume 16",
+        "gospel_acclamation": "Jean 13, 34",
+        "gospel": "Matthieu 22, 34-40"
     },
     "StPaulinusNola": {
-        "first_reading": "2Cor 8, 9-15",
-        "responsorial_psalm": "Salmo 40",
-        "alleluia_verse": "Mt 5,3",
-        "gospel": "Lc 12, 32-34"
+        "first_reading": "2 Corinthiens 8, 9-15",
+        "responsorial_psalm": "Psaume 40",
+        "gospel_acclamation": "Matthieu 5,3",
+        "gospel": "Luc 12, 32-34"
     },
     "StsJohnFisherThomasMore": {
-        "first_reading": "1 Pt 4, 12-19",
-        "responsorial_psalm": "Salmo 126",
-        "alleluia_verse": "Lc 9, 24",
-        "gospel": "Mt 10, 34-39"
+        "first_reading": "1 Pierre 4, 12-19",
+        "responsorial_psalm": "Psaume 126",
+        "gospel_acclamation": "Luc 9, 24",
+        "gospel": "Matthieu 10, 34-39"
     },
     "StCyrilAlexandria": {
-        "first_reading": "2 Tm 4, 1-5",
-        "responsorial_psalm": "Salmo 88 (89)",
-        "alleluia_verse": "Mt 5, 16",
-        "gospel": "Mt 5, 13-19"
+        "first_reading": "2 Timothée 4, 1-5",
+        "responsorial_psalm": "Psaume 88 (89)",
+        "gospel_acclamation": "Matthieu 5, 16",
+        "gospel": "Matthieu 5, 13-19"
     },
     "StIrenaeus": {
-        "first_reading": "2 Tm 2, 22b-26",
-        "responsorial_psalm": "Salmo 36 (37)",
-        "alleluia_verse": "Gv 15, 9b.5b",
-        "gospel": "Gv 17, 20-26"
+        "first_reading": "2 Timothée 2, 22b-26",
+        "responsorial_psalm": "Psaume 36 (37)",
+        "gospel_acclamation": "Jean 15, 9b.5b",
+        "gospel": "Jean 17, 20-26"
     },
     "FirstMartyrsRome": {
-        "first_reading": "Rm 8, 31b-39",
-        "responsorial_psalm": "Salmo 123 (124)",
-        "alleluia_verse": "Mt 5, 10",
-        "gospel": "Mt 24, 4-13"
+        "first_reading": "Romains 8, 31b-39",
+        "responsorial_psalm": "Psaume 123 (124)",
+        "gospel_acclamation": "Matthieu 5, 10",
+        "gospel": "Matthieu 24, 4-13"
     },
     "StThomasAp": {
-        "first_reading": "Ef 2, 19-22",
-        "responsorial_psalm": "Salmo 116 (117)",
-        "alleluia_verse": "Gv 20, 29",
-        "gospel": "Gv 20, 24-29"
+        "first_reading": "Éphésiens 2, 19-22",
+        "responsorial_psalm": "Psaume 116 (117)",
+        "gospel_acclamation": "Jean 20, 29",
+        "gospel": "Jean 20, 24-29"
     },
     "StElizabethPortugal": {
-        "first_reading": "1 Gv 3, 14-18",
-        "responsorial_psalm": "Salmo 111 (112)",
-        "alleluia_verse": "Cf. Gv 13, 34",
-        "gospel": "Mt 25, 31-46"
+        "first_reading": "1 Jean 3, 14-18",
+        "responsorial_psalm": "Psaume 111 (112)",
+        "gospel_acclamation": "Cf. Jean 13, 34",
+        "gospel": "Matthieu 25, 31-46"
     },
     "StAnthonyZaccaria": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StMariaGoretti": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StBenedict": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StHenry": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StCamillusDeLellis": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StBonaventure": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
-    "LadyMountCarmel": {
+    "OurLadyOfMountCarmel": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StLawrenceBrindisi": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StMaryMagdalene": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StBridget": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJamesAp": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StsJoachimAnne": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StMartha": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StPeterChrysologus": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StIgnatiusLoyola": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StAlphonsusMariaDeLiguori": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StEusebius": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJeanVianney": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "DedicationStMaryMajor": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StSixtusIIPope": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StCajetan": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StDominic": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StLawrenceDeacon": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StClare": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJaneFrancesDeChantal": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StsPontianHippolytus": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StStephenHungary": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJohnEudes": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StBernardClairvaux": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StPiusX": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "QueenshipMary": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StRoseLima": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StBartholomewAp": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StLouis": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJosephCalasanz": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StMonica": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StAugustineHippo": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "BeheadingJohnBaptist": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StGregoryGreat": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "NativityVirginMary": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJohnChrysostom": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
-    "LadySorrows": {
+    "OurLadyOfSorrows": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StsCorneliusCyprian": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StRobertBellarmine": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJanuarius": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StMatthewEvangelist": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StsCosmasDamian": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StVincentDePaul": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StWenceslaus": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StsArchangels": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJerome": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StThereseChildJesus": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "GuardianAngels": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StFrancisAssisi": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StBruno": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
-    "LadyRosary": {
+    "OurLadyOfTheRosary": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StDenis": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJohnLeonardi": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StCallistusIPope": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StTeresaJesus": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StHedwig": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StMargaretAlacoque": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StIgnatiusAntioch": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StLukeEvangelist": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StsJeanBrebeuf": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StPaulCross": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJohnCapistrano": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StAnthonyMaryClaret": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StSimonStJudeAp": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StMartinPorres": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StCharlesBorromeo": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StLeoGreat": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StMartinTours": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJosaphat": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StAlbertGreat": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StMargaretScotland": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
-    "StGertrudeGreat": {
+    "StJérémietrudeGreat": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StElizabethHungary": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "DedicationStsPeterPaul": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "PresentationMary": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StCecilia": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StClementIPope": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StColumban": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StAndrewAp": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StFrancisXavier": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJohnDamascene": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StNicholas": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StAmbrose": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StDamasusIPope": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StLucySyracuse": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJohnCross": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StPeterCanisius": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJohnKanty": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StStephenProtomartyr": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJohnEvangelist": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "HolyInnocents": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StThomasBecket": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StSylvesterIPope": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "NameJesus": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StJosephineBakhita": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StAdalbert": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StLouisGrignionMontfort": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "LadyFatima": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StChristopherMagallanes": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StRitaCascia": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StAugustineZhaoRong": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StApollinaris": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StSharbelMakhluf": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StPeterJulianEymard": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StEdithStein": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StMaximilianKolbe": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StPeterClaver": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "HolyNameMary": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StAndrewKimTaegon": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StsLawrenceRuiz": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StAndrewDungLac": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StCatherineAlexandria": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "StPioPietrelcina": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
-    "LadyGuadalupe": {
+    "OurLadyOfGuadalupe": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     },
     "JuanDiego": {
         "first_reading": "",
         "responsorial_psalm": "",
-        "alleluia_verse": "",
+        "gospel_acclamation": "",
         "gospel": ""
     }
 }

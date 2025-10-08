@@ -215,11 +215,13 @@ abstract class AbstractLiturgicalEventMap implements \IteratorAggregate
      * Compares two LiturgicalEvent objects based on their date and liturgical grade.
      *
      * If the two LiturgicalEvent objects have different dates, the comparison is based on their date.
-     * If the two LiturgicalEvent objects have different dates, the object with the later date is considered higher.
+     * If the two LiturgicalEvent objects have different dates, the object with the later date is considered higher (i.e. it will come after the earlier date).
      * If the two LiturgicalEvent objects have the same date, the comparison is based on their grade.
      * If the two LiturgicalEvent objects have the same grade, the comparison result is 0 and no sorting will take place.
-     * If the two LiturgicalEvent objects have different grades, the object with the higher grade is considered higher
-     * (i.e. it will come after the lower grade celebration, so that optional memorials, commemorations, and vigil Masses will come after weekday Masses).
+     * If the two LiturgicalEvent objects have different grades, the object with the higher grade is considered higher (i.e. it will come after the lower grade):
+     *   this may seem counterintuitive, it would seem that a higher grade should come before a lower grade, but the most common case is for commemorations on weekdays,
+     *   where the commemoration actually has a higher logical grade but is still optional so it should come after the weekday celebration.
+     * However Vigil Masses will always be considered higher, i.e. will always come after the main celebration of the day, regardless of their grade.
      *
      * @param LiturgicalEvent $a The first LiturgicalEvent object to compare.
      * @param LiturgicalEvent $b The second LiturgicalEvent object to compare.
@@ -232,6 +234,12 @@ abstract class AbstractLiturgicalEventMap implements \IteratorAggregate
     public static function compDateAndGrade(LiturgicalEvent $a, LiturgicalEvent $b)
     {
         if ($a->date == $b->date) {
+            if ($a->is_vigil_mass) {
+                return +1;
+            }
+            if ($b->is_vigil_mass) {
+                return -1;
+            }
             if ($a->grade->value === $b->grade->value) {
                 return 0;
             }

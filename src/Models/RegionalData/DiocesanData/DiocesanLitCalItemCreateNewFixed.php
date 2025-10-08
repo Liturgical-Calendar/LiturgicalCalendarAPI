@@ -9,7 +9,7 @@ use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
 use LiturgicalCalendar\Api\Models\LiturgicalEventData;
 
-final class LitCalItemCreateNewFixed extends LiturgicalEventData
+final class DiocesanLitCalItemCreateNewFixed extends LiturgicalEventData
 {
     public readonly int $day;
 
@@ -27,7 +27,7 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
     public private(set) DateTime $date;
 
     /**
-     * Creates a new LitCalItemCreateNewFixed object.
+     * Creates a new DiocesanLitCalItemCreateNewFixed object.
      *
      * The provided arguments must be valid. The object will be created with the provided values.
      *
@@ -42,12 +42,12 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
      */
     private function __construct(string $event_key, int $day, int $month, array $color, LitGrade $grade, LitCommons $common)
     {
-        if (false === self::isValidMonthValue($month)) {
+        if (false === static::isValidMonthValue($month)) {
             throw new \ValueError('`$month` must be an integer between 1 and 12');
         }
 
-        if (false === self::isValidDayValueForMonth($month, $day)) {
-            throw new \ValueError('`$day` must be an integer between 1 and 31 and it must be a valid day value for the given month');
+        if (false === static::isValidDayValueForMonth($month, $day)) {
+            throw new \ValueError("`$day` must be a valid day integer for the given month {$month}, got {$day}");
         }
 
         if (0 === count($color)) {
@@ -90,6 +90,9 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
      */
     public function setGrade(LitGrade $grade): void
     {
+        if ($grade === LitGrade::HIGHER_SOLEMNITY || $grade === LitGrade::FEAST_LORD) {
+            throw new \ValueError('Diocesan events cannot have grade HIGHER_SOLEMNITY or FEAST_LORD');
+        }
         $this->unlock();
         $this->grade = $grade;
         $this->lock();
@@ -103,7 +106,7 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
     }
 
     /**
-     * Creates an instance of LitCalItemCreateNewFixed from an object containing the required properties.
+     * Creates an instance of DiocesanLitCalItemCreateNewFixed from an object containing the required properties.
      *
      * The stdClass object must have the following properties:
      * - event_key (string): the key of the event
@@ -125,18 +128,28 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
             throw new \ValueError('invalid common: expected an array of LitCommon enum cases, LitCommon enum values, or LitMassVariousNeeds instances');
         }
 
+        $grade = LitGrade::from($data->grade);
+        if ($grade === LitGrade::HIGHER_SOLEMNITY || $grade === LitGrade::FEAST_LORD) {
+            throw new \ValueError('Diocesan events cannot have grade HIGHER_SOLEMNITY or FEAST_LORD');
+        }
+
         return new static(
             $data->event_key,
             $data->day,
             $data->month,
-            array_map(fn($color) => LitColor::from($color), $data->color),
-            LitGrade::from($data->grade),
+            array_map(
+                function (string $color): LitColor {
+                    return LitColor::from($color);
+                },
+                $data->color
+            ),
+            $grade,
             $commons
         );
     }
 
     /**
-     * Creates an instance of LitCalItemCreateNewFixed from an associative array.
+     * Creates an instance of DiocesanLitCalItemCreateNewFixed from an associative array.
      *
      * The array must have the following keys:
      * - event_key (string): the key of the event
@@ -158,12 +171,22 @@ final class LitCalItemCreateNewFixed extends LiturgicalEventData
             throw new \ValueError('invalid common: expected an array of LitCommon enum cases, LitCommon enum values, or LitMassVariousNeeds instances');
         }
 
+        $grade = LitGrade::from($data['grade']);
+        if ($grade === LitGrade::HIGHER_SOLEMNITY || $grade === LitGrade::FEAST_LORD) {
+            throw new \ValueError('Diocesan events cannot have grade HIGHER_SOLEMNITY or FEAST_LORD');
+        }
+
         return new static(
             $data['event_key'],
             $data['day'],
             $data['month'],
-            array_map(fn($color) => LitColor::from($color), $data['color']),
-            LitGrade::from($data['grade']),
+            array_map(
+                function (string $color): LitColor {
+                    return LitColor::from($color);
+                },
+                $data['color']
+            ),
+            $grade,
             $commons
         );
     }

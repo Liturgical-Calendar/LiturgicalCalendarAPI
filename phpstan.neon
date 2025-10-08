@@ -1,5 +1,0 @@
-includes:
-    - phpstan.neon.dist
-
-parameters:
-    editorUrl: 'vscode://vscode-remote/wsl+Ubuntu-24.04/%%file%%:%%line%%'

@@ -38,7 +38,7 @@ final class Translations extends AbstractJsonSrcData implements \IteratorAggrega
     /**
      * Returns an iterator for the translations in the data.
      *
-     * @return \Traversable<string, TranslationMap> An iterator for the translations in the data.
+     * @return \Traversable<string,TranslationMap> An iterator for the translations in the data.
      */
     public function getIterator(): \Traversable
     {
@@ -62,7 +62,7 @@ final class Translations extends AbstractJsonSrcData implements \IteratorAggrega
      * If the offset is not provided or is null, the value will be appended to the end of the i18nData array.
      * If the offset is provided, the value will be set at that offset.
      *
-     * @param mixed $offset The offset to set the value to. Can be null.
+     * @param string $offset The offset to set the value to. Can be null.
      * @param TranslationMap $value The value to set.
      */
     public function offsetSet($offset, $value): void
@@ -79,7 +79,7 @@ final class Translations extends AbstractJsonSrcData implements \IteratorAggrega
     /**
      * Checks if a translation exists at the given offset.
      *
-     * @param mixed $offset The offset to check.
+     * @param string $offset The offset to check.
      * @return bool True if the translation exists, false otherwise.
      */
     public function offsetExists($offset): bool
@@ -93,7 +93,7 @@ final class Translations extends AbstractJsonSrcData implements \IteratorAggrega
      * This will remove the translation entry and its corresponding key from the
      * i18nData and keys arrays.
      *
-     * @param mixed $offset The offset of the translation to unset.
+     * @param string $offset The offset of the translation to unset.
      */
     public function offsetUnset($offset): void
     {
@@ -105,7 +105,7 @@ final class Translations extends AbstractJsonSrcData implements \IteratorAggrega
     /**
      * Retrieves the translation value at the given offset.
      *
-     * @param mixed $offset The offset to retrieve the translation value from.
+     * @param string $offset The offset to retrieve the translation value from.
      * @return TranslationMap|null The translation value at the given offset. Null if the offset does not exist.
      */
     public function offsetGet($offset): ?TranslationMap
@@ -132,7 +132,7 @@ final class Translations extends AbstractJsonSrcData implements \IteratorAggrega
      * Creates an instance of this class from an associative array.
      *
      * The array should have the following structure:
-     * <code>
+     * ```
      * [
      *     'locale_1' => [
      *         'event_key_1' => 'translation_1',
@@ -146,7 +146,7 @@ final class Translations extends AbstractJsonSrcData implements \IteratorAggrega
      *     ],
      *     ...
      * ]
-     * </code>
+     * ```
      *
      * @param array<string,array<string,string>> $i18nData The associative array to create the instance from.
      * @return static A new instance of this class.

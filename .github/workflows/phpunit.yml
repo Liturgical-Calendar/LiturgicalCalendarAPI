@@ -3,7 +3,15 @@ name: PHPUnit
 on:
   push:
     branches: [ development ]
-    paths: [ '**/*.php' ]
+    paths: [
+      '**/*.php',
+      'composer.json',
+      'composer.lock',
+      'phpunit*.xml*',
+      '.env.example',
+      'jsondata/**',
+      'i18n/**'
+    ]
   workflow_dispatch:
 
 concurrency:
@@ -19,16 +27,15 @@ jobs:
   phpunit_tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - name: Install gettext
-        run: sudo apt-get update -y && sudo apt-get install -y gettext
-
-      - name: Setup PHP with PECL extension
+      - name: Setup PHP with PECL extensions
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ env.PHP_VERSION }}
-          extensions: yaml, intl, zip, calendar, apcu
+          extensions: yaml, intl, zip, calendar, gettext, apcu, opcache
+          ini-values: apcu.enable_cli=1, opcache.enable=1, opcache.enable_cli=1
 
       - name: Cache Composer dependencies
         uses: actions/cache@v4
@@ -38,17 +45,66 @@ jobs:
           restore-keys: |
             composer-
 
+      - name: Cache PHPUnit cache
+        uses: actions/cache@v4
+        with:
+          path: .phpunit.cache
+          key: phpunit-${{ hashFiles('phpunit.xml.dist') }}
+          restore-keys: phpunit-
+
       - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --classmap-authoritative --no-progress
 
       - name: Copy env file
         run: cp .env.example .env.local
 
+      - name: Install gettext + locales
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gettext locales-all
+
       - name: Start the PHP web server
         run: composer start
 
-      - name: PHPUnit
-        run: composer test
+      - name: Wait for server PID and HTTP readiness
+        id: server-check
+        run: |
+          MAX_WAIT=10   # max seconds to wait
+          COUNT=0
+          while [ ! -f server.pid ] && [ $COUNT -lt $MAX_WAIT ]; do
+            sleep 1
+            COUNT=$((COUNT + 1))
+          done
 
-      - name: Stop the PHP web server
-        run: composer stop
+          if [ -f server.pid ]; then
+            echo "Server is running."
+          else
+            echo "Server failed to start within $MAX_WAIT seconds."
+            exit 1
+          fi
+
+          # wait for the server to actually bind
+          MAX_TRIES=30
+          for i in $(seq 1 $MAX_TRIES); do
+            if nc -z localhost 8000; then
+              echo "Server is ready."
+              exit 0
+            fi
+            sleep 1
+          done
+
+          echo "Server did not respond on localhost:8000 after $MAX_TRIES seconds."
+          exit 1
+
+      - name: Run tests
+        run: time composer test
+
+      - name: Show logs on failure
+        if: failure()
+        run: |
+          echo "=== Dumping logs ==="
+          if [ -d logs ]; then
+            find logs -type f -name "*.log" -print -exec cat {} \;
+          else
+            echo "No logs directory found"
+          fi

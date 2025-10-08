@@ -104,23 +104,21 @@ abstract class AbstractHandler implements RequestHandlerInterface
         }
 
         if ('' === $originsFile) {
-            throw new \Exception("Allowed origins file '{$originsFile}' not found.");
+            throw new \RuntimeException("Allowed origins file '{$originsFile}' not found.");
         }
 
         $originsFileContents = file($originsFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
         if (false === $originsFileContents) {
-            throw new \Exception("Allowed origins file '{$originsFile}' could not be read.");
+            throw new \RuntimeException("Allowed origins file '{$originsFile}' could not be read.");
         }
 
-        $originsFileStringContents = array_map(
-            fn($v): string => strval($v),
+        /** @var string[] $trimmedOriginsFileContents */
+        $trimmedOriginsFileContents = array_map(
+            function (string $v): string {
+                return trim($v);
+            },
             $originsFileContents
         );
-
-        $trimmedOriginsFileContents = array_values(array_map(
-            fn($v): string => trim($v),
-            $originsFileStringContents
-        ));
 
         $this->setAllowedOrigins($trimmedOriginsFileContents);
 
@@ -156,7 +154,9 @@ abstract class AbstractHandler implements RequestHandlerInterface
     {
         $this->allowedAcceptHeaders = array_values(array_filter(
             AcceptHeader::cases(),
-            fn(AcceptHeader $case) => in_array($case, $acceptHeaders, true)
+            function (AcceptHeader $case) use ($acceptHeaders): bool {
+                return in_array($case, $acceptHeaders, true);
+            }
         ));
 
         return $this;
@@ -174,7 +174,9 @@ abstract class AbstractHandler implements RequestHandlerInterface
     {
         $this->allowedRequestMethods = array_values(array_filter(
             RequestMethod::cases(),
-            fn(RequestMethod $case) => in_array($case, $requestMethods, true)
+            function (RequestMethod $case) use ($requestMethods): bool {
+                return in_array($case, $requestMethods, true);
+            }
         ));
 
         return $this;
@@ -193,7 +195,9 @@ abstract class AbstractHandler implements RequestHandlerInterface
     {
         $this->allowedRequestContentTypes = array_values(array_filter(
             RequestContentType::cases(),
-            fn(RequestContentType $case) => in_array($case, $requestContentTypes, true)
+            function (RequestContentType $case) use ($requestContentTypes): bool {
+                return in_array($case, $requestContentTypes, true);
+            }
         ));
 
         return $this;
@@ -281,7 +285,23 @@ abstract class AbstractHandler implements RequestHandlerInterface
     {
         $headersHeader = $request->getHeaderLine('Access-Control-Request-Headers');
         if ($headersHeader !== '') {
-            return $response->withHeader('Access-Control-Allow-Headers', $headersHeader);
+            // Echo back only the subset of requested headers we allow; avoid forbidden headers per Fetch/CORS.
+            $allowed   = ['Accept', 'Accept-Language', 'Content-Type', 'Authorization', 'X-Requested-With'];
+            $requested = array_values(array_filter(array_map('trim', explode(',', $headersHeader))));
+            // Case-insensitive intersection while preserving canonical casing and de-duplicating
+            $canonicalByLc = array_combine(array_map('strtolower', $allowed), $allowed);
+            $approvedAssoc = [];
+            foreach ($requested as $header) {
+                $lc = strtolower($header);
+                if (isset($canonicalByLc[$lc])) {
+                    $approvedAssoc[$canonicalByLc[$lc]] = true; // preserve casing, dedupe
+                }
+            }
+            if ($approvedAssoc === []) {
+                // No approved non-safelisted headers; omit ACAH entirely
+                return $response;
+            }
+            return $response->withHeader('Access-Control-Allow-Headers', implode(',', array_keys($approvedAssoc)));
         }
         return $response;
     }
@@ -308,13 +328,31 @@ abstract class AbstractHandler implements RequestHandlerInterface
 
     protected function handlePreflightRequest(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
+        // if method == OPTIONS and "Origin" in headers and "Access-Control-Request-Method" in headers:
+        //   # This is a CORS preflight request
+        // if method == OPTIONS and not ("Origin" in headers or "Access-Control-Request-Method" in headers):
+        //   # This is a normal OPTIONS request
+        $isCorsRequest = ( $request->getMethod() === 'OPTIONS' && $request->getHeaderLine('Origin') !== '' && $request->getHeaderLine('Access-Control-Request-Method') !== '' );
+
         $response = $response->withStatus(StatusCode::OK->value, StatusCode::OK->reason());
-        $response = $this->setAccessControlAllowOriginHeader($request, $response);
-        $response = $this->setAccessControlAllowMethodsHeader($request, $response);
-        $response = $this->setAccessControlAllowHeadersHeader($request, $response);
-        // Since in the current implementation of the API we do not request credentials for any requests, we should omit this header.
-        // $response = $this->setAccessControlAllowCredentialsHeader($response);
-        $response = $this->setAccessControlMaxAgeHeader($response);
+        if ($isCorsRequest) {
+            // Preflight should not carry a body
+            $response = $response->withStatus(StatusCode::NO_CONTENT->value, StatusCode::NO_CONTENT->reason());
+            $response = $this->setAccessControlAllowOriginHeader($request, $response);
+            // Optimize cache hit-rates by only adding Vary: Origin when Access-Control-Allow-Origin is not "*"
+            if ($response->getHeaderLine('Access-Control-Allow-Origin') !== '*') {
+                $response = $response->withAddedHeader('Vary', 'Origin');
+            }
+            $response = $response->withAddedHeader('Vary', 'Access-Control-Request-Method')
+                                 ->withAddedHeader('Vary', 'Access-Control-Request-Headers');
+            $response = $this->setAccessControlAllowMethodsHeader($request, $response);
+            $response = $this->setAccessControlAllowHeadersHeader($request, $response);
+            // Since in the current implementation of the API we do not request credentials for any requests, we should omit this header.
+            // $response = $this->setAccessControlAllowCredentialsHeader($response);
+            $response = $this->setAccessControlMaxAgeHeader($response);
+        } else {
+            $response = $response->withHeader('Allow', implode(',', array_column($this->allowedRequestMethods, 'value')));
+        }
         return $response;
     }
 
@@ -438,7 +476,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
         /** @var array<string,scalar|null> $filteredQueryParams */
         $filteredQueryParams = array_filter(
             $request->getQueryParams(),
-            fn($value) => is_scalar($value) || $value === null
+            fn($value): bool => ( is_scalar($value) || $value === null )
         );
         return $filteredQueryParams;
     }
@@ -496,20 +534,17 @@ abstract class AbstractHandler implements RequestHandlerInterface
 
         switch ($mime) {
             case RequestContentType::JSON:
-                $parsedBody = json_decode($rawBodyContents, true);
+                $parsedBody = json_decode($rawBodyContents, true, 512, JSON_THROW_ON_ERROR);
                 break;
             case RequestContentType::YAML:
-                if (!extension_loaded('yaml')) {
+                if (!extension_loaded('yaml') || !function_exists('yaml_parse')) {
                     throw new ImplementationException('YAML extension not loaded');
                 }
 
-                set_error_handler([self::class, 'warningHandler'], E_WARNING);
                 try {
                     $parsedBody = yaml_parse($rawBodyContents);
                 } catch (\ErrorException $e) {
                     throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
-                } finally {
-                    restore_error_handler();
                 }
                 break;
             case RequestContentType::FORMDATA:
@@ -523,16 +558,22 @@ abstract class AbstractHandler implements RequestHandlerInterface
 
         // We don't expect a single scalar value, only an array of scalar values,
         // so we discard a pure scalar value
-        if (false === is_array($parsedBody)) {
+        if (false === is_array($parsedBody) || empty($parsedBody)) {
             if ($required) {
-                throw new UnsupportedMediaTypeException();
+                throw new ValidationException();
             } else {
                 // silently discard the parsed body content
                 return null;
             }
         }
+
         /** @var array<string,scalar|null> $parsedBodyWithOnlyScalarValues */
-        $parsedBodyWithOnlyScalarValues = array_filter($parsedBody, fn($value) => is_scalar($value) || $value === null);
+        $parsedBodyWithOnlyScalarValues = array_filter(
+            $parsedBody,
+            function ($value): bool {
+                return ( is_scalar($value) || $value === null );
+            }
+        );
         return $parsedBodyWithOnlyScalarValues;
     }
 
@@ -584,7 +625,6 @@ abstract class AbstractHandler implements RequestHandlerInterface
                     throw new ImplementationException('YAML extension not loaded');
                 }
 
-                set_error_handler([self::class, 'warningHandler'], E_WARNING);
                 try {
                     $parsedBody = yaml_parse($rawBodyContents);
                     if (false === is_array($parsedBody) || empty($parsedBody)) {
@@ -606,8 +646,6 @@ abstract class AbstractHandler implements RequestHandlerInterface
                     }
                 } catch (\ErrorException $e) {
                     throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
-                } finally {
-                    restore_error_handler();
                 }
                 break;
             default:
@@ -645,13 +683,10 @@ abstract class AbstractHandler implements RequestHandlerInterface
                 $recodedResponse     = json_decode($jsonEncodedResponse, true, 512, JSON_THROW_ON_ERROR);
 
                 // Then we attempt to encode the array as YAML
-                set_error_handler([static::class, 'warningHandler'], E_WARNING);
                 try {
                     $encodedResponse = yaml_emit($recodedResponse, YAML_UTF8_ENCODING);
                 } catch (\ErrorException $e) {
                     throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
-                } finally {
-                    restore_error_handler();
                 }
                 break;
             default:

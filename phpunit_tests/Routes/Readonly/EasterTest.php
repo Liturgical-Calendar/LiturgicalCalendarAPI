@@ -10,7 +10,7 @@ final class EasterTest extends ApiTestCase
 {
     public function testGetEasterReturnsJson(): void
     {
-        $response = self::$http->get('/easter');
+        $response = self::$http->get('/easter', []);
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
         $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 

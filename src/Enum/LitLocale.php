@@ -7,6 +7,7 @@ class LitLocale
     public const LATIN                     = 'la_VA';
     public const LATIN_PRIMARY_LANGUAGE    = 'la';
     public static string $PRIMARY_LANGUAGE = 'la';
+    public static string $RUNTIME_LOCALE   = 'en_US';
 
     /** @var string[] */
     public static array $values = [ 'la', 'la_VA' ];

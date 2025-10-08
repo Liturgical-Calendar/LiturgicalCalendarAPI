@@ -37,7 +37,7 @@ enum JsonData: string
     case DECREES_FOLDER = JsonDataConstants::DECREES_FOLDER;
 
     /**
-     * The file containing the data with the Decrees of the Congregation for Divine Worship.
+     * The file containing the data with the Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments.
      * Evaluates to 'jsondata/sourcedata/decrees/decrees.json'.
      */
     case DECREES_FILE = JsonDataConstants::DECREES_FILE;
@@ -49,7 +49,7 @@ enum JsonData: string
     case DECREES_I18N_FOLDER = JsonDataConstants::DECREES_I18N_FOLDER;
 
     /**
-     * The file containing the i18n data for the decrees of the Congregation for Divine Worship,
+     * The file containing the i18n data for the decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments,
      * with a placeholder for the locale.
      * Evaluates to 'jsondata/sourcedata/decrees/i18n/{locale}.json'.
      */

@@ -244,8 +244,8 @@ final class Negotiator
             /** @var string[] $supportedMediaTypes */
             $supportedMediaTypes = array_values(AcceptHeader::values());
         } else {
-            $lowercasedMediaTypes = array_map(fn($v) => strtolower($v), $supported);
-            $supportedMediaTypes  = array_values(array_unique($lowercasedMediaTypes));
+            /** @var string[] $supportedMediaTypes */
+            $supportedMediaTypes = array_values(array_unique(array_map('strtolower', $supported)));
         }
 
         // If the request is coming from a browser, it won't be requesting JSON,
@@ -255,7 +255,12 @@ final class Negotiator
         }
 
         self::$acceptValues         = self::parseAccept($acceptHeader);
-        self::$filteredAcceptValues = array_filter(self::$acceptValues, fn ($v) => in_array($v['type'], $supportedMediaTypes, true));
+        self::$filteredAcceptValues = array_filter(
+            self::$acceptValues,
+            function ($v) use ($supportedMediaTypes): bool {
+                return in_array($v['type'], $supportedMediaTypes, true);
+            }
+        );
 
         // If no Accept header, RFC allows */* with q=1 → pick first supported.
         if ($acceptHeader === '') {
@@ -356,7 +361,12 @@ final class Negotiator
         if (empty($supported)) {
             $supportedLocales = LitLocale::$AllAvailableLocales;
         } else {
-            $lowercaseSupported = array_map(fn($v) => strtolower($v), $supported);
+            $lowercaseSupported = array_map(
+                function (string $v): string {
+                    return strtolower($v);
+                },
+                $supported
+            );
             $supportedLocales   = array_values(array_unique($lowercaseSupported));
         }
 
@@ -472,7 +482,12 @@ final class Negotiator
             /** @var string[] $supportedEncodings */
             $supportedEncodings = ContentEncoding::values();
         } else {
-            $lowercaseEncodings = array_map(fn($v) => strtolower($v), $supported);
+            $lowercaseEncodings = array_map(
+                function (string $v): string {
+                    return strtolower($v);
+                },
+                $supported
+            );
             $supportedEncodings = array_values(array_unique($lowercaseEncodings));
         }
 
@@ -598,7 +613,12 @@ final class Negotiator
             // Default supported set; customize as needed for your app
             $supportedCharsets = ['utf-8'];
         } else {
-            $lowercaseCharsets = array_map(fn($v) => strtolower($v), $supported);
+            $lowercaseCharsets = array_map(
+                function (string $v): string {
+                    return strtolower($v);
+                },
+                $supported
+            );
             $supportedCharsets = array_values(array_unique($lowercaseCharsets));
         }
 

@@ -13,7 +13,7 @@ use LiturgicalCalendar\Api\Models\RelativeLiturgicalDate;
 /**
  * @phpstan-import-type StrToTime from \LiturgicalCalendar\Api\Models\RelativeLiturgicalDate
  */
-final class LitCalItemCreateNewMobile extends LiturgicalEventData
+final class DiocesanLitCalItemCreateNewMobile extends LiturgicalEventData
 {
     public readonly string|RelativeLiturgicalDate $strtotime;
 
@@ -80,6 +80,9 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
      */
     public function setGrade(LitGrade $grade): void
     {
+        if ($grade === LitGrade::HIGHER_SOLEMNITY || $grade === LitGrade::FEAST_LORD) {
+            throw new \ValueError('Diocesan events cannot have grade HIGHER_SOLEMNITY or FEAST_LORD');
+        }
         $this->unlock();
         $this->grade = $grade;
         $this->lock();
@@ -93,7 +96,7 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
     }
 
     /**
-     * Creates an instance of LitCalItemCreateNewMobile from an object containing the required properties.
+     * Creates an instance of DiocesanLitCalItemCreateNewMobile from an object containing the required properties.
      *
      * The stdClass object must have the following properties:
      * - event_key (string): the key of the event
@@ -125,17 +128,27 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
             throw new \ValueError('invalid common: expected an array of LitCommon enum cases, LitCommon enum values, or LitMassVariousNeeds instances');
         }
 
+        $grade = LitGrade::from($data->grade);
+        if ($grade === LitGrade::HIGHER_SOLEMNITY || $grade === LitGrade::FEAST_LORD) {
+            throw new \ValueError('Diocesan events cannot have grade HIGHER_SOLEMNITY or FEAST_LORD');
+        }
+
         return new static(
             $data->event_key,
             $strToTime,
-            array_map(fn($color) => LitColor::from($color), $data->color),
-            LitGrade::from($data->grade),
+            array_map(
+                function (string $color): LitColor {
+                    return LitColor::from($color);
+                },
+                $data->color
+            ),
+            $grade,
             $commons
         );
     }
 
     /**
-     * Creates an instance of LitCalItemCreateNewMobile from an associative array.
+     * Creates an instance of DiocesanLitCalItemCreateNewMobile from an associative array.
      *
      * The array must have the following keys:
      * - event_key (string): The key of the event.
@@ -167,11 +180,21 @@ final class LitCalItemCreateNewMobile extends LiturgicalEventData
             throw new \ValueError('invalid common: expected an array of LitCommon enum cases, LitCommon enum values, or LitMassVariousNeeds instances');
         }
 
+        $grade = LitGrade::from($data['grade']);
+        if ($grade === LitGrade::HIGHER_SOLEMNITY || $grade === LitGrade::FEAST_LORD) {
+            throw new \ValueError('Diocesan events cannot have grade HIGHER_SOLEMNITY or FEAST_LORD');
+        }
+
         return new static(
             $data['event_key'],
             $strToTime,
-            array_map(fn($color) => LitColor::from($color), $data['color']),
-            LitGrade::from($data['grade']),
+            array_map(
+                function (string $color): LitColor {
+                    return LitColor::from($color);
+                },
+                $data['color']
+            ),
+            $grade,
             $commons
         );
     }

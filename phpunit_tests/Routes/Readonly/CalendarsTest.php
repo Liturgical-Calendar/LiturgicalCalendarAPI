@@ -20,7 +20,7 @@ final class CalendarsTest extends ApiTestCase
 
     public function testGetCalendarsReturnsJson(): void
     {
-        $response = self::$http->get('/calendars');
+        $response = self::$http->get('/calendars', []);
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK, but found error: ' . $response->getBody());
         $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
@@ -57,7 +57,7 @@ final class CalendarsTest extends ApiTestCase
 
     public function testPostCalendarsReturnsJson(): void
     {
-        $response = self::$http->post('/calendars');
+        $response = self::$http->post('/calendars', []);
 
         // Assert status code
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
@@ -71,19 +71,19 @@ final class CalendarsTest extends ApiTestCase
 
     public function testPutCalendarsReturnsError(): void
     {
-        $response = self::$http->put('/calendars');
+        $response = self::$http->put('/calendars', []);
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
     public function testPatchCalendarsReturnsError(): void
     {
-        $response = self::$http->patch('/calendars');
+        $response = self::$http->patch('/calendars', []);
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
     public function testDeleteCalendarsReturnsError(): void
     {
-        $response = self::$http->delete('/calendars');
+        $response = self::$http->delete('/calendars', []);
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 

@@ -10,7 +10,7 @@ final class SchemasTest extends ApiTestCase
 {
     public function testGetSchemasReturnsJson(): void
     {
-        $response = self::$http->get('/schemas');
+        $response = self::$http->get('/schemas', []);
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
         $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
@@ -41,7 +41,7 @@ final class SchemasTest extends ApiTestCase
                 $this->assertEquals('3.1.0', $data->openapi, 'openapi should be 3.1.0');
             } elseif (property_exists($data, '$schema')) {
                 $this->assertIsString($data->{'$schema'}, '$schema should be a string');
-                $this->assertEquals('http://json-schema.org/draft-07/schema#', $data->{'$schema'}, '$schema should be http://json-schema.org/draft-07/schema#');
+                $this->assertEquals('https://json-schema.org/draft-07/schema#', $data->{'$schema'}, '$schema should be https://json-schema.org/draft-07/schema#');
             } else {
                 $this->fail('Data object has neither openapi nor $schema property.');
             }
@@ -50,7 +50,7 @@ final class SchemasTest extends ApiTestCase
 
     public function testPostSchemasReturnsJson(): void
     {
-        $response = self::$http->post('/schemas');
+        $response = self::$http->post('/schemas', []);
         $this->assertSame(200, $response->getStatusCode(), 'Expected HTTP 200 OK');
         $this->assertStringStartsWith('application/json', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/json');
 
@@ -76,19 +76,19 @@ final class SchemasTest extends ApiTestCase
 
     public function testPutSchemasReturnsError(): void
     {
-        $response = self::$http->put('/schemas');
+        $response = self::$http->put('/schemas', []);
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
     public function testPatchSchemasReturnsError(): void
     {
-        $response = self::$http->patch('/schemas');
+        $response = self::$http->patch('/schemas', []);
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 
     public function testDeleteSchemasReturnsError(): void
     {
-        $response = self::$http->delete('/schemas');
+        $response = self::$http->delete('/schemas', []);
         $this->assertSame(405, $response->getStatusCode(), 'Expected HTTP 405 Method Not Allowed');
     }
 }

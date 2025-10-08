@@ -1,5 +1,6 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "$id": "./WiderRegionCalendar.json",
     "title": "WiderRegionCalendar",
     "type": "object",
     "additionalProperties": false,
@@ -28,7 +29,6 @@
     ],
     "definitions": {
         "LitCal": {
-            "type": "object",
             "oneOf": [
                 {
                     "$ref": "#/definitions/LitCalCreateNew"
@@ -77,22 +77,22 @@
             "additionalProperties": false,
             "properties": {
                 "event_key": {
-                    "type": "string"
+                    "$ref": "./CommonDef.json#/definitions/EventKey"
                 },
                 "color": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
+                    "$ref": "./CommonDef.json#/definitions/LitColor"
                 },
                 "grade": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                    "$ref": "./CommonDef.json#/definitions/LitGrade"
                 },
                 "day": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Day"
+                    "$ref": "./CommonDef.json#/definitions/Day"
                 },
                 "month": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Month"
+                    "$ref": "./CommonDef.json#/definitions/Month"
                 },
                 "common": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitCommon"
+                    "$ref": "./CommonDef.json#/definitions/LitCommon"
                 },
                 "name": {
                     "type": "string"
@@ -113,10 +113,10 @@
             "additionalProperties": false,
             "properties": {
                 "event_key": {
-                    "type": "string"
+                    "$ref": "./CommonDef.json#/definitions/EventKey"
                 },
                 "grade": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                    "$ref": "./CommonDef.json#/definitions/LitGrade"
                 },
                 "name": {
                     "type": "string"
@@ -137,7 +137,9 @@
                     "const": "createNew"
                 },
                 "since_year": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1970,
+                    "maximum": 9999
                 },
                 "url": {
                     "type": "string",
@@ -147,7 +149,9 @@
                     "$ref": "#/definitions/UrlLangMap"
                 },
                 "until_year": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1970,
+                    "maximum": 9999
                 }
             },
             "required": [
@@ -156,7 +160,7 @@
                 "url",
                 "url_lang_map"
             ],
-            "title": "Metadata"
+            "title": "MetadataCreateNew"
         },
         "MetadataMakePatron": {
             "type": "object",
@@ -167,7 +171,9 @@
                     "const": "makePatron"
                 },
                 "since_year": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1800,
+                    "maximum": 9999
                 },
                 "url": {
                     "type": "string",
@@ -177,7 +183,9 @@
                     "$ref": "#/definitions/UrlLangMap"
                 },
                 "until_year": {
-                    "type": "integer"
+                    "type": "integer",
+                    "minimum": 1970,
+                    "maximum": 9999
                 }
             },
             "required": [
@@ -186,7 +194,7 @@
                 "url",
                 "url_lang_map"
             ],
-            "title": "Metadata"
+            "title": "MetadataMakePatron"
         },
         "UrlLangMap": {
             "type": "object",
@@ -516,11 +524,9 @@
                     "Zimbabwe"
                 ]
             },
-            "patternProperties": {
-                "": {
-                    "type": "string",
-                    "pattern": "[A-Z1-9]{2,3}"
-                }
+            "additionalProperties": {
+                "type": "string",
+                "pattern": "[A-Z1-9]{2,3}"
             },
             "minProperties": 1,
             "title": "NationalCalendars"
@@ -532,7 +538,7 @@
                 "locales": {
                     "type": "array",
                     "items": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+                        "$ref": "./CommonDef.json#/definitions/Locale"
                     },
                     "minItems": 1
                 },
@@ -556,23 +562,11 @@
         "CalendarI18n": {
             "type": "object",
             "description": "A JSON object of the form { \"locale\": { \"key\": \"value\" } }, used only in PUT and PATCH requests.",
-            "additionalProperties": false,
-            "propertyNames": {
-                "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Locale"
+            "additionalProperties": {
+                "$ref": "./LitCalTranslation.json"
             },
-            "patternProperties": {
-                "": {
-                    "type": "object",
-                    "additionalProperties": false,
-                    "propertyNames": {
-                        "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/EventKey"
-                    },
-                    "patternProperties": {
-                        "": {
-                            "type": "string"
-                        }
-                    }
-                }
+            "propertyNames": {
+                "$ref": "./CommonDef.json#/definitions/Locale"
             }
         }
     }

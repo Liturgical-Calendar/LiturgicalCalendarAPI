@@ -272,7 +272,7 @@ class RomanMissal
     /**
      * Gets an array of all the valid Roman Missal enumeration constants.
      *
-     * @return array<string> an array of all the valid Roman Missal enumeration constants
+     * @return string[] an array of all the valid Roman Missal enumeration constants
      */
     public static function getMissalIds(): array
     {
@@ -282,22 +282,17 @@ class RomanMissal
     /**
      * Gets an array of all the Latin Missal enumeration constants.
      *
-     * @return array<string> an array of all the Latin Missal enumeration constants
+     * @return string[] an array of all the Latin Missal enumeration constants
      */
     public static function getLatinMissalIds(): array
     {
-        return array_filter(self::$values, static fn (string $missal_id): bool => self::isLatinMissal($missal_id));
+        return array_values(array_filter(self::$values, static fn (string $missal_id): bool => self::isLatinMissal($missal_id)));
     }
 
     /**
      * This method was used by the /calendars route, to add metadata about the Roman Missals,
      * however we have created the /missals route which also produces this metadata
      * using however a different approach, by globbing the data directory.
-     * In order for a request to the /missals route to use this method,
-     * the method would need access to the MissalsParams instance in the Paths\Missals class,
-     * or this RomanMissal enum would need to store arrays of current Missal regions and years,
-     * and the MissalsParams class would need to check against the RomanMissal enum
-     * rather than against it's own arrays.
      *
      * @param bool $obj whether to return an array of metadata objects or an array of associative arrays
      *

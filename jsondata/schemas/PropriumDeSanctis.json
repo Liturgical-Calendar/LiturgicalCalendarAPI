@@ -1,20 +1,21 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "$id": "./PropriumDeSanctis.json",
     "type": "array",
     "items": {
         "$ref": "#/definitions/PropriumDeSanctis"
     },
     "definitions": {
         "PropriumDeSanctis": {
-            "@comment": "TODO: Language edition missals require the grade_display field, should all missals require it? or should we try to define two different schemas?",
+            "$comment": "TODO: Language edition missals require the grade_display field, should all missals require it? or should we try to define two different schemas?",
             "type": "object",
             "additionalProperties": false,
             "properties": {
                 "month": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Month"
+                    "$ref": "./CommonDef.json#/definitions/Month"
                 },
                 "day": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Day"
+                    "$ref": "./CommonDef.json#/definitions/Day"
                 },
                 "event_key": {
                     "type": "string"
@@ -23,19 +24,19 @@
                     "type": "string"
                 },
                 "grade": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitGrade"
+                    "$ref": "./CommonDef.json#/definitions/LitGrade"
                 },
                 "grade_display": {
                     "type": ["string", "null"]
                 },
                 "common": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitCommon"
+                    "$ref": "./CommonDef.json#/definitions/LitCommon"
                 },
                 "calendar": {
                     "$ref": "#/definitions/Calendar"
                 },
                 "color": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/LitColor"
+                    "$ref": "./CommonDef.json#/definitions/LitColor"
                 }
             },
             "required": [
@@ -54,33 +55,33 @@
             "additionalProperties": false,
             "properties": {
                 "vigil": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                    "$ref": "./CommonDef.json#/definitions/Readings"
                 },
                 "day": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                    "$ref": "./CommonDef.json#/definitions/Readings"
                 }
             },
             "required": [
                 "vigil",
                 "day"
             ],
-            "title": "LiturgicalEventWithMass"
+            "title": "ReadingsWithVigil"
         },
         "ReadingsChristmas": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
                 "vigil": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                    "$ref": "./CommonDef.json#/definitions/Readings"
                 },
                 "night": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                    "$ref": "./CommonDef.json#/definitions/Readings"
                 },
                 "dawn": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                    "$ref": "./CommonDef.json#/definitions/Readings"
                 },
                 "day": {
-                    "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Readings"
+                    "$ref": "./CommonDef.json#/definitions/Readings"
                 }
             },
             "required": [
@@ -89,10 +90,10 @@
                 "dawn",
                 "day"
             ],
-            "title": "LiturgicalEventChristmas"
+            "title": "ReadingsChristmas"
         },
         "Calendar": {
-            "$ref": "https://litcal.johnromanodorazio.com/api/dev/jsondata/schemas/CommonDef.json#/definitions/Calendar"
+            "$ref": "./CommonDef.json#/definitions/Calendar"
         }
     }
 }

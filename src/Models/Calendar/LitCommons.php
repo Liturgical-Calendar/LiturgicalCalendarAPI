@@ -69,7 +69,12 @@ final class LitCommons implements \JsonSerializable
             /**
              * @var LitCommon[] $litCommons
              */
-            $commons = array_values(array_map(fn(LitCommon $litCommon) => new LitCommonItem($litCommon), $litCommons));
+            $commons = array_map(
+                function (LitCommon $litCommon): LitCommonItem {
+                    return new LitCommonItem($litCommon);
+                },
+                $litCommons
+            );
             return new static($commons);
         }
 
@@ -195,16 +200,16 @@ final class LitCommons implements \JsonSerializable
         $fromTheCommon = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'De Commune' : _('From the Common');
 
         /** @var string[] $commonsLcl */
-        $commonsLcl = array_map(function ($litCommonItem) use ($locale, $fromTheCommon): string {
+        $commonsLcl = array_map(function (LitCommonItem $litCommonItem) use ($locale, $fromTheCommon): string {
             $commonGeneralStringParts = [ $fromTheCommon ];
 
-            $possessive = self::getPossessive($litCommonItem->commonGeneral, $locale);
+            $possessive = LitCommons::getPossessive($litCommonItem->commonGeneral, $locale);
 
-            if ($possessive !== LitCommon::NONE->value) {
+            if ($possessive !== '') {
                 array_push($commonGeneralStringParts, $possessive);
             }
 
-            $commonGeneralLcl = self::i18n($litCommonItem->commonGeneral, $locale);
+            $commonGeneralLcl = LitCommons::i18n($litCommonItem->commonGeneral, $locale);
 
             if ($commonGeneralLcl !== LitCommon::NONE->value) {
                 array_push($commonGeneralStringParts, $commonGeneralLcl);
@@ -213,7 +218,7 @@ final class LitCommons implements \JsonSerializable
             $commonGeneralString = implode(' ', $commonGeneralStringParts);
 
             $commonSpecificLcl = $litCommonItem->commonSpecific !== null
-                ? ': ' . self::i18n($litCommonItem->commonSpecific, $locale)
+                ? ': ' . LitCommons::i18n($litCommonItem->commonSpecific, $locale)
                 : '';
 
             return $commonGeneralString . $commonSpecificLcl;
@@ -249,7 +254,7 @@ final class LitCommons implements \JsonSerializable
      */
     public static function i18n(LitCommon $litCommon, string $locale): string
     {
-        return $locale === LitLocale::LATIN || $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+        return in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE], true)
             ? LitCommon::LATIN[$litCommon->name]
             : $litCommon->translate();
     }
@@ -265,9 +270,9 @@ final class LitCommons implements \JsonSerializable
      * @param string $locale the locale in which to get the possessive form
      * @return string the possessive form for the given liturgical common
      */
-    private static function getPossessive(LitCommon $litCommon, $locale): string
+    private static function getPossessive(LitCommon $litCommon, string $locale): string
     {
-        return $locale === LitLocale::LATIN || $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
+        return in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE], true)
             ? ''
             : $litCommon->possessive();
     }

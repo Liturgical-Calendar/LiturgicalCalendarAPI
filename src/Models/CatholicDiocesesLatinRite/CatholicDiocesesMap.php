@@ -153,11 +153,15 @@ final class CatholicDiocesesMap extends AbstractJsonSrcData
     protected static function fromObjectInternal(\stdClass $data): static
     {
         $countries        = array_map(
-            fn(\stdClass $item): string => $item->country_iso,
+            function (\stdClass $item): string {
+                return $item->country_iso;
+            },
             $data->catholic_dioceses_latin_rite
         );
         $countryItems     = array_map(
-            fn (\stdClass $countryItem): CountryWithDiocesesItem => CountryWithDiocesesItem::fromObject($countryItem),
+            function (\stdClass $countryItem): CountryWithDiocesesItem {
+                return CountryWithDiocesesItem::fromObject($countryItem);
+            },
             $data->catholic_dioceses_latin_rite
         );
         $associativeArray = array_combine($countries, $countryItems);

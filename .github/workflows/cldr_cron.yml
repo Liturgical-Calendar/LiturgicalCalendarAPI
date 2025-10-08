@@ -1,0 +1,87 @@
+name: Update CLDR
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"   # every Monday at 3AM UTC
+  workflow_dispatch:      # manual trigger
+
+jobs:
+  update-cldr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get latest CLDR release tag
+        id: cldr
+        run: |
+          latest=$(curl -fsSL -H "Authorization: Bearer ${{ github.token }}" \
+            https://api.github.com/repos/unicode-org/cldr-json/releases/latest \
+            | jq -r .tag_name)
+          if [ -z "$latest" ] || [ "$latest" = "null" ]; then
+            echo "Failed to get latest CLDR release tag"
+            exit 1
+          fi
+          echo "tag=$latest" >> $GITHUB_OUTPUT
+
+      - name: Check current version in local repo
+        id: local
+        run: |
+          if [ -f jsondata/likelySubtags.json ]; then
+            local_version=$(jq -r '.supplemental.version._cldrVersion // "none"' jsondata/likelySubtags.json 2>/dev/null || echo "none")
+          else
+            local_version="none"
+          fi
+          echo "version=$local_version" >> $GITHUB_OUTPUT
+
+      - name: Compare versions
+        id: compare
+        run: |
+          # the likelySubtags.json file contains the current version as a major version only (e.g. "42")
+          local_version="${{ steps.local.outputs.version }}"
+
+          # the cldr repo does not use a leading v, but just for future proofing let's strip any possible leading v
+          remote_tag="${{ steps.cldr.outputs.tag }}"
+          remote_version="${remote_tag#v}"
+
+          # the cldr repo uses full semver tags (e.g. "42.1.0"), but the likelySubtags.json file only uses the major version (e.g. "42")
+          # so we need to extract the major version from the remote tag
+          if [[ $remote_version == *.* ]]; then
+            # If it does, extract the major part
+            remote_version=$(echo "$remote_version" | cut -d '.' -f 1)
+          fi
+
+          if [[ $remote_version == $local_version ]]; then
+            echo "up_to_date=true" >> $GITHUB_OUTPUT
+          else
+            echo "up_to_date=false" >> $GITHUB_OUTPUT
+          fi
+
+          echo "Remote: $remote_version"
+          echo "Local:  $local_version"
+          echo "Up to date: $up_to_date"
+
+      - name: Download likelySubtags.json
+        if: steps.compare.outputs.up_to_date == 'false'
+        run: |
+          url="https://raw.githubusercontent.com/unicode-org/cldr-json/refs/tags/${{ steps.cldr.outputs.tag }}/cldr-json/cldr-core/supplemental/likelySubtags.json"
+          curl -fsSL "$url" -o jsondata/likelySubtags.json
+          # Validate downloaded file is valid JSON
+          if ! jq empty jsondata/likelySubtags.json 2>/dev/null; then
+            echo "Downloaded likelySubtags.json is not valid JSON"
+            exit 1
+          fi
+
+      - name: Commit changes
+        if: steps.compare.outputs.up_to_date == 'false'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "Update CLDR likelySubtags to ${{ steps.cldr.outputs.tag }}"
+          title: "Update CLDR likelySubtags to ${{ steps.cldr.outputs.tag }}"
+          body: |
+            This PR updates the CLDR likelySubtags data from version ${{ steps.local.outputs.version }} to ${{ steps.compare.outputs.remote_version }}.
+
+            Release notes: https://github.com/unicode-org/cldr-json/releases/tag/${{ steps.cldr.outputs.tag }}
+          labels: dependencies, automated
+          branch: update-cldr
+          delete-branch: true

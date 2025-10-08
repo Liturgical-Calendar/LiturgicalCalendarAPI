@@ -1,19 +1,12 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "$ref": "#/definitions/LitCalTranslation",
-    "definitions": {
-        "LitCalTranslation": {
-            "type": "object",
-            "description": "a collection of key value pairs, in which the keys are the tags for Liturgical events as defined in the Liturgical Calendar json definition being translated; the name of the current file is the two-letter ISO code of the language for the translation",
-            "additionalProperties": {
-                "$ref": "#/definitions/Translation"
-            },
-            "title": "LitCalTranslation"
-        },
-        "Translation": {
-            "type": "string",
-            "description": "a key value pair in which the key is a Liturgical event tag that corresponds to the same tag in the corresponding Liturgical Calendar JSON definition being translated, and the value is the translated value",
-            "title": "Translation"
-        }
-    }
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "$id": "./LitCalTranslation.json",
+    "title": "LitCalTranslation",
+    "type": "object",
+    "description": "a collection of key value pairs, in which the keys are the event_key ids for Liturgical events as defined in the Liturgical Calendar json definition being translated; the name of the current file is the two-letter ISO code (optionally with a region identifier) of the language for the translation",
+    "additionalProperties":  { "type": "string" },
+    "propertyNames": {
+        "$ref": "./CommonDef.json#/definitions/EventKey"
+    },
+    "minProperties": 1
 }

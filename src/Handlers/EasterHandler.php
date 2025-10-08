@@ -176,9 +176,6 @@ final class EasterHandler extends AbstractHandler
             $response = $this->setAccessControlAllowOriginHeader($request, $response);
         }
 
-        // For all other request methods, validate that they are supported by the endpoint
-        $this->validateRequestMethod($request);
-
         // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint:
         //   if set we negotiate the best Content-Type, if not set we default to the first supported by the current handler
         switch ($method) {
@@ -230,6 +227,8 @@ final class EasterHandler extends AbstractHandler
 
         $this->params = new EasterParams($params);
 
+        $this->validateRequestMethod($request);
+
         $cacheFile = 'engineCache/easter/' . $this->params->baseLocale . '.' . $fileExtension;
         if (file_exists($cacheFile)) {
             $bodyContents = Utilities::rawContentsFromFile($cacheFile);
@@ -259,7 +258,10 @@ final class EasterHandler extends AbstractHandler
             throw new ServiceUnavailableException('Failed to write cache file');
         }
 
-        if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] === $responseHash) {
+        if (
+            $request->getHeaderLine('If-None-Match') !== ''
+            && trim($request->getHeaderLine('If-None-Match'), " \t\"") === $responseHash
+        ) {
             return $response->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
                             ->withHeader('Content-Length', '0');
         }

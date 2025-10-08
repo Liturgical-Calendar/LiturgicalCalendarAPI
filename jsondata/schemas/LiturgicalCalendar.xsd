@@ -78,7 +78,7 @@
                     </xs:element>
                     <xs:element name="DayOfTheWeekLong" type="xs:string" />
                     <xs:element name="DayOfTheWeekShort" type="xs:string" />
-                    <xs:element name="EventIdx" type="xs:string" />
+                    <xs:element name="EventIdx" type="xs:unsignedShort" />
                     <xs:element name="EventKey" type="xs:string" />
                     <xs:element name="Grade">
                       <xs:simpleType>
@@ -101,6 +101,7 @@
                     <xs:element name="HasVesperI" minOccurs="0" type="xs:boolean" />
                     <xs:element name="HasVesperII" minOccurs="0" type="xs:boolean" />
                     <xs:element name="HasVigilMass" minOccurs="0" type="xs:boolean" />
+                    <xs:element name="HolyDayOfObligation" minOccurs="0" type="xs:boolean" />
                     <xs:element name="IsVigilFor" minOccurs="0" type="xs:string" />
                     <xs:element name="IsVigilMass" minOccurs="0" type="xs:boolean" />
                     <xs:element name="LiturgicalSeason" minOccurs="0" type="xs:string" />
@@ -205,6 +206,22 @@
                 </xs:simpleType>
               </xs:element>
               <xs:element name="EternalHighPriest" type="xs:boolean" />
+              <xs:element name="HolydaysOfObligation">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Christmas" type="xs:boolean" />
+                    <xs:element name="Epiphany" type="xs:boolean" />
+                    <xs:element name="Ascension" type="xs:boolean" />
+                    <xs:element name="CorpusChristi" type="xs:boolean" />
+                    <xs:element name="MaryMotherOfGod" type="xs:boolean" />
+                    <xs:element name="ImmaculateConception" type="xs:boolean" />
+                    <xs:element name="Assumption" type="xs:boolean" />
+                    <xs:element name="StJoseph" type="xs:boolean" />
+                    <xs:element name="StsPeterPaulAp" type="xs:boolean" />
+                    <xs:element name="AllSaints" type="xs:boolean" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
               <xs:element name="NationalCalendar" minOccurs="0" type="xs:string" />
               <xs:element name="DiocesanCalendar" minOccurs="0" type="xs:string" />
             </xs:sequence>
@@ -352,7 +369,7 @@
       <xs:enumeration value="red" />
       <xs:enumeration value="white" />
       <xs:enumeration value="purple" />
-      <xs:enumeration value="pink" />
+      <xs:enumeration value="rose" />
     </xs:restriction>
   </xs:simpleType>
   <xs:complexType name="LitCalEventType">
@@ -392,7 +409,7 @@
         <xs:sequence>
           <xs:element name="FirstReading" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="ResponsorialPsalm" type="xs:string" minOccurs="1" maxOccurs="1" />
-          <xs:element name="AlleluiaVerse" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="GospelAcclamation" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="Gospel" type="xs:string" minOccurs="1" maxOccurs="1" />
         </xs:sequence>
         <xs:attribute name="readingsType" type="xs:string" use="required" fixed="ferial"/>
@@ -406,7 +423,7 @@
           <xs:element name="FirstReading" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="ResponsorialPsalm" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="SecondReading" type="xs:string" minOccurs="1" maxOccurs="1" />
-          <xs:element name="AlleluiaVerse" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="GospelAcclamation" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="Gospel" type="xs:string" minOccurs="1" maxOccurs="1" />
         </xs:sequence>
         <xs:attribute name="readingsType" type="xs:string" use="required" fixed="festive" />
@@ -421,7 +438,7 @@
           <xs:element name="FirstReading" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="ResponsorialPsalm" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="SecondReading" type="xs:string" minOccurs="1" maxOccurs="1" />
-          <xs:element name="AlleluiaVerse" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="GospelAcclamation" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="Gospel" type="xs:string" minOccurs="1" maxOccurs="1" />
         </xs:sequence>
         <xs:attribute name="readingsType" type="xs:string" use="required" fixed="palmSunday" />
@@ -448,7 +465,7 @@
           <xs:element name="ResponsorialPsalm7" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="Epistle" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="ResponsorialPsalmEpistle" type="xs:string" minOccurs="1" maxOccurs="1" />
-          <xs:element name="AlleluiaVerse" type="xs:string" minOccurs="1" maxOccurs="1" />
+          <xs:element name="GospelAcclamation" type="xs:string" minOccurs="1" maxOccurs="1" />
           <xs:element name="Gospel" type="xs:string" minOccurs="1" maxOccurs="1" />
         </xs:sequence>
         <xs:attribute name="readingsType" type="xs:string" use="required" fixed="easterVigil" />
@@ -483,7 +500,7 @@
     <xs:complexContent>
       <xs:extension base="cl:ReadingsType">
         <xs:sequence>
-          <xs:element name="OutsideEasterSeasonType" type="cl:ReadingsFerialType" minOccurs="1" maxOccurs="1" />
+          <xs:element name="OutsideEasterSeason" type="cl:ReadingsFerialType" minOccurs="1" maxOccurs="1" />
           <xs:element name="EasterSeason" type="cl:ReadingsFerialType" minOccurs="1" maxOccurs="1" />
         </xs:sequence>
         <xs:attribute name="readingsType" type="xs:string" use="required" fixed="seasonal" />

@@ -18,6 +18,12 @@ abstract class ApiTestCase extends TestCase
 
     protected static ?CurlMultiHandler $multiHandler = null;
 
+    private static ?\Throwable $lastException = null;
+    private static int $lastStatusCode        = 0;
+    private static string $responseBody       = '';
+    private static bool $preferV4             = true; // default to IPv4 unless detected otherwise
+    private static string $addr               = '';
+
     public static function setUpBeforeClass(): void
     {
         // Create a shared CurlMultiHandler that will persist connections
@@ -33,27 +39,52 @@ abstract class ApiTestCase extends TestCase
             }
         }
 
+        if (self::isIPAddress($_ENV['API_HOST'])) {
+            // Already an IP — detect family directly
+            if (filter_var($_ENV['API_HOST'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                self::$preferV4 = false;
+                self::$addr     = $_ENV['API_HOST'];
+            } elseif (filter_var($_ENV['API_HOST'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                self::$preferV4 = true;
+                self::$addr     = $_ENV['API_HOST'];
+            }
+        } else {
+            // Hostname — detect preferred stack via DNS resolution
+            $result = self::detectBinding((int) $_ENV['API_PORT']);
+            if ($result['addr'] !== null) {
+                self::$preferV4 = $result['preferV4'];
+                self::$addr     = $result['addr'];
+            } else {
+                throw new \RuntimeException('Could not detect API binding on ' . sprintf('%s://%s:%s', $_ENV['API_PROTOCOL'], $_ENV['API_HOST'], $_ENV['API_PORT']));
+            }
+        }
+
         self::$http = new Client([
-            'base_uri'        => sprintf('%s://%s:%s', $_ENV['API_PROTOCOL'], $_ENV['API_HOST'], $_ENV['API_PORT']),
-            'handler'         => $stack,
-            'timeout'         => 60,
-            'connect_timeout' => 5,
-            'http_errors'     => false,
-            'headers'         => [ 'Connection' => 'keep-alive' ],
-            'curl'            => [ CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2_0 ]
+            'base_uri'         => sprintf('%s://%s:%s', $_ENV['API_PROTOCOL'], $_ENV['API_HOST'], $_ENV['API_PORT']),
+            'handler'          => $stack,
+            'timeout'          => 60,
+            'connect_timeout'  => 5,
+            'http_errors'      => false,
+            'headers'          => [ 'Connection' => 'keep-alive' ],
+            'curl'             => [ CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_2_0 ],
+            'force_ip_resolve' => self::$preferV4 ? 'v4' : 'v6'
         ]);
 
         try {
             // Simple check — adjust path if your API root needs authentication
-            $response           = self::$http->get('/', [
+            $response             = self::$http->get('/', [
                 'on_stats' => function (\GuzzleHttp\TransferStats $stats) {
                     self::$transferStats = $stats->getHandlerStat('http_version');
                 }
             ]);
-            self::$apiAvailable = $response->getStatusCode() < 500;
-            //$response           = self::$http->get('/');
+            self::$lastStatusCode = $response->getStatusCode();
+            self::$apiAvailable   = self::$lastStatusCode < 500;
+            if (false === self::$apiAvailable) {
+                self::$responseBody = (string) $response->getBody();
+            }
         } catch (ConnectException $e) {
-            self::$apiAvailable = false;
+            self::$apiAvailable  = false;
+            self::$lastException = $e;
         }
     }
 
@@ -63,12 +94,24 @@ abstract class ApiTestCase extends TestCase
             // We use `fail` instead of `markSkipped` because we want the message to show without the `--debug` flag,
             // but `markSkipped` only shows the message with `--debug`
             $this->fail(
-                "API is not running on {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']} — skipping integration tests. Maybe run `composer start` first?"
+                "API is not running on {$_ENV['API_PROTOCOL']}://{$_ENV['API_HOST']}:{$_ENV['API_PORT']} "
+                . ( self::$addr !== '' ? '(bound to ' . ( self::$preferV4 ? 'IPv4' : 'IPv6' ) . ' address ' . self::$addr . ') ' : '' )
+                . '— skipping integration tests. Maybe run `composer start` first?' . PHP_EOL
+                . (
+                    self::$lastException
+                    ? 'Error: ' . self::$lastException->getMessage()
+                    : 'Last status code: ' . self::$lastStatusCode . (
+                        self::$responseBody
+                        ? ' (response body: ' . self::$responseBody . ')'
+                        : ''
+                    )
+                )
             );
         }
-        if (self::$transferStats === null) {
+
+        if (self::$transferStats === null || ( self::$transferStats !== 2 && self::$transferStats !== 3 )) {
             $this->fail(
-                'Expected HTTP2 transport, but got ' . ( self::$transferStats ?? 'unknown' )
+                'Expected HTTP2 or HTTP3 transport, but got ' . ( self::$transferStats ?? 'unknown' )
             );
         }
     }
@@ -113,5 +156,35 @@ abstract class ApiTestCase extends TestCase
 
             $dir = $parentDir;
         }
+    }
+
+    private static function isIPAddress(string $host): bool
+    {
+        // Strip IPv6 brackets if present
+        if (str_starts_with($host, '[') && str_ends_with($host, ']')) {
+            $host = substr($host, 1, -1);
+        }
+
+        return filter_var($host, FILTER_VALIDATE_IP) !== false;
+    }
+
+    private static function detectBinding(int $port): array
+    {
+        // Bracket IPv6 host if needed
+        $sock6 = @fsockopen('tcp://[::1]', $port, $errno, $errstr, 0.5);
+        if ($sock6) {
+            fclose($sock6);
+            return ['preferV4' => false, 'addr' => '::1'];
+        }
+
+        // Then try IPv4
+        $sock4 = @fsockopen('tcp://127.0.0.1', $port, $errno, $errstr, 0.5);
+        if ($sock4) {
+            fclose($sock4);
+            return ['preferV4' => true, 'addr' => '127.0.0.1'];
+        }
+
+        // Neither reachable
+        return ['preferV4' => null, 'addr' => null];
     }
 }

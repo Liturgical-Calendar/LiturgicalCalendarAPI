@@ -102,8 +102,6 @@
         "common": [
           "Proper"
         ],
-        "day": 1,
-        "month": 1,
         "event_key": "OnzeLieveVrouwterNood",
         "strtotime": "last saturday of May"
       },
@@ -121,8 +119,6 @@
         "common": [
           "Proper"
         ],
-        "day": 1,
-        "month": 1,
         "event_key": "MirakelvanhetHSacramentteAmsterdam",
         "strtotime": "wednesday after March 12"
       },
@@ -188,7 +184,7 @@
   ],
   "metadata": {
     "diocese_id": "haaams_nl",
-    "diocese_name": "Haarlem-Amsterdam",
+    "diocese_name": "Haarlem–Amsterdam",
     "nation": "NL",
     "locales": [
       "nl_NL"

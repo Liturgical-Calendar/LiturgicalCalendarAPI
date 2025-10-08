@@ -11,6 +11,7 @@ use LiturgicalCalendar\Api\Enum\LitCommon;
 use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Api\LatinUtils;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewMobile;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsAbstract;
@@ -23,8 +24,8 @@ use LiturgicalCalendar\Api\Models\PropriumDeSanctisEvent;
 use LiturgicalCalendar\Api\Models\PropriumDeTemporeEvent;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile;
-use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewFixed as DiocesanLitCalItemCreateNewFixed;
-use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\LitCalItemCreateNewMobile as DiocesanLitCalItemCreateNewMobile;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewFixed;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewMobile;
 
 final class LiturgicalEvent implements \JsonSerializable
 {
@@ -52,6 +53,7 @@ final class LiturgicalEvent implements \JsonSerializable
     public ?string $is_vigil_for         = null;
     public ?string $liturgical_year      = null;
     public ?LitSeason $liturgical_season = null;
+    public bool $holy_day_of_obligation  = false;
 
     /** The following properties are set based on properties passed in the constructor or on other properties */
     private string $grade_lcl;
@@ -87,21 +89,33 @@ final class LiturgicalEvent implements \JsonSerializable
     ) {
         $litMassVariousNeedsArray = false;
         if (is_array($common)) {
-            $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $common)));
-            if (count($valueTypes) > 1) {
-                throw new \InvalidArgumentException('Incoherent liturgical common value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes));
+            if (count($common) === 0) {
+                $litMassVariousNeedsArray = false;
+            } else {
+                $uniqueValueTypes = array_values(array_unique(array_map('gettype', $common)));
+                if (count($uniqueValueTypes) > 1) {
+                    throw new \InvalidArgumentException(
+                        'Incoherent liturgical common value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $uniqueValueTypes)
+                    );
+                }
+                $litMassVariousNeedsArray = $common[0] instanceof LitMassVariousNeeds;
             }
-            $litMassVariousNeedsArray = $common[0] instanceof LitMassVariousNeeds;
         }
+
         $this->event_idx     = self::$internal_index++;
         $this->name          = $name;
         $this->date          = $date; //DateTime object
         $this->color         = is_array($color) ? $color : [$color];
-        $this->color_lcl     = array_map(fn($item) => LitColor::i18n($item, self::$locale), $this->color);
+        $this->color_lcl     = array_map(
+            function (LitColor $item): string {
+                return $item->i18n(self::$locale);
+            },
+            $this->color
+        );
         $this->type          = $type;
         $this->grade         = $grade;
-        $this->grade_lcl     = LitGrade::i18n($this->grade, self::$locale, false, false);
-        $this->grade_abbr    = LitGrade::i18n($this->grade, self::$locale, false, true);
+        $this->grade_lcl     = $this->grade->i18n(self::$locale, false, false);
+        $this->grade_abbr    = $this->grade->i18n(self::$locale, false, true);
         $this->grade_display = $this->grade === LitGrade::HIGHER_SOLEMNITY ? '' : $displayGrade;
         $commons             = $common instanceof LitCommons || $common instanceof LitMassVariousNeeds || $litMassVariousNeedsArray
                                 ? $common
@@ -115,7 +129,12 @@ final class LiturgicalEvent implements \JsonSerializable
         } elseif ($litMassVariousNeedsArray) {
             /** @var LitMassVariousNeeds[] $commons */
             $this->common = $commons;
-            $commonsLcl   = array_map(fn($item) => $item->fullTranslate(self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE), $commons);
+            $commonsLcl   = array_map(
+                function (LitMassVariousNeeds $item): string {
+                    return $item->fullTranslate(self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE);
+                },
+                $commons
+            );
 
             /**translators: when there are multiple possible commons, this will be the glue "[; or] From the Common of..." */
             $or               = self::$locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'vel' : _('or');
@@ -161,15 +180,11 @@ final class LiturgicalEvent implements \JsonSerializable
         $this->readings = $readings;
     }
 
-    /*
-    private static function debugWrite( string $string ) {
-        file_put_contents( "debug.log", $string . PHP_EOL, FILE_APPEND );
-    }
-    */
-
     /**
-     * This function is used to finalize the output of the object for serialization as a JSON string.
-     * It returns an associative array with the following keys:
+     * {@inheritDoc}
+     *
+     * Finalizes the output of the liturgical event for serialization as a JSON string.
+     * Returns an associative array with the following keys:
      * - event_key: a unique key for the liturgical event
      * - event_idx: the index of the event in the array of liturgical events
      * - name: the name of the liturgical event
@@ -201,12 +216,14 @@ final class LiturgicalEvent implements \JsonSerializable
      * - psalter_week: the psalter week of the liturgical event, if applicable
      * - liturgical_season: the liturgical season of the liturgical event, if applicable
      * - liturgical_season_lcl: the liturgical season of the liturgical event, translated according to the current locale
+     * - holy_day_of_obligation: a boolean value of true indicating that the liturgical event is a holy day of obligation, if applicable
+     *
      * @return array{
      *      event_key: string,
      *      event_idx: int,
      *      name: string,
      *      date: int,
-     *      color: array<'green'|'pink'|'purple'|'red'|'white'>,
+     *      color: array<'green'|'rose'|'purple'|'red'|'white'>,
      *      color_lcl: string[],
      *      type: 'fixed'|'mobile',
      *      grade: -1|0|1|2|3|4|5|6|7,
@@ -231,7 +248,8 @@ final class LiturgicalEvent implements \JsonSerializable
      *      has_vesper_ii?: ?bool,
      *      psalter_week?: ?int,
      *      liturgical_season?: ?string,
-     *      liturgical_season_lcl?: string
+     *      liturgical_season_lcl?: string,
+     *      holy_day_of_obligation?: bool
      * }
      */
     public function jsonSerialize(): array
@@ -258,12 +276,20 @@ final class LiturgicalEvent implements \JsonSerializable
             'date'                    => (int) $this->date->format('U'),
             'year'                    => (int) $this->date->format('Y'),
             'month'                   => (int) $this->date->format('n'), //1 for January, 12 for December
-            'month_short'             => self::$monthShort->format($this->date->format('U')),
-            'month_long'              => self::$monthLong->format($this->date->format('U')),
+            'month_short'             => LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE
+                                            ? LatinUtils::LATIN_MONTHS_ABBR[(int) $this->date->format('n')]
+                                            : self::$monthShort->format($this->date->format('U')),
+            'month_long'              => LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE
+                                            ? LatinUtils::LATIN_MONTHS[(int) $this->date->format('n')]
+                                            : self::$monthLong->format($this->date->format('U')),
             'day'                     => (int) $this->date->format('j'),
             'day_of_the_week_iso8601' => (int) $this->date->format('N'), //1 for Monday, 7 for Sunday
-            'day_of_the_week_short'   => self::$dayOfTheWeekShort->format($this->date->format('U')),
-            'day_of_the_week_long'    => self::$dayOfTheWeekLong->format($this->date->format('U')),
+            'day_of_the_week_short'   => LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE
+                                            ? LatinUtils::LATIN_WEEKDAYS_ABBR[$this->date->format('w')]
+                                            : self::$dayOfTheWeekShort->format($this->date->format('U')),
+            'day_of_the_week_long'    => LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE
+                                            ? LatinUtils::LATIN_DAYOFTHEWEEK[$this->date->format('w')]
+                                            : self::$dayOfTheWeekLong->format($this->date->format('U')),
             'readings'                => $this->readings->jsonSerialize()
         ];
 
@@ -297,7 +323,11 @@ final class LiturgicalEvent implements \JsonSerializable
 
         if ($this->liturgical_season !== null) {
             $returnArr['liturgical_season']     = $this->liturgical_season->value;
-            $returnArr['liturgical_season_lcl'] = LitSeason::i18n($this->liturgical_season, self::$locale);
+            $returnArr['liturgical_season_lcl'] = $this->liturgical_season->i18n(self::$locale);
+        }
+
+        if ($this->holy_day_of_obligation) {
+            $returnArr['holy_day_of_obligation'] = true;
         }
 
         return $returnArr;
@@ -330,6 +360,8 @@ final class LiturgicalEvent implements \JsonSerializable
             self::$dayOfTheWeekLong  = $dowLongFormat;
             self::$monthShort        = $monthShortFormat;
             self::$monthLong         = $monthLongFormat;
+        } else {
+            throw new \InvalidArgumentException('The provided locale is not valid: ' . $locale . '.');
         }
     }
 
@@ -389,14 +421,19 @@ final class LiturgicalEvent implements \JsonSerializable
 
             if (property_exists($obj, 'color')) {
                 if (is_array($obj->color)) {
-                    $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $obj->color)));
+                    $valueTypes = array_values(array_unique(array_map('gettype', $obj->color)));
                     if (count($valueTypes) > 1) {
                         throw new \InvalidArgumentException('Incoherent color value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes));
                     }
                     if ($valueTypes[0] === 'string') {
                         /** @var string[] $colors */
                         $colors = $obj->color;
-                        $color  = array_values(array_map(fn(string $value): LitColor => LitColor::from($value), $colors));
+                        $color  = array_map(
+                            function (string $value): LitColor {
+                                return LitColor::from($value);
+                            },
+                            $colors
+                        );
                     } else {
                         throw new \InvalidArgumentException('Invalid color value types provided to create LiturgicalEvent. Expected type string or LitColor, found ' . $valueTypes[0]);
                     }
@@ -445,11 +482,12 @@ final class LiturgicalEvent implements \JsonSerializable
             }
         } else {
             if (isset($obj->common)) {
+                /** @var LitCommons|LitMassVariousNeeds[] $commons */
                 $commons = $obj->common;
             } else {
                 // We ensure a default value
                 /** @var LitCommons $commons */
-                $commons = LitCommons::create([]);
+                $commons = LitCommons::create([LitCommon::NONE]);
             }
             if (isset($obj->color)) {
                 $color = $obj->color;
@@ -553,7 +591,7 @@ final class LiturgicalEvent implements \JsonSerializable
         $colors = LitColor::GREEN;
         if (array_key_exists('color', $arr)) {
             if (is_array($arr['color'])) {
-                $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $arr['color'])));
+                $valueTypes = array_values(array_unique(array_map('gettype', $arr['color'])));
                 if (count($valueTypes) > 1) {
                     throw new \InvalidArgumentException('Incoherent color value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes));
                 }
@@ -623,8 +661,8 @@ final class LiturgicalEvent implements \JsonSerializable
     }
 
     /**
-     * @param LitCommons|array<LitMassVariousNeeds|LitCommon|string> $common
-     * @return LitCommons|array<LitMassVariousNeeds>
+     * @param LitCommons|LitMassVariousNeeds[]|LitCommon[]|string[] $common
+     * @return LitCommons|LitMassVariousNeeds[]
      */
     private static function transformCommons(LitCommons|array $common): LitCommons|array
     {
@@ -638,7 +676,7 @@ final class LiturgicalEvent implements \JsonSerializable
             return $commons;
         }
 
-        $valueTypes = array_values(array_unique(array_map(fn($value) => gettype($value), $common)));
+        $valueTypes = array_values(array_unique(array_map('gettype', $common)));
 
         if (count($valueTypes) > 1) {
             throw new \InvalidArgumentException('Incoherent liturgical common value types provided to create LiturgicalEvent: found multiple types ' . implode(', ', $valueTypes));
@@ -646,11 +684,12 @@ final class LiturgicalEvent implements \JsonSerializable
 
         if ($valueTypes[0] === 'string') {
             /** @var string[] $common */
-            return LitCommons::create($common)
-                    ?? array_values(array_map(
-                        fn(string $value): LitMassVariousNeeds => LitMassVariousNeeds::from($value),
-                        $common
-                    ));
+            return LitCommons::create($common) ?? array_map(
+                function (string $value): LitMassVariousNeeds {
+                    return LitMassVariousNeeds::from($value);
+                },
+                $common
+            );
         }
 
         if (self::allInstancesOf($common, LitCommon::class)) {

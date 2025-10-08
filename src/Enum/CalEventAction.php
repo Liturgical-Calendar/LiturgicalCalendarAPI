@@ -46,7 +46,7 @@ enum CalEventAction: string
     case CreateNew = 'createNew';
 
     /**
-     * This `metadata.action` is only used for Decrees of the Congregation for Divine Worship.
+     * This `metadata.action` is only used for Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments.
      */
     case MakeDoctor = 'makeDoctor';
 }

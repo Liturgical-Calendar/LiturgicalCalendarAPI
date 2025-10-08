@@ -5,7 +5,9 @@ vendor/*
 .env.*
 !.env.example
 phpstan.neon
-..idea
+!phpstan.neon.dist
+phpunit.xml
+!phpunit.xml.dist
 /*.php
 /*.txt
 /*.js
@@ -17,3 +19,5 @@ phpstan.neon
 public/*.php
 !public/index.php
 !public/LitCalTestServer.php
+/.aider*
+.DS_Store
