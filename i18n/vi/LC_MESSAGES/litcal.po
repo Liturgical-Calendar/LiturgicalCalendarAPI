@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # Long Truong <binhlong@gmail.com>, 2024.
 # OpenAI <noreply-mt-openai@weblate.org>, 2024.
+# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-08-22 15:48+0000\n"
-"PO-Revision-Date: 2024-10-03 13:34+0000\n"
-"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
+"PO-Revision-Date: 2025-10-08 14:05+0000\n"
+"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Vietnamese <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/vi/>\n"
 "Language: vi\n"
@@ -17,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.6.1\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:32
@@ -1154,17 +1155,15 @@ msgstr ""
 #.  7. National or wider region calendar
 #.
 #: src/Handlers/CalendarHandler.php:3167
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
-#| "'%5$s' in the year %6$d."
+#, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, was suppressed by the %4$s "
 "'%5$s' in the year %6$d, however being elevated to a Patronal festivity for "
 "the Calendar %7$s, it has been reinstated."
 msgstr ""
-"%1$s '%2$s', thường được cử hành vào ngày %3$s, bị thay thế bởi %4$s '%5$s' "
-"vào năm %6$d."
+"Lễ %1$s '%2$s', thường được tổ chức vào ngày %3$s, đã bị bãi bỏ bởi %4$s '%5$"
+"s' vào năm %6$d, tuy nhiên khi được nâng lên thành lễ Bổn mạng cho Lịch %7$"
+"s, nó đã được khôi phục."
 
 #. translators:
 #.  1. Grade of the liturgical event
@@ -1176,17 +1175,15 @@ msgstr ""
 #.  7. National or wider region calendar
 #.
 #: src/Handlers/CalendarHandler.php:3187
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
-#| "'%5$s' in the year %6$d."
+#, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, was suppressed by the %4$s "
 "'%5$s' in the year %6$d, and though it would be elevated to a Patronal "
 "festivity for the Calendar %7$s, it has not been reinstated."
 msgstr ""
-"%1$s '%2$s', thường được cử hành vào ngày %3$s, bị thay thế bởi %4$s '%5$s' "
-"vào năm %6$d."
+"Lễ %1$s '%2$s', thường được tổ chức vào ngày %3$s, đã bị bãi bỏ bởi %4$s '%5$"
+"s' vào năm %6$d, và mặc dù nó được nâng lên thành lễ Bổn mạng cho Lịch %7$s, "
+"nhưng vẫn chưa được khôi phục."
 
 #. translators:
 #.  1. Name of the first coinciding Memorial
@@ -1271,16 +1268,13 @@ msgstr ""
 #.  6. Requested calendar year
 #.
 #: src/Handlers/CalendarHandler.php:3504
-#, fuzzy, php-format
-#| msgid ""
-#| "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
-#| "applicable to the year %5$d (%6$s)."
+#, php-format
 msgid ""
 "The name of the %1$s '%2$s' has been changed to '%3$s' in the national "
 "calendar '%4$s' since the year %5$d, applicable to the year %6$d."
 msgstr ""
-"Tên của %1$s '%2$s' đã được đổi thành %3$s kể từ năm %4$d, áp dụng cho năm "
-"%5$d (%6$s)."
+"Tên của %1$s '%2$s' đã được đổi thành '%3$s' trong lịch quốc gia '%4$s' kể "
+"từ năm %5$d, áp dụng cho năm %6$d."
 
 #. translators:
 #.  1. Event key of the liturgical event
@@ -1290,17 +1284,15 @@ msgstr ""
 #.  5. Requested calendar year
 #.
 #: src/Handlers/CalendarHandler.php:3522
-#, fuzzy, php-format
-#| msgid ""
-#| "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
-#| "applicable to the year %5$d (%6$s)."
+#, php-format
 msgid ""
 "The name of the celebration '%1$s' has been changed to '%2$s' in the "
 "national calendar '%3$s' since the year %4$d, but could not be applied to "
 "the year %5$d because the celebration was not found."
 msgstr ""
-"Tên của %1$s '%2$s' đã được đổi thành %3$s kể từ năm %4$d, áp dụng cho năm "
-"%5$d (%6$s)."
+"Tên của lễ kỷ niệm '%1$s' đã được đổi thành '%2$s' trong lịch quốc gia '%3$"
+"s' từ năm %4$d, nhưng không thể áp dụng cho năm %5$d vì lễ kỷ niệm không "
+"được tìm thấy."
 
 #. translators:
 #.  1. Original liturgical grade
@@ -1353,16 +1345,13 @@ msgstr ""
 #.  7. Requested calendar year
 #.
 #: src/Handlers/CalendarHandler.php:3603
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
-#| "applicable to the year %6$d."
+#, php-format
 msgid ""
 "The %1$s '%2$s' has been moved from %3$s to %4$s since the year %5$d in the "
 "national calendar '%6$s', applicable to the year %7$d."
 msgstr ""
-"%1$s '%2$s' đã được thêm vào ngày %3$s kể từ năm %4$d (%5$s), áp dụng cho "
-"năm %6$d."
+"%1$s '%2$s' đã được chuyển từ %3$s sang %4$s kể từ năm %5$d trong lịch quốc "
+"gia '%6$s', áp dụng cho năm %7$d."
 
 #. translators:
 #.  1. Name of the liturgical event
@@ -1378,6 +1367,9 @@ msgid ""
 "the national calendar '%4$s', but cannot be applied in the year %5$d simply "
 "because we could not find the data for it from the Roman Missal events."
 msgstr ""
+"Sự kiện phụng vụ '%1$s' đã được chuyển sang %2$s kể từ năm %3$d trong lịch "
+"quốc gia '%4$s', nhưng không thể áp dụng trong năm %5$d chỉ vì chúng tôi "
+"không thể tìm thấy dữ liệu cho nó từ các sự kiện trong Sách lễ Rôma."
 
 #. translators:
 #.  1. event_key of the liturgical event
