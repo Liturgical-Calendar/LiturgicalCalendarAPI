@@ -33,6 +33,14 @@ class AssertionItem
             throw new \InvalidArgumentException('Property `expected_value` must be a string or null');
         }
 
+        // If expected_value is a string, ensure it's a valid RFC 3339 (ISO 8601) date-time string
+        if (is_string($assertionItem->expected_value)) {
+            $parsed = \DateTime::createFromFormat(\DateTime::ATOM, $assertionItem->expected_value);
+            if (false === $parsed || $parsed->format(\DateTime::ATOM) !== $assertionItem->expected_value) {
+                throw new \InvalidArgumentException('Property `expected_value` must be a valid RFC 3339 (ISO 8601) date-time string');
+            }
+        }
+
         if (false === is_string($assertionItem->assert)) {
             throw new \InvalidArgumentException('Property `assert` must be a string');
         }
