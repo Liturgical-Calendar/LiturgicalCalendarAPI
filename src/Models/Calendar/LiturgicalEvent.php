@@ -274,7 +274,7 @@ final class LiturgicalEvent implements \JsonSerializable
             'type'                    => $this->type->value,
             //'timestamp'               => (int) $this->date->format('U'),        // PHP timestamp (seconds since the Unix Epoch)
             //'timestamp_ms'            => (int) $this->date->format('U') * 1000, // JavaScript timestamp (milliseconds since the Unix Epoch)
-            'date'                    => (int) $this->date->format('c'), // serialize the DateTime object as an ISO-8601 (RFC 3339) date string
+            'date'                    => $this->date->format('c'),                // serialize the DateTime object as an ISO-8601 (RFC 3339) date string
             'year'                    => (int) $this->date->format('Y'),
             'month'                   => (int) $this->date->format('n'), // 1 for January, 12 for December
             'month_short'             => LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE
