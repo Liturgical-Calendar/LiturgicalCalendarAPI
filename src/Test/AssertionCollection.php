@@ -19,7 +19,7 @@ class AssertionCollection implements \IteratorAggregate
      *
      * Each assertion must be an object with the required properties for an AssertionItem.
      *
-     * @param array<object{year:int,expected_value:int,assert:string,assertion:string,comment:string}> $assertions The assertions to include in the collection.
+     * @param array<object{year:int,expected_value:string|null,assert:string,assertion:string,comment:string}> $assertions The assertions to include in the collection.
      *
      * See {@see \LiturgicalCalendar\Api\Test\AssertionItem::__construct()} for the required properties of each assertion.
      */
