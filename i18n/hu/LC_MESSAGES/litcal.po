@@ -2,13 +2,14 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Gábor <pleineux@gmail.com>, 2025.
+# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-08-22 15:48+0000\n"
-"PO-Revision-Date: 2025-04-21 09:40+0000\n"
-"Last-Translator: Gábor <pleineux@gmail.com>\n"
+"PO-Revision-Date: 2025-10-08 14:05+0000\n"
+"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Hungarian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/hu/>\n"
 "Language: hu\n"
@@ -16,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.11\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:32
@@ -590,37 +591,37 @@ msgstr ""
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:28
 msgid "Advent"
-msgstr ""
+msgstr "Advent"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:31
 msgid "Christmas"
-msgstr ""
+msgstr "Karácsony"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:34
 msgid "Lent"
-msgstr ""
+msgstr "Nagyböjt"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:37
 msgid "Easter Triduum"
-msgstr ""
+msgstr "Húsvéti Szent Háromnap"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:40
 msgid "Easter"
-msgstr ""
+msgstr "Húsvét"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:43
 msgid "Ordinary Time"
-msgstr ""
+msgstr "Évközi időszak"
 
 #. translators: context = liturgical season: unsupported value
 #: src/Enum/LitSeason.php:46
 msgid "Unknown Season"
-msgstr ""
+msgstr "Ismeretlen évszak"
 
 #: src/Handlers/CalendarHandler.php:425
 #, php-format
