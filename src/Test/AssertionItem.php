@@ -7,7 +7,7 @@ use LiturgicalCalendar\Api\Enum\LitEventTestAssertion;
 class AssertionItem
 {
     public int $year;
-    public ?int $expected_value;
+    public ?string $expected_value;
     public LitEventTestAssertion $assert;
     public string $assertion;
     public ?string $comment = null;
@@ -15,7 +15,7 @@ class AssertionItem
     public const REQUIRED_PROPERTIES = ['year', 'expected_value', 'assert', 'assertion'];
 
     /**
-     * @param object{year:int,expected_value:int|null,assert:string,assertion:string,comment?:string} $assertionItem
+     * @param object{year:int,expected_value:string|null,assert:string,assertion:string,comment?:string} $assertionItem
      */
     public function __construct(object $assertionItem)
     {
@@ -29,8 +29,8 @@ class AssertionItem
             throw new \InvalidArgumentException('Property `year` must be an integer');
         }
 
-        if (false === is_int($assertionItem->expected_value) && false === is_null($assertionItem->expected_value)) {
-            throw new \InvalidArgumentException('Property `expected_value` must be an integer or null');
+        if (false === is_string($assertionItem->expected_value) && false === is_null($assertionItem->expected_value)) {
+            throw new \InvalidArgumentException('Property `expected_value` must be a string or null');
         }
 
         if (false === is_string($assertionItem->assert)) {
