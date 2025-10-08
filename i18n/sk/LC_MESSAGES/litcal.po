@@ -1,15 +1,15 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024.
+# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024, 2025.
 # Milan Šalka <salka.milan@googlemail.com>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-08-22 15:48+0000\n"
-"PO-Revision-Date: 2024-10-03 11:32+0000\n"
-"Last-Translator: Milan Šalka <salka.milan@googlemail.com>\n"
+"PO-Revision-Date: 2025-10-08 14:05+0000\n"
+"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Slovak <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/sk/>\n"
 "Language: sk\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Weblate 5.6.1\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:32
@@ -1158,16 +1158,14 @@ msgstr ""
 #.  7. National or wider region calendar
 #.
 #: src/Handlers/CalendarHandler.php:3167
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
-#| "'%5$s' in the year %6$d."
+#, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, was suppressed by the %4$s "
 "'%5$s' in the year %6$d, however being elevated to a Patronal festivity for "
 "the Calendar %7$s, it has been reinstated."
 msgstr ""
-"%1$s '%2$s', zvyčajne oslavovaný %3$s, je v roku %6$d potlačený %4$s '%5$s'."
+"%1$s '%2$s', zvyčajne oslavovaný %3$s, bol zrušený %4$s '%5$s' v roku %6$d, "
+"avšak po povýšení na patrónsku slávnosť pre kalendár %7$s bol obnovený."
 
 #. translators:
 #.  1. Grade of the liturgical event
@@ -1179,16 +1177,15 @@ msgstr ""
 #.  7. National or wider region calendar
 #.
 #: src/Handlers/CalendarHandler.php:3187
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s', usually celebrated on %3$s, is suppressed by the %4$s "
-#| "'%5$s' in the year %6$d."
+#, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, was suppressed by the %4$s "
 "'%5$s' in the year %6$d, and though it would be elevated to a Patronal "
 "festivity for the Calendar %7$s, it has not been reinstated."
 msgstr ""
-"%1$s '%2$s', zvyčajne oslavovaný %3$s, je v roku %6$d potlačený %4$s '%5$s'."
+"%1$s '%2$s', zvyčajne oslavovaný %3$s, bol zrušený %4$s '%5$s' v roku %6$d, "
+"a hoci by bol povýšený na patrónsku slávnosť pre kalendár %7$s, nebol "
+"obnovený."
 
 #. translators:
 #.  1. Name of the first coinciding Memorial
@@ -1273,16 +1270,13 @@ msgstr ""
 #.  6. Requested calendar year
 #.
 #: src/Handlers/CalendarHandler.php:3504
-#, fuzzy, php-format
-#| msgid ""
-#| "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
-#| "applicable to the year %5$d (%6$s)."
+#, php-format
 msgid ""
 "The name of the %1$s '%2$s' has been changed to '%3$s' in the national "
 "calendar '%4$s' since the year %5$d, applicable to the year %6$d."
 msgstr ""
-"Názov %1$s '%2$s' bol zmenený na %3$s od roku %4$d, platný pre rok %5$d "
-"(%6$s)."
+"Názov %1$s '%2$s' bol zmenený na '%3$s' v národnom kalendári '%4$s' od roku "
+"%5$d, platný pre rok %6$d."
 
 #. translators:
 #.  1. Event key of the liturgical event
@@ -1292,17 +1286,15 @@ msgstr ""
 #.  5. Requested calendar year
 #.
 #: src/Handlers/CalendarHandler.php:3522
-#, fuzzy, php-format
-#| msgid ""
-#| "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
-#| "applicable to the year %5$d (%6$s)."
+#, php-format
 msgid ""
 "The name of the celebration '%1$s' has been changed to '%2$s' in the "
 "national calendar '%3$s' since the year %4$d, but could not be applied to "
 "the year %5$d because the celebration was not found."
 msgstr ""
-"Názov %1$s '%2$s' bol zmenený na %3$s od roku %4$d, platný pre rok %5$d "
-"(%6$s)."
+"Názov oslavy '%1$s' bol zmenený na '%2$s' v národnom kalendári '%3$s' od "
+"roku %4$d, ale nemohol byť použitý v roku %5$d, pretože oslava nebola "
+"nájdená."
 
 #. translators:
 #.  1. Original liturgical grade
@@ -1355,15 +1347,13 @@ msgstr ""
 #.  7. Requested calendar year
 #.
 #: src/Handlers/CalendarHandler.php:3603
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
-#| "applicable to the year %6$d."
+#, php-format
 msgid ""
 "The %1$s '%2$s' has been moved from %3$s to %4$s since the year %5$d in the "
 "national calendar '%6$s', applicable to the year %7$d."
 msgstr ""
-"%1$s '%2$s' bol pridaný dňa %3$s od roku %4$d (%5$s), platný pre rok %6$d."
+"%1$s '%2$s' bol presunutý z %3$s do %4$s od roku %5$d v národnom kalendári "
+"'%6$s', platnom pre rok %7$d."
 
 #. translators:
 #.  1. Name of the liturgical event
