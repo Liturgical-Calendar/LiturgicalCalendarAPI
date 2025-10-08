@@ -188,7 +188,7 @@ final class LiturgicalEvent implements \JsonSerializable
      * - event_key: a unique key for the liturgical event
      * - event_idx: the index of the event in the array of liturgical events
      * - name: the name of the liturgical event
-     * - date: a PHP timestamp (seconds since the Unix Epoch) for the date of the liturgical event
+     * - date: an RFC 3339 (ISO 8601) formatted date string representing the date of the liturgical event
      * - color: the liturgical color of the liturgical event
      * - color_lcl: the color of the liturgical event, translated according to the current locale
      * - type: the type of the liturgical event (mobile or fixed)
@@ -371,7 +371,7 @@ final class LiturgicalEvent implements \JsonSerializable
      *
      * The provided object must have the following properties:
      * - name: The name of the liturgical event, as a string.
-     * - date: The date of the liturgical event, as a DateTime object or as an integer representing the Unix timestamp.
+     * - date: The date of the liturgical event, as a DateTime object or as an RFC 3339 formatted string.
      * - grade: The grade of the liturgical event, as a LitGrade object or as an integer.
      *
      * Optional properties are:
@@ -405,7 +405,7 @@ final class LiturgicalEvent implements \JsonSerializable
             throw new \InvalidArgumentException('Invalid name provided to create LiturgicalEvent');
         }
 
-        if (false === $obj->date instanceof DateTime && false === is_int($obj->date)) {
+        if (false === $obj->date instanceof DateTime && false === is_string($obj->date)) {
             throw new \InvalidArgumentException('Invalid date provided to create LiturgicalEvent');
         }
 
@@ -416,8 +416,8 @@ final class LiturgicalEvent implements \JsonSerializable
         // When we read data from a JSON file, $obj will be an instance of stdClass,
         // and we need to cast the values to types that will be accepted by the LiturgicalEvent constructor
         if ($obj instanceof \stdClass) {
-            if (is_int($obj->date)) {
-                $obj->date = new DateTime()->setTimestamp($obj->date)->setTimezone(new \DateTimeZone('UTC'));
+            if (is_string($obj->date)) {
+                $obj->date = new DateTime($obj->date);
             }
 
             if (property_exists($obj, 'color')) {
@@ -543,7 +543,7 @@ final class LiturgicalEvent implements \JsonSerializable
      *
      * The array must contain the following keys:
      * - name: The name of the liturgical event, as a string.
-     * - date: The date of the liturgical event, as a DateTime object or as an integer representing the Unix timestamp.
+     * - date: The date of the liturgical event, as a DateTime object or as an RFC 3339 (ISO 8601) formatted string.
      * - grade: The grade of the liturgical event, as a LitGrade object or as an integer.
      *
      * Optional keys are:
@@ -577,7 +577,7 @@ final class LiturgicalEvent implements \JsonSerializable
             throw new \InvalidArgumentException('Invalid name provided to create LiturgicalEvent');
         }
 
-        if (false === $arr['date'] instanceof DateTime && false === is_int($arr['date'])) {
+        if (false === $arr['date'] instanceof DateTime && false === is_string($arr['date'])) {
             throw new \InvalidArgumentException('Invalid date provided to create LiturgicalEvent');
         }
 
@@ -586,7 +586,7 @@ final class LiturgicalEvent implements \JsonSerializable
         }
 
         if (is_int($arr['date'])) {
-            $arr['date'] = new DateTime()->setTimestamp($arr['date'])->setTimezone(new \DateTimeZone('UTC'));
+            $arr['date'] = new DateTime($arr['date']);
         }
 
         $colors = LitColor::GREEN;

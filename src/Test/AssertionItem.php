@@ -21,24 +21,24 @@ class AssertionItem
     {
         foreach (self::REQUIRED_PROPERTIES as $property) {
             if (!property_exists($assertionItem, $property)) {
-                throw new \InvalidArgumentException(__METHOD__ . ": Missing required property: $property");
+                throw new \InvalidArgumentException("Missing required property: $property");
             }
         }
 
         if (false === is_int($assertionItem->year)) {
-            throw new \InvalidArgumentException(__METHOD__ . ': Property `year` must be an integer');
+            throw new \InvalidArgumentException('Property `year` must be an integer');
         }
 
         if (false === is_int($assertionItem->expected_value) && false === is_null($assertionItem->expected_value)) {
-            throw new \InvalidArgumentException(__METHOD__ . ': Property `expected_value` must be an integer or null');
+            throw new \InvalidArgumentException('Property `expected_value` must be an integer or null');
         }
 
         if (false === is_string($assertionItem->assert)) {
-            throw new \InvalidArgumentException(__METHOD__ . ': Property `assert` must be a string');
+            throw new \InvalidArgumentException('Property `assert` must be a string');
         }
 
         if (false === is_string($assertionItem->assertion)) {
-            throw new \InvalidArgumentException(__METHOD__ . ': Property `assertion` must be a string');
+            throw new \InvalidArgumentException('Property `assertion` must be a string');
         }
 
         $this->year           = $assertionItem->year;

@@ -6,20 +6,20 @@
     "assertions": [
         {
             "year": 2022,
-            "expected_value": 1655942400,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2022-06-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "Nativity of John the Baptist should be moved to June 23"
         },
         {
             "year": 2033,
-            "expected_value": 2003097600,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2033-06-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "Nativity of John the Baptist should be moved to June 23"
         },
         {
             "year": 2044,
-            "expected_value": 2350252800,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2044-06-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "Nativity of John the Baptist should be moved to June 23"
         }
     ]
