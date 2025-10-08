@@ -222,7 +222,7 @@ final class LiturgicalEvent implements \JsonSerializable
      *      event_key: string,
      *      event_idx: int,
      *      name: string,
-     *      date: int,
+     *      date: string,
      *      color: array<'green'|'rose'|'purple'|'red'|'white'>,
      *      color_lcl: string[],
      *      type: 'fixed'|'mobile',
@@ -261,7 +261,6 @@ final class LiturgicalEvent implements \JsonSerializable
             'event_key'               => $this->event_key,
             'event_idx'               => $this->event_idx,
             'name'                    => $this->name,
-            //serialize the DateTime   object as a PHP timestamp (seconds since the Unix Epoch)
             'color'                   => array_map(fn ($color) => $color->value, $this->color),
             'color_lcl'               => $this->color_lcl,
             'grade'                   => $this->grade->value,
@@ -273,9 +272,11 @@ final class LiturgicalEvent implements \JsonSerializable
                                             : array_map(fn (LitMassVariousNeeds $litMassVariousNeeds) => $litMassVariousNeeds->value, $this->common),
             'common_lcl'              => $this->common_lcl,
             'type'                    => $this->type->value,
-            'date'                    => (int) $this->date->format('U'),
+            //'timestamp'               => (int) $this->date->format('U'),        // PHP timestamp (seconds since the Unix Epoch)
+            //'timestamp_ms'            => (int) $this->date->format('U') * 1000, // JavaScript timestamp (milliseconds since the Unix Epoch)
+            'date'                    => (int) $this->date->format('c'), // serialize the DateTime object as an ISO-8601 (RFC 3339) date string
             'year'                    => (int) $this->date->format('Y'),
-            'month'                   => (int) $this->date->format('n'), //1 for January, 12 for December
+            'month'                   => (int) $this->date->format('n'), // 1 for January, 12 for December
             'month_short'             => LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE
                                             ? LatinUtils::LATIN_MONTHS_ABBR[(int) $this->date->format('n')]
                                             : self::$monthShort->format($this->date->format('U')),
@@ -283,7 +284,7 @@ final class LiturgicalEvent implements \JsonSerializable
                                             ? LatinUtils::LATIN_MONTHS[(int) $this->date->format('n')]
                                             : self::$monthLong->format($this->date->format('U')),
             'day'                     => (int) $this->date->format('j'),
-            'day_of_the_week_iso8601' => (int) $this->date->format('N'), //1 for Monday, 7 for Sunday
+            'day_of_the_week_iso8601' => (int) $this->date->format('N'), // 1 for Monday, 7 for Sunday
             'day_of_the_week_short'   => LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE
                                             ? LatinUtils::LATIN_WEEKDAYS_ABBR[$this->date->format('w')]
                                             : self::$dayOfTheWeekShort->format($this->date->format('U')),
