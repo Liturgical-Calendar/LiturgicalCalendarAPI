@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # Bonaventura Galang <bonaventuragal@gmail.com>, 2024.
 # User_425 <user425.itsme@gmail.com>, 2024.
+# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-08-22 15:48+0000\n"
-"PO-Revision-Date: 2024-08-20 15:40+0000\n"
-"Last-Translator: User_425 <user425.itsme@gmail.com>\n"
+"PO-Revision-Date: 2025-10-08 14:05+0000\n"
+"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Indonesian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/api-strings/id/>\n"
 "Language: id\n"
@@ -17,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.6.1\n"
+"X-Generator: Weblate 5.12.2\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:32
@@ -615,27 +616,27 @@ msgstr ""
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:28
 msgid "Advent"
-msgstr ""
+msgstr "Adven"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:31
 msgid "Christmas"
-msgstr ""
+msgstr "Natal"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:34
 msgid "Lent"
-msgstr ""
+msgstr "Prapaskah"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:37
 msgid "Easter Triduum"
-msgstr ""
+msgstr "Trihari Paskah"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:40
 msgid "Easter"
-msgstr ""
+msgstr "Paskah"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:43
@@ -645,7 +646,7 @@ msgstr ""
 #. translators: context = liturgical season: unsupported value
 #: src/Enum/LitSeason.php:46
 msgid "Unknown Season"
-msgstr ""
+msgstr "Musim Tak Dikenal"
 
 #: src/Handlers/CalendarHandler.php:425
 #, php-format
