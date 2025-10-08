@@ -416,8 +416,13 @@ final class LiturgicalEvent implements \JsonSerializable
         // When we read data from a JSON file, $obj will be an instance of stdClass,
         // and we need to cast the values to types that will be accepted by the LiturgicalEvent constructor
         if ($obj instanceof \stdClass) {
+            // TODO: Will the date ever be a string? Will any JSON src file contain a date as a string?
             if (is_string($obj->date)) {
-                $obj->date = new DateTime($obj->date);
+                $parsed = \DateTime::createFromFormat(\DateTime::ATOM, $obj->date);
+                if (false === $parsed || $parsed->format(\DateTime::ATOM) !== $obj->date) {
+                    throw new \InvalidArgumentException('Property `date` must be a valid RFC 3339 (ISO 8601) date-time string');
+                }
+                $obj->date = $parsed;
             }
 
             if (property_exists($obj, 'color')) {
@@ -585,8 +590,13 @@ final class LiturgicalEvent implements \JsonSerializable
             throw new \InvalidArgumentException('Invalid grade provided to create LiturgicalEvent');
         }
 
-        if (is_int($arr['date'])) {
-            $arr['date'] = new DateTime($arr['date']);
+        // TODO: Will the date ever be a string? Will any JSON src file contain a date as a string?
+        if (is_string($arr['date'])) {
+            $parsed = \DateTime::createFromFormat(\DateTime::ATOM, $arr['date']);
+            if (false === $parsed || $parsed->format(\DateTime::ATOM) !== $arr['date']) {
+                throw new \InvalidArgumentException('Property `date` must be a valid RFC 3339 (ISO 8601) date-time string');
+            }
+            $arr['date'] = $parsed;
         }
 
         $colors = LitColor::GREEN;
