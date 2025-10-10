@@ -50,7 +50,7 @@ class TestItem
     /**
      * Constructs a new TestItem instance from the given test object.
      *
-     * @param \stdClass&object{name:string,description:string,test_type:string,event_key:string,assertions:array<object{year:int,expected_value:int,assert:string,assertion:string,comment:string}>} $testObject An object representing a test, which must contain
+     * @param \stdClass&object{name:string,description:string,test_type:string,event_key:string,assertions:array<object{year:int,expected_value:string|null,assert:string,assertion:string,comment:string}>} $testObject An object representing a test, which must contain
      *                              the required properties: 'name', 'event_key',
      *                              'description', 'test_type', and 'assertions'.
      *

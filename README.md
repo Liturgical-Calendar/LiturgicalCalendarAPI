@@ -50,6 +50,7 @@
 ![Codesniffer PHPStan POTs update](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/actions/workflows/main.yml/badge.svg?branch=development)
 ![PHPStan level](https://img.shields.io/badge/phpstan-level%2010-brightgreen?style=flat-square&logo=php "PHPStan level 10")
 ![PHPUnit](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/actions/workflows/phpunit.yml/badge.svg?branch=development)
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/Liturgical-Calendar/LiturgicalCalendarAPI?utm_source=oss&utm_medium=github&utm_campaign=Liturgical-Calendar%2FLiturgicalCalendarAPI&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 
 # Liturgical Calendar
 

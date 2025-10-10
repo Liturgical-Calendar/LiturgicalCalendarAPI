@@ -25,7 +25,7 @@ class DateTime extends \DateTime implements \JsonSerializable
         $tz = json_decode($tzJson, true, 512, JSON_THROW_ON_ERROR);
 
         return [
-            'date' => $this->format('c'), //serialize the DateTime object as a PHP timestamp
+            'date' => $this->format('c'), // serialize the DateTime object as an ISO-8601 date string
             ...$tz
         ];
     }

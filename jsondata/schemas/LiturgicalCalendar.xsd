@@ -59,7 +59,7 @@
                       </xs:complexType>
                     </xs:element>
                     <xs:element name="CommonLcl" type="xs:string" />
-                    <xs:element name="Date" type="xs:long" />
+                    <xs:element name="Date" type="xs:dateTime" />
                     <xs:element name="Day">
                       <xs:simpleType>
                         <xs:restriction base="xs:positiveInteger">
