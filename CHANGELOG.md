@@ -238,7 +238,7 @@ Blessed Virgin Mary Mother of the Church, pray for us! ⛪
 ## [v3.3](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v3.3) (January 27th 2022)
 
 * move liturgical event data from the 2008 Editio Typica Tertia emendata out from the `LitCalAPI.php`, to a JSON file
-* move data for festivities from Decrees of the Congregation of Divine Worship out from the `LitCalAPI.php`, to a JSON file
+* move data for festivities from Decrees of the Dicastery for Divine Worship out from the `LitCalAPI.php`, to a JSON file
 
 Saint Angela Merici, Virgin, pray for us! 🌼
 

@@ -4520,7 +4520,7 @@
                   },
                   "decree": {
                     "type": "string",
-                    "description": "When a liturgical event is defined ex-novo by a decree of the Congregation of Divine Worship rather than by a Roman Missal, this property will be present with a reference to the decree"
+                    "description": "When a liturgical event is defined ex-novo by a decree of the Dicastery for Divine Worship rather than by a Roman Missal, this property will be present with a reference to the decree"
                   }
                 },
                 "additionalProperties": false,

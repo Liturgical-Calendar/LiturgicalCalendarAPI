@@ -42,16 +42,6 @@ msgstr "bianco"
 msgid "red"
 msgstr "rosso"
 
-#. translators: context = liturgical color
-#: src/Enum/LitColor.php:44
-msgid "pink"
-msgstr "rosa"
-
-#. translators: context = liturgical color: unsupported value
-#: src/Enum/LitColor.php:47
-msgid "unknown"
-msgstr ""
-
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
 msgid "Proper"
@@ -649,11 +639,6 @@ msgstr "Pasqua"
 msgid "Ordinary Time"
 msgstr "Tempo Ordinario"
 
-#. translators: context = liturgical season: unsupported value
-#: src/Enum/LitSeason.php:46
-msgid "Unknown Season"
-msgstr ""
-
 #: src/Models/Calendar/LitCommons.php:195
 msgid "From the Common"
 msgstr "Dal Comune"
@@ -687,17 +672,6 @@ msgstr ""
 "nell'anno %5$d. Secondo il %6$s, la prima ha la precedenza, pertanto la "
 "Messa nella Vigilia è confermata come anche i Primi Vespri."
 
-#: src/Models/Calendar/LiturgicalEventCollection.php:1436
-#: src/Models/Decrees/DecreeEventMetadata.php:54
-#: src/Models/RegionalData/NationalData/LitCalItemMakePatronMetadata.php:49
-#: src/Paths/CalendarPath.php:1488 src/Paths/CalendarPath.php:1513
-#: src/Paths/CalendarPath.php:1568 src/Paths/CalendarPath.php:1606
-#: src/Paths/CalendarPath.php:2199 src/Paths/CalendarPath.php:2505
-#: src/Paths/CalendarPath.php:2987 src/Paths/CalendarPath.php:3003
-#: src/Paths/CalendarPath.php:3021 src/Paths/CalendarPath.php:3060
-msgid "Decree of the Congregation for Divine Worship"
-msgstr "Decreto della Congregazione per il Culto Divino"
-
 #: src/Models/Calendar/LiturgicalEventCollection.php:1445
 #, php-format
 msgid ""
@@ -723,17 +697,6 @@ msgstr ""
 "nell'anno %5$d. Quest'ultima Solennità ha la precedenza, pertanto manterrà i "
 "Secondi Vespri e una Messa serale, mentre la prima Solennità non avrà né una "
 "Messa di Vigilia né i Primi Vespri."
-
-#: src/Models/Calendar/LiturgicalEventCollection.php:1540
-#, php-format
-msgid ""
-"The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
-"year %5$d. We should ask the Congregation for Divine Worship what to do "
-"about this!"
-msgstr ""
-"La Messa nella Vigilia per la %1$s '%2$s' coincide con la %3$s '%4$s' "
-"nell'anno %5$d. Dovremmo chiedere alla Congregazione del Culto Divino cosa "
-"fare a riguardo!"
 
 #: src/Paths/CalendarPath.php:663
 #, php-format
@@ -794,17 +757,6 @@ msgstr "lunedì che segue la Seconda Domenica di Pasqua"
 #: src/Paths/CalendarPath.php:1561
 msgid "the following Monday"
 msgstr "lunedì seguente"
-
-#. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year
-#: src/Paths/CalendarPath.php:1580
-#, php-format
-msgid ""
-"The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year %3$d. "
-"We should ask the Congregation for Divine Worship what to do about this!"
-msgstr ""
-"La Solennità <i>'%1$s'</i> coincide con la Solennità <i>'%2$s'</i> nell'anno "
-"%3$d. Dovremmo chiedere alla Congregazione del Culto Divino cosa fare a "
-"riguardo!"
 
 #. translators:
 #.  1: LiturgicalEvent name,
@@ -1591,16 +1543,56 @@ msgstr ""
 msgid "Error converting Liturgical Calendar to XML."
 msgstr ""
 
-#: src/Paths/CalendarPath.php:4834
-#, php-format
-msgid "Error receiving or parsing info from github about latest release: %s."
-msgstr ""
-"Errore nel ricevere o nel fare il parsing delle informazioni da github "
-"sull'ultima release: %s."
-
 #: src/Paths/CalendarPath.php:4846
 msgid "Error serializing Liturgical Calendar."
 msgstr ""
+
+#. translators: context = liturgical color
+#: src/Enum/LitColor.php:44
+#~ msgid "pink"
+#~ msgstr "rosa"
+
+#: src/Models/Calendar/LiturgicalEventCollection.php:1436
+#: src/Models/Decrees/DecreeEventMetadata.php:54
+#: src/Models/RegionalData/NationalData/LitCalItemMakePatronMetadata.php:49
+#: src/Paths/CalendarPath.php:1488 src/Paths/CalendarPath.php:1513
+#: src/Paths/CalendarPath.php:1568 src/Paths/CalendarPath.php:1606
+#: src/Paths/CalendarPath.php:2199 src/Paths/CalendarPath.php:2505
+#: src/Paths/CalendarPath.php:2987 src/Paths/CalendarPath.php:3003
+#: src/Paths/CalendarPath.php:3021 src/Paths/CalendarPath.php:3060
+#~ msgid "Decree of the Congregation for Divine Worship"
+#~ msgstr "Decreto della Congregazione per il Culto Divino"
+
+#: src/Models/Calendar/LiturgicalEventCollection.php:1540
+#, php-format
+#~ msgid ""
+#~ "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
+#~ "year %5$d. We should ask the Congregation for Divine Worship what to do "
+#~ "about this!"
+#~ msgstr ""
+#~ "La Messa nella Vigilia per la %1$s '%2$s' coincide con la %3$s '%4$s' "
+#~ "nell'anno %5$d. Dovremmo chiedere alla Congregazione del Culto Divino "
+#~ "cosa fare a riguardo!"
+
+#. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year
+#: src/Paths/CalendarPath.php:1580
+#, php-format
+#~ msgid ""
+#~ "The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year "
+#~ "%3$d. We should ask the Congregation for Divine Worship what to do about "
+#~ "this!"
+#~ msgstr ""
+#~ "La Solennità <i>'%1$s'</i> coincide con la Solennità <i>'%2$s'</i> "
+#~ "nell'anno %3$d. Dovremmo chiedere alla Congregazione del Culto Divino "
+#~ "cosa fare a riguardo!"
+
+#: src/Paths/CalendarPath.php:4834
+#, php-format
+#~ msgid ""
+#~ "Error receiving or parsing info from github about latest release: %s."
+#~ msgstr ""
+#~ "Errore nel ricevere o nel fare il parsing delle informazioni da github "
+#~ "sull'ultima release: %s."
 
 #~ msgid "The Diocesan calendar \"%s\" was not found in the index file."
 #~ msgstr "Il calendario diocesano \"%s\" non è stato trovato nel file indice."
