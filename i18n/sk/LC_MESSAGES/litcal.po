@@ -6,18 +6,18 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-10-04 00:53+0000\n"
-"PO-Revision-Date: 2025-10-08 14:05+0000\n"
+"PO-Revision-Date: 2025-10-10 22:58+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Slovak <https://translate.johnromanodorazio.com/projects/"
-"liturgical-calendar/api-strings/sk/>\n"
+"liturgical-calendar/liturgical-calendar-api/api-strings/sk/>\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 5.13.3\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:30
@@ -1068,15 +1068,15 @@ msgstr ""
 
 #. translators: 1: LiturgicalEvent name, 2: Source of the information, 3: Requested calendar year, 4: Coinciding LiturgicalEvent grade, 5: Coinciding LiturgicalEvent name
 #: src/Handlers/CalendarHandler.php:2782
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
 "since the year 2002 (%2$s), applicable to the year %3$d. However, it is "
 "superseded by the %4$s '%5$s' in the year %3$d."
 msgstr ""
 "Voliteľná spomienka '%1$s' bola presunutá z 12. decembra na 12. augusta od "
-"roku 2002 (%2$s), platná pre rok %3$d. Avšak, v roku %3$d je nahradená "
-"nedeľou, slávnosťou alebo sviatkom '%4$s'."
+"roku 2002 (%2$s), vzťahuje sa na rok %3$d. Avšak, v roku %3$d ju nahrádza %4$"
+"s '%5$s'."
 
 #. translators: 1: LiturgicalEvent name, 2: Source of the information
 #: src/Handlers/CalendarHandler.php:2821
@@ -1114,13 +1114,13 @@ msgstr ""
 
 #. translators: 1: Event key, 2: Original date, 3: New date, 4: Requested calendar year
 #: src/Handlers/CalendarHandler.php:3153
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The liturgical event '%1$s' has been moved from %2$s to %3$s due to "
 "conditional rules in the year %4$d."
 msgstr ""
-"%1$s '%2$s' bol presunutý z %3$s do %4$s od roku %5$d v národnom kalendári "
-"'%6$s', platnom pre rok %7$d."
+"Liturgická udalosť '%1$s' bola presunutá z %2$s na %3$s kvôli podmieneným "
+"pravidlám v roku %4$d."
 
 #. translators:
 #.  1. Grade of the liturgical event
@@ -1221,13 +1221,13 @@ msgstr ""
 #.  4. Requested calendar year
 #.
 #: src/Handlers/CalendarHandler.php:3502
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The %1$s '%2$s' was not added to the calendar on %3$s because it conflicts "
 "with an existing liturgical event in the year %4$d."
 msgstr ""
-"%1$s '%2$s' bol povýšený na hodnosť %3$s od roku %4$d, platné pre rok %5$d "
-"(%6$s)."
+"Dátum %1$s '%2$s' nebol pridaný do kalendára %3$s, pretože je v konflikte s "
+"existujúcou liturgickou udalosťou v roku %4$d."
 
 #. translators:
 #.  1. Liturgical grade
@@ -1274,13 +1274,13 @@ msgstr ""
 #.  7. Requested calendar year
 #.
 #: src/Handlers/CalendarHandler.php:3616
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The grade of the %1$s '%2$s' has been changed to '%3$s' in the national "
 "calendar '%4$s' since the year %5$d (%6$s), applicable to the year %7$d."
 msgstr ""
-"Názov %1$s '%2$s' bol zmenený na %3$s od roku %4$d, platný pre rok %5$d "
-"(%6$s)."
+"Hodnosť %1$s '%2$s' bola v národnom kalendári '%4$s' zmenená na '%3$s' od "
+"roku %5$d (%6$s), platná pre rok %7$d."
 
 #. translators:
 #.  1. Event key of the liturgical event
@@ -1290,14 +1290,15 @@ msgstr ""
 #.  5. Requested calendar year
 #.
 #: src/Handlers/CalendarHandler.php:3635
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The grade of the celebration '%1$s' has been changed to '%2$s' in the "
 "national calendar '%3$s' since the year %4$d (%5$s), but could not be "
 "applied to the year %6$d because the celebration was not found."
 msgstr ""
-"Názov %1$s '%2$s' bol zmenený na %3$s od roku %4$d, platný pre rok %5$d "
-"(%6$s)."
+"Stupeň oslavy '%1$s' bol zmenený na '%2$s' v národnom kalendári '%3$s' od "
+"roku %4$d (%5$s), ale nemohol byť použitý pre rok %6$d, pretože oslava "
+"nebola nájdená."
 
 #. translators:
 #.  1. Liturgical grade
@@ -1407,33 +1408,35 @@ msgstr ""
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
 #: src/Handlers/CalendarHandler.php:4126
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s' relative to liturgical event "
 "with key '%2$s', liturgical event does not exist."
 msgstr ""
-"Nemožno vytvoriť mobilnú slávnosť '%1$s' vzhľadom na slávnosť s kľúčom '%2$s'"
+"Nie je možné vytvoriť mobilnú liturgickú udalosť '%1$s' vzťahujúcu sa na "
+"liturgickú udalosť s kľúčom '%2$s', liturgická udalosť neexistuje."
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. event_key of the liturgical event that it is relative to, 3. List of valid keywords
 #: src/Handlers/CalendarHandler.php:4142
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': the `strtotime.relative_time` "
 "property can only express relativity to the liturgical event with key '%2$s' "
 "using keywords %3$s."
 msgstr ""
-"Nie je možné vytvoriť mobilnú slávnosť '%1$s': môže byť relatívna len k "
-"slávnosti s kľúčom '%2$s' pomocou kľúčových slov %3$s"
+"Nedá sa vytvoriť mobilnú liturgickú udalosť '%1$s': vlastnosť "
+"`strtotime.relative_time` môže vyjadriť relatívnosť len voči liturgickej "
+"udalosti s kľúčom '%2$s' pomocou kľúčových slov %3$s."
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile liturgical event being created
 #: src/Handlers/CalendarHandler.php:4220
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': 'strtotime' property must be "
 "either an object or a string, instead it is of type '%2$s'."
 msgstr ""
-"Nemožno vytvoriť mobilnú slávnosť '%1$s': vlastnosť 'strtotime' musí byť buď "
-"objekt alebo reťazec! Momentálne má typ '%2$s'"
+"Nemožno vytvoriť mobilnú liturgickú udalosť '%1$s': 'strtotime' vlastnosť "
+"musí byť buď objekt alebo reťazec, namiesto toho má typ '%2$s'."
 
 #. translators: 1: LiturgicalEvent name, 2: Name of the diocese, 3: LiturgicalEvent date, 4: Coinciding liturgical event name, 5: Requested calendar year
 #: src/Handlers/CalendarHandler.php:4300
@@ -1448,13 +1451,13 @@ msgstr ""
 
 #. translators: 1: LiturgicalEvent grade, 2: LiturgicalEvent name, 3: Name of the diocese, 4: LiturgicalEvent date, 5: Coinciding liturgical event name, 6: Requested calendar year
 #: src/Handlers/CalendarHandler.php:4325
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
 "on %4$s, is suppressed by the %5$s %6$s in the year %7$d."
 msgstr ""
-"Slávnosť %1$s '%2$s', vlastná kalendáru %3$s a zvyčajne slávená %4$s, je v "
-"roku %6$d potlačená nedeľou alebo slávnosťou %5$s"
+"Slávnosť %1$s '%2$s', vlastná pre kalendár %3$s a obvykle slávená %4$s, je "
+"potlačená %5$s %6$s v roku %7$d."
 
 #: src/Handlers/CalendarHandler.php:4530
 msgid "Error converting Liturgical Calendar to XML."
