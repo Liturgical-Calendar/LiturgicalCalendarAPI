@@ -230,13 +230,13 @@ enum JsonData: string
     case LECTIONARY_SAINTS_FILE = JsonDataConstants::LECTIONARY_SAINTS_FILE;
 
     /**
-     * The folder containing readings for memorials created via Decrees of the Congregation of Divine Worship.
+     * The folder containing readings for memorials created via Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments.
      * Evalates to 'jsondata/sourcedata/decrees/lectionary';
      */
     case LECTIONARY_DECREES_FOLDER = JsonDataConstants::LECTIONARY_DECREES_FOLDER;
 
     /**
-     * The file containing readings for memorials created via Decrees of the Congregation of Divine Worship,
+     * The file containing readings for memorials created via Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments,
      * with placeholders for the locale.
      * Evaluates to 'jsondata/sourcedata/decrees/lectionary/{locale}.json'.
      */

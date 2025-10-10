@@ -9,198 +9,198 @@
     "assertions": [
         {
             "year": 1999,
-            "expected_value": 934243200,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "1999-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2000,
-            "expected_value": 965865600,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2000-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2001,
-            "expected_value": 997401600,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2001-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2002,
-            "expected_value": 1028937600,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2002-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2003,
-            "expected_value": 1060560000,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2003-08-11T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 11",
             "comment": "since this is a Sunday, the feast should have been moved to the next day"
         },
         {
             "year": 2004,
-            "expected_value": 1092096000,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2004-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2005,
-            "expected_value": 1123632000,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2005-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2006,
-            "expected_value": 1155168000,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2006-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2007,
-            "expected_value": 1186704000,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2007-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2008,
-            "expected_value": 1218412800,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2008-08-11T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 11",
             "comment": "since this is a Sunday, the feast should have been moved to the next day"
         },
         {
             "year": 2009,
-            "expected_value": 1249862400,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2009-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2010,
-            "expected_value": 1281398400,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2010-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2011,
-            "expected_value": 1312934400,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2011-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2012,
-            "expected_value": 1344556800,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2012-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2013,
-            "expected_value": 1376092800,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2013-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2014,
-            "expected_value": 1407715200,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2014-08-11T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 11",
             "comment": "since this is a Sunday, the feast should have been moved to the next day"
         },
         {
             "year": 2015,
-            "expected_value": 1439164800,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2015-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2016,
-            "expected_value": 1470787200,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2016-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2017,
-            "expected_value": 1502323200,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2017-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2018,
-            "expected_value": 1533859200,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2018-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2019,
-            "expected_value": 1565395200,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2019-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2020,
-            "expected_value": 1597017600,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2020-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2021,
-            "expected_value": 1628553600,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2021-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2022,
-            "expected_value": 1660089600,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2022-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2023,
-            "expected_value": 1691625600,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2023-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2024,
-            "expected_value": 1723248000,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2024-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2025,
-            "expected_value": 1754870400,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2025-08-11T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 11",
             "comment": "since this is a Sunday, the feast should have been moved to the next day"
         },
         {
             "year": 2026,
-            "expected_value": 1786320000,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2026-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2027,
-            "expected_value": 1817856000,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2027-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2028,
-            "expected_value": 1849478400,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2028-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2029,
-            "expected_value": 1881014400,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2029-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         },
         {
             "year": 2030,
-            "expected_value": 1912550400,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2030-08-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The FEAST of &#039;H. Laurentius, diaken en martelaar, patroon van het bisdom&#039; should fall on August 10"
         }
     ]

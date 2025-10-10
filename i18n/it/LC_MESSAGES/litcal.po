@@ -42,11 +42,6 @@ msgstr "bianco"
 msgid "red"
 msgstr "rosso"
 
-#. translators: context = liturgical color
-#: src/Enum/LitColor.php:38
-msgid "rose"
-msgstr ""
-
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
 msgid "Proper"

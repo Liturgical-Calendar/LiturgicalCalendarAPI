@@ -50,6 +50,7 @@
 ![Codesniffer PHPStan POTs update](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/actions/workflows/main.yml/badge.svg?branch=development)
 ![PHPStan level](https://img.shields.io/badge/phpstan-level%2010-brightgreen?style=flat-square&logo=php "PHPStan level 10")
 ![PHPUnit](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/actions/workflows/phpunit.yml/badge.svg?branch=development)
+![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/Liturgical-Calendar/LiturgicalCalendarAPI?utm_source=oss&utm_medium=github&utm_campaign=Liturgical-Calendar%2FLiturgicalCalendarAPI&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)
 
 # Liturgical Calendar
 
@@ -74,7 +75,7 @@ Some characteristics of this API:
   * Missale Romanum, Editio typica tertia, 2002
   * Missale Romanum, Editio typica tertia emendata, 2008
   * [Mysterii Paschalis, PAULUS PP. VI, 1969](http://www.vatican.va/content/paul-vi/la/motu_proprio/documents/hf_p-vi_motu-proprio_19690214_mysterii-paschalis.html)
-  * [Decrees of the Congregation of Divine Worship](https://www.vatican.va/roman_curia/congregations/ccdds/index_it.htm)
+  * [Decrees of the Dicastery for Divine Worship](https://www.vatican.va/roman_curia/congregations/ccdds/index_it.htm)
 * **The data is historically accurate**, *i.e.* the liturgical calendar produced for the year 1979 will reflect the calendar as it was in that year,
   and not as it would be today (obviously future years will reflect the calendar as it is generated in the current year;
   as new decrees are issued by the Dicastery for Divine Worship and the Discipline of the Sacraments or new editions of the Roman Missal are published,

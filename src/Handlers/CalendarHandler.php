@@ -1182,7 +1182,7 @@ final class CalendarHandler extends AbstractHandler
              * It is not possible for a fixed date Solemnity to fall on a Sunday of Easter.
 
              * However, if a solemnity is impeded by Palm Sunday or by Easter Sunday, it is transferred to the first free day ( Monday? )
-             *   after the Second Sunday of Easter ( decision of the Congregation of Divine Worship, dated 22 April 1990,
+             *   after the Second Sunday of Easter ( decision of the Dicastery for Divine Worship, dated 22 April 1990,
              *   in Notitiæ vol. 26 [ 1990 ] num. 3/4, p. 160, Prot. CD 500/89 ).
              * Any other celebrations that are impeded are omitted for that year.
              *
@@ -2728,7 +2728,7 @@ final class CalendarHandler extends AbstractHandler
      * In the Tertia Editio Typica (2002),
      * Saint Jane Frances de Chantal was moved from December 12 to August 12,
      * probably to allow local bishop's conferences to insert Our Lady of Guadalupe as an optional memorial on December 12
-     * seeing that with the decree of March 25th 1999 of the Congregation of Divine Worship
+     * seeing that with the decree of March 25th 1999 of the Dicastery for Divine Worship and the Discipline of the Sacraments,
      * Our Lady of Guadalupe was granted as a Feast day for all dioceses and territories of the Americas
      * source: https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20000628_guadalupe_lt.html
      */

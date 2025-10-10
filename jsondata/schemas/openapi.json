@@ -3160,14 +3160,14 @@
                       },
                       {
                         "year": 2018,
-                        "expected_value": 1526860800,
-                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "expected_value": "2018-05-21T00:00:00+00:00",
+                        "assert": "eventExists AND hasExpectedDate",
                         "assertion": "The memorial 'Mary Mother of the Church' should be created on the expected date"
                       },
                       {
                         "year": 2019,
-                        "expected_value": 1560124800,
-                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "expected_value": "2019-06-10T00:00:00+00:00",
+                        "assert": "eventExists AND hasExpectedDate",
                         "assertion": "The memorial 'Mary Mother of the Church' should be created on the expected date"
                       }
                     ]
@@ -3180,20 +3180,20 @@
                     "assertions": [
                       {
                         "year": 2022,
-                        "expected_value": 1655942400,
-                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "expected_value": "2022-06-23T00:00:00+00:00",
+                        "assert": "eventExists AND hasExpectedDate",
                         "assertion": "Nativity of John the Baptist should be moved to June 23"
                       },
                       {
                         "year": 2033,
-                        "expected_value": 2003097600,
-                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "expected_value": "2033-06-23T00:00:00+00:00",
+                        "assert": "eventExists AND hasExpectedDate",
                         "assertion": "Nativity of John the Baptist should be moved to June 23"
                       },
                       {
                         "year": 2044,
-                        "expected_value": 2350252800,
-                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "expected_value": "2044-06-23T00:00:00+00:00",
+                        "assert": "eventExists AND hasExpectedDate",
                         "assertion": "Nativity of John the Baptist should be moved to June 23"
                       }
                     ]
@@ -3216,21 +3216,21 @@
                       },
                       {
                         "year": 2011,
-                        "expected_value": 1295654400,
-                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "expected_value": "2011-01-22T00:00:00+00:00",
+                        "assert": "eventExists AND hasExpectedDate",
                         "assertion": "should fall on expected date January 22"
                       },
                       {
                         "year": 2012,
-                        "expected_value": 1327276800,
-                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "expected_value": "2012-01-23T00:00:00+00:00",
+                        "assert": "eventExists AND hasExpectedDate",
                         "assertion": "should fall on expected date January 23",
                         "comment": "this test is significant since January 22nd falls on a Sunday, so the National Day of Prayer for the Unborn should have been moved to January 23rd"
                       },
                       {
                         "year": 2045,
-                        "expected_value": 2368742400,
-                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "expected_value": "2045-01-23T00:00:00+00:00",
+                        "assert": "eventExists AND hasExpectedDate",
                         "assertion": "should fall on expected date January 23",
                         "comment": "this test is significant since January 22nd falls on a Sunday, so the National Day of Prayer for the Unborn should have been moved to January 23rd"
                       }
@@ -3244,20 +3244,20 @@
                     "assertions": [
                       {
                         "year": 2001,
-                        "expected_value": 1008115200,
-                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "expected_value": "2001-12-12T00:00:00+00:00",
+                        "assert": "eventExists AND hasExpectedDate",
                         "assertion": "should fall on expected date December 12"
                       },
                       {
                         "year": 2002,
-                        "expected_value": 1029110400,
-                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "expected_value": "2002-08-12T00:00:00+00:00",
+                        "assert": "eventExists AND hasExpectedDate",
                         "assertion": "should fall on expected date August 12"
                       },
                       {
                         "year": 2010,
-                        "expected_value": 1281571200,
-                        "assert": "eventExists AND hasExpectedTimestamp",
+                        "expected_value": "2010-08-12T00:00:00+00:00",
+                        "assert": "eventExists AND hasExpectedDate",
                         "assertion": "should fall on expected date August 12",
                         "comment": "this test is significant since December 12th falls on a Sunday, so the memorial would have been suppressed if it hadn't been moved"
                       },
@@ -3399,14 +3399,14 @@
                     },
                     {
                       "year": 2018,
-                      "expected_value": 1526860800,
-                      "assert": "eventExists AND hasExpectedTimestamp",
+                      "expected_value": "2018-05-21T00:00:00+00:00",
+                      "assert": "eventExists AND hasExpectedDate",
                       "assertion": "The memorial 'Mary Mother of the Church' should be created on the expected date"
                     },
                     {
                       "year": 2019,
-                      "expected_value": 1560124800,
-                      "assert": "eventExists AND hasExpectedTimestamp",
+                      "expected_value": "2019-06-10T00:00:00+00:00",
+                      "assert": "eventExists AND hasExpectedDate",
                       "assertion": "The memorial 'Mary Mother of the Church' should be created on the expected date"
                     }
                   ]
@@ -3588,13 +3588,12 @@
                     ]
                   },
                   "Date": {
-                    "type": "integer",
-                    "format": "int64",
-                    "description": "a PHP style unix timestamp (seconds from the Unix Epoch) in UTC time. The time should be a zero value seeing that we deal only with all day events, and time is not of importance. For use in Javascript, multiply this value by 1000, because Javascript uses milliseconds as a base for timestamps, whereas PHP uses seconds. The timestamp value should be dealt with accordingly in each programming language used, as is if the language uses seconds as a base, or multiplying by 1000 if it uses milliseconds as a base.",
-                    "minimum": -2851200,
-                    "maximum": 253402300799,
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "an ISO 8601 (RFC 3339) date-time string in UTC time. The time part is always a zero value seeing that we deal only with all day events, and time is not of importance.",
+                    "pattern": "^(?:1969-(?:11-(?:29|30)|12-(?:0[1-9]|[12][0-9]|3[01]))|19[7-9]\\d-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])|[2-9]\\d{3}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01]))T00:00:00\\+00:00$",
                     "examples": [
-                      1577923200
+                      "2020-01-02T00:00:00+00:00"
                     ]
                   },
                   "EventIdx": {
@@ -4241,7 +4240,7 @@
             "items": {
               "anyOf": [
                 {
-                  "$ref": "#/components/schemas/EventExistsAndHasExpectedTimestampAssertion"
+                  "$ref": "#/components/schemas/EventExistsAndHasExpectedDateAssertion"
                 },
                 {
                   "$ref": "#/components/schemas/EventNotExistsAssertion"
@@ -4300,7 +4299,7 @@
             "items": {
               "anyOf": [
                 {
-                  "$ref": "#/components/schemas/EventExistsAndHasExpectedTimestampAssertion"
+                  "$ref": "#/components/schemas/EventExistsAndHasExpectedDateAssertion"
                 },
                 {
                   "$ref": "#/components/schemas/EventNotExistsAssertion"
@@ -4360,7 +4359,7 @@
             "items": {
               "anyOf": [
                 {
-                  "$ref": "#/components/schemas/EventExistsAndHasExpectedTimestampAssertion"
+                  "$ref": "#/components/schemas/EventExistsAndHasExpectedDateAssertion"
                 },
                 {
                   "$ref": "#/components/schemas/EventNotExistsAssertion"
@@ -4521,7 +4520,7 @@
                   },
                   "decree": {
                     "type": "string",
-                    "description": "When a liturgical event is defined ex-novo by a decree of the Congregation of Divine Worship rather than by a Roman Missal, this property will be present with a reference to the decree"
+                    "description": "When a liturgical event is defined ex-novo by a decree of the Dicastery for Divine Worship rather than by a Roman Missal, this property will be present with a reference to the decree"
                   }
                 },
                 "additionalProperties": false,
@@ -4604,8 +4603,8 @@
         },
         "additionalProperties": false
       },
-      "EventExistsAndHasExpectedTimestampAssertion": {
-        "title": "Event exists and has expected timestamp",
+      "EventExistsAndHasExpectedDateAssertion": {
+        "title": "Event exists and has expected date value",
         "description": "Expect that a liturgical event be present in the calendar on the expected date in the given year",
         "type": "object",
         "additionalProperties": false,
@@ -4618,14 +4617,12 @@
             "maximum": 9999
           },
           "expected_value": {
-            "type": "integer",
-            "format": "int64",
-            "minimum": -2851200,
-            "maximum": 253402300799
+            "type": "string",
+            "format": "date-time"
           },
           "assert": {
             "type": "string",
-            "const": "eventExists AND hasExpectedTimestamp"
+            "const": "eventExists AND hasExpectedDate"
           },
           "assertion": {
             "type": "string",

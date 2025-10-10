@@ -32,7 +32,7 @@
                 "timestamp": {
                     "type": "integer",
                     "description": "Certainly cannot be any earlier than the start of the project itself July 26, 2017; we'll set the max to Dec 12th, 9999",
-                    "minimum": 1501108382,
+                    "minimum": 1501027200,
                     "maximum": 253402214400
                 },
                 "date_time": {
@@ -399,7 +399,8 @@
                     },
                     "date": {
                         "type": "string",
-                        "format": "date-time"
+                        "format": "date-time",
+                        "pattern": "^(?:1969-(?:11-(?:29|30)|12-(?:0[1-9]|[12][0-9]|3[01]))|19[7-9]\\d-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])|[2-9]\\d{3}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01]))T00:00:00\\+00:00$"
                     },
                     "timezone_type": {
                         "type": "integer",
@@ -427,7 +428,9 @@
                     "type": "string"
                 },
                 "date": {
-                    "$ref": "./CommonDef.json#/definitions/Timestamp"
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:1969-(?:11-(?:29|30)|12-(?:0[1-9]|[12][0-9]|3[01]))|19[7-9]\\d-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])|[2-9]\\d{3}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01]))T00:00:00\\+00:00$"
                 },
                 "color": {
                     "$ref": "./CommonDef.json#/definitions/LitColor"
@@ -577,7 +580,9 @@
                     "type": "string"
                 },
                 "date": {
-                    "$ref": "./CommonDef.json#/definitions/Timestamp"
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:1969-(?:11-(?:29|30)|12-(?:0[1-9]|[12][0-9]|3[01]))|19[7-9]\\d-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])|[2-9]\\d{3}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01]))T00:00:00\\+00:00$"
                 },
                 "color": {
                     "$ref": "./CommonDef.json#/definitions/LitColor"
