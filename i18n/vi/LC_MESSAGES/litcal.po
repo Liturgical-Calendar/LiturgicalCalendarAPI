@@ -7,18 +7,18 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-10-04 00:53+0000\n"
-"PO-Revision-Date: 2025-10-08 14:05+0000\n"
+"PO-Revision-Date: 2025-10-10 22:58+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Vietnamese <https://translate.johnromanodorazio.com/projects/"
-"liturgical-calendar/api-strings/vi/>\n"
+"liturgical-calendar/liturgical-calendar-api/api-strings/vi/>\n"
 "Language: vi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.12.2\n"
+"X-Generator: Weblate 5.13.3\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:30
@@ -1065,15 +1065,15 @@ msgstr ""
 
 #. translators: 1: LiturgicalEvent name, 2: Source of the information, 3: Requested calendar year, 4: Coinciding LiturgicalEvent grade, 5: Coinciding LiturgicalEvent name
 #: src/Handlers/CalendarHandler.php:2782
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
 "since the year 2002 (%2$s), applicable to the year %3$d. However, it is "
 "superseded by the %4$s '%5$s' in the year %3$d."
 msgstr ""
-"Lễ nhớ tùy chọn '%1$s' đã được chuyển từ ngày 12 tháng 12 sang ngày 12 tháng "
-"8 từ năm 2002 (%2$s), áp dụng cho năm %3$d. Tuy nhiên, nó bị thay thế bởi "
-"một Chúa Nhật, một Lễ Trọng, hoặc một Lễ Kính '%4$s' vào năm %3$d."
+"Ngày tưởng niệm tùy chọn '%1$s' đã được chuyển từ ngày 12 tháng 12 sang ngày "
+"12 tháng 8 kể từ năm 2002 (%2$s), áp dụng cho năm %3$d. Tuy nhiên, nó bị "
+"thay thế bởi %4$s '%5$s' trong năm %3$d."
 
 #. translators: 1: LiturgicalEvent name, 2: Source of the information
 #: src/Handlers/CalendarHandler.php:2821
@@ -1111,13 +1111,13 @@ msgstr ""
 
 #. translators: 1: Event key, 2: Original date, 3: New date, 4: Requested calendar year
 #: src/Handlers/CalendarHandler.php:3153
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The liturgical event '%1$s' has been moved from %2$s to %3$s due to "
 "conditional rules in the year %4$d."
 msgstr ""
-"%1$s '%2$s' đã được chuyển từ %3$s sang %4$s kể từ năm %5$d trong lịch quốc "
-"gia '%6$s', áp dụng cho năm %7$d."
+"Sự kiện phụng vụ '%1$s' đã được chuyển từ %2$s sang %3$s do quy tắc điều "
+"kiện trong năm %4$d."
 
 #. translators:
 #.  1. Grade of the liturgical event
@@ -1219,13 +1219,13 @@ msgstr ""
 #.  4. Requested calendar year
 #.
 #: src/Handlers/CalendarHandler.php:3502
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The %1$s '%2$s' was not added to the calendar on %3$s because it conflicts "
 "with an existing liturgical event in the year %4$d."
 msgstr ""
-"%1$s '%2$s' đã được nâng lên bậc %3$s kể từ năm %4$d, áp dụng cho năm %5$d "
-"(%6$s)."
+"%1$s '%2$s' đã không được thêm vào lịch vào %3$s vì nó xung đột với một sự "
+"kiện phụng vụ hiện có trong năm %4$d."
 
 #. translators:
 #.  1. Liturgical grade
@@ -1272,13 +1272,13 @@ msgstr ""
 #.  7. Requested calendar year
 #.
 #: src/Handlers/CalendarHandler.php:3616
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The grade of the %1$s '%2$s' has been changed to '%3$s' in the national "
 "calendar '%4$s' since the year %5$d (%6$s), applicable to the year %7$d."
 msgstr ""
-"Tên của %1$s '%2$s' đã được đổi thành %3$s kể từ năm %4$d, áp dụng cho năm "
-"%5$d (%6$s)."
+"Bậc của %1$s '%2$s' đã được thay đổi thành '%3$s' trong lịch quốc gia '%4$s' "
+"kể từ năm %5$d (%6$s), áp dụng cho năm %7$d."
 
 #. translators:
 #.  1. Event key of the liturgical event
@@ -1288,14 +1288,15 @@ msgstr ""
 #.  5. Requested calendar year
 #.
 #: src/Handlers/CalendarHandler.php:3635
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The grade of the celebration '%1$s' has been changed to '%2$s' in the "
 "national calendar '%3$s' since the year %4$d (%5$s), but could not be "
 "applied to the year %6$d because the celebration was not found."
 msgstr ""
-"Tên của %1$s '%2$s' đã được đổi thành %3$s kể từ năm %4$d, áp dụng cho năm "
-"%5$d (%6$s)."
+"Bậc cử hành '%1$s' đã được thay đổi thành '%2$s' trong lịch quốc gia '%3$s' "
+"từ năm %4$d (%5$s), nhưng không thể áp dụng cho năm %6$d vì không tìm thấy "
+"cử hành này."
 
 #. translators:
 #.  1. Liturgical grade
@@ -1408,32 +1409,35 @@ msgstr ""
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
 #: src/Handlers/CalendarHandler.php:4126
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s' relative to liturgical event "
 "with key '%2$s', liturgical event does not exist."
-msgstr "Không thể tạo lễ di động '%1$s' liên quan đến lễ có khóa '%2$s'"
+msgstr ""
+"Không thể tạo sự kiện phụng vụ di động '%1$s' liên quan đến sự kiện phụng vụ "
+"với mã '%2$s', sự kiện phụng vụ không tồn tại."
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. event_key of the liturgical event that it is relative to, 3. List of valid keywords
 #: src/Handlers/CalendarHandler.php:4142
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': the `strtotime.relative_time` "
 "property can only express relativity to the liturgical event with key '%2$s' "
 "using keywords %3$s."
 msgstr ""
-"Không thể tạo lễ di động '%1$s': chỉ có thể liên quan đến lễ có khóa '%2$s' "
-"bằng cách sử dụng từ khóa %3$s"
+"Không thể tạo sự kiện phụng vụ di động '%1$s': thuộc tính "
+"`strtotime.relative_time` chỉ có thể diễn đạt sự tương đối so với sự kiện "
+"phụng vụ có khóa '%2$s' bằng cách sử dụng các từ khóa %3$s."
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile liturgical event being created
 #: src/Handlers/CalendarHandler.php:4220
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': 'strtotime' property must be "
 "either an object or a string, instead it is of type '%2$s'."
 msgstr ""
-"Không thể tạo lễ di động '%1$s': thuộc tính 'strtotime' phải là một đối "
-"tượng hoặc một chuỗi! Hiện tại nó có kiểu '%2$s'"
+"Không thể tạo sự kiện phụng vụ trên di động '%1$s': thuộc tính 'strtotime' "
+"phải là một đối tượng hoặc một chuỗi, thay vào đó nó thuộc loại '%2$s'."
 
 #. translators: 1: LiturgicalEvent name, 2: Name of the diocese, 3: LiturgicalEvent date, 4: Coinciding liturgical event name, 5: Requested calendar year
 #: src/Handlers/CalendarHandler.php:4300
@@ -1449,13 +1453,13 @@ msgstr ""
 
 #. translators: 1: LiturgicalEvent grade, 2: LiturgicalEvent name, 3: Name of the diocese, 4: LiturgicalEvent date, 5: Coinciding liturgical event name, 6: Requested calendar year
 #: src/Handlers/CalendarHandler.php:4325
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
 "on %4$s, is suppressed by the %5$s %6$s in the year %7$d."
 msgstr ""
-"Lễ %1$s '%2$s', thuộc lịch của %3$s và thường được cử hành vào %4$s, bị thay "
-"thế bởi Chủ nhật hoặc Lễ trọng %5$s trong năm %6$d"
+"Lễ %1$s '%2$s', thuộc lịch của %3$s và thường được cử hành vào ngày %4$s, bị "
+"hủy bỏ bởi %5$s %6$s vào năm %7$d."
 
 #: src/Handlers/CalendarHandler.php:4530
 msgid "Error converting Liturgical Calendar to XML."
