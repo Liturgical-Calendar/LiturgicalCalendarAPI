@@ -323,21 +323,18 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:207
 #, fuzzy
-#| msgid "For Founders of a Church"
 msgid "For the Church"
 msgstr "Dla założycieli kościoła"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:209
 #, fuzzy
-#| msgid "For a Pope"
 msgid "For the Pope"
 msgstr "Za papieża"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:211
 #, fuzzy
-#| msgid "For a Bishop"
 msgid "For the Bishop"
 msgstr "Dla biskupa"
 
@@ -369,7 +366,6 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:223
 #, fuzzy
-#| msgid "For Founders of a Church"
 msgid "For Ministers of the Church"
 msgstr "Dla założycieli kościoła"
 
@@ -381,7 +377,6 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:227
 #, fuzzy
-#| msgid "For One Saint"
 msgid "For the Laity"
 msgstr "Dla jednego świętego"
 
@@ -423,7 +418,6 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:245
 #, fuzzy
-#| msgid "For Religious"
 msgid "For Reconciliation"
 msgstr "Dla religijnych"
 
@@ -520,21 +514,18 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:283
 #, fuzzy
-#| msgid "For a Nun"
 msgid "For Rain"
 msgstr "Dla zakonnicy"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:285
 #, fuzzy
-#| msgid "For One Martyr"
 msgid "For Fine Weather"
 msgstr "Dla jednego męczennika"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:287
 #, fuzzy
-#| msgid "For Educators"
 msgid "For an End to Storms"
 msgstr "Dla nauczycieli"
 
@@ -551,7 +542,6 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:293
 #, fuzzy
-#| msgid "For One Martyr"
 msgid "For Charity"
 msgstr "Dla jednego męczennika"
 
@@ -573,21 +563,18 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:301
 #, fuzzy
-#| msgid "For One Virgin"
 msgid "For Those in Prison"
 msgstr "Dla jednej dziewicy"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:303
 #, fuzzy
-#| msgid "For One Saint"
 msgid "For the Sick"
 msgstr "Dla jednego świętego"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:305
 #, fuzzy
-#| msgid "For One Saint"
 msgid "For the Dying"
 msgstr "Dla jednego świętego"
 
