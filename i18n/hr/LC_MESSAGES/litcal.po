@@ -418,7 +418,6 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:247
 #, fuzzy
-#| msgid "%s Day of the Octave of Christmas"
 msgid "For the Unity of Christians"
 msgstr "%s dan u osmini Božića"
 

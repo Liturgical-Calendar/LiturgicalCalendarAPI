@@ -4,23 +4,23 @@
 # Ubuntu <priest@johnromanodorazio.com>, 2021.
 # John R. D'Orazio <priest@johnromanodorazio.com>, 2022, 2023.
 # OpenAI <noreply-mt-openai@weblate.org>, 2024.
-# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024.
+# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024, 2025.
 # Weblate Admin <admin@example.com>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-10-04 00:53+0000\n"
-"PO-Revision-Date: 2024-12-06 23:24+0000\n"
+"PO-Revision-Date: 2025-10-10 22:58+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: German <https://translate.johnromanodorazio.com/projects/"
-"liturgical-calendar/api-strings/de/>\n"
+"liturgical-calendar/liturgical-calendar-api/api-strings/de/>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.8.4\n"
+"X-Generator: Weblate 5.13.3\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:30
@@ -255,7 +255,6 @@ msgstr ""
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:144
 #, fuzzy
-#| msgid "Commemoration"
 msgid "commemoration"
 msgstr "Gedächtnis"
 
@@ -267,7 +266,6 @@ msgstr ""
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:151
 #, fuzzy
-#| msgid "Optional memorial"
 msgid "optional memorial"
 msgstr "Nichtgebotener Gedenktag"
 
@@ -329,21 +327,18 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:207
 #, fuzzy
-#| msgid "and Doctor of the Church"
 msgid "For the Church"
 msgstr "und Kirchenlehrer"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:209
 #, fuzzy
-#| msgid "For a Pope"
 msgid "For the Pope"
 msgstr "Für einen Papst"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:211
 #, fuzzy
-#| msgid "For a Bishop"
 msgid "For the Bishop"
 msgstr "Für einen Bischof"
 
@@ -375,7 +370,6 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:223
 #, fuzzy
-#| msgid "For Founders of a Church"
 msgid "For Ministers of the Church"
 msgstr "Für Gründer einer Kirche"
 
@@ -387,7 +381,6 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:227
 #, fuzzy
-#| msgid "For One Saint"
 msgid "For the Laity"
 msgstr "Für einen Heiligen"
 
@@ -429,14 +422,12 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:245
 #, fuzzy
-#| msgid "For Religious"
 msgid "For Reconciliation"
 msgstr "Für Ordensleute"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:247
 #, fuzzy
-#| msgid "%s Day of the Octave of Christmas"
 msgid "For the Unity of Christians"
 msgstr "%s Tag der Oktav von Weihnachten"
 
@@ -528,21 +519,18 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:283
 #, fuzzy
-#| msgid "For a Nun"
 msgid "For Rain"
 msgstr "Für eine Nonne"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:285
 #, fuzzy
-#| msgid "For One Martyr"
 msgid "For Fine Weather"
 msgstr "Für einen Märtyrer"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:287
 #, fuzzy
-#| msgid "For Educators"
 msgid "For an End to Storms"
 msgstr "Für Erzieher"
 
@@ -559,7 +547,6 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:293
 #, fuzzy
-#| msgid "For One Martyr"
 msgid "For Charity"
 msgstr "Für einen Märtyrer"
 
@@ -581,21 +568,18 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:301
 #, fuzzy
-#| msgid "For One Virgin"
 msgid "For Those in Prison"
 msgstr "Für eine Jungfrau"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:303
 #, fuzzy
-#| msgid "For One Saint"
 msgid "For the Sick"
 msgstr "Für einen Heiligen"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:305
 #, fuzzy
-#| msgid "For One Saint"
 msgid "For the Dying"
 msgstr "Für einen Heiligen"
 
@@ -667,9 +651,6 @@ msgstr ""
 
 #: src/Handlers/CalendarHandler.php:568
 #, fuzzy, php-format
-#| msgid ""
-#| "Only years from 1970 and after are supported. You tried requesting the "
-#| "year %d."
 msgid "Only years until 9999 are supported. You tried requesting the year %d."
 msgstr ""
 "Nur Jahre ab 1970 werden unterstützt. Du hast versucht, das Jahr %d "
@@ -744,10 +725,6 @@ msgstr "der folgende Montag"
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year
 #: src/Handlers/CalendarHandler.php:1343
 #, fuzzy, php-format
-#| msgid ""
-#| "The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year "
-#| "%3$d. We should ask the Congregation for Divine Worship what to do about "
-#| "this!"
 msgid ""
 "The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year %3$d. "
 "We should ask the Dicastery for Divine Worship and the Discipline of the "
@@ -957,9 +934,6 @@ msgstr ""
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
 #: src/Handlers/CalendarHandler.php:2314
 #, fuzzy, php-format
-#| msgid ""
-#| "Cannot create mobile festivity '%1$s': can only be relative to festivity "
-#| "with key '%2$s' using keywords %3$s"
 msgid ""
 "Cannot create mobile liturgical event '%1$s': can only be relative to "
 "liturgical event with key '%2$s' using keywords %3$s"
@@ -971,9 +945,6 @@ msgstr ""
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
 #: src/Handlers/CalendarHandler.php:2328
 #, fuzzy, php-format
-#| msgid ""
-#| "Cannot create mobile festivity '%1$s' relative to festivity with key "
-#| "'%2$s'"
 msgid ""
 "Cannot create mobile liturgical event '%1$s' relative to liturgical event "
 "with key '%2$s'"
@@ -1110,19 +1081,15 @@ msgstr ""
 
 #. translators: 1: LiturgicalEvent name, 2: Source of the information, 3: Requested calendar year, 4: Coinciding LiturgicalEvent grade, 5: Coinciding LiturgicalEvent name
 #: src/Handlers/CalendarHandler.php:2782
-#, fuzzy, php-format
-#| msgid ""
-#| "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
-#| "since the year 2002 (%2$s), applicable to the year %3$d. However, it is "
-#| "superseded by a Sunday, a Solemnity, or a Feast '%4$s' in the year %3$d."
+#, php-format
 msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
 "since the year 2002 (%2$s), applicable to the year %3$d. However, it is "
 "superseded by the %4$s '%5$s' in the year %3$d."
 msgstr ""
-"Das optionale Gedenken '%1$s' wurde seit dem Jahr 2002 (%2$s) vom 12. Dez. "
-"auf den 12. Aug. verschoben, anwendbar auf das Jahr %3$d. Es wird jedoch im "
-"Jahr %3$d von einem Sonntag, einer Hochfest oder einem Fest '%4$s' verdrängt."
+"Das optionale Gedächtnis '%1$s' wurde seit dem Jahr 2002 (%2$s) vom 12. "
+"Dezember auf den 12. August verlegt, gilt jedoch für das Jahr %3$d. Es wird "
+"jedoch im Jahr %3$d durch den %4$s '%5$s' verdrängt."
 
 #. translators: 1: LiturgicalEvent name, 2: Source of the information
 #: src/Handlers/CalendarHandler.php:2821
@@ -1162,16 +1129,13 @@ msgstr ""
 
 #. translators: 1: Event key, 2: Original date, 3: New date, 4: Requested calendar year
 #: src/Handlers/CalendarHandler.php:3153
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s' has been moved from %3$s to %4$s since the year %5$d in "
-#| "the national calendar '%6$s', applicable to the year %7$d."
+#, php-format
 msgid ""
 "The liturgical event '%1$s' has been moved from %2$s to %3$s due to "
 "conditional rules in the year %4$d."
 msgstr ""
-"Der %1$s '%2$s' wurde seit dem Jahr %5$d im nationalen Kalender '%6$s', der "
-"für das Jahr %7$d gilt, von %3$s nach %4$s verschoben."
+"Die liturgische Veranstaltung '%1$s' wurde aufgrund von Bedingungsregeln im "
+"Jahr %4$d von %2$s auf %3$s verschoben."
 
 #. translators:
 #.  1. Grade of the liturgical event
@@ -1261,9 +1225,6 @@ msgstr ""
 
 #: src/Handlers/CalendarHandler.php:3428
 #, fuzzy
-#| msgid ""
-#| "We should be creating a new festivity, however we do not seem to have the "
-#| "correct date information in order to proceed"
 msgid ""
 "We should be creating a new liturgical event, however we do not seem to have "
 "the correct date information in order to proceed"
@@ -1278,16 +1239,13 @@ msgstr ""
 #.  4. Requested calendar year
 #.
 #: src/Handlers/CalendarHandler.php:3502
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s' has been raised to the rank of %3$s since the year %4$d, "
-#| "applicable to the year %5$d (%6$s)."
+#, php-format
 msgid ""
 "The %1$s '%2$s' was not added to the calendar on %3$s because it conflicts "
 "with an existing liturgical event in the year %4$d."
 msgstr ""
-"Das %1$s '%2$s' wurde seit dem Jahr %4$d in den Rang von %3$s erhoben, "
-"anwendbar für das Jahr %5$d (%6$s)."
+"Der %1$s '%2$s' wurde am %3$s nicht dem Kalender hinzugefügt, da er mit "
+"einem bestehenden liturgischen Ereignis im Jahr %4$d kollidiert."
 
 #. translators:
 #.  1. Liturgical grade
@@ -1334,16 +1292,13 @@ msgstr ""
 #.  7. Requested calendar year
 #.
 #: src/Handlers/CalendarHandler.php:3616
-#, fuzzy, php-format
-#| msgid ""
-#| "The grade of the %1$s '%2$s' has been changed to '%3$s' in the national "
-#| "calendar '%4$s' since the year %5$d, applicable to the year %6$d."
+#, php-format
 msgid ""
 "The grade of the %1$s '%2$s' has been changed to '%3$s' in the national "
 "calendar '%4$s' since the year %5$d (%6$s), applicable to the year %7$d."
 msgstr ""
-"Die Einstufung des %1$s '%2$s' wurde im nationalen Kalender '%4$s' seit dem "
-"Jahr %5$d auf '%3$s' geändert, gültig für das Jahr %6$d."
+"Die Einstufung des %1$s '%2$s' wurde seit dem Jahr %5$d (%6$s) im nationalen "
+"Kalender '%4$s' auf '%3$s' geändert, anwendbar für das Jahr %7$d."
 
 #. translators:
 #.  1. Event key of the liturgical event
@@ -1353,18 +1308,14 @@ msgstr ""
 #.  5. Requested calendar year
 #.
 #: src/Handlers/CalendarHandler.php:3635
-#, fuzzy, php-format
-#| msgid ""
-#| "The grade of the celebration '%1$s' has been changed to '%2$s' in the "
-#| "national calendar '%3$s' since the year %4$d, but could not be applied to "
-#| "the year %5$d because the celebration was not found."
+#, php-format
 msgid ""
 "The grade of the celebration '%1$s' has been changed to '%2$s' in the "
 "national calendar '%3$s' since the year %4$d (%5$s), but could not be "
 "applied to the year %6$d because the celebration was not found."
 msgstr ""
 "Der Rang der Feier '%1$s' wurde im nationalen Kalender '%3$s' seit dem Jahr "
-"%4$d auf '%2$s' geändert, konnte jedoch im Jahr %5$d nicht angewendet "
+"%4$d (%5$s) auf '%2$s' geändert, konnte jedoch im Jahr %6$d nicht angewendet "
 "werden, da die Feier nicht gefunden wurde."
 
 #. translators:
@@ -1413,11 +1364,6 @@ msgstr ""
 #.
 #: src/Handlers/CalendarHandler.php:3708
 #, fuzzy, php-format
-#| msgid ""
-#| "The liturgical event '%1$s' has been moved to %2$s since the year %3$d in "
-#| "the national calendar '%4$s', but this could not take place in the year "
-#| "%5$d since the new date %2$s seems to be a Sunday or a festivity of "
-#| "greater rank."
 msgid ""
 "The liturgical event '%1$s' has been moved to %2$s since the year %3$d in "
 "the national calendar '%4$s', but this could not take place in the year %5$d "
@@ -1489,44 +1435,38 @@ msgstr ""
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
 #: src/Handlers/CalendarHandler.php:4126
-#, fuzzy, php-format
-#| msgid ""
-#| "Cannot create mobile festivity '%1$s' relative to festivity with key "
-#| "'%2$s'"
+#, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s' relative to liturgical event "
 "with key '%2$s', liturgical event does not exist."
 msgstr ""
-"Kann das mobile Festivität '%1$s' relativ zum Festivität mit dem Schlüssel "
-"'%2$s', nicht erstellen"
+"Kann mobiles liturgisches Ereignis '%1$s' im Zusammenhang mit liturgischem "
+"Ereignis mit Schlüssel '%2$s' nicht erstellen, liturgisches Ereignis "
+"existiert nicht."
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. event_key of the liturgical event that it is relative to, 3. List of valid keywords
 #: src/Handlers/CalendarHandler.php:4142
-#, fuzzy, php-format
-#| msgid ""
-#| "Cannot create mobile festivity '%1$s': can only be relative to festivity "
-#| "with key '%2$s' using keywords %3$s"
+#, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': the `strtotime.relative_time` "
 "property can only express relativity to the liturgical event with key '%2$s' "
 "using keywords %3$s."
 msgstr ""
-"Kann mobile Festlichkeit '%1$s' nicht erstellen: kann nur relativ zur "
-"Festlichkeit mit Schlüssel '%2$s' unter Verwendung der Schlüsselwörter %3$s "
-"sein"
+"Kann das mobile liturgische Ereignis '%1$s' nicht erstellen: Die Eigenschaft "
+"`strtotime.relative_time` kann nur in Bezug auf das liturgische Ereignis mit "
+"dem Schlüssel '%2$s' unter Verwendung der Schlüsselwörter %3$s ausgedrückt "
+"werden."
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile liturgical event being created
 #: src/Handlers/CalendarHandler.php:4220
-#, fuzzy, php-format
-#| msgid ""
-#| "Cannot create mobile festivity '%1$s': 'strtotime' property must be "
-#| "either an object or a string! Currently it has type '%2$s'"
+#, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': 'strtotime' property must be "
 "either an object or a string, instead it is of type '%2$s'."
 msgstr ""
-"Kann mobile Festlichkeit '%1$s' nicht erstellen: 'strtotime'-Eigenschaft "
-"muss entweder ein Objekt oder ein String sein! Derzeit hat es den Typ '%2$s'"
+"Das mobile liturgische Ereignis '%1$s' kann nicht erstellt werden: Die "
+"Eigenschaft 'strtotime' muss entweder ein Objekt oder ein String sein, "
+"stattdessen ist sie vom Typ '%2$s'."
 
 #. translators: 1: LiturgicalEvent name, 2: Name of the diocese, 3: LiturgicalEvent date, 4: Coinciding liturgical event name, 5: Requested calendar year
 #: src/Handlers/CalendarHandler.php:4300
@@ -1542,18 +1482,14 @@ msgstr ""
 
 #. translators: 1: LiturgicalEvent grade, 2: LiturgicalEvent name, 3: Name of the diocese, 4: LiturgicalEvent date, 5: Coinciding liturgical event name, 6: Requested calendar year
 #: src/Handlers/CalendarHandler.php:4325
-#, fuzzy, php-format
-#| msgid ""
-#| "The %1$s '%2$s', proper to the calendar of the %3$s and usually "
-#| "celebrated on %4$s, is suppressed by the Sunday or Solemnity %5$s in the "
-#| "year %6$d"
+#, php-format
 msgid ""
 "The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
 "on %4$s, is suppressed by the %5$s %6$s in the year %7$d."
 msgstr ""
-"Der %1$s '%2$s', der dem Kalender des %3$s eigen ist und normalerweise am "
-"%4$s gefeiert wird, wird im Jahr %6$d durch den Sonntag oder die "
-"Feierlichkeit %5$s unterdrückt"
+"Das Fest %1$s '%2$s', das dem Kalender des %3$s eigentümlich ist und "
+"normalerweise am %4$s gefeiert wird, wird im Jahr %7$d durch den %5$s %6$s "
+"unterdrückt."
 
 #: src/Handlers/CalendarHandler.php:4530
 msgid "Error converting Liturgical Calendar to XML."
@@ -1561,8 +1497,6 @@ msgstr ""
 
 #: src/Handlers/CalendarHandler.php:4565
 #, fuzzy, php-format
-#| msgid ""
-#| "Error receiving or parsing info from github about latest release: %s."
 msgid "Error receiving or parsing info from GitHub about latest release: %s."
 msgstr ""
 "Fehler beim Empfangen oder Parsen von Informationen von GitHub über die "
@@ -1624,10 +1558,6 @@ msgstr ""
 
 #: src/Models/Calendar/LiturgicalEventCollection.php:1577
 #, fuzzy, php-format
-#| msgid ""
-#| "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
-#| "year %5$d. We should ask the Congregation for Divine Worship what to do "
-#| "about this!"
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
 "year %5$d. We should ask the Dicastery for Divine Worship and the Discipline "

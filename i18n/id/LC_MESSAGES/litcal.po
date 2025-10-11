@@ -323,21 +323,18 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:207
 #, fuzzy
-#| msgid "and Doctor of the Church"
 msgid "For the Church"
 msgstr "dan Pujangga Gereja"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:209
 #, fuzzy
-#| msgid "For a Pope"
 msgid "For the Pope"
 msgstr "Untuk Seorang Paus"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:211
 #, fuzzy
-#| msgid "For a Bishop"
 msgid "For the Bishop"
 msgstr "Untuk Seorang Uskup"
 
@@ -369,7 +366,6 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:223
 #, fuzzy
-#| msgid "For Founders of a Church"
 msgid "For Ministers of the Church"
 msgstr "Untuk Para Pendiri Gereja"
 
@@ -381,7 +377,6 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:227
 #, fuzzy
-#| msgid "For One Saint"
 msgid "For the Laity"
 msgstr "Untuk Seorang Kudus"
 
@@ -428,7 +423,6 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:247
 #, fuzzy
-#| msgid "%s Day of the Octave of Christmas"
 msgid "For the Unity of Christians"
 msgstr "Hari %s pada Oktaf Natal"
 
@@ -520,14 +514,12 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:283
 #, fuzzy
-#| msgid "For a Nun"
 msgid "For Rain"
 msgstr "Untuk Seorang Biarawati"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:285
 #, fuzzy
-#| msgid "For One Martyr"
 msgid "For Fine Weather"
 msgstr "Untuk Seorang Martir"
 
@@ -549,7 +541,6 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:293
 #, fuzzy
-#| msgid "For One Martyr"
 msgid "For Charity"
 msgstr "Untuk Seorang Martir"
 
@@ -571,21 +562,18 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:301
 #, fuzzy
-#| msgid "For One Virgin"
 msgid "For Those in Prison"
 msgstr "Untuk Seorang Perawan"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:303
 #, fuzzy
-#| msgid "For One Saint"
 msgid "For the Sick"
 msgstr "Untuk Seorang Kudus"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:305
 #, fuzzy
-#| msgid "For One Saint"
 msgid "For the Dying"
 msgstr "Untuk Seorang Kudus"
 
@@ -655,9 +643,6 @@ msgstr ""
 
 #: src/Handlers/CalendarHandler.php:568
 #, fuzzy, php-format
-#| msgid ""
-#| "Only years from 1970 and after are supported. You tried requesting the "
-#| "year %d."
 msgid "Only years until 9999 are supported. You tried requesting the year %d."
 msgstr ""
 "Hanya mendukung dari tahun 1970 dan seterusnya. Kamu mencoba meminta tahun "
