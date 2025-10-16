@@ -2,15 +2,15 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Long Truong <binhlong@gmail.com>, 2024.
-# OpenAI <noreply-mt-openai@weblate.org>, 2024.
+# OpenAI <noreply-mt-openai@weblate.org>, 2024, 2025.
 # "John R. D'Orazio" <priest@johnromanodorazio.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-10-04 00:53+0000\n"
-"PO-Revision-Date: 2025-10-10 22:58+0000\n"
-"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2025-10-17 13:18+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Vietnamese <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/vi/>\n"
 "Language: vi\n"
@@ -634,7 +634,7 @@ msgstr "Thường Niên"
 #, php-format
 msgid ""
 "The name of the diocese could not be derived from the diocese ID \"%s\"."
-msgstr ""
+msgstr "Tên của giáo phận không thể tìm thấy từ ID giáo phận \"%s\"."
 
 #: src/Handlers/CalendarHandler.php:561
 #, php-format
@@ -644,9 +644,9 @@ msgid ""
 msgstr "Chỉ hỗ trợ từ năm 1970 trở về sau. Bạn đã yêu cầu năm %d."
 
 #: src/Handlers/CalendarHandler.php:568
-#, fuzzy, php-format
+#, php-format
 msgid "Only years until 9999 are supported. You tried requesting the year %d."
-msgstr "Chỉ hỗ trợ từ năm 1970 trở về sau. Bạn đã yêu cầu năm %d."
+msgstr "Chỉ hỗ trợ các năm đến 9999. Bạn đã thử yêu cầu năm %d."
 
 #. translators: days before Epiphany (not useful in Italian!)
 #. translators: days after Epiphany when Epiphany falls on Jan 6 (not useful in Italian!)
@@ -704,7 +704,7 @@ msgstr "thứ Bảy trước Chúa Nhật Lễ Lá"
 msgid ""
 "Decree of the Dicastery for Divine Worship and the Discipline of the "
 "Sacraments"
-msgstr ""
+msgstr "Sắc lệnh của Bộ Phụng tự và Kỷ luật Bí tích"
 
 #: src/Handlers/CalendarHandler.php:1268
 msgid "the Monday following the Second Sunday of Easter"
@@ -716,14 +716,14 @@ msgstr "thứ Hai tiếp theo"
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year
 #: src/Handlers/CalendarHandler.php:1343
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year %3$d. "
 "We should ask the Dicastery for Divine Worship and the Discipline of the "
 "Sacraments what to do about this!"
 msgstr ""
-"Lễ trọng '%1$s' trùng với Lễ trọng '%2$s' trong năm %3$d. Chúng ta nên hỏi "
-"Bộ Phụng tự về việc này!"
+"Lễ trọng '%1$s' trùng với lễ trọng '%2$s' vào năm %3$d. Chúng ta nên hỏi Bộ "
+"Phụng tự và Kỷ luật Bí tích làm gì với trường hợp này!"
 
 #. translators:
 #.  1: LiturgicalEvent name,
@@ -921,21 +921,23 @@ msgstr ""
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
 #: src/Handlers/CalendarHandler.php:2314
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': can only be relative to "
 "liturgical event with key '%2$s' using keywords %3$s"
 msgstr ""
-"Không thể tạo lễ di động '%1$s': chỉ có thể liên quan đến lễ có khóa '%2$s' "
-"bằng cách sử dụng từ khóa %3$s"
+"Không thể tạo sự kiện phụng vụ di động '%1$s': chỉ có thể liên quan đến sự "
+"kiện phụng vụ với khóa '%2$s' bằng cách sử dụng từ khóa %3$s"
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
 #: src/Handlers/CalendarHandler.php:2328
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s' relative to liturgical event "
 "with key '%2$s'"
-msgstr "Không thể tạo lễ di động '%1$s' liên quan đến lễ có khóa '%2$s'"
+msgstr ""
+"Không thể tạo sự kiện phụng vụ di động '%1$s' liên quan đến sự kiện phụng vụ "
+"với khóa '%2$s'"
 
 #. translators:
 #.  1. Grade or rank of the liturgical event
@@ -1107,7 +1109,7 @@ msgstr "Lễ nhớ Thứ Bảy Đức Mẹ"
 #, php-format
 msgid ""
 "Could not find a %1$s property in the %2$s for the National Calendar %3$s."
-msgstr ""
+msgstr "Không thể tìm thấy thuộc tính %1$s trong %2$s cho Lịch Quốc gia %3$s."
 
 #. translators: 1: Event key, 2: Original date, 3: New date, 4: Requested calendar year
 #: src/Handlers/CalendarHandler.php:3153
@@ -1202,15 +1204,17 @@ msgid ""
 "liturgical event is greater than the number of days (%3$d) in the month "
 "(%4$d) of the liturgical event year (%5$d)."
 msgstr ""
+"Không thể tạo sự kiện phụng vụ với khóa \"%1$s\": ngày (%2$d) của sự kiện "
+"phụng vụ lớn hơn số ngày (%3$d) trong tháng (%4$d) của năm sự kiện phụng vụ "
+"(%5$d)."
 
 #: src/Handlers/CalendarHandler.php:3428
-#, fuzzy
 msgid ""
 "We should be creating a new liturgical event, however we do not seem to have "
 "the correct date information in order to proceed"
 msgstr ""
-"Chúng ta nên tạo ra một lễ hội mới, tuy nhiên dường như chúng ta không có "
-"thông tin ngày tháng chính xác để tiến hành"
+"Chúng ta nên tạo một sự kiện phụng vụ mới, tuy nhiên có vẻ như chúng ta "
+"không có thông tin ngày tháng chính xác để tiến hành"
 
 #. translators:
 #.  1. Grade or rank of the liturgical event
@@ -1349,12 +1353,15 @@ msgid ""
 "since the new date %2$s seems to be a Sunday or a liturgical event of "
 "greater rank."
 msgstr ""
+"Sự kiện phụng vụ '%1$s' đã được dời sang %2$s kể từ năm %3$d trong lịch quốc "
+"gia '%4$s', nhưng điều này không thể thực hiện được vào năm %5$d vì ngày mới "
+"%2$s dường như là Chủ nhật hoặc một sự kiện phụng vụ có hạng cao hơn."
 
 #. translators: 1. Country name, 2. List of missals
 #: src/Handlers/CalendarHandler.php:3747
 #, php-format
 msgid "Found Missals for region %1$s: %2$s."
-msgstr ""
+msgstr "Tìm thấy Sách lễ cho khu vực %1$s: %2$s."
 
 #. translators: Name of the Roman Missal
 #: src/Handlers/CalendarHandler.php:3771
@@ -1463,18 +1470,17 @@ msgstr ""
 
 #: src/Handlers/CalendarHandler.php:4530
 msgid "Error converting Liturgical Calendar to XML."
-msgstr ""
+msgstr "Lỗi chuyển đổi Lịch Phụng vụ sang XML."
 
 #: src/Handlers/CalendarHandler.php:4565
-#, fuzzy, php-format
+#, php-format
 msgid "Error receiving or parsing info from GitHub about latest release: %s."
 msgstr ""
-"Lỗi khi nhận hoặc phân tích thông tin từ github về bản phát hành mới nhất: "
-"%s."
+"Lỗi nhận hoặc phân tích thông tin từ GitHub về bản phát hành mới nhất: %s."
 
 #: src/Handlers/CalendarHandler.php:4576
 msgid "Error serializing Liturgical Calendar."
-msgstr ""
+msgstr "Lỗi tuần tự hóa Lịch Phụng vụ."
 
 #: src/Models/Calendar/LitCommons.php:200
 msgid "From the Common"
@@ -1525,14 +1531,14 @@ msgstr ""
 "tối, trong khi Lễ trọng đầu tiên sẽ không có Thánh lễ Vọng hoặc Vespers I."
 
 #: src/Models/Calendar/LiturgicalEventCollection.php:1577
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
 "year %5$d. We should ask the Dicastery for Divine Worship and the Discipline "
 "of the Sacraments what to do about this!"
 msgstr ""
-"Thánh Lễ Vọng cho %1$s '%2$s' trùng với %3$s '%4$s' trong năm %5$d. Chúng ta "
-"nên hỏi Bộ Phụng Tự về việc này!"
+"Thánh lễ Canh thức cho %1$s '%2$s' trùng với %3$s '%4$s' vào năm %5$d. Chúng "
+"ta nên hỏi Bộ Phụng tự và Kỷ luật Bí tích làm gì với trường hợp này!"
 
 #~ msgid "pink"
 #~ msgstr "hồng"
