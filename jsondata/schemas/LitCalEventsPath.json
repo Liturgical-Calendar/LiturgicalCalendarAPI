@@ -150,7 +150,7 @@
                   "description": "The actual name of the liturgical event as defined in the latest edition of the source Roman Missal indicated in the property `missal` (i.e. if the Missal is the Latin edition of the Roman Missal, the name should be from the latest edition of the Latin Roman Missal)"
                 },
                 "type": {
-                  "$ref": "./CommonDef.json#/definitions/LitFeastType"
+                  "$ref": "./CommonDef.json#/definitions/LitEventType"
                 },
                 "missal": {
                   "$ref": "./CommonDef.json#/definitions/MissalID"
