@@ -390,6 +390,8 @@
     "definitions": {
         "DateTimeObjectCollection": {
             "type": "array",
+            "title": "Date Time Object Collection",
+            "description": "a collection of date-time objects representing liturgical events, such as the solemnities of the Lord and the Blessed Virgin Mary, solemnities, feasts of the Lord, feasts, memorials, suppressed events, or reinstated events",
             "items": {
                 "type": "object",
                 "additionalProperties": false,
@@ -444,7 +446,7 @@
                     "uniqueItems": true
                 },
                 "type": {
-                    "$ref": "./CommonDef.json#/definitions/LitFeastType"
+                    "$ref": "./CommonDef.json#/definitions/LitEventType"
                 },
                 "grade": {
                     "$ref": "./CommonDef.json#/definitions/LitGrade"
@@ -563,10 +565,14 @@
                 "psalter_week",
                 "readings"
             ],
-            "additionalProperties": false
+            "additionalProperties": false,
+            "title": "Liturgical Event Vigil (Evening Mass)",
+            "description": "When we say vigil, it is in the broad sense of the term, as in the evening Mass on the day preceding the main celebration, where the readings are often the same as those of the day of the main celebration."
         },
         "LiturgicalEvent": {
             "type": "object",
+            "additionalProperties": false,
+            "title": "Liturgical Event",
             "properties": {
                 "event_idx": {
                     "type": "integer",
@@ -596,7 +602,7 @@
                     "uniqueItems": true
                 },
                 "type": {
-                    "$ref": "./CommonDef.json#/definitions/LitFeastType"
+                    "$ref": "./CommonDef.json#/definitions/LitEventType"
                 },
                 "grade": {
                     "$ref": "./CommonDef.json#/definitions/LitGrade"
@@ -715,12 +721,12 @@
                 "liturgical_season_lcl",
                 "psalter_week",
                 "readings"
-            ],
-            "additionalProperties": false
+            ]
         },
         "GeneralRomanCalendarSettings": {
             "type": "object",
-            "description": "echoes back the settings that were requested and utilized in generating the General Roman Calendar",
+            "title": "General Roman Calendar Settings",
+            "description": ".the settings that were utilized (and possibly requested) to generate the General Roman Calendar",
             "additionalProperties": false,
             "properties": {
                 "year": {
@@ -775,7 +781,8 @@
         },
         "NationalCalendarSettings": {
             "type": "object",
-            "description": "settings utilized to generate this national calendar",
+            "title": "National Calendar Settings",
+            "description": "the settings utilized (and possibly requested) to generate the national calendar",
             "additionalProperties": false,
             "properties": {
                 "year": {
@@ -834,7 +841,8 @@
         },
         "DiocesanCalendarSettings": {
             "type": "object",
-            "description": "settings utilized to generate this diocesan calendar",
+            "title": "Diocesan Calendar Settings",
+            "description": "the settings that were utilized (and possibly requested) to generate the diocesan calendar",
             "additionalProperties": false,
             "properties": {
                 "year": {
@@ -893,30 +901,6 @@
                 "holydays_of_obligation",
                 "national_calendar",
                 "diocesan_calendar"
-            ]
-        },
-        "ChristmasReadings": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "vigil": {
-                    "$ref": "./CommonDef.json#/definitions/Readings"
-                },
-                "night": {
-                    "$ref": "./CommonDef.json#/definitions/Readings"
-                },
-                "dawn": {
-                    "$ref": "./CommonDef.json#/definitions/Readings"
-                },
-                "day": {
-                    "$ref": "./CommonDef.json#/definitions/Readings"
-                }
-            },
-            "required": [
-                "vigil",
-                "night",
-                "dawn",
-                "day"
             ]
         }
     }

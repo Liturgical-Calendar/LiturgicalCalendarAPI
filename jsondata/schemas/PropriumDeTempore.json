@@ -18,7 +18,7 @@
                     "$ref": "./CommonDef.json#/definitions/LitGrade"
                 },
                 "type": {
-                    "$ref": "./CommonDef.json#/definitions/LitFeastType"
+                    "$ref": "./CommonDef.json#/definitions/LitEventType"
                 },
                 "color": {
                     "$ref": "./CommonDef.json#/definitions/LitColor"

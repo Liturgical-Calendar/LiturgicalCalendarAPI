@@ -4,21 +4,25 @@
     "definitions": {
         "EventKey": {
             "type": "string",
-            "pattern": "^([a-z]+_[a-z]+_)?[A-Z][a-zA-Z0-9]+(?:[A-Z][a-zA-Z0-9]+)*(?:_\\d+)?(?:_vigil)?$",
-            "description": "corresponds to the `event_key` property of liturgical events in the output of the LitCal API and similar endpoints"
+            "title": "Event Key",
+            "description": "corresponds to the `event_key` property of liturgical events in the output of the LitCal API and similar endpoints",
+            "pattern": "^([a-z]+_[a-z]+_)?[A-Z][a-zA-Z0-9]+(?:[A-Z][a-zA-Z0-9]+)*(?:_\\d+)?(?:_vigil)?$"
         },
         "EventKeyVigilMass": {
             "type": "string",
-            "pattern": "^([a-z]+_[a-z]+_)?[A-Z][a-zA-Z0-9]+(?:[A-Z][a-zA-Z0-9]+)*(?:_\\d+)?_vigil$",
-            "description": "corresponds to the `event_key` property of Vigil Mass liturgical events in the output of the LitCal API and similar endpoints"
+            "title": "Event Key Vigil Mass",
+            "description": "corresponds to the `event_key` property of Vigil Mass liturgical events in the output of the LitCal API and similar endpoints; vigil is used in the broad sense, i.e., the evening Mass on the day before a solemnity or sunday where the readings may be the same as those used on the day itself",
+            "pattern": "^([a-z]+_[a-z]+_)?[A-Z][a-zA-Z0-9]+(?:[A-Z][a-zA-Z0-9]+)*(?:_\\d+)?_vigil$"
         },
         "EventKeyNonVigilMass": {
             "type": "string",
-            "pattern": "^([a-z]+_[a-z]+_)?[A-Z][a-zA-Z0-9]+(?:[A-Z][a-zA-Z0-9]+)*(?:_\\d+)?$",
-            "description": "corresponds to the `event_key` property of Non-Vigil Mass liturgical events in the output of the LitCal API and similar endpoints"
+            "title": "Event Key Non-Vigil Mass",
+            "description": "corresponds to the `event_key` property of Non-Vigil Mass liturgical events (i.e. the main celebration) in the output of the LitCal API and similar endpoints",
+            "pattern": "^([a-z]+_[a-z]+_)?[A-Z][a-zA-Z0-9]+(?:[A-Z][a-zA-Z0-9]+)*(?:_\\d+)?$"
         },
         "LitColor": {
             "type": "array",
+            "title": "Liturgical Color",
             "uniqueItems": true,
             "minItems": 1,
             "items": {
@@ -30,11 +34,11 @@
                     "purple",
                     "rose"
                 ]
-            },
-            "title": "LitColor"
+            }
         },
         "LitCommon": {
             "type": "array",
+            "title": "Liturgical Common (or Proper, or Masses for Various Needs and Occasions) of the celebration",
             "minItems": 0,
             "maxItems": 3,
             "uniqueItems": true,
@@ -78,15 +82,14 @@
                     "For Giving Thanks to God for the Gift of Human Life [USA]",
                     "For the Preservation of Peace and Justice"
                 ]
-            },
-            "title": "Common"
+            }
         },
         "LitGrade": {
             "type": "integer",
-            "minimum": 0,
-            "maximum": 7,
+            "title": "Liturgical Grade (or Rank)",
             "description": "0 = WEEKDAY, 1 = COMMEMORATION, 2 = MEMORIAL_OPT, 3 = MEMORIAL, 4 = FEAST, 5 = FEAST_LORD, 6 = SOLEMNITY, 7 = HIGHER_SOLEMNITY",
-            "title": "LitGrade"
+            "minimum": 0,
+            "maximum": 7
         },
         "Readings": {
             "oneOf": [
@@ -122,6 +125,7 @@
         },
         "ReadingsFerial": {
             "type": "object",
+            "title": "Ferial Readings",
             "additionalProperties": false,
             "properties": {
                 "first_reading": {
@@ -142,11 +146,11 @@
                 "responsorial_psalm",
                 "gospel_acclamation",
                 "gospel"
-            ],
-            "title": "ReadingsFerial"
+            ]
         },
         "ReadingsFestive": {
             "type": "object",
+            "title": "Festive Readings",
             "additionalProperties": false,
             "properties": {
                 "first_reading": {
@@ -171,11 +175,11 @@
                 "second_reading",
                 "gospel_acclamation",
                 "gospel"
-            ],
-            "title": "ReadingsFestive"
+            ]
         },
         "ReadingsPalmSunday": {
             "type": "object",
+            "title": "Palm Sunday Readings",
             "additionalProperties": false,
             "properties": {
                 "palm_gospel": {
@@ -204,11 +208,11 @@
                 "second_reading",
                 "gospel_acclamation",
                 "gospel"
-            ],
-            "title": "ReadingsPalmSunday"
+            ]
         },
         "ReadingsEasterVigil": {
             "type": "object",
+            "title": "Easter Vigil Readings",
             "additionalProperties": false,
             "properties": {
                 "first_reading": {
@@ -285,11 +289,11 @@
                 "responsorial_psalm_epistle",
                 "gospel_acclamation",
                 "gospel"
-            ],
-            "title": "ReadingsEasterVigil"
+            ]
         },
         "ReadingsChristmas": {
             "type": "object",
+            "title": "Christmas Day Readings",
             "additionalProperties": false,
             "properties": {
                 "night": {
@@ -306,11 +310,12 @@
                 "night",
                 "dawn",
                 "day"
-            ],
-            "title": "ReadingsChristmas"
+            ]
         },
         "ReadingsWithEvening": {
             "type": "object",
+            "title": "Readings with Evening Mass",
+            "description": "Used for Easter Sunday, which has both a daytime and an evening Mass, each with proper readings.",
             "additionalProperties": false,
             "properties": {
                 "day": {
@@ -323,12 +328,12 @@
             "required": [
                 "day",
                 "evening"
-            ],
-            "title": "ReadingsWithEvening",
-            "description": "Used for Easter Sunday, which has both a daytime and an evening Mass, each with proper readings."
+            ]
         },
         "ReadingsMultipleSchemas": {
             "type": "object",
+            "title": "Readings with Multiple Schemas",
+            "description": "Used for All Souls Day (Commemoration of the Faithful Departed).",
             "additionalProperties": false,
             "properties": {
                 "schema_one": {
@@ -345,9 +350,7 @@
                 "schema_one",
                 "schema_two",
                 "schema_three"
-            ],
-            "title": "ReadingsMultipleSchemas",
-            "description": "Used for All Souls Day (Commemoration of the Faithful Departed)."
+            ]
         },
         "ReadingsCommons": {
             "type": "string",
@@ -356,6 +359,8 @@
         },
         "ReadingsSeasonal": {
             "type": "object",
+            "title": "Seasonal Readings",
+            "description": "Lectionary readings that change depending on whether the liturgical event falls within the Easter season.",
             "additionalProperties": false,
             "properties": {
                 "easter_season": {
@@ -368,60 +373,66 @@
             "required": [
                 "easter_season",
                 "outside_easter_season"
-            ],
-            "title": "ReadingsSeasonal",
-            "description": "Lectionary readings that change depending on whether the liturgical event falls within the Easter season."
+            ]
         },
         "Day": {
             "type": "integer",
-            "minimum": 1,
-            "maximum": 31,
+            "title": "Day",
             "description": "maximum value will be 28, 29, 30, or 31 depending on whether we are dealing with a leap year, and whether we are dealing with a month that usually has 28, 30, or 31 days",
-            "title": "Day"
+            "minimum": 1,
+            "maximum": 31
         },
         "Month": {
             "type": "integer",
+            "title": "Month",
             "minimum": 1,
-            "maximum": 12,
-            "title": "Month"
+            "maximum": 12
         },
-        "LitFeastType": {
+        "LitEventType": {
             "type": "string",
+            "title": "Liturgical Event Type",
+            "description": "Whether the liturgical event is of type fixed or mobile",
             "enum": [
                 "fixed",
                 "mobile"
-            ],
-            "title": "LitFeastType"
+            ]
         },
         "Epiphany": {
             "type": "string",
+            "title": "Epiphany",
+            "description": "Enumeration that describes when Epiphany is celebrated in the current calendar",
             "enum": [
                 "JAN6",
                 "SUNDAY_JAN2_JAN8"
-            ],
-            "title": "Epiphany"
+            ]
         },
         "Ascension": {
             "type": "string",
+            "title": "Ascension",
+            "description": "Enumeration that describes when Ascension is celebrated in the current calendar",
             "enum": [
                 "SUNDAY",
                 "THURSDAY"
-            ],
-            "title": "Ascension"
+            ]
         },
         "CorpusChristi": {
             "type": "string",
+            "title": "Corpus Christi",
+            "description": "Enumeration that describes when Corpus Christi is celebrated in the current calendar",
             "enum": [
                 "SUNDAY",
                 "THURSDAY"
-            ],
-            "title": "CorpusChristi"
+            ]
         },
         "EternalHighPriest": {
-            "type": "boolean"
+            "type": "boolean",
+            "title": "Eternal High Priest",
+            "description": "Whether the Jesus Christ, the Eternal High Priest, is celebrated in the current calendar"
         },
         "HolyDaysOfObligation": {
             "type": "object",
+            "title": "Holy Days of Obligation",
+            "description": "Which of the standard holy days of obligation are observed in this calendar, plus any additional holy days of obligation proper to the calendar",
             "properties": {
                 "Christmas": {
                     "type": "boolean"
@@ -456,11 +467,12 @@
             },
             "additionalProperties": {
                 "const": true
-            },
-            "description": "Which of the standard holy days of obligation are observed in this calendar, plus any additional holy days of obligation proper to the calendar"
+            }
         },
         "CalendarSettings": {
             "type": "object",
+            "title": "Calendar Settings",
+            "description": "the settings utilized (and possibly requested) to generate the current calendar",
             "additionalProperties": false,
             "properties": {
                 "epiphany": {
@@ -482,6 +494,7 @@
         },
         "Calendar": {
             "type": "string",
+            "title": "Calendar",
             "enum": [
                 "",
                 "GENERAL ROMAN",
@@ -489,19 +502,21 @@
                 "US",
                 "NL",
                 "CA"
-            ],
-            "title": "Calendar"
+            ]
         },
         "Missals": {
             "type": "array",
-            "uniqueItems": true,
+            "title": "Missals",
             "description": "Missals as defined in the PHP RomanMissal enum, from which data for the current calendar is drawn",
+            "uniqueItems": true,
             "items": {
                 "$ref": "#/definitions/MissalID"
             }
         },
         "MissalDef": {
             "type": "string",
+            "title": "Missal Definition",
+            "description": "an enumeration of Roman Missals supported by the Liturgical Calendar API",
             "enum": [
                 "EDITIO_TYPICA_1970",
                 "REIMPRESSIO_EMENDATA_1971",
@@ -518,6 +533,8 @@
         },
         "MissalID": {
             "type": "string",
+            "title": "Missal ID",
+            "description": "an enumeration of Roman Missal IDs for the Roman Missals supported by the Liturgical Calendar API",
             "enum": [
                 "EDITIO_TYPICA_1970",
                 "EDITIO_TYPICA_1971",
@@ -534,6 +551,8 @@
         },
         "MissalName": {
             "type": "string",
+            "title": "Missal Name",
+            "description": "an enumeration of Roman Missal names for the Roman Missals supported by the Liturgical Calendar API",
             "enum": [
                 "Editio Typica 1970",
                 "Reimpressio Emendata 1971",
@@ -818,21 +837,23 @@
         },
         "WiderRegionCalendarAction": {
             "type": "string",
+            "title": "Wider Region Calendar Action",
+            "description": "an enumeration of supported actions that act upon a liturgical event in a Wider Region calendar definition",
             "enum": [
                 "createNew",
                 "makePatron"
-            ],
-            "title": "WiderRegionCalendarAction"
+            ]
         },
         "NationalCalendarAction": {
             "type": "string",
+            "title": "National Calendar Action",
+            "description": "an enumeration of supported actions that act upon a liturgical event in a National calendar",
             "enum": [
                 "createNew",
                 "setProperty",
                 "makePatron",
                 "moveEvent"
-            ],
-            "title": "NationalCalendarAction"
+            ]
         },
         "Year": {
             "type": "integer",

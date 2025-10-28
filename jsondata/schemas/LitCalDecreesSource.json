@@ -69,7 +69,7 @@
                     "$ref": "./CommonDef.json#/definitions/LitColor"
                 },
                 "type": {
-                    "$ref": "./CommonDef.json#/definitions/LitFeastType"
+                    "$ref": "./CommonDef.json#/definitions/LitEventType"
                 },
                 "readings": {
                     "$ref": "./CommonDef.json#/definitions/Readings"
