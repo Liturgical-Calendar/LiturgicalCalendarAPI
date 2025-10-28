@@ -354,8 +354,8 @@
         },
         "ReadingsCommons": {
             "type": "string",
-            "title": "ReadingsCommons",
-            "description": "Used for memorials and optional memorials that do not have a Proper lectionary. The readings are taken from the Common of Saints, as appropriate."
+            "title": "Readings from liturgical Commons",
+            "description": "Used for memorials and optional memorials that do not have a Proper lectionary. The readings are taken from the Common of Saints, or from Masses for Various Needs and Occasions, as appropriate. Indicates the name of the Common or Mass for Various Needs and Occasions from which the readings are taken."
         },
         "ReadingsSeasonal": {
             "type": "object",
