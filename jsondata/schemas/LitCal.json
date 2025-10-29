@@ -417,9 +417,14 @@
         },
         "LiturgicalEventVigil": {
             "type": "object",
+            "additionalProperties": false,
+            "title": "Liturgical Event Vigil (Evening Mass)",
+            "description": "When we say vigil, it is in the broad sense of the term, as in the evening Mass on the day preceding the main celebration, where the readings are often the same as those of the day of the main celebration.",
             "properties": {
                 "event_idx": {
                     "type": "integer",
+                    "title": "Event Index",
+                    "description": "A sequential index number assigned to each liturgical event in the calendar, starting from 0 for the first event that is calculated. This index helps to uniquely identify and reference each event within the liturgical calendar for that year, seeing that the `event_key` property might not be unique.",
                     "minimum": 0,
                     "maximum": 2000
                 },
@@ -427,10 +432,14 @@
                     "$ref": "./CommonDef.json#/definitions/EventKeyVigilMass"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Liturgical Event Name",
+                    "description": "the full name of the liturgical event in the locale requested and according to the current requested calendar (i.e. General Roman Calendar, National Calendar, Diocesan Calendar)"
                 },
                 "date": {
                     "type": "string",
+                    "title": "Liturgical Event Date",
+                    "description": "the date of the liturgical event in ISO 8601 (RFC 3339) format, always at midnight UTC time",
                     "format": "date-time",
                     "pattern": "^(?:1969-(?:11-(?:29|30)|12-(?:0[1-9]|[12][0-9]|3[01]))|19[7-9]\\d-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])|[2-9]\\d{3}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01]))T00:00:00\\+00:00$"
                 },
@@ -439,6 +448,8 @@
                 },
                 "color_lcl": {
                     "type": "array",
+                    "title": "Liturgical Color Localized",
+                    "description": "an array of localized strings describing the liturgical color(s) associated with the celebration; if more than one liturgical common is associated with a celebration, there may be more than one color associated with the celebration",
                     "items": {
                         "type": "string"
                     },
@@ -452,66 +463,98 @@
                     "$ref": "./CommonDef.json#/definitions/LitGrade"
                 },
                 "grade_lcl": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Liturgical Grade Localized",
+                    "description": "a localized string describing the liturgical grade of the celebration, such as 'Solemnity', 'Feast', 'Memorial', etc., according to the locale requested"
                 },
                 "grade_abbr": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Liturgical Grade Abbreviation",
+                    "description": "a localized abbreviation for the liturgical grade of the celebration, such as 'S' for Solemnity, 'F' for Feast, 'M' for Memorial, etc."
                 },
                 "grade_display": {
                     "type": [
                         "string",
                         "null"
-                    ]
+                    ],
+                    "title": "Liturgical Grade Display",
+                    "description": "a localized string for display purposes that may differ from the standard name of the liturgical grade; can be null if no special display name is needed, or an empty string if no particular grade is meant to be shown. For example, for Higher Grade Solemnities it would be undesirable to display 'Solemnity with precedence over other solemnities', so this property would be an empty string in that case; or for All Souls Day which is logically treated as a Solemnity but displayed as a 'Commemoration' or as an 'Optional memorial' (according to local translations), so a localized string such as 'Commemoration' or 'Optional memorial' would be appropriate."
                 },
                 "common": {
                     "$ref": "./CommonDef.json#/definitions/LitCommon"
                 },
                 "common_lcl": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Liturgical Common Localized",
+                    "description": "a localized string describing the liturgical Proper or common(s) (if any) associated with the celebration, according to the locale requested"
                 },
                 "day_of_the_week_iso8601": {
                     "type": "integer",
+                    "title": "Day of the Week ISO 8601",
+                    "description": "the day of the week for the liturgical event, following the ISO 8601 standard where Monday is 1 and Sunday is 7",
                     "minimum": 1,
                     "maximum": 7
                 },
                 "month": {
                     "type": "integer",
+                    "title": "Month",
+                    "description": "the month for the liturgical event, represented as an integer from 1 (January) to 12 (December)",
                     "minimum": 1,
                     "maximum": 12
                 },
                 "day": {
                     "type": "integer",
+                    "title": "Day",
+                    "description": "the day of the month for the liturgical event, represented as an integer from 1 to 31 depending on the month",
                     "minimum": 1,
                     "maximum": 31
                 },
                 "year": {
                     "type": "integer",
+                    "title": "Year",
+                    "description": "the year for the liturgical event, between 1969 and 9999; will have the same value for all events when requesting a CIVIL year calendar, but may differ when requesting a LITURGICAL year calendar (i.e. events from the first Sunday of Advent to December 31 will have the previous year as their year value, and events from January 1 to the last Saturday following Christ the King will have the requested year as their year value)",
                     "minimum": 1969,
                     "maximum": 9999
                 },
                 "month_short": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Month Short Name",
+                    "description": "a localized abbreviated string for the month of the liturgical event, such as 'gen.' for January if Italian was requested"
                 },
                 "month_long": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Month Long Name",
+                    "description": "a localized full string for the month of the liturgical event, such as 'gennaio' for January if Italian was requested"
                 },
                 "day_of_the_week_short": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Day of the Week Short Name",
+                    "description": "a localized abbreviated string for the day of the week of the liturgical event, such as 'lun.' for Monday if Italian was requested"
                 },
                 "day_of_the_week_long": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Day of the Week Long Name",
+                    "description": "a localized full string for the day of the week of the liturgical event, such as 'lunedi' for Monday if Italian was requested"
                 },
                 "liturgical_year": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Liturgical Year",
+                    "description": "a localized string representing the liturgical year designation (YEAR A, YEAR B, or YEAR C for Sundays and Solemnities; YEAR I or YEAR II for weekdays) according to the liturgical calendar cycle in use for the requested year"
                 },
                 "is_vigil_mass": {
-                    "type": "boolean"
+                    "const": true,
+                    "title": "Is Vigil Mass",
+                    "description": "the property will only exist and will be true if the celebration is a Vigil Mass (i.e., the evening Mass on the day before a solemnity or sunday where the readings may be the same as those used on the day itself); otherwise the property will be absent"
                 },
                 "is_vigil_for": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Is Vigil For",
+                    "description": "the `event_key` of the main celebration for which this vigil mass is being held"
                 },
                 "liturgical_season": {
                     "type": "string",
+                    "title": "Liturgical Season",
+                    "description": "an enumeration value of the liturgical season in which the event falls, one of: ADVENT, CHRISTMAS, LENT, EASTER_TRIDUUM, EASTER, ORDINARY_TIME",
                     "enum": [
                         "ADVENT",
                         "CHRISTMAS",
@@ -522,10 +565,14 @@
                     ]
                 },
                 "liturgical_season_lcl": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Liturgical Season Localized",
+                    "description": "a localized string representing the name of the liturgical season in which the event falls, according to the locale requested"
                 },
                 "psalter_week": {
                     "type": "integer",
+                    "title": "Psalter Week",
+                    "description": "the psalter week (1 to 4) for the liturgical event, used in the Liturgy of the Hours, if applicable; otherwise 0",
                     "minimum": 0,
                     "maximum": 4
                 },
@@ -533,7 +580,9 @@
                     "$ref": "./CommonDef.json#/definitions/Readings"
                 },
                 "holy_day_of_obligation": {
-                    "const": true
+                    "const": true,
+                    "title": "Is Holy Day of Obligation",
+                    "description": "the property will only exist and will be true if the celebration is a Holy Day of Obligation, according to the calendar requested; otherwise the property will be absent"
                 }
             },
             "required": [
@@ -564,18 +613,18 @@
                 "liturgical_season_lcl",
                 "psalter_week",
                 "readings"
-            ],
-            "additionalProperties": false,
-            "title": "Liturgical Event Vigil (Evening Mass)",
-            "description": "When we say vigil, it is in the broad sense of the term, as in the evening Mass on the day preceding the main celebration, where the readings are often the same as those of the day of the main celebration."
+            ]
         },
         "LiturgicalEvent": {
             "type": "object",
             "additionalProperties": false,
             "title": "Liturgical Event",
+            "description": "a liturgical event in the calendar, such as a solemnity, feast, memorial, temporal celebration, weekday etc.",
             "properties": {
                 "event_idx": {
                     "type": "integer",
+                    "title": "Event Index",
+                    "description": "A sequential index number assigned to each liturgical event in the calendar, starting from 0 for the first event that is calculated. This index helps to uniquely identify and reference each event within the liturgical calendar for that year, seeing that the `event_key` property might not be unique.",
                     "minimum": 0,
                     "maximum": 2000
                 },
@@ -583,10 +632,14 @@
                     "$ref": "./CommonDef.json#/definitions/EventKeyNonVigilMass"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Liturgical Event Name",
+                    "description": "the full name of the liturgical event in the locale requested and according to the current requested calendar (i.e. General Roman Calendar, National Calendar, Diocesan Calendar)"
                 },
                 "date": {
                     "type": "string",
+                    "title": "Liturgical Event Date",
+                    "description": "the date of the liturgical event in ISO 8601 (RFC 3339) format, always at midnight UTC time",
                     "format": "date-time",
                     "pattern": "^(?:1969-(?:11-(?:29|30)|12-(?:0[1-9]|[12][0-9]|3[01]))|19[7-9]\\d-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])|[2-9]\\d{3}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01]))T00:00:00\\+00:00$"
                 },
@@ -595,6 +648,8 @@
                 },
                 "color_lcl": {
                     "type": "array",
+                    "title": "Liturgical Color Localized",
+                    "description": "an array of localized strings describing the liturgical color(s) associated with the celebration; if more than one liturgical common is associated with a celebration, there may be more than one color associated with the celebration",
                     "items": {
                         "type": "string"
                     },
@@ -608,60 +663,88 @@
                     "$ref": "./CommonDef.json#/definitions/LitGrade"
                 },
                 "grade_lcl": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Liturgical Grade Localized",
+                    "description": "a localized string describing the liturgical grade of the celebration, such as 'Solemnity', 'Feast', 'Memorial', etc., according to the locale requested"
                 },
                 "grade_abbr": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Liturgical Grade Abbreviation",
+                    "description": "a localized abbreviation for the liturgical grade of the celebration, such as 'S' for Solemnity, 'F' for Feast, 'M' for Memorial, etc."
                 },
                 "grade_display": {
                     "type": [
                         "string",
                         "null"
-                    ]
+                    ],
+                    "title": "Liturgical Grade Display",
+                    "description": "a localized string for display purposes that may differ from the standard name of the liturgical grade; can be null if no special display name is needed, or an empty string if no particular grade is meant to be shown. For example, for Higher Grade Solemnities it would be undesirable to display 'Solemnity with precedence over other solemnities', so this property would be an empty string in that case; or for All Souls Day which is logically treated as a Solemnity but displayed as a 'Commemoration' or as an 'Optional memorial' (according to local translations), so a localized string such as 'Commemoration' or 'Optional memorial' would be appropriate."
                 },
                 "common": {
                     "$ref": "./CommonDef.json#/definitions/LitCommon"
                 },
                 "common_lcl": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Liturgical Common Localized",
+                    "description": "a localized string describing the liturgical Proper or common(s) (if any) associated with the celebration, according to the locale requested"
                 },
                 "day_of_the_week_iso8601": {
                     "type": "integer",
+                    "title": "Day of the Week ISO 8601",
+                    "description": "the day of the week for the liturgical event, following the ISO 8601 standard where Monday is 1 and Sunday is 7",
                     "minimum": 1,
                     "maximum": 7
                 },
                 "month": {
                     "type": "integer",
+                    "title": "Month",
+                    "description": "the month for the liturgical event, represented as an integer from 1 (January) to 12 (December)",
                     "minimum": 1,
                     "maximum": 12
                 },
                 "day": {
                     "type": "integer",
+                    "title": "Day",
+                    "description": "the day of the month for the liturgical event, represented as an integer from 1 to 31 depending on the month",
                     "minimum": 1,
                     "maximum": 31
                 },
                 "year": {
                     "type": "integer",
+                    "title": "Year",
+                    "description": "the year for the liturgical event, between 1969 and 9999; will have the same value for all events when requesting a CIVIL year calendar, but may differ when requesting a LITURGICAL year calendar (i.e. events from the first Sunday of Advent to December 31 will have the previous year as their year value, and events from January 1 to the last Saturday following Christ the King will have the requested year as their year value)",
                     "minimum": 1969,
                     "maximum": 9999
                 },
                 "month_short": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Month Short Name",
+                    "description": "a localized abbreviated string for the month of the liturgical event, such as 'gen.' for January if Italian was requested"
                 },
                 "month_long": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Month Long Name",
+                    "description": "a localized full string for the month of the liturgical event, such as 'gennaio' for January if Italian was requested"
                 },
                 "day_of_the_week_short": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Day of the Week Short Name",
+                    "description": "a localized abbreviated string for the day of the week of the liturgical event, such as 'lun.' for Monday if Italian was requested"
                 },
                 "day_of_the_week_long": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Day of the Week Long Name",
+                    "description": "a localized full string for the day of the week of the liturgical event, such as 'lunedì' for Monday if Italian was requested"
                 },
                 "liturgical_year": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Liturgical Year",
+                    "description": "a localized string representing the liturgical year designation (YEAR A, YEAR B, or YEAR C for Sundays and Solemnities; YEAR I or YEAR II for weekdays) according to the liturgical calendar cycle in use for the requested year"
                 },
                 "liturgical_season": {
                     "type": "string",
+                    "title": "Liturgical Season",
+                    "description": "an enumeration value of the liturgical season in which the event falls, one of: ADVENT, CHRISTMAS, LENT, EASTER_TRIDUUM, EASTER, ORDINARY_TIME",
                     "enum": [
                         "ADVENT",
                         "CHRISTMAS",
@@ -672,7 +755,9 @@
                     ]
                 },
                 "liturgical_season_lcl": {
-                    "type": "string"
+                    "type": "string",
+                    "title": "Liturgical Season Localized",
+                    "description": "a localized string representing the name of the liturgical season in which the event falls, according to the locale requested"
                 },
                 "has_vigil_mass": {
                     "type": "boolean"
@@ -685,6 +770,8 @@
                 },
                 "psalter_week": {
                     "type": "integer",
+                    "title": "Psalter Week",
+                    "description": "the psalter week (1 to 4) for the liturgical event, used in the Liturgy of the Hours, if applicable; otherwise 0",
                     "minimum": 0,
                     "maximum": 4
                 },
@@ -692,7 +779,9 @@
                     "$ref": "./CommonDef.json#/definitions/Readings"
                 },
                 "holy_day_of_obligation": {
-                    "const": true
+                    "const": true,
+                    "title": "Is Holy Day of Obligation",
+                    "description": "the property will only exist and will be true if the celebration is a Holy Day of Obligation, according to the calendar requested; otherwise the property will be absent"
                 }
             },
             "required": [
