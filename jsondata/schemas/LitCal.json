@@ -434,7 +434,7 @@
                 "name": {
                     "type": "string",
                     "title": "Liturgical Event Name",
-                    "description": "the full name of the liturgical event in the locale requested and according to the current requested calendar (i.e. General Roman Calendar, National Calendar, Diocesan Calendar)"
+                    "description": "the localized full name of the liturgical event in the locale requested and according to the current requested calendar (i.e. General Roman Calendar, National Calendar, Diocesan Calendar)"
                 },
                 "date": {
                     "type": "string",
@@ -634,7 +634,7 @@
                 "name": {
                     "type": "string",
                     "title": "Liturgical Event Name",
-                    "description": "the full name of the liturgical event in the locale requested and according to the current requested calendar (i.e. General Roman Calendar, National Calendar, Diocesan Calendar)"
+                    "description": "the localized full name of the liturgical event in the locale requested and according to the current requested calendar (i.e. General Roman Calendar, National Calendar, Diocesan Calendar)"
                 },
                 "date": {
                     "type": "string",
@@ -760,13 +760,19 @@
                     "description": "a localized string representing the name of the liturgical season in which the event falls, according to the locale requested"
                 },
                 "has_vigil_mass": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "title": "Has Vigil Mass",
+                    "description": "indicates whether the celebration has an associated Vigil Mass (i.e., the evening Mass on the day before the main celebration where the readings may be the same as those used on the day itself)"
                 },
                 "has_vesper_i": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "title": "Has Vesper I",
+                    "description": "indicates whether the celebration has First Vespers (the vespers of the evening prior to the main celebration)"
                 },
                 "has_vesper_ii": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "title": "Has Vesper II",
+                    "description": "indicates whether the celebration has Second Vespers (the vespers of the evening of the day of the main celebration)"
                 },
                 "psalter_week": {
                     "type": "integer",
