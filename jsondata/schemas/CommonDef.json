@@ -5,24 +5,25 @@
         "EventKey": {
             "type": "string",
             "title": "Event Key",
-            "description": "corresponds to the `event_key` property of liturgical events in the output of the LitCal API and similar endpoints",
+            "description": "the `event_key` property of liturgical events in the output of the LitCal API and similar endpoints",
             "pattern": "^([a-z]+_[a-z]+_)?[A-Z][a-zA-Z0-9]+(?:[A-Z][a-zA-Z0-9]+)*(?:_\\d+)?(?:_vigil)?$"
         },
         "EventKeyVigilMass": {
             "type": "string",
             "title": "Event Key Vigil Mass",
-            "description": "corresponds to the `event_key` property of Vigil Mass liturgical events in the output of the LitCal API and similar endpoints; vigil is used in the broad sense, i.e., the evening Mass on the day before a solemnity or sunday where the readings may be the same as those used on the day itself",
+            "description": "the `event_key` property of Vigil Mass liturgical events in the output of the LitCal API and similar endpoints; vigil is used in the broad sense, i.e., the evening Mass on the day before a solemnity or sunday where the readings may be the same as those used on the day itself",
             "pattern": "^([a-z]+_[a-z]+_)?[A-Z][a-zA-Z0-9]+(?:[A-Z][a-zA-Z0-9]+)*(?:_\\d+)?_vigil$"
         },
         "EventKeyNonVigilMass": {
             "type": "string",
             "title": "Event Key Non-Vigil Mass",
-            "description": "corresponds to the `event_key` property of Non-Vigil Mass liturgical events (i.e. the main celebration) in the output of the LitCal API and similar endpoints",
+            "description": "the `event_key` property of the main celebration of a liturgical event in the output of the LitCal API and similar endpoints",
             "pattern": "^([a-z]+_[a-z]+_)?[A-Z][a-zA-Z0-9]+(?:[A-Z][a-zA-Z0-9]+)*(?:_\\d+)?$"
         },
         "LitColor": {
             "type": "array",
             "title": "Liturgical Color",
+            "description": "an array of enumeration values describing the liturgical color(s) associated with the celebration; if more than one liturgical common is associated with a celebration, there may be more than one color associated with the celebration",
             "uniqueItems": true,
             "minItems": 1,
             "items": {
@@ -38,7 +39,8 @@
         },
         "LitCommon": {
             "type": "array",
-            "title": "Liturgical Common (or Proper, or Masses for Various Needs and Occasions) of the celebration",
+            "title": "Liturgical Common",
+            "description": "an array of enumeration values describing the Liturgical Common(s), or Proper, or Masses for Various Needs and Occasions, of the celebration",
             "minItems": 0,
             "maxItems": 3,
             "uniqueItems": true,
@@ -92,6 +94,8 @@
             "maximum": 7
         },
         "Readings": {
+            "title": "Lectionary Readings",
+            "description": "the lectionary readings for the Mass associated with this liturgical event, following one of several possible schemas depending on the type of celebration",
             "oneOf": [
                 {
                     "$ref": "#/definitions/ReadingsFerial"
@@ -120,12 +124,12 @@
                 {
                     "$ref": "#/definitions/ReadingsSeasonal"
                 }
-            ],
-            "title": "Readings"
+            ]
         },
         "ReadingsFerial": {
             "type": "object",
             "title": "Ferial Readings",
+            "description": "the standard lectionary reading schema for ferial (weekday) Masses",
             "additionalProperties": false,
             "properties": {
                 "first_reading": {
@@ -151,6 +155,7 @@
         "ReadingsFestive": {
             "type": "object",
             "title": "Festive Readings",
+            "description": "the standard lectionary reading schema for festive (feast) Masses",
             "additionalProperties": false,
             "properties": {
                 "first_reading": {
@@ -180,6 +185,7 @@
         "ReadingsPalmSunday": {
             "type": "object",
             "title": "Palm Sunday Readings",
+            "description": "the standard lectionary reading schema for Palm Sunday Masses",
             "additionalProperties": false,
             "properties": {
                 "palm_gospel": {
@@ -213,6 +219,7 @@
         "ReadingsEasterVigil": {
             "type": "object",
             "title": "Easter Vigil Readings",
+            "description": "the standard lectionary reading schema for the Easter Vigil Mass",
             "additionalProperties": false,
             "properties": {
                 "first_reading": {
@@ -293,7 +300,8 @@
         },
         "ReadingsChristmas": {
             "type": "object",
-            "title": "Christmas Day Readings",
+            "title": "Christmas Readings",
+            "description": "the standard lectionary reading schema for Christmas Masses (Night, Dawn, and Day); the evening vigil Mass is separated out into its own event",
             "additionalProperties": false,
             "properties": {
                 "night": {
@@ -333,7 +341,7 @@
         "ReadingsMultipleSchemas": {
             "type": "object",
             "title": "Readings with Multiple Schemas",
-            "description": "Used for All Souls Day (Commemoration of the Faithful Departed).",
+            "description": "Used for All Souls Day (Commemoration of the Faithful Departed), which has three possible schemas for the three allowed Masses.",
             "additionalProperties": false,
             "properties": {
                 "schema_one": {
@@ -378,20 +386,21 @@
         "Day": {
             "type": "integer",
             "title": "Day",
-            "description": "maximum value will be 28, 29, 30, or 31 depending on whether we are dealing with a leap year, and whether we are dealing with a month that usually has 28, 30, or 31 days",
+            "description": "day of the month; the maximum value will be 28, 29, 30, or 31 depending on whether we are dealing with a leap year, and whether we are dealing with a month that usually has 28, 30, or 31 days",
             "minimum": 1,
             "maximum": 31
         },
         "Month": {
             "type": "integer",
             "title": "Month",
+            "description": "the month for the liturgical event, represented as an integer from 1 (January) to 12 (December)",
             "minimum": 1,
             "maximum": 12
         },
         "LitEventType": {
             "type": "string",
             "title": "Liturgical Event Type",
-            "description": "Whether the liturgical event is of type fixed or mobile",
+            "description": "an enumeration value indicating whether the liturgical event is of type `fixed` or `mobile`",
             "enum": [
                 "fixed",
                 "mobile"
@@ -432,7 +441,7 @@
         "HolyDaysOfObligation": {
             "type": "object",
             "title": "Holy Days of Obligation",
-            "description": "Which of the standard holy days of obligation are observed in this calendar, plus any additional holy days of obligation proper to the calendar",
+            "description": "a map of `event_key`s to booleans, that indicate which of the standard holy days of obligation are observed in the current requested calendar, plus any additional holy days of obligation proper to the calendar",
             "properties": {
                 "Christmas": {
                     "type": "boolean"
@@ -583,6 +592,8 @@
         },
         "Nation": {
             "type": "string",
+            "title": "Nation",
+            "description": "an enumeration of ISO 3166-1 alpha-2 country codes representing nations for which national liturgical calendars can be defined",
             "enum": [
                 "AD",
                 "AE",
@@ -857,12 +868,14 @@
         },
         "Year": {
             "type": "integer",
+            "title": "Year",
+            "description": "the year for the liturgical event or for the current requested calendar, represented as a four-digit integer",
             "minimum": 1970,
             "maximum": 9999
         },
         "Timestamp": {
             "type": "integer",
-            "description": "Earliest possible event timestamp is Nov 29th 1969, saturday vigil of the First Sunday of Advent",
+            "description": "the earliest possible event timestamp corresponds to Nov 29th 1969, saturday vigil of the First Sunday of Advent",
             "minimum": -2851200,
             "maximum": 253402214400
         },
@@ -1865,6 +1878,8 @@
         },
         "DiocesanCalendarId": {
             "type": "string",
+            "title": "Diocesan Calendar ID",
+            "description": "a unique identifier for a diocesan calendar",
             "minLength": 9,
             "maxLength": 9,
             "enum": [
@@ -4807,6 +4822,8 @@
         },
         "DioceseName": {
             "type": "string",
+            "title": "Diocese Name",
+            "description": "The full name of the Diocese for which a diocesan calendar has been defined / requested",
             "enum": [
                 "Aachen",
                 "Aba",
@@ -7711,6 +7728,8 @@
         },
         "NationalCalendarId": {
             "type": "string",
+            "title": "National Calendar ID",
+            "description": "a unique identifier for a national calendar",
             "minLength": 2,
             "maxLength": 2,
             "enum": [
@@ -7722,6 +7741,8 @@
         },
         "RelativeDateObject": {
             "type": "object",
+            "title": "Relative Date Object",
+            "description": "a relative date object, describing a day of the week relative to a liturgical event, useful for calculating moveable celebrations",
             "additionalProperties": false,
             "properties": {
                 "day_of_the_week": {
@@ -7755,6 +7776,8 @@
         },
         "Timezone": {
             "type": "string",
+            "title": "Timezone",
+            "description": "a timezone identifier from the IANA Time Zone Database, useful for indicating the timezone for a diocesan calendar",
             "enum": [
                 "Africa/Abidjan",
                 "Africa/Accra",
@@ -8197,6 +8220,8 @@
         },
         "ConditionalRule": {
             "type": "object",
+            "title": "Conditional Rule",
+            "description": "a conditional rule that can be used to adjust dates of liturgical events based on certain conditions; an example is the National Day of Prayer for the Unborn in the United States",
             "additionalProperties": false,
             "properties": {
                 "condition": {
