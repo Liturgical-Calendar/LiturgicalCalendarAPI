@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [v5.3](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.3) (November 15th 2025)
+
+* refactor the `date` property in liturgical events to be an RFC 3339 (ISO 8601) formatted date-time rather than a Unix timestamp (issue [#333])
+
+Saint Albert the Great, pray for us! 📖
+
 ## [v5.2](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.2) (October 4th 2025)
 
 * implement conditional rules for national calendar liturgical events (was previously hardcoded into the API for USA National Day of Prayer for the Unborn; issue [#206])
