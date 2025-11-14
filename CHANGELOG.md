@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## [v5.4](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.4) (November 17th 2025)
+
+* implement `filter` parameter for limited sets of calendar events (issue [#43])
+
+Saint Elizabeth of Hungary, pray for us! 🌟
+
 ## [v5.3](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.3) (November 15th 2025)
 
 * refactor the `date` property in liturgical events to be an RFC 3339 (ISO 8601) formatted date-time rather than a Unix timestamp (issue [#333])

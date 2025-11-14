@@ -96,11 +96,17 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
         }
     }
 
+    /**
+     * Format a byte count into a human-readable string, with units.
+     * @param int $bytes The number of bytes to format.
+     * @return string The formatted string, e.g. "1.23 KB".
+     */
     private static function formatBytes(int $bytes): string
     {
-        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        $power = $bytes > 0 ? floor(log($bytes, 1024)) : 0;
-        return number_format($bytes / ( 1024 ** $power ), 2) . ' ' . $units[$power];
+        $units       = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $power       = $bytes > 0 ? (int) floor(log((float) $bytes, 1024)) : 0;
+        $scaledValue = (float) ( $bytes / ( 1024 ** $power ) );
+        return number_format($scaledValue, 2) . ' ' . $units[$power];
     }
 
     /**
