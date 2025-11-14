@@ -2,15 +2,16 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Long Truong <binhlong@gmail.com>, 2024.
-# OpenAI <noreply-mt-openai@weblate.org>, 2024.
+# OpenAI <noreply-mt-openai@weblate.org>, 2024, 2025.
 # "John R. D'Orazio" <priest@johnromanodorazio.com>, 2025.
+# Mai Lê Bảo Khang <baokhang48812002@gmail.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-10-04 00:53+0000\n"
-"PO-Revision-Date: 2025-10-10 22:58+0000\n"
-"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2025-10-18 13:19+0000\n"
+"Last-Translator: Mai Lê Bảo Khang <baokhang48812002@gmail.com>\n"
 "Language-Team: Vietnamese <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/vi/>\n"
 "Language: vi\n"
@@ -23,12 +24,12 @@ msgstr ""
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:30
 msgid "green"
-msgstr "màu xanh lá cây"
+msgstr "xanh"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:32
 msgid "purple"
-msgstr "màu tím"
+msgstr "tím"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:34
@@ -43,7 +44,7 @@ msgstr "đỏ"
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:38
 msgid "rose"
-msgstr ""
+msgstr "hồng"
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
@@ -88,7 +89,7 @@ msgstr "Các Thánh Nam Nữ"
 #. translators: context = from the Common of Martyrs: For One Martyr
 #: src/Enum/LitCommon.php:182
 msgid "For One Martyr"
-msgstr "Dành cho một Thánh Tử đạo"
+msgstr "Cho Một Thánh Tử Đạo"
 
 #. translators: context = from the Common of Martyrs: For Several Martyrs
 #: src/Enum/LitCommon.php:184
@@ -98,27 +99,27 @@ msgstr "Cho Nhiều Vị Tử Đạo"
 #. translators: context = from the Common of Martyrs: For Missionary Martyrs
 #: src/Enum/LitCommon.php:186
 msgid "For Missionary Martyrs"
-msgstr "Dành cho các Thánh Tử đạo Truyền giáo"
+msgstr "Cho Tử Đạo Truyền Giáo"
 
 #. translators: context = from the Common of Martyrs: For One Missionary Martyr
 #: src/Enum/LitCommon.php:188
 msgid "For One Missionary Martyr"
-msgstr "Cho Một Tử đạo Truyền giáo"
+msgstr "Cho Một Tử Đạo Truyền Giáo"
 
 #. translators: context = from the Common of Martyrs: For Several Missionary Martyrs
 #: src/Enum/LitCommon.php:190
 msgid "For Several Missionary Martyrs"
-msgstr "Cho Nhiều Vị Tử Đạo Truyền Giáo"
+msgstr "Cho Nhiều Tử Đạo Truyền Giáo"
 
 #. translators: context = from the Common of Martyrs: For a Virgin Martyr
 #: src/Enum/LitCommon.php:192
 msgid "For a Virgin Martyr"
-msgstr "Cho một Trinh Nữ Tử Đạo"
+msgstr "Cho Một Trinh Nữ Tử Đạo"
 
 #. translators: context = from the Common of Martyrs: For a Holy Woman Martyr
 #: src/Enum/LitCommon.php:194
 msgid "For a Holy Woman Martyr"
-msgstr "Dành cho một Nữ thánh Tử đạo"
+msgstr "Cho Một Thánh Nữ Tử Đạo"
 
 #. translators: context = from the Common of Pastors: For a Pope
 #: src/Enum/LitCommon.php:196
@@ -128,7 +129,7 @@ msgstr "Cho Một Giáo Hoàng"
 #. translators: context = from the Common of Pastors: For a Bishop
 #: src/Enum/LitCommon.php:198
 msgid "For a Bishop"
-msgstr "Dành cho một Giám mục"
+msgstr "Cho Một Giám Mục"
 
 #. translators: context = from the Common of Pastors: For One Pastor
 #: src/Enum/LitCommon.php:200
@@ -148,7 +149,7 @@ msgstr "Cho Các Nhà Sáng Lập Giáo Hội"
 #. translators: context = from the Common of Pastors: For One Founder
 #: src/Enum/LitCommon.php:206
 msgid "For One Founder"
-msgstr "Dành cho một Đấng sáng lập"
+msgstr "Cho Một Đấng Sáng Lập"
 
 #. translators: context = from the Common of Pastors: For Several Founders
 #: src/Enum/LitCommon.php:208
@@ -163,17 +164,17 @@ msgstr "Cho Các Nhà Truyền Giáo"
 #. translators: context = from the Common of Virgins: For One Virgin
 #: src/Enum/LitCommon.php:212
 msgid "For One Virgin"
-msgstr "Cho Một Trinh nữ"
+msgstr "Cho Một Trinh Nữ"
 
 #. translators: context = from the Common of Virgins: For Several Virgins
 #: src/Enum/LitCommon.php:214
 msgid "For Several Virgins"
-msgstr "Dành cho nhiều Trinh nữ"
+msgstr "Cho Nhiều Trinh Nữ"
 
 #. translators: context = from the Common of Holy Men and Women: For Several Saints
 #: src/Enum/LitCommon.php:216
 msgid "For Several Saints"
-msgstr "Dành cho nhiều Thánh"
+msgstr "Cho Nhiều Thánh"
 
 #. translators: context = from the Common of Holy Men and Women: For One Saint
 #: src/Enum/LitCommon.php:218
@@ -183,7 +184,7 @@ msgstr "Cho Một Thánh"
 #. translators: context = from the Common of Holy Men and Women: For an Abbot
 #: src/Enum/LitCommon.php:220
 msgid "For an Abbot"
-msgstr "Cho một Viện Phụ"
+msgstr "Cho Một Viện Phụ"
 
 #. translators: context = from the Common of Holy Men and Women: For a Monk
 #: src/Enum/LitCommon.php:222
@@ -204,7 +205,7 @@ msgstr "Cho Tu Sĩ"
 #. translators: context = from the Common of Holy Men and Women: For Those Who Practiced Works of Mercy
 #: src/Enum/LitCommon.php:228
 msgid "For Those Who Practiced Works of Mercy"
-msgstr "Cho Những Người Thực Hành Các Công Việc Từ Thiện"
+msgstr "Cho Những Người Lo Công Việc Bác Ái"
 
 #. translators: context = from the Common of Holy Men and Women: For Educators
 #: src/Enum/LitCommon.php:230
@@ -248,29 +249,27 @@ msgstr "ngày trong tuần"
 #. translators: liturgical rank 'WEEKDAY' in abbreviated form
 #: src/Enum/LitGrade.php:139
 msgid "w"
-msgstr ""
+msgstr "t"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:144
-#, fuzzy
 msgid "commemoration"
-msgstr "Kỷ Niệm"
+msgstr "kỷ niệm"
 
 #. translators: liturgical rank 'COMMEMORATION' in abbreviated form
 #: src/Enum/LitGrade.php:146
 msgid "m*"
-msgstr ""
+msgstr "n*"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:151
-#, fuzzy
 msgid "optional memorial"
-msgstr "Lễ nhớ tùy chọn"
+msgstr "Lễ nhớ tự do"
 
 #. translators: liturgical rank 'OPTIONAL MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:153
 msgid "m"
-msgstr ""
+msgstr "n"
 
 #. translators: liturgical rank. Keep Capitalized
 #: src/Enum/LitGrade.php:158
@@ -280,27 +279,27 @@ msgstr "Lễ nhớ"
 #. translators: liturgical rank 'MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:160
 msgid "M"
-msgstr ""
+msgstr "N"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:165
 msgid "FEAST"
-msgstr "LỄ"
+msgstr "LỄ KÍNH"
 
 #. translators: liturgical rank 'FEAST' in abbreviated form
 #: src/Enum/LitGrade.php:167
 msgid "F"
-msgstr ""
+msgstr "K"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:172
 msgid "FEAST OF THE LORD"
-msgstr "LỄ CHÚA"
+msgstr "LỄ KÍNH CHÚA"
 
 #. translators: liturgical rank 'FEAST OF THE LORD' in abbreviated form
 #: src/Enum/LitGrade.php:174
 msgid "F✝"
-msgstr ""
+msgstr "K✝"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:179
@@ -310,107 +309,102 @@ msgstr "LỄ TRỌNG"
 #. translators: liturgical rank 'SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:181
 msgid "S"
-msgstr ""
+msgstr "T"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:186
 msgid "celebration with precedence over solemnities"
-msgstr "lễ kỷ niệm có ưu tiên hơn các lễ trọng"
+msgstr "lễ ưu tiên hơn các lễ trọng"
 
 #. translators: liturgical rank 'HIGHER SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:188
 msgid "S✝"
-msgstr ""
+msgstr "T✝"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:207
-#, fuzzy
 msgid "For the Church"
-msgstr "và Tiến sĩ Hội Thánh"
+msgstr "Cầu cho Hội Thánh"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:209
-#, fuzzy
 msgid "For the Pope"
-msgstr "Cho Một Giáo Hoàng"
+msgstr "Cầu cho Giáo Hoàng"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:211
-#, fuzzy
 msgid "For the Bishop"
-msgstr "Dành cho một Giám mục"
+msgstr "Cầu cho Giám mục"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:213
 msgid "For the Election of a Pope or a Bishop"
-msgstr ""
+msgstr "Cầu cho Việc Bầu cử Giáo Hoàng hay Giám mục"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:215
 msgid "For a Council or a Synod"
-msgstr ""
+msgstr "Cầu cho Công đồng hay Công nghị"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:217
 msgid "For Priests"
-msgstr ""
+msgstr "Cầu cho Các Linh mục"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:219
 msgid "For the Priest Himself"
-msgstr ""
+msgstr "Cầu cho Chính Linh mục"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:221
 msgid "On the Anniversary of His Ordination"
-msgstr ""
+msgstr "Nhân dịp Kỷ niệm Thụ phong Linh mục"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:223
-#, fuzzy
 msgid "For Ministers of the Church"
-msgstr "Cho Các Nhà Sáng Lập Giáo Hội"
+msgstr "Cầu cho Các Mục tử Hội Thánh"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:225
 msgid "For Vocations to Holy Orders"
-msgstr ""
+msgstr "Cầu cho Ơn gọi Thánh chức"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:227
-#, fuzzy
 msgid "For the Laity"
-msgstr "Cho Một Thánh"
+msgstr "Cầu cho Giáo dân"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:229
 msgid "On the Anniversaries of Marriage: On Any Anniversary"
-msgstr ""
+msgstr "Nhân dịp Kỷ niệm Hôn phối"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:231
 msgid "On the Anniversaries of Marriage: On the Twenty-Fifth Anniversary"
-msgstr ""
+msgstr "Nhân dịp Kỷ niệm Ngân khánh Hôn phối"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:233
 msgid "On the Anniversaries of Marriage: On the Fiftieth Anniversary"
-msgstr ""
+msgstr "Nhân dịp Kỷ niệm Kim khánh Hôn phối"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:235
 msgid "For the Family"
-msgstr ""
+msgstr "Cầu cho Gia đình"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:239
 msgid "On the Twenty-Fifth or Fiftieth Anniversary of Religious Profession"
-msgstr ""
+msgstr "Nhân dịp Ngân khánh hay Kim khánh Khấn dòng"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:241
 msgid "For Vocations to Religious Life"
-msgstr ""
+msgstr "Cầu cho Ơn gọi Tu trì"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:243
@@ -419,20 +413,18 @@ msgstr ""
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:245
-#, fuzzy
 msgid "For Reconciliation"
-msgstr "Cho Tu Sĩ"
+msgstr "Cầu cho Hoà giải"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:247
-#, fuzzy
 msgid "For the Unity of Christians"
-msgstr "Ngày %s trong Tuần Bát Nhật Giáng Sinh"
+msgstr "Cầu cho Các Kitô hữu Hiệp nhất"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:249
 msgid "For the Evangelization of Peoples"
-msgstr ""
+msgstr "Cầu cho Việc Loan báo Tin Mừng cho Các Dân tộc"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:251
@@ -477,60 +469,57 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:267
 msgid "At Seedtime"
-msgstr ""
+msgstr "Trong Thời gian Gieo hạt"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:269
 msgid "After the Harvest"
-msgstr ""
+msgstr "Tạ ơn Sau Mùa gặt"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:271
 msgid "For the Progress of Peoples"
-msgstr ""
+msgstr "Cầu cho Sự Tiến bộ của Các dân tộc"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:273
 msgid "For the Preservation of Peace and Justice"
-msgstr ""
+msgstr "Cầu cho Việc Bảo vệ Hoà bình và Công lý"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:275
 msgid "In Time of War or Civil Disturbance"
-msgstr ""
+msgstr "Trong Thời chiến hay Nội chiến"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:277
 msgid "For Refugees and Exiles"
-msgstr ""
+msgstr "Cầu cho Di dân"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:279
 msgid "In Time of Famine or for Those Suffering Hunger"
-msgstr ""
+msgstr "Trong Nạn đói hay Cầu cho Những người đang chịu đói"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:281
 msgid "In Time of Earthquake"
-msgstr ""
+msgstr "Trong Thời kỳ Động đất"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:283
-#, fuzzy
 msgid "For Rain"
-msgstr "Cho Một Nữ Tu"
+msgstr "Cầu Mưa"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:285
-#, fuzzy
 msgid "For Fine Weather"
-msgstr "Dành cho một Thánh Tử đạo"
+msgstr "Cầu cho Thời tiết đẹp"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:287
-#, fuzzy
 msgid "For an End to Storms"
-msgstr "Cho Các Nhà Giáo Dục"
+msgstr "Cầu cho Việc Chấm dứt Bão tố"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:289
@@ -544,9 +533,8 @@ msgstr ""
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:293
-#, fuzzy
 msgid "For Charity"
-msgstr "Dành cho một Thánh Tử đạo"
+msgstr "Cầu cho Công việc Bác ái"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:295
@@ -565,40 +553,37 @@ msgstr ""
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:301
-#, fuzzy
 msgid "For Those in Prison"
-msgstr "Cho Một Trinh nữ"
+msgstr "Cầu cho Tù nhân"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:303
-#, fuzzy
 msgid "For the Sick"
-msgstr "Cho Một Thánh"
+msgstr "Cầu cho Bệnh nhân"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:305
-#, fuzzy
 msgid "For the Dying"
-msgstr "Cho Một Thánh"
+msgstr "Cầu cho Người Hấp hối"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:307
 msgid "For the Grace of a Happy Death"
-msgstr ""
+msgstr "Cầu cho Ơn Chết lành"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:309
 msgid "In Any Need"
-msgstr ""
+msgstr "Trong Mọi Nhu cầu"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:311
 msgid "For Giving Thanks to God"
-msgstr ""
+msgstr "Tạ ơn Thiên Chúa"
 
 #: src/Enum/LitMassVariousNeeds.php:328
 msgid "Masses and Prayers for Various Needs and Occasions"
-msgstr ""
+msgstr "Thánh Lễ và Kinh Nguyện cho Mọi Nhu Cầu"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:27
@@ -608,7 +593,7 @@ msgstr "Mùa Vọng"
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:29
 msgid "Christmas"
-msgstr "Giáng Sinh"
+msgstr "Mùa Giáng Sinh"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:31
@@ -623,7 +608,7 @@ msgstr "Tam Nhật Vượt Qua"
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:35
 msgid "Easter"
-msgstr "Phục Sinh"
+msgstr "Mùa Phục Sinh"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:37
@@ -634,7 +619,7 @@ msgstr "Thường Niên"
 #, php-format
 msgid ""
 "The name of the diocese could not be derived from the diocese ID \"%s\"."
-msgstr ""
+msgstr "Tên của giáo phận không thể tìm thấy từ ID giáo phận \"%s\"."
 
 #: src/Handlers/CalendarHandler.php:561
 #, php-format
@@ -644,9 +629,9 @@ msgid ""
 msgstr "Chỉ hỗ trợ từ năm 1970 trở về sau. Bạn đã yêu cầu năm %d."
 
 #: src/Handlers/CalendarHandler.php:568
-#, fuzzy, php-format
+#, php-format
 msgid "Only years until 9999 are supported. You tried requesting the year %d."
-msgstr "Chỉ hỗ trợ từ năm 1970 trở về sau. Bạn đã yêu cầu năm %d."
+msgstr "Chỉ hỗ trợ từ năm 9999 trở về trước. Bạn đã yêu cầu năm %d."
 
 #. translators: days before Epiphany (not useful in Italian!)
 #. translators: days after Epiphany when Epiphany falls on Jan 6 (not useful in Italian!)
@@ -667,7 +652,7 @@ msgstr "hoặc"
 #. translators: as instituted on the day of the canonization of St Faustina Kowalska by Pope John Paul II in the year 2000
 #: src/Handlers/CalendarHandler.php:1056
 msgid "Divine Mercy Sunday"
-msgstr "Chúa Nhật Lòng Thương Xót Chúa"
+msgstr "Chúa Nhật Lòng Chúa Thương Xót"
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
@@ -686,12 +671,12 @@ msgid ""
 "The Solemnity '%1$s' falls on %2$s in the year %3$d, the celebration has "
 "been transferred to %4$s (%5$s) as per the %6$s."
 msgstr ""
-"Lễ Trọng '%1$s' rơi vào ngày %2$s trong năm %3$d, lễ kỷ niệm đã được chuyển "
+"Lễ Trọng '%1$s' rơi vào ngày %2$s trong năm %3$d, lễ kỷ niệm đã được dời "
 "sang ngày %4$s (%5$s) theo %6$s."
 
 #: src/Handlers/CalendarHandler.php:1243
 msgid "the Saturday preceding Palm Sunday"
-msgstr "thứ Bảy trước Chúa Nhật Lễ Lá"
+msgstr "Thứ Bảy trước Chúa Nhật Lễ Lá"
 
 #: src/Handlers/CalendarHandler.php:1251 src/Handlers/CalendarHandler.php:1276
 #: src/Handlers/CalendarHandler.php:1331 src/Handlers/CalendarHandler.php:1369
@@ -704,26 +689,26 @@ msgstr "thứ Bảy trước Chúa Nhật Lễ Lá"
 msgid ""
 "Decree of the Dicastery for Divine Worship and the Discipline of the "
 "Sacraments"
-msgstr ""
+msgstr "Sắc lệnh của Bộ Phụng tự và Kỷ luật Bí tích"
 
 #: src/Handlers/CalendarHandler.php:1268
 msgid "the Monday following the Second Sunday of Easter"
-msgstr "thứ Hai sau Chúa nhật thứ Hai Phục Sinh"
+msgstr "Thứ Hai sau Chúa Nhật II Mùa Phục Sinh"
 
 #: src/Handlers/CalendarHandler.php:1324
 msgid "the following Monday"
-msgstr "thứ Hai tiếp theo"
+msgstr "Thứ Hai tiếp theo"
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year
 #: src/Handlers/CalendarHandler.php:1343
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year %3$d. "
 "We should ask the Dicastery for Divine Worship and the Discipline of the "
 "Sacraments what to do about this!"
 msgstr ""
-"Lễ trọng '%1$s' trùng với Lễ trọng '%2$s' trong năm %3$d. Chúng ta nên hỏi "
-"Bộ Phụng tự về việc này!"
+"Lễ trọng '%1$s' trùng với lễ trọng '%2$s' vào năm %3$d. Chúng ta nên hỏi Bộ "
+"Phụng tự và Kỷ luật Bí tích làm gì với trường hợp này!"
 
 #. translators:
 #.  1: LiturgicalEvent name,
@@ -747,8 +732,8 @@ msgid ""
 "'%1$s' falls on a Sunday in the year %2$d, therefore the Feast '%3$s' is "
 "celebrated on %4$s rather than on the Sunday after Christmas."
 msgstr ""
-"'%1$s' rơi vào Chủ nhật trong năm %2$d, do đó Lễ '%3$s' được cử hành vào "
-"%4$s thay vì vào Chủ nhật sau Giáng Sinh."
+"'%1$s' rơi vào Chúa Nhật trong năm %2$d, do đó Lễ '%3$s' được cử hành vào %4$"
+"s thay vì vào Chúa Nhật sau Giáng Sinh."
 
 #. translators: You can ignore this translation if the Feast has not been inserted by the Episcopal Conference
 #: src/Handlers/CalendarHandler.php:1498
@@ -764,10 +749,10 @@ msgid ""
 "own liturgical calendars on the Thursday after Pentecost: applicable to the "
 "calendar '%1$s' in the year '%2$d' (%3$s)."
 msgstr ""
-"Năm 2012, Đức Giáo Hoàng Benedict XVI đã cho phép các Hội đồng Giám mục đưa "
-"Lễ Chúa Giêsu Kitô Thượng Tế Vĩnh Cửu vào lịch phụng vụ riêng của họ vào thứ "
-"Năm sau Lễ Chúa Thánh Thần Hiện Xuống: áp dụng cho lịch '%1$s' trong năm "
-"'%2$d' (%3$s)."
+"Năm 2012, Đức Giáo Hoàng Biển Đức XVI đã cho phép các Hội đồng Giám mục đưa "
+"Lễ Chúa Giêsu Kitô Thượng Tế Vĩnh Cửu vào lịch phụng vụ riêng của họ vào Thứ "
+"Năm sau Lễ Chúa Thánh Thần Hiện Xuống: áp dụng cho lịch '%1$s' trong năm '%2$"
+"d' (%3$s)."
 
 #. translators: 1: LiturgicalEvent name, 2: Superseding LiturgicalEvent grade, 3: Superseding LiturgicalEvent name, 4: Requested calendar year
 #: src/Handlers/CalendarHandler.php:1571 src/Handlers/CalendarHandler.php:1617
@@ -917,25 +902,27 @@ msgid ""
 "They are both reduced in rank to optional memorials (%4$s)."
 msgstr ""
 "Lễ nhớ '%1$s' trùng với một Lễ nhớ khác '%2$s' trong năm %3$d. Cả hai đều bị "
-"giảm cấp xuống thành lễ nhớ tùy chọn (%4$s)."
+"giảm cấp xuống thành lễ nhớ tự do (%4$s)."
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
 #: src/Handlers/CalendarHandler.php:2314
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': can only be relative to "
 "liturgical event with key '%2$s' using keywords %3$s"
 msgstr ""
-"Không thể tạo lễ di động '%1$s': chỉ có thể liên quan đến lễ có khóa '%2$s' "
-"bằng cách sử dụng từ khóa %3$s"
+"Không thể tạo sự kiện phụng vụ di động '%1$s': chỉ có thể liên quan đến sự "
+"kiện phụng vụ với khóa '%2$s' bằng cách sử dụng từ khóa %3$s"
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
 #: src/Handlers/CalendarHandler.php:2328
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s' relative to liturgical event "
 "with key '%2$s'"
-msgstr "Không thể tạo lễ di động '%1$s' liên quan đến lễ có khóa '%2$s'"
+msgstr ""
+"Không thể tạo sự kiện phụng vụ di động '%1$s' liên quan đến sự kiện phụng vụ "
+"với khóa '%2$s'"
 
 #. translators:
 #.  1. Grade or rank of the liturgical event
@@ -1084,30 +1071,30 @@ msgid ""
 "%2$s it has been reinstated so that local churches can optionally celebrate "
 "the memorial."
 msgstr ""
-"Lễ '%1$s' lẽ ra đã bị thay thế năm nay (2009) vì rơi vào Chủ nhật, tuy nhiên "
-"do là Năm của Tông đồ Phaolô, theo %2$s nó đã được khôi phục để các nhà thờ "
-"địa phương có thể tùy chọn cử hành lễ nhớ."
+"Lễ '%1$s' lẽ ra đã bị thay thế năm nay (2009) vì rơi vào Chúa Nhật, tuy "
+"nhiên do là Năm của Tông đồ Phaolô, theo %2$s nó đã được khôi phục để các "
+"nhà thờ địa phương có thể tùy chọn cử hành lễ nhớ."
 
 #: src/Handlers/CalendarHandler.php:2873
 #, php-format
 msgid "of the %s Week of Easter"
-msgstr "của Tuần %s Phục Sinh"
+msgstr "trong Tuần %s Mùa Phục Sinh"
 
 #: src/Handlers/CalendarHandler.php:2945 src/Handlers/CalendarHandler.php:2993
 #, php-format
 msgid "of the %s Week of Ordinary Time"
-msgstr "của Tuần %s Thường Niên"
+msgstr "trong Tuần %s Mùa Thường Niên"
 
 #: src/Handlers/CalendarHandler.php:3036
 msgid "Saturday Memorial of the Blessed Virgin Mary"
-msgstr "Lễ nhớ Thứ Bảy Đức Mẹ"
+msgstr "Lễ nhớ Đức Mẹ ngày Thứ Bảy"
 
 #. translators: 1: wider_region, 2: metadata, 3: calendar_id
 #: src/Handlers/CalendarHandler.php:3111
 #, php-format
 msgid ""
 "Could not find a %1$s property in the %2$s for the National Calendar %3$s."
-msgstr ""
+msgstr "Không thể tìm thấy thuộc tính %1$s trong %2$s cho Lịch Quốc gia %3$s."
 
 #. translators: 1: Event key, 2: Original date, 3: New date, 4: Requested calendar year
 #: src/Handlers/CalendarHandler.php:3153
@@ -1202,15 +1189,17 @@ msgid ""
 "liturgical event is greater than the number of days (%3$d) in the month "
 "(%4$d) of the liturgical event year (%5$d)."
 msgstr ""
+"Không thể tạo sự kiện phụng vụ với khóa \"%1$s\": ngày (%2$d) của sự kiện "
+"phụng vụ lớn hơn số ngày (%3$d) trong tháng (%4$d) của năm sự kiện phụng vụ "
+"(%5$d)."
 
 #: src/Handlers/CalendarHandler.php:3428
-#, fuzzy
 msgid ""
 "We should be creating a new liturgical event, however we do not seem to have "
 "the correct date information in order to proceed"
 msgstr ""
-"Chúng ta nên tạo ra một lễ hội mới, tuy nhiên dường như chúng ta không có "
-"thông tin ngày tháng chính xác để tiến hành"
+"Chúng ta nên tạo một sự kiện phụng vụ mới, tuy nhiên có vẻ như chúng ta "
+"không có thông tin ngày tháng chính xác để tiến hành"
 
 #. translators:
 #.  1. Grade or rank of the liturgical event
@@ -1349,12 +1338,15 @@ msgid ""
 "since the new date %2$s seems to be a Sunday or a liturgical event of "
 "greater rank."
 msgstr ""
+"Sự kiện phụng vụ '%1$s' đã được dời sang %2$s kể từ năm %3$d trong lịch quốc "
+"gia '%4$s', nhưng điều này không thể thực hiện được vào năm %5$d vì ngày mới "
+"%2$s dường như là Chúa Nhật hoặc một sự kiện phụng vụ có hạng cao hơn."
 
 #. translators: 1. Country name, 2. List of missals
 #: src/Handlers/CalendarHandler.php:3747
 #, php-format
 msgid "Found Missals for region %1$s: %2$s."
-msgstr ""
+msgstr "Tìm thấy Sách lễ cho khu vực %1$s: %2$s."
 
 #. translators: Name of the Roman Missal
 #: src/Handlers/CalendarHandler.php:3771
@@ -1463,22 +1455,21 @@ msgstr ""
 
 #: src/Handlers/CalendarHandler.php:4530
 msgid "Error converting Liturgical Calendar to XML."
-msgstr ""
+msgstr "Lỗi chuyển đổi Lịch Phụng vụ sang XML."
 
 #: src/Handlers/CalendarHandler.php:4565
-#, fuzzy, php-format
+#, php-format
 msgid "Error receiving or parsing info from GitHub about latest release: %s."
 msgstr ""
-"Lỗi khi nhận hoặc phân tích thông tin từ github về bản phát hành mới nhất: "
-"%s."
+"Lỗi nhận hoặc phân tích thông tin từ GitHub về bản phát hành mới nhất: %s."
 
 #: src/Handlers/CalendarHandler.php:4576
 msgid "Error serializing Liturgical Calendar."
-msgstr ""
+msgstr "Lỗi tuần tự hóa Lịch Phụng vụ."
 
 #: src/Models/Calendar/LitCommons.php:200
 msgid "From the Common"
-msgstr "Từ Phổ thông"
+msgstr "Từ Phần Chung"
 
 #. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
 #: src/Models/Calendar/LiturgicalEventCollection.php:172
@@ -1487,7 +1478,7 @@ msgstr "NĂM"
 
 #: src/Models/Calendar/LiturgicalEventCollection.php:173
 msgid "Vigil Mass"
-msgstr "Thánh lễ vọng"
+msgstr "Thánh Lễ Vọng"
 
 #: src/Models/Calendar/LiturgicalEventCollection.php:1467
 #, php-format
@@ -1496,8 +1487,8 @@ msgid ""
 "year %5$d. As per %6$s, the first has precedence, therefore the Vigil Mass "
 "is confirmed as are I Vespers."
 msgstr ""
-"Thánh lễ vọng cho %1$s '%2$s' trùng với %3$s '%4$s' trong năm %5$d. Theo "
-"%6$s, cái đầu tiên được ưu tiên, do đó Thánh lễ vọng được xác nhận cũng như "
+"Thánh Lễ Vọng cho %1$s '%2$s' trùng với %3$s '%4$s' trong năm %5$d. Theo %6$"
+"s, cái đầu tiên được ưu tiên, do đó Thánh lễ vọng được xác nhận cũng như "
 "Kinh Chiều I."
 
 #: src/Models/Calendar/LiturgicalEventCollection.php:1482
@@ -1508,9 +1499,9 @@ msgid ""
 "and a vigil Mass, whereas the last Solemnity will not have either Vespers II "
 "or an evening Mass."
 msgstr ""
-"Thánh lễ Vọng cho %1$s '%2$s' trùng với %3$s '%4$s' trong năm %5$d. Vì Lễ "
+"Thánh Lễ Vọng cho %1$s '%2$s' trùng với %3$s '%4$s' trong năm %5$d. Vì Lễ "
 "trọng đầu tiên có ưu tiên, nó sẽ có Kinh Chiều I và Thánh lễ vọng, trong khi "
-"Lễ trọng cuối cùng sẽ không có Kinh Chiều II hoặc Thánh lễ buổi tối."
+"Lễ trọng cuối cùng sẽ không có Kinh Chiều II hoặc Thánh Lễ buổi tối."
 
 #: src/Models/Calendar/LiturgicalEventCollection.php:1492
 #, php-format
@@ -1520,19 +1511,19 @@ msgid ""
 "Vespers II and an evening Mass, while the first Solemnity will not have a "
 "Vigil Mass or Vespers I."
 msgstr ""
-"Thánh lễ Vọng cho %1$s '%2$s' trùng với %3$s '%4$s' trong năm %5$d. Lễ trọng "
-"cuối cùng này được ưu tiên, do đó sẽ giữ Vespers II và một Thánh lễ buổi "
-"tối, trong khi Lễ trọng đầu tiên sẽ không có Thánh lễ Vọng hoặc Vespers I."
+"Thánh Lễ Vọng cho %1$s '%2$s' trùng với %3$s '%4$s' trong năm %5$d. Lễ trọng "
+"cuối cùng này được ưu tiên, do đó sẽ giữ Kinh Chiều II và một Thánh lễ buổi "
+"tối, trong khi Lễ trọng đầu tiên sẽ không có Thánh Lễ Vọng hoặc Kinh Chiều I."
 
 #: src/Models/Calendar/LiturgicalEventCollection.php:1577
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
 "year %5$d. We should ask the Dicastery for Divine Worship and the Discipline "
 "of the Sacraments what to do about this!"
 msgstr ""
-"Thánh Lễ Vọng cho %1$s '%2$s' trùng với %3$s '%4$s' trong năm %5$d. Chúng ta "
-"nên hỏi Bộ Phụng Tự về việc này!"
+"Thánh lễ Canh thức cho %1$s '%2$s' trùng với %3$s '%4$s' vào năm %5$d. Chúng "
+"ta nên hỏi Bộ Phụng tự và Kỷ luật Bí tích làm gì với trường hợp này!"
 
 #~ msgid "pink"
 #~ msgstr "hồng"
