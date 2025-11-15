@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-10-04 00:53+0000\n"
-"PO-Revision-Date: 2025-11-15 03:03+0000\n"
+"PO-Revision-Date: 2025-11-15 03:15+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: German <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/de/>\n"
@@ -45,7 +45,7 @@ msgstr "rot"
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:38
 msgid "rose"
-msgstr "Rose"
+msgstr "rosa"
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
@@ -70,7 +70,7 @@ msgstr "Märtyrer"
 #. translators: context = from the Common of Pastors
 #: src/Enum/LitCommon.php:174
 msgid "Pastors"
-msgstr "Pastoren"
+msgstr "Hirten"
 
 #. translators: context = from the Common of Doctors
 #: src/Enum/LitCommon.php:176
@@ -616,7 +616,7 @@ msgstr "Osterzeit"
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:37
 msgid "Ordinary Time"
-msgstr "Gewöhnliche Zeit"
+msgstr "Zeit im Jahreskreis"
 
 #: src/Handlers/CalendarHandler.php:424
 #, php-format
@@ -717,7 +717,7 @@ msgid ""
 "Sacraments what to do about this!"
 msgstr ""
 "Die Feierlichkeit „%1$s“ fällt im Jahr %3$d mit der Feierlichkeit „%2$s“ "
-"zusammen. Wir sollten die Abteilung für den Gottesdienst und die "
+"zusammen. Wir sollten das Dikasterium für den Gottesdienst und die "
 "Sakramentenordnung fragen, was wir in diesem Fall tun sollen!"
 
 #. translators:
@@ -1549,7 +1549,7 @@ msgid ""
 "year %5$d. We should ask the Dicastery for Divine Worship and the Discipline "
 "of the Sacraments what to do about this!"
 msgstr ""
-"Die Vorabendmesse für die %1$s '%2$s' fällt im Jahr %5$d mit dem %3$s '%4$s' "
+"Die Vigilmesse für die %1$s '%2$s' fällt im Jahr %5$d mit dem %3$s '%4$s' "
 "zusammen. Wir sollten das Dikasterium für den Gottesdienst und die "
 "Sakramentenordnung fragen, was wir dagegen tun sollen!"
 
