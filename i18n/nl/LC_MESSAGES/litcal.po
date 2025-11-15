@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-10-04 00:53+0000\n"
-"PO-Revision-Date: 2025-11-15 02:01+0000\n"
+"PO-Revision-Date: 2025-11-15 03:03+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Dutch <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/nl/>\n"
@@ -708,15 +708,15 @@ msgstr "de volgende maandag"
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year
 #: src/Handlers/CalendarHandler.php:1343
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year %3$d. "
 "We should ask the Dicastery for Divine Worship and the Discipline of the "
 "Sacraments what to do about this!"
 msgstr ""
 "Het hoogfeest van '%1$s' valt samen met het hoogfeest van '%2$s' in het jaar "
-"%3$d. We moeten de Congregatie voor de Goddelijke Eredienst vragen hoe te "
-"handelen!"
+"%3$d. We moeten het dicasterie voor de Goddelijke Eredienst en de Regeling "
+"van de Sacramenten vragen wat we hieraan moeten doen!"
 
 #. translators:
 #.  1: LiturgicalEvent name,
@@ -1538,14 +1538,15 @@ msgstr ""
 "vigiliemis of avondgebed heeft."
 
 #: src/Models/Calendar/LiturgicalEventCollection.php:1577
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
 "year %5$d. We should ask the Dicastery for Divine Worship and the Discipline "
 "of the Sacraments what to do about this!"
 msgstr ""
-"De vigiliemis voor de %1$s '%2$s' valt samen met de %3$s '%4$s' in het jaar "
-"%5$d. Het Dicasterie van de Goddelijke Eredienst moet aangeven wat te doen!"
+"De Vigilie Mis voor de %1$s '%2$s' valt samen met de %3$s '%4$s' in het jaar "
+"%5$d. We moeten de Dicasterie voor de Goddelijke Eredienst en de Discipline "
+"van de Sacramenten vragen wat we hieraan moeten doen!"
 
 #~ msgid "pink"
 #~ msgstr "roze"

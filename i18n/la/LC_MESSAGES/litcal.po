@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-10-04 00:53+0000\n"
-"PO-Revision-Date: 2025-11-15 02:01+0000\n"
+"PO-Revision-Date: 2025-11-15 03:03+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/la/>\n"
@@ -44,7 +44,7 @@ msgstr "ruber"
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:38
 msgid "rose"
-msgstr ""
+msgstr "rosa"
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
@@ -706,7 +706,7 @@ msgstr "sabbatum ante Dominicam in Palmis"
 msgid ""
 "Decree of the Dicastery for Divine Worship and the Discipline of the "
 "Sacraments"
-msgstr ""
+msgstr "Decretum Dicasterii de Cultu Divino et Disciplina Sacramentorum"
 
 #: src/Handlers/CalendarHandler.php:1268
 msgid "the Monday following the Second Sunday of Easter"
@@ -718,14 +718,15 @@ msgstr "diem Lunæ proximum"
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year
 #: src/Handlers/CalendarHandler.php:1343
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year %3$d. "
 "We should ask the Dicastery for Divine Worship and the Discipline of the "
 "Sacraments what to do about this!"
 msgstr ""
-"Sollemnitas <i>'%1$s'</i> coincidet cum Sollemnitate <i>'%2$s'</i> in anno "
-"%3$d. Oportet quaerere a Congregatione Cultu Divino quid facere!"
+"Solemnitas '%1$s' coincit cum Solemnitate '%2$s' anno %3$d. Rogare debemus "
+"Dicasterium de Cultu Divino et Disciplina Sacramentorum quid de hoc agendum "
+"sit!"
 
 #. translators:
 #.  1: LiturgicalEvent name,
@@ -1363,7 +1364,7 @@ msgstr ""
 #: src/Handlers/CalendarHandler.php:3747
 #, php-format
 msgid "Found Missals for region %1$s: %2$s."
-msgstr ""
+msgstr "Inventa Missalia pro regione %1$s: %2$s."
 
 #. translators: Name of the Roman Missal
 #: src/Handlers/CalendarHandler.php:3771
@@ -1473,16 +1474,18 @@ msgstr ""
 
 #: src/Handlers/CalendarHandler.php:4530
 msgid "Error converting Liturgical Calendar to XML."
-msgstr ""
+msgstr "Error convertendi Calendarium Liturgicum ad XML."
 
 #: src/Handlers/CalendarHandler.php:4565
 #, php-format
 msgid "Error receiving or parsing info from GitHub about latest release: %s."
 msgstr ""
+"Error accipiendi aut interpretandi informationes de ultimis emissionibus ex "
+"GitHub: %s."
 
 #: src/Handlers/CalendarHandler.php:4576
 msgid "Error serializing Liturgical Calendar."
-msgstr ""
+msgstr "Error serializationis Calendarii Liturgici."
 
 #: src/Models/Calendar/LitCommons.php:200
 msgid "From the Common"
@@ -1535,14 +1538,15 @@ msgstr ""
 "Vesperis servabit."
 
 #: src/Models/Calendar/LiturgicalEventCollection.php:1577
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
 "year %5$d. We should ask the Dicastery for Divine Worship and the Discipline "
 "of the Sacraments what to do about this!"
 msgstr ""
-"Missa in Vigilia %1$s '%2$s' coincidet cum %3$s'%4$s' in anno %5$d. Oportet "
-"quaerere a Congregatione Cultu Divino quid facere!"
+"Missa Vigiliae pro %1$s '%2$s' cum %3$s '%4$s' anno %5$d coincidit. A "
+"Dicasterio de Cultu Divino et Disciplina Sacramentorum quid agendum sit "
+"quaeramus!"
 
 #~ msgid "pink"
 #~ msgstr "rosea"

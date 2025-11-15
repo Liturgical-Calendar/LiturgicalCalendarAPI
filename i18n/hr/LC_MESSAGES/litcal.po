@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-10-04 00:53+0000\n"
-"PO-Revision-Date: 2025-11-15 02:01+0000\n"
+"PO-Revision-Date: 2025-11-15 03:03+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Croatian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/hr/>\n"
@@ -43,7 +43,7 @@ msgstr "crvena"
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:38
 msgid "rose"
-msgstr "ruža"
+msgstr "ružičasta"
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
@@ -612,7 +612,7 @@ msgstr "Uskrs"
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:37
 msgid "Ordinary Time"
-msgstr ""
+msgstr "Vrijeme kroz godinu"
 
 #: src/Handlers/CalendarHandler.php:424
 #, php-format
@@ -1370,7 +1370,7 @@ msgstr "GODINA"
 
 #: src/Models/Calendar/LiturgicalEventCollection.php:173
 msgid "Vigil Mass"
-msgstr ""
+msgstr "Misa bdijenja"
 
 #: src/Models/Calendar/LiturgicalEventCollection.php:1467
 #, php-format
@@ -1379,6 +1379,8 @@ msgid ""
 "year %5$d. As per %6$s, the first has precedence, therefore the Vigil Mass "
 "is confirmed as are I Vespers."
 msgstr ""
+"Bdijenje mise za %1$s '%2$s' podudara se s %3$s '%4$s' u godini %5$d. Prema "
+"%6$s, prvo ima prednost, stoga su bdijenje mise i I. večernje potvrđeni."
 
 #: src/Models/Calendar/LiturgicalEventCollection.php:1482
 #, php-format
@@ -1388,6 +1390,9 @@ msgid ""
 "and a vigil Mass, whereas the last Solemnity will not have either Vespers II "
 "or an evening Mass."
 msgstr ""
+"Vigilna misa za %1$s '%2$s' poklapa se s %3$s '%4$s' godine %5$d. Budući da "
+"prva svetkovina ima prednost, imat će Prve Večernje i vigilnu misu, dok "
+"posljednja svetkovina neće imati ni Druge Večernje ni večernju misu."
 
 #: src/Models/Calendar/LiturgicalEventCollection.php:1492
 #, php-format
@@ -1397,6 +1402,10 @@ msgid ""
 "Vespers II and an evening Mass, while the first Solemnity will not have a "
 "Vigil Mass or Vespers I."
 msgstr ""
+"Vigilijska misa za %1$s '%2$s' poklapa se s %3$s '%4$s' u godini %5$d. Ova "
+"posljednja svetkovina ima prednost, stoga će se održati Večernje II i "
+"večernja misa, dok prva svetkovina neće imati Vigilijsku misu niti Večernje "
+"I."
 
 #: src/Models/Calendar/LiturgicalEventCollection.php:1577
 #, php-format
@@ -1405,6 +1414,9 @@ msgid ""
 "year %5$d. We should ask the Dicastery for Divine Worship and the Discipline "
 "of the Sacraments what to do about this!"
 msgstr ""
+"Vigilijska misa za %1$s '%2$s' podudara se s %3$s '%4$s' u godini %5$d. "
+"Trebali bismo pitati Dikasterij za bogoštovlje i disciplinu sakramenata što "
+"učiniti povodom toga!"
 
 #~ msgid "pink"
 #~ msgstr "ružičasta"

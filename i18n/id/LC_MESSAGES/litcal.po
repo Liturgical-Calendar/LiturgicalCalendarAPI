@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-10-04 00:53+0000\n"
-"PO-Revision-Date: 2025-11-15 02:13+0000\n"
+"PO-Revision-Date: 2025-11-15 03:03+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Indonesian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/id/>\n"
@@ -1363,7 +1363,7 @@ msgstr ""
 
 #: src/Models/Calendar/LitCommons.php:200
 msgid "From the Common"
-msgstr "Dari Teks Biasa"
+msgstr "Dari Komon"
 
 #. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
 #: src/Models/Calendar/LiturgicalEventCollection.php:172
