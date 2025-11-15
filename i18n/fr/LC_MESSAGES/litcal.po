@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-10-04 00:53+0000\n"
-"PO-Revision-Date: 2025-11-15 02:01+0000\n"
+"PO-Revision-Date: 2025-11-15 03:03+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: French <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/fr/>\n"
@@ -711,15 +711,15 @@ msgstr "le lundi suivant"
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year
 #: src/Handlers/CalendarHandler.php:1343
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year %3$d. "
 "We should ask the Dicastery for Divine Worship and the Discipline of the "
 "Sacraments what to do about this!"
 msgstr ""
 "La solennité '%1$s' coïncide avec la solennité '%2$s' en l'année %3$d. Nous "
-"devrions demander à la Congrégation pour le Culte Divin quoi faire à ce "
-"sujet !"
+"devrions demander au Dicastère pour le Culte Divin et la Discipline des "
+"Sacrements quoi faire à ce sujet !"
 
 #. translators:
 #.  1: LiturgicalEvent name,
@@ -1540,15 +1540,15 @@ msgstr ""
 "pas de Messe de la Veillée ni de Vêpres I."
 
 #: src/Models/Calendar/LiturgicalEventCollection.php:1577
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
 "year %5$d. We should ask the Dicastery for Divine Worship and the Discipline "
 "of the Sacraments what to do about this!"
 msgstr ""
-"La Messe de la Veillée pour le %1$s '%2$s' coïncide avec le %3$s '%4$s' en "
-"l'année %5$d. Nous devrions demander à la Congrégation pour le Culte Divin "
-"quoi faire à ce sujet !"
+"La messe de vigile pour le %1$s '%2$s' coïncide avec le %3$s '%4$s' en "
+"l'année %5$d. Nous devrions demander au Dicastère pour le Culte Divin et la "
+"Discipline des Sacrements quoi faire à ce sujet !"
 
 #~ msgid "pink"
 #~ msgstr "rose"
