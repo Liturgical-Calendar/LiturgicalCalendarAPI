@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-10-04 00:53+0000\n"
-"PO-Revision-Date: 2025-10-10 22:58+0000\n"
+"PO-Revision-Date: 2025-11-15 02:01+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: French <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/fr/>\n"
@@ -46,7 +46,7 @@ msgstr "rouge"
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:38
 msgid "rose"
-msgstr ""
+msgstr "rose"
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
@@ -325,281 +325,271 @@ msgstr "S✝"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:207
-#, fuzzy
 msgid "For the Church"
-msgstr "et docteur de l'Église"
+msgstr "Pour l'Église"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:209
-#, fuzzy
 msgid "For the Pope"
-msgstr "Pour un Pape"
+msgstr "Pour le Pape"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:211
-#, fuzzy
 msgid "For the Bishop"
-msgstr "Pour un Évêque"
+msgstr "Pour l'évêque"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:213
 msgid "For the Election of a Pope or a Bishop"
-msgstr ""
+msgstr "Pour l'élection d'un Pape ou d'un évêque"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:215
 msgid "For a Council or a Synod"
-msgstr ""
+msgstr "Pour un Concile ou un Synode"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:217
 msgid "For Priests"
-msgstr ""
+msgstr "Pour les prêtres"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:219
 msgid "For the Priest Himself"
-msgstr ""
+msgstr "Pour le prêtre lui-même"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:221
 msgid "On the Anniversary of His Ordination"
-msgstr ""
+msgstr "À l'anniversaire de son ordination"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:223
-#, fuzzy
 msgid "For Ministers of the Church"
-msgstr "Pour des fondateurs d'église"
+msgstr "Pour les ministres de l'Église"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:225
 msgid "For Vocations to Holy Orders"
-msgstr ""
+msgstr "Pour les vocations aux ordres sacrés"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:227
-#, fuzzy
 msgid "For the Laity"
-msgstr "Pour un saint"
+msgstr "Pour les laïcs"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:229
 msgid "On the Anniversaries of Marriage: On Any Anniversary"
-msgstr ""
+msgstr "Pour les anniversaires de mariage : Pour tout anniversaire"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:231
 msgid "On the Anniversaries of Marriage: On the Twenty-Fifth Anniversary"
 msgstr ""
+"À l'occasion des anniversaires de mariage : pour le vingt-cinquième "
+"anniversaire"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:233
 msgid "On the Anniversaries of Marriage: On the Fiftieth Anniversary"
-msgstr ""
+msgstr "Pour les anniversaires de mariage : Pour le cinquantième anniversaire"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:235
 msgid "For the Family"
-msgstr ""
+msgstr "Pour la famille"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:239
 msgid "On the Twenty-Fifth or Fiftieth Anniversary of Religious Profession"
 msgstr ""
+"À l'occasion du vingt-cinquième ou cinquantième anniversaire de profession "
+"religieuse"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:241
 msgid "For Vocations to Religious Life"
-msgstr ""
+msgstr "Pour les vocations à la vie religieuse"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:243
 msgid "For Promoting Harmony"
-msgstr ""
+msgstr "Pour promouvoir l'harmonie"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:245
-#, fuzzy
 msgid "For Reconciliation"
-msgstr "Pour les religieux et les religieuses"
+msgstr "Pour la Réconciliation"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:247
-#, fuzzy
 msgid "For the Unity of Christians"
-msgstr "%s jour dans l'Octave de la Nativité"
+msgstr "Pour l'unité des chrétiens"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:249
 msgid "For the Evangelization of Peoples"
-msgstr ""
+msgstr "Pour l'évangélisation des peuples"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:251
 msgid "For Persecuted Christians"
-msgstr ""
+msgstr "Pour les chrétiens persécutés"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:253
 msgid "For a Spiritual or Pastoral Gathering"
-msgstr ""
+msgstr "Pour un rassemblement spirituel ou pastoral"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:255
 msgid "For the Nation or State"
-msgstr ""
+msgstr "Pour la Nation ou l'État"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:257
 msgid "For Those in Public Office"
-msgstr ""
+msgstr "Pour ceux qui occupent des fonctions publiques"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:259
 msgid "For a Governing Assembly"
-msgstr ""
+msgstr "Pour une Assemblée Gouvernante"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:261
 msgid "For the Head of State or Ruler"
-msgstr ""
+msgstr "Pour le chef d'État ou le souverain"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:263
 msgid "At the Beginning of the Civil Year"
-msgstr ""
+msgstr "Au début de l'année civile"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:265
 msgid "For the Sanctification of Human Labor"
-msgstr ""
+msgstr "Pour la sanctification du travail humain"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:267
 msgid "At Seedtime"
-msgstr ""
+msgstr "Au temps des semailles"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:269
 msgid "After the Harvest"
-msgstr ""
+msgstr "Après la récolte"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:271
 msgid "For the Progress of Peoples"
-msgstr ""
+msgstr "Pour le progrès des peuples"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:273
 msgid "For the Preservation of Peace and Justice"
-msgstr ""
+msgstr "Pour la préservation de la paix et de la justice"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:275
 msgid "In Time of War or Civil Disturbance"
-msgstr ""
+msgstr "En temps de guerre ou de troubles civils"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:277
 msgid "For Refugees and Exiles"
-msgstr ""
+msgstr "Pour les réfugiés et les exilés"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:279
 msgid "In Time of Famine or for Those Suffering Hunger"
-msgstr ""
+msgstr "En temps de famine ou pour ceux qui souffrent de la faim"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:281
 msgid "In Time of Earthquake"
-msgstr ""
+msgstr "En temps de tremblement de terre"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:283
-#, fuzzy
 msgid "For Rain"
-msgstr "Pour une moniale"
+msgstr "Pour la pluie"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:285
-#, fuzzy
 msgid "For Fine Weather"
-msgstr "Pour un martyr"
+msgstr "Pour un beau temps"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:287
-#, fuzzy
 msgid "For an End to Storms"
-msgstr "Pour les éducateurs"
+msgstr "Pour une fin aux tempêtes"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:289
 msgid "For the Forgiveness of Sins"
-msgstr ""
+msgstr "Pour le pardon des péchés"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:291
 msgid "For Chastity"
-msgstr ""
+msgstr "Pour la chasteté"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:293
-#, fuzzy
 msgid "For Charity"
-msgstr "Pour un martyr"
+msgstr "Pour la charité"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:295
 msgid "For Relatives and Friends"
-msgstr ""
+msgstr "Pour les proches et amis"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:297
 msgid "For Our Oppressors"
-msgstr ""
+msgstr "Pour nos oppresseurs"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:299
 msgid "For Those Held in Captivity"
-msgstr ""
+msgstr "Pour ceux qui sont détenus en captivité"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:301
-#, fuzzy
 msgid "For Those in Prison"
-msgstr "Pour une vierge"
+msgstr "Pour les personnes en prison"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:303
-#, fuzzy
 msgid "For the Sick"
-msgstr "Pour un saint"
+msgstr "Pour les malades"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:305
-#, fuzzy
 msgid "For the Dying"
-msgstr "Pour un saint"
+msgstr "Pour les mourants"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:307
 msgid "For the Grace of a Happy Death"
-msgstr ""
+msgstr "Pour la grâce d'une bonne mort"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:309
 msgid "In Any Need"
-msgstr ""
+msgstr "Pour tout besoin"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:311
 msgid "For Giving Thanks to God"
-msgstr ""
+msgstr "Pour remercier Dieu"
 
 #: src/Enum/LitMassVariousNeeds.php:328
 msgid "Masses and Prayers for Various Needs and Occasions"
-msgstr ""
+msgstr "Messes et Prières pour Diverses Intentions et Occasions"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:27
@@ -647,11 +637,11 @@ msgstr ""
 "de demander l'année %d."
 
 #: src/Handlers/CalendarHandler.php:568
-#, fuzzy, php-format
+#, php-format
 msgid "Only years until 9999 are supported. You tried requesting the year %d."
 msgstr ""
-"Seules les années à partir de 1970 sont prises en charge. Vous avez essayé "
-"de demander l'année %d."
+"Seules les années jusqu'en 9999 sont prises en charge. Vous avez essayé de "
+"demander l'année %d."
 
 #. translators: days before Epiphany (not useful in Italian!)
 #. translators: days after Epiphany when Epiphany falls on Jan 6 (not useful in Italian!)
