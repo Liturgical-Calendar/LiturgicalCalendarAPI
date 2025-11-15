@@ -10,7 +10,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-10-04 00:53+0000\n"
-"PO-Revision-Date: 2025-10-10 22:58+0000\n"
+"PO-Revision-Date: 2025-11-15 02:01+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/la/>\n"
@@ -635,7 +635,7 @@ msgstr "Tempus per annum"
 #, php-format
 msgid ""
 "The name of the diocese could not be derived from the diocese ID \"%s\"."
-msgstr ""
+msgstr "Nomen dioecesis ex ID dioecesis \"%s\" deduci non potuit."
 
 #: src/Handlers/CalendarHandler.php:561
 #, php-format
@@ -646,10 +646,9 @@ msgstr ""
 "Petere potes nisi ab annis MCMLXX et ultra. Tu anno %d conatus est petere."
 
 #: src/Handlers/CalendarHandler.php:568
-#, fuzzy, php-format
+#, php-format
 msgid "Only years until 9999 are supported. You tried requesting the year %d."
-msgstr ""
-"Petere potes nisi ab annis MCMLXX et ultra. Tu anno %d conatus est petere."
+msgstr "Tantum anni usque ad IXCMXCIX sustinentur. Conatus es petere annum %d."
 
 #. translators: days before Epiphany (not useful in Italian!)
 #. translators: days after Epiphany when Epiphany falls on Jan 6 (not useful in Italian!)
@@ -958,8 +957,8 @@ msgid ""
 "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
 "applicable to the year %5$d (%6$s)."
 msgstr ""
-"%1$s '%2$s' elevata est in gradu %3$s ab anno %4$d, ergo applicatur ad anno "
-"%5$d (%6$s)."
+"Nomen %1$s '%2$s' mutatum est in %3$s ab anno %4$d, applicandur ad annum %5$"
+"d (%6$s)."
 
 #. translators:
 #.  1. Grade or rank of the liturgical event
@@ -992,8 +991,8 @@ msgid ""
 "The %1$s '%2$s' has been lowered to the rank of %3$s since the year %4$d, "
 "applicable to the year %5$d (%6$s)."
 msgstr ""
-"%1$s '%2$s' elevata est in gradu %3$s ab anno %4$d, ergo applicatur ad anno "
-"%5$d (%6$s)."
+"%1$s '%2$s' ad gradum %3$s demota est ex anno %4$d, applicabile ad annum %5$"
+"d (%6$s)."
 
 #. translators:
 #.  1. Name of the liturgical event
@@ -1162,9 +1161,9 @@ msgid ""
 "'%5$s' in the year %6$d, and though it would be elevated to a Patronal "
 "festivity for the Calendar %7$s, it has not been reinstated."
 msgstr ""
-"The %1$s '%2$s', plerumque celebrata die %3$s, suppressa est a %4$s '%5$s' "
-"anno %6$d, etsi ad festum Patronale pro Calendario %7$s elevata esset, non "
-"restituta est."
+"%1$s '%2$s', qui die %3$s celebrari solet, ab %4$s '%5$s' anno %6$d "
+"suppressa est, etiamsi pro Calendario %7$s in festum Patronale elevatum "
+"esset, non restituta est."
 
 #. translators:
 #.  1. Name of the first coinciding Memorial
@@ -1231,7 +1230,7 @@ msgid ""
 "The %1$s '%2$s' was not added to the calendar on %3$s because it conflicts "
 "with an existing liturgical event in the year %4$d."
 msgstr ""
-"'The %1$s '%2$s' non adiectum est ad calendarium die %3$s quia confligit cum "
+"%1$s '%2$s' non adiectum est ad calendarium die %3$s quia confligit cum "
 "eventu liturgico existente in anno %4$d."
 
 #. translators:
@@ -1356,6 +1355,9 @@ msgid ""
 "since the new date %2$s seems to be a Sunday or a liturgical event of "
 "greater rank."
 msgstr ""
+"Eventus liturgicus '%1$s' ad %2$s cum anno %3$d in calendario nationali '%4$"
+"s' translatus est, sed hoc anno %5$d fieri non potuit, cum nova dies %2$s "
+"videtur esse dies Dominica aut eventus liturgicus maioris gradus."
 
 #. translators: 1. Country name, 2. List of missals
 #: src/Handlers/CalendarHandler.php:3747
@@ -1384,8 +1386,8 @@ msgid ""
 "The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
 "superseded by the %5$s '%6$s' in the year %7$d"
 msgstr ""
-"%1$s '%2$s' (%3$s), aggregata calendario nationali in %4$s, subplantata est "
-"ab %5$s '%6$s' in anno %7$d"
+"%1$s '%2$s' (%3$s), adiecta ad calendarium nationale in %4$s, superata est a "
+"%5$s '%6$s' anno %7$d"
 
 #. translators: Name of the Roman Missal
 #: src/Handlers/CalendarHandler.php:3821
@@ -1455,6 +1457,9 @@ msgid ""
 "celebrated on %3$s, coincides with the Sunday or Solemnity '%4$s' in the "
 "year %5$d! Does something need to be done about this?"
 msgstr ""
+"Sollemnitas '%1$s', propria calendario %2$s et plerumque celebrata die %3$s, "
+"coincidit cum Dominica vel Sollemnitate '%4$s' anno %5$d! Opus est aliquid "
+"de hoc agere?"
 
 #. translators: 1: LiturgicalEvent grade, 2: LiturgicalEvent name, 3: Name of the diocese, 4: LiturgicalEvent date, 5: Coinciding liturgical event name, 6: Requested calendar year
 #: src/Handlers/CalendarHandler.php:4325
