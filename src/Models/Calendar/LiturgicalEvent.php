@@ -188,7 +188,7 @@ final class LiturgicalEvent implements \JsonSerializable
      * - event_key: a unique key for the liturgical event
      * - event_idx: the index of the event in the array of liturgical events
      * - name: the name of the liturgical event
-     * - date: a PHP timestamp (seconds since the Unix Epoch) for the date of the liturgical event
+     * - date: an RFC 3339 (ISO 8601) formatted date string representing the date of the liturgical event
      * - color: the liturgical color of the liturgical event
      * - color_lcl: the color of the liturgical event, translated according to the current locale
      * - type: the type of the liturgical event (mobile or fixed)
@@ -222,7 +222,7 @@ final class LiturgicalEvent implements \JsonSerializable
      *      event_key: string,
      *      event_idx: int,
      *      name: string,
-     *      date: int,
+     *      date: string,
      *      color: array<'green'|'rose'|'purple'|'red'|'white'>,
      *      color_lcl: string[],
      *      type: 'fixed'|'mobile',
@@ -261,7 +261,6 @@ final class LiturgicalEvent implements \JsonSerializable
             'event_key'               => $this->event_key,
             'event_idx'               => $this->event_idx,
             'name'                    => $this->name,
-            //serialize the DateTime   object as a PHP timestamp (seconds since the Unix Epoch)
             'color'                   => array_map(fn ($color) => $color->value, $this->color),
             'color_lcl'               => $this->color_lcl,
             'grade'                   => $this->grade->value,
@@ -273,9 +272,11 @@ final class LiturgicalEvent implements \JsonSerializable
                                             : array_map(fn (LitMassVariousNeeds $litMassVariousNeeds) => $litMassVariousNeeds->value, $this->common),
             'common_lcl'              => $this->common_lcl,
             'type'                    => $this->type->value,
-            'date'                    => (int) $this->date->format('U'),
+            //'timestamp'               => (int) $this->date->format('U'),        // PHP timestamp (seconds since the Unix Epoch)
+            //'timestamp_ms'            => (int) $this->date->format('U') * 1000, // JavaScript timestamp (milliseconds since the Unix Epoch)
+            'date'                    => $this->date->format('c'),                // serialize the DateTime object as an ISO-8601 (RFC 3339) date string
             'year'                    => (int) $this->date->format('Y'),
-            'month'                   => (int) $this->date->format('n'), //1 for January, 12 for December
+            'month'                   => (int) $this->date->format('n'), // 1 for January, 12 for December
             'month_short'             => LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE
                                             ? LatinUtils::LATIN_MONTHS_ABBR[(int) $this->date->format('n')]
                                             : self::$monthShort->format($this->date->format('U')),
@@ -283,7 +284,7 @@ final class LiturgicalEvent implements \JsonSerializable
                                             ? LatinUtils::LATIN_MONTHS[(int) $this->date->format('n')]
                                             : self::$monthLong->format($this->date->format('U')),
             'day'                     => (int) $this->date->format('j'),
-            'day_of_the_week_iso8601' => (int) $this->date->format('N'), //1 for Monday, 7 for Sunday
+            'day_of_the_week_iso8601' => (int) $this->date->format('N'), // 1 for Monday, 7 for Sunday
             'day_of_the_week_short'   => LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE
                                             ? LatinUtils::LATIN_WEEKDAYS_ABBR[$this->date->format('w')]
                                             : self::$dayOfTheWeekShort->format($this->date->format('U')),
@@ -370,7 +371,7 @@ final class LiturgicalEvent implements \JsonSerializable
      *
      * The provided object must have the following properties:
      * - name: The name of the liturgical event, as a string.
-     * - date: The date of the liturgical event, as a DateTime object or as an integer representing the Unix timestamp.
+     * - date: The date of the liturgical event, as a DateTime object or as an RFC 3339 formatted string.
      * - grade: The grade of the liturgical event, as a LitGrade object or as an integer.
      *
      * Optional properties are:
@@ -404,7 +405,7 @@ final class LiturgicalEvent implements \JsonSerializable
             throw new \InvalidArgumentException('Invalid name provided to create LiturgicalEvent');
         }
 
-        if (false === $obj->date instanceof DateTime && false === is_int($obj->date)) {
+        if (false === $obj->date instanceof DateTime && false === is_string($obj->date)) {
             throw new \InvalidArgumentException('Invalid date provided to create LiturgicalEvent');
         }
 
@@ -415,8 +416,13 @@ final class LiturgicalEvent implements \JsonSerializable
         // When we read data from a JSON file, $obj will be an instance of stdClass,
         // and we need to cast the values to types that will be accepted by the LiturgicalEvent constructor
         if ($obj instanceof \stdClass) {
-            if (is_int($obj->date)) {
-                $obj->date = new DateTime()->setTimestamp($obj->date)->setTimezone(new \DateTimeZone('UTC'));
+            // TODO: Will the date ever be a string? Will any JSON src file contain a date as a string?
+            if (is_string($obj->date)) {
+                $parsed = \DateTime::createFromFormat(\DateTime::ATOM, $obj->date);
+                if (false === $parsed || $parsed->format(\DateTime::ATOM) !== $obj->date) {
+                    throw new \InvalidArgumentException('Property `date` must be a valid RFC 3339 (ISO 8601) date-time string');
+                }
+                $obj->date = $parsed;
             }
 
             if (property_exists($obj, 'color')) {
@@ -542,7 +548,7 @@ final class LiturgicalEvent implements \JsonSerializable
      *
      * The array must contain the following keys:
      * - name: The name of the liturgical event, as a string.
-     * - date: The date of the liturgical event, as a DateTime object or as an integer representing the Unix timestamp.
+     * - date: The date of the liturgical event, as a DateTime object or as an RFC 3339 (ISO 8601) formatted string.
      * - grade: The grade of the liturgical event, as a LitGrade object or as an integer.
      *
      * Optional keys are:
@@ -576,7 +582,7 @@ final class LiturgicalEvent implements \JsonSerializable
             throw new \InvalidArgumentException('Invalid name provided to create LiturgicalEvent');
         }
 
-        if (false === $arr['date'] instanceof DateTime && false === is_int($arr['date'])) {
+        if (false === $arr['date'] instanceof DateTime && false === is_string($arr['date'])) {
             throw new \InvalidArgumentException('Invalid date provided to create LiturgicalEvent');
         }
 
@@ -584,8 +590,13 @@ final class LiturgicalEvent implements \JsonSerializable
             throw new \InvalidArgumentException('Invalid grade provided to create LiturgicalEvent');
         }
 
-        if (is_int($arr['date'])) {
-            $arr['date'] = new DateTime()->setTimestamp($arr['date'])->setTimezone(new \DateTimeZone('UTC'));
+        // TODO: Will the date ever be a string? Will any JSON src file contain a date as a string?
+        if (is_string($arr['date'])) {
+            $parsed = \DateTime::createFromFormat(\DateTime::ATOM, $arr['date']);
+            if (false === $parsed || $parsed->format(\DateTime::ATOM) !== $arr['date']) {
+                throw new \InvalidArgumentException('Property `date` must be a valid RFC 3339 (ISO 8601) date-time string');
+            }
+            $arr['date'] = $parsed;
         }
 
         $colors = LitColor::GREEN;

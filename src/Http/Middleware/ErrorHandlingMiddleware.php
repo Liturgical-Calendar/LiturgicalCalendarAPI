@@ -23,6 +23,14 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
     // Store the current request so processors can use it
     private ?ServerRequestInterface $currentRequest = null;
 
+    /**
+     * Constructor for the ErrorHandlingMiddleware.
+     *
+     * @param ResponseFactoryInterface $responseFactory The PSR-7 response factory.
+     * @param bool $debug Whether to enable debug level logging.
+     *
+     * @throws \RuntimeException If unable to open php://stderr for writing.
+     */
     public function __construct(ResponseFactoryInterface $responseFactory, bool $debug = false)
     {
         $this->responseFactory = $responseFactory;
@@ -48,6 +56,23 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
         set_error_handler([$this, 'handlePhpWarning']);
     }
 
+    /**
+     * This middleware will catch any exceptions thrown by the handler, log them, and
+     * return a response with a status of 500 and a JSON body that conforms to the
+     * application/problem+json format.
+     *
+     * The response will contain a 'type' key with the value 'about:blank'. A 'title' key
+     * with the value 'Internal Server Error', and a 'status' key with the value 500.
+     *
+     * If the exception is an instance of ApiException, then it will define its own
+     * structure for the response. Otherwise, if debug mode is enabled, then the response
+     * will contain additional information, such as the file and line number of the error,
+     * and a trace of the error.
+     *
+     * @param ServerRequestInterface $request
+     * @param RequestHandlerInterface $handler
+     * @return ResponseInterface
+     */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $this->currentRequest = $request;
@@ -96,15 +121,33 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
         }
     }
 
+    /**
+     * Format a byte count into a human-readable string, with units.
+     * @param int $bytes The number of bytes to format.
+     * @return string The formatted string, e.g. "1.23 KB".
+     */
     private static function formatBytes(int $bytes): string
     {
-        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
-        $power = $bytes > 0 ? floor(log($bytes, 1024)) : 0;
-        return number_format($bytes / ( 1024 ** $power ), 2) . ' ' . $units[$power];
+        $units       = ['B', 'KB', 'MB', 'GB', 'TB'];
+        $power       = $bytes > 0 ? (int) floor(log((float) $bytes, 1024)) : 0;
+        $scaledValue = (float) ( $bytes / ( 1024 ** $power ) );
+        return number_format($scaledValue, 2) . ' ' . $units[$power];
     }
 
     /**
-     * Convert PHP warnings, notices, etc., into exceptions
+     * Handles PHP warnings by throwing an \Exception if the error is not fatal.
+     * Does not handle fatal errors, as they are handled by PHP itself.
+     * Does not handle E_STRICT errors, as they are only thrown in development mode.
+     * Does not handle E_PARSE errors, as they are only thrown in development mode.
+     * Does not handle E_CORE_ERROR errors, as they are only thrown when a core PHP extension has an error.
+     * Does not handle E_COMPILE_ERROR errors, as they are only thrown when a PHP extension has an error at compile-time.
+     * Does not handle E_ERROR errors, as they are fatal and handled by PHP itself.
+     *
+     * @param int $errno The level of the error raised.
+     * @param string $errstr The error message.
+     * @param string $errfile The file the error was raised in.
+     * @param int $errline The line the error was raised on.
+     * @return bool Whether the error was escalated and thrown as an exception.
      */
     public function handlePhpWarning(int $errno, string $errstr, string $errfile, int $errline): bool
     {
@@ -143,7 +186,11 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
     }
 
     /**
-     * Catch uncaught exceptions
+     * Catch uncaught exceptions and log them at critical level.
+     * This function is called by a registered shutdown function.
+     * It will log the exception and then exit with a status code of 1.
+     *
+     * @param \Throwable $e The uncaught exception to log.
      */
     public function handleUncaughtException(\Throwable $e): void
     {
@@ -151,6 +198,19 @@ class ErrorHandlingMiddleware implements MiddlewareInterface
         exit(1);
     }
 
+    /**
+     * Log an exception with some context information.
+     *
+     * The exception is logged at the specified severity, and the context
+     * information is available to processors (like the JSON formatter)
+     * for final output.
+     *
+     * The context information includes the request method, URI, request ID,
+     * and the exception object itself.
+     *
+     * @param \Throwable $e The exception to log.
+     * @param string $severity The severity at which to log the exception.
+     */
     private function logException(\Throwable $e, string $severity = 'error'): void
     {
         $method = $this->currentRequest?->getMethod() ?? 'N/A';

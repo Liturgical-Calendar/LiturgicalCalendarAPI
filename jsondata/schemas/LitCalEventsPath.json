@@ -150,14 +150,14 @@
                   "description": "The actual name of the liturgical event as defined in the latest edition of the source Roman Missal indicated in the property `missal` (i.e. if the Missal is the Latin edition of the Roman Missal, the name should be from the latest edition of the Latin Roman Missal)"
                 },
                 "type": {
-                  "$ref": "./CommonDef.json#/definitions/LitFeastType"
+                  "$ref": "./CommonDef.json#/definitions/LitEventType"
                 },
                 "missal": {
                   "$ref": "./CommonDef.json#/definitions/MissalID"
                 },
                 "decree": {
                   "type": "string",
-                  "description": "When a liturgical event is defined ex-novo by a decree of the Congregation of Divine Worship rather than by a Roman Missal, this property will be present with a reference to the decree"
+                  "description": "When a liturgical event is defined ex-novo by a decree of the Dicastery for Divine Worship rather than by a Roman Missal, this property will be present with a reference to the decree"
                 },
                 "strtotime": {
                   "oneOf": [

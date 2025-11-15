@@ -24,7 +24,7 @@ jobs:
           fi
           echo "tag=$latest" >> $GITHUB_OUTPUT
 
-      - name: Check current version in repo
+      - name: Check current version in local repo
         id: local
         run: |
           if [ -f jsondata/likelySubtags.json ]; then
@@ -37,31 +37,30 @@ jobs:
       - name: Compare versions
         id: compare
         run: |
-          remote_tag="${{ steps.cldr.outputs.tag }}"
-          remote_version="${remote_tag#v}"   # strip leading v in shell
+          # the likelySubtags.json file contains the current version as a major version only (e.g. "42")
           local_version="${{ steps.local.outputs.version }}"
+
+          # the cldr repo does not use a leading v, but just for future proofing let's strip any possible leading v
+          remote_tag="${{ steps.cldr.outputs.tag }}"
+          remote_version="${remote_tag#v}"
+
+          # the cldr repo uses full semver tags (e.g. "42.1.0"), but the likelySubtags.json file only uses the major version (e.g. "42")
+          # so we need to extract the major version from the remote tag
+          if [[ $remote_version == *.* ]]; then
+            # If it does, extract the major part
+            remote_version=$(echo "$remote_version" | cut -d '.' -f 1)
+          fi
+
+          if [[ $remote_version == $local_version ]]; then
+            echo "up_to_date=true" >> $GITHUB_OUTPUT
+          else
+            echo "up_to_date=false" >> $GITHUB_OUTPUT
+          fi
 
           echo "Remote: $remote_version"
           echo "Local:  $local_version"
+          echo "Up to date: $up_to_date"
 
-          # Check if the remote version has a decimal point
-          if [[ $remote_version == *.* ]]; then
-            # If it does, extract the major part
-            remote_major=$(echo "$remote_version" | cut -d '.' -f 1)
-            # Compare the major part with the local version
-            if [[ $remote_major == $local_version ]]; then
-              echo "up_to_date=true" >> $GITHUB_OUTPUT
-            else
-              echo "up_to_date=false" >> $GITHUB_OUTPUT
-            fi
-          else
-            # If it doesn't, compare the remote version with the local version directly
-            if [[ $remote_version == $local_version ]]; then
-              echo "up_to_date=true" >> $GITHUB_OUTPUT
-            else
-              echo "up_to_date=false" >> $GITHUB_OUTPUT
-            fi
-          fi
       - name: Download likelySubtags.json
         if: steps.compare.outputs.up_to_date == 'false'
         run: |

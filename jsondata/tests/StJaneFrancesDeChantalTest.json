@@ -6,20 +6,20 @@
     "assertions": [
         {
             "year": 2001,
-            "expected_value": 1008115200,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2001-12-12T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "should fall on expected date December 12"
         },
         {
             "year": 2002,
-            "expected_value": 1029110400,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2002-08-12T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "should fall on expected date August 12"
         },
         {
             "year": 2010,
-            "expected_value": 1281571200,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2010-08-12T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "should fall on expected date August 12",
             "comment": "this test is significant since December 12th falls on a Sunday, so the memorial would have been suppressed if it hadn't been moved"
         },

@@ -173,11 +173,13 @@
                                 "$ref": "./CommonDef.json#/definitions/Year"
                             },
                             "expected_value": {
-                                "$ref": "./CommonDef.json#/definitions/Timestamp"
+                                "type": "string",
+                                "format": "date-time",
+                                "pattern": "^(?:1969-(?:11-(?:29|30)|12-(?:0[1-9]|[12][0-9]|3[01]))|19[7-9]\\d-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])|[2-9]\\d{3}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01]))T00:00:00\\+00:00$"
                             },
                             "assert": {
                                 "type": "string",
-                                "const": "eventExists AND hasExpectedTimestamp"
+                                "const": "eventExists AND hasExpectedDate"
                             },
                             "assertion": {
                                 "type": "string"

@@ -228,13 +228,13 @@ class JsonDataConstants
     public const LECTIONARY_SAINTS_FILE = JsonDataConstants::LECTIONARY_SAINTS_FOLDER . '/{locale}.json';
 
     /**
-     * The folder containing readings for memorials created via Decrees of the Congregation of Divine Worship.
+     * The folder containing readings for memorials created via Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments.
      * Evalates to 'jsondata/sourcedata/decrees/lectionary';
      */
     public const LECTIONARY_DECREES_FOLDER = JsonDataConstants::DECREES_FOLDER . '/lectionary';
 
     /**
-     * The file containing readings for memorials created via Decrees of the Congregation of Divine Worship,
+     * The file containing readings for memorials created via Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments,
      * with placeholders for the locale.
      * Evaluates to 'jsondata/sourcedata/decrees/lectionary/{locale}.json'.
      */

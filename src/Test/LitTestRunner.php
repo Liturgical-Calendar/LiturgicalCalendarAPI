@@ -22,7 +22,7 @@ use LiturgicalCalendar\Api\Test\TestsMap;
  *      grade_display:string|null,
  *      grade_abbr:string|null,
  *      grade_lcl:string|null,
- *      date:int,
+ *      date:string,
  *      color:string[],
  *      color_lcl:string[],
  *      common:string[],
@@ -151,9 +151,9 @@ class LitTestRunner
      * does not exist in the calendar. If it does, it will set an error message.
      * Otherwise, it will set a success message.
      *
-     * If the assertion is of type "eventExists AND hasExpectedTimestamp", it
+     * If the assertion is of type "eventExists AND hasExpectedDate", it
      * will check if the event exists in the calendar and has the expected
-     * timestamp. If it does not, it will set an error message. Otherwise, it
+     * date value. If it does not, it will set an error message. Otherwise, it
      * will set a success message.
      *
      * If the assertion is of any other type, it will set an error message.
@@ -187,16 +187,16 @@ class LitTestRunner
                         $this->setSuccess();
                     } else {
                         $errorMessage = is_null($assertion->expected_value)
-                            ? " The event {$eventKey} should not exist, instead the event has a timestamp of {$eventBeingTested->date}"
+                            ? " The event {$eventKey} should not exist, instead the event has a date value of {$eventBeingTested->date}"
                             : " What is going on here? We expected the event not to exist, and in fact it doesn't. We should never get here!";
                         $this->setError($messageIfError . $errorMessage);
                     }
                     break;
-                case LitEventTestAssertion::EVENT_EXISTS_AND_HAS_EXPECTED_TIMESTAMP:
+                case LitEventTestAssertion::EVENT_EXISTS_AND_HAS_EXPECTED_DATE:
                     $firstErrorMessage = " The event {$eventKey} should exist, instead it was not found";
                     if (null !== $eventBeingTested) {
                         $actualValue        = $eventBeingTested->date;
-                        $secondErrorMessage = " The event {$eventKey} was expected to have timestamp {$assertion->expected_value}, instead it had timestamp {$actualValue}";
+                        $secondErrorMessage = " The event {$eventKey} was expected to have a date value of {$assertion->expected_value}, instead it had a date value of {$actualValue}";
                         if ($actualValue === $assertion->expected_value) {
                             $this->setSuccess("expected_value = {$assertion->expected_value}, actualValue = {$actualValue}");
                         } else {
@@ -207,7 +207,7 @@ class LitTestRunner
                     }
                     break;
                 default:
-                    $this->setError('This should never happen. We can only test whether an event does not exist, OR (does exist AND has an expected timestamp)');
+                    $this->setError('This should never happen. We can only test whether an event does not exist, OR (does exist AND has an expected date value)');
                     break;
             }
         }

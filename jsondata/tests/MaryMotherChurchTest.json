@@ -25,14 +25,14 @@
         },
         {
             "year": 2018,
-            "expected_value": 1526860800,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2018-05-21T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The memorial 'Mary Mother of the Church' should be created on the expected date"
         },
         {
             "year": 2019,
-            "expected_value": 1560124800,
-            "assert": "eventExists AND hasExpectedTimestamp",
+            "expected_value": "2019-06-10T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
             "assertion": "The memorial 'Mary Mother of the Church' should be created on the expected date"
         }
     ]
