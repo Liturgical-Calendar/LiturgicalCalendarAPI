@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-10-04 00:53+0000\n"
-"PO-Revision-Date: 2025-11-15 02:01+0000\n"
+"PO-Revision-Date: 2025-11-15 02:13+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Indonesian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/id/>\n"
@@ -509,7 +509,7 @@ msgstr "Dalam Waktu Gempa Bumi"
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:283
 msgid "For Rain"
-msgstr "Untuk Rain"
+msgstr "Untuk Hujan"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:285
