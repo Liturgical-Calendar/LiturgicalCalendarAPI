@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-10-04 00:53+0000\n"
-"PO-Revision-Date: 2025-11-15 02:01+0000\n"
+"PO-Revision-Date: 2025-11-15 02:13+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Slovak <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/sk/>\n"
@@ -646,7 +646,7 @@ msgstr ""
 #: src/Handlers/CalendarHandler.php:568
 #, php-format
 msgid "Only years until 9999 are supported. You tried requesting the year %d."
-msgstr "Podporované sú len roky do 9999. Skúsil si zadať rok %d."
+msgstr "Podporované sú len roky do 9999. Skúsili ste zadať rok %d."
 
 #. translators: days before Epiphany (not useful in Italian!)
 #. translators: days after Epiphany when Epiphany falls on Jan 6 (not useful in Italian!)
