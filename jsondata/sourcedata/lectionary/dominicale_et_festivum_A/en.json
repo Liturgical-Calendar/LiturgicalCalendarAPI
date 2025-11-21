@@ -1,31 +1,31 @@
 {
     "Advent1": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Isaiah 2:1-5",
+        "responsorial_psalm": "Psalm 122: 1-2, 3-4, 4-5, 6-7, 8-9",
+        "second_reading": "Romans 13:11-14",
+        "gospel_acclamation": "Cf. Psalm 85:8",
+        "gospel": "Matthew 24:37-44"
     },
     "Advent2": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Isaiah 11:1-10",
+        "responsorial_psalm": "Psalm 72:1-2, 7-8, 12-13, 17",
+        "second_reading": "Romans 15:4-9",
+        "gospel_acclamation": "Luke 3:4, 6",
+        "gospel": "Matthew 3:1-12"
     },
     "Advent3": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Isaiah 35:1-6a, 10",
+        "responsorial_psalm": "Psalm 146:6-7, 8-9, 9-10",
+        "second_reading": "James 5:7-10",
+        "gospel_acclamation": "Isaiah 61:1",
+        "gospel": "Matthew 11:2-11"
     },
     "Advent4": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Isaiah 7:10-14",
+        "responsorial_psalm": "Psalm 24:1-2, 3-4, 5-6",
+        "second_reading": "Romans 1:1-7",
+        "gospel_acclamation": "Matthew 1:23",
+        "gospel": "Matthew 1:18-24"
     },
     "Christmas": {
         "vigil": {
