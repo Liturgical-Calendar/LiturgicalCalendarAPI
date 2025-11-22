@@ -1188,39 +1188,39 @@
         "gospel": ""
     },
     "OrdWeekday34Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Daniel 1:1-6, 8-20",
+        "responsorial_psalm": "Daniel 3:52, 53, 54, 55, 56",
+        "gospel_acclamation": "Matthew 24:42a, 44",
+        "gospel": "Luke 21:1-4"
     },
     "OrdWeekday34Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Daniel 2:31-45",
+        "responsorial_psalm": "Daniel 3:57, 58, 59, 60, 61",
+        "gospel_acclamation": "Revelation 2:10c",
+        "gospel": "Luke 21:5-11"
     },
     "OrdWeekday34Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Daniel 5:1-6, 13-14, 16-17, 23-28",
+        "responsorial_psalm": "Daniel 3:62, 63, 64, 65, 66, 67",
+        "gospel_acclamation": "Revelation 2:10c",
+        "gospel": "Luke 21:12-19"
     },
     "OrdWeekday34Thursday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Daniel 6:12-28",
+        "responsorial_psalm": "Daniel 3:68, 69, 70, 71, 72, 73, 74",
+        "gospel_acclamation": "Luke 21:28",
+        "gospel": "Luke 21:20-28"
     },
     "OrdWeekday34Friday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Daniel 7:2-14",
+        "responsorial_psalm": "Daniel 3:75, 76, 77, 78, 79, 80, 81",
+        "gospel_acclamation": "Luke 21:28",
+        "gospel": "Luke 21:29-33"
     },
     "OrdWeekday34Saturday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Daniel 7:15-27",
+        "responsorial_psalm": "Daniel 3:82, 83, 84, 85, 86, 87",
+        "gospel_acclamation": "Luke 21:36",
+        "gospel": "Luke 21:34-36"
     }
 }

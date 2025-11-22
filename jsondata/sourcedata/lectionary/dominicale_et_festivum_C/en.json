@@ -503,11 +503,11 @@
         "gospel": ""
     },
     "ChristKing": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "2 Samuel 5:1-3",
+        "responsorial_psalm": "Psalm 122:1-3, 3-4, 4-5",
+        "second_reading": "Colossians 1:12-20",
+        "gospel_acclamation": "Mark 11:9, 10",
+        "gospel": "Luke 23:35-43"
     },
     "JesusChristEternalHighPriest": {
         "first_reading": "Isaiah 6:1-4,8",
