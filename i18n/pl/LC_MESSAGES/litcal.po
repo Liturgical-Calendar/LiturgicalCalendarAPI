@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-10-04 00:53+0000\n"
-"PO-Revision-Date: 2025-11-15 02:13+0000\n"
+"PO-Revision-Date: 2025-11-21 04:22+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Polish <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/pl/>\n"
@@ -43,7 +43,7 @@ msgstr "czerwony"
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:38
 msgid "rose"
-msgstr "róża"
+msgstr "różowy"
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
@@ -68,7 +68,7 @@ msgstr "Męczennicy"
 #. translators: context = from the Common of Pastors
 #: src/Enum/LitCommon.php:174
 msgid "Pastors"
-msgstr "Pastorzy"
+msgstr "Pasterze"
 
 #. translators: context = from the Common of Doctors
 #: src/Enum/LitCommon.php:176
@@ -138,7 +138,7 @@ msgstr "Dla jednego pastora"
 #. translators: context = from the Common of Pastors: For Several Pastors
 #: src/Enum/LitCommon.php:202
 msgid "For Several Pastors"
-msgstr "Dla kilku pastorów"
+msgstr "Dla kilku pasterzy"
 
 #. translators: context = from the Common of Pastors: For Founders of a Church
 #: src/Enum/LitCommon.php:204
@@ -273,7 +273,7 @@ msgstr ""
 #. translators: liturgical rank. Keep Capitalized
 #: src/Enum/LitGrade.php:158
 msgid "Memorial"
-msgstr "Upamiętnienie"
+msgstr "Wspomnienie"
 
 #. translators: liturgical rank 'MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:160

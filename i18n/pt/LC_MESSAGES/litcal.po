@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2025-10-04 00:53+0000\n"
-"PO-Revision-Date: 2025-11-15 03:03+0000\n"
+"PO-Revision-Date: 2025-11-21 04:22+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Portuguese <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/pt/>\n"
@@ -46,7 +46,7 @@ msgstr "vermelho"
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:38
 msgid "rose"
-msgstr ""
+msgstr "rosa"
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
@@ -223,7 +223,7 @@ msgstr "Para Mulheres Santas"
 #: src/Enum/LitCommon.php:256
 msgctxt "(SING_FEMM)"
 msgid "of the"
-msgstr "do"
+msgstr "da"
 
 #. translators: "From the Common [of] Virgins" (plural feminine). Latin: leave empty!
 #: src/Enum/LitCommon.php:258
