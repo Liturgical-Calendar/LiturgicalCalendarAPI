@@ -380,6 +380,31 @@ class Health implements MessageComponentInterface
     }
 
     /**
+     * Find diocese metadata by calendar ID.
+     *
+     * @param string $calendarId The diocese calendar ID to look up.
+     * @return MetadataDiocesanCalendarItem The diocese metadata.
+     * @throws \RuntimeException If metadata is not loaded yet.
+     * @throws \Exception If no diocese is found for the given calendar ID.
+     */
+    private function findDioceseMetadata(string $calendarId): MetadataDiocesanCalendarItem
+    {
+        if (false === isset(self::$metadata)) {
+            throw new \RuntimeException('Metadata not loaded yet; retry shortly');
+        }
+        $dioceseMetadata = array_find(
+            self::$metadata->diocesan_calendars,
+            function (MetadataDiocesanCalendarItem $el) use ($calendarId): bool {
+                return $el->calendar_id === $calendarId;
+            }
+        );
+        if ($dioceseMetadata === null) {
+            throw new \Exception("No diocese found for calendar id: {$calendarId}");
+        }
+        return $dioceseMetadata;
+    }
+
+    /**
      * Validate a data file by checking that it exists and that it is valid JSON that conforms to a specific schema.
      *
      * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $validation The validation object. It should have the following properties:
@@ -429,24 +454,12 @@ class Health implements MessageComponentInterface
                             );
                             break;
                         case 'diocesan-calendar':
-                            if (false === isset(self::$metadata)) {
-                                throw new \RuntimeException('Metadata not loaded yet; retry shortly');
-                            }
-                            $dioceseMetadata = array_find(
-                                self::$metadata->diocesan_calendars,
-                                function (MetadataDiocesanCalendarItem $el) use ($matches): bool {
-                                    return $el->calendar_id === $matches[2];
-                                }
-                            );
-                            if ($dioceseMetadata === null) {
-                                throw new \Exception("No diocese found for calendar id: {$matches[2]}");
-                            }
-                            $nation   = $dioceseMetadata->nation;
-                            $dataPath = strtr(
+                            $dioceseMetadata = $this->findDioceseMetadata($matches[2]);
+                            $dataPath        = strtr(
                                 JsonData::DIOCESAN_CALENDAR_I18N_FOLDER->path(),
                                 [
                                     '{diocese}' => $matches[2],
-                                    '{nation}'  => $nation
+                                    '{nation}'  => $dioceseMetadata->nation
                                 ]
                             );
                             break;
@@ -481,26 +494,13 @@ class Health implements MessageComponentInterface
                                 );
                                 break;
                             case 'diocesan-calendar':
-                                if (false === isset(self::$metadata)) {
-                                    throw new \RuntimeException('Metadata not loaded yet; retry shortly');
-                                }
-                                $dioceseMetadata = array_find(
-                                    self::$metadata->diocesan_calendars,
-                                    function (MetadataDiocesanCalendarItem $el) use ($matches): bool {
-                                        return $el->calendar_id === $matches[2];
-                                    }
-                                );
-                                if ($dioceseMetadata === null) {
-                                    throw new \Exception("No diocese found for calendar id: {$matches[2]}");
-                                }
-                                $nation      = (string) $dioceseMetadata->nation;
-                                $dioceseName = (string) $dioceseMetadata->diocese;
-                                $dataPath    = strtr(
+                                $dioceseMetadata = $this->findDioceseMetadata($matches[2]);
+                                $dataPath        = strtr(
                                     JsonData::DIOCESAN_CALENDAR_FILE->path(),
                                     [
                                         '{diocese}'      => $matches[2],
-                                        '{nation}'       => $nation,
-                                        '{diocese_name}' => $dioceseName
+                                        '{nation}'       => $dioceseMetadata->nation,
+                                        '{diocese_name}' => $dioceseMetadata->diocese
                                     ]
                                 );
                                 break;
@@ -804,6 +804,26 @@ class Health implements MessageComponentInterface
     }
 
     /**
+     * Build the calendar API request path based on calendar ID, year, and category.
+     *
+     * @param string $calendar The calendar identifier (e.g., 'VA' for Vatican, 'USA' for national).
+     * @param int $year The year for the calendar request.
+     * @param string $category The type of calendar ('nationalcalendar' or 'diocesancalendar').
+     * @return string The constructed request path.
+     */
+    private function buildCalendarRequestPath(string $calendar, int $year, string $category): string
+    {
+        if ($calendar === 'VA') {
+            return "/$year?year_type=CIVIL";
+        }
+        return match ($category) {
+            'nationalcalendar'  => "/nation/$calendar/$year?year_type=CIVIL",
+            'diocesancalendar'  => "/diocese/$calendar/$year?year_type=CIVIL",
+            default             => '/unknown'
+        };
+    }
+
+    /**
      * Validates the specified liturgical calendar for a given year and category,
      * and sends the validation results to the specified connection.
      *
@@ -828,22 +848,7 @@ class Health implements MessageComponentInterface
             'stream'  => true
         ];
 
-        if ($calendar === 'VA') {
-            $req = "/$year?year_type=CIVIL";
-        } else {
-            switch ($category) {
-                case 'nationalcalendar':
-                    $req = "/nation/$calendar/$year?year_type=CIVIL";
-                    break;
-                case 'diocesancalendar':
-                    $req = "/diocese/$calendar/$year?year_type=CIVIL";
-                    break;
-                default:
-                    //we shouldn't ever get any other categories
-                    $req = '/unknown';
-            }
-        }
-
+        $req     = $this->buildCalendarRequestPath($calendar, $year, $category);
         $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts);
         $promise->then(
             function (array $result) use ($to, $calendar, $year, $category, $req, $responseType) {
@@ -1127,21 +1132,7 @@ class Health implements MessageComponentInterface
             'stream'  => true
         ];
 
-        if ($calendar === 'VA') {
-            $req = "/$year?year_type=CIVIL";
-        } else {
-            switch ($category) {
-                case 'nationalcalendar':
-                    $req = "/nation/$calendar/$year?year_type=CIVIL";
-                    break;
-                case 'diocesancalendar':
-                    $req = "/diocese/$calendar/$year?year_type=CIVIL";
-                    break;
-                default:
-                    //we shouldn't ever get any other categories
-                    $req = '/unknown';
-            }
-        }
+        $req     = $this->buildCalendarRequestPath($calendar, $year, $category);
         $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts);
         $promise->then(
             function (array $result) use ($to, $test, $year) {

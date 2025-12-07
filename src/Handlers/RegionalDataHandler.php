@@ -1324,22 +1324,7 @@ final class RegionalDataHandler extends AbstractHandler
         // we don't care about locale for DELETE or PUT requests
         if (false === in_array($method, [RequestMethod::DELETE, RequestMethod::PUT], true)) {
             /** @var MetadataNationalCalendarItem $currentNation */
-            $validLangs = $currentNation->locales;
-            if (isset($params->locale)) {
-                if (
-                    null === $this->params->i18nRequest // short circuit for i18n requests
-                    && false === in_array($params->locale, $validLangs, true)
-                ) {
-                    $message = "Invalid value {$params->locale} for param `locale`, valid values for nation {$params->key} are: "
-                                . implode(', ', $validLangs);
-                    throw new UnprocessableContentException($message);
-                }
-            } else {
-                if (null !== $this->params->i18nRequest) {
-                    $description = 'Missing param `locale`';
-                    throw new UnprocessableContentException($description);
-                }
-            }
+            $this->validateLocaleForCalendar($params, $currentNation->locales);
         }
     }
 
@@ -1383,22 +1368,7 @@ final class RegionalDataHandler extends AbstractHandler
         // we don't care about locale for DELETE or PUT requests
         if (false === in_array($method, [RequestMethod::DELETE, RequestMethod::PUT], true)) {
             /** @var MetadataDiocesanCalendarItem $currentDiocese */
-            $validLangs = $currentDiocese->locales;
-            if (isset($params->locale)) {
-                if (
-                    null === $this->params->i18nRequest // short circuit for i18n requests
-                    && false === in_array($params->locale, $validLangs, true)
-                ) {
-                    $message = "Invalid value {$params->locale} for param `locale`, valid values for nation {$params->key} are: "
-                                . implode(', ', $validLangs);
-                    throw new UnprocessableContentException($message);
-                }
-            } else {
-                if (null !== $this->params->i18nRequest) {
-                    $description = 'Missing param `locale`';
-                    throw new UnprocessableContentException($description);
-                }
-            }
+            $this->validateLocaleForCalendar($params, $currentDiocese->locales);
         }
     }
 
@@ -1455,26 +1425,38 @@ final class RegionalDataHandler extends AbstractHandler
         // we don't care about locale for DELETE or PUT requests
         if (false === in_array($method, [RequestMethod::DELETE, RequestMethod::PUT], true)) {
             /** @var MetadataWiderRegionItem $currentWiderRegion */
-            $validLangs = $currentWiderRegion->locales;
-            if (isset($params->locale)) {
-                if (
-                    null === $this->params->i18nRequest // short circuit for i18n requests
-                    && false === in_array($params->locale, $validLangs, true)
-                ) {
-                    $message = "Invalid value {$params->locale} for param `locale`, valid values for nation {$params->key} are: "
-                                . implode(', ', $validLangs);
-                    throw new UnprocessableContentException($message);
-                }
-            } else {
-                if (null !== $this->params->i18nRequest) {
-                    $description = 'Missing param `locale`';
-                    throw new UnprocessableContentException($description);
-                }
-            }
+            $this->validateLocaleForCalendar($params, $currentWiderRegion->locales);
         }
     }
 
-
+    /**
+     * Validate the locale parameter for a regional calendar request.
+     *
+     * Checks that the locale is valid for the given calendar, unless this is an i18n request.
+     * Also validates that locale is present when required for i18n requests.
+     *
+     * @param RegionalDataParams $params The request parameters containing locale and key.
+     * @param string[] $validLangs The valid locales for the calendar.
+     * @throws UnprocessableContentException If locale validation fails.
+     */
+    private function validateLocaleForCalendar(RegionalDataParams $params, array $validLangs): void
+    {
+        if (isset($params->locale)) {
+            if (
+                null === $this->params->i18nRequest // short circuit for i18n requests
+                && false === in_array($params->locale, $validLangs, true)
+            ) {
+                $message = "Invalid value {$params->locale} for param `locale`, valid values for calendar {$params->key} are: "
+                            . implode(', ', $validLangs);
+                throw new UnprocessableContentException($message);
+            }
+        } else {
+            if (null !== $this->params->i18nRequest) {
+                $description = 'Missing param `locale`';
+                throw new UnprocessableContentException($description);
+            }
+        }
+    }
 
     /**
      * Initializes the RegionalData class.
