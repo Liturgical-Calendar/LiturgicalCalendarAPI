@@ -114,7 +114,12 @@ final class CalendarHandler extends AbstractHandler
     private string $BaptismLordFmt;
     private string $BaptismLordMod;
 
-    public const API_VERSION                  = '5.6';
+    public const API_VERSION = '5.6';
+
+    /**
+     * Path to the cache directory. Initialized by handle() before any cache operations.
+     * Must be set before calling ensureCachePathExists() or prepareResponseBody().
+     */
     private string $CachePath                 = '';
     private string $CacheFile                 = '';
     private string $CacheDuration             = '';
@@ -625,6 +630,9 @@ final class CalendarHandler extends AbstractHandler
      * Ensure the cache directory exists and is writable.
      *
      * Creates the cache directory if it doesn't exist.
+     *
+     * Note: $this->CachePath must be initialized by handle() before calling this method.
+     * This is used by both fetchGitHubReleaseInfo() and prepareResponseBody().
      *
      * @throws ServiceUnavailableException If the cache directory cannot be created
      * @return void
