@@ -632,7 +632,7 @@ final class CalendarHandler extends AbstractHandler
      * Creates the cache directory if it doesn't exist.
      *
      * Note: $this->CachePath must be initialized by handle() before calling this method.
-     * This is used by both fetchGitHubReleaseInfo() and prepareResponseBody().
+     * This is used by both getGithubReleaseInfo() and prepareResponseBody().
      *
      * @throws ServiceUnavailableException If the cache directory cannot be created
      * @return void
@@ -640,12 +640,12 @@ final class CalendarHandler extends AbstractHandler
     private function ensureCachePathExists(): void
     {
         if (false === realpath($this->CachePath)) {
-            $cwd = getcwd() ?: './';
-            if (false === is_writable($cwd)) {
+            $parentDir = dirname($this->CachePath) ?: '.';
+            if (false === is_writable($parentDir)) {
                 $description = sprintf(
                     'The cache folder %s does not exist, but we cannot create it because the parent folder %s is not writable.',
-                    dirname($this->CachePath),
-                    $cwd
+                    $this->CachePath,
+                    $parentDir
                 );
                 throw new ServiceUnavailableException($description);
             }
