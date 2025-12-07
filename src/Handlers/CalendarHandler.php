@@ -3494,6 +3494,11 @@ final class CalendarHandler extends AbstractHandler
             && is_string($liturgicalEvent->strtotime)
             && $liturgicalEvent->strtotime !== '';
 
+        $formattedDateStr = $this->formatLocalizedDate($liturgicalEvent->date);
+        $dateStr          = ( $liturgicalEvent instanceof LitCalItemCreateNewMobile ) && $hasStrToTime
+            ? '<i>' . $liturgicalEvent->strtotime . '</i>'
+            : $formattedDateStr;
+
         if ($this->liturgicalEventCanBeCreated($liturgicalEvent)) {
             if ($this->liturgicalEventDoesNotCoincide($liturgicalEvent)) {
                 $newLitEvent = LiturgicalEvent::fromObject($liturgicalEvent);
@@ -3514,10 +3519,6 @@ final class CalendarHandler extends AbstractHandler
                 $infoSource = RomanMissal::getName($litEvent->metadata->missal) . ' #createNewRegionalOrNationalLiturgicalEvent';
             }
 
-            $formattedDateStr = $this->formatLocalizedDate($liturgicalEvent->date);
-            $dateStr          = ( $liturgicalEvent instanceof LitCalItemCreateNewMobile ) && $hasStrToTime
-                ? '<i>' . $liturgicalEvent->strtotime . '</i>'
-                : $formattedDateStr;
             $this->Messages[] = sprintf(
                 /**translators:
                  * 1. Grade or rank of the liturgical event
@@ -3536,11 +3537,6 @@ final class CalendarHandler extends AbstractHandler
                 $this->CalendarParams->Year
             );
         } else {
-            $formattedDateStr = $this->formatLocalizedDate($liturgicalEvent->date);
-            $dateStr          = ( $liturgicalEvent instanceof LitCalItemCreateNewMobile ) && $hasStrToTime
-                ? '<i>' . $liturgicalEvent->strtotime . '</i>'
-                : $formattedDateStr;
-
             $this->Messages[] = sprintf(
                 /**translators:
                  * 1. Grade or rank of the liturgical event
