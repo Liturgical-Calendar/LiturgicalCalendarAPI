@@ -657,23 +657,11 @@ class Health implements MessageComponentInterface
             // If the 'sourceFolder' property is not set, then we are validating a single source file or API path
             $matches = null;
             if (preg_match('/^diocesan-calendar-([a-z]{6}_[a-z]{2})$/', $pathForSchema, $matches)) {
-                $dioceseId = $matches[1];
-                if (false === isset(self::$metadata)) {
-                    throw new \RuntimeException('Metadata not loaded yet; retry shortly');
-                }
-
-                $dioceseMetadata = array_find(
-                    self::$metadata->diocesan_calendars,
-                    function (MetadataDiocesanCalendarItem $diocesan_calendar) use ($dioceseId): bool {
-                        return $diocesan_calendar->calendar_id === $dioceseId;
-                    }
-                );
-                if (null === $dioceseMetadata) {
-                    throw new \InvalidArgumentException("Invalid diocese ID $dioceseId");
-                }
-                $nation      = $dioceseMetadata->nation;
-                $dioceseName = $dioceseMetadata->diocese;
-                $dataPath    = strtr(JsonData::DIOCESAN_CALENDAR_FILE->path(), [
+                $dioceseId       = $matches[1];
+                $dioceseMetadata = $this->findDioceseMetadata($dioceseId);
+                $nation          = $dioceseMetadata->nation;
+                $dioceseName     = $dioceseMetadata->diocese;
+                $dataPath        = strtr(JsonData::DIOCESAN_CALENDAR_FILE->path(), [
                     '{nation}'       => $nation,
                     '{diocese}'      => $dioceseId,
                     '{diocese_name}' => $dioceseName
