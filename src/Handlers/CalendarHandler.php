@@ -650,7 +650,7 @@ final class CalendarHandler extends AbstractHandler
                 throw new ServiceUnavailableException($description);
             }
 
-            if (false === mkdir($this->CachePath, 0755, true)) {
+            if (false === mkdir($this->CachePath, 0755, true) && false === is_dir($this->CachePath)) {
                 $description = sprintf(
                     'Could not create cache folder: %s. Please ensure the path is writable.',
                     $this->CachePath
