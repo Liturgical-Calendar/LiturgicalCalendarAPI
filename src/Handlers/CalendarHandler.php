@@ -639,9 +639,15 @@ final class CalendarHandler extends AbstractHandler
      */
     private function ensureCachePathExists(): void
     {
-        if (false === realpath($this->CachePath)) {
+        // Normalize and validate the cache path
+        $cachePath = rtrim($this->CachePath, DIRECTORY_SEPARATOR);
+        if ($cachePath === '') {
+            throw new ServiceUnavailableException('Cache path has not been initialized.');
+        }
+
+        if (false === realpath($cachePath)) {
             // Walk up from the target directory to find the nearest existing ancestor
-            $existingAncestor = dirname($this->CachePath);
+            $existingAncestor = dirname($cachePath);
             while ($existingAncestor !== '' && $existingAncestor !== '.' && false === is_dir($existingAncestor)) {
                 $existingAncestor = dirname($existingAncestor);
             }
@@ -653,16 +659,16 @@ final class CalendarHandler extends AbstractHandler
             if (false === is_writable($existingAncestor)) {
                 $description = sprintf(
                     'The cache folder %s does not exist, but we cannot create it because the parent folder %s is not writable.',
-                    $this->CachePath,
+                    $cachePath,
                     $existingAncestor
                 );
                 throw new ServiceUnavailableException($description);
             }
 
-            if (false === mkdir($this->CachePath, 0755, true) && false === is_dir($this->CachePath)) {
+            if (false === mkdir($cachePath, 0755, true) && false === is_dir($cachePath)) {
                 $description = sprintf(
                     'Could not create cache folder: %s. Please ensure the path is writable.',
-                    $this->CachePath
+                    $cachePath
                 );
                 throw new ServiceUnavailableException($description);
             }
