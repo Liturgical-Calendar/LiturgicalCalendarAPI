@@ -391,7 +391,7 @@ class Health implements MessageComponentInterface
     private function findDioceseMetadata(string $calendarId): MetadataDiocesanCalendarItem
     {
         if (false === isset(self::$metadata)) {
-            throw new \RuntimeException('Metadata not loaded yet; retry shortly');
+            throw new \RuntimeException('Metadata not loaded yet; it is fetched asynchronously on WebSocket connection');
         }
         $dioceseMetadata = array_find(
             self::$metadata->diocesan_calendars,
