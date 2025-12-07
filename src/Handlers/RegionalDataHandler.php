@@ -1443,7 +1443,7 @@ final class RegionalDataHandler extends AbstractHandler
     {
         if (isset($params->locale)) {
             if (
-                null === $this->params->i18nRequest // short circuit for i18n requests
+                null === $params->i18nRequest // short circuit for i18n requests
                 && false === in_array($params->locale, $validLangs, true)
             ) {
                 $message = "Invalid value {$params->locale} for param `locale`, valid values for calendar {$params->key} are: "
@@ -1451,7 +1451,7 @@ final class RegionalDataHandler extends AbstractHandler
                 throw new UnprocessableContentException($message);
             }
         } else {
-            if (null !== $this->params->i18nRequest) {
+            if (null !== $params->i18nRequest) {
                 $description = 'Missing param `locale`';
                 throw new UnprocessableContentException($description);
             }
