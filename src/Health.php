@@ -42,7 +42,7 @@ use Psr\Http\Message\ResponseInterface;
  * @phpstan-type ExecuteValidationSourceFolder \stdClass&object{action:'executeValidation',category:'sourceDataCheck',validate:string,sourceFolder:string}
  * @phpstan-type ExecuteValidationSourceFile \stdClass&object{action:'executeValidation',category:'sourceDataCheck',validate:string,sourceFile:string}
  * @phpstan-type ExecuteValidationResource \stdClass&object{action:'executeValidation',category:'resourceDataCheck',validate:string,sourceFile:string}
- * @phpstan-type ValidateCalendar \stdClass&object{action:'validateCalendar',calendar:string,year:int,category:'nationalcalendar'|'diocesanCalendar',responsetype:'JSON'|'XML'|'ICS'|'YML'}
+ * @phpstan-type ValidateCalendar \stdClass&object{action:'validateCalendar',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar',responsetype:'JSON'|'XML'|'ICS'|'YML'}
  * @phpstan-type ExecuteUnitTest \stdClass&object{action:'executeUnitTest',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar',test:string}
  *
  * @phpstan-import-type LiturgicalEvent from \LiturgicalCalendar\Api\Test\LitTestRunner
