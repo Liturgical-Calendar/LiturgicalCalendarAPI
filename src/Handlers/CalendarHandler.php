@@ -640,12 +640,21 @@ final class CalendarHandler extends AbstractHandler
     private function ensureCachePathExists(): void
     {
         if (false === realpath($this->CachePath)) {
-            $parentDir = dirname($this->CachePath) ?: '.';
-            if (false === is_writable($parentDir)) {
+            // Walk up from the target directory to find the nearest existing ancestor
+            $existingAncestor = dirname($this->CachePath);
+            while ($existingAncestor !== '' && $existingAncestor !== '.' && false === is_dir($existingAncestor)) {
+                $existingAncestor = dirname($existingAncestor);
+            }
+            // Fall back to current directory if we walked all the way up
+            if ($existingAncestor === '' || false === is_dir($existingAncestor)) {
+                $existingAncestor = '.';
+            }
+
+            if (false === is_writable($existingAncestor)) {
                 $description = sprintf(
                     'The cache folder %s does not exist, but we cannot create it because the parent folder %s is not writable.',
                     $this->CachePath,
-                    $parentDir
+                    $existingAncestor
                 );
                 throw new ServiceUnavailableException($description);
             }
