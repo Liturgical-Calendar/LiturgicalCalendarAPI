@@ -20,6 +20,7 @@ use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
+use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Test\LitTestRunner;
@@ -385,7 +386,7 @@ class Health implements MessageComponentInterface
      * @param string $calendarId The diocese calendar ID to look up.
      * @return MetadataDiocesanCalendarItem The diocese metadata.
      * @throws \RuntimeException If metadata is not loaded yet.
-     * @throws \Exception If no diocese is found for the given calendar ID.
+     * @throws NotFoundException If no diocese is found for the given calendar ID.
      */
     private function findDioceseMetadata(string $calendarId): MetadataDiocesanCalendarItem
     {
@@ -399,7 +400,7 @@ class Health implements MessageComponentInterface
             }
         );
         if ($dioceseMetadata === null) {
-            throw new \Exception("No diocese found for calendar id: {$calendarId}");
+            throw new NotFoundException("No diocese found for calendar id: {$calendarId}");
         }
         return $dioceseMetadata;
     }
@@ -819,7 +820,7 @@ class Health implements MessageComponentInterface
         return match ($category) {
             'nationalcalendar'  => "/nation/$calendar/$year?year_type=CIVIL",
             'diocesancalendar'  => "/diocese/$calendar/$year?year_type=CIVIL",
-            default             => '/unknown'
+            default             => throw new \InvalidArgumentException("Unknown calendar category: {$category}")
         };
     }
 

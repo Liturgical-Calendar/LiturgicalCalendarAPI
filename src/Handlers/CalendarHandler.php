@@ -569,13 +569,18 @@ final class CalendarHandler extends AbstractHandler
     }
 
     /**
-     * Get the localized day of the week string for a given date.
+     * Get the localized date identifier for Christmas weekday naming.
      *
-     * Handles Latin (using LatinUtils::LATIN_DAYOFTHEWEEK), Italian (using dayAndMonth formatter),
-     * and other locales (using dayOfTheWeek formatter).
+     * Returns different formats based on locale, tailored for use in Christmas weekday names:
+     * - Latin: Day of the week (e.g., "Feria II") from LatinUtils::LATIN_DAYOFTHEWEEK
+     * - Italian: Day and month (e.g., "3 gennaio") using dayAndMonth formatter
+     * - Other locales: Day of the week using dayOfTheWeek formatter
      *
-     * @param DateTime $dateTime The date to get the day of the week for
-     * @return string The localized day of the week string
+     * Note: This is specifically designed for formatChristmasWeekdayName() usage,
+     * where Italian uses day+month format ("Feria propria del 3 gennaio").
+     *
+     * @param DateTime $dateTime The date to format
+     * @return string The localized date identifier for Christmas weekday naming
      */
     private function getLocalizedDayOfTheWeek(DateTime $dateTime): string
     {
@@ -597,20 +602,21 @@ final class CalendarHandler extends AbstractHandler
      * Handles Latin ("X temporis Nativitatis"), Italian ("Feria propria del X"),
      * and other locales using gettext translation.
      *
-     * @param string $dayOfTheWeek The localized day of the week string
+     * @param string $dateIdentifier The localized date identifier from getLocalizedDayOfTheWeek().
+     *                               For Latin/other locales: day of week. For Italian: day+month.
      * @return string The formatted Christmas weekday name
      */
-    private function formatChristmasWeekdayName(string $dayOfTheWeek): string
+    private function formatChristmasWeekdayName(string $dateIdentifier): string
     {
         $locale = LitLocale::$PRIMARY_LANGUAGE;
         return $locale === LitLocale::LATIN_PRIMARY_LANGUAGE
-            ? sprintf('%s temporis Nativitatis', $dayOfTheWeek)
+            ? sprintf('%s temporis Nativitatis', $dateIdentifier)
             : ( $locale === 'it'
-                ? sprintf('Feria propria del %s', $dayOfTheWeek)
+                ? sprintf('Feria propria del %s', $dateIdentifier)
                 : sprintf(
                     /**translators: Christmas weekday name pattern */
                     _('%s - Christmas Weekday'),
-                    $dayOfTheWeek
+                    $dateIdentifier
                 )
             );
     }
