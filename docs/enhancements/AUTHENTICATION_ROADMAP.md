@@ -484,6 +484,68 @@ curl -X DELETE http://localhost:8000/data?category=national&calendar=TEST
 
 These limitations are acceptable for the initial implementation to protect against unauthorized modifications. Future phases will address them.
 
+### CORS Configuration Design
+
+The API uses different CORS configurations for public and authenticated endpoints:
+
+#### Public Endpoints (`Access-Control-Allow-Origin: *`)
+
+The following endpoints are intentionally configured with wildcard CORS:
+
+- `GET /calendars` (MetadataHandler) - Discovery endpoint listing available calendars
+- `GET /calendar` (CalendarHandler) - Calendar data retrieval
+- `GET /temporale` (TemporaleHandler) - Temporale data retrieval
+- `GET /events` (EventsHandler) - Event catalog
+- Other read-only GET endpoints
+
+**Why wildcard CORS for these endpoints:**
+
+1. **Public data** - These endpoints return the same data regardless of who's requesting
+2. **Maximum accessibility** - Any website/application can consume this public API
+3. **No authentication needed** - No user-specific or protected information
+
+**Important:** Wildcard CORS (`Access-Control-Allow-Origin: *`) is incompatible with `credentials: 'include'`.
+Browsers block credential requests to wildcard-CORS endpoints as a security measure.
+This is intentional for public endpoints.
+
+#### Authenticated Endpoints (Origin-Specific CORS)
+
+The following endpoints require specific CORS origins configured via `CORS_ALLOWED_ORIGINS`:
+
+- `POST /auth/login`, `/auth/logout`, `/auth/refresh`, `GET /auth/me`
+- `PUT /data`, `PATCH /data`, `DELETE /data`
+- Other write operations
+
+**Why origin-specific CORS for these endpoints:**
+
+1. **Cookie-based authentication** - HttpOnly cookies require `credentials: 'include'`
+2. **Security** - Prevents credential leakage to arbitrary origins
+3. **CORS spec requirement** - Credentialed requests cannot use wildcard origins
+
+**Client-side handling:**
+
+```javascript
+// For public endpoints (no credentials needed)
+fetch('https://api.example.com/calendars', {
+    credentials: 'omit'  // or simply omit the credentials option
+});
+
+// For authenticated endpoints (credentials required)
+fetch('https://api.example.com/data', {
+    method: 'PUT',
+    credentials: 'include',  // Send HttpOnly cookies
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+});
+```
+
+**Configuration:**
+
+```env
+# .env - Configure allowed origins for credentialed requests
+CORS_ALLOWED_ORIGINS=https://frontend.example.com,https://admin.example.com
+```
+
 ### Phase 2.5 Support: Full Cookie-Only Authentication (2025-12-02)
 
 The API backend fully supports Phase 2.5 (Full Cookie-Only Authentication) from the Frontend Authentication Roadmap.
