@@ -1,77 +1,5 @@
 [
     {
-        "event_key": "HolyThursChrism",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "HolyThurs",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "GoodFri",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "red" ]
-    },
-    {
-        "event_key": "EasterVigil",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "Easter",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "Christmas",
-        "grade": 7,
-        "type": "fixed",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "MaryMotherOfGod",
-        "grade": 6,
-        "type": "fixed",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "Epiphany",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "Ascension",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "Pentecost",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "red" ]
-    },
-    {
-        "event_key": "Easter7",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "Christmas2",
-        "grade": 5,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
         "event_key": "Advent1",
         "grade": 7,
         "type": "mobile",
@@ -96,163 +24,37 @@
         "color": [ "purple" ]
     },
     {
-        "event_key": "Lent1",
+        "event_key": "Christmas",
         "grade": 7,
-        "type": "mobile",
-        "color": [ "purple" ]
-    },
-    {
-        "event_key": "Lent2",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "purple" ]
-    },
-    {
-        "event_key": "Lent3",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "purple" ]
-    },
-    {
-        "event_key": "Lent4",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "rose", "purple" ]
-    },
-    {
-        "event_key": "Lent5",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "purple" ]
-    },
-    {
-        "event_key": "PalmSun",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "red" ]
-    },
-    {
-        "event_key": "Easter2",
-        "grade": 7,
-        "type": "mobile",
+        "type": "fixed",
         "color": [ "white" ]
     },
     {
-        "event_key": "Easter3",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "Easter4",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "Easter5",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "Easter6",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "Trinity",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "CorpusChristi",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "AshWednesday",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "purple" ]
-    },
-    {
-        "event_key": "MonHolyWeek",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "purple" ]
-    },
-    {
-        "event_key": "TueHolyWeek",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "purple" ]
-    },
-    {
-        "event_key": "WedHolyWeek",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "purple" ]
-    },
-    {
-        "event_key": "MonOctaveEaster",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "TueOctaveEaster",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "WedOctaveEaster",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "ThuOctaveEaster",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "FriOctaveEaster",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "SatOctaveEaster",
-        "grade": 7,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "SacredHeart",
-        "grade": 6,
-        "type": "mobile",
-        "color": [ "red" ]
-    },
-    {
-        "event_key": "ChristKing",
-        "grade": 6,
-        "type": "mobile",
-        "color": [ "white" ]
-    },
-    {
-        "event_key": "BaptismLord",
+        "event_key": "HolyFamily",
         "grade": 5,
         "type": "mobile",
         "color": [ "white" ]
     },
     {
-        "event_key": "HolyFamily",
+        "event_key": "MaryMotherOfGod",
+        "grade": 6,
+        "type": "fixed",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "Christmas2",
+        "grade": 5,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "Epiphany",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "BaptismLord",
         "grade": 5,
         "type": "mobile",
         "color": [ "white" ]
@@ -450,8 +252,206 @@
         "color": [ "green" ]
     },
     {
+        "event_key": "AshWednesday",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "purple" ]
+    },
+    {
+        "event_key": "Lent1",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "purple" ]
+    },
+    {
+        "event_key": "Lent2",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "purple" ]
+    },
+    {
+        "event_key": "Lent3",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "purple" ]
+    },
+    {
+        "event_key": "Lent4",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "rose", "purple" ]
+    },
+    {
+        "event_key": "Lent5",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "purple" ]
+    },
+    {
+        "event_key": "PalmSun",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "red" ]
+    },
+    {
+        "event_key": "MonHolyWeek",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "purple" ]
+    },
+    {
+        "event_key": "TueHolyWeek",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "purple" ]
+    },
+    {
+        "event_key": "WedHolyWeek",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "purple" ]
+    },
+    {
+        "event_key": "HolyThursChrism",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "HolyThurs",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "GoodFri",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "red" ]
+    },
+    {
+        "event_key": "EasterVigil",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "Easter",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "MonOctaveEaster",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "TueOctaveEaster",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "WedOctaveEaster",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "ThuOctaveEaster",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "FriOctaveEaster",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "SatOctaveEaster",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "Easter2",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "Easter3",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "Easter4",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "Easter5",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "Easter6",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "Easter7",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "Ascension",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "Pentecost",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "red" ]
+    },
+    {
+        "event_key": "Trinity",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "CorpusChristi",
+        "grade": 7,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "SacredHeart",
+        "grade": 6,
+        "type": "mobile",
+        "color": [ "red" ]
+    },
+    {
         "event_key": "ImmaculateHeart",
         "grade": 3,
+        "type": "mobile",
+        "color": [ "white" ]
+    },
+    {
+        "event_key": "ChristKing",
+        "grade": 6,
         "type": "mobile",
         "color": [ "white" ]
     }
