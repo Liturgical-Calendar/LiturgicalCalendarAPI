@@ -36,10 +36,23 @@ class CookieHelper
     /**
      * Get the domain for cookies (empty string for localhost)
      *
+     * For cross-subdomain cookie sharing, set the COOKIE_DOMAIN environment variable
+     * to the parent domain with a leading dot (e.g., ".example.com").
+     *
+     * Example: If your frontend is at frontend.example.com and API is at api.example.com,
+     * set COOKIE_DOMAIN=.example.com to share cookies across both subdomains.
+     *
      * @return string Domain for Set-Cookie header
      */
     public static function getCookieDomain(): string
     {
+        // Check for explicit COOKIE_DOMAIN environment variable first
+        // This enables cross-subdomain cookie sharing (e.g., ".example.com")
+        $cookieDomain = $_ENV['COOKIE_DOMAIN'] ?? $_SERVER['COOKIE_DOMAIN'] ?? null;
+        if (is_string($cookieDomain) && $cookieDomain !== '') {
+            return $cookieDomain;
+        }
+
         $host = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? 'localhost';
 
         // Ensure $host is a string before using preg_replace
