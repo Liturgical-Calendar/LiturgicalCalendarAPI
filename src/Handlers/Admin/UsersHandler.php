@@ -147,8 +147,10 @@ final class UsersHandler extends AbstractHandler
                 continue;
             }
             if (isset($usersWithRolesMap[$userId])) {
-                // User has roles - use the data from usersWithRolesMap (includes role info)
-                $usersWithRoles[] = $usersWithRolesMap[$userId];
+                // User has roles - merge role info with email verification from the all-users list
+                $userWithRoles                  = $usersWithRolesMap[$userId];
+                $userWithRoles['emailVerified'] = $user['emailVerified'] ?? false;
+                $usersWithRoles[]               = $userWithRoles;
             } else {
                 // User has no roles
                 $user['roles']       = [];
