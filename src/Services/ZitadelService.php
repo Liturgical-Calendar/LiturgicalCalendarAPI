@@ -349,6 +349,85 @@ class ZitadelService
     }
 
     /**
+     * List all users in the organization.
+     *
+     * Returns all users regardless of whether they have roles.
+     *
+     * @param int $limit Maximum number of results (default 100)
+     * @param int $offset Offset for pagination (default 0)
+     * @return array{users: array<int, array<string, mixed>>, total: int}
+     */
+    public function listAllUsers(int $limit = 100, int $offset = 0): array
+    {
+        try {
+            $response = $this->httpClient->post('/management/v1/users/_search', [
+                'headers' => $this->getAuthHeaders(),
+                'json'    => [
+                    'limit'  => $limit,
+                    'offset' => $offset,
+                ],
+            ]);
+
+            $data = json_decode($response->getBody()->getContents(), true);
+            if (!is_array($data)) {
+                return ['users' => [], 'total' => 0];
+            }
+
+            $result  = $data['result'] ?? [];
+            $details = $data['details'] ?? [];
+            $total   = 0;
+            if (is_array($details) && isset($details['totalResult'])) {
+                $totalResult = $details['totalResult'];
+                $total       = is_int($totalResult) || is_string($totalResult) ? (int) $totalResult : 0;
+            }
+
+            if (!is_array($result)) {
+                return ['users' => [], 'total' => 0];
+            }
+
+            // Transform users to a consistent format
+            $users = [];
+            foreach ($result as $user) {
+                if (!is_array($user)) {
+                    continue;
+                }
+
+                $userId = $user['id'] ?? null;
+                if (!is_string($userId)) {
+                    continue;
+                }
+
+                // Extract human user details if present
+                $human         = $user['human'] ?? [];
+                $profile       = is_array($human) ? ( $human['profile'] ?? [] ) : [];
+                $email         = is_array($human) ? ( $human['email'] ?? [] ) : [];
+                $firstName     = is_array($profile) ? ( $profile['givenName'] ?? '' ) : '';
+                $lastName      = is_array($profile) ? ( $profile['familyName'] ?? '' ) : '';
+                $emailAddr     = is_array($email) ? ( $email['email'] ?? '' ) : '';
+                $emailVerified = is_array($email) ? ( $email['isVerified'] ?? false ) : false;
+
+                $users[] = [
+                    'userId'        => $userId,
+                    'username'      => $user['userName'] ?? '',
+                    'email'         => $emailAddr,
+                    'emailVerified' => (bool) $emailVerified,
+                    'displayName'   => is_array($profile) ? ( $profile['displayName'] ?? '' ) : '',
+                    'firstName'     => $firstName,
+                    'lastName'      => $lastName,
+                    'state'         => $user['state'] ?? null,
+                ];
+            }
+
+            return ['users' => $users, 'total' => $total];
+        } catch (GuzzleException $e) {
+            $this->logger?->warning('Failed to list all users from Zitadel', [
+                'error' => $e->getMessage(),
+            ]);
+            return ['users' => [], 'total' => 0];
+        }
+    }
+
+    /**
      * Get all grants for a specific user in the project.
      *
      * @param string $userId Zitadel user ID

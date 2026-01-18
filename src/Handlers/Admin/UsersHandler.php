@@ -22,7 +22,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * Admin Users Handler
  *
  * Handles admin operations for user management:
- * - GET /admin/users - List all users with roles
+ * - GET /admin/users - List all users (with and without roles)
  * - DELETE /admin/users/{userId}/roles/{role} - Revoke a role from a user
  *
  * Requires admin role.
@@ -102,7 +102,7 @@ final class UsersHandler extends AbstractHandler
     }
 
     /**
-     * List all users with roles in the project.
+     * List all users (with and without roles).
      *
      * @param ResponseInterface $response
      * @return ResponseInterface
@@ -110,11 +110,17 @@ final class UsersHandler extends AbstractHandler
     private function listUsers(ResponseInterface $response): ResponseInterface
     {
         $zitadel = ZitadelService::fromEnv();
-        $result  = $zitadel->listProjectUsers();
 
-        // Transform users to include a flat 'roles' array for easier frontend consumption
-        $users = [];
-        foreach ($result['users'] as $user) {
+        // Fetch users with roles
+        $usersWithRolesResult = $zitadel->listProjectUsers();
+
+        // Fetch all users
+        $allUsersResult = $zitadel->listAllUsers();
+
+        // Build a map of users with roles (keyed by userId)
+        /** @var array<string, array<string, mixed>> $usersWithRolesMap */
+        $usersWithRolesMap = [];
+        foreach ($usersWithRolesResult['users'] as $user) {
             // Flatten roles from all grants into a single array
             $roles = [];
             if (isset($user['grants']) && is_array($user['grants'])) {
@@ -125,12 +131,37 @@ final class UsersHandler extends AbstractHandler
                 }
             }
             $user['roles'] = array_values(array_unique($roles));
-            $users[]       = $user;
+            $userId        = $user['userId'] ?? null;
+            if (is_string($userId)) {
+                $usersWithRolesMap[$userId] = $user;
+            }
+        }
+
+        // Separate users into those with roles and those without
+        $usersWithRoles    = [];
+        $usersWithoutRoles = [];
+
+        foreach ($allUsersResult['users'] as $user) {
+            $userId = $user['userId'] ?? null;
+            if (!is_string($userId)) {
+                continue;
+            }
+            if (isset($usersWithRolesMap[$userId])) {
+                // User has roles - use the data from usersWithRolesMap (includes role info)
+                $usersWithRoles[] = $usersWithRolesMap[$userId];
+            } else {
+                // User has no roles
+                $user['roles']       = [];
+                $usersWithoutRoles[] = $user;
+            }
         }
 
         return $this->encodeResponseBody($response, [
-            'users' => $users,
-            'total' => $result['total'],
+            'usersWithRoles'    => $usersWithRoles,
+            'usersWithoutRoles' => $usersWithoutRoles,
+            'totalWithRoles'    => count($usersWithRoles),
+            'totalWithoutRoles' => count($usersWithoutRoles),
+            'total'             => $allUsersResult['total'],
         ]);
     }
 
