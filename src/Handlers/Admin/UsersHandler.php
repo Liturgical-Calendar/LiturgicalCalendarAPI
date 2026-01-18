@@ -162,12 +162,16 @@ final class UsersHandler extends AbstractHandler
             }
         }
 
+        $processedTotal = count($usersWithRoles) + count($usersWithoutRoles);
+        $reportedTotal  = $allUsersResult['total'] ?? 0;
+
         return $this->encodeResponseBody($response, [
             'usersWithRoles'    => $usersWithRoles,
             'usersWithoutRoles' => $usersWithoutRoles,
             'totalWithRoles'    => count($usersWithRoles),
             'totalWithoutRoles' => count($usersWithoutRoles),
-            'total'             => $allUsersResult['total'],
+            'total'             => $processedTotal,
+            'reportedTotal'     => $reportedTotal,
         ]);
     }
 
