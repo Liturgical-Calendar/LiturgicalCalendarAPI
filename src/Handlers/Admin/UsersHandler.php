@@ -117,10 +117,14 @@ final class UsersHandler extends AbstractHandler
         // Fetch all users
         $allUsersResult = $zitadel->listAllUsers();
 
+        // Defensive checks for API response structure
+        $usersWithRolesArray = $usersWithRolesResult['users'] ?? [];
+        $allUsersArray       = $allUsersResult['users'] ?? [];
+
         // Build a map of users with roles (keyed by userId)
         /** @var array<string, array<string, mixed>> $usersWithRolesMap */
         $usersWithRolesMap = [];
-        foreach ($usersWithRolesResult['users'] as $user) {
+        foreach ($usersWithRolesArray as $user) {
             // Flatten roles from all grants into a single array
             $roles = [];
             if (isset($user['grants']) && is_array($user['grants'])) {
@@ -141,7 +145,7 @@ final class UsersHandler extends AbstractHandler
         $usersWithRoles    = [];
         $usersWithoutRoles = [];
 
-        foreach ($allUsersResult['users'] as $user) {
+        foreach ($allUsersArray as $user) {
             $userId = $user['userId'] ?? null;
             if (!is_string($userId)) {
                 continue;
