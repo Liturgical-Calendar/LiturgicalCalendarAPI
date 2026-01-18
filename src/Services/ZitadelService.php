@@ -404,7 +404,7 @@ class ZitadelService
                 $firstName     = is_array($profile) ? ( $profile['givenName'] ?? '' ) : '';
                 $lastName      = is_array($profile) ? ( $profile['familyName'] ?? '' ) : '';
                 $emailAddr     = is_array($email) ? ( $email['email'] ?? '' ) : '';
-                $emailVerified = is_array($email) ? ( $email['isVerified'] ?? false ) : false;
+                $emailVerified = is_array($email) ? ( $email['isEmailVerified'] ?? false ) : false;
 
                 $users[] = [
                     'userId'        => $userId,
