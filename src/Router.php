@@ -8,7 +8,9 @@ use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\CacheDuration;
+use LiturgicalCalendar\Api\Enum\CalendarType;
 use LiturgicalCalendar\Api\Enum\PathCategory;
+use LiturgicalCalendar\Api\Enum\PermissionLevel;
 use LiturgicalCalendar\Api\Handlers\CalendarHandler;
 use LiturgicalCalendar\Api\Handlers\EasterHandler;
 use LiturgicalCalendar\Api\Handlers\EventsHandler;
@@ -23,12 +25,23 @@ use LiturgicalCalendar\Api\Handlers\Auth\LoginHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\LogoutHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\MeHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\RefreshHandler;
+use LiturgicalCalendar\Api\Handlers\Auth\RoleRequestHandler;
+use LiturgicalCalendar\Api\Handlers\Admin\ApplicationAdminHandler;
+use LiturgicalCalendar\Api\Handlers\Admin\NotificationsHandler;
+use LiturgicalCalendar\Api\Handlers\Admin\RoleRequestAdminHandler;
+use LiturgicalCalendar\Api\Handlers\Admin\UsersHandler;
+use LiturgicalCalendar\Api\Handlers\ApplicationsHandler;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\Http\Middleware\AuthorizationMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\ErrorHandlingMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\HttpsEnforcementMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\JwtAuthMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\LoggingMiddleware;
+use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
+use LiturgicalCalendar\Api\Http\Middleware\OidcAvailabilityMiddleware;
+use LiturgicalCalendar\Api\Database\Connection;
+use LiturgicalCalendar\Api\Repositories\CalendarPermissionRepository;
 use LiturgicalCalendar\Api\Http\Server\MiddlewarePipeline;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
@@ -308,7 +321,7 @@ class Router
                 break;
             case 'auth':
                 // Handle authentication routes
-                if (count($requestPathParts) === 1) {
+                if (count($requestPathParts) >= 1) {
                     $authRoute = $requestPathParts[0];
                     if ($authRoute === 'login') {
                         $loginHandler  = new LoginHandler();
@@ -322,6 +335,13 @@ class Router
                     } elseif ($authRoute === 'me') {
                         $meHandler     = new MeHandler();
                         $this->handler = $meHandler;
+                    } elseif ($authRoute === 'role-requests') {
+                        // Role request routes for authenticated users
+                        // POST /auth/role-requests - Create new request
+                        // GET /auth/role-requests - Get user's own requests
+                        // GET /auth/role-requests/status - Check if user needs to request a role
+                        $roleRequestHandler = new RoleRequestHandler();
+                        $this->handler      = $roleRequestHandler;
                     } else {
                         $this->response = new Response(StatusCode::NOT_FOUND->value, [], null, $this->request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
                         $this->emitResponse();
@@ -330,6 +350,61 @@ class Router
                     $this->response = new Response(StatusCode::NOT_FOUND->value, [], null, $this->request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
                     $this->emitResponse();
                 }
+                break;
+            case 'admin':
+                // Handle admin routes
+                if (count($requestPathParts) >= 1) {
+                    $adminRoute = $requestPathParts[0];
+                    if ($adminRoute === 'role-requests') {
+                        // Admin role request management routes
+                        // GET /admin/role-requests - List all pending requests
+                        // POST /admin/role-requests/{id}/approve - Approve a request
+                        // POST /admin/role-requests/{id}/reject - Reject a request
+                        $roleRequestAdminHandler = new RoleRequestAdminHandler();
+                        $this->handler           = $roleRequestAdminHandler;
+                    } elseif ($adminRoute === 'notifications') {
+                        // Admin notifications route
+                        // GET /admin/notifications - Get counts of pending items
+                        $notificationsHandler = new NotificationsHandler();
+                        $this->handler        = $notificationsHandler;
+                    } elseif ($adminRoute === 'users') {
+                        // Admin users management routes
+                        // GET /admin/users - List all users with roles
+                        // DELETE /admin/users/{userId}/roles/{role} - Revoke a role
+                        $usersHandler  = new UsersHandler();
+                        $this->handler = $usersHandler;
+                    } elseif ($adminRoute === 'applications') {
+                        // Admin application management routes
+                        // GET /admin/applications - List all applications (optional status filter)
+                        // GET /admin/applications/pending - List pending applications
+                        // GET /admin/applications/{uuid} - Get single application details
+                        // POST /admin/applications/{uuid}/approve - Approve an application
+                        // POST /admin/applications/{uuid}/reject - Reject an application
+                        // POST /admin/applications/{uuid}/revoke - Revoke an approved application
+                        $applicationAdminHandler = new ApplicationAdminHandler();
+                        $this->handler           = $applicationAdminHandler;
+                    } else {
+                        $this->response = new Response(StatusCode::NOT_FOUND->value, [], null, $this->request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
+                        $this->emitResponse();
+                    }
+                } else {
+                    $this->response = new Response(StatusCode::NOT_FOUND->value, [], null, $this->request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
+                    $this->emitResponse();
+                }
+                break;
+            case 'applications':
+                // Developer applications and API keys management
+                // GET /applications - List user's applications
+                // POST /applications - Create new application
+                // GET /applications/{uuid} - Get single application
+                // PATCH /applications/{uuid} - Update application
+                // DELETE /applications/{uuid} - Delete application
+                // GET /applications/{uuid}/keys - List keys for application
+                // POST /applications/{uuid}/keys - Generate new API key
+                // DELETE /applications/{uuid}/keys/{keyId} - Revoke/delete key
+                // POST /applications/{uuid}/keys/{keyId}/rotate - Rotate key
+                $applicationsHandler = new ApplicationsHandler();
+                $this->handler       = $applicationsHandler;
                 break;
             case 'data':
                 $regionalDataHandler = new RegionalDataHandler($requestPathParts);
@@ -437,22 +512,104 @@ class Router
         $pipeline->pipe(new ErrorHandlingMiddleware($this->psr17Factory, self::$debug, $allowedOrigins)); // outermost middleware
         $pipeline->pipe(new LoggingMiddleware(self::$debug));
 
-        // Apply HTTPS enforcement middleware for auth routes in production
-        if ($route === 'auth') {
+        // Apply HTTPS enforcement middleware for auth, admin, and applications routes in production
+        if (in_array($route, ['auth', 'admin', 'applications'], true)) {
             $pipeline->pipe(new HttpsEnforcementMiddleware());
         }
 
-        // Apply JWT authentication middleware for protected routes
+        // Apply OIDC authentication for role-requests routes (auth), admin, and applications
+        // These routes need the oidc_user attribute set before the handler checks authentication
+        if (
+            ( $route === 'auth' && count($requestPathParts) >= 1 && $requestPathParts[0] === 'role-requests' )
+            || $route === 'admin'
+            || $route === 'applications'
+        ) {
+            // Check OIDC availability within the pipeline so ErrorHandlingMiddleware catches exceptions
+            // and CORS headers are applied properly
+            $pipeline->pipe(new OidcAvailabilityMiddleware(
+                self::isOidcConfigured(),
+                'OIDC authentication is not configured. These features require Zitadel integration.'
+            ));
+
+            if (self::isOidcConfigured()) {
+                $pipeline->pipe(OidcAuthMiddleware::fromEnv());
+            }
+        }
+
+        // Apply authentication middleware for protected routes
         if (
             in_array($route, ['data', 'tests', 'temporale'], true)
             && in_array($this->request->getMethod(), [RequestMethod::PUT->value, RequestMethod::PATCH->value, RequestMethod::DELETE->value], true)
         ) {
-            $pipeline->pipe(new JwtAuthMiddleware());
+            // Use OIDC (Zitadel) authentication if configured, otherwise fall back to JWT
+            if (self::isOidcConfigured()) {
+                $pipeline->pipe(OidcAuthMiddleware::fromEnv());
+            } else {
+                // Fall back to legacy JWT authentication
+                // JwtAuthMiddleware sets oidc_user attribute for compatibility with AuthorizationMiddleware
+                $pipeline->pipe(new JwtAuthMiddleware());
+            }
+
+            // Apply authorization middleware with role-based access control
+            // (shared between OIDC and JWT paths)
+            $this->configureAuthorizationPipeline($pipeline, $route, $requestPathParts);
         }
 
         $this->response = $pipeline->handle($this->request)
             ->withHeader('X-Request-Id', $this->requestId);
         $this->emitResponse();
+    }
+
+    /**
+     * Configure authorization middleware for the pipeline.
+     *
+     * Extracts common authorization logic to avoid duplication between OIDC and JWT paths.
+     *
+     * @param MiddlewarePipeline $pipeline The middleware pipeline to configure
+     * @param string $route The current route being handled
+     * @param array<int, string> $requestPathParts The parsed path parts after the route
+     */
+    private function configureAuthorizationPipeline(
+        MiddlewarePipeline $pipeline,
+        string $route,
+        array $requestPathParts
+    ): void {
+        if (!Connection::isConfigured()) {
+            throw new ServiceUnavailableException(
+                'Database not configured. Protected routes require database connection.'
+            );
+        }
+
+        $permissionRepo = new CalendarPermissionRepository();
+
+        // Determine required role and calendar type based on route
+        $calendarType = null;
+        if ($route === 'data' && count($requestPathParts) >= 2) {
+            $calendarType = match ($requestPathParts[0]) {
+                PathCategory::NATION->value      => CalendarType::NATIONAL,
+                PathCategory::DIOCESE->value     => CalendarType::DIOCESAN,
+                PathCategory::WIDERREGION->value => CalendarType::WIDERREGION,
+                default                          => null
+            };
+
+            // Set calendar_id attribute for AuthorizationMiddleware
+            $this->request = $this->request->withAttribute('calendar_id', $requestPathParts[1] ?? null);
+        }
+
+        if ($route === 'data') {
+            $pipeline->pipe(new AuthorizationMiddleware(
+                $permissionRepo,
+                'calendar_editor',
+                $calendarType,
+                'calendar_id',
+                PermissionLevel::WRITE
+            ));
+        } elseif ($route === 'tests') {
+            $pipeline->pipe(AuthorizationMiddleware::forTestEditor($permissionRepo));
+        } elseif ($route === 'temporale') {
+            // Temporale requires admin role (General Roman Calendar)
+            $pipeline->pipe(AuthorizationMiddleware::forAdmin($permissionRepo));
+        }
     }
 
     /**
@@ -470,6 +627,16 @@ class Router
         return in_array($serverAddress, $localhostAddresses) ||
                in_array($remoteAddress, $localhostAddresses) ||
                in_array($serverName, $localhostNames);
+    }
+
+    /**
+     * Check if OIDC (Zitadel) authentication is configured.
+     *
+     * @return bool true if ZITADEL_ISSUER and ZITADEL_CLIENT_ID are set
+     */
+    public static function isOidcConfigured(): bool
+    {
+        return OidcAuthMiddleware::isConfigured();
     }
 
     private function retrieveRequest(): ServerRequestInterface

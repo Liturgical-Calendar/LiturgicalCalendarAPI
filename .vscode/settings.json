@@ -4,7 +4,10 @@
     "phpcs.ignorePatterns": [
         "**/vendor/*"
     ],
-    "phpcs.phpcbfOnSave": true,
+    "phpcs.phpcbfOnSave": false,
+    "phpcs.phpcbfSaveOnFix": true,
+    "phpcs.useNativePreview": true,
+    "editor.renderWhitespace": "all",
     "json.schemas": [
         {
             "fileMatch": [
