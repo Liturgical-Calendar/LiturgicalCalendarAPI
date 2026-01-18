@@ -26,6 +26,7 @@ use LiturgicalCalendar\Api\Handlers\Auth\LogoutHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\MeHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\RefreshHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\RoleRequestHandler;
+use LiturgicalCalendar\Api\Handlers\Auth\EmailVerificationHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\ApplicationAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\NotificationsHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\RoleRequestAdminHandler;
@@ -342,6 +343,11 @@ class Router
                         // GET /auth/role-requests/status - Check if user needs to request a role
                         $roleRequestHandler = new RoleRequestHandler();
                         $this->handler      = $roleRequestHandler;
+                    } elseif ($authRoute === 'email-verification') {
+                        // Email verification routes for authenticated users
+                        // POST /auth/email-verification/resend - Resend verification email
+                        $emailVerificationHandler = new EmailVerificationHandler();
+                        $this->handler            = $emailVerificationHandler;
                     } else {
                         $this->response = new Response(StatusCode::NOT_FOUND->value, [], null, $this->request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
                         $this->emitResponse();
@@ -517,10 +523,10 @@ class Router
             $pipeline->pipe(new HttpsEnforcementMiddleware());
         }
 
-        // Apply OIDC authentication for role-requests routes (auth), admin, and applications
+        // Apply OIDC authentication for auth routes (role-requests, email-verification), admin, and applications
         // These routes need the oidc_user attribute set before the handler checks authentication
         if (
-            ( $route === 'auth' && count($requestPathParts) >= 1 && $requestPathParts[0] === 'role-requests' )
+            ( $route === 'auth' && count($requestPathParts) >= 1 && in_array($requestPathParts[0], ['role-requests', 'email-verification'], true) )
             || $route === 'admin'
             || $route === 'applications'
         ) {

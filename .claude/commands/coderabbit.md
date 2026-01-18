@@ -1,10 +1,16 @@
-Run coderabbit --plain, let it run as long as it needs (run it in the background).
+## CodeRabbit CLI Workflow
 
-Evaluate the fixes and considerations. Fix major issues, critical issues, and only fix the nits if they make sense even if they seem out of scope.
+1. Run `coderabbit --plain` and allow it to complete its analysis (can run in background).
 
-Once those changes are implemented, run CodeRabbit CLI one more time to make sure
-we addressed all the critical issues and didn't introduce any additional bugs.
+2. Evaluate the reported issues:
+   - Fix all major and critical issues
+   - Fix minor nits only if they are clearly beneficial
 
-Only run the loop up to four times. If on the fourth run you don't find any critical issues,
-ignore the nits and you're complete. Give me a summary of everything that was
-completed and why.
+3. After implementing changes, re-run CodeRabbit CLI to verify:
+   - All critical issues are resolved
+   - No new bugs were introduced
+
+4. Iteration limit:
+   - Maximum of four iterations
+   - If the fourth run shows no critical issues, skip remaining nits
+   - Provide a summary of completed changes and rationale

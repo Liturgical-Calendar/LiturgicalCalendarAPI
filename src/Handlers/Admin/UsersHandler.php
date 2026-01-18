@@ -22,7 +22,7 @@ use Psr\Http\Message\ServerRequestInterface;
  * Admin Users Handler
  *
  * Handles admin operations for user management:
- * - GET /admin/users - List all users with roles
+ * - GET /admin/users - List all users (with and without roles)
  * - DELETE /admin/users/{userId}/roles/{role} - Revoke a role from a user
  *
  * Requires admin role.
@@ -102,7 +102,7 @@ final class UsersHandler extends AbstractHandler
     }
 
     /**
-     * List all users with roles in the project.
+     * List all users (with and without roles).
      *
      * @param ResponseInterface $response
      * @return ResponseInterface
@@ -110,11 +110,21 @@ final class UsersHandler extends AbstractHandler
     private function listUsers(ResponseInterface $response): ResponseInterface
     {
         $zitadel = ZitadelService::fromEnv();
-        $result  = $zitadel->listProjectUsers();
 
-        // Transform users to include a flat 'roles' array for easier frontend consumption
-        $users = [];
-        foreach ($result['users'] as $user) {
+        // Fetch users with roles
+        $usersWithRolesResult = $zitadel->listProjectUsers();
+
+        // Fetch all users
+        $allUsersResult = $zitadel->listAllUsers();
+
+        // Defensive checks for API response structure
+        $usersWithRolesArray = $usersWithRolesResult['users'] ?? [];
+        $allUsersArray       = $allUsersResult['users'] ?? [];
+
+        // Build a map of users with roles (keyed by userId)
+        /** @var array<string, array<string, mixed>> $usersWithRolesMap */
+        $usersWithRolesMap = [];
+        foreach ($usersWithRolesArray as $user) {
             // Flatten roles from all grants into a single array
             $roles = [];
             if (isset($user['grants']) && is_array($user['grants'])) {
@@ -125,12 +135,55 @@ final class UsersHandler extends AbstractHandler
                 }
             }
             $user['roles'] = array_values(array_unique($roles));
-            $users[]       = $user;
+            $userId        = $user['userId'] ?? null;
+            if (is_string($userId)) {
+                $usersWithRolesMap[$userId] = $user;
+            }
         }
 
+        // Separate users into those with roles and those without
+        $usersWithRoles    = [];
+        $usersWithoutRoles = [];
+        $seenUserIds       = [];
+
+        foreach ($allUsersArray as $user) {
+            $userId = $user['userId'] ?? null;
+            if (!is_string($userId)) {
+                continue;
+            }
+            $seenUserIds[$userId] = true;
+            if (isset($usersWithRolesMap[$userId])) {
+                // User has roles - merge role info with email verification from the all-users list
+                $userWithRoles                  = $usersWithRolesMap[$userId];
+                $userWithRoles['emailVerified'] = $user['emailVerified'] ?? false;
+                $usersWithRoles[]               = $userWithRoles;
+            } else {
+                // User has no roles
+                $user['roles']       = [];
+                $usersWithoutRoles[] = $user;
+            }
+        }
+
+        // Ensure all role-bearing users are included, even if not in allUsersArray
+        // (e.g., due to pagination limits in listAllUsers)
+        foreach ($usersWithRolesMap as $userId => $userWithRoles) {
+            if (!isset($seenUserIds[$userId])) {
+                // User has roles but wasn't in allUsersArray - add with emailVerified defaulting to false
+                $userWithRoles['emailVerified'] = $userWithRoles['emailVerified'] ?? false;
+                $usersWithRoles[]               = $userWithRoles;
+            }
+        }
+
+        $processedTotal = count($usersWithRoles) + count($usersWithoutRoles);
+        $reportedTotal  = $allUsersResult['total'] ?? 0;
+
         return $this->encodeResponseBody($response, [
-            'users' => $users,
-            'total' => $result['total'],
+            'usersWithRoles'    => $usersWithRoles,
+            'usersWithoutRoles' => $usersWithoutRoles,
+            'totalWithRoles'    => count($usersWithRoles),
+            'totalWithoutRoles' => count($usersWithoutRoles),
+            'total'             => $processedTotal,
+            'reportedTotal'     => $reportedTotal,
         ]);
     }
 
