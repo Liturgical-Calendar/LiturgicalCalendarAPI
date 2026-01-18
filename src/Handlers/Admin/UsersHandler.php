@@ -144,12 +144,14 @@ final class UsersHandler extends AbstractHandler
         // Separate users into those with roles and those without
         $usersWithRoles    = [];
         $usersWithoutRoles = [];
+        $seenUserIds       = [];
 
         foreach ($allUsersArray as $user) {
             $userId = $user['userId'] ?? null;
             if (!is_string($userId)) {
                 continue;
             }
+            $seenUserIds[$userId] = true;
             if (isset($usersWithRolesMap[$userId])) {
                 // User has roles - merge role info with email verification from the all-users list
                 $userWithRoles                  = $usersWithRolesMap[$userId];
@@ -159,6 +161,16 @@ final class UsersHandler extends AbstractHandler
                 // User has no roles
                 $user['roles']       = [];
                 $usersWithoutRoles[] = $user;
+            }
+        }
+
+        // Ensure all role-bearing users are included, even if not in allUsersArray
+        // (e.g., due to pagination limits in listAllUsers)
+        foreach ($usersWithRolesMap as $userId => $userWithRoles) {
+            if (!isset($seenUserIds[$userId])) {
+                // User has roles but wasn't in allUsersArray - add with emailVerified defaulting to false
+                $userWithRoles['emailVerified'] = $userWithRoles['emailVerified'] ?? false;
+                $usersWithRoles[]               = $userWithRoles;
             }
         }
 
