@@ -601,6 +601,44 @@ class ZitadelService
     }
 
     /**
+     * Resend email verification to a user.
+     *
+     * Triggers Zitadel to send a new verification email to the user.
+     *
+     * @param string $userId Zitadel user ID
+     * @return array{success: true}|array{success: false, error: string} Result with success status and optional error
+     */
+    public function resendEmailVerification(string $userId): array
+    {
+        try {
+            $this->httpClient->post("/management/v1/users/{$userId}/email/_resend_verification", [
+                'headers' => $this->getAuthHeaders(),
+                'json'    => new \stdClass(), // Empty JSON object required by Zitadel
+            ]);
+
+            return ['success' => true];
+        } catch (GuzzleException $e) {
+            $errorMessage = $e->getMessage();
+
+            // Try to extract more details from Guzzle response
+            if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->getResponse() !== null) {
+                $responseBody = (string) $e->getResponse()->getBody();
+                $decoded      = json_decode($responseBody, true);
+                if (is_array($decoded) && isset($decoded['message']) && is_string($decoded['message'])) {
+                    $errorMessage = $decoded['message'];
+                }
+            }
+
+            $this->logger?->warning('Failed to resend email verification in Zitadel', [
+                'userId' => $userId,
+                'error'  => $errorMessage,
+            ]);
+
+            return ['success' => false, 'error' => $errorMessage];
+        }
+    }
+
+    /**
      * Get OIDC discovery document.
      *
      * The document is cached after the first successful fetch to avoid
