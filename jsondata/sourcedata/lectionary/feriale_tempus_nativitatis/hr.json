@@ -1,0 +1,128 @@
+{
+    "ChristmasWeekdayDec29": {
+        "first_reading": "1 Iv 2,3-11",
+        "responsorial_psalm": "Ps 96",
+        "gospel_acclamation": "Iv 1,14a.12a",
+        "gospel": "Lk 2,22-35"
+    },
+    "ChristmasWeekdayDec30": {
+        "first_reading": "1 Iv 2,12-17",
+        "responsorial_psalm": "Ps 96",
+        "gospel_acclamation": "Lk 2,32",
+        "gospel": "Lk 2,36-40"
+    },
+    "ChristmasWeekdayDec31": {
+        "first_reading": "1 Iv 2,18-21",
+        "responsorial_psalm": "Ps 96",
+        "gospel_acclamation": "Iv 1,14a.12a",
+        "gospel": "Iv 1,1-18"
+    },
+    "ChristmasWeekdayJan2": {
+        "first_reading": "1 Iv 2,22-28",
+        "responsorial_psalm": "Ps 98",
+        "gospel_acclamation": "Heb 1,1-2",
+        "gospel": "Iv 1,19-28"
+    },
+    "ChristmasWeekdayJan3": {
+        "first_reading": "1 Iv 2,29–3,6",
+        "responsorial_psalm": "Ps 98",
+        "gospel_acclamation": "Iv 1,14a.12a",
+        "gospel": "Iv 1,29-34"
+    },
+    "ChristmasWeekdayJan4": {
+        "first_reading": "1 Iv 3,7-10",
+        "responsorial_psalm": "Ps 98",
+        "gospel_acclamation": "Iv 1,14a.12a",
+        "gospel": "Iv 1,35-42"
+    },
+    "ChristmasWeekdayJan5": {
+        "first_reading": "1 Iv 3,11-21",
+        "responsorial_psalm": "Ps 100",
+        "gospel_acclamation": "Iv 1,14a.12a",
+        "gospel": "Iv 1,43-51"
+    },
+    "ChristmasWeekdayJan6": {
+        "first_reading": "1 Iv 5,5-13",
+        "responsorial_psalm": "Ps 147",
+        "gospel_acclamation": "Mk 9,7",
+        "gospel": "Mk 1,7-11|Lk 3,23-38"
+    },
+    "ChristmasWeekdayJan7": {
+        "first_reading": "1 Iv 5,14-21",
+        "responsorial_psalm": "Ps 149",
+        "gospel_acclamation": "Lk 7,16",
+        "gospel": "Iv 2,1-11"
+    },
+    "DayAfterEpiphanyJan7": {
+        "first_reading": "1 Iv 3,22–4,6",
+        "responsorial_psalm": "Ps 2",
+        "gospel_acclamation": "Mt 4,23",
+        "gospel": "Mt 4,12-17.23-25"
+    },
+    "DayAfterEpiphanyJan8": {
+        "first_reading": "1 Iv 4,7-10",
+        "responsorial_psalm": "Ps 72",
+        "gospel_acclamation": "Lk 4,18",
+        "gospel": "Mk 6,34-44"
+    },
+    "DayAfterEpiphanyJan9": {
+        "first_reading": "1 Iv 4,11-18",
+        "responsorial_psalm": "Ps 72",
+        "gospel_acclamation": "1 Tim 3,16",
+        "gospel": "Mk 6,45-52"
+    },
+    "DayAfterEpiphanyJan10": {
+        "first_reading": "1 Iv 4,19–5,4",
+        "responsorial_psalm": "Ps 72",
+        "gospel_acclamation": "Lk 4,18",
+        "gospel": "Lk 4,14-22a"
+    },
+    "DayAfterEpiphanyJan11": {
+        "first_reading": "1 Iv 5,5-13",
+        "responsorial_psalm": "Ps 147",
+        "gospel_acclamation": "Mt 4,23",
+        "gospel": "Lk 5,12-16"
+    },
+    "DayAfterEpiphanyJan12": {
+        "first_reading": "1 Iv 5,14-21",
+        "responsorial_psalm": "Ps 149",
+        "gospel_acclamation": "Mt 4,16",
+        "gospel": "Iv 3,22-30"
+    },
+    "DayAfterEpiphanyMonday": {
+        "first_reading": "1 Iv 3,22–4,6",
+        "responsorial_psalm": "Ps 2",
+        "gospel_acclamation": "Mt 4,23",
+        "gospel": "Mt 4,12-17.23-25"
+    },
+    "DayAfterEpiphanyTuesday": {
+        "first_reading": "1 Iv 4,7-10",
+        "responsorial_psalm": "Ps 72",
+        "gospel_acclamation": "Lk 4,18",
+        "gospel": "Mk 6,34-44"
+    },
+    "DayAfterEpiphanyWednesday": {
+        "first_reading": "1 Iv 4,11-18",
+        "responsorial_psalm": "Ps 72",
+        "gospel_acclamation": "1 Tim 3,16",
+        "gospel": "Mk 6,45-52"
+    },
+    "DayAfterEpiphanyThursday": {
+        "first_reading": "1 Iv 4,19–5,4",
+        "responsorial_psalm": "Ps 72",
+        "gospel_acclamation": "Lk 4,18",
+        "gospel": "Lk 4,14-22a"
+    },
+    "DayAfterEpiphanyFriday": {
+        "first_reading": "1 Iv 5,5-13",
+        "responsorial_psalm": "Ps 147",
+        "gospel_acclamation": "Mt 4,23",
+        "gospel": "Lk 5,12-16"
+    },
+    "DayAfterEpiphanySaturday": {
+        "first_reading": "1 Iv 5,14-21",
+        "responsorial_psalm": "Ps 149",
+        "gospel_acclamation": "Mt 4,16",
+        "gospel": "Iv 3,22-30"
+    }
+}

@@ -50,7 +50,7 @@ msgstr "ružičasta"
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
 msgid "Proper"
-msgstr ""
+msgstr "Vlastiti"
 
 #. translators: context = from the Common of the Dedication of a Church
 #: src/Enum/LitCommon.php:168
@@ -60,163 +60,163 @@ msgstr "Posveta crkve"
 #. translators: context = from the Common of the Blessed Virgin Mary
 #: src/Enum/LitCommon.php:170
 msgid "Blessed Virgin Mary"
-msgstr ""
+msgstr "Blažena Djevica Marija"
 
 #. translators: context = from the Common of Martyrs
 #: src/Enum/LitCommon.php:172
 msgid "Martyrs"
-msgstr ""
+msgstr "Mučenici"
 
 #. translators: context = from the Common of Pastors
 #: src/Enum/LitCommon.php:174
 msgid "Pastors"
-msgstr ""
+msgstr "Pastiri"
 
 #. translators: context = from the Common of Doctors
 #: src/Enum/LitCommon.php:176
 msgid "Doctors"
-msgstr ""
+msgstr "Naučitelji"
 
 #. translators: context = from the Common of Virgins
 #: src/Enum/LitCommon.php:178
 msgid "Virgins"
-msgstr ""
+msgstr "Djevice"
 
 #. translators: context = from the Common of Holy Men and Women
 #: src/Enum/LitCommon.php:180
 msgid "Holy Men and Women"
-msgstr ""
+msgstr "Sveci i Svetice"
 
 #. translators: context = from the Common of Martyrs: For One Martyr
 #: src/Enum/LitCommon.php:182
 msgid "For One Martyr"
-msgstr ""
+msgstr "Za jednog mučenika"
 
 #. translators: context = from the Common of Martyrs: For Several Martyrs
 #: src/Enum/LitCommon.php:184
 msgid "For Several Martyrs"
-msgstr ""
+msgstr "Za više mučenika"
 
 #. translators: context = from the Common of Martyrs: For Missionary Martyrs
 #: src/Enum/LitCommon.php:186
 msgid "For Missionary Martyrs"
-msgstr ""
+msgstr "Za mučenike misionare"
 
 #. translators: context = from the Common of Martyrs: For One Missionary Martyr
 #: src/Enum/LitCommon.php:188
 msgid "For One Missionary Martyr"
-msgstr ""
+msgstr "Za jednog mučenika misionara"
 
 #. translators: context = from the Common of Martyrs: For Several Missionary Martyrs
 #: src/Enum/LitCommon.php:190
 msgid "For Several Missionary Martyrs"
-msgstr ""
+msgstr "Za više mučenika misionara"
 
 #. translators: context = from the Common of Martyrs: For a Virgin Martyr
 #: src/Enum/LitCommon.php:192
 msgid "For a Virgin Martyr"
-msgstr ""
+msgstr "Za djevicu mučenicu"
 
 #. translators: context = from the Common of Martyrs: For a Holy Woman Martyr
 #: src/Enum/LitCommon.php:194
 msgid "For a Holy Woman Martyr"
-msgstr ""
+msgstr "Za svetu ženu mučenicu"
 
 #. translators: context = from the Common of Pastors: For a Pope
 #: src/Enum/LitCommon.php:196
 msgid "For a Pope"
-msgstr ""
+msgstr "Za papu"
 
 #. translators: context = from the Common of Pastors: For a Bishop
 #: src/Enum/LitCommon.php:198
 msgid "For a Bishop"
-msgstr ""
+msgstr "Za biskupa"
 
 #. translators: context = from the Common of Pastors: For One Pastor
 #: src/Enum/LitCommon.php:200
 msgid "For One Pastor"
-msgstr ""
+msgstr "Za jednog pastira"
 
 #. translators: context = from the Common of Pastors: For Several Pastors
 #: src/Enum/LitCommon.php:202
 msgid "For Several Pastors"
-msgstr ""
+msgstr "Za više pastira"
 
 #. translators: context = from the Common of Pastors: For Founders of a Church
 #: src/Enum/LitCommon.php:204
 msgid "For Founders of a Church"
-msgstr ""
+msgstr "Za utemeljitelje crkve"
 
 #. translators: context = from the Common of Pastors: For One Founder
 #: src/Enum/LitCommon.php:206
 msgid "For One Founder"
-msgstr ""
+msgstr "Za jednog utemeljitelja"
 
 #. translators: context = from the Common of Pastors: For Several Founders
 #: src/Enum/LitCommon.php:208
 msgid "For Several Founders"
-msgstr ""
+msgstr "Za više utemeljitelja"
 
 #. translators: context = from the Common of Pastors: For Missionaries
 #: src/Enum/LitCommon.php:210
 msgid "For Missionaries"
-msgstr ""
+msgstr "Za misionare"
 
 #. translators: context = from the Common of Virgins: For One Virgin
 #: src/Enum/LitCommon.php:212
 msgid "For One Virgin"
-msgstr ""
+msgstr "Za jednu djevicu"
 
 #. translators: context = from the Common of Virgins: For Several Virgins
 #: src/Enum/LitCommon.php:214
 msgid "For Several Virgins"
-msgstr ""
+msgstr "Za više djevica"
 
 #. translators: context = from the Common of Holy Men and Women: For Several Saints
 #: src/Enum/LitCommon.php:216
 msgid "For Several Saints"
-msgstr ""
+msgstr "Za više svetaca"
 
 #. translators: context = from the Common of Holy Men and Women: For One Saint
 #: src/Enum/LitCommon.php:218
 msgid "For One Saint"
-msgstr ""
+msgstr "Za jednog sveca"
 
 #. translators: context = from the Common of Holy Men and Women: For an Abbot
 #: src/Enum/LitCommon.php:220
 msgid "For an Abbot"
-msgstr ""
+msgstr "Za opata"
 
 #. translators: context = from the Common of Holy Men and Women: For a Monk
 #: src/Enum/LitCommon.php:222
 msgid "For a Monk"
-msgstr ""
+msgstr "Za redovnika"
 
 #. translators: context = from the Common of Holy Men and Women: For a Nun
 #: src/Enum/LitCommon.php:224
 msgid "For a Nun"
-msgstr ""
+msgstr "Za redovnicu"
 
 #. translators: context = from the Common of Holy Men and Women: For Religious
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitCommon.php:226 src/Enum/LitMassVariousNeeds.php:237
 msgid "For Religious"
-msgstr ""
+msgstr "Za redovnike"
 
 #. translators: context = from the Common of Holy Men and Women: For Those Who Practiced Works of Mercy
 #: src/Enum/LitCommon.php:228
 msgid "For Those Who Practiced Works of Mercy"
-msgstr ""
+msgstr "Za one koji su vršili djela milosrđa"
 
 #. translators: context = from the Common of Holy Men and Women: For Educators
 #: src/Enum/LitCommon.php:230
 msgid "For Educators"
-msgstr ""
+msgstr "Za odgojitelje"
 
 #. translators: context = from the Common of Holy Men and Women: For Holy Women
 #: src/Enum/LitCommon.php:232
 msgid "For Holy Women"
-msgstr ""
+msgstr "Za svete žene"
 
 #. translators: "From the Common [of the] Blessed Virgin Mary|Dedication of a Church" (singular feminine). Latin: leave empty!
 #: src/Enum/LitCommon.php:256
@@ -620,7 +620,7 @@ msgstr "Vrijeme kroz godinu"
 #: src/FerialEventNameGenerator.php:366
 #, php-format
 msgid "December %s"
-msgstr ""
+msgstr "%s. prosinca"
 
 #. translators: %s is an ordinal number (1st, 2nd, 3rd)
 #. translators: %s is an ordinal number (first, second...)
@@ -641,13 +641,13 @@ msgstr "%s dan u osmini Božića"
 #: src/FerialEventNameGenerator.php:418 src/FerialEventNameGenerator.php:452
 #, php-format
 msgid "January %s"
-msgstr ""
+msgstr "%s. siječnja"
 
 #. translators: %s is a day of the week - for days after Epiphany
 #: src/FerialEventNameGenerator.php:435
 #, php-format
 msgid "%s after Epiphany"
-msgstr ""
+msgstr "%s poslije Bogojavljenja"
 
 #. translators: Day after Ash Wednesday pattern
 #: src/FerialEventNameGenerator.php:467 src/Handlers/CalendarHandler.php:1879
@@ -663,9 +663,9 @@ msgstr "%s tjedna korizme"
 
 #. translators: %s is a day of the week - Easter Octave pattern
 #: src/FerialEventNameGenerator.php:501
-#, fuzzy, php-format
+#, php-format
 msgid "%s within the Octave of Easter"
-msgstr "%s dan u osmini Božića"
+msgstr "%s u osmini Uskrsa"
 
 #. translators: %s is an ordinal number (2nd, 3rd, etc.)
 #: src/FerialEventNameGenerator.php:517 src/Handlers/CalendarHandler.php:2868
@@ -684,7 +684,7 @@ msgstr "%s tjedna kroz godinu"
 #: src/FerialEventNameGenerator.php:552
 #, php-format
 msgid "%s of Holy Week"
-msgstr ""
+msgstr "%s Velikog tjedna"
 
 #: src/Handlers/CalendarHandler.php:432
 #, php-format
@@ -804,7 +804,7 @@ msgstr ""
 #. translators: You can ignore this translation if the Feast has not been inserted by the Episcopal Conference
 #: src/Handlers/CalendarHandler.php:1518
 msgid "Our Lord Jesus Christ, The Eternal High Priest"
-msgstr ""
+msgstr "Gospodin naš Isus Krist, Vječni Veliki Svećenik"
 
 #. translators: 1: National Calendar, 2: Requested calendar year, 3: source of the rule
 #: src/Handlers/CalendarHandler.php:1530
@@ -1113,7 +1113,7 @@ msgstr ""
 
 #: src/Handlers/CalendarHandler.php:3031
 msgid "Saturday Memorial of the Blessed Virgin Mary"
-msgstr ""
+msgstr "Subotnji spomendan Blažene Djevice Marije"
 
 #. translators: 1: wider_region, 2: metadata, 3: calendar_id
 #: src/Handlers/CalendarHandler.php:3106
@@ -1477,6 +1477,8 @@ msgid ""
 "The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
 "on %4$s, is suppressed by the %5$s %6$s in the year %7$d."
 msgstr ""
+"%1$s '%2$s', vlastit kalendaru %3$s i obično slavljen %4$s, potisnut je od "
+"%5$s %6$s u godini %7$d."
 
 #: src/Handlers/CalendarHandler.php:4447
 msgid "Error converting Liturgical Calendar to XML."
