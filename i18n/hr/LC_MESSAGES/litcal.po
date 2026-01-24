@@ -1477,7 +1477,7 @@ msgid ""
 "The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
 "on %4$s, is suppressed by the %5$s %6$s in the year %7$d."
 msgstr ""
-"%1$s '%2$s', vlastit kalendaru %3$s i obično slavljen %4$s, potisnut je od "
+"%1$s '%2$s', vlastitom kalendaru %3$s i obično slavljen %4$s, potisnut je od "
 "%5$s %6$s u godini %7$d."
 
 #: src/Handlers/CalendarHandler.php:4447

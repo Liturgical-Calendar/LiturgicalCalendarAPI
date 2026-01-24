@@ -438,11 +438,12 @@
             "schema": {
               "type": "string",
               "enum": [
+                "CA",
+                "HR",
                 "IT",
-                "US",
                 "NL",
-                "VA",
-                "CA"
+                "US",
+                "VA"
               ],
               "summary": "uppercase two letter ISO 3166 code of a nation for which the liturgical calendar has been defined"
             }
@@ -574,11 +575,12 @@
             "schema": {
               "type": "string",
               "enum": [
+                "CA",
+                "HR",
                 "IT",
-                "US",
                 "NL",
-                "VA",
-                "CA"
+                "US",
+                "VA"
               ]
             }
           },
@@ -2217,11 +2219,12 @@
             "schema": {
               "type": "string",
               "enum": [
+                "CA",
+                "HR",
                 "IT",
-                "US",
                 "NL",
-                "VA",
-                "CA"
+                "US",
+                "VA"
               ]
             }
           }
@@ -2321,11 +2324,12 @@
             "schema": {
               "type": "string",
               "enum": [
+                "CA",
+                "HR",
                 "IT",
-                "US",
                 "NL",
-                "VA",
-                "CA"
+                "US",
+                "VA"
               ]
             }
           }
@@ -6460,11 +6464,12 @@
         "schema": {
           "type": "string",
           "enum": [
+            "CA",
+            "HR",
             "IT",
-            "US",
             "NL",
-            "VA",
-            "CA"
+            "US",
+            "VA"
           ]
         }
       },
