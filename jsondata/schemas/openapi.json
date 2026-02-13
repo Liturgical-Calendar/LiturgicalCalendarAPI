@@ -63,6 +63,30 @@
     {
       "name": "Temporale",
       "description": "Retrieve / create / update / delete Proprium de Tempore (temporale) events"
+    },
+    {
+      "name": "Role Requests",
+      "description": "User-facing role request operations (request roles, check status)"
+    },
+    {
+      "name": "Admin - Role Requests",
+      "description": "Admin operations for managing role requests (approve, reject, revoke)"
+    },
+    {
+      "name": "Admin - Users",
+      "description": "Admin operations for user management (list users, revoke roles)"
+    },
+    {
+      "name": "Admin - Notifications",
+      "description": "Admin notification counts (pending requests, etc.)"
+    },
+    {
+      "name": "Admin - Applications",
+      "description": "Admin operations for application approval workflow (approve, reject, revoke)"
+    },
+    {
+      "name": "Applications",
+      "description": "Developer application management (create, update, delete applications and API keys)"
     }
   ],
   "paths": {
@@ -1042,6 +1066,891 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
           }
+        }
+      }
+    },
+    "/auth/role-requests": {
+      "get": {
+        "tags": ["Role Requests"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Get user's own role requests",
+        "operationId": "getUserRoleRequests",
+        "description": "Retrieve all role requests submitted by the authenticated user.",
+        "responses": {
+          "200": {
+            "description": "OK: List of user's role requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRoleRequestsResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"}
+        }
+      },
+      "post": {
+        "tags": ["Role Requests"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Create a new role request",
+        "operationId": "createRoleRequest",
+        "description": "Submit a request for a role. Valid roles are: developer, calendar_editor, test_editor.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoleRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created: Role request submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateRoleRequestResponse"
+                }
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest400"},
+          "401": {"$ref": "#/components/responses/Unauthorized401"}
+        }
+      }
+    },
+    "/auth/role-requests/status": {
+      "get": {
+        "tags": ["Role Requests"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Get role request status for user",
+        "operationId": "getRoleRequestStatus",
+        "description": "Check if the user has roles, pending requests, and whether they need to request a role.",
+        "responses": {
+          "200": {
+            "description": "OK: User's role status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoleRequestStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"}
+        }
+      }
+    },
+    "/admin/role-requests": {
+      "get": {
+        "tags": ["Admin - Role Requests"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "List all role requests",
+        "operationId": "adminListRoleRequests",
+        "description": "List all role requests with optional status filter. Requires admin role.",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by status",
+            "schema": {
+              "type": "string",
+              "enum": ["pending", "approved", "rejected", "revoked"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: List of role requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminRoleRequestsResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"}
+        }
+      }
+    },
+    "/admin/role-requests/{id}/approve": {
+      "post": {
+        "tags": ["Admin - Role Requests"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Approve a role request",
+        "operationId": "adminApproveRoleRequest",
+        "description": "Approve a pending role request and assign the role in Zitadel. Requires admin role.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Role request UUID",
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminReviewRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK: Role request approved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminApproveRoleRequestResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"}
+        }
+      }
+    },
+    "/admin/role-requests/{id}/reject": {
+      "post": {
+        "tags": ["Admin - Role Requests"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Reject a role request",
+        "operationId": "adminRejectRoleRequest",
+        "description": "Reject a pending role request. Requires admin role.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Role request UUID",
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminReviewRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK: Role request rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminRejectResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"}
+        }
+      }
+    },
+    "/admin/role-requests/{id}/revoke": {
+      "post": {
+        "tags": ["Admin - Role Requests"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Revoke a previously approved role request",
+        "operationId": "adminRevokeRoleRequest",
+        "description": "Revoke a previously approved role request and remove the role from Zitadel. Requires admin role.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Role request UUID",
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminReviewRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK: Role request revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminRevokeRoleRequestResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"}
+        }
+      }
+    },
+    "/admin/notifications": {
+      "get": {
+        "tags": ["Admin - Notifications"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Get admin notification counts",
+        "operationId": "adminGetNotifications",
+        "description": "Get counts of pending items requiring admin attention. Requires admin role.",
+        "responses": {
+          "200": {
+            "description": "OK: Notification counts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminNotificationsResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"}
+        }
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "tags": ["Admin - Users"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "List all users with roles",
+        "operationId": "adminListUsers",
+        "description": "List all users in the project with their assigned roles. Requires admin role.",
+        "responses": {
+          "200": {
+            "description": "OK: List of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUsersResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"}
+        }
+      }
+    },
+    "/admin/users/{userId}/roles/{role}": {
+      "delete": {
+        "tags": ["Admin - Users"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Revoke a role from a user",
+        "operationId": "adminRevokeUserRole",
+        "description": "Revoke a specific role from a user in Zitadel. Requires admin role.",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "description": "Zitadel user ID",
+            "schema": {"type": "string"}
+          },
+          {
+            "name": "role",
+            "in": "path",
+            "required": true,
+            "description": "Role to revoke",
+            "schema": {"type": "string"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Role revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"}
+        }
+      }
+    },
+    "/admin/applications": {
+      "get": {
+        "tags": ["Admin - Applications"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "List all applications",
+        "operationId": "adminListApplications",
+        "description": "List all applications with optional status filter. Requires admin role.",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by status",
+            "schema": {
+              "type": "string",
+              "enum": ["pending", "approved", "rejected", "revoked"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: List of applications",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminApplicationsResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"}
+        }
+      }
+    },
+    "/admin/applications/pending": {
+      "get": {
+        "tags": ["Admin - Applications"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "List pending applications",
+        "operationId": "adminListPendingApplications",
+        "description": "List all applications awaiting approval. Requires admin role.",
+        "responses": {
+          "200": {
+            "description": "OK: List of pending applications",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPendingApplicationsResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"}
+        }
+      }
+    },
+    "/admin/applications/{uuid}": {
+      "get": {
+        "tags": ["Admin - Applications"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Get single application details",
+        "operationId": "adminGetApplication",
+        "description": "Get details of a specific application. Requires admin role.",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "description": "Application UUID",
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Application details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Application"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"}
+        }
+      }
+    },
+    "/admin/applications/{uuid}/approve": {
+      "post": {
+        "tags": ["Admin - Applications"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Approve an application",
+        "operationId": "adminApproveApplication",
+        "description": "Approve a pending or rejected application. Requires admin role.",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "description": "Application UUID",
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminReviewRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK: Application approved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminApplicationActionResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"}
+        }
+      }
+    },
+    "/admin/applications/{uuid}/reject": {
+      "post": {
+        "tags": ["Admin - Applications"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Reject an application",
+        "operationId": "adminRejectApplication",
+        "description": "Reject a pending application. Requires admin role.",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "description": "Application UUID",
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminReviewRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK: Application rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminApplicationActionResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"}
+        }
+      }
+    },
+    "/admin/applications/{uuid}/revoke": {
+      "post": {
+        "tags": ["Admin - Applications"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Revoke an approved application",
+        "operationId": "adminRevokeApplication",
+        "description": "Revoke a previously approved application. Requires admin role.",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "description": "Application UUID",
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminReviewRequestBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK: Application revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminApplicationActionResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"}
+        }
+      }
+    },
+    "/applications": {
+      "get": {
+        "tags": ["Applications"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "List user's applications",
+        "operationId": "listApplications",
+        "description": "List all applications owned by the authenticated user. Requires developer role.",
+        "responses": {
+          "200": {
+            "description": "OK: List of user's applications",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationsListResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"}
+        }
+      },
+      "post": {
+        "tags": ["Applications"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Create new application",
+        "operationId": "createApplication",
+        "description": "Create a new application (starts with 'pending' status). Requires developer role.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateApplicationBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created: Application submitted for review",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateApplicationResponse"
+                }
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest400"},
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"}
+        }
+      }
+    },
+    "/applications/{uuid}": {
+      "get": {
+        "tags": ["Applications"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Get single application",
+        "operationId": "getApplication",
+        "description": "Get details of a specific application owned by the user. Requires developer role.",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "description": "Application UUID",
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Application details with API keys",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApplicationWithKeys"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"}
+        }
+      },
+      "patch": {
+        "tags": ["Applications"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Update application",
+        "operationId": "updateApplication",
+        "description": "Update application details. Requires developer role and ownership.",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "description": "Application UUID",
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateApplicationBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK: Application updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateApplicationResponse"
+                }
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest400"},
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"}
+        }
+      },
+      "delete": {
+        "tags": ["Applications"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Delete application",
+        "operationId": "deleteApplication",
+        "description": "Permanently delete an application and all associated API keys. Requires developer role and ownership.",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "description": "Application UUID",
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Application deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"}
+        }
+      }
+    },
+    "/applications/{uuid}/resubmit": {
+      "post": {
+        "tags": ["Applications"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Resubmit rejected application",
+        "operationId": "resubmitApplication",
+        "description": "Resubmit a rejected application for review. Only rejected applications can be resubmitted. Requires developer role and ownership.",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "description": "Application UUID",
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Application resubmitted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResubmitApplicationResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"}
+        }
+      }
+    },
+    "/applications/{uuid}/keys": {
+      "get": {
+        "tags": ["Applications"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "List API keys for application",
+        "operationId": "listApiKeys",
+        "description": "List all API keys for an application. Requires developer role and ownership.",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "description": "Application UUID",
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: List of API keys",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeysListResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"}
+        }
+      },
+      "post": {
+        "tags": ["Applications"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Generate new API key",
+        "operationId": "generateApiKey",
+        "description": "Generate a new API key for an approved application. The plain text key is only shown once. Requires developer role and ownership.",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "description": "Application UUID",
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateApiKeyBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created: API key generated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenerateApiKeyResponse"
+                }
+              }
+            }
+          },
+          "400": {"$ref": "#/components/responses/BadRequest400"},
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"}
+        }
+      }
+    },
+    "/applications/{uuid}/keys/{keyId}": {
+      "delete": {
+        "tags": ["Applications"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Revoke/delete API key",
+        "operationId": "revokeApiKey",
+        "description": "Revoke (delete) an API key. Requires developer role and ownership.",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "description": "Application UUID",
+            "schema": {"type": "string", "format": "uuid"}
+          },
+          {
+            "name": "keyId",
+            "in": "path",
+            "required": true,
+            "description": "API key ID",
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: API key revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"}
+        }
+      }
+    },
+    "/applications/{uuid}/keys/{keyId}/rotate": {
+      "post": {
+        "tags": ["Applications"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Rotate API key",
+        "operationId": "rotateApiKey",
+        "description": "Rotate an API key (revoke old, create new with same settings). The new plain text key is only shown once. Requires developer role and ownership.",
+        "parameters": [
+          {
+            "name": "uuid",
+            "in": "path",
+            "required": true,
+            "description": "Application UUID",
+            "schema": {"type": "string", "format": "uuid"}
+          },
+          {
+            "name": "keyId",
+            "in": "path",
+            "required": true,
+            "description": "API key ID to rotate",
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: API key rotated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RotateApiKeyResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"}
         }
       }
     },
@@ -5058,6 +5967,382 @@
         "required": [
           "authenticated"
         ]
+      },
+      "RoleRequest": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string", "format": "uuid"},
+          "zitadel_user_id": {"type": "string"},
+          "user_email": {"type": "string", "format": "email"},
+          "user_name": {"type": "string"},
+          "requested_role": {"type": "string", "enum": ["developer", "calendar_editor", "test_editor"]},
+          "justification": {"type": ["string", "null"]},
+          "status": {"type": "string", "enum": ["pending", "approved", "rejected", "revoked"]},
+          "reviewed_by": {"type": ["string", "null"]},
+          "review_notes": {"type": ["string", "null"]},
+          "reviewed_at": {"type": ["string", "null"], "format": "date-time"},
+          "zitadel_sync_status": {"type": ["string", "null"], "enum": ["pending", "synced", "failed", null]},
+          "zitadel_sync_error": {"type": ["string", "null"]},
+          "created_at": {"type": "string", "format": "date-time"},
+          "updated_at": {"type": "string", "format": "date-time"}
+        },
+        "required": ["id", "zitadel_user_id", "user_email", "user_name", "requested_role", "status", "created_at", "updated_at"],
+        "additionalProperties": false
+      },
+      "UserRoleRequestsResponse": {
+        "type": "object",
+        "properties": {
+          "requests": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/RoleRequest"}
+          }
+        },
+        "required": ["requests"],
+        "additionalProperties": false
+      },
+      "CreateRoleRequestBody": {
+        "type": "object",
+        "required": ["role"],
+        "properties": {
+          "role": {"type": "string", "enum": ["developer", "calendar_editor", "test_editor"], "description": "Role being requested"},
+          "justification": {"type": "string", "description": "Reason for requesting the role"},
+          "email": {"type": "string", "format": "email", "description": "User email (optional, falls back to token claim)"},
+          "name": {"type": "string", "description": "User display name (optional, falls back to token claim)"}
+        },
+        "additionalProperties": false
+      },
+      "CreateRoleRequestResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "request_id": {"type": "string", "format": "uuid"},
+          "message": {"type": "string"}
+        },
+        "required": ["success", "request_id", "message"],
+        "additionalProperties": false
+      },
+      "RoleRequestStatusResponse": {
+        "type": "object",
+        "properties": {
+          "has_roles": {"type": "boolean"},
+          "current_roles": {"type": "array", "items": {"type": "string"}},
+          "pending_requests": {"type": "integer"},
+          "approved_requests": {"type": "integer"},
+          "rejected_requests": {"type": "integer"},
+          "needs_role_request": {"type": "boolean"},
+          "valid_roles": {"type": "array", "items": {"type": "string"}}
+        },
+        "required": ["has_roles", "current_roles", "pending_requests", "approved_requests", "rejected_requests", "needs_role_request", "valid_roles"],
+        "additionalProperties": false
+      },
+      "AdminRoleRequestsResponse": {
+        "type": "object",
+        "properties": {
+          "requests": {"type": "array", "items": {"$ref": "#/components/schemas/RoleRequest"}},
+          "pending_requests": {"type": "array", "items": {"$ref": "#/components/schemas/RoleRequest"}},
+          "approved": {"type": "array", "items": {"$ref": "#/components/schemas/RoleRequest"}},
+          "rejected": {"type": "array", "items": {"$ref": "#/components/schemas/RoleRequest"}},
+          "revoked": {"type": "array", "items": {"$ref": "#/components/schemas/RoleRequest"}},
+          "counts": {
+            "type": "object",
+            "properties": {
+              "pending": {"type": "integer"},
+              "approved": {"type": "integer"},
+              "rejected": {"type": "integer"},
+              "revoked": {"type": "integer"}
+            },
+            "required": ["pending", "approved", "rejected", "revoked"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["requests", "pending_requests", "approved", "rejected", "revoked", "counts"],
+        "additionalProperties": false
+      },
+      "AdminReviewRequestBody": {
+        "type": "object",
+        "properties": {
+          "notes": {"type": "string", "description": "Optional review notes"}
+        },
+        "additionalProperties": false
+      },
+      "AdminApproveRoleRequestResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "request": {"$ref": "#/components/schemas/RoleRequest"},
+          "role_assigned": {"type": "boolean"},
+          "zitadel_error": {"type": ["string", "null"]},
+          "message": {"type": "string"}
+        },
+        "required": ["success", "request", "role_assigned", "message"],
+        "additionalProperties": false
+      },
+      "AdminRejectResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "message": {"type": "string"}
+        },
+        "required": ["success", "message"],
+        "additionalProperties": false
+      },
+      "AdminRevokeRoleRequestResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "role_removed": {"type": "boolean"},
+          "zitadel_error": {"type": ["string", "null"]},
+          "message": {"type": "string"}
+        },
+        "required": ["success", "role_removed", "message"],
+        "additionalProperties": false
+      },
+      "AdminNotificationsResponse": {
+        "type": "object",
+        "properties": {
+          "pending_role_requests": {"type": "integer"},
+          "pending_permission_requests": {"type": "integer"},
+          "total": {"type": "integer"},
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {"type": "string"},
+                "id": {"type": "string"},
+                "user_name": {"type": "string"},
+                "user_email": {"type": "string"},
+                "role": {"type": "string"},
+                "created_at": {"type": "string", "format": "date-time"},
+                "url": {"type": "string"}
+              },
+              "required": ["type", "id", "created_at"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["pending_role_requests", "pending_permission_requests", "total", "items"],
+        "additionalProperties": false
+      },
+      "AdminUsersResponse": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "userId": {"type": "string"},
+                "displayName": {"type": "string"},
+                "email": {"type": "string", "format": "email"},
+                "roles": {"type": "array", "items": {"type": "string"}},
+                "grants": {"type": "array", "items": {"type": "object"}}
+              },
+              "required": ["userId"],
+              "additionalProperties": false
+            }
+          },
+          "total": {"type": "integer"}
+        },
+        "required": ["users", "total"],
+        "additionalProperties": false
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "message": {"type": "string"}
+        },
+        "required": ["success", "message"],
+        "additionalProperties": false
+      },
+      "Application": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string", "format": "uuid"},
+          "uuid": {"type": "string", "format": "uuid", "description": "Alias for id"},
+          "zitadel_user_id": {"type": "string"},
+          "name": {"type": "string"},
+          "description": {"type": ["string", "null"]},
+          "website": {"type": ["string", "null"], "format": "uri"},
+          "status": {"type": "string", "enum": ["pending", "approved", "rejected", "revoked"]},
+          "reviewed_by": {"type": ["string", "null"]},
+          "review_notes": {"type": ["string", "null"]},
+          "reviewed_at": {"type": ["string", "null"], "format": "date-time"},
+          "is_active": {"type": "boolean"},
+          "created_at": {"type": "string", "format": "date-time"},
+          "updated_at": {"type": "string", "format": "date-time"},
+          "user_name": {"type": ["string", "null"], "description": "Owner's display name (admin view only)"},
+          "user_email": {"type": ["string", "null"], "description": "Owner's email (admin view only)"}
+        },
+        "required": ["id", "zitadel_user_id", "name", "status", "is_active", "created_at", "updated_at"],
+        "unevaluatedProperties": false
+      },
+      "ApplicationWithKeys": {
+        "allOf": [
+          {"$ref": "#/components/schemas/Application"},
+          {
+            "type": "object",
+            "properties": {
+              "keys": {"type": "array", "items": {"$ref": "#/components/schemas/ApiKey"}}
+            }
+          }
+        ],
+        "unevaluatedProperties": false
+      },
+      "ApiKey": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string", "format": "uuid"},
+          "application_id": {"type": "string", "format": "uuid"},
+          "name": {"type": ["string", "null"]},
+          "key_prefix": {"type": "string", "description": "First 8 characters of the key for identification"},
+          "scope": {"type": "string", "enum": ["read", "write"]},
+          "rate_limit": {"type": "integer"},
+          "is_active": {"type": "boolean"},
+          "expires_at": {"type": ["string", "null"], "format": "date-time"},
+          "last_used_at": {"type": ["string", "null"], "format": "date-time"},
+          "created_at": {"type": "string", "format": "date-time"}
+        },
+        "required": ["id", "application_id", "key_prefix", "scope", "rate_limit", "is_active", "created_at"],
+        "additionalProperties": false
+      },
+      "AdminApplicationsResponse": {
+        "type": "object",
+        "properties": {
+          "applications": {"type": "array", "items": {"$ref": "#/components/schemas/Application"}},
+          "total": {"type": "integer"},
+          "filter": {"type": ["string", "null"]}
+        },
+        "required": ["applications", "total"],
+        "additionalProperties": false
+      },
+      "AdminPendingApplicationsResponse": {
+        "type": "object",
+        "properties": {
+          "pending_applications": {"type": "array", "items": {"$ref": "#/components/schemas/Application"}},
+          "pending_count": {"type": "integer"}
+        },
+        "required": ["pending_applications", "pending_count"],
+        "additionalProperties": false
+      },
+      "AdminApplicationActionResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "message": {"type": "string"},
+          "application": {"$ref": "#/components/schemas/Application"}
+        },
+        "required": ["success", "message", "application"],
+        "additionalProperties": false
+      },
+      "ApplicationsListResponse": {
+        "type": "object",
+        "properties": {
+          "applications": {
+            "type": "array",
+            "items": {
+              "allOf": [
+                {"$ref": "#/components/schemas/Application"},
+                {"type": "object", "properties": {"key_count": {"type": "integer"}}}
+              ],
+              "unevaluatedProperties": false
+            }
+          },
+          "total": {"type": "integer"}
+        },
+        "required": ["applications", "total"],
+        "additionalProperties": false
+      },
+      "CreateApplicationBody": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {"type": "string", "description": "Application name"},
+          "description": {"type": "string", "description": "Application description"},
+          "website": {"type": "string", "format": "uri", "description": "Application website URL"}
+        },
+        "additionalProperties": false
+      },
+      "CreateApplicationResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "message": {"type": "string"},
+          "application": {"$ref": "#/components/schemas/Application"}
+        },
+        "required": ["success", "message", "application"],
+        "additionalProperties": false
+      },
+      "UpdateApplicationBody": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "description": {"type": "string"},
+          "website": {"type": "string", "format": "uri"}
+        },
+        "additionalProperties": false
+      },
+      "UpdateApplicationResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "message": {"type": "string"},
+          "application": {"$ref": "#/components/schemas/Application"}
+        },
+        "required": ["success", "message", "application"],
+        "additionalProperties": false
+      },
+      "ResubmitApplicationResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "message": {"type": "string"},
+          "application": {"$ref": "#/components/schemas/Application"}
+        },
+        "required": ["success", "message", "application"],
+        "additionalProperties": false
+      },
+      "ApiKeysListResponse": {
+        "type": "object",
+        "properties": {
+          "keys": {"type": "array", "items": {"$ref": "#/components/schemas/ApiKey"}},
+          "total": {"type": "integer"}
+        },
+        "required": ["keys", "total"],
+        "additionalProperties": false
+      },
+      "GenerateApiKeyBody": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string", "description": "Optional name for the API key"},
+          "scope": {"type": "string", "enum": ["read", "write"], "default": "read"},
+          "rate_limit": {"type": "integer", "description": "Rate limit per minute", "default": 1000},
+          "expires_at": {"type": "string", "format": "date-time", "description": "Optional expiration date"}
+        },
+        "additionalProperties": false
+      },
+      "GenerateApiKeyResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "message": {"type": "string"},
+          "key": {"type": "string", "description": "Plain text API key - only shown once"},
+          "record": {"$ref": "#/components/schemas/ApiKey"}
+        },
+        "required": ["success", "message", "key", "record"],
+        "additionalProperties": false
+      },
+      "RotateApiKeyResponse": {
+        "type": "object",
+        "properties": {
+          "success": {"type": "boolean"},
+          "message": {"type": "string"},
+          "key": {"type": "string", "description": "New plain text API key - only shown once"},
+          "record": {"$ref": "#/components/schemas/ApiKey"}
+        },
+        "required": ["success", "message", "key", "record"],
+        "additionalProperties": false
       }
     },
     "parameters": {

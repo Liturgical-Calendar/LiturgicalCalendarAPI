@@ -304,6 +304,11 @@ Use `Negotiator::negotiateResponseContentType()` to respect:
 
 Return appropriate PSR-7 Response with correct `Content-Type` header.
 
+**IMPORTANT:** The `return_type` query parameter is **only** intended for the `/calendar` endpoint.
+This parameter exists to allow browser-based viewing of calendar responses without requiring control over the `Accept` header.
+Admin endpoints and other API routes should use standard `Accept` header content negotiation only.
+Do NOT add `return_type` handling to admin or other non-calendar endpoints.
+
 **Language Negotiation:**
 
 **IMPORTANT:** Always use `Negotiator::pickLanguage()` for Accept-Language header processing, **never** use PHP's `\Locale::acceptFromHttp()`.

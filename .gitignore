@@ -1,4 +1,6 @@
 **/engineCache/*
+/cache/*
+!/cache/.gitkeep
 vendor/*
 .envrc
 .env

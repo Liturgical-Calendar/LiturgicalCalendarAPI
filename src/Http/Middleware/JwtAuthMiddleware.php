@@ -103,6 +103,13 @@ class JwtAuthMiddleware implements MiddlewareInterface
         $request = $request->withAttribute('user', $user);
         $request = $request->withAttribute('jwt_payload', $payload);
 
+        // Also set 'oidc_user' attribute for compatibility with AuthorizationMiddleware
+        // This allows the same authorization middleware to work with both OIDC and JWT flows
+        $request = $request->withAttribute('oidc_user', [
+            'sub'   => $user->username,
+            'roles' => $user->roles,
+        ]);
+
         // Continue with the request
         return $handler->handle($request);
     }
