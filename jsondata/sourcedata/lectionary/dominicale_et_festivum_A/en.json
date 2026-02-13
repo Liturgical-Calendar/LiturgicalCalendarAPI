@@ -317,39 +317,39 @@
         "gospel": ""
     },
     "Lent1": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Genesis 2:7-9; Genesis 3:1-7",
+        "responsorial_psalm": "Psalm 51:3-4, 5-6, 12-13, 17",
+        "second_reading": "Romans 5:12-19|Romans 5:12, 17-19",
+        "gospel_acclamation": "Matthew 4:4b",
+        "gospel": "Matthew 4:1-11"
     },
     "Lent2": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Genesis 12:1-4a",
+        "responsorial_psalm": "Psalm 33:4-5, 18-19, 20, 22",
+        "second_reading": "2 Timothy 1:8b-10",
+        "gospel_acclamation": "Matthew 17:5",
+        "gospel": "Matthew 17:1-9"
     },
     "Lent3": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Exodus 17:3-7",
+        "responsorial_psalm": "Psalm 95:1-2, 6-7, 8-9",
+        "second_reading": "Romans 5:1-2, 5-8",
+        "gospel_acclamation": "John 4:42, 15",
+        "gospel": "John 4:5-42|John 4:5-15, 19b-26, 39a, 40-42"
     },
     "Lent4": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "1 Samuel 16:1b, 6-7, 10-13a",
+        "responsorial_psalm": "Psalm 23:1-3a, 3b-4, 5, 6",
+        "second_reading": "Ephesians 5:8-14",
+        "gospel_acclamation": "John 8:12",
+        "gospel": "John 9:1-41|John 9:1, 6-9, 13-17, 34-38"
     },
     "Lent5": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Ezekiel 37:12-14",
+        "responsorial_psalm": "Psalm 130:1-2, 3-4, 5-6, 7-8",
+        "second_reading": "Romans 8:8-11",
+        "gospel_acclamation": "John 11:25a, 26",
+        "gospel": "John 11:1-45|John 11:3-7, 17, 20-27, 33b-45"
     },
     "PalmSun": {
         "palm_gospel": "",
