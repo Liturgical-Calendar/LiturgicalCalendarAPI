@@ -190,12 +190,11 @@ class JwtService
         // Extract custom claims from the refresh token payload
         // Exclude standard JWT claims that will be regenerated
         $standardClaims = ['iss', 'aud', 'iat', 'exp', 'nbf', 'jti', 'type', 'sub'];
-        $customClaims   = [];
-        foreach (get_object_vars($payload) as $key => $value) {
-            if (!in_array($key, $standardClaims, true)) {
-                $customClaims[$key] = $value;
-            }
-        }
+        /** @var array<string, mixed> $customClaims */
+        $customClaims = array_diff_key(
+            get_object_vars($payload),
+            array_flip($standardClaims)
+        );
 
         // Generate new access token with the same subject and custom claims
         return $this->generate($username, $customClaims);
