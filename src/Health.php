@@ -135,7 +135,7 @@ class Health implements MessageComponentInterface
     public function onOpen(ConnectionInterface $conn): void
     {
         // Store the new connection to send messages to later
-        $this->clients->attach($conn);
+        $this->clients[$conn] = null;
         if (false === is_int($conn->resourceId)) {
             echo 'Error onOpen: expected an integer resourceId, got ' . gettype($conn->resourceId) . "\n";
             return;
@@ -383,10 +383,10 @@ class Health implements MessageComponentInterface
      */
     public function onClose(ConnectionInterface $conn): void
     {
-        // The connection is closed, remove it, as we can no longer send it messages
-        $this->clients->detach($conn);
         /** @var int $resourceId */
         $resourceId = $conn->resourceId;
+        // The connection is closed, remove it, as we can no longer send it messages
+        unset($this->clients[$conn]);
         echo "Connection {$resourceId} has disconnected\n";
     }
 
