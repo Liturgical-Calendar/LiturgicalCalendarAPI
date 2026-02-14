@@ -143,6 +143,9 @@ class Health implements MessageComponentInterface
             echo "New connection! ({$conn->resourceId}) and current working directory is " . getcwd() . "\n";
         }
 
+        // Initialize Router paths before creating logger (LoggerFactory needs Router::$apiFilePath)
+        Router::getApiPaths();
+
         // Initialize cache backend only once (not on every connection)
         // Note: This check-then-set pattern is safe because Ratchet/ReactPHP WebSocket
         // servers are single-threaded (event-loop based), so concurrent connections
@@ -239,8 +242,6 @@ class Health implements MessageComponentInterface
                 }
             }
         }
-
-        Router::getApiPaths();
 
         if (false === isset(self::$metadata)) {
             echo 'Metadata not yet loaded, loading now from ' . Route::CALENDARS->path() . "\n";
