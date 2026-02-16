@@ -1,45 +1,39 @@
 {
     "MonOctaveEaster": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 2:14, 22-33",
+        "responsorial_psalm": "Psalm 16:1-2a and 5, 7-8, 9-10, 11",
+        "gospel_acclamation": "Psalm 118:24",
+        "gospel": "Matthew 28:8-15"
     },
     "TueOctaveEaster": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 2:36-41",
+        "responsorial_psalm": "Psalm 33:4-5, 18-19, 20 and 22",
+        "gospel_acclamation": "Psalm 118:24",
+        "gospel": "John 20:11-18"
     },
     "WedOctaveEaster": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 3:1-10",
+        "responsorial_psalm": "Psalm 105:1-2, 3-4, 6-7, 8-9",
+        "gospel_acclamation": "Psalm 118:24",
+        "gospel": "Luke 24:13-35"
     },
     "ThuOctaveEaster": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 3:11-26",
+        "responsorial_psalm": "Psalm 8:2ab and 5, 6-7, 8-9",
+        "gospel_acclamation": "Psalm 118:24",
+        "gospel": "Luke 24:35-48"
     },
     "FriOctaveEaster": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 4:1-12",
+        "responsorial_psalm": "Psalm 118:1-2 and 4, 22-24, 25-27a",
+        "gospel_acclamation": "Psalm 118:24",
+        "gospel": "John 21:1-14"
     },
     "SatOctaveEaster": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "second_reading": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 4:13-21",
+        "responsorial_psalm": "Psalm 118:1 and 14-15ab, 16-18, 19-21",
+        "gospel_acclamation": "Psalm 118:24",
+        "gospel": "Mark 16:9-15"
     },
     "EasterWeekday2Monday": {
         "first_reading": "",
