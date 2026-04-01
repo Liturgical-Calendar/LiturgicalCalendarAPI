@@ -3372,7 +3372,7 @@
     "packages-dev": [
         {
             "name": "captainhook/captainhook-phar",
-            "version": "5.28.0",
+            "version": "5.29.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/captainhook-git/captainhook-phar.git",
@@ -3426,7 +3426,7 @@
             ],
             "support": {
                 "issues": "https://github.com/captainhook-git/captainhook/issues",
-                "source": "https://github.com/captainhook-git/captainhook-phar/tree/5.28.0"
+                "source": "https://github.com/captainhook-git/captainhook-phar/tree/5.29.2"
             },
             "funding": [
                 {
@@ -5681,6 +5681,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "phpstan/phpstan": 0,
         "phpunit/phpunit": 0,
         "react/filesystem": 20
     },
@@ -5703,5 +5704,5 @@
         "ext-zip": "*"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
