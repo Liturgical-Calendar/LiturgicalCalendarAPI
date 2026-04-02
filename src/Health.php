@@ -92,6 +92,7 @@ class Health implements MessageComponentInterface
     private static bool $cacheEnabled     = false;
     private static string $cacheBackend   = 'none';
     private static ?\Redis $redis         = null;
+    private int $cacheHitCounter          = 0;
     //private static PromiseInterface $metadataPromise;
 
     /**
@@ -388,6 +389,7 @@ class Health implements MessageComponentInterface
         $resourceId = $conn->resourceId;
         // The connection is closed, remove it, as we can no longer send it messages
         unset($this->clients[$conn]);
+        $this->cacheHitCounter = 0;
         echo "Connection {$resourceId} has disconnected\n";
     }
 
@@ -1479,15 +1481,24 @@ class Health implements MessageComponentInterface
         $key      = 'http_' . md5($url . serialize($options));
         $deferred = new Deferred();
 
-        // Return from cache if available - use futureTick to allow event loop to process other events
+        // Return from cache if available - stagger resolutions to stream results back gradually
         if (self::$cacheEnabled && self::cacheExists($key)) {
             echo "Cache hit for $url\n";
             [$success, $data] = self::cacheGet($key);
             if ($success && is_string($data)) {
-                // Schedule resolution via event loop to prevent blocking
-                Loop::futureTick(function () use ($deferred, $data) {
-                    $deferred->resolve(['data' => $data, 'fromCache' => true]);
-                });
+                // Stagger cached responses: resolve in small batches using incremental delays
+                // This prevents all cache hits from resolving in a single tick
+                $delay = floor($this->cacheHitCounter / $this->maxConcurrency) * 0.05;
+                ++$this->cacheHitCounter;
+                if ($delay > 0) {
+                    Loop::addTimer($delay, function () use ($deferred, $data) {
+                        $deferred->resolve(['data' => $data, 'fromCache' => true]);
+                    });
+                } else {
+                    Loop::futureTick(function () use ($deferred, $data) {
+                        $deferred->resolve(['data' => $data, 'fromCache' => true]);
+                    });
+                }
             } else {
                 $deferred->reject(new \RuntimeException("Cache fetch for URL $url failed or returned non-string data"));
             }
