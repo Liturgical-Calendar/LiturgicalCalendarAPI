@@ -550,5 +550,12 @@
         "second_reading": "1 Peter 3:15-18",
         "gospel_acclamation": "John 14:23",
         "gospel": "John 14:15-21"
+    },
+    "OrdSunday11_vigil": {
+        "first_reading": "Exodus 19:2-6a",
+        "responsorial_psalm": "Psalm 100:1-2, 3, 5",
+        "second_reading": "Romans 5:6-11",
+        "gospel_acclamation": "Mark 1:15",
+        "gospel": "Matthew 9:36-10:8"
     }
 }
