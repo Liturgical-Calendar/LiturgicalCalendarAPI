@@ -515,5 +515,12 @@
         "second_reading": "1 Corinthians 15:20-26, 28",
         "gospel_acclamation": "Mark 11:9, 10",
         "gospel": "Matthew 25:31-46"
+    },
+    "Easter2_vigil": {
+        "first_reading": "Acts 2:42-47",
+        "responsorial_psalm": "Psalm 118:2-4, 13-15, 22-24",
+        "second_reading": "1 Peter 1:3-9",
+        "gospel_acclamation": "John 20:29",
+        "gospel": "John 20:19-31"
     }
 }
