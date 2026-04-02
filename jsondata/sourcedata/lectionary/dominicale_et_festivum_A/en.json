@@ -564,5 +564,12 @@
         "second_reading": "Romans 5:12-15",
         "gospel_acclamation": "John 15:26b, 27a",
         "gospel": "Matthew 10:26-33"
+    },
+    "OrdSunday13_vigil": {
+        "first_reading": "2 Kings 4:8-11, 14-16a",
+        "responsorial_psalm": "Psalm 89:2-3, 16-17, 18-19",
+        "second_reading": "Romans 6:3-4, 8-11",
+        "gospel_acclamation": "1 Peter 2:9",
+        "gospel": "Matthew 10:37-42"
     }
 }
