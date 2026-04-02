@@ -754,9 +754,14 @@ class Health implements MessageComponentInterface
                 );
             } else {
                 // $dataPath is probably a source file in the filesystem in this case
-                echo 'Reading data from file ' . $dataPath . "\n";
+                // Resolve relative paths against the project root
+                $fsPath = $dataPath;
+                if (!str_starts_with($dataPath, '/')) {
+                    $fsPath = Router::$apiFilePath . $dataPath;
+                }
+                echo 'Reading data from file ' . $fsPath . "\n";
                 /** @var PromiseInterface<array{data: string, fromCache: bool}> $promise */
-                $promise = $this->cachedFileGetContents($dataPath);
+                $promise = $this->cachedFileGetContents($fsPath);
                 $promise->then(
                     function (array $result) use ($to, $validation, $dataPath, $schema, $pathForSchema) {
                         /** @var array{data: string, fromCache: bool} $result */
