@@ -1,0 +1,178 @@
+# LiturgicalCalendar Infrastructure
+# This Docker Compose file sets up Zitadel (identity provider) with Login V2 and PostgreSQL
+# for the RBAC and registration system.
+#
+# Usage:
+#   docker compose up -d              # Start all services
+#   docker compose down               # Stop all services
+#   docker compose logs -f zitadel    # View Zitadel logs
+#
+# After starting, access Zitadel Console at: http://localhost:8080/ui/console
+# Default admin: zitadel-admin@zitadel.localhost / Password1!
+
+services:
+  zitadel:
+    restart: unless-stopped
+    image: ghcr.io/zitadel/zitadel:latest
+    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters"'
+    environment:
+      # See "What's next" to learn about how to serve Zitadel on a different domain or IP.
+      ZITADEL_EXTERNALDOMAIN: localhost
+
+      # See "What's next" to learn about how to enable TLS.
+      ZITADEL_EXTERNALSECURE: false
+      ZITADEL_TLS_ENABLED: false
+
+      # Database configuration
+      ZITADEL_DATABASE_POSTGRES_HOST: db
+      ZITADEL_DATABASE_POSTGRES_PORT: 5432
+      # The database is created by the init job if it does not exist
+      ZITADEL_DATABASE_POSTGRES_DATABASE: zitadel
+      # The admin user must already exist in the database.
+      ZITADEL_DATABASE_POSTGRES_ADMIN_USERNAME: postgres
+      ZITADEL_DATABASE_POSTGRES_ADMIN_PASSWORD: postgres
+      ZITADEL_DATABASE_POSTGRES_ADMIN_SSL_MODE: disable
+      # The zitadel user is created by the init job if it does not exist.
+      ZITADEL_DATABASE_POSTGRES_USER_USERNAME: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_PASSWORD: zitadel
+      ZITADEL_DATABASE_POSTGRES_USER_SSL_MODE: disable
+
+      # By configuring a login client, the setup job creates a user of type machine with the role IAM_LOGIN_CLIENT.
+      # It writes a PAT to the path specified in ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH.
+      # The PAT is passed to the login container via the environment variable ZITADEL_SERVICE_USER_TOKEN_FILE.
+      ZITADEL_FIRSTINSTANCE_LOGINCLIENTPATPATH: /current-dir/login-client.pat
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORDCHANGEREQUIRED: false
+      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_USERNAME: login-client
+      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_NAME: Login V2 Client
+      ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_PAT_EXPIRATIONDATE: '2030-01-01T00:00:00Z'
+
+      # Enable Login V2 (port 8081 to avoid conflict with Frontend dev server on 3000)
+      # To activate the login v2 on an existing installation, read the "What's next" section.
+      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED: true
+      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI: http://localhost:8081/ui/v2/login
+      # Configure the redirection paths to the login v2.
+      ZITADEL_OIDC_DEFAULTLOGINURLV2: http://localhost:8081/ui/v2/login/login?authRequest=
+      ZITADEL_OIDC_DEFAULTLOGOUTURLV2: http://localhost:8081/ui/v2/login/logout?post_logout_redirect=
+      ZITADEL_SAML_DEFAULTLOGINURLV2: http://localhost:8081/ui/v2/login/login?samlRequest=
+
+      # By configuring a machine, the setup job creates a user of type machine with the role IAM_OWNER.
+      # It writes a personal access token (PAT) to the path specified in ZITADEL_FIRSTINSTANCE_PATPATH.
+      # The PAT can be used to provision resources with [Terraform](/docs/guides/manage/terraform-provider), for example.
+      ZITADEL_FIRSTINSTANCE_PATPATH: /current-dir/admin.pat
+      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_USERNAME: admin
+      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_MACHINE_NAME: Automatically Initialized IAM_OWNER
+      ZITADEL_FIRSTINSTANCE_ORG_MACHINE_PAT_EXPIRATIONDATE: '2030-01-01T00:00:00Z'
+
+      # To change the initial human admin users username and password, uncomment the following lines.
+      # The first login name is formatted like this: <username>@<org_name>.<external_domain>
+      # With the following incommented configuration, this would be root@my-organization.localhost
+      # Visit http://localhost:8080/ui/console to check if the login name works.
+      # If you can't log in, check the available login names:
+      # echo "select * from projections.login_names3;" | psql -h localhost -U postgres -d zitadel
+      # The postgres users password is postgres.
+      ZITADEL_FIRSTINSTANCE_ORG_NAME: "LiturgicalCalendar"
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME: root
+      ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD: RootPassword1!
+
+      # Enable debug logs
+      ZITADEL_LOG_LEVEL: debug
+      # Write Access Logs to stdout.
+      ZITADEL_LOGSTORE_ACCESS_STDOUT_ENABLED: true
+
+    healthcheck:
+      test: ["CMD", "/app/zitadel", "ready"]
+      interval: 10s
+      timeout: 60s
+      retries: 5
+      start_period: 10s
+    user: "0"
+    volumes:
+      - .:/current-dir:delegated
+    ports:
+      - 8080:8080
+      - 8081:3000
+    networks:
+      - zitadel
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Login V2 - Next.js based login UI with passkeys, flexible onboarding, etc.
+  login:
+    restart: unless-stopped
+    image: ghcr.io/zitadel/zitadel-login:latest
+    environment:
+      ZITADEL_API_URL: http://localhost:8080
+      NEXT_PUBLIC_BASE_PATH: /ui/v2/login
+      ZITADEL_SERVICE_USER_TOKEN_FILE: /current-dir/login-client.pat
+      EMAIL_VERIFICATION: true
+    healthcheck:
+      # Use Node.js (available in Next.js image) to check if the server responds
+      test:
+        - CMD
+        - node
+        - -e
+        - "const http = require('http'); const req = http.get('http://localhost:3000/ui/v2/login', (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.setTimeout(5000, () => { req.destroy(); process.exit(1); });"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    network_mode: service:zitadel
+    user: "0"
+    volumes:
+      - .:/current-dir:ro
+    depends_on:
+      zitadel:
+        condition: service_healthy
+        restart: false
+
+  db:
+    restart: unless-stopped
+    image: postgres:17
+    environment:
+      PGUSER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready
+      - -d
+      - zitadel
+      - -U
+      - postgres
+      interval: 10s
+      timeout: 30s
+      retries: 5
+    networks:
+      - zitadel
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data:rw
+      - ./infrastructure/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+
+  # Adminer - Database management UI
+  # Access at: http://localhost:8088
+  # Login: System=PostgreSQL, Server=db, Username=postgres, Password=postgres
+  adminer:
+    image: adminer:latest
+    restart: unless-stopped
+    ports:
+      - 8088:8080
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+      ADMINER_DESIGN: lucas-sandery
+    networks:
+      - zitadel
+    depends_on:
+      - db
+
+networks:
+  zitadel:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
+  login_pat:
+    driver: local
