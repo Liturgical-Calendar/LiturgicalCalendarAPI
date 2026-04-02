@@ -529,5 +529,12 @@
         "second_reading": "1 Peter 1:17-21",
         "gospel_acclamation": "Cf. Luke 24:32",
         "gospel": "Luke 24:13-35"
+    },
+    "Easter4_vigil": {
+        "first_reading": "Acts 2:14a, 36-41",
+        "responsorial_psalm": "Psalm 23: 1-3a, 3b-4, 5, 6",
+        "second_reading": "1 Peter 2:20b-25",
+        "gospel_acclamation": "John 10:14",
+        "gospel": "John 10:1-10"
     }
 }
