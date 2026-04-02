@@ -142,8 +142,8 @@ CREATE INDEX idx_api_keys_prefix ON api_keys(key_prefix);
 
 COMMENT ON TABLE api_keys IS 'API keys for application authentication';
 COMMENT ON COLUMN api_keys.key_hash IS 'SHA-256 hash of the API key';
-COMMENT ON COLUMN api_keys.key_prefix IS 'First 8 characters for identification';
-COMMENT ON COLUMN api_keys.scope IS 'Scope: read, read_write';
+COMMENT ON COLUMN api_keys.key_prefix IS 'First 20 characters for identification';
+COMMENT ON COLUMN api_keys.scope IS 'Scope: read, write';
 
 -- Audit log
 CREATE TABLE audit_log (
