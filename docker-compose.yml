@@ -8,13 +8,15 @@
 #   docker compose logs -f zitadel    # View Zitadel logs
 #
 # After starting, access Zitadel Console at: http://localhost:8080/ui/console
-# Default admin: zitadel-admin@zitadel.localhost / Password1!
+# Default admin: root@LiturgicalCalendar.localhost / RootPassword1!
 
 services:
   zitadel:
     restart: unless-stopped
     image: ghcr.io/zitadel/zitadel:latest
-    command: 'start-from-init --masterkey "MasterkeyNeedsToHave32Characters"'
+    # Master key for encryption (MUST be exactly 32 characters).
+    # Override in production via ZITADEL_MASTERKEY env var: generate with `openssl rand -hex 16`
+    command: 'start-from-init --masterkey "${ZITADEL_MASTERKEY:-MasterkeyNeedsToHave32Characters}"'
     environment:
       # See "What's next" to learn about how to serve Zitadel on a different domain or IP.
       ZITADEL_EXTERNALDOMAIN: localhost
@@ -146,7 +148,7 @@ services:
     networks:
       - zitadel
     ports:
-      - 5432:5432
+      - 127.0.0.1:5432:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data:rw
       - ./infrastructure/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
@@ -173,6 +175,4 @@ networks:
 
 volumes:
   postgres_data:
-    driver: local
-  login_pat:
     driver: local

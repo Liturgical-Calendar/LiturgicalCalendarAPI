@@ -5,7 +5,7 @@ This directory contains the infrastructure configuration for the LiturgicalCalen
 ## Components
 
 - **Zitadel** - Identity provider for user authentication, registration, and role management
-- **Login V2** - Next.js based login UI with passkeys, flexible onboarding, and modern authentication features
+- **Login V2** - Next.js-based login UI with passkeys, flexible onboarding, and modern authentication features
 - **PostgreSQL** - Database for Zitadel and application-specific data
 
 ## Architecture
@@ -39,8 +39,8 @@ Open [http://localhost:8080/ui/console](http://localhost:8080/ui/console) in you
 
 **Default Admin Credentials:**
 
-- Username: `zitadel-admin@zitadel.localhost`
-- Password: `Password1!`
+- Username: `root@LiturgicalCalendar.localhost`
+- Password: `RootPassword1!`
 
 ### 3. Configure Zitadel Project
 
@@ -134,6 +134,7 @@ Application-specific data:
 
 | Table                       | Purpose                                                              |
 |-----------------------------|----------------------------------------------------------------------|
+| `role_requests`             | Tracks user role assignment requests and approval workflow           |
 | `user_calendar_permissions` | Calendar-specific permissions (e.g., "user X can edit USA calendar") |
 | `permission_requests`       | Workflow for requesting calendar access                              |
 | `applications`              | Registered applications for API key management                       |
@@ -182,7 +183,7 @@ Check if Zitadel is healthy and the PAT was generated:
 
 ```bash
 docker compose logs login
-docker compose exec zitadel cat /login-client.pat
+docker compose exec zitadel cat /current-dir/login-client.pat
 ```
 
 ### Cannot connect to Zitadel Console

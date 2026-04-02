@@ -1,5 +1,9 @@
 -- LiturgicalCalendar Database Initialization
 -- This script runs on first PostgreSQL startup to create required databases and users.
+--
+-- NOTE: The passwords below are DEVELOPMENT DEFAULTS ONLY.
+-- For production, override them via environment variables in docker-compose.yml
+-- (POSTGRES_PASSWORD, and create users with strong generated passwords).
 
 -- Create Zitadel database and user
 CREATE USER zitadel WITH PASSWORD 'zitadel';
@@ -30,20 +34,26 @@ CREATE TABLE role_requests (
     user_name VARCHAR(255),
     requested_role VARCHAR(50) NOT NULL,  -- 'developer', 'calendar_editor', 'test_editor'
     justification TEXT,
-    status VARCHAR(20) DEFAULT 'pending',  -- 'pending', 'approved', 'rejected'
+    status VARCHAR(20) DEFAULT 'pending',
     reviewed_by VARCHAR(255),              -- Admin's Zitadel user ID
     review_notes TEXT,
+    zitadel_sync_status VARCHAR(20) DEFAULT NULL,
+    zitadel_sync_error TEXT DEFAULT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    reviewed_at TIMESTAMP
+    reviewed_at TIMESTAMP,
+    CONSTRAINT chk_role_request_status CHECK (status IN ('pending', 'approved', 'rejected', 'revoked')),
+    CONSTRAINT chk_zitadel_sync_status CHECK (zitadel_sync_status IS NULL OR zitadel_sync_status IN ('pending', 'synced', 'failed'))
 );
 
 CREATE INDEX idx_role_requests_status ON role_requests(status);
 CREATE INDEX idx_role_requests_user ON role_requests(zitadel_user_id);
 CREATE INDEX idx_role_requests_created ON role_requests(created_at);
+CREATE INDEX idx_role_requests_sync_status ON role_requests(zitadel_sync_status)
+WHERE zitadel_sync_status = 'failed';
 
 COMMENT ON TABLE role_requests IS 'Pending role assignment requests from users';
 COMMENT ON COLUMN role_requests.requested_role IS 'Role: developer, calendar_editor, test_editor';
-COMMENT ON COLUMN role_requests.status IS 'Status: pending, approved, rejected';
+COMMENT ON COLUMN role_requests.status IS 'Status: pending, approved, rejected, revoked';
 
 -- Calendar-specific permissions (beyond Zitadel roles)
 CREATE TABLE user_calendar_permissions (
@@ -95,12 +105,20 @@ CREATE TABLE applications (
     name VARCHAR(255) NOT NULL,
     description TEXT,
     website VARCHAR(500),
+    status VARCHAR(20) DEFAULT 'pending',
+    requested_scope VARCHAR(10) NOT NULL DEFAULT 'read',
+    reviewed_by VARCHAR(255),
+    review_notes TEXT,
+    reviewed_at TIMESTAMP,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT chk_application_status CHECK (status IN ('pending', 'approved', 'rejected', 'revoked')),
+    CONSTRAINT chk_application_requested_scope CHECK (requested_scope IN ('read', 'write'))
 );
 
 CREATE INDEX idx_applications_user ON applications(zitadel_user_id);
+CREATE INDEX idx_applications_status ON applications(status);
 
 COMMENT ON TABLE applications IS 'Registered applications for API key management';
 
