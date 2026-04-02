@@ -313,6 +313,8 @@ class Health implements MessageComponentInterface
     {
         /** @var int $resourceId */
         $resourceId = $from->resourceId;
+        // Reset per-connection cache hit counter for each new message (test run)
+        $this->cacheHitCounters[$resourceId] = 0;
         echo sprintf('Receiving message from connection %d: %s', $resourceId, $msg . "\n");
         /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest $messageReceived */
         $messageReceived = json_decode($msg);
