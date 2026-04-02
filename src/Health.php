@@ -591,6 +591,10 @@ class Health implements MessageComponentInterface
             $sourceFolder = (string) $validation->sourceFolder;
             // If the 'sourceFolder' property is set, then we are validating a folder of i18n files
             /** @var ExecuteValidationSourceFolder $validation */
+            // Resolve relative paths against the project root
+            if (!str_starts_with($dataPath, '/')) {
+                $dataPath = Router::$apiFilePath . $dataPath;
+            }
             $files = glob($dataPath . '/*.json');
             if (false === $files || empty($files)) {
                 $message          = new \stdClass();
