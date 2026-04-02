@@ -536,5 +536,12 @@
         "second_reading": "1 Peter 2:20b-25",
         "gospel_acclamation": "John 10:14",
         "gospel": "John 10:1-10"
+    },
+    "Easter5_vigil": {
+        "first_reading": "Acts 6:1-7",
+        "responsorial_psalm": "Psalm 33:1-2, 4-5, 18-19",
+        "second_reading": "1 Peter 2:4-9",
+        "gospel_acclamation": "John 14:6",
+        "gospel": "John 14:1-12"
     }
 }
