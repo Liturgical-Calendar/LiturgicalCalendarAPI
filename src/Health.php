@@ -135,13 +135,16 @@ class Health implements MessageComponentInterface
     public function onOpen(ConnectionInterface $conn): void
     {
         // Store the new connection to send messages to later
-        $this->clients->attach($conn);
+        $this->clients[$conn] = null;
         if (false === is_int($conn->resourceId)) {
             echo 'Error onOpen: expected an integer resourceId, got ' . gettype($conn->resourceId) . "\n";
             return;
         } else {
             echo "New connection! ({$conn->resourceId}) and current working directory is " . getcwd() . "\n";
         }
+
+        // Initialize Router paths before creating logger (LoggerFactory needs Router::$apiFilePath)
+        Router::getApiPaths();
 
         // Initialize cache backend only once (not on every connection)
         // Note: This check-then-set pattern is safe because Ratchet/ReactPHP WebSocket
@@ -239,8 +242,6 @@ class Health implements MessageComponentInterface
                 }
             }
         }
-
-        Router::getApiPaths();
 
         if (false === isset(self::$metadata)) {
             echo 'Metadata not yet loaded, loading now from ' . Route::CALENDARS->path() . "\n";
@@ -383,10 +384,10 @@ class Health implements MessageComponentInterface
      */
     public function onClose(ConnectionInterface $conn): void
     {
-        // The connection is closed, remove it, as we can no longer send it messages
-        $this->clients->detach($conn);
         /** @var int $resourceId */
         $resourceId = $conn->resourceId;
+        // The connection is closed, remove it, as we can no longer send it messages
+        unset($this->clients[$conn]);
         echo "Connection {$resourceId} has disconnected\n";
     }
 
@@ -753,9 +754,14 @@ class Health implements MessageComponentInterface
                 );
             } else {
                 // $dataPath is probably a source file in the filesystem in this case
-                echo 'Reading data from file ' . $dataPath . "\n";
+                // Resolve relative paths against the project root
+                $fsPath = $dataPath;
+                if (!str_starts_with($dataPath, '/')) {
+                    $fsPath = Router::$apiFilePath . $dataPath;
+                }
+                echo 'Reading data from file ' . $fsPath . "\n";
                 /** @var PromiseInterface<array{data: string, fromCache: bool}> $promise */
-                $promise = $this->cachedFileGetContents($dataPath);
+                $promise = $this->cachedFileGetContents($fsPath);
                 $promise->then(
                     function (array $result) use ($to, $validation, $dataPath, $schema, $pathForSchema) {
                         /** @var array{data: string, fromCache: bool} $result */
