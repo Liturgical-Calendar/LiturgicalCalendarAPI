@@ -121,7 +121,7 @@ class Health implements MessageComponentInterface
         ]);
 
         if (isset($_ENV['WS_MAX_CONCURRENCY']) && is_numeric($_ENV['WS_MAX_CONCURRENCY'])) {
-            $this->maxConcurrency = (int) $_ENV['WS_MAX_CONCURRENCY'];
+            $this->maxConcurrency = max(1, (int) $_ENV['WS_MAX_CONCURRENCY']);
         } elseif (Router::isLocalhost() || ( isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development' )) {
             $this->maxConcurrency = 4;
         } else {
