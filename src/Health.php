@@ -82,6 +82,11 @@ class Health implements MessageComponentInterface
 
     private CurlMultiHandler $multiHandler;
 
+    /**
+     * Delay in seconds between batches of staggered cache responses.
+     * Override via WS_STAGGER_INTERVAL env var.
+     */
+    private float $staggerInterval;
     private int $maxConcurrency;
     private int $inFlight = 0;
     /** @var list<array{url:string,options:array{headers?:array{Accept:string}},resolve:\Closure(ResponseInterface):void,reject:\Closure(\Throwable):void}> */
@@ -92,6 +97,8 @@ class Health implements MessageComponentInterface
     private static bool $cacheEnabled     = false;
     private static string $cacheBackend   = 'none';
     private static ?\Redis $redis         = null;
+    /** @var array<int, int> Per-connection cache hit counters, keyed by resourceId */
+    private array $cacheHitCounters = [];
     //private static PromiseInterface $metadataPromise;
 
     /**
@@ -119,12 +126,16 @@ class Health implements MessageComponentInterface
         ]);
 
         if (isset($_ENV['WS_MAX_CONCURRENCY']) && is_numeric($_ENV['WS_MAX_CONCURRENCY'])) {
-            $this->maxConcurrency = (int) $_ENV['WS_MAX_CONCURRENCY'];
+            $this->maxConcurrency = max(1, (int) $_ENV['WS_MAX_CONCURRENCY']);
         } elseif (Router::isLocalhost() || ( isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development' )) {
             $this->maxConcurrency = 4;
         } else {
             $this->maxConcurrency = 10; // Conservative default for production
         }
+
+        $this->staggerInterval = isset($_ENV['WS_STAGGER_INTERVAL']) && is_numeric($_ENV['WS_STAGGER_INTERVAL'])
+            ? max(0.01, (float) $_ENV['WS_STAGGER_INTERVAL'])
+            : 0.05;
     }
 
     /**
@@ -253,7 +264,7 @@ class Health implements MessageComponentInterface
             ];
 
             /** @var PromiseInterface<array{data: string, fromCache: bool}> $metadataPromise */
-            $metadataPromise = $this->cachedGet(Route::CALENDARS->path(), $opts);
+            $metadataPromise = $this->cachedGet(Route::CALENDARS->path(), $opts, 300, $conn);
             //self::$metadataPromise = $metadataPromise;
 
             $metadataPromise->then(
@@ -311,6 +322,8 @@ class Health implements MessageComponentInterface
     {
         /** @var int $resourceId */
         $resourceId = $from->resourceId;
+        // Reset per-connection cache hit counter for each new message (test run)
+        $this->cacheHitCounters[$resourceId] = 0;
         echo sprintf('Receiving message from connection %d: %s', $resourceId, $msg . "\n");
         /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest $messageReceived */
         $messageReceived = json_decode($msg);
@@ -388,6 +401,7 @@ class Health implements MessageComponentInterface
         $resourceId = $conn->resourceId;
         // The connection is closed, remove it, as we can no longer send it messages
         unset($this->clients[$conn]);
+        unset($this->cacheHitCounters[$resourceId]);
         echo "Connection {$resourceId} has disconnected\n";
     }
 
@@ -744,7 +758,7 @@ class Health implements MessageComponentInterface
                 // $dataPath is an API path in this case
                 echo 'Retrieving data from URL ' . $dataPath . "\n";
                 /** @var PromiseInterface<array{data: string, fromCache: bool}> $httpPromise */
-                $httpPromise = $this->cachedGet($dataPath);
+                $httpPromise = $this->cachedGet($dataPath, [], 300, $to);
                 $httpPromise->then(
                     function (array $result) use ($to, $validation, $dataPath, $schema, $pathForSchema) {
                         /** @var array{data: string, fromCache: bool} $result */
@@ -952,7 +966,7 @@ class Health implements MessageComponentInterface
         ];
 
         $req     = $this->buildCalendarRequestPath($calendar, $year, $category);
-        $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts);
+        $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts, 300, $to);
         $promise->then(
             function (array $result) use ($to, $calendar, $year, $category, $req, $responseType) {
                 /** @var array{data: string, fromCache: bool} $result */
@@ -1202,7 +1216,7 @@ class Health implements MessageComponentInterface
         ];
 
         $req     = $this->buildCalendarRequestPath($calendar, $year, $category);
-        $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts);
+        $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts, 300, $to);
         $promise->then(
             function (array $result) use ($to, $test, $year) {
                 /** @var array{data: string, fromCache: bool} $result */
@@ -1474,20 +1488,34 @@ class Health implements MessageComponentInterface
      *
      * @return PromiseInterface<array{data: string, fromCache: bool}>
      */
-    private function cachedGet(string $url, array $options = [], int $ttl = 300): PromiseInterface
+    private function cachedGet(string $url, array $options = [], int $ttl = 300, ?ConnectionInterface $conn = null): PromiseInterface
     {
         $key      = 'http_' . md5($url . serialize($options));
         $deferred = new Deferred();
 
-        // Return from cache if available - use futureTick to allow event loop to process other events
+        // Return from cache if available - stagger resolutions to stream results back gradually
         if (self::$cacheEnabled && self::cacheExists($key)) {
             echo "Cache hit for $url\n";
             [$success, $data] = self::cacheGet($key);
             if ($success && is_string($data)) {
-                // Schedule resolution via event loop to prevent blocking
-                Loop::futureTick(function () use ($deferred, $data) {
+                // Stagger cached responses: resolve in small batches using incremental delays
+                // This prevents all cache hits from resolving in a single tick
+                $connId                          = $conn !== null && is_int($conn->resourceId) ? $conn->resourceId : 0;
+                $counter                         = $this->cacheHitCounters[$connId] ?? 0;
+                $delay                           = floor($counter / max(1, $this->maxConcurrency)) * $this->staggerInterval;
+                $this->cacheHitCounters[$connId] = $counter + 1;
+                $resolveIfOpen                   = function () use ($deferred, $data, $conn) {
+                    // Skip resolving if the client has disconnected while waiting
+                    if ($conn !== null && !$this->clients->contains($conn)) {
+                        return;
+                    }
                     $deferred->resolve(['data' => $data, 'fromCache' => true]);
-                });
+                };
+                if ($delay > 0) {
+                    Loop::addTimer($delay, $resolveIfOpen);
+                } else {
+                    Loop::futureTick($resolveIfOpen);
+                }
             } else {
                 $deferred->reject(new \RuntimeException("Cache fetch for URL $url failed or returned non-string data"));
             }
