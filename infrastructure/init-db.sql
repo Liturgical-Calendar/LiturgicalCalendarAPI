@@ -91,7 +91,8 @@ CREATE TABLE permission_requests (
     reviewed_by VARCHAR(255),
     review_notes TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    reviewed_at TIMESTAMP
+    reviewed_at TIMESTAMP,
+    CONSTRAINT chk_permission_requests_status CHECK (status IN ('pending', 'approved', 'rejected'))
 );
 
 CREATE INDEX idx_permission_requests_status ON permission_requests(status);
