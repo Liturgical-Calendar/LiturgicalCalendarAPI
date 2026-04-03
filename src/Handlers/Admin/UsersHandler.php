@@ -134,7 +134,7 @@ final class UsersHandler extends AbstractHandler
                     }
                 }
             }
-            $user['roles'] = array_values(array_unique($roles));
+            $user['roles'] = array_values(array_unique(array_filter($roles, 'is_string')));
             $userId        = $user['userId'] ?? null;
             if (is_string($userId)) {
                 $usersWithRolesMap[$userId] = $user;
