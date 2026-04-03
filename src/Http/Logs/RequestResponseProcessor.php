@@ -15,7 +15,12 @@ class RequestResponseProcessor
             switch ($ctx['type']) {
                 case 'request':
                     if (!isset($ctx['request']) || false === ( $ctx['request'] instanceof ServerRequestInterface )) {
-                        throw new \RuntimeException('Expected request object in context of RequestResponseProcessor when invoked with context of type request');
+                        // Request object not available (e.g., error during shutdown before request was set).
+                        // Return the record as-is with basic extra fields to avoid cascading failures.
+                        return $record->with(extra: array_merge($record->extra, [
+                            'pid'        => getmypid(),
+                            'request_id' => $ctx['request_id'] ?? 'unknown',
+                        ]));
                     }
                     $request  = $ctx['request'];
                     $protocol = $request->getProtocolVersion();

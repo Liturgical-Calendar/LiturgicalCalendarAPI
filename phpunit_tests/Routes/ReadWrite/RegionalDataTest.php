@@ -236,6 +236,9 @@ JSON;
      */
     public function testAuthenticatedPutDataExistingCalendarReturns409(): void
     {
+        if (!self::isDatabaseConfigured()) {
+            $this->markTestSkipped('Database not configured — authorization middleware requires database connection');
+        }
         $token = self::getJwtToken();
         $this->assertNotNull($token, 'Failed to obtain JWT token for authenticated test');
 
@@ -257,6 +260,9 @@ JSON;
      */
     public function testAuthenticatedPatchCalendarDataIdMismatchReturns422(): void
     {
+        if (!self::isDatabaseConfigured()) {
+            $this->markTestSkipped('Database not configured — authorization middleware requires database connection');
+        }
         $token = self::getJwtToken();
         $this->assertNotNull($token, 'Failed to obtain JWT token for authenticated test');
 
@@ -278,6 +284,9 @@ JSON;
      */
     public function testAuthenticatedPutPatchWithoutContentTypeReturns415(): void
     {
+        if (!self::isDatabaseConfigured()) {
+            $this->markTestSkipped('Database not configured — authorization middleware requires database connection');
+        }
         $token = self::getJwtToken();
         $this->assertNotNull($token, 'Failed to obtain JWT token for authenticated test');
 
@@ -303,6 +312,9 @@ JSON;
      */
     public function testAuthenticatedWriteOperationsWithoutPathParametersReturnValidationErrors(): void
     {
+        if (!self::isDatabaseConfigured()) {
+            $this->markTestSkipped('Database not configured — authorization middleware requires database connection');
+        }
         $token = self::getJwtToken();
         $this->assertNotNull($token, 'Failed to obtain JWT token for authenticated test');
 
