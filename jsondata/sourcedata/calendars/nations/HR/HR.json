@@ -1,0 +1,204 @@
+{
+    "litcal": [
+        {
+            "liturgical_event": {
+                "event_key": "StJoseph",
+                "grade": 4
+            },
+            "metadata": {
+                "action": "makePatron",
+                "since_year": 1970,
+                "url": "https://hfranciskanci.com/sveti-josip-zastitnik-hrvatske/"
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "BlessedAlojzijeStepinac",
+                "color": [ "red" ],
+                "grade": 3,
+                "day": 10,
+                "month": 2,
+                "common": [ "Martyrs:For One Martyr", "Pastors:For a Bishop" ]
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1998
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "BlessedOzanaKotorska",
+                "color": [ "white" ],
+                "grade": 2,
+                "day": 27,
+                "month": 4,
+                "common": [ "Virgins:For One Virgin" ]
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1970
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "BlessedIvanMerz",
+                "color": [ "white" ],
+                "grade": 2,
+                "day": 10,
+                "month": 5,
+                "common": [ "Holy Men and Women:For One Saint" ]
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2003
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "StLeopoldMandic",
+                "color": [ "white" ],
+                "grade": 3,
+                "day": 12,
+                "month": 5,
+                "common": [ "Pastors:For One Pastor" ]
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1983
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "BlessedMariaPetkovic",
+                "color": [ "white" ],
+                "grade": 2,
+                "day": 9,
+                "month": 7,
+                "common": [ "Virgins:For One Virgin", "Holy Men and Women:For Religious" ]
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2003
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "OurLadyOfMarijaBistrica",
+                "color": [ "white" ],
+                "grade": 2,
+                "day": 13,
+                "month": 7,
+                "common": [ "Blessed Virgin Mary" ]
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1970
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "BlessedAugustinKazotic",
+                "color": [ "white" ],
+                "grade": 2,
+                "day": 3,
+                "month": 8,
+                "common": [ "Pastors:For a Bishop" ]
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1970
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "BlessedMiroslavBulesic",
+                "color": [ "red" ],
+                "grade": 2,
+                "day": 24,
+                "month": 8,
+                "common": [ "Martyrs:For One Martyr", "Pastors:For One Pastor" ]
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2013
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "StMarkofKrizevci",
+                "color": [ "red" ],
+                "grade": 3,
+                "day": 7,
+                "month": 9,
+                "common": [ "Martyrs:For One Martyr", "Pastors:For One Pastor" ]
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1970
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "StJerome",
+                "grade": 3
+            },
+            "metadata": {
+                "action": "setProperty",
+                "property": "grade",
+                "since_year": 1970
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "BlessedGracijaKotorski",
+                "color": [ "white" ],
+                "grade": 2,
+                "day": 8,
+                "month": 11,
+                "common": [ "Holy Men and Women:For a Monk" ]
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1970
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "StNikolasTavelic",
+                "color": [ "red" ],
+                "grade": 3,
+                "day": 14,
+                "month": 11,
+                "common": [ "Martyrs:For One Martyr" ]
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 1970
+            }
+        }
+    ],
+    "settings": {
+        "epiphany": "JAN6",
+        "ascension": "THURSDAY",
+        "corpus_christi": "THURSDAY",
+        "eternal_high_priest": false,
+        "holydays_of_obligation": {
+            "Christmas": true,
+            "Epiphany": false,
+            "Ascension": true,
+            "CorpusChristi": true,
+            "MaryMotherOfGod": true,
+            "ImmaculateConception": true,
+            "Assumption": true,
+            "StJoseph": true,
+            "StsPeterPaulAp": false,
+            "AllSaints": true
+        }
+    },
+    "metadata": {
+        "nation": "HR",
+        "wider_region": "Europe",
+        "missals": [],
+        "locales": [ "hr_HR" ]
+    }
+}
