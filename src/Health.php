@@ -1504,14 +1504,17 @@ class Health implements MessageComponentInterface
                 $counter                         = $this->cacheHitCounters[$connId] ?? 0;
                 $delay                           = floor($counter / max(1, $this->maxConcurrency)) * $this->staggerInterval;
                 $this->cacheHitCounters[$connId] = $counter + 1;
+                $resolveIfOpen                   = function () use ($deferred, $data, $conn) {
+                    // Skip resolving if the client has disconnected while waiting
+                    if ($conn !== null && !$this->clients->contains($conn)) {
+                        return;
+                    }
+                    $deferred->resolve(['data' => $data, 'fromCache' => true]);
+                };
                 if ($delay > 0) {
-                    Loop::addTimer($delay, function () use ($deferred, $data) {
-                        $deferred->resolve(['data' => $data, 'fromCache' => true]);
-                    });
+                    Loop::addTimer($delay, $resolveIfOpen);
                 } else {
-                    Loop::futureTick(function () use ($deferred, $data) {
-                        $deferred->resolve(['data' => $data, 'fromCache' => true]);
-                    });
+                    Loop::futureTick($resolveIfOpen);
                 }
             } else {
                 $deferred->reject(new \RuntimeException("Cache fetch for URL $url failed or returned non-string data"));
