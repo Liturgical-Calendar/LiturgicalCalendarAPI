@@ -64,7 +64,9 @@ CREATE TABLE user_calendar_permissions (
     permission VARCHAR(10) NOT NULL,
     granted_by VARCHAR(255),
     granted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(zitadel_user_id, calendar_type, calendar_id, permission)
+    UNIQUE(zitadel_user_id, calendar_type, calendar_id, permission),
+    CONSTRAINT chk_calendar_permission CHECK (permission IN ('read', 'write')),
+    CONSTRAINT chk_calendar_type CHECK (calendar_type IN ('national', 'diocesan', 'widerregion'))
 );
 
 CREATE INDEX idx_user_calendar_perms ON user_calendar_permissions(zitadel_user_id, calendar_type);
