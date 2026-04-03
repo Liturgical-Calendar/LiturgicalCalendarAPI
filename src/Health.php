@@ -82,6 +82,11 @@ class Health implements MessageComponentInterface
 
     private CurlMultiHandler $multiHandler;
 
+    /**
+     * Delay in seconds between batches of staggered cache responses.
+     * Override via WS_STAGGER_INTERVAL env var.
+     */
+    private float $staggerInterval;
     private int $maxConcurrency;
     private int $inFlight = 0;
     /** @var list<array{url:string,options:array{headers?:array{Accept:string}},resolve:\Closure(ResponseInterface):void,reject:\Closure(\Throwable):void}> */
@@ -127,6 +132,10 @@ class Health implements MessageComponentInterface
         } else {
             $this->maxConcurrency = 10; // Conservative default for production
         }
+
+        $this->staggerInterval = isset($_ENV['WS_STAGGER_INTERVAL']) && is_numeric($_ENV['WS_STAGGER_INTERVAL'])
+            ? max(0.01, (float) $_ENV['WS_STAGGER_INTERVAL'])
+            : 0.05;
     }
 
     /**
@@ -1493,7 +1502,7 @@ class Health implements MessageComponentInterface
                 // This prevents all cache hits from resolving in a single tick
                 $connId                          = $conn !== null && is_int($conn->resourceId) ? $conn->resourceId : 0;
                 $counter                         = $this->cacheHitCounters[$connId] ?? 0;
-                $delay                           = floor($counter / max(1, $this->maxConcurrency)) * 0.05;
+                $delay                           = floor($counter / max(1, $this->maxConcurrency)) * $this->staggerInterval;
                 $this->cacheHitCounters[$connId] = $counter + 1;
                 if ($delay > 0) {
                     Loop::addTimer($delay, function () use ($deferred, $data) {
