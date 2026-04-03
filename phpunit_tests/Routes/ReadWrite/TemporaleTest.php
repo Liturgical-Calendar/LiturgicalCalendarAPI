@@ -68,6 +68,9 @@ final class TemporaleTest extends ApiTestCase
      */
     public function testAuthenticatedPutWhenDataExistsReturns409(): void
     {
+        if (!self::isDatabaseConfigured()) {
+            $this->markTestSkipped('Database not configured — authorization middleware requires database connection');
+        }
         $token = self::getJwtToken();
         $this->assertNotNull($token, 'Failed to obtain JWT token for authenticated test');
 
@@ -108,6 +111,9 @@ final class TemporaleTest extends ApiTestCase
      */
     public function testAuthenticatedPatchWithInvalidPayloadReturns400(): void
     {
+        if (!self::isDatabaseConfigured()) {
+            $this->markTestSkipped('Database not configured — authorization middleware requires database connection');
+        }
         $token = self::getJwtToken();
         $this->assertNotNull($token, 'Failed to obtain JWT token for authenticated test');
 
@@ -133,6 +139,9 @@ final class TemporaleTest extends ApiTestCase
      */
     public function testAuthenticatedPatchWithMissingEventKeyReturns400(): void
     {
+        if (!self::isDatabaseConfigured()) {
+            $this->markTestSkipped('Database not configured — authorization middleware requires database connection');
+        }
         $token = self::getJwtToken();
         $this->assertNotNull($token, 'Failed to obtain JWT token for authenticated test');
 
@@ -162,6 +171,9 @@ final class TemporaleTest extends ApiTestCase
      */
     public function testAuthenticatedPatchWithDuplicateEventKeysReturns400(): void
     {
+        if (!self::isDatabaseConfigured()) {
+            $this->markTestSkipped('Database not configured — authorization middleware requires database connection');
+        }
         $token = self::getJwtToken();
         $this->assertNotNull($token, 'Failed to obtain JWT token for authenticated test');
 
@@ -203,6 +215,9 @@ final class TemporaleTest extends ApiTestCase
      */
     public function testAuthenticatedDeleteNonExistentEventReturns404(): void
     {
+        if (!self::isDatabaseConfigured()) {
+            $this->markTestSkipped('Database not configured — authorization middleware requires database connection');
+        }
         $token = self::getJwtToken();
         $this->assertNotNull($token, 'Failed to obtain JWT token for authenticated test');
 
@@ -224,6 +239,9 @@ final class TemporaleTest extends ApiTestCase
      */
     public function testAuthenticatedWriteWithoutContentTypeReturnsError(): void
     {
+        if (!self::isDatabaseConfigured()) {
+            $this->markTestSkipped('Database not configured — authorization middleware requires database connection');
+        }
         $token = self::getJwtToken();
         $this->assertNotNull($token, 'Failed to obtain JWT token for authenticated test');
 

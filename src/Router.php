@@ -581,9 +581,19 @@ class Router
         array $requestPathParts
     ): void {
         if (!Connection::isConfigured()) {
-            throw new ServiceUnavailableException(
-                'Database not configured. Protected routes require database connection.'
-            );
+            // Add a middleware that throws at runtime instead of during pipeline setup,
+            // so the ErrorHandlingMiddleware can catch it and return a proper response.
+            $pipeline->pipe(new class () implements \Psr\Http\Server\MiddlewareInterface {
+                public function process(
+                    \Psr\Http\Message\ServerRequestInterface $request,
+                    \Psr\Http\Server\RequestHandlerInterface $handler
+                ): \Psr\Http\Message\ResponseInterface {
+                    throw new ServiceUnavailableException(
+                        'Database not configured. Protected routes require database connection.'
+                    );
+                }
+            });
+            return;
         }
 
         $permissionRepo = new CalendarPermissionRepository();

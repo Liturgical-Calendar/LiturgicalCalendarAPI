@@ -189,6 +189,25 @@ abstract class ApiTestCase extends TestCase
     }
 
     /**
+     * Check if the database is configured for tests that require authorization.
+     *
+     * Protected routes (PUT/PATCH/DELETE on /data, /tests, /temporale) require
+     * a database connection for role-based authorization. This method checks if
+     * the necessary environment variables are set.
+     *
+     * @return bool True if database is configured, false otherwise.
+     */
+    protected static function isDatabaseConfigured(): bool
+    {
+        $host     = $_ENV['DB_HOST'] ?? '';
+        $name     = $_ENV['DB_NAME'] ?? '';
+        $user     = $_ENV['DB_USER'] ?? '';
+        $password = $_ENV['DB_PASSWORD'] ?? null;
+
+        return $host !== '' && $name !== '' && $user !== '' && $password !== null;
+    }
+
+    /**
      * Obtain a JWT access token for authenticated tests.
      *
      * Uses admin credentials from environment variables (ADMIN_USERNAME, ADMIN_PASSWORD)
