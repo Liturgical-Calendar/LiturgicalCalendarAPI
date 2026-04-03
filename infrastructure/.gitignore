@@ -1,3 +1,0 @@
-# Infrastructure secrets (do not commit)
-*.env
-secrets/
