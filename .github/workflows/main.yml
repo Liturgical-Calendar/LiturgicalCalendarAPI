@@ -17,16 +17,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
         with:
           php-version: ${{ env.PHP_VERSION }}
 
       # Restore vendor folder from cache if available
       - name: Cache Composer dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: vendor
           key: composer-${{ hashFiles('composer.lock') }}
@@ -38,7 +38,7 @@ jobs:
 
       # Share vendor folder with other jobs in this run
       - name: Upload vendor folder
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: vendor-folder
           path: vendor
@@ -48,15 +48,15 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
         with:
           php-version: ${{ env.PHP_VERSION }}
 
       - name: Download vendor folder from build job
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: vendor-folder
           path: vendor
@@ -71,15 +71,15 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Set up PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
         with:
           php-version: ${{ env.PHP_VERSION }}
 
       - name: Download vendor folder from build job
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
           name: vendor-folder
           path: vendor
@@ -97,7 +97,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Check-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
 
       - name: Update source file translation strings
         id: update_pot
@@ -111,7 +111,7 @@ jobs:
       # push the output folder to your repo
       - name: Push changes
         if: ${{ steps.update_pot.outputs.POT_LINES_CHANGED > 0 }}
-        uses: actions-x/commit@v6
+        uses: actions-x/commit@803b20e5b72c0425eb7919c42c321e67c5bc5d2d # v6
         with:
           # The committer's email address
           email: 41898282+github-actions[bot]@users.noreply.github.com

@@ -12,3 +12,11 @@ updates:
     # Labels on pull requests for version updates
     labels:
       - "composer dependencies"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    target-branch: "development"
+    labels:
+      - "github-actions dependencies"

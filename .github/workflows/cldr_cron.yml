@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
           ref: development
 
@@ -77,7 +77,7 @@ jobs:
 
       - name: Commit changes
         if: steps.compare.outputs.up_to_date == 'false'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c # v6.1.0
         with:
           commit-message: "Update CLDR likelySubtags to ${{ steps.cldr.outputs.tag }}"
           title: "Update CLDR likelySubtags to ${{ steps.cldr.outputs.tag }}"
