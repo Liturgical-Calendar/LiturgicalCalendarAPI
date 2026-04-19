@@ -20,6 +20,7 @@ class ZitadelService
 {
     private Client $httpClient;
     private string $issuer;
+    private ?string $internalUrl;
     private string $projectId;
     private ?string $machineToken;
     private ?LoggerInterface $logger;
@@ -40,24 +41,39 @@ class ZitadelService
     /**
      * Create Zitadel service.
      *
-     * @param string $issuer Zitadel issuer URL
+     * @param string $issuer Zitadel issuer URL (public URL for token validation)
      * @param string $projectId Zitadel project ID
      * @param string|null $machineToken Service account token for management API
+     * @param string|null $internalUrl Internal URL for Docker networking (e.g., http://zitadel:8080)
      * @param LoggerInterface|null $logger Optional logger for error logging
      */
     public function __construct(
         string $issuer,
         string $projectId,
         ?string $machineToken = null,
+        ?string $internalUrl = null,
         ?LoggerInterface $logger = null
     ) {
         $this->issuer       = rtrim($issuer, '/');
+        $this->internalUrl  = $internalUrl !== null ? rtrim($internalUrl, '/') : null;
         $this->projectId    = $projectId;
         $this->machineToken = $machineToken;
         $this->logger       = $logger;
-        $this->httpClient   = new Client([
-            'base_uri' => $this->issuer,
+
+        // Use internal URL for HTTP requests if configured (Docker networking)
+        $baseUri = $this->internalUrl ?? $this->issuer;
+        $headers = [];
+        if ($this->internalUrl !== null) {
+            // Add Host header matching the public issuer for Zitadel's domain validation
+            $parsedIssuer    = parse_url($this->issuer);
+            $host            = ( $parsedIssuer['host'] ?? 'localhost' )
+                . ( isset($parsedIssuer['port']) ? ':' . $parsedIssuer['port'] : '' );
+            $headers['Host'] = $host;
+        }
+        $this->httpClient = new Client([
+            'base_uri' => $baseUri,
             'timeout'  => 30,
+            'headers'  => $headers,
         ]);
     }
 
@@ -89,10 +105,12 @@ class ZitadelService
         $issuerEnv       = getenv('ZITADEL_ISSUER') ?: ( $_ENV['ZITADEL_ISSUER'] ?? '' );
         $projectIdEnv    = getenv('ZITADEL_PROJECT_ID') ?: ( $_ENV['ZITADEL_PROJECT_ID'] ?? '' );
         $machineTokenEnv = getenv('ZITADEL_MACHINE_TOKEN') ?: ( $_ENV['ZITADEL_MACHINE_TOKEN'] ?? null );
+        $internalUrlEnv  = getenv('ZITADEL_INTERNAL_URL') ?: ( $_ENV['ZITADEL_INTERNAL_URL'] ?? '' );
 
         $issuer       = is_string($issuerEnv) ? $issuerEnv : '';
         $projectId    = is_string($projectIdEnv) ? $projectIdEnv : '';
         $machineToken = is_string($machineTokenEnv) ? $machineTokenEnv : null;
+        $internalUrl  = is_string($internalUrlEnv) && !empty($internalUrlEnv) ? $internalUrlEnv : null;
 
         if (empty($issuer) || empty($projectId)) {
             throw new \RuntimeException(
@@ -100,7 +118,7 @@ class ZitadelService
             );
         }
 
-        return new self($issuer, $projectId, $machineToken, $logger);
+        return new self($issuer, $projectId, $machineToken, $internalUrl, $logger);
     }
 
     /**
