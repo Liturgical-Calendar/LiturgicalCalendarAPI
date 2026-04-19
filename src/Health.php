@@ -330,7 +330,12 @@ class Health implements MessageComponentInterface
         /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest $messageReceived */
         $messageReceived = json_decode($msg);
         // Store optional run token for response correlation
-        if ($messageReceived instanceof \stdClass && property_exists($messageReceived, 'runToken') && is_string($messageReceived->runToken)) {
+        if (
+            $messageReceived instanceof \stdClass
+            && property_exists($messageReceived, 'runToken')
+            && is_string($messageReceived->runToken)
+            && preg_match('/^[A-Za-z0-9_\-]{1,64}$/', $messageReceived->runToken)
+        ) {
             $this->runTokens[$resourceId] = $messageReceived->runToken;
         }
         if (
