@@ -99,6 +99,8 @@ class Health implements MessageComponentInterface
     private static ?\Redis $redis         = null;
     /** @var array<int, int> Per-connection cache hit counters, keyed by resourceId */
     private array $cacheHitCounters = [];
+    /** @var array<int, string> Per-connection run tokens, keyed by resourceId */
+    private array $runTokens = [];
     //private static PromiseInterface $metadataPromise;
 
     /**
@@ -327,6 +329,15 @@ class Health implements MessageComponentInterface
         echo sprintf('Receiving message from connection %d: %s', $resourceId, $msg . "\n");
         /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest $messageReceived */
         $messageReceived = json_decode($msg);
+        // Store optional run token for response correlation
+        if (
+            $messageReceived instanceof \stdClass
+            && property_exists($messageReceived, 'runToken')
+            && is_string($messageReceived->runToken)
+            && preg_match('/^[A-Za-z0-9_\-]{1,64}$/', $messageReceived->runToken)
+        ) {
+            $this->runTokens[$resourceId] = $messageReceived->runToken;
+        }
         if (
             json_last_error() === JSON_ERROR_NONE
             && $messageReceived instanceof \stdClass
@@ -402,6 +413,7 @@ class Health implements MessageComponentInterface
         // The connection is closed, remove it, as we can no longer send it messages
         unset($this->clients[$conn]);
         unset($this->cacheHitCounters[$resourceId]);
+        unset($this->runTokens[$resourceId]);
         echo "Connection {$resourceId} has disconnected\n";
     }
 
@@ -429,6 +441,11 @@ class Health implements MessageComponentInterface
      */
     private function sendMessage(ConnectionInterface $from, string|\stdClass $msg): void
     {
+        /** @var int $resourceId */
+        $resourceId = $from->resourceId;
+        if ($msg instanceof \stdClass && isset($this->runTokens[$resourceId])) {
+            $msg->runToken = $this->runTokens[$resourceId];
+        }
         if (gettype($msg) !== 'string') {
             $msg = json_encode($msg, JSON_PRETTY_PRINT);
         }
