@@ -240,9 +240,12 @@ class OidcAuthMiddleware implements MiddlewareInterface
             // default headers. Use middleware to inject the Host header so Zitadel
             // accepts requests sent to the Docker service name.
             $parsedIssuer = parse_url($this->issuer);
-            $hostHeader   = ( $parsedIssuer['host'] ?? 'localhost' )
+            if (!is_array($parsedIssuer)) {
+                throw new \RuntimeException('Invalid ZITADEL_ISSUER URL: ' . $this->issuer);
+            }
+            $hostHeader = ( $parsedIssuer['host'] ?? 'localhost' )
                 . ( isset($parsedIssuer['port']) ? ':' . $parsedIssuer['port'] : '' );
-            $stack        = HandlerStack::create();
+            $stack      = HandlerStack::create();
             $stack->push(Middleware::mapRequest(function (RequestInterface $request) use ($hostHeader) {
                 return $request->withHeader('Host', $hostHeader);
             }));

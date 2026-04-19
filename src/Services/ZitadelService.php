@@ -65,7 +65,10 @@ class ZitadelService
         $headers = [];
         if ($this->internalUrl !== null) {
             // Add Host header matching the public issuer for Zitadel's domain validation
-            $parsedIssuer    = parse_url($this->issuer);
+            $parsedIssuer = parse_url($this->issuer);
+            if (!is_array($parsedIssuer)) {
+                throw new \RuntimeException('Invalid ZITADEL_ISSUER URL: ' . $this->issuer);
+            }
             $host            = ( $parsedIssuer['host'] ?? 'localhost' )
                 . ( isset($parsedIssuer['port']) ? ':' . $parsedIssuer['port'] : '' );
             $headers['Host'] = $host;
