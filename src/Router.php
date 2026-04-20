@@ -40,6 +40,8 @@ use LiturgicalCalendar\Api\Http\Middleware\HttpsEnforcementMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\JwtAuthMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\LoggingMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
+use LiturgicalCalendar\Api\Http\Middleware\ApiKeyMiddleware;
+use LiturgicalCalendar\Api\Http\Middleware\ApiKeyRateLimitMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAvailabilityMiddleware;
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Repositories\CalendarPermissionRepository;
@@ -517,6 +519,17 @@ class Router
         $pipeline = new MiddlewarePipeline($this->handler);
         $pipeline->pipe(new ErrorHandlingMiddleware($this->psr17Factory, self::$debug, $allowedOrigins)); // outermost middleware
         $pipeline->pipe(new LoggingMiddleware(self::$debug));
+
+        // Apply API key validation and rate limiting for public API routes
+        if (!in_array($route, ['auth', 'admin', 'applications'], true)) {
+            if (Connection::isConfigured()) {
+                $pipeline->pipe(new ApiKeyMiddleware(
+                    new \LiturgicalCalendar\Api\Repositories\ApiKeyRepository(),
+                    new \LiturgicalCalendar\Api\Repositories\AuditLogRepository()
+                ));
+            }
+            $pipeline->pipe(ApiKeyRateLimitMiddleware::fromEnv());
+        }
 
         // Apply HTTPS enforcement middleware for auth, admin, and applications routes in production
         if (in_array($route, ['auth', 'admin', 'applications'], true)) {

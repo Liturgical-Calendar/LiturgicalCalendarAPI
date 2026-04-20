@@ -101,6 +101,20 @@ class RateLimiter
     }
 
     /**
+     * Record a request for an identifier.
+     *
+     * General-purpose alias for recordFailedAttempt() suitable for API key
+     * rate limiting where every request counts, not just failures.
+     *
+     * @param string $identifier The identifier (e.g., API key ID, IP address)
+     * @return void
+     */
+    public function recordRequest(string $identifier): void
+    {
+        $this->recordFailedAttempt($identifier);
+    }
+
+    /**
      * Record a failed attempt for an identifier
      *
      * Uses file locking to prevent race conditions when multiple processes
@@ -208,6 +222,24 @@ class RateLimiter
         $expiresAt = $oldestAttempt + $this->windowSeconds;
 
         return max(0, $expiresAt - time());
+    }
+
+    /**
+     * Get the number of recorded attempts within the current window.
+     *
+     * @param string $identifier The identifier (e.g., API key ID, IP address)
+     * @return int Number of attempts in the current window
+     */
+    public function getAttemptCount(string $identifier): int
+    {
+        $data = $this->loadData($identifier);
+
+        if ($data === null) {
+            return 0;
+        }
+
+        $cutoff = time() - $this->windowSeconds;
+        return count(array_filter($data['attempts'], fn($timestamp) => $timestamp > $cutoff));
     }
 
     /**
