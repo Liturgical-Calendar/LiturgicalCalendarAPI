@@ -1363,6 +1363,7 @@
               }
             }
           },
+          "400": {"$ref": "#/components/responses/BadRequest400"},
           "401": {"$ref": "#/components/responses/Unauthorized401"},
           "403": {"$ref": "#/components/responses/Forbidden403"}
         }

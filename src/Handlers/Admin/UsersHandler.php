@@ -138,15 +138,23 @@ final class UsersHandler extends AbstractHandler
 
         $zitadel = ZitadelService::fromEnv();
 
-        // Fetch all users with roles (high limit to ensure complete role data for merging)
-        $usersWithRolesResult = $zitadel->listProjectUsers(self::MAX_LIMIT);
+        // Fetch all project users with roles by paging through the full set.
+        // This ensures the complete role data is available for merging regardless of count.
+        $usersWithRolesArray = [];
+        $projectOffset       = 0;
+        do {
+            $page                = $zitadel->listProjectUsers(self::MAX_LIMIT, $projectOffset);
+            $pageUsers           = $page['users'] ?? [];
+            $usersWithRolesArray = array_merge($usersWithRolesArray, $pageUsers);
+            $projectOffset      += self::MAX_LIMIT;
+            $projectTotal        = $page['total'] ?? 0;
+        } while ($projectOffset < $projectTotal);
 
         // Fetch paginated list of all users
         $allUsersResult = $zitadel->listAllUsers($limit, $offset);
 
         // Defensive checks for API response structure
-        $usersWithRolesArray = $usersWithRolesResult['users'] ?? [];
-        $allUsersArray       = $allUsersResult['users'] ?? [];
+        $allUsersArray = $allUsersResult['users'] ?? [];
 
         // Build a map of users with roles (keyed by userId)
         /** @var array<string, array<string, mixed>> $usersWithRolesMap */
@@ -168,17 +176,17 @@ final class UsersHandler extends AbstractHandler
             }
         }
 
-        // Separate users into those with roles and those without
+        // Separate current-page users into those with roles and those without.
+        // Only users from the paginated listAllUsers response are included to
+        // preserve consistent pagination semantics (total/hasMore).
         $usersWithRoles    = [];
         $usersWithoutRoles = [];
-        $seenUserIds       = [];
 
         foreach ($allUsersArray as $user) {
             $userId = $user['userId'] ?? null;
             if (!is_string($userId)) {
                 continue;
             }
-            $seenUserIds[$userId] = true;
             if (isset($usersWithRolesMap[$userId])) {
                 // User has roles - merge role info with email verification from the all-users list
                 $userWithRoles                  = $usersWithRolesMap[$userId];
@@ -188,16 +196,6 @@ final class UsersHandler extends AbstractHandler
                 // User has no roles
                 $user['roles']       = [];
                 $usersWithoutRoles[] = $user;
-            }
-        }
-
-        // Ensure all role-bearing users are included, even if not in allUsersArray
-        // (e.g., due to pagination limits in listAllUsers)
-        foreach ($usersWithRolesMap as $userId => $userWithRoles) {
-            if (!isset($seenUserIds[$userId])) {
-                // User has roles but wasn't in allUsersArray - add with emailVerified defaulting to false
-                $userWithRoles['emailVerified'] = $userWithRoles['emailVerified'] ?? false;
-                $usersWithRoles[]               = $userWithRoles;
             }
         }
 
