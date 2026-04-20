@@ -16,6 +16,7 @@ use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Models\Auth\User;
 use LiturgicalCalendar\Api\Services\JwtServiceFactory;
 use LiturgicalCalendar\Api\Services\ZitadelHostHeader;
+use LiturgicalCalendar\Api\Services\ZitadelService;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -38,6 +39,7 @@ class OidcAuthMiddleware implements MiddlewareInterface
 {
     private string $issuer;
     private string $clientId;
+    private ?string $projectId;
     private ?string $internalUrl;
     private int $cacheTtl;
     private bool $jwtFallback;
@@ -55,6 +57,7 @@ class OidcAuthMiddleware implements MiddlewareInterface
      *
      * @param string $issuer Zitadel issuer URL (e.g., http://localhost:8080)
      * @param string $clientId Zitadel client ID for audience validation
+     * @param string|null $projectId Zitadel project ID (also valid as audience for machine-to-machine tokens)
      * @param string|null $internalUrl Internal URL for server-side requests (e.g., http://zitadel:8080)
      * @param int $cacheTtl JWKS cache TTL in seconds (default: 3600)
      * @param LoggerInterface|null $logger PSR-3 logger instance (optional)
@@ -63,6 +66,7 @@ class OidcAuthMiddleware implements MiddlewareInterface
     public function __construct(
         string $issuer,
         string $clientId,
+        ?string $projectId = null,
         ?string $internalUrl = null,
         int $cacheTtl = 3600,
         ?LoggerInterface $logger = null,
@@ -70,6 +74,7 @@ class OidcAuthMiddleware implements MiddlewareInterface
     ) {
         $this->issuer      = rtrim($issuer, '/');
         $this->clientId    = $clientId;
+        $this->projectId   = $projectId;
         $this->internalUrl = $internalUrl !== null ? rtrim($internalUrl, '/') : null;
         $this->cacheTtl    = $cacheTtl;
         $this->jwtFallback = $jwtFallback;
@@ -106,10 +111,12 @@ class OidcAuthMiddleware implements MiddlewareInterface
         // Check both getenv() and $_ENV since Dotenv may not always populate putenv()
         $issuerEnv      = getenv('ZITADEL_ISSUER') ?: ( $_ENV['ZITADEL_ISSUER'] ?? '' );
         $clientIdEnv    = getenv('ZITADEL_CLIENT_ID') ?: ( $_ENV['ZITADEL_CLIENT_ID'] ?? '' );
+        $projectIdEnv   = getenv('ZITADEL_PROJECT_ID') ?: ( $_ENV['ZITADEL_PROJECT_ID'] ?? '' );
         $internalUrlEnv = getenv('ZITADEL_INTERNAL_URL') ?: ( $_ENV['ZITADEL_INTERNAL_URL'] ?? '' );
 
         $issuer      = is_string($issuerEnv) ? $issuerEnv : '';
         $clientId    = is_string($clientIdEnv) ? $clientIdEnv : '';
+        $projectId   = is_string($projectIdEnv) && !empty($projectIdEnv) ? $projectIdEnv : null;
         $internalUrl = is_string($internalUrlEnv) && !empty($internalUrlEnv) ? $internalUrlEnv : null;
 
         if (empty($issuer) || empty($clientId)) {
@@ -118,7 +125,7 @@ class OidcAuthMiddleware implements MiddlewareInterface
             );
         }
 
-        return new self($issuer, $clientId, $internalUrl, 3600, null, $jwtFallback);
+        return new self($issuer, $clientId, $projectId, $internalUrl, 3600, null, $jwtFallback);
     }
 
     /**
@@ -202,11 +209,15 @@ class OidcAuthMiddleware implements MiddlewareInterface
         }
 
         // Validate audience (can be string or array)
-        $aud           = $payload->aud ?? null;
-        $validAudience = false;
-        if (is_string($aud) && $aud === $this->clientId) {
+        // Accept either the OIDC client ID or the project ID as valid audience.
+        // Zitadel puts the project ID in the audience for machine-to-machine tokens,
+        // and the client ID for user-facing OIDC tokens.
+        $aud            = $payload->aud ?? null;
+        $validAudiences = array_filter([$this->clientId, $this->projectId]);
+        $validAudience  = false;
+        if (is_string($aud) && in_array($aud, $validAudiences, true)) {
             $validAudience = true;
-        } elseif (is_array($aud) && in_array($this->clientId, $aud, true)) {
+        } elseif (is_array($aud) && !empty(array_intersect(array_filter($aud, 'is_string'), $validAudiences))) {
             $validAudience = true;
         }
 
@@ -387,6 +398,20 @@ class OidcAuthMiddleware implements MiddlewareInterface
                 if (is_string($role)) {
                     $roles[] = $role;
                 }
+            }
+        }
+
+        // If roles are not present in the token (e.g., JWT Profile grant for service accounts),
+        // look them up via the Zitadel Management API
+        if (empty($roles) && is_string($sub) && ZitadelService::isConfigured()) {
+            try {
+                $zitadelService = ZitadelService::fromEnv();
+                $roles          = $zitadelService->getUserRoles($sub);
+            } catch (\Exception $e) {
+                $this->logger->debug('Failed to look up roles from Zitadel Management API', [
+                    'error'  => $e->getMessage(),
+                    'userId' => $sub,
+                ]);
             }
         }
 

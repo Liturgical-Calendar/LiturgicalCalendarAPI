@@ -328,6 +328,122 @@ update_env_file() {
     fi
 }
 
+# Function to create a service account (machine user) for tests
+create_test_service_account() {
+    local pat="$1"
+    local project_id="$2"
+    local username="test-service-account"
+    local display_name="Test Service Account"
+
+    echo -e "${YELLOW}Creating test service account...${NC}" >&2
+
+    # Check if machine user already exists
+    existing=$(curl -s -X POST "${ZITADEL_URL}/management/v1/users/_search" \
+        -H "Authorization: Bearer $pat" \
+        -H "Content-Type: application/json" \
+        -d "{\"queries\": [{\"userNameQuery\": {\"userName\": \"${username}\", \"method\": \"TEXT_QUERY_METHOD_EQUALS\"}}]}")
+
+    existing_id=$(echo "$existing" | jq -r '.result[0].id // empty')
+
+    if [ -n "$existing_id" ]; then
+        echo -e "${GREEN}Service account already exists with ID: $existing_id${NC}" >&2
+        echo "$existing_id"
+        return 0
+    fi
+
+    # Create machine user
+    result=$(curl -s -X POST "${ZITADEL_URL}/management/v1/users/machine" \
+        -H "Authorization: Bearer $pat" \
+        -H "Content-Type: application/json" \
+        -d "{
+            \"userName\": \"${username}\",
+            \"name\": \"${display_name}\",
+            \"accessTokenType\": \"ACCESS_TOKEN_TYPE_JWT\"
+        }")
+
+    user_id=$(echo "$result" | jq -r '.userId // empty')
+
+    if [ -n "$user_id" ]; then
+        echo -e "${GREEN}Service account created with ID: $user_id${NC}" >&2
+        echo "$user_id"
+    else
+        echo -e "${RED}Failed to create service account: $result${NC}" >&2
+        exit 1
+    fi
+}
+
+# Function to assign a project role to a user
+assign_project_role() {
+    local pat="$1"
+    local project_id="$2"
+    local user_id="$3"
+    local role="$4"
+
+    echo -e "${YELLOW}Assigning role '${role}' to user ${user_id}...${NC}" >&2
+
+    # Check if grant already exists
+    existing=$(curl -s -X POST "${ZITADEL_URL}/management/v1/users/${user_id}/grants/_search" \
+        -H "Authorization: Bearer $pat" \
+        -H "Content-Type: application/json" \
+        -d "{}")
+
+    existing_grant=$(echo "$existing" | jq -r --arg pid "$project_id" '(.result // [])[] | select(.projectId == $pid) | .id // empty')
+
+    if [ -n "$existing_grant" ]; then
+        echo -e "${GREEN}Role grant already exists${NC}" >&2
+        return 0
+    fi
+
+    result=$(curl -s -X POST "${ZITADEL_URL}/management/v1/users/${user_id}/grants" \
+        -H "Authorization: Bearer $pat" \
+        -H "Content-Type: application/json" \
+        -d "{
+            \"projectId\": \"${project_id}\",
+            \"roleKeys\": [\"${role}\"]
+        }")
+
+    if echo "$result" | jq -e '.userGrantId' > /dev/null 2>&1; then
+        echo -e "${GREEN}Role '${role}' assigned successfully${NC}" >&2
+    else
+        echo -e "${YELLOW}Role assignment result: ${result}${NC}" >&2
+    fi
+}
+
+# Function to generate a JWT key for the service account
+generate_service_account_key() {
+    local pat="$1"
+    local user_id="$2"
+    local key_file="${PROJECT_DIR}/test-service-account-key.json"
+
+    echo -e "${YELLOW}Generating JWT key for service account...${NC}" >&2
+
+    # Check if key file already exists
+    if [ -f "$key_file" ] && [ "$FORCE_SECRETS" != "true" ]; then
+        echo -e "${GREEN}Key file already exists (use --force-secrets to regenerate)${NC}" >&2
+        echo "$key_file"
+        return 0
+    fi
+
+    result=$(curl -s -X POST "${ZITADEL_URL}/management/v1/users/${user_id}/keys" \
+        -H "Authorization: Bearer $pat" \
+        -H "Content-Type: application/json" \
+        -d "{
+            \"type\": \"KEY_TYPE_JSON\",
+            \"expirationDate\": \"2030-01-01T00:00:00Z\"
+        }")
+
+    key_details=$(echo "$result" | jq -r '.keyDetails // empty')
+
+    if [ -n "$key_details" ]; then
+        echo "$key_details" | base64 -d > "$key_file"
+        echo -e "${GREEN}Key saved to $key_file${NC}" >&2
+        echo "$key_file"
+    else
+        echo -e "${RED}Failed to generate key: $result${NC}" >&2
+        exit 1
+    fi
+}
+
 # Main execution
 main() {
     # Handle --docker-init: start Docker stack if not running
@@ -354,6 +470,12 @@ main() {
     echo
     create_roles "$PAT" "$PROJECT_ID"
 
+    # Create test service account
+    echo
+    SERVICE_ACCOUNT_ID=$(create_test_service_account "$PAT" "$PROJECT_ID")
+    assign_project_role "$PAT" "$PROJECT_ID" "$SERVICE_ACCOUNT_ID" "admin"
+    SERVICE_KEY_FILE=$(generate_service_account_key "$PAT" "$SERVICE_ACCOUNT_ID")
+
     # Create Frontend OIDC app
     echo
     FRONTEND_CREDS=$(create_oidc_app "$PAT" "$PROJECT_ID" "LiturgicalCalendar Frontend" \
@@ -372,6 +494,7 @@ main() {
     echo -e "  Client ID:       ${FRONTEND_CLIENT_ID}"
     echo -e "  Client Secret:   ${FRONTEND_CLIENT_SECRET}"
     echo -e "  Service Token:   ${PAT}"
+    echo -e "  Test SA Key:     ${SERVICE_KEY_FILE}"
     echo
     echo -e "${GREEN}Roles created:${NC}"
     for role in "${ROLES[@]}"; do
@@ -398,6 +521,7 @@ main() {
                 update_env_file "$target" "ZITADEL_ISSUER" "${ZITADEL_URL}"
                 update_env_file "$target" "ZITADEL_CLIENT_ID" "$FRONTEND_CLIENT_ID"
                 update_env_file "$target" "ZITADEL_PROJECT_ID" "$PROJECT_ID"
+                update_env_file "$target" "ZITADEL_MACHINE_TOKEN" "$PAT"
                 echo -e "${GREEN}Updated ${label}: $target${NC}"
             else
                 echo -e "${YELLOW}Skipped ${label} (no .env file found in $dir)${NC}"

@@ -208,15 +208,100 @@ abstract class ApiTestCase extends TestCase
     }
 
     /**
-     * Obtain a JWT access token for authenticated tests.
+     * Obtain an access token for authenticated tests.
+     *
+     * Attempts Zitadel OIDC authentication first (via JWT Profile grant using a service account key),
+     * then falls back to legacy JWT authentication via /auth/login.
+     *
+     * @return string|null The access token, or null if authentication fails.
+     */
+    protected static function getJwtToken(): ?string
+    {
+        if (self::$http === null) {
+            return null;
+        }
+
+        // Try Zitadel OIDC token first
+        $oidcToken = self::getZitadelToken();
+        if ($oidcToken !== null) {
+            return $oidcToken;
+        }
+
+        // Fall back to legacy JWT authentication
+        return self::getLegacyJwtToken();
+    }
+
+    /**
+     * Obtain a Zitadel OIDC access token via the JWT Profile grant (machine-to-machine).
+     *
+     * Requires a service account key file (JSON) at the project root or path specified
+     * by the ZITADEL_SERVICE_KEY_FILE environment variable.
+     *
+     * @return string|null The JWT access token, or null if Zitadel auth is not configured or fails.
+     */
+    private static function getZitadelToken(): ?string
+    {
+        $issuer    = $_ENV['ZITADEL_ISSUER'] ?? '';
+        $projectId = $_ENV['ZITADEL_PROJECT_ID'] ?? '';
+        $keyFile   = $_ENV['ZITADEL_SERVICE_KEY_FILE']
+            ?? dirname(__DIR__) . '/test-service-account-key.json';
+
+        if (empty($issuer) || empty($projectId) || !file_exists($keyFile)) {
+            return null;
+        }
+
+        $keyData = json_decode((string) file_get_contents($keyFile), true);
+        if (!is_array($keyData) || empty($keyData['key']) || empty($keyData['userId'])) {
+            return null;
+        }
+
+        $now     = time();
+        $payload = [
+            'iss' => $keyData['userId'],
+            'sub' => $keyData['userId'],
+            'aud' => rtrim($issuer, '/'),
+            'iat' => $now,
+            'exp' => $now + 3600,
+        ];
+
+        // Sign the JWT assertion with the service account's private key
+        $assertion = \Firebase\JWT\JWT::encode($payload, $keyData['key'], 'RS256', $keyData['keyId']);
+
+        // Exchange the assertion for an access token at the OIDC token endpoint
+        // The scope includes the project audience so the token's aud claim matches what the middleware expects
+        $tokenUrl = rtrim($issuer, '/') . '/oauth/v2/token';
+        $scope    = "openid profile email urn:zitadel:iam:org:project:id:{$projectId}:aud urn:zitadel:iam:org:project:roles";
+
+        try {
+            $client   = new Client(['timeout' => 10]);
+            $response = $client->post($tokenUrl, [
+                'form_params' => [
+                    'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                    'scope'      => $scope,
+                    'assertion'  => $assertion,
+                ],
+            ]);
+
+            if ($response->getStatusCode() !== 200) {
+                return null;
+            }
+
+            $data = json_decode((string) $response->getBody(), true);
+            return is_array($data) ? ( $data['access_token'] ?? null ) : null;
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Obtain a legacy JWT access token via /auth/login.
      *
      * Uses admin credentials from environment variables (ADMIN_USERNAME, ADMIN_PASSWORD)
-     * or defaults to admin/password which are available in development and test environments
-     * when ADMIN_PASSWORD_HASH is not set.
+     * or defaults to admin/password which are available in development and test environments.
      *
      * @return string|null The JWT access token, or null if authentication fails.
      */
-    protected static function getJwtToken(): ?string
+    private static function getLegacyJwtToken(): ?string
     {
         if (self::$http === null) {
             return null;
