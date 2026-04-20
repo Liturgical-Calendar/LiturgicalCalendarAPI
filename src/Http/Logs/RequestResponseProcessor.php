@@ -10,7 +10,7 @@ class RequestResponseProcessor
 {
     public function __invoke(LogRecord $record): LogRecord
     {
-        $ctx = $record->context ?? [];
+        $ctx = $record->context;
         if (isset($ctx['type'])) {
             switch ($ctx['type']) {
                 case 'request':

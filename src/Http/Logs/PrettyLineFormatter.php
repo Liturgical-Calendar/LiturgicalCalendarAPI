@@ -95,8 +95,7 @@ class PrettyLineFormatter extends LineFormatter
             return $record;
         }
         if (
-            isset($record->context)
-            && isset($record->context['type'])
+            isset($record->context['type'])
             && $record->context['type'] === 'response'
             && isset($record->context['response'])
             && $record->context['response'] instanceof ResponseInterface

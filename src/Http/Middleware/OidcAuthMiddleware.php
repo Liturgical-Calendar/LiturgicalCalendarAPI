@@ -7,9 +7,13 @@ namespace LiturgicalCalendar\Api\Http\Middleware;
 use Firebase\JWT\CachedKeySet;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\HttpFactory;
+use Psr\Http\Message\RequestInterface;
 use LiturgicalCalendar\Api\Http\CookieHelper;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
+use LiturgicalCalendar\Api\Services\ZitadelHostHeader;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -32,6 +36,7 @@ class OidcAuthMiddleware implements MiddlewareInterface
 {
     private string $issuer;
     private string $clientId;
+    private ?string $internalUrl;
     private int $cacheTtl;
     private LoggerInterface $logger;
 
@@ -45,21 +50,24 @@ class OidcAuthMiddleware implements MiddlewareInterface
     /**
      * Create the OIDC authentication middleware.
      *
-     * @param string $issuer Zitadel issuer URL (e.g., http://localhost:8081)
+     * @param string $issuer Zitadel issuer URL (e.g., http://localhost:8080)
      * @param string $clientId Zitadel client ID for audience validation
+     * @param string|null $internalUrl Internal URL for server-side requests (e.g., http://zitadel:8080)
      * @param int $cacheTtl JWKS cache TTL in seconds (default: 3600)
      * @param LoggerInterface|null $logger PSR-3 logger instance (optional)
      */
     public function __construct(
         string $issuer,
         string $clientId,
+        ?string $internalUrl = null,
         int $cacheTtl = 3600,
         ?LoggerInterface $logger = null
     ) {
-        $this->issuer   = rtrim($issuer, '/');
-        $this->clientId = $clientId;
-        $this->cacheTtl = $cacheTtl;
-        $this->logger   = $logger ?? LoggerFactory::create('auth', null, 30, false, true, false);
+        $this->issuer      = rtrim($issuer, '/');
+        $this->clientId    = $clientId;
+        $this->internalUrl = $internalUrl !== null ? rtrim($internalUrl, '/') : null;
+        $this->cacheTtl    = $cacheTtl;
+        $this->logger      = $logger ?? LoggerFactory::create('auth', null, 30, false, true, false);
     }
 
     /**
@@ -89,11 +97,13 @@ class OidcAuthMiddleware implements MiddlewareInterface
     public static function fromEnv(): self
     {
         // Check both getenv() and $_ENV since Dotenv may not always populate putenv()
-        $issuerEnv   = getenv('ZITADEL_ISSUER') ?: ( $_ENV['ZITADEL_ISSUER'] ?? '' );
-        $clientIdEnv = getenv('ZITADEL_CLIENT_ID') ?: ( $_ENV['ZITADEL_CLIENT_ID'] ?? '' );
+        $issuerEnv      = getenv('ZITADEL_ISSUER') ?: ( $_ENV['ZITADEL_ISSUER'] ?? '' );
+        $clientIdEnv    = getenv('ZITADEL_CLIENT_ID') ?: ( $_ENV['ZITADEL_CLIENT_ID'] ?? '' );
+        $internalUrlEnv = getenv('ZITADEL_INTERNAL_URL') ?: ( $_ENV['ZITADEL_INTERNAL_URL'] ?? '' );
 
-        $issuer   = is_string($issuerEnv) ? $issuerEnv : '';
-        $clientId = is_string($clientIdEnv) ? $clientIdEnv : '';
+        $issuer      = is_string($issuerEnv) ? $issuerEnv : '';
+        $clientId    = is_string($clientIdEnv) ? $clientIdEnv : '';
+        $internalUrl = is_string($internalUrlEnv) && !empty($internalUrlEnv) ? $internalUrlEnv : null;
 
         if (empty($issuer) || empty($clientId)) {
             throw new \RuntimeException(
@@ -101,7 +111,7 @@ class OidcAuthMiddleware implements MiddlewareInterface
             );
         }
 
-        return new self($issuer, $clientId);
+        return new self($issuer, $clientId, $internalUrl);
     }
 
     /**
@@ -223,7 +233,22 @@ class OidcAuthMiddleware implements MiddlewareInterface
 
         $jwksUri = $this->issuer . '/oauth/v2/keys';
 
-        $httpClient  = new Client();
+        if ($this->internalUrl !== null) {
+            // Rewrite JWKS URI to use internal URL for Docker networking
+            $jwksUri = $this->internalUrl . '/oauth/v2/keys';
+
+            // CachedKeySet uses PSR-18 sendRequest() which doesn't apply Guzzle's
+            // default headers. Use middleware to inject the Host header so Zitadel
+            // accepts requests sent to the Docker service name.
+            $hostHeader = ZitadelHostHeader::deriveFromIssuer($this->issuer);
+            $stack      = HandlerStack::create();
+            $stack->push(Middleware::mapRequest(function (RequestInterface $request) use ($hostHeader) {
+                return $request->withHeader('Host', $hostHeader);
+            }));
+            $httpClient = new Client(['handler' => $stack]);
+        } else {
+            $httpClient = new Client();
+        }
         $httpFactory = new HttpFactory();
 
         // Use filesystem cache for JWKS (PSR-6 compatible)

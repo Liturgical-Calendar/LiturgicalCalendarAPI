@@ -6,6 +6,9 @@ namespace LiturgicalCalendar\Api\Services;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -20,6 +23,7 @@ class ZitadelService
 {
     private Client $httpClient;
     private string $issuer;
+    private ?string $internalUrl;
     private string $projectId;
     private ?string $machineToken;
     private ?LoggerInterface $logger;
@@ -40,25 +44,43 @@ class ZitadelService
     /**
      * Create Zitadel service.
      *
-     * @param string $issuer Zitadel issuer URL
+     * @param string $issuer Zitadel issuer URL (public URL for token validation)
      * @param string $projectId Zitadel project ID
      * @param string|null $machineToken Service account token for management API
+     * @param string|null $internalUrl Internal URL for Docker networking (e.g., http://zitadel:8080)
      * @param LoggerInterface|null $logger Optional logger for error logging
      */
     public function __construct(
         string $issuer,
         string $projectId,
         ?string $machineToken = null,
+        ?string $internalUrl = null,
         ?LoggerInterface $logger = null
     ) {
         $this->issuer       = rtrim($issuer, '/');
+        $this->internalUrl  = $internalUrl !== null ? rtrim($internalUrl, '/') : null;
         $this->projectId    = $projectId;
         $this->machineToken = $machineToken;
         $this->logger       = $logger;
-        $this->httpClient   = new Client([
-            'base_uri' => $this->issuer,
+
+        // Use internal URL for HTTP requests if configured (Docker networking)
+        $baseUri       = $this->internalUrl ?? $this->issuer;
+        $clientOptions = [
+            'base_uri' => $baseUri,
             'timeout'  => 30,
-        ]);
+        ];
+        if ($this->internalUrl !== null) {
+            // Use middleware to force the Host header matching the public issuer.
+            // Client-level default headers can be overridden by the PSR-7 request URI,
+            // so middleware is needed to reliably inject the Host header.
+            $hostHeader = ZitadelHostHeader::deriveFromIssuer($this->issuer);
+            $stack      = HandlerStack::create();
+            $stack->push(Middleware::mapRequest(function (RequestInterface $request) use ($hostHeader) {
+                return $request->withHeader('Host', $hostHeader);
+            }));
+            $clientOptions['handler'] = $stack;
+        }
+        $this->httpClient = new Client($clientOptions);
     }
 
     /**
@@ -89,10 +111,12 @@ class ZitadelService
         $issuerEnv       = getenv('ZITADEL_ISSUER') ?: ( $_ENV['ZITADEL_ISSUER'] ?? '' );
         $projectIdEnv    = getenv('ZITADEL_PROJECT_ID') ?: ( $_ENV['ZITADEL_PROJECT_ID'] ?? '' );
         $machineTokenEnv = getenv('ZITADEL_MACHINE_TOKEN') ?: ( $_ENV['ZITADEL_MACHINE_TOKEN'] ?? null );
+        $internalUrlEnv  = getenv('ZITADEL_INTERNAL_URL') ?: ( $_ENV['ZITADEL_INTERNAL_URL'] ?? '' );
 
         $issuer       = is_string($issuerEnv) ? $issuerEnv : '';
         $projectId    = is_string($projectIdEnv) ? $projectIdEnv : '';
         $machineToken = is_string($machineTokenEnv) ? $machineTokenEnv : null;
+        $internalUrl  = is_string($internalUrlEnv) && !empty($internalUrlEnv) ? $internalUrlEnv : null;
 
         if (empty($issuer) || empty($projectId)) {
             throw new \RuntimeException(
@@ -100,7 +124,7 @@ class ZitadelService
             );
         }
 
-        return new self($issuer, $projectId, $machineToken, $logger);
+        return new self($issuer, $projectId, $machineToken, $internalUrl, $logger);
     }
 
     /**
