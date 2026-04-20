@@ -2,6 +2,9 @@
 
 namespace LiturgicalCalendar\Api\Services;
 
+use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
+use Psr\Log\LoggerInterface;
+
 /**
  * Simple file-based rate limiter for brute-force protection
  *
@@ -16,6 +19,7 @@ class RateLimiter
     private string $storagePath;
     private int $maxAttempts;
     private int $windowSeconds;
+    private LoggerInterface $logger;
 
     /**
      * Create a new rate limiter instance
@@ -35,6 +39,7 @@ class RateLimiter
         $this->maxAttempts   = $maxAttempts;
         $this->windowSeconds = $windowSeconds;
         $this->storagePath   = $storagePath ?? sys_get_temp_dir();
+        $this->logger        = LoggerFactory::create('rate-limiter', null, 30, false, true, false);
 
         // Ensure the rate limit directory exists
         $rateLimitDir = $this->getRateLimitDir();
@@ -101,6 +106,102 @@ class RateLimiter
     }
 
     /**
+     * Record a request for an identifier.
+     *
+     * General-purpose alias for recordFailedAttempt() suitable for API key
+     * rate limiting where every request counts, not just failures.
+     *
+     * @param string $identifier The identifier (e.g., API key ID, IP address)
+     * @return void
+     */
+    public function recordRequest(string $identifier): void
+    {
+        $this->recordFailedAttempt($identifier);
+    }
+
+    /**
+     * Atomically record a request and return the new count within the window.
+     *
+     * Uses file locking to prevent TOCTOU race conditions between checking
+     * the count and recording the request. When a cap is provided, the request
+     * is recorded only when the current count is at or below the cap (allowing
+     * one overflow so callers can detect the breach), then stops recording to
+     * prevent unbounded file growth.
+     *
+     * @param string $identifier The identifier (e.g., API key ID, IP address)
+     * @param int|null $cap Maximum allowed count; records up to cap+1 (one overflow) so callers
+     *                      can detect the limit was exceeded, then stops recording to prevent unbounded growth
+     * @return int The count of attempts within the window after recording
+     */
+    public function recordRequestAndGetCount(string $identifier, ?int $cap = null): int
+    {
+        $lockFile   = $this->getLockFilePath($identifier);
+        $lockHandle = @fopen($lockFile, 'c');
+
+        if ($lockHandle === false) {
+            $this->logger->error('Failed to open lock file, falling back to non-atomic operation', [
+                'identifier_hash' => hash('sha256', $identifier),
+            ]);
+            return $this->recordFailedAttemptUnsafe($identifier, $cap);
+        }
+
+        try {
+            if (flock($lockHandle, LOCK_EX)) {
+                try {
+                    $data   = $this->loadData($identifier) ?? ['attempts' => []];
+                    $cutoff = time() - $this->windowSeconds;
+                    /** @var int[] $attempts */
+                    $attempts = array_values(array_filter($data['attempts'], fn($timestamp) => $timestamp > $cutoff));
+
+                    // Record up to cap+1: allow one overflow so the caller sees count > cap
+                    // and can trigger a 429, then stop recording to prevent unbounded growth
+                    if ($cap === null || count($attempts) <= $cap) {
+                        $attempts[] = time();
+                        $this->saveData($identifier, ['attempts' => $attempts]);
+                    }
+                    return count($attempts);
+                } finally {
+                    flock($lockHandle, LOCK_UN);
+                }
+            } else {
+                $this->logger->error('Failed to acquire lock, falling back to non-atomic operation', [
+                    'identifier_hash' => hash('sha256', $identifier),
+                ]);
+                return $this->recordFailedAttemptUnsafe($identifier, $cap);
+            }
+        } finally {
+            fclose($lockHandle);
+        }
+    }
+
+    /**
+     * Get the UNIX timestamp when the current rate limit window resets.
+     *
+     * Returns the time when the oldest attempt in the window will expire,
+     * or the current time if there are no recorded attempts.
+     *
+     * @param string $identifier The identifier (e.g., API key ID, IP address)
+     * @return int UNIX timestamp of window reset
+     */
+    public function getWindowResetTime(string $identifier): int
+    {
+        $data = $this->loadData($identifier);
+        if ($data === null || empty($data['attempts'])) {
+            return time();
+        }
+
+        $cutoff = time() - $this->windowSeconds;
+        /** @var int[] $attempts */
+        $attempts = array_filter($data['attempts'], fn($timestamp) => $timestamp > $cutoff);
+        if (empty($attempts)) {
+            return time();
+        }
+
+        // The window resets when the oldest attempt expires
+        return min($attempts) + $this->windowSeconds;
+    }
+
+    /**
      * Record a failed attempt for an identifier
      *
      * Uses file locking to prevent race conditions when multiple processes
@@ -140,23 +241,32 @@ class RateLimiter
     }
 
     /**
-     * Record a failed attempt without locking (internal use)
+     * Record a failed attempt without locking (internal use).
+     *
+     * Returns the count of attempts within the window after recording,
+     * so callers in the fallback path can use the in-memory count
+     * without a separate file read. Mirrors the cap behavior of
+     * recordRequestAndGetCount (allows one overflow, then stops).
      *
      * @param string $identifier The identifier (e.g., IP address)
-     * @return void
+     * @param int|null $cap Maximum allowed count (allows one overflow, then stops recording)
+     * @return int The count of attempts within the window after recording
      */
-    private function recordFailedAttemptUnsafe(string $identifier): void
+    private function recordFailedAttemptUnsafe(string $identifier, ?int $cap = null): int
     {
         $data = $this->loadData($identifier) ?? ['attempts' => []];
 
         // Clean up old attempts outside the window
         $cutoff           = time() - $this->windowSeconds;
-        $data['attempts'] = array_filter($data['attempts'], fn($timestamp) => $timestamp > $cutoff);
+        $data['attempts'] = array_values(array_filter($data['attempts'], fn($timestamp) => $timestamp > $cutoff));
 
-        // Add current attempt
-        $data['attempts'][] = time();
+        // Record up to cap+1 (same overflow behavior as the locked path)
+        if ($cap === null || count($data['attempts']) <= $cap) {
+            $data['attempts'][] = time();
+        }
 
         $this->saveData($identifier, $data);
+        return count($data['attempts']);
     }
 
     /**
@@ -208,6 +318,24 @@ class RateLimiter
         $expiresAt = $oldestAttempt + $this->windowSeconds;
 
         return max(0, $expiresAt - time());
+    }
+
+    /**
+     * Get the number of recorded attempts within the current window.
+     *
+     * @param string $identifier The identifier (e.g., API key ID, IP address)
+     * @return int Number of attempts in the current window
+     */
+    public function getAttemptCount(string $identifier): int
+    {
+        $data = $this->loadData($identifier);
+
+        if ($data === null) {
+            return 0;
+        }
+
+        $cutoff = time() - $this->windowSeconds;
+        return count(array_filter($data['attempts'], fn($timestamp) => $timestamp > $cutoff));
     }
 
     /**

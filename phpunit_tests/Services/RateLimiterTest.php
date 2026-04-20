@@ -318,6 +318,79 @@ class RateLimiterTest extends TestCase
         }
     }
 
+    public function testRecordRequestAndGetCountRespectsCapWithOverflow(): void
+    {
+        $identifier = 'apikey_test-cap';
+        $cap        = 3;
+
+        // Requests 1-3: under cap, all recorded
+        for ($i = 1; $i <= $cap; $i++) {
+            $count = $this->rateLimiter->recordRequestAndGetCount($identifier, $cap);
+            $this->assertEquals($i, $count, "Request {$i} should return count {$i}");
+        }
+
+        // Request 4: at cap, one overflow recorded (count becomes cap+1)
+        $count = $this->rateLimiter->recordRequestAndGetCount($identifier, $cap);
+        $this->assertEquals($cap + 1, $count, 'Overflow request should return cap+1');
+
+        // Request 5: beyond overflow, not recorded, count stays at cap+1
+        $count = $this->rateLimiter->recordRequestAndGetCount($identifier, $cap);
+        $this->assertEquals($cap + 1, $count, 'Further requests should not increase count beyond cap+1');
+    }
+
+    public function testRecordRequestAndGetCountTriggersRateLimit(): void
+    {
+        $identifier = 'apikey_test-trigger';
+        $limit      = 3;
+
+        // Requests 1-3: within limit, remaining >= 0
+        for ($i = 1; $i <= $limit; $i++) {
+            $count     = $this->rateLimiter->recordRequestAndGetCount($identifier, $limit);
+            $remaining = $limit - $count;
+            $this->assertGreaterThanOrEqual(0, $remaining, "Request {$i} should not exceed limit");
+        }
+
+        // Request 4: overflow triggers rate limit (remaining < 0)
+        $count     = $this->rateLimiter->recordRequestAndGetCount($identifier, $limit);
+        $remaining = $limit - $count;
+        $this->assertLessThan(0, $remaining, 'Request after limit should trigger rate limiting');
+    }
+
+    public function testGetWindowResetTimeReturnsCorrectTimestamp(): void
+    {
+        $identifier = 'test-reset-time';
+
+        // No attempts: reset time should be between before and after
+        $before    = time();
+        $resetTime = $this->rateLimiter->getWindowResetTime($identifier);
+        $after     = time();
+        $this->assertGreaterThanOrEqual($before, $resetTime);
+        $this->assertLessThanOrEqual($after, $resetTime);
+
+        // Record an attempt
+        $before = time();
+        $this->rateLimiter->recordRequest($identifier);
+        $after = time();
+
+        // Reset time should be between (before + window) and (after + window)
+        $resetTime = $this->rateLimiter->getWindowResetTime($identifier);
+        $this->assertGreaterThanOrEqual($before + 60, $resetTime);
+        $this->assertLessThanOrEqual($after + 60, $resetTime);
+    }
+
+    public function testGetAttemptCountReturnsCorrectCount(): void
+    {
+        $identifier = 'test-count';
+
+        $this->assertEquals(0, $this->rateLimiter->getAttemptCount($identifier));
+
+        $this->rateLimiter->recordRequest($identifier);
+        $this->assertEquals(1, $this->rateLimiter->getAttemptCount($identifier));
+
+        $this->rateLimiter->recordRequest($identifier);
+        $this->assertEquals(2, $this->rateLimiter->getAttemptCount($identifier));
+    }
+
     public function testFactoryClampsAttemptsToMinimum(): void
     {
         $saved = $this->saveEnvValues();
