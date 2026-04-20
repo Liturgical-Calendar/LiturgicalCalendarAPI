@@ -41,6 +41,7 @@ CREATE TABLE role_requests (
     zitadel_sync_error TEXT DEFAULT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     reviewed_at TIMESTAMP,
+    CONSTRAINT chk_requested_role CHECK (requested_role IN ('developer', 'calendar_editor', 'test_editor')),
     CONSTRAINT chk_role_request_status CHECK (status IN ('pending', 'approved', 'rejected', 'revoked')),
     CONSTRAINT chk_zitadel_sync_status CHECK (zitadel_sync_status IS NULL OR zitadel_sync_status IN ('pending', 'synced', 'failed'))
 );
