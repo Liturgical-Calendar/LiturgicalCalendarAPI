@@ -635,7 +635,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
                         }
                         /** @var list<\stdClass>|\stdClass $parsedBody */
                     }
-                } catch (ParseException $e) {
+                } catch (ParseException | \JsonException $e) {
                     throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
                 }
                 break;
