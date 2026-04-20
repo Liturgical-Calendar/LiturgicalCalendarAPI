@@ -138,10 +138,10 @@ final class UsersHandler extends AbstractHandler
 
         $zitadel = ZitadelService::fromEnv();
 
-        // Fetch users with roles
-        $usersWithRolesResult = $zitadel->listProjectUsers($limit, $offset);
+        // Fetch all users with roles (unpaginated to ensure complete role data for merging)
+        $usersWithRolesResult = $zitadel->listProjectUsers();
 
-        // Fetch all users
+        // Fetch paginated list of all users
         $allUsersResult = $zitadel->listAllUsers($limit, $offset);
 
         // Defensive checks for API response structure
