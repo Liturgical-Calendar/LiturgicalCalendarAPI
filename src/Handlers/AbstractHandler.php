@@ -7,7 +7,6 @@ use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
-use LiturgicalCalendar\Api\Http\Exception\ImplementationException;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\NotAcceptableException;
 use LiturgicalCalendar\Api\Http\Exception\UnsupportedMediaTypeException;
@@ -18,6 +17,9 @@ use LiturgicalCalendar\Api\Models\Decrees\DecreeItem;
 use LiturgicalCalendar\Api\Models\MissalsPath\MissalMetadataMap;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\Stream;
+use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\Yaml\Exception\DumpException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -497,25 +499,6 @@ abstract class AbstractHandler implements RequestHandlerInterface
         return $filteredQueryParams;
     }
 
-    /**
-     * Handles warnings by throwing an \ErrorException.
-     *
-     * This function acts as a custom error handler that converts warnings into `\ErrorException` exceptions.
-     * It is registered as a warning handler to maintain consistent error handling using exceptions.
-     * Used by the {@see \LiturgicalCalendar\Api\Handlers\AbstractHandler::parseBodyParams()},
-     * {@see \LiturgicalCalendar\Api\Handlers\AbstractHandler::parseBodyPayload()},
-     * and {@see \LiturgicalCalendar\Api\Handlers\AbstractHandler::encodeResponseBody()} methods
-     * to handle warnings from the `yaml_parse` and `yaml_emit` functions.
-     *
-     * @param int $errno The level of the error raised.
-     * @param string $errstr The error message.
-     *
-     * @throws \ErrorException Always throws an exception with the error message and level.
-     */
-    protected static function warningHandler(int $errno, string $errstr, string $errfile, int $errline): never
-    {
-        throw new \ErrorException($errstr, 0, $errno, $errfile, $errline);
-    }
 
     /**
      * Parse the request body according to the request Content-Type,
@@ -553,13 +536,9 @@ abstract class AbstractHandler implements RequestHandlerInterface
                 $parsedBody = json_decode($rawBodyContents, true, 512, JSON_THROW_ON_ERROR);
                 break;
             case RequestContentType::YAML:
-                if (!extension_loaded('yaml') || !function_exists('yaml_parse')) {
-                    throw new ImplementationException('YAML extension not loaded');
-                }
-
                 try {
-                    $parsedBody = yaml_parse($rawBodyContents);
-                } catch (\ErrorException $e) {
+                    $parsedBody = Yaml::parse($rawBodyContents);
+                } catch (ParseException $e) {
                     throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
                 }
                 break;
@@ -637,12 +616,8 @@ abstract class AbstractHandler implements RequestHandlerInterface
                 }
                 break;
             case RequestContentType::YAML:
-                if (!extension_loaded('yaml')) {
-                    throw new ImplementationException('YAML extension not loaded');
-                }
-
                 try {
-                    $parsedBody = yaml_parse($rawBodyContents);
+                    $parsedBody = Yaml::parse($rawBodyContents);
                     if (false === is_array($parsedBody) || empty($parsedBody)) {
                         throw new YamlException('Invalid body content received in the request: expected an array', StatusCode::UNPROCESSABLE_CONTENT->value);
                     }
@@ -660,7 +635,7 @@ abstract class AbstractHandler implements RequestHandlerInterface
                         }
                         /** @var list<\stdClass>|\stdClass $parsedBody */
                     }
-                } catch (\ErrorException $e) {
+                } catch (ParseException $e) {
                     throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
                 }
                 break;
@@ -690,9 +665,6 @@ abstract class AbstractHandler implements RequestHandlerInterface
                 $encodedResponse = json_encode($responseBody, JSON_THROW_ON_ERROR);
                 break;
             case AcceptHeader::YAML:
-                if (!extension_loaded('yaml')) {
-                    throw new ImplementationException('YAML extension not loaded');
-                }
                 // In order to emit YAML, we need to recast the response body as an array
                 // So first we encode the object as JSON
                 $jsonEncodedResponse = json_encode($responseBody, JSON_THROW_ON_ERROR);
@@ -700,8 +672,8 @@ abstract class AbstractHandler implements RequestHandlerInterface
 
                 // Then we attempt to encode the array as YAML
                 try {
-                    $encodedResponse = yaml_emit($recodedResponse, YAML_UTF8_ENCODING);
-                } catch (\ErrorException $e) {
+                    $encodedResponse = Yaml::dump($recodedResponse, 10, 2, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+                } catch (DumpException $e) {
                     throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
                 }
                 break;

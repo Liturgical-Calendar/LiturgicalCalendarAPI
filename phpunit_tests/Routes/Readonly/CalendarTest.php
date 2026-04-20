@@ -8,6 +8,7 @@ use GuzzleHttp\Promise\EachPromise;
 use LiturgicalCalendar\Tests\ApiTestCase;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\Yaml\Yaml;
 
 final class CalendarTest extends ApiTestCase
 {
@@ -26,17 +27,13 @@ final class CalendarTest extends ApiTestCase
 
     public function testGetCalendarReturnsYaml(): void
     {
-        if (!extension_loaded('yaml')) {
-            $this->markTestSkipped('YAML extension is not installed');
-        }
-
         $response = self::$http->get('/calendar', [
             'headers' => ['Accept' => 'application/yaml']
         ]);
         $this->assertSame(200, $response->getStatusCode());
         $this->assertStringStartsWith('application/yaml', $response->getHeaderLine('Content-Type'), 'Content-Type should be application/yaml');
 
-        $yaml = yaml_parse((string) $response->getBody());
+        $yaml = Yaml::parse((string) $response->getBody());
         $this->assertIsArray($yaml, 'YAML Response should be an array');
         $encoded = json_encode($yaml);
         $this->assertSame(JSON_ERROR_NONE, json_last_error(), 'YAML Response should have been encoded to JSON: ' . json_last_error_msg());

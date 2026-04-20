@@ -22,6 +22,7 @@ use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
+use Symfony\Component\Yaml\Yaml;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Test\LitTestRunner;
@@ -1100,16 +1101,8 @@ class Health implements MessageComponentInterface
                         break;
                     case 'YML':
                         try {
-                            if (!function_exists('yaml_parse')) {
-                                throw new \RuntimeException('PHP yaml extension not installed');
-                            }
-
-                            /**
-                             * TODO: perhaps we need to register a custom Exception handler, since yaml_parse() throws a warning instead of an exception
-                             *       and we need to catch that warning as an exception {@see \LiturgicalCalendar\Api\Core::warningHandler()}
-                             */
-                            $yamlParsed = yaml_parse($data);
-                            if (false === $yamlParsed) {
+                            $yamlParsed = Yaml::parse($data);
+                            if (false === is_array($yamlParsed)) {
                                 throw new \Exception('YAML parsing failed');
                             }
 

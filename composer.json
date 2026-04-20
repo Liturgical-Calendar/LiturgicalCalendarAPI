@@ -39,7 +39,8 @@
         "monolog/monolog": "^3.9",
         "firebase/php-jwt": "^6.11 || ^7.0",
         "symfony/cache": "^8.0",
-        "plesk/ratchetphp": "^1.0"
+        "plesk/ratchetphp": "^1.0",
+        "symfony/yaml": "^8.0"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^4.0",
@@ -50,9 +51,7 @@
         "captainhook/hook-installer": "^1.0",
         "phpunit/phpunit": "^12.3@stable"
     },
-    "suggest": {
-        "ext-yaml": "Required to return application/yaml responses; otherwise request JSON/XML/ICS."
-    },
+    "suggest": {},
     "license": "Apache-2.0",
     "autoload": {
         "psr-4": {
