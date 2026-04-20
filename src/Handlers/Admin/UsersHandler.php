@@ -80,7 +80,7 @@ final class UsersHandler extends AbstractHandler
         // admin/users/{userId}/roles/{role}
 
         if ($method === RequestMethod::GET) {
-            return $this->listUsers($response);
+            return $this->listUsers($request, $response);
         }
 
         // DELETE requires userId and role
@@ -101,57 +101,115 @@ final class UsersHandler extends AbstractHandler
         return $this->revokeRole($response, $userId, $role);
     }
 
+    private const DEFAULT_LIMIT = 100;
+    private const MAX_LIMIT     = 1000;
+
     /**
      * List all users (with and without roles).
      *
+     * Accepts optional `limit` and `offset` query parameters for pagination.
+     *
+     * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    private function listUsers(ResponseInterface $response): ResponseInterface
+    private function listUsers(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
+        $queryParams = $request->getQueryParams();
+
+        $limit  = self::DEFAULT_LIMIT;
+        $offset = 0;
+
+        if (isset($queryParams['limit'])) {
+            $limitParam = filter_var($queryParams['limit'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => self::MAX_LIMIT]]);
+            if ($limitParam === false) {
+                throw new ValidationException('limit must be an integer between 1 and ' . self::MAX_LIMIT);
+            }
+            $limit = $limitParam;
+        }
+
+        if (isset($queryParams['offset'])) {
+            $offsetParam = filter_var($queryParams['offset'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
+            if ($offsetParam === false) {
+                throw new ValidationException('offset must be a non-negative integer');
+            }
+            $offset = $offsetParam;
+        }
+
         $zitadel = ZitadelService::fromEnv();
 
-        // Fetch users with roles
-        $usersWithRolesResult = $zitadel->listProjectUsers();
+        // Fetch all project users with roles by paging through the full set.
+        // This ensures the complete role data is available for merging regardless of count.
+        $usersWithRolesArray = [];
+        $projectOffset       = 0;
+        do {
+            $page                = $zitadel->listProjectUsers(self::MAX_LIMIT, $projectOffset);
+            $pageUsers           = $page['users'] ?? [];
+            $usersWithRolesArray = array_merge($usersWithRolesArray, $pageUsers);
+            $projectOffset      += self::MAX_LIMIT;
+            $projectTotal        = $page['total'] ?? 0;
+        } while ($projectOffset < $projectTotal);
 
-        // Fetch all users
-        $allUsersResult = $zitadel->listAllUsers();
+        // Fetch paginated list of all users
+        $allUsersResult = $zitadel->listAllUsers($limit, $offset);
 
         // Defensive checks for API response structure
-        $usersWithRolesArray = $usersWithRolesResult['users'] ?? [];
-        $allUsersArray       = $allUsersResult['users'] ?? [];
+        $allUsersArray = $allUsersResult['users'] ?? [];
 
-        // Build a map of users with roles (keyed by userId)
+        // Build a map of users with roles (keyed by userId), merging grants across pages
         /** @var array<string, array<string, mixed>> $usersWithRolesMap */
         $usersWithRolesMap = [];
         foreach ($usersWithRolesArray as $user) {
-            // Flatten roles from all grants into a single array
-            $roles = [];
+            $userId = $user['userId'] ?? null;
+            if (!is_string($userId)) {
+                continue;
+            }
+
+            $grants = [];
             if (isset($user['grants']) && is_array($user['grants'])) {
-                foreach ($user['grants'] as $grant) {
+                $grants = $user['grants'];
+            }
+
+            if (isset($usersWithRolesMap[$userId])) {
+                // Merge grants from additional pages for the same user
+                $existing           = $usersWithRolesMap[$userId];
+                $existingGrants     = is_array($existing['grants'] ?? null) ? $existing['grants'] : [];
+                $mergedGrants       = array_merge($existingGrants, $grants);
+                $existing['grants'] = $mergedGrants;
+
+                // Re-flatten roles from all merged grants
+                $roles = [];
+                foreach ($mergedGrants as $grant) {
                     if (is_array($grant) && isset($grant['roles']) && is_array($grant['roles'])) {
                         $roles = array_merge($roles, $grant['roles']);
                     }
                 }
-            }
-            $user['roles'] = array_values(array_unique(array_filter($roles, 'is_string')));
-            $userId        = $user['userId'] ?? null;
-            if (is_string($userId)) {
+                $existing['roles']          = array_values(array_unique(array_filter($roles, 'is_string')));
+                $usersWithRolesMap[$userId] = $existing;
+            } else {
+                // Flatten roles from grants
+                $roles = [];
+                foreach ($grants as $grant) {
+                    if (is_array($grant) && isset($grant['roles']) && is_array($grant['roles'])) {
+                        $roles = array_merge($roles, $grant['roles']);
+                    }
+                }
+                $user['roles']              = array_values(array_unique(array_filter($roles, 'is_string')));
                 $usersWithRolesMap[$userId] = $user;
             }
         }
 
-        // Separate users into those with roles and those without
+        // Separate current-page users into those with roles and those without.
+        // Only users from the paginated listAllUsers response are included to
+        // preserve consistent pagination semantics (total/hasMore).
         $usersWithRoles    = [];
         $usersWithoutRoles = [];
-        $seenUserIds       = [];
 
         foreach ($allUsersArray as $user) {
             $userId = $user['userId'] ?? null;
             if (!is_string($userId)) {
                 continue;
             }
-            $seenUserIds[$userId] = true;
             if (isset($usersWithRolesMap[$userId])) {
                 // User has roles - merge role info with email verification from the all-users list
                 $userWithRoles                  = $usersWithRolesMap[$userId];
@@ -161,16 +219,6 @@ final class UsersHandler extends AbstractHandler
                 // User has no roles
                 $user['roles']       = [];
                 $usersWithoutRoles[] = $user;
-            }
-        }
-
-        // Ensure all role-bearing users are included, even if not in allUsersArray
-        // (e.g., due to pagination limits in listAllUsers)
-        foreach ($usersWithRolesMap as $userId => $userWithRoles) {
-            if (!isset($seenUserIds[$userId])) {
-                // User has roles but wasn't in allUsersArray - add with emailVerified defaulting to false
-                $userWithRoles['emailVerified'] = $userWithRoles['emailVerified'] ?? false;
-                $usersWithRoles[]               = $userWithRoles;
             }
         }
 
@@ -184,6 +232,11 @@ final class UsersHandler extends AbstractHandler
             'totalWithoutRoles' => count($usersWithoutRoles),
             'total'             => $processedTotal,
             'reportedTotal'     => $reportedTotal,
+            'pagination'        => [
+                'limit'   => $limit,
+                'offset'  => $offset,
+                'hasMore' => ( $offset + $limit ) < $reportedTotal,
+            ],
         ]);
     }
 

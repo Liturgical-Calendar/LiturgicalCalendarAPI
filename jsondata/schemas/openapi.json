@@ -1336,6 +1336,22 @@
         "summary": "List all users with roles",
         "operationId": "adminListUsers",
         "description": "List all users in the project with their assigned roles. Requires admin role.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Maximum number of users to return (1-1000, default 100)",
+            "schema": {"type": "integer", "minimum": 1, "maximum": 1000, "default": 100}
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Number of users to skip for pagination (default 0)",
+            "schema": {"type": "integer", "minimum": 0, "default": 0}
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK: List of users",
@@ -1347,6 +1363,7 @@
               }
             }
           },
+          "400": {"$ref": "#/components/responses/BadRequest400"},
           "401": {"$ref": "#/components/responses/Unauthorized401"},
           "403": {"$ref": "#/components/responses/Forbidden403"}
         }
@@ -6129,27 +6146,76 @@
         "required": ["pending_role_requests", "pending_permission_requests", "total", "items"],
         "additionalProperties": false
       },
+      "UserGrant": {
+        "type": "object",
+        "properties": {
+          "grantId": {"type": "string"},
+          "roles": {"type": "array", "items": {"type": "string"}},
+          "state": {"type": ["integer", "null"], "description": "Grant state from identity provider"}
+        },
+        "required": ["grantId", "roles"],
+        "additionalProperties": false
+      },
+      "AdminUserWithRoles": {
+        "type": "object",
+        "properties": {
+          "userId": {"type": "string"},
+          "username": {"type": "string"},
+          "displayName": {"type": "string"},
+          "firstName": {"type": "string"},
+          "lastName": {"type": "string"},
+          "email": {"type": "string", "format": "email"},
+          "emailVerified": {"type": "boolean"},
+          "roles": {"type": "array", "items": {"type": "string"}},
+          "grants": {"type": "array", "items": {"$ref": "#/components/schemas/UserGrant"}}
+        },
+        "required": ["userId"],
+        "additionalProperties": false
+      },
+      "AdminUserWithoutRoles": {
+        "type": "object",
+        "properties": {
+          "userId": {"type": "string"},
+          "username": {"type": "string"},
+          "displayName": {"type": "string"},
+          "firstName": {"type": "string"},
+          "lastName": {"type": "string"},
+          "email": {"type": "string", "format": "email"},
+          "emailVerified": {"type": "boolean"},
+          "roles": {"type": "array", "items": {"type": "string"}, "maxItems": 0},
+          "state": {"type": ["string", "null"], "description": "User state from identity provider (e.g., USER_STATE_ACTIVE)"}
+        },
+        "required": ["userId"],
+        "additionalProperties": false
+      },
+      "PaginationMetadata": {
+        "type": "object",
+        "properties": {
+          "limit": {"type": "integer", "description": "Maximum number of results per page"},
+          "offset": {"type": "integer", "description": "Number of results skipped"},
+          "hasMore": {"type": "boolean", "description": "Whether more results exist beyond this page"}
+        },
+        "required": ["limit", "offset", "hasMore"],
+        "additionalProperties": false
+      },
       "AdminUsersResponse": {
         "type": "object",
         "properties": {
-          "users": {
+          "usersWithRoles": {
             "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "userId": {"type": "string"},
-                "displayName": {"type": "string"},
-                "email": {"type": "string", "format": "email"},
-                "roles": {"type": "array", "items": {"type": "string"}},
-                "grants": {"type": "array", "items": {"type": "object"}}
-              },
-              "required": ["userId"],
-              "additionalProperties": false
-            }
+            "items": {"$ref": "#/components/schemas/AdminUserWithRoles"}
           },
-          "total": {"type": "integer"}
+          "usersWithoutRoles": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/AdminUserWithoutRoles"}
+          },
+          "totalWithRoles": {"type": "integer"},
+          "totalWithoutRoles": {"type": "integer"},
+          "total": {"type": "integer", "description": "Total users returned in this response"},
+          "reportedTotal": {"type": "integer", "description": "Total user count reported by the identity provider"},
+          "pagination": {"$ref": "#/components/schemas/PaginationMetadata"}
         },
-        "required": ["users", "total"],
+        "required": ["usersWithRoles", "usersWithoutRoles", "totalWithRoles", "totalWithoutRoles", "total", "reportedTotal", "pagination"],
         "additionalProperties": false
       },
       "SuccessResponse": {
