@@ -80,7 +80,7 @@ final class UsersHandler extends AbstractHandler
         // admin/users/{userId}/roles/{role}
 
         if ($method === RequestMethod::GET) {
-            return $this->listUsers($response);
+            return $this->listUsers($request, $response);
         }
 
         // DELETE requires userId and role
@@ -101,21 +101,48 @@ final class UsersHandler extends AbstractHandler
         return $this->revokeRole($response, $userId, $role);
     }
 
+    private const DEFAULT_LIMIT = 100;
+    private const MAX_LIMIT     = 1000;
+
     /**
      * List all users (with and without roles).
      *
+     * Accepts optional `limit` and `offset` query parameters for pagination.
+     *
+     * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    private function listUsers(ResponseInterface $response): ResponseInterface
+    private function listUsers(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
+        $queryParams = $request->getQueryParams();
+
+        $limit  = self::DEFAULT_LIMIT;
+        $offset = 0;
+
+        if (isset($queryParams['limit'])) {
+            $limitParam = filter_var($queryParams['limit'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 1, 'max_range' => self::MAX_LIMIT]]);
+            if ($limitParam === false) {
+                throw new ValidationException('limit must be an integer between 1 and ' . self::MAX_LIMIT);
+            }
+            $limit = $limitParam;
+        }
+
+        if (isset($queryParams['offset'])) {
+            $offsetParam = filter_var($queryParams['offset'], FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
+            if ($offsetParam === false) {
+                throw new ValidationException('offset must be a non-negative integer');
+            }
+            $offset = $offsetParam;
+        }
+
         $zitadel = ZitadelService::fromEnv();
 
         // Fetch users with roles
-        $usersWithRolesResult = $zitadel->listProjectUsers();
+        $usersWithRolesResult = $zitadel->listProjectUsers($limit, $offset);
 
         // Fetch all users
-        $allUsersResult = $zitadel->listAllUsers();
+        $allUsersResult = $zitadel->listAllUsers($limit, $offset);
 
         // Defensive checks for API response structure
         $usersWithRolesArray = $usersWithRolesResult['users'] ?? [];
@@ -184,6 +211,11 @@ final class UsersHandler extends AbstractHandler
             'totalWithoutRoles' => count($usersWithoutRoles),
             'total'             => $processedTotal,
             'reportedTotal'     => $reportedTotal,
+            'pagination'        => [
+                'limit'   => $limit,
+                'offset'  => $offset,
+                'hasMore' => ( $offset + $limit ) < $reportedTotal,
+            ],
         ]);
     }
 
