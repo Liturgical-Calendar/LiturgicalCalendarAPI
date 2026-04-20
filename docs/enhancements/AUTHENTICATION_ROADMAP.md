@@ -278,7 +278,11 @@ Browser → API → Zitadel (who is this user? what roles do they have?)
 
 ### Authorization Model (Draft)
 
-An OpenFGA authorization model for the LiturgicalCalendar might look like:
+Each calendar type (wider region, national, diocesan) is an independent resource type with no
+permission inheritance between them. This reflects the ecclesial reality: national calendars fall
+under the jurisdiction of bishops' conferences, diocesan calendars under individual dioceses, and
+wider region calendars may be coordinated across multiple bishops' conferences. Each is a distinct
+institution with its own jurisdiction.
 
 ```yaml
 model
@@ -290,23 +294,19 @@ type wider_region
   relations
     define viewer: [user]
     define editor: [user]
-    define admin: [user]
+    define deleter: [user]
 
 type national_calendar
   relations
-    define parent: [wider_region]
-    define viewer: [user] or viewer from parent
-    define editor: [user] or editor from parent
-    define deleter: [user] or admin from parent
-    define admin: [user] or admin from parent
+    define viewer: [user]
+    define editor: [user]
+    define deleter: [user]
 
 type diocesan_calendar
   relations
-    define parent: [national_calendar]
-    define viewer: [user] or viewer from parent
-    define editor: [user] or editor from parent
-    define deleter: [user] or admin from parent
-    define admin: [user] or admin from parent
+    define viewer: [user]
+    define editor: [user]
+    define deleter: [user]
 
 type test_definition
   relations
@@ -318,9 +318,10 @@ type test_definition
 This model enables policies like:
 
 - Grant `editor` on `national_calendar:IT` → user can edit Italy's calendar
-- Grant `editor` on `wider_region:Europe` → user can edit all European national calendars (inherited)
+- Grant `editor` on `diocesan_calendar:roma_lazio_it` → user can edit Rome's diocesan calendar
 - `deleter` is separate from `editor` → edit without delete is possible
-- `admin` on a wider region cascades to all national and diocesan calendars beneath it
+- Permissions on a wider region do **not** cascade to national or diocesan calendars;
+  each must be granted independently
 
 ### Permission Checks in the API
 
