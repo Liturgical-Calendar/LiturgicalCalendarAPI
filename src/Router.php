@@ -527,8 +527,12 @@ class Router
                     new \LiturgicalCalendar\Api\Repositories\ApiKeyRepository(),
                     new \LiturgicalCalendar\Api\Repositories\AuditLogRepository()
                 ));
+                $pipeline->pipe(ApiKeyRateLimitMiddleware::fromEnv());
+            } else {
+                // Without a database, API key validation is unavailable.
+                // Apply IP-only rate limiting for unauthenticated requests.
+                $pipeline->pipe(ApiKeyRateLimitMiddleware::fromEnv());
             }
-            $pipeline->pipe(ApiKeyRateLimitMiddleware::fromEnv());
         }
 
         // Apply HTTPS enforcement middleware for auth, admin, and applications routes in production

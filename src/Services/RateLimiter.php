@@ -118,19 +118,22 @@ class RateLimiter
      * Atomically record a request and return the new count within the window.
      *
      * Uses file locking to prevent TOCTOU race conditions between checking
-     * the count and recording the request.
+     * the count and recording the request. When a cap is provided, the request
+     * is only recorded if the current count is below the cap, preventing
+     * unbounded file growth from requests that exceed the limit.
      *
      * @param string $identifier The identifier (e.g., API key ID, IP address)
-     * @return int The count of attempts within the window after recording this request
+     * @param int|null $cap Maximum allowed count; if current count >= cap, the request is not recorded
+     * @return int The count of attempts within the window (after recording if under cap)
      */
-    public function recordRequestAndGetCount(string $identifier): int
+    public function recordRequestAndGetCount(string $identifier, ?int $cap = null): int
     {
         $lockFile   = $this->getLockFilePath($identifier);
         $lockHandle = @fopen($lockFile, 'c');
 
         if ($lockHandle === false) {
-            $this->recordFailedAttemptUnsafe($identifier);
-            return $this->getAttemptCount($identifier);
+            error_log("RateLimiter: failed to open lock file for {$identifier}, falling back to non-atomic operation");
+            return $this->recordFailedAttemptUnsafe($identifier);
         }
 
         try {
@@ -139,16 +142,20 @@ class RateLimiter
                     $data   = $this->loadData($identifier) ?? ['attempts' => []];
                     $cutoff = time() - $this->windowSeconds;
                     /** @var int[] $attempts */
-                    $attempts   = array_values(array_filter($data['attempts'], fn($timestamp) => $timestamp > $cutoff));
-                    $attempts[] = time();
-                    $this->saveData($identifier, ['attempts' => $attempts]);
+                    $attempts = array_values(array_filter($data['attempts'], fn($timestamp) => $timestamp > $cutoff));
+
+                    // Only record if under the cap (or no cap specified)
+                    if ($cap === null || count($attempts) < $cap) {
+                        $attempts[] = time();
+                        $this->saveData($identifier, ['attempts' => $attempts]);
+                    }
                     return count($attempts);
                 } finally {
                     flock($lockHandle, LOCK_UN);
                 }
             } else {
-                $this->recordFailedAttemptUnsafe($identifier);
-                return $this->getAttemptCount($identifier);
+                error_log("RateLimiter: failed to acquire lock for {$identifier}, falling back to non-atomic operation");
+                return $this->recordFailedAttemptUnsafe($identifier);
             }
         } finally {
             fclose($lockHandle);
@@ -222,23 +229,28 @@ class RateLimiter
     }
 
     /**
-     * Record a failed attempt without locking (internal use)
+     * Record a failed attempt without locking (internal use).
+     *
+     * Returns the count of attempts within the window after recording,
+     * so callers in the fallback path can use the in-memory count
+     * without a separate file read.
      *
      * @param string $identifier The identifier (e.g., IP address)
-     * @return void
+     * @return int The count of attempts within the window after recording
      */
-    private function recordFailedAttemptUnsafe(string $identifier): void
+    private function recordFailedAttemptUnsafe(string $identifier): int
     {
         $data = $this->loadData($identifier) ?? ['attempts' => []];
 
         // Clean up old attempts outside the window
         $cutoff           = time() - $this->windowSeconds;
-        $data['attempts'] = array_filter($data['attempts'], fn($timestamp) => $timestamp > $cutoff);
+        $data['attempts'] = array_values(array_filter($data['attempts'], fn($timestamp) => $timestamp > $cutoff));
 
         // Add current attempt
         $data['attempts'][] = time();
 
         $this->saveData($identifier, $data);
+        return count($data['attempts']);
     }
 
     /**

@@ -66,9 +66,10 @@ class ApiKeyRateLimitMiddleware implements MiddlewareInterface
             $limit      = $this->defaultLimit;
         }
 
-        // Atomically record the request and get the new count to avoid TOCTOU race conditions
-        $newCount  = $this->rateLimiter->recordRequestAndGetCount($identifier);
-        $remaining = $limit - $newCount;
+        // Atomically record the request (capped) and get the count.
+        // The cap prevents unbounded file growth from requests that exceed the limit.
+        $count     = $this->rateLimiter->recordRequestAndGetCount($identifier, $limit);
+        $remaining = $limit - $count;
 
         if ($remaining < 0) {
             $retryAfter = $this->rateLimiter->getRetryAfter($identifier);
@@ -107,7 +108,7 @@ class ApiKeyRateLimitMiddleware implements MiddlewareInterface
      * Extract the client IP address from the request.
      *
      * Only trusts proxy headers (X-Forwarded-For, X-Real-IP) when trustProxyHeaders
-     * is enabled. Without this, an attacker can spoof these headers to bypass rate limits.
+     * is enabled. Validates extracted IPs with filter_var to prevent malformed values.
      *
      * @param ServerRequestInterface $request
      * @return string Client IP address
@@ -119,9 +120,11 @@ class ApiKeyRateLimitMiddleware implements MiddlewareInterface
             foreach ($headers as $header) {
                 $value = $request->getHeaderLine($header);
                 if (!empty($value)) {
-                    // X-Forwarded-For may contain multiple IPs; take the first (client IP)
-                    $ips = array_map('trim', explode(',', $value));
-                    return $ips[0];
+                    $ips       = array_map('trim', explode(',', $value));
+                    $candidate = $ips[0];
+                    if (filter_var($candidate, FILTER_VALIDATE_IP) !== false) {
+                        return $candidate;
+                    }
                 }
             }
         }
