@@ -6,6 +6,9 @@ namespace LiturgicalCalendar\Api\Services;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use Psr\Http\Message\RequestInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -61,23 +64,23 @@ class ZitadelService
         $this->logger       = $logger;
 
         // Use internal URL for HTTP requests if configured (Docker networking)
-        $baseUri = $this->internalUrl ?? $this->issuer;
-        $headers = [];
-        if ($this->internalUrl !== null) {
-            // Add Host header matching the public issuer for Zitadel's domain validation
-            $parsedIssuer = parse_url($this->issuer);
-            if (!is_array($parsedIssuer)) {
-                throw new \RuntimeException('Invalid ZITADEL_ISSUER URL: ' . $this->issuer);
-            }
-            $host            = ( $parsedIssuer['host'] ?? 'localhost' )
-                . ( isset($parsedIssuer['port']) ? ':' . $parsedIssuer['port'] : '' );
-            $headers['Host'] = $host;
-        }
-        $this->httpClient = new Client([
+        $baseUri       = $this->internalUrl ?? $this->issuer;
+        $clientOptions = [
             'base_uri' => $baseUri,
             'timeout'  => 30,
-            'headers'  => $headers,
-        ]);
+        ];
+        if ($this->internalUrl !== null) {
+            // Use middleware to force the Host header matching the public issuer.
+            // Client-level default headers can be overridden by the PSR-7 request URI,
+            // so middleware is needed to reliably inject the Host header.
+            $hostHeader = ZitadelHostHeader::deriveFromIssuer($this->issuer);
+            $stack      = HandlerStack::create();
+            $stack->push(Middleware::mapRequest(function (RequestInterface $request) use ($hostHeader) {
+                return $request->withHeader('Host', $hostHeader);
+            }));
+            $clientOptions['handler'] = $stack;
+        }
+        $this->httpClient = new Client($clientOptions);
     }
 
     /**

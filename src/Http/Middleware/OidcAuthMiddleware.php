@@ -13,6 +13,7 @@ use GuzzleHttp\Psr7\HttpFactory;
 use Psr\Http\Message\RequestInterface;
 use LiturgicalCalendar\Api\Http\CookieHelper;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
+use LiturgicalCalendar\Api\Services\ZitadelHostHeader;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -239,12 +240,7 @@ class OidcAuthMiddleware implements MiddlewareInterface
             // CachedKeySet uses PSR-18 sendRequest() which doesn't apply Guzzle's
             // default headers. Use middleware to inject the Host header so Zitadel
             // accepts requests sent to the Docker service name.
-            $parsedIssuer = parse_url($this->issuer);
-            if (!is_array($parsedIssuer)) {
-                throw new \RuntimeException('Invalid ZITADEL_ISSUER URL: ' . $this->issuer);
-            }
-            $hostHeader = ( $parsedIssuer['host'] ?? 'localhost' )
-                . ( isset($parsedIssuer['port']) ? ':' . $parsedIssuer['port'] : '' );
+            $hostHeader = ZitadelHostHeader::deriveFromIssuer($this->issuer);
             $stack      = HandlerStack::create();
             $stack->push(Middleware::mapRequest(function (RequestInterface $request) use ($hostHeader) {
                 return $request->withHeader('Host', $hostHeader);
