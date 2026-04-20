@@ -360,16 +360,22 @@ class RateLimiterTest extends TestCase
     {
         $identifier = 'test-reset-time';
 
-        // No attempts: reset time should be approximately now
+        // No attempts: reset time should be between before and after
+        $before    = time();
         $resetTime = $this->rateLimiter->getWindowResetTime($identifier);
-        $this->assertEqualsWithDelta(time(), $resetTime, 1);
+        $after     = time();
+        $this->assertGreaterThanOrEqual($before, $resetTime);
+        $this->assertLessThanOrEqual($after, $resetTime);
 
         // Record an attempt
+        $before = time();
         $this->rateLimiter->recordRequest($identifier);
+        $after = time();
 
-        // Reset time should be approximately now + window seconds
+        // Reset time should be between (before + window) and (after + window)
         $resetTime = $this->rateLimiter->getWindowResetTime($identifier);
-        $this->assertEqualsWithDelta(time() + 60, $resetTime, 1);
+        $this->assertGreaterThanOrEqual($before + 60, $resetTime);
+        $this->assertLessThanOrEqual($after + 60, $resetTime);
     }
 
     public function testGetAttemptCountReturnsCorrectCount(): void

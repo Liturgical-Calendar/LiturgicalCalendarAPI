@@ -2,6 +2,9 @@
 
 namespace LiturgicalCalendar\Api\Services;
 
+use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
+use Psr\Log\LoggerInterface;
+
 /**
  * Simple file-based rate limiter for brute-force protection
  *
@@ -16,6 +19,7 @@ class RateLimiter
     private string $storagePath;
     private int $maxAttempts;
     private int $windowSeconds;
+    private LoggerInterface $logger;
 
     /**
      * Create a new rate limiter instance
@@ -35,6 +39,7 @@ class RateLimiter
         $this->maxAttempts   = $maxAttempts;
         $this->windowSeconds = $windowSeconds;
         $this->storagePath   = $storagePath ?? sys_get_temp_dir();
+        $this->logger        = LoggerFactory::create('rate-limiter', null, 30, false, true, false);
 
         // Ensure the rate limit directory exists
         $rateLimitDir = $this->getRateLimitDir();
@@ -119,8 +124,9 @@ class RateLimiter
      *
      * Uses file locking to prevent TOCTOU race conditions between checking
      * the count and recording the request. When a cap is provided, the request
-     * is only recorded if the current count is below the cap, preventing
-     * unbounded file growth from requests that exceed the limit.
+     * is recorded only when the current count is at or below the cap (allowing
+     * one overflow so callers can detect the breach), then stops recording to
+     * prevent unbounded file growth.
      *
      * @param string $identifier The identifier (e.g., API key ID, IP address)
      * @param int|null $cap Maximum allowed count; records up to cap+1 (one overflow) so callers
@@ -133,7 +139,9 @@ class RateLimiter
         $lockHandle = @fopen($lockFile, 'c');
 
         if ($lockHandle === false) {
-            error_log("RateLimiter: failed to open lock file for {$identifier}, falling back to non-atomic operation");
+            $this->logger->error('Failed to open lock file, falling back to non-atomic operation', [
+                'identifier_hash' => hash('sha256', $identifier),
+            ]);
             return $this->recordFailedAttemptUnsafe($identifier, $cap);
         }
 
@@ -156,7 +164,9 @@ class RateLimiter
                     flock($lockHandle, LOCK_UN);
                 }
             } else {
-                error_log("RateLimiter: failed to acquire lock for {$identifier}, falling back to non-atomic operation");
+                $this->logger->error('Failed to acquire lock, falling back to non-atomic operation', [
+                    'identifier_hash' => hash('sha256', $identifier),
+                ]);
                 return $this->recordFailedAttemptUnsafe($identifier, $cap);
             }
         } finally {
