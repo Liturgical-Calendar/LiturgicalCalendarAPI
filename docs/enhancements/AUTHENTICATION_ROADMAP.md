@@ -234,6 +234,120 @@ For detailed documentation on the Zitadel implementation, see the project wiki:
 See the [Implementation Status wiki page](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/wiki/Zitadel-Implementation-Status#outstanding-work)
 for the current list of outstanding work with linked GitHub issues.
 
+---
+
+## Future: Fine-Grained Authorization with OpenFGA
+
+### The Problem
+
+Zitadel provides coarse-grained role-based access control (RBAC): a user is a `calendar_editor` or they are not.
+The current `user_calendar_permissions` table adds a layer of per-calendar permissions, but only supports
+`read`/`write` — it cannot express fine-grained policies like:
+
+- "User X can **edit** the national calendar of Italy but cannot **delete** it"
+- "User Y can **create** diocesan calendars under Italy but cannot modify existing ones"
+- "User Z can **edit** any calendar in the Americas wider region"
+
+These relationship-based, resource-level permissions require a dedicated authorization engine.
+
+### Why OpenFGA
+
+[OpenFGA](https://openfga.dev/) is the open-source implementation of
+[Google's Zanzibar](https://research.google/pubs/zanzibar-googles-consistent-global-authorization-system/)
+authorization system. It was evaluated for fine-grained authorization because:
+
+1. **Relationship-based access control (ReBAC)** — permissions are modeled as relationships between users
+   and resources, not just roles
+2. **Open source and self-hostable** — aligns with the project's Docker-based philosophy (like Zitadel)
+3. **Language-agnostic** — HTTP/gRPC API, usable from PHP without an SDK
+4. **CNCF project** — part of the Cloud Native Computing Foundation, with active development
+5. **Designed for scale** — handles complex permission graphs efficiently
+6. **Composable with Zitadel** — Zitadel handles identity/authentication, OpenFGA handles
+   fine-grained authorization
+
+### Proposed Architecture
+
+```text
+Browser → API → Zitadel (who is this user? what roles do they have?)
+                    ↓
+                OpenFGA (can this user perform this action on this resource?)
+```
+
+- **Zitadel** — identity, authentication, coarse-grained roles
+- **OpenFGA** — fine-grained, per-resource permission checks
+
+### Authorization Model (Draft)
+
+An OpenFGA authorization model for the LiturgicalCalendar might look like:
+
+```yaml
+model
+  schema 1.1
+
+type user
+
+type wider_region
+  relations
+    define viewer: [user]
+    define editor: [user]
+    define admin: [user]
+
+type national_calendar
+  relations
+    define parent: [wider_region]
+    define viewer: [user] or viewer from parent
+    define editor: [user] or editor from parent
+    define deleter: [user] or admin from parent
+    define admin: [user] or admin from parent
+
+type diocesan_calendar
+  relations
+    define parent: [national_calendar]
+    define viewer: [user] or viewer from parent
+    define editor: [user] or editor from parent
+    define deleter: [user] or admin from parent
+    define admin: [user] or admin from parent
+
+type test_definition
+  relations
+    define viewer: [user]
+    define editor: [user]
+    define deleter: [user]
+```
+
+This model enables policies like:
+
+- Grant `editor` on `national_calendar:IT` → user can edit Italy's calendar
+- Grant `editor` on `wider_region:Europe` → user can edit all European national calendars (inherited)
+- `deleter` is separate from `editor` → edit without delete is possible
+- `admin` on a wider region cascades to all national and diocesan calendars beneath it
+
+### Permission Checks in the API
+
+The middleware would check OpenFGA before allowing operations:
+
+```text
+PUT    /data/national/IT  →  check(user, "editor", "national_calendar:IT")
+DELETE /data/national/IT  →  check(user, "deleter", "national_calendar:IT")
+PATCH  /data/diocesan/roma_lazio_it  →  check(user, "editor", "diocesan_calendar:roma_lazio_it")
+```
+
+### Infrastructure
+
+OpenFGA would be added to the Docker Compose stack:
+
+- **openfga** container (port 8081 or similar)
+- **PostgreSQL** or **MySQL** backend for OpenFGA (can share the existing PostgreSQL instance)
+- The `setup-zitadel.sh` script would be extended to also initialize the OpenFGA authorization model
+
+### Migration Path
+
+1. **Phase 1**: Add OpenFGA to Docker stack, define authorization model
+2. **Phase 2**: Create middleware that checks OpenFGA for calendar write operations
+3. **Phase 3**: Build admin UI for managing per-resource permissions (replaces `user_calendar_permissions` table)
+4. **Phase 4**: Migrate existing `user_calendar_permissions` data to OpenFGA relationship tuples
+5. **Phase 5**: Remove the `user_calendar_permissions` and `permission_requests` tables
+
 ### CORS Configuration Design
 
 The API uses different CORS configurations for public and authenticated endpoints:
