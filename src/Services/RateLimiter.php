@@ -123,8 +123,9 @@ class RateLimiter
      * unbounded file growth from requests that exceed the limit.
      *
      * @param string $identifier The identifier (e.g., API key ID, IP address)
-     * @param int|null $cap Maximum allowed count; if current count >= cap, the request is not recorded
-     * @return int The count of attempts within the window (after recording if under cap)
+     * @param int|null $cap Maximum allowed count; records up to cap+1 (one overflow) so callers
+     *                      can detect the limit was exceeded, then stops recording to prevent unbounded growth
+     * @return int The count of attempts within the window after recording
      */
     public function recordRequestAndGetCount(string $identifier, ?int $cap = null): int
     {
@@ -133,7 +134,7 @@ class RateLimiter
 
         if ($lockHandle === false) {
             error_log("RateLimiter: failed to open lock file for {$identifier}, falling back to non-atomic operation");
-            return $this->recordFailedAttemptUnsafe($identifier);
+            return $this->recordFailedAttemptUnsafe($identifier, $cap);
         }
 
         try {
@@ -144,8 +145,9 @@ class RateLimiter
                     /** @var int[] $attempts */
                     $attempts = array_values(array_filter($data['attempts'], fn($timestamp) => $timestamp > $cutoff));
 
-                    // Only record if under the cap (or no cap specified)
-                    if ($cap === null || count($attempts) < $cap) {
+                    // Record up to cap+1: allow one overflow so the caller sees count > cap
+                    // and can trigger a 429, then stop recording to prevent unbounded growth
+                    if ($cap === null || count($attempts) <= $cap) {
                         $attempts[] = time();
                         $this->saveData($identifier, ['attempts' => $attempts]);
                     }
@@ -155,7 +157,7 @@ class RateLimiter
                 }
             } else {
                 error_log("RateLimiter: failed to acquire lock for {$identifier}, falling back to non-atomic operation");
-                return $this->recordFailedAttemptUnsafe($identifier);
+                return $this->recordFailedAttemptUnsafe($identifier, $cap);
             }
         } finally {
             fclose($lockHandle);
@@ -233,12 +235,14 @@ class RateLimiter
      *
      * Returns the count of attempts within the window after recording,
      * so callers in the fallback path can use the in-memory count
-     * without a separate file read.
+     * without a separate file read. Mirrors the cap behavior of
+     * recordRequestAndGetCount (allows one overflow, then stops).
      *
      * @param string $identifier The identifier (e.g., IP address)
+     * @param int|null $cap Maximum allowed count (allows one overflow, then stops recording)
      * @return int The count of attempts within the window after recording
      */
-    private function recordFailedAttemptUnsafe(string $identifier): int
+    private function recordFailedAttemptUnsafe(string $identifier, ?int $cap = null): int
     {
         $data = $this->loadData($identifier) ?? ['attempts' => []];
 
@@ -246,8 +250,10 @@ class RateLimiter
         $cutoff           = time() - $this->windowSeconds;
         $data['attempts'] = array_values(array_filter($data['attempts'], fn($timestamp) => $timestamp > $cutoff));
 
-        // Add current attempt
-        $data['attempts'][] = time();
+        // Record up to cap+1 (same overflow behavior as the locked path)
+        if ($cap === null || count($data['attempts']) <= $cap) {
+            $data['attempts'][] = time();
+        }
 
         $this->saveData($identifier, $data);
         return count($data['attempts']);
