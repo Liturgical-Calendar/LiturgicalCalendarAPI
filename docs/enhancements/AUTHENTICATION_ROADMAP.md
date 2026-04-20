@@ -193,7 +193,8 @@ For detailed documentation on the Zitadel implementation, see the project wiki:
 **Role Request Workflow:**
 
 - Users submit requests via `POST /auth/role-requests`
-- Admins approve/reject via `POST /admin/role-requests/{id}/approve|reject`
+- Admins approve via `POST /admin/role-requests/{id}/approve`
+- Admins reject via `POST /admin/role-requests/{id}/reject`
 - Approval triggers role grant in Zitadel via Management API
 - Role revocation support
 
