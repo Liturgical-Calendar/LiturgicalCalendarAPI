@@ -156,22 +156,45 @@ final class UsersHandler extends AbstractHandler
         // Defensive checks for API response structure
         $allUsersArray = $allUsersResult['users'] ?? [];
 
-        // Build a map of users with roles (keyed by userId)
+        // Build a map of users with roles (keyed by userId), merging grants across pages
         /** @var array<string, array<string, mixed>> $usersWithRolesMap */
         $usersWithRolesMap = [];
         foreach ($usersWithRolesArray as $user) {
-            // Flatten roles from all grants into a single array
-            $roles = [];
+            $userId = $user['userId'] ?? null;
+            if (!is_string($userId)) {
+                continue;
+            }
+
+            $grants = [];
             if (isset($user['grants']) && is_array($user['grants'])) {
-                foreach ($user['grants'] as $grant) {
+                $grants = $user['grants'];
+            }
+
+            if (isset($usersWithRolesMap[$userId])) {
+                // Merge grants from additional pages for the same user
+                $existing           = $usersWithRolesMap[$userId];
+                $existingGrants     = is_array($existing['grants'] ?? null) ? $existing['grants'] : [];
+                $mergedGrants       = array_merge($existingGrants, $grants);
+                $existing['grants'] = $mergedGrants;
+
+                // Re-flatten roles from all merged grants
+                $roles = [];
+                foreach ($mergedGrants as $grant) {
                     if (is_array($grant) && isset($grant['roles']) && is_array($grant['roles'])) {
                         $roles = array_merge($roles, $grant['roles']);
                     }
                 }
-            }
-            $user['roles'] = array_values(array_unique(array_filter($roles, 'is_string')));
-            $userId        = $user['userId'] ?? null;
-            if (is_string($userId)) {
+                $existing['roles']          = array_values(array_unique(array_filter($roles, 'is_string')));
+                $usersWithRolesMap[$userId] = $existing;
+            } else {
+                // Flatten roles from grants
+                $roles = [];
+                foreach ($grants as $grant) {
+                    if (is_array($grant) && isset($grant['roles']) && is_array($grant['roles'])) {
+                        $roles = array_merge($roles, $grant['roles']);
+                    }
+                }
+                $user['roles']              = array_values(array_unique(array_filter($roles, 'is_string')));
                 $usersWithRolesMap[$userId] = $user;
             }
         }

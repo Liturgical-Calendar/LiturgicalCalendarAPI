@@ -6146,6 +6146,16 @@
         "required": ["pending_role_requests", "pending_permission_requests", "total", "items"],
         "additionalProperties": false
       },
+      "UserGrant": {
+        "type": "object",
+        "properties": {
+          "grantId": {"type": "string"},
+          "roles": {"type": "array", "items": {"type": "string"}},
+          "state": {"type": ["integer", "null"], "description": "Grant state from identity provider"}
+        },
+        "required": ["grantId", "roles"],
+        "additionalProperties": false
+      },
       "AdminUserWithRoles": {
         "type": "object",
         "properties": {
@@ -6157,9 +6167,10 @@
           "email": {"type": "string", "format": "email"},
           "emailVerified": {"type": "boolean"},
           "roles": {"type": "array", "items": {"type": "string"}},
-          "grants": {"type": "array", "items": {"type": "object"}}
+          "grants": {"type": "array", "items": {"$ref": "#/components/schemas/UserGrant"}}
         },
-        "required": ["userId"]
+        "required": ["userId"],
+        "additionalProperties": false
       },
       "AdminUserWithoutRoles": {
         "type": "object",
@@ -6172,9 +6183,10 @@
           "email": {"type": "string", "format": "email"},
           "emailVerified": {"type": "boolean"},
           "roles": {"type": "array", "items": {"type": "string"}, "maxItems": 0},
-          "state": {}
+          "state": {"type": ["string", "null"], "description": "User state from identity provider (e.g., USER_STATE_ACTIVE)"}
         },
-        "required": ["userId"]
+        "required": ["userId"],
+        "additionalProperties": false
       },
       "PaginationMetadata": {
         "type": "object",
@@ -6183,7 +6195,8 @@
           "offset": {"type": "integer", "description": "Number of results skipped"},
           "hasMore": {"type": "boolean", "description": "Whether more results exist beyond this page"}
         },
-        "required": ["limit", "offset", "hasMore"]
+        "required": ["limit", "offset", "hasMore"],
+        "additionalProperties": false
       },
       "AdminUsersResponse": {
         "type": "object",
@@ -6202,7 +6215,8 @@
           "reportedTotal": {"type": "integer", "description": "Total user count reported by the identity provider"},
           "pagination": {"$ref": "#/components/schemas/PaginationMetadata"}
         },
-        "required": ["usersWithRoles", "usersWithoutRoles", "totalWithRoles", "totalWithoutRoles", "total", "reportedTotal", "pagination"]
+        "required": ["usersWithRoles", "usersWithoutRoles", "totalWithRoles", "totalWithoutRoles", "total", "reportedTotal", "pagination"],
+        "additionalProperties": false
       },
       "SuccessResponse": {
         "type": "object",
