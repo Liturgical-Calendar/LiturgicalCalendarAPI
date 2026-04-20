@@ -25,6 +25,7 @@ class ApiKeyRateLimitMiddleware implements MiddlewareInterface
 {
     private RateLimiter $rateLimiter;
     private int $defaultLimit;
+    private bool $trustProxyHeaders;
 
     private const WINDOW_SECONDS = 3600; // 1 hour
 
@@ -33,10 +34,12 @@ class ApiKeyRateLimitMiddleware implements MiddlewareInterface
      *
      * @param int $defaultLimit Default requests per hour for unauthenticated requests
      * @param string|null $storagePath Path to store rate limit data (default: system temp dir)
+     * @param bool $trustProxyHeaders Whether to trust X-Forwarded-For/X-Real-IP headers for client IP
      */
-    public function __construct(int $defaultLimit = 100, ?string $storagePath = null)
+    public function __construct(int $defaultLimit = 100, ?string $storagePath = null, bool $trustProxyHeaders = false)
     {
-        $this->defaultLimit = $defaultLimit;
+        $this->defaultLimit      = $defaultLimit;
+        $this->trustProxyHeaders = $trustProxyHeaders;
         // maxAttempts is set high because we compare against per-key limits ourselves.
         // The RateLimiter only handles window-based counting and file storage.
         $this->rateLimiter = new RateLimiter(PHP_INT_MAX, self::WINDOW_SECONDS, $storagePath);
@@ -63,10 +66,11 @@ class ApiKeyRateLimitMiddleware implements MiddlewareInterface
             $limit      = $this->defaultLimit;
         }
 
-        // Check current count within the window
-        $currentCount = $this->rateLimiter->getAttemptCount($identifier);
-        $remaining    = $limit - $currentCount;
-        if ($remaining <= 0) {
+        // Atomically record the request and get the new count to avoid TOCTOU race conditions
+        $newCount  = $this->rateLimiter->recordRequestAndGetCount($identifier);
+        $remaining = $limit - $newCount;
+
+        if ($remaining < 0) {
             $retryAfter = $this->rateLimiter->getRetryAfter($identifier);
             throw new TooManyRequestsException(
                 "Rate limit exceeded. Maximum {$limit} requests per hour.",
@@ -74,15 +78,12 @@ class ApiKeyRateLimitMiddleware implements MiddlewareInterface
             );
         }
 
-        // Record this request
-        $this->rateLimiter->recordRequest($identifier);
-
         // Add rate limit headers to response
         $response = $handler->handle($request);
         return $response
             ->withHeader('X-RateLimit-Limit', (string) $limit)
-            ->withHeader('X-RateLimit-Remaining', (string) max(0, $remaining - 1))
-            ->withHeader('X-RateLimit-Reset', (string) ( time() + self::WINDOW_SECONDS ));
+            ->withHeader('X-RateLimit-Remaining', (string) max(0, $remaining))
+            ->withHeader('X-RateLimit-Reset', (string) $this->rateLimiter->getWindowResetTime($identifier));
     }
 
     /**
@@ -96,26 +97,32 @@ class ApiKeyRateLimitMiddleware implements MiddlewareInterface
         $defaultLimit    = is_numeric($defaultLimitEnv) ? (int) $defaultLimitEnv : 100;
         $storagePath     = getenv('RATE_LIMIT_STORAGE_PATH') ?: ( $_ENV['RATE_LIMIT_STORAGE_PATH'] ?? null );
         $storagePath     = is_string($storagePath) && !empty($storagePath) ? $storagePath : null;
+        $trustProxy      = getenv('TRUST_PROXY_HEADERS') ?: ( $_ENV['TRUST_PROXY_HEADERS'] ?? 'false' );
+        $trustProxy      = filter_var($trustProxy, FILTER_VALIDATE_BOOLEAN);
 
-        return new self($defaultLimit, $storagePath);
+        return new self($defaultLimit, $storagePath, $trustProxy);
     }
 
     /**
      * Extract the client IP address from the request.
+     *
+     * Only trusts proxy headers (X-Forwarded-For, X-Real-IP) when trustProxyHeaders
+     * is enabled. Without this, an attacker can spoof these headers to bypass rate limits.
      *
      * @param ServerRequestInterface $request
      * @return string Client IP address
      */
     private function getClientIp(ServerRequestInterface $request): string
     {
-        // Check common proxy headers
-        $headers = ['X-Forwarded-For', 'X-Real-IP'];
-        foreach ($headers as $header) {
-            $value = $request->getHeaderLine($header);
-            if (!empty($value)) {
-                // X-Forwarded-For may contain multiple IPs; take the first (client IP)
-                $ips = array_map('trim', explode(',', $value));
-                return $ips[0];
+        if ($this->trustProxyHeaders) {
+            $headers = ['X-Forwarded-For', 'X-Real-IP'];
+            foreach ($headers as $header) {
+                $value = $request->getHeaderLine($header);
+                if (!empty($value)) {
+                    // X-Forwarded-For may contain multiple IPs; take the first (client IP)
+                    $ips = array_map('trim', explode(',', $value));
+                    return $ips[0];
+                }
             }
         }
 

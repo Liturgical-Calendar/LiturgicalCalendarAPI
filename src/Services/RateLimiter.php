@@ -115,6 +115,74 @@ class RateLimiter
     }
 
     /**
+     * Atomically record a request and return the new count within the window.
+     *
+     * Uses file locking to prevent TOCTOU race conditions between checking
+     * the count and recording the request.
+     *
+     * @param string $identifier The identifier (e.g., API key ID, IP address)
+     * @return int The count of attempts within the window after recording this request
+     */
+    public function recordRequestAndGetCount(string $identifier): int
+    {
+        $lockFile   = $this->getLockFilePath($identifier);
+        $lockHandle = @fopen($lockFile, 'c');
+
+        if ($lockHandle === false) {
+            $this->recordFailedAttemptUnsafe($identifier);
+            return $this->getAttemptCount($identifier);
+        }
+
+        try {
+            if (flock($lockHandle, LOCK_EX)) {
+                try {
+                    $data   = $this->loadData($identifier) ?? ['attempts' => []];
+                    $cutoff = time() - $this->windowSeconds;
+                    /** @var int[] $attempts */
+                    $attempts   = array_values(array_filter($data['attempts'], fn($timestamp) => $timestamp > $cutoff));
+                    $attempts[] = time();
+                    $this->saveData($identifier, ['attempts' => $attempts]);
+                    return count($attempts);
+                } finally {
+                    flock($lockHandle, LOCK_UN);
+                }
+            } else {
+                $this->recordFailedAttemptUnsafe($identifier);
+                return $this->getAttemptCount($identifier);
+            }
+        } finally {
+            fclose($lockHandle);
+        }
+    }
+
+    /**
+     * Get the UNIX timestamp when the current rate limit window resets.
+     *
+     * Returns the time when the oldest attempt in the window will expire,
+     * or the current time if there are no recorded attempts.
+     *
+     * @param string $identifier The identifier (e.g., API key ID, IP address)
+     * @return int UNIX timestamp of window reset
+     */
+    public function getWindowResetTime(string $identifier): int
+    {
+        $data = $this->loadData($identifier);
+        if ($data === null || empty($data['attempts'])) {
+            return time();
+        }
+
+        $cutoff = time() - $this->windowSeconds;
+        /** @var int[] $attempts */
+        $attempts = array_filter($data['attempts'], fn($timestamp) => $timestamp > $cutoff);
+        if (empty($attempts)) {
+            return time();
+        }
+
+        // The window resets when the oldest attempt expires
+        return min($attempts) + $this->windowSeconds;
+    }
+
+    /**
      * Record a failed attempt for an identifier
      *
      * Uses file locking to prevent race conditions when multiple processes
