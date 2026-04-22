@@ -94,7 +94,7 @@ class ApiKeyRateLimitMiddleware implements MiddlewareInterface
      */
     public static function fromEnv(): self
     {
-        $defaultLimitEnv = getenv('API_KEY_DEFAULT_RATE_LIMIT') ?: ( $_ENV['API_KEY_DEFAULT_RATE_LIMIT'] ?? '' );
+        $defaultLimitEnv = getenv('UNAUTHENTICATED_RATE_LIMIT') ?: ( $_ENV['UNAUTHENTICATED_RATE_LIMIT'] ?? '' );
         $defaultLimit    = is_numeric($defaultLimitEnv) ? (int) $defaultLimitEnv : 100;
         $storagePath     = getenv('RATE_LIMIT_STORAGE_PATH') ?: ( $_ENV['RATE_LIMIT_STORAGE_PATH'] ?? null );
         $storagePath     = is_string($storagePath) && !empty($storagePath) ? $storagePath : null;

@@ -81,7 +81,7 @@ jobs:
       - name: Configure environment for testing
         run: |
           cp .env.example .env.local
-          echo "API_KEY_DEFAULT_RATE_LIMIT=999999" >> .env.local
+          echo "UNAUTHENTICATED_RATE_LIMIT=999999" >> .env.local
           echo "DB_HOST=localhost" >> .env.local
           echo "DB_PORT=5432" >> .env.local
           echo "DB_NAME=litcal" >> .env.local
