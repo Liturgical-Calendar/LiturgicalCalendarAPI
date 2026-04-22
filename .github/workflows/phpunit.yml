@@ -12,6 +12,17 @@ on:
       'jsondata/**',
       'i18n/**'
     ]
+  pull_request:
+    branches: [ development ]
+    paths: [
+      '**/*.php',
+      'composer.json',
+      'composer.lock',
+      'phpunit*.xml*',
+      '.env.example',
+      'jsondata/**',
+      'i18n/**'
+    ]
   workflow_dispatch:
 
 concurrency:
