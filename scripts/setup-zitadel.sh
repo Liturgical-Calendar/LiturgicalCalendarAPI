@@ -480,6 +480,33 @@ generate_service_account_key() {
     fi
 }
 
+# Function to create a personal access token for a service account
+create_service_account_pat() {
+    local pat="$1"
+    local user_id="$2"
+
+    echo -e "${YELLOW}Creating PAT for service account ${user_id}...${NC}" >&2
+
+    local result
+    result=$(curl -s -X POST "${ZITADEL_URL}/management/v1/users/${user_id}/pats" \
+        -H "Authorization: Bearer $pat" \
+        -H "Content-Type: application/json" \
+        -d "{
+            \"expirationDate\": \"2030-01-01T00:00:00Z\"
+        }")
+
+    local token
+    token=$(echo "$result" | jq -r '.token // empty')
+
+    if [ -n "$token" ]; then
+        echo -e "${GREEN}Service account PAT created${NC}" >&2
+        echo "$token"
+    else
+        echo -e "${RED}Failed to create service account PAT: $result${NC}" >&2
+        exit 1
+    fi
+}
+
 # Main execution
 main() {
     # Handle --docker-init: start Docker stack if not running
@@ -511,6 +538,7 @@ main() {
     SERVICE_ACCOUNT_ID=$(create_test_service_account "$PAT" "$PROJECT_ID")
     assign_project_role "$PAT" "$PROJECT_ID" "$SERVICE_ACCOUNT_ID" "admin"
     SERVICE_KEY_FILE=$(generate_service_account_key "$PAT" "$SERVICE_ACCOUNT_ID")
+    SERVICE_ACCOUNT_PAT=$(create_service_account_pat "$PAT" "$SERVICE_ACCOUNT_ID")
 
     # Create Frontend OIDC app
     echo
@@ -529,7 +557,7 @@ main() {
     echo -e "  Project ID:      ${PROJECT_ID}"
     echo -e "  Client ID:       ${FRONTEND_CLIENT_ID}"
     echo -e "  Client Secret:   ${FRONTEND_CLIENT_SECRET}"
-    echo -e "  Service Token:   ${PAT}"
+    echo -e "  SA PAT:          ${SERVICE_ACCOUNT_PAT}"
     echo -e "  Test SA Key:     ${SERVICE_KEY_FILE}"
     echo
     echo -e "${GREEN}Roles created:${NC}"
@@ -557,7 +585,10 @@ main() {
                 update_env_file "$target" "ZITADEL_ISSUER" "${ZITADEL_URL}"
                 update_env_file "$target" "ZITADEL_CLIENT_ID" "$FRONTEND_CLIENT_ID"
                 update_env_file "$target" "ZITADEL_PROJECT_ID" "$PROJECT_ID"
-                update_env_file "$target" "ZITADEL_MACHINE_TOKEN" "$PAT"
+                # Only the API needs a machine token for Management API calls
+                if [ "$label" = "API" ]; then
+                    update_env_file "$target" "ZITADEL_MACHINE_TOKEN" "$SERVICE_ACCOUNT_PAT"
+                fi
                 echo -e "${GREEN}Updated ${label}: $target${NC}"
             else
                 echo -e "${YELLOW}Skipped ${label} (no .env file found in $dir)${NC}"
