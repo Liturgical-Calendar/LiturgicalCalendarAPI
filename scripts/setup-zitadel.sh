@@ -455,7 +455,7 @@ generate_service_account_key() {
         return 0
     fi
 
-    result=$(curl -s -X POST "${ZITADEL_URL}/management/v1/users/${user_id}/keys" \
+    result=$(curl -s -X POST "${ZITADEL_URL}/v2/users/${user_id}/keys" \
         -H "Authorization: Bearer $pat" \
         -H "Content-Type: application/json" \
         -d "{
@@ -484,6 +484,35 @@ generate_service_account_key() {
     fi
 }
 
+# Function to assign an org-level role to a user via the v2 InternalPermissionService
+# Required for Management API access (e.g., user lookups, grant management)
+assign_org_role() {
+    local pat="$1"
+    local user_id="$2"
+    local role="$3"
+
+    echo -e "${YELLOW}Assigning org role '${role}' to user ${user_id}...${NC}" >&2
+
+    local result
+    result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.internal_permission.v2.InternalPermissionService/CreateAdministrator" \
+        -H "Authorization: Bearer $pat" \
+        -H "Content-Type: application/json" \
+        -d "{
+            \"userId\": \"${user_id}\",
+            \"resource\": { \"instance\": true },
+            \"roles\": [\"${role}\"]
+        }")
+
+    if echo "$result" | jq -e '.creationDate' > /dev/null 2>&1; then
+        echo -e "${GREEN}Org role '${role}' assigned successfully${NC}" >&2
+    elif echo "$result" | jq -e '.code == 6' > /dev/null 2>&1; then
+        # ALREADY_EXISTS
+        echo -e "${GREEN}Org role '${role}' already assigned${NC}" >&2
+    else
+        echo -e "${YELLOW}Org role assignment result: ${result}${NC}" >&2
+    fi
+}
+
 # Function to create a personal access token for a service account
 create_service_account_pat() {
     local pat="$1"
@@ -500,7 +529,7 @@ create_service_account_pat() {
     echo -e "${YELLOW}Creating PAT for service account ${user_id}...${NC}" >&2
 
     local result
-    result=$(curl -s -X POST "${ZITADEL_URL}/management/v1/users/${user_id}/pats" \
+    result=$(curl -s -X POST "${ZITADEL_URL}/v2/users/${user_id}/pats" \
         -H "Authorization: Bearer $pat" \
         -H "Content-Type: application/json" \
         -d "{
@@ -551,6 +580,7 @@ main() {
     echo
     SERVICE_ACCOUNT_ID=$(create_test_service_account "$PAT" "$PROJECT_ID")
     assign_project_role "$PAT" "$PROJECT_ID" "$SERVICE_ACCOUNT_ID" "admin"
+    assign_org_role "$PAT" "$SERVICE_ACCOUNT_ID" "ORG_OWNER"
     SERVICE_KEY_FILE=$(generate_service_account_key "$PAT" "$SERVICE_ACCOUNT_ID")
     SERVICE_ACCOUNT_PAT=$(create_service_account_pat "$PAT" "$SERVICE_ACCOUNT_ID")
 
