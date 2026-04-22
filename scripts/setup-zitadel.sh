@@ -488,6 +488,14 @@ generate_service_account_key() {
 create_service_account_pat() {
     local pat="$1"
     local user_id="$2"
+    local pat_file="${PROJECT_DIR}/service-account.pat"
+
+    # Reuse existing PAT file unless --force-secrets is set
+    if [ -f "$pat_file" ] && [ "$FORCE_SECRETS" != "true" ]; then
+        echo -e "${GREEN}PAT file already exists (use --force-secrets to regenerate)${NC}" >&2
+        cat "$pat_file"
+        return 0
+    fi
 
     echo -e "${YELLOW}Creating PAT for service account ${user_id}...${NC}" >&2
 
@@ -503,7 +511,9 @@ create_service_account_pat() {
     token=$(echo "$result" | jq -r '.token // empty')
 
     if [ -n "$token" ]; then
-        echo -e "${GREEN}Service account PAT created${NC}" >&2
+        echo "$token" > "$pat_file"
+        chmod 600 "$pat_file" || { echo -e "${RED}Failed to set permissions on $pat_file${NC}" >&2; exit 1; }
+        echo -e "${GREEN}Service account PAT created and saved to $pat_file${NC}" >&2
         echo "$token"
     else
         echo -e "${RED}Failed to create service account PAT: $result${NC}" >&2
