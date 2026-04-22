@@ -14,15 +14,6 @@ on:
     ]
   pull_request:
     branches: [ development, stable ]
-    paths: [
-      '**/*.php',
-      'composer.json',
-      'composer.lock',
-      'phpunit*.xml*',
-      '.env.example',
-      'jsondata/**',
-      'i18n/**'
-    ]
   workflow_dispatch:
 
 concurrency:
