@@ -410,11 +410,23 @@ class OidcAuthMiddleware implements MiddlewareInterface
         }
 
         // If roles are not present in the token (e.g., JWT Profile grant for service accounts),
-        // look them up via the Zitadel Management API
+        // look them up via the Zitadel Management API with a short-lived cache
         if (empty($roles) && is_string($sub) && ZitadelService::isConfigured()) {
+            $cacheDir = dirname(__DIR__, 3) . '/cache';
+            $cache    = new FilesystemAdapter('roles', 300, $cacheDir);
+            $cacheKey = 'user_roles_' . str_replace(['{', '}', '(', ')', '/', '\\', '@', ':'], '_', $sub);
+
             try {
-                $zitadelService = ZitadelService::fromEnv();
-                $roles          = $zitadelService->getUserRoles($sub);
+                $cachedItem = $cache->getItem($cacheKey);
+                if ($cachedItem->isHit()) {
+                    $cached = $cachedItem->get();
+                    $roles  = is_array($cached) ? array_filter($cached, 'is_string') : [];
+                } else {
+                    $zitadelService = ZitadelService::fromEnv();
+                    $roles          = $zitadelService->getUserRoles($sub);
+                    $cachedItem->set($roles);
+                    $cache->save($cachedItem);
+                }
             } catch (\Exception $e) {
                 $this->logger->debug('Failed to look up roles from Zitadel Management API', [
                     'error'  => $e->getMessage(),
