@@ -350,12 +350,14 @@ create_test_service_account() {
     echo -e "${YELLOW}Creating test service account...${NC}" >&2
 
     # Check if machine user already exists
-    existing=$(curl -s -X POST "${ZITADEL_URL}/management/v1/users/_search" \
+    local existing
+    existing=$(curl -s -X POST "${ZITADEL_URL}/v2/users" \
         -H "Authorization: Bearer $pat" \
         -H "Content-Type: application/json" \
-        -d "{\"queries\": [{\"userNameQuery\": {\"userName\": \"${username}\", \"method\": \"TEXT_QUERY_METHOD_EQUALS\"}}]}")
+        -d "{\"queries\": [{\"user_name_query\": {\"userName\": \"${username}\", \"method\": \"TEXT_QUERY_METHOD_EQUALS\"}}]}")
 
-    existing_id=$(echo "$existing" | jq -r '.result[0].id // empty')
+    local existing_id
+    existing_id=$(echo "$existing" | jq -r '.result[0].userId // empty')
 
     if [ -n "$existing_id" ]; then
         echo -e "${GREEN}Service account already exists with ID: $existing_id${NC}" >&2
@@ -364,16 +366,20 @@ create_test_service_account() {
     fi
 
     # Create machine user
-    result=$(curl -s -X POST "${ZITADEL_URL}/management/v1/users/machine" \
+    local result
+    result=$(curl -s -X POST "${ZITADEL_URL}/v2/users/new" \
         -H "Authorization: Bearer $pat" \
         -H "Content-Type: application/json" \
         -d "{
-            \"userName\": \"${username}\",
-            \"name\": \"${display_name}\",
-            \"accessTokenType\": \"ACCESS_TOKEN_TYPE_JWT\"
+            \"machine\": {
+                \"username\": \"${username}\",
+                \"name\": \"${display_name}\",
+                \"accessTokenType\": \"JWT\"
+            }
         }")
 
-    user_id=$(echo "$result" | jq -r '.userId // empty')
+    local user_id
+    user_id=$(echo "$result" | jq -r '.id // empty')
 
     if [ -n "$user_id" ]; then
         echo -e "${GREEN}Service account created with ID: $user_id${NC}" >&2
