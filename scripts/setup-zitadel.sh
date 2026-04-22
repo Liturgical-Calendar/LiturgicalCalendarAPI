@@ -38,6 +38,7 @@ PROJECT_DIR="${SCRIPT_DIR}/.."
 UPDATE_ENV="${UPDATE_ENV:-false}"
 DOCKER_INIT="${DOCKER_INIT:-false}"
 FORCE_SECRETS="${FORCE_SECRETS:-false}"
+SHOW_SECRETS="${SHOW_SECRETS:-false}"
 for arg in "$@"; do
     case $arg in
         --update-env)
@@ -48,6 +49,9 @@ for arg in "$@"; do
             ;;
         --force-secrets)
             FORCE_SECRETS="true"
+            ;;
+        --show-secrets)
+            SHOW_SECRETS="true"
             ;;
     esac
 done
@@ -557,7 +561,11 @@ main() {
     echo -e "  Project ID:      ${PROJECT_ID}"
     echo -e "  Client ID:       ${FRONTEND_CLIENT_ID}"
     echo -e "  Client Secret:   ${FRONTEND_CLIENT_SECRET}"
-    echo -e "  SA PAT:          ${SERVICE_ACCOUNT_PAT}"
+    if [ "${SHOW_SECRETS}" = "true" ]; then
+        echo -e "  SA PAT:          ${SERVICE_ACCOUNT_PAT}"
+    else
+        echo -e "  SA PAT:          ****${SERVICE_ACCOUNT_PAT: -4}"
+    fi
     echo -e "  Test SA Key:     ${SERVICE_KEY_FILE}"
     echo
     echo -e "${GREEN}Roles created:${NC}"
