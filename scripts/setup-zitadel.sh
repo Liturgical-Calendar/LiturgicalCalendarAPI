@@ -596,6 +596,15 @@ main() {
                 # Only the API needs a machine token for Management API calls
                 if [ "$label" = "API" ]; then
                     update_env_file "$target" "ZITADEL_MACHINE_TOKEN" "$SERVICE_ACCOUNT_PAT"
+                else
+                    # Remove stale ZITADEL_MACHINE_TOKEN from non-API env files
+                    if grep -q "^ZITADEL_MACHINE_TOKEN=" "$target" 2>/dev/null; then
+                        if [[ "$OSTYPE" == "darwin"* ]]; then
+                            sed -i '' '/^ZITADEL_MACHINE_TOKEN=/d' "$target"
+                        else
+                            sed -i '/^ZITADEL_MACHINE_TOKEN=/d' "$target"
+                        fi
+                    fi
                 fi
                 echo -e "${GREEN}Updated ${label}: $target${NC}"
             else
