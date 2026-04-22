@@ -564,12 +564,11 @@ class Router
             in_array($route, ['data', 'tests', 'temporale'], true)
             && in_array($this->request->getMethod(), [RequestMethod::PUT->value, RequestMethod::PATCH->value, RequestMethod::DELETE->value], true)
         ) {
-            // Use OIDC (Zitadel) authentication if configured, otherwise fall back to JWT
+            // Use OIDC (Zitadel) authentication if configured (with legacy JWT fallback),
+            // otherwise use JWT-only authentication
             if (self::isOidcConfigured()) {
-                $pipeline->pipe(OidcAuthMiddleware::fromEnv());
+                $pipeline->pipe(OidcAuthMiddleware::fromEnv(jwtFallback: true));
             } else {
-                // Fall back to legacy JWT authentication
-                // JwtAuthMiddleware sets oidc_user attribute for compatibility with AuthorizationMiddleware
                 $pipeline->pipe(new JwtAuthMiddleware());
             }
 

@@ -10,9 +10,10 @@ use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
-use LiturgicalCalendar\Api\Http\Exception\ImplementationException;
 use LiturgicalCalendar\Api\Http\Exception\UnsupportedMediaTypeException;
 use LiturgicalCalendar\Api\Http\Exception\YamlException;
+use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Yaml\Exception\DumpException;
 use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
@@ -309,14 +310,11 @@ final class MetadataHandler extends AbstractHandler
                     return $response->withStatus(StatusCode::OK->value, StatusCode::OK->reason())->withBody(Stream::create($responseBody));
                     // no break needed
                 case AcceptHeader::YAML->value:
-                    if (!extension_loaded('yaml')) {
-                        throw new ImplementationException('YAML extension not loaded');
-                    }
                     $responseBodyObj = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
 
                     try {
-                        $yamlEncodedResponse = yaml_emit($responseBodyObj, YAML_UTF8_ENCODING);
-                    } catch (\ErrorException $e) {
+                        $yamlEncodedResponse = Yaml::dump($responseBodyObj, 10, 2, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+                    } catch (DumpException $e) {
                         throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
                     }
                     return $response->withStatus(StatusCode::OK->value, StatusCode::OK->reason())->withBody(Stream::create($yamlEncodedResponse));

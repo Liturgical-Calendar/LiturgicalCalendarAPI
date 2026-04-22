@@ -13,7 +13,10 @@ use GuzzleHttp\Psr7\HttpFactory;
 use Psr\Http\Message\RequestInterface;
 use LiturgicalCalendar\Api\Http\CookieHelper;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
+use LiturgicalCalendar\Api\Models\Auth\User;
+use LiturgicalCalendar\Api\Services\JwtServiceFactory;
 use LiturgicalCalendar\Api\Services\ZitadelHostHeader;
+use LiturgicalCalendar\Api\Services\ZitadelService;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -36,8 +39,10 @@ class OidcAuthMiddleware implements MiddlewareInterface
 {
     private string $issuer;
     private string $clientId;
+    private ?string $projectId;
     private ?string $internalUrl;
     private int $cacheTtl;
+    private bool $jwtFallback;
     private LoggerInterface $logger;
 
     /**
@@ -52,21 +57,27 @@ class OidcAuthMiddleware implements MiddlewareInterface
      *
      * @param string $issuer Zitadel issuer URL (e.g., http://localhost:8080)
      * @param string $clientId Zitadel client ID for audience validation
+     * @param string|null $projectId Zitadel project ID (also valid as audience for machine-to-machine tokens)
      * @param string|null $internalUrl Internal URL for server-side requests (e.g., http://zitadel:8080)
      * @param int $cacheTtl JWKS cache TTL in seconds (default: 3600)
      * @param LoggerInterface|null $logger PSR-3 logger instance (optional)
+     * @param bool $jwtFallback Whether to fall back to legacy JWT validation when OIDC validation fails
      */
     public function __construct(
         string $issuer,
         string $clientId,
+        ?string $projectId = null,
         ?string $internalUrl = null,
         int $cacheTtl = 3600,
-        ?LoggerInterface $logger = null
+        ?LoggerInterface $logger = null,
+        bool $jwtFallback = false
     ) {
         $this->issuer      = rtrim($issuer, '/');
         $this->clientId    = $clientId;
+        $this->projectId   = $projectId;
         $this->internalUrl = $internalUrl !== null ? rtrim($internalUrl, '/') : null;
         $this->cacheTtl    = $cacheTtl;
+        $this->jwtFallback = $jwtFallback;
         $this->logger      = $logger ?? LoggerFactory::create('auth', null, 30, false, true, false);
     }
 
@@ -91,18 +102,21 @@ class OidcAuthMiddleware implements MiddlewareInterface
      * - ZITADEL_ISSUER: Zitadel issuer URL
      * - ZITADEL_CLIENT_ID: Client ID for audience validation
      *
+     * @param bool $jwtFallback Whether to fall back to legacy JWT validation when OIDC validation fails
      * @return self
      * @throws \RuntimeException If required environment variables are missing
      */
-    public static function fromEnv(): self
+    public static function fromEnv(bool $jwtFallback = false): self
     {
         // Check both getenv() and $_ENV since Dotenv may not always populate putenv()
         $issuerEnv      = getenv('ZITADEL_ISSUER') ?: ( $_ENV['ZITADEL_ISSUER'] ?? '' );
         $clientIdEnv    = getenv('ZITADEL_CLIENT_ID') ?: ( $_ENV['ZITADEL_CLIENT_ID'] ?? '' );
+        $projectIdEnv   = getenv('ZITADEL_PROJECT_ID') ?: ( $_ENV['ZITADEL_PROJECT_ID'] ?? '' );
         $internalUrlEnv = getenv('ZITADEL_INTERNAL_URL') ?: ( $_ENV['ZITADEL_INTERNAL_URL'] ?? '' );
 
         $issuer      = is_string($issuerEnv) ? $issuerEnv : '';
         $clientId    = is_string($clientIdEnv) ? $clientIdEnv : '';
+        $projectId   = is_string($projectIdEnv) && !empty($projectIdEnv) ? $projectIdEnv : null;
         $internalUrl = is_string($internalUrlEnv) && !empty($internalUrlEnv) ? $internalUrlEnv : null;
 
         if (empty($issuer) || empty($clientId)) {
@@ -111,11 +125,14 @@ class OidcAuthMiddleware implements MiddlewareInterface
             );
         }
 
-        return new self($issuer, $clientId, $internalUrl);
+        return new self($issuer, $clientId, $projectId, $internalUrl, 3600, null, $jwtFallback);
     }
 
     /**
      * Process the request and validate OIDC token.
+     *
+     * Attempts OIDC (Zitadel) token validation first. If that fails and JWT fallback
+     * is enabled, attempts legacy JWT validation as a secondary mechanism.
      *
      * @param ServerRequestInterface $request Incoming request
      * @param RequestHandlerInterface $handler Next handler
@@ -135,43 +152,123 @@ class OidcAuthMiddleware implements MiddlewareInterface
             throw new UnauthorizedException('Missing authentication token');
         }
 
+        // Try OIDC validation first
+        $oidcResult = $this->tryOidcValidation($token);
+
+        if ($oidcResult !== null) {
+            // OIDC validation succeeded
+            $request = $request->withAttribute('oidc_user', $oidcResult['user']);
+            $request = $request->withAttribute('oidc_token', $oidcResult['payload']);
+            return $handler->handle($request);
+        }
+
+        // OIDC validation failed — try JWT fallback if enabled
+        if ($this->jwtFallback) {
+            $jwtResult = $this->tryJwtFallback($token);
+            if ($jwtResult !== null) {
+                $request = $request->withAttribute('user', $jwtResult['user']);
+                $request = $request->withAttribute('jwt_payload', $jwtResult['payload']);
+                $request = $request->withAttribute('oidc_user', [
+                    'sub'                => $jwtResult['user']->username,
+                    'email'              => null,
+                    'email_verified'     => false,
+                    'name'               => null,
+                    'given_name'         => null,
+                    'family_name'        => null,
+                    'preferred_username' => $jwtResult['user']->username,
+                    'roles'              => $jwtResult['user']->roles,
+                ]);
+                return $handler->handle($request);
+            }
+        }
+
+        throw new UnauthorizedException('Invalid or expired token');
+    }
+
+    /**
+     * Attempt OIDC token validation.
+     *
+     * @param string $token JWT token string
+     * @return array{user: array{sub: string|null, email: string|null, email_verified: bool, name: string|null, given_name: string|null, family_name: string|null, preferred_username: string|null, roles: array<string>, project_id?: string}, payload: object}|null Validated result or null on failure
+     */
+    private function tryOidcValidation(string $token): ?array
+    {
         try {
             $payload = $this->validateToken($token);
         } catch (\Exception $e) {
-            // Log full details for debugging, return generic message to client
-            $this->logger->warning('OIDC token validation failed', [
+            $this->logger->debug('OIDC token validation failed, will try fallback', [
                 'error'  => $e->getMessage(),
                 'issuer' => $this->issuer,
             ]);
-            throw new UnauthorizedException('Invalid or expired token');
+            return null;
         }
 
         // Validate issuer
         if (!isset($payload->iss) || $payload->iss !== $this->issuer) {
-            throw new UnauthorizedException('Invalid token issuer');
+            $this->logger->warning('OIDC issuer mismatch', [
+                'expected' => $this->issuer,
+                'actual'   => $payload->iss ?? '(missing)',
+            ]);
+            return null;
         }
 
         // Validate audience (can be string or array)
-        $aud           = $payload->aud ?? null;
-        $validAudience = false;
-        if (is_string($aud) && $aud === $this->clientId) {
+        // Accept either the OIDC client ID or the project ID as valid audience.
+        // Zitadel puts the project ID in the audience for machine-to-machine tokens,
+        // and the client ID for user-facing OIDC tokens.
+        $aud            = $payload->aud ?? null;
+        $validAudiences = array_filter([$this->clientId, $this->projectId]);
+        $validAudience  = false;
+        if (is_string($aud) && in_array($aud, $validAudiences, true)) {
             $validAudience = true;
-        } elseif (is_array($aud) && in_array($this->clientId, $aud, true)) {
+        } elseif (is_array($aud) && !empty(array_intersect(array_filter($aud, 'is_string'), $validAudiences))) {
             $validAudience = true;
         }
 
         if (!$validAudience) {
-            throw new UnauthorizedException('Invalid token audience');
+            $this->logger->warning('OIDC audience mismatch', [
+                'expected' => $validAudiences,
+                'actual'   => $aud,
+            ]);
+            return null;
         }
 
-        // Extract user info and roles from token
         $oidcUser = $this->extractUserInfo($payload);
+        return ['user' => $oidcUser, 'payload' => $payload];
+    }
 
-        // Attach to request attributes
-        $request = $request->withAttribute('oidc_user', $oidcUser);
-        $request = $request->withAttribute('oidc_token', $payload);
+    /**
+     * Attempt legacy JWT token validation as a fallback.
+     *
+     * @param string $token JWT token string
+     * @return array{user: User, payload: object}|null Validated result or null on failure
+     */
+    private function tryJwtFallback(string $token): ?array
+    {
+        try {
+            $jwtService = JwtServiceFactory::fromEnv();
+            $payload    = $jwtService->verify($token);
 
-        return $handler->handle($request);
+            if ($payload === null) {
+                return null;
+            }
+
+            $user = User::fromJwtPayload($payload);
+            if ($user === null) {
+                return null;
+            }
+
+            $this->logger->info('Authenticated via legacy JWT fallback', [
+                'username' => $user->username,
+            ]);
+
+            return ['user' => $user, 'payload' => $payload];
+        } catch (\Exception $e) {
+            $this->logger->debug('JWT fallback validation also failed', [
+                'error' => $e->getMessage(),
+            ]);
+            return null;
+        }
     }
 
     /**
@@ -309,6 +406,20 @@ class OidcAuthMiddleware implements MiddlewareInterface
                 if (is_string($role)) {
                     $roles[] = $role;
                 }
+            }
+        }
+
+        // If roles are not present in the token (e.g., JWT Profile grant for service accounts),
+        // look them up via the Zitadel Management API
+        if (empty($roles) && is_string($sub) && ZitadelService::isConfigured()) {
+            try {
+                $zitadelService = ZitadelService::fromEnv();
+                $roles          = $zitadelService->getUserRoles($sub);
+            } catch (\Exception $e) {
+                $this->logger->debug('Failed to look up roles from Zitadel Management API', [
+                    'error'  => $e->getMessage(),
+                    'userId' => $sub,
+                ]);
             }
         }
 

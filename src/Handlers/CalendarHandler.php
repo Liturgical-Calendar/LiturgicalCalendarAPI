@@ -26,10 +26,11 @@ use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
-use LiturgicalCalendar\Api\Http\Exception\ImplementationException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Exception\YamlException;
+use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Yaml\Exception\DumpException;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use LiturgicalCalendar\Api\Http\Negotiator;
 use LiturgicalCalendar\Api\Models\LitCalItem;
@@ -4459,13 +4460,10 @@ final class CalendarHandler extends AbstractHandler
                 $responseBody = $dom->saveXML();
                 break;
             case ReturnTypeParam::YAML:
-                if (!extension_loaded('yaml')) {
-                    throw new ImplementationException('YAML extension not loaded');
-                }
                 $jsonArr = Utilities::objectToArray($SerializeableLitCal);
                 try {
-                    $responseBody = yaml_emit($jsonArr, YAML_UTF8_ENCODING);
-                } catch (\ErrorException $e) {
+                    $responseBody = Yaml::dump($jsonArr, 10, 2, Yaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+                } catch (DumpException $e) {
                     throw new YamlException($e->getMessage(), StatusCode::UNPROCESSABLE_CONTENT->value, $e);
                 }
                 break;

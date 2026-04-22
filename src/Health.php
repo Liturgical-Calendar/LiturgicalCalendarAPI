@@ -22,6 +22,7 @@ use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
+use Symfony\Component\Yaml\Yaml;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Test\LitTestRunner;
@@ -1100,41 +1101,35 @@ class Health implements MessageComponentInterface
                         break;
                     case 'YML':
                         try {
-                            if (!function_exists('yaml_parse')) {
-                                throw new \RuntimeException('PHP yaml extension not installed');
-                            }
-
-                            /**
-                             * TODO: perhaps we need to register a custom Exception handler, since yaml_parse() throws a warning instead of an exception
-                             *       and we need to catch that warning as an exception {@see \LiturgicalCalendar\Api\Core::warningHandler()}
-                             */
-                            $yamlParsed = yaml_parse($data);
-                            if (false === $yamlParsed) {
-                                throw new \Exception('YAML parsing failed');
+                            $yamlParsed = Yaml::parse($data);
+                            if (false === is_array($yamlParsed) || empty($yamlParsed)) {
+                                throw new \Exception('YAML parsing failed: expected a non-empty associative array');
                             }
 
                             $jsonEncoded = json_encode($yamlParsed, JSON_THROW_ON_ERROR);
-                            $yamlData    = json_decode($jsonEncoded);
-                            if ($yamlData) {
+                            $yamlData    = json_decode($jsonEncoded, false, 512, JSON_THROW_ON_ERROR);
+                            if (!( $yamlData instanceof \stdClass )) {
+                                throw new \Exception('YAML parsing failed: expected an object mapping, got ' . gettype($yamlData));
+                            }
+
+                            $message          = new \stdClass();
+                            $message->type    = 'success';
+                            $message->text    = "The $category of $calendar for the year $year was successfully decoded as YAML";
+                            $message->classes = ".calendar-$calendar.json-valid.year-$year";
+                            $this->sendMessage($to, $message);
+
+                            // Always validate against schema (even for cached responses) since this is a test endpoint
+                            $validationResult = $this->validateDataAgainstSchema($yamlData, LitSchema::LITCAL->path());
+                            if (gettype($validationResult) === 'boolean' && $validationResult === true) {
                                 $message          = new \stdClass();
                                 $message->type    = 'success';
-                                $message->text    = "The $category of $calendar for the year $year was successfully decoded as YAML";
-                                $message->classes = ".calendar-$calendar.json-valid.year-$year";
+                                $cachedNote       = $fromCache ? ' (cached)' : '';
+                                $message->text    = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL->path() . $cachedNote;
+                                $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                                 $this->sendMessage($to, $message);
-
-                                // Always validate against schema (even for cached responses) since this is a test endpoint
-                                $validationResult = $this->validateDataAgainstSchema($yamlData, LitSchema::LITCAL->path());
-                                if (gettype($validationResult) === 'boolean' && $validationResult === true) {
-                                    $message          = new \stdClass();
-                                    $message->type    = 'success';
-                                    $cachedNote       = $fromCache ? ' (cached)' : '';
-                                    $message->text    = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL->path() . $cachedNote;
-                                    $message->classes = ".calendar-$calendar.schema-valid.year-$year";
-                                    $this->sendMessage($to, $message);
-                                } elseif ($validationResult instanceof \stdClass) {
-                                    $validationResult->classes = ".calendar-$calendar.schema-valid.year-$year";
-                                    $this->sendMessage($to, $validationResult);
-                                }
+                            } elseif ($validationResult instanceof \stdClass) {
+                                $validationResult->classes = ".calendar-$calendar.schema-valid.year-$year";
+                                $this->sendMessage($to, $validationResult);
                             }
                         } catch (\Throwable $e) {
                             $message               = new \stdClass();

@@ -63,10 +63,6 @@ final class SchemasTest extends ApiTestCase
 
     public function testGetSchemasReturnsYaml(): void
     {
-        if (!extension_loaded('yaml')) {
-            $this->markTestSkipped('YAML extension is not installed');
-        }
-
         $response = self::$http->get('/schemas', [
             'headers' => ['Accept' => 'application/yaml']
         ]);
