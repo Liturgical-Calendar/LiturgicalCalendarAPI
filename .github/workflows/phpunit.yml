@@ -10,7 +10,8 @@ on:
       'phpunit*.xml*',
       '.env.example',
       'jsondata/**',
-      'i18n/**'
+      'i18n/**',
+      'infrastructure/init-db.sql'
     ]
   pull_request:
     branches: [ development, stable ]
