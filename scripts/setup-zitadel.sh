@@ -476,7 +476,8 @@ generate_service_account_key() {
         return 0
     fi
 
-    result=$(curl -s -X POST "${ZITADEL_URL}/management/v1/users/${user_id}/keys" \
+    local result
+    result=$(curl -s -X POST "${ZITADEL_URL}/v2/users/${user_id}/keys" \
         -H "Authorization: Bearer $pat" \
         -H "Content-Type: application/json" \
         -d "{
