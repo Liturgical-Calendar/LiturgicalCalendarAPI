@@ -63,14 +63,6 @@ is_stack_running() {
     docker compose ps --status running 2>/dev/null | grep -q "zitadel"
 }
 
-# Function to start Docker stack
-start_docker_stack() {
-    echo -e "${YELLOW}Starting Docker stack...${NC}" >&2
-    cd "$PROJECT_DIR"
-    docker compose up -d
-    echo -e "${GREEN}Docker stack started${NC}" >&2
-}
-
 # Function to wait for Zitadel to be ready
 wait_for_zitadel() {
     echo -e "${YELLOW}Waiting for Zitadel to be ready...${NC}"
