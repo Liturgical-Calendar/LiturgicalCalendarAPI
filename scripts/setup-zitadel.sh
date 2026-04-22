@@ -218,20 +218,25 @@ create_oidc_app() {
     echo -e "${YELLOW}Creating OIDC app: $app_name...${NC}" >&2
 
     # Check if app already exists
-    existing=$(curl -s -X POST "${ZITADEL_URL}/management/v1/projects/${project_id}/apps/_search" \
+    local existing
+    existing=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/ListApplications" \
         -H "Authorization: Bearer $pat" \
         -H "Content-Type: application/json" \
-        -d '{}')
+        -d "{\"filters\": [{\"project_id_filter\": {\"projectId\": \"${project_id}\"}}, {\"name_filter\": {\"name\": \"${app_name}\"}}]}")
 
-    existing_id=$(echo "$existing" | jq -r --arg name "$app_name" '(.result // [])[] | select(.name == $name) | .id // empty')
+    local existing_id
+    existing_id=$(echo "$existing" | jq -r '.applications[0].applicationId // empty')
 
     if [ -n "$existing_id" ]; then
         echo -e "${YELLOW}App already exists, getting client ID...${NC}" >&2
-        client_id=$(echo "$existing" | jq -r --arg name "$app_name" '(.result // [])[] | select(.name == $name) | .oidcConfig.clientId // empty')
+        local client_id
+        client_id=$(echo "$existing" | jq -r '.applications[0].oidcConfiguration.clientId // empty')
 
         # Check if we have an existing secret
+        local existing_secret
         existing_secret=$(get_existing_client_secret "$client_id")
 
+        local client_secret
         if [ -n "$existing_secret" ] && [ "$FORCE_SECRETS" != "true" ]; then
             echo -e "${GREEN}Using existing client secret (sessions preserved)${NC}" >&2
             client_secret="$existing_secret"
@@ -241,30 +246,37 @@ create_oidc_app() {
             else
                 echo -e "${YELLOW}No existing secret found, generating new one...${NC}" >&2
             fi
-            secret_result=$(curl -s -X POST "${ZITADEL_URL}/management/v1/projects/${project_id}/apps/${existing_id}/oidc_config/_generate_client_secret" \
+            local secret_result
+            secret_result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/GenerateClientSecret" \
                 -H "Authorization: Bearer $pat" \
-                -H "Content-Type: application/json")
+                -H "Content-Type: application/json" \
+                -d "{\"applicationId\": \"${existing_id}\", \"projectId\": \"${project_id}\"}")
             client_secret=$(echo "$secret_result" | jq -r '.clientSecret // empty')
         fi
 
         # Update config
-        update_result=$(curl -s -X PUT "${ZITADEL_URL}/management/v1/projects/${project_id}/apps/${existing_id}/oidc_config" \
+        local update_result
+        update_result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/UpdateApplication" \
             -H "Authorization: Bearer $pat" \
             -H "Content-Type: application/json" \
             -d "{
-                \"redirectUris\": [\"$redirect_uri\"],
-                \"postLogoutRedirectUris\": [\"$post_logout_uri\"],
-                \"responseTypes\": [\"OIDC_RESPONSE_TYPE_CODE\"],
-                \"grantTypes\": [\"OIDC_GRANT_TYPE_AUTHORIZATION_CODE\", \"OIDC_GRANT_TYPE_REFRESH_TOKEN\"],
-                \"appType\": \"OIDC_APP_TYPE_WEB\",
-                \"authMethodType\": \"OIDC_AUTH_METHOD_TYPE_NONE\",
-                \"accessTokenType\": \"OIDC_TOKEN_TYPE_JWT\",
-                \"devMode\": true,
-                \"idTokenRoleAssertion\": true,
-                \"idTokenUserinfoAssertion\": true
+                \"projectId\": \"${project_id}\",
+                \"applicationId\": \"${existing_id}\",
+                \"oidcConfiguration\": {
+                    \"redirectUris\": [\"$redirect_uri\"],
+                    \"postLogoutRedirectUris\": [\"$post_logout_uri\"],
+                    \"responseTypes\": [\"OIDC_RESPONSE_TYPE_CODE\"],
+                    \"grantTypes\": [\"OIDC_GRANT_TYPE_AUTHORIZATION_CODE\", \"OIDC_GRANT_TYPE_REFRESH_TOKEN\"],
+                    \"appType\": \"OIDC_APP_TYPE_WEB\",
+                    \"authMethodType\": \"OIDC_AUTH_METHOD_TYPE_NONE\",
+                    \"accessTokenType\": \"OIDC_TOKEN_TYPE_JWT\",
+                    \"devMode\": true,
+                    \"idTokenRoleAssertion\": true,
+                    \"idTokenUserinfoAssertion\": true
+                }
             }")
 
-        if ! echo "$update_result" | jq -e '.details' > /dev/null 2>&1; then
+        if ! echo "$update_result" | jq -e '.changeDate' > /dev/null 2>&1; then
             echo -e "${YELLOW}Warning: Config update may have failed: $update_result${NC}" >&2
         fi
 
@@ -273,24 +285,28 @@ create_oidc_app() {
     fi
 
     # Create new app
-    result=$(curl -s -X POST "${ZITADEL_URL}/management/v1/projects/${project_id}/apps/oidc" \
+    local result
+    result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/CreateApplication" \
         -H "Authorization: Bearer $pat" \
         -H "Content-Type: application/json" \
         -d "{
+            \"projectId\": \"${project_id}\",
             \"name\": \"$app_name\",
-            \"redirectUris\": [\"$redirect_uri\"],
-            \"postLogoutRedirectUris\": [\"$post_logout_uri\"],
-            \"responseTypes\": [\"OIDC_RESPONSE_TYPE_CODE\"],
-            \"grantTypes\": [\"OIDC_GRANT_TYPE_AUTHORIZATION_CODE\", \"OIDC_GRANT_TYPE_REFRESH_TOKEN\"],
-            \"appType\": \"OIDC_APP_TYPE_WEB\",
-            \"authMethodType\": \"OIDC_AUTH_METHOD_TYPE_NONE\",
-            \"accessTokenType\": \"OIDC_TOKEN_TYPE_JWT\",
-            \"devMode\": true,
-            \"idTokenRoleAssertion\": true,
-            \"idTokenUserinfoAssertion\": true
+            \"oidcConfiguration\": {
+                \"redirectUris\": [\"$redirect_uri\"],
+                \"postLogoutRedirectUris\": [\"$post_logout_uri\"],
+                \"responseTypes\": [\"OIDC_RESPONSE_TYPE_CODE\"],
+                \"grantTypes\": [\"OIDC_GRANT_TYPE_AUTHORIZATION_CODE\", \"OIDC_GRANT_TYPE_REFRESH_TOKEN\"],
+                \"appType\": \"OIDC_APP_TYPE_WEB\",
+                \"authMethodType\": \"OIDC_AUTH_METHOD_TYPE_NONE\",
+                \"accessTokenType\": \"OIDC_TOKEN_TYPE_JWT\",
+                \"devMode\": true
+            }
         }")
 
+    local client_id
     client_id=$(echo "$result" | jq -r '.clientId // empty')
+    local client_secret
     client_secret=$(echo "$result" | jq -r '.clientSecret // empty')
 
     if [ -n "$client_id" ]; then
