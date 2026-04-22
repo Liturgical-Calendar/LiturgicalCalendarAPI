@@ -283,12 +283,14 @@ abstract class ApiTestCase extends TestCase
             ]);
 
             if ($response->getStatusCode() !== 200) {
+                error_log("Zitadel token exchange failed: HTTP {$response->getStatusCode()} - {$response->getBody()}");
                 return null;
             }
 
             $data = json_decode((string) $response->getBody(), true);
             return is_array($data) ? ( $data['access_token'] ?? null ) : null;
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            error_log("Zitadel token exchange error: {$e->getMessage()}");
             return null;
         }
     }
