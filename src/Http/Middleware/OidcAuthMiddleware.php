@@ -205,6 +205,10 @@ class OidcAuthMiddleware implements MiddlewareInterface
 
         // Validate issuer
         if (!isset($payload->iss) || $payload->iss !== $this->issuer) {
+            $this->logger->warning('OIDC issuer mismatch', [
+                'expected' => $this->issuer,
+                'actual'   => $payload->iss ?? '(missing)',
+            ]);
             return null;
         }
 
@@ -222,6 +226,10 @@ class OidcAuthMiddleware implements MiddlewareInterface
         }
 
         if (!$validAudience) {
+            $this->logger->warning('OIDC audience mismatch', [
+                'expected' => $validAudiences,
+                'actual'   => $aud,
+            ]);
             return null;
         }
 
