@@ -412,9 +412,14 @@ class OidcAuthMiddleware implements MiddlewareInterface
         // If roles are not present in the token (e.g., JWT Profile grant for service accounts),
         // look them up via the Zitadel Management API with a short-lived cache
         if (empty($roles) && is_string($sub) && ZitadelService::isConfigured()) {
+            $sanitize = static fn(string $v): string => str_replace(
+                ['{', '}', '(', ')', '/', '\\', '@', ':'],
+                '_',
+                $v
+            );
             $cacheDir = dirname(__DIR__, 3) . '/cache';
             $cache    = new FilesystemAdapter('roles', 300, $cacheDir);
-            $cacheKey = 'user_roles_' . str_replace(['{', '}', '(', ')', '/', '\\', '@', ':'], '_', $sub);
+            $cacheKey = $sanitize($this->issuer) . '_' . $sanitize($this->projectId ?? '') . '_' . $sanitize($sub);
 
             try {
                 $cachedItem = $cache->getItem($cacheKey);
@@ -428,10 +433,19 @@ class OidcAuthMiddleware implements MiddlewareInterface
                     $cache->save($cachedItem);
                 }
             } catch (\Exception $e) {
-                $this->logger->debug('Failed to look up roles from Zitadel Management API', [
+                $this->logger->debug('Role cache/lookup failed, falling back to API', [
                     'error'  => $e->getMessage(),
                     'userId' => $sub,
                 ]);
+                try {
+                    $zitadelService = ZitadelService::fromEnv();
+                    $roles          = $zitadelService->getUserRoles($sub);
+                } catch (\Exception $fallbackEx) {
+                    $this->logger->debug('Fallback role lookup also failed', [
+                        'error'  => $fallbackEx->getMessage(),
+                        'userId' => $sub,
+                    ]);
+                }
             }
         }
 
