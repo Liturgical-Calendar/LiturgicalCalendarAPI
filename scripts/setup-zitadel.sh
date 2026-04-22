@@ -140,26 +140,29 @@ create_roles() {
     local project_id="$2"
     echo -e "${YELLOW}Creating project roles...${NC}" >&2
 
-    for role in "${ROLES[@]}"; do
-        # Check if role exists
-        existing=$(curl -s -X POST "${ZITADEL_URL}/management/v1/projects/${project_id}/roles/_search" \
-            -H "Authorization: Bearer $pat" \
-            -H "Content-Type: application/json" \
-            -d "{\"queries\": [{\"keyQuery\": {\"key\": \"${role}\", \"method\": \"TEXT_QUERY_METHOD_EQUALS\"}}]}")
+    # Fetch existing roles once
+    local existing
+    existing=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/ListProjectRoles" \
+        -H "Authorization: Bearer $pat" \
+        -H "Content-Type: application/json" \
+        -d "{\"projectId\": \"${project_id}\"}")
 
-        existing_key=$(echo "$existing" | jq -r '.result[0].key // empty')
+    for role in "${ROLES[@]}"; do
+        local existing_key
+        existing_key=$(echo "$existing" | jq -r --arg r "$role" '(.roles // [])[] | select(.key == $r) | .key // empty')
 
         if [ -n "$existing_key" ]; then
             echo -e "  ${GREEN}Role '${role}' already exists${NC}" >&2
             continue
         fi
 
-        result=$(curl -s -X POST "${ZITADEL_URL}/management/v1/projects/${project_id}/roles" \
+        local result
+        result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/AddProjectRole" \
             -H "Authorization: Bearer $pat" \
             -H "Content-Type: application/json" \
-            -d "{\"roleKey\": \"${role}\", \"displayName\": \"${role}\"}")
+            -d "{\"projectId\": \"${project_id}\", \"roleKey\": \"${role}\", \"displayName\": \"${role}\"}")
 
-        if echo "$result" | jq -e '.details' > /dev/null 2>&1; then
+        if echo "$result" | jq -e '.creationDate' > /dev/null 2>&1; then
             echo -e "  ${GREEN}Role '${role}' created${NC}" >&2
         else
             echo -e "  ${YELLOW}Role '${role}': ${result}${NC}" >&2
