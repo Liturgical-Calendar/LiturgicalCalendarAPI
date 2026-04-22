@@ -104,12 +104,12 @@ create_project() {
     echo -e "${YELLOW}Creating ${PROJECT_NAME} project...${NC}" >&2
 
     # Check if project already exists
-    existing=$(curl -s -X POST "${ZITADEL_URL}/management/v1/projects/_search" \
+    existing=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/ListProjects" \
         -H "Authorization: Bearer $pat" \
         -H "Content-Type: application/json" \
-        -d "{\"queries\": [{\"nameQuery\": {\"name\": \"${PROJECT_NAME}\", \"method\": \"TEXT_QUERY_METHOD_EQUALS\"}}]}")
+        -d "{\"filters\": [{\"project_name_filter\": {\"name\": \"${PROJECT_NAME}\", \"method\": \"TEXT_FILTER_METHOD_EQUALS\"}}]}")
 
-    existing_id=$(echo "$existing" | jq -r '.result[0].id // empty')
+    existing_id=$(echo "$existing" | jq -r '.projects[0].projectId // empty')
 
     if [ -n "$existing_id" ]; then
         echo -e "${GREEN}Project already exists with ID: $existing_id${NC}" >&2
@@ -118,12 +118,12 @@ create_project() {
     fi
 
     # Create new project
-    result=$(curl -s -X POST "${ZITADEL_URL}/management/v1/projects" \
+    result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/CreateProject" \
         -H "Authorization: Bearer $pat" \
         -H "Content-Type: application/json" \
         -d "{\"name\": \"${PROJECT_NAME}\"}")
 
-    project_id=$(echo "$result" | jq -r '.id // empty')
+    project_id=$(echo "$result" | jq -r '.projectId // empty')
 
     if [ -n "$project_id" ]; then
         echo -e "${GREEN}Project created with ID: $project_id${NC}" >&2
