@@ -11,6 +11,7 @@ updates:
     target-branch: "development"
     # Labels on pull requests for version updates
     labels:
+      - "dependencies"
       - "composer dependencies"
 
   - package-ecosystem: "github-actions"
@@ -19,4 +20,5 @@ updates:
       interval: "weekly"
     target-branch: "development"
     labels:
-      - "github-actions dependencies"
+      - "dependencies"
+      - "github-actions"
