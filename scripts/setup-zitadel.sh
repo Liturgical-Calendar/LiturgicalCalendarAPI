@@ -300,7 +300,9 @@ create_oidc_app() {
                 \"appType\": \"OIDC_APP_TYPE_WEB\",
                 \"authMethodType\": \"OIDC_AUTH_METHOD_TYPE_NONE\",
                 \"accessTokenType\": \"OIDC_TOKEN_TYPE_JWT\",
-                \"devMode\": true
+                \"devMode\": true,
+                \"idTokenRoleAssertion\": true,
+                \"idTokenUserinfoAssertion\": true
             }
         }")
 
