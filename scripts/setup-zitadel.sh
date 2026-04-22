@@ -391,6 +391,8 @@ create_test_service_account() {
 }
 
 # Function to assign a project role to a user
+# NOTE: User grants (role assignments) do not have a v2 API equivalent yet.
+# These endpoints remain on v1 until Zitadel provides a v2 replacement.
 assign_project_role() {
     local pat="$1"
     local project_id="$2"
