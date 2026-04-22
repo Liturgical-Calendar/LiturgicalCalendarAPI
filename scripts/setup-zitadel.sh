@@ -190,7 +190,8 @@ get_existing_client_secret() {
         local env_file
         env_file=$(resolve_env_file "$base_dir")
         if [ -n "$env_file" ]; then
-            local env_client_id=$(grep "^ZITADEL_CLIENT_ID=" "$env_file" 2>/dev/null | cut -d= -f2-)
+            local env_client_id
+            env_client_id=$(grep "^ZITADEL_CLIENT_ID=" "$env_file" 2>/dev/null | cut -d= -f2-)
             if [ "$env_client_id" = "$client_id" ]; then
                 existing_secret=$(grep "^ZITADEL_CLIENT_SECRET=" "$env_file" 2>/dev/null | cut -d= -f2-)
                 if [ -n "$existing_secret" ]; then
