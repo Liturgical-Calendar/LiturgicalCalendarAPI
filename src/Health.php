@@ -1107,7 +1107,7 @@ class Health implements MessageComponentInterface
                             }
 
                             $jsonEncoded = json_encode($yamlParsed, JSON_THROW_ON_ERROR);
-                            $yamlData    = json_decode($jsonEncoded);
+                            $yamlData    = json_decode($jsonEncoded, false, 512, JSON_THROW_ON_ERROR);
                             if (!( $yamlData instanceof \stdClass )) {
                                 throw new \Exception('YAML parsing failed: expected an object mapping, got ' . gettype($yamlData));
                             }
