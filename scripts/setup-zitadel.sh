@@ -435,7 +435,16 @@ generate_service_account_key() {
     key_details=$(echo "$result" | jq -r '.keyDetails // empty')
 
     if [ -n "$key_details" ]; then
-        echo "$key_details" | base64 -d > "$key_file"
+        # Decode base64 portably (GNU uses -d, BSD/macOS uses -D)
+        if echo "dGVzdA==" | base64 -d >/dev/null 2>&1; then
+            echo "$key_details" | base64 -d > "$key_file"
+        elif echo "dGVzdA==" | base64 -D >/dev/null 2>&1; then
+            echo "$key_details" | base64 -D > "$key_file"
+        else
+            echo -e "${RED}No supported base64 decode option found${NC}" >&2
+            exit 1
+        fi
+        chmod 600 "$key_file" || { echo -e "${RED}Failed to set permissions on $key_file${NC}" >&2; exit 1; }
         echo -e "${GREEN}Key saved to $key_file${NC}" >&2
         echo "$key_file"
     else
