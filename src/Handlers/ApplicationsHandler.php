@@ -440,7 +440,7 @@ final class ApplicationsHandler extends AbstractHandler
         }
 
         $envRateLimit     = $_ENV['API_KEY_DEFAULT_RATE_LIMIT'] ?? null;
-        $defaultRateLimit = is_numeric($envRateLimit) ? max(1, (int) $envRateLimit) : 1000;
+        $defaultRateLimit = is_numeric($envRateLimit) ? max(1, (int) $envRateLimit) : 100;
         $rateLimit        = isset($body['rate_limit']) && is_numeric($body['rate_limit'])
             ? max(1, (int) $body['rate_limit'])
             : $defaultRateLimit;

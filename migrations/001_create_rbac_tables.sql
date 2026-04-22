@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS api_keys (
     key_prefix VARCHAR(20) NOT NULL,
     name VARCHAR(100),
     scope VARCHAR(20) DEFAULT 'read',
-    rate_limit_per_hour INTEGER DEFAULT 1000,
+    rate_limit_per_hour INTEGER DEFAULT 100,
     is_active BOOLEAN DEFAULT TRUE,
     last_used_at TIMESTAMP,
     expires_at TIMESTAMP,

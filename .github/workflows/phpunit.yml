@@ -10,8 +10,11 @@ on:
       'phpunit*.xml*',
       '.env.example',
       'jsondata/**',
-      'i18n/**'
+      'i18n/**',
+      'infrastructure/init-db.sql'
     ]
+  pull_request:
+    branches: [ development, stable ]
   workflow_dispatch:
 
 concurrency:
@@ -26,19 +29,39 @@ env:
 jobs:
   phpunit_tests:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          PGUSER: postgres
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Initialize PostgreSQL database
+        run: psql -h localhost -U postgres -v ON_ERROR_STOP=1 -f infrastructure/init-db.sql
+        env:
+          PGPASSWORD: postgres
 
       - name: Setup PHP with PECL extensions
         uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2.37.0
         with:
           php-version: ${{ env.PHP_VERSION }}
-          extensions: yaml, intl, zip, calendar, gettext, apcu, opcache
+          extensions: yaml, intl, zip, calendar, gettext, apcu, opcache, pdo_pgsql
           ini-values: apcu.enable_cli=1, opcache.enable=1, opcache.enable_cli=1
 
       - name: Cache Composer dependencies
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: vendor
           key: composer-${{ hashFiles('composer.lock') }}
@@ -46,7 +69,7 @@ jobs:
             composer-
 
       - name: Cache PHPUnit cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: .phpunit.cache
           key: phpunit-${{ hashFiles('phpunit.xml.dist') }}
@@ -55,8 +78,15 @@ jobs:
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader --classmap-authoritative --no-progress
 
-      - name: Copy env file
-        run: cp .env.example .env.local
+      - name: Configure environment for testing
+        run: |
+          cp .env.example .env.local
+          echo "UNAUTHENTICATED_RATE_LIMIT=999999" >> .env.local
+          echo "DB_HOST=localhost" >> .env.local
+          echo "DB_PORT=5432" >> .env.local
+          echo "DB_NAME=litcal" >> .env.local
+          echo "DB_USER=litcal" >> .env.local
+          echo "DB_PASSWORD=litcal_secure_password" >> .env.local
 
       - name: Install gettext + locales
         run: |
