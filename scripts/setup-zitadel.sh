@@ -374,19 +374,53 @@ assign_project_role() {
 
     echo -e "${YELLOW}Assigning role '${role}' to user ${user_id}...${NC}" >&2
 
-    # Check if grant already exists
+    # Check if a grant for this project already exists and whether it includes the requested role
+    local existing
     existing=$(curl -s -X POST "${ZITADEL_URL}/management/v1/users/${user_id}/grants/_search" \
         -H "Authorization: Bearer $pat" \
         -H "Content-Type: application/json" \
         -d "{}")
 
-    existing_grant=$(echo "$existing" | jq -r --arg pid "$project_id" '(.result // [])[] | select(.projectId == $pid) | .id // empty')
+    local existing_grant_id
+    existing_grant_id=$(echo "$existing" | jq -r --arg pid "$project_id" '(.result // [])[] | select(.projectId == $pid) | .id // empty')
 
-    if [ -n "$existing_grant" ]; then
-        echo -e "${GREEN}Role grant already exists${NC}" >&2
+    if [ -n "$existing_grant_id" ]; then
+        # Check if the requested role is already in the grant's roleKeys
+        local has_role
+        has_role=$(echo "$existing" | jq -r --arg pid "$project_id" --arg r "$role" \
+            '(.result // [])[] | select(.projectId == $pid) | .roleKeys // [] | if index($r) then "yes" else "no" end')
+
+        if [ "$has_role" = "yes" ]; then
+            echo -e "${GREEN}Role '${role}' already assigned${NC}" >&2
+            return 0
+        fi
+
+        # Grant exists but lacks the requested role — merge it in
+        local current_roles
+        current_roles=$(echo "$existing" | jq -r --arg pid "$project_id" \
+            '(.result // [])[] | select(.projectId == $pid) | .roleKeys // [] | join(",")')
+        local merged_roles="${current_roles},${role}"
+
+        # Build JSON array from comma-separated roles
+        local role_keys_json
+        role_keys_json=$(echo "$merged_roles" | tr ',' '\n' | sort -u | jq -R . | jq -s .)
+
+        local result
+        result=$(curl -s -X PUT "${ZITADEL_URL}/management/v1/users/${user_id}/grants/${existing_grant_id}" \
+            -H "Authorization: Bearer $pat" \
+            -H "Content-Type: application/json" \
+            -d "{\"roleKeys\": ${role_keys_json}}")
+
+        if echo "$result" | jq -e '.userGrantId' > /dev/null 2>&1; then
+            echo -e "${GREEN}Role '${role}' added to existing grant${NC}" >&2
+        else
+            echo -e "${YELLOW}Grant update result: ${result}${NC}" >&2
+        fi
         return 0
     fi
 
+    # No grant exists for this project — create a new one
+    local result
     result=$(curl -s -X POST "${ZITADEL_URL}/management/v1/users/${user_id}/grants" \
         -H "Authorization: Bearer $pat" \
         -H "Content-Type: application/json" \
