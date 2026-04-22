@@ -38,7 +38,7 @@ jobs:
           ini-values: apcu.enable_cli=1, opcache.enable=1, opcache.enable_cli=1
 
       - name: Cache Composer dependencies
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: vendor
           key: composer-${{ hashFiles('composer.lock') }}
@@ -46,7 +46,7 @@ jobs:
             composer-
 
       - name: Cache PHPUnit cache
-        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: .phpunit.cache
           key: phpunit-${{ hashFiles('phpunit.xml.dist') }}
