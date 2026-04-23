@@ -721,7 +721,6 @@ main() {
         "http://localhost:${FRONTEND_PORT}/auth/callback.php" \
         "http://localhost:${FRONTEND_PORT}")
     FRONTEND_CLIENT_ID=$(echo "$FRONTEND_CREDS" | cut -d: -f1)
-    FRONTEND_CLIENT_SECRET=$(echo "$FRONTEND_CREDS" | cut -d: -f2-)
 
     # Create Tests OIDC app
     echo
@@ -729,7 +728,6 @@ main() {
         "http://localhost:${TESTS_PORT}/auth/callback.php" \
         "http://localhost:${TESTS_PORT}")
     TESTS_CLIENT_ID=$(echo "$TESTS_CREDS" | cut -d: -f1)
-    TESTS_CLIENT_SECRET=$(echo "$TESTS_CREDS" | cut -d: -f2-)
 
     echo
     echo -e "${BLUE}========================================${NC}"
