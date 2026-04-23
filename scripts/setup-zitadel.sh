@@ -274,10 +274,10 @@ create_oidc_app() {
                     \"postLogoutRedirectUris\": [\"$post_logout_uri\"],
                     \"responseTypes\": [\"OIDC_RESPONSE_TYPE_CODE\"],
                     \"grantTypes\": [\"OIDC_GRANT_TYPE_AUTHORIZATION_CODE\", \"OIDC_GRANT_TYPE_REFRESH_TOKEN\"],
-                    \"appType\": \"OIDC_APP_TYPE_WEB\",
+                    \"application_type\": \"OIDC_APP_TYPE_WEB\",
                     \"authMethodType\": \"OIDC_AUTH_METHOD_TYPE_NONE\",
                     \"accessTokenType\": \"OIDC_TOKEN_TYPE_JWT\",
-                    \"devMode\": true,
+                    \"development_mode\": true,
                     \"idTokenRoleAssertion\": true,
                     \"idTokenUserinfoAssertion\": true
                 }
@@ -305,10 +305,10 @@ create_oidc_app() {
                 \"postLogoutRedirectUris\": [\"$post_logout_uri\"],
                 \"responseTypes\": [\"OIDC_RESPONSE_TYPE_CODE\"],
                 \"grantTypes\": [\"OIDC_GRANT_TYPE_AUTHORIZATION_CODE\", \"OIDC_GRANT_TYPE_REFRESH_TOKEN\"],
-                \"appType\": \"OIDC_APP_TYPE_WEB\",
+                \"application_type\": \"OIDC_APP_TYPE_WEB\",
                 \"authMethodType\": \"OIDC_AUTH_METHOD_TYPE_NONE\",
                 \"accessTokenType\": \"OIDC_TOKEN_TYPE_JWT\",
-                \"devMode\": true,
+                \"development_mode\": true,
                 \"idTokenRoleAssertion\": true,
                 \"idTokenUserinfoAssertion\": true
             }
