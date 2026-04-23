@@ -202,7 +202,8 @@ create_roles() {
         if echo "$result" | jq -e '.creationDate' > /dev/null 2>&1; then
             echo -e "  ${GREEN}Role '${role}' created${NC}" >&2
         else
-            echo -e "  ${YELLOW}Role '${role}': ${result}${NC}" >&2
+            echo -e "${RED}Failed to create role '${role}': ${result}${NC}" >&2
+            exit 1
         fi
     done
 }
