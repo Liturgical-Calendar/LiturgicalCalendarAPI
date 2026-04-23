@@ -111,10 +111,12 @@ create_project() {
         -d "{\"filters\": [{\"project_name_filter\": {\"name\": \"${PROJECT_NAME}\", \"method\": \"TEXT_FILTER_METHOD_EQUALS\"}}]}")
 
     existing_id=$(echo "$existing" | jq -r '.projects[0].projectId // empty')
+    local org_id
+    org_id=$(echo "$existing" | jq -r '.projects[0].organizationId // empty')
 
     if [ -n "$existing_id" ]; then
         echo -e "${GREEN}Project already exists with ID: $existing_id${NC}" >&2
-        echo "$existing_id"
+        echo "${existing_id}:${org_id}"
         return 0
     fi
 
@@ -128,8 +130,16 @@ create_project() {
     project_id=$(echo "$result" | jq -r '.projectId // empty')
 
     if [ -n "$project_id" ]; then
+        # Retrieve org ID for the newly created project
+        local project_detail
+        project_detail=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/ListProjects" \
+            -H "Authorization: Bearer $pat" \
+            -H "Connect-Protocol-Version: 1" \
+            -H "Content-Type: application/json" \
+            -d "{\"filters\": [{\"in_project_ids_filter\": {\"projectIds\": [\"${project_id}\"]}}]}")
+        org_id=$(echo "$project_detail" | jq -r '.projects[0].organizationId // empty')
         echo -e "${GREEN}Project created with ID: $project_id${NC}" >&2
-        echo "$project_id"
+        echo "${project_id}:${org_id}"
     else
         echo -e "${RED}Failed to create project: $result${NC}" >&2
         exit 1
@@ -402,42 +412,41 @@ create_test_service_account() {
     fi
 }
 
-# Function to assign a project role to a user
-# NOTE: User grants (role assignments) do not have a v2 API equivalent yet.
-# These endpoints remain on v1 until Zitadel provides a v2 replacement.
+# Function to assign a project role to a user via v2 AuthorizationService
 assign_project_role() {
     local pat="$1"
     local project_id="$2"
-    local user_id="$3"
-    local role="$4"
+    local org_id="$3"
+    local user_id="$4"
+    local role="$5"
 
     echo -e "${YELLOW}Assigning role '${role}' to user ${user_id}...${NC}" >&2
 
-    # Check if a grant for this project already exists and whether it includes the requested role
+    # Check if an authorization for this project/user already exists
     local existing
-    existing=$(curl -s -X POST "${ZITADEL_URL}/management/v1/users/${user_id}/grants/_search" \
+    existing=$(curl -s -X POST "${ZITADEL_URL}/zitadel.authorization.v2.AuthorizationService/ListAuthorizations" \
         -H "Authorization: Bearer $pat" \
+        -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
-        -d "{}")
+        -d "{\"filters\": [{\"user_ids\": {\"ids\": [\"${user_id}\"]}}, {\"project_id\": {\"projectId\": \"${project_id}\"}}]}")
 
-    local existing_grant_id
-    existing_grant_id=$(echo "$existing" | jq -r --arg pid "$project_id" '(.result // [])[] | select(.projectId == $pid) | .id // empty')
+    local existing_auth_id
+    existing_auth_id=$(echo "$existing" | jq -r '.result[0].id // empty')
 
-    if [ -n "$existing_grant_id" ]; then
-        # Check if the requested role is already in the grant's roleKeys
+    if [ -n "$existing_auth_id" ]; then
+        # Check if the requested role is already present
         local has_role
-        has_role=$(echo "$existing" | jq -r --arg pid "$project_id" --arg r "$role" \
-            '(.result // [])[] | select(.projectId == $pid) | .roleKeys // [] | if index($r) then "yes" else "no" end')
+        has_role=$(echo "$existing" | jq -r --arg r "$role" \
+            '[.result[0].roles[].key] | if index($r) then "yes" else "no" end')
 
         if [ "$has_role" = "yes" ]; then
             echo -e "${GREEN}Role '${role}' already assigned${NC}" >&2
             return 0
         fi
 
-        # Grant exists but lacks the requested role — merge it in
+        # Authorization exists but lacks the requested role — merge it in
         local current_roles
-        current_roles=$(echo "$existing" | jq -r --arg pid "$project_id" \
-            '(.result // [])[] | select(.projectId == $pid) | .roleKeys // [] | join(",")')
+        current_roles=$(echo "$existing" | jq -r '[.result[0].roles[].key] | join(",")')
         local merged_roles="${current_roles},${role}"
 
         # Build JSON array from comma-separated roles
@@ -445,30 +454,34 @@ assign_project_role() {
         role_keys_json=$(echo "$merged_roles" | tr ',' '\n' | sort -u | jq -R . | jq -s .)
 
         local result
-        result=$(curl -s -X PUT "${ZITADEL_URL}/management/v1/users/${user_id}/grants/${existing_grant_id}" \
+        result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.authorization.v2.AuthorizationService/UpdateAuthorization" \
             -H "Authorization: Bearer $pat" \
+            -H "Connect-Protocol-Version: 1" \
             -H "Content-Type: application/json" \
-            -d "{\"roleKeys\": ${role_keys_json}}")
+            -d "{\"id\": \"${existing_auth_id}\", \"roleKeys\": ${role_keys_json}}")
 
-        if echo "$result" | jq -e '.userGrantId' > /dev/null 2>&1; then
-            echo -e "${GREEN}Role '${role}' added to existing grant${NC}" >&2
+        if echo "$result" | jq -e '.changeDate' > /dev/null 2>&1; then
+            echo -e "${GREEN}Role '${role}' added to existing authorization${NC}" >&2
         else
-            echo -e "${YELLOW}Grant update result: ${result}${NC}" >&2
+            echo -e "${YELLOW}Authorization update result: ${result}${NC}" >&2
         fi
         return 0
     fi
 
-    # No grant exists for this project — create a new one
+    # No authorization exists — create a new one
     local result
-    result=$(curl -s -X POST "${ZITADEL_URL}/management/v1/users/${user_id}/grants" \
+    result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.authorization.v2.AuthorizationService/CreateAuthorization" \
         -H "Authorization: Bearer $pat" \
+        -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
         -d "{
+            \"userId\": \"${user_id}\",
             \"projectId\": \"${project_id}\",
+            \"organizationId\": \"${org_id}\",
             \"roleKeys\": [\"${role}\"]
         }")
 
-    if echo "$result" | jq -e '.userGrantId' > /dev/null 2>&1; then
+    if echo "$result" | jq -e '.id' > /dev/null 2>&1; then
         echo -e "${GREEN}Role '${role}' assigned successfully${NC}" >&2
     else
         echo -e "${YELLOW}Role assignment result: ${result}${NC}" >&2
@@ -540,8 +553,11 @@ main() {
     # Get admin PAT
     PAT=$(get_admin_pat)
 
-    # Create project
-    PROJECT_ID=$(create_project "$PAT")
+    # Create project (returns "projectId:orgId")
+    local project_result
+    project_result=$(create_project "$PAT")
+    PROJECT_ID="${project_result%%:*}"
+    ORG_ID="${project_result#*:}"
 
     # Create roles
     echo
@@ -550,7 +566,7 @@ main() {
     # Create test service account
     echo
     SERVICE_ACCOUNT_ID=$(create_test_service_account "$PAT" "$PROJECT_ID")
-    assign_project_role "$PAT" "$PROJECT_ID" "$SERVICE_ACCOUNT_ID" "admin"
+    assign_project_role "$PAT" "$PROJECT_ID" "$ORG_ID" "$SERVICE_ACCOUNT_ID" "admin"
     SERVICE_KEY_FILE=$(generate_service_account_key "$PAT" "$SERVICE_ACCOUNT_ID")
 
     # Create Frontend OIDC app
