@@ -102,56 +102,67 @@ get_admin_pat() {
     exit 1
 }
 
+# Function to get the organization ID of the default organization
+get_org_id() {
+    local pat="$1"
+    echo -e "${YELLOW}Getting organization ID...${NC}" >&2
+
+    local result
+    result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.org.v2.OrganizationService/ListOrganizations" \
+        -H "Authorization: Bearer $pat" \
+        -H "Connect-Protocol-Version: 1" \
+        -H "Content-Type: application/json" \
+        -d "{}")
+
+    local org_id
+    org_id=$(echo "$result" | jq -r '.result[0].id // empty')
+
+    if [ -n "$org_id" ]; then
+        echo -e "${GREEN}Organization ID: $org_id${NC}" >&2
+        echo "$org_id"
+    else
+        echo -e "${RED}Failed to get organization ID: $result${NC}" >&2
+        exit 1
+    fi
+}
+
 # Function to create or find the project
 create_project() {
     local pat="$1"
+    local org_id="$2"
     echo -e "${YELLOW}Creating ${PROJECT_NAME} project...${NC}" >&2
 
     # Check if project already exists
+    local existing
     existing=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/ListProjects" \
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
         -d "{\"filters\": [{\"project_name_filter\": {\"projectName\": \"${PROJECT_NAME}\", \"method\": \"TEXT_FILTER_METHOD_EQUALS\"}}]}")
 
+    local existing_id
     existing_id=$(echo "$existing" | jq -r '.projects[0].projectId // empty')
-    local org_id
-    org_id=$(echo "$existing" | jq -r '.projects[0].organizationId // empty')
 
     if [ -n "$existing_id" ]; then
-        if [ -z "$org_id" ]; then
-            echo -e "${RED}Project found but organization ID is missing from response${NC}" >&2
-            exit 1
-        fi
         echo -e "${GREEN}Project already exists with ID: $existing_id${NC}" >&2
-        echo "${existing_id}:${org_id}"
+        echo "$existing_id"
         return 0
     fi
 
     # Create new project
+    local result
     result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/CreateProject" \
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
-        -d "{\"name\": \"${PROJECT_NAME}\"}")
+        -d "{\"name\": \"${PROJECT_NAME}\", \"organizationId\": \"${org_id}\"}")
 
+    local project_id
     project_id=$(echo "$result" | jq -r '.projectId // empty')
 
     if [ -n "$project_id" ]; then
-        # Retrieve org ID for the newly created project
-        local project_detail
-        project_detail=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/ListProjects" \
-            -H "Authorization: Bearer $pat" \
-            -H "Connect-Protocol-Version: 1" \
-            -H "Content-Type: application/json" \
-            -d "{\"filters\": [{\"in_project_ids_filter\": {\"projectIds\": [\"${project_id}\"]}}]}")
-        org_id=$(echo "$project_detail" | jq -r '.projects[0].organizationId // empty')
-        if [ -z "$org_id" ]; then
-            echo -e "${RED}Project created but organization ID could not be determined${NC}" >&2
-            exit 1
-        fi
         echo -e "${GREEN}Project created with ID: $project_id${NC}" >&2
-        echo "${project_id}:${org_id}"
+        echo "$project_id"
     else
         echo -e "${RED}Failed to create project: $result${NC}" >&2
         exit 1
@@ -376,7 +387,7 @@ update_env_file() {
 # Function to create a service account (machine user) for tests
 create_test_service_account() {
     local pat="$1"
-    local project_id="$2"
+    local org_id="$2"
     local username="test-service-account"
     local display_name="Test Service Account"
 
@@ -407,6 +418,7 @@ create_test_service_account() {
         -H "Content-Type: application/json" \
         -d "{
             \"username\": \"${username}\",
+            \"organizationId\": \"${org_id}\",
             \"machine\": {
                 \"name\": \"${display_name}\",
                 \"accessTokenType\": \"ACCESS_TOKEN_TYPE_JWT\"
@@ -414,7 +426,7 @@ create_test_service_account() {
         }")
 
     local user_id
-    user_id=$(echo "$result" | jq -r '.userId // empty')
+    user_id=$(echo "$result" | jq -r '.id // empty')
 
     if [ -n "$user_id" ]; then
         echo -e "${GREEN}Service account created with ID: $user_id${NC}" >&2
@@ -637,16 +649,11 @@ main() {
     # Get admin PAT
     PAT=$(get_admin_pat)
 
-    # Create project (returns "projectId:orgId")
-    local project_result
-    project_result=$(create_project "$PAT")
-    PROJECT_ID="${project_result%%:*}"
-    ORG_ID="${project_result#*:}"
+    # Get organization ID
+    ORG_ID=$(get_org_id "$PAT")
 
-    if [ -z "$ORG_ID" ] || [ "$ORG_ID" = "$PROJECT_ID" ]; then
-        echo -e "${RED}Failed to parse organization ID from project result${NC}" >&2
-        exit 1
-    fi
+    # Create project
+    PROJECT_ID=$(create_project "$PAT" "$ORG_ID")
 
     # Create roles
     echo
@@ -654,7 +661,7 @@ main() {
 
     # Create test service account
     echo
-    SERVICE_ACCOUNT_ID=$(create_test_service_account "$PAT" "$PROJECT_ID")
+    SERVICE_ACCOUNT_ID=$(create_test_service_account "$PAT" "$ORG_ID")
     assign_project_role "$PAT" "$PROJECT_ID" "$ORG_ID" "$SERVICE_ACCOUNT_ID" "admin"
     assign_org_role "$PAT" "$SERVICE_ACCOUNT_ID" "$ORG_ID" "ORG_OWNER"
     SERVICE_KEY_FILE=$(generate_service_account_key "$PAT" "$SERVICE_ACCOUNT_ID")
