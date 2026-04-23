@@ -112,7 +112,7 @@ create_project() {
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
-        -d "{\"filters\": [{\"project_name_filter\": {\"name\": \"${PROJECT_NAME}\", \"method\": \"TEXT_FILTER_METHOD_EQUALS\"}}]}")
+        -d "{\"filters\": [{\"project_name_filter\": {\"projectName\": \"${PROJECT_NAME}\", \"method\": \"TEXT_FILTER_METHOD_EQUALS\"}}]}")
 
     existing_id=$(echo "$existing" | jq -r '.projects[0].projectId // empty')
     local org_id
