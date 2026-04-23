@@ -476,7 +476,8 @@ assign_project_role() {
         if echo "$result" | jq -e '.changeDate' > /dev/null 2>&1; then
             echo -e "${GREEN}Role '${role}' added to existing authorization${NC}" >&2
         else
-            echo -e "${YELLOW}Authorization update result: ${result}${NC}" >&2
+            echo -e "${RED}Failed to update authorization: ${result}${NC}" >&2
+            exit 1
         fi
         return 0
     fi
@@ -497,7 +498,8 @@ assign_project_role() {
     if echo "$result" | jq -e '.id' > /dev/null 2>&1; then
         echo -e "${GREEN}Role '${role}' assigned successfully${NC}" >&2
     else
-        echo -e "${YELLOW}Role assignment result: ${result}${NC}" >&2
+        echo -e "${RED}Failed to create authorization: ${result}${NC}" >&2
+        exit 1
     fi
 }
 
