@@ -701,7 +701,7 @@ main() {
         -H "Authorization: Bearer $PAT" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
-        -d '{"queries": [{"user_name_query": {"userName": "root", "method": "TEXT_QUERY_METHOD_STARTS_WITH"}}]}')
+        -d "{\"queries\": [{\"user_name_query\": {\"userName\": \"root\", \"method\": \"TEXT_QUERY_METHOD_STARTS_WITH\"}}, {\"organization_id_query\": {\"organizationId\": \"${ORG_ID}\"}}]}")
     ADMIN_USER_ID=$(echo "$root_user_result" | jq -r '.result[0].userId // empty')
     if [ -n "$ADMIN_USER_ID" ]; then
         assign_project_role "$PAT" "$PROJECT_ID" "$ORG_ID" "$ADMIN_USER_ID" "admin"
