@@ -106,6 +106,7 @@ create_project() {
     # Check if project already exists
     existing=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/ListProjects" \
         -H "Authorization: Bearer $pat" \
+        -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
         -d "{\"filters\": [{\"project_name_filter\": {\"name\": \"${PROJECT_NAME}\", \"method\": \"TEXT_FILTER_METHOD_EQUALS\"}}]}")
 
@@ -120,6 +121,7 @@ create_project() {
     # Create new project
     result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/CreateProject" \
         -H "Authorization: Bearer $pat" \
+        -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
         -d "{\"name\": \"${PROJECT_NAME}\"}")
 
@@ -144,6 +146,7 @@ create_roles() {
     local existing
     existing=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/ListProjectRoles" \
         -H "Authorization: Bearer $pat" \
+        -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
         -d "{\"projectId\": \"${project_id}\"}")
 
@@ -159,7 +162,8 @@ create_roles() {
         local result
         result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/AddProjectRole" \
             -H "Authorization: Bearer $pat" \
-            -H "Content-Type: application/json" \
+            -H "Connect-Protocol-Version: 1" \
+        -H "Content-Type: application/json" \
             -d "{\"projectId\": \"${project_id}\", \"roleKey\": \"${role}\", \"displayName\": \"${role}\"}")
 
         if echo "$result" | jq -e '.creationDate' > /dev/null 2>&1; then
@@ -221,6 +225,7 @@ create_oidc_app() {
     local existing
     existing=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/ListApplications" \
         -H "Authorization: Bearer $pat" \
+        -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
         -d "{\"filters\": [{\"project_id_filter\": {\"projectId\": \"${project_id}\"}}, {\"name_filter\": {\"name\": \"${app_name}\"}}]}")
 
@@ -249,7 +254,8 @@ create_oidc_app() {
             local secret_result
             secret_result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/GenerateClientSecret" \
                 -H "Authorization: Bearer $pat" \
-                -H "Content-Type: application/json" \
+                -H "Connect-Protocol-Version: 1" \
+        -H "Content-Type: application/json" \
                 -d "{\"applicationId\": \"${existing_id}\", \"projectId\": \"${project_id}\"}")
             client_secret=$(echo "$secret_result" | jq -r '.clientSecret // empty')
         fi
@@ -258,7 +264,8 @@ create_oidc_app() {
         local update_result
         update_result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/UpdateApplication" \
             -H "Authorization: Bearer $pat" \
-            -H "Content-Type: application/json" \
+            -H "Connect-Protocol-Version: 1" \
+        -H "Content-Type: application/json" \
             -d "{
                 \"projectId\": \"${project_id}\",
                 \"applicationId\": \"${existing_id}\",
@@ -288,6 +295,7 @@ create_oidc_app() {
     local result
     result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/CreateApplication" \
         -H "Authorization: Bearer $pat" \
+        -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
         -d "{
             \"projectId\": \"${project_id}\",
@@ -355,6 +363,7 @@ create_test_service_account() {
     local existing
     existing=$(curl -s -X POST "${ZITADEL_URL}/v2/users" \
         -H "Authorization: Bearer $pat" \
+        -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
         -d "{\"queries\": [{\"user_name_query\": {\"userName\": \"${username}\", \"method\": \"TEXT_QUERY_METHOD_EQUALS\"}}]}")
 
@@ -371,6 +380,7 @@ create_test_service_account() {
     local result
     result=$(curl -s -X POST "${ZITADEL_URL}/v2/users/new" \
         -H "Authorization: Bearer $pat" \
+        -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
         -d "{
             \"username\": \"${username}\",
@@ -483,6 +493,7 @@ generate_service_account_key() {
     local result
     result=$(curl -s -X POST "${ZITADEL_URL}/v2/users/${user_id}/keys" \
         -H "Authorization: Bearer $pat" \
+        -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
         -d "{
             \"type\": \"KEY_TYPE_JSON\",
