@@ -386,7 +386,7 @@ create_test_service_account() {
             \"username\": \"${username}\",
             \"machine\": {
                 \"name\": \"${display_name}\",
-                \"accessTokenType\": \"JWT\"
+                \"accessTokenType\": \"ACCESS_TOKEN_TYPE_JWT\"
             }
         }")
 
