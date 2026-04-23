@@ -373,15 +373,15 @@ create_test_service_account() {
         -H "Authorization: Bearer $pat" \
         -H "Content-Type: application/json" \
         -d "{
+            \"username\": \"${username}\",
             \"machine\": {
-                \"username\": \"${username}\",
                 \"name\": \"${display_name}\",
                 \"accessTokenType\": \"JWT\"
             }
         }")
 
     local user_id
-    user_id=$(echo "$result" | jq -r '.id // empty')
+    user_id=$(echo "$result" | jq -r '.userId // empty')
 
     if [ -n "$user_id" ]; then
         echo -e "${GREEN}Service account created with ID: $user_id${NC}" >&2
