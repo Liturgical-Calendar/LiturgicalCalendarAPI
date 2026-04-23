@@ -440,16 +440,16 @@ assign_project_role() {
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
-        -d "{\"filters\": [{\"user_ids\": {\"ids\": [\"${user_id}\"]}}, {\"project_id\": {\"projectId\": \"${project_id}\"}}]}")
+        -d "{\"filters\": [{\"in_user_ids\": {\"ids\": [\"${user_id}\"]}}, {\"project_id\": {\"id\": \"${project_id}\"}}]}")
 
     local existing_auth_id
-    existing_auth_id=$(echo "$existing" | jq -r '.result[0].id // empty')
+    existing_auth_id=$(echo "$existing" | jq -r '.authorizations[0].id // empty')
 
     if [ -n "$existing_auth_id" ]; then
         # Check if the requested role is already present
         local has_role
         has_role=$(echo "$existing" | jq -r --arg r "$role" \
-            '[.result[0].roles[].key] | if index($r) then "yes" else "no" end')
+            '[.authorizations[0].roles[].key] | if index($r) then "yes" else "no" end')
 
         if [ "$has_role" = "yes" ]; then
             echo -e "${GREEN}Role '${role}' already assigned${NC}" >&2
@@ -458,7 +458,7 @@ assign_project_role() {
 
         # Authorization exists but lacks the requested role — merge it in
         local current_roles
-        current_roles=$(echo "$existing" | jq -r '[.result[0].roles[].key] | join(",")')
+        current_roles=$(echo "$existing" | jq -r '[.authorizations[0].roles[].key] | join(",")')
         local merged_roles="${current_roles},${role}"
 
         # Build JSON array from comma-separated roles
