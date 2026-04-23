@@ -76,6 +76,14 @@ services:
       ZITADEL_FIRSTINSTANCE_ORG_HUMAN_USERNAME: root
       ZITADEL_FIRSTINSTANCE_ORG_HUMAN_PASSWORD: RootPassword1!
 
+      # SMTP configuration (Mailpit for local development)
+      ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_HOST: mailpit:1025
+      ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_USER: ""
+      ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_SMTP_PASSWORD: ""
+      ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_TLS: false
+      ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_FROM: noreply@liturgicalcalendar.localhost
+      ZITADEL_DEFAULTINSTANCE_SMTPCONFIGURATION_FROMNAME: LiturgicalCalendar
+
       # Enable debug logs
       ZITADEL_LOG_LEVEL: debug
       # Write Access Logs to stdout.
@@ -98,6 +106,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      mailpit:
+        condition: service_started
 
   # Login V2 - Next.js based login UI with passkeys, flexible onboarding, etc.
   login:
@@ -168,6 +178,20 @@ services:
       - zitadel
     depends_on:
       - db
+
+  # Mailpit - Email testing tool for local development
+  # Web UI at: http://localhost:8025
+  # SMTP server on port 1025 (internal, used by Zitadel)
+  mailpit:
+    image: axllent/mailpit:latest
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:${MAILPIT_PORT:-8025}:8025
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: 1
+      MP_SMTP_AUTH_ALLOW_INSECURE: 1
+    networks:
+      - zitadel
 
 networks:
   zitadel:
