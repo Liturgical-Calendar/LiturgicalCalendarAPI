@@ -327,6 +327,7 @@ create_oidc_app() {
                     \"accessTokenType\": \"OIDC_TOKEN_TYPE_JWT\",
                     \"development_mode\": true,
                     \"idTokenRoleAssertion\": true,
+                    \"accessTokenRoleAssertion\": true,
                     \"idTokenUserinfoAssertion\": true
                 }
             }")
@@ -363,6 +364,7 @@ create_oidc_app() {
                 \"accessTokenType\": \"OIDC_TOKEN_TYPE_JWT\",
                 \"development_mode\": true,
                 \"idTokenRoleAssertion\": true,
+                \"accessTokenRoleAssertion\": true,
                 \"idTokenUserinfoAssertion\": true
             }
         }")
