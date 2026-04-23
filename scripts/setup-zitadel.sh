@@ -676,15 +676,23 @@ main() {
     FRONTEND_CLIENT_ID=$(echo "$FRONTEND_CREDS" | cut -d: -f1)
     FRONTEND_CLIENT_SECRET=$(echo "$FRONTEND_CREDS" | cut -d: -f2-)
 
+    # Create Tests OIDC app
+    echo
+    TESTS_CREDS=$(create_oidc_app "$PAT" "$PROJECT_ID" "LiturgicalCalendar Tests" \
+        "http://localhost:${TESTS_PORT}/auth/callback.php" \
+        "http://localhost:${TESTS_PORT}")
+    TESTS_CLIENT_ID=$(echo "$TESTS_CREDS" | cut -d: -f1)
+    TESTS_CLIENT_SECRET=$(echo "$TESTS_CREDS" | cut -d: -f2-)
+
     echo
     echo -e "${BLUE}========================================${NC}"
     echo -e "${BLUE}  Configuration Complete!${NC}"
     echo -e "${BLUE}========================================${NC}"
     echo
     echo -e "${GREEN}Zitadel Credentials:${NC}"
-    echo -e "  Project ID:      ${PROJECT_ID}"
-    echo -e "  Client ID:       ${FRONTEND_CLIENT_ID}"
-    echo -e "  Client Secret:   ${FRONTEND_CLIENT_SECRET}"
+    echo -e "  Project ID:         ${PROJECT_ID}"
+    echo -e "  Frontend Client ID: ${FRONTEND_CLIENT_ID}"
+    echo -e "  Tests Client ID:    ${TESTS_CLIENT_ID}"
     if [ "${SHOW_SECRETS}" = "true" ]; then
         echo -e "  SA PAT:          ${SERVICE_ACCOUNT_PAT}"
     else
@@ -715,8 +723,12 @@ main() {
             target=$(resolve_env_file "$dir")
             if [ -n "$target" ]; then
                 update_env_file "$target" "ZITADEL_ISSUER" "${ZITADEL_URL}"
-                update_env_file "$target" "ZITADEL_CLIENT_ID" "$FRONTEND_CLIENT_ID"
                 update_env_file "$target" "ZITADEL_PROJECT_ID" "$PROJECT_ID"
+                if [ "$label" = "Tests" ]; then
+                    update_env_file "$target" "ZITADEL_CLIENT_ID" "$TESTS_CLIENT_ID"
+                else
+                    update_env_file "$target" "ZITADEL_CLIENT_ID" "$FRONTEND_CLIENT_ID"
+                fi
                 # Only the API needs a machine token for Management API calls
                 if [ "$label" = "API" ]; then
                     update_env_file "$target" "ZITADEL_MACHINE_TOKEN" "$SERVICE_ACCOUNT_PAT"
