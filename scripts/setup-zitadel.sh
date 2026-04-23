@@ -318,8 +318,12 @@ create_oidc_app() {
             }")
 
         if ! echo "$update_result" | jq -e '.changeDate' > /dev/null 2>&1; then
-            echo -e "${RED}Failed to update OIDC config: $update_result${NC}" >&2
-            exit 1
+            if echo "$update_result" | jq -e '.code == "failed_precondition"' > /dev/null 2>&1; then
+                echo -e "${GREEN}OIDC config already up to date${NC}" >&2
+            else
+                echo -e "${RED}Failed to update OIDC config: $update_result${NC}" >&2
+                exit 1
+            fi
         fi
 
         echo "${client_id}:${client_secret}"
@@ -659,6 +663,19 @@ main() {
     # Create roles
     echo
     create_roles "$PAT" "$PROJECT_ID"
+
+    # Assign admin role to the root user (username includes org domain, e.g. root@org.localhost)
+    echo
+    local root_user_result
+    root_user_result=$(curl -s -X POST "${ZITADEL_URL}/v2/users" \
+        -H "Authorization: Bearer $PAT" \
+        -H "Connect-Protocol-Version: 1" \
+        -H "Content-Type: application/json" \
+        -d '{"queries": [{"user_name_query": {"userName": "root", "method": "TEXT_QUERY_METHOD_STARTS_WITH"}}]}')
+    ADMIN_USER_ID=$(echo "$root_user_result" | jq -r '.result[0].userId // empty')
+    if [ -n "$ADMIN_USER_ID" ]; then
+        assign_project_role "$PAT" "$PROJECT_ID" "$ORG_ID" "$ADMIN_USER_ID" "admin"
+    fi
 
     # Create test service account
     echo
