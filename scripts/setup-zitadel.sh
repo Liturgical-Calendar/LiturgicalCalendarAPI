@@ -496,18 +496,18 @@ generate_service_account_key() {
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
         -d "{
-            \"type\": \"KEY_TYPE_JSON\",
             \"expirationDate\": \"2030-01-01T00:00:00Z\"
         }")
 
-    key_details=$(echo "$result" | jq -r '.keyDetails // empty')
+    local key_content
+    key_content=$(echo "$result" | jq -r '.keyContent // empty')
 
-    if [ -n "$key_details" ]; then
+    if [ -n "$key_content" ]; then
         # Decode base64 portably (GNU uses -d, BSD/macOS uses -D)
         if echo "dGVzdA==" | base64 -d >/dev/null 2>&1; then
-            echo "$key_details" | base64 -d > "$key_file"
+            echo "$key_content" | base64 -d > "$key_file"
         elif echo "dGVzdA==" | base64 -D >/dev/null 2>&1; then
-            echo "$key_details" | base64 -D > "$key_file"
+            echo "$key_content" | base64 -D > "$key_file"
         else
             echo -e "${RED}No supported base64 decode option found${NC}" >&2
             exit 1
