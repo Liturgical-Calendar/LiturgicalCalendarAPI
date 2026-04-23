@@ -174,7 +174,7 @@ create_roles() {
 
     for role in "${ROLES[@]}"; do
         local existing_key
-        existing_key=$(echo "$existing" | jq -r --arg r "$role" '(.roles // [])[] | select(.key == $r) | .key // empty')
+        existing_key=$(echo "$existing" | jq -r --arg r "$role" '(.projectRoles // [])[] | select(.key == $r) | .key // empty')
 
         if [ -n "$existing_key" ]; then
             echo -e "  ${GREEN}Role '${role}' already exists${NC}" >&2
