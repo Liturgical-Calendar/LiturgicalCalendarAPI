@@ -434,7 +434,7 @@ create_test_service_account() {
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
-        -d "{\"queries\": [{\"user_name_query\": {\"userName\": \"${username}\", \"method\": \"TEXT_QUERY_METHOD_EQUALS\"}}]}")
+        -d "{\"queries\": [{\"user_name_query\": {\"userName\": \"${username}\", \"method\": \"TEXT_QUERY_METHOD_EQUALS\"}}, {\"organization_id_query\": {\"organizationId\": \"${org_id}\"}}]}")
 
     local existing_id
     existing_id=$(echo "$existing" | jq -r '.result[0].userId // empty')
