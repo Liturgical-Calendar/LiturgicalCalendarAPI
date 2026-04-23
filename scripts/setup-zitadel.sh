@@ -145,6 +145,13 @@ create_project() {
 
     if [ -n "$existing_id" ]; then
         echo -e "${GREEN}Project already exists with ID: $existing_id${NC}" >&2
+        # Ensure projectRoleAssertion is enabled (required for role claims in tokens)
+        curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/UpdateProject" \
+            -H "Authorization: Bearer $pat" \
+            -H "Connect-Protocol-Version: 1" \
+            -H "Content-Type: application/json" \
+            -d "{\"projectId\": \"${existing_id}\", \"projectRoleAssertion\": true}" > /dev/null
+        echo -e "${GREEN}Enabled projectRoleAssertion${NC}" >&2
         echo "$existing_id"
         return 0
     fi
@@ -162,6 +169,13 @@ create_project() {
 
     if [ -n "$project_id" ]; then
         echo -e "${GREEN}Project created with ID: $project_id${NC}" >&2
+        # Enable projectRoleAssertion so role claims appear in tokens
+        curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/UpdateProject" \
+            -H "Authorization: Bearer $pat" \
+            -H "Connect-Protocol-Version: 1" \
+            -H "Content-Type: application/json" \
+            -d "{\"projectId\": \"${project_id}\", \"projectRoleAssertion\": true}" > /dev/null
+        echo -e "${GREEN}Enabled projectRoleAssertion${NC}" >&2
         echo "$project_id"
     else
         echo -e "${RED}Failed to create project: $result${NC}" >&2
