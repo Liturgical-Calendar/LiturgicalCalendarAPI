@@ -147,12 +147,20 @@ create_project() {
     if [ -n "$existing_id" ]; then
         echo -e "${GREEN}Project already exists with ID: $existing_id${NC}" >&2
         # Ensure projectRoleAssertion is enabled (required for role claims in tokens)
-        curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/UpdateProject" \
+        local update_result
+        update_result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/UpdateProject" \
             -H "Authorization: Bearer $pat" \
             -H "Connect-Protocol-Version: 1" \
             -H "Content-Type: application/json" \
-            -d "{\"projectId\": \"${existing_id}\", \"projectRoleAssertion\": true}" > /dev/null
-        echo -e "${GREEN}Enabled projectRoleAssertion${NC}" >&2
+            -d "{\"projectId\": \"${existing_id}\", \"projectRoleAssertion\": true}")
+        if echo "$update_result" | jq -e '.changeDate' > /dev/null 2>&1; then
+            echo -e "${GREEN}Enabled projectRoleAssertion${NC}" >&2
+        elif echo "$update_result" | jq -e '.code == "failed_precondition"' > /dev/null 2>&1; then
+            echo -e "${GREEN}projectRoleAssertion already enabled${NC}" >&2
+        else
+            echo -e "${RED}Failed to enable projectRoleAssertion: $update_result${NC}" >&2
+            exit 1
+        fi
         echo "$existing_id"
         return 0
     fi
@@ -171,11 +179,16 @@ create_project() {
     if [ -n "$project_id" ]; then
         echo -e "${GREEN}Project created with ID: $project_id${NC}" >&2
         # Enable projectRoleAssertion so role claims appear in tokens
-        curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/UpdateProject" \
+        local update_result
+        update_result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/UpdateProject" \
             -H "Authorization: Bearer $pat" \
             -H "Connect-Protocol-Version: 1" \
             -H "Content-Type: application/json" \
-            -d "{\"projectId\": \"${project_id}\", \"projectRoleAssertion\": true}" > /dev/null
+            -d "{\"projectId\": \"${project_id}\", \"projectRoleAssertion\": true}")
+        if ! echo "$update_result" | jq -e '.changeDate' > /dev/null 2>&1; then
+            echo -e "${RED}Failed to enable projectRoleAssertion: $update_result${NC}" >&2
+            exit 1
+        fi
         echo -e "${GREEN}Enabled projectRoleAssertion${NC}" >&2
         echo "$project_id"
     else
