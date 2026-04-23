@@ -38,6 +38,7 @@ PROJECT_DIR="${SCRIPT_DIR}/.."
 UPDATE_ENV="${UPDATE_ENV:-false}"
 DOCKER_INIT="${DOCKER_INIT:-false}"
 FORCE_SECRETS="${FORCE_SECRETS:-false}"
+SHOW_SECRETS="${SHOW_SECRETS:-false}"
 for arg in "$@"; do
     case $arg in
         --update-env)
@@ -48,6 +49,9 @@ for arg in "$@"; do
             ;;
         --force-secrets)
             FORCE_SECRETS="true"
+            ;;
+        --show-secrets)
+            SHOW_SECRETS="true"
             ;;
     esac
 done
@@ -115,6 +119,10 @@ create_project() {
     org_id=$(echo "$existing" | jq -r '.projects[0].organizationId // empty')
 
     if [ -n "$existing_id" ]; then
+        if [ -z "$org_id" ]; then
+            echo -e "${RED}Project found but organization ID is missing from response${NC}" >&2
+            exit 1
+        fi
         echo -e "${GREEN}Project already exists with ID: $existing_id${NC}" >&2
         echo "${existing_id}:${org_id}"
         return 0
@@ -138,6 +146,10 @@ create_project() {
             -H "Content-Type: application/json" \
             -d "{\"filters\": [{\"in_project_ids_filter\": {\"projectIds\": [\"${project_id}\"]}}]}")
         org_id=$(echo "$project_detail" | jq -r '.projects[0].organizationId // empty')
+        if [ -z "$org_id" ]; then
+            echo -e "${RED}Project created but organization ID could not be determined${NC}" >&2
+            exit 1
+        fi
         echo -e "${GREEN}Project created with ID: $project_id${NC}" >&2
         echo "${project_id}:${org_id}"
     else
@@ -488,6 +500,75 @@ assign_project_role() {
     fi
 }
 
+# Function to assign an org-level role to a user via the v2 InternalPermissionService
+# Required for Management API access (e.g., user lookups, grant management)
+assign_org_role() {
+    local pat="$1"
+    local user_id="$2"
+    local org_id="$3"
+    local role="$4"
+
+    echo -e "${YELLOW}Assigning org role '${role}' to user ${user_id}...${NC}" >&2
+
+    local result
+    result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.internal_permission.v2.InternalPermissionService/CreateAdministrator" \
+        -H "Authorization: Bearer $pat" \
+        -H "Connect-Protocol-Version: 1" \
+        -H "Content-Type: application/json" \
+        -d "{
+            \"userId\": \"${user_id}\",
+            \"resource\": { \"organizationId\": \"${org_id}\" },
+            \"roles\": [\"${role}\"]
+        }")
+
+    if echo "$result" | jq -e '.creationDate' > /dev/null 2>&1; then
+        echo -e "${GREEN}Org role '${role}' assigned successfully${NC}" >&2
+    elif echo "$result" | jq -e '.code == "already_exists"' > /dev/null 2>&1; then
+        echo -e "${GREEN}Org role '${role}' already assigned${NC}" >&2
+    else
+        echo -e "${RED}Failed to assign org role '${role}': ${result}${NC}" >&2
+        exit 1
+    fi
+}
+
+# Function to create a personal access token for a service account
+create_service_account_pat() {
+    local pat="$1"
+    local user_id="$2"
+    local pat_file="${PROJECT_DIR}/service-account.pat"
+
+    # Reuse existing PAT file unless --force-secrets is set
+    if [ -f "$pat_file" ] && [ "$FORCE_SECRETS" != "true" ]; then
+        echo -e "${GREEN}PAT file already exists (use --force-secrets to regenerate)${NC}" >&2
+        cat "$pat_file"
+        return 0
+    fi
+
+    echo -e "${YELLOW}Creating PAT for service account ${user_id}...${NC}" >&2
+
+    local result
+    result=$(curl -s -X POST "${ZITADEL_URL}/v2/users/${user_id}/pats" \
+        -H "Authorization: Bearer $pat" \
+        -H "Connect-Protocol-Version: 1" \
+        -H "Content-Type: application/json" \
+        -d "{
+            \"expirationDate\": \"2030-01-01T00:00:00Z\"
+        }")
+
+    local token
+    token=$(echo "$result" | jq -r '.token // empty')
+
+    if [ -n "$token" ]; then
+        echo "$token" > "$pat_file"
+        chmod 600 "$pat_file" || { echo -e "${RED}Failed to set permissions on $pat_file${NC}" >&2; exit 1; }
+        echo -e "${GREEN}Service account PAT created and saved to $pat_file${NC}" >&2
+        echo "$token"
+    else
+        echo -e "${RED}Failed to create service account PAT: $result${NC}" >&2
+        exit 1
+    fi
+}
+
 # Function to generate a JWT key for the service account
 generate_service_account_key() {
     local pat="$1"
@@ -559,6 +640,11 @@ main() {
     PROJECT_ID="${project_result%%:*}"
     ORG_ID="${project_result#*:}"
 
+    if [ -z "$ORG_ID" ] || [ "$ORG_ID" = "$PROJECT_ID" ]; then
+        echo -e "${RED}Failed to parse organization ID from project result${NC}" >&2
+        exit 1
+    fi
+
     # Create roles
     echo
     create_roles "$PAT" "$PROJECT_ID"
@@ -567,7 +653,9 @@ main() {
     echo
     SERVICE_ACCOUNT_ID=$(create_test_service_account "$PAT" "$PROJECT_ID")
     assign_project_role "$PAT" "$PROJECT_ID" "$ORG_ID" "$SERVICE_ACCOUNT_ID" "admin"
+    assign_org_role "$PAT" "$SERVICE_ACCOUNT_ID" "$ORG_ID" "ORG_OWNER"
     SERVICE_KEY_FILE=$(generate_service_account_key "$PAT" "$SERVICE_ACCOUNT_ID")
+    SERVICE_ACCOUNT_PAT=$(create_service_account_pat "$PAT" "$SERVICE_ACCOUNT_ID")
 
     # Create Frontend OIDC app
     echo
@@ -586,7 +674,11 @@ main() {
     echo -e "  Project ID:      ${PROJECT_ID}"
     echo -e "  Client ID:       ${FRONTEND_CLIENT_ID}"
     echo -e "  Client Secret:   ${FRONTEND_CLIENT_SECRET}"
-    echo -e "  Service Token:   ${PAT}"
+    if [ "${SHOW_SECRETS}" = "true" ]; then
+        echo -e "  SA PAT:          ${SERVICE_ACCOUNT_PAT}"
+    else
+        echo -e "  SA PAT:          ****${SERVICE_ACCOUNT_PAT: -4}"
+    fi
     echo -e "  Test SA Key:     ${SERVICE_KEY_FILE}"
     echo
     echo -e "${GREEN}Roles created:${NC}"
@@ -614,7 +706,19 @@ main() {
                 update_env_file "$target" "ZITADEL_ISSUER" "${ZITADEL_URL}"
                 update_env_file "$target" "ZITADEL_CLIENT_ID" "$FRONTEND_CLIENT_ID"
                 update_env_file "$target" "ZITADEL_PROJECT_ID" "$PROJECT_ID"
-                update_env_file "$target" "ZITADEL_MACHINE_TOKEN" "$PAT"
+                # Only the API needs a machine token for Management API calls
+                if [ "$label" = "API" ]; then
+                    update_env_file "$target" "ZITADEL_MACHINE_TOKEN" "$SERVICE_ACCOUNT_PAT"
+                else
+                    # Remove stale ZITADEL_MACHINE_TOKEN from non-API env files
+                    if grep -q "^ZITADEL_MACHINE_TOKEN=" "$target" 2>/dev/null; then
+                        if [[ "$OSTYPE" == "darwin"* ]]; then
+                            sed -i '' '/^ZITADEL_MACHINE_TOKEN=/d' "$target"
+                        else
+                            sed -i '/^ZITADEL_MACHINE_TOKEN=/d' "$target"
+                        fi
+                    fi
+                fi
                 echo -e "${GREEN}Updated ${label}: $target${NC}"
             else
                 echo -e "${YELLOW}Skipped ${label} (no .env file found in $dir)${NC}"
