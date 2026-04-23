@@ -315,9 +315,9 @@ create_oidc_app() {
         }")
 
     local client_id
-    client_id=$(echo "$result" | jq -r '.clientId // empty')
+    client_id=$(echo "$result" | jq -r '.oidcConfiguration.clientId // .clientId // empty')
     local client_secret
-    client_secret=$(echo "$result" | jq -r '.clientSecret // empty')
+    client_secret=$(echo "$result" | jq -r '.oidcConfiguration.clientSecret // .clientSecret // empty')
 
     if [ -n "$client_id" ]; then
         echo -e "${GREEN}App created successfully${NC}" >&2
