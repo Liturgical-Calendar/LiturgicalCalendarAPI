@@ -9,6 +9,7 @@
 #   ./scripts/setup-zitadel.sh --docker-init      # Start Docker stack and configure
 #   ./scripts/setup-zitadel.sh --update-env --docker-init  # Full automated setup
 #   ./scripts/setup-zitadel.sh --force-secrets    # Regenerate client secrets
+#   ./scripts/setup-zitadel.sh --show-secrets     # Display full secrets in output
 
 set -e
 
