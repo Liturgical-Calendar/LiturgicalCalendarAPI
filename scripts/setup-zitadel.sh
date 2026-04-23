@@ -306,7 +306,8 @@ create_oidc_app() {
             }")
 
         if ! echo "$update_result" | jq -e '.changeDate' > /dev/null 2>&1; then
-            echo -e "${YELLOW}Warning: Config update may have failed: $update_result${NC}" >&2
+            echo -e "${RED}Failed to update OIDC config: $update_result${NC}" >&2
+            exit 1
         fi
 
         echo "${client_id}:${client_secret}"
