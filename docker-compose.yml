@@ -48,14 +48,14 @@ services:
       ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_MACHINE_NAME: Login V2 Client
       ZITADEL_FIRSTINSTANCE_ORG_LOGINCLIENT_PAT_EXPIRATIONDATE: '2030-01-01T00:00:00Z'
 
-      # Enable Login V2 (port 8081 to avoid conflict with Frontend dev server on 3000)
-      # To activate the login v2 on an existing installation, read the "What's next" section.
+      # Enable Login V2 (default port 8081 to avoid conflict with Frontend dev server on 3000)
+      # Override ZITADEL_LOGIN_PORT in .env to change the Login V2 port
       ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_REQUIRED: true
-      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI: http://localhost:8081/ui/v2/login
+      ZITADEL_DEFAULTINSTANCE_FEATURES_LOGINV2_BASEURI: http://localhost:${ZITADEL_LOGIN_PORT:-8081}/ui/v2/login
       # Configure the redirection paths to the login v2.
-      ZITADEL_OIDC_DEFAULTLOGINURLV2: http://localhost:8081/ui/v2/login/login?authRequest=
-      ZITADEL_OIDC_DEFAULTLOGOUTURLV2: http://localhost:8081/ui/v2/login/logout?post_logout_redirect=
-      ZITADEL_SAML_DEFAULTLOGINURLV2: http://localhost:8081/ui/v2/login/login?samlRequest=
+      ZITADEL_OIDC_DEFAULTLOGINURLV2: http://localhost:${ZITADEL_LOGIN_PORT:-8081}/ui/v2/login/login?authRequest=
+      ZITADEL_OIDC_DEFAULTLOGOUTURLV2: http://localhost:${ZITADEL_LOGIN_PORT:-8081}/ui/v2/login/logout?post_logout_redirect=
+      ZITADEL_SAML_DEFAULTLOGINURLV2: http://localhost:${ZITADEL_LOGIN_PORT:-8081}/ui/v2/login/login?samlRequest=
 
       # By configuring a machine, the setup job creates a user of type machine with the role IAM_OWNER.
       # It writes a personal access token (PAT) to the path specified in ZITADEL_FIRSTINSTANCE_PATPATH.
@@ -91,8 +91,8 @@ services:
     volumes:
       - .:/current-dir:delegated
     ports:
-      - 8080:8080
-      - 8081:3000
+      - 127.0.0.1:${ZITADEL_PORT:-8080}:8080
+      - 127.0.0.1:${ZITADEL_LOGIN_PORT:-8081}:3000
     networks:
       - zitadel
     depends_on:
@@ -104,7 +104,7 @@ services:
     restart: unless-stopped
     image: ghcr.io/zitadel/zitadel-login:latest
     environment:
-      ZITADEL_API_URL: http://localhost:8080
+      ZITADEL_API_URL: http://localhost:${ZITADEL_PORT:-8080}
       NEXT_PUBLIC_BASE_PATH: /ui/v2/login
       ZITADEL_SERVICE_USER_TOKEN_FILE: /current-dir/login-client.pat
       EMAIL_VERIFICATION: true
@@ -148,7 +148,7 @@ services:
     networks:
       - zitadel
     ports:
-      - 127.0.0.1:5432:5432
+      - 127.0.0.1:${DB_PORT:-5432}:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data:rw
       - ./infrastructure/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
@@ -160,7 +160,7 @@ services:
     image: adminer:latest
     restart: unless-stopped
     ports:
-      - 8088:8080
+      - 127.0.0.1:${ADMINER_PORT:-8088}:8080
     environment:
       ADMINER_DEFAULT_SERVER: db
       ADMINER_DESIGN: lucas-sandery
