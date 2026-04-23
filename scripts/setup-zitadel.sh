@@ -383,6 +383,8 @@ create_oidc_app() {
             }
         }")
 
+    local app_id
+    app_id=$(echo "$result" | jq -r '.applicationId // empty')
     local client_id
     client_id=$(echo "$result" | jq -r '.oidcConfiguration.clientId // .clientId // empty')
     local client_secret
@@ -390,6 +392,22 @@ create_oidc_app() {
 
     if [ -n "$client_id" ]; then
         echo -e "${GREEN}App created successfully${NC}" >&2
+        # CreateApplication silently ignores accessTokenRoleAssertion,
+        # so set it via a follow-up UpdateApplication call
+        local update_assertion
+        update_assertion=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/UpdateApplication" \
+            -H "Authorization: Bearer $pat" \
+            -H "Connect-Protocol-Version: 1" \
+            -H "Content-Type: application/json" \
+            -d "{\"projectId\": \"${project_id}\", \"applicationId\": \"${app_id}\", \"oidcConfiguration\": {\"accessTokenRoleAssertion\": true}}")
+        if echo "$update_assertion" | jq -e '.changeDate' > /dev/null 2>&1; then
+            echo -e "${GREEN}Enabled accessTokenRoleAssertion${NC}" >&2
+        elif echo "$update_assertion" | jq -e '.code == "failed_precondition"' > /dev/null 2>&1; then
+            echo -e "${GREEN}accessTokenRoleAssertion already enabled${NC}" >&2
+        else
+            echo -e "${RED}Failed to enable accessTokenRoleAssertion: $update_assertion${NC}" >&2
+            exit 1
+        fi
         echo "${client_id}:${client_secret}"
     else
         echo -e "${RED}Failed to create app: $result${NC}" >&2
