@@ -114,10 +114,12 @@ create_project() {
         -d "{\"queries\": [{\"nameQuery\": {\"name\": \"${PROJECT_NAME}\", \"method\": \"TEXT_QUERY_METHOD_EQUALS\"}}]}")
 
     existing_id=$(echo "$existing" | jq -r '.result[0].id // empty')
+    local org_id
+    org_id=$(echo "$existing" | jq -r '.result[0].details.resourceOwner // empty')
 
     if [ -n "$existing_id" ]; then
         echo -e "${GREEN}Project already exists with ID: $existing_id${NC}" >&2
-        echo "$existing_id"
+        echo "${existing_id}:${org_id}"
         return 0
     fi
 
@@ -128,10 +130,11 @@ create_project() {
         -d "{\"name\": \"${PROJECT_NAME}\"}")
 
     project_id=$(echo "$result" | jq -r '.id // empty')
+    org_id=$(echo "$result" | jq -r '.details.resourceOwner // empty')
 
     if [ -n "$project_id" ]; then
         echo -e "${GREEN}Project created with ID: $project_id${NC}" >&2
-        echo "$project_id"
+        echo "${project_id}:${org_id}"
     else
         echo -e "${RED}Failed to create project: $result${NC}" >&2
         exit 1
@@ -489,7 +492,8 @@ generate_service_account_key() {
 assign_org_role() {
     local pat="$1"
     local user_id="$2"
-    local role="$3"
+    local org_id="$3"
+    local role="$4"
 
     echo -e "${YELLOW}Assigning org role '${role}' to user ${user_id}...${NC}" >&2
 
@@ -499,17 +503,17 @@ assign_org_role() {
         -H "Content-Type: application/json" \
         -d "{
             \"userId\": \"${user_id}\",
-            \"resource\": { \"instance\": true },
+            \"resource\": { \"organization_id\": \"${org_id}\" },
             \"roles\": [\"${role}\"]
         }")
 
     if echo "$result" | jq -e '.creationDate' > /dev/null 2>&1; then
         echo -e "${GREEN}Org role '${role}' assigned successfully${NC}" >&2
-    elif echo "$result" | jq -e '.code == 6' > /dev/null 2>&1; then
-        # ALREADY_EXISTS
+    elif echo "$result" | jq -e '.code == "already_exists"' > /dev/null 2>&1; then
         echo -e "${GREEN}Org role '${role}' already assigned${NC}" >&2
     else
-        echo -e "${YELLOW}Org role assignment result: ${result}${NC}" >&2
+        echo -e "${RED}Failed to assign org role '${role}': ${result}${NC}" >&2
+        exit 1
     fi
 }
 
@@ -569,8 +573,11 @@ main() {
     # Get admin PAT
     PAT=$(get_admin_pat)
 
-    # Create project
-    PROJECT_ID=$(create_project "$PAT")
+    # Create project (returns "projectId:orgId")
+    local project_result
+    project_result=$(create_project "$PAT")
+    PROJECT_ID="${project_result%%:*}"
+    ORG_ID="${project_result#*:}"
 
     # Create roles
     echo
@@ -580,7 +587,7 @@ main() {
     echo
     SERVICE_ACCOUNT_ID=$(create_test_service_account "$PAT" "$PROJECT_ID")
     assign_project_role "$PAT" "$PROJECT_ID" "$SERVICE_ACCOUNT_ID" "admin"
-    assign_org_role "$PAT" "$SERVICE_ACCOUNT_ID" "ORG_OWNER"
+    assign_org_role "$PAT" "$SERVICE_ACCOUNT_ID" "$ORG_ID" "ORG_OWNER"
     SERVICE_KEY_FILE=$(generate_service_account_key "$PAT" "$SERVICE_ACCOUNT_ID")
     SERVICE_ACCOUNT_PAT=$(create_service_account_pat "$PAT" "$SERVICE_ACCOUNT_ID")
 
