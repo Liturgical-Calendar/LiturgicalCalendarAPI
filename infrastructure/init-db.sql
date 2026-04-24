@@ -83,7 +83,7 @@ CREATE TABLE permission_requests (
     review_notes TEXT,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     reviewed_at TIMESTAMP,
-    CONSTRAINT chk_permission_requests_status CHECK (status IN ('pending', 'approved', 'rejected')),
+    CONSTRAINT chk_permission_requests_status CHECK (status IN ('pending', 'approved', 'rejected', 'revoked')),
     CONSTRAINT chk_permission_requests_object_type CHECK (object_type IN ('national_calendar', 'diocesan_calendar', 'wider_region', 'test_definition')),
     CONSTRAINT chk_permission_requests_relation CHECK (relation IN ('admin', 'viewer', 'editor', 'deleter'))
 );
@@ -94,8 +94,8 @@ CREATE INDEX idx_permission_requests_user ON permission_requests(zitadel_user_id
 COMMENT ON TABLE permission_requests IS 'Approval workflow for calendar access — on approval, OpenFGA tuple is created';
 COMMENT ON COLUMN permission_requests.object_type IS 'OpenFGA object type: national_calendar, diocesan_calendar, wider_region, test_definition';
 COMMENT ON COLUMN permission_requests.object_id IS 'Resource identifier: USA, BOSTON, Americas, etc.';
-COMMENT ON COLUMN permission_requests.relation IS 'OpenFGA relation: viewer, editor, deleter';
-COMMENT ON COLUMN permission_requests.status IS 'Status: pending, approved, rejected';
+COMMENT ON COLUMN permission_requests.relation IS 'OpenFGA relation: admin, viewer, editor, deleter';
+COMMENT ON COLUMN permission_requests.status IS 'Status: pending, approved, rejected, revoked';
 
 -- Applications (for API developers)
 CREATE TABLE applications (

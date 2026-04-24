@@ -13,6 +13,7 @@ use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
 use LiturgicalCalendar\Api\Repositories\ApplicationRepository;
+use LiturgicalCalendar\Api\Repositories\PermissionRequestRepository;
 use LiturgicalCalendar\Api\Repositories\RoleRequestRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -27,8 +28,9 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 final class NotificationsHandler extends AbstractHandler
 {
-    private ?RoleRequestRepository $roleRequestRepo = null;
-    private ?ApplicationRepository $applicationRepo = null;
+    private ?RoleRequestRepository $roleRequestRepo       = null;
+    private ?ApplicationRepository $applicationRepo       = null;
+    private ?PermissionRequestRepository $permRequestRepo = null;
 
     public function __construct()
     {
@@ -53,6 +55,14 @@ final class NotificationsHandler extends AbstractHandler
             $this->applicationRepo = new ApplicationRepository();
         }
         return $this->applicationRepo;
+    }
+
+    private function getPermissionRequestRepository(): PermissionRequestRepository
+    {
+        if ($this->permRequestRepo === null) {
+            $this->permRequestRepo = new PermissionRequestRepository();
+        }
+        return $this->permRequestRepo;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -85,10 +95,11 @@ final class NotificationsHandler extends AbstractHandler
 
         // Get notification counts
         $notifications = [
-            'pending_role_requests' => 0,
-            'pending_applications'  => 0,
-            'total'                 => 0,
-            'items'                 => [],
+            'pending_role_requests'       => 0,
+            'pending_applications'        => 0,
+            'pending_permission_requests' => 0,
+            'total'                       => 0,
+            'items'                       => [],
         ];
 
         if (Connection::isConfigured()) {
@@ -130,6 +141,26 @@ final class NotificationsHandler extends AbstractHandler
                 ];
             }
 
+            // Get pending permission requests count
+            $permRequestRepo                              = $this->getPermissionRequestRepository();
+            $notifications['pending_permission_requests'] = $permRequestRepo->countPending();
+
+            // Get recent pending permission requests for the dropdown
+            $pendingPermRequests = $permRequestRepo->getPending();
+            foreach (array_slice($pendingPermRequests, 0, 5) as $req) {
+                $notifications['items'][] = [
+                    'type'        => 'permission_request',
+                    'id'          => $req['id'] ?? '',
+                    'user_name'   => $req['user_name'] ?? $req['user_email'] ?? 'Unknown',
+                    'user_email'  => $req['user_email'] ?? '',
+                    'object_type' => $req['object_type'] ?? '',
+                    'object_id'   => $req['object_id'] ?? '',
+                    'relation'    => $req['relation'] ?? '',
+                    'created_at'  => $req['created_at'] ?? '',
+                    'url'         => 'admin-permissions.php',
+                ];
+            }
+
             // Sort items by created_at descending and limit to 5 most recent
             usort($notifications['items'], function ($a, $b) {
                 $aDate = is_string($a['created_at']) ? $a['created_at'] : '';
@@ -139,7 +170,8 @@ final class NotificationsHandler extends AbstractHandler
             $notifications['items'] = array_slice($notifications['items'], 0, 5);
 
             $notifications['total'] = $notifications['pending_role_requests']
-                                    + $notifications['pending_applications'];
+                                    + $notifications['pending_applications']
+                                    + $notifications['pending_permission_requests'];
         }
 
         // Add Cache-Control header to prevent caching
