@@ -37,6 +37,7 @@ use LiturgicalCalendar\Api\Http\Middleware\AuthorizationMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\ErrorHandlingMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\HttpsEnforcementMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\JwtAuthMiddleware;
+use LiturgicalCalendar\Api\Http\Middleware\JsonBodyParserMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\LoggingMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\ApiKeyMiddleware;
@@ -528,6 +529,9 @@ class Router
         $pipeline = new MiddlewarePipeline($this->handler);
         $pipeline->pipe(new ErrorHandlingMiddleware($this->psr17Factory, self::$debug, $allowedOrigins)); // outermost middleware
         $pipeline->pipe(new LoggingMiddleware(self::$debug));
+
+        // Parse JSON request bodies into getParsedBody() for all routes
+        $pipeline->pipe(new JsonBodyParserMiddleware());
 
         // Apply API key validation and rate limiting for public API routes
         if (!in_array($route, ['auth', 'admin', 'applications'], true)) {

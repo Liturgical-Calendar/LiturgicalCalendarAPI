@@ -255,11 +255,7 @@ final class PermissionAdminHandler extends AbstractHandler
     ): ResponseInterface {
         $body = $request->getParsedBody();
         if (!is_array($body)) {
-            $rawBody = (string) $request->getBody();
-            $body    = json_decode($rawBody, true);
-            if (!is_array($body)) {
-                throw new ValidationException('Request body must be JSON');
-            }
+            throw new ValidationException('Request body must be JSON');
         }
 
         $user       = is_string($body['user'] ?? null) ? $body['user'] : '';
@@ -308,11 +304,7 @@ final class PermissionAdminHandler extends AbstractHandler
     ): ResponseInterface {
         $body = $request->getParsedBody();
         if (!is_array($body)) {
-            $rawBody = (string) $request->getBody();
-            $body    = json_decode($rawBody, true);
-            if (!is_array($body)) {
-                throw new ValidationException('Request body must be JSON');
-            }
+            throw new ValidationException('Request body must be JSON');
         }
 
         $user       = is_string($body['user'] ?? null) ? $body['user'] : '';
