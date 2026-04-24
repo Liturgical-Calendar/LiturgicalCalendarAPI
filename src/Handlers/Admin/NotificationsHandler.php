@@ -99,10 +99,15 @@ final class NotificationsHandler extends AbstractHandler
             // Get recent pending access requests for the dropdown
             $pendingRequests = $accessRequestRepo->getPending();
             foreach (array_slice($pendingRequests, 0, 5) as $req) {
+                $displayName              = !empty($req['user_name'])
+                    ? $req['user_name']
+                    : ( !empty($req['user_email'])
+                        ? $req['user_email']
+                        : ( 'User ' . substr(is_string($req['zitadel_user_id'] ?? null) ? $req['zitadel_user_id'] : '', -6) ) );
                 $notifications['items'][] = [
                     'type'       => 'access_request',
                     'id'         => $req['id'] ?? '',
-                    'user_name'  => $req['user_name'] ?? $req['user_email'] ?? 'Unknown',
+                    'user_name'  => $displayName,
                     'user_email' => $req['user_email'] ?? '',
                     'role'       => $req['requested_role'] ?? '',
                     'created_at' => $req['created_at'] ?? '',
