@@ -6,7 +6,8 @@ This directory contains the infrastructure configuration for the LiturgicalCalen
 
 - **Zitadel** - Identity provider for user authentication, registration, and role management
 - **Login V2** - Next.js-based login UI with passkeys, flexible onboarding, and modern authentication features
-- **PostgreSQL** - Database for Zitadel and application-specific data
+- **OpenFGA** - Fine-grained authorization engine (Google Zanzibar implementation) for per-resource permissions
+- **PostgreSQL** - Database for Zitadel, OpenFGA, and application-specific data
 
 ## Architecture
 
@@ -14,13 +15,18 @@ This directory contains the infrastructure configuration for the LiturgicalCalen
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
 │   PostgreSQL    │────▶│     Zitadel     │────▶│    Login V2     │
 │   Port: 5432    │     │   Port: 8080    │     │   Port: 8081    │
-└─────────────────┘     └─────────────────┘     └─────────────────┘
-                               │
-                               ▼
-                    ┌─────────────────────┐
-                    │  Your Application   │
-                    │  (API + Frontend)   │
-                    └─────────────────────┘
+└────────┬────────┘     └─────────────────┘     └─────────────────┘
+         │                     │
+         ▼                     ▼
+┌─────────────────┐  ┌─────────────────────┐
+│     OpenFGA     │  │  Your Application   │
+│   Port: 8083    │  │  (API + Frontend)   │
+│  Playground:    │  └─────────────────────┘
+│   Port: 3001    │            │
+└─────────────────┘            │
+         ▲                     │
+         └─────────────────────┘
+   (fine-grained permission checks)
 ```
 
 ## Quick Start
@@ -42,7 +48,17 @@ Open [http://localhost:8080/ui/console](http://localhost:8080/ui/console) in you
 - Username: `root@LiturgicalCalendar.localhost`
 - Password: `RootPassword1!`
 
-### 3. Configure Zitadel Project
+### 3. Configure OpenFGA
+
+```bash
+./scripts/setup-openfga.sh --update-env
+```
+
+This creates the OpenFGA store, loads the authorization model, and updates your `.env.local` with the store and model IDs.
+
+Access the OpenFGA Playground at [http://localhost:3001](http://localhost:3001) to explore the model interactively.
+
+### 4. Configure Zitadel Project
 
 After logging in to Zitadel Console:
 
@@ -77,7 +93,7 @@ After logging in to Zitadel Console:
    - Configure email verification
    - Set default role for new users (optional)
 
-### 4. Configure Environment Variables
+### 5. Configure Environment Variables
 
 Copy the client IDs and configure your applications:
 
@@ -108,11 +124,14 @@ ZITADEL_PROJECT_ID=<project-id>
 
 ## Port Summary
 
-| Service    | Port | Purpose                                    |
-|------------|------|--------------------------------------------|
-| Zitadel    | 8080 | API, Console, OIDC endpoints               |
-| Login V2   | 8081 | Login/Logout UI (passkeys, registration)   |
-| PostgreSQL | 5432 | Database                                   |
+| Service             | Port | Purpose                                    |
+|---------------------|------|--------------------------------------------|
+| Zitadel             | 8080 | API, Console, OIDC endpoints               |
+| Login V2            | 8081 | Login/Logout UI (passkeys, registration)   |
+| OpenFGA HTTP API    | 8083 | Authorization checks (REST)                |
+| OpenFGA gRPC        | 8084 | Authorization checks (gRPC)                |
+| OpenFGA Playground  | 3001 | Interactive model explorer                 |
+| PostgreSQL          | 5432 | Database                                   |
 
 ## Database Schema
 
@@ -120,13 +139,12 @@ The `init-db.sql` script creates the application database:
 
 ### Zitadel Database (`zitadel`)
 
-Managed entirely by Zitadel. Contains:
+Managed entirely by Zitadel. Contains users, organizations, projects, roles, and authentication data.
 
-- Users
-- Organizations
-- Projects
-- Roles
-- Authentication data
+### OpenFGA Database (`openfga`)
+
+Managed entirely by OpenFGA. Contains authorization model definitions and relationship tuples
+(e.g., "user X is an editor of national_calendar:IT").
 
 ### Application Database (`litcal`)
 
@@ -153,6 +171,7 @@ docker compose down
 # View logs
 docker compose logs -f zitadel
 docker compose logs -f login
+docker compose logs -f openfga
 docker compose logs -f db
 
 # Reset everything (WARNING: destroys data)
@@ -202,7 +221,31 @@ Verify the database was initialized:
 docker compose exec db psql -U postgres -c '\l'
 ```
 
-You should see both `zitadel` and `litcal` databases.
+You should see `zitadel`, `openfga`, and `litcal` databases.
+
+### OpenFGA not starting
+
+Check if the migration completed successfully:
+
+```bash
+docker compose logs openfga-migrate
+docker compose logs openfga
+```
+
+If migration failed, ensure the `openfga` database exists:
+
+```bash
+docker compose exec db psql -U postgres -c '\l' | grep openfga
+```
+
+### OpenFGA setup script fails
+
+Ensure OpenFGA is healthy before running the setup script:
+
+```bash
+docker compose ps openfga
+curl http://localhost:8083/healthz
+```
 
 ## Production Considerations
 
@@ -215,3 +258,4 @@ For production deployment:
 5. **Use environment-specific configuration files**
 6. **Set up database backups**
 7. **Configure proper CORS origins**
+8. **Secure OpenFGA**: Restrict access to the OpenFGA API in production (e.g., firewall rules, internal network only)

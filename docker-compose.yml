@@ -1,14 +1,17 @@
 # LiturgicalCalendar Infrastructure
-# This Docker Compose file sets up Zitadel (identity provider) with Login V2 and PostgreSQL
-# for the RBAC and registration system.
+# This Docker Compose file sets up Zitadel (identity provider) with Login V2, PostgreSQL,
+# and OpenFGA (fine-grained authorization) for the RBAC and registration system.
 #
 # Usage:
 #   docker compose up -d              # Start all services
 #   docker compose down               # Stop all services
 #   docker compose logs -f zitadel    # View Zitadel logs
+#   docker compose logs -f openfga    # View OpenFGA logs
 #
-# After starting, access Zitadel Console at: http://localhost:8080/ui/console
-# Default admin: root@LiturgicalCalendar.localhost / RootPassword1!
+# After starting:
+#   Zitadel Console: http://localhost:8080/ui/console
+#   OpenFGA Playground: http://localhost:3001
+#   Default admin: root@LiturgicalCalendar.localhost / RootPassword1!
 
 services:
   zitadel:
@@ -192,6 +195,45 @@ services:
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
     networks:
       - zitadel
+
+  # OpenFGA - Fine-grained authorization engine (Google Zanzibar implementation)
+  # Provides relationship-based access control for calendar-specific permissions.
+  # HTTP API: http://localhost:3001 (Playground), http://localhost:8083 (API)
+  openfga-migrate:
+    image: openfga/openfga:latest
+    command: migrate
+    environment:
+      OPENFGA_DATASTORE_ENGINE: postgres
+      OPENFGA_DATASTORE_URI: postgres://openfga:openfga_secure_password@db:5432/openfga?sslmode=disable
+    networks:
+      - zitadel
+    depends_on:
+      db:
+        condition: service_healthy
+
+  openfga:
+    restart: unless-stopped
+    image: openfga/openfga:latest
+    command: run
+    environment:
+      OPENFGA_DATASTORE_ENGINE: postgres
+      OPENFGA_DATASTORE_URI: postgres://openfga:openfga_secure_password@db:5432/openfga?sslmode=disable
+      OPENFGA_PLAYGROUND_ENABLED: "true"
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/grpc_health_probe", "-addr=openfga:8081"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 10s
+    ports:
+      - 127.0.0.1:${OPENFGA_HTTP_PORT:-8083}:8080
+      - 127.0.0.1:${OPENFGA_GRPC_PORT:-8084}:8081
+      - 127.0.0.1:${OPENFGA_PLAYGROUND_PORT:-3001}:3000
+    networks:
+      - zitadel
+    depends_on:
+      openfga-migrate:
+        condition: service_completed_successfully
 
 networks:
   zitadel:

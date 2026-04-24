@@ -1,0 +1,140 @@
+{
+  "schema_version": "1.1",
+  "type_definitions": [
+    {
+      "type": "user"
+    },
+    {
+      "type": "wider_region",
+      "relations": {
+        "viewer": {
+          "this": {}
+        },
+        "editor": {
+          "this": {}
+        },
+        "deleter": {
+          "this": {}
+        }
+      },
+      "metadata": {
+        "relations": {
+          "viewer": {
+            "directly_related_user_types": [
+              { "type": "user" }
+            ]
+          },
+          "editor": {
+            "directly_related_user_types": [
+              { "type": "user" }
+            ]
+          },
+          "deleter": {
+            "directly_related_user_types": [
+              { "type": "user" }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "national_calendar",
+      "relations": {
+        "viewer": {
+          "this": {}
+        },
+        "editor": {
+          "this": {}
+        },
+        "deleter": {
+          "this": {}
+        }
+      },
+      "metadata": {
+        "relations": {
+          "viewer": {
+            "directly_related_user_types": [
+              { "type": "user" }
+            ]
+          },
+          "editor": {
+            "directly_related_user_types": [
+              { "type": "user" }
+            ]
+          },
+          "deleter": {
+            "directly_related_user_types": [
+              { "type": "user" }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "diocesan_calendar",
+      "relations": {
+        "viewer": {
+          "this": {}
+        },
+        "editor": {
+          "this": {}
+        },
+        "deleter": {
+          "this": {}
+        }
+      },
+      "metadata": {
+        "relations": {
+          "viewer": {
+            "directly_related_user_types": [
+              { "type": "user" }
+            ]
+          },
+          "editor": {
+            "directly_related_user_types": [
+              { "type": "user" }
+            ]
+          },
+          "deleter": {
+            "directly_related_user_types": [
+              { "type": "user" }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "type": "test_definition",
+      "relations": {
+        "viewer": {
+          "this": {}
+        },
+        "editor": {
+          "this": {}
+        },
+        "deleter": {
+          "this": {}
+        }
+      },
+      "metadata": {
+        "relations": {
+          "viewer": {
+            "directly_related_user_types": [
+              { "type": "user" }
+            ]
+          },
+          "editor": {
+            "directly_related_user_types": [
+              { "type": "user" }
+            ]
+          },
+          "deleter": {
+            "directly_related_user_types": [
+              { "type": "user" }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

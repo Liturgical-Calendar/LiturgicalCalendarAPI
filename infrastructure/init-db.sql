@@ -10,6 +10,11 @@ CREATE USER zitadel WITH PASSWORD 'zitadel';
 CREATE DATABASE zitadel OWNER zitadel;
 GRANT ALL PRIVILEGES ON DATABASE zitadel TO zitadel;
 
+-- Create OpenFGA database and user (fine-grained authorization engine)
+CREATE USER openfga WITH PASSWORD 'openfga_secure_password';
+CREATE DATABASE openfga OWNER openfga;
+GRANT ALL PRIVILEGES ON DATABASE openfga TO openfga;
+
 -- Create application database and user for LiturgicalCalendar-specific data
 CREATE USER litcal WITH PASSWORD 'litcal_secure_password';
 CREATE DATABASE litcal OWNER litcal;
