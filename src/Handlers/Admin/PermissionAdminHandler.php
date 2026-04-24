@@ -269,14 +269,6 @@ final class PermissionAdminHandler extends AbstractHandler
         $relation   = is_string($body['relation'] ?? null) ? $body['relation'] : '';
 
         $this->validateTupleParams($user, $objectType, $objectId, $relation);
-
-        // Only global admins can grant the "admin" relation
-        if ($relation === 'admin' && !$isGlobalAdmin) {
-            throw new ForbiddenException(
-                'Only global admins can grant the admin relation'
-            );
-        }
-
         $this->requireResourceAdmin($userId, $isGlobalAdmin, $objectType, $objectId);
 
         $fgaUser   = $this->normalizeUser($user);
@@ -319,14 +311,6 @@ final class PermissionAdminHandler extends AbstractHandler
         $relation   = is_string($body['relation'] ?? null) ? $body['relation'] : '';
 
         $this->validateTupleParams($user, $objectType, $objectId, $relation);
-
-        // Only global admins can revoke the "admin" relation
-        if ($relation === 'admin' && !$isGlobalAdmin) {
-            throw new ForbiddenException(
-                'Only global admins can revoke the admin relation'
-            );
-        }
-
         $this->requireResourceAdmin($userId, $isGlobalAdmin, $objectType, $objectId);
 
         $fgaUser   = $this->normalizeUser($user);
