@@ -61,51 +61,9 @@ COMMENT ON TABLE role_requests IS 'Pending role assignment requests from users';
 COMMENT ON COLUMN role_requests.requested_role IS 'Role: developer, calendar_editor, test_editor';
 COMMENT ON COLUMN role_requests.status IS 'Status: pending, approved, rejected, revoked';
 
--- Calendar-specific permissions (beyond Zitadel roles)
-CREATE TABLE user_calendar_permissions (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    zitadel_user_id VARCHAR(255) NOT NULL,
-    calendar_type VARCHAR(20) NOT NULL,
-    calendar_id VARCHAR(50) NOT NULL,
-    permission VARCHAR(10) NOT NULL,
-    granted_by VARCHAR(255),
-    granted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(zitadel_user_id, calendar_type, calendar_id, permission),
-    CONSTRAINT chk_calendar_permission CHECK (permission IN ('read', 'write')),
-    CONSTRAINT chk_calendar_type CHECK (calendar_type IN ('national', 'diocesan', 'widerregion'))
-);
-
-CREATE INDEX idx_user_calendar_perms ON user_calendar_permissions(zitadel_user_id, calendar_type);
-
-COMMENT ON TABLE user_calendar_permissions IS 'Calendar-specific permissions beyond Zitadel roles';
-COMMENT ON COLUMN user_calendar_permissions.zitadel_user_id IS 'Zitadel user ID (sub claim from OIDC token)';
-COMMENT ON COLUMN user_calendar_permissions.calendar_type IS 'Type: national, diocesan, widerregion';
-COMMENT ON COLUMN user_calendar_permissions.calendar_id IS 'Calendar identifier: USA, BOSTON, Americas, etc.';
-COMMENT ON COLUMN user_calendar_permissions.permission IS 'Permission level: read, write';
-
--- Permission requests (approval workflow)
-CREATE TABLE permission_requests (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    zitadel_user_id VARCHAR(255) NOT NULL,
-    user_email VARCHAR(255) NOT NULL,
-    user_name VARCHAR(255),
-    calendar_type VARCHAR(20) NOT NULL,
-    calendar_id VARCHAR(50) NOT NULL,
-    justification TEXT,
-    credentials TEXT,
-    status VARCHAR(20) DEFAULT 'pending',
-    reviewed_by VARCHAR(255),
-    review_notes TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    reviewed_at TIMESTAMP,
-    CONSTRAINT chk_permission_requests_status CHECK (status IN ('pending', 'approved', 'rejected'))
-);
-
-CREATE INDEX idx_permission_requests_status ON permission_requests(status);
-CREATE INDEX idx_permission_requests_user ON permission_requests(zitadel_user_id);
-
-COMMENT ON TABLE permission_requests IS 'Permission request workflow for calendar access';
-COMMENT ON COLUMN permission_requests.status IS 'Status: pending, approved, rejected';
+-- NOTE: Calendar-specific permissions (formerly user_calendar_permissions and
+-- permission_requests tables) are now managed by OpenFGA. See infrastructure/openfga-model.json
+-- and scripts/setup-openfga.sh for the fine-grained authorization model.
 
 -- Applications (for API developers)
 CREATE TABLE applications (

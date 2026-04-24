@@ -8,9 +8,7 @@ use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\CacheDuration;
-use LiturgicalCalendar\Api\Enum\CalendarType;
 use LiturgicalCalendar\Api\Enum\PathCategory;
-use LiturgicalCalendar\Api\Enum\PermissionLevel;
 use LiturgicalCalendar\Api\Handlers\CalendarHandler;
 use LiturgicalCalendar\Api\Handlers\EasterHandler;
 use LiturgicalCalendar\Api\Handlers\EventsHandler;
@@ -46,7 +44,6 @@ use LiturgicalCalendar\Api\Http\Middleware\ApiKeyRateLimitMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAvailabilityMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\OpenFgaAuthorizationMiddleware;
 use LiturgicalCalendar\Api\Database\Connection;
-use LiturgicalCalendar\Api\Repositories\CalendarPermissionRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Http\Server\MiddlewarePipeline;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -607,46 +604,14 @@ class Router
         string $route,
         array $requestPathParts
     ): void {
-        if (!Connection::isConfigured()) {
-            // Add a middleware that throws at runtime instead of during pipeline setup,
-            // so the ErrorHandlingMiddleware can catch it and return a proper response.
-            $pipeline->pipe(new class () implements \Psr\Http\Server\MiddlewareInterface {
-                public function process(
-                    \Psr\Http\Message\ServerRequestInterface $request,
-                    \Psr\Http\Server\RequestHandlerInterface $handler
-                ): \Psr\Http\Message\ResponseInterface {
-                    throw new ServiceUnavailableException(
-                        'Database not configured. Protected routes require database connection.'
-                    );
-                }
-            });
-            return;
-        }
-
-        $permissionRepo = new CalendarPermissionRepository();
-
-        // Determine required role and calendar type based on route
-        $calendarType = null;
-        if ($route === 'data' && count($requestPathParts) >= 2) {
-            $calendarType = match ($requestPathParts[0]) {
-                PathCategory::NATION->value      => CalendarType::NATIONAL,
-                PathCategory::DIOCESE->value     => CalendarType::DIOCESAN,
-                PathCategory::WIDERREGION->value => CalendarType::WIDERREGION,
-                default                          => null
-            };
-
-            // Set calendar_id attribute for AuthorizationMiddleware
-            $this->request = $this->request->withAttribute('calendar_id', $requestPathParts[1] ?? null);
-        }
-
+        // Role-based authorization (Zitadel roles)
         if ($route === 'data') {
-            $pipeline->pipe(new AuthorizationMiddleware(
-                $permissionRepo,
-                'calendar_editor',
-                $calendarType,
-                'calendar_id',
-                PermissionLevel::WRITE
-            ));
+            $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
+
+            // Set calendar_id attribute for OpenFGA check
+            if (count($requestPathParts) >= 2) {
+                $this->request = $this->request->withAttribute('calendar_id', $requestPathParts[1]);
+            }
 
             // OpenFGA fine-grained authorization (runs after role check)
             if (OpenFgaClient::isConfigured() && count($requestPathParts) >= 2) {
@@ -659,11 +624,10 @@ class Router
                 }
             }
         } elseif ($route === 'tests') {
-            $pipeline->pipe(AuthorizationMiddleware::forTestEditor($permissionRepo));
+            $pipeline->pipe(AuthorizationMiddleware::forTestEditor());
 
             // OpenFGA fine-grained authorization for test definitions
             if (OpenFgaClient::isConfigured()) {
-                // Set test_id attribute from path for OpenFGA check
                 if (count($requestPathParts) >= 1) {
                     $this->request = $this->request->withAttribute('test_id', $requestPathParts[0]);
                 }
@@ -673,7 +637,7 @@ class Router
             }
         } elseif ($route === 'temporale') {
             // Temporale requires admin role (General Roman Calendar)
-            $pipeline->pipe(AuthorizationMiddleware::forAdmin($permissionRepo));
+            $pipeline->pipe(AuthorizationMiddleware::forAdmin());
         }
     }
 
