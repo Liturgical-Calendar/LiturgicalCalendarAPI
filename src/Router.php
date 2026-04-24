@@ -43,8 +43,10 @@ use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\ApiKeyMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\ApiKeyRateLimitMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAvailabilityMiddleware;
+use LiturgicalCalendar\Api\Http\Middleware\OpenFgaAuthorizationMiddleware;
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Repositories\CalendarPermissionRepository;
+use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Http\Server\MiddlewarePipeline;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
@@ -636,8 +638,30 @@ class Router
                 'calendar_id',
                 PermissionLevel::WRITE
             ));
+
+            // OpenFGA fine-grained authorization (runs after role check)
+            if (OpenFgaClient::isConfigured() && count($requestPathParts) >= 2) {
+                $fgaMiddleware = OpenFgaAuthorizationMiddleware::forCalendarData(
+                    OpenFgaClient::fromEnv(),
+                    $requestPathParts[0]
+                );
+                if ($fgaMiddleware !== null) {
+                    $pipeline->pipe($fgaMiddleware);
+                }
+            }
         } elseif ($route === 'tests') {
             $pipeline->pipe(AuthorizationMiddleware::forTestEditor($permissionRepo));
+
+            // OpenFGA fine-grained authorization for test definitions
+            if (OpenFgaClient::isConfigured()) {
+                // Set test_id attribute from path for OpenFGA check
+                if (count($requestPathParts) >= 1) {
+                    $this->request = $this->request->withAttribute('test_id', $requestPathParts[0]);
+                }
+                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forTestDefinition(
+                    OpenFgaClient::fromEnv()
+                ));
+            }
         } elseif ($route === 'temporale') {
             // Temporale requires admin role (General Roman Calendar)
             $pipeline->pipe(AuthorizationMiddleware::forAdmin($permissionRepo));
