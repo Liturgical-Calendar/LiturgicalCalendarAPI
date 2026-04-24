@@ -65,12 +65,12 @@
       "description": "Retrieve / create / update / delete Proprium de Tempore (temporale) events"
     },
     {
-      "name": "Role Requests",
-      "description": "User-facing role request operations (request roles, check status)"
+      "name": "Access Requests",
+      "description": "User-facing access request operations (request roles and permissions, check status)"
     },
     {
-      "name": "Admin - Role Requests",
-      "description": "Admin operations for managing role requests (approve, reject, revoke)"
+      "name": "Admin - Access Requests",
+      "description": "Admin operations for managing access requests (approve, reject, revoke)"
     },
     {
       "name": "Admin - Users",
@@ -1071,91 +1071,16 @@
         }
       }
     },
-    "/auth/role-requests": {
+    "/auth/access-requests": {
       "get": {
-        "tags": ["Role Requests"],
+        "tags": ["Access Requests"],
         "security": [{"BearerAuth": []}, {"CookieAuth": []}],
-        "summary": "Get user's own role requests",
-        "operationId": "getUserRoleRequests",
-        "description": "Retrieve all role requests submitted by the authenticated user.",
+        "summary": "List user's own access requests",
+        "operationId": "getUserAccessRequests",
+        "description": "Retrieve all access requests submitted by the authenticated user.",
         "responses": {
           "200": {
-            "description": "OK: List of user's role requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UserRoleRequestsResponse"
-                }
-              }
-            }
-          },
-          "401": {"$ref": "#/components/responses/Unauthorized401"}
-        }
-      },
-      "post": {
-        "tags": ["Role Requests"],
-        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
-        "summary": "Create a new role request",
-        "operationId": "createRoleRequest",
-        "description": "Submit a request for a role. Valid roles are: developer, calendar_editor, test_editor.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateRoleRequestBody"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created: Role request submitted successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateRoleRequestResponse"
-                }
-              }
-            }
-          },
-          "400": {"$ref": "#/components/responses/BadRequest400"},
-          "401": {"$ref": "#/components/responses/Unauthorized401"}
-        }
-      }
-    },
-    "/auth/role-requests/status": {
-      "get": {
-        "tags": ["Role Requests"],
-        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
-        "summary": "Get role request status for user",
-        "operationId": "getRoleRequestStatus",
-        "description": "Check if the user has roles, pending requests, and whether they need to request a role.",
-        "responses": {
-          "200": {
-            "description": "OK: User's role status",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RoleRequestStatusResponse"
-                }
-              }
-            }
-          },
-          "401": {"$ref": "#/components/responses/Unauthorized401"}
-        }
-      }
-    },
-    "/auth/permission-requests": {
-      "get": {
-        "tags": ["Permission Requests"],
-        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
-        "summary": "List own permission requests",
-        "operationId": "listOwnPermissionRequests",
-        "description": "List the authenticated user's own permission requests and their status.",
-        "responses": {
-          "200": {
-            "description": "OK: List of user's permission requests",
+            "description": "OK: List of user's access requests",
             "content": {
               "application/json": {
                 "schema": {
@@ -1163,10 +1088,11 @@
                   "properties": {
                     "requests": {
                       "type": "array",
-                      "items": {"$ref": "#/components/schemas/PermissionRequest"}
+                      "items": {"$ref": "#/components/schemas/AccessRequest"}
                     },
                     "count": {"type": "integer"}
-                  }
+                  },
+                  "required": ["requests", "count"]
                 }
               }
             }
@@ -1175,74 +1101,73 @@
         }
       },
       "post": {
-        "tags": ["Permission Requests"],
+        "tags": ["Access Requests"],
         "security": [{"BearerAuth": []}, {"CookieAuth": []}],
-        "summary": "Submit a permission request",
-        "operationId": "createPermissionRequest",
-        "description": "Submit a request for access to a specific calendar resource. An admin or resource admin will review the request.",
+        "summary": "Submit a new access request",
+        "operationId": "createAccessRequest",
+        "description": "Submit a request for a role and associated permissions. Valid roles are: developer, calendar_editor, test_editor.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "required": ["object_type", "object_id", "relation"],
-                "properties": {
-                  "object_type": {
-                    "type": "string",
-                    "enum": ["national_calendar", "diocesan_calendar", "wider_region", "test_definition"],
-                    "description": "OpenFGA object type"
-                  },
-                  "object_id": {
-                    "type": "string",
-                    "description": "Resource identifier (e.g., 'IT', 'BOSTON', 'Americas')"
-                  },
-                  "relation": {
-                    "type": "string",
-                    "enum": ["admin", "viewer", "editor", "deleter"],
-                    "description": "Requested permission relation"
-                  },
-                  "justification": {
-                    "type": "string",
-                    "description": "Why the user needs this access"
-                  },
-                  "credentials": {
-                    "type": "string",
-                    "description": "Supporting credentials or qualifications"
-                  }
-                }
+                "$ref": "#/components/schemas/CreateAccessRequestBody"
               }
             }
           }
         },
         "responses": {
-          "200": {
-            "description": "OK: Permission request submitted",
+          "201": {
+            "description": "Created: Access request submitted successfully",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "success": {"type": "boolean"},
+                    "success": {"type": "boolean", "example": true},
                     "message": {"type": "string"},
                     "id": {"type": "string", "format": "uuid"}
-                  }
+                  },
+                  "required": ["success", "message", "id"]
                 }
               }
             }
           },
+          "400": {"$ref": "#/components/responses/BadRequest400"},
           "401": {"$ref": "#/components/responses/Unauthorized401"},
           "422": {"$ref": "#/components/responses/ValidationError422"}
         }
       }
     },
-    "/admin/role-requests": {
+    "/auth/access-requests/status": {
       "get": {
-        "tags": ["Admin - Role Requests"],
+        "tags": ["Access Requests"],
         "security": [{"BearerAuth": []}, {"CookieAuth": []}],
-        "summary": "List all role requests",
-        "operationId": "adminListRoleRequests",
-        "description": "List all role requests with optional status filter. Requires admin role.",
+        "summary": "Get access request status for user",
+        "operationId": "getAccessRequestStatus",
+        "description": "Check if the user has roles, pending requests, and whether they need to submit an access request.",
+        "responses": {
+          "200": {
+            "description": "OK: User's access status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccessRequestStatusResponse"
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"}
+        }
+      }
+    },
+    "/admin/access-requests": {
+      "get": {
+        "tags": ["Admin - Access Requests"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "List all access requests",
+        "operationId": "adminListAccessRequests",
+        "description": "List all access requests with optional status filter. Requires admin role.",
         "parameters": [
           {
             "name": "status",
@@ -1256,11 +1181,19 @@
         ],
         "responses": {
           "200": {
-            "description": "OK: List of role requests",
+            "description": "OK: List of access requests",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminRoleRequestsResponse"
+                  "type": "object",
+                  "properties": {
+                    "requests": {
+                      "type": "array",
+                      "items": {"$ref": "#/components/schemas/AccessRequest"}
+                    },
+                    "count": {"type": "integer"}
+                  },
+                  "required": ["requests", "count"]
                 }
               }
             }
@@ -1270,19 +1203,19 @@
         }
       }
     },
-    "/admin/role-requests/{id}/approve": {
+    "/admin/access-requests/{id}/approve": {
       "post": {
-        "tags": ["Admin - Role Requests"],
+        "tags": ["Admin - Access Requests"],
         "security": [{"BearerAuth": []}, {"CookieAuth": []}],
-        "summary": "Approve a role request",
-        "operationId": "adminApproveRoleRequest",
-        "description": "Approve a pending role request and assign the role in Zitadel. Requires admin role.",
+        "summary": "Approve an access request",
+        "operationId": "adminApproveAccessRequest",
+        "description": "Approve a pending access request, assign the role in Zitadel, and create OpenFGA permission tuples. Requires admin role.",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "description": "Role request UUID",
+            "description": "Access request UUID",
             "schema": {"type": "string", "format": "uuid"}
           }
         ],
@@ -1297,11 +1230,11 @@
         },
         "responses": {
           "200": {
-            "description": "OK: Role request approved",
+            "description": "OK: Access request approved",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminApproveRoleRequestResponse"
+                  "$ref": "#/components/schemas/AdminApproveAccessRequestResponse"
                 }
               }
             }
@@ -1312,19 +1245,19 @@
         }
       }
     },
-    "/admin/role-requests/{id}/reject": {
+    "/admin/access-requests/{id}/reject": {
       "post": {
-        "tags": ["Admin - Role Requests"],
+        "tags": ["Admin - Access Requests"],
         "security": [{"BearerAuth": []}, {"CookieAuth": []}],
-        "summary": "Reject a role request",
-        "operationId": "adminRejectRoleRequest",
-        "description": "Reject a pending role request. Requires admin role.",
+        "summary": "Reject an access request",
+        "operationId": "adminRejectAccessRequest",
+        "description": "Reject a pending access request. Requires admin role.",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "description": "Role request UUID",
+            "description": "Access request UUID",
             "schema": {"type": "string", "format": "uuid"}
           }
         ],
@@ -1339,11 +1272,16 @@
         },
         "responses": {
           "200": {
-            "description": "OK: Role request rejected",
+            "description": "OK: Access request rejected",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminRejectResponse"
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean"},
+                    "message": {"type": "string"}
+                  },
+                  "required": ["success", "message"]
                 }
               }
             }
@@ -1354,19 +1292,19 @@
         }
       }
     },
-    "/admin/role-requests/{id}/revoke": {
+    "/admin/access-requests/{id}/revoke": {
       "post": {
-        "tags": ["Admin - Role Requests"],
+        "tags": ["Admin - Access Requests"],
         "security": [{"BearerAuth": []}, {"CookieAuth": []}],
-        "summary": "Revoke a previously approved role request",
-        "operationId": "adminRevokeRoleRequest",
-        "description": "Revoke a previously approved role request and remove the role from Zitadel. Requires admin role.",
+        "summary": "Revoke a previously approved access request",
+        "operationId": "adminRevokeAccessRequest",
+        "description": "Revoke a previously approved access request, remove the role from Zitadel, and delete OpenFGA permission tuples. Requires admin role.",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "description": "Role request UUID",
+            "description": "Access request UUID",
             "schema": {"type": "string", "format": "uuid"}
           }
         ],
@@ -1381,11 +1319,11 @@
         },
         "responses": {
           "200": {
-            "description": "OK: Role request revoked",
+            "description": "OK: Access request revoked",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdminRevokeRoleRequestResponse"
+                  "$ref": "#/components/schemas/AdminRevokeAccessRequestResponse"
                 }
               }
             }
@@ -1641,156 +1579,6 @@
           },
           "401": {"$ref": "#/components/responses/Unauthorized401"},
           "403": {"$ref": "#/components/responses/Forbidden403"},
-          "422": {"$ref": "#/components/responses/ValidationError422"}
-        }
-      }
-    },
-    "/admin/permission-requests": {
-      "get": {
-        "tags": ["Admin - Permission Requests"],
-        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
-        "summary": "List pending permission requests",
-        "operationId": "adminListPermissionRequests",
-        "description": "List pending permission requests. Global admins see all; resource admins see only requests for their administered resources.",
-        "responses": {
-          "200": {
-            "description": "OK: List of pending requests",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "requests": {
-                      "type": "array",
-                      "items": {"$ref": "#/components/schemas/PermissionRequest"}
-                    },
-                    "count": {"type": "integer"}
-                  }
-                }
-              }
-            }
-          },
-          "401": {"$ref": "#/components/responses/Unauthorized401"},
-          "403": {"$ref": "#/components/responses/Forbidden403"}
-        }
-      }
-    },
-    "/admin/permission-requests/{id}/approve": {
-      "post": {
-        "tags": ["Admin - Permission Requests"],
-        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
-        "summary": "Approve a permission request",
-        "operationId": "adminApprovePermissionRequest",
-        "description": "Approve a pending permission request. Creates the corresponding OpenFGA tuple. Requires global admin or resource admin for the requested resource.",
-        "parameters": [
-          {"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "notes": {"type": "string", "description": "Optional review notes"}
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK: Request approved and OpenFGA tuple created",
-            "content": {
-              "application/json": {
-                "schema": {"$ref": "#/components/schemas/PermissionRequestActionResponse"}
-              }
-            }
-          },
-          "401": {"$ref": "#/components/responses/Unauthorized401"},
-          "403": {"$ref": "#/components/responses/Forbidden403"},
-          "404": {"$ref": "#/components/responses/NotFound404"},
-          "422": {"$ref": "#/components/responses/ValidationError422"}
-        }
-      }
-    },
-    "/admin/permission-requests/{id}/reject": {
-      "post": {
-        "tags": ["Admin - Permission Requests"],
-        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
-        "summary": "Reject a permission request",
-        "operationId": "adminRejectPermissionRequest",
-        "description": "Reject a pending permission request with optional notes.",
-        "parameters": [
-          {"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "notes": {"type": "string", "description": "Reason for rejection"}
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK: Request rejected",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {"type": "boolean"},
-                    "message": {"type": "string"}
-                  }
-                }
-              }
-            }
-          },
-          "401": {"$ref": "#/components/responses/Unauthorized401"},
-          "403": {"$ref": "#/components/responses/Forbidden403"},
-          "404": {"$ref": "#/components/responses/NotFound404"},
-          "422": {"$ref": "#/components/responses/ValidationError422"}
-        }
-      }
-    },
-    "/admin/permission-requests/{id}/revoke": {
-      "post": {
-        "tags": ["Admin - Permission Requests"],
-        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
-        "summary": "Revoke a previously approved permission",
-        "operationId": "adminRevokePermissionRequest",
-        "description": "Revoke a previously approved permission request. Deletes the corresponding OpenFGA tuple. Requires global admin or resource admin.",
-        "parameters": [
-          {"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "notes": {"type": "string", "description": "Reason for revocation"}
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK: Permission revoked and OpenFGA tuple deleted",
-            "content": {
-              "application/json": {
-                "schema": {"$ref": "#/components/schemas/PermissionRequestActionResponse"}
-              }
-            }
-          },
-          "401": {"$ref": "#/components/responses/Unauthorized401"},
-          "403": {"$ref": "#/components/responses/Forbidden403"},
-          "404": {"$ref": "#/components/responses/NotFound404"},
           "422": {"$ref": "#/components/responses/ValidationError422"}
         }
       }
@@ -6376,57 +6164,91 @@
           "authenticated"
         ]
       },
-      "RoleRequest": {
+      "Permission": {
         "type": "object",
+        "description": "A permission entry specifying access to a specific resource",
+        "properties": {
+          "object_type": {
+            "type": "string",
+            "enum": ["national_calendar", "diocesan_calendar", "wider_region", "test_definition"],
+            "description": "OpenFGA object type"
+          },
+          "object_id": {
+            "type": "string",
+            "description": "Resource identifier (e.g., 'IT', 'BOSTON', 'Americas')"
+          },
+          "relation": {
+            "type": "string",
+            "enum": ["admin", "viewer", "editor", "deleter"],
+            "description": "Permission relation"
+          }
+        },
+        "required": ["object_type", "object_id", "relation"],
+        "additionalProperties": false
+      },
+      "AccessRequest": {
+        "type": "object",
+        "description": "A unified access request combining role and permission requests",
         "properties": {
           "id": {"type": "string", "format": "uuid"},
           "zitadel_user_id": {"type": "string"},
           "user_email": {"type": "string", "format": "email"},
-          "user_name": {"type": "string"},
+          "user_name": {"type": ["string", "null"]},
           "requested_role": {"type": "string", "enum": ["developer", "calendar_editor", "test_editor"]},
+          "permissions": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/Permission"}
+          },
           "justification": {"type": ["string", "null"]},
+          "credentials": {"type": ["string", "null"]},
           "status": {"type": "string", "enum": ["pending", "approved", "rejected", "revoked"]},
           "reviewed_by": {"type": ["string", "null"]},
           "review_notes": {"type": ["string", "null"]},
-          "reviewed_at": {"type": ["string", "null"], "format": "date-time"},
           "zitadel_sync_status": {"type": ["string", "null"], "enum": ["pending", "synced", "failed", null]},
           "zitadel_sync_error": {"type": ["string", "null"]},
           "created_at": {"type": "string", "format": "date-time"},
-          "updated_at": {"type": "string", "format": "date-time"}
+          "reviewed_at": {"type": ["string", "null"], "format": "date-time"}
         },
-        "required": ["id", "zitadel_user_id", "user_email", "user_name", "requested_role", "status", "created_at", "updated_at"],
+        "required": ["id", "zitadel_user_id", "user_email", "requested_role", "permissions", "status", "created_at"],
         "additionalProperties": false
       },
-      "UserRoleRequestsResponse": {
+      "CreateAccessRequestBody": {
         "type": "object",
+        "description": "Request body for submitting a new access request",
+        "required": ["requested_role", "permissions"],
         "properties": {
-          "requests": {
+          "requested_role": {
+            "type": "string",
+            "enum": ["developer", "calendar_editor", "test_editor"],
+            "description": "Role being requested"
+          },
+          "permissions": {
             "type": "array",
-            "items": {"$ref": "#/components/schemas/RoleRequest"}
+            "items": {"$ref": "#/components/schemas/Permission"},
+            "description": "Array of permission entries requested"
+          },
+          "justification": {
+            "type": "string",
+            "description": "Why the user needs this access"
+          },
+          "credentials": {
+            "type": "string",
+            "description": "Supporting credentials or qualifications"
           }
         },
-        "required": ["requests"],
         "additionalProperties": false
       },
-      "CreateRoleRequestBody": {
+      "AccessRequestStatusResponse": {
         "type": "object",
-        "required": ["role"],
+        "description": "User's current access status",
         "properties": {
-          "role": {"type": "string", "enum": ["developer", "calendar_editor", "test_editor"], "description": "Role being requested"},
-          "justification": {"type": "string", "description": "Reason for requesting the role"},
-          "email": {"type": "string", "format": "email", "description": "User email (optional, falls back to token claim)"},
-          "name": {"type": "string", "description": "User display name (optional, falls back to token claim)"}
+          "has_roles": {"type": "boolean"},
+          "current_roles": {"type": "array", "items": {"type": "string"}},
+          "pending_requests": {"type": "integer"},
+          "needs_access_request": {"type": "boolean"},
+          "valid_roles": {"type": "array", "items": {"type": "string"}}
         },
-        "additionalProperties": false
-      },
-      "CreateRoleRequestResponse": {
-        "type": "object",
-        "properties": {
-          "success": {"type": "boolean"},
-          "request_id": {"type": "string", "format": "uuid"},
-          "message": {"type": "string"}
-        },
-        "required": ["success", "request_id", "message"],
+        "required": ["has_roles", "current_roles", "pending_requests", "needs_access_request", "valid_roles"],
         "additionalProperties": false
       },
       "PermissionTuple": {
@@ -6450,27 +6272,6 @@
         },
         "required": ["user", "object_type", "object_id", "relation"]
       },
-      "PermissionRequest": {
-        "type": "object",
-        "description": "A permission request in the approval workflow",
-        "required": ["id", "zitadel_user_id", "user_email", "object_type", "object_id", "relation", "status", "created_at"],
-        "properties": {
-          "id": {"type": "string", "format": "uuid"},
-          "zitadel_user_id": {"type": "string"},
-          "user_email": {"type": "string"},
-          "user_name": {"type": ["string", "null"]},
-          "object_type": {"type": "string", "enum": ["national_calendar", "diocesan_calendar", "wider_region", "test_definition"]},
-          "object_id": {"type": "string"},
-          "relation": {"type": "string", "enum": ["admin", "viewer", "editor", "deleter"]},
-          "justification": {"type": ["string", "null"]},
-          "credentials": {"type": ["string", "null"]},
-          "status": {"type": "string", "enum": ["pending", "approved", "rejected", "revoked"]},
-          "reviewed_by": {"type": ["string", "null"]},
-          "review_notes": {"type": ["string", "null"]},
-          "created_at": {"type": "string", "format": "date-time"},
-          "reviewed_at": {"type": ["string", "null"], "format": "date-time"}
-        }
-      },
       "PermissionRequestActionResponse": {
         "type": "object",
         "description": "Response from a permission request action (approve/revoke)",
@@ -6483,43 +6284,6 @@
         },
         "required": ["success", "message"]
       },
-      "RoleRequestStatusResponse": {
-        "type": "object",
-        "properties": {
-          "has_roles": {"type": "boolean"},
-          "current_roles": {"type": "array", "items": {"type": "string"}},
-          "pending_requests": {"type": "integer"},
-          "approved_requests": {"type": "integer"},
-          "rejected_requests": {"type": "integer"},
-          "needs_role_request": {"type": "boolean"},
-          "valid_roles": {"type": "array", "items": {"type": "string"}}
-        },
-        "required": ["has_roles", "current_roles", "pending_requests", "approved_requests", "rejected_requests", "needs_role_request", "valid_roles"],
-        "additionalProperties": false
-      },
-      "AdminRoleRequestsResponse": {
-        "type": "object",
-        "properties": {
-          "requests": {"type": "array", "items": {"$ref": "#/components/schemas/RoleRequest"}},
-          "pending_requests": {"type": "array", "items": {"$ref": "#/components/schemas/RoleRequest"}},
-          "approved": {"type": "array", "items": {"$ref": "#/components/schemas/RoleRequest"}},
-          "rejected": {"type": "array", "items": {"$ref": "#/components/schemas/RoleRequest"}},
-          "revoked": {"type": "array", "items": {"$ref": "#/components/schemas/RoleRequest"}},
-          "counts": {
-            "type": "object",
-            "properties": {
-              "pending": {"type": "integer"},
-              "approved": {"type": "integer"},
-              "rejected": {"type": "integer"},
-              "revoked": {"type": "integer"}
-            },
-            "required": ["pending", "approved", "rejected", "revoked"],
-            "additionalProperties": false
-          }
-        },
-        "required": ["requests", "pending_requests", "approved", "rejected", "revoked", "counts"],
-        "additionalProperties": false
-      },
       "AdminReviewRequestBody": {
         "type": "object",
         "properties": {
@@ -6527,43 +6291,46 @@
         },
         "additionalProperties": false
       },
-      "AdminApproveRoleRequestResponse": {
+      "AdminApproveAccessRequestResponse": {
         "type": "object",
+        "description": "Response from approving an access request",
         "properties": {
           "success": {"type": "boolean"},
-          "request": {"$ref": "#/components/schemas/RoleRequest"},
+          "message": {"type": "string"},
           "role_assigned": {"type": "boolean"},
+          "tuples_created": {"type": "integer", "description": "Number of OpenFGA permission tuples created"},
           "zitadel_error": {"type": ["string", "null"]},
-          "message": {"type": "string"}
+          "tuple_errors": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Errors encountered while creating permission tuples"
+          }
         },
-        "required": ["success", "request", "role_assigned", "message"],
+        "required": ["success", "message", "role_assigned", "tuples_created"],
         "additionalProperties": false
       },
-      "AdminRejectResponse": {
+      "AdminRevokeAccessRequestResponse": {
         "type": "object",
+        "description": "Response from revoking an access request",
         "properties": {
           "success": {"type": "boolean"},
-          "message": {"type": "string"}
-        },
-        "required": ["success", "message"],
-        "additionalProperties": false
-      },
-      "AdminRevokeRoleRequestResponse": {
-        "type": "object",
-        "properties": {
-          "success": {"type": "boolean"},
+          "message": {"type": "string"},
           "role_removed": {"type": "boolean"},
+          "tuples_deleted": {"type": "integer", "description": "Number of OpenFGA permission tuples deleted"},
           "zitadel_error": {"type": ["string", "null"]},
-          "message": {"type": "string"}
+          "tuple_errors": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Errors encountered while deleting permission tuples"
+          }
         },
-        "required": ["success", "role_removed", "message"],
+        "required": ["success", "message", "role_removed", "tuples_deleted"],
         "additionalProperties": false
       },
       "AdminNotificationsResponse": {
         "type": "object",
         "properties": {
-          "pending_role_requests": {"type": "integer"},
-          "pending_permission_requests": {"type": "integer"},
+          "pending_access_requests": {"type": "integer"},
           "total": {"type": "integer"},
           "items": {
             "type": "array",
@@ -6583,7 +6350,7 @@
             }
           }
         },
-        "required": ["pending_role_requests", "pending_permission_requests", "total", "items"],
+        "required": ["pending_access_requests", "total", "items"],
         "additionalProperties": false
       },
       "UserGrant": {
