@@ -1146,6 +1146,96 @@
         }
       }
     },
+    "/auth/permission-requests": {
+      "get": {
+        "tags": ["Permission Requests"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "List own permission requests",
+        "operationId": "listOwnPermissionRequests",
+        "description": "List the authenticated user's own permission requests and their status.",
+        "responses": {
+          "200": {
+            "description": "OK: List of user's permission requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "requests": {
+                      "type": "array",
+                      "items": {"$ref": "#/components/schemas/PermissionRequest"}
+                    },
+                    "count": {"type": "integer"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"}
+        }
+      },
+      "post": {
+        "tags": ["Permission Requests"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Submit a permission request",
+        "operationId": "createPermissionRequest",
+        "description": "Submit a request for access to a specific calendar resource. An admin or resource admin will review the request.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["object_type", "object_id", "relation"],
+                "properties": {
+                  "object_type": {
+                    "type": "string",
+                    "enum": ["national_calendar", "diocesan_calendar", "wider_region", "test_definition"],
+                    "description": "OpenFGA object type"
+                  },
+                  "object_id": {
+                    "type": "string",
+                    "description": "Resource identifier (e.g., 'IT', 'BOSTON', 'Americas')"
+                  },
+                  "relation": {
+                    "type": "string",
+                    "enum": ["admin", "viewer", "editor", "deleter"],
+                    "description": "Requested permission relation"
+                  },
+                  "justification": {
+                    "type": "string",
+                    "description": "Why the user needs this access"
+                  },
+                  "credentials": {
+                    "type": "string",
+                    "description": "Supporting credentials or qualifications"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK: Permission request submitted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean"},
+                    "message": {"type": "string"},
+                    "id": {"type": "string", "format": "uuid"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "422": {"$ref": "#/components/responses/ValidationError422"}
+        }
+      }
+    },
     "/admin/role-requests": {
       "get": {
         "tags": ["Admin - Role Requests"],
@@ -1406,6 +1496,302 @@
           "401": {"$ref": "#/components/responses/Unauthorized401"},
           "403": {"$ref": "#/components/responses/Forbidden403"},
           "404": {"$ref": "#/components/responses/NotFound404"}
+        }
+      }
+    },
+    "/admin/permissions": {
+      "get": {
+        "tags": ["Admin - Permissions"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "List permission tuples",
+        "operationId": "adminListPermissions",
+        "description": "List OpenFGA permission tuples. Global admins see all; resource admins see only their resources. Supports filtering by user, object_type, object_id, and relation.",
+        "parameters": [
+          {"name": "user", "in": "query", "description": "Filter by user ID", "schema": {"type": "string"}},
+          {"name": "object_type", "in": "query", "description": "Filter by object type", "schema": {"type": "string", "enum": ["national_calendar", "diocesan_calendar", "wider_region", "test_definition"]}},
+          {"name": "object_id", "in": "query", "description": "Filter by object ID", "schema": {"type": "string"}},
+          {"name": "relation", "in": "query", "description": "Filter by relation", "schema": {"type": "string", "enum": ["admin", "viewer", "editor", "deleter"]}}
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: List of permission tuples",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "permissions": {
+                      "type": "array",
+                      "items": {"$ref": "#/components/schemas/PermissionTuple"}
+                    },
+                    "count": {"type": "integer"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"}
+        }
+      },
+      "post": {
+        "tags": ["Admin - Permissions"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Grant a permission",
+        "operationId": "adminGrantPermission",
+        "description": "Create an OpenFGA tuple granting a user a relation on a resource. Requires global admin or resource admin.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/PermissionTupleInput"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK: Permission granted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean"},
+                    "message": {"type": "string"},
+                    "user": {"type": "string"},
+                    "relation": {"type": "string"},
+                    "object": {"type": "string"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "422": {"$ref": "#/components/responses/ValidationError422"}
+        }
+      },
+      "delete": {
+        "tags": ["Admin - Permissions"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Revoke a permission",
+        "operationId": "adminRevokePermission",
+        "description": "Delete an OpenFGA tuple revoking a user's relation on a resource. Requires global admin or resource admin.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/PermissionTupleInput"}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK: Permission revoked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean"},
+                    "message": {"type": "string"},
+                    "user": {"type": "string"},
+                    "relation": {"type": "string"},
+                    "object": {"type": "string"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "422": {"$ref": "#/components/responses/ValidationError422"}
+        }
+      }
+    },
+    "/admin/permissions/check": {
+      "get": {
+        "tags": ["Admin - Permissions"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Check a permission",
+        "operationId": "adminCheckPermission",
+        "description": "Check if a user has a specific relation on a resource via OpenFGA.",
+        "parameters": [
+          {"name": "user", "in": "query", "required": true, "schema": {"type": "string"}},
+          {"name": "object_type", "in": "query", "required": true, "schema": {"type": "string", "enum": ["national_calendar", "diocesan_calendar", "wider_region", "test_definition"]}},
+          {"name": "object_id", "in": "query", "required": true, "schema": {"type": "string"}},
+          {"name": "relation", "in": "query", "required": true, "schema": {"type": "string", "enum": ["admin", "viewer", "editor", "deleter"]}}
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Permission check result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "allowed": {"type": "boolean"},
+                    "user": {"type": "string"},
+                    "relation": {"type": "string"},
+                    "object": {"type": "string"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "422": {"$ref": "#/components/responses/ValidationError422"}
+        }
+      }
+    },
+    "/admin/permission-requests": {
+      "get": {
+        "tags": ["Admin - Permission Requests"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "List pending permission requests",
+        "operationId": "adminListPermissionRequests",
+        "description": "List pending permission requests. Global admins see all; resource admins see only requests for their administered resources.",
+        "responses": {
+          "200": {
+            "description": "OK: List of pending requests",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "requests": {
+                      "type": "array",
+                      "items": {"$ref": "#/components/schemas/PermissionRequest"}
+                    },
+                    "count": {"type": "integer"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"}
+        }
+      }
+    },
+    "/admin/permission-requests/{id}/approve": {
+      "post": {
+        "tags": ["Admin - Permission Requests"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Approve a permission request",
+        "operationId": "adminApprovePermissionRequest",
+        "description": "Approve a pending permission request. Creates the corresponding OpenFGA tuple. Requires global admin or resource admin for the requested resource.",
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "notes": {"type": "string", "description": "Optional review notes"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK: Request approved and OpenFGA tuple created",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/PermissionRequestActionResponse"}
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"},
+          "422": {"$ref": "#/components/responses/ValidationError422"}
+        }
+      }
+    },
+    "/admin/permission-requests/{id}/reject": {
+      "post": {
+        "tags": ["Admin - Permission Requests"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Reject a permission request",
+        "operationId": "adminRejectPermissionRequest",
+        "description": "Reject a pending permission request with optional notes.",
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "notes": {"type": "string", "description": "Reason for rejection"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK: Request rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean"},
+                    "message": {"type": "string"}
+                  }
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"},
+          "422": {"$ref": "#/components/responses/ValidationError422"}
+        }
+      }
+    },
+    "/admin/permission-requests/{id}/revoke": {
+      "post": {
+        "tags": ["Admin - Permission Requests"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Revoke a previously approved permission",
+        "operationId": "adminRevokePermissionRequest",
+        "description": "Revoke a previously approved permission request. Deletes the corresponding OpenFGA tuple. Requires global admin or resource admin.",
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "schema": {"type": "string", "format": "uuid"}}
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "notes": {"type": "string", "description": "Reason for revocation"}
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK: Permission revoked and OpenFGA tuple deleted",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/PermissionRequestActionResponse"}
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {"$ref": "#/components/responses/Forbidden403"},
+          "404": {"$ref": "#/components/responses/NotFound404"},
+          "422": {"$ref": "#/components/responses/ValidationError422"}
         }
       }
     },
@@ -6043,6 +6429,60 @@
         "required": ["success", "request_id", "message"],
         "additionalProperties": false
       },
+      "PermissionTuple": {
+        "type": "object",
+        "description": "An OpenFGA relationship tuple representing a granted permission",
+        "properties": {
+          "user": {"type": "string", "description": "User identifier (e.g., 'user:zitadel-id')"},
+          "relation": {"type": "string", "enum": ["admin", "viewer", "editor", "deleter"]},
+          "object": {"type": "string", "description": "Object identifier (e.g., 'national_calendar:IT')"}
+        },
+        "required": ["user", "relation", "object"]
+      },
+      "PermissionTupleInput": {
+        "type": "object",
+        "description": "Input for granting or revoking a permission",
+        "properties": {
+          "user": {"type": "string", "description": "Zitadel user ID (with or without 'user:' prefix)"},
+          "object_type": {"type": "string", "enum": ["national_calendar", "diocesan_calendar", "wider_region", "test_definition"]},
+          "object_id": {"type": "string", "description": "Resource identifier (e.g., 'IT', 'BOSTON')"},
+          "relation": {"type": "string", "enum": ["admin", "viewer", "editor", "deleter"]}
+        },
+        "required": ["user", "object_type", "object_id", "relation"]
+      },
+      "PermissionRequest": {
+        "type": "object",
+        "description": "A permission request in the approval workflow",
+        "required": ["id", "zitadel_user_id", "user_email", "object_type", "object_id", "relation", "status", "created_at"],
+        "properties": {
+          "id": {"type": "string", "format": "uuid"},
+          "zitadel_user_id": {"type": "string"},
+          "user_email": {"type": "string"},
+          "user_name": {"type": ["string", "null"]},
+          "object_type": {"type": "string", "enum": ["national_calendar", "diocesan_calendar", "wider_region", "test_definition"]},
+          "object_id": {"type": "string"},
+          "relation": {"type": "string", "enum": ["admin", "viewer", "editor", "deleter"]},
+          "justification": {"type": ["string", "null"]},
+          "credentials": {"type": ["string", "null"]},
+          "status": {"type": "string", "enum": ["pending", "approved", "rejected", "revoked"]},
+          "reviewed_by": {"type": ["string", "null"]},
+          "review_notes": {"type": ["string", "null"]},
+          "created_at": {"type": "string", "format": "date-time"},
+          "reviewed_at": {"type": ["string", "null"], "format": "date-time"}
+        }
+      },
+      "PermissionRequestActionResponse": {
+        "type": "object",
+        "description": "Response from a permission request action (approve/revoke)",
+        "properties": {
+          "success": {"type": "boolean"},
+          "message": {"type": "string"},
+          "user": {"type": "string"},
+          "relation": {"type": "string"},
+          "object": {"type": "string"}
+        },
+        "required": ["success", "message"]
+      },
       "RoleRequestStatusResponse": {
         "type": "object",
         "properties": {
@@ -7036,6 +7476,22 @@
               "title": "Not Found",
               "status": 404,
               "detail": "The requested resource was not found"
+            }
+          }
+        }
+      },
+      "ValidationError422": {
+        "description": "422 Unprocessable Entity. The request was well-formed but contains invalid parameters.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "./Problem.json"
+            },
+            "example": {
+              "type": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/422",
+              "title": "Unprocessable Entity",
+              "status": 422,
+              "detail": "Validation failed: missing or invalid parameters"
             }
           }
         }
