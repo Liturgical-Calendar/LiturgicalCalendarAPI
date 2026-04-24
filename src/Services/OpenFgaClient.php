@@ -190,12 +190,17 @@ class OpenFgaClient
      */
     public function readTuples(string $user, string $object, ?string $relation = null): array
     {
-        $tupleKey = [
-            'user'   => $user,
-            'object' => $object,
-        ];
+        $tupleKey = [];
 
-        if ($relation !== null) {
+        if ($user !== '') {
+            $tupleKey['user'] = $user;
+        }
+
+        if ($object !== '') {
+            $tupleKey['object'] = $object;
+        }
+
+        if ($relation !== null && $relation !== '') {
             $tupleKey['relation'] = $relation;
         }
 
