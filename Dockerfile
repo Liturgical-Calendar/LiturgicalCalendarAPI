@@ -36,6 +36,7 @@ COPY ./.env.example ./.env.local
 COPY ./infrastructure/init-db.sql ./infrastructure/init-db.sql
 COPY ./infrastructure/openfga-model.json ./infrastructure/openfga-model.json
 COPY ./scripts/setup-openfga.sh ./scripts/setup-openfga.sh
+COPY ./scripts/setup-zitadel.sh ./scripts/setup-zitadel.sh
 
 # Stage 2: final build
 FROM php:8.4-cli AS main
