@@ -116,7 +116,8 @@ get_admin_pat() {
     container_name=$(docker compose ps -q zitadel 2>/dev/null)
     local tmp_pat="/tmp/zitadel-admin-$$.pat"
     for i in $(seq 1 $MAX_RETRIES); do
-        # Tier 1: bind-mount path
+        # Tier 1: bind-mount path (API repo mounts . to /current-dir;
+        # won't exist in Frontend repo which uses a named volume instead)
         if [ -f "${PROJECT_DIR}/admin.pat" ]; then
             PAT=$(cat "${PROJECT_DIR}/admin.pat" 2>/dev/null || true)
             if [ -n "$PAT" ] && [ ${#PAT} -gt 10 ]; then
@@ -125,7 +126,9 @@ get_admin_pat() {
                 return 0
             fi
         fi
-        # Tier 2: docker cp from container
+        # Tier 2: docker cp from container (Frontend repo uses named volume
+        # at /zitadel-data — this is the expected path for that stack)
+
         if [ -n "$container_name" ] && docker cp "${container_name}:/zitadel-data/admin.pat" "$tmp_pat" 2>/dev/null; then
             PAT=$(cat "$tmp_pat" 2>/dev/null || true)
             rm -f "$tmp_pat"
@@ -188,7 +191,7 @@ create_project() {
         echo -e "${GREEN}Project already exists with ID: $existing_id${NC}" >&2
         # Ensure projectRoleAssertion is enabled (required for role claims in tokens)
         local update_result
-        update_result=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/UpdateProject" \
+        update_result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/UpdateProject" \
             -H "Authorization: Bearer $pat" \
             -H "Connect-Protocol-Version: 1" \
             -H "Content-Type: application/json" \
@@ -220,7 +223,7 @@ create_project() {
         echo -e "${GREEN}Project created with ID: $project_id${NC}" >&2
         # Enable projectRoleAssertion so role claims appear in tokens
         local update_result
-        update_result=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/UpdateProject" \
+        update_result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/UpdateProject" \
             -H "Authorization: Bearer $pat" \
             -H "Connect-Protocol-Version: 1" \
             -H "Content-Type: application/json" \
@@ -380,7 +383,7 @@ create_oidc_app() {
 
         # Update config
         local update_result
-        update_result=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/UpdateApplication" \
+        update_result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/UpdateApplication" \
             -H "Authorization: Bearer $pat" \
             -H "Connect-Protocol-Version: 1" \
             -H "Content-Type: application/json" \
@@ -450,7 +453,7 @@ create_oidc_app() {
         # CreateApplication silently ignores accessTokenRoleAssertion,
         # so set it via a follow-up UpdateApplication call
         local update_assertion
-        update_assertion=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/UpdateApplication" \
+        update_assertion=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/UpdateApplication" \
             -H "Authorization: Bearer $pat" \
             -H "Connect-Protocol-Version: 1" \
             -H "Content-Type: application/json" \

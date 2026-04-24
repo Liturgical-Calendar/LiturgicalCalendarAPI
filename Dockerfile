@@ -47,7 +47,8 @@ WORKDIR /var/www/html
 # Install runtime dependencies (not the -dev packages)
 RUN apt-get update -y && \
     apt-get install -y --no-install-suggests --no-install-recommends \
-    libyaml-0-2 libicu-dev libzip-dev libpq5 locales-all && \
+    libyaml-0-2 libicu-dev libzip-dev libpq5 locales-all \
+    curl jq && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy the compiled PHP extensions from the build stage
