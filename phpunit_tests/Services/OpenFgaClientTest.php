@@ -2,16 +2,19 @@
 
 namespace LiturgicalCalendar\Api\Tests\Services;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 /**
  * Unit tests for the OpenFgaClient service.
  *
- * Tests configuration and static methods without requiring a running OpenFGA server.
- * Integration tests with a live OpenFGA instance are covered by the Docker-based
- * end-to-end verification.
+ * Uses Guzzle's MockHandler to test HTTP interactions without a running OpenFGA server.
  */
 class OpenFgaClientTest extends TestCase
 {
@@ -35,6 +38,22 @@ class OpenFgaClientTest extends TestCase
         putenv('OPENFGA_MODEL_ID');
 
         parent::tearDown();
+    }
+
+    private function createClientWithMock(MockHandler $mock): OpenFgaClient
+    {
+        $handlerStack = HandlerStack::create($mock);
+        $httpClient   = new Client(['handler' => $handlerStack]);
+        $psr17        = new Psr17Factory();
+
+        return new OpenFgaClient(
+            'http://localhost:8083',
+            'store-123',
+            'model-456',
+            $httpClient,
+            $psr17,
+            $psr17
+        );
     }
 
     public function testIsConfiguredReturnsFalseWhenNoEnvVars(): void
@@ -76,30 +95,6 @@ class OpenFgaClientTest extends TestCase
         $this->assertInstanceOf(OpenFgaClient::class, $client);
     }
 
-    public function testConstructorAcceptsParameters(): void
-    {
-        $client = new OpenFgaClient(
-            'http://localhost:8083',
-            'store-123',
-            'model-456'
-        );
-
-        $this->assertInstanceOf(OpenFgaClient::class, $client);
-    }
-
-    public function testCheckThrowsOnConnectionFailure(): void
-    {
-        // Point to a non-existent server
-        $client = new OpenFgaClient(
-            'http://127.0.0.1:19999',
-            'store-id',
-            'model-id'
-        );
-
-        $this->expectException(RuntimeException::class);
-        $client->check('user:test', 'editor', 'national_calendar:IT');
-    }
-
     public function testIsConfiguredReadsFromGetenv(): void
     {
         putenv('OPENFGA_API_URL=http://localhost:8083');
@@ -112,5 +107,92 @@ class OpenFgaClientTest extends TestCase
         putenv('OPENFGA_API_URL');
         putenv('OPENFGA_STORE_ID');
         putenv('OPENFGA_MODEL_ID');
+    }
+
+    public function testCheckReturnsTrueWhenAllowed(): void
+    {
+        $mock   = new MockHandler([
+            new Response(200, [], json_encode(['allowed' => true]) ?: ''),
+        ]);
+        $client = $this->createClientWithMock($mock);
+
+        $this->assertTrue($client->check('user:test', 'editor', 'national_calendar:IT'));
+    }
+
+    public function testCheckReturnsFalseWhenDenied(): void
+    {
+        $mock   = new MockHandler([
+            new Response(200, [], json_encode(['allowed' => false]) ?: ''),
+        ]);
+        $client = $this->createClientWithMock($mock);
+
+        $this->assertFalse($client->check('user:test', 'editor', 'national_calendar:IT'));
+    }
+
+    public function testCheckThrowsOnApiError(): void
+    {
+        $mock   = new MockHandler([
+            new Response(400, [], json_encode(['message' => 'invalid request']) ?: ''),
+        ]);
+        $client = $this->createClientWithMock($mock);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('OpenFGA API error (HTTP 400): invalid request');
+        $client->check('user:test', 'editor', 'national_calendar:IT');
+    }
+
+    public function testWriteTupleSucceeds(): void
+    {
+        $mock   = new MockHandler([
+            new Response(200, [], '{}'),
+        ]);
+        $client = $this->createClientWithMock($mock);
+
+        // Should not throw
+        $client->writeTuple('user:test', 'editor', 'national_calendar:IT');
+        $this->assertTrue(true); // Reached without exception
+    }
+
+    public function testDeleteTupleSucceeds(): void
+    {
+        $mock   = new MockHandler([
+            new Response(200, [], '{}'),
+        ]);
+        $client = $this->createClientWithMock($mock);
+
+        // Should not throw
+        $client->deleteTuple('user:test', 'editor', 'national_calendar:IT');
+        $this->assertTrue(true); // Reached without exception
+    }
+
+    public function testReadTuplesReturnsParsedTuples(): void
+    {
+        $responseBody = json_encode([
+            'tuples' => [
+                ['key' => ['user' => 'user:test', 'relation' => 'editor', 'object' => 'national_calendar:IT']],
+                ['key' => ['user' => 'user:test', 'relation' => 'viewer', 'object' => 'national_calendar:IT']],
+            ],
+        ]);
+        $mock         = new MockHandler([
+            new Response(200, [], $responseBody ?: ''),
+        ]);
+        $client       = $this->createClientWithMock($mock);
+
+        $tuples = $client->readTuples('user:test', 'national_calendar:IT');
+
+        $this->assertCount(2, $tuples);
+        $this->assertEquals('editor', $tuples[0]['relation']);
+        $this->assertEquals('viewer', $tuples[1]['relation']);
+    }
+
+    public function testReadTuplesReturnsEmptyArrayWhenNoTuples(): void
+    {
+        $mock   = new MockHandler([
+            new Response(200, [], json_encode(['tuples' => []]) ?: ''),
+        ]);
+        $client = $this->createClientWithMock($mock);
+
+        $tuples = $client->readTuples('user:test', 'national_calendar:IT');
+        $this->assertCount(0, $tuples);
     }
 }

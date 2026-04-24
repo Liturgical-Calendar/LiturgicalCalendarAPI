@@ -4,10 +4,16 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Services;
 
+use GuzzleHttp\Client;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Psr\Http\Client\ClientExceptionInterface;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestFactoryInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 use RuntimeException;
 
 /**
- * HTTP client for OpenFGA authorization checks.
+ * PSR-18 HTTP client for OpenFGA authorization checks.
  *
  * Communicates with the OpenFGA REST API to check, write, and delete
  * relationship tuples for fine-grained authorization.
@@ -17,16 +23,30 @@ class OpenFgaClient
     private string $apiUrl;
     private string $storeId;
     private string $modelId;
+    private ClientInterface $httpClient;
+    private RequestFactoryInterface $requestFactory;
+    private StreamFactoryInterface $streamFactory;
 
-    public function __construct(string $apiUrl, string $storeId, string $modelId)
-    {
-        $this->apiUrl  = rtrim($apiUrl, '/');
-        $this->storeId = $storeId;
-        $this->modelId = $modelId;
+    public function __construct(
+        string $apiUrl,
+        string $storeId,
+        string $modelId,
+        ClientInterface $httpClient,
+        RequestFactoryInterface $requestFactory,
+        StreamFactoryInterface $streamFactory
+    ) {
+        $this->apiUrl         = rtrim($apiUrl, '/');
+        $this->storeId        = $storeId;
+        $this->modelId        = $modelId;
+        $this->httpClient     = $httpClient;
+        $this->requestFactory = $requestFactory;
+        $this->streamFactory  = $streamFactory;
     }
 
     /**
      * Create an OpenFgaClient from environment variables.
+     *
+     * Uses Guzzle (PSR-18) and Nyholm (PSR-17) as default implementations.
      *
      * @throws RuntimeException If required environment variables are missing
      */
@@ -42,7 +62,10 @@ class OpenFgaClient
             );
         }
 
-        return new self($apiUrl, $storeId, $modelId);
+        $httpClient = new Client(['timeout' => 5, 'connect_timeout' => 2]);
+        $psr17      = new Psr17Factory();
+
+        return new self($apiUrl, $storeId, $modelId, $httpClient, $psr17, $psr17);
     }
 
     /**
@@ -217,33 +240,26 @@ class OpenFgaClient
             throw new RuntimeException('Failed to encode OpenFGA request payload');
         }
 
-        $ch = curl_init($url);
-        if ($ch === false) {
-            throw new RuntimeException('Failed to initialize cURL for OpenFGA request');
-        }
+        $body    = $this->streamFactory->createStream($json);
+        $request = $this->requestFactory->createRequest('POST', $url)
+            ->withHeader('Content-Type', 'application/json')
+            ->withBody($body);
 
-        curl_setopt_array($ch, [
-            CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => $json,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
-            CURLOPT_TIMEOUT        => 5,
-            CURLOPT_CONNECTTIMEOUT => 2,
-        ]);
-
-        $responseBody = curl_exec($ch);
-        $httpCode     = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlError    = curl_error($ch);
-        unset($ch);
-
-        if ($responseBody === false || $curlError !== '') {
+        try {
+            $response = $this->httpClient->sendRequest($request);
+        } catch (ClientExceptionInterface $e) {
             throw new RuntimeException(
-                sprintf('OpenFGA request failed: %s', $curlError)
+                sprintf('OpenFGA request failed: %s', $e->getMessage()),
+                0,
+                $e
             );
         }
 
+        $responseBody = (string) $response->getBody();
+        $httpCode     = $response->getStatusCode();
+
         /** @var array<string, mixed> $decoded */
-        $decoded = json_decode((string) $responseBody, true);
+        $decoded = json_decode($responseBody, true);
 
         if (!is_array($decoded)) {
             $decoded = [];
