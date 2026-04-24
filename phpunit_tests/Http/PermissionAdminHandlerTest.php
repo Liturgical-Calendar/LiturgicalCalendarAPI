@@ -32,13 +32,16 @@ class PermissionAdminHandlerTest extends TestCase
         $this->handler->handle($request);
     }
 
-    public function testRejectsNonAdminUser(): void
+    public function testNonGlobalAdminRequiresObjectTypeFilter(): void
     {
+        // Non-global-admins (potential resource admins) must specify object_type
+        // when listing permissions, to scope the query to resources they administer
         $request = ( new ServerRequest('GET', '/admin/permissions') )
             ->withHeader('Accept', 'application/json')
             ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['calendar_editor']]);
 
-        $this->expectException(\LiturgicalCalendar\Api\Http\Exception\ForbiddenException::class);
+        $this->expectException(\LiturgicalCalendar\Api\Http\Exception\ValidationException::class);
+        $this->expectExceptionMessage('Resource admins must specify object_type filter');
         $this->handler->handle($request);
     }
 

@@ -85,7 +85,7 @@ CREATE TABLE permission_requests (
     reviewed_at TIMESTAMP,
     CONSTRAINT chk_permission_requests_status CHECK (status IN ('pending', 'approved', 'rejected')),
     CONSTRAINT chk_permission_requests_object_type CHECK (object_type IN ('national_calendar', 'diocesan_calendar', 'wider_region', 'test_definition')),
-    CONSTRAINT chk_permission_requests_relation CHECK (relation IN ('viewer', 'editor', 'deleter'))
+    CONSTRAINT chk_permission_requests_relation CHECK (relation IN ('admin', 'viewer', 'editor', 'deleter'))
 );
 
 CREATE INDEX idx_permission_requests_status ON permission_requests(status);

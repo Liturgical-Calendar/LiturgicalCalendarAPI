@@ -20,14 +20,17 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * Permission Admin Handler — OpenFGA tuple management.
  *
- * Provides admin endpoints for managing fine-grained permissions:
+ * Provides endpoints for managing fine-grained permissions:
  *
  * - GET    /admin/permissions              — List tuples (optional filters)
  * - POST   /admin/permissions              — Grant permission (create tuple)
  * - DELETE /admin/permissions              — Revoke permission (delete tuple)
  * - GET    /admin/permissions/check        — Check a specific permission
  *
- * All endpoints require the admin role.
+ * Access control:
+ * - Global admins (Zitadel "admin" role) can manage all resources
+ * - Resource admins (OpenFGA "admin" relation on a resource) can manage
+ *   permissions for that specific resource only
  */
 final class PermissionAdminHandler extends AbstractHandler
 {
@@ -48,7 +51,7 @@ final class PermissionAdminHandler extends AbstractHandler
      *
      * @var array<string>
      */
-    private const VALID_RELATIONS = ['viewer', 'editor', 'deleter'];
+    private const VALID_RELATIONS = ['admin', 'viewer', 'editor', 'deleter'];
 
     private ?OpenFgaClient $fgaClient = null;
 
@@ -94,9 +97,12 @@ final class PermissionAdminHandler extends AbstractHandler
             throw new UnauthorizedException('Authentication required');
         }
 
-        if (!OidcAuthMiddleware::isAdmin($oidcUser)) {
-            throw new ForbiddenException('Admin role required');
+        $userId = $oidcUser['sub'] ?? null;
+        if ($userId === null) {
+            throw new UnauthorizedException('Invalid authentication token');
         }
+
+        $isGlobalAdmin = OidcAuthMiddleware::isAdmin($oidcUser);
 
         // Determine sub-route: /admin/permissions or /admin/permissions/check
         $path      = $request->getUri()->getPath();
@@ -104,23 +110,61 @@ final class PermissionAdminHandler extends AbstractHandler
         $lastPart  = end($pathParts);
 
         if ($method === RequestMethod::GET && $lastPart === 'check') {
-            return $this->checkPermission($request, $response);
+            return $this->checkPermission($request, $response, $userId, $isGlobalAdmin);
         }
 
         if ($method === RequestMethod::GET) {
-            return $this->listPermissions($request, $response);
+            return $this->listPermissions($request, $response, $userId, $isGlobalAdmin);
         }
 
         if ($method === RequestMethod::POST) {
-            return $this->grantPermission($request, $response);
+            return $this->grantPermission($request, $response, $userId, $isGlobalAdmin);
         }
 
         // DELETE
-        return $this->revokePermission($request, $response);
+        return $this->revokePermission($request, $response, $userId, $isGlobalAdmin);
+    }
+
+    /**
+     * Check if the current user can manage permissions on a specific resource.
+     *
+     * A user can manage permissions if they are a global admin (Zitadel role)
+     * or a resource admin (OpenFGA "admin" relation on the resource).
+     *
+     * @param string $userId The current user's Zitadel ID
+     * @param bool $isGlobalAdmin Whether the user has the Zitadel admin role
+     * @param string $objectType The OpenFGA object type
+     * @param string $objectId The resource ID
+     * @throws ForbiddenException If the user cannot manage this resource
+     */
+    private function requireResourceAdmin(
+        string $userId,
+        bool $isGlobalAdmin,
+        string $objectType,
+        string $objectId
+    ): void {
+        if ($isGlobalAdmin) {
+            return;
+        }
+
+        // Check if user has the "admin" relation on this specific resource
+        $fgaUser   = "user:{$userId}";
+        $fgaObject = "{$objectType}:{$objectId}";
+
+        $isResourceAdmin = $this->getClient()->check($fgaUser, 'admin', $fgaObject);
+
+        if (!$isResourceAdmin) {
+            throw new ForbiddenException(
+                sprintf('No admin permission for %s', $fgaObject)
+            );
+        }
     }
 
     /**
      * GET /admin/permissions — List relationship tuples.
+     *
+     * Global admins see all tuples. Resource admins see only tuples
+     * for resources they administer.
      *
      * Query parameters:
      *   - user: Filter by user (e.g., "user:zitadel-id")
@@ -128,18 +172,39 @@ final class PermissionAdminHandler extends AbstractHandler
      *   - object_id: Filter by specific object (e.g., "IT")
      *   - relation: Filter by relation (e.g., "editor")
      */
-    private function listPermissions(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
-    {
+    private function listPermissions(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        string $userId,
+        bool $isGlobalAdmin
+    ): ResponseInterface {
         $params     = $request->getQueryParams();
         $user       = is_string($params['user'] ?? null) ? $params['user'] : '';
         $objectType = is_string($params['object_type'] ?? null) ? $params['object_type'] : '';
         $objectId   = is_string($params['object_id'] ?? null) ? $params['object_id'] : '';
         $relation   = is_string($params['relation'] ?? null) ? $params['relation'] : '';
 
-        // Build the object filter for OpenFGA read
-        // OpenFGA read requires at least an object type prefix (e.g., "national_calendar:")
+        if (!$isGlobalAdmin && $objectType === '') {
+            // Resource admins must specify an object_type to avoid listing
+            // tuples across resources they don't administer
+            throw new ValidationException(
+                'Resource admins must specify object_type filter'
+            );
+        }
+
+        if ($objectType !== '' && !in_array($objectType, self::VALID_OBJECT_TYPES, true)) {
+            throw new ValidationException(
+                sprintf('Invalid object_type. Valid types: %s', implode(', ', self::VALID_OBJECT_TYPES))
+            );
+        }
+
+        // For resource admins with a specific object, verify admin access
+        if (!$isGlobalAdmin && $objectId !== '') {
+            $this->requireResourceAdmin($userId, false, $objectType, $objectId);
+        }
+
         if ($objectType === '') {
-            // No filter — list all tuples across all object types
+            // Global admin: list all tuples across all object types
             $allTuples = [];
             foreach (self::VALID_OBJECT_TYPES as $type) {
                 $object = $type . ':' . $objectId;
@@ -159,18 +224,18 @@ final class PermissionAdminHandler extends AbstractHandler
             ]);
         }
 
-        if (!in_array($objectType, self::VALID_OBJECT_TYPES, true)) {
-            throw new ValidationException(
-                sprintf('Invalid object_type. Valid types: %s', implode(', ', self::VALID_OBJECT_TYPES))
-            );
-        }
-
         $object = $objectType . ':' . $objectId;
         $tuples = $this->getClient()->readTuples(
             $user !== '' ? $this->normalizeUser($user) : '',
             $object,
             $relation !== '' ? $relation : null
         );
+
+        // For resource admins listing without a specific object_id,
+        // filter to only resources they administer
+        if (!$isGlobalAdmin && $objectId === '') {
+            $tuples = $this->filterByAdminAccess($tuples, $userId, $objectType);
+        }
 
         return $this->encodeResponseBody($response, [
             'permissions' => $tuples,
@@ -185,10 +250,14 @@ final class PermissionAdminHandler extends AbstractHandler
      *   - user: string (required) — Zitadel user ID (with or without "user:" prefix)
      *   - object_type: string (required) — e.g., "national_calendar"
      *   - object_id: string (required) — e.g., "IT"
-     *   - relation: string (required) — "viewer", "editor", or "deleter"
+     *   - relation: string (required) — "admin", "viewer", "editor", or "deleter"
      */
-    private function grantPermission(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
-    {
+    private function grantPermission(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        string $userId,
+        bool $isGlobalAdmin
+    ): ResponseInterface {
         $body = $request->getParsedBody();
         if (!is_array($body)) {
             throw new ValidationException('Request body must be JSON');
@@ -200,6 +269,15 @@ final class PermissionAdminHandler extends AbstractHandler
         $relation   = is_string($body['relation'] ?? null) ? $body['relation'] : '';
 
         $this->validateTupleParams($user, $objectType, $objectId, $relation);
+
+        // Only global admins can grant the "admin" relation
+        if ($relation === 'admin' && !$isGlobalAdmin) {
+            throw new ForbiddenException(
+                'Only global admins can grant the admin relation'
+            );
+        }
+
+        $this->requireResourceAdmin($userId, $isGlobalAdmin, $objectType, $objectId);
 
         $fgaUser   = $this->normalizeUser($user);
         $fgaObject = "{$objectType}:{$objectId}";
@@ -224,8 +302,12 @@ final class PermissionAdminHandler extends AbstractHandler
      *   - object_id: string (required)
      *   - relation: string (required)
      */
-    private function revokePermission(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
-    {
+    private function revokePermission(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        string $userId,
+        bool $isGlobalAdmin
+    ): ResponseInterface {
         $body = $request->getParsedBody();
         if (!is_array($body)) {
             throw new ValidationException('Request body must be JSON');
@@ -237,6 +319,15 @@ final class PermissionAdminHandler extends AbstractHandler
         $relation   = is_string($body['relation'] ?? null) ? $body['relation'] : '';
 
         $this->validateTupleParams($user, $objectType, $objectId, $relation);
+
+        // Only global admins can revoke the "admin" relation
+        if ($relation === 'admin' && !$isGlobalAdmin) {
+            throw new ForbiddenException(
+                'Only global admins can revoke the admin relation'
+            );
+        }
+
+        $this->requireResourceAdmin($userId, $isGlobalAdmin, $objectType, $objectId);
 
         $fgaUser   = $this->normalizeUser($user);
         $fgaObject = "{$objectType}:{$objectId}";
@@ -261,8 +352,12 @@ final class PermissionAdminHandler extends AbstractHandler
      *   - object_id: string (required)
      *   - relation: string (required)
      */
-    private function checkPermission(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
-    {
+    private function checkPermission(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        string $userId,
+        bool $isGlobalAdmin
+    ): ResponseInterface {
         $params     = $request->getQueryParams();
         $user       = is_string($params['user'] ?? null) ? $params['user'] : '';
         $objectType = is_string($params['object_type'] ?? null) ? $params['object_type'] : '';
@@ -270,6 +365,7 @@ final class PermissionAdminHandler extends AbstractHandler
         $relation   = is_string($params['relation'] ?? null) ? $params['relation'] : '';
 
         $this->validateTupleParams($user, $objectType, $objectId, $relation);
+        $this->requireResourceAdmin($userId, $isGlobalAdmin, $objectType, $objectId);
 
         $fgaUser   = $this->normalizeUser($user);
         $fgaObject = "{$objectType}:{$objectId}";
@@ -282,6 +378,43 @@ final class PermissionAdminHandler extends AbstractHandler
             'relation' => $relation,
             'object'   => $fgaObject,
         ]);
+    }
+
+    /**
+     * Filter tuples to only those on resources the user administers.
+     *
+     * @param array<int, array{user: string, relation: string, object: string}> $tuples All tuples
+     * @param string $userId The current user's Zitadel ID
+     * @param string $objectType The object type being listed
+     * @return array<int, array{user: string, relation: string, object: string}> Filtered tuples
+     */
+    private function filterByAdminAccess(array $tuples, string $userId, string $objectType): array
+    {
+        // Collect unique object IDs from the tuples
+        $objectIds = [];
+        foreach ($tuples as $tuple) {
+            $parts = explode(':', $tuple['object'], 2);
+            if (count($parts) === 2 && $parts[1] !== '') {
+                $objectIds[$parts[1]] = true;
+            }
+        }
+
+        // Check admin access for each unique object
+        $fgaUser    = "user:{$userId}";
+        $allowedIds = [];
+        foreach (array_keys($objectIds) as $objId) {
+            $fgaObject = "{$objectType}:{$objId}";
+            if ($this->getClient()->check($fgaUser, 'admin', $fgaObject)) {
+                $allowedIds[$objId] = true;
+            }
+        }
+
+        // Filter tuples
+        return array_values(array_filter($tuples, function (array $tuple) use ($allowedIds): bool {
+            $parts = explode(':', $tuple['object'], 2);
+            $objId = $parts[1] ?? '';
+            return isset($allowedIds[$objId]);
+        }));
     }
 
     /**
