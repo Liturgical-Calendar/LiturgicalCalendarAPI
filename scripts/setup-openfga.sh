@@ -219,8 +219,38 @@ echo
 
 if [ "$UPDATE_ENV" = "true" ]; then
     echo -e "${YELLOW}Updating .env files...${NC}"
-    update_env_file "${PROJECT_DIR}/.env.local" "$STORE_ID" "$MODEL_ID"
-    update_env_file "${PROJECT_DIR}/.env.development" "$STORE_ID" "$MODEL_ID"
+
+    # Find the best .env file to update (same priority as setup-zitadel.sh)
+    # Checks .env.local first, then .env.development, then .env
+    resolve_env_file() {
+        local dir="$1"
+        for variant in ".env.local" ".env.development" ".env"; do
+            if [ -f "${dir}/${variant}" ]; then
+                echo "${dir}/${variant}"
+                return
+            fi
+        done
+        echo ""
+    }
+
+    # Update the project's env file
+    env_file=$(resolve_env_file "$PROJECT_DIR")
+    if [ -n "$env_file" ]; then
+        update_env_file "$env_file" "$STORE_ID" "$MODEL_ID"
+    else
+        echo -e "${YELLOW}No .env file found in ${PROJECT_DIR}. Creating .env.local${NC}"
+        touch "${PROJECT_DIR}/.env.local"
+        update_env_file "${PROJECT_DIR}/.env.local" "$STORE_ID" "$MODEL_ID"
+    fi
+
+    # Also update sibling repos if they exist
+    for sibling_dir in "${PROJECT_DIR}/../LiturgicalCalendarFrontend" "${PROJECT_DIR}/../UnitTestInterface"; do
+        sibling_env=$(resolve_env_file "$sibling_dir")
+        if [ -n "$sibling_env" ]; then
+            update_env_file "$sibling_env" "$STORE_ID" "$MODEL_ID"
+        fi
+    done
+
     echo
 fi
 
