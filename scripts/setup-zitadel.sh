@@ -152,7 +152,7 @@ get_org_id() {
     echo -e "${YELLOW}Getting organization ID...${NC}" >&2
 
     local result
-    result=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.org.v2.OrganizationService/ListOrganizations" \
+    result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.org.v2.OrganizationService/ListOrganizations" \
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
@@ -178,7 +178,7 @@ create_project() {
 
     # Check if project already exists
     local existing
-    existing=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/ListProjects" \
+    existing=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/ListProjects" \
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
@@ -210,7 +210,7 @@ create_project() {
 
     # Create new project
     local result
-    result=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/CreateProject" \
+    result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/CreateProject" \
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
@@ -248,7 +248,7 @@ create_roles() {
 
     # Fetch existing roles once
     local existing
-    existing=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/ListProjectRoles" \
+    existing=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/ListProjectRoles" \
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
@@ -264,7 +264,7 @@ create_roles() {
         fi
 
         local result
-        result=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/AddProjectRole" \
+        result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/AddProjectRole" \
             -H "Authorization: Bearer $pat" \
             -H "Connect-Protocol-Version: 1" \
             -H "Content-Type: application/json" \
@@ -344,7 +344,7 @@ create_oidc_app() {
 
     # Check if app already exists
     local existing
-    existing=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/ListApplications" \
+    existing=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/ListApplications" \
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
@@ -373,7 +373,7 @@ create_oidc_app() {
                 echo -e "${YELLOW}No existing secret found, generating new one...${NC}" >&2
             fi
             local secret_result
-            secret_result=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/GenerateClientSecret" \
+            secret_result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/GenerateClientSecret" \
                 -H "Authorization: Bearer $pat" \
                 -H "Connect-Protocol-Version: 1" \
                 -H "Content-Type: application/json" \
@@ -420,7 +420,7 @@ create_oidc_app() {
 
     # Create new app
     local result
-    result=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/CreateApplication" \
+    result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/CreateApplication" \
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
@@ -485,7 +485,7 @@ assign_project_role() {
 
     # Check if an authorization for this project/user already exists
     local existing
-    existing=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.authorization.v2.AuthorizationService/ListAuthorizations" \
+    existing=$(curl -s -X POST "${ZITADEL_URL}/zitadel.authorization.v2.AuthorizationService/ListAuthorizations" \
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
@@ -515,7 +515,7 @@ assign_project_role() {
         role_keys_json=$(echo "$merged_roles" | tr ',' '\n' | sort -u | jq -R . | jq -s .)
 
         local result
-        result=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.authorization.v2.AuthorizationService/UpdateAuthorization" \
+        result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.authorization.v2.AuthorizationService/UpdateAuthorization" \
             -H "Authorization: Bearer $pat" \
             -H "Connect-Protocol-Version: 1" \
             -H "Content-Type: application/json" \
@@ -532,7 +532,7 @@ assign_project_role() {
 
     # No authorization exists — create a new one
     local result
-    result=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.authorization.v2.AuthorizationService/CreateAuthorization" \
+    result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.authorization.v2.AuthorizationService/CreateAuthorization" \
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
@@ -562,7 +562,7 @@ create_test_service_account() {
 
     # Check if machine user already exists
     local existing
-    existing=$(curl -sf -X POST "${ZITADEL_URL}/v2/users" \
+    existing=$(curl -s -X POST "${ZITADEL_URL}/v2/users" \
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
@@ -579,7 +579,7 @@ create_test_service_account() {
 
     # Create machine user
     local result
-    result=$(curl -sf -X POST "${ZITADEL_URL}/v2/users/new" \
+    result=$(curl -s -X POST "${ZITADEL_URL}/v2/users/new" \
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
@@ -615,7 +615,7 @@ assign_org_role() {
     echo -e "${YELLOW}Assigning org role '${role}' to user ${user_id}...${NC}" >&2
 
     local result
-    result=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.internal_permission.v2.InternalPermissionService/CreateAdministrator" \
+    result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.internal_permission.v2.InternalPermissionService/CreateAdministrator" \
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
@@ -651,7 +651,7 @@ create_service_account_pat() {
     echo -e "${YELLOW}Creating PAT for service account ${user_id}...${NC}" >&2
 
     local result
-    result=$(curl -sf -X POST "${ZITADEL_URL}/v2/users/${user_id}/pats" \
+    result=$(curl -s -X POST "${ZITADEL_URL}/v2/users/${user_id}/pats" \
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
@@ -689,7 +689,7 @@ generate_service_account_key() {
     fi
 
     local result
-    result=$(curl -sf -X POST "${ZITADEL_URL}/v2/users/${user_id}/keys" \
+    result=$(curl -s -X POST "${ZITADEL_URL}/v2/users/${user_id}/keys" \
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
@@ -782,7 +782,7 @@ main() {
     # Assign admin role to the root user (username includes org domain, e.g. root@org.localhost)
     echo
     local root_user_result
-    root_user_result=$(curl -sf -X POST "${ZITADEL_URL}/v2/users" \
+    root_user_result=$(curl -s -X POST "${ZITADEL_URL}/v2/users" \
         -H "Authorization: Bearer $PAT" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
