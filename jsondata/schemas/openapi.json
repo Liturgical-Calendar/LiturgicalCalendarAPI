@@ -6272,18 +6272,6 @@
         },
         "required": ["user", "object_type", "object_id", "relation"]
       },
-      "PermissionRequestActionResponse": {
-        "type": "object",
-        "description": "Response from a permission request action (approve/revoke)",
-        "properties": {
-          "success": {"type": "boolean"},
-          "message": {"type": "string"},
-          "user": {"type": "string"},
-          "relation": {"type": "string"},
-          "object": {"type": "string"}
-        },
-        "required": ["success", "message"]
-      },
       "AdminReviewRequestBody": {
         "type": "object",
         "properties": {
