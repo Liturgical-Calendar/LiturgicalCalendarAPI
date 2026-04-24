@@ -214,7 +214,9 @@ echo
 echo -e "  Store ID:  ${GREEN}${STORE_ID}${NC}"
 echo -e "  Model ID:  ${GREEN}${MODEL_ID}${NC}"
 echo -e "  API URL:   ${GREEN}${OPENFGA_URL}${NC}"
-echo -e "  Playground: ${GREEN}http://localhost:${OPENFGA_PLAYGROUND_PORT:-3001}${NC}"
+if [ "${OPENFGA_PLAYGROUND_ENABLED:-true}" = "true" ]; then
+    echo -e "  Playground: ${GREEN}http://localhost:${OPENFGA_PLAYGROUND_PORT:-3001}${NC}"
+fi
 echo
 
 if [ "$UPDATE_ENV" = "true" ]; then

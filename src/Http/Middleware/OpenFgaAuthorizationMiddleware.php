@@ -94,7 +94,7 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
         }
 
         $userId = $oidcUser['sub'] ?? null;
-        if ($userId === null) {
+        if ($userId === null || ( is_string($userId) && trim($userId) === '' )) {
             throw new UnauthorizedException('Invalid user token');
         }
 

@@ -86,7 +86,7 @@ final class PermissionRequestAdminHandler extends AbstractHandler
         }
 
         $adminId = $oidcUser['sub'] ?? null;
-        if ($adminId === null) {
+        if ($adminId === null || ( is_string($adminId) && trim($adminId) === '' )) {
             throw new UnauthorizedException('Invalid authentication token');
         }
 

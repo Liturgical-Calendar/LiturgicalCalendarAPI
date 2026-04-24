@@ -90,13 +90,13 @@ class OpenFgaClient
     private static function getEnvString(string $name): string
     {
         $value = $_ENV[$name] ?? null;
-        if (is_string($value) && $value !== '') {
-            return $value;
+        if (is_string($value) && trim($value) !== '') {
+            return trim($value);
         }
 
         $envValue = getenv($name);
-        if (is_string($envValue) && $envValue !== '') {
-            return $envValue;
+        if (is_string($envValue) && trim($envValue) !== '') {
+            return trim($envValue);
         }
 
         return '';
@@ -201,7 +201,9 @@ class OpenFgaClient
 
         $payload = ['tuple_key' => $tupleKey];
 
-        $tuples = [];
+        $tuples   = [];
+        $maxPages = 100;
+        $page     = 0;
 
         // Paginate through all results using continuation_token
         do {
@@ -213,11 +215,20 @@ class OpenFgaClient
                     if (!is_array($tuple)) {
                         continue;
                     }
-                    $key      = is_array($tuple['key'] ?? null) ? $tuple['key'] : [];
+                    $key  = is_array($tuple['key'] ?? null) ? $tuple['key'] : [];
+                    $user = is_string($key['user'] ?? null) ? $key['user'] : '';
+                    $rel  = is_string($key['relation'] ?? null) ? $key['relation'] : '';
+                    $obj  = is_string($key['object'] ?? null) ? $key['object'] : '';
+
+                    // Skip malformed tuples with missing fields
+                    if ($user === '' || $rel === '' || $obj === '') {
+                        continue;
+                    }
+
                     $tuples[] = [
-                        'user'     => is_string($key['user'] ?? null) ? $key['user'] : '',
-                        'relation' => is_string($key['relation'] ?? null) ? $key['relation'] : '',
-                        'object'   => is_string($key['object'] ?? null) ? $key['object'] : '',
+                        'user'     => $user,
+                        'relation' => $rel,
+                        'object'   => $obj,
                     ];
                 }
             }
@@ -229,7 +240,9 @@ class OpenFgaClient
             if ($continuationToken !== '') {
                 $payload['continuation_token'] = $continuationToken;
             }
-        } while ($continuationToken !== '');
+
+            $page++;
+        } while ($continuationToken !== '' && $page < $maxPages);
 
         return $tuples;
     }
