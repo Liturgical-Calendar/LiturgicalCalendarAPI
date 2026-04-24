@@ -11,6 +11,7 @@ use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
+use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
@@ -114,6 +115,15 @@ final class AccessRequestHandler extends AbstractHandler
         $path = $request->getUri()->getPath();
 
         if ($method === RequestMethod::POST) {
+            // Check if this is a resubmit: POST /auth/access-requests/{id}/resubmit
+            if (str_ends_with($path, '/resubmit')) {
+                $pathParts = explode('/', trim($path, '/'));
+                $partCount = count($pathParts);
+                if ($partCount >= 4) {
+                    $requestId = $pathParts[$partCount - 2];
+                    return $this->resubmitRequest($request, $response, $oidcUser, $requestId);
+                }
+            }
             return $this->createRequest($request, $response, $oidcUser);
         }
 
@@ -285,6 +295,102 @@ final class AccessRequestHandler extends AbstractHandler
      * @param string $userId
      * @return ResponseInterface
      */
+    /**
+     * POST /auth/access-requests/{id}/resubmit — Resubmit a rejected request.
+     *
+     * Allows the user to update their permissions and resubmit for review.
+     * Only the user who created the request can resubmit it, and only
+     * if the request was rejected.
+     *
+     * @param ServerRequestInterface $request The HTTP request
+     * @param ResponseInterface $response The HTTP response
+     * @param array{sub?: string, email?: string, name?: string, preferred_username?: string, roles?: array<string>} $oidcUser
+     * @param string $requestId UUID of the request to resubmit
+     */
+    private function resubmitRequest(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        array $oidcUser,
+        string $requestId
+    ): ResponseInterface {
+        $userId = $oidcUser['sub'] ?? '';
+
+        // Validate UUID format
+        if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $requestId)) {
+            throw new ValidationException('Invalid request ID format');
+        }
+
+        // Get the existing request
+        $existing = $this->getRepository()->getById($requestId);
+        if ($existing === null) {
+            throw new ValidationException('Access request not found');
+        }
+
+        // Verify ownership — only the user who created the request can resubmit
+        if (( $existing['zitadel_user_id'] ?? '' ) !== $userId) {
+            throw new ForbiddenException('You can only resubmit your own requests');
+        }
+
+        // Only rejected requests can be resubmitted
+        if (( $existing['status'] ?? '' ) !== 'rejected') {
+            throw new ValidationException(
+                sprintf('Cannot resubmit a request with status: %s. Only rejected requests can be resubmitted.', is_string($existing['status'] ?? null) ? $existing['status'] : 'unknown')
+            );
+        }
+
+        // Parse updated permissions from body
+        $body = $request->getParsedBody();
+        if (!is_array($body)) {
+            throw new ValidationException('Request body must be JSON');
+        }
+
+        $permissions = $body['permissions'] ?? null;
+        if (!is_array($permissions) || count($permissions) === 0) {
+            throw new ValidationException('At least one permission is required');
+        }
+
+        // Validate each permission
+        $role = is_string($existing['requested_role'] ?? null) ? $existing['requested_role'] : '';
+        /** @var array<int, array{object_type: string, object_id: string, relation: string}> $validatedPermissions */
+        $validatedPermissions = [];
+        foreach ($permissions as $perm) {
+            if (!is_array($perm)) {
+                throw new ValidationException('Each permission must be an object');
+            }
+            $objType  = is_string($perm['object_type'] ?? null) ? $perm['object_type'] : '';
+            $objId    = is_string($perm['object_id'] ?? null) ? $perm['object_id'] : '';
+            $relation = is_string($perm['relation'] ?? null) ? $perm['relation'] : '';
+
+            if ($objType === '' || $objId === '' || $relation === '') {
+                throw new ValidationException('Each permission requires object_type, object_id, and relation');
+            }
+
+            $validatedPermissions[] = [
+                'object_type' => $objType,
+                'object_id'   => $objId,
+                'relation'    => $relation,
+            ];
+        }
+
+        // Validate role-permission consistency
+        $this->validateRolePermissionConsistency($role, $validatedPermissions);
+
+        $justification = isset($body['justification']) && is_string($body['justification'])
+            ? $body['justification']
+            : null;
+
+        $resubmitted = $this->getRepository()->resubmit($requestId, $validatedPermissions, $justification);
+        if (!$resubmitted) {
+            throw new ValidationException('Failed to resubmit request');
+        }
+
+        return $this->encodeResponseBody($response, [
+            'success' => true,
+            'message' => 'Access request resubmitted for review',
+            'id'      => $requestId,
+        ]);
+    }
+
     private function listOwnRequests(ResponseInterface $response, string $userId): ResponseInterface
     {
         $requests = $this->getRepository()->getByUser($userId);

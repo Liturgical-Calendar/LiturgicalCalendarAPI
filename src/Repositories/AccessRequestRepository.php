@@ -352,6 +352,51 @@ class AccessRequestRepository
     }
 
     /**
+     * Resubmit a rejected access request with updated permissions.
+     *
+     * Resets status to 'pending', clears review fields, and updates
+     * the permissions array. The original request ID and justification
+     * are preserved to maintain the conversation thread.
+     *
+     * @param string $id Request UUID
+     * @param array<int, array{object_type: string, object_id: string, relation: string}> $permissions Updated permissions
+     * @param string|null $justification Updated justification (null = keep original)
+     * @return bool True if resubmitted successfully
+     */
+    public function resubmit(string $id, array $permissions, ?string $justification = null): bool
+    {
+        $setClauses = [
+            "status = 'pending'",
+            'permissions = :permissions',
+            'reviewed_by = NULL',
+            'review_notes = NULL',
+            'reviewed_at = NULL',
+            'zitadel_sync_status = NULL',
+            'zitadel_sync_error = NULL',
+            'created_at = CURRENT_TIMESTAMP',
+        ];
+
+        $params = [
+            'id'          => $id,
+            'permissions' => json_encode($permissions),
+        ];
+
+        if ($justification !== null) {
+            $setClauses[]            = 'justification = :justification';
+            $params['justification'] = $justification;
+        }
+
+        $sql = 'UPDATE access_requests SET '
+            . implode(', ', $setClauses)
+            . " WHERE id = :id AND status = 'rejected'";
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($params);
+
+        return $stmt->rowCount() > 0;
+    }
+
+    /**
      * Revoke a previously approved access request.
      *
      * This marks the request as revoked. The caller is responsible for
