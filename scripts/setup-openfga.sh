@@ -25,7 +25,13 @@ RETRY_INTERVAL=5
 # Directories
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="${SCRIPT_DIR}/.."
-MODEL_FILE="${PROJECT_DIR}/infrastructure/openfga-model.json"
+# Look for the model file in the standard location, then in the script directory
+# (covers both running from the API repo and from extracted scripts)
+if [ -f "${PROJECT_DIR}/infrastructure/openfga-model.json" ]; then
+    MODEL_FILE="${PROJECT_DIR}/infrastructure/openfga-model.json"
+else
+    MODEL_FILE="${SCRIPT_DIR}/openfga-model.json"
+fi
 
 # Parse command line arguments
 UPDATE_ENV="${UPDATE_ENV:-false}"
