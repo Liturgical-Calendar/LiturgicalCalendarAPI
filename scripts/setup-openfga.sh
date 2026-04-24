@@ -253,6 +253,22 @@ if [ "$UPDATE_ENV" = "true" ]; then
         fi
     done
 
+    # Write to Docker Compose .env files for variable substitution
+    # Uses the internal Docker hostname (openfga:8080) instead of localhost
+    for compose_dir in "$PROJECT_DIR" "${PROJECT_DIR}/../LiturgicalCalendarFrontend"; do
+        if [ -f "${compose_dir}/docker-compose.yml" ] || [ -f "${compose_dir}/docker-compose.yaml" ]; then
+            local compose_env="${compose_dir}/.env"
+            [ ! -f "$compose_env" ] && touch "$compose_env"
+            sed_inplace "s|^OPENFGA_API_URL=.*|OPENFGA_API_URL=http://openfga:8080|" "$compose_env"
+            grep -q "^OPENFGA_API_URL=" "$compose_env" || echo "OPENFGA_API_URL=http://openfga:8080" >> "$compose_env"
+            sed_inplace "s|^OPENFGA_STORE_ID=.*|OPENFGA_STORE_ID=${STORE_ID}|" "$compose_env"
+            grep -q "^OPENFGA_STORE_ID=" "$compose_env" || echo "OPENFGA_STORE_ID=${STORE_ID}" >> "$compose_env"
+            sed_inplace "s|^OPENFGA_MODEL_ID=.*|OPENFGA_MODEL_ID=${MODEL_ID}|" "$compose_env"
+            grep -q "^OPENFGA_MODEL_ID=" "$compose_env" || echo "OPENFGA_MODEL_ID=${MODEL_ID}" >> "$compose_env"
+            echo -e "${GREEN}Updated compose .env: ${compose_env}${NC}"
+        fi
+    done
+
     echo
 fi
 

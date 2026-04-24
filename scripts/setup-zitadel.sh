@@ -917,6 +917,19 @@ main() {
         echo
         echo -e "${GREEN}Environment files updated!${NC}"
 
+        # Run OpenFGA setup if the service is available
+        local openfga_script="${SCRIPT_DIR}/setup-openfga.sh"
+        if [ -f "$openfga_script" ]; then
+            local openfga_url="${OPENFGA_API_URL:-http://localhost:${OPENFGA_HTTP_PORT:-8083}}"
+            if curl -sf "${openfga_url}/healthz" > /dev/null 2>&1; then
+                echo
+                echo -e "${YELLOW}Running OpenFGA setup...${NC}"
+                bash "$openfga_script" --update-env
+            else
+                echo -e "${YELLOW}OpenFGA not available at ${openfga_url} — skipping setup${NC}"
+            fi
+        fi
+
         # Handle Docker container recreation
         if [[ "$DOCKER_INIT" == "true" ]]; then
             if is_stack_running; then
