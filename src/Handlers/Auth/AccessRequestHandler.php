@@ -341,7 +341,11 @@ final class AccessRequestHandler extends AbstractHandler
         // Parse updated permissions from body
         $body = $request->getParsedBody();
         if (!is_array($body)) {
-            throw new ValidationException('Request body must be JSON');
+            $rawBody = (string) $request->getBody();
+            $body    = json_decode($rawBody, true);
+            if (!is_array($body)) {
+                throw new ValidationException('Request body must be JSON');
+            }
         }
 
         $permissions = $body['permissions'] ?? null;
