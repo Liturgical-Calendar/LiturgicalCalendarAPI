@@ -29,6 +29,7 @@ use LiturgicalCalendar\Api\Handlers\Auth\RoleRequestHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\EmailVerificationHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\ApplicationAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\NotificationsHandler;
+use LiturgicalCalendar\Api\Handlers\Admin\PermissionAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\RoleRequestAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\UsersHandler;
 use LiturgicalCalendar\Api\Handlers\ApplicationsHandler;
@@ -383,6 +384,14 @@ class Router
                         // DELETE /admin/users/{userId}/roles/{role} - Revoke a role
                         $usersHandler  = new UsersHandler();
                         $this->handler = $usersHandler;
+                    } elseif ($adminRoute === 'permissions') {
+                        // Admin permission management routes (OpenFGA)
+                        // GET    /admin/permissions       - List permissions (with filters)
+                        // POST   /admin/permissions       - Grant permission
+                        // DELETE /admin/permissions       - Revoke permission
+                        // GET    /admin/permissions/check - Check a specific permission
+                        $permissionAdminHandler = new PermissionAdminHandler();
+                        $this->handler          = $permissionAdminHandler;
                     } elseif ($adminRoute === 'applications') {
                         // Admin application management routes
                         // GET /admin/applications - List all applications (optional status filter)
