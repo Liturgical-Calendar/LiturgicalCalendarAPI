@@ -176,12 +176,12 @@ final class AccessRequestAdminHandler extends AbstractHandler
         if ($isGlobalAdmin) {
             $requests = $statusFilter !== null
                 ? $repo->getAll($statusFilter)
-                : $repo->getPending();
+                : $repo->getAll();
         } else {
             // Resource admins: get requests, then filter by admin access
             $allRequests = $statusFilter !== null
                 ? $repo->getAll($statusFilter)
-                : $repo->getPending();
+                : $repo->getAll();
             $requests    = $this->filterByAdminAccess($allRequests, $adminId);
         }
 
