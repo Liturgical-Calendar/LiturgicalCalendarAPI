@@ -204,19 +204,14 @@ final class PermissionAdminHandler extends AbstractHandler
         }
 
         if ($objectType === '') {
-            // Global admin: list all tuples across all object types
-            $allTuples = [];
-            foreach (self::VALID_OBJECT_TYPES as $type) {
-                $object = $type . ':' . $objectId;
-                $tuples = $this->getClient()->readTuples(
-                    $user !== '' ? $this->normalizeUser($user) : '',
-                    $object,
-                    $relation !== '' ? $relation : null
-                );
-                foreach ($tuples as $tuple) {
-                    $allTuples[] = $tuple;
-                }
-            }
+            // Global admin with no type filter: read all tuples
+            $normalizedUser = $user !== '' ? $this->normalizeUser($user) : '';
+            $relationFilter = $relation !== '' ? $relation : null;
+            $allTuples      = $this->getClient()->readTuples(
+                $normalizedUser,
+                '',
+                $relationFilter
+            );
 
             return $this->encodeResponseBody($response, [
                 'permissions' => $allTuples,

@@ -204,7 +204,9 @@ class OpenFgaClient
             $tupleKey['relation'] = $relation;
         }
 
-        $payload = ['tuple_key' => $tupleKey];
+        // Only include tuple_key if it has at least one filter;
+        // empty tuple_key causes OpenFGA validation error, but omitting it returns all tuples.
+        $payload = count($tupleKey) > 0 ? ['tuple_key' => $tupleKey] : [];
 
         $tuples   = [];
         $maxPages = 100;
