@@ -164,7 +164,7 @@ services:
       - 127.0.0.1:${DB_PORT:-5432}:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data:rw
-      - ./infrastructure/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
 
   # Adminer - Database management UI
   # Access at: http://localhost:8088

@@ -364,7 +364,7 @@ docker compose up -d                          # Start all services (including Op
 - `OPENFGA_GRPC_PORT` — Docker host port for gRPC (default: 8084)
 - `OPENFGA_PLAYGROUND_PORT` — Docker host port for Playground UI (default: 3001)
 
-**Authorization model file:** `infrastructure/openfga-model.json`
+**Authorization model file:** `scripts/openfga-model.json`
 
 ### Migration Path
 

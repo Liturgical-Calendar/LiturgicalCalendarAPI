@@ -7,7 +7,4 @@
 !public/LitCalTestServer.php
 !public/index.php
 !.env.example
-!infrastructure/init-db.sql
-!infrastructure/openfga-model.json
-!scripts/setup-openfga.sh
-!scripts/setup-zitadel.sh
+!scripts

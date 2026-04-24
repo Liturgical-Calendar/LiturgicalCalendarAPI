@@ -31,12 +31,9 @@ COPY ./jsondata ./jsondata
 COPY ./public/LitCalTestServer.php ./public/index.php ./public/
 COPY ./.env.example ./.env.local
 
-# Include infrastructure files so consumers (e.g., frontend docker-compose)
-# can extract them from this image without duplicating source files.
-COPY ./infrastructure/init-db.sql ./infrastructure/init-db.sql
-COPY ./infrastructure/openfga-model.json ./infrastructure/openfga-model.json
-COPY ./scripts/setup-openfga.sh ./scripts/setup-openfga.sh
-COPY ./scripts/setup-zitadel.sh ./scripts/setup-zitadel.sh
+# Include scripts directory (setup scripts, init-db.sql, openfga model)
+# so consumers (e.g., frontend docker-compose) can extract them.
+COPY ./scripts ./scripts
 
 # Stage 2: final build
 FROM php:8.4-cli AS main
