@@ -146,7 +146,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
-    public function testPassesThroughWhenNoResourceId(): void
+    public function testDeniesWhenNoResourceId(): void
     {
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->never())->method('check');
@@ -155,10 +155,11 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
         $request = ( new ServerRequest('PUT', '/data/nation') )
             ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['calendar_editor']]);
-        // No calendar_id attribute set
+        // No calendar_id attribute set — should fail closed
 
-        $response = $middleware->process($request, $this->nextHandler);
-        $this->assertEquals(200, $response->getStatusCode());
+        $this->expectException(ForbiddenException::class);
+        $this->expectExceptionMessage('Missing resource ID');
+        $middleware->process($request, $this->nextHandler);
     }
 
     public function testPassesThroughForGetMethod(): void
@@ -184,7 +185,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $this->assertInstanceOf(OpenFgaAuthorizationMiddleware::class, $middleware);
     }
 
-    public function testForCalendarDataMapsDioceseTodiocesanCalendar(): void
+    public function testForCalendarDataMapsDioceseToDiocesanCalendar(): void
     {
         $client     = $this->createMock(OpenFgaClient::class);
         $middleware = OpenFgaAuthorizationMiddleware::forCalendarData($client, 'diocese');
@@ -192,7 +193,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $this->assertInstanceOf(OpenFgaAuthorizationMiddleware::class, $middleware);
     }
 
-    public function testForCalendarDataMapsWiderregionToWiderRegion(): void
+    public function testForCalendarDataMapsWiderRegionToWiderRegion(): void
     {
         $client     = $this->createMock(OpenFgaClient::class);
         $middleware = OpenFgaAuthorizationMiddleware::forCalendarData($client, 'widerregion');

@@ -188,32 +188,29 @@ final class PermissionRequestAdminHandler extends AbstractHandler
         $relation   = $permRequest['relation'] ?? '';
         $userId     = $permRequest['zitadel_user_id'] ?? '';
 
+        if ($objectType === '' || $objectId === '' || $relation === '' || $userId === '') {
+            throw new ValidationException('Permission request has incomplete data');
+        }
+
         $this->requireResourceAdmin($adminId, $isGlobalAdmin, $objectType, $objectId);
 
-        // Update DB status first
+        // Create OpenFGA tuple first — if this fails, don't update the DB
+        $fgaUser   = "user:{$userId}";
+        $fgaObject = "{$objectType}:{$objectId}";
+        $this->getClient()->writeTuple($fgaUser, $relation, $fgaObject);
+
+        // Tuple created successfully — now update DB status
         $updated = $this->getRepository()->approve($requestId, $adminId, $notes);
         if (!$updated) {
             throw new ValidationException('Failed to approve request');
         }
 
-        // Create OpenFGA tuple
-        $fgaUser   = "user:{$userId}";
-        $fgaObject = "{$objectType}:{$objectId}";
-
-        $tupleError = null;
-        try {
-            $this->getClient()->writeTuple($fgaUser, $relation, $fgaObject);
-        } catch (\RuntimeException $e) {
-            $tupleError = $e->getMessage();
-        }
-
         return $this->encodeResponseBody($response, [
-            'success'     => true,
-            'message'     => 'Permission request approved',
-            'tuple_error' => $tupleError,
-            'user'        => $fgaUser,
-            'relation'    => $relation,
-            'object'      => $fgaObject,
+            'success'  => true,
+            'message'  => 'Permission request approved',
+            'user'     => $fgaUser,
+            'relation' => $relation,
+            'object'   => $fgaObject,
         ]);
     }
 
@@ -282,32 +279,29 @@ final class PermissionRequestAdminHandler extends AbstractHandler
         $relation   = $permRequest['relation'] ?? '';
         $userId     = $permRequest['zitadel_user_id'] ?? '';
 
+        if ($objectType === '' || $objectId === '' || $relation === '' || $userId === '') {
+            throw new ValidationException('Permission request has incomplete data');
+        }
+
         $this->requireResourceAdmin($adminId, $isGlobalAdmin, $objectType, $objectId);
 
-        // Update DB status first
+        // Delete OpenFGA tuple first — if this fails, don't update the DB
+        $fgaUser   = "user:{$userId}";
+        $fgaObject = "{$objectType}:{$objectId}";
+        $this->getClient()->deleteTuple($fgaUser, $relation, $fgaObject);
+
+        // Tuple deleted successfully — now update DB status
         $updated = $this->getRepository()->revoke($requestId, $adminId, $notes);
         if (!$updated) {
             throw new ValidationException('Failed to revoke request');
         }
 
-        // Delete OpenFGA tuple
-        $fgaUser   = "user:{$userId}";
-        $fgaObject = "{$objectType}:{$objectId}";
-
-        $tupleError = null;
-        try {
-            $this->getClient()->deleteTuple($fgaUser, $relation, $fgaObject);
-        } catch (\RuntimeException $e) {
-            $tupleError = $e->getMessage();
-        }
-
         return $this->encodeResponseBody($response, [
-            'success'     => true,
-            'message'     => 'Permission revoked',
-            'tuple_error' => $tupleError,
-            'user'        => $fgaUser,
-            'relation'    => $relation,
-            'object'      => $fgaObject,
+            'success'  => true,
+            'message'  => 'Permission revoked',
+            'user'     => $fgaUser,
+            'relation' => $relation,
+            'object'   => $fgaObject,
         ]);
     }
 

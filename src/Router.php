@@ -564,10 +564,10 @@ class Router
             $pipeline->pipe(new HttpsEnforcementMiddleware());
         }
 
-        // Apply OIDC authentication for auth routes (role-requests, email-verification), admin, and applications
+        // Apply OIDC authentication for auth routes (role-requests, permission-requests, email-verification), admin, and applications
         // These routes need the oidc_user attribute set before the handler checks authentication
         if (
-            ( $route === 'auth' && count($requestPathParts) >= 1 && in_array($requestPathParts[0], ['role-requests', 'email-verification'], true) )
+            ( $route === 'auth' && count($requestPathParts) >= 1 && in_array($requestPathParts[0], ['role-requests', 'permission-requests', 'email-verification'], true) )
             || $route === 'admin'
             || $route === 'applications'
         ) {
@@ -643,10 +643,8 @@ class Router
             $pipeline->pipe(AuthorizationMiddleware::forTestEditor());
 
             // OpenFGA fine-grained authorization for test definitions
-            if (OpenFgaClient::isConfigured()) {
-                if (count($requestPathParts) >= 1) {
-                    $this->request = $this->request->withAttribute('test_id', $requestPathParts[0]);
-                }
+            if (OpenFgaClient::isConfigured() && count($requestPathParts) >= 1) {
+                $this->request = $this->request->withAttribute('test_id', $requestPathParts[0]);
                 $pipeline->pipe(OpenFgaAuthorizationMiddleware::forTestDefinition(
                     OpenFgaClient::fromEnv()
                 ));

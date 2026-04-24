@@ -200,25 +200,35 @@ class OpenFgaClient
             'authorization_model_id' => $this->modelId,
         ];
 
-        $response = $this->post("/stores/{$this->storeId}/read", $payload);
+        $tuples = [];
 
-        $tuples         = [];
-        $responseTuples = $response['tuples'] ?? [];
-        if (!is_array($responseTuples)) {
-            return $tuples;
-        }
+        // Paginate through all results using continuation_token
+        do {
+            $response = $this->post("/stores/{$this->storeId}/read", $payload);
 
-        foreach ($responseTuples as $tuple) {
-            if (!is_array($tuple)) {
-                continue;
+            $responseTuples = $response['tuples'] ?? [];
+            if (is_array($responseTuples)) {
+                foreach ($responseTuples as $tuple) {
+                    if (!is_array($tuple)) {
+                        continue;
+                    }
+                    $key      = is_array($tuple['key'] ?? null) ? $tuple['key'] : [];
+                    $tuples[] = [
+                        'user'     => is_string($key['user'] ?? null) ? $key['user'] : '',
+                        'relation' => is_string($key['relation'] ?? null) ? $key['relation'] : '',
+                        'object'   => is_string($key['object'] ?? null) ? $key['object'] : '',
+                    ];
+                }
             }
-            $key      = is_array($tuple['key'] ?? null) ? $tuple['key'] : [];
-            $tuples[] = [
-                'user'     => is_string($key['user'] ?? null) ? $key['user'] : '',
-                'relation' => is_string($key['relation'] ?? null) ? $key['relation'] : '',
-                'object'   => is_string($key['object'] ?? null) ? $key['object'] : '',
-            ];
-        }
+
+            $continuationToken = is_string($response['continuation_token'] ?? null)
+                ? $response['continuation_token']
+                : '';
+
+            if ($continuationToken !== '') {
+                $payload['continuation_token'] = $continuationToken;
+            }
+        } while ($continuationToken !== '');
 
         return $tuples;
     }

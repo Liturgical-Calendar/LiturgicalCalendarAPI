@@ -220,7 +220,7 @@ services:
       OPENFGA_DATASTORE_URI: postgres://openfga:openfga_secure_password@db:5432/openfga?sslmode=disable
       OPENFGA_PLAYGROUND_ENABLED: "true"
     healthcheck:
-      test: ["CMD", "/usr/local/bin/grpc_health_probe", "-addr=openfga:8081"]
+      test: ["CMD", "/usr/local/bin/grpc_health_probe", "-addr=localhost:8081"]
       interval: 10s
       timeout: 30s
       retries: 5

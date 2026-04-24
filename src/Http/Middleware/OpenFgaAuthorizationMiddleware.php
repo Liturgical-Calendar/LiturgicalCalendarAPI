@@ -116,12 +116,12 @@ class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        // Extract resource ID
+        // Extract resource ID — fail closed for write operations
         $resourceId = $this->extractResourceId($request);
         if ($resourceId === null) {
-            // No resource ID means we can't check permissions.
-            // Let the handler decide (it may reject for other reasons).
-            return $handler->handle($request);
+            throw new ForbiddenException(
+                sprintf('Missing resource ID for %s authorization check', $this->objectType)
+            );
         }
 
         // Check OpenFGA permission
