@@ -115,11 +115,14 @@ load_model() {
         echo -e "${GREEN}Authorization model already exists with ID: $existing_model_id${NC}" >&2
         echo -e "${YELLOW}To update the model, a new version will be created.${NC}" >&2
 
-        # Compare the full model structure (not just type names) to detect any changes
+        # Compare model structures by normalizing both sides.
+        # The API response includes extra default fields (condition, module, source_info,
+        # empty relations objects) that aren't in the model file, so we strip them.
+        local normalize_filter='walk(if type == "object" then with_entries(select(.value != "" and .value != null and .value != {})) else . end)'
         local existing_model
-        existing_model=$(echo "$existing_models" | jq -cS '.authorization_models[0].type_definitions')
+        existing_model=$(echo "$existing_models" | jq -cS ".authorization_models[0].type_definitions | ${normalize_filter}")
         local file_model
-        file_model=$(jq -cS '.type_definitions' "$MODEL_FILE")
+        file_model=$(jq -cS ".type_definitions | ${normalize_filter}" "$MODEL_FILE")
 
         if [ "$existing_model" = "$file_model" ]; then
             echo -e "${GREEN}Model is up to date — using existing model${NC}" >&2
