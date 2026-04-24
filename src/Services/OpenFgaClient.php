@@ -264,8 +264,9 @@ class OpenFgaClient
      */
     private function post(string $path, array $payload): array
     {
-        $url  = $this->apiUrl . $path;
-        $json = json_encode($payload);
+        $url = $this->apiUrl . $path;
+        // Empty payload must encode as {} not [] for OpenFGA
+        $json = count($payload) === 0 ? '{}' : json_encode($payload);
 
         if ($json === false) {
             throw new RuntimeException('Failed to encode OpenFGA request payload');
