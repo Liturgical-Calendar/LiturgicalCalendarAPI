@@ -61,9 +61,41 @@ COMMENT ON TABLE role_requests IS 'Pending role assignment requests from users';
 COMMENT ON COLUMN role_requests.requested_role IS 'Role: developer, calendar_editor, test_editor';
 COMMENT ON COLUMN role_requests.status IS 'Status: pending, approved, rejected, revoked';
 
--- NOTE: Calendar-specific permissions (formerly user_calendar_permissions and
--- permission_requests tables) are now managed by OpenFGA. See infrastructure/openfga-model.json
+-- NOTE: Granted calendar permissions (formerly user_calendar_permissions) are now
+-- managed by OpenFGA relationship tuples. See infrastructure/openfga-model.json
 -- and scripts/setup-openfga.sh for the fine-grained authorization model.
+
+-- Permission requests (approval workflow)
+-- Users request access to specific calendars; admins approve/reject.
+-- On approval, an OpenFGA tuple is created via the admin permissions endpoint.
+CREATE TABLE permission_requests (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    zitadel_user_id VARCHAR(255) NOT NULL,
+    user_email VARCHAR(255) NOT NULL,
+    user_name VARCHAR(255),
+    object_type VARCHAR(30) NOT NULL,
+    object_id VARCHAR(50) NOT NULL,
+    relation VARCHAR(20) NOT NULL,
+    justification TEXT,
+    credentials TEXT,
+    status VARCHAR(20) DEFAULT 'pending',
+    reviewed_by VARCHAR(255),
+    review_notes TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    reviewed_at TIMESTAMP,
+    CONSTRAINT chk_permission_requests_status CHECK (status IN ('pending', 'approved', 'rejected')),
+    CONSTRAINT chk_permission_requests_object_type CHECK (object_type IN ('national_calendar', 'diocesan_calendar', 'wider_region', 'test_definition')),
+    CONSTRAINT chk_permission_requests_relation CHECK (relation IN ('viewer', 'editor', 'deleter'))
+);
+
+CREATE INDEX idx_permission_requests_status ON permission_requests(status);
+CREATE INDEX idx_permission_requests_user ON permission_requests(zitadel_user_id);
+
+COMMENT ON TABLE permission_requests IS 'Approval workflow for calendar access — on approval, OpenFGA tuple is created';
+COMMENT ON COLUMN permission_requests.object_type IS 'OpenFGA object type: national_calendar, diocesan_calendar, wider_region, test_definition';
+COMMENT ON COLUMN permission_requests.object_id IS 'Resource identifier: USA, BOSTON, Americas, etc.';
+COMMENT ON COLUMN permission_requests.relation IS 'OpenFGA relation: viewer, editor, deleter';
+COMMENT ON COLUMN permission_requests.status IS 'Status: pending, approved, rejected';
 
 -- Applications (for API developers)
 CREATE TABLE applications (
