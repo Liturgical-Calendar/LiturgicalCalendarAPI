@@ -23,6 +23,7 @@ class OpenFgaClient
     private string $apiUrl;
     private string $storeId;
     private string $modelId;
+    private string $apiToken;
     private ClientInterface $httpClient;
     private RequestFactoryInterface $requestFactory;
     private StreamFactoryInterface $streamFactory;
@@ -33,7 +34,8 @@ class OpenFgaClient
         string $modelId,
         ClientInterface $httpClient,
         RequestFactoryInterface $requestFactory,
-        StreamFactoryInterface $streamFactory
+        StreamFactoryInterface $streamFactory,
+        string $apiToken = ''
     ) {
         $this->apiUrl         = rtrim($apiUrl, '/');
         $this->storeId        = $storeId;
@@ -41,6 +43,7 @@ class OpenFgaClient
         $this->httpClient     = $httpClient;
         $this->requestFactory = $requestFactory;
         $this->streamFactory  = $streamFactory;
+        $this->apiToken       = $apiToken;
     }
 
     /**
@@ -62,10 +65,11 @@ class OpenFgaClient
             );
         }
 
+        $apiToken   = self::getEnvString('OPENFGA_API_TOKEN');
         $httpClient = new Client(['timeout' => 5, 'connect_timeout' => 2]);
         $psr17      = new Psr17Factory();
 
-        return new self($apiUrl, $storeId, $modelId, $httpClient, $psr17, $psr17);
+        return new self($apiUrl, $storeId, $modelId, $httpClient, $psr17, $psr17, $apiToken);
     }
 
     /**
@@ -195,10 +199,7 @@ class OpenFgaClient
             $tupleKey['relation'] = $relation;
         }
 
-        $payload = [
-            'tuple_key'              => $tupleKey,
-            'authorization_model_id' => $this->modelId,
-        ];
+        $payload = ['tuple_key' => $tupleKey];
 
         $tuples = [];
 
@@ -253,7 +254,12 @@ class OpenFgaClient
         $body    = $this->streamFactory->createStream($json);
         $request = $this->requestFactory->createRequest('POST', $url)
             ->withHeader('Content-Type', 'application/json')
+            ->withHeader('Accept', 'application/json')
             ->withBody($body);
+
+        if ($this->apiToken !== '') {
+            $request = $request->withHeader('Authorization', 'Bearer ' . $this->apiToken);
+        }
 
         try {
             $response = $this->httpClient->sendRequest($request);

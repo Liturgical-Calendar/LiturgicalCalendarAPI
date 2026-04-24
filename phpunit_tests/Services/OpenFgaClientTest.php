@@ -148,9 +148,8 @@ class OpenFgaClientTest extends TestCase
         ]);
         $client = $this->createClientWithMock($mock);
 
-        // Should not throw
         $client->writeTuple('user:test', 'editor', 'national_calendar:IT');
-        $this->assertTrue(true); // Reached without exception
+        $this->assertEquals(0, $mock->count());
     }
 
     public function testDeleteTupleSucceeds(): void
@@ -160,9 +159,8 @@ class OpenFgaClientTest extends TestCase
         ]);
         $client = $this->createClientWithMock($mock);
 
-        // Should not throw
         $client->deleteTuple('user:test', 'editor', 'national_calendar:IT');
-        $this->assertTrue(true); // Reached without exception
+        $this->assertEquals(0, $mock->count());
     }
 
     public function testReadTuplesReturnsParsedTuples(): void

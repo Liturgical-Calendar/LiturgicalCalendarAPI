@@ -274,7 +274,14 @@ final class PermissionAdminHandler extends AbstractHandler
         $fgaUser   = $this->normalizeUser($user);
         $fgaObject = "{$objectType}:{$objectId}";
 
-        $this->getClient()->writeTuple($fgaUser, $relation, $fgaObject);
+        try {
+            $this->getClient()->writeTuple($fgaUser, $relation, $fgaObject);
+        } catch (\RuntimeException $e) {
+            // Treat "tuple already exists" as success (idempotent grant)
+            if (!str_contains($e->getMessage(), 'cannot write a tuple which already exists')) {
+                throw $e;
+            }
+        }
 
         return $this->encodeResponseBody($response, [
             'success'  => true,
@@ -316,7 +323,14 @@ final class PermissionAdminHandler extends AbstractHandler
         $fgaUser   = $this->normalizeUser($user);
         $fgaObject = "{$objectType}:{$objectId}";
 
-        $this->getClient()->deleteTuple($fgaUser, $relation, $fgaObject);
+        try {
+            $this->getClient()->deleteTuple($fgaUser, $relation, $fgaObject);
+        } catch (\RuntimeException $e) {
+            // Treat "tuple not found" as success (idempotent revoke)
+            if (!str_contains($e->getMessage(), 'cannot delete a tuple which does not exist')) {
+                throw $e;
+            }
+        }
 
         return $this->encodeResponseBody($response, [
             'success'  => true,

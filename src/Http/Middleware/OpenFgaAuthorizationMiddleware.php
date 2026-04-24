@@ -29,7 +29,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  *   /data/widerregion/{id}  → wider_region:{id}
  *   /tests/{id}             → test_definition:{id}
  */
-class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
+final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
 {
     /**
      * Map of path category to OpenFGA object type.

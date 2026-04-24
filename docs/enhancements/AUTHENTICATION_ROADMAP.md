@@ -293,24 +293,28 @@ type user
 
 type wider_region
   relations
+    define admin: [user]
     define viewer: [user]
     define editor: [user]
     define deleter: [user]
 
 type national_calendar
   relations
+    define admin: [user]
     define viewer: [user]
     define editor: [user]
     define deleter: [user]
 
 type diocesan_calendar
   relations
+    define admin: [user]
     define viewer: [user]
     define editor: [user]
     define deleter: [user]
 
 type test_definition
   relations
+    define admin: [user]
     define viewer: [user]
     define editor: [user]
     define deleter: [user]
@@ -318,6 +322,7 @@ type test_definition
 
 This model enables policies like:
 
+- Grant `admin` on `national_calendar:IT` → user can manage permissions for Italy's calendar
 - Grant `editor` on `national_calendar:IT` → user can edit Italy's calendar
 - Grant `editor` on `diocesan_calendar:roma_lazio_it` → user can edit Rome's diocesan calendar
 - `deleter` is separate from `editor` → edit without delete is possible

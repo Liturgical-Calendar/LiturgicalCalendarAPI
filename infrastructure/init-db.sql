@@ -90,6 +90,7 @@ CREATE TABLE permission_requests (
 
 CREATE INDEX idx_permission_requests_status ON permission_requests(status);
 CREATE INDEX idx_permission_requests_user ON permission_requests(zitadel_user_id);
+CREATE INDEX idx_permission_requests_object ON permission_requests(object_type, object_id);
 
 COMMENT ON TABLE permission_requests IS 'Approval workflow for calendar access — on approval, OpenFGA tuple is created';
 COMMENT ON COLUMN permission_requests.object_type IS 'OpenFGA object type: national_calendar, diocesan_calendar, wider_region, test_definition';

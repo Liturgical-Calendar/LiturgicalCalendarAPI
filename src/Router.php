@@ -620,6 +620,9 @@ class Router
         string $route,
         array $requestPathParts
     ): void {
+        // Cache a single OpenFGA client for the pipeline (avoid multiple fromEnv calls)
+        $fgaClient = OpenFgaClient::isConfigured() ? OpenFgaClient::fromEnv() : null;
+
         // Role-based authorization (Zitadel roles)
         if ($route === 'data') {
             $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
@@ -630,9 +633,9 @@ class Router
             }
 
             // OpenFGA fine-grained authorization (runs after role check)
-            if (OpenFgaClient::isConfigured() && count($requestPathParts) >= 2) {
+            if ($fgaClient !== null && count($requestPathParts) >= 2) {
                 $fgaMiddleware = OpenFgaAuthorizationMiddleware::forCalendarData(
-                    OpenFgaClient::fromEnv(),
+                    $fgaClient,
                     $requestPathParts[0]
                 );
                 if ($fgaMiddleware !== null) {
@@ -643,11 +646,9 @@ class Router
             $pipeline->pipe(AuthorizationMiddleware::forTestEditor());
 
             // OpenFGA fine-grained authorization for test definitions
-            if (OpenFgaClient::isConfigured() && count($requestPathParts) >= 1) {
+            if ($fgaClient !== null && count($requestPathParts) >= 1) {
                 $this->request = $this->request->withAttribute('test_id', $requestPathParts[0]);
-                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forTestDefinition(
-                    OpenFgaClient::fromEnv()
-                ));
+                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forTestDefinition($fgaClient));
             }
         } elseif ($route === 'temporale') {
             // Temporale requires admin role (General Roman Calendar)

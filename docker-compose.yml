@@ -199,12 +199,13 @@ services:
   # OpenFGA - Fine-grained authorization engine (Google Zanzibar implementation)
   # Provides relationship-based access control for calendar-specific permissions.
   # HTTP API: http://localhost:3001 (Playground), http://localhost:8083 (API)
+  # Pin to a specific version for reproducible deployments.
   openfga-migrate:
-    image: openfga/openfga:latest
+    image: openfga/openfga:v1.8.12
     command: migrate
     environment:
       OPENFGA_DATASTORE_ENGINE: postgres
-      OPENFGA_DATASTORE_URI: postgres://openfga:openfga_secure_password@db:5432/openfga?sslmode=disable
+      OPENFGA_DATASTORE_URI: postgres://${OPENFGA_DB_USER:-openfga}:${OPENFGA_DB_PASSWORD:-openfga_secure_password}@db:5432/${OPENFGA_DB_NAME:-openfga}?sslmode=disable
     networks:
       - zitadel
     depends_on:
@@ -213,12 +214,12 @@ services:
 
   openfga:
     restart: unless-stopped
-    image: openfga/openfga:latest
+    image: openfga/openfga:v1.8.12
     command: run
     environment:
       OPENFGA_DATASTORE_ENGINE: postgres
-      OPENFGA_DATASTORE_URI: postgres://openfga:openfga_secure_password@db:5432/openfga?sslmode=disable
-      OPENFGA_PLAYGROUND_ENABLED: "true"
+      OPENFGA_DATASTORE_URI: postgres://${OPENFGA_DB_USER:-openfga}:${OPENFGA_DB_PASSWORD:-openfga_secure_password}@db:5432/${OPENFGA_DB_NAME:-openfga}?sslmode=disable
+      OPENFGA_PLAYGROUND_ENABLED: "${OPENFGA_PLAYGROUND_ENABLED:-true}"
     healthcheck:
       test: ["CMD", "/usr/local/bin/grpc_health_probe", "-addr=localhost:8081"]
       interval: 10s

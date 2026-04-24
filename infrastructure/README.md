@@ -124,14 +124,14 @@ ZITADEL_PROJECT_ID=<project-id>
 
 ## Port Summary
 
-| Service             | Port | Purpose                                    |
-|---------------------|------|--------------------------------------------|
-| Zitadel             | 8080 | API, Console, OIDC endpoints               |
-| Login V2            | 8081 | Login/Logout UI (passkeys, registration)   |
-| OpenFGA HTTP API    | 8083 | Authorization checks (REST)                |
-| OpenFGA gRPC        | 8084 | Authorization checks (gRPC)                |
-| OpenFGA Playground  | 3001 | Interactive model explorer                 |
-| PostgreSQL          | 5432 | Database                                   |
+| Service            | Port | Purpose                                  |
+| ------------------ | ---- | ---------------------------------------- |
+| Zitadel            | 8080 | API, Console, OIDC endpoints             |
+| Login V2           | 8081 | Login/Logout UI (passkeys, registration) |
+| OpenFGA HTTP API   | 8083 | Authorization checks (REST)              |
+| OpenFGA gRPC       | 8084 | Authorization checks (gRPC)              |
+| OpenFGA Playground | 3001 | Interactive model explorer               |
+| PostgreSQL         | 5432 | Database                                 |
 
 ## Database Schema
 
@@ -150,14 +150,16 @@ Managed entirely by OpenFGA. Contains authorization model definitions and relati
 
 Application-specific data:
 
-| Table                       | Purpose                                                              |
-|-----------------------------|----------------------------------------------------------------------|
-| `role_requests`             | Tracks user role assignment requests and approval workflow           |
-| `user_calendar_permissions` | Calendar-specific permissions (e.g., "user X can edit USA calendar") |
-| `permission_requests`       | Workflow for requesting calendar access                              |
-| `applications`              | Registered applications for API key management                       |
-| `api_keys`                  | API keys for application authentication                              |
-| `audit_log`                 | Security and compliance audit trail                                  |
+| Table                 | Purpose                                                                      |
+| --------------------- | ---------------------------------------------------------------------------- |
+| `role_requests`       | Tracks user role assignment requests and approval workflow                   |
+| `permission_requests` | Approval workflow for calendar access; on approval, OpenFGA tuple is created |
+| `applications`        | Registered applications for API key management                               |
+| `api_keys`            | API keys for application authentication                                      |
+| `audit_log`           | Security and compliance audit trail                                          |
+
+> **Note:** Granted calendar permissions (formerly `user_calendar_permissions`) are now
+> managed as OpenFGA relationship tuples, not database rows. See the OpenFGA database above.
 
 ## Useful Commands
 
