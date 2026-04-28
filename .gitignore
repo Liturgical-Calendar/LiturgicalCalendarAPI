@@ -34,3 +34,6 @@ test-service-account-key.json
 # Infrastructure secrets
 infrastructure/secrets/
 infrastructure/*.env
+
+# Local git worktrees
+.worktrees/
