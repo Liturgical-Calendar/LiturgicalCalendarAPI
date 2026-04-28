@@ -133,8 +133,12 @@ default_modes:
 
 # initial prompt for the project. It will always be given to the LLM upon activating the project
 # (contrary to the memories, which are loaded on demand).
-initial_prompt: ""
-
+initial_prompt: |
+  - PRs target `development`, NEVER `stable`. Branch off `development`.
+  - For Accept-Language: ALWAYS `Negotiator::pickLanguage($request, [], LitLocale::LATIN)`. NEVER `\Locale::acceptFromHttp()` (ICU lacks Latin `la`/`la_VA`).
+  - `return_type` query param is ONLY valid on `/calendar`. Do NOT propagate it to admin/auth or other routes.
+  - Timezone is always `Europe/Vatican`; year range 1970-9999.
+  - PHPStan level 10, PSR-12; pre-commit (CaptainHook) runs lint + lint:md. Never `--no-verify`.
 # time budget (seconds) per tool call for the retrieval of additional symbol information
 # such as docstrings or parameter information.
 # This overrides the corresponding setting in the global configuration; see the documentation there.
