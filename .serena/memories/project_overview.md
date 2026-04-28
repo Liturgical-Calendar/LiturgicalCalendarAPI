@@ -33,8 +33,6 @@ Calculates mobile festivities (Easter-based) and the precedence of solemnities, 
 
 ## Repo Location
 
-`/home/johnrdorazio/development/LiturgicalCalendar/LiturgicalCalendarAPI`
-
 Companion repos in same parent directory:
 
 - `LiturgicalCalendarFrontend` — public website

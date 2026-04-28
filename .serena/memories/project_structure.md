@@ -2,7 +2,7 @@
 
 ## Top-level layout
 
-```
+```text
 LiturgicalCalendarAPI/
 ├── public/             # Web entry point (index.php)
 ├── src/                # PHP source (PSR-4: LiturgicalCalendar\Api\)
