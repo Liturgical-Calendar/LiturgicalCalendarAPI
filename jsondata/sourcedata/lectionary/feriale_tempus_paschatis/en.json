@@ -144,40 +144,40 @@
         "gospel": ""
     },
     "EasterWeekday5Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 14:5-18",
+        "responsorial_psalm": "Psalm 115:1-2, 3-4, 15-16",
+        "gospel_acclamation": "John 14:26",
+        "gospel": "John 14:21-26"
     },
     "EasterWeekday5Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 14:19-28",
+        "responsorial_psalm": "Psalm 145:10-11, 12-13ab, 21",
+        "gospel_acclamation": "See Luke 24:46, 26",
+        "gospel": "John 14:27-31a"
     },
     "EasterWeekday5Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 15:1-6",
+        "responsorial_psalm": "Psalm 122:1-2, 3-4ab, 4cd-5",
+        "gospel_acclamation": "John 15:4a, 5b",
+        "gospel": "John 15:1-8"
     },
     "EasterWeekday5Thursday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 15:7-21",
+        "responsorial_psalm": "Psalm 96:1-2a, 2b-3, 10",
+        "gospel_acclamation": "John 10:27",
+        "gospel": "John 15:9-11"
     },
     "EasterWeekday5Friday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 15:22-31",
+        "responsorial_psalm": "Psalm 57:8-9, 10 and 12",
+        "gospel_acclamation": "John 15:15b",
+        "gospel": "John 15:12-17"
     },
     "EasterWeekday5Saturday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 16:1-10",
+        "responsorial_psalm": "Psalm 100:1b-2, 3, 5",
+        "gospel_acclamation": "Colossians 3:1",
+        "gospel": "John 15:18-21"
     },
     "EasterWeekday6Monday": {
         "first_reading": "",
