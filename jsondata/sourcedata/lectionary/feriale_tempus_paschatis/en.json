@@ -128,7 +128,7 @@
     "EasterWeekday4Thursday": {
         "first_reading": "Acts 13:13-25",
         "responsorial_psalm": "Psalm 89:2-3, 21-22, 25 and 27",
-        "gospel_acclamation": "See Revelation 1:5ab",
+        "gospel_acclamation": "Cf. Revelation 1:5ab",
         "gospel": "John 13:16-20"
     },
     "EasterWeekday4Friday": {
@@ -152,7 +152,7 @@
     "EasterWeekday5Tuesday": {
         "first_reading": "Acts 14:19-28",
         "responsorial_psalm": "Psalm 145:10-11, 12-13ab, 21",
-        "gospel_acclamation": "See Luke 24:46, 26",
+        "gospel_acclamation": "Cf. Luke 24:46, 26",
         "gospel": "John 14:27-31a"
     },
     "EasterWeekday5Wednesday": {
@@ -180,75 +180,75 @@
         "gospel": "John 15:18-21"
     },
     "EasterWeekday6Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 16:11-15",
+        "responsorial_psalm": "Psalm 149:1b-2, 3-4, 5-6a and 9b",
+        "gospel_acclamation": "John 15:26b, 27a",
+        "gospel": "John 15:26-16:4a"
     },
     "EasterWeekday6Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 16:22-34",
+        "responsorial_psalm": "Psalm 138:1-2ab, 2cde-3, 7c-8",
+        "gospel_acclamation": "Cf. John 16:7, 13",
+        "gospel": "John 16:5-11"
     },
     "EasterWeekday6Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 17:15, 22-18:1",
+        "responsorial_psalm": "Psalm 148:1-2, 11-12, 13, 14",
+        "gospel_acclamation": "John 14:16",
+        "gospel": "John 16:12-15"
     },
     "EasterWeekday6Thursday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 18:1-8",
+        "responsorial_psalm": "Psalm 98:1, 2-3ab, 3cd-4",
+        "gospel_acclamation": "Cf. John 14:18",
+        "gospel": "John 16:16-20"
     },
     "EasterWeekday6Friday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 18:9-18",
+        "responsorial_psalm": "Psalm 47:2-3, 4-5, 6-7",
+        "gospel_acclamation": "Cf. Luke 24:46, 26",
+        "gospel": "John 16:20-23"
     },
     "EasterWeekday6Saturday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 18:23-28",
+        "responsorial_psalm": "Psalm 47:2-3, 8-9, 10",
+        "gospel_acclamation": "John 16:28",
+        "gospel": "John 16:23b-28"
     },
     "EasterWeekday7Monday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 19:1-8",
+        "responsorial_psalm": "Psalm 68:2-3ab, 4-5acd, 6-7ab",
+        "gospel_acclamation": "Colossians 3:1",
+        "gospel": "John 16:29-33"
     },
     "EasterWeekday7Tuesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 20:17-27",
+        "responsorial_psalm": "Psalm 68:10-11, 20-21",
+        "gospel_acclamation": "John 14:16",
+        "gospel": "John 17:1-11a"
     },
     "EasterWeekday7Wednesday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 20:28-38",
+        "responsorial_psalm": "Psalm 68:29-30, 33-35a, 35bc-36ab",
+        "gospel_acclamation": "Cf. John 17:17b, 17a",
+        "gospel": "John 17:11b-19"
     },
     "EasterWeekday7Thursday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 22:30; 23:6-11",
+        "responsorial_psalm": "Psalm 16:1-2a and 5, 7-8, 9-10, 11",
+        "gospel_acclamation": "John 17:21",
+        "gospel": "John 17:20-26"
     },
     "EasterWeekday7Friday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 25:13b-21",
+        "responsorial_psalm": "Psalm 103:1-2, 11-12, 19-20ab",
+        "gospel_acclamation": "John 14:26",
+        "gospel": "John 21:15-19"
     },
     "EasterWeekday7Saturday": {
-        "first_reading": "",
-        "responsorial_psalm": "",
-        "gospel_acclamation": "",
-        "gospel": ""
+        "first_reading": "Acts 28:16-20, 30-31",
+        "responsorial_psalm": "Psalm 11:4, 5 and 7",
+        "gospel_acclamation": "John 16:7, 13",
+        "gospel": "John 21:20-25"
     }
 }
