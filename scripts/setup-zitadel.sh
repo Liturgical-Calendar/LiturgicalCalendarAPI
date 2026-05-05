@@ -1,7 +1,9 @@
 #!/bin/bash
 # Zitadel Setup Script for LiturgicalCalendar
-# Canonical source: this file (LiturgicalCalendarAPI/scripts/setup-zitadel.sh)
-# Keep the Frontend repo's copy in sync when modifying this file.
+# Canonical source: this file (LiturgicalCalendarAPI/scripts/setup-zitadel.sh).
+# The Frontend repo extracts this script from the API Docker image at runtime
+# (see LiturgicalCalendarFrontend/scripts/setup-zitadel.sh), so changes here
+# automatically propagate downstream — no manual sync needed.
 #
 # Automates the creation of the project, roles, and OIDC applications in Zitadel.
 # Run this after a fresh `docker compose up -d` with clean volumes.
@@ -116,7 +118,10 @@ get_admin_pat() {
     container_name=$(docker compose ps -q zitadel 2>/dev/null)
     local tmp_pat="/tmp/zitadel-admin-$$.pat"
     for i in $(seq 1 $MAX_RETRIES); do
-        # Tier 1: bind-mount path
+        # Tier 1: bind-mount path. Used by the API repo's docker-compose.yml,
+        # which bind-mounts ${PROJECT_DIR} into the Zitadel container so admin.pat
+        # appears on the host. The Frontend repo uses a named volume instead, so
+        # this file does not exist there and Tier 2 (docker cp) is the expected path.
         if [ -f "${PROJECT_DIR}/admin.pat" ]; then
             PAT=$(cat "${PROJECT_DIR}/admin.pat" 2>/dev/null || true)
             if [ -n "$PAT" ] && [ ${#PAT} -gt 10 ]; then
@@ -186,9 +191,12 @@ create_project() {
 
     if [ -n "$existing_id" ]; then
         echo -e "${GREEN}Project already exists with ID: $existing_id${NC}" >&2
-        # Ensure projectRoleAssertion is enabled (required for role claims in tokens)
+        # Ensure projectRoleAssertion is enabled (required for role claims in tokens).
+        # Use curl -s (not -sf) so we can parse 4xx response bodies — Zitadel returns
+        # failed_precondition when the setting is already enabled, which is not an error here.
+        # With set -e, var=$(curl -sf …) aborts the script on 4xx before the elif runs.
         local update_result
-        update_result=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/UpdateProject" \
+        update_result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/UpdateProject" \
             -H "Authorization: Bearer $pat" \
             -H "Connect-Protocol-Version: 1" \
             -H "Content-Type: application/json" \
@@ -378,9 +386,10 @@ create_oidc_app() {
             client_secret=$(echo "$secret_result" | jq -r '.clientSecret // empty')
         fi
 
-        # Update config
+        # Update config. Use curl -s (not -sf) so the failed_precondition body is parseable
+        # when the OIDC config is already up to date (treated as success below).
         local update_result
-        update_result=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/UpdateApplication" \
+        update_result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/UpdateApplication" \
             -H "Authorization: Bearer $pat" \
             -H "Connect-Protocol-Version: 1" \
             -H "Content-Type: application/json" \
@@ -448,9 +457,10 @@ create_oidc_app() {
     if [ -n "$client_id" ]; then
         echo -e "${GREEN}App created successfully${NC}" >&2
         # CreateApplication silently ignores accessTokenRoleAssertion,
-        # so set it via a follow-up UpdateApplication call
+        # so set it via a follow-up UpdateApplication call.
+        # Use curl -s (not -sf) so a failed_precondition body (already enabled) stays parseable.
         local update_assertion
-        update_assertion=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/UpdateApplication" \
+        update_assertion=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/UpdateApplication" \
             -H "Authorization: Bearer $pat" \
             -H "Connect-Protocol-Version: 1" \
             -H "Content-Type: application/json" \
@@ -611,8 +621,10 @@ assign_org_role() {
 
     echo -e "${YELLOW}Assigning org role '${role}' to user ${user_id}...${NC}" >&2
 
+    # Use curl -s (not -sf) so the already_exists body stays parseable when the role
+    # is already assigned — that case is treated as success below.
     local result
-    result=$(curl -sf -X POST "${ZITADEL_URL}/zitadel.internal_permission.v2.InternalPermissionService/CreateAdministrator" \
+    result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.internal_permission.v2.InternalPermissionService/CreateAdministrator" \
         -H "Authorization: Bearer $pat" \
         -H "Connect-Protocol-Version: 1" \
         -H "Content-Type: application/json" \
