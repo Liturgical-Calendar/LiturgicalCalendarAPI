@@ -27,7 +27,13 @@ final class JsonBodyParserMiddleware implements MiddlewareInterface
             $request->getParsedBody() === null
             && stripos($contentType, 'application/json') !== false
         ) {
-            $rawBody = (string) $request->getBody();
+            $body    = $request->getBody();
+            $rawBody = (string) $body;
+            // Rewind so downstream handlers reading via getBody()->getContents()
+            // (e.g., AbstractHandler::parseBodyParams) still see the body.
+            if ($body->isSeekable()) {
+                $body->rewind();
+            }
             if ($rawBody !== '') {
                 $decoded = json_decode($rawBody, true);
                 if (is_array($decoded)) {
