@@ -47,7 +47,7 @@ WORKDIR /var/www/html
 # at container start. curl is already provided by the php:8.4-cli base image.
 RUN apt-get update -y && \
     apt-get install -y --no-install-suggests --no-install-recommends \
-    libyaml-0-2 libicu-dev libzip-dev libpq5 locales-all jq && \
+    libyaml-0-2 libicu76 libzip5 libpq5 locales-all jq && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy the compiled PHP extensions from the build stage

@@ -612,6 +612,12 @@ class Router
         // Cache a single OpenFGA client for the pipeline (avoid multiple fromEnv calls)
         $fgaClient = OpenFgaClient::isConfigured() ? OpenFgaClient::fromEnv() : null;
 
+        // OpenFgaAuthorizationMiddleware reads the 'oidc_user' attribute, which is
+        // only populated by OidcAuthMiddleware (including its JWT-fallback path).
+        // The pure JwtAuthMiddleware path does not set 'oidc_user', so skip the
+        // FGA middleware there to avoid an unconditional UnauthorizedException.
+        $oidcAvailable = self::isOidcConfigured();
+
         // Role-based authorization (Zitadel roles)
         if ($route === 'data') {
             $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
@@ -622,7 +628,7 @@ class Router
             }
 
             // OpenFGA fine-grained authorization (runs after role check)
-            if ($fgaClient !== null && count($requestPathParts) >= 2) {
+            if ($oidcAvailable && $fgaClient !== null && count($requestPathParts) >= 2) {
                 $fgaMiddleware = OpenFgaAuthorizationMiddleware::forCalendarData(
                     $fgaClient,
                     $requestPathParts[0]
@@ -635,7 +641,7 @@ class Router
             $pipeline->pipe(AuthorizationMiddleware::forTestEditor());
 
             // OpenFGA fine-grained authorization for test definitions
-            if ($fgaClient !== null && count($requestPathParts) >= 1) {
+            if ($oidcAvailable && $fgaClient !== null && count($requestPathParts) >= 1) {
                 $this->request = $this->request->withAttribute('test_id', $requestPathParts[0]);
                 $pipeline->pipe(OpenFgaAuthorizationMiddleware::forTestDefinition($fgaClient));
             }

@@ -349,11 +349,11 @@ final class AccessRequestHandler extends AbstractHandler
             throw new ValidationException('At least one permission is required');
         }
 
-        // Validate each permission
+        // Validate each permission against the same constraints as createRequest
         $role = is_string($existing['requested_role'] ?? null) ? $existing['requested_role'] : '';
         /** @var array<int, array{object_type: string, object_id: string, relation: string}> $validatedPermissions */
         $validatedPermissions = [];
-        foreach ($permissions as $perm) {
+        foreach ($permissions as $index => $perm) {
             if (!is_array($perm)) {
                 throw new ValidationException('Each permission must be an object');
             }
@@ -363,6 +363,24 @@ final class AccessRequestHandler extends AbstractHandler
 
             if ($objType === '' || $objId === '' || $relation === '') {
                 throw new ValidationException('Each permission requires object_type, object_id, and relation');
+            }
+
+            if (!in_array($objType, self::VALID_OBJECT_TYPES, true)) {
+                throw new ValidationException(sprintf(
+                    'permissions[%d].object_type "%s" is invalid. Valid types: %s',
+                    $index,
+                    $objType,
+                    implode(', ', self::VALID_OBJECT_TYPES)
+                ));
+            }
+
+            if (!in_array($relation, self::VALID_RELATIONS, true)) {
+                throw new ValidationException(sprintf(
+                    'permissions[%d].relation "%s" is invalid. Valid relations: %s',
+                    $index,
+                    $relation,
+                    implode(', ', self::VALID_RELATIONS)
+                ));
             }
 
             $validatedPermissions[] = [
@@ -438,8 +456,9 @@ final class AccessRequestHandler extends AbstractHandler
             }
         }
 
-        // User needs to request access if they have no roles and no pending requests
-        $needsAccessRequest = !$hasRoles && $pendingCount === 0;
+        // User needs to request access only if they have no roles, no pending request,
+        // and no approved request (an approved request may not yet have synced to roles).
+        $needsAccessRequest = !$hasRoles && $pendingCount === 0 && $approvedCount === 0;
 
         return $this->encodeResponseBody($response, [
             'has_roles'            => $hasRoles,

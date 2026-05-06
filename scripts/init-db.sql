@@ -64,6 +64,12 @@ CREATE INDEX idx_access_requests_created ON access_requests(created_at);
 CREATE INDEX idx_access_requests_sync_status ON access_requests(zitadel_sync_status)
 WHERE zitadel_sync_status = 'failed';
 
+-- At most one pending request per (user, role): defense-in-depth against races
+-- and direct DB inserts. Application layer also checks via hasPendingRequest().
+CREATE UNIQUE INDEX idx_access_requests_unique_pending_user_role
+ON access_requests(zitadel_user_id, requested_role)
+WHERE status = 'pending';
+
 COMMENT ON TABLE access_requests IS 'Unified role + permission requests — role via Zitadel, permissions via OpenFGA';
 COMMENT ON COLUMN access_requests.requested_role IS 'Zitadel role: developer, calendar_editor, test_editor';
 COMMENT ON COLUMN access_requests.permissions IS 'JSON array of OpenFGA tuples: [{object_type, object_id, relation}, ...]';

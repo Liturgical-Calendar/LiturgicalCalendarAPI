@@ -81,6 +81,10 @@
       "description": "Admin notification counts (pending requests, etc.)"
     },
     {
+      "name": "Admin - Permissions",
+      "description": "Admin operations for managing OpenFGA permission tuples (list, grant, revoke, check)"
+    },
+    {
       "name": "Admin - Applications",
       "description": "Admin operations for application approval workflow (approve, reject, revoke)"
     },
@@ -1463,7 +1467,8 @@
                       "items": {"$ref": "#/components/schemas/PermissionTuple"}
                     },
                     "count": {"type": "integer"}
-                  }
+                  },
+                  "required": ["permissions", "count"]
                 }
               }
             }
@@ -1499,7 +1504,8 @@
                     "user": {"type": "string"},
                     "relation": {"type": "string"},
                     "object": {"type": "string"}
-                  }
+                  },
+                  "required": ["success", "user", "relation", "object"]
                 }
               }
             }
@@ -1536,7 +1542,8 @@
                     "user": {"type": "string"},
                     "relation": {"type": "string"},
                     "object": {"type": "string"}
-                  }
+                  },
+                  "required": ["success", "user", "relation", "object"]
                 }
               }
             }
@@ -1572,7 +1579,8 @@
                     "user": {"type": "string"},
                     "relation": {"type": "string"},
                     "object": {"type": "string"}
-                  }
+                  },
+                  "required": ["allowed", "user", "relation", "object"]
                 }
               }
             }
@@ -6246,7 +6254,7 @@
           "current_roles": {"type": "array", "items": {"type": "string"}},
           "pending_requests": {"type": "integer"},
           "needs_access_request": {"type": "boolean"},
-          "valid_roles": {"type": "array", "items": {"type": "string"}}
+          "valid_roles": {"type": "array", "items": {"type": "string", "enum": ["developer", "calendar_editor", "test_editor"]}}
         },
         "required": ["has_roles", "current_roles", "pending_requests", "needs_access_request", "valid_roles"],
         "additionalProperties": false

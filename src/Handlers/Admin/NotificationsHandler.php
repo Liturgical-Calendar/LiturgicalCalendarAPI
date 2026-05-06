@@ -96,9 +96,12 @@ final class NotificationsHandler extends AbstractHandler
             $accessRequestRepo                        = $this->getAccessRequestRepository();
             $notifications['pending_access_requests'] = $accessRequestRepo->countPending();
 
-            // Get recent pending access requests for the dropdown
+            // Get recent pending access requests for the dropdown.
+            // getPending() returns oldest-first (ORDER BY created_at ASC),
+            // so take the last 5 and reverse to display newest-first.
             $pendingRequests = $accessRequestRepo->getPending();
-            foreach (array_slice($pendingRequests, 0, 5) as $req) {
+            $recentPending   = array_reverse(array_slice($pendingRequests, -5));
+            foreach ($recentPending as $req) {
                 $displayName              = !empty($req['user_name'])
                     ? $req['user_name']
                     : ( !empty($req['user_email'])
