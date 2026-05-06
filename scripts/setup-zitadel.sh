@@ -16,6 +16,14 @@
 
 set -e
 
+# Require Bash >= 4 (uses associative arrays). macOS ships Bash 3.2 by default;
+# install bash via Homebrew (`brew install bash`) and invoke this script with it.
+if [ -z "${BASH_VERSINFO[0]}" ] || [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
+    echo "Error: Bash >= 4 is required (current: ${BASH_VERSION:-unknown})." >&2
+    echo "On macOS, run: brew install bash && /opt/homebrew/bin/bash $0 $*" >&2
+    exit 1
+fi
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -731,10 +739,15 @@ update_env_file() {
     fi
 
     if grep -q "^${key}=" "$file" 2>/dev/null; then
+        # Escape characters that sed would otherwise interpret in the replacement:
+        # backslash first, then ampersand, then the chosen delimiter '|'.
+        local escaped_value="${value//\\/\\\\}"
+        escaped_value="${escaped_value//&/\\&}"
+        escaped_value="${escaped_value//|/\\|}"
         if [[ "$OSTYPE" == "darwin"* ]]; then
-            sed -i '' "s|^${key}=.*|${key}=${value}|" "$file"
+            sed -i '' "s|^${key}=.*|${key}=${escaped_value}|" "$file"
         else
-            sed -i "s|^${key}=.*|${key}=${value}|" "$file"
+            sed -i "s|^${key}=.*|${key}=${escaped_value}|" "$file"
         fi
     else
         echo "${key}=${value}" >> "$file"
