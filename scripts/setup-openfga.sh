@@ -64,7 +64,10 @@ create_store() {
 
     # List existing stores to check if one already exists
     local existing
-    existing=$(curl -s "${OPENFGA_URL}/stores")
+    existing=$(curl -sS --fail-with-body "${OPENFGA_URL}/stores") || {
+        echo -e "${RED}Failed to list stores: ${existing}${NC}" >&2
+        exit 1
+    }
 
     local existing_id
     existing_id=$(echo "$existing" | jq -r --arg name "$STORE_NAME" '.stores[]? | select(.name == $name) | .id // empty')
@@ -77,9 +80,12 @@ create_store() {
 
     # Create a new store
     local result
-    result=$(curl -s -X POST "${OPENFGA_URL}/stores" \
+    result=$(curl -sS --fail-with-body -X POST "${OPENFGA_URL}/stores" \
         -H "Content-Type: application/json" \
-        -d "{\"name\": \"${STORE_NAME}\"}")
+        -d "{\"name\": \"${STORE_NAME}\"}") || {
+        echo -e "${RED}Failed to create store: ${result}${NC}" >&2
+        exit 1
+    }
 
     local store_id
     store_id=$(echo "$result" | jq -r '.id // empty')
@@ -106,7 +112,10 @@ load_model() {
 
     # Check if a model already exists
     local existing_models
-    existing_models=$(curl -s "${OPENFGA_URL}/stores/${store_id}/authorization-models")
+    existing_models=$(curl -sS --fail-with-body "${OPENFGA_URL}/stores/${store_id}/authorization-models") || {
+        echo -e "${RED}Failed to list authorization models: ${existing_models}${NC}" >&2
+        exit 1
+    }
 
     local existing_model_id
     existing_model_id=$(echo "$existing_models" | jq -r '.authorization_models[0]?.id // empty')
@@ -138,9 +147,12 @@ load_model() {
     model_payload=$(jq -c '.' "$MODEL_FILE")
 
     local result
-    result=$(curl -s -X POST "${OPENFGA_URL}/stores/${store_id}/authorization-models" \
+    result=$(curl -sS --fail-with-body -X POST "${OPENFGA_URL}/stores/${store_id}/authorization-models" \
         -H "Content-Type: application/json" \
-        -d "$model_payload")
+        -d "$model_payload") || {
+        echo -e "${RED}Failed to load authorization model: ${result}${NC}" >&2
+        exit 1
+    }
 
     local model_id
     model_id=$(echo "$result" | jq -r '.authorization_model_id // empty')
