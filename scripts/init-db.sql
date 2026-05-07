@@ -83,7 +83,7 @@ CREATE TABLE applications (
     name VARCHAR(255) NOT NULL,
     description TEXT,
     website VARCHAR(500),
-    status VARCHAR(20) DEFAULT 'pending',
+    status VARCHAR(20) NOT NULL DEFAULT 'pending',
     requested_scope VARCHAR(10) NOT NULL DEFAULT 'read',
     reviewed_by VARCHAR(255),
     review_notes TEXT,
