@@ -11,7 +11,8 @@ on:
       '.env.example',
       'jsondata/**',
       'i18n/**',
-      'infrastructure/init-db.sql'
+      'infrastructure/init-db.sql',
+      '.github/workflows/phpunit.yml'
     ]
   pull_request:
     branches: [ development, stable ]
@@ -59,6 +60,7 @@ jobs:
           php-version: ${{ env.PHP_VERSION }}
           extensions: yaml, intl, zip, calendar, gettext, apcu, opcache, pdo_pgsql
           ini-values: apcu.enable_cli=1, opcache.enable=1, opcache.enable_cli=1
+          coverage: pcov
 
       - name: Cache Composer dependencies
         uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
@@ -126,8 +128,25 @@ jobs:
           echo "Server did not respond on localhost:8000 after $MAX_TRIES seconds."
           exit 1
 
-      - name: Run tests
-        run: time composer test
+      - name: Run tests with coverage and JUnit output
+        run: time composer test:coverage
+
+      - name: Upload coverage to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/codecov-action@75cd11691c0faa626561e295848008c8a7dddffe # v5.5.4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: Liturgical-Calendar/LiturgicalCalendarAPI
+          files: ./coverage.xml
+          fail_ci_if_error: false
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3 # v1.2.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./junit.xml
+          fail_ci_if_error: false
 
       - name: Show logs on failure
         if: failure()
