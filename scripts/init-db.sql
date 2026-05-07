@@ -46,7 +46,7 @@ CREATE TABLE access_requests (
     permissions JSONB NOT NULL DEFAULT '[]',
     justification TEXT,
     credentials TEXT,
-    status VARCHAR(20) DEFAULT 'pending',
+    status VARCHAR(20) NOT NULL DEFAULT 'pending',
     reviewed_by VARCHAR(255),
     review_notes TEXT,
     zitadel_sync_status VARCHAR(20) DEFAULT NULL,

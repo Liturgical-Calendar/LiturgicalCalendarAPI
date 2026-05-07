@@ -6238,10 +6238,12 @@
           },
           "justification": {
             "type": "string",
+            "maxLength": 2000,
             "description": "Why the user needs this access"
           },
           "credentials": {
             "type": "string",
+            "maxLength": 2000,
             "description": "Supporting credentials or qualifications"
           }
         },

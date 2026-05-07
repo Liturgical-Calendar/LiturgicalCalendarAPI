@@ -200,6 +200,12 @@ final class PermissionAdminHandler extends AbstractHandler
             );
         }
 
+        if ($relation !== '' && !in_array($relation, self::VALID_RELATIONS, true)) {
+            throw new ValidationException(
+                sprintf('Invalid relation. Valid relations: %s', implode(', ', self::VALID_RELATIONS))
+            );
+        }
+
         // For resource admins with a specific object, verify admin access
         if (!$isGlobalAdmin && $objectId !== '') {
             $this->requireResourceAdmin($userId, false, $objectType, $objectId);
