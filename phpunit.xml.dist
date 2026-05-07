@@ -10,4 +10,9 @@
       <directory suffix="Test.php">phpunit_tests</directory>
     </testsuite>
   </testsuites>
+  <source>
+    <include>
+      <directory>src</directory>
+    </include>
+  </source>
 </phpunit>
