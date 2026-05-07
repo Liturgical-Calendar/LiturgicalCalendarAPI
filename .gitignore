@@ -34,3 +34,11 @@ test-service-account-key.json
 # Infrastructure secrets
 infrastructure/secrets/
 infrastructure/*.env
+
+# Local git worktrees
+.worktrees/
+
+# Coverage and test-result artifacts produced by composer test:coverage
+coverage.xml
+junit.xml
+.phpunit.cache/
