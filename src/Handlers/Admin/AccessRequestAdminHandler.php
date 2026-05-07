@@ -151,7 +151,7 @@ final class AccessRequestAdminHandler extends AbstractHandler
      * for resources they administer.
      *
      * Query parameters:
-     * - status: Filter by status (pending, approved, rejected, revoked). If omitted, returns all pending.
+     * - status: Filter by status (pending, approved, rejected, revoked). If omitted, returns all statuses.
      */
     private function listRequests(
         ServerRequestInterface $request,
