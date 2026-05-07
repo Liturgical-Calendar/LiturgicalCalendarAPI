@@ -481,6 +481,74 @@ class AccessRequestRepository
     }
 
     /**
+     * Remove a specific permission tuple from all approved access requests.
+     *
+     * When an individual tuple is revoked via PermissionAdminHandler,
+     * this method keeps the access_requests table in sync by removing
+     * the matching permission from the JSONB array.
+     *
+     * @param string $userId Zitadel user ID (without "user:" prefix)
+     * @param string $objectType OpenFGA object type (e.g., "national_calendar")
+     * @param string $objectId Resource identifier (e.g., "IT")
+     * @param string $relation OpenFGA relation (e.g., "editor")
+     * @return int Number of access requests updated
+     */
+    public function removePermissionTuple(
+        string $userId,
+        string $objectType,
+        string $objectId,
+        string $relation
+    ): int {
+        // Find approved requests for this user that contain the permission
+        $stmt = $this->db->prepare(
+            "SELECT id, permissions FROM access_requests
+             WHERE zitadel_user_id = :user_id
+               AND status = 'approved'"
+        );
+        $stmt->execute(['user_id' => $userId]);
+
+        /** @var array<int, array{id: string, permissions: string}> $rows */
+        $rows    = $stmt->fetchAll();
+        $updated = 0;
+
+        foreach ($rows as $row) {
+            /** @var array<int, array{object_type: string, object_id: string, relation: string}>|null $permissions */
+            $permissions = json_decode($row['permissions'], true);
+            if (!is_array($permissions)) {
+                continue;
+            }
+
+            // Filter out the matching permission
+            $filtered = array_values(array_filter(
+                $permissions,
+                function (array $perm) use ($objectType, $objectId, $relation): bool {
+                    return !(
+                        $perm['object_type'] === $objectType
+                        && $perm['object_id'] === $objectId
+                        && $perm['relation'] === $relation
+                    );
+                }
+            ));
+
+            // Only update if something was actually removed
+            if (count($filtered) < count($permissions)) {
+                $update = $this->db->prepare(
+                    'UPDATE access_requests
+                     SET permissions = :permissions
+                     WHERE id = :id'
+                );
+                $update->execute([
+                    'id'          => $row['id'],
+                    'permissions' => json_encode($filtered),
+                ]);
+                $updated++;
+            }
+        }
+
+        return $updated;
+    }
+
+    /**
      * Decode the permissions JSON column in a single result row.
      *
      * @param array<string, mixed> $row Database row

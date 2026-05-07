@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Handlers\Admin;
 
+use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Handlers\AbstractHandler;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
@@ -13,6 +14,7 @@ use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
+use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -325,6 +327,17 @@ final class PermissionAdminHandler extends AbstractHandler
             if (!str_contains($e->getMessage(), 'cannot delete a tuple which does not exist')) {
                 throw $e;
             }
+        }
+
+        // Keep access_requests DB in sync: remove this permission from
+        // any approved access request for this user
+        $bareUserId = str_starts_with($fgaUser, 'user:')
+            ? substr($fgaUser, 5)
+            : $fgaUser;
+
+        if (Connection::isConfigured()) {
+            $repo = new AccessRequestRepository();
+            $repo->removePermissionTuple($bareUserId, $objectType, $objectId, $relation);
         }
 
         return $this->encodeResponseBody($response, [
