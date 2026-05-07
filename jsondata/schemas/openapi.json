@@ -6244,7 +6244,7 @@
       },
       "AccessRequestListResponse": {
         "type": "object",
-        "description": "Paginated list of access requests returned by GET /auth/access-requests and GET /admin/access-requests.",
+        "description": "List of access requests returned by GET /auth/access-requests and GET /admin/access-requests. Currently returns the full unpaginated set.",
         "properties": {
           "requests": {
             "type": "array",
