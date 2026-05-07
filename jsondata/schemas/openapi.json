@@ -1087,17 +1087,7 @@
             "description": "OK: List of user's access requests",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "requests": {
-                      "type": "array",
-                      "items": {"$ref": "#/components/schemas/AccessRequest"}
-                    },
-                    "count": {"type": "integer"}
-                  },
-                  "required": ["requests", "count"]
-                }
+                "schema": {"$ref": "#/components/schemas/AccessRequestListResponse"}
               }
             }
           },
@@ -1188,17 +1178,7 @@
             "description": "OK: List of access requests",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "requests": {
-                      "type": "array",
-                      "items": {"$ref": "#/components/schemas/AccessRequest"}
-                    },
-                    "count": {"type": "integer"}
-                  },
-                  "required": ["requests", "count"]
-                }
+                "schema": {"$ref": "#/components/schemas/AccessRequestListResponse"}
               }
             }
           },
@@ -6262,6 +6242,19 @@
         "required": ["has_roles", "current_roles", "pending_requests", "needs_access_request", "valid_roles"],
         "additionalProperties": false
       },
+      "AccessRequestListResponse": {
+        "type": "object",
+        "description": "Paginated list of access requests returned by GET /auth/access-requests and GET /admin/access-requests.",
+        "properties": {
+          "requests": {
+            "type": "array",
+            "items": {"$ref": "#/components/schemas/AccessRequest"}
+          },
+          "count": {"type": "integer"}
+        },
+        "required": ["requests", "count"],
+        "additionalProperties": false
+      },
       "PermissionTuple": {
         "type": "object",
         "description": "An OpenFGA relationship tuple representing a granted permission",
@@ -6270,7 +6263,8 @@
           "relation": {"type": "string", "enum": ["admin", "viewer", "editor", "deleter"]},
           "object": {"type": "string", "description": "Object identifier (e.g., 'national_calendar:IT')"}
         },
-        "required": ["user", "relation", "object"]
+        "required": ["user", "relation", "object"],
+        "additionalProperties": false
       },
       "PermissionTupleInput": {
         "type": "object",
@@ -6281,7 +6275,8 @@
           "object_id": {"type": "string", "description": "Resource identifier (e.g., 'IT', 'BOSTON')"},
           "relation": {"type": "string", "enum": ["admin", "viewer", "editor", "deleter"]}
         },
-        "required": ["user", "object_type", "object_id", "relation"]
+        "required": ["user", "object_type", "object_id", "relation"],
+        "additionalProperties": false
       },
       "AdminReviewRequestBody": {
         "type": "object",
