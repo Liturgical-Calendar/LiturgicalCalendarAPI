@@ -6233,6 +6233,7 @@
           "permissions": {
             "type": "array",
             "items": {"$ref": "#/components/schemas/Permission"},
+            "maxItems": 50,
             "description": "Array of permission entries requested"
           },
           "justification": {

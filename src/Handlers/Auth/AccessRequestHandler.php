@@ -82,7 +82,13 @@ final class AccessRequestHandler extends AbstractHandler
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $response = static::initResponse($request);
-        $method   = RequestMethod::from($request->getMethod());
+        // tryFrom returns null for unrecognized methods; let validateRequestMethod
+        // surface that as a 405 instead of a ValueError → 500.
+        $method = RequestMethod::tryFrom($request->getMethod());
+
+        if ($method === null) {
+            $this->validateRequestMethod($request);
+        }
 
         if ($method === RequestMethod::OPTIONS) {
             return $this->handlePreflightRequest($request, $response);
@@ -103,7 +109,7 @@ final class AccessRequestHandler extends AbstractHandler
         }
 
         $userId = $oidcUser['sub'] ?? null;
-        if ($userId === null || ( is_string($userId) && trim($userId) === '' )) {
+        if (!is_string($userId) || trim($userId) === '') {
             throw new UnauthorizedException('Invalid authentication token');
         }
 
