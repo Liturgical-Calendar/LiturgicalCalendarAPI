@@ -1155,6 +1155,77 @@
         }
       }
     },
+    "/auth/access-requests/{id}/resubmit": {
+      "post": {
+        "tags": ["Access Requests"],
+        "security": [{"BearerAuth": []}, {"CookieAuth": []}],
+        "summary": "Resubmit a rejected access request",
+        "operationId": "resubmitAccessRequest",
+        "description": "Resubmit a previously rejected access request with updated permissions (and optionally an updated justification). Only the user who created the request may resubmit it, and only when its current status is `rejected` — the request transitions back to `pending` for admin re-review. The role originally requested cannot be changed; create a new request via POST /auth/access-requests for a different role. Permissions in the body are validated identically to POST /auth/access-requests (object_type and relation must match the same enums; role-permission consistency is enforced).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "UUID of the access request being resubmitted",
+            "schema": {"type": "string", "format": "uuid"}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "permissions": {
+                    "type": "array",
+                    "items": {"$ref": "#/components/schemas/Permission"},
+                    "minItems": 1,
+                    "maxItems": 50,
+                    "description": "Updated array of OpenFGA tuples to request. Replaces the original request's permissions on success."
+                  },
+                  "justification": {
+                    "type": "string",
+                    "maxLength": 2000,
+                    "description": "Optional updated justification narrative. When omitted, the original request's justification is preserved."
+                  }
+                },
+                "required": ["permissions"],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK: Access request resubmitted (status moved back to pending)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean", "example": true},
+                    "message": {"type": "string"},
+                    "id": {"type": "string", "format": "uuid"}
+                  },
+                  "required": ["success", "message", "id"]
+                }
+              }
+            }
+          },
+          "401": {"$ref": "#/components/responses/Unauthorized401"},
+          "403": {
+            "description": "Forbidden: the authenticated user is not the original submitter of this request",
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "422": {
+            "description": "Unprocessable: invalid UUID, request not found, request status is not `rejected`, missing/empty/invalid permissions, or role-permission inconsistency",
+            "$ref": "#/components/responses/ValidationError422"
+          }
+        }
+      }
+    },
     "/admin/access-requests": {
       "get": {
         "tags": ["Admin - Access Requests"],
