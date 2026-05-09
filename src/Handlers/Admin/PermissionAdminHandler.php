@@ -16,6 +16,8 @@ use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\RoleCascadeService;
+use LiturgicalCalendar\Api\Services\ZitadelService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -346,12 +348,39 @@ final class PermissionAdminHandler extends AbstractHandler
             $repo->removePermissionTuple($bareUserId, $objectType, $objectId, $relation);
         }
 
+        // Cascade: if this delete leaves any of the user's currently-held roles
+        // with zero in-scope tuples, revoke the role too. Only check roles whose
+        // scope includes the deleted tuple's object_type — others can't have
+        // been affected. Failures here are non-fatal: the tuple delete already
+        // succeeded.
+        $cascadedRoles = [];
+        if (ZitadelService::isConfigured() && OpenFgaClient::isConfigured()) {
+            try {
+                $cascade   = RoleCascadeService::fromEnv();
+                $userRoles = ZitadelService::fromEnv()->getUserRoles($bareUserId);
+                foreach ($userRoles as $role) {
+                    $allowedTypes = AccessRequestRepository::ROLE_OBJECT_TYPES[$role] ?? [];
+                    if (!in_array($objectType, $allowedTypes, true)) {
+                        continue;
+                    }
+                    if ($cascade->maybeCascadeRoleRevoke($bareUserId, $role)) {
+                        $cascadedRoles[] = $role;
+                    }
+                }
+            } catch (\Throwable $e) {
+                error_log('PermissionAdminHandler cascade check failed: ' . $e->getMessage());
+            }
+        }
+
         return $this->encodeResponseBody($response, [
-            'success'  => true,
-            'message'  => 'Permission revoked',
-            'user'     => $fgaUser,
-            'relation' => $relation,
-            'object'   => $fgaObject,
+            'success'        => true,
+            'message'        => empty($cascadedRoles)
+                ? 'Permission revoked'
+                : 'Permission revoked; cascaded role(s) revoked: ' . implode(', ', $cascadedRoles),
+            'user'           => $fgaUser,
+            'relation'       => $relation,
+            'object'         => $fgaObject,
+            'cascaded_roles' => $cascadedRoles,
         ]);
     }
 

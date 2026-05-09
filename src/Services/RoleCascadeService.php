@@ -33,7 +33,7 @@ class RoleCascadeService
     public static function fromEnv(?LoggerInterface $logger = null): self
     {
         return new self(
-            OpenFgaClient::fromEnv($logger),
+            OpenFgaClient::fromEnv(),
             ZitadelService::fromEnv($logger),
             new AccessRequestRepository(),
             $logger

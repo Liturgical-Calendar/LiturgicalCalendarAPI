@@ -14,6 +14,8 @@ use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
+use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\RoleCascadeService;
 use LiturgicalCalendar\Api\Services\ZitadelService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -281,11 +283,30 @@ final class UsersHandler extends AbstractHandler
             ]);
         }
 
+        // Cascade: clean up orphaned OpenFGA tuples in the role's scope, then
+        // mark related approved access_requests as revoked. Without this, the
+        // role is gone but the user still appears to have permissions in the
+        // admin Permission Tuples table, and access_requests rows remain
+        // "approved" forever. Failures are non-fatal (Zitadel revoke succeeded;
+        // tuple cleanup is best-effort).
+        $cascadedTuples = [];
+        if (OpenFgaClient::isConfigured()) {
+            try {
+                $cascade        = RoleCascadeService::fromEnv();
+                $cascadedTuples = $cascade->cascadeTupleRevokeForRole($userId, $role);
+            } catch (\Throwable $e) {
+                error_log('UsersHandler::revokeRole cascade cleanup failed: ' . $e->getMessage());
+            }
+        }
+
         $response = $response->withStatus(StatusCode::OK->value);
 
         return $this->encodeResponseBody($response, [
-            'success' => true,
-            'message' => 'Role revoked successfully',
+            'success'         => true,
+            'message'         => empty($cascadedTuples)
+                ? 'Role revoked successfully'
+                : 'Role revoked successfully; ' . count($cascadedTuples) . ' in-scope permission tuple(s) cleaned up',
+            'cascaded_tuples' => $cascadedTuples,
         ]);
     }
 }

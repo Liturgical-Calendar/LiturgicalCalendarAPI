@@ -17,6 +17,7 @@ use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\RoleCascadeService;
 use LiturgicalCalendar\Api\Services\ZitadelService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -425,7 +426,11 @@ final class AccessRequestAdminHandler extends AbstractHandler
             throw new NotFoundException('Request not found or not in approved status');
         }
 
-        // Step 3: Remove role from Zitadel
+        // Step 3: Conditionally remove role from Zitadel.
+        // Cascade rule: only revoke the role if the user has zero remaining
+        // tuples in the role's scope. Other access_requests may still grant
+        // tuples for the same role — revoking unconditionally would strip
+        // those legitimate grants.
         $roleRemoved  = false;
         $zitadelError = null;
 
@@ -437,9 +442,8 @@ final class AccessRequestAdminHandler extends AbstractHandler
                 $repo->updateZitadelSyncStatus($requestId, 'pending');
 
                 try {
-                    $zitadel = ZitadelService::fromEnv();
-                    $zitadel->revokeUserRole($userId, $requestedRole);
-                    $roleRemoved = true;
+                    $cascade     = RoleCascadeService::fromEnv();
+                    $roleRemoved = $cascade->maybeCascadeRoleRevoke($userId, $requestedRole);
 
                     $repo->updateZitadelSyncStatus($requestId, 'synced');
                 } catch (\Exception $e) {
@@ -456,10 +460,12 @@ final class AccessRequestAdminHandler extends AbstractHandler
             'tuples_deleted' => $deletedTuples,
             'fga_errors'     => $fgaErrors,
             'message'        => $roleRemoved
-                ? 'Access revoked, role removed and permissions deleted'
+                ? 'Access revoked, role removed (no remaining permissions in scope) and permissions deleted'
                 : ( $zitadelError !== null
                     ? 'Access revoked but Zitadel sync failed (will retry)'
-                    : 'Access revoked (Zitadel not configured)' ),
+                    : ( ZitadelService::isConfigured()
+                        ? 'Access revoked, permissions deleted; role retained (other in-scope permissions remain)'
+                        : 'Access revoked (Zitadel not configured)' ) ),
         ]);
     }
 
