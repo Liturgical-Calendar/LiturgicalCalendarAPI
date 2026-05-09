@@ -180,15 +180,6 @@ class OpenFgaClient
     }
 
     /**
-     * Read relationship tuples for a user and object type.
-     *
-     * @param string      $user     User identifier (e.g., "user:zitadel-user-id")
-     * @param string      $object   Object type or full object (e.g., "national_calendar:" or "national_calendar:IT")
-     * @param string|null $relation Optional relation filter
-     * @return array<int, array{user: string, relation: string, object: string}> List of tuples
-     * @throws RuntimeException If the API request fails
-     */
-    /**
      * List object IDs of a given type that a user has the specified relation on.
      *
      * Wraps OpenFGA's ListObjects API. Used by RoleCascadeService to answer
@@ -232,6 +223,15 @@ class OpenFgaClient
         return $stripped;
     }
 
+    /**
+     * Read relationship tuples for a user and object type.
+     *
+     * @param string      $user     User identifier (e.g., "user:zitadel-user-id")
+     * @param string      $object   Object type or full object (e.g., "national_calendar:" or "national_calendar:IT")
+     * @param string|null $relation Optional relation filter
+     * @return array<int, array{user: string, relation: string, object: string}> List of tuples
+     * @throws RuntimeException If the API request fails
+     */
     public function readTuples(string $user, string $object, ?string $relation = null): array
     {
         $tupleKey = [];
