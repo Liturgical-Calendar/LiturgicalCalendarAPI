@@ -660,11 +660,30 @@ create_service_account_pat() {
     local user_id="$2"
     local pat_file="${PROJECT_DIR}/service-account.pat"
 
-    # Reuse existing PAT file unless --force-secrets is set
+    # Reuse existing PAT file unless --force-secrets is set, but only if the
+    # cached token still works against the current Zitadel instance. Without
+    # this check, a `docker compose down -v` followed by `setup-zitadel.sh
+    # --update-env` would silently propagate a stale PAT (the local file
+    # outlives the wiped Zitadel state) into .env, leaving the API unable
+    # to auth — with no error from this script.
     if [ -f "$pat_file" ] && [ "$FORCE_SECRETS" != "true" ]; then
-        echo -e "${GREEN}PAT file already exists (use --force-secrets to regenerate)${NC}" >&2
-        cat "$pat_file"
-        return 0
+        local cached_pat
+        cached_pat=$(cat "$pat_file")
+        local verify_status
+        verify_status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${ZITADEL_URL}/management/v1/users/_search" \
+            -H "Authorization: Bearer $cached_pat" \
+            -H "Content-Type: application/json" \
+            -d '{"limit":1}')
+        # Anything other than 401 (Errors.Token.Invalid) means Zitadel
+        # recognises the token; 403/500/network errors aren't auto-fixable
+        # by regenerating, so trust the cache in those cases.
+        if [ "$verify_status" != "401" ]; then
+            echo -e "${GREEN}PAT file already exists and is valid (use --force-secrets to regenerate)${NC}" >&2
+            echo "$cached_pat"
+            return 0
+        fi
+        echo -e "${YELLOW}Cached PAT in $pat_file is stale (Zitadel returned 401); regenerating...${NC}" >&2
     fi
 
     echo -e "${YELLOW}Creating PAT for service account ${user_id}...${NC}" >&2
