@@ -6231,15 +6231,40 @@
       },
       "AccessRequestStatusResponse": {
         "type": "object",
-        "description": "User's current access status",
+        "description": "Authenticated user's current access status, returned by GET /auth/access-requests/status. Combines facts about the user's existing roles and any access requests they have on file with a single derived flag (needs_access_request) that drives the new-user onboarding decision.",
         "properties": {
-          "has_roles": {"type": "boolean"},
-          "current_roles": {"type": "array", "items": {"type": "string"}},
-          "pending_requests": {"type": "integer"},
-          "needs_access_request": {"type": "boolean"},
-          "valid_roles": {"type": "array", "items": {"type": "string", "enum": ["developer", "calendar_editor", "test_editor"]}}
+          "has_roles": {
+            "type": "boolean",
+            "description": "True if the user already has at least one role assigned via Zitadel."
+          },
+          "current_roles": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "List of role names currently assigned to the user (e.g., \"developer\", \"calendar_editor\"). Empty when has_roles is false."
+          },
+          "pending_requests": {
+            "type": "integer",
+            "description": "Count of the user's access requests with status=pending (waiting for admin review)."
+          },
+          "approved_requests": {
+            "type": "integer",
+            "description": "Count of the user's access requests with status=approved. May be > 0 even when has_roles is false during the brief window between admin approval and Zitadel role sync."
+          },
+          "rejected_requests": {
+            "type": "integer",
+            "description": "Count of the user's access requests with status=rejected. A rejected request can be resubmitted via POST /auth/access-requests/{id}/resubmit; until then it remains rejected and the user may want to be shown the rejection notes from the most recent request."
+          },
+          "needs_access_request": {
+            "type": "boolean",
+            "description": "Server-derived hint to clients: true if and only if the user is in the initial \"no access yet, nothing in flight\" state and should be prompted to submit an access request. Computed as `!has_roles && pending_requests === 0 && approved_requests === 0`. Clients should prefer this over recomputing the rule themselves so the API can evolve the criteria (e.g., add cooling-off windows for rejected users) without coordinated client updates."
+          },
+          "valid_roles": {
+            "type": "array",
+            "items": {"type": "string", "enum": ["developer", "calendar_editor", "test_editor"]},
+            "description": "The role names accepted by POST /auth/access-requests as the requested_role. Provided so clients don't hard-code the list."
+          }
         },
-        "required": ["has_roles", "current_roles", "pending_requests", "needs_access_request", "valid_roles"],
+        "required": ["has_roles", "current_roles", "pending_requests", "approved_requests", "rejected_requests", "needs_access_request", "valid_roles"],
         "additionalProperties": false
       },
       "AccessRequestListResponse": {
