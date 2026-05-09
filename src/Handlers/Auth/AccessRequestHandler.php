@@ -257,17 +257,16 @@ final class AccessRequestHandler extends AbstractHandler
         // Validate role-permission consistency
         $this->validateRolePermissionConsistency($requestedRole, $validatedPermissions);
 
-        // Check if user already has a pending request for this role
+        // Check if user already has a pending request for this role.
+        // Note: deliberately NOT blocking when the user already holds the role.
+        // A user with role X granted via a previous access request is allowed
+        // to submit additional access requests for the same role to add more
+        // resource permissions (e.g., calendar editor with permissions for IT
+        // requesting permissions for US). The role grant on approval is
+        // idempotent in Zitadel; the new permission tuples are additive.
         $repo = $this->getRepository();
         if ($repo->hasPendingRequest($userId, $requestedRole)) {
             throw new ValidationException('You already have a pending request for this role');
-        }
-
-        // Check if user already has this role in Zitadel
-        /** @var array<string> $currentRoles */
-        $currentRoles = $oidcUser['roles'] ?? [];
-        if (in_array($requestedRole, $currentRoles, true)) {
-            throw new ValidationException('You already have this role');
         }
 
         // Create the request
