@@ -188,6 +188,50 @@ class OpenFgaClient
      * @return array<int, array{user: string, relation: string, object: string}> List of tuples
      * @throws RuntimeException If the API request fails
      */
+    /**
+     * List object IDs of a given type that a user has the specified relation on.
+     *
+     * Wraps OpenFGA's ListObjects API. Used by RoleCascadeService to answer
+     * "does user U still have any objects of type T with relation R?" without
+     * pulling every tuple via Read.
+     *
+     * @param string $user     User identifier (e.g., "user:abc")
+     * @param string $relation Relation name (e.g., "viewer")
+     * @param string $type     Object type (e.g., "national_calendar")
+     * @return array<int, string> Object IDs without the type prefix (e.g., ["IT", "VA"])
+     * @throws RuntimeException If the API request fails
+     */
+    public function listObjects(string $user, string $relation, string $type): array
+    {
+        $payload = [
+            'user'                   => $user,
+            'relation'               => $relation,
+            'type'                   => $type,
+            'authorization_model_id' => $this->modelId,
+        ];
+
+        $response = $this->post("/stores/{$this->storeId}/list-objects", $payload);
+
+        $objects = $response['objects'] ?? [];
+        if (!is_array($objects)) {
+            return [];
+        }
+
+        // OpenFGA returns objects as fully-qualified strings like "national_calendar:IT".
+        // Strip the type prefix for ergonomic consumption.
+        $prefix    = $type . ':';
+        $prefixLen = strlen($prefix);
+        $stripped  = [];
+        foreach ($objects as $obj) {
+            if (!is_string($obj)) {
+                continue;
+            }
+            $stripped[] = str_starts_with($obj, $prefix) ? substr($obj, $prefixLen) : $obj;
+        }
+
+        return $stripped;
+    }
+
     public function readTuples(string $user, string $object, ?string $relation = null): array
     {
         $tupleKey = [];

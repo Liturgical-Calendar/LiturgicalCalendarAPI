@@ -36,6 +36,29 @@ class AccessRequestRepository
      */
     public const VALID_SYNC_STATUSES = ['pending', 'synced', 'failed'];
 
+    /**
+     * Valid OpenFGA relations on permission tuples.
+     */
+    public const VALID_RELATIONS = ['admin', 'viewer', 'editor', 'deleter'];
+
+    /**
+     * Valid OpenFGA object types on permission tuples.
+     */
+    public const VALID_OBJECT_TYPES = ['national_calendar', 'diocesan_calendar', 'wider_region', 'test_definition'];
+
+    /**
+     * Object types each role is permitted to hold tuples for. Used by RoleCascadeService
+     * to detect when revoking a tuple leaves the role with zero in-scope tuples and
+     * should therefore cascade to a role-level revoke.
+     *
+     * @var array<string, array<int, string>>
+     */
+    public const ROLE_OBJECT_TYPES = [
+        'developer'       => ['national_calendar', 'diocesan_calendar', 'wider_region', 'test_definition'],
+        'calendar_editor' => ['national_calendar', 'diocesan_calendar', 'wider_region'],
+        'test_editor'     => ['test_definition'],
+    ];
+
     public function __construct(?PDO $db = null)
     {
         $this->db = $db ?? Connection::getInstance();
@@ -426,6 +449,43 @@ class AccessRequestRepository
         ]);
 
         return $stmt->rowCount() > 0;
+    }
+
+    /**
+     * Cascade-revoke all approved access_requests for a (user, role) pair.
+     *
+     * Called by RoleCascadeService when a tuple revoke (or direct role revoke)
+     * leaves the user with zero remaining tuples in the role's scope. Distinct
+     * from revoke() in that it operates by (user, role) rather than by request
+     * UUID, since a single role-revoke may affect multiple historical access
+     * requests at once. The reviewer is recorded as 'system:cascade' so the
+     * audit trail distinguishes cascade revokes from explicit admin revokes.
+     *
+     * @param string $userId Zitadel user ID
+     * @param string $role The role whose access_requests should be marked revoked
+     * @param string|null $notes Optional reason; defaults to a system note
+     * @return int Number of access_requests rows updated
+     */
+    public function cascadeRevokeByRole(string $userId, string $role, ?string $notes = null): int
+    {
+        $stmt = $this->db->prepare(
+            "UPDATE access_requests
+             SET status = 'revoked',
+                 reviewed_by = 'system:cascade',
+                 review_notes = COALESCE(:notes, 'Role cascade-revoked: no remaining permissions in scope'),
+                 reviewed_at = CURRENT_TIMESTAMP
+             WHERE zitadel_user_id = :user_id
+               AND requested_role = :role
+               AND status = 'approved'"
+        );
+
+        $stmt->execute([
+            'user_id' => $userId,
+            'role'    => $role,
+            'notes'   => $notes,
+        ]);
+
+        return $stmt->rowCount();
     }
 
     /**
