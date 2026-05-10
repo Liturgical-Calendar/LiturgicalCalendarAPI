@@ -31,9 +31,11 @@ use LiturgicalCalendar\Api\Handlers\Admin\NotificationsHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\PermissionAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\UsersHandler;
 use LiturgicalCalendar\Api\Handlers\ApplicationsHandler;
+use LiturgicalCalendar\Api\Handlers\Ops\MigrateHandler;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Middleware\AuthorizationMiddleware;
+use LiturgicalCalendar\Api\Http\Middleware\DeployTokenMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\ErrorHandlingMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\HttpsEnforcementMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\JwtAuthMiddleware;
@@ -521,6 +523,20 @@ class Router
                 }
                 $this->handler = $temporaleHandler;
                 break;
+            case '_ops':
+                if (count($requestPathParts) === 1 && $requestPathParts[0] === 'migrate') {
+                    $migrateHandler = new MigrateHandler();
+                    $migrateHandler->setAllowedRequestMethods([RequestMethod::POST]);
+                    $this->handler = $migrateHandler;
+                } elseif (count($requestPathParts) === 2 && $requestPathParts[0] === 'migrate' && $requestPathParts[1] === 'status') {
+                    $migrateHandler = new MigrateHandler();
+                    $migrateHandler->setAllowedRequestMethods([RequestMethod::GET]);
+                    $this->handler = $migrateHandler;
+                } else {
+                    $this->response = new Response(StatusCode::NOT_FOUND->value, [], null, $this->request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
+                    $this->emitResponse();
+                }
+                break;
             default:
                 $this->response = new Response(StatusCode::NOT_FOUND->value, [], null, $this->request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
                 $this->emitResponse();
@@ -534,7 +550,7 @@ class Router
         $pipeline->pipe(new JsonBodyParserMiddleware());
 
         // Apply API key validation and rate limiting for public API routes
-        if (!in_array($route, ['auth', 'admin', 'applications'], true)) {
+        if (!in_array($route, ['auth', 'admin', 'applications', '_ops'], true)) {
             if (Connection::isConfigured()) {
                 $pipeline->pipe(new ApiKeyMiddleware(
                     new \LiturgicalCalendar\Api\Repositories\ApiKeyRepository(),
@@ -549,8 +565,13 @@ class Router
         }
 
         // Apply HTTPS enforcement middleware for auth, admin, and applications routes in production
-        if (in_array($route, ['auth', 'admin', 'applications'], true)) {
+        if (in_array($route, ['auth', 'admin', 'applications', '_ops'], true)) {
             $pipeline->pipe(new HttpsEnforcementMiddleware());
+        }
+
+        // Deploy token authentication for /_ops routes.
+        if ($route === '_ops') {
+            $pipeline->pipe(new DeployTokenMiddleware());
         }
 
         // Apply OIDC authentication for auth routes (access-requests, email-verification), admin, and applications
