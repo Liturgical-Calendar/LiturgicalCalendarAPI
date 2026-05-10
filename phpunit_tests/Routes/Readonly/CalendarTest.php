@@ -149,7 +149,7 @@ final class CalendarTest extends ApiTestCase
                     // a single IP's unauthenticated budget. 192.0.2.100-199 are reserved
                     // here for this bucket-rotation; ApiTestCase's per-class default is
                     // skipped because we're setting the header explicitly.
-                    $bucketIp = '192.0.2.' . ( 100 + ( (int) ( $idx / 500 ) ) % 100 );
+                    $bucketIp = '192.0.2.' . ( 100 + intdiv($idx, 500) % 100 );
                     yield self::$http
                         ->getAsync($request['uri'], [
                             'http_errors' => false,

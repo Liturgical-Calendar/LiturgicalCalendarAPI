@@ -119,7 +119,10 @@ class ApiKeyRateLimitMiddleware implements MiddlewareInterface
         // local dev/test environment so the test suite can isolate per-class
         // rate-limit budgets without saturating the host's natural IP.
         // Production (APP_ENV=staging|production) is unaffected.
-        $appEnv     = $_ENV['APP_ENV'] ?? '';
+        // Read APP_ENV via getenv() with $_ENV fallback to behave consistently
+        // across CLI, FPM, and container environments (matches the pattern in
+        // fromEnv() above).
+        $appEnv     = getenv('APP_ENV') ?: ( $_ENV['APP_ENV'] ?? '' );
         $devOrTest  = is_string($appEnv) && in_array($appEnv, ['development', 'test'], true);
         $trustProxy = $this->trustProxyHeaders || $devOrTest;
 

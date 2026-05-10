@@ -44,10 +44,19 @@ if ($dbHost === null || $dbName === null || $dbUser === null || $dbPassword === 
     exit(1);
 }
 
+if (!ctype_digit($dbPort) || (int) $dbPort < 1 || (int) $dbPort > 65535) {
+    fwrite(
+        STDERR,
+        "Invalid DB_PORT '{$dbPort}': must be an integer between 1 and 65535.\n"
+    );
+    exit(1);
+}
+$dbPortInt = (int) $dbPort;
+
 $connection = DriverManager::getConnection([
     'driver'   => 'pdo_pgsql',
     'host'     => $dbHost,
-    'port'     => (int) $dbPort,
+    'port'     => $dbPortInt,
     'dbname'   => $dbName,
     'user'     => $dbUser,
     'password' => $dbPassword,

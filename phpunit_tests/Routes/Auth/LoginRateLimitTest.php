@@ -23,11 +23,15 @@ class LoginRateLimitTest extends ApiTestCase
      * across full-suite reruns within the 15-minute window, or between the host
      * test runner and a containerized API. The earlier reset-by-filesystem-delete
      * approach didn't work in containerized setups.
+     *
+     * Octet range 1-99 is reserved for per-method IPs so they never collide
+     * with CalendarTest's bucket-rotation range (100-199) or ApiTestCase's
+     * per-class range (200-254).
      */
     protected function setUp(): void
     {
         parent::setUp();
-        $this->testIp = '192.0.2.' . ( ( abs(crc32($this->name())) % 254 ) + 1 );
+        $this->testIp = '192.0.2.' . ( ( abs(crc32($this->name())) % 99 ) + 1 );
     }
 
     /**

@@ -36,7 +36,13 @@ abstract class ApiTestCase extends TestCase
         // so a saturated previous run doesn't carry over within the limiter's
         // window. Honoured only when APP_ENV is dev/test (see
         // ApiKeyRateLimitMiddleware::getClientIp()).
-        self::$currentTestIp = '192.0.2.' . ( ( abs(crc32(static::class . '|' . getmypid())) % 254 ) + 1 );
+        //
+        // Octet range 200-254 is reserved for per-class IPs to keep three
+        // disjoint subranges within 192.0.2.0/24:
+        //   1-99    : per-method IPs (LoginRateLimitTest)
+        //   100-199 : bucket-rotation (CalendarTest::testGetCalendarSampleAllCalendars)
+        //   200-254 : per-class default (here)
+        self::$currentTestIp = '192.0.2.' . ( ( abs(crc32(static::class . '|' . getmypid())) % 55 ) + 200 );
 
         // Create a shared CurlMultiHandler that will persist connections
         self::$multiHandler = new CurlMultiHandler(['max_handles' => 50]); // pool size; tune as needed
@@ -206,7 +212,12 @@ abstract class ApiTestCase extends TestCase
      */
     protected static function hostRegex(): string
     {
-        $host             = $_ENV['API_HOST'] ?? '';
+        $host = $_ENV['API_HOST'] ?? '';
+        // Strip IPv6 brackets so '[::1]' matches the '::1' alias (same
+        // normalization isIPAddress() applies).
+        if (str_starts_with($host, '[') && str_ends_with($host, ']')) {
+            $host = substr($host, 1, -1);
+        }
         $localhostAliases = ['localhost', '127.0.0.1', '0.0.0.0', '::1'];
         if (in_array($host, $localhostAliases, true)) {
             return '(?:localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])';
