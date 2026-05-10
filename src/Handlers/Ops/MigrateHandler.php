@@ -33,13 +33,16 @@ use Symfony\Component\Console\Output\StreamOutput;
  */
 final class MigrateHandler extends AbstractHandler
 {
-    private Connection $connection;
+    private ?Connection $connection;
     private string $configFile;
 
     public function __construct(?Connection $connection = null, ?string $configFile = null)
     {
         parent::__construct();
-        $this->connection = $connection ?? self::buildConnectionFromEnv();
+        // Connection is lazy-built in handle() so the router can construct
+        // this handler without a live DB env. Middleware (DeployTokenMiddleware)
+        // runs first and may reject the request before we ever touch the DB.
+        $this->connection = $connection;
         $this->configFile = $configFile ?? dirname(__DIR__, 3) . '/doctrine-migrations.php';
     }
 
@@ -53,6 +56,10 @@ final class MigrateHandler extends AbstractHandler
             set_time_limit(0);
         }
         ignore_user_abort(true);
+
+        if ($this->connection === null) {
+            $this->connection = self::buildConnectionFromEnv();
+        }
 
         $factory = DependencyFactory::fromConnection(
             new PhpFile($this->configFile),
