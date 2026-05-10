@@ -123,9 +123,11 @@ PHP;
         $body = (string) $response->getBody();
         $this->assertStringContainsString('Version20260101000000', $body);
 
-        // Verify the migration actually ran.
-        $tables = $this->connection->createSchemaManager()->listTableNames();
-        $this->assertContains('example_target', $tables);
+        // Verify the migration actually ran. Use listTables() (not the
+        // deprecated listTableNames()) and map to names for the assertion.
+        $tables     = $this->connection->createSchemaManager()->listTables();
+        $tableNames = array_map(static fn($t): string => $t->getName(), $tables);
+        $this->assertContains('example_target', $tableNames);
     }
 
     public function testPostMigrateOnUpToDateDbReturns200(): void
