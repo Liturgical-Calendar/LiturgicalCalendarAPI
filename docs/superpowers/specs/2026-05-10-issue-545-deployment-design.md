@@ -282,16 +282,6 @@ logs/
 # calendars; written by EasterHandler and CalendarHandler).
 /cache/*
 /public/engineCache/*
-
-# --- SERVER-MANAGED public/ DIAGNOSTIC SCRIPTS ---
-# .gitignore tracks only public/index.php and public/LitCalTestServer.php;
-# any other public/*.php on the server (apc.php, debuginfo.php, etc.) is
-# server-managed and must survive --delete. Whitelist the two tracked
-# files first; first-match-wins means any other .php under public/ is
-# both excluded from transfer and protected from delete on the server.
-+ /public/index.php
-+ /public/LitCalTestServer.php
-/public/*.php
 ```
 
 The `+ .env.example` line uses rsync's include-override syntax (must precede
