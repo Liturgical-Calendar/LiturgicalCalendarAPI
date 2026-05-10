@@ -123,9 +123,10 @@ PHP;
         $body = (string) $response->getBody();
         $this->assertStringContainsString('Version20260101000000', $body);
 
-        // Verify the migration actually ran. Use listTables() (not the
-        // deprecated listTableNames()) and map to names for the assertion.
-        $tables     = $this->connection->createSchemaManager()->listTables();
+        // Verify the migration actually ran. introspectTables() is the
+        // non-deprecated DBAL 4.x replacement for listTables() (which itself
+        // was the original swap for the deprecated listTableNames()).
+        $tables     = $this->connection->createSchemaManager()->introspectTables();
         $tableNames = array_map(static fn($t): string => $t->getName(), $tables);
         $this->assertContains('example_target', $tableNames);
     }
