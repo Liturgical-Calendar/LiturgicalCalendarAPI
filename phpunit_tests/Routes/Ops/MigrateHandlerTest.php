@@ -88,6 +88,125 @@ final class MigrateHandlerTest extends TestCase
         );
     }
 
+    public function testPostMigrateAppliesPendingMigrations(): void
+    {
+        $migrationClass = <<<'PHP'
+<?php
+declare(strict_types=1);
+namespace LiturgicalCalendar\TestMigrations;
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigration;
+final class Version20260101000000 extends AbstractMigration
+{
+    public function up(Schema $schema): void
+    {
+        $this->addSql('CREATE TABLE example_target (id INTEGER PRIMARY KEY)');
+    }
+    public function down(Schema $schema): void
+    {
+        $this->addSql('DROP TABLE example_target');
+    }
+}
+PHP;
+        $configFile     = $this->writeConfig(['Version20260101000000' => $migrationClass]);
+
+        $handler = new MigrateHandler($this->connection, $configFile);
+        $handler->setAllowedRequestMethods([
+            \LiturgicalCalendar\Api\Http\Enum\RequestMethod::POST,
+        ]);
+
+        $request = new ServerRequest('POST', '/_ops/migrate');
+
+        $response = $handler->handle($request);
+
+        $this->assertSame(200, $response->getStatusCode());
+        $body = (string) $response->getBody();
+        $this->assertStringContainsString('Version20260101000000', $body);
+
+        // Verify the migration actually ran.
+        $tables = $this->connection->createSchemaManager()->listTableNames();
+        $this->assertContains('example_target', $tables);
+    }
+
+    public function testPostMigrateOnUpToDateDbReturns200(): void
+    {
+        // A second POST after all migrations have been applied is a true
+        // "already up-to-date" no-op. Doctrine's MigrateCommand returns
+        // non-zero on a config with zero registered migrations ("the version
+        // 'latest' couldn't be reached"), so we register one migration,
+        // apply it, then re-run to exercise the up-to-date path.
+        $migrationClass = <<<'PHP'
+<?php
+declare(strict_types=1);
+namespace LiturgicalCalendar\TestMigrations;
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigration;
+final class Version20260101000001 extends AbstractMigration
+{
+    public function up(Schema $schema): void
+    {
+        $this->addSql('CREATE TABLE noop_target (id INTEGER PRIMARY KEY)');
+    }
+    public function down(Schema $schema): void
+    {
+        $this->addSql('DROP TABLE noop_target');
+    }
+}
+PHP;
+        $configFile     = $this->writeConfig(['Version20260101000001' => $migrationClass]);
+
+        $handler = new MigrateHandler($this->connection, $configFile);
+        $handler->setAllowedRequestMethods([
+            \LiturgicalCalendar\Api\Http\Enum\RequestMethod::POST,
+        ]);
+
+        $request = new ServerRequest('POST', '/_ops/migrate');
+
+        // First call: applies the pending migration.
+        $first = $handler->handle($request);
+        $this->assertSame(200, $first->getStatusCode());
+
+        // Second call: nothing to migrate; should still be 200.
+        $second = $handler->handle($request);
+        $this->assertSame(200, $second->getStatusCode());
+        $this->assertStringContainsString(
+            'Already at the latest version',
+            (string) $second->getBody()
+        );
+    }
+
+    public function testPostMigrateRejectsMalformedToParam(): void
+    {
+        $configFile = $this->writeConfig([]);
+
+        $handler = new MigrateHandler($this->connection, $configFile);
+        $handler->setAllowedRequestMethods([
+            \LiturgicalCalendar\Api\Http\Enum\RequestMethod::POST,
+        ]);
+
+        $request = ( new ServerRequest('POST', '/_ops/migrate?to=bad/value') )
+            ->withQueryParams(['to' => 'bad/value']);
+
+        $response = $handler->handle($request);
+
+        $this->assertSame(400, $response->getStatusCode());
+    }
+
+    public function testGetWithDisallowedMethodThrowsMethodNotAllowed(): void
+    {
+        $configFile = $this->writeConfig([]);
+
+        $handler = new MigrateHandler($this->connection, $configFile);
+        $handler->setAllowedRequestMethods([
+            \LiturgicalCalendar\Api\Http\Enum\RequestMethod::POST,
+        ]);
+
+        $request = new ServerRequest('GET', '/_ops/migrate');
+
+        $this->expectException(\LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException::class);
+        $handler->handle($request);
+    }
+
     /**
      * Writes a temporary doctrine-migrations.php file that points at a
      * temp directory containing the supplied migration class names.
