@@ -11,6 +11,7 @@ phpstan.neon
 phpunit.xml
 !phpunit.xml.dist
 /*.php
+!/doctrine-migrations.php
 /*.txt
 /*.js
 *.cache
