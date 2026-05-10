@@ -14,6 +14,9 @@ final class MigrateHandlerTest extends TestCase
 {
     private Connection $connection;
 
+    /** @var list<string> */
+    private array $tempPaths = [];
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -36,6 +39,34 @@ final class MigrateHandlerTest extends TestCase
         ]);
     }
 
+    protected function tearDown(): void
+    {
+        // Clean up temp files/dirs created by writeConfig(). Files are
+        // unlinked first, then directories removed. Paths are confined to
+        // sys_get_temp_dir() with a fixed "litcal_test_migrate_" prefix and
+        // are appended only by writeConfig() (no user input).
+        $tempRoot = realpath(sys_get_temp_dir());
+        foreach (array_reverse($this->tempPaths) as $path) {
+            $real = realpath($path);
+            if (
+                $tempRoot === false
+                || $real === false
+                || !str_starts_with($real, $tempRoot . DIRECTORY_SEPARATOR)
+                || !str_contains(basename($real), 'litcal_test_migrate_')
+            ) {
+                continue;
+            }
+            if (is_file($real)) {
+                // nosemgrep: php.lang.security.unlink-use.unlink-use
+                @unlink($real);
+            } elseif (is_dir($real)) {
+                @rmdir($real);
+            }
+        }
+        $this->tempPaths = [];
+        parent::tearDown();
+    }
+
     public function testStatusActionReturns200OnFreshDb(): void
     {
         $configFile = $this->writeConfig([]);
@@ -50,6 +81,11 @@ final class MigrateHandlerTest extends TestCase
 
         $this->assertSame(200, $response->getStatusCode());
         $this->assertStringContainsString('text/plain', $response->getHeaderLine('Content-Type'));
+        $this->assertStringContainsString(
+            'migration',
+            strtolower((string) $response->getBody()),
+            'Status output should mention migrations'
+        );
     }
 
     /**
@@ -62,8 +98,10 @@ final class MigrateHandlerTest extends TestCase
     {
         $migrationsDir = sys_get_temp_dir() . '/litcal_test_migrate_' . bin2hex(random_bytes(6));
         mkdir($migrationsDir, 0700, true);
+        $this->tempPaths[] = $migrationsDir;
         foreach ($migrations as $name => $source) {
             file_put_contents($migrationsDir . '/' . $name . '.php', $source);
+            $this->tempPaths[] = $migrationsDir . '/' . $name . '.php';
         }
 
         $configFile = sys_get_temp_dir() . '/litcal_test_migrate_cfg_' . bin2hex(random_bytes(6)) . '.php';
@@ -73,6 +111,7 @@ final class MigrateHandlerTest extends TestCase
             'all_or_nothing'   => true,
             'transactional'    => true,
         ], true) . ";\n");
+        $this->tempPaths[] = $configFile;
 
         return $configFile;
     }

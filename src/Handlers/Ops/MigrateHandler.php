@@ -13,7 +13,6 @@ use Doctrine\Migrations\Tools\Console\Command\MigrateCommand;
 use Doctrine\Migrations\Tools\Console\Command\StatusCommand;
 use Doctrine\Migrations\Tools\Console\Command\SyncMetadataCommand;
 use LiturgicalCalendar\Api\Handlers\AbstractHandler;
-use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use Nyholm\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -46,15 +45,13 @@ final class MigrateHandler extends AbstractHandler
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        // Pre-handler dispatch: enforce method, content-types, etc.
-        $preflight = $this->preHandle($request);
-        if ($preflight !== null) {
-            return $preflight;
-        }
+        $this->validateRequestMethod($request);
 
         // FPM may otherwise kill long migrations; transactional DDL on
         // PostgreSQL means we shouldn't be killed mid-transaction either.
-        @set_time_limit(0);
+        if (function_exists('set_time_limit')) {
+            set_time_limit(0);
+        }
         ignore_user_abort(true);
 
         $factory = DependencyFactory::fromConnection(
@@ -116,26 +113,15 @@ final class MigrateHandler extends AbstractHandler
         );
     }
 
-    /**
-     * Returns null when the request should proceed, or a populated
-     * Response (405) when the method isn't in $allowedRequestMethods.
-     */
-    private function preHandle(ServerRequestInterface $request): ?ResponseInterface
-    {
-        $method  = $request->getMethod();
-        $allowed = array_map(static fn(RequestMethod $m): string => $m->value, $this->allowedRequestMethods ?? []);
-        if (!in_array($method, $allowed, true)) {
-            return new Response(
-                405,
-                ['Allow' => implode(', ', $allowed), 'Content-Type' => 'text/plain'],
-                "Method Not Allowed\n"
-            );
-        }
-        return null;
-    }
-
     private static function buildConnectionFromEnv(): Connection
     {
+        if (!\LiturgicalCalendar\Api\Database\Connection::isConfigured()) {
+            throw new \RuntimeException(
+                'MigrateHandler: database configuration missing. '
+                . 'Required environment variables: DB_HOST, DB_NAME, DB_USER, DB_PASSWORD.'
+            );
+        }
+
         $host = getenv('DB_HOST') ?: ( $_ENV['DB_HOST'] ?? '' );
         $port = getenv('DB_PORT') ?: ( $_ENV['DB_PORT'] ?? '5432' );
         $name = getenv('DB_NAME') ?: ( $_ENV['DB_NAME'] ?? '' );
