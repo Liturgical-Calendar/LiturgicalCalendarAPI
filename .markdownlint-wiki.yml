@@ -1,0 +1,2 @@
+extends: .markdownlint.yml
+MD013: false

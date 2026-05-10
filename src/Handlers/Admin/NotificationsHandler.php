@@ -12,8 +12,8 @@ use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
+use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Api\Repositories\ApplicationRepository;
-use LiturgicalCalendar\Api\Repositories\RoleRequestRepository;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -27,8 +27,8 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 final class NotificationsHandler extends AbstractHandler
 {
-    private ?RoleRequestRepository $roleRequestRepo = null;
-    private ?ApplicationRepository $applicationRepo = null;
+    private ?AccessRequestRepository $accessRequestRepo = null;
+    private ?ApplicationRepository $applicationRepo     = null;
 
     public function __construct()
     {
@@ -39,12 +39,12 @@ final class NotificationsHandler extends AbstractHandler
         $this->allowCredentials      = true;
     }
 
-    private function getRoleRequestRepository(): RoleRequestRepository
+    private function getAccessRequestRepository(): AccessRequestRepository
     {
-        if ($this->roleRequestRepo === null) {
-            $this->roleRequestRepo = new RoleRequestRepository();
+        if ($this->accessRequestRepo === null) {
+            $this->accessRequestRepo = new AccessRequestRepository();
         }
-        return $this->roleRequestRepo;
+        return $this->accessRequestRepo;
     }
 
     private function getApplicationRepository(): ApplicationRepository
@@ -85,30 +85,36 @@ final class NotificationsHandler extends AbstractHandler
 
         // Get notification counts
         $notifications = [
-            'pending_role_requests' => 0,
-            'pending_applications'  => 0,
-            'total'                 => 0,
-            'items'                 => [],
+            'pending_access_requests' => 0,
+            'pending_applications'    => 0,
+            'total'                   => 0,
+            'items'                   => [],
         ];
 
         if (Connection::isConfigured()) {
-            // Get role request counts
-            $roleRequestRepo = $this->getRoleRequestRepository();
-            $counts          = $roleRequestRepo->getRequestCounts();
+            // Get access request counts (unified role + permission requests)
+            $accessRequestRepo                        = $this->getAccessRequestRepository();
+            $notifications['pending_access_requests'] = $accessRequestRepo->countPending();
 
-            $notifications['pending_role_requests'] = $counts['pending'];
-
-            // Get recent pending role requests for the dropdown
-            $pendingRequests = $roleRequestRepo->getPendingRequests();
-            foreach (array_slice($pendingRequests, 0, 5) as $req) {
+            // Get recent pending access requests for the dropdown.
+            // getPending() returns oldest-first (ORDER BY created_at ASC),
+            // so take the last 5 and reverse to display newest-first.
+            $pendingRequests = $accessRequestRepo->getPending();
+            $recentPending   = array_reverse(array_slice($pendingRequests, -5));
+            foreach ($recentPending as $req) {
+                $displayName              = !empty($req['user_name'])
+                    ? $req['user_name']
+                    : ( !empty($req['user_email'])
+                        ? $req['user_email']
+                        : ( 'User ' . substr(is_string($req['zitadel_user_id'] ?? null) ? $req['zitadel_user_id'] : '', -6) ) );
                 $notifications['items'][] = [
-                    'type'       => 'role_request',
+                    'type'       => 'access_request',
                     'id'         => $req['id'] ?? '',
-                    'user_name'  => $req['user_name'] ?? $req['user_email'] ?? 'Unknown',
+                    'user_name'  => $displayName,
                     'user_email' => $req['user_email'] ?? '',
                     'role'       => $req['requested_role'] ?? '',
                     'created_at' => $req['created_at'] ?? '',
-                    'url'        => 'admin-role-requests.php',
+                    'url'        => 'admin-permissions.php',
                 ];
             }
 
@@ -138,7 +144,7 @@ final class NotificationsHandler extends AbstractHandler
             });
             $notifications['items'] = array_slice($notifications['items'], 0, 5);
 
-            $notifications['total'] = $notifications['pending_role_requests']
+            $notifications['total'] = $notifications['pending_access_requests']
                                     + $notifications['pending_applications'];
         }
 

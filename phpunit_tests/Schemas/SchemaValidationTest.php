@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LiturgicalCalendar\Api\Tests\Schemas;
+namespace LiturgicalCalendar\Tests\Schemas;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;

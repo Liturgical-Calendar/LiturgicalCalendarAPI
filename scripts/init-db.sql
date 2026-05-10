@@ -10,6 +10,11 @@ CREATE USER zitadel WITH PASSWORD 'zitadel';
 CREATE DATABASE zitadel OWNER zitadel;
 GRANT ALL PRIVILEGES ON DATABASE zitadel TO zitadel;
 
+-- Create OpenFGA database and user (fine-grained authorization engine)
+CREATE USER openfga WITH PASSWORD 'openfga_secure_password';
+CREATE DATABASE openfga OWNER openfga;
+GRANT ALL PRIVILEGES ON DATABASE openfga TO openfga;
+
 -- Create application database and user for LiturgicalCalendar-specific data
 CREATE USER litcal WITH PASSWORD 'litcal_secure_password';
 CREATE DATABASE litcal OWNER litcal;
@@ -25,82 +30,51 @@ GRANT ALL ON SCHEMA public TO litcal;
 -- This runs as postgres superuser (which has permissions), but in the litcal database context
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
--- Role requests table
--- Stores pending role assignment requests from users
-CREATE TABLE role_requests (
+-- Unified access requests table
+-- Bundles a Zitadel role request with fine-grained OpenFGA permissions.
+-- On approval: Zitadel role is granted + all OpenFGA tuples are created.
+-- On revoke: Zitadel role is removed + all OpenFGA tuples are deleted.
+--
+-- Granted calendar permissions are managed by OpenFGA relationship tuples.
+-- See infrastructure/openfga-model.json and scripts/setup-openfga.sh.
+CREATE TABLE access_requests (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     zitadel_user_id VARCHAR(255) NOT NULL,
     user_email VARCHAR(255) NOT NULL,
     user_name VARCHAR(255),
-    requested_role VARCHAR(50) NOT NULL,  -- 'developer', 'calendar_editor', 'test_editor'
+    requested_role VARCHAR(50) NOT NULL,
+    permissions JSONB NOT NULL DEFAULT '[]',
     justification TEXT,
-    status VARCHAR(20) DEFAULT 'pending',
-    reviewed_by VARCHAR(255),              -- Admin's Zitadel user ID
+    credentials TEXT,
+    status VARCHAR(20) NOT NULL DEFAULT 'pending',
+    reviewed_by VARCHAR(255),
     review_notes TEXT,
     zitadel_sync_status VARCHAR(20) DEFAULT NULL,
     zitadel_sync_error TEXT DEFAULT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     reviewed_at TIMESTAMP,
     CONSTRAINT chk_requested_role CHECK (requested_role IN ('developer', 'calendar_editor', 'test_editor')),
-    CONSTRAINT chk_role_request_status CHECK (status IN ('pending', 'approved', 'rejected', 'revoked')),
+    CONSTRAINT chk_access_request_status CHECK (status IN ('pending', 'approved', 'rejected', 'revoked')),
     CONSTRAINT chk_zitadel_sync_status CHECK (zitadel_sync_status IS NULL OR zitadel_sync_status IN ('pending', 'synced', 'failed'))
 );
 
-CREATE INDEX idx_role_requests_status ON role_requests(status);
-CREATE INDEX idx_role_requests_user ON role_requests(zitadel_user_id);
-CREATE INDEX idx_role_requests_created ON role_requests(created_at);
-CREATE INDEX idx_role_requests_sync_status ON role_requests(zitadel_sync_status)
+CREATE INDEX idx_access_requests_status ON access_requests(status);
+CREATE INDEX idx_access_requests_user ON access_requests(zitadel_user_id);
+CREATE INDEX idx_access_requests_created ON access_requests(created_at);
+CREATE INDEX idx_access_requests_sync_status ON access_requests(zitadel_sync_status)
 WHERE zitadel_sync_status = 'failed';
 
-COMMENT ON TABLE role_requests IS 'Pending role assignment requests from users';
-COMMENT ON COLUMN role_requests.requested_role IS 'Role: developer, calendar_editor, test_editor';
-COMMENT ON COLUMN role_requests.status IS 'Status: pending, approved, rejected, revoked';
+-- At most one pending request per (user, role): defense-in-depth against races
+-- and direct DB inserts. Application layer also checks via hasPendingRequest().
+CREATE UNIQUE INDEX idx_access_requests_unique_pending_user_role
+ON access_requests(zitadel_user_id, requested_role)
+WHERE status = 'pending';
 
--- Calendar-specific permissions (beyond Zitadel roles)
-CREATE TABLE user_calendar_permissions (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    zitadel_user_id VARCHAR(255) NOT NULL,
-    calendar_type VARCHAR(20) NOT NULL,
-    calendar_id VARCHAR(50) NOT NULL,
-    permission VARCHAR(10) NOT NULL,
-    granted_by VARCHAR(255),
-    granted_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(zitadel_user_id, calendar_type, calendar_id, permission),
-    CONSTRAINT chk_calendar_permission CHECK (permission IN ('read', 'write')),
-    CONSTRAINT chk_calendar_type CHECK (calendar_type IN ('national', 'diocesan', 'widerregion'))
-);
-
-CREATE INDEX idx_user_calendar_perms ON user_calendar_permissions(zitadel_user_id, calendar_type);
-
-COMMENT ON TABLE user_calendar_permissions IS 'Calendar-specific permissions beyond Zitadel roles';
-COMMENT ON COLUMN user_calendar_permissions.zitadel_user_id IS 'Zitadel user ID (sub claim from OIDC token)';
-COMMENT ON COLUMN user_calendar_permissions.calendar_type IS 'Type: national, diocesan, widerregion';
-COMMENT ON COLUMN user_calendar_permissions.calendar_id IS 'Calendar identifier: USA, BOSTON, Americas, etc.';
-COMMENT ON COLUMN user_calendar_permissions.permission IS 'Permission level: read, write';
-
--- Permission requests (approval workflow)
-CREATE TABLE permission_requests (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    zitadel_user_id VARCHAR(255) NOT NULL,
-    user_email VARCHAR(255) NOT NULL,
-    user_name VARCHAR(255),
-    calendar_type VARCHAR(20) NOT NULL,
-    calendar_id VARCHAR(50) NOT NULL,
-    justification TEXT,
-    credentials TEXT,
-    status VARCHAR(20) DEFAULT 'pending',
-    reviewed_by VARCHAR(255),
-    review_notes TEXT,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    reviewed_at TIMESTAMP,
-    CONSTRAINT chk_permission_requests_status CHECK (status IN ('pending', 'approved', 'rejected'))
-);
-
-CREATE INDEX idx_permission_requests_status ON permission_requests(status);
-CREATE INDEX idx_permission_requests_user ON permission_requests(zitadel_user_id);
-
-COMMENT ON TABLE permission_requests IS 'Permission request workflow for calendar access';
-COMMENT ON COLUMN permission_requests.status IS 'Status: pending, approved, rejected';
+COMMENT ON TABLE access_requests IS 'Unified role + permission requests — role via Zitadel, permissions via OpenFGA';
+COMMENT ON COLUMN access_requests.requested_role IS 'Zitadel role: developer, calendar_editor, test_editor';
+COMMENT ON COLUMN access_requests.permissions IS 'JSON array of OpenFGA tuples: [{object_type, object_id, relation}, ...]';
+COMMENT ON COLUMN access_requests.status IS 'Status: pending, approved, rejected, revoked';
+COMMENT ON COLUMN access_requests.zitadel_sync_status IS 'Zitadel role sync: null (not attempted), pending, synced, failed';
 
 -- Applications (for API developers)
 CREATE TABLE applications (
@@ -109,7 +83,7 @@ CREATE TABLE applications (
     name VARCHAR(255) NOT NULL,
     description TEXT,
     website VARCHAR(500),
-    status VARCHAR(20) DEFAULT 'pending',
+    status VARCHAR(20) NOT NULL DEFAULT 'pending',
     requested_scope VARCHAR(10) NOT NULL DEFAULT 'read',
     reviewed_by VARCHAR(255),
     review_notes TEXT,
