@@ -144,9 +144,16 @@ final class CalendarTest extends ApiTestCase
         $each = new EachPromise(
             ( function () use ($requests, &$responses, &$errors) {
                 foreach ($requests as $idx => $request) {
+                    // Rotate X-Forwarded-For every 500 requests. This test spans 80 years
+                    // × every national + diocesan calendar — easily 1000+ calls, more than
+                    // a single IP's unauthenticated budget. 192.0.2.100-199 are reserved
+                    // here for this bucket-rotation; ApiTestCase's per-class default is
+                    // skipped because we're setting the header explicitly.
+                    $bucketIp = '192.0.2.' . ( 100 + intdiv($idx, 500) % 100 );
                     yield self::$http
                         ->getAsync($request['uri'], [
-                            'http_errors' => false
+                            'http_errors' => false,
+                            'headers'     => [ 'X-Forwarded-For' => $bucketIp ],
                         ])
                         ->then(
                             function (ResponseInterface $response) use ($idx, $request, &$responses) {

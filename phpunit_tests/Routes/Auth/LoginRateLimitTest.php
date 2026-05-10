@@ -3,100 +3,50 @@
 namespace LiturgicalCalendar\Tests\Routes\Auth;
 
 use LiturgicalCalendar\Tests\ApiTestCase;
+use PHPUnit\Framework\Attributes\Group;
 
 /**
  * Integration tests for login endpoint rate limiting
  *
  * These tests verify that the /auth/login endpoint properly enforces rate limiting
  * to protect against brute-force attacks.
- *
- * Note: These tests are marked @group slow because they make multiple HTTP requests
- * and may take longer to complete.
- *
- * @group slow
  */
+#[Group('slow')]
 class LoginRateLimitTest extends ApiTestCase
 {
+    private string $testIp = '';
+
     /**
-     * Clear rate limit state before each test.
+     * Each test method gets its own synthetic client IP from RFC 5737 TEST-NET-1
+     * (192.0.2.0/24). The login rate limiter keys on client IP, so per-method
+     * isolation gives every test a fresh budget — no shared state across tests,
+     * across full-suite reruns within the 15-minute window, or between the host
+     * test runner and a containerized API. The earlier reset-by-filesystem-delete
+     * approach didn't work in containerized setups.
      *
-     * This ensures that rate limit state doesn't carry over from previous tests.
+     * Octet range 1-99 is reserved for per-method IPs so they never collide
+     * with CalendarTest's bucket-rotation range (100-199) or ApiTestCase's
+     * per-class range (200-254).
      */
     protected function setUp(): void
     {
         parent::setUp();
-        $this->resetRateLimitState();
+        $this->testIp = '192.0.2.' . ( ( abs(crc32($this->name())) % 99 ) + 1 );
     }
 
     /**
-     * Reset rate limit state by clearing files and attempting successful login.
+     * Headers for /auth/login requests, including the per-test X-Forwarded-For
+     * that ClientIpTrait::getClientIp() honours.
      *
-     * We attempt to clear files directly first (works when test process shares
-     * filesystem with API), then fall back to successful login approach for
-     * environments where the API runs in a container with different filesystem.
+     * @return array<string, string>
      */
-    private function resetRateLimitState(): void
+    private function loginHeaders(): array
     {
-        // Clear rate limit files directly (works in local dev)
-        $this->clearRateLimitFiles();
-
-        // Also attempt a successful login as a fallback for containerized environments
-        // where we may not have filesystem access to the API's rate limit storage
-        $response = self::$http->post('/auth/login', [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Accept'       => 'application/json'
-            ],
-            'json'    => [
-                'username' => $_ENV['ADMIN_USERNAME'] ?? 'admin',
-                'password' => $_ENV['ADMIN_PASSWORD'] ?? 'password'
-            ]
-        ]);
-
-        if ($response->getStatusCode() !== 200) {
-            $this->fail(
-                'Admin login in resetRateLimitState() failed with status ' .
-                $response->getStatusCode() . '. Check ADMIN_USERNAME/ADMIN_PASSWORD configuration.'
-            );
-        }
-    }
-
-    /**
-     * Clear all rate limit files from the storage directory.
-     *
-     * This is a best-effort operation that silently fails if the directory
-     * doesn't exist or files can't be deleted (e.g., in containerized CI
-     * environments where the API has a different filesystem).
-     */
-    private function clearRateLimitFiles(): void
-    {
-        // Get the storage path (default is system temp dir)
-        $storagePath  = $_ENV['RATE_LIMIT_STORAGE_PATH'] ?? sys_get_temp_dir();
-        $rateLimitDir = rtrim($storagePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'litcal_rate_limits';
-
-        if (!is_dir($rateLimitDir)) {
-            return;
-        }
-
-        $files = glob($rateLimitDir . DIRECTORY_SEPARATOR . '*.json');
-        if ($files === false) {
-            return;
-        }
-
-        foreach ($files as $file) {
-            @unlink($file);
-            // Also remove corresponding lock file
-            $lockFile = str_replace('.json', '.lock', $file);
-            @unlink($lockFile);
-        }
-
-        // Clean up any orphaned lock files
-        $lockFiles = glob($rateLimitDir . DIRECTORY_SEPARATOR . '*.lock');
-        if ($lockFiles !== false) {
-            foreach ($lockFiles as $lockFile) {
-                @unlink($lockFile);
-            }
-        }
+        return [
+            'X-Forwarded-For' => $this->testIp,
+            'Content-Type'    => 'application/json',
+            'Accept'          => 'application/json',
+        ];
     }
 
     /**
@@ -110,10 +60,7 @@ class LoginRateLimitTest extends ApiTestCase
 
         for ($i = 0; $i < $maxAttempts; $i++) {
             $response = self::$http->post('/auth/login', [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept'       => 'application/json'
-                ],
+                'headers' => $this->loginHeaders(),
                 'json'    => [
                     'username' => 'admin',
                     'password' => 'wrong-' . uniqid()
@@ -129,10 +76,7 @@ class LoginRateLimitTest extends ApiTestCase
 
         // Return the rate-limited response
         return self::$http->post('/auth/login', [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Accept'       => 'application/json'
-            ],
+            'headers' => $this->loginHeaders(),
             'json'    => [
                 'username' => 'admin',
                 'password' => 'wrong-final'
@@ -148,10 +92,7 @@ class LoginRateLimitTest extends ApiTestCase
     public function testLoginFailsWithInvalidCredentials(): void
     {
         $response = self::$http->post('/auth/login', [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Accept'       => 'application/json'
-            ],
+            'headers' => $this->loginHeaders(),
             'json'    => [
                 'username' => 'admin',
                 'password' => 'wrong-password-' . uniqid()
@@ -179,10 +120,7 @@ class LoginRateLimitTest extends ApiTestCase
         // Make failed login attempts up to the limit
         for ($i = 0; $i < $maxAttempts; $i++) {
             $response = self::$http->post('/auth/login', [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept'       => 'application/json'
-                ],
+                'headers' => $this->loginHeaders(),
                 'json'    => [
                     'username' => 'admin',
                     'password' => 'wrong-password-attempt-' . $i
@@ -199,10 +137,7 @@ class LoginRateLimitTest extends ApiTestCase
 
         // The next attempt should be rate limited (429)
         $response = self::$http->post('/auth/login', [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Accept'       => 'application/json'
-            ],
+            'headers' => $this->loginHeaders(),
             'json'    => [
                 'username' => 'admin',
                 'password' => 'wrong-password-final'
@@ -271,10 +206,7 @@ class LoginRateLimitTest extends ApiTestCase
         $failedAttempts = max(1, $maxAttempts - 2);
         for ($i = 0; $i < $failedAttempts; $i++) {
             $response = self::$http->post('/auth/login', [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept'       => 'application/json'
-                ],
+                'headers' => $this->loginHeaders(),
                 'json'    => [
                     'username' => 'admin',
                     'password' => 'wrong-password-clear-test-' . $i
@@ -285,10 +217,7 @@ class LoginRateLimitTest extends ApiTestCase
 
         // Now login successfully
         $response = self::$http->post('/auth/login', [
-            'headers' => [
-                'Content-Type' => 'application/json',
-                'Accept'       => 'application/json'
-            ],
+            'headers' => $this->loginHeaders(),
             'json'    => [
                 'username' => $_ENV['ADMIN_USERNAME'] ?? 'admin',
                 'password' => $_ENV['ADMIN_PASSWORD'] ?? 'password'
@@ -305,10 +234,7 @@ class LoginRateLimitTest extends ApiTestCase
         // Make the same number of failed attempts as before
         for ($i = 0; $i < $failedAttempts; $i++) {
             $response = self::$http->post('/auth/login', [
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept'       => 'application/json'
-                ],
+                'headers' => $this->loginHeaders(),
                 'json'    => [
                     'username' => 'admin',
                     'password' => 'wrong-password-after-clear-' . $i
@@ -340,16 +266,5 @@ class LoginRateLimitTest extends ApiTestCase
             $contentType,
             'Rate limit response should use application/problem+json content type'
         );
-    }
-
-    /**
-     * Clean up rate limit data after each test.
-     *
-     * This ensures that rate limit state doesn't carry over to other test classes.
-     */
-    protected function tearDown(): void
-    {
-        $this->resetRateLimitState();
-        parent::tearDown();
     }
 }
