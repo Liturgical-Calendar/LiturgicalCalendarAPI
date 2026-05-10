@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace LiturgicalCalendar\Api\Tests\Http;
+namespace LiturgicalCalendar\Tests\Http;
 
 use LiturgicalCalendar\Api\Http\Middleware\JsonBodyParserMiddleware;
 use Nyholm\Psr7\Factory\Psr17Factory;

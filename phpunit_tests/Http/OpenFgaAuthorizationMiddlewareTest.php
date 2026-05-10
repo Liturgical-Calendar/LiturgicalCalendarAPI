@@ -1,6 +1,6 @@
 <?php
 
-namespace LiturgicalCalendar\Api\Tests\Http;
+namespace LiturgicalCalendar\Tests\Http;
 
 use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;

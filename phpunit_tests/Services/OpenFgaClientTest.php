@@ -1,6 +1,6 @@
 <?php
 
-namespace LiturgicalCalendar\Api\Tests\Services;
+namespace LiturgicalCalendar\Tests\Services;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;

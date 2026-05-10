@@ -1,6 +1,6 @@
 <?php
 
-namespace LiturgicalCalendar\Api\Tests\Http;
+namespace LiturgicalCalendar\Tests\Http;
 
 use LiturgicalCalendar\Api\Handlers\Admin\PermissionAdminHandler;
 use Nyholm\Psr7\ServerRequest;
