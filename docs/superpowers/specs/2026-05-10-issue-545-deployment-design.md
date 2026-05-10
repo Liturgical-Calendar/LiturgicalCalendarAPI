@@ -156,7 +156,11 @@ this workflow file.
 7. **SSHFP drift check.** DNS lookup of SHA-256 SSHFP records vs pinned
    key fingerprint. Warns only.
 8. **Ensure deploy + cache + logs dirs.** SSH-exec
-   `mkdir -p "${DEPLOY_PATH}" "${DEPLOY_PATH}/cache" "${DEPLOY_PATH}/logs"`.
+   `mkdir -p "${DEPLOY_PATH}" "${DEPLOY_PATH}/cache" "${DEPLOY_PATH}/public/engineCache" "${DEPLOY_PATH}/logs"`.
+   `cache/` is the OIDC PSR-6 cache (JWKS + Zitadel roles);
+   `public/engineCache/` is the calendar-engine memoization cache
+   (Easter dates, computed calendars). Both excluded from rsync but
+   must exist for PHP to write into them.
 9. **Deploy via rsync.**
    `--archive --delete --protect-args --exclude-from=.github/deploy/rsync-exclude.txt`.
    SSH options: `IdentitiesOnly=yes`, `StrictHostKeyChecking=yes`.
@@ -270,9 +274,24 @@ README.md
 logs/
 
 # --- RUNTIME CACHE (preserve server-side state) ---
-# Excludes contents only; the directory itself is created on the
-# server in a pre-rsync SSH-exec step so PHP can still write to it.
+# Excludes contents only; the directories themselves are created on
+# the server in a pre-rsync SSH-exec step so PHP can still write to
+# them. /cache is the OIDC PSR-6 cache (JWKS + Zitadel roles, used by
+# OidcAuthMiddleware). /public/engineCache is the calendar-engine
+# memoization cache (per-locale Easter, per-version computed
+# calendars; written by EasterHandler and CalendarHandler).
 /cache/*
+/public/engineCache/*
+
+# --- SERVER-MANAGED public/ DIAGNOSTIC SCRIPTS ---
+# .gitignore tracks only public/index.php and public/LitCalTestServer.php;
+# any other public/*.php on the server (apc.php, debuginfo.php, etc.) is
+# server-managed and must survive --delete. Whitelist the two tracked
+# files first; first-match-wins means any other .php under public/ is
+# both excluded from transfer and protected from delete on the server.
++ /public/index.php
++ /public/LitCalTestServer.php
+/public/*.php
 ```
 
 The `+ .env.example` line uses rsync's include-override syntax (must precede
