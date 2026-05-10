@@ -356,8 +356,8 @@ final class CalendarsTest extends ApiTestCase
 
             self::$WIDER_REGION_API_PATH_PATTERN = sprintf(
                 '/^%s:\/\/%s:%d\/data\/widerregion\/(Europe|Africa|Asia|Oceania|Americas)\?locale=\{locale\}$/',
-                $_ENV['API_PROTOCOL'],
-                $_ENV['API_HOST'],
+                preg_quote($_ENV['API_PROTOCOL'], '/'),
+                self::hostRegex(),
                 $_ENV['API_PORT']
             );
         }
