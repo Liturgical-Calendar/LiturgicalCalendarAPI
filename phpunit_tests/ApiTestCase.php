@@ -7,6 +7,8 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Handler\CurlMultiHandler;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use Psr\Http\Message\RequestInterface;
 
 abstract class ApiTestCase extends TestCase
 {
@@ -23,13 +25,40 @@ abstract class ApiTestCase extends TestCase
     private static string $responseBody       = '';
     private static bool $preferV4             = true; // default to IPv4 unless detected otherwise
     private static string $addr               = '';
+    protected static string $currentTestIp    = '192.0.2.1';
 
     public static function setUpBeforeClass(): void
     {
+        // Per-class synthetic client IP (RFC 5737 TEST-NET-1). Each test class
+        // gets its own rate-limit budget so the full suite never saturates a
+        // single IP, and the host's natural IP is never used at all. Mixing in
+        // getmypid() keeps consecutive `composer test` runs on different IPs,
+        // so a saturated previous run doesn't carry over within the limiter's
+        // window. Honoured only when APP_ENV is dev/test (see
+        // ApiKeyRateLimitMiddleware::getClientIp()).
+        //
+        // Octet range 200-254 is reserved for per-class IPs to keep three
+        // disjoint subranges within 192.0.2.0/24:
+        //   1-99    : per-method IPs (LoginRateLimitTest)
+        //   100-199 : bucket-rotation (CalendarTest::testGetCalendarSampleAllCalendars)
+        //   200-254 : per-class default (here)
+        self::$currentTestIp = '192.0.2.' . ( ( abs(crc32(static::class . '|' . getmypid())) % 55 ) + 200 );
+
         // Create a shared CurlMultiHandler that will persist connections
         self::$multiHandler = new CurlMultiHandler(['max_handles' => 50]); // pool size; tune as needed
 
         $stack = HandlerStack::create(self::$multiHandler);
+        // Inject the per-class X-Forwarded-For on every outgoing request unless
+        // the test has already set one (LoginRateLimitTest sets a per-method IP
+        // for budget-isolation purposes).
+        // Reads $currentTestIp at call time so subsequent setUpBeforeClass
+        // invocations (one per test class) flip the value cleanly.
+        $stack->push(Middleware::mapRequest(static function (RequestInterface $request): RequestInterface {
+            if ($request->hasHeader('X-Forwarded-For')) {
+                return $request;
+            }
+            return $request->withHeader('X-Forwarded-For', ApiTestCase::$currentTestIp);
+        }));
 
         // Validate required environment variables
         $requiredEnvVars = ['API_PROTOCOL', 'API_HOST', 'API_PORT'];
@@ -166,6 +195,35 @@ abstract class ApiTestCase extends TestCase
         }
 
         return filter_var($host, FILTER_VALIDATE_IP) !== false;
+    }
+
+    /**
+     * Regex fragment matching the configured API_HOST plus equivalent
+     * localhost forms the dev server may report.
+     *
+     * Why: the PHP built-in server, Docker port forwarding, and curl can
+     * each surface a different localhost variant in URLs even though they
+     * all reach the same process. A test that hardcodes only `localhost`
+     * fails when the server's $_SERVER['SERVER_NAME'] resolves to
+     * `0.0.0.0` (e.g. when bound to all interfaces inside a container).
+     *
+     * Returns a fragment with no surrounding delimiters, ready to embed
+     * in a larger pattern via sprintf.
+     */
+    protected static function hostRegex(): string
+    {
+        $host = $_ENV['API_HOST'] ?? '';
+        // Strip IPv6 brackets so '[::1]' matches the '::1' alias (same
+        // normalization isIPAddress() applies).
+        if (str_starts_with($host, '[') && str_ends_with($host, ']')) {
+            $host = substr($host, 1, -1);
+        }
+        $localhostAliases = ['localhost', '127.0.0.1', '0.0.0.0', '::1'];
+        if (in_array($host, $localhostAliases, true)) {
+            return '(?:localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\])';
+        }
+
+        return preg_quote($host, '/');
     }
 
     private static function detectBinding(int $port): array

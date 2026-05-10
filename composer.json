@@ -40,7 +40,9 @@
         "firebase/php-jwt": "^6.11 || ^7.0",
         "symfony/cache": "^8.0",
         "plesk/ratchetphp": "^1.0",
-        "symfony/yaml": "^8.0"
+        "symfony/yaml": "^8.0",
+        "doctrine/dbal": "^4.4",
+        "doctrine/migrations": "^3.9"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "^4.0",
@@ -86,7 +88,12 @@
         "start": "./start-server.sh",
         "stop": "./stop-server.sh",
         "ws:start": "./ws-start-server.sh",
-        "ws:stop": "./ws-stop-server.sh"
+        "ws:stop": "./ws-stop-server.sh",
+        "db:migrate": "@php bin/doctrine-migrations migrate --no-interaction",
+        "db:migrations:status": "@php bin/doctrine-migrations status",
+        "db:migrations:generate": "@php bin/doctrine-migrations generate",
+        "db:migrations:sync": "@php bin/doctrine-migrations sync-metadata-storage",
+        "db:migrations:mark-applied": "@php bin/doctrine-migrations version --add --all --no-interaction"
     },
     "config": {
         "allow-plugins": {

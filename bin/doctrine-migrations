@@ -1,0 +1,70 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Doctrine\DBAL\DriverManager;
+use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
+use Doctrine\Migrations\Configuration\Migration\PhpFile;
+use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Tools\Console\ConsoleRunner;
+use Dotenv\Dotenv;
+
+$projectRoot = dirname(__DIR__);
+
+require_once $projectRoot . '/vendor/autoload.php';
+
+$dotenv = Dotenv::createImmutable(
+    $projectRoot,
+    ['.env', '.env.local', '.env.development', '.env.test', '.env.staging', '.env.production'],
+    false
+);
+$dotenv->safeLoad();
+
+$readEnv = static function (string $key): ?string {
+    $value = $_ENV[$key] ?? $_SERVER[$key] ?? getenv($key);
+    if ($value === false || $value === '') {
+        return null;
+    }
+    return is_string($value) ? $value : (string) $value;
+};
+
+$dbHost     = $readEnv('DB_HOST');
+$dbPort     = $readEnv('DB_PORT') ?? '5432';
+$dbName     = $readEnv('DB_NAME');
+$dbUser     = $readEnv('DB_USER');
+$dbPassword = $readEnv('DB_PASSWORD');
+
+if ($dbHost === null || $dbName === null || $dbUser === null || $dbPassword === null) {
+    fwrite(
+        STDERR,
+        "Database configuration missing. Required environment variables: " .
+        "DB_HOST, DB_NAME, DB_USER, DB_PASSWORD\n"
+    );
+    exit(1);
+}
+
+if (!ctype_digit($dbPort) || (int) $dbPort < 1 || (int) $dbPort > 65535) {
+    fwrite(
+        STDERR,
+        "Invalid DB_PORT '{$dbPort}': must be an integer between 1 and 65535.\n"
+    );
+    exit(1);
+}
+$dbPortInt = (int) $dbPort;
+
+$connection = DriverManager::getConnection([
+    'driver'   => 'pdo_pgsql',
+    'host'     => $dbHost,
+    'port'     => $dbPortInt,
+    'dbname'   => $dbName,
+    'user'     => $dbUser,
+    'password' => $dbPassword,
+]);
+
+$dependencyFactory = DependencyFactory::fromConnection(
+    new PhpFile($projectRoot . '/doctrine-migrations.php'),
+    new ExistingConnection($connection)
+);
+
+ConsoleRunner::run([], $dependencyFactory);

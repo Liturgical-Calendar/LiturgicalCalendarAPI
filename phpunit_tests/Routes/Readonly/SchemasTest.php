@@ -22,8 +22,8 @@ final class SchemasTest extends ApiTestCase
 
         $regex = sprintf(
             '/^%s:\/\/%s:%d\/schemas\/(?:[A-Z][A-Za-z]+|openapi)\.json$/',
-            $_ENV['API_PROTOCOL'],
-            $_ENV['API_HOST'],
+            preg_quote($_ENV['API_PROTOCOL'], '/'),
+            self::hostRegex(),
             $_ENV['API_PORT']
         );
 

@@ -115,7 +115,18 @@ class ApiKeyRateLimitMiddleware implements MiddlewareInterface
      */
     private function getClientIp(ServerRequestInterface $request): string
     {
-        if ($this->trustProxyHeaders) {
+        // Honour proxy headers when explicitly trusted, or when running in a
+        // local dev/test environment so the test suite can isolate per-class
+        // rate-limit budgets without saturating the host's natural IP.
+        // Production (APP_ENV=staging|production) is unaffected.
+        // Read APP_ENV via getenv() with $_ENV fallback to behave consistently
+        // across CLI, FPM, and container environments (matches the pattern in
+        // fromEnv() above).
+        $appEnv     = getenv('APP_ENV') ?: ( $_ENV['APP_ENV'] ?? '' );
+        $devOrTest  = is_string($appEnv) && in_array($appEnv, ['development', 'test'], true);
+        $trustProxy = $this->trustProxyHeaders || $devOrTest;
+
+        if ($trustProxy) {
             $headers = ['X-Forwarded-For', 'X-Real-IP'];
             foreach ($headers as $header) {
                 $value = $request->getHeaderLine($header);
