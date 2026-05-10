@@ -245,6 +245,20 @@ restart-server.sh
 server.pid
 server.vscode.pid
 
+# --- CLI tooling that cannot run in the SSH chroot anyway ---
+# bin/ currently contains only doctrine-migrations, which is invoked
+# in-process via the /_ops/migrate endpoint. Leaving CLI scripts on the
+# server is needless surface area and a foot-gun if PHP CLI ever becomes
+# reachable. doctrine-migrations.php (Doctrine config at the repo root)
+# IS shipped — it's read by MigrateHandler via PhpFile.
+bin/
+
+# --- Composer install-time only (never read at runtime) ---
+# composer.json IS shipped — Router::findProjectRoot() uses it as a
+# project-root marker (file_exists, not parsed). composer.lock is only
+# consumed by `composer install`, which runs on the runner.
+composer.lock
+
 # --- Project meta files ---
 CLAUDE.md
 README.md
@@ -265,11 +279,33 @@ The `+ .env.example` line uses rsync's include-override syntax (must precede
 the matching exclude). It ships the example file so server admins can diff
 against the live `.env.production` to spot new/removed variables.
 
-`migrations/` is *included* (Doctrine migration classes; required at runtime
-for `migrations:migrate`).
+### What ships and why
 
-`vendor/` is *included* implicitly (no exclude line; built on the runner in
-step 5).
+The runner-builds-vendor + HTTP-migrations model means the server never runs
+`composer install` and never invokes a PHP CLI. The shipped tree therefore
+differs from issue #545's original sketch (which assumed server-side
+`composer install`):
+
+- `vendor/` — **shipped**. Built on the runner in step 5; required at
+  runtime for PSR-4 autoloading and the Doctrine Migrations classes used
+  by `MigrateHandler`.
+- `src/` (including `src/Migrations/`) — **shipped**. Application code and
+  Doctrine migration classes loaded at runtime.
+- `migrations/` (if present at repo root) — **shipped**. Reserved for
+  future migration locations declared in `doctrine-migrations.php`.
+- `public/`, `jsondata/`, `i18n/`, `cache/` (empty) — **shipped**. Web
+  root, source data, translations, runtime cache directory.
+- `composer.json` — **shipped**. Used by `Router::findProjectRoot()` as a
+  `file_exists()` marker for path-walking; contents are not parsed at
+  runtime. Excluding it would break the router's project-root detection.
+- `doctrine-migrations.php` — **shipped**. Read by `MigrateHandler` via
+  `Doctrine\Migrations\Configuration\Migration\PhpFile` to obtain
+  `migrations_paths` and the `doctrine_migration_versions` table schema.
+- `composer.lock` — **excluded**. Only consumed by `composer install` on
+  the runner.
+- `bin/doctrine-migrations` (whole `bin/` dir) — **excluded**. CLI script;
+  PHP CLI is unreachable from the chrooted SSH user, and nothing else
+  invokes it. Leaving it on disk is needless attack surface.
 
 ## 8. Deploy endpoint
 
@@ -302,7 +338,10 @@ Migrations programmatically inside the deployed PHP-FPM process.
 
 - `set_time_limit(0); ignore_user_abort(true);` at top.
 - Builds `Doctrine\Migrations\DependencyFactory` from an `ExistingConnection`
-  (same construction as `bin/doctrine-migrations`).
+  and `new PhpFile(<project-root>/doctrine-migrations.php)` (same
+  construction as `bin/doctrine-migrations`, just in-process). The config
+  file at the repo root supplies `migrations_paths` and the
+  `doctrine_migration_versions` table schema.
 - For POST: registers `MigrateCommand` with a Symfony Console `Application`,
   runs `migrations:sync-metadata-storage --no-interaction` then
   `migrations:migrate --no-interaction` (or `--no-interaction <version>` if
