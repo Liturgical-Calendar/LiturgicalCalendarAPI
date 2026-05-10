@@ -295,6 +295,15 @@ class OpenFgaClient
             $page++;
         } while ($continuationToken !== '' && $page < $maxPages);
 
+        // If we exited because of the page cap with the server still offering more
+        // data, fail loudly instead of returning a silently truncated set.
+        if ($continuationToken !== '') {
+            throw new \RuntimeException(sprintf(
+                'OpenFGA readTuples pagination limit reached (%d pages). The store has more results than this client will fetch in a single call; tighten the filter (user/object_type/object_id/relation) or read in narrower scopes.',
+                $maxPages
+            ));
+        }
+
         return $tuples;
     }
 

@@ -339,6 +339,16 @@ final class AccessRequestHandler extends AbstractHandler
             );
         }
 
+        // Block resubmit when another pending request for the same role already exists.
+        // Mirrors the in-memory check createRequest() makes; the partial unique index
+        // idx_access_requests_unique_pending_user_role catches the race at the DB level,
+        // but checking here gives a clean 422 instead of letting the constraint
+        // violation bubble up as a 500.
+        $requestedRole = is_string($existing['requested_role'] ?? null) ? $existing['requested_role'] : '';
+        if ($requestedRole !== '' && $this->getRepository()->hasPendingRequest($userId, $requestedRole)) {
+            throw new ValidationException('You already have a pending request for this role');
+        }
+
         // Parse updated permissions from body
         $body = $request->getParsedBody();
         if (!is_array($body)) {

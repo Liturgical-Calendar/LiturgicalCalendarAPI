@@ -1498,10 +1498,10 @@
         "security": [{"BearerAuth": []}, {"CookieAuth": []}],
         "summary": "List permission tuples",
         "operationId": "adminListPermissions",
-        "description": "List OpenFGA permission tuples. Global admins see all; resource admins see only their resources. Supports filtering by user, object_type, object_id, and relation.",
+        "description": "List OpenFGA permission tuples. Global admins see all; resource admins see only tuples on resources they administer. Supports filtering by user, object_type, object_id, and relation. **Resource admins must supply `object_type`** to scope the listing — calling without one returns 400.",
         "parameters": [
           {"name": "user", "in": "query", "description": "Filter by user ID", "schema": {"type": "string"}},
-          {"name": "object_type", "in": "query", "description": "Filter by object type", "schema": {"type": "string", "enum": ["national_calendar", "diocesan_calendar", "wider_region", "test_definition"]}},
+          {"name": "object_type", "in": "query", "description": "Filter by object type. Optional for global admins; required for resource admins (the handler returns 400 without it).", "schema": {"type": "string", "enum": ["national_calendar", "diocesan_calendar", "wider_region", "test_definition"]}},
           {"name": "object_id", "in": "query", "description": "Filter by object ID", "schema": {"type": "string"}},
           {"name": "relation", "in": "query", "description": "Filter by relation", "schema": {"type": "string", "enum": ["admin", "viewer", "editor", "deleter"]}}
         ],

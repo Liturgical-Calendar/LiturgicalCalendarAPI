@@ -13,12 +13,14 @@ use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\RoleCascadeService;
 use LiturgicalCalendar\Api\Services\ZitadelService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Admin Users Handler
@@ -31,6 +33,8 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 final class UsersHandler extends AbstractHandler
 {
+    private LoggerInterface $logger;
+
     public function __construct()
     {
         parent::__construct();
@@ -38,6 +42,7 @@ final class UsersHandler extends AbstractHandler
         $this->allowedRequestMethods = [RequestMethod::GET, RequestMethod::DELETE];
         $this->allowedAcceptHeaders  = [AcceptHeader::JSON];
         $this->allowCredentials      = true;
+        $this->logger                = LoggerFactory::create('admin', null, 30, false, true, false);
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -295,7 +300,11 @@ final class UsersHandler extends AbstractHandler
                 $cascade        = RoleCascadeService::fromEnv();
                 $cascadedTuples = $cascade->cascadeTupleRevokeForRole($userId, $role);
             } catch (\Throwable $e) {
-                error_log('UsersHandler::revokeRole cascade cleanup failed: ' . $e->getMessage());
+                $this->logger->error('UsersHandler::revokeRole cascade cleanup failed', [
+                    'user_id'   => $userId,
+                    'role'      => $role,
+                    'exception' => $e,
+                ]);
             }
         }
 

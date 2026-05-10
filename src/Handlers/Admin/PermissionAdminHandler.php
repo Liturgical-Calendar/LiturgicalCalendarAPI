@@ -13,6 +13,7 @@ use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
@@ -20,6 +21,7 @@ use LiturgicalCalendar\Api\Services\RoleCascadeService;
 use LiturgicalCalendar\Api\Services\ZitadelService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * Permission Admin Handler — OpenFGA tuple management.
@@ -58,6 +60,7 @@ final class PermissionAdminHandler extends AbstractHandler
     private const VALID_RELATIONS = ['admin', 'viewer', 'editor', 'deleter'];
 
     private ?OpenFgaClient $fgaClient = null;
+    private LoggerInterface $logger;
 
     public function __construct()
     {
@@ -67,6 +70,7 @@ final class PermissionAdminHandler extends AbstractHandler
         $this->allowedAcceptHeaders       = [AcceptHeader::JSON];
         $this->allowedRequestContentTypes = [RequestContentType::JSON];
         $this->allowCredentials           = true;
+        $this->logger                     = LoggerFactory::create('admin', null, 30, false, true, false);
     }
 
     private function getClient(): OpenFgaClient
@@ -368,7 +372,7 @@ final class PermissionAdminHandler extends AbstractHandler
                     }
                 }
             } catch (\Throwable $e) {
-                error_log('PermissionAdminHandler cascade check failed: ' . $e->getMessage());
+                $this->logger->error('PermissionAdminHandler cascade check failed', ['exception' => $e]);
             }
         }
 
@@ -465,8 +469,14 @@ final class PermissionAdminHandler extends AbstractHandler
      */
     private function validateTupleParams(string $user, string $objectType, string $objectId, string $relation): void
     {
-        if ($user === '') {
+        // Trim and reject empty / whitespace-only user. Also catches "user:" with empty subject after the prefix.
+        $trimmed = trim($user);
+        if ($trimmed === '') {
             throw new ValidationException('Missing required parameter: user');
+        }
+        $subject = str_starts_with($trimmed, 'user:') ? substr($trimmed, 5) : $trimmed;
+        if (trim($subject) === '') {
+            throw new ValidationException('Invalid user: subject id must not be empty');
         }
 
         if ($objectType === '') {
