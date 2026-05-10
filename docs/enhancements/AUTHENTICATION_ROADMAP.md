@@ -293,24 +293,28 @@ type user
 
 type wider_region
   relations
+    define admin: [user]
     define viewer: [user]
     define editor: [user]
     define deleter: [user]
 
 type national_calendar
   relations
+    define admin: [user]
     define viewer: [user]
     define editor: [user]
     define deleter: [user]
 
 type diocesan_calendar
   relations
+    define admin: [user]
     define viewer: [user]
     define editor: [user]
     define deleter: [user]
 
 type test_definition
   relations
+    define admin: [user]
     define viewer: [user]
     define editor: [user]
     define deleter: [user]
@@ -318,6 +322,7 @@ type test_definition
 
 This model enables policies like:
 
+- Grant `admin` on `national_calendar:IT` → user can manage permissions for Italy's calendar
 - Grant `editor` on `national_calendar:IT` → user can edit Italy's calendar
 - Grant `editor` on `diocesan_calendar:roma_lazio_it` → user can edit Rome's diocesan calendar
 - `deleter` is separate from `editor` → edit without delete is possible
@@ -336,15 +341,34 @@ PATCH  /data/diocesan/roma_lazio_it  →  check(user, "editor", "diocesan_calend
 
 ### Infrastructure
 
-OpenFGA would be added to the Docker Compose stack:
+OpenFGA has been added to the Docker Compose stack:
 
-- **openfga** container (port 8081 or similar)
-- **PostgreSQL** or **MySQL** backend for OpenFGA (can share the existing PostgreSQL instance)
-- The `setup-zitadel.sh` script would be extended to also initialize the OpenFGA authorization model
+- **openfga** container — HTTP API on port 8083, gRPC on port 8084, Playground on port 3001
+- **openfga-migrate** — one-shot container that runs database migrations before OpenFGA starts
+- **PostgreSQL** backend — dedicated `openfga` database sharing the existing PostgreSQL instance
+- **`scripts/setup-openfga.sh`** — creates the OpenFGA store and loads the authorization model
+
+**Setup commands:**
+
+```bash
+docker compose up -d                          # Start all services (including OpenFGA)
+./scripts/setup-openfga.sh --update-env       # Create store, load model, update .env
+```
+
+**Configuration** (added to `.env.example`):
+
+- `OPENFGA_API_URL` — OpenFGA HTTP API endpoint (default: `http://localhost:8083`)
+- `OPENFGA_STORE_ID` — Store ID (output by setup script)
+- `OPENFGA_MODEL_ID` — Authorization model ID (output by setup script)
+- `OPENFGA_HTTP_PORT` — Docker host port for HTTP API (default: 8083)
+- `OPENFGA_GRPC_PORT` — Docker host port for gRPC (default: 8084)
+- `OPENFGA_PLAYGROUND_PORT` — Docker host port for Playground UI (default: 3001)
+
+**Authorization model file:** `scripts/openfga-model.json`
 
 ### Migration Path
 
-1. **Phase 1**: Add OpenFGA to Docker stack, define authorization model
+1. **Phase 1**: Add OpenFGA to Docker stack, define authorization model — **done**
 2. **Phase 2**: Create middleware that checks OpenFGA for calendar write operations
 3. **Phase 3**: Build admin UI for managing per-resource permissions (replaces `user_calendar_permissions` table)
 4. **Phase 4**: Migrate existing `user_calendar_permissions` data to OpenFGA relationship tuples

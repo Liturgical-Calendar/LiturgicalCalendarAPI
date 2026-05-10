@@ -31,16 +31,23 @@ COPY ./jsondata ./jsondata
 COPY ./public/LitCalTestServer.php ./public/index.php ./public/
 COPY ./.env.example ./.env.local
 
+# Include scripts directory (setup scripts, init-db.sql, openfga model)
+# so consumers (e.g., frontend docker-compose) can extract them.
+COPY ./scripts ./scripts
+
 # Stage 2: final build
 FROM php:8.4-cli AS main
 
 # Set the working directory
 WORKDIR /var/www/html
 
-# Install runtime dependencies (not the -dev packages)
+# Install runtime dependencies (not the -dev packages).
+# jq is included so consumers of this image (e.g., the frontend's openfga-setup
+# service) can run setup-openfga.sh / setup-zitadel.sh without an apt-get install
+# at container start. curl is already provided by the php:8.4-cli base image.
 RUN apt-get update -y && \
     apt-get install -y --no-install-suggests --no-install-recommends \
-    libyaml-0-2 libicu-dev libzip-dev libpq5 locales-all && \
+    libyaml-0-2 libicu76 libzip5 libpq5 locales-all jq && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy the compiled PHP extensions from the build stage

@@ -1,5 +1,10 @@
 #!/bin/bash
-# Zitadel Setup Script for LiturgicalCalendar API
+# Zitadel Setup Script for LiturgicalCalendar
+# Canonical source: this file (LiturgicalCalendarAPI/scripts/setup-zitadel.sh).
+# The Frontend repo extracts this script from the API Docker image at runtime
+# (see LiturgicalCalendarFrontend/scripts/setup-zitadel.sh), so changes here
+# automatically propagate downstream — no manual sync needed.
+#
 # Automates the creation of the project, roles, and OIDC applications in Zitadel.
 # Run this after a fresh `docker compose up -d` with clean volumes.
 #
@@ -12,6 +17,14 @@
 #   ./scripts/setup-zitadel.sh --show-secrets     # Display full secrets in output
 
 set -e
+
+# Require Bash >= 4 (uses associative arrays). macOS ships Bash 3.2 by default;
+# install bash via Homebrew (`brew install bash`) and invoke this script with it.
+if [ -z "${BASH_VERSINFO[0]}" ] || [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
+    echo "Error: Bash >= 4 is required (current: ${BASH_VERSION:-unknown})." >&2
+    echo "On macOS, run: brew install bash && /opt/homebrew/bin/bash $0 $*" >&2
+    exit 1
+fi
 
 # Colors for output
 RED='\033[0;31m'
@@ -68,11 +81,31 @@ is_stack_running() {
     docker compose ps --status running 2>/dev/null | grep -q "zitadel"
 }
 
+# Function to recreate app containers to pick up new env vars.
+# Detects which containers exist in the compose stack.
+recreate_app_containers() {
+    echo -e "${YELLOW}Recreating app containers to pick up new credentials...${NC}" >&2
+    cd "$PROJECT_DIR"
+    local services=()
+    for svc in litcal-api litcal-frontend litcal-tests; do
+        if docker compose ps --services 2>/dev/null | grep -q "^${svc}$"; then
+            services+=("$svc")
+        fi
+    done
+    if [ ${#services[@]} -gt 0 ]; then
+        docker compose up -d --force-recreate "${services[@]}"
+        echo -e "${GREEN}App containers recreated: ${services[*]}${NC}" >&2
+    else
+        echo -e "${YELLOW}No app containers found in compose stack.${NC}" >&2
+        echo -e "${YELLOW}Remember to restart your app services to pick up the new credentials.${NC}" >&2
+    fi
+}
+
 # Function to wait for Zitadel to be ready
 wait_for_zitadel() {
     echo -e "${YELLOW}Waiting for Zitadel to be ready...${NC}"
     for i in $(seq 1 $MAX_RETRIES); do
-        if curl -s "${ZITADEL_URL}/debug/healthz" > /dev/null 2>&1; then
+        if curl -sf "${ZITADEL_URL}/debug/healthz" > /dev/null 2>&1; then
             echo -e "${GREEN}Zitadel is ready!${NC}"
             return 0
         fi
@@ -83,13 +116,34 @@ wait_for_zitadel() {
     exit 1
 }
 
-# Function to get the admin PAT from the project root (bind-mounted from Zitadel container)
+# Function to get the admin PAT from Zitadel.
+# Tier 1: Try reading $PROJECT_DIR/admin.pat directly (works for API's bind-mount).
+# Tier 2: Fall back to docker cp from the Zitadel container (works for Frontend's named volume).
 get_admin_pat() {
     echo -e "${YELLOW}Getting admin PAT from Zitadel...${NC}" >&2
-    local pat_file="${PROJECT_DIR}/admin.pat"
+    cd "$PROJECT_DIR"
+    local container_name
+    container_name=$(docker compose ps -q zitadel 2>/dev/null)
+    local tmp_pat="/tmp/zitadel-admin-$$.pat"
     for i in $(seq 1 $MAX_RETRIES); do
-        if [ -f "$pat_file" ]; then
-            PAT=$(cat "$pat_file" 2>/dev/null || true)
+        # Tier 1: bind-mount path. Used by the API repo's docker-compose.yml,
+        # which bind-mounts ${PROJECT_DIR} into the Zitadel container so admin.pat
+        # appears on the host. The Frontend repo uses a named volume instead, so
+        # this file does not exist there and Tier 2 (docker cp) is the expected path.
+        if [ -f "${PROJECT_DIR}/admin.pat" ]; then
+            PAT=$(cat "${PROJECT_DIR}/admin.pat" 2>/dev/null || true)
+            if [ -n "$PAT" ] && [ ${#PAT} -gt 10 ]; then
+                echo -e "${GREEN}Admin PAT retrieved successfully${NC}" >&2
+                echo "$PAT"
+                return 0
+            fi
+        fi
+        # Tier 2: docker cp from container (Frontend repo uses named volume
+        # at /zitadel-data — this is the expected path for that stack)
+
+        if [ -n "$container_name" ] && docker cp "${container_name}:/zitadel-data/admin.pat" "$tmp_pat" 2>/dev/null; then
+            PAT=$(cat "$tmp_pat" 2>/dev/null || true)
+            rm -f "$tmp_pat"
             if [ -n "$PAT" ] && [ ${#PAT} -gt 10 ]; then
                 echo -e "${GREEN}Admin PAT retrieved successfully${NC}" >&2
                 echo "$PAT"
@@ -99,6 +153,7 @@ get_admin_pat() {
         echo "  Attempt $i/$MAX_RETRIES - PAT not available yet..." >&2
         sleep $RETRY_INTERVAL
     done
+    rm -f "$tmp_pat"
     echo -e "${RED}Failed to get admin PAT${NC}" >&2
     exit 1
 }
@@ -146,7 +201,10 @@ create_project() {
 
     if [ -n "$existing_id" ]; then
         echo -e "${GREEN}Project already exists with ID: $existing_id${NC}" >&2
-        # Ensure projectRoleAssertion is enabled (required for role claims in tokens)
+        # Ensure projectRoleAssertion is enabled (required for role claims in tokens).
+        # Use curl -s (not -sf) so we can parse 4xx response bodies — Zitadel returns
+        # failed_precondition when the setting is already enabled, which is not an error here.
+        # With set -e, var=$(curl -sf …) aborts the script on 4xx before the elif runs.
         local update_result
         update_result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/UpdateProject" \
             -H "Authorization: Bearer $pat" \
@@ -224,7 +282,7 @@ create_roles() {
         result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.project.v2.ProjectService/AddProjectRole" \
             -H "Authorization: Bearer $pat" \
             -H "Connect-Protocol-Version: 1" \
-        -H "Content-Type: application/json" \
+            -H "Content-Type: application/json" \
             -d "{\"projectId\": \"${project_id}\", \"roleKey\": \"${role}\", \"displayName\": \"${role}\"}")
 
         if echo "$result" | jq -e '.creationDate' > /dev/null 2>&1; then
@@ -250,12 +308,28 @@ resolve_env_file() {
     echo ""
 }
 
-# Function to get existing client secret from .env file
+# Function to get existing client secret from .env file.
+# Dynamically discovers sibling project directories.
 get_existing_client_secret() {
     local client_id="$1"
     local existing_secret=""
 
-    for base_dir in "$PROJECT_DIR" "${PROJECT_DIR}/../LiturgicalCalendarFrontend" "${PROJECT_DIR}/../UnitTestInterface"; do
+    # Build a deduplicated list of candidate directories
+    local -A seen_dirs
+    local candidates=()
+    for candidate in "$PROJECT_DIR" \
+                     "$PROJECT_DIR/../LiturgicalCalendarAPI" \
+                     "$PROJECT_DIR/../LiturgicalCalendarFrontend" \
+                     "$PROJECT_DIR/../UnitTestInterface"; do
+        local resolved
+        resolved=$(cd "$candidate" 2>/dev/null && pwd) || continue
+        if [ -z "${seen_dirs[$resolved]+x}" ]; then
+            seen_dirs[$resolved]=1
+            candidates+=("$candidate")
+        fi
+    done
+
+    for base_dir in "${candidates[@]}"; do
         local env_file
         env_file=$(resolve_env_file "$base_dir")
         if [ -n "$env_file" ]; then
@@ -317,17 +391,18 @@ create_oidc_app() {
             secret_result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/GenerateClientSecret" \
                 -H "Authorization: Bearer $pat" \
                 -H "Connect-Protocol-Version: 1" \
-        -H "Content-Type: application/json" \
+                -H "Content-Type: application/json" \
                 -d "{\"applicationId\": \"${existing_id}\", \"projectId\": \"${project_id}\"}")
             client_secret=$(echo "$secret_result" | jq -r '.clientSecret // empty')
         fi
 
-        # Update config
+        # Update config. Use curl -s (not -sf) so the failed_precondition body is parseable
+        # when the OIDC config is already up to date (treated as success below).
         local update_result
         update_result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/UpdateApplication" \
             -H "Authorization: Bearer $pat" \
             -H "Connect-Protocol-Version: 1" \
-        -H "Content-Type: application/json" \
+            -H "Content-Type: application/json" \
             -d "{
                 \"projectId\": \"${project_id}\",
                 \"applicationId\": \"${existing_id}\",
@@ -378,7 +453,6 @@ create_oidc_app() {
                 \"accessTokenType\": \"OIDC_TOKEN_TYPE_JWT\",
                 \"developmentMode\": true,
                 \"idTokenRoleAssertion\": true,
-                \"accessTokenRoleAssertion\": true,
                 \"idTokenUserinfoAssertion\": true
             }
         }")
@@ -393,7 +467,8 @@ create_oidc_app() {
     if [ -n "$client_id" ]; then
         echo -e "${GREEN}App created successfully${NC}" >&2
         # CreateApplication silently ignores accessTokenRoleAssertion,
-        # so set it via a follow-up UpdateApplication call
+        # so set it via a follow-up UpdateApplication call.
+        # Use curl -s (not -sf) so a failed_precondition body (already enabled) stays parseable.
         local update_assertion
         update_assertion=$(curl -s -X POST "${ZITADEL_URL}/zitadel.application.v2.ApplicationService/UpdateApplication" \
             -H "Authorization: Bearer $pat" \
@@ -411,81 +486,6 @@ create_oidc_app() {
         echo "${client_id}:${client_secret}"
     else
         echo -e "${RED}Failed to create app: $result${NC}" >&2
-        exit 1
-    fi
-}
-
-# Function to update .env file
-update_env_file() {
-    local file="$1"
-    local key="$2"
-    local value="$3"
-
-    if [ ! -f "$file" ]; then
-        echo -e "${YELLOW}Creating $file${NC}"
-        touch "$file"
-    fi
-
-    if grep -q "^${key}=" "$file" 2>/dev/null; then
-        if [[ "$OSTYPE" == "darwin"* ]]; then
-            sed -i '' "s|^${key}=.*|${key}=${value}|" "$file"
-        else
-            sed -i "s|^${key}=.*|${key}=${value}|" "$file"
-        fi
-    else
-        echo "${key}=${value}" >> "$file"
-    fi
-}
-
-# Function to create a service account (machine user) for tests
-create_test_service_account() {
-    local pat="$1"
-    local org_id="$2"
-    local username="test-service-account"
-    local display_name="Test Service Account"
-
-    echo -e "${YELLOW}Creating test service account...${NC}" >&2
-
-    # Check if machine user already exists
-    local existing
-    existing=$(curl -s -X POST "${ZITADEL_URL}/v2/users" \
-        -H "Authorization: Bearer $pat" \
-        -H "Connect-Protocol-Version: 1" \
-        -H "Content-Type: application/json" \
-        -d "{\"queries\": [{\"user_name_query\": {\"userName\": \"${username}\", \"method\": \"TEXT_QUERY_METHOD_EQUALS\"}}, {\"organization_id_query\": {\"organizationId\": \"${org_id}\"}}]}")
-
-    local existing_id
-    existing_id=$(echo "$existing" | jq -r '.result[0].userId // empty')
-
-    if [ -n "$existing_id" ]; then
-        echo -e "${GREEN}Service account already exists with ID: $existing_id${NC}" >&2
-        echo "$existing_id"
-        return 0
-    fi
-
-    # Create machine user
-    local result
-    result=$(curl -s -X POST "${ZITADEL_URL}/v2/users/new" \
-        -H "Authorization: Bearer $pat" \
-        -H "Connect-Protocol-Version: 1" \
-        -H "Content-Type: application/json" \
-        -d "{
-            \"username\": \"${username}\",
-            \"organizationId\": \"${org_id}\",
-            \"machine\": {
-                \"name\": \"${display_name}\",
-                \"accessTokenType\": \"ACCESS_TOKEN_TYPE_JWT\"
-            }
-        }")
-
-    local user_id
-    user_id=$(echo "$result" | jq -r '.id // empty')
-
-    if [ -n "$user_id" ]; then
-        echo -e "${GREEN}Service account created with ID: $user_id${NC}" >&2
-        echo "$user_id"
-    else
-        echo -e "${RED}Failed to create service account: $result${NC}" >&2
         exit 1
     fi
 }
@@ -568,6 +568,59 @@ assign_project_role() {
     fi
 }
 
+# Function to create a service account (machine user) for tests
+create_test_service_account() {
+    local pat="$1"
+    local org_id="$2"
+    local username="test-service-account"
+    local display_name="Test Service Account"
+
+    echo -e "${YELLOW}Creating test service account...${NC}" >&2
+
+    # Check if machine user already exists
+    local existing
+    existing=$(curl -s -X POST "${ZITADEL_URL}/v2/users" \
+        -H "Authorization: Bearer $pat" \
+        -H "Connect-Protocol-Version: 1" \
+        -H "Content-Type: application/json" \
+        -d "{\"queries\": [{\"user_name_query\": {\"userName\": \"${username}\", \"method\": \"TEXT_QUERY_METHOD_EQUALS\"}}, {\"organization_id_query\": {\"organizationId\": \"${org_id}\"}}]}")
+
+    local existing_id
+    existing_id=$(echo "$existing" | jq -r '.result[0].userId // empty')
+
+    if [ -n "$existing_id" ]; then
+        echo -e "${GREEN}Service account already exists with ID: $existing_id${NC}" >&2
+        echo "$existing_id"
+        return 0
+    fi
+
+    # Create machine user
+    local result
+    result=$(curl -s -X POST "${ZITADEL_URL}/v2/users/new" \
+        -H "Authorization: Bearer $pat" \
+        -H "Connect-Protocol-Version: 1" \
+        -H "Content-Type: application/json" \
+        -d "{
+            \"username\": \"${username}\",
+            \"organizationId\": \"${org_id}\",
+            \"machine\": {
+                \"name\": \"${display_name}\",
+                \"accessTokenType\": \"ACCESS_TOKEN_TYPE_JWT\"
+            }
+        }")
+
+    local user_id
+    user_id=$(echo "$result" | jq -r '.id // empty')
+
+    if [ -n "$user_id" ]; then
+        echo -e "${GREEN}Service account created with ID: $user_id${NC}" >&2
+        echo "$user_id"
+    else
+        echo -e "${RED}Failed to create service account: $result${NC}" >&2
+        exit 1
+    fi
+}
+
 # Function to assign an org-level role to a user via the v2 InternalPermissionService
 # Required for Management API access (e.g., user lookups, grant management)
 assign_org_role() {
@@ -578,6 +631,8 @@ assign_org_role() {
 
     echo -e "${YELLOW}Assigning org role '${role}' to user ${user_id}...${NC}" >&2
 
+    # Use curl -s (not -sf) so the already_exists body stays parseable when the role
+    # is already assigned — that case is treated as success below.
     local result
     result=$(curl -s -X POST "${ZITADEL_URL}/zitadel.internal_permission.v2.InternalPermissionService/CreateAdministrator" \
         -H "Authorization: Bearer $pat" \
@@ -605,11 +660,30 @@ create_service_account_pat() {
     local user_id="$2"
     local pat_file="${PROJECT_DIR}/service-account.pat"
 
-    # Reuse existing PAT file unless --force-secrets is set
+    # Reuse existing PAT file unless --force-secrets is set, but only if the
+    # cached token still works against the current Zitadel instance. Without
+    # this check, a `docker compose down -v` followed by `setup-zitadel.sh
+    # --update-env` would silently propagate a stale PAT (the local file
+    # outlives the wiped Zitadel state) into .env, leaving the API unable
+    # to auth — with no error from this script.
     if [ -f "$pat_file" ] && [ "$FORCE_SECRETS" != "true" ]; then
-        echo -e "${GREEN}PAT file already exists (use --force-secrets to regenerate)${NC}" >&2
-        cat "$pat_file"
-        return 0
+        local cached_pat
+        cached_pat=$(cat "$pat_file")
+        local verify_status
+        verify_status=$(curl -s -o /dev/null -w "%{http_code}" \
+            -X POST "${ZITADEL_URL}/management/v1/users/_search" \
+            -H "Authorization: Bearer $cached_pat" \
+            -H "Content-Type: application/json" \
+            -d '{"limit":1}')
+        # Anything other than 401 (Errors.Token.Invalid) means Zitadel
+        # recognises the token; 403/500/network errors aren't auto-fixable
+        # by regenerating, so trust the cache in those cases.
+        if [ "$verify_status" != "401" ]; then
+            echo -e "${GREEN}PAT file already exists and is valid (use --force-secrets to regenerate)${NC}" >&2
+            echo "$cached_pat"
+            return 0
+        fi
+        echo -e "${YELLOW}Cached PAT in $pat_file is stale (Zitadel returned 401); regenerating...${NC}" >&2
     fi
 
     echo -e "${YELLOW}Creating PAT for service account ${user_id}...${NC}" >&2
@@ -683,6 +757,42 @@ generate_service_account_key() {
     fi
 }
 
+# Function to update .env file
+update_env_file() {
+    local file="$1"
+    local key="$2"
+    local value="$3"
+
+    if [ ! -f "$file" ]; then
+        echo -e "${YELLOW}Creating $file${NC}"
+        touch "$file"
+    fi
+
+    if grep -q "^${key}=" "$file" 2>/dev/null; then
+        # Escape characters that sed would otherwise interpret in the replacement:
+        # backslash first, then ampersand, then the chosen delimiter '|'.
+        local escaped_value="${value//\\/\\\\}"
+        escaped_value="${escaped_value//&/\\&}"
+        escaped_value="${escaped_value//|/\\|}"
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            sed -i '' "s|^${key}=.*|${key}=${escaped_value}|" "$file"
+        else
+            sed -i "s|^${key}=.*|${key}=${escaped_value}|" "$file"
+        fi
+    else
+        echo "${key}=${value}" >> "$file"
+    fi
+}
+
+# Detect whether this repo is the API (has src/Router.php) or something else
+detect_self_label() {
+    if [ -f "${PROJECT_DIR}/src/Router.php" ]; then
+        echo "API"
+    else
+        echo "Frontend"
+    fi
+}
+
 # Main execution
 main() {
     # Handle --docker-init: start Docker stack if not running
@@ -723,6 +833,8 @@ main() {
     ADMIN_USER_ID=$(echo "$root_user_result" | jq -r '.result[0].userId // empty')
     if [ -n "$ADMIN_USER_ID" ]; then
         assign_project_role "$PAT" "$PROJECT_ID" "$ORG_ID" "$ADMIN_USER_ID" "admin"
+    else
+        echo -e "${YELLOW}Warning: root user not found — admin role not assigned (Zitadel: ${ZITADEL_URL}, Project: ${PROJECT_ID})${NC}" >&2
     fi
 
     # Create test service account
@@ -773,12 +885,46 @@ main() {
     if [[ "$UPDATE_ENV" == "true" ]]; then
         echo -e "${YELLOW}Updating environment files...${NC}"
 
+        # Write docker-compose .env when docker-compose.yml exists in PROJECT_DIR
+        if [ -f "${PROJECT_DIR}/docker-compose.yml" ] || [ -f "${PROJECT_DIR}/docker-compose.yaml" ]; then
+            local compose_env="${PROJECT_DIR}/.env"
+            update_env_file "$compose_env" "ZITADEL_ISSUER" "${ZITADEL_URL}"
+            update_env_file "$compose_env" "ZITADEL_CLIENT_ID" "$FRONTEND_CLIENT_ID"
+            update_env_file "$compose_env" "ZITADEL_PROJECT_ID" "$PROJECT_ID"
+            update_env_file "$compose_env" "ZITADEL_MACHINE_TOKEN" "$SERVICE_ACCOUNT_PAT"
+            echo -e "${GREEN}Updated compose .env: $compose_env${NC}"
+        fi
+
+        # Detect self-label to avoid duplicate entries
+        local self_label
+        self_label=$(detect_self_label)
+
+        # Build a dynamic projects list by discovering sibling directories
+        local -A seen_projects
+        local projects=()
+
+        # Always include self
+        local self_resolved
+        self_resolved=$(cd "$PROJECT_DIR" && pwd)
+        seen_projects[$self_resolved]=1
+        projects+=("${self_label}:${PROJECT_DIR}")
+
+        # Discover siblings
+        for candidate_info in \
+            "API:${PROJECT_DIR}/../LiturgicalCalendarAPI" \
+            "Frontend:${PROJECT_DIR}/../LiturgicalCalendarFrontend" \
+            "Tests:${PROJECT_DIR}/../UnitTestInterface"; do
+            local label="${candidate_info%%:*}"
+            local dir="${candidate_info#*:}"
+            local resolved
+            resolved=$(cd "$dir" 2>/dev/null && pwd) || continue
+            if [ -z "${seen_projects[$resolved]+x}" ]; then
+                seen_projects[$resolved]=1
+                projects+=("${label}:${dir}")
+            fi
+        done
+
         # Update each project's .env file (finds .env.local, .env.development, or .env)
-        local projects=(
-            "API:${PROJECT_DIR}"
-            "Frontend:${PROJECT_DIR}/../LiturgicalCalendarFrontend"
-            "Tests:${PROJECT_DIR}/../UnitTestInterface"
-        )
         for entry in "${projects[@]}"; do
             local label="${entry%%:*}"
             local dir="${entry#*:}"
@@ -813,7 +959,45 @@ main() {
 
         echo
         echo -e "${GREEN}Environment files updated!${NC}"
-        echo -e "${YELLOW}Remember to restart the API server to pick up the new credentials.${NC}"
+
+        # Run OpenFGA setup if the service is available
+        # Look for the script in the current repo first, then in the API sibling
+        local openfga_script=""
+        for candidate in "${SCRIPT_DIR}/setup-openfga.sh" "${SCRIPT_DIR}/../../LiturgicalCalendarAPI/scripts/setup-openfga.sh"; do
+            if [ -f "$candidate" ]; then
+                openfga_script="$candidate"
+                break
+            fi
+        done
+        if [ -n "$openfga_script" ]; then
+            local openfga_url="${OPENFGA_API_URL:-http://localhost:${OPENFGA_HTTP_PORT:-8083}}"
+            if curl -sf "${openfga_url}/healthz" > /dev/null 2>&1; then
+                echo
+                echo -e "${YELLOW}Running OpenFGA setup...${NC}"
+                bash "$openfga_script" --update-env
+            else
+                echo -e "${YELLOW}OpenFGA not available at ${openfga_url} — skipping setup${NC}"
+            fi
+        fi
+
+        # Handle Docker container recreation
+        if [[ "$DOCKER_INIT" == "true" ]]; then
+            if is_stack_running; then
+                recreate_app_containers
+            fi
+        elif [ -t 0 ]; then
+            if is_stack_running; then
+                echo -e "${YELLOW}App containers are running with stale credentials.${NC}"
+                read -p "Recreate app containers to pick up new credentials? (Y/n) " -n 1 -r
+                echo
+                if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+                    recreate_app_containers
+                fi
+            fi
+        else
+            echo -e "${YELLOW}Remember to restart app services to pick up the new credentials.${NC}"
+            echo -e "${YELLOW}Run: docker compose up -d --force-recreate <services>${NC}"
+        fi
     else
         echo -e "${YELLOW}To automatically update .env files, run with --update-env flag${NC}"
         echo

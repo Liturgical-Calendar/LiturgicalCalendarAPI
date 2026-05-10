@@ -1,14 +1,17 @@
 # LiturgicalCalendar Infrastructure
-# This Docker Compose file sets up Zitadel (identity provider) with Login V2 and PostgreSQL
-# for the RBAC and registration system.
+# This Docker Compose file sets up Zitadel (identity provider) with Login V2, PostgreSQL,
+# and OpenFGA (fine-grained authorization) for the RBAC and registration system.
 #
 # Usage:
 #   docker compose up -d              # Start all services
 #   docker compose down               # Stop all services
 #   docker compose logs -f zitadel    # View Zitadel logs
+#   docker compose logs -f openfga    # View OpenFGA logs
 #
-# After starting, access Zitadel Console at: http://localhost:8080/ui/console
-# Default admin: root@LiturgicalCalendar.localhost / RootPassword1!
+# After starting:
+#   Zitadel Console: http://localhost:8080/ui/console
+#   OpenFGA Playground: http://localhost:3001
+#   Default admin: root@LiturgicalCalendar.localhost / RootPassword1!
 
 services:
   zitadel:
@@ -161,7 +164,7 @@ services:
       - 127.0.0.1:${DB_PORT:-5432}:5432
     volumes:
       - postgres_data:/var/lib/postgresql/data:rw
-      - ./infrastructure/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
 
   # Adminer - Database management UI
   # Access at: http://localhost:8088
@@ -192,6 +195,53 @@ services:
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
     networks:
       - zitadel
+
+  # OpenFGA - Fine-grained authorization engine (Google Zanzibar implementation)
+  # Provides relationship-based access control for calendar-specific permissions.
+  # HTTP API: http://localhost:3001 (Playground), http://localhost:8083 (API)
+  # Pin to a specific version for reproducible deployments.
+  openfga-migrate:
+    image: openfga/openfga:v1.8.12
+    command: migrate
+    environment:
+      OPENFGA_DATASTORE_ENGINE: postgres
+      OPENFGA_DATASTORE_URI: postgres://${OPENFGA_DB_USER:-openfga}:${OPENFGA_DB_PASSWORD:-openfga_secure_password}@db:5432/${OPENFGA_DB_NAME:-openfga}?sslmode=disable
+    networks:
+      - zitadel
+    depends_on:
+      db:
+        condition: service_healthy
+
+  openfga:
+    restart: unless-stopped
+    image: openfga/openfga:v1.8.12
+    command: run
+    environment:
+      OPENFGA_DATASTORE_ENGINE: postgres
+      OPENFGA_DATASTORE_URI: postgres://${OPENFGA_DB_USER:-openfga}:${OPENFGA_DB_PASSWORD:-openfga_secure_password}@db:5432/${OPENFGA_DB_NAME:-openfga}?sslmode=disable
+      # Secure-by-default: Playground UI is OFF and auth is OFF. Local dev should
+      # set OPENFGA_PLAYGROUND_ENABLED=true in .env.local to use the Playground.
+      # Production deployments must set OPENFGA_AUTHN_METHOD=preshared and
+      # OPENFGA_AUTHN_PRESHARED_KEYS=<key1>[,<key2>] (and configure the API with
+      # OPENFGA_API_TOKEN matching one of those keys).
+      OPENFGA_PLAYGROUND_ENABLED: "${OPENFGA_PLAYGROUND_ENABLED:-false}"
+      OPENFGA_AUTHN_METHOD: "${OPENFGA_AUTHN_METHOD:-none}"
+      OPENFGA_AUTHN_PRESHARED_KEYS: "${OPENFGA_AUTHN_PRESHARED_KEYS:-}"
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/grpc_health_probe", "-addr=localhost:8081"]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 10s
+    ports:
+      - 127.0.0.1:${OPENFGA_HTTP_PORT:-8083}:8080
+      - 127.0.0.1:${OPENFGA_GRPC_PORT:-8084}:8081
+      - 127.0.0.1:${OPENFGA_PLAYGROUND_PORT:-3001}:3000
+    networks:
+      - zitadel
+    depends_on:
+      openfga-migrate:
+        condition: service_completed_successfully
 
 networks:
   zitadel:

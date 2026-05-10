@@ -1,0 +1,76 @@
+{
+  "schema_version": "1.1",
+  "type_definitions": [
+    {
+      "type": "user"
+    },
+    {
+      "type": "wider_region",
+      "relations": {
+        "admin": { "this": {} },
+        "viewer": { "this": {} },
+        "editor": { "this": {} },
+        "deleter": { "this": {} }
+      },
+      "metadata": {
+        "relations": {
+          "admin":   { "directly_related_user_types": [{ "type": "user" }] },
+          "viewer":  { "directly_related_user_types": [{ "type": "user" }] },
+          "editor":  { "directly_related_user_types": [{ "type": "user" }] },
+          "deleter": { "directly_related_user_types": [{ "type": "user" }] }
+        }
+      }
+    },
+    {
+      "type": "national_calendar",
+      "relations": {
+        "admin": { "this": {} },
+        "viewer": { "this": {} },
+        "editor": { "this": {} },
+        "deleter": { "this": {} }
+      },
+      "metadata": {
+        "relations": {
+          "admin":   { "directly_related_user_types": [{ "type": "user" }] },
+          "viewer":  { "directly_related_user_types": [{ "type": "user" }] },
+          "editor":  { "directly_related_user_types": [{ "type": "user" }] },
+          "deleter": { "directly_related_user_types": [{ "type": "user" }] }
+        }
+      }
+    },
+    {
+      "type": "diocesan_calendar",
+      "relations": {
+        "admin": { "this": {} },
+        "viewer": { "this": {} },
+        "editor": { "this": {} },
+        "deleter": { "this": {} }
+      },
+      "metadata": {
+        "relations": {
+          "admin":   { "directly_related_user_types": [{ "type": "user" }] },
+          "viewer":  { "directly_related_user_types": [{ "type": "user" }] },
+          "editor":  { "directly_related_user_types": [{ "type": "user" }] },
+          "deleter": { "directly_related_user_types": [{ "type": "user" }] }
+        }
+      }
+    },
+    {
+      "type": "test_definition",
+      "relations": {
+        "admin": { "this": {} },
+        "viewer": { "this": {} },
+        "editor": { "this": {} },
+        "deleter": { "this": {} }
+      },
+      "metadata": {
+        "relations": {
+          "admin":   { "directly_related_user_types": [{ "type": "user" }] },
+          "viewer":  { "directly_related_user_types": [{ "type": "user" }] },
+          "editor":  { "directly_related_user_types": [{ "type": "user" }] },
+          "deleter": { "directly_related_user_types": [{ "type": "user" }] }
+        }
+      }
+    }
+  ]
+}

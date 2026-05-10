@@ -8,9 +8,7 @@ use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\CacheDuration;
-use LiturgicalCalendar\Api\Enum\CalendarType;
 use LiturgicalCalendar\Api\Enum\PathCategory;
-use LiturgicalCalendar\Api\Enum\PermissionLevel;
 use LiturgicalCalendar\Api\Handlers\CalendarHandler;
 use LiturgicalCalendar\Api\Handlers\EasterHandler;
 use LiturgicalCalendar\Api\Handlers\EventsHandler;
@@ -25,11 +23,12 @@ use LiturgicalCalendar\Api\Handlers\Auth\LoginHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\LogoutHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\MeHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\RefreshHandler;
-use LiturgicalCalendar\Api\Handlers\Auth\RoleRequestHandler;
+use LiturgicalCalendar\Api\Handlers\Auth\AccessRequestHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\EmailVerificationHandler;
+use LiturgicalCalendar\Api\Handlers\Admin\AccessRequestAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\ApplicationAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\NotificationsHandler;
-use LiturgicalCalendar\Api\Handlers\Admin\RoleRequestAdminHandler;
+use LiturgicalCalendar\Api\Handlers\Admin\PermissionAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\UsersHandler;
 use LiturgicalCalendar\Api\Handlers\ApplicationsHandler;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
@@ -38,13 +37,15 @@ use LiturgicalCalendar\Api\Http\Middleware\AuthorizationMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\ErrorHandlingMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\HttpsEnforcementMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\JwtAuthMiddleware;
+use LiturgicalCalendar\Api\Http\Middleware\JsonBodyParserMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\LoggingMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\ApiKeyMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\ApiKeyRateLimitMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAvailabilityMiddleware;
+use LiturgicalCalendar\Api\Http\Middleware\OpenFgaAuthorizationMiddleware;
 use LiturgicalCalendar\Api\Database\Connection;
-use LiturgicalCalendar\Api\Repositories\CalendarPermissionRepository;
+use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Http\Server\MiddlewarePipeline;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
@@ -338,13 +339,13 @@ class Router
                     } elseif ($authRoute === 'me') {
                         $meHandler     = new MeHandler();
                         $this->handler = $meHandler;
-                    } elseif ($authRoute === 'role-requests') {
-                        // Role request routes for authenticated users
-                        // POST /auth/role-requests - Create new request
-                        // GET /auth/role-requests - Get user's own requests
-                        // GET /auth/role-requests/status - Check if user needs to request a role
-                        $roleRequestHandler = new RoleRequestHandler();
-                        $this->handler      = $roleRequestHandler;
+                    } elseif ($authRoute === 'access-requests') {
+                        // Unified access request routes for authenticated users
+                        // POST /auth/access-requests - Submit access request (role + permissions)
+                        // GET /auth/access-requests - View own requests
+                        // GET /auth/access-requests/status - Check access status
+                        $accessRequestHandler = new AccessRequestHandler();
+                        $this->handler        = $accessRequestHandler;
                     } elseif ($authRoute === 'email-verification') {
                         // Email verification routes for authenticated users
                         // POST /auth/email-verification/resend - Resend verification email
@@ -363,13 +364,14 @@ class Router
                 // Handle admin routes
                 if (count($requestPathParts) >= 1) {
                     $adminRoute = $requestPathParts[0];
-                    if ($adminRoute === 'role-requests') {
-                        // Admin role request management routes
-                        // GET /admin/role-requests - List all pending requests
-                        // POST /admin/role-requests/{id}/approve - Approve a request
-                        // POST /admin/role-requests/{id}/reject - Reject a request
-                        $roleRequestAdminHandler = new RoleRequestAdminHandler();
-                        $this->handler           = $roleRequestAdminHandler;
+                    if ($adminRoute === 'access-requests') {
+                        // Unified access request management routes
+                        // GET  /admin/access-requests - List requests
+                        // POST /admin/access-requests/{id}/approve - Approve (role + tuples)
+                        // POST /admin/access-requests/{id}/reject - Reject
+                        // POST /admin/access-requests/{id}/revoke - Revoke (role + tuples)
+                        $accessRequestAdminHandler = new AccessRequestAdminHandler();
+                        $this->handler             = $accessRequestAdminHandler;
                     } elseif ($adminRoute === 'notifications') {
                         // Admin notifications route
                         // GET /admin/notifications - Get counts of pending items
@@ -381,6 +383,14 @@ class Router
                         // DELETE /admin/users/{userId}/roles/{role} - Revoke a role
                         $usersHandler  = new UsersHandler();
                         $this->handler = $usersHandler;
+                    } elseif ($adminRoute === 'permissions') {
+                        // Admin permission management routes (OpenFGA)
+                        // GET    /admin/permissions       - List permissions (with filters)
+                        // POST   /admin/permissions       - Grant permission
+                        // DELETE /admin/permissions       - Revoke permission
+                        // GET    /admin/permissions/check - Check a specific permission
+                        $permissionAdminHandler = new PermissionAdminHandler();
+                        $this->handler          = $permissionAdminHandler;
                     } elseif ($adminRoute === 'applications') {
                         // Admin application management routes
                         // GET /admin/applications - List all applications (optional status filter)
@@ -520,6 +530,9 @@ class Router
         $pipeline->pipe(new ErrorHandlingMiddleware($this->psr17Factory, self::$debug, $allowedOrigins)); // outermost middleware
         $pipeline->pipe(new LoggingMiddleware(self::$debug));
 
+        // Parse JSON request bodies into getParsedBody() for all routes
+        $pipeline->pipe(new JsonBodyParserMiddleware());
+
         // Apply API key validation and rate limiting for public API routes
         if (!in_array($route, ['auth', 'admin', 'applications'], true)) {
             if (Connection::isConfigured()) {
@@ -540,10 +553,10 @@ class Router
             $pipeline->pipe(new HttpsEnforcementMiddleware());
         }
 
-        // Apply OIDC authentication for auth routes (role-requests, email-verification), admin, and applications
+        // Apply OIDC authentication for auth routes (access-requests, email-verification), admin, and applications
         // These routes need the oidc_user attribute set before the handler checks authentication
         if (
-            ( $route === 'auth' && count($requestPathParts) >= 1 && in_array($requestPathParts[0], ['role-requests', 'email-verification'], true) )
+            ( $route === 'auth' && count($requestPathParts) >= 1 && in_array($requestPathParts[0], ['access-requests', 'email-verification'], true) )
             || $route === 'admin'
             || $route === 'applications'
         ) {
@@ -596,51 +609,45 @@ class Router
         string $route,
         array $requestPathParts
     ): void {
-        if (!Connection::isConfigured()) {
-            // Add a middleware that throws at runtime instead of during pipeline setup,
-            // so the ErrorHandlingMiddleware can catch it and return a proper response.
-            $pipeline->pipe(new class () implements \Psr\Http\Server\MiddlewareInterface {
-                public function process(
-                    \Psr\Http\Message\ServerRequestInterface $request,
-                    \Psr\Http\Server\RequestHandlerInterface $handler
-                ): \Psr\Http\Message\ResponseInterface {
-                    throw new ServiceUnavailableException(
-                        'Database not configured. Protected routes require database connection.'
-                    );
-                }
-            });
-            return;
-        }
+        // Cache a single OpenFGA client for the pipeline (avoid multiple fromEnv calls)
+        $fgaClient = OpenFgaClient::isConfigured() ? OpenFgaClient::fromEnv() : null;
 
-        $permissionRepo = new CalendarPermissionRepository();
+        // OpenFgaAuthorizationMiddleware reads the 'oidc_user' attribute, which is
+        // only populated by OidcAuthMiddleware (including its JWT-fallback path).
+        // The pure JwtAuthMiddleware path does not set 'oidc_user', so skip the
+        // FGA middleware there to avoid an unconditional UnauthorizedException.
+        $oidcAvailable = self::isOidcConfigured();
 
-        // Determine required role and calendar type based on route
-        $calendarType = null;
-        if ($route === 'data' && count($requestPathParts) >= 2) {
-            $calendarType = match ($requestPathParts[0]) {
-                PathCategory::NATION->value      => CalendarType::NATIONAL,
-                PathCategory::DIOCESE->value     => CalendarType::DIOCESAN,
-                PathCategory::WIDERREGION->value => CalendarType::WIDERREGION,
-                default                          => null
-            };
-
-            // Set calendar_id attribute for AuthorizationMiddleware
-            $this->request = $this->request->withAttribute('calendar_id', $requestPathParts[1] ?? null);
-        }
-
+        // Role-based authorization (Zitadel roles)
         if ($route === 'data') {
-            $pipeline->pipe(new AuthorizationMiddleware(
-                $permissionRepo,
-                'calendar_editor',
-                $calendarType,
-                'calendar_id',
-                PermissionLevel::WRITE
-            ));
+            $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
+
+            // Set calendar_id attribute for OpenFGA check
+            if (count($requestPathParts) >= 2) {
+                $this->request = $this->request->withAttribute('calendar_id', $requestPathParts[1]);
+            }
+
+            // OpenFGA fine-grained authorization (runs after role check)
+            if ($oidcAvailable && $fgaClient !== null && count($requestPathParts) >= 2) {
+                $fgaMiddleware = OpenFgaAuthorizationMiddleware::forCalendarData(
+                    $fgaClient,
+                    $requestPathParts[0]
+                );
+                if ($fgaMiddleware !== null) {
+                    $pipeline->pipe($fgaMiddleware);
+                }
+            }
         } elseif ($route === 'tests') {
-            $pipeline->pipe(AuthorizationMiddleware::forTestEditor($permissionRepo));
+            $pipeline->pipe(AuthorizationMiddleware::forTestEditor());
+
+            // OpenFGA fine-grained authorization for test definitions
+            if ($oidcAvailable && $fgaClient !== null && count($requestPathParts) >= 1) {
+                $this->request = $this->request->withAttribute('test_id', $requestPathParts[0]);
+                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forTestDefinition($fgaClient));
+            }
         } elseif ($route === 'temporale') {
             // Temporale requires admin role (General Roman Calendar)
-            $pipeline->pipe(AuthorizationMiddleware::forAdmin($permissionRepo));
+            $pipeline->pipe(AuthorizationMiddleware::forAdmin());
         }
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace LiturgicalCalendar\Api\Tests\Services;
+namespace LiturgicalCalendar\Tests\Services;
 
 use LiturgicalCalendar\Api\Services\RateLimiter;
 use PHPUnit\Framework\TestCase;
