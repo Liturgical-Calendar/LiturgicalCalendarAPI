@@ -18,6 +18,14 @@ final class MigrateHandlerTest extends TestCase
     {
         parent::setUp();
 
+        if (!extension_loaded('pdo_sqlite')) {
+            $this->markTestSkipped(
+                'pdo_sqlite extension required for MigrateHandlerTest. '
+                . 'On Debian/Ubuntu: sudo apt-get install -y php8.4-sqlite3 '
+                . '&& sudo phpenmod -v 8.4 -s cli pdo_sqlite sqlite3.'
+            );
+        }
+
         // Each test gets a fresh in-memory sqlite DB. The handler config
         // (doctrine-migrations.php) declares migrations_paths pointing at
         // src/Migrations; for the unit test we provide a synthetic config
