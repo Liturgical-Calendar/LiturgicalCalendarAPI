@@ -44,20 +44,22 @@ class Connection
     /**
      * Check if a database connection is configured.
      *
-     * Returns true if the required environment variables are set,
-     * without actually attempting to connect.
+     * Returns true if the required environment variables are set in $_ENV
+     * (populated by Dotenv at bootstrap, and by PHP from the process env
+     * when variables_order includes "E"). Mirrors how JwtServiceFactory
+     * and other src/ env readers do it.
      */
     public static function isConfigured(): bool
     {
-        $host     = getenv('DB_HOST');
-        $name     = getenv('DB_NAME');
-        $user     = getenv('DB_USER');
-        $password = getenv('DB_PASSWORD');
+        $host     = $_ENV['DB_HOST'] ?? null;
+        $name     = $_ENV['DB_NAME'] ?? null;
+        $user     = $_ENV['DB_USER'] ?? null;
+        $password = $_ENV['DB_PASSWORD'] ?? null;
 
-        return $host !== false && $host !== ''
-            && $name !== false && $name !== ''
-            && $user !== false && $user !== ''
-            && $password !== false;
+        return is_string($host) && $host !== ''
+            && is_string($name) && $name !== ''
+            && is_string($user) && $user !== ''
+            && $password !== null;
     }
 
     /**
@@ -86,13 +88,14 @@ class Connection
      */
     private static function createConnection(): PDO
     {
-        $host     = getenv('DB_HOST');
-        $port     = getenv('DB_PORT') ?: '5432';
-        $name     = getenv('DB_NAME');
-        $user     = getenv('DB_USER');
-        $password = getenv('DB_PASSWORD');
+        $host     = $_ENV['DB_HOST'] ?? null;
+        $portRaw  = $_ENV['DB_PORT'] ?? '';
+        $port     = is_string($portRaw) && $portRaw !== '' ? $portRaw : '5432';
+        $name     = $_ENV['DB_NAME'] ?? null;
+        $user     = $_ENV['DB_USER'] ?? null;
+        $password = $_ENV['DB_PASSWORD'] ?? null;
 
-        if ($host === false || $name === false || $user === false || $password === false) {
+        if (!is_string($host) || !is_string($name) || !is_string($user) || !is_string($password)) {
             throw new RuntimeException(
                 'Database configuration missing. Required environment variables: ' .
                 'DB_HOST, DB_NAME, DB_USER, DB_PASSWORD'

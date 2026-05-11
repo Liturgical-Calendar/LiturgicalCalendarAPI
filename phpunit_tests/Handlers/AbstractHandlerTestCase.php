@@ -74,18 +74,6 @@ abstract class AbstractHandlerTestCase extends TestCase
                 return;
             }
 
-            // The project's bootstrap uses Dotenv::createMutable, which populates
-            // $_ENV but NOT the process env table that getenv() reads. Several
-            // singletons in src/ (notably Database\Connection::isConfigured())
-            // use getenv() and would treat the DB as unconfigured. Mirror the
-            // values into the process env so handler code reaches the right
-            // branch under test.
-            foreach (['DB_HOST' => $host, 'DB_PORT' => $port, 'DB_NAME' => $name, 'DB_USER' => $user, 'DB_PASSWORD' => $password] as $k => $v) {
-                if (getenv($k) === false || getenv($k) === '') {
-                    putenv("{$k}={$v}");
-                }
-            }
-
             try {
                 self::$pdo = new PDO(
                     sprintf('pgsql:host=%s;port=%s;dbname=%s', $host, $port, $name),
