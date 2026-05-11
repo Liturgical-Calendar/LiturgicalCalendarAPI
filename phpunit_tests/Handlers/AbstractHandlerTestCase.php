@@ -51,16 +51,24 @@ abstract class AbstractHandlerTestCase extends TestCase
      * to a known string value, even if it was uninitialised before setUp ran.
      * The typed-string property on Router can't accept null.
      */
-    private static string $savedApiPath = '';
+    private static string $savedApiPath     = '';
+    private static string $savedApiFilePath = '';
 
     public static function setUpBeforeClass(): void
     {
-        // Pin Router::$apiPath so handlers that read it (e.g. for building
-        // self-links) get a stable, predictable value in tests. isset() is
-        // false for typed-uninitialised properties, so we fall back to ''
+        // Pin Router::$apiPath + Router::$apiFilePath so handlers that read
+        // them (for self-links + JsonData::*->path() filesystem lookups)
+        // get stable, predictable values in tests. isset() is false for
+        // typed-uninitialised properties, so we fall back to defaults
         // rather than tripping an Error on the access.
-        self::$savedApiPath = isset(Router::$apiPath) ? Router::$apiPath : '';
-        Router::$apiPath    = '';
+        self::$savedApiPath     = isset(Router::$apiPath) ? Router::$apiPath : '';
+        self::$savedApiFilePath = isset(Router::$apiFilePath) ? Router::$apiFilePath : '';
+        Router::$apiPath        = '';
+        // apiFilePath is used as a prefix when JsonData enum cases build
+        // filesystem paths like '<root>/jsondata/schemas/Foo.json', so set
+        // it to the project root with a trailing slash, matching Router's
+        // production behaviour.
+        Router::$apiFilePath = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR;
 
         if (static::$requiresDatabase) {
             $host     = self::env('DB_HOST');
@@ -95,8 +103,9 @@ abstract class AbstractHandlerTestCase extends TestCase
 
     public static function tearDownAfterClass(): void
     {
-        self::$pdo       = null;
-        Router::$apiPath = self::$savedApiPath;
+        self::$pdo           = null;
+        Router::$apiPath     = self::$savedApiPath;
+        Router::$apiFilePath = self::$savedApiFilePath;
     }
 
     protected function setUp(): void
