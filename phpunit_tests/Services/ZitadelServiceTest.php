@@ -13,10 +13,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * ZitadelService builds its own Guzzle client in the constructor (no
- * injection seam). These tests swap the private `httpClient` property
- * via reflection with a MockHandler-backed Client so the HTTP
- * interactions can be exercised offline.
+ * The constructor takes an optional Guzzle Client (DI seam mirrored from
+ * OpenFgaClient); these tests pass a MockHandler-backed Client so the
+ * HTTP interactions can be exercised offline without reflection.
  */
 #[CoversClass(ZitadelService::class)]
 final class ZitadelServiceTest extends TestCase
@@ -61,20 +60,17 @@ final class ZitadelServiceTest extends TestCase
 
     private function makeService(MockHandler $mock): ZitadelService
     {
-        $svc = new ZitadelService(
-            'https://zitadel.test',
-            'project-123',
-            'machine-token',
-        );
-
         $stack  = HandlerStack::create($mock);
         $client = new Client(['handler' => $stack, 'base_uri' => 'https://zitadel.test']);
 
-        $refl = new \ReflectionClass($svc);
-        $prop = $refl->getProperty('httpClient');
-        $prop->setValue($svc, $client);
-
-        return $svc;
+        return new ZitadelService(
+            'https://zitadel.test',
+            'project-123',
+            'machine-token',
+            null,
+            null,
+            $client
+        );
     }
 
     public function testIsConfiguredFalseWhenAllMissing(): void
