@@ -41,5 +41,8 @@ infrastructure/*.env
 
 # Coverage and test-result artifacts produced by composer test:coverage
 coverage.xml
+coverage.merged.xml
+coverage/
 junit.xml
 .phpunit.cache/
+server.coverage.pid
