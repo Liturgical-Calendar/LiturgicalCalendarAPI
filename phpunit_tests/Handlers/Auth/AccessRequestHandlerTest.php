@@ -220,12 +220,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
 
         $response = ( new AccessRequestHandler() )->handle($request);
 
-        // The handler does `->withStatus(StatusCode::CREATED)` before encodeResponseBody,
-        // but encodeResponseBody defaults its $statusCode parameter to StatusCode::OK
-        // and overwrites the status, so the response ends up 200 — not the 201 the
-        // handler clearly intended. Asserting actual behavior here; a follow-up
-        // issue covers the fix.
-        self::assertSame(200, $response->getStatusCode());
+        self::assertSame(201, $response->getStatusCode());
         $body = $this->decodeJsonBody($response);
         self::assertTrue($body['success']);
         self::assertMatchesRegularExpression(

@@ -70,12 +70,16 @@ final class NotificationsHandlerTest extends AbstractHandlerTestCase
 
     public function testAdminGetsCountsWhenPendingItemsExist(): void
     {
+        // usleep between inserts so the rows have monotonically increasing
+        // created_at timestamps the handler can sort by.
         $accessRepo = new AccessRequestRepository(self::$pdo);
         $accessRepo->create('user-a', 'a@x.test', 'Alice', 'developer', []);
+        usleep(2000);
         $accessRepo->create('user-b', 'b@x.test', 'Bob', 'developer', []);
+        usleep(2000);
 
         $appRepo = new ApplicationRepository(self::$pdo);
-        $appRepo->create('user-c', 'AppC', 'desc', null, 'read'); // pending by default
+        $appRepo->create('user-c', 'AppC', 'desc', null, 'read'); // pending by default, newest
 
         $request  = $this->withOidcUser($this->requestFor('GET', '/admin/notifications'));
         $response = ( new NotificationsHandler() )->handle($request);
@@ -87,9 +91,15 @@ final class NotificationsHandlerTest extends AbstractHandlerTestCase
         self::assertSame(3, $body['total']);
         self::assertCount(3, $body['items']);
 
-        // Items contain both types and respect created_at ordering (descending).
+        // Verify items are returned newest-first by created_at, then assert
+        // the type sequence matches the insertion order in reverse: application
+        // was inserted last (so it's first), the two access_requests follow.
+        $timestamps = array_column($body['items'], 'created_at');
+        $sorted     = $timestamps;
+        rsort($sorted, SORT_STRING);
+        self::assertSame($sorted, $timestamps, 'Items must be sorted by created_at descending');
+
         $types = array_column($body['items'], 'type');
-        sort($types);
-        self::assertSame(['access_request', 'access_request', 'application'], $types);
+        self::assertSame(['application', 'access_request', 'access_request'], $types);
     }
 }

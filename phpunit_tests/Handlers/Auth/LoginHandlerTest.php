@@ -55,7 +55,11 @@ final class LoginHandlerTest extends AbstractHandlerTestCase
 
     public function testMissingBodyIsValidationError(): void
     {
-        $this->expectException(\Throwable::class); // ValidationException or UnsupportedMediaType
+        // Empty JSON body passes the Content-Type gate and reaches the
+        // empty-body check inside parseBodyParams(), which throws
+        // ValidationException with a specific message.
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Empty body content');
         ( new LoginHandler() )->handle($this->requestFor('POST', '/auth/login', ['Content-Type' => 'application/json'], ''));
     }
 

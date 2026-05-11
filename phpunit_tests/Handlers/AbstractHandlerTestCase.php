@@ -46,13 +46,20 @@ abstract class AbstractHandlerTestCase extends TestCase
      */
     protected static bool $requiresDatabase = false;
 
-    private static ?string $savedApiPath = null;
+    /**
+     * Default to '' so tearDownAfterClass can always restore Router::$apiPath
+     * to a known string value, even if it was uninitialised before setUp ran.
+     * The typed-string property on Router can't accept null.
+     */
+    private static string $savedApiPath = '';
 
     public static function setUpBeforeClass(): void
     {
         // Pin Router::$apiPath so handlers that read it (e.g. for building
-        // self-links) get a stable, predictable value in tests.
-        self::$savedApiPath = Router::$apiPath ?? null;
+        // self-links) get a stable, predictable value in tests. isset() is
+        // false for typed-uninitialised properties, so we fall back to ''
+        // rather than tripping an Error on the access.
+        self::$savedApiPath = isset(Router::$apiPath) ? Router::$apiPath : '';
         Router::$apiPath    = '';
 
         if (static::$requiresDatabase) {
@@ -100,10 +107,8 @@ abstract class AbstractHandlerTestCase extends TestCase
 
     public static function tearDownAfterClass(): void
     {
-        self::$pdo = null;
-        if (self::$savedApiPath !== null) {
-            Router::$apiPath = self::$savedApiPath;
-        }
+        self::$pdo       = null;
+        Router::$apiPath = self::$savedApiPath;
     }
 
     protected function setUp(): void
@@ -122,9 +127,11 @@ abstract class AbstractHandlerTestCase extends TestCase
         }
 
         // Confirm the JWT env is set up at least to the minimum the
-        // services need. Skipping (not failing) keeps the rest of the
-        // suite usable for devs without auth configured.
-        if (self::env('JWT_SECRET') === null) {
+        // services need (JwtServiceFactory::fromEnv rejects secrets
+        // shorter than 32 chars). Skipping (not failing) keeps the
+        // rest of the suite usable for devs without auth configured.
+        $secret = self::env('JWT_SECRET');
+        if ($secret === null || strlen($secret) < 32) {
             $this->markTestSkipped(
                 'Handler test requires JWT_SECRET (32+ chars) in env. '
                 . 'See CLAUDE.md for the recommended values.'

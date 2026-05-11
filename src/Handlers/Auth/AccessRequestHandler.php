@@ -280,13 +280,14 @@ final class AccessRequestHandler extends AbstractHandler
             is_string($credentials) ? $credentials : null
         );
 
-        $response = $response->withStatus(StatusCode::CREATED->value);
-
+        // encodeResponseBody overwrites the response status with its $statusCode
+        // argument (default OK), so the only effective way to emit 201 here is
+        // to pass it through rather than calling ->withStatus() first.
         return $this->encodeResponseBody($response, [
             'success'    => true,
             'request_id' => $requestId,
             'message'    => 'Access request submitted successfully. An administrator will review your request.',
-        ]);
+        ], StatusCode::CREATED);
     }
 
     /**
