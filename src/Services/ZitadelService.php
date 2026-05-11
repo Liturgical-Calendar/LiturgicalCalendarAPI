@@ -49,19 +49,29 @@ class ZitadelService
      * @param string|null $machineToken Service account token for management API
      * @param string|null $internalUrl Internal URL for Docker networking (e.g., http://zitadel:8080)
      * @param LoggerInterface|null $logger Optional logger for error logging
+     * @param Client|null $httpClient Pre-built Guzzle client (DI seam for testing).
+     *                                When provided, the issuer / internalUrl /
+     *                                Host-header wiring is skipped and the
+     *                                client is used as-is.
      */
     public function __construct(
         string $issuer,
         string $projectId,
         ?string $machineToken = null,
         ?string $internalUrl = null,
-        ?LoggerInterface $logger = null
+        ?LoggerInterface $logger = null,
+        ?Client $httpClient = null
     ) {
         $this->issuer       = rtrim($issuer, '/');
         $this->internalUrl  = $internalUrl !== null ? rtrim($internalUrl, '/') : null;
         $this->projectId    = $projectId;
         $this->machineToken = $machineToken;
         $this->logger       = $logger;
+
+        if ($httpClient !== null) {
+            $this->httpClient = $httpClient;
+            return;
+        }
 
         // Use internal URL for HTTP requests if configured (Docker networking)
         $baseUri       = $this->internalUrl ?? $this->issuer;
