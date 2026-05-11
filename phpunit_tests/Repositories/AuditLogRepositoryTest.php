@@ -18,12 +18,9 @@ final class AuditLogRepositoryTest extends RepositoryTestCase
         $this->repo = new AuditLogRepository(self::$pdo);
     }
 
-    public function testLogPersistsAllColumns(): void
+    public function testLogPersistsAllColumnsAndReturnsId(): void
     {
-        // log() casts the UUID PK to int, so the returned value is always 0
-        // in practice — that's a quirk of the existing API, not something
-        // this test should validate. Just verify the row was written.
-        $this->repo->log(
+        $id = $this->repo->log(
             'user-1',
             'create_application',
             'application',
@@ -34,8 +31,12 @@ final class AuditLogRepositoryTest extends RepositoryTestCase
             true
         );
 
+        // log() returns the UUID of the inserted row.
+        self::assertMatchesRegularExpression('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $id);
+
         $rows = $this->repo->query();
         self::assertCount(1, $rows);
+        self::assertSame($id, $rows[0]['id']);
         self::assertSame('user-1', $rows[0]['zitadel_user_id']);
         self::assertSame('create_application', $rows[0]['action']);
         self::assertSame('application', $rows[0]['resource_type']);
