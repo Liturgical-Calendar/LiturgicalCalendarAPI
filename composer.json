@@ -85,6 +85,8 @@
         "test": "phpunit --testdox --display-warnings",
         "test:quick": "phpunit --testdox --display-warnings --exclude-group slow",
         "test:coverage": "phpunit --display-warnings --coverage-clover coverage.xml --log-junit junit.xml",
+        "test:coverage:full": "./scripts/coverage-with-server.sh",
+        "coverage:merge": "@php scripts/merge-pcov-coverage.php coverage.xml coverage/pcov-server coverage.merged.xml",
         "start": "./start-server.sh",
         "stop": "./stop-server.sh",
         "ws:start": "./ws-start-server.sh",

@@ -95,8 +95,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gettext locales-all
 
-      - name: Start the PHP web server
+      - name: Start the PHP web server (instrumented with pcov)
+        # PCOV_SERVER_COVERAGE_DIR triggers the bootstrap hook in
+        # public/index.php that dumps per-request pcov data so HTTP integration
+        # tests in phpunit_tests/Routes/* contribute to the merged report
+        # (otherwise pcov sees only the PHPUnit process). The hook is also
+        # gated on APP_ENV=test, so it stays dormant in production.
         run: composer start
+        env:
+          PCOV_SERVER_COVERAGE_DIR: ${{ github.workspace }}/coverage/pcov-server
 
       - name: Wait for server PID and HTTP readiness
         id: server-check
@@ -130,6 +137,45 @@ jobs:
 
       - name: Run tests with coverage and JUnit output
         run: time composer test:coverage
+
+      - name: Stop the PHP web server
+        # Stop before merging so per-request shutdown handlers flush their
+        # final dump files (and so a stalled worker doesn't hold the job open).
+        if: ${{ !cancelled() }}
+        run: composer stop || true
+
+      - name: Merge server pcov dumps into the clover report
+        if: ${{ !cancelled() }}
+        # Folds the per-request coverage data captured by the dev-server
+        # bootstrap hook (public/index.php) into the in-process clover PHPUnit
+        # produced. After this step coverage.xml reflects both layers.
+        # The merger's stderr is tee'd into $GITHUB_STEP_SUMMARY so the
+        # "lifted N lines across M files" headline is visible on the run
+        # summary page without digging through job logs.
+        run: |
+          {
+            echo "## pcov server-side dump merge"
+            echo ""
+            if [ -d coverage/pcov-server ] && [ -n "$(ls -A coverage/pcov-server 2>/dev/null)" ]; then
+              echo '```'
+              php scripts/merge-pcov-coverage.php coverage.xml coverage/pcov-server coverage.merged.xml 2>&1
+              echo '```'
+              mv coverage.merged.xml coverage.xml
+            else
+              echo "_No server-side pcov dumps to merge; using PHPUnit coverage as-is._"
+            fi
+            echo ""
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Coverage summary
+        if: ${{ !cancelled() }}
+        # Emit a per-layer Markdown table from the merged clover so the
+        # project totals + bucket breakdown surface directly on the workflow
+        # run page (no Codecov round-trip needed).
+        run: |
+          if [ -f coverage.xml ]; then
+            php scripts/coverage-summary.php coverage.xml >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Upload coverage to Codecov
         if: ${{ !cancelled() }}
