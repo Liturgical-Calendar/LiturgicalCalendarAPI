@@ -11,7 +11,15 @@ if [ -f "ws-server.pid" ]; then
 fi
 
 
-php public/LitCalTestServer.php > /dev/null 2>&1 &
+# When the coverage harness is active (PCOV_SERVER_COVERAGE_DIR is exported by
+# scripts/coverage-with-server.sh or the CI workflow), enable pcov on the WS
+# server PHP process so the bootstrap hook in public/LitCalTestServer.php can
+# collect per-message coverage. No-op in normal development / production.
+if [ -n "${PCOV_SERVER_COVERAGE_DIR:-}" ]; then
+  php -d pcov.enabled=1 -d pcov.directory=src public/LitCalTestServer.php > /dev/null 2>&1 &
+else
+  php public/LitCalTestServer.php > /dev/null 2>&1 &
+fi
 
 # Save PID
 pid=$!
