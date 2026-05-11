@@ -63,4 +63,18 @@ final class CharsetTest extends TestCase
         $this->expectException(UnsupportedCharsetException::class);
         Charset::fromLabel('not-a-charset');
     }
+
+    public function testEmptyStringLabelRaises(): void
+    {
+        $this->expectException(UnsupportedCharsetException::class);
+        Charset::fromLabel('');
+    }
+
+    public function testWhitespaceOnlyLabelRaises(): void
+    {
+        // fromLabel() trims before matching, so whitespace-only collapses to ''
+        // and lands in the default arm.
+        $this->expectException(UnsupportedCharsetException::class);
+        Charset::fromLabel('   ');
+    }
 }

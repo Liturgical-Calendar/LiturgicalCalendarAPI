@@ -20,9 +20,6 @@ final class RouterTest extends TestCase
     /** @var array<string,mixed> */
     private array $savedServer = [];
 
-    /** @var array<string,mixed> */
-    private array $savedEnv = [];
-
     private const UNSET = "\0__unset__\0";
 
     private const SERVER_KEYS = [

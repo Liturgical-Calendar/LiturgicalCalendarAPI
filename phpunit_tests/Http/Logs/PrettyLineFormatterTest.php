@@ -77,8 +77,11 @@ final class PrettyLineFormatterTest extends TestCase
         $formatter = new PrettyLineFormatter();
         $message   = "\033[0;36mhello\033[0m";
         $output    = $formatter->format($this->makeRecord(Level::Info, $message));
-        // Should not have wrapped with an additional green colour code.
+        // The pre-coloured message must appear verbatim (cyan, not re-wrapped).
         self::assertStringContainsString($message, $output);
+        // And the Info-level green wrapper must NOT have been applied around it.
+        self::assertStringNotContainsString("\033[0;32m{$message}", $output);
+        self::assertStringNotContainsString("\033[0;32m{$message}\033[0m", $output);
     }
 
     public function testExtraFieldsAreRenderedPretty(): void

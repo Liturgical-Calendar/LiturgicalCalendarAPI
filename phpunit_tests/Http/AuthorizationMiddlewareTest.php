@@ -73,18 +73,47 @@ final class AuthorizationMiddlewareTest extends TestCase
         ( new AuthorizationMiddleware('calendar_editor') )->process($request, $this->handler());
     }
 
-    public function testFactoryHelpers(): void
+    /**
+     * @return iterable<string, array{0:\Closure():AuthorizationMiddleware,1:string,2:string}>
+     */
+    public static function factoryProvider(): iterable
     {
-        // Each factory should produce a middleware that accepts only its own role
-        // (or admin). We verify via a developer user against each.
-        $devRequest = $this->request()->withAttribute('oidc_user', ['sub' => 'u1', 'roles' => ['developer']]);
-        $editorReq  = $this->request()->withAttribute('oidc_user', ['sub' => 'u1', 'roles' => ['calendar_editor']]);
-        $testReq    = $this->request()->withAttribute('oidc_user', ['sub' => 'u1', 'roles' => ['test_editor']]);
-        $adminReq   = $this->request()->withAttribute('oidc_user', ['sub' => 'u1', 'roles' => ['admin']]);
+        // tuple = [factory closure, role that should be accepted, role that should NOT]
+        yield 'developer'       => [static fn (): AuthorizationMiddleware => AuthorizationMiddleware::forDeveloper(), 'developer', 'calendar_editor'];
+        yield 'calendar_editor' => [static fn (): AuthorizationMiddleware => AuthorizationMiddleware::forCalendarEditor(), 'calendar_editor', 'developer'];
+        yield 'test_editor'     => [static fn (): AuthorizationMiddleware => AuthorizationMiddleware::forTestEditor(), 'test_editor', 'developer'];
+        yield 'admin'           => [static fn (): AuthorizationMiddleware => AuthorizationMiddleware::forAdmin(), 'admin', 'developer'];
+    }
 
-        self::assertSame(200, AuthorizationMiddleware::forDeveloper()->process($devRequest, $this->handler())->getStatusCode());
-        self::assertSame(200, AuthorizationMiddleware::forCalendarEditor()->process($editorReq, $this->handler())->getStatusCode());
-        self::assertSame(200, AuthorizationMiddleware::forTestEditor()->process($testReq, $this->handler())->getStatusCode());
-        self::assertSame(200, AuthorizationMiddleware::forAdmin()->process($adminReq, $this->handler())->getStatusCode());
+    #[\PHPUnit\Framework\Attributes\DataProvider('factoryProvider')]
+    public function testFactoryAcceptsItsOwnRole(\Closure $make, string $allowed, string $denied): void
+    {
+        $request  = $this->request()->withAttribute('oidc_user', ['sub' => 'u1', 'roles' => [$allowed]]);
+        $response = $make()->process($request, $this->handler());
+        self::assertSame(200, $response->getStatusCode());
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('factoryProvider')]
+    public function testFactoryRejectsMismatchedRole(\Closure $make, string $allowed, string $denied): void
+    {
+        $request = $this->request()->withAttribute('oidc_user', ['sub' => 'u1', 'roles' => [$denied]]);
+        $this->expectException(ForbiddenException::class);
+        $make()->process($request, $this->handler());
+    }
+
+    public function testAllFactoriesLetAdminThrough(): void
+    {
+        // Admin role bypasses every factory's required-role check.
+        $adminReq = $this->request()->withAttribute('oidc_user', ['sub' => 'u1', 'roles' => ['admin']]);
+        foreach (
+            [
+                AuthorizationMiddleware::forDeveloper(),
+                AuthorizationMiddleware::forCalendarEditor(),
+                AuthorizationMiddleware::forTestEditor(),
+                AuthorizationMiddleware::forAdmin(),
+            ] as $mw
+        ) {
+            self::assertSame(200, $mw->process($adminReq, $this->handler())->getStatusCode());
+        }
     }
 }
