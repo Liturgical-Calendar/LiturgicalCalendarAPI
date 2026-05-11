@@ -134,10 +134,12 @@ jobs:
       contents: read
 ```
 
-`environment: ${target}` ties the run to a GitHub Environment. The production
-environment can be configured (in repo Settings) with required reviewers so
-prod deploys pause for manual confirmation before any SSH, without touching
-this workflow file.
+`environment: ${target}` ties the run to a GitHub Environment. Environments
+auto-create on first reference — no pre-setup required. If at any later
+point you want a manual-confirmation gate on production, add a required
+reviewer in repo Settings → Environments → production → Deployment
+protection rules. Toggleable without touching this workflow file or
+re-running anything.
 
 ### Steps (in order)
 
@@ -192,12 +194,15 @@ Steps 4–11 gate on `if: steps.shape.outputs.skip != 'true'`.
 
 ### Environments
 
-Two GitHub Environments:
+`staging` and `production` auto-create on first workflow dispatch — no
+manual setup needed unless you want one of the optional features:
 
-- `staging`: no required reviewers; secrets scoped here are visible only to
-  staging-target runs.
-- `production`: required-reviewer protection recommended (manual confirmation
-  before SSH ever happens). Configured in repo Settings, not in this workflow.
+- **Required-reviewer gate** on production for a manual-confirmation pause
+  before any SSH. Off by default; flip on later via Settings → Environments
+  → production → Deployment protection rules if experience shows the need.
+- **Per-environment secret scoping** if staging and production ever need
+  distinct values for `VPS_HOST`, `DEPLOY_TOKEN`, etc. Currently both lanes
+  share the repo-level secrets.
 
 ## 7. rsync exclude policy
 
@@ -503,8 +508,11 @@ User does this once per environment, before the first workflow run.
 7. Add other GHA secrets: `VPS_SSH_PRIVATE_KEY` (private half of deploy
    key), `VPS_USERNAME`, `VPS_HOST`.
 8. Add GHA variables: `VPS_APP_DIR`, `VPS_SSH_PORT`, `VPS_APP_BASE_URL`.
-9. In repo Settings → Environments: create `staging` and `production`.
-   Optionally add required reviewers to `production`.
+9. GitHub Environments — **nothing to do here for the default setup.** The
+   `staging` and `production` environments auto-create on first workflow
+   dispatch. Only revisit if you decide later you want a required-reviewer
+   gate on production (Settings → Environments → production → Deployment
+   protection rules, toggleable without touching the workflow).
 10. In Plesk: confirm `request_terminate_timeout >= 600` for the deployed
     domain's PHP-FPM pool.
 11. First trigger: `workflow_dispatch` with `target=staging`. Watch the run
