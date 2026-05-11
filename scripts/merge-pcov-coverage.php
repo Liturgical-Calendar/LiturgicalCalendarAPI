@@ -43,7 +43,7 @@ if (!is_dir($pcovDir) || !is_readable($pcovDir)) {
     exit(1);
 }
 
-$xml = new DOMDocument();
+$xml                     = new DOMDocument();
 $xml->preserveWhiteSpace = false;
 $xml->formatOutput       = true;
 if (!$xml->load($cloverIn)) {
@@ -73,7 +73,7 @@ if ($filesByPath === []) {
 
 // Union the set of executed lines across every pcov dump.
 /** @var array<string,array<int,true>> $pcovHits */
-$pcovHits = [];
+$pcovHits  = [];
 $dumpFiles = glob(rtrim($pcovDir, '/') . '/*.cov') ?: [];
 foreach ($dumpFiles as $dump) {
     $raw = @file_get_contents($dump);
@@ -102,8 +102,8 @@ foreach ($dumpFiles as $dump) {
     }
 }
 
-$mergedFiles  = 0;
-$liftedLines  = 0;
+$mergedFiles = 0;
+$liftedLines = 0;
 foreach ($pcovHits as $file => $lineSet) {
     if (!isset($filesByPath[$file])) {
         continue;
@@ -141,12 +141,12 @@ $totalLines        = 0;
 $totalNcloc        = 0;
 $totalClasses      = 0;
 foreach ($filesByPath as $fileEl) {
-    $fileStmts = 0;
-    $fileCovStmts = 0;
-    $fileMethods = 0;
+    $fileStmts      = 0;
+    $fileCovStmts   = 0;
+    $fileMethods    = 0;
     $fileCovMethods = 0;
-    $fileConds = 0;
-    $fileCovConds = 0;
+    $fileConds      = 0;
+    $fileCovConds   = 0;
     foreach ($xpath->query('./line', $fileEl) as $lineEl) {
         if (!$lineEl instanceof DOMElement) {
             continue;
@@ -207,10 +207,10 @@ if ($projectMetricsEl instanceof DOMElement) {
     $projectMetricsEl->setAttribute('coveredmethods', (string) $totalCovMethods);
     $projectMetricsEl->setAttribute('conditionals', (string) $totalConditionals);
     $projectMetricsEl->setAttribute('coveredconditionals', (string) $totalCovConds);
-    $projectMetricsEl->setAttribute('elements', (string) ($totalStmts + $totalMethods + $totalConditionals));
+    $projectMetricsEl->setAttribute('elements', (string) ( $totalStmts + $totalMethods + $totalConditionals ));
     $projectMetricsEl->setAttribute(
         'coveredelements',
-        (string) ($totalCovStmts + $totalCovMethods + $totalCovConds)
+        (string) ( $totalCovStmts + $totalCovMethods + $totalCovConds )
     );
     if ($projectMetricsEl->hasAttribute('loc')) {
         $projectMetricsEl->setAttribute('loc', (string) $totalLines);

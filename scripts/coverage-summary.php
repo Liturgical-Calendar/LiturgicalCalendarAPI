@@ -29,7 +29,7 @@ $cloverPath = $argv[1];
 $srcRoot    = $argv[2] ?? realpath(__DIR__ . '/../src');
 
 if (!is_string($srcRoot) || !is_dir($srcRoot)) {
-    fwrite(STDERR, "src root not found: " . var_export($srcRoot, true) . "\n");
+    fwrite(STDERR, 'src root not found: ' . var_export($srcRoot, true) . "\n");
     exit(1);
 }
 if (!is_file($cloverPath) || !is_readable($cloverPath)) {
@@ -58,7 +58,7 @@ $ingest = function (\SimpleXMLElement $fileEl) use (&$buckets, &$totalStmts, &$t
     }
     $rel    = ltrim(substr($name, strlen($srcRootReal)), '/');
     $parts  = explode('/', $rel);
-    $bucket = (count($parts) <= 1) ? '(root)' : $parts[0];
+    $bucket = ( count($parts) <= 1 ) ? '(root)' : $parts[0];
 
     $m       = $fileEl->metrics;
     $stmts   = (int) $m['statements'];
