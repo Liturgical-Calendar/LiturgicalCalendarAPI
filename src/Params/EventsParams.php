@@ -117,7 +117,12 @@ class EventsParams implements ParamsInterface
                             throw new ValidationException('Invalid locale string: ' . $value);
                         }
 
-                        $this->Locale = LitLocale::isValid($locale) ? $locale : LitLocale::LATIN;
+                        if (false === LitLocale::isValid($locale)) {
+                            $description = "Invalid value `$locale` for param `locale`, valid values are: la, la_VA, "
+                                . implode(', ', LitLocale::$AllAvailableLocales);
+                            throw new ValidationException($description);
+                        }
+                        $this->Locale = $locale;
                         $baseLocale   = \Locale::getPrimaryLanguage($this->Locale);
                         if (null === $baseLocale) {
                             $description = '“The evil spirit had bound his tongue, and together with his tongue had fettered his soul.” — St. John Chrysostom, Homily 32 on Matthew';
