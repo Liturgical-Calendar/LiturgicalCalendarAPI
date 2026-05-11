@@ -82,6 +82,52 @@ final class EventsParamsTest extends TestCase
         self::assertNull($params->NationalCalendar);
     }
 
+    /**
+     * Regression for #576: when national_calendar=VA appears anywhere in the
+     * input, its locale=la_VA / eternal_high_priest=false invariants must win
+     * regardless of where it sits relative to sibling keys.
+     */
+    public function testNationalCalendarVaOverridesEvenWhenItComesFirst(): void
+    {
+        $params = new EventsParams([
+            'national_calendar'   => 'VA',
+            'eternal_high_priest' => true,
+            'locale'              => 'en_US',
+        ]);
+
+        self::assertSame(LitLocale::LATIN, $params->Locale);
+        self::assertSame(LitLocale::LATIN_PRIMARY_LANGUAGE, $params->baseLocale);
+        self::assertFalse($params->EternalHighPriest);
+        self::assertNull($params->NationalCalendar);
+    }
+
+    public function testNationalCalendarVaOverridesWhenItComesLast(): void
+    {
+        $params = new EventsParams([
+            'eternal_high_priest' => true,
+            'locale'              => 'en_US',
+            'national_calendar'   => 'VA',
+        ]);
+
+        self::assertSame(LitLocale::LATIN, $params->Locale);
+        self::assertSame(LitLocale::LATIN_PRIMARY_LANGUAGE, $params->baseLocale);
+        self::assertFalse($params->EternalHighPriest);
+        self::assertNull($params->NationalCalendar);
+    }
+
+    public function testInvalidSiblingValuesStillRejectedEvenWhenVaIsSet(): void
+    {
+        // VA only overrides the *successfully* parsed sibling values; it does
+        // not silence input validation for malformed siblings.
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('eternal_high_priest');
+
+        new EventsParams([
+            'national_calendar'   => 'VA',
+            'eternal_high_priest' => 'maybe', // @phpstan-ignore-line
+        ]);
+    }
+
     public function testUnknownNationalCalendarIsRejected(): void
     {
         $this->expectException(ValidationException::class);

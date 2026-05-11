@@ -100,6 +100,14 @@ class EventsParams implements ParamsInterface
             // If no parameters are provided, we can just return
             return;
         }
+
+        // national_calendar=VA selects the General Roman Calendar and forces
+        // locale=la_VA + eternal_high_priest=false. Defer those writes until
+        // after the loop so they're not overwritten by sibling iterations
+        // regardless of the order the caller passed the keys in
+        // (foreach iterates a snapshot, so mutating $params mid-loop is a no-op).
+        $forceVaInvariants = false;
+
         foreach ($params as $key => $value) {
             if (in_array($key, self::ALLOWED_PARAMS)) {
                 switch ($key) {
@@ -124,11 +132,7 @@ class EventsParams implements ParamsInterface
                             throw new ValidationException($description);
                         }
                         if ($value === 'VA') {
-                            $this->Locale                  = LitLocale::LATIN;
-                            $this->baseLocale              = LitLocale::LATIN_PRIMARY_LANGUAGE;
-                            $this->EternalHighPriest       = false;
-                            $params['eternal_high_priest'] = false;
-                            $params['locale']              = LitLocale::LATIN;
+                            $forceVaInvariants = true;
                         } else {
                             $this->NationalCalendar = strtoupper($value);
                         }
@@ -151,6 +155,12 @@ class EventsParams implements ParamsInterface
                         break;
                 }
             }
+        }
+
+        if ($forceVaInvariants) {
+            $this->Locale            = LitLocale::LATIN;
+            $this->baseLocale        = LitLocale::LATIN_PRIMARY_LANGUAGE;
+            $this->EternalHighPriest = false;
         }
     }
 
