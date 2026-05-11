@@ -68,8 +68,17 @@ composer.lock
 CLAUDE.md
 README.md
 
-# --- SERVER-MANAGED FILES (never overwrite, never --delete) ---
+# --- TRACKED EXAMPLE FILE (transferred + overwritten every deploy) ---
+# The "+" prefix is an rsync include-override: this rule must precede the
+# matching ".env.*" exclude below for first-match-wins to honor it. We
+# intentionally DO want .env.example to ship and overwrite the server's
+# copy on every deploy so admins can diff it against .env.production to
+# spot new or deprecated environment variables.
 + .env.example
+
+# --- SERVER-MANAGED FILES (never transferred, never --delete) ---
+# These are server-only state: .env / .env.production carries the live
+# secrets, logs/ accumulates runtime logs. Both stay untouched by rsync.
 .env
 .env.*
 logs/
