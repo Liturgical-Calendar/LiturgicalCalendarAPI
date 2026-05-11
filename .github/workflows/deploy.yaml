@@ -113,7 +113,7 @@ jobs:
 
       - name: Install production dependencies
         if: steps.shape.outputs.skip != 'true'
-        run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress --prefer-dist
+        run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress --no-scripts --no-plugins --prefer-dist
 
       - name: Configure SSH
         if: steps.shape.outputs.skip != 'true'
@@ -235,7 +235,7 @@ jobs:
             echo "::error::Repository variable VPS_APP_BASE_URL is not set." >&2
             exit 1
           fi
-          curl -fsS --max-time 600 --retry 2 --retry-delay 5 \
+          curl -fsS --max-time 600 \
             -X POST \
             -H "X-Deploy-Token: ${DEPLOY_TOKEN}" \
             -H "Accept: text/plain" \

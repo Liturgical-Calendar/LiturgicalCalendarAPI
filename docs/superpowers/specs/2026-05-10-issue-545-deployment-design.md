@@ -340,13 +340,17 @@ Migrations programmatically inside the deployed PHP-FPM process.
 
 - Reads `DEPLOY_TOKEN` via `getenv('DEPLOY_TOKEN') ?: $_ENV['DEPLOY_TOKEN'] ?? ''`.
   Same fallback pattern as `ApiKeyRateLimitMiddleware`.
-- Fail-closed if `DEPLOY_TOKEN` is empty: every request rejected with 503
-  (server misconfigured, not a client error).
-- Reads `X-Deploy-Token` header; compares with `hash_equals()`.
-- Refuses unless `APP_ENV in {staging, production}` to keep the endpoint dark
-  in dev/test environments where `.env` may carry a long-forgotten test token.
-- On reject: 401 with no response body details (no auth-mode signaling that
-  helps an attacker probe).
+- **APP_ENV gate first** — if `APP_ENV` is not in `{staging, production}`,
+  returns **503** ("Deploy endpoint disabled in this environment"). Keeps the
+  endpoint dark in dev/test where a leftover token might exist.
+- **Empty-token fail-closed** — if `DEPLOY_TOKEN` is unset or empty, returns
+  **503** ("Deploy endpoint not configured"). Server misconfiguration, not a
+  client error.
+- **Token check** — reads `X-Deploy-Token` header. If missing or
+  `!hash_equals($expected, $provided)`, returns **401** ("Unauthorized") with
+  a single-line plain-text body. Constant-time compare prevents timing-based
+  token discovery; the empty-header short-circuit avoids invoking
+  `hash_equals` against the secret when no header is supplied.
 
 **`src/Handlers/Ops/MigrateHandler.php`** (extends `AbstractHandler`):
 
@@ -361,9 +365,13 @@ Migrations programmatically inside the deployed PHP-FPM process.
   `migrations:migrate --no-interaction` (or `--no-interaction <version>` if
   `?to=` is supplied and matches the version regex).
 - For GET on `/status`: runs `migrations:status --no-interaction`.
-- Output streamed via `StreamOutput(fopen('php://output', 'wb'))`.
-- HTTP status: 200 on Console exit code 0, 500 on non-zero. The `curl -f` in
-  the workflow turns that into a workflow failure.
+- Output captured via `StreamOutput(fopen('php://temp', 'w+b'))`, then
+  rewound and returned as the HTTP response body. (Rationale: `php://temp`
+  is an in-memory buffer that doesn't interleave with PHP-FPM's output
+  buffer; the full Doctrine Console output is available atomically rather
+  than streamed mid-flight.)
+- HTTP status: 200 on Console exit code 0, 500 on non-zero. The `curl -f`
+  in the workflow turns that into a workflow failure.
 - Content-Type: `text/plain; charset=utf-8`.
 
 **Routing (`src/Router.php` + `src/Enum/Route.php`)**:
