@@ -260,7 +260,9 @@ final class ApplicationsHandler extends AbstractHandler
             $application['uuid'] = $application['id'];
         }
 
-        $response = $response->withStatus(StatusCode::CREATED->value);
+        // encodeResponseBody overwrites the response status with its $statusCode
+        // argument (default OK), so the only effective way to emit 201 here is
+        // to pass it through rather than calling ->withStatus() first.
         return $this->encodeResponseBody($response, [
             'success'     => true,
             'message'     => 'Application request submitted successfully. An admin will review your application.',
@@ -462,7 +464,8 @@ final class ApplicationsHandler extends AbstractHandler
             $expiresAt
         );
 
-        $response = $response->withStatus(StatusCode::CREATED->value);
+        // encodeResponseBody's $statusCode argument is what actually sticks;
+        // the prior $response->withStatus() was a no-op overwritten below.
         return $this->encodeResponseBody($response, [
             'success' => true,
             'message' => 'API key generated successfully. Save this key - it will not be shown again.',
