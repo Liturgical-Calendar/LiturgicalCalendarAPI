@@ -135,8 +135,32 @@ jobs:
           echo "Server did not respond on localhost:8000 after $MAX_TRIES seconds."
           exit 1
 
+      - name: Start the WebSocket test server (instrumented with pcov)
+        # The Ratchet-driven WS server (public/LitCalTestServer.php) is the
+        # only entry point that reaches src/Test/ (LitTestRunner et al.) and
+        # Health.php's onOpen/onMessage/onClose. Same triple-gated hook as the
+        # HTTP server; ws-start-server.sh honors PCOV_SERVER_COVERAGE_DIR.
+        run: composer ws:start
+        env:
+          PCOV_SERVER_COVERAGE_DIR: ${{ github.workspace }}/coverage/pcov-server
+
+      - name: Wait for WS server to bind
+        run: |
+          for i in $(seq 1 30); do
+            if nc -z localhost 8082; then
+              echo "WS server is ready."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "WS server did not respond on localhost:8082; continuing — WebSocket tests will self-skip."
+
       - name: Run tests with coverage and JUnit output
         run: time composer test:coverage
+
+      - name: Stop the WebSocket test server
+        if: ${{ !cancelled() }}
+        run: composer ws:stop || true
 
       - name: Stop the PHP web server
         # Stop before merging so per-request shutdown handlers flush their
