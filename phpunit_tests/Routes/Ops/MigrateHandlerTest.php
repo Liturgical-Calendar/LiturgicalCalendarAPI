@@ -210,6 +210,182 @@ PHP;
         $handler->handle($request);
     }
 
+
+    public function testPostMigrateWithValidToReachesTargetVersion(): void
+    {
+        // Doctrine's migrations:migrate accepts the symbolic aliases first /
+        // prev / next / latest plus FQCNs. Bare version numbers don't work,
+        // and FQCNs would be rejected by our /^[A-Za-z0-9_]+$/ regex anyway.
+        // The rollback use case ("migrate to the previous version") maps to
+        // `?to=prev`, so we exercise that alias here.
+        //
+        // Use distinct version names (20260301* not 20260101*) so PHP doesn't
+        // try to redeclare the class already registered by
+        // testPostMigrateAppliesPendingMigrations earlier in the suite.
+        $first      = $this->buildMigrationClass('Version20260301000000', 'rollback_first');
+        $second     = $this->buildMigrationClass('Version20260301000001', 'rollback_second');
+        $configFile = $this->writeConfig([
+            'Version20260301000000' => $first,
+            'Version20260301000001' => $second,
+        ]);
+
+        $handler = new MigrateHandler($this->connection, $configFile);
+        $handler->setAllowedRequestMethods([
+            \LiturgicalCalendar\Api\Http\Enum\RequestMethod::POST,
+        ]);
+
+        // Apply both, then roll back to `prev` (= rollback_first only).
+        $applyAll = $handler->handle(new ServerRequest('POST', '/_ops/migrate'));
+        $this->assertSame(200, $applyAll->getStatusCode());
+
+        $rollback = ( new ServerRequest('POST', '/_ops/migrate?to=prev') )
+            ->withQueryParams(['to' => 'prev']);
+        $response = $handler->handle($rollback);
+
+        $this->assertSame(200, $response->getStatusCode());
+
+        // The body should reflect a down-migration to the previous version.
+        $body = (string) $response->getBody();
+        $this->assertStringContainsString('Migrating down', $body);
+        $this->assertStringContainsString('Version20260301000000', $body);
+    }
+
+    public function testPostMigrateReturns500OnMigrationFailure(): void
+    {
+        // Migration with invalid SQL — sync-metadata succeeds, migrate fails
+        // when the bogus DDL hits sqlite.
+        $broken     = <<<'PHP'
+<?php
+declare(strict_types=1);
+namespace LiturgicalCalendar\TestMigrations;
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigration;
+final class Version20260202000000 extends AbstractMigration
+{
+    public function up(Schema $schema): void
+    {
+        $this->addSql('THIS IS NOT VALID SQL');
+    }
+    public function down(Schema $schema): void
+    {
+    }
+}
+PHP;
+        $configFile = $this->writeConfig(['Version20260202000000' => $broken]);
+
+        $handler = new MigrateHandler($this->connection, $configFile);
+        $handler->setAllowedRequestMethods([
+            \LiturgicalCalendar\Api\Http\Enum\RequestMethod::POST,
+        ]);
+
+        $request = new ServerRequest('POST', '/_ops/migrate');
+
+        $response = $handler->handle($request);
+
+        $this->assertSame(500, $response->getStatusCode());
+    }
+
+    public function testBuildConnectionFromEnvFailsFastWhenDbNotConfigured(): void
+    {
+        // Snapshot and clear DB env so Connection::isConfigured() returns false.
+        $vars = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'];
+        $snap = [];
+        foreach ($vars as $v) {
+            $snap[$v] = [
+                'env'    => $_ENV[$v] ?? '__UNSET__',
+                'getenv' => getenv($v) === false ? '__UNSET__' : (string) getenv($v),
+            ];
+            unset($_ENV[$v]);
+            putenv($v);
+        }
+
+        try {
+            $method = new \ReflectionMethod(MigrateHandler::class, 'buildConnectionFromEnv');
+            $method->setAccessible(true);
+
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessage('database configuration missing');
+            $method->invoke(null);
+        } finally {
+            foreach ($vars as $v) {
+                if ($snap[$v]['env'] === '__UNSET__') {
+                    unset($_ENV[$v]);
+                } else {
+                    $_ENV[$v] = $snap[$v]['env'];
+                }
+                if ($snap[$v]['getenv'] === '__UNSET__') {
+                    putenv($v);
+                } else {
+                    putenv("{$v}={$snap[$v]['getenv']}");
+                }
+            }
+        }
+    }
+
+    public function testBuildConnectionFromEnvBuildsConnectionWhenConfigured(): void
+    {
+        // Bogus but well-formed values so isConfigured() passes and
+        // DriverManager::getConnection() returns a Connection. DBAL connects
+        // lazily — we never call any method that would attempt a real socket.
+        $vars = ['DB_HOST' => 'localhost', 'DB_PORT' => '5432', 'DB_NAME' => 'doesnotexist', 'DB_USER' => 'noone', 'DB_PASSWORD' => 'unused'];
+        $snap = [];
+        foreach ($vars as $k => $val) {
+            $snap[$k] = [
+                'env'    => $_ENV[$k] ?? '__UNSET__',
+                'getenv' => getenv($k) === false ? '__UNSET__' : (string) getenv($k),
+            ];
+            $_ENV[$k] = $val;
+            putenv("{$k}={$val}");
+        }
+
+        try {
+            $method = new \ReflectionMethod(MigrateHandler::class, 'buildConnectionFromEnv');
+            $method->setAccessible(true);
+
+            $connection = $method->invoke(null);
+            $this->assertInstanceOf(\Doctrine\DBAL\Connection::class, $connection);
+        } finally {
+            foreach (array_keys($vars) as $k) {
+                if ($snap[$k]['env'] === '__UNSET__') {
+                    unset($_ENV[$k]);
+                } else {
+                    $_ENV[$k] = $snap[$k]['env'];
+                }
+                if ($snap[$k]['getenv'] === '__UNSET__') {
+                    putenv($k);
+                } else {
+                    putenv("{$k}={$snap[$k]['getenv']}");
+                }
+            }
+        }
+    }
+
+    /**
+     * Build a synthetic Doctrine migration class as PHP source, creating
+     * the named table on up() and dropping it on down().
+     */
+    private function buildMigrationClass(string $version, string $tableName): string
+    {
+        return <<<PHP
+<?php
+declare(strict_types=1);
+namespace LiturgicalCalendar\\TestMigrations;
+use Doctrine\\DBAL\\Schema\\Schema;
+use Doctrine\\Migrations\\AbstractMigration;
+final class {$version} extends AbstractMigration
+{
+    public function up(Schema \$schema): void
+    {
+        \$this->addSql('CREATE TABLE {$tableName} (id INTEGER PRIMARY KEY)');
+    }
+    public function down(Schema \$schema): void
+    {
+        \$this->addSql('DROP TABLE {$tableName}');
+    }
+}
+PHP;
+    }
+
     /**
      * Writes a temporary doctrine-migrations.php file that points at a
      * temp directory containing the supplied migration class names.
