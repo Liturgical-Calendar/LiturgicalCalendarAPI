@@ -7,7 +7,7 @@ namespace LiturgicalCalendar\Tests\Routes\Readonly;
 use LiturgicalCalendar\Tests\ApiTestCase;
 
 /**
- * End-to-end tests for the /missals endpoint and its single-missal variant.
+ * Integration tests for the /missals endpoint and its single-missal variant.
  *
  * Exercises MissalsHandler + the propriumdesanctis loading path that the
  * unit tests don't reach (the unit tests cover MissalMetadata / MissalsMap

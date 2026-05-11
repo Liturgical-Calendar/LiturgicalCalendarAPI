@@ -7,7 +7,7 @@ namespace LiturgicalCalendar\Tests\Routes\Readonly;
 use LiturgicalCalendar\Tests\ApiTestCase;
 
 /**
- * End-to-end tests for the /tests endpoint and its single-resource variant.
+ * Integration tests for the /tests endpoint and its single-resource variant.
  *
  * Serves the catalog of test definitions used by the UnitTestInterface
  * websocket runner. The HTTP endpoint itself doesn't invoke LitTestRunner —

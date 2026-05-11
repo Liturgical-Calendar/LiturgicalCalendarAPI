@@ -7,7 +7,7 @@ namespace LiturgicalCalendar\Tests\Routes\Readonly;
 use LiturgicalCalendar\Tests\ApiTestCase;
 
 /**
- * End-to-end tests for the /decrees endpoint and its single-decree variant.
+ * Integration tests for the /decrees endpoint and its single-decree variant.
  *
  * The Decrees endpoint serves Dicastery for Divine Worship rulings that
  * modify the liturgical calendar (e.g. adding Mary Mother of the Church
