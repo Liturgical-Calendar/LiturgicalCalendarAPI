@@ -12,16 +12,19 @@ use RuntimeException;
 #[CoversClass(Connection::class)]
 final class ConnectionTest extends TestCase
 {
-    /** @var array<string,string|false> */
+    /** @var array<string,mixed> Map of env var name → original $_ENV entry (or "unset" sentinel). */
     private array $savedEnv = [];
+
+    private const UNSET_SENTINEL = "\0__unset__\0";
 
     protected function setUp(): void
     {
-        // Capture existing values so each test starts from a clean,
-        // restorable slate. getenv returns false when unset.
+        // Connection reads from $_ENV (populated by Dotenv at bootstrap and by
+        // PHP from the process env). Snapshot the relevant keys so each test
+        // starts from a clean, restorable slate.
         foreach (['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'] as $name) {
-            $this->savedEnv[$name] = getenv($name);
-            putenv($name);
+            $this->savedEnv[$name] = array_key_exists($name, $_ENV) ? $_ENV[$name] : self::UNSET_SENTINEL;
+            unset($_ENV[$name]);
         }
         Connection::close();
     }
@@ -29,10 +32,10 @@ final class ConnectionTest extends TestCase
     protected function tearDown(): void
     {
         foreach ($this->savedEnv as $name => $value) {
-            if ($value === false) {
-                putenv($name);
+            if ($value === self::UNSET_SENTINEL) {
+                unset($_ENV[$name]);
             } else {
-                putenv("{$name}={$value}");
+                $_ENV[$name] = $value;
             }
         }
         Connection::close();
@@ -45,9 +48,9 @@ final class ConnectionTest extends TestCase
 
     public function testIsConfiguredReturnsFalseWhenAnyRequiredVarMissing(): void
     {
-        putenv('DB_HOST=db.example.test');
-        putenv('DB_NAME=litcal');
-        putenv('DB_USER=postgres');
+        $_ENV['DB_HOST'] = 'db.example.test';
+        $_ENV['DB_NAME'] = 'litcal';
+        $_ENV['DB_USER'] = 'postgres';
         // DB_PASSWORD intentionally left unset
 
         self::assertFalse(Connection::isConfigured());
@@ -55,10 +58,10 @@ final class ConnectionTest extends TestCase
 
     public function testIsConfiguredReturnsFalseWhenRequiredVarIsEmpty(): void
     {
-        putenv('DB_HOST=');
-        putenv('DB_NAME=litcal');
-        putenv('DB_USER=postgres');
-        putenv('DB_PASSWORD=secret');
+        $_ENV['DB_HOST']     = '';
+        $_ENV['DB_NAME']     = 'litcal';
+        $_ENV['DB_USER']     = 'postgres';
+        $_ENV['DB_PASSWORD'] = 'secret';
 
         self::assertFalse(Connection::isConfigured());
     }
@@ -67,20 +70,20 @@ final class ConnectionTest extends TestCase
     {
         // Connection only requires that DB_PASSWORD exist as an env var,
         // an empty string is permitted (some local Postgres setups use trust auth).
-        putenv('DB_HOST=db.example.test');
-        putenv('DB_NAME=litcal');
-        putenv('DB_USER=postgres');
-        putenv('DB_PASSWORD=');
+        $_ENV['DB_HOST']     = 'db.example.test';
+        $_ENV['DB_NAME']     = 'litcal';
+        $_ENV['DB_USER']     = 'postgres';
+        $_ENV['DB_PASSWORD'] = '';
 
         self::assertTrue(Connection::isConfigured());
     }
 
     public function testIsConfiguredReturnsTrueWhenAllRequiredVarsPresent(): void
     {
-        putenv('DB_HOST=db.example.test');
-        putenv('DB_NAME=litcal');
-        putenv('DB_USER=postgres');
-        putenv('DB_PASSWORD=secret');
+        $_ENV['DB_HOST']     = 'db.example.test';
+        $_ENV['DB_NAME']     = 'litcal';
+        $_ENV['DB_USER']     = 'postgres';
+        $_ENV['DB_PASSWORD'] = 'secret';
 
         self::assertTrue(Connection::isConfigured());
     }
@@ -103,11 +106,11 @@ final class ConnectionTest extends TestCase
         // Point at a host that cannot accept connections so PDO fails fast.
         // The wrapper should surface the failure as RuntimeException with
         // the PDO message preserved in the chain.
-        putenv('DB_HOST=127.0.0.1');
-        putenv('DB_PORT=1');
-        putenv('DB_NAME=nonexistent');
-        putenv('DB_USER=nobody');
-        putenv('DB_PASSWORD=none');
+        $_ENV['DB_HOST']     = '127.0.0.1';
+        $_ENV['DB_PORT']     = '1';
+        $_ENV['DB_NAME']     = 'nonexistent';
+        $_ENV['DB_USER']     = 'nobody';
+        $_ENV['DB_PASSWORD'] = 'none';
 
         try {
             Connection::getInstance();
