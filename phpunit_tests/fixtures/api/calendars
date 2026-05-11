@@ -1,0 +1,62 @@
+{
+  "litcal_metadata": {
+    "national_calendars": [
+      {
+        "calendar_id": "IT",
+        "locales": ["it"],
+        "missals": ["EDITIO_TYPICA_1970", "IT_1983"],
+        "wider_region": "Europe",
+        "settings": {
+          "epiphany": "JAN6",
+          "ascension": "SUNDAY",
+          "corpus_christi": "SUNDAY",
+          "eternal_high_priest": false
+        }
+      },
+      {
+        "calendar_id": "US",
+        "locales": ["en", "es_US"],
+        "missals": ["EDITIO_TYPICA_1970", "USA_2011"],
+        "wider_region": "Americas",
+        "settings": {
+          "epiphany": "SUNDAY_JAN2_JAN8",
+          "ascension": "SUNDAY",
+          "corpus_christi": "SUNDAY",
+          "eternal_high_priest": true
+        }
+      },
+      {
+        "calendar_id": "VA",
+        "locales": ["la_VA"],
+        "missals": ["EDITIO_TYPICA_1970"],
+        "settings": {
+          "epiphany": "JAN6",
+          "ascension": "THURSDAY",
+          "corpus_christi": "THURSDAY",
+          "eternal_high_priest": false
+        }
+      }
+    ],
+    "national_calendars_keys": ["IT", "US", "VA"],
+    "diocesan_calendars": [
+      {
+        "calendar_id": "romamo_it",
+        "diocese": "Roma",
+        "nation": "IT",
+        "locales": ["it"],
+        "timezone": "Europe/Vatican"
+      }
+    ],
+    "diocesan_calendars_keys": ["romamo_it"],
+    "diocesan_groups": [],
+    "wider_regions": [
+      {
+        "name": "Europe",
+        "locales": ["en", "it", "fr", "de"],
+        "api_path": "/calendars/wider_region/Europe"
+      }
+    ],
+    "wider_regions_keys": ["Europe"],
+    "locales": ["en", "it", "es_US", "fr", "de"]
+  }
+}
