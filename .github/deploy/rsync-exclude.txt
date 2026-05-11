@@ -1,0 +1,94 @@
+# Patterns excluded from `rsync --delete` deploys.
+#
+# These patterns serve two purposes:
+#   1. Files matched here are NOT transferred from the runner.
+#   2. Files matched here are NOT removed on the destination by --delete.
+#
+# Anything that should live only on the server (env files, runtime
+# logs, server-managed state) MUST be listed here so it isn't wiped
+# on deploy.
+
+# --- VCS / CI / agent metadata ---
+.git/
+.github/
+.gitignore
+.gitattributes
+.editorconfig
+.serena/
+.worktrees/
+.claude/
+
+# --- IDE / local tooling ---
+.vscode/
+.idea/
+.phpunit.cache/
+.phpcs.cache
+
+# --- Tests, dev-only sources ---
+phpunit_tests/
+coverage/
+docs/
+
+# --- Build / dev configuration with no runtime role ---
+phpcs.xml
+phpcs.xml.dist
+phpstan.neon
+phpstan.neon.dist
+phpunit.xml
+phpunit.xml.dist
+captainhook.json
+redocly.yaml
+.markdownlint.yml
+docker-compose.yml
+docker-compose.yaml
+Dockerfile
+.dockerignore
+
+# --- Local dev scripts (not used in production) ---
+start-server.sh
+stop-server.sh
+restart-server.sh
+server.pid
+server.vscode.pid
+
+# --- CLI tooling that cannot run in the SSH chroot anyway ---
+# bin/ currently contains only doctrine-migrations, which is invoked
+# in-process via the /_ops/migrate endpoint. doctrine-migrations.php
+# (Doctrine config at the repo root) IS shipped — it's read by
+# MigrateHandler via PhpFile.
+bin/
+
+# --- Composer install-time only (never read at runtime) ---
+# composer.json IS shipped — Router::findProjectRoot() uses it as a
+# project-root marker. composer.lock is only consumed by
+# `composer install`, which runs on the runner.
+composer.lock
+
+# --- Project meta files ---
+CLAUDE.md
+README.md
+
+# --- TRACKED EXAMPLE FILE (transferred + overwritten every deploy) ---
+# The "+" prefix is an rsync include-override: this rule must precede the
+# matching ".env.*" exclude below for first-match-wins to honor it. We
+# intentionally DO want .env.example to ship and overwrite the server's
+# copy on every deploy so admins can diff it against .env.production to
+# spot new or deprecated environment variables.
++ .env.example
+
+# --- SERVER-MANAGED FILES (never transferred, never --delete) ---
+# These are server-only state: .env / .env.production carries the live
+# secrets, logs/ accumulates runtime logs. Both stay untouched by rsync.
+.env
+.env.*
+logs/
+
+# --- RUNTIME CACHE (preserve server-side state) ---
+# Excludes contents only; the directories themselves are created on
+# the server in a pre-rsync SSH-exec step so PHP can still write to
+# them. /cache is the OIDC PSR-6 cache (JWKS + Zitadel roles, used by
+# OidcAuthMiddleware). /public/engineCache is the calendar-engine
+# memoization cache (per-locale Easter, per-version computed
+# calendars; written by EasterHandler and CalendarHandler).
+/cache/*
+/public/engineCache/*
