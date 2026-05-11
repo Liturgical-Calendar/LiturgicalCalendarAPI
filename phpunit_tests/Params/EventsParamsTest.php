@@ -52,14 +52,29 @@ final class EventsParamsTest extends TestCase
         self::assertSame('en', $params->baseLocale);
     }
 
-    public function testUnsupportedLocaleFallsBackToLatin(): void
+    public function testUnsupportedLocaleIsRejected(): void
     {
-        // Per current behavior, when a locale is canonicalisable but unsupported,
-        // it silently falls back to Latin rather than rejecting outright.
-        $params = new EventsParams(['locale' => 'not-a-locale']);
+        // Regression for #578: EventsParams now matches the rest of the
+        // src/Params/ family — an unsupported (but canonicalisable) locale
+        // raises ValidationException rather than silently falling back to
+        // Latin.
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Invalid value');
+        $this->expectExceptionMessage('param `locale`');
 
-        self::assertSame(LitLocale::LATIN, $params->Locale);
-        self::assertSame(LitLocale::LATIN_PRIMARY_LANGUAGE, $params->baseLocale);
+        new EventsParams(['locale' => 'not-a-locale']);
+    }
+
+    public function testEmptyLocaleStringIsRejected(): void
+    {
+        // Locale::canonicalize('') returns 'en_US_POSIX' on this build, which
+        // is unsupported — so empty strings end up in the new unsupported-locale
+        // arm rather than the upstream null-canonicalize guard. Either way, the
+        // user gets a ValidationException with the locale-rejection message.
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('param `locale`');
+
+        new EventsParams(['locale' => '']);
     }
 
     public function testNationalCalendarFromMetadataIsAccepted(): void
