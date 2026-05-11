@@ -18,8 +18,14 @@ final class EventsParamsTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
+        $fixturePath = realpath(__DIR__ . '/../fixtures/api');
+        if ($fixturePath === false) {
+            throw new \RuntimeException(
+                'Missing fixture directory: ' . __DIR__ . '/../fixtures/api'
+            );
+        }
         self::$savedApiPath = Router::$apiPath ?? '';
-        Router::$apiPath    = 'file://' . realpath(__DIR__ . '/../fixtures/api');
+        Router::$apiPath    = 'file://' . $fixturePath;
     }
 
     public static function tearDownAfterClass(): void

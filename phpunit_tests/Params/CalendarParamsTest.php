@@ -25,8 +25,14 @@ final class CalendarParamsTest extends TestCase
     {
         // Stand in a file:// URL pointing at the bundled metadata fixture so
         // the constructor's HTTP fetch resolves locally and deterministically.
+        $fixturePath = realpath(__DIR__ . '/../fixtures/api');
+        if ($fixturePath === false) {
+            throw new \RuntimeException(
+                'Missing fixture directory: ' . __DIR__ . '/../fixtures/api'
+            );
+        }
         self::$savedApiPath = Router::$apiPath ?? '';
-        Router::$apiPath    = 'file://' . realpath(__DIR__ . '/../fixtures/api');
+        Router::$apiPath    = 'file://' . $fixturePath;
     }
 
     public static function tearDownAfterClass(): void

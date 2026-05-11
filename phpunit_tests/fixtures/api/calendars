@@ -24,6 +24,17 @@
           "corpus_christi": "SUNDAY",
           "eternal_high_priest": true
         }
+      },
+      {
+        "calendar_id": "VA",
+        "locales": ["la_VA"],
+        "missals": ["EDITIO_TYPICA_1970"],
+        "settings": {
+          "epiphany": "JAN6",
+          "ascension": "THURSDAY",
+          "corpus_christi": "THURSDAY",
+          "eternal_high_priest": false
+        }
       }
     ],
     "national_calendars_keys": ["IT", "US", "VA"],
