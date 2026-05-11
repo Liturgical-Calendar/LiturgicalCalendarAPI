@@ -98,8 +98,7 @@ final class ApplicationsHandlerTest extends AbstractHandlerTestCase
             ])->withAttribute('oidc_user', $this->devUser())
         );
 
-        self::assertGreaterThanOrEqual(200, $response->getStatusCode());
-        self::assertLessThan(300, $response->getStatusCode());
+        self::assertSame(201, $response->getStatusCode());
         $body = $this->decodeJsonBody($response);
         self::assertSame('My App', $body['application']['name']);
         self::assertSame('pending', $body['application']['status']);
