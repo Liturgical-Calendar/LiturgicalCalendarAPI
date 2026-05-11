@@ -91,7 +91,7 @@ class AuditLogRepository
      * @param string|null $ipAddress Client IP address
      * @param string|null $userAgent Client user agent
      * @param bool $success Whether the action was successful
-     * @return int The ID of the log entry
+     * @return string The UUID of the log entry
      */
     public function log(
         ?string $userId,
@@ -102,7 +102,7 @@ class AuditLogRepository
         ?string $ipAddress = null,
         ?string $userAgent = null,
         bool $success = true
-    ): int {
+    ): string {
         $stmt = $this->db->prepare(
             'INSERT INTO audit_log
                 (zitadel_user_id, action, resource_type, resource_id, details, ip_address, user_agent, success)
@@ -122,7 +122,7 @@ class AuditLogRepository
             'success'       => $success ? 'true' : 'false',
         ]);
 
-        return (int) $stmt->fetchColumn();
+        return (string) $stmt->fetchColumn();
     }
 
     /**
