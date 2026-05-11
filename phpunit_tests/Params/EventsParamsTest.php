@@ -82,6 +82,68 @@ final class EventsParamsTest extends TestCase
         self::assertNull($params->NationalCalendar);
     }
 
+    /**
+     * Regression for #576: when national_calendar=VA appears anywhere in the
+     * input, its locale=la_VA / eternal_high_priest=false invariants must win
+     * regardless of where it sits relative to sibling keys.
+     */
+    public function testNationalCalendarVaOverridesEvenWhenItComesFirst(): void
+    {
+        $params = new EventsParams([
+            'national_calendar'   => 'VA',
+            'eternal_high_priest' => true,
+            'locale'              => 'en_US',
+        ]);
+
+        self::assertSame(LitLocale::LATIN, $params->Locale);
+        self::assertSame(LitLocale::LATIN_PRIMARY_LANGUAGE, $params->baseLocale);
+        self::assertFalse($params->EternalHighPriest);
+        self::assertNull($params->NationalCalendar);
+    }
+
+    public function testNationalCalendarVaOverridesWhenItComesLast(): void
+    {
+        $params = new EventsParams([
+            'eternal_high_priest' => true,
+            'locale'              => 'en_US',
+            'national_calendar'   => 'VA',
+        ]);
+
+        self::assertSame(LitLocale::LATIN, $params->Locale);
+        self::assertSame(LitLocale::LATIN_PRIMARY_LANGUAGE, $params->baseLocale);
+        self::assertFalse($params->EternalHighPriest);
+        self::assertNull($params->NationalCalendar);
+    }
+
+    public function testInvalidSiblingValuesStillRejectedEvenWhenVaIsSet(): void
+    {
+        // VA only overrides the *successfully* parsed sibling values; it does
+        // not silence input validation for malformed siblings.
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('eternal_high_priest');
+
+        new EventsParams([
+            'national_calendar'   => 'VA',
+            'eternal_high_priest' => 'maybe', // @phpstan-ignore-line
+        ]);
+    }
+
+    public function testRepeatedSetParamsVaClearsPreviousNationalCalendar(): void
+    {
+        // setParams() is public; switching from a real nation to VA on the same
+        // instance must clear NationalCalendar so the post-loop VA invariants
+        // fully describe the request shape (no stale nation override left over).
+        $params = new EventsParams(['national_calendar' => 'IT']);
+        self::assertSame('IT', $params->NationalCalendar);
+
+        $params->setParams(['national_calendar' => 'VA']);
+
+        self::assertNull($params->NationalCalendar);
+        self::assertSame(LitLocale::LATIN, $params->Locale);
+        self::assertSame(LitLocale::LATIN_PRIMARY_LANGUAGE, $params->baseLocale);
+        self::assertFalse($params->EternalHighPriest);
+    }
+
     public function testUnknownNationalCalendarIsRejected(): void
     {
         $this->expectException(ValidationException::class);
