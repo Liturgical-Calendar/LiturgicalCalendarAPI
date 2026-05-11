@@ -44,12 +44,17 @@ final class ZitadelServiceTest extends TestCase
 
     protected function tearDown(): void
     {
+        // setUp clears both $_ENV and the process env table; mirror that
+        // on restore so getenv()-using callers (the rest of ZitadelService
+        // reads via $_ENV, but consistency keeps later tests honest) see
+        // the original state.
         foreach ($this->savedEnv as $k => $v) {
             if ($v === self::UNSET) {
                 unset($_ENV[$k]);
                 putenv($k);
             } else {
                 $_ENV[$k] = $v;
+                putenv($k . '=' . (string) $v);
             }
         }
     }

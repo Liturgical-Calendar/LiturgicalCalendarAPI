@@ -96,8 +96,9 @@ final class RateLimiterFactoryTest extends TestCase
             // file per identifier inside it.
             self::assertDirectoryExists($dir . '/litcal_rate_limits');
         } finally {
-            foreach ((array) glob($dir . '/litcal_rate_limits/*') as $f) {
-                if (is_string($f) && is_file($f)) {
+            $files = glob($dir . '/litcal_rate_limits/*');
+            foreach ($files !== false ? $files : [] as $f) {
+                if (is_file($f)) {
                     unlink($f);
                 }
             }
