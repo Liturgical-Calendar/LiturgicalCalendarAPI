@@ -1,0 +1,256 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: 'Deployment target'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+        default: staging
+      tag:
+        description: 'Release tag (production only, e.g. v5.0 or v5.1.2). Ignored for staging.'
+        required: false
+        type: string
+  release:
+    types: [published]
+
+concurrency:
+  group: deploy-${{ github.event_name == 'release' && 'production' || inputs.target }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy ${{ github.event_name == 'release' && 'production' || inputs.target }}
+    if: github.event_name != 'release' || github.event.release.prerelease == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: ${{ github.event_name == 'release' && 'production' || inputs.target }}
+    permissions:
+      contents: read
+
+    steps:
+      - name: Resolve ref and deploy path
+        id: params
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_TARGET: ${{ inputs.target }}
+          INPUT_TAG: ${{ inputs.tag }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+          APP_DIR: ${{ vars.VPS_APP_DIR }}
+        run: |
+          set -euo pipefail
+          if [ -z "${APP_DIR}" ]; then
+            echo "::error::Repository variable VPS_APP_DIR is not set." >&2
+            exit 1
+          fi
+          case "${EVENT_NAME}" in
+            release)
+              TARGET="production"
+              TAG="${RELEASE_TAG}"
+              ;;
+            workflow_dispatch)
+              TARGET="${INPUT_TARGET}"
+              TAG="${INPUT_TAG}"
+              ;;
+            *)
+              echo "::error::Unsupported event: ${EVENT_NAME}" >&2
+              exit 1
+              ;;
+          esac
+          if [ "${TARGET}" = "production" ]; then
+            if [ -z "${TAG}" ]; then
+              echo "::error::tag is required for production deploys (e.g. v5.0)." >&2
+              exit 1
+            fi
+            if ! printf '%s' "${TAG}" | grep -qE '^v[0-9]+\.[0-9]+(\.[0-9]+)?(-[A-Za-z0-9.-]+)?$'; then
+              echo "::error::tag must match v<MAJOR>.<MINOR>(.<PATCH>)?(-prerelease)? - got: ${TAG}" >&2
+              exit 1
+            fi
+            MAJOR=$(printf '%s' "${TAG}" | sed -E 's/^v([0-9]+)\..*/\1/')
+            REF="${TAG}"
+            SUBDIR="v${MAJOR}"
+          else
+            REF="development"
+            SUBDIR="dev"
+          fi
+          DEPLOY_PATH="${APP_DIR%/}/${SUBDIR}"
+          {
+            echo "ref=${REF}"
+            echo "deploy_subdir=${SUBDIR}"
+            echo "deploy_path=${DEPLOY_PATH}"
+          } >> "${GITHUB_OUTPUT}"
+          echo "::notice::Deploying ${TARGET}: ref=${REF} -> ${DEPLOY_PATH}"
+
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ steps.params.outputs.ref }}
+          persist-credentials: false
+
+      - name: Verify modern codebase shape
+        id: shape
+        run: |
+          set -euo pipefail
+          if [ ! -f composer.json ]; then
+            echo "::notice::Tag does not contain composer.json; treating as legacy snapshot and skipping the rest of the deploy."
+            echo "skip=true" >> "${GITHUB_OUTPUT}"
+          else
+            echo "skip=false" >> "${GITHUB_OUTPUT}"
+          fi
+
+      - name: Set up PHP
+        if: steps.shape.outputs.skip != 'true'
+        uses: shivammathur/setup-php@accd6127cb78bee3e8082180cb391013d204ef9f # v2
+        with:
+          php-version: '8.4'
+          extensions: intl, pdo_pgsql, json, simplexml, dom, calendar, zip, yaml, gettext, curl, xml
+          tools: composer:v2
+          coverage: none
+
+      - name: Install production dependencies
+        if: steps.shape.outputs.skip != 'true'
+        run: composer install --no-dev --optimize-autoloader --no-interaction --no-progress --no-scripts --no-plugins --prefer-dist
+
+      - name: Configure SSH
+        if: steps.shape.outputs.skip != 'true'
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.VPS_SSH_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SSH_KNOWN_HOSTS}" ]; then
+            echo "::error::Secret VPS_SSH_KNOWN_HOSTS is empty. Refusing to deploy without a pinned host key." >&2
+            exit 1
+          fi
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${SSH_PRIVATE_KEY}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          printf '%s\n' "${SSH_KNOWN_HOSTS}" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Sanity-check pinned host key against DNS SSHFP records
+        if: steps.shape.outputs.skip != 'true'
+        env:
+          SSH_KNOWN_HOSTS: ${{ secrets.VPS_SSH_KNOWN_HOSTS }}
+          SSHFP_HOST: ${{ secrets.VPS_HOST }}
+        run: |
+          set -euo pipefail
+          if ! command -v dig >/dev/null; then
+            echo "::warning::dig not available; skipping SSHFP drift check."
+            exit 0
+          fi
+          PIN_FPS=$(printf '%s\n' "${SSH_KNOWN_HOSTS}" \
+            | awk '$2 ~ /^(ssh-|ecdsa-)/' \
+            | while read -r _host _alg keyb64 _; do
+                printf '%s' "$keyb64" | base64 -d 2>/dev/null | sha256sum | awk '{print toupper($1)}'
+              done \
+            | sort -u)
+          DNS_FPS=$(dig +short SSHFP "${SSHFP_HOST}" \
+            | awk '$2 == "2" {for (i=3; i<=NF; i++) printf "%s", $i; print ""}' \
+            | tr -d ' ' \
+            | tr 'a-f' 'A-F' \
+            | sort -u)
+          if [ -z "${DNS_FPS}" ]; then
+            echo "::warning::No SHA-256 SSHFP records found for ${SSHFP_HOST}; skipping drift check."
+            exit 0
+          fi
+          if [ -z "${PIN_FPS}" ]; then
+            echo "::warning::Could not derive any fingerprints from VPS_SSH_KNOWN_HOSTS; skipping drift check."
+            exit 0
+          fi
+          PIN_NOT_IN_DNS=$(comm -23 <(echo "${PIN_FPS}") <(echo "${DNS_FPS}"))
+          DNS_NOT_IN_PIN=$(comm -13 <(echo "${PIN_FPS}") <(echo "${DNS_FPS}"))
+          if [ -n "${PIN_NOT_IN_DNS}" ]; then
+            while IFS= read -r fp; do
+              echo "::warning::Pinned key SHA256:${fp} not in DNS SSHFP for ${SSHFP_HOST}."
+            done <<< "${PIN_NOT_IN_DNS}"
+          fi
+          if [ -n "${DNS_NOT_IN_PIN}" ]; then
+            while IFS= read -r fp; do
+              echo "::warning::DNS SSHFP advertises SHA256:${fp} not present in VPS_SSH_KNOWN_HOSTS."
+            done <<< "${DNS_NOT_IN_PIN}"
+          fi
+          if [ -z "${PIN_NOT_IN_DNS}" ] && [ -z "${DNS_NOT_IN_PIN}" ]; then
+            echo "Pin matches DNS SSHFP records."
+          fi
+
+      - name: Ensure deploy + cache + logs dirs exist
+        if: steps.shape.outputs.skip != 'true'
+        env:
+          VPS_USER: ${{ secrets.VPS_USERNAME }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PORT: ${{ vars.VPS_SSH_PORT || '22' }}
+          DEPLOY_PATH: ${{ steps.params.outputs.deploy_path }}
+        run: |
+          set -euo pipefail
+          remote_cmd=$(printf 'mkdir -p %q %q %q %q' \
+            "${DEPLOY_PATH}" \
+            "${DEPLOY_PATH}/cache" \
+            "${DEPLOY_PATH}/public/engineCache" \
+            "${DEPLOY_PATH}/logs")
+          ssh -i ~/.ssh/deploy_key -p "${VPS_PORT}" \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile=~/.ssh/known_hosts \
+            -o ConnectTimeout=10 \
+            -o ServerAliveInterval=15 \
+            -o ServerAliveCountMax=2 \
+            "${VPS_USER}@${VPS_HOST}" \
+            "${remote_cmd}"
+
+      - name: Deploy via rsync
+        if: steps.shape.outputs.skip != 'true'
+        env:
+          VPS_USER: ${{ secrets.VPS_USERNAME }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PORT: ${{ vars.VPS_SSH_PORT || '22' }}
+          DEPLOY_PATH: ${{ steps.params.outputs.deploy_path }}
+        run: |
+          set -euo pipefail
+          rsync \
+            --archive --no-owner --no-group \
+            --compress --human-readable --verbose \
+            --delete --protect-args \
+            --exclude-from=.github/deploy/rsync-exclude.txt \
+            -e "ssh -i ~/.ssh/deploy_key -p ${VPS_PORT} -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=~/.ssh/known_hosts -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=2" \
+            ./ "${VPS_USER}@${VPS_HOST}:${DEPLOY_PATH%/}/"
+
+      - name: Run database migrations
+        if: steps.shape.outputs.skip != 'true'
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+          BASE: ${{ vars.VPS_APP_BASE_URL }}
+          SUBDIR: ${{ steps.params.outputs.deploy_subdir }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DEPLOY_TOKEN}" ]; then
+            echo "::error::DEPLOY_TOKEN secret is empty." >&2
+            exit 1
+          fi
+          if [ -z "${BASE}" ]; then
+            echo "::error::Repository variable VPS_APP_BASE_URL is not set." >&2
+            exit 1
+          fi
+          curl -fsS --max-time 600 \
+            -X POST \
+            -H "X-Deploy-Token: ${DEPLOY_TOKEN}" \
+            -H "Accept: text/plain" \
+            "${BASE%/}/${SUBDIR}/_ops/migrate"
+
+      - name: Post-deploy health check
+        if: steps.shape.outputs.skip != 'true'
+        env:
+          BASE: ${{ vars.VPS_APP_BASE_URL }}
+          SUBDIR: ${{ steps.params.outputs.deploy_subdir }}
+        run: |
+          set -euo pipefail
+          curl -fsS --retry 3 --retry-delay 5 --max-time 10 \
+            "${BASE%/}/${SUBDIR}/calendars" -o /dev/null
+
+      - name: Clean up SSH key
+        if: always() && steps.shape.outputs.skip != 'true'
+        run: rm -f ~/.ssh/deploy_key
