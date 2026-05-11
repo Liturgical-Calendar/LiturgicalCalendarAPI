@@ -70,6 +70,51 @@ $dotenv->ifPresent(['API_PORT'])->isInteger();
 $dotenv->ifPresent(['APP_ENV'])->notEmpty()->allowedValues(['development', 'test', 'staging', 'production']);
 $dotenv->ifPresent(['CORS_ALLOWED_ORIGINS'])->notEmpty();
 
+// Optional: when running under the integration-test coverage harness, instrument
+// the server with pcov so HTTP integration tests contribute to coverage. Gated
+// on three signals so this never fires in production by accident:
+//   1) the pcov extension is loaded,
+//   2) APP_ENV=test,
+//   3) PCOV_SERVER_COVERAGE_DIR points at a writable directory.
+// Each request appends a serialized \pcov\collect() snapshot under that dir;
+// scripts/merge-pcov-coverage.php folds those snapshots into the clover report.
+// Read PCOV_SERVER_COVERAGE_DIR via getenv() rather than $_ENV because the
+// orchestration layer (CI workflow / coverage helper script) passes it through
+// the shell environment, and PHP's default variables_order ("GPCS") leaves
+// $_ENV empty for arbitrary shell variables. APP_ENV is checked the same way
+// for symmetry (it usually comes from .env.local but may also be exported).
+$pcovServerCoverageDir = getenv('PCOV_SERVER_COVERAGE_DIR');
+$pcovAppEnv            = $_ENV['APP_ENV'] ?? getenv('APP_ENV');
+if (
+    extension_loaded('pcov')
+    && $pcovAppEnv === 'test'
+    && is_string($pcovServerCoverageDir) && $pcovServerCoverageDir !== ''
+) {
+    \pcov\start();
+    $pcovCoverageDir = $pcovServerCoverageDir;
+    register_shutdown_function(static function () use ($pcovCoverageDir): void {
+        try {
+            \pcov\stop();
+            $data = \pcov\collect();
+            if ($data === []) {
+                return;
+            }
+            if (!is_dir($pcovCoverageDir) && !@mkdir($pcovCoverageDir, 0755, true) && !is_dir($pcovCoverageDir)) {
+                return;
+            }
+            $file = sprintf(
+                '%s/pcov-%d-%s.cov',
+                rtrim($pcovCoverageDir, '/'),
+                getmypid(),
+                bin2hex(random_bytes(8))
+            );
+            @file_put_contents($file, serialize($data), LOCK_EX);
+        } catch (\Throwable) {
+            // Coverage instrumentation must never crash a response. Swallow.
+        }
+    });
+}
+
 $logsFolder = $projectFolder . DIRECTORY_SEPARATOR . 'logs';
 if (!file_exists($logsFolder)) {
     if (!mkdir($logsFolder, 0755, true)) {
