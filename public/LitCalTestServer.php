@@ -52,6 +52,58 @@ $dotenv->ifPresent(['WS_PORT'])->isInteger();
 $dotenv->ifPresent(['REDIS_SOCKET', 'REDIS_HOST'])->notEmpty();
 $dotenv->ifPresent(['REDIS_PORT'])->isInteger();
 
+// Optional: instrument the WebSocket server with pcov so the LitTestRunner /
+// validation paths under src/Test/ contribute to the merged coverage report.
+// Same triple gate as public/index.php (extension + APP_ENV=test +
+// PCOV_SERVER_COVERAGE_DIR), so production stays dormant. Unlike the HTTP
+// server's pre-forked workers, this is a single long-running Ratchet loop —
+// one \pcov\start() at boot covers every message, and we dump on shutdown
+// (Ratchet exits cleanly on SIGTERM, so register_shutdown_function fires).
+$pcovServerCoverageDir = getenv('PCOV_SERVER_COVERAGE_DIR');
+$pcovAppEnv            = $_ENV['APP_ENV'] ?? getenv('APP_ENV');
+if (
+    extension_loaded('pcov')
+    && $pcovAppEnv === 'test'
+    && is_string($pcovServerCoverageDir) && $pcovServerCoverageDir !== ''
+) {
+    \pcov\start();
+    $pcovCoverageDir = $pcovServerCoverageDir;
+    register_shutdown_function(static function () use ($pcovCoverageDir): void {
+        try {
+            \pcov\stop();
+            $data = \pcov\collect();
+            if ($data === []) {
+                return;
+            }
+            if (!is_dir($pcovCoverageDir) && !@mkdir($pcovCoverageDir, 0755, true) && !is_dir($pcovCoverageDir)) {
+                return;
+            }
+            $file = sprintf(
+                '%s/pcov-ws-%d-%s.cov',
+                rtrim($pcovCoverageDir, '/'),
+                getmypid(),
+                bin2hex(random_bytes(8))
+            );
+            @file_put_contents($file, serialize($data), LOCK_EX);
+        } catch (\Throwable) {
+            // Coverage instrumentation must never crash the server. Swallow.
+        }
+    });
+
+    // Ratchet's event loop installs its own SIGTERM/SIGINT handler that
+    // sometimes exits without invoking shutdown handlers. Re-arm the signal
+    // so the per-server-shutdown dump fires reliably under `composer ws:stop`
+    // (which sends SIGTERM via the PID file).
+    if (function_exists('pcntl_signal') && function_exists('pcntl_async_signals')) {
+        pcntl_async_signals(true);
+        $shutdownHandler = static function (): void {
+            exit(0);
+        };
+        pcntl_signal(SIGTERM, $shutdownHandler);
+        pcntl_signal(SIGINT, $shutdownHandler);
+    }
+}
+
 $logsFolder = $projectFolder . DIRECTORY_SEPARATOR . 'logs';
 if (!file_exists($logsFolder)) {
     mkdir($logsFolder);
