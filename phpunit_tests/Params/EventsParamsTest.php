@@ -128,6 +128,22 @@ final class EventsParamsTest extends TestCase
         ]);
     }
 
+    public function testRepeatedSetParamsVaClearsPreviousNationalCalendar(): void
+    {
+        // setParams() is public; switching from a real nation to VA on the same
+        // instance must clear NationalCalendar so the post-loop VA invariants
+        // fully describe the request shape (no stale nation override left over).
+        $params = new EventsParams(['national_calendar' => 'IT']);
+        self::assertSame('IT', $params->NationalCalendar);
+
+        $params->setParams(['national_calendar' => 'VA']);
+
+        self::assertNull($params->NationalCalendar);
+        self::assertSame(LitLocale::LATIN, $params->Locale);
+        self::assertSame(LitLocale::LATIN_PRIMARY_LANGUAGE, $params->baseLocale);
+        self::assertFalse($params->EternalHighPriest);
+    }
+
     public function testUnknownNationalCalendarIsRejected(): void
     {
         $this->expectException(ValidationException::class);

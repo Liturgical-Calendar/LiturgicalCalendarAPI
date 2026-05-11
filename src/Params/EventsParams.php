@@ -161,6 +161,9 @@ class EventsParams implements ParamsInterface
             $this->Locale            = LitLocale::LATIN;
             $this->baseLocale        = LitLocale::LATIN_PRIMARY_LANGUAGE;
             $this->EternalHighPriest = false;
+            // Clear any prior non-VA national override so a second setParams()
+            // call that switches to VA fully resets the request shape.
+            $this->NationalCalendar = null;
         }
     }
 
