@@ -83,6 +83,12 @@ jobs:
       - name: Configure environment for testing
         run: |
           cp .env.example .env.local
+          # Override APP_ENV to 'test' so the pcov bootstrap hooks in
+          # public/index.php + public/LitCalTestServer.php fire — both gate
+          # on APP_ENV === 'test'. Without this we silently fall back to
+          # PHPUnit's in-process coverage only, since .env.example ships
+          # APP_ENV=development.
+          echo "APP_ENV=test" >> .env.local
           echo "UNAUTHENTICATED_RATE_LIMIT=999999" >> .env.local
           echo "DB_HOST=localhost" >> .env.local
           echo "DB_PORT=5432" >> .env.local
@@ -186,7 +192,13 @@ jobs:
               echo '```'
               mv coverage.merged.xml coverage.xml
             else
-              echo "_No server-side pcov dumps to merge; using PHPUnit coverage as-is._"
+              echo "> [!WARNING]"
+              echo "> **No server-side pcov dumps were produced.** Coverage will reflect PHPUnit's in-process"
+              echo "> coverage only — the HTTP- and WS-driven integration tests in phpunit_tests/Routes/"
+              echo "> and phpunit_tests/WebSocket/ won't contribute. This usually means the pcov bootstrap"
+              echo "> hook in public/index.php / public/LitCalTestServer.php didn't fire. Check that"
+              echo "> APP_ENV=test is set in .env.local and that PCOV_SERVER_COVERAGE_DIR is exported"
+              echo "> when starting both servers."
             fi
             echo ""
           } | tee -a "$GITHUB_STEP_SUMMARY"
