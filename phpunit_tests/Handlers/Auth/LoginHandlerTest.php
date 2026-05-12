@@ -17,6 +17,9 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(LoginHandler::class)]
 final class LoginHandlerTest extends AbstractHandlerTestCase
 {
+    private ?string $savedRateLimitStoragePath  = null;
+    private static ?string $rateLimitStorageDir = null;
+
     /**
      * Each test gets a unique synthetic IP so the rate limiter doesn't carry
      * state between cases. The handler reads X-Forwarded-For when present.
@@ -30,9 +33,56 @@ final class LoginHandlerTest extends AbstractHandlerTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // Pin the rate-limit storage to a per-process isolated directory so
+        // failed-attempt records written by these in-process unit tests can
+        // never leak into the HTTP server's RateLimiter, which during CI
+        // shares the same sys_get_temp_dir(). Without this, when one of
+        // these tests happens to hash to an IP also used by the
+        // /auth/login integration tests in phpunit_tests/Routes/Auth/, the
+        // server reads a poisoned counter and the integration test trips
+        // its 5-attempt budget early.
+        if (self::$rateLimitStorageDir === null) {
+            self::$rateLimitStorageDir = sys_get_temp_dir()
+                . DIRECTORY_SEPARATOR
+                . 'litcal_unit_rate_limits_'
+                . getmypid()
+                . '_'
+                . bin2hex(random_bytes(4));
+        }
+        $existing                        = $_ENV['RATE_LIMIT_STORAGE_PATH'] ?? null;
+        $this->savedRateLimitStoragePath = is_string($existing) ? $existing : null;
+        $_ENV['RATE_LIMIT_STORAGE_PATH'] = self::$rateLimitStorageDir;
+
         // Clear any rate-limit state for this test's synthetic IP so consecutive
         // runs of this class don't interfere with each other.
         RateLimiterFactory::fromEnv()->clearAttempts($this->clientIp());
+    }
+
+    protected function tearDown(): void
+    {
+        if ($this->savedRateLimitStoragePath === null) {
+            unset($_ENV['RATE_LIMIT_STORAGE_PATH']);
+        } else {
+            $_ENV['RATE_LIMIT_STORAGE_PATH'] = $this->savedRateLimitStoragePath;
+        }
+        parent::tearDown();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        if (self::$rateLimitStorageDir !== null && is_dir(self::$rateLimitStorageDir)) {
+            $litcalDir = self::$rateLimitStorageDir . DIRECTORY_SEPARATOR . 'litcal_rate_limits';
+            if (is_dir($litcalDir)) {
+                foreach (glob($litcalDir . DIRECTORY_SEPARATOR . '*') ?: [] as $file) {
+                    @unlink($file);
+                }
+                @rmdir($litcalDir);
+            }
+            @rmdir(self::$rateLimitStorageDir);
+        }
+        self::$rateLimitStorageDir = null;
+        parent::tearDownAfterClass();
     }
 
     public function testOptionsPreflightSucceeds(): void
