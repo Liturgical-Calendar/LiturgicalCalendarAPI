@@ -18,7 +18,9 @@ namespace LiturgicalCalendar\Tests\WebSocket;
  *
  * Binary frames, continuation frames, fragmented payloads, ping/pong, and
  * frames > 65535 bytes are NOT supported. None of those are needed by the
- * Health WebSocket handler we're exercising.
+ * Health WebSocket handler we're exercising — its replies are slim
+ * `{type, text, classes, test}` objects since #589 trimmed the `jsonData`
+ * payload from non-assertion error frames.
  */
 final class WsTestClient
 {
