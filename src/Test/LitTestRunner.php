@@ -189,7 +189,7 @@ class LitTestRunner
                         $errorMessage = is_null($assertion->expected_value)
                             ? " The event {$eventKey} should not exist, instead the event has a date value of {$eventBeingTested->date}"
                             : " What is going on here? We expected the event not to exist, and in fact it doesn't. We should never get here!";
-                        $this->setError($messageIfError . $errorMessage);
+                        $this->setAssertionFailure($messageIfError . $errorMessage);
                     }
                     break;
                 case LitEventTestAssertion::EVENT_EXISTS_AND_HAS_EXPECTED_DATE:
@@ -200,10 +200,10 @@ class LitTestRunner
                         if ($actualValue === $assertion->expected_value) {
                             $this->setSuccess("expected_value = {$assertion->expected_value}, actualValue = {$actualValue}");
                         } else {
-                            $this->setError($messageIfError . $secondErrorMessage);
+                            $this->setAssertionFailure($messageIfError . $secondErrorMessage);
                         }
                     } else {
-                        $this->setError($messageIfError . $firstErrorMessage);
+                        $this->setAssertionFailure($messageIfError . $firstErrorMessage);
                     }
                     break;
                 default:
@@ -240,10 +240,17 @@ class LitTestRunner
     /**
      * Sets the message details based on the provided type and optional text. Called by {@see \LiturgicalCalendar\Api\Test\LitTestRunner::setError()} and {@see \LiturgicalCalendar\Api\Test\LitTestRunner::setSuccess()}.
      *
-     * @param string $type The type of the message ('success' or 'error').
-     * @param string|null $text The optional text to include in the message.
+     * The `$attachJsonData` flag is set only by
+     * {@see \LiturgicalCalendar\Api\Test\LitTestRunner::setAssertionFailure()},
+     * which is the only error path that needs the diagnostic calendar
+     * payload attached to the reply. Setup-time and configuration errors
+     * leave it off so reply frames stay small.
+     *
+     * @param string      $type           The type of the message ('success' or 'error').
+     * @param string|null $text           The optional text to include in the message.
+     * @param bool        $attachJsonData When true, attaches `$this->dataToTest` to `jsonData`.
      */
-    private function setMessage(string $type, ?string $text = null): void
+    private function setMessage(string $type, ?string $text = null, bool $attachJsonData = false): void
     {
         $this->Message          = new \stdClass();
         $this->Message->type    = $type;
@@ -256,8 +263,10 @@ class LitTestRunner
                 $this->Message->text = "$this->Test passed for the Calendar {$this->getCalendarName()} for the year {$this->dataToTest->settings->year}: " . $text;
             }
         } else {
-            $this->Message->text     = $text;
-            $this->Message->jsonData = $this->dataToTest;
+            $this->Message->text = $text;
+            if ($attachJsonData) {
+                $this->Message->jsonData = $this->dataToTest;
+            }
         }
     }
 
@@ -272,6 +281,28 @@ class LitTestRunner
     private function setError(string $text): void
     {
         $this->setMessage('error', $text);
+    }
+
+    /**
+     * Sets the message to be an assertion-failure error and attaches the
+     * full calendar payload to the message under `jsonData`. The frontend
+     * UnitTestInterface uses this attachment to show the actual server
+     * response when the asserted event isn't where it should be (or is
+     * present when it shouldn't be).
+     *
+     * Used only from the three assertion-mismatch branches in
+     * {@see \LiturgicalCalendar\Api\Test\LitTestRunner::runTest()}. Setup-
+     * and configuration-time errors (test-instructions missing, schema
+     * mismatch, out-of-bounds year, internal-state mismatch) call
+     * {@see \LiturgicalCalendar\Api\Test\LitTestRunner::setError()}
+     * instead — those replies would have carried ~450 KB of irrelevant
+     * calendar JSON on every error message.
+     *
+     * @param string $text The text of the assertion-failure error message.
+     */
+    private function setAssertionFailure(string $text): void
+    {
+        $this->setMessage('error', $text, true);
     }
 
     /**
