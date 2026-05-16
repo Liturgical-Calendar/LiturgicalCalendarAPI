@@ -82,7 +82,7 @@ final class ValidateCalendarTest extends TestCase
             $frames = [];
             for ($i = 0; $i < $expectedFrames; $i++) {
                 $reply   = $client->receiveText();
-                $decoded = json_decode($reply);
+                $decoded = json_decode($reply, false, 512, JSON_THROW_ON_ERROR);
                 $this->assertInstanceOf(\stdClass::class, $decoded, "Frame {$i} did not decode as JSON: " . substr($reply, 0, 200));
                 $this->assertObjectHasProperty('type', $decoded, "Frame {$i} missing `type`");
                 $frames[] = $decoded;
