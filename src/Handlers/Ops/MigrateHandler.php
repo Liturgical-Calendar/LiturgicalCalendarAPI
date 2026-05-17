@@ -94,18 +94,29 @@ final class MigrateHandler extends AbstractHandler
                 '--no-interaction' => true,
             ]), $output);
             if ($exitCode === 0) {
-                $migrateInput = [
-                    'command'          => 'migrations:migrate',
-                    '--no-interaction' => true,
-                ];
-                $to           = $request->getQueryParams()['to'] ?? null;
-                if (is_string($to) && $to !== '') {
-                    if (!preg_match('/^[A-Za-z0-9_]+$/', $to)) {
-                        return new Response(400, ['Content-Type' => 'text/plain'], "Invalid 'to' parameter\n");
+                // Guard against the "no registered migrations" case. When the
+                // configured migrations_paths contain zero Version*.php files,
+                // `migrations:migrate` fails with `version "latest" couldn't
+                // be reached` — exit code 1 — which would otherwise turn a
+                // healthy deploy red. Treat empty as a successful no-op so
+                // the workflow can land code before any migrations are
+                // written for it.
+                if ($this->countMigrationFiles() === 0) {
+                    fwrite($output->getStream(), "  [INFO] No migration files registered; nothing to apply.\n");
+                } else {
+                    $migrateInput = [
+                        'command'          => 'migrations:migrate',
+                        '--no-interaction' => true,
+                    ];
+                    $to           = $request->getQueryParams()['to'] ?? null;
+                    if (is_string($to) && $to !== '') {
+                        if (!preg_match('/^[A-Za-z0-9_]+$/', $to)) {
+                            return new Response(400, ['Content-Type' => 'text/plain'], "Invalid 'to' parameter\n");
+                        }
+                        $migrateInput['version'] = $to;
                     }
-                    $migrateInput['version'] = $to;
+                    $exitCode = $app->run(new ArrayInput($migrateInput), $output);
                 }
-                $exitCode = $app->run(new ArrayInput($migrateInput), $output);
             }
         }
 
@@ -118,6 +129,32 @@ final class MigrateHandler extends AbstractHandler
             ['Content-Type' => 'text/plain; charset=utf-8'],
             $body
         );
+    }
+
+    /**
+     * Count Version*.php files across all configured migrations_paths.
+     *
+     * Used to detect the "no migrations registered" state up-front, since
+     * Doctrine's migrate command errors out instead of treating it as a
+     * no-op. Reads the migrations config file directly rather than going
+     * through Doctrine's internal repository APIs (those vary across
+     * minor versions; plain glob is stable).
+     */
+    private function countMigrationFiles(): int
+    {
+        /** @var array<string, mixed> $config */
+        $config = include $this->configFile;
+        $paths  = $config['migrations_paths'] ?? [];
+        $count  = 0;
+        if (is_array($paths)) {
+            foreach ($paths as $dir) {
+                if (is_string($dir) && is_dir($dir)) {
+                    $matches = glob($dir . DIRECTORY_SEPARATOR . 'Version*.php') ?: [];
+                    $count  += count($matches);
+                }
+            }
+        }
+        return $count;
     }
 
     private static function buildConnectionFromEnv(): Connection
