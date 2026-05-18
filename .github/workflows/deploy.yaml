@@ -321,14 +321,22 @@ jobs:
             echo "::error::Repository variable VPS_APP_BASE_URL is not set." >&2
             exit 1
           fi
-          # --retry 2 covers transient TCP-layer failures (connection
-          # reset, refused) without retrying on HTTP error codes. The
-          # migrate endpoint is idempotent — Doctrine wraps each
-          # migration in a transaction (transactional: true) and uses
-          # sync-metadata-storage to claim each version atomically, so
-          # a dropped connection mid-run rolls back cleanly and the
-          # next attempt re-applies whatever didn't commit.
-          curl -fsS --max-time 600 --retry 2 --retry-delay 5 \
+          # Retry transient TCP failures on the migrate request. Default
+          # `--retry` covers timeouts and 5xx but does NOT cover
+          # connection-refused — that's gated by `--retry-connrefused`,
+          # which we explicitly enable here so a PHP-FPM restart blip
+          # between OPcache reset and this call doesn't fail the deploy.
+          # (Connection-reset mid-stream is still not retried by default;
+          # we'd need `--retry-all-errors` for that, which is more
+          # aggressive than warranted at this point — add later if we
+          # observe RST-class failures in practice.)
+          # Safe to retry: the migrate endpoint is idempotent — Doctrine
+          # wraps each migration in a transaction (transactional: true)
+          # and uses sync-metadata-storage to claim each version
+          # atomically, so a dropped connection mid-run rolls back
+          # cleanly and the next attempt re-applies whatever didn't
+          # commit.
+          curl -fsS --max-time 600 --retry 2 --retry-delay 5 --retry-connrefused \
             -X POST \
             -H "X-Deploy-Token: ${DEPLOY_TOKEN}" \
             -H "Accept: text/plain" \
