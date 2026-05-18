@@ -219,6 +219,33 @@ jobs:
             -e "ssh -i ~/.ssh/deploy_key -p ${VPS_PORT} -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=~/.ssh/known_hosts -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=2" \
             ./ "${VPS_USER}@${VPS_HOST}:${DEPLOY_PATH%/}/"
 
+      - name: Reset OPcache
+        if: steps.shape.outputs.skip != 'true'
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+          BASE: ${{ vars.VPS_APP_BASE_URL }}
+          SUBDIR: ${{ steps.params.outputs.deploy_subdir }}
+        # Without this, php-fpm can keep serving cached bytecode of the
+        # pre-deploy code (especially when rsync preserves source mtimes
+        # that pre-date the cached entries, leaving OPcache's revalidate
+        # check unconvinced anything has changed). opcache_reset() is
+        # process-shared on FPM SAPI, so one call clears all workers.
+        run: |
+          set -euo pipefail
+          if [ -z "${DEPLOY_TOKEN}" ]; then
+            echo "::error::DEPLOY_TOKEN secret is empty." >&2
+            exit 1
+          fi
+          if [ -z "${BASE}" ]; then
+            echo "::error::Repository variable VPS_APP_BASE_URL is not set." >&2
+            exit 1
+          fi
+          curl -fsS --retry 3 --retry-delay 3 --max-time 30 \
+            -X POST \
+            -H "X-Deploy-Token: ${DEPLOY_TOKEN}" \
+            -H "Accept: text/plain" \
+            "${BASE%/}/${SUBDIR}/_ops/opcache-reset"
+
       - name: Run database migrations
         if: steps.shape.outputs.skip != 'true'
         env:
