@@ -214,15 +214,32 @@ jobs:
             "${DEPLOY_PATH}/cache" \
             "${DEPLOY_PATH}/public/engineCache" \
             "${DEPLOY_PATH}/logs")
-          ssh -i ~/.ssh/deploy_key -p "${VPS_PORT}" \
-            -o IdentitiesOnly=yes \
-            -o StrictHostKeyChecking=yes \
-            -o UserKnownHostsFile=~/.ssh/known_hosts \
-            -o ConnectTimeout=10 \
-            -o ServerAliveInterval=15 \
-            -o ServerAliveCountMax=2 \
-            "${VPS_USER}@${VPS_HOST}" \
-            "${remote_cmd}"
+          # Retry on transient SSH failures (connection reset, fail2ban
+          # backoff, MaxStartups contention). 3 attempts with 10s/20s
+          # backoff — total worst-case wait 30s before giving up.
+          attempt=1
+          max=3
+          while true; do
+            if ssh -i ~/.ssh/deploy_key -p "${VPS_PORT}" \
+                -o IdentitiesOnly=yes \
+                -o StrictHostKeyChecking=yes \
+                -o UserKnownHostsFile=~/.ssh/known_hosts \
+                -o ConnectTimeout=10 \
+                -o ServerAliveInterval=15 \
+                -o ServerAliveCountMax=2 \
+                "${VPS_USER}@${VPS_HOST}" \
+                "${remote_cmd}"; then
+              break
+            fi
+            if [ "$attempt" -ge "$max" ]; then
+              echo "::error::ssh mkdir failed after ${max} attempts" >&2
+              exit 1
+            fi
+            delay=$((attempt * 10))
+            echo "::warning::ssh mkdir attempt ${attempt} failed; retrying in ${delay}s..." >&2
+            sleep "$delay"
+            attempt=$((attempt + 1))
+          done
 
       - name: Deploy via rsync
         if: steps.shape.outputs.skip != 'true'
@@ -233,13 +250,33 @@ jobs:
           DEPLOY_PATH: ${{ steps.params.outputs.deploy_path }}
         run: |
           set -euo pipefail
-          rsync \
-            --archive --no-owner --no-group \
-            --compress --human-readable --verbose \
-            --delete --protect-args \
-            --exclude-from=.github/deploy/rsync-exclude.txt \
-            -e "ssh -i ~/.ssh/deploy_key -p ${VPS_PORT} -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=~/.ssh/known_hosts -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=2" \
-            ./ "${VPS_USER}@${VPS_HOST}:${DEPLOY_PATH%/}/"
+          # Retry on transient SSH-layer failures the underlying rsync
+          # surfaces as "Connection reset by peer" / exit code 255. Same
+          # 3-attempt 10s/20s backoff as the mkdir step above. rsync's own
+          # --partial would help for mid-transfer drops, but the failures
+          # we've seen happen at SSH key exchange — before rsync has any
+          # bytes on the wire — so a wrapper retry is the right level.
+          attempt=1
+          max=3
+          while true; do
+            if rsync \
+                --archive --no-owner --no-group \
+                --compress --human-readable --verbose \
+                --delete --protect-args \
+                --exclude-from=.github/deploy/rsync-exclude.txt \
+                -e "ssh -i ~/.ssh/deploy_key -p ${VPS_PORT} -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=~/.ssh/known_hosts -o ConnectTimeout=10 -o ServerAliveInterval=15 -o ServerAliveCountMax=2" \
+                ./ "${VPS_USER}@${VPS_HOST}:${DEPLOY_PATH%/}/"; then
+              break
+            fi
+            if [ "$attempt" -ge "$max" ]; then
+              echo "::error::rsync failed after ${max} attempts" >&2
+              exit 1
+            fi
+            delay=$((attempt * 10))
+            echo "::warning::rsync attempt ${attempt} failed; retrying in ${delay}s..." >&2
+            sleep "$delay"
+            attempt=$((attempt + 1))
+          done
 
       - name: Reset OPcache
         if: steps.shape.outputs.skip != 'true'
@@ -284,7 +321,22 @@ jobs:
             echo "::error::Repository variable VPS_APP_BASE_URL is not set." >&2
             exit 1
           fi
-          curl -fsS --max-time 600 \
+          # Retry transient TCP failures on the migrate request. Default
+          # `--retry` covers timeouts and 5xx but does NOT cover
+          # connection-refused — that's gated by `--retry-connrefused`,
+          # which we explicitly enable here so a PHP-FPM restart blip
+          # between OPcache reset and this call doesn't fail the deploy.
+          # (Connection-reset mid-stream is still not retried by default;
+          # we'd need `--retry-all-errors` for that, which is more
+          # aggressive than warranted at this point — add later if we
+          # observe RST-class failures in practice.)
+          # Safe to retry: the migrate endpoint is idempotent — Doctrine
+          # wraps each migration in a transaction (transactional: true)
+          # and uses sync-metadata-storage to claim each version
+          # atomically, so a dropped connection mid-run rolls back
+          # cleanly and the next attempt re-applies whatever didn't
+          # commit.
+          curl -fsS --max-time 600 --retry 2 --retry-delay 5 --retry-connrefused \
             -X POST \
             -H "X-Deploy-Token: ${DEPLOY_TOKEN}" \
             -H "Accept: text/plain" \
