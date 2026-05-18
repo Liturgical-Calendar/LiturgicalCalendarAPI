@@ -22,13 +22,27 @@ use Doctrine\Migrations\AbstractMigration;
  * Also enables the pgcrypto extension (gen_random_uuid()).
  *
  * IMPORTANT for environments where the schema was bootstrapped out
- * of band from init-db.sql before this migration existed (the
- * production server's first Postgres setup on 2026-05-18, and any
- * docker-compose local-dev container that ran db-init before
- * pulling this PR):
+ * of band from init-db.sql before this migration existed:
  *
- *   Mark this baseline as already applied so migrate doesn't try
- *   to re-create the tables and crash. Either via direct SQL:
+ *   - The STAGING server's litcal_staging database was manually
+ *     populated from init-db.sql DDL on 2026-05-18. The baseline
+ *     marker has already been INSERTed there as part of this PR's
+ *     pre-merge prep — no further action needed for staging.
+ *
+ *   - Any docker-compose local-dev container whose db volume was
+ *     created BEFORE pulling this PR has the schema but not the
+ *     marker. Insert it manually or wipe the volume and let
+ *     init-db.sql re-bootstrap.
+ *
+ *   - litcal_production is still empty (no tables) — auth features
+ *     haven't shipped to prod yet. When the first production deploy
+ *     happens this migration will apply normally and create the
+ *     schema. DO NOT pre-mark Version20260518120000 as applied on
+ *     production; that would cause CREATE-TABLE statements to be
+ *     silently skipped and leave production without the tables.
+ *
+ * To pre-mark a baseline as already applied (only when the schema
+ * already exists out-of-band, as on staging), either via direct SQL:
  *
  *     INSERT INTO doctrine_migration_versions
  *         (version, executed_at, execution_time)
@@ -37,8 +51,8 @@ use Doctrine\Migrations\AbstractMigration;
  *          NOW(), 0)
  *     ON CONFLICT (version) DO NOTHING;
  *
- *   ...or by running, in an environment that has `bin/doctrine-migrations`
- *   (i.e. local dev, NOT the deployed server which excludes bin/):
+ * ...or by running, in an environment that has `bin/doctrine-migrations`
+ * (i.e. local dev, NOT the deployed server which excludes bin/):
  *
  *     bin/doctrine-migrations version --add \
  *         'LiturgicalCalendar\Api\Migrations\Version20260518120000' \
