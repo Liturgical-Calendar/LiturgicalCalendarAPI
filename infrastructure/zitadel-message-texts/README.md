@@ -8,8 +8,14 @@ Each `{locale}/{template}.json` file maps 1:1 to a Zitadel Management API
 endpoint of the form:
 
 ```text
-PUT {ZITADEL_URL}/management/v1/text/message/{template}/{locale}
+PUT {ZITADEL_URL}/management/v1/text/message/{messageType}/{locale}
 ```
+
+where `{messageType}` is the JSON filename with hyphens stripped — Zitadel's
+URL path segments are all lowercase with no separators (`verify-email.json`
+→ `verifyemail`, `passwordless-registration.json` → `passwordlessregistration`,
+`init.json` → `init` unchanged). Filenames stay hyphenated here for
+readability; the runner does the strip.
 
 The `scripts/setup-zitadel-message-texts.sh` runner walks this tree and
 PUTs each file. See "Running the setup" below.

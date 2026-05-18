@@ -172,7 +172,13 @@ for locale_dir in "$TEMPLATES_DIR"/*/; do
             continue
         fi
 
-        url="${ZITADEL_URL:-(dry)}/management/v1/text/message/${template}/${locale}"
+        # Zitadel collapses hyphens in URL path segments — `verify-email`
+        # is `verifyemail` on the wire, `password-reset` is `passwordreset`,
+        # etc. We keep filenames hyphenated for readability and strip them
+        # only at URL-build time. (Filename verify-email.json → URL segment
+        # verifyemail; init.json → init unchanged.)
+        url_segment="${template//-/}"
+        url="${ZITADEL_URL:-(dry)}/management/v1/text/message/${url_segment}/${locale}"
 
         if $DRY_RUN; then
             echo -e "${BLUE}PUT${NC}  ${url}"
