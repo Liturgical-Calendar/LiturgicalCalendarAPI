@@ -57,6 +57,26 @@ final class MigrateHandler extends AbstractHandler
         }
         ignore_user_abort(true);
 
+        // For POST: validate the `to` query parameter and the migrations
+        // config up-front, before bootstrapping Doctrine. Doctrine's
+        // PhpFile loader throws raw TypeErrors for malformed configs and
+        // silently treats a missing `migrations_paths` key as zero
+        // migrations, so doing this first gives us clear error messages
+        // and lets us short-circuit the no-op case without spinning up a
+        // DB connection.
+        $to             = null;
+        $migrationCount = null;
+        if ($request->getMethod() === 'POST') {
+            $toParam = $request->getQueryParams()['to'] ?? null;
+            if (is_string($toParam) && $toParam !== '') {
+                if (!preg_match('/^[A-Za-z0-9_]+$/', $toParam)) {
+                    return new Response(400, ['Content-Type' => 'text/plain'], "Invalid 'to' parameter\n");
+                }
+                $to = $toParam;
+            }
+            $migrationCount = $this->countMigrationFiles();
+        }
+
         if ($this->connection === null) {
             $this->connection = self::buildConnectionFromEnv();
         }
@@ -94,18 +114,25 @@ final class MigrateHandler extends AbstractHandler
                 '--no-interaction' => true,
             ]), $output);
             if ($exitCode === 0) {
-                $migrateInput = [
-                    'command'          => 'migrations:migrate',
-                    '--no-interaction' => true,
-                ];
-                $to           = $request->getQueryParams()['to'] ?? null;
-                if (is_string($to) && $to !== '') {
-                    if (!preg_match('/^[A-Za-z0-9_]+$/', $to)) {
-                        return new Response(400, ['Content-Type' => 'text/plain'], "Invalid 'to' parameter\n");
+                // Guard against the "no registered migrations" case. When the
+                // configured migrations_paths contain zero Version*.php files,
+                // `migrations:migrate` fails with `version "latest" couldn't
+                // be reached` — exit code 1 — which would otherwise turn a
+                // healthy deploy red. Treat empty as a successful no-op so
+                // the workflow can land code before any migrations are
+                // written for it.
+                if ($migrationCount === 0) {
+                    fwrite($output->getStream(), "  [INFO] No migration files registered; nothing to apply.\n");
+                } else {
+                    $migrateInput = [
+                        'command'          => 'migrations:migrate',
+                        '--no-interaction' => true,
+                    ];
+                    if ($to !== null) {
+                        $migrateInput['version'] = $to;
                     }
-                    $migrateInput['version'] = $to;
+                    $exitCode = $app->run(new ArrayInput($migrateInput), $output);
                 }
-                $exitCode = $app->run(new ArrayInput($migrateInput), $output);
             }
         }
 
@@ -118,6 +145,65 @@ final class MigrateHandler extends AbstractHandler
             ['Content-Type' => 'text/plain; charset=utf-8'],
             $body
         );
+    }
+
+    /**
+     * Count Version*.php files across all configured migrations_paths.
+     *
+     * Used to detect the "no migrations registered" state up-front, since
+     * Doctrine's migrate command errors out instead of treating it as a
+     * no-op. Reads the migrations config file directly rather than going
+     * through Doctrine's internal repository APIs (those vary across
+     * minor versions; plain glob is stable).
+     *
+     * Throws on any config/IO error so a misconfigured deploy fails loudly
+     * rather than silently swallowing a path that should have held
+     * migrations.
+     */
+    private function countMigrationFiles(): int
+    {
+        /** @var mixed $config */
+        $config = include $this->configFile;
+        if (!is_array($config)) {
+            throw new \RuntimeException(sprintf(
+                'MigrateHandler: migrations config %s did not return an array.',
+                $this->configFile
+            ));
+        }
+        if (!array_key_exists('migrations_paths', $config)) {
+            throw new \RuntimeException(sprintf(
+                'MigrateHandler: migrations config %s is missing the "migrations_paths" key.',
+                $this->configFile
+            ));
+        }
+        $paths = $config['migrations_paths'];
+        if (!is_array($paths)) {
+            throw new \RuntimeException(sprintf(
+                'MigrateHandler: "migrations_paths" in %s must be an array.',
+                $this->configFile
+            ));
+        }
+
+        $count = 0;
+        foreach ($paths as $dir) {
+            if (!is_string($dir) || !is_dir($dir)) {
+                // A configured path that isn't a real directory is a
+                // misconfiguration, not "zero migrations". Surface it.
+                throw new \RuntimeException(sprintf(
+                    'MigrateHandler: migrations_paths entry %s is not an existing directory.',
+                    is_string($dir) ? $dir : '(non-string)'
+                ));
+            }
+            $matches = glob($dir . DIRECTORY_SEPARATOR . 'Version*.php');
+            if ($matches === false) {
+                throw new \RuntimeException(sprintf(
+                    'MigrateHandler: glob() failed scanning %s for Version*.php',
+                    $dir
+                ));
+            }
+            $count += count($matches);
+        }
+        return $count;
     }
 
     private static function buildConnectionFromEnv(): Connection

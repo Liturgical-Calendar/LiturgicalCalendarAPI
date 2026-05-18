@@ -32,6 +32,7 @@ use LiturgicalCalendar\Api\Handlers\Admin\PermissionAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\UsersHandler;
 use LiturgicalCalendar\Api\Handlers\ApplicationsHandler;
 use LiturgicalCalendar\Api\Handlers\Ops\MigrateHandler;
+use LiturgicalCalendar\Api\Handlers\Ops\OpcacheResetHandler;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Middleware\AuthorizationMiddleware;
@@ -532,6 +533,10 @@ class Router
                     $migrateHandler = new MigrateHandler();
                     $migrateHandler->setAllowedRequestMethods([RequestMethod::GET]);
                     $this->handler = $migrateHandler;
+                } elseif (count($requestPathParts) === 1 && $requestPathParts[0] === 'opcache-reset') {
+                    $opcacheResetHandler = new OpcacheResetHandler();
+                    $opcacheResetHandler->setAllowedRequestMethods([RequestMethod::POST]);
+                    $this->handler = $opcacheResetHandler;
                 } else {
                     $this->response = new Response(StatusCode::NOT_FOUND->value, [], null, $this->request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
                     $this->emitResponse();
