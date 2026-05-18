@@ -1,0 +1,9 @@
+{
+  "title": "Verify Your Email",
+  "preHeader": "One last step to confirm your email address.",
+  "subject": "Verify your email — Liturgical Calendar",
+  "greeting": "Hello {{.PreferredLoginName}},",
+  "text": "Please confirm the email address associated with your Liturgical Calendar account by clicking the button below.",
+  "buttonText": "Verify Email",
+  "footerText": "Liturgical Calendar is a project of the Catholic Digital Commons Foundation. If you didn't request this, you can safely ignore this email — no further action is needed."
+}

@@ -1,0 +1,9 @@
+{
+  "title": "You've Been Invited",
+  "preHeader": "Accept your invitation to Liturgical Calendar.",
+  "subject": "You've been invited to Liturgical Calendar",
+  "greeting": "Hello {{.PreferredLoginName}},",
+  "text": "You've been invited to join the Liturgical Calendar project on the Catholic Digital Commons Foundation identity service. Click the button below to accept the invitation and set up your account.",
+  "buttonText": "Accept Invitation",
+  "footerText": "Liturgical Calendar is a project of the Catholic Digital Commons Foundation. If you weren't expecting this invitation, you can safely ignore it."
+}
