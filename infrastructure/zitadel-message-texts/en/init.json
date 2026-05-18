@@ -1,0 +1,9 @@
+{
+  "title": "Welcome to Liturgical Calendar",
+  "preHeader": "Activate your Liturgical Calendar account.",
+  "subject": "Welcome — activate your Liturgical Calendar account",
+  "greeting": "Hello {{.PreferredLoginName}},",
+  "text": "Your account has been created on the Catholic Digital Commons Foundation identity service. Click the button below to set your password and finish activating your access to the Liturgical Calendar project.",
+  "buttonText": "Activate Account",
+  "footerText": "Liturgical Calendar is a project of the Catholic Digital Commons Foundation. If you weren't expecting this email, you can safely ignore it."
+}
