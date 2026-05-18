@@ -147,3 +147,25 @@ COMMENT ON TABLE audit_log IS 'Audit trail for security and compliance';
 -- Grant permissions to litcal user on all tables
 -- (No sequence grants needed since we use UUID primary keys instead of SERIAL)
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO litcal;
+
+-- Mark the Doctrine baseline migration as already applied so the API's
+-- /_ops/migrate endpoint sees nothing to do on first run (which is what
+-- we want — the schema above is identical to what
+-- src/Migrations/Version20260518120000.php would create).
+--
+-- We create the tracking table here with the same shape Doctrine
+-- creates via `migrations:sync-metadata-storage`, then insert the
+-- baseline row. Doctrine on first call will detect the table exists
+-- and is up-to-date; nothing fires CREATE TABLE conflicts.
+CREATE TABLE IF NOT EXISTS doctrine_migration_versions (
+    version VARCHAR(191) NOT NULL PRIMARY KEY,
+    executed_at TIMESTAMP NULL,
+    execution_time INTEGER NULL
+);
+GRANT ALL PRIVILEGES ON doctrine_migration_versions TO litcal;
+
+INSERT INTO doctrine_migration_versions (version, executed_at, execution_time)
+VALUES
+    ('LiturgicalCalendar\Api\Migrations\Version20260518120000',
+     CURRENT_TIMESTAMP, 0)
+ON CONFLICT (version) DO NOTHING;
