@@ -35,6 +35,14 @@ COPY ./.env.example ./.env.local
 # so consumers (e.g., frontend docker-compose) can extract them.
 COPY ./scripts ./scripts
 
+# Include the Doctrine migrations CLI script + its config so the
+# docker-compose `litcal-migrate` one-shot service can invoke
+# `php bin/doctrine-migrations migrate --no-interaction`. Both files
+# are tiny (the CLI bootstraps DependencyFactory from env vars; the
+# config declares table_storage + migrations_paths).
+COPY ./bin ./bin
+COPY ./doctrine-migrations.php ./
+
 # Stage 2: final build
 FROM php:8.4-cli AS main
 

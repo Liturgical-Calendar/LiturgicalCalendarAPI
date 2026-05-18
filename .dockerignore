@@ -8,3 +8,5 @@
 !public/index.php
 !.env.example
 !scripts
+!bin
+!doctrine-migrations.php
