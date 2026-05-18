@@ -5,7 +5,7 @@
 -- applications, api_keys, audit_log) lives in Doctrine migrations under
 -- src/Migrations/ and is applied via `composer db:migrate` (or by hitting
 -- `POST /_ops/migrate` once the API server is running). See CLAUDE.md →
--- "Local Development Setup".
+-- "Local Development Bootstrap".
 --
 -- What this script does NOT do:
 --   * Create application tables (handled by Version20260518120000 and later)
