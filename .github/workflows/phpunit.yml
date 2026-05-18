@@ -101,6 +101,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gettext locales-all
 
+      - name: Apply Doctrine migrations
+        # scripts/init-db.sql is bootstrap-only (roles, databases, pgcrypto,
+        # empty doctrine_migration_versions tracking table). Application
+        # tables (access_requests, applications, api_keys, audit_log) are
+        # created by Doctrine migrations and must be applied before the
+        # PHP web server starts — Routes/* and Handlers/Admin/* tests
+        # exercise endpoints that query those tables directly.
+        run: composer db:migrate
+
       - name: Start the PHP web server (instrumented with pcov)
         # PCOV_SERVER_COVERAGE_DIR triggers the bootstrap hook in
         # public/index.php that dumps per-request pcov data so HTTP integration
