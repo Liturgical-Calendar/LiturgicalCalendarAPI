@@ -96,31 +96,50 @@ See [Authentication Roadmap](docs/enhancements/AUTHENTICATION_ROADMAP.md) for im
 ### Local Development Bootstrap
 
 The API server runs on the **host** (not in a container). The `docker-compose.yml`
-stack provides only the dependent infrastructure (Postgres, Zitadel, OpenFGA,
-Mailpit, Adminer). Fresh-clone setup is a three-step sequence:
+stack provides the dependent infrastructure (Postgres, Zitadel, OpenFGA,
+Mailpit, Adminer) plus a one-shot `litcal-migrate` container that applies
+all pending Doctrine migrations against the litcal database. Fresh-clone
+setup is a three-step sequence:
 
 ```bash
-# 1. Start the infrastructure (Postgres + Zitadel + OpenFGA + ...).
-#    On first run, scripts/init-db.sql creates roles, databases, the pgcrypto
-#    extension, and an empty doctrine_migration_versions table. It does NOT
-#    create application tables — those live in src/Migrations/.
-docker compose up -d
+# 1. Start (or restart) the infrastructure and apply migrations.
+#
+#    Always pass --build so newly-pulled migration files land in the
+#    litcal-migrate image before it runs. --build is cheap when nothing
+#    in the build context changed (cached layers).
+#
+#    On first run: scripts/init-db.sql creates roles, databases, the
+#    pgcrypto extension, and the empty doctrine_migration_versions
+#    tracking table. The litcal-migrate one-shot then applies
+#    Version20260518120000 (and any later migrations) to create the
+#    application schema — access_requests, applications, api_keys,
+#    audit_log, ... — and exits.
+#
+#    On subsequent runs: db comes up healthy from the persisted volume;
+#    litcal-migrate re-runs and is a no-op if everything is up-to-date,
+#    or applies whatever new migrations the rebuild picked up.
+docker compose up -d --build
 
-# 2. Install PHP dependencies.
+# 2. Install PHP dependencies on the host (separate from the container).
 composer install
 
-# 3. Apply Doctrine migrations to create the application schema
-#    (access_requests, applications, api_keys, audit_log, ...).
-#    Re-runnable: a no-op once everything is up-to-date.
-composer db:migrate
-
-# 4. Start the API server.
+# 3. Start the API server on the host.
 composer start
 ```
 
-**After-pull:** if a new migration has landed since your last pull, re-run
-`composer db:migrate` before `composer start`. There's no auto-apply on
-server startup — migrations are an explicit step.
+**After-pull workflow:** re-run `docker compose up -d --build`. The
+`--build` flag triggers a rebuild of the litcal-migrate image whenever
+`src/Migrations/` (or any other COPY'd path) has changed, so newly-
+pulled migrations apply automatically without a manual `composer
+db:migrate` step.
+
+**Manual migrate (escape hatch):** if for any reason you need to run
+migrations from the host instead — debugging, running a single
+migration up/down, generating a new one — the composer scripts still
+work: `composer db:migrate`, `composer db:migrations:status`,
+`composer db:migrations:generate`. These require `vendor/` populated on
+the host (i.e. `composer install` first) and a Postgres reachable on
+`localhost:5432`.
 
 **Schema is authoritative in `src/Migrations/`, not in `init-db.sql`.** When
 adding a new table or column:

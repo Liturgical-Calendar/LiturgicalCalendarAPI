@@ -166,6 +166,37 @@ services:
       - postgres_data:/var/lib/postgresql/data:rw
       - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
 
+  # One-shot Doctrine migrate runner for the litcal database.
+  # scripts/init-db.sql is bootstrap-only (roles, databases, pgcrypto, empty
+  # doctrine_migration_versions tracking table). Application-table DDL
+  # (access_requests, applications, api_keys, audit_log, ...) lives in
+  # src/Migrations/ and is applied by this service against the running db.
+  #
+  # Re-runnable: a no-op when everything is up-to-date. Always rebuild the
+  # image with `docker compose up -d --build` so newly-pulled migrations
+  # land in the container before this service runs.
+  #
+  # NOTE: this service exists so a fresh `docker compose up -d --build`
+  # from a wiped postgres_data volume produces a fully migrated schema
+  # with no manual `composer db:migrate` step. The API server itself
+  # still runs on the host via `composer start` — only migrations run
+  # in-container.
+  litcal-migrate:
+    build: .
+    command: ["php", "bin/doctrine-migrations", "migrate", "--no-interaction"]
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: litcal
+      DB_USER: litcal
+      DB_PASSWORD: litcal_secure_password
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - zitadel
+    restart: "no"
+
   # Adminer - Database management UI
   # Access at: http://localhost:8088
   # Login: System=PostgreSQL, Server=db, Username=postgres, Password=postgres
