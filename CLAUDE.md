@@ -93,6 +93,46 @@ The API supports full cookie-only authentication where:
 
 See [Authentication Roadmap](docs/enhancements/AUTHENTICATION_ROADMAP.md) for implementation details.
 
+### Local Development Bootstrap
+
+The API server runs on the **host** (not in a container). The `docker-compose.yml`
+stack provides only the dependent infrastructure (Postgres, Zitadel, OpenFGA,
+Mailpit, Adminer). Fresh-clone setup is a three-step sequence:
+
+```bash
+# 1. Start the infrastructure (Postgres + Zitadel + OpenFGA + ...).
+#    On first run, scripts/init-db.sql creates roles, databases, the pgcrypto
+#    extension, and an empty doctrine_migration_versions table. It does NOT
+#    create application tables — those live in src/Migrations/.
+docker compose up -d
+
+# 2. Install PHP dependencies.
+composer install
+
+# 3. Apply Doctrine migrations to create the application schema
+#    (access_requests, applications, api_keys, audit_log, ...).
+#    Re-runnable: a no-op once everything is up-to-date.
+composer db:migrate
+
+# 4. Start the API server.
+composer start
+```
+
+**After-pull:** if a new migration has landed since your last pull, re-run
+`composer db:migrate` before `composer start`. There's no auto-apply on
+server startup — migrations are an explicit step.
+
+**Schema is authoritative in `src/Migrations/`, not in `init-db.sql`.** When
+adding a new table or column:
+
+- Generate a migration: `composer db:migrations:generate`, then edit it.
+- Apply locally: `composer db:migrate`.
+- Verify with `composer db:migrations:status`.
+
+Do NOT add application-table DDL to `scripts/init-db.sql` — that script is
+bootstrap-only (roles, databases, pgcrypto, the empty migrations tracking
+table). Anything else there silently diverges from the migration history.
+
 ### Testing
 
 ```bash
