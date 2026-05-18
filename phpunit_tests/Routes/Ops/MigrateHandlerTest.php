@@ -360,6 +360,100 @@ PHP;
         }
     }
 
+
+    public function testPostMigrateRejectsConfigThatDoesNotReturnArray(): void
+    {
+        // include returns int 42 — countMigrationFiles() must surface this as
+        // a hard error instead of treating it like "0 migrations registered".
+        $configFile = sys_get_temp_dir() . '/litcal_test_migrate_cfg_' . bin2hex(random_bytes(6)) . '.php';
+        file_put_contents($configFile, "<?php\nreturn 42;\n");
+        $this->tempPaths[] = $configFile;
+
+        $handler = new MigrateHandler($this->connection, $configFile);
+        $handler->setAllowedRequestMethods([
+            \LiturgicalCalendar\Api\Http\Enum\RequestMethod::POST,
+        ]);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('did not return an array');
+        $handler->handle(new ServerRequest('POST', '/_ops/migrate'));
+    }
+
+    public function testPostMigrateRejectsConfigMissingMigrationsPathsKey(): void
+    {
+        $configFile = sys_get_temp_dir() . '/litcal_test_migrate_cfg_' . bin2hex(random_bytes(6)) . '.php';
+        file_put_contents($configFile, "<?php\nreturn " . var_export([
+            'table_storage' => ['table_name' => 'doctrine_migration_versions'],
+        ], true) . ";\n");
+        $this->tempPaths[] = $configFile;
+
+        $handler = new MigrateHandler($this->connection, $configFile);
+        $handler->setAllowedRequestMethods([
+            \LiturgicalCalendar\Api\Http\Enum\RequestMethod::POST,
+        ]);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('missing the "migrations_paths" key');
+        $handler->handle(new ServerRequest('POST', '/_ops/migrate'));
+    }
+
+    public function testPostMigrateRejectsConfigWithNonArrayMigrationsPaths(): void
+    {
+        $configFile = sys_get_temp_dir() . '/litcal_test_migrate_cfg_' . bin2hex(random_bytes(6)) . '.php';
+        file_put_contents($configFile, "<?php\nreturn " . var_export(['migrations_paths' => 'not-an-array'], true) . ";\n");
+        $this->tempPaths[] = $configFile;
+
+        $handler = new MigrateHandler($this->connection, $configFile);
+        $handler->setAllowedRequestMethods([
+            \LiturgicalCalendar\Api\Http\Enum\RequestMethod::POST,
+        ]);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('must be an array');
+        $handler->handle(new ServerRequest('POST', '/_ops/migrate'));
+    }
+
+    public function testPostMigrateRejectsMigrationsPathEntryThatIsNotADirectory(): void
+    {
+        $configFile = sys_get_temp_dir() . '/litcal_test_migrate_cfg_' . bin2hex(random_bytes(6)) . '.php';
+        $bogusDir   = sys_get_temp_dir() . '/litcal_test_migrate_nope_' . bin2hex(random_bytes(6));
+        file_put_contents($configFile, "<?php\nreturn " . var_export([
+            'migrations_paths' => ['LiturgicalCalendar\\TestMigrations' => $bogusDir],
+        ], true) . ";\n");
+        $this->tempPaths[] = $configFile;
+
+        $handler = new MigrateHandler($this->connection, $configFile);
+        $handler->setAllowedRequestMethods([
+            \LiturgicalCalendar\Api\Http\Enum\RequestMethod::POST,
+        ]);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('is not an existing directory');
+        $handler->handle(new ServerRequest('POST', '/_ops/migrate'));
+    }
+
+    public function testPostMigrateEmptyPathsReturns200WithNoOpNotice(): void
+    {
+        // Empty migrations_paths array is the deploy-time happy path that
+        // motivated this PR: workflow lands code before any Version*.php
+        // exists. countMigrationFiles() returns 0 → handler writes an info
+        // notice and returns 200 instead of letting Doctrine fail.
+        $configFile = $this->writeConfig([]);
+
+        $handler = new MigrateHandler($this->connection, $configFile);
+        $handler->setAllowedRequestMethods([
+            \LiturgicalCalendar\Api\Http\Enum\RequestMethod::POST,
+        ]);
+
+        $response = $handler->handle(new ServerRequest('POST', '/_ops/migrate'));
+
+        $this->assertSame(200, $response->getStatusCode());
+        $this->assertStringContainsString(
+            'No migration files registered',
+            (string) $response->getBody()
+        );
+    }
+
     /**
      * Build a synthetic Doctrine migration class as PHP source, creating
      * the named table on up() and dropping it on down().

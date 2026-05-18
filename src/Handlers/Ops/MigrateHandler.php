@@ -57,12 +57,15 @@ final class MigrateHandler extends AbstractHandler
         }
         ignore_user_abort(true);
 
-        // Validate the `to` query parameter up-front so a malformed value is
-        // rejected with 400 regardless of whether any migrations are
-        // registered. (Doing this after the empty-migrations short-circuit
-        // below would let bad input through whenever migrations_paths is
-        // empty.)
-        $to = null;
+        // For POST: validate the `to` query parameter and the migrations
+        // config up-front, before bootstrapping Doctrine. Doctrine's
+        // PhpFile loader throws raw TypeErrors for malformed configs and
+        // silently treats a missing `migrations_paths` key as zero
+        // migrations, so doing this first gives us clear error messages
+        // and lets us short-circuit the no-op case without spinning up a
+        // DB connection.
+        $to             = null;
+        $migrationCount = null;
         if ($request->getMethod() === 'POST') {
             $toParam = $request->getQueryParams()['to'] ?? null;
             if (is_string($toParam) && $toParam !== '') {
@@ -71,6 +74,7 @@ final class MigrateHandler extends AbstractHandler
                 }
                 $to = $toParam;
             }
+            $migrationCount = $this->countMigrationFiles();
         }
 
         if ($this->connection === null) {
@@ -117,7 +121,7 @@ final class MigrateHandler extends AbstractHandler
                 // healthy deploy red. Treat empty as a successful no-op so
                 // the workflow can land code before any migrations are
                 // written for it.
-                if ($this->countMigrationFiles() === 0) {
+                if ($migrationCount === 0) {
                     fwrite($output->getStream(), "  [INFO] No migration files registered; nothing to apply.\n");
                 } else {
                     $migrateInput = [
