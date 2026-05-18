@@ -168,7 +168,16 @@ final class Version20260518120000 extends AbstractMigration
             )
         SQL);
 
-        $this->addSql('CREATE INDEX idx_api_keys_hash ON api_keys(key_hash)');
+        // No separate index on key_hash — it's VARCHAR(255) UNIQUE NOT NULL,
+        // so Postgres already creates a unique B-tree index to enforce the
+        // constraint (api_keys_key_hash_key). A second index would just cost
+        // write throughput with no query-planner benefit.
+        //
+        // Index on application_id because it's a FK (NOT NULL REFERENCES
+        // applications(id) ON DELETE CASCADE) and Postgres does NOT auto-
+        // index FK columns — without this, "list keys for application X"
+        // and cascade-deletes from applications fall back to seq scans.
+        $this->addSql('CREATE INDEX idx_api_keys_application_id ON api_keys(application_id)');
         $this->addSql('CREATE INDEX idx_api_keys_prefix ON api_keys(key_prefix)');
         $this->addSql("COMMENT ON TABLE api_keys IS 'API keys for application authentication'");
         $this->addSql("COMMENT ON COLUMN api_keys.key_hash IS 'SHA-256 hash of the API key'");
