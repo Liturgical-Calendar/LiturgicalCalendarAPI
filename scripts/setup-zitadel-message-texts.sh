@@ -148,6 +148,7 @@ for locale_dir in "$TEMPLATES_DIR"/*/; do
     done
     if ! $in_supported; then
         echo -e "${YELLOW}skip${NC} ${locale}/  (not in Zitadel's supported locales)"
+        skipped=$((skipped + 1))
         continue
     fi
 
@@ -212,3 +213,18 @@ if [ "$failed" -gt 0 ]; then
     exit 1
 fi
 echo -e "  failed:  ${failed}"
+
+# Fail loudly if filters were set but matched zero template files. Without
+# this guard, a typo like --template=verify-emails (extra 's') would exit 0
+# with "pushed: 0", silently signalling success for a no-op. The locale
+# filter is already validated against SUPPORTED_LOCALES up front, but the
+# template filter is matched against on-disk filenames — so this is where
+# the typo gets caught.
+if [ "$pushed" -eq 0 ] && [ "$failed" -eq 0 ] && { [ -n "$LOCALE_FILTER" ] || [ -n "$TEMPLATE_FILTER" ]; }; then
+    echo
+    echo -e "${RED}Error: filters matched zero template files.${NC}" >&2
+    [ -n "$LOCALE_FILTER" ]   && echo -e "  --locale=${LOCALE_FILTER}" >&2
+    [ -n "$TEMPLATE_FILTER" ] && echo -e "  --template=${TEMPLATE_FILTER}" >&2
+    echo -e "${DIM}Check the template name spelling; available templates are the .json file basenames under each locale dir.${NC}" >&2
+    exit 1
+fi
