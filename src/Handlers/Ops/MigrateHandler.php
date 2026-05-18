@@ -57,6 +57,22 @@ final class MigrateHandler extends AbstractHandler
         }
         ignore_user_abort(true);
 
+        // Validate the `to` query parameter up-front so a malformed value is
+        // rejected with 400 regardless of whether any migrations are
+        // registered. (Doing this after the empty-migrations short-circuit
+        // below would let bad input through whenever migrations_paths is
+        // empty.)
+        $to = null;
+        if ($request->getMethod() === 'POST') {
+            $toParam = $request->getQueryParams()['to'] ?? null;
+            if (is_string($toParam) && $toParam !== '') {
+                if (!preg_match('/^[A-Za-z0-9_]+$/', $toParam)) {
+                    return new Response(400, ['Content-Type' => 'text/plain'], "Invalid 'to' parameter\n");
+                }
+                $to = $toParam;
+            }
+        }
+
         if ($this->connection === null) {
             $this->connection = self::buildConnectionFromEnv();
         }
@@ -108,11 +124,7 @@ final class MigrateHandler extends AbstractHandler
                         'command'          => 'migrations:migrate',
                         '--no-interaction' => true,
                     ];
-                    $to           = $request->getQueryParams()['to'] ?? null;
-                    if (is_string($to) && $to !== '') {
-                        if (!preg_match('/^[A-Za-z0-9_]+$/', $to)) {
-                            return new Response(400, ['Content-Type' => 'text/plain'], "Invalid 'to' parameter\n");
-                        }
+                    if ($to !== null) {
                         $migrateInput['version'] = $to;
                     }
                     $exitCode = $app->run(new ArrayInput($migrateInput), $output);
@@ -139,20 +151,53 @@ final class MigrateHandler extends AbstractHandler
      * no-op. Reads the migrations config file directly rather than going
      * through Doctrine's internal repository APIs (those vary across
      * minor versions; plain glob is stable).
+     *
+     * Throws on any config/IO error so a misconfigured deploy fails loudly
+     * rather than silently swallowing a path that should have held
+     * migrations.
      */
     private function countMigrationFiles(): int
     {
-        /** @var array<string, mixed> $config */
+        /** @var mixed $config */
         $config = include $this->configFile;
-        $paths  = $config['migrations_paths'] ?? [];
-        $count  = 0;
-        if (is_array($paths)) {
-            foreach ($paths as $dir) {
-                if (is_string($dir) && is_dir($dir)) {
-                    $matches = glob($dir . DIRECTORY_SEPARATOR . 'Version*.php') ?: [];
-                    $count  += count($matches);
-                }
+        if (!is_array($config)) {
+            throw new \RuntimeException(sprintf(
+                'MigrateHandler: migrations config %s did not return an array.',
+                $this->configFile
+            ));
+        }
+        if (!array_key_exists('migrations_paths', $config)) {
+            throw new \RuntimeException(sprintf(
+                'MigrateHandler: migrations config %s is missing the "migrations_paths" key.',
+                $this->configFile
+            ));
+        }
+        $paths = $config['migrations_paths'];
+        if (!is_array($paths)) {
+            throw new \RuntimeException(sprintf(
+                'MigrateHandler: "migrations_paths" in %s must be an array.',
+                $this->configFile
+            ));
+        }
+
+        $count = 0;
+        foreach ($paths as $dir) {
+            if (!is_string($dir) || !is_dir($dir)) {
+                // A configured path that isn't a real directory is a
+                // misconfiguration, not "zero migrations". Surface it.
+                throw new \RuntimeException(sprintf(
+                    'MigrateHandler: migrations_paths entry %s is not an existing directory.',
+                    is_string($dir) ? $dir : '(non-string)'
+                ));
             }
+            $matches = glob($dir . DIRECTORY_SEPARATOR . 'Version*.php');
+            if ($matches === false) {
+                throw new \RuntimeException(sprintf(
+                    'MigrateHandler: glob() failed scanning %s for Version*.php',
+                    $dir
+                ));
+            }
+            $count += count($matches);
         }
         return $count;
     }
