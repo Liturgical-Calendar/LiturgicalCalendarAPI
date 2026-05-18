@@ -15,20 +15,25 @@ on:
         description: 'Release tag (production only, e.g. v5.0 or v5.1.2). Ignored for staging.'
         required: false
         type: string
+  push:
+    branches:
+      - development
   release:
     types: [published]
 
 concurrency:
-  group: deploy-${{ github.event_name == 'release' && 'production' || inputs.target }}
+  # Pin per-target so staging and production deploys never serialize behind
+  # each other; same-target deploys queue rather than cancel mid-flight.
+  group: deploy-${{ (github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.target == 'production')) && 'production' || 'staging' }}
   cancel-in-progress: false
 
 jobs:
   deploy:
-    name: Deploy ${{ github.event_name == 'release' && 'production' || inputs.target }}
+    name: Deploy ${{ (github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.target == 'production')) && 'production' || 'staging' }}
     if: github.event_name != 'release' || github.event.release.prerelease == false
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    environment: ${{ github.event_name == 'release' && 'production' || inputs.target }}
+    environment: ${{ (github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.target == 'production')) && 'production' || 'staging' }}
     permissions:
       contents: read
 
@@ -40,6 +45,7 @@ jobs:
           INPUT_TARGET: ${{ inputs.target }}
           INPUT_TAG: ${{ inputs.tag }}
           RELEASE_TAG: ${{ github.event.release.tag_name }}
+          GIT_REF: ${{ github.ref }}
           APP_DIR: ${{ vars.VPS_APP_DIR }}
         run: |
           set -euo pipefail
@@ -55,6 +61,12 @@ jobs:
             workflow_dispatch)
               TARGET="${INPUT_TARGET}"
               TAG="${INPUT_TAG}"
+              ;;
+            push)
+              # Per the `push: branches: [development]` filter above, this
+              # only fires for pushes to development → auto-staging.
+              TARGET="staging"
+              TAG=""
               ;;
             *)
               echo "::error::Unsupported event: ${EVENT_NAME}" >&2
@@ -74,7 +86,17 @@ jobs:
             REF="${TAG}"
             SUBDIR="v${MAJOR}"
           else
-            REF="development"
+            # staging: any branch can be deployed.
+            # - push (always from development): REF=development
+            # - workflow_dispatch: REF=whatever branch the user picked in
+            #   the "Use workflow from" dropdown. This lets feature
+            #   branches be sent to staging for end-to-end testing
+            #   without merging first.
+            if [ "${EVENT_NAME}" = "push" ]; then
+              REF="development"
+            else
+              REF="${GIT_REF#refs/heads/}"
+            fi
             SUBDIR="dev"
           fi
           DEPLOY_PATH="${APP_DIR%/}/${SUBDIR}"
