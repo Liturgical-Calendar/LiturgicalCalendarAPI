@@ -1,0 +1,9 @@
+{
+  "title": "Your Email Domain Was Claimed",
+  "preHeader": "Action required on your Liturgical Calendar account.",
+  "subject": "Your email domain has been claimed — Liturgical Calendar",
+  "greeting": "Hello {{.PreferredLoginName}},",
+  "text": "The domain of your email address has been claimed by an organization on the Catholic Digital Commons Foundation identity service. At your next sign-in you'll be asked to choose a new login name. Your account data, including your Liturgical Calendar settings and history, is preserved.",
+  "buttonText": "Sign In",
+  "footerText": "Liturgical Calendar is a project of the Catholic Digital Commons Foundation."
+}

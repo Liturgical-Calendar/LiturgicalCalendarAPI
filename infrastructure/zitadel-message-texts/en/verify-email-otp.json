@@ -1,0 +1,9 @@
+{
+  "title": "Your Verification Code",
+  "preHeader": "Use this one-time code to verify your email.",
+  "subject": "Your Liturgical Calendar verification code",
+  "greeting": "Hello {{.PreferredLoginName}},",
+  "text": "Your one-time verification code is {{.OTP}}. Enter it on the verification page to confirm your email address. This code expires shortly — please use it promptly.",
+  "buttonText": "Verify",
+  "footerText": "Liturgical Calendar is a project of the Catholic Digital Commons Foundation. If you didn't request this code, please secure your account."
+}
