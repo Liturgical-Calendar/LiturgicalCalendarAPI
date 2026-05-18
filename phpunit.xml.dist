@@ -14,5 +14,17 @@
     <include>
       <directory>src</directory>
     </include>
+    <exclude>
+      <!--
+        Doctrine migration files are pure DDL invoked through the Symfony
+        Console MigrateCommand at deploy time, with no behavior to assert
+        beyond "the SQL ran." They're covered end-to-end by the deploy
+        workflow (which actually applies them against a real Postgres),
+        not by unit tests. Excluding them from coverage prevents new
+        baseline-style migrations from triggering false "0% patch
+        coverage" Codecov alerts on every PR.
+      -->
+      <directory>src/Migrations</directory>
+    </exclude>
   </source>
 </phpunit>
