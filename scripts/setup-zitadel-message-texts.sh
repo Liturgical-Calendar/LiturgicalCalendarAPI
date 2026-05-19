@@ -176,8 +176,11 @@ for locale_dir in "$TEMPLATES_DIR"/*/; do
         # is `verifyemail` on the wire, `password-reset` is `passwordreset`,
         # etc. We keep filenames hyphenated for readability and strip them
         # only at URL-build time. (Filename verify-email.json → URL segment
-        # verifyemail; init.json → init unchanged.)
+        # verifyemail; init.json → init unchanged.) Also lowercase to
+        # stay canonical if a contributor ever lands a mixed-case
+        # filename — Zitadel rejects non-canonical case with 404.
         url_segment="${template//-/}"
+        url_segment="${url_segment,,}"
         url="${ZITADEL_URL:-(dry)}/management/v1/text/message/${url_segment}/${locale}"
 
         if $DRY_RUN; then
