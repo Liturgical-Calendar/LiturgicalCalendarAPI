@@ -169,6 +169,54 @@ final class NotificationsHandlerTest extends AbstractHandlerTestCase
         self::assertSame(404, $response->getStatusCode());
     }
 
+    public function testRejectsEmptyStringSub(): void
+    {
+        $this->expectException(UnauthorizedException::class);
+        $this->expectExceptionMessage('Invalid authentication token');
+
+        $request = $this->requestFor('GET', '/auth/notifications')
+            ->withAttribute('oidc_user', ['sub' => '']);
+
+        ( new NotificationsHandler() )->handle($request);
+    }
+
+    public function testRejectsWhitespaceOnlySub(): void
+    {
+        $this->expectException(UnauthorizedException::class);
+        $this->expectExceptionMessage('Invalid authentication token');
+
+        $request = $this->requestFor('GET', '/auth/notifications')
+            ->withAttribute('oidc_user', ['sub' => '   ']);
+
+        ( new NotificationsHandler() )->handle($request);
+    }
+
+    public function testRejectsMissingSub(): void
+    {
+        $this->expectException(UnauthorizedException::class);
+        $this->expectExceptionMessage('Invalid authentication token');
+
+        // oidc_user without a 'sub' key — $userId resolves to null,
+        // triggering the !is_string($userId) branch.
+        $request = $this->requestFor('GET', '/auth/notifications')
+            ->withAttribute('oidc_user', ['email' => 'x@example.test']);
+
+        ( new NotificationsHandler() )->handle($request);
+    }
+
+    public function testHandlesOptionsPreflight(): void
+    {
+        $request  = $this->requestFor('OPTIONS', '/auth/notifications')
+            ->withHeader('Origin', 'https://example.test')
+            ->withHeader('Access-Control-Request-Method', 'GET');
+        $response = ( new NotificationsHandler() )->handle($request);
+
+        // Preflight should short-circuit before auth, so no UnauthorizedException
+        // is thrown. Status should be 2xx (typically 204 No Content).
+        self::assertLessThan(300, $response->getStatusCode());
+        self::assertGreaterThanOrEqual(200, $response->getStatusCode());
+    }
+
     public function testGetThenSeenThenGetFlipsUnreadFlag(): void
     {
         $repo = new AccessRequestRepository(self::$pdo);

@@ -125,6 +125,64 @@ final class UserNotificationRepositoryTest extends AbstractHandlerTestCase
         self::assertSame(55, $result['unread_count']);
     }
 
+    public function testFetchInboxClampsLimitAboveCap(): void
+    {
+        // Seed two items so the clamp's effect (cap at 50) is the only thing
+        // that could constrain the result; with 2 items and a caller-requested
+        // 999, we expect 2 returned (not an error, not the raw 999).
+        $id1 = $this->accessReqRepo->create(
+            'zitadel-user-clamp-hi',
+            'ch@example.test',
+            'CH',
+            'calendar_editor',
+            [['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor']]
+        );
+        $id2 = $this->accessReqRepo->create(
+            'zitadel-user-clamp-hi',
+            'ch@example.test',
+            'CH',
+            'developer',
+            [['object_type' => 'test_definition', 'object_id' => 'foo', 'relation' => 'editor']]
+        );
+        $this->accessReqRepo->approve($id1, 'admin-x', null);
+        $this->accessReqRepo->approve($id2, 'admin-x', null);
+
+        $result = $this->repo->fetchInbox('zitadel-user-clamp-hi', limit: 999);
+
+        self::assertCount(2, $result['items']);
+        self::assertSame(2, $result['total']);
+    }
+
+    public function testFetchInboxClampsNonPositiveLimitToOne(): void
+    {
+        // A caller-requested limit of 0 or negative is nonsensical; the
+        // repository clamps to 1 (defense in depth) rather than running a
+        // `LIMIT 0` query that returns no items.
+        $id1 = $this->accessReqRepo->create(
+            'zitadel-user-clamp-lo',
+            'cl@example.test',
+            'CL',
+            'calendar_editor',
+            [['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor']]
+        );
+        $id2 = $this->accessReqRepo->create(
+            'zitadel-user-clamp-lo',
+            'cl@example.test',
+            'CL',
+            'developer',
+            [['object_type' => 'test_definition', 'object_id' => 'foo', 'relation' => 'editor']]
+        );
+        $this->accessReqRepo->approve($id1, 'admin-x', null);
+        $this->accessReqRepo->approve($id2, 'admin-x', null);
+
+        $result = $this->repo->fetchInbox('zitadel-user-clamp-lo', limit: 0);
+
+        self::assertCount(1, $result['items']);
+        // total is the window-function count over the FULL filtered set,
+        // so it still sees both items even though only 1 is paged in.
+        self::assertSame(2, $result['total']);
+    }
+
     public function testFetchInboxOrdersByReviewedAtDesc(): void
     {
         $id1 = $this->accessReqRepo->create(
