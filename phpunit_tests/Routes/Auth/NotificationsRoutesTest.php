@@ -25,6 +25,17 @@ final class NotificationsRoutesTest extends ApiTestCase
         if (!self::isDatabaseConfigured()) {
             self::markTestSkipped('Database not configured.');
         }
+        // OidcAvailabilityMiddleware short-circuits with 503 when Zitadel
+        // envs aren't set on the running server. In that environment every
+        // request to /auth/notifications returns 503 regardless of auth,
+        // so neither the no-auth-401 assertion nor the token-flow tests
+        // can run meaningfully.
+        $probe = self::$http->get('/auth/notifications', [
+            'headers' => ['Accept' => 'application/json'],
+        ]);
+        if ($probe->getStatusCode() === 503) {
+            self::markTestSkipped('OIDC (Zitadel) not configured on the running server.');
+        }
     }
 
     /**
