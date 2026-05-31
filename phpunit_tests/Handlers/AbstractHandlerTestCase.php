@@ -38,7 +38,7 @@ abstract class AbstractHandlerTestCase extends TestCase
     protected static ?PDO $pdo = null;
 
     /** @var array<int,string> */
-    protected const TABLES = ['api_keys', 'applications', 'access_requests', 'audit_log'];
+    protected const TABLES = ['api_keys', 'applications', 'access_requests', 'audit_log', 'user_notification_state'];
 
     /**
      * Subclasses set true when their tests need a working Postgres.
