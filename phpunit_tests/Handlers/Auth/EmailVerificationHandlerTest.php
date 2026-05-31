@@ -9,11 +9,14 @@ use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Tests\Handlers\AbstractHandlerTestCase;
+use LiturgicalCalendar\Tests\Support\EnvIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(EmailVerificationHandler::class)]
 final class EmailVerificationHandlerTest extends AbstractHandlerTestCase
 {
+    use EnvIsolationTrait;
+
     public function testOptionsPreflightSucceeds(): void
     {
         $response = ( new EmailVerificationHandler() )->handle(
@@ -66,14 +69,14 @@ final class EmailVerificationHandlerTest extends AbstractHandlerTestCase
 
     public function testZitadelNotConfiguredIsRuntimeError(): void
     {
-        // We don't set up Zitadel envs in the test bootstrap, so the handler
-        // should fail at the isConfigured() gate when reached.
+        // Bootstrap may load Zitadel envs from .env.local on dev machines,
+        // so clear them locally to reach the handler's isConfigured() gate.
         $request = $this->requestFor('POST', '/auth/email-verification/resend')
             ->withAttribute('oidc_user', ['sub' => 'user-123', 'email_verified' => false]);
 
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Zitadel service not configured');
 
-        ( new EmailVerificationHandler() )->handle($request);
+        $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => ( new EmailVerificationHandler() )->handle($request));
     }
 }
