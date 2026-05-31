@@ -217,6 +217,45 @@ final class NotificationsHandlerTest extends AbstractHandlerTestCase
         self::assertGreaterThanOrEqual(200, $response->getStatusCode());
     }
 
+    public function testUnknownHttpMethodReturns405(): void
+    {
+        // Method outside the RequestMethod enum (e.g. 'BANANA') makes
+        // RequestMethod::tryFrom return null; validateRequestMethod then
+        // throws a MethodNotAllowedException that surfaces as 405.
+        $this->expectException(\Throwable::class);
+
+        $request = $this->requestFor('BANANA', '/auth/notifications');
+
+        ( new NotificationsHandler() )->handle($request);
+    }
+
+    public function testExtractSubPathFallbackWhenApiBasePathUnset(): void
+    {
+        // The fallback branch in extractSubPath fires when API_BASE_PATH is
+        // absent or non-string. .env.local normally provides API_BASE_PATH=''
+        // so we have to temporarily unset it to exercise the fallback.
+        $originalEnv    = $_ENV['API_BASE_PATH'] ?? null;
+        $originalServer = $_SERVER['API_BASE_PATH'] ?? null;
+        unset($_ENV['API_BASE_PATH'], $_SERVER['API_BASE_PATH']);
+
+        try {
+            $response = ( new NotificationsHandler() )->handle(
+                $this->withOidcUser(
+                    $this->requestFor('GET', '/auth/notifications'),
+                    'zitadel-user-fallback'
+                )
+            );
+            self::assertSame(200, $response->getStatusCode());
+        } finally {
+            if ($originalEnv !== null) {
+                $_ENV['API_BASE_PATH'] = $originalEnv;
+            }
+            if ($originalServer !== null) {
+                $_SERVER['API_BASE_PATH'] = $originalServer;
+            }
+        }
+    }
+
     public function testGetThenSeenThenGetFlipsUnreadFlag(): void
     {
         $repo = new AccessRequestRepository(self::$pdo);

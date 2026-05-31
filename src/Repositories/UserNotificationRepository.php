@@ -135,34 +135,29 @@ final class UserNotificationRepository
 
     /**
      * Narrow a scalar DB column value to int without violating PHPStan L10's
-     * cast-from-mixed rule. Postgres returns COUNT(*) OVER () as a numeric
-     * string by default; cast-after-validate is the canonical L10 pattern.
+     * cast-from-mixed rule. With PDO::ATTR_EMULATE_PREPARES=false (the project
+     * default — see Connection.php), pdo_pgsql returns COUNT(*) OVER () as a
+     * native PHP int, so a single is_int guard suffices.
      */
     private function toInt(mixed $value): int
     {
-        if (is_int($value)) {
-            return $value;
+        if (!is_int($value)) {
+            throw new \UnexpectedValueException('Expected int, got ' . gettype($value));
         }
-        if (is_string($value) && is_numeric($value)) {
-            return (int) $value;
-        }
-        throw new \UnexpectedValueException('Expected int-compatible scalar, got ' . gettype($value));
+        return $value;
     }
 
     /**
      * Narrow a scalar DB column value to string without violating PHPStan L10's
-     * cast-from-mixed rule. All columns we read here are either text-typed or
-     * UUID/timestamp (which the driver returns as strings).
+     * cast-from-mixed rule. All columns we read here are TEXT, VARCHAR, UUID,
+     * or TIMESTAMP — all of which pdo_pgsql returns as PHP strings.
      */
     private function toString(mixed $value): string
     {
-        if (is_string($value)) {
-            return $value;
+        if (!is_string($value)) {
+            throw new \UnexpectedValueException('Expected string, got ' . gettype($value));
         }
-        if (is_int($value) || is_float($value)) {
-            return (string) $value;
-        }
-        throw new \UnexpectedValueException('Expected string-compatible scalar, got ' . gettype($value));
+        return $value;
     }
 
     /**
