@@ -145,7 +145,7 @@ class AccessRequestRepository
             return null;
         }
 
-        return $this->decodePermissions($result);
+        return self::decodePermissions($result);
     }
 
     /**
@@ -614,7 +614,7 @@ class AccessRequestRepository
      * @param array<string, mixed> $row Database row
      * @return array<string, mixed> Row with permissions decoded
      */
-    private function decodePermissions(array $row): array
+    public static function decodePermissions(array $row): array
     {
         if (isset($row['permissions']) && is_string($row['permissions'])) {
             /** @var array<int, array{object_type: string, object_id: string, relation: string}>|null $decoded */
@@ -633,6 +633,6 @@ class AccessRequestRepository
      */
     private function decodePermissionsList(array $rows): array
     {
-        return array_map([$this, 'decodePermissions'], $rows);
+        return array_map([self::class, 'decodePermissions'], $rows);
     }
 }
