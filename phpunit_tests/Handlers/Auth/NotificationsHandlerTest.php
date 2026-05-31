@@ -84,4 +84,131 @@ final class NotificationsHandlerTest extends AbstractHandlerTestCase
 
         self::assertSame(404, $response->getStatusCode());
     }
+
+    public function testPostSeenRequiresAuthentication(): void
+    {
+        $this->expectException(UnauthorizedException::class);
+
+        ( new NotificationsHandler() )->handle(
+            $this->requestFor('POST', '/auth/notifications/seen', [], [])
+        );
+    }
+
+    public function testPostSeenInsertsBookmarkAndReturnsTimestamp(): void
+    {
+        $response = ( new NotificationsHandler() )->handle(
+            $this->withOidcUser(
+                $this->requestFor('POST', '/auth/notifications/seen', [], []),
+                'zitadel-user-seen-1'
+            )
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertSame('no-store', $response->getHeaderLine('Cache-Control'));
+
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertMatchesRegularExpression(
+            '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\+00:00$/',
+            $body['seen_at']
+        );
+
+        $stmt = self::$pdo->prepare(
+            'SELECT COUNT(*) FROM user_notification_state WHERE user_id = :u'
+        );
+        $stmt->execute(['u' => 'zitadel-user-seen-1']);
+        self::assertSame(1, (int) $stmt->fetchColumn());
+    }
+
+    public function testPostSeenTwiceAdvancesTimestamp(): void
+    {
+        $h = new NotificationsHandler();
+
+        $resp1 = $h->handle(
+            $this->withOidcUser(
+                $this->requestFor('POST', '/auth/notifications/seen', [], []),
+                'zitadel-user-seen-2'
+            )
+        );
+        $body1 = $this->decodeJsonBody($resp1);
+
+        usleep(1_100_000);
+
+        $resp2 = $h->handle(
+            $this->withOidcUser(
+                $this->requestFor('POST', '/auth/notifications/seen', [], []),
+                'zitadel-user-seen-2'
+            )
+        );
+        $body2 = $this->decodeJsonBody($resp2);
+
+        self::assertGreaterThan($body1['seen_at'], $body2['seen_at']);
+    }
+
+    public function testPostSeenUnknownSubPathReturns404(): void
+    {
+        $response = ( new NotificationsHandler() )->handle(
+            $this->withOidcUser(
+                $this->requestFor('POST', '/auth/notifications/bogus', [], []),
+                'zitadel-user-seen-3'
+            )
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testPostSeenAtBaseUrlReturns404(): void
+    {
+        $response = ( new NotificationsHandler() )->handle(
+            $this->withOidcUser(
+                $this->requestFor('POST', '/auth/notifications', [], []),
+                'zitadel-user-seen-4'
+            )
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+    }
+
+    public function testGetThenSeenThenGetFlipsUnreadFlag(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create(
+            'zitadel-user-rt-1',
+            'rt@example.test',
+            'RT',
+            'calendar_editor',
+            [['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor']]
+        );
+        $repo->approve($id, 'admin-x', null);
+
+        $h = new NotificationsHandler();
+
+        $body1 = $this->decodeJsonBody($h->handle(
+            $this->withOidcUser(
+                $this->requestFor('GET', '/auth/notifications'),
+                'zitadel-user-rt-1'
+            )
+        ));
+        self::assertSame(1, $body1['unread_count']);
+        self::assertTrue($body1['items'][0]['unread']);
+
+        usleep(1_100_000);
+
+        $h->handle(
+            $this->withOidcUser(
+                $this->requestFor('POST', '/auth/notifications/seen', [], []),
+                'zitadel-user-rt-1'
+            )
+        );
+
+        $body2 = $this->decodeJsonBody($h->handle(
+            $this->withOidcUser(
+                $this->requestFor('GET', '/auth/notifications'),
+                'zitadel-user-rt-1'
+            )
+        ));
+        self::assertSame(0, $body2['unread_count']);
+        self::assertFalse($body2['items'][0]['unread']);
+        self::assertSame(1, $body2['total']);
+    }
 }
