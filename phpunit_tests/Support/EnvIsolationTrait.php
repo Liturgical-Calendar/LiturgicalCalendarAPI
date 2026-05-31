@@ -58,6 +58,12 @@ trait EnvIsolationTrait
      * Run `$fn` with `$vars` cleared from `$_ENV` and the process env table,
      * restoring originals on exit — even when `$fn` throws.
      *
+     * `$_ENV` and the process env table (read by `getenv()`) are independent;
+     * `putenv()` only writes the process table and array assignment to
+     * `$_ENV` only writes the superglobal. They can drift if code mutates
+     * one without the other. The trait snapshots both independently so the
+     * restore is exact even under that drift.
+     *
      * @template T
      * @param list<string>  $vars Env-var names to clear for the duration.
      * @param callable(): T $fn   The closure to run under the cleared env.
@@ -65,22 +71,30 @@ trait EnvIsolationTrait
      */
     protected function withoutEnv(array $vars, callable $fn): mixed
     {
-        $saved = [];
+        /** @var array<string, mixed>        $savedEnv    */
+        /** @var array<string, string|false> $savedGetenv */
+        $savedEnv    = [];
+        $savedGetenv = [];
         foreach ($vars as $k) {
-            $saved[$k] = array_key_exists($k, $_ENV) ? $_ENV[$k] : self::UNSET_SENTINEL;
+            $savedEnv[$k]    = array_key_exists($k, $_ENV) ? $_ENV[$k] : self::UNSET_SENTINEL;
+            $savedGetenv[$k] = getenv($k);
             unset($_ENV[$k]);
             putenv($k);
         }
         try {
             return $fn();
         } finally {
-            foreach ($saved as $k => $v) {
+            foreach ($savedEnv as $k => $v) {
                 if ($v === self::UNSET_SENTINEL) {
                     unset($_ENV[$k]);
-                    putenv($k);
                 } else {
                     $_ENV[$k] = $v;
-                    putenv($k . '=' . ( is_scalar($v) ? (string) $v : '' ));
+                }
+                $orig = $savedGetenv[$k];
+                if ($orig === false) {
+                    putenv($k);
+                } else {
+                    putenv($k . '=' . $orig);
                 }
             }
         }
