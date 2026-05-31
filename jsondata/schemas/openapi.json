@@ -1079,6 +1079,112 @@
         }
       }
     },
+    "/auth/notifications": {
+      "get": {
+        "tags": [
+          "Notifications"
+        ],
+        "operationId": "getUserNotifications",
+        "summary": "Get the authenticated user's notification inbox",
+        "description": "Returns up to 50 most recent reviewed access-requests for the current user, with unread badge count and last-seen bookmark. Inbox items remain visible after marking-as-seen; only the unread flag and unread_count change.",
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Inbox payload.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserNotificationsResponse"
+                }
+              }
+            },
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "no-store"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          }
+        }
+      }
+    },
+    "/auth/notifications/seen": {
+      "post": {
+        "tags": [
+          "Notifications"
+        ],
+        "operationId": "markNotificationsSeen",
+        "summary": "Mark the user's notification inbox as seen",
+        "description": "Upserts the user's bookmark so that last_notification_seen_at = NOW() (DB clock). Inbox itself is unchanged; only unread flags and unread_count flip on subsequent GETs.",
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Bookmark updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationsSeenResponse"
+                }
+              }
+            },
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "no-store"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          }
+        }
+      }
+    },
     "/auth/access-requests": {
       "get": {
         "tags": [
