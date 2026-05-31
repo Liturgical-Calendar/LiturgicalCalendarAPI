@@ -50,6 +50,10 @@ final class UserNotificationRepository
      */
     public function fetchInbox(string $userId, int $limit = 50): array
     {
+        // Enforce the "up to 50" contract locally — defense in depth against
+        // callers that ask for an unbounded or non-positive page size.
+        $limit = max(1, min($limit, 50));
+
         // Statement A: bookmark (or epoch).
         $stmt = $this->db->prepare(
             'SELECT last_notification_seen_at FROM user_notification_state WHERE user_id = :uid'
