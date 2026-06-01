@@ -37,7 +37,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
     public function testThrowsUnauthorizedWhenNoOidcUser(): void
     {
-        $client     = $this->createMock(OpenFgaClient::class);
+        $client     = $this->createStub(OpenFgaClient::class);
         $middleware = new OpenFgaAuthorizationMiddleware($client, 'national_calendar');
 
         $request = new ServerRequest('PUT', '/data/nation/IT');
@@ -48,7 +48,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
     public function testThrowsUnauthorizedWhenNoSubClaim(): void
     {
-        $client     = $this->createMock(OpenFgaClient::class);
+        $client     = $this->createStub(OpenFgaClient::class);
         $middleware = new OpenFgaAuthorizationMiddleware($client, 'national_calendar');
 
         $request = ( new ServerRequest('PUT', '/data/nation/IT') )
@@ -179,7 +179,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
     public function testForCalendarDataMapsNationToNationalCalendar(): void
     {
-        $client     = $this->createMock(OpenFgaClient::class);
+        $client     = $this->createStub(OpenFgaClient::class);
         $middleware = OpenFgaAuthorizationMiddleware::forCalendarData($client, 'nation');
 
         $this->assertInstanceOf(OpenFgaAuthorizationMiddleware::class, $middleware);
@@ -187,7 +187,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
     public function testForCalendarDataMapsDioceseToDiocesanCalendar(): void
     {
-        $client     = $this->createMock(OpenFgaClient::class);
+        $client     = $this->createStub(OpenFgaClient::class);
         $middleware = OpenFgaAuthorizationMiddleware::forCalendarData($client, 'diocese');
 
         $this->assertInstanceOf(OpenFgaAuthorizationMiddleware::class, $middleware);
@@ -195,7 +195,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
     public function testForCalendarDataMapsWiderRegionToWiderRegion(): void
     {
-        $client     = $this->createMock(OpenFgaClient::class);
+        $client     = $this->createStub(OpenFgaClient::class);
         $middleware = OpenFgaAuthorizationMiddleware::forCalendarData($client, 'widerregion');
 
         $this->assertInstanceOf(OpenFgaAuthorizationMiddleware::class, $middleware);
@@ -203,7 +203,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
     public function testForCalendarDataReturnsNullForUnknownCategory(): void
     {
-        $client     = $this->createMock(OpenFgaClient::class);
+        $client     = $this->createStub(OpenFgaClient::class);
         $middleware = OpenFgaAuthorizationMiddleware::forCalendarData($client, 'unknown');
 
         $this->assertNull($middleware);
@@ -211,7 +211,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
     public function testForTestDefinitionCreatesMiddleware(): void
     {
-        $client     = $this->createMock(OpenFgaClient::class);
+        $client     = $this->createStub(OpenFgaClient::class);
         $middleware = OpenFgaAuthorizationMiddleware::forTestDefinition($client);
 
         $this->assertInstanceOf(OpenFgaAuthorizationMiddleware::class, $middleware);
