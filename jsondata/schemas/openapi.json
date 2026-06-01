@@ -1200,14 +1200,78 @@
         ],
         "summary": "List user's own access requests",
         "operationId": "getUserAccessRequests",
-        "description": "Retrieve all access requests submitted by the authenticated user.",
+        "description": "Retrieve a paginated page of access requests submitted by the authenticated user. Default page size is 100; clients page via `limit` and `offset` and inspect `has_more` (or compare `offset + count` against `total`) to determine when to stop. Per-user volume is small in practice, but the envelope is uniform with /admin/access-requests for client simplicity.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LimitQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/OffsetQueryParam"
+          }
+        ],
         "responses": {
           "200": {
-            "description": "OK: List of user's access requests",
+            "description": "OK: Paginated page of the user's access requests",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AccessRequestListResponse"
+                },
+                "examples": {
+                  "firstPage": {
+                    "summary": "First page (defaults)",
+                    "description": "Default request — no `limit` / `offset` supplied — returning the first page of the user's two access requests.",
+                    "value": {
+                      "requests": [
+                        {
+                          "id": "0e7c4f88-1111-4111-8111-111111111111",
+                          "zitadel_user_id": "user-alice",
+                          "user_email": "alice@example.test",
+                          "user_name": "Alice Example",
+                          "requested_role": "calendar_editor",
+                          "permissions": [
+                            {
+                              "object_type": "national_calendar",
+                              "object_id": "IT",
+                              "relation": "editor"
+                            }
+                          ],
+                          "justification": "I help maintain the IT calendar.",
+                          "status": "pending",
+                          "created_at": "2026-05-30T12:00:00Z"
+                        },
+                        {
+                          "id": "0e7c4f88-2222-4222-8222-222222222222",
+                          "zitadel_user_id": "user-alice",
+                          "user_email": "alice@example.test",
+                          "user_name": "Alice Example",
+                          "requested_role": "developer",
+                          "permissions": [],
+                          "status": "approved",
+                          "created_at": "2026-05-15T08:30:00Z",
+                          "reviewed_at": "2026-05-15T09:00:00Z",
+                          "reviewed_by": "admin"
+                        }
+                      ],
+                      "count": 2,
+                      "total": 2,
+                      "limit": 100,
+                      "offset": 0,
+                      "has_more": false
+                    }
+                  },
+                  "lastPage": {
+                    "summary": "Last page (has_more false)",
+                    "description": "Final page of a paginated traversal — `has_more` is false and clients can stop.",
+                    "value": {
+                      "requests": [],
+                      "count": 0,
+                      "total": 2,
+                      "limit": 100,
+                      "offset": 100,
+                      "has_more": false
+                    }
+                  }
                 }
               }
             }
@@ -1432,7 +1496,7 @@
         ],
         "summary": "List all access requests",
         "operationId": "adminListAccessRequests",
-        "description": "List all access requests with optional status filter. Requires admin role.",
+        "description": "List a paginated page of access requests with optional status filter. Default page size is 100; clients page via `limit` and `offset`, inspecting `has_more` (or comparing `offset + count` against `total`). Global admins see all rows. Resource admins see only requests over resources they administer — for those, the post-fetch filter may shrink the returned page below `limit`, but `total` and `has_more` reflect the pre-filter SQL paginator; clients should keep paging until `has_more` is false. Requires admin role.",
         "parameters": [
           {
             "name": "status",
@@ -1447,15 +1511,65 @@
                 "revoked"
               ]
             }
+          },
+          {
+            "$ref": "#/components/parameters/LimitQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/OffsetQueryParam"
           }
         ],
         "responses": {
           "200": {
-            "description": "OK: List of access requests",
+            "description": "OK: Paginated page of access requests",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AccessRequestListResponse"
+                },
+                "examples": {
+                  "firstPage": {
+                    "summary": "First page (defaults)",
+                    "description": "Default admin listing — no `limit` / `offset` supplied — returning the first 100 of 137 pending and historical access requests.",
+                    "value": {
+                      "requests": [
+                        {
+                          "id": "0e7c4f88-3333-4333-8333-333333333333",
+                          "zitadel_user_id": "user-bob",
+                          "user_email": "bob@example.test",
+                          "user_name": "Bob Example",
+                          "requested_role": "calendar_editor",
+                          "permissions": [
+                            {
+                              "object_type": "national_calendar",
+                              "object_id": "US",
+                              "relation": "editor"
+                            }
+                          ],
+                          "justification": "I work on the US calendar.",
+                          "status": "pending",
+                          "created_at": "2026-05-31T11:00:00Z"
+                        }
+                      ],
+                      "count": 1,
+                      "total": 137,
+                      "limit": 100,
+                      "offset": 0,
+                      "has_more": true
+                    }
+                  },
+                  "lastPage": {
+                    "summary": "Last page (has_more false)",
+                    "description": "Final page reached: `offset + count == total`, so `has_more` is false and the client stops paging.",
+                    "value": {
+                      "requests": [],
+                      "count": 0,
+                      "total": 137,
+                      "limit": 100,
+                      "offset": 200,
+                      "has_more": false
+                    }
+                  }
                 }
               }
             }
@@ -7302,7 +7416,7 @@
       },
       "AccessRequestListResponse": {
         "type": "object",
-        "description": "List of access requests returned by GET /auth/access-requests and GET /admin/access-requests. Currently returns the full unpaginated set.",
+        "description": "Offset-paginated page of access requests returned by GET /auth/access-requests and GET /admin/access-requests. When a resource admin (non-global) calls /admin/access-requests, filterByAdminAccess is applied to each page after fetching: `count` may be smaller than `limit`, and `total` reflects the pre-filter SQL count. Clients should page until `has_more` is false even when individual pages come back short.",
         "properties": {
           "requests": {
             "type": "array",
@@ -7311,12 +7425,38 @@
             }
           },
           "count": {
-            "type": "integer"
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of items in this page. May be less than `limit` on the last page, or smaller still for resource admins after post-filtering."
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total matching rows ignoring limit/offset. For resource admins on /admin/access-requests, this is the pre-filter SQL count."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500,
+            "description": "Effective limit applied to this page (default 100 if not supplied)."
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Effective offset of the first item in this page (default 0 if not supplied)."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "True iff (offset + count) < total. False on the final page."
           }
         },
         "required": [
           "requests",
-          "count"
+          "count",
+          "total",
+          "limit",
+          "offset",
+          "has_more"
         ],
         "additionalProperties": false
       },
@@ -8470,6 +8610,29 @@
         "description": "Identifier for a diocesan calendar",
         "schema": {
           "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+        }
+      },
+      "LimitQueryParam": {
+        "in": "query",
+        "name": "limit",
+        "required": false,
+        "description": "Maximum number of items to return in this page. Default 100, max 500.",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500,
+          "default": 100
+        }
+      },
+      "OffsetQueryParam": {
+        "in": "query",
+        "name": "offset",
+        "required": false,
+        "description": "Zero-based offset of the first item to return. Default 0.",
+        "schema": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
         }
       }
     },
