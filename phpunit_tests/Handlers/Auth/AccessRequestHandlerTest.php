@@ -12,6 +12,7 @@ use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Tests\Handlers\AbstractHandlerTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(AccessRequestHandler::class)]
 final class AccessRequestHandlerTest extends AbstractHandlerTestCase
@@ -317,5 +318,115 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
         $row = $repo->getById($reqId);
         self::assertNotNull($row);
         self::assertSame('pending', $row['status']);
+    }
+
+    // --- Pagination (issue #572) -----------------------------------------
+
+    public function testListOwnRequestsWithoutParamsReturnsFirstPage(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $repo->create('user-alice', 'a@x.test', null, 'developer', []);
+        $repo->create('user-alice', 'a@x.test', null, 'calendar_editor', []);
+        $repo->create('user-bob', 'b@x.test', null, 'developer', []); // not Alice's
+
+        $request = $this->requestFor('GET', '/auth/access-requests')
+            ->withAttribute('oidc_user', $this->oidcUser());
+
+        $response = ( new AccessRequestHandler() )->handle($request);
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertCount(2, $body['requests']);
+        self::assertSame(2, $body['count']);
+        self::assertSame(2, $body['total']);
+        self::assertSame(100, $body['limit']);
+        self::assertSame(0, $body['offset']);
+        self::assertFalse($body['has_more']);
+    }
+
+    public function testListOwnRequestsWithLimitAndOffsetReturnsSlice(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        // Three Alice rows, ordered newest-to-oldest by created_at after inserts.
+        $repo->create('user-alice', 'a@x.test', null, 'developer', []);
+        usleep(2000);
+        $repo->create('user-alice', 'a@x.test', null, 'calendar_editor', []);
+        usleep(2000);
+        $repo->create('user-alice', 'a@x.test', null, 'test_editor', []);
+
+        $request = $this->requestFor('GET', '/auth/access-requests?limit=1&offset=1')
+            ->withAttribute('oidc_user', $this->oidcUser());
+
+        $response = ( new AccessRequestHandler() )->handle($request);
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertCount(1, $body['requests']);
+        self::assertSame(1, $body['count']);
+        self::assertSame(3, $body['total']);
+        self::assertSame(1, $body['limit']);
+        self::assertSame(1, $body['offset']);
+        self::assertTrue($body['has_more']); // offset(1) + count(1) = 2 < total(3)
+    }
+
+    public function testListOwnRequestsHasMoreFalseOnLastPage(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $repo->create('user-alice', 'a@x.test', null, 'developer', []);
+        usleep(2000);
+        $repo->create('user-alice', 'a@x.test', null, 'calendar_editor', []);
+        usleep(2000);
+        $repo->create('user-alice', 'a@x.test', null, 'test_editor', []);
+
+        // Page 2 of 2 with limit=2: offset=2, expect 1 row, has_more=false.
+        $request = $this->requestFor('GET', '/auth/access-requests?limit=2&offset=2')
+            ->withAttribute('oidc_user', $this->oidcUser());
+
+        $response = ( new AccessRequestHandler() )->handle($request);
+
+        $body = $this->decodeJsonBody($response);
+        self::assertSame(1, $body['count']);
+        self::assertSame(3, $body['total']);
+        self::assertFalse($body['has_more']);
+    }
+
+    /** @return iterable<string, array{0:string,1:string}> */
+    public static function invalidLimitProvider(): iterable
+    {
+        yield 'zero'         => ['limit=0', 'between 1 and 500'];
+        yield 'too-large'    => ['limit=501', 'between 1 and 500'];
+        yield 'non-numeric'  => ['limit=abc', 'must be a positive integer'];
+        yield 'negative'     => ['limit=-1', 'must be a positive integer'];
+    }
+
+    #[DataProvider('invalidLimitProvider')]
+    public function testListOwnRequestsRejectsInvalidLimit(string $query, string $messageFragment): void
+    {
+        $request = $this->requestFor('GET', '/auth/access-requests?' . $query)
+            ->withAttribute('oidc_user', $this->oidcUser());
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage($messageFragment);
+
+        ( new AccessRequestHandler() )->handle($request);
+    }
+
+    /** @return iterable<string, array{0:string}> */
+    public static function invalidOffsetProvider(): iterable
+    {
+        yield 'negative'    => ['offset=-1'];
+        yield 'non-numeric' => ['offset=abc'];
+    }
+
+    #[DataProvider('invalidOffsetProvider')]
+    public function testListOwnRequestsRejectsInvalidOffset(string $query): void
+    {
+        $request = $this->requestFor('GET', '/auth/access-requests?' . $query)
+            ->withAttribute('oidc_user', $this->oidcUser());
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('offset must be a non-negative integer');
+
+        ( new AccessRequestHandler() )->handle($request);
     }
 }

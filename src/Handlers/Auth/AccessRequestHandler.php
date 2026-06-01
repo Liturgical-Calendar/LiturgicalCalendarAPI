@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Api\Handlers\Auth;
 
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Handlers\AbstractHandler;
+use LiturgicalCalendar\Api\Handlers\Pagination\OffsetPaginationTrait;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\RequestContentType;
@@ -32,6 +33,7 @@ use Psr\Http\Message\ServerRequestInterface;
 final class AccessRequestHandler extends AbstractHandler
 {
     use AccessTokenTrait;
+    use OffsetPaginationTrait;
 
     /**
      * @var array<string>
@@ -138,7 +140,7 @@ final class AccessRequestHandler extends AbstractHandler
             return $this->getStatus($response, $oidcUser);
         }
 
-        return $this->listOwnRequests($response, $userId);
+        return $this->listOwnRequests($request, $response, $userId);
     }
 
     /**
@@ -291,13 +293,6 @@ final class AccessRequestHandler extends AbstractHandler
     }
 
     /**
-     * GET /auth/access-requests — List the user's own requests.
-     *
-     * @param ResponseInterface $response
-     * @param string $userId
-     * @return ResponseInterface
-     */
-    /**
      * POST /auth/access-requests/{id}/resubmit — Resubmit a rejected request.
      *
      * Allows the user to update their permissions and resubmit for review.
@@ -425,13 +420,35 @@ final class AccessRequestHandler extends AbstractHandler
         ]);
     }
 
-    private function listOwnRequests(ResponseInterface $response, string $userId): ResponseInterface
-    {
-        $requests = $this->getRepository()->getByUser($userId);
+    /**
+     * GET /auth/access-requests — List the user's own requests, paginated.
+     *
+     * Query params (validated via OffsetPaginationTrait):
+     *   - limit  (1..500, default 100)
+     *   - offset (>=0, default 0)
+     *
+     * Response envelope: requests[], count, total, limit, offset, has_more.
+     */
+    private function listOwnRequests(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        string $userId
+    ): ResponseInterface {
+        $params = $request->getQueryParams();
+        $limit  = $this->parseLimit($params['limit'] ?? null);
+        $offset = $this->parseOffset($params['offset'] ?? null);
+
+        $repo     = $this->getRepository();
+        $requests = $repo->getByUser($userId, $limit, $offset);
+        $total    = $repo->countByUser($userId);
 
         return $this->encodeResponseBody($response, [
             'requests' => $requests,
             'count'    => count($requests),
+            'total'    => $total,
+            'limit'    => $limit,
+            'offset'   => $offset,
+            'has_more' => ( $offset + count($requests) ) < $total,
         ]);
     }
 
