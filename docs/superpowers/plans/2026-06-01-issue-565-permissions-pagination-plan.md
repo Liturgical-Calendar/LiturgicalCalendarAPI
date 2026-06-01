@@ -1130,13 +1130,17 @@ git push -u origin feature/issue-565-permissions-pagination
 
 - [ ] **Step 5.10: Open PR**
 
-````bash
+`````bash
 gh pr create --base development \
   --title 'feat(api): cursor pagination on GET /admin/permissions (#565)' \
   --body "$(cat <<'EOF'
 Closes #565.
 
-Adds cursor-based pagination to `GET /admin/permissions`. `OpenFgaClient::readTuples()` becomes a single-page primitive (no more silent auto-loop with 100-page cap); the handler drives pagination via the new `limit` and `page_token` query params and returns the new `{permissions, count, has_more, next_page_token}` envelope.
+Adds cursor-based pagination to `GET /admin/permissions`.
+`OpenFgaClient::readTuples()` becomes a single-page primitive (no more silent
+auto-loop with 100-page cap); the handler drives pagination via the new
+`limit` and `page_token` query params and returns the new
+`{permissions, count, has_more, next_page_token}` envelope.
 
 ## Design
 
@@ -1194,7 +1198,7 @@ description.
 EOF
 )"
 
-````
+`````
 
 Expected: PR created against `development`. CI runs the linters + tests; codecov reports patch
 coverage. Once green, follow the merge dance from the previous PRs (`gh pr merge <N> --merge

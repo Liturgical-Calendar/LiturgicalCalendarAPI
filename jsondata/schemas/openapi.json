@@ -1919,7 +1919,7 @@
                       ],
                       "count": 2,
                       "has_more": true,
-                      "next_page_token": "eyJwayI6IjAxIDM2MmIzZWM..."
+                      "next_page_token": "opaque_cursor_token_example"
                     }
                   },
                   "lastPage": {
@@ -1936,6 +1936,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized401"

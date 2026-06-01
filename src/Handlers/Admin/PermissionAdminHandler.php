@@ -200,6 +200,23 @@ final class PermissionAdminHandler extends AbstractHandler
     }
 
     /**
+     * Parse the `page_token` query param: returns the string (possibly empty)
+     * when absent/string, throws ValidationException when present as a non-string
+     * (matches the strictness applied to `limit`). Empty string downstream is
+     * treated as "no token / first page".
+     */
+    private function parsePageToken(mixed $raw): string
+    {
+        if ($raw === null) {
+            return '';
+        }
+        if (!is_string($raw)) {
+            throw new ValidationException('page_token must be a string');
+        }
+        return $raw;
+    }
+
+    /**
      * GET /admin/permissions — List relationship tuples with cursor pagination.
      *
      * Global admins see all tuples. Resource admins see only tuples
@@ -230,7 +247,7 @@ final class PermissionAdminHandler extends AbstractHandler
         $objectId   = is_string($params['object_id'] ?? null) ? $params['object_id'] : '';
         $relation   = is_string($params['relation'] ?? null) ? $params['relation'] : '';
         $limit      = $this->parseLimit($params['limit'] ?? null);
-        $pageToken  = is_string($params['page_token'] ?? null) ? $params['page_token'] : '';
+        $pageToken  = $this->parsePageToken($params['page_token'] ?? null);
 
         if (!$isGlobalAdmin && $objectType === '') {
             throw new ValidationException('Resource admins must specify object_type filter');

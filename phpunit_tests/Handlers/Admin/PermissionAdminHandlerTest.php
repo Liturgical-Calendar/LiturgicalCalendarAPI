@@ -143,20 +143,41 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         );
     }
 
-    public function testListWithLimitAtUpperBoundPassesValidation(): void
+    public function testListWithNonStringPageTokenIsValidationError(): void
     {
-        // At limit=500 the parseLimit() helper accepts the value and the handler
-        // proceeds past validation. With OpenFGA not configured in tests, the
-        // call to OpenFgaClient::fromEnv() fails — caught here as a
-        // RuntimeException. The point of the test is that we DON'T see a
-        // ValidationException about limit before that.
-        $this->expectException(\RuntimeException::class);
-        // (no exceptionMessage assertion — we only care that it's NOT a
-        // ValidationException about limit)
+        // PSR-7 query parsing represents `?page_token[]=x` as an array;
+        // the handler must reject non-string page_token rather than
+        // silently coercing it to '' (which would restart pagination
+        // and mask a client-side bug).
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('page_token must be a string');
 
         ( new PermissionAdminHandler() )->handle(
-            $this->withOidcUser($this->requestFor('GET', '/admin/permissions?object_type=national_calendar&limit=500'))
+            $this->withOidcUser($this->requestFor('GET', '/admin/permissions?object_type=national_calendar&page_token[]=x'))
         );
+    }
+
+    public function testListWithLimitAtUpperBoundPassesValidation(): void
+    {
+        // At limit=500 the parseLimit() helper must accept the value. With
+        // OpenFGA not configured in this test path the downstream
+        // OpenFgaClient::fromEnv() throws a generic \RuntimeException — that's
+        // the success signal. ValidationException IS-A \RuntimeException
+        // (via ApiException), so we can't use expectException(RuntimeException)
+        // — a regression that incorrectly re-rejects limit=500 would slip past.
+        try {
+            ( new PermissionAdminHandler() )->handle(
+                $this->withOidcUser($this->requestFor('GET', '/admin/permissions?object_type=national_calendar&limit=500'))
+            );
+            self::fail('Expected a downstream \RuntimeException (OpenFGA not configured); none was thrown.');
+        } catch (ValidationException $e) {
+            self::fail('limit=500 should pass validation but ValidationException was thrown: ' . $e->getMessage());
+        } catch (\RuntimeException $e) {
+            // Expected: validation passed; the handler reached OpenFgaClient and
+            // failed at the env gate. Any \RuntimeException that ISN'T a
+            // ValidationException counts as "validation passed".
+            self::assertNotInstanceOf(ValidationException::class, $e);
+        }
     }
 
     public function testListDefaultsToLimit100AndNoToken(): void
@@ -202,5 +223,48 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         self::assertIsArray($payload);
         self::assertSame(100, $payload['page_size']);
         self::assertArrayNotHasKey('continuation_token', $payload);
+    }
+
+    public function testListAsGlobalAdminWithNoObjectTypeFilter(): void
+    {
+        // Global admin (withOidcUser defaults to roles=['admin']) without any
+        // object_type filter exercises the ternary's `: ''` fallback in
+        // $objectFilter construction — readTuples is called with object=''
+        // (no OpenFGA object filter). The mock returns 0 tuples; we don't
+        // care about the result payload here, only that the wire-level
+        // request reflects the empty-object-filter path.
+        $requestHistory = [];
+        $mock           = new MockHandler([
+            new Response(200, [], (string) json_encode([
+                'tuples'             => [],
+                'continuation_token' => '',
+            ])),
+        ]);
+        $handlerStack   = HandlerStack::create($mock);
+        $handlerStack->push(\GuzzleHttp\Middleware::history($requestHistory));
+        $httpClient = new Client(['handler' => $handlerStack]);
+        $psr17      = new \Nyholm\Psr7\Factory\Psr17Factory();
+        $fgaClient  = new OpenFgaClient(
+            'http://localhost:8083',
+            'store-123',
+            'model-456',
+            $httpClient,
+            $psr17,
+            $psr17
+        );
+
+        $response = ( new PermissionAdminHandler($fgaClient) )->handle(
+            $this->withOidcUser($this->requestFor('GET', '/admin/permissions'))
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+
+        self::assertCount(1, $requestHistory);
+        $payload = json_decode((string) $requestHistory[0]['request']->getBody(), true);
+        self::assertIsArray($payload);
+        // With no filters at all, the request payload should have no
+        // tuple_key (OpenFGA returns all tuples) and page_size=100.
+        self::assertArrayNotHasKey('tuple_key', $payload);
+        self::assertSame(100, $payload['page_size']);
     }
 }
