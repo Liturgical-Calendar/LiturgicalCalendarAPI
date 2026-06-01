@@ -24,6 +24,15 @@ class LoginRateLimitTest extends ApiTestCase
      * test runner and a containerized API. The earlier reset-by-filesystem-delete
      * approach didn't work in containerized setups.
      *
+     * The hash mixes in `getmypid()` so the same test method picks a different
+     * IP on each PHP process. A bucket exhausted by one composer-test run no
+     * longer 429s the next run — the next run uses a different IP. (Within a
+     * single run, the PID is stable, so each test method's IP stays consistent
+     * across its own setUp/exhaustRateLimit/assertion calls.) Hashes still mod
+     * by 99 so the resulting octet stays in the 1-99 reservation; rare
+     * collisions across PID boundaries reduce the rerun-failure rate from
+     * 100% to ~1%.
+     *
      * Octet range 1-99 is reserved for per-method IPs so they never collide
      * with CalendarTest's bucket-rotation range (100-199) or ApiTestCase's
      * per-class range (200-254).
@@ -31,7 +40,8 @@ class LoginRateLimitTest extends ApiTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->testIp = '192.0.2.' . ( ( abs(crc32($this->name())) % 99 ) + 1 );
+        $hash         = crc32($this->name() . '|' . getmypid());
+        $this->testIp = '192.0.2.' . ( ( abs($hash) % 99 ) + 1 );
     }
 
     /**
