@@ -380,13 +380,13 @@ Two layers — wire-level and validation-level — plus one focused integration 
 
 **5 new tests:**
 
-| #   | Test                                                  | Verifies                                                                                                                   |
-| --- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| C1  | `testReadTuplesPassesLimitAndContinuationToken`       | Request body: `page_size=50`, `continuation_token='abc'`; response: `next_continuation_token='xyz'`.                       |
-| C2  | `testReadTuplesOmitsLimitWhenNull`                    | Request body has no `page_size` key when limit is null.                                                                    |
-| C3  | `testReadTuplesOmitsContinuationTokenWhenNullOrEmpty` | Empty string and null both produce a request body without `continuation_token`.                                            |
-| C4  | `testReadTuplesReturnsEmptyTokenWhenServerOmits`      | Server response missing `continuation_token` → `next_continuation_token === ''`.                                           |
-| C5  | `testReadTuplesNoLongerAutoPaginates`                 | Even when first response carries a `continuation_token`, only ONE HTTP request is made. Locks in the architectural change. |
+| #   | Test                                                  | Verifies                                                                                             |
+| --- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| C1  | `testReadTuplesPassesLimitAndContinuationToken`       | Request body: `page_size=50`, `continuation_token='abc'`; response: `next_continuation_token='xyz'`. |
+| C2  | `testReadTuplesOmitsLimitWhenNull`                    | Request body has no `page_size` key when limit is null.                                              |
+| C3  | `testReadTuplesOmitsContinuationTokenWhenNullOrEmpty` | Empty string and null both produce a request body without `continuation_token`.                      |
+| C4  | `testReadTuplesReturnsEmptyTokenWhenServerOmits`      | Server response missing `continuation_token` → `next_continuation_token === ''`.                     |
+| C5  | `testReadTuplesNoLongerAutoPaginates`                 | First response carries `continuation_token`; exactly ONE HTTP request is made (regression lock).     |
 
 ### Layer B — `PermissionAdminHandlerTest` (validation-level)
 
@@ -402,9 +402,9 @@ Two layers — wire-level and validation-level — plus one focused integration 
 
 ### Layer C — Handler/client integration (1 test, the back-compat assertion)
 
-| #   | Test                                   | Setup                                                              | Assertion                                                                                                                      |
-| --- | -------------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------ |
-| I1  | `testListDefaultsToLimit100AndNoToken` | MockHandler returns empty page; handler built with injected client | Request: `page_size=100`, no `continuation_token`; response: `{permissions:[], count:0, has_more:false, next_page_token:null}` |
+| #   | Test                                   | Setup                       | Assertion                                                                                       |
+| --- | -------------------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------- |
+| I1  | `testListDefaultsToLimit100AndNoToken` | Empty mock; injected client | Request: `page_size=100`, no token; response envelope `has_more=false`, `next_page_token=null`. |
 
 This is the test the issue's "back-compat" acceptance criterion ("existing clients without
 pagination params still receive a bounded first page using the server default limit") asks for.
