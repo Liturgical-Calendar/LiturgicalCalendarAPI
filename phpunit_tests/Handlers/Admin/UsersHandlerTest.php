@@ -9,17 +9,22 @@ use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Tests\Handlers\AbstractHandlerTestCase;
+use LiturgicalCalendar\Tests\Support\EnvIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
- * UsersHandler hard-blocks when Zitadel isn't configured (the test env
- * doesn't set ZITADEL_* envs), so most of the listing/revoke code paths
- * can't be exercised here. These tests cover everything that runs before
- * the Zitadel gate.
+ * UsersHandler hard-blocks when Zitadel isn't configured, so most of the
+ * listing/revoke code paths can't be exercised here. These tests cover
+ * everything that runs before the Zitadel gate, plus the gate itself —
+ * the gate-assertion test uses {@see EnvIsolationTrait::withoutEnv()} to
+ * clear ZITADEL_* env vars (which the bootstrap may have loaded from
+ * .env.local on developer machines, see #620).
  */
 #[CoversClass(UsersHandler::class)]
 final class UsersHandlerTest extends AbstractHandlerTestCase
 {
+    use EnvIsolationTrait;
+
     public function testOptionsPreflightSucceeds(): void
     {
         $response = ( new UsersHandler() )->handle(
@@ -64,8 +69,8 @@ final class UsersHandlerTest extends AbstractHandlerTestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Zitadel service not configured');
 
-        ( new UsersHandler() )->handle(
+        $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => ( new UsersHandler() )->handle(
             $this->withOidcUser($this->requestFor('GET', '/admin/users'))
-        );
+        ));
     }
 }
