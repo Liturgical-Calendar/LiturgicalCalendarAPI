@@ -1880,30 +1880,59 @@
                 "deleter"
               ]
             }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Maximum number of permission tuples to return in this page. Default 100, max 500.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500,
+              "default": 100
+            }
+          },
+          {
+            "name": "page_token",
+            "in": "query",
+            "required": false,
+            "description": "Opaque pagination cursor returned in the previous response's `next_page_token`. Omit (or pass empty) to request the first page.",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "OK: List of permission tuples",
+            "description": "Paginated list of permission tuples.",
             "content": {
               "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "permissions": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/PermissionTuple"
-                      }
-                    },
-                    "count": {
-                      "type": "integer"
+                "schema": { "$ref": "#/components/schemas/AdminListPermissionsResponse" },
+                "examples": {
+                  "firstPage": {
+                    "summary": "First page of results — more remain",
+                    "value": {
+                      "permissions": [
+                        { "user": "user:zitadel-123", "relation": "editor", "object": "national_calendar:IT" },
+                        { "user": "user:zitadel-456", "relation": "viewer", "object": "national_calendar:IT" }
+                      ],
+                      "count": 2,
+                      "has_more": true,
+                      "next_page_token": "eyJwayI6IjAxIDM2MmIzZWM..."
                     }
                   },
-                  "required": [
-                    "permissions",
-                    "count"
-                  ]
+                  "lastPage": {
+                    "summary": "Final page — no more results",
+                    "value": {
+                      "permissions": [
+                        { "user": "user:zitadel-789", "relation": "deleter", "object": "national_calendar:IT" }
+                      ],
+                      "count": 1,
+                      "has_more": false,
+                      "next_page_token": null
+                    }
+                  }
                 }
               }
             }
@@ -7676,6 +7705,32 @@
           "reportedTotal",
           "pagination"
         ],
+        "additionalProperties": false
+      },
+      "AdminListPermissionsResponse": {
+        "type": "object",
+        "description": "Cursor-paginated page of OpenFGA permission tuples. Use `next_page_token` to fetch the next page; `null` means this was the last page. Note: when the handler applies a server-side admin-access filter, the returned `permissions` array may be shorter than `limit` — clients should keep paging until `has_more` is false.",
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PermissionTuple" },
+            "description": "Tuples in this page, up to the requested `limit` (may be fewer after server-side filtering)."
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of tuples in this page (`permissions.length`). NOT a total count across all pages — OpenFGA does not expose an O(1) total."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "True iff the OpenFGA store has more tuples matching the filter beyond this page."
+          },
+          "next_page_token": {
+            "type": ["string", "null"],
+            "description": "Opaque continuation token to pass back as `page_token` for the next page. `null` when `has_more` is false."
+          }
+        },
+        "required": ["permissions", "count", "has_more", "next_page_token"],
         "additionalProperties": false
       },
       "SuccessResponse": {
