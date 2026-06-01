@@ -224,87 +224,81 @@ class OpenFgaClient
     }
 
     /**
-     * Read relationship tuples for a user and object type.
+     * Read a single page of OpenFGA tuples matching the given filter.
      *
-     * @param string      $user     User identifier (e.g., "user:zitadel-user-id")
-     * @param string      $object   Object type or full object (e.g., "national_calendar:" or "national_calendar:IT")
-     * @param string|null $relation Optional relation filter
-     * @return array<int, array{user: string, relation: string, object: string}> List of tuples
+     * Pagination is caller-driven — pass `$continuationToken` from the previous
+     * call's `next_continuation_token` to fetch the next page. The empty string
+     * means "no more pages".
+     *
+     * @param string      $user              User identifier (e.g., "user:zitadel-user-id"); '' for no user filter
+     * @param string      $object            Object type or full object (e.g., "national_calendar:" or "national_calendar:IT"); '' for no object filter
+     * @param string|null $relation          Optional relation filter
+     * @param int|null    $limit             Optional max items in this page; null lets OpenFGA apply its server-side default
+     * @param string|null $continuationToken Opaque cursor from a previous response; null/'' means "first page"
+     * @return array{
+     *     tuples: list<array{user: string, relation: string, object: string}>,
+     *     next_continuation_token: string
+     * }
      * @throws RuntimeException If the API request fails
      */
-    public function readTuples(string $user, string $object, ?string $relation = null): array
-    {
+    public function readTuples(
+        string $user,
+        string $object,
+        ?string $relation = null,
+        ?int $limit = null,
+        ?string $continuationToken = null,
+    ): array {
         $tupleKey = [];
-
         if ($user !== '') {
             $tupleKey['user'] = $user;
         }
-
         if ($object !== '') {
             $tupleKey['object'] = $object;
         }
-
         if ($relation !== null && $relation !== '') {
             $tupleKey['relation'] = $relation;
         }
 
-        // Only include tuple_key if it has at least one filter;
-        // empty tuple_key causes OpenFGA validation error, but omitting it returns all tuples.
         $payload = count($tupleKey) > 0 ? ['tuple_key' => $tupleKey] : [];
-
-        $tuples   = [];
-        $maxPages = 100;
-        $page     = 0;
-
-        // Paginate through all results using continuation_token
-        do {
-            $response = $this->post("/stores/{$this->storeId}/read", $payload);
-
-            $responseTuples = $response['tuples'] ?? [];
-            if (is_array($responseTuples)) {
-                foreach ($responseTuples as $tuple) {
-                    if (!is_array($tuple)) {
-                        continue;
-                    }
-                    $key  = is_array($tuple['key'] ?? null) ? $tuple['key'] : [];
-                    $user = is_string($key['user'] ?? null) ? $key['user'] : '';
-                    $rel  = is_string($key['relation'] ?? null) ? $key['relation'] : '';
-                    $obj  = is_string($key['object'] ?? null) ? $key['object'] : '';
-
-                    // Skip malformed tuples with missing fields
-                    if ($user === '' || $rel === '' || $obj === '') {
-                        continue;
-                    }
-
-                    $tuples[] = [
-                        'user'     => $user,
-                        'relation' => $rel,
-                        'object'   => $obj,
-                    ];
-                }
-            }
-
-            $continuationToken = is_string($response['continuation_token'] ?? null)
-                ? $response['continuation_token']
-                : '';
-
-            if ($continuationToken !== '') {
-                $payload['continuation_token'] = $continuationToken;
-            }
-
-            $page++;
-        } while ($continuationToken !== '' && $page < $maxPages);
-
-        // If we exited because of the page cap with the server still offering more
-        // data, fail loudly instead of returning a silently truncated set.
-        if ($continuationToken !== '') {
-            throw new \RuntimeException(sprintf(
-                'OpenFGA readTuples pagination limit reached (%d pages). The store has more results than this client will fetch in a single call; tighten the filter (user/object_type/object_id/relation) or read in narrower scopes.',
-                $maxPages
-            ));
+        if ($limit !== null) {
+            $payload['page_size'] = $limit;
+        }
+        if ($continuationToken !== null && $continuationToken !== '') {
+            $payload['continuation_token'] = $continuationToken;
         }
 
-        return $tuples;
+        $response = $this->post("/stores/{$this->storeId}/read", $payload);
+
+        $tuples         = [];
+        $responseTuples = $response['tuples'] ?? [];
+        if (is_array($responseTuples)) {
+            foreach ($responseTuples as $tuple) {
+                if (!is_array($tuple)) {
+                    continue;
+                }
+                $key           = is_array($tuple['key'] ?? null) ? $tuple['key'] : [];
+                $tupleUser     = is_string($key['user'] ?? null) ? $key['user'] : '';
+                $tupleRelation = is_string($key['relation'] ?? null) ? $key['relation'] : '';
+                $tupleObject   = is_string($key['object'] ?? null) ? $key['object'] : '';
+                if ($tupleUser === '' || $tupleRelation === '' || $tupleObject === '') {
+                    continue;
+                }
+                $tuples[] = [
+                    'user'     => $tupleUser,
+                    'relation' => $tupleRelation,
+                    'object'   => $tupleObject,
+                ];
+            }
+        }
+
+        $nextToken = is_string($response['continuation_token'] ?? null)
+            ? $response['continuation_token']
+            : '';
+
+        return [
+            'tuples'                  => $tuples,
+            'next_continuation_token' => $nextToken,
+        ];
     }
 
     /**

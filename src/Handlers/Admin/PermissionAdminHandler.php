@@ -59,12 +59,21 @@ final class PermissionAdminHandler extends AbstractHandler
      */
     private const VALID_RELATIONS = ['admin', 'viewer', 'editor', 'deleter'];
 
+    private const DEFAULT_LIMIT = 100;
+    private const MAX_LIMIT     = 500;
+
     private ?OpenFgaClient $fgaClient = null;
     private LoggerInterface $logger;
 
-    public function __construct()
+    public function __construct(?OpenFgaClient $client = null)
     {
         parent::__construct();
+
+        // Pre-seed the lazy client slot so tests can inject a mock.
+        // When null (Router path: `new PermissionAdminHandler()`), getClient()
+        // falls back to OpenFgaClient::fromEnv() on first use — existing
+        // behavior unchanged.
+        $this->fgaClient = $client;
 
         $this->allowedRequestMethods      = [RequestMethod::GET, RequestMethod::POST, RequestMethod::DELETE];
         $this->allowedAcceptHeaders       = [AcceptHeader::JSON];
@@ -169,16 +178,62 @@ final class PermissionAdminHandler extends AbstractHandler
     }
 
     /**
-     * GET /admin/permissions — List relationship tuples.
+     * Parse the `limit` query param: returns DEFAULT_LIMIT when absent/empty,
+     * throws ValidationException when present but invalid or out of range.
+     */
+    private function parseLimit(mixed $raw): int
+    {
+        if ($raw === null || $raw === '') {
+            return self::DEFAULT_LIMIT;
+        }
+        if (!is_string($raw) || !ctype_digit($raw)) {
+            throw new ValidationException('limit must be a positive integer');
+        }
+        $limit = (int) $raw;
+        if ($limit < 1 || $limit > self::MAX_LIMIT) {
+            throw new ValidationException(sprintf(
+                'limit must be between 1 and %d',
+                self::MAX_LIMIT
+            ));
+        }
+        return $limit;
+    }
+
+    /**
+     * Parse the `page_token` query param: returns the string (possibly empty)
+     * when absent/string, throws ValidationException when present as a non-string
+     * (matches the strictness applied to `limit`). Empty string downstream is
+     * treated as "no token / first page".
+     */
+    private function parsePageToken(mixed $raw): string
+    {
+        if ($raw === null) {
+            return '';
+        }
+        if (!is_string($raw)) {
+            throw new ValidationException('page_token must be a string');
+        }
+        return $raw;
+    }
+
+    /**
+     * GET /admin/permissions — List relationship tuples with cursor pagination.
      *
      * Global admins see all tuples. Resource admins see only tuples
-     * for resources they administer.
+     * for resources they administer (filterByAdminAccess is applied
+     * post-fetch when object_id is unset).
      *
      * Query parameters:
-     *   - user: Filter by user (e.g., "user:zitadel-id")
-     *   - object_type: Filter by object type (e.g., "national_calendar")
-     *   - object_id: Filter by specific object (e.g., "IT")
-     *   - relation: Filter by relation (e.g., "editor")
+     *   - user, object_type, object_id, relation: filters (existing)
+     *   - limit: max items in this page (1..500, default 100)
+     *   - page_token: opaque cursor from a previous response's
+     *     `next_page_token`; empty/omitted means first page
+     *
+     * Note: when filterByAdminAccess is applied, the page returned may be
+     * smaller than `limit` (some OpenFGA tuples in the page are filtered
+     * out). `has_more` continues to reflect OpenFGA's pagination state, so
+     * clients should keep paging until `has_more` is false even if a page
+     * comes back smaller than expected.
      */
     private function listPermissions(
         ServerRequestInterface $request,
@@ -191,13 +246,11 @@ final class PermissionAdminHandler extends AbstractHandler
         $objectType = is_string($params['object_type'] ?? null) ? $params['object_type'] : '';
         $objectId   = is_string($params['object_id'] ?? null) ? $params['object_id'] : '';
         $relation   = is_string($params['relation'] ?? null) ? $params['relation'] : '';
+        $limit      = $this->parseLimit($params['limit'] ?? null);
+        $pageToken  = $this->parsePageToken($params['page_token'] ?? null);
 
         if (!$isGlobalAdmin && $objectType === '') {
-            // Resource admins must specify an object_type to avoid listing
-            // tuples across resources they don't administer
-            throw new ValidationException(
-                'Resource admins must specify object_type filter'
-            );
+            throw new ValidationException('Resource admins must specify object_type filter');
         }
 
         if ($objectType !== '' && !in_array($objectType, self::VALID_OBJECT_TYPES, true)) {
@@ -212,43 +265,41 @@ final class PermissionAdminHandler extends AbstractHandler
             );
         }
 
-        // For resource admins with a specific object, verify admin access
         if (!$isGlobalAdmin && $objectId !== '') {
             $this->requireResourceAdmin($userId, false, $objectType, $objectId);
         }
 
-        if ($objectType === '') {
-            // Global admin with no type filter: read all tuples
-            $normalizedUser = $user !== '' ? $this->normalizeUser($user) : '';
-            $relationFilter = $relation !== '' ? $relation : null;
-            $allTuples      = $this->getClient()->readTuples(
-                $normalizedUser,
-                '',
-                $relationFilter
-            );
+        $normalizedUser = $user !== '' ? $this->normalizeUser($user) : '';
+        $relationFilter = $relation !== '' ? $relation : null;
+        $objectFilter   = $objectType !== ''
+            ? ( $objectId !== '' ? "{$objectType}:{$objectId}" : "{$objectType}:" )
+            : '';
 
-            return $this->encodeResponseBody($response, [
-                'permissions' => $allTuples,
-                'count'       => count($allTuples),
-            ]);
-        }
-
-        $object = $objectType . ':' . $objectId;
-        $tuples = $this->getClient()->readTuples(
-            $user !== '' ? $this->normalizeUser($user) : '',
-            $object,
-            $relation !== '' ? $relation : null
+        $page = $this->getClient()->readTuples(
+            $normalizedUser,
+            $objectFilter,
+            $relationFilter,
+            $limit,
+            $pageToken === '' ? null : $pageToken
         );
 
-        // For resource admins listing without a specific object_id,
-        // filter to only resources they administer
-        if (!$isGlobalAdmin && $objectId === '') {
+        /** @var list<array{user: string, relation: string, object: string}> $tuples */
+        $tuples    = $page['tuples'];
+        $nextToken = $page['next_continuation_token'];
+
+        // Preserve the existing post-filter for resource admins listing without
+        // a specific object_id. May reduce this page's item count below `limit`.
+        if (!$isGlobalAdmin && $objectType !== '' && $objectId === '') {
             $tuples = $this->filterByAdminAccess($tuples, $userId, $objectType);
         }
 
+        $hasMore = $nextToken !== '';
+
         return $this->encodeResponseBody($response, [
-            'permissions' => $tuples,
-            'count'       => count($tuples),
+            'permissions'     => $tuples,
+            'count'           => count($tuples),
+            'has_more'        => $hasMore,
+            'next_page_token' => $hasMore ? $nextToken : null,
         ]);
     }
 
