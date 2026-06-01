@@ -198,20 +198,32 @@ class AccessRequestRepository
     }
 
     /**
-     * Get all requests for a specific user.
+     * Get all requests for a specific user, with optional offset pagination.
      *
      * @param string $userId Zitadel user ID
-     * @return array<int, array<string, mixed>> List of requests
+     * @param int|null $limit Max rows to return; null = no LIMIT clause.
+     * @param int|null $offset Zero-based row offset; null = no OFFSET clause.
+     * @return array<int, array<string, mixed>> List of requests, newest first
      */
-    public function getByUser(string $userId): array
+    public function getByUser(string $userId, ?int $limit = null, ?int $offset = null): array
     {
-        $stmt = $this->db->prepare(
-            'SELECT * FROM access_requests
+        $sql = 'SELECT * FROM access_requests
              WHERE zitadel_user_id = :user_id
-             ORDER BY created_at DESC'
-        );
+             ORDER BY created_at DESC';
 
-        $stmt->execute(['user_id' => $userId]);
+        if ($limit !== null && $offset !== null) {
+            $sql .= ' LIMIT :limit OFFSET :offset';
+        }
+
+        $stmt = $this->db->prepare($sql);
+        $stmt->bindValue('user_id', $userId, PDO::PARAM_STR);
+        if ($limit !== null && $offset !== null) {
+            // PARAM_INT binds — PDO's execute([...]) form binds everything as
+            // a string, which can confuse Postgres's LIMIT/OFFSET parsing.
+            $stmt->bindValue('limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue('offset', $offset, PDO::PARAM_INT);
+        }
+        $stmt->execute();
 
         /** @var array<int, array<string, mixed>> $results */
         $results = $stmt->fetchAll();
@@ -241,38 +253,99 @@ class AccessRequestRepository
     }
 
     /**
-     * Get all access requests with optional status filter.
+     * Get all access requests with optional status filter and offset pagination.
      *
      * @param string|null $status Filter by status (pending, approved, rejected, revoked)
-     * @return array<int, array<string, mixed>> List of requests
+     * @param int|null $limit Max rows to return; null = no LIMIT clause.
+     * @param int|null $offset Zero-based row offset; null = no OFFSET clause.
+     * @return array<int, array<string, mixed>> List of requests, newest first
      * @throws \InvalidArgumentException If status is not a valid value
      */
-    public function getAll(?string $status = null): array
+    public function getAll(?string $status = null, ?int $limit = null, ?int $offset = null): array
     {
-        if ($status !== null) {
-            if (!in_array($status, self::VALID_STATUSES, true)) {
-                throw new \InvalidArgumentException(
-                    sprintf('Invalid status filter: %s. Valid values are: %s', $status, implode(', ', self::VALID_STATUSES))
-                );
-            }
-            $stmt = $this->db->prepare(
-                'SELECT * FROM access_requests
-                 WHERE status = :status
-                 ORDER BY created_at DESC'
+        if ($status !== null && !in_array($status, self::VALID_STATUSES, true)) {
+            throw new \InvalidArgumentException(
+                sprintf('Invalid status filter: %s. Valid values are: %s', $status, implode(', ', self::VALID_STATUSES))
             );
-            $stmt->execute(['status' => $status]);
-        } else {
-            $stmt = $this->db->prepare(
-                'SELECT * FROM access_requests
-                 ORDER BY created_at DESC'
-            );
-            $stmt->execute();
         }
+
+        $sql = 'SELECT * FROM access_requests';
+        if ($status !== null) {
+            $sql .= ' WHERE status = :status';
+        }
+        $sql .= ' ORDER BY created_at DESC';
+
+        if ($limit !== null && $offset !== null) {
+            $sql .= ' LIMIT :limit OFFSET :offset';
+        }
+
+        $stmt = $this->db->prepare($sql);
+        if ($status !== null) {
+            $stmt->bindValue('status', $status, PDO::PARAM_STR);
+        }
+        if ($limit !== null && $offset !== null) {
+            // PARAM_INT binds — PDO's execute([...]) form binds everything as
+            // a string, which can confuse Postgres's LIMIT/OFFSET parsing.
+            $stmt->bindValue('limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue('offset', $offset, PDO::PARAM_INT);
+        }
+        $stmt->execute();
 
         /** @var array<int, array<string, mixed>> $results */
         $results = $stmt->fetchAll();
 
         return $this->decodePermissionsList($results);
+    }
+
+    /**
+     * Count access requests matching an optional status filter.
+     *
+     * Companion to getAll() for pagination metadata.
+     *
+     * @param string|null $status Filter by status (pending, approved, rejected, revoked)
+     * @return int Total matching rows, ignoring limit/offset
+     * @throws \InvalidArgumentException If status is not a valid value
+     */
+    public function countAll(?string $status = null): int
+    {
+        if ($status !== null && !in_array($status, self::VALID_STATUSES, true)) {
+            throw new \InvalidArgumentException(
+                sprintf('Invalid status filter: %s. Valid values are: %s', $status, implode(', ', self::VALID_STATUSES))
+            );
+        }
+
+        $sql = 'SELECT COUNT(*) FROM access_requests';
+        if ($status !== null) {
+            $sql .= ' WHERE status = :status';
+        }
+
+        $stmt = $this->db->prepare($sql);
+        if ($status !== null) {
+            $stmt->bindValue('status', $status, PDO::PARAM_STR);
+        }
+        $stmt->execute();
+
+        $count = $stmt->fetchColumn();
+        return is_numeric($count) ? (int) $count : 0;
+    }
+
+    /**
+     * Count access requests for a given user.
+     *
+     * Companion to getByUser() for pagination metadata.
+     *
+     * @param string $userId Zitadel user ID
+     * @return int Total rows for this user, ignoring limit/offset
+     */
+    public function countByUser(string $userId): int
+    {
+        $stmt = $this->db->prepare(
+            'SELECT COUNT(*) FROM access_requests WHERE zitadel_user_id = :user_id'
+        );
+        $stmt->execute(['user_id' => $userId]);
+
+        $count = $stmt->fetchColumn();
+        return is_numeric($count) ? (int) $count : 0;
     }
 
     /**
