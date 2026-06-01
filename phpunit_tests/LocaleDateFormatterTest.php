@@ -16,6 +16,33 @@ use IntlDateFormatter;
  */
 class LocaleDateFormatterTest extends TestCase
 {
+    /**
+     * Reset gettext state to a deterministic "no translations bound" baseline
+     * before each test.
+     *
+     * `LocaleDateFormatter::formatChristmasWeekdayName()` has hardcoded
+     * sprintf paths for Latin and Italian, but the English/French/default
+     * branch calls `_('%s - Christmas Weekday')` and inherits whatever the
+     * process-wide gettext state currently is. Production handlers
+     * (`CalendarHandler`, `EventsHandler`, `FerialEventNameGenerator`) call
+     * `setlocale + bindtextdomain('litcal') + textdomain('litcal')` and don't
+     * restore. When a prior test exercises one of those handlers with
+     * locale=it_IT, the Italian .mo catalog stays bound for the rest of the
+     * PHP process — and the English tests in this file then get back
+     * "%s - Giorno feriale di Natale" instead of the expected msgid fallback.
+     *
+     * Resetting to `LC_ALL=C` and the default `messages` textdomain (which
+     * this project never binds) means `_()` returns its msgid unchanged.
+     * Tests that assert hardcoded translations (Latin/Italian) are unaffected
+     * because those paths bypass gettext.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+        \setlocale(LC_ALL, 'C');
+        \textdomain('messages');
+    }
+
     /* ========================= formatLocalizedDate Tests ========================= */
 
     /**
