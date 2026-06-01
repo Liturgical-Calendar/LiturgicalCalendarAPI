@@ -62,9 +62,15 @@ final class PermissionAdminHandler extends AbstractHandler
     private ?OpenFgaClient $fgaClient = null;
     private LoggerInterface $logger;
 
-    public function __construct()
+    public function __construct(?OpenFgaClient $client = null)
     {
         parent::__construct();
+
+        // Pre-seed the lazy client slot so tests can inject a mock.
+        // When null (Router path: `new PermissionAdminHandler()`), getClient()
+        // falls back to OpenFgaClient::fromEnv() on first use — existing
+        // behavior unchanged.
+        $this->fgaClient = $client;
 
         $this->allowedRequestMethods      = [RequestMethod::GET, RequestMethod::POST, RequestMethod::DELETE];
         $this->allowedAcceptHeaders       = [AcceptHeader::JSON];
