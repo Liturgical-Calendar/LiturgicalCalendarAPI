@@ -11,11 +11,14 @@ use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Tests\Handlers\AbstractHandlerTestCase;
+use LiturgicalCalendar\Tests\Support\EnvIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(AccessRequestAdminHandler::class)]
 final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
 {
+    use EnvIsolationTrait;
+
     protected static bool $requiresDatabase = true;
 
     public function testOptionsPreflightSucceeds(): void
@@ -137,11 +140,15 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
             ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
         ]);
 
-        // Neither OpenFGA nor Zitadel envs are set in the test bootstrap, so
-        // both isConfigured() gates are false and the handler should still
-        // flip the DB status to approved without touching either service.
-        $response = ( new AccessRequestAdminHandler() )->handle(
-            $this->withOidcUser($this->requestFor('POST', '/admin/access-requests/' . $id . '/approve', [], ['notes' => 'ok']))
+        // Clear OpenFGA + Zitadel envs so both isConfigured() gates return
+        // false during the handler call. The bootstrap's safeLoad of
+        // .env.local would otherwise leak dev-stack credentials into this
+        // test on developer machines (see #619).
+        $response = $this->withoutEnv(
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+            fn() => ( new AccessRequestAdminHandler() )->handle(
+                $this->withOidcUser($this->requestFor('POST', '/admin/access-requests/' . $id . '/approve', [], ['notes' => 'ok']))
+            )
         );
 
         self::assertSame(200, $response->getStatusCode());
@@ -176,15 +183,31 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
     public function testRevokeHappyPathWithoutFgaOrZitadel(): void
     {
         $repo = new AccessRequestRepository(self::$pdo);
-        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', []);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+        ]);
         $repo->approve($id, 'admin');
 
-        $response = ( new AccessRequestAdminHandler() )->handle(
-            $this->withOidcUser($this->requestFor('POST', '/admin/access-requests/' . $id . '/revoke', [], []))
+        // Mirror testApproveHappyPathWithoutFgaOrZitadel — clear both gate's
+        // env vars so the handler hits the not-configured branch for each
+        // service. Seeding with a real permission (rather than the previous
+        // empty []) makes the "tuples_deleted=[]" assertion meaningful: an
+        // FGA-configured run would have tuples to delete; here it shouldn't
+        // even try.
+        $response = $this->withoutEnv(
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+            fn() => ( new AccessRequestAdminHandler() )->handle(
+                $this->withOidcUser($this->requestFor('POST', '/admin/access-requests/' . $id . '/revoke', [], []))
+            )
         );
 
+        self::assertSame(200, $response->getStatusCode());
         $body = $this->decodeJsonBody($response);
         self::assertTrue($body['success']);
+        self::assertFalse($body['role_removed']);
+        self::assertNull($body['zitadel_error']);
+        self::assertSame([], $body['tuples_deleted']);
+        self::assertSame([], $body['fga_errors']);
 
         $row = $repo->getById($id);
         self::assertNotNull($row);
