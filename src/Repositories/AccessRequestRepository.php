@@ -211,16 +211,23 @@ class AccessRequestRepository
              WHERE zitadel_user_id = :user_id
              ORDER BY created_at DESC';
 
-        if ($limit !== null && $offset !== null) {
-            $sql .= ' LIMIT :limit OFFSET :offset';
+        // LIMIT and OFFSET are independent — either, both, or neither may be
+        // supplied. Matches the docstring promise that null = "omit the clause".
+        if ($limit !== null) {
+            $sql .= ' LIMIT :limit';
+        }
+        if ($offset !== null) {
+            $sql .= ' OFFSET :offset';
         }
 
         $stmt = $this->db->prepare($sql);
         $stmt->bindValue('user_id', $userId, PDO::PARAM_STR);
-        if ($limit !== null && $offset !== null) {
-            // PARAM_INT binds — PDO's execute([...]) form binds everything as
+        if ($limit !== null) {
+            // PARAM_INT bind — PDO's execute([...]) form binds everything as
             // a string, which can confuse Postgres's LIMIT/OFFSET parsing.
             $stmt->bindValue('limit', $limit, PDO::PARAM_INT);
+        }
+        if ($offset !== null) {
             $stmt->bindValue('offset', $offset, PDO::PARAM_INT);
         }
         $stmt->execute();
@@ -275,18 +282,25 @@ class AccessRequestRepository
         }
         $sql .= ' ORDER BY created_at DESC';
 
-        if ($limit !== null && $offset !== null) {
-            $sql .= ' LIMIT :limit OFFSET :offset';
+        // LIMIT and OFFSET are independent — either, both, or neither may be
+        // supplied. Matches the docstring promise that null = "omit the clause".
+        if ($limit !== null) {
+            $sql .= ' LIMIT :limit';
+        }
+        if ($offset !== null) {
+            $sql .= ' OFFSET :offset';
         }
 
         $stmt = $this->db->prepare($sql);
         if ($status !== null) {
             $stmt->bindValue('status', $status, PDO::PARAM_STR);
         }
-        if ($limit !== null && $offset !== null) {
-            // PARAM_INT binds — PDO's execute([...]) form binds everything as
+        if ($limit !== null) {
+            // PARAM_INT bind — PDO's execute([...]) form binds everything as
             // a string, which can confuse Postgres's LIMIT/OFFSET parsing.
             $stmt->bindValue('limit', $limit, PDO::PARAM_INT);
+        }
+        if ($offset !== null) {
             $stmt->bindValue('offset', $offset, PDO::PARAM_INT);
         }
         $stmt->execute();

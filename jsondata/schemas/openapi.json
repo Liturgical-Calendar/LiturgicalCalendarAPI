@@ -1276,6 +1276,9 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
           }
@@ -1530,7 +1533,7 @@
                 "examples": {
                   "firstPage": {
                     "summary": "First page (defaults)",
-                    "description": "Default admin listing — no `limit` / `offset` supplied — returning the first 100 of 137 pending and historical access requests.",
+                    "description": "Abbreviated sample of the first page returned by a default admin listing — no `limit` / `offset` supplied. `total: 137` and `count: 100` would be realistic over a populated table; only one representative `requests[]` entry is shown here to keep the doc readable. `has_more: true` because `offset + count < total`.",
                     "value": {
                       "requests": [
                         {
@@ -1551,7 +1554,7 @@
                           "created_at": "2026-05-31T11:00:00Z"
                         }
                       ],
-                      "count": 1,
+                      "count": 100,
                       "total": 137,
                       "limit": 100,
                       "offset": 0,
@@ -1573,6 +1576,9 @@
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
@@ -7447,7 +7453,7 @@
           },
           "has_more": {
             "type": "boolean",
-            "description": "True iff (offset + count) < total. False on the final page."
+            "description": "True iff more rows are available beyond this page. For global admins (and /auth/access-requests), equals `(offset + count) < total`. For non-global admins on /admin/access-requests this reflects the SQL paginator's state — `(offset + pre-filter SQL page size) < total` — rather than the post-filter `count`, so the client stops correctly on the final SQL page even when filterByAdminAccess trimmed it."
           }
         },
         "required": [

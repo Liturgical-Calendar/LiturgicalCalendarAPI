@@ -193,6 +193,15 @@ final class AccessRequestAdminHandler extends AbstractHandler
         $page  = $repo->getAll($statusFilter, $limit, $offset);
         $total = $repo->countAll($statusFilter);
 
+        // Snapshot the SQL page size BEFORE filterByAdminAccess shrinks the page.
+        // `has_more` must reflect the SQL paginator's state, not the filtered
+        // page count: when SQL returns its final page (sqlPageCount < limit so
+        // offset + sqlPageCount == total), the client should stop. If we used
+        // the post-filter count instead, a heavily-filtered final page would
+        // falsely advertise has_more=true and the client would fetch an empty
+        // next page.
+        $sqlPageCount = count($page);
+
         if (!$isGlobalAdmin) {
             $page = $this->filterByAdminAccess($page, $adminId);
         }
@@ -203,7 +212,7 @@ final class AccessRequestAdminHandler extends AbstractHandler
             'total'    => $total,
             'limit'    => $limit,
             'offset'   => $offset,
-            'has_more' => ( $offset + count($page) ) < $total,
+            'has_more' => ( $offset + $sqlPageCount ) < $total,
         ]);
     }
 
