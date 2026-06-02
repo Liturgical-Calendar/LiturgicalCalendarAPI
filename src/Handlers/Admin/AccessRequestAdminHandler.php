@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Api\Handlers\Admin;
 
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Handlers\AbstractHandler;
+use LiturgicalCalendar\Api\Handlers\Pagination\OffsetPaginationTrait;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\RequestContentType;
@@ -39,6 +40,8 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 final class AccessRequestAdminHandler extends AbstractHandler
 {
+    use OffsetPaginationTrait;
+
     private ?AccessRequestRepository $repository = null;
     private ?OpenFgaClient $fgaClient            = null;
 
@@ -146,13 +149,24 @@ final class AccessRequestAdminHandler extends AbstractHandler
     }
 
     /**
-     * GET /admin/access-requests — List access requests.
+     * GET /admin/access-requests — List access requests, paginated.
      *
      * Global admins see all requests. Resource admins see only requests
-     * for resources they administer.
+     * for resources they administer (filterByAdminAccess is applied
+     * post-fetch to each page).
      *
      * Query parameters:
-     * - status: Filter by status (pending, approved, rejected, revoked). If omitted, returns all statuses.
+     *   - status: Filter by status (pending, approved, rejected, revoked).
+     *             If omitted, returns all statuses.
+     *   - limit:  Max items in this page (1..500, default 100).
+     *   - offset: Zero-based item index where this page starts (default 0).
+     *
+     * Note: when filterByAdminAccess is applied (non-global admin), the
+     * returned `count` may be smaller than `limit` and smaller than
+     * `total` — `total` reflects the pre-filter SQL count, `has_more`
+     * reflects the SQL paginator. Clients should keep paging until
+     * `has_more` is false even when individual pages come back short.
+     * Same caveat as PR #623's /admin/permissions endpoint.
      */
     private function listRequests(
         ServerRequestInterface $request,
@@ -167,28 +181,38 @@ final class AccessRequestAdminHandler extends AbstractHandler
             ? $queryParams['status']
             : null;
 
-        // Validate status if provided
         if ($statusFilter !== null && !in_array($statusFilter, AccessRequestRepository::VALID_STATUSES, true)) {
             throw new ValidationException(
                 sprintf('Invalid status. Valid values are: %s', implode(', ', AccessRequestRepository::VALID_STATUSES))
             );
         }
 
-        if ($isGlobalAdmin) {
-            $requests = $statusFilter !== null
-                ? $repo->getAll($statusFilter)
-                : $repo->getAll();
-        } else {
-            // Resource admins: get requests, then filter by admin access
-            $allRequests = $statusFilter !== null
-                ? $repo->getAll($statusFilter)
-                : $repo->getAll();
-            $requests    = $this->filterByAdminAccess($allRequests, $adminId);
+        $limit  = $this->parseLimit($queryParams['limit']   ?? null);
+        $offset = $this->parseOffset($queryParams['offset'] ?? null);
+
+        $page  = $repo->getAll($statusFilter, $limit, $offset);
+        $total = $repo->countAll($statusFilter);
+
+        // Snapshot the SQL page size BEFORE filterByAdminAccess shrinks the page.
+        // `has_more` must reflect the SQL paginator's state, not the filtered
+        // page count: when SQL returns its final page (sqlPageCount < limit so
+        // offset + sqlPageCount == total), the client should stop. If we used
+        // the post-filter count instead, a heavily-filtered final page would
+        // falsely advertise has_more=true and the client would fetch an empty
+        // next page.
+        $sqlPageCount = count($page);
+
+        if (!$isGlobalAdmin) {
+            $page = $this->filterByAdminAccess($page, $adminId);
         }
 
         return $this->encodeResponseBody($response, [
-            'requests' => $requests,
-            'count'    => count($requests),
+            'requests' => $page,
+            'count'    => count($page),
+            'total'    => $total,
+            'limit'    => $limit,
+            'offset'   => $offset,
+            'has_more' => ( $offset + $sqlPageCount ) < $total,
         ]);
     }
 

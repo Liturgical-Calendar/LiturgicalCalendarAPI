@@ -13,6 +13,7 @@ use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Tests\Handlers\AbstractHandlerTestCase;
 use LiturgicalCalendar\Tests\Support\EnvIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(AccessRequestAdminHandler::class)]
 final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
@@ -224,6 +225,111 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
 
         ( new AccessRequestAdminHandler() )->handle(
             $this->withOidcUser($this->requestFor('POST', '/admin/access-requests/' . $id . '/teleport', [], []))
+        );
+    }
+
+    // --- Pagination (issue #572) -----------------------------------------
+
+    public function testListRequestsWithoutPaginationDefaults(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $repo->create('user-a', 'a@x.test', null, 'developer', []);
+        $repo->create('user-b', 'b@x.test', null, 'developer', []);
+
+        $response = ( new AccessRequestAdminHandler() )->handle(
+            $this->withOidcUser($this->requestFor('GET', '/admin/access-requests'))
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertCount(2, $body['requests']);
+        self::assertSame(2, $body['count']);
+        self::assertSame(2, $body['total']);
+        self::assertSame(100, $body['limit']);
+        self::assertSame(0, $body['offset']);
+        self::assertFalse($body['has_more']);
+    }
+
+    public function testListRequestsWithLimitAndOffsetReturnsSlice(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $repo->create('user-a', 'a@x.test', null, 'developer', []);
+        usleep(2000);
+        $repo->create('user-b', 'b@x.test', null, 'developer', []);
+        usleep(2000);
+        $repo->create('user-c', 'c@x.test', null, 'developer', []);
+
+        $response = ( new AccessRequestAdminHandler() )->handle(
+            $this->withOidcUser($this->requestFor('GET', '/admin/access-requests?limit=1&offset=1'))
+        );
+
+        $body = $this->decodeJsonBody($response);
+        self::assertCount(1, $body['requests']);
+        self::assertSame(1, $body['count']);
+        self::assertSame(3, $body['total']);
+        self::assertSame(1, $body['limit']);
+        self::assertSame(1, $body['offset']);
+        self::assertTrue($body['has_more']); // 1 + 1 = 2 < 3
+    }
+
+    public function testListRequestsCombinesStatusFilterAndPagination(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $repo->create('user-a', 'a@x.test', null, 'developer', []); // pending
+        usleep(2000);
+        $repo->create('user-b', 'b@x.test', null, 'developer', []); // pending
+        usleep(2000);
+        $approved = $repo->create('user-c', 'c@x.test', null, 'developer', []);
+        $repo->approve($approved, 'someone'); // not pending — must not appear
+
+        $response = ( new AccessRequestAdminHandler() )->handle(
+            $this->withOidcUser($this->requestFor('GET', '/admin/access-requests?status=pending&limit=1&offset=0'))
+        );
+
+        $body = $this->decodeJsonBody($response);
+        self::assertCount(1, $body['requests']);
+        self::assertSame(1, $body['count']);
+        // total counts only matching (pending) rows, ignoring limit/offset.
+        self::assertSame(2, $body['total']);
+        self::assertTrue($body['has_more']); // 0 + 1 = 1 < 2
+        self::assertSame('pending', $body['requests'][0]['status']);
+    }
+
+    /** @return iterable<string, array{0:string,1:string}> */
+    public static function adminInvalidLimitProvider(): iterable
+    {
+        yield 'zero'        => ['limit=0', 'between 1 and 500'];
+        yield 'too-large'   => ['limit=501', 'between 1 and 500'];
+        yield 'non-numeric' => ['limit=abc', 'must be a positive integer'];
+        yield 'negative'    => ['limit=-1', 'must be a positive integer'];
+    }
+
+    #[DataProvider('adminInvalidLimitProvider')]
+    public function testListRequestsRejectsInvalidLimit(string $query, string $messageFragment): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage($messageFragment);
+
+        ( new AccessRequestAdminHandler() )->handle(
+            $this->withOidcUser($this->requestFor('GET', '/admin/access-requests?' . $query))
+        );
+    }
+
+    /** @return iterable<string, array{0:string}> */
+    public static function adminInvalidOffsetProvider(): iterable
+    {
+        yield 'negative'    => ['offset=-1'];
+        yield 'non-numeric' => ['offset=abc'];
+    }
+
+    #[DataProvider('adminInvalidOffsetProvider')]
+    public function testListRequestsRejectsInvalidOffset(string $query): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('offset must be a non-negative integer');
+
+        ( new AccessRequestAdminHandler() )->handle(
+            $this->withOidcUser($this->requestFor('GET', '/admin/access-requests?' . $query))
         );
     }
 }
