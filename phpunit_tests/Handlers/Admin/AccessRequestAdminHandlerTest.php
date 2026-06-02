@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Handlers\Admin;
 
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use LiturgicalCalendar\Api\Handlers\Admin\AccessRequestAdminHandler;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
+use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Tests\Handlers\AbstractHandlerTestCase;
 use LiturgicalCalendar\Tests\Support\EnvIsolationTrait;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -359,5 +365,275 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertSame('failed', $row['zitadel_sync_status']);
         self::assertArrayHasKey('zitadel_sync_error', $row);
         self::assertSame('token expired', $row['zitadel_sync_error']);
+    }
+
+    // --- Fail-fast on OpenFGA tuple errors (issue #567) ------------------
+
+    /**
+     * Build a real OpenFgaClient backed by a Guzzle MockHandler that
+     * replays the queued HTTP responses. We construct the handler with
+     * this client injected, set the OPENFGA_* env vars so
+     * `OpenFgaClient::isConfigured()` returns true (otherwise the tuple-
+     * write loop is skipped), and undo both at the end of the test.
+     */
+    private function withMockOpenFgaClient(MockHandler $mock, callable $fn): mixed
+    {
+        $stack  = HandlerStack::create($mock);
+        $guzzle = new GuzzleClient(['handler' => $stack]);
+        $psr17  = new Psr17Factory();
+        $client = new OpenFgaClient(
+            apiUrl: 'http://openfga.test',
+            storeId: 'test-store',
+            modelId: 'test-model',
+            httpClient: $guzzle,
+            requestFactory: $psr17,
+            streamFactory: $psr17,
+            apiToken: 'test-token'
+        );
+
+        $savedEnv = [];
+        foreach (['OPENFGA_API_URL', 'OPENFGA_STORE_ID', 'OPENFGA_MODEL_ID'] as $name) {
+            $savedEnv[$name] = getenv($name);
+            putenv("{$name}=stub");
+            $_ENV[$name] = 'stub';
+        }
+
+        try {
+            return $fn($client);
+        } finally {
+            foreach ($savedEnv as $name => $original) {
+                if ($original === false) {
+                    putenv($name);
+                    unset($_ENV[$name]);
+                } else {
+                    putenv("{$name}={$original}");
+                    $_ENV[$name] = $original;
+                }
+            }
+        }
+    }
+
+    public function testApproveSucceedsWhenAllTupleWritesSucceed(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+            ['object_type' => 'diocesan_calendar', 'object_id' => 'romamo_it', 'relation' => 'viewer'],
+        ]);
+
+        $mock = new MockHandler([
+            new GuzzleResponse(200, [], '{}'), // tuple 1 write OK
+            new GuzzleResponse(200, [], '{}'), // tuple 2 write OK
+        ]);
+
+        $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock,
+            fn(OpenFgaClient $client) => ( new AccessRequestAdminHandler($client) )->handle(
+                $this->withOidcUser($this->requestFor(
+                    'POST',
+                    '/admin/access-requests/' . $id . '/approve',
+                    [],
+                    ['notes' => 'ok']
+                ))
+            )
+        ));
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertCount(2, $body['tuples_created']);
+        self::assertSame([], $body['fga_errors']);
+
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('approved', $row['status']);
+    }
+
+    public function testApproveTreatsDuplicateTupleAsBenign(): void
+    {
+        // Idempotent re-approval: one tuple already exists. The handler
+        // should treat that write as success, still mutate the DB, and
+        // return success: true.
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+        ]);
+
+        $mock = new MockHandler([
+            new GuzzleResponse(400, [], (string) json_encode([
+                'code'    => 'cannot_allow_duplicate_tuple',
+                'message' => 'cannot write duplicate tuple',
+            ])),
+        ]);
+
+        $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock,
+            fn(OpenFgaClient $client) => ( new AccessRequestAdminHandler($client) )->handle(
+                $this->withOidcUser($this->requestFor(
+                    'POST',
+                    '/admin/access-requests/' . $id . '/approve',
+                    [],
+                    ['notes' => 'retry']
+                ))
+            )
+        ));
+
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertCount(1, $body['tuples_created']);
+        self::assertSame([], $body['fga_errors']);
+
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('approved', $row['status']);
+    }
+
+    public function testApproveBailsAndKeepsRequestPendingOnRealFgaError(): void
+    {
+        // Genuine OpenFGA failure (e.g. validation error). The handler must
+        // NOT mark the DB as approved — leaving it pending lets the admin
+        // retry once the underlying error is resolved.
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+        ]);
+
+        $mock = new MockHandler([
+            new GuzzleResponse(400, [], (string) json_encode([
+                'code'    => 'validation_error',
+                'message' => 'invalid relation for type',
+            ])),
+        ]);
+
+        $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock,
+            fn(OpenFgaClient $client) => ( new AccessRequestAdminHandler($client) )->handle(
+                $this->withOidcUser($this->requestFor(
+                    'POST',
+                    '/admin/access-requests/' . $id . '/approve',
+                    [],
+                    ['notes' => 'try']
+                ))
+            )
+        ));
+
+        $body = $this->decodeJsonBody($response);
+        self::assertFalse($body['success']);
+        self::assertCount(1, $body['fga_errors']);
+        self::assertStringContainsString('Approval aborted', $body['message']);
+
+        // DB row must still be pending — the request was NOT approved.
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('pending', $row['status']);
+    }
+
+    public function testRevokeSucceedsWhenAllTupleDeletesSucceed(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+        ]);
+        $repo->approve($id, 'admin-bob');
+
+        $mock = new MockHandler([
+            new GuzzleResponse(200, [], '{}'), // delete OK
+        ]);
+
+        $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock,
+            fn(OpenFgaClient $client) => ( new AccessRequestAdminHandler($client) )->handle(
+                $this->withOidcUser($this->requestFor(
+                    'POST',
+                    '/admin/access-requests/' . $id . '/revoke',
+                    [],
+                    []
+                ))
+            )
+        ));
+
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertCount(1, $body['tuples_deleted']);
+        self::assertSame([], $body['fga_errors']);
+
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('revoked', $row['status']);
+    }
+
+    public function testRevokeTreatsMissingTupleAsBenign(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+        ]);
+        $repo->approve($id, 'admin-bob');
+
+        $mock = new MockHandler([
+            new GuzzleResponse(400, [], (string) json_encode([
+                'code'    => 'cannot_allow_unknown_tuple_to_be_deleted',
+                'message' => 'cannot delete unknown tuple',
+            ])),
+        ]);
+
+        $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock,
+            fn(OpenFgaClient $client) => ( new AccessRequestAdminHandler($client) )->handle(
+                $this->withOidcUser($this->requestFor(
+                    'POST',
+                    '/admin/access-requests/' . $id . '/revoke',
+                    [],
+                    []
+                ))
+            )
+        ));
+
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertCount(1, $body['tuples_deleted']);
+        self::assertSame([], $body['fga_errors']);
+
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('revoked', $row['status']);
+    }
+
+    public function testRevokeBailsAndKeepsRequestApprovedOnRealFgaError(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+        ]);
+        $repo->approve($id, 'admin-bob');
+
+        $mock = new MockHandler([
+            new GuzzleResponse(500, [], (string) json_encode([
+                'code'    => 'internal_error',
+                'message' => 'internal server error',
+            ])),
+        ]);
+
+        $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock,
+            fn(OpenFgaClient $client) => ( new AccessRequestAdminHandler($client) )->handle(
+                $this->withOidcUser($this->requestFor(
+                    'POST',
+                    '/admin/access-requests/' . $id . '/revoke',
+                    [],
+                    []
+                ))
+            )
+        ));
+
+        $body = $this->decodeJsonBody($response);
+        self::assertFalse($body['success']);
+        self::assertCount(1, $body['fga_errors']);
+        self::assertStringContainsString('Revocation aborted', $body['message']);
+
+        // DB row must still be approved — the revoke was NOT committed.
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('approved', $row['status']);
     }
 }

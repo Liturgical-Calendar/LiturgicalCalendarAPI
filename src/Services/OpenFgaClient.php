@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Services;
 
 use GuzzleHttp\Client;
+use LiturgicalCalendar\Api\Services\Exception\OpenFgaApiException;
+use LiturgicalCalendar\Api\Services\Exception\TupleAlreadyExistsException;
+use LiturgicalCalendar\Api\Services\Exception\TupleNotFoundException;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
@@ -130,10 +133,18 @@ class OpenFgaClient
     /**
      * Write a relationship tuple.
      *
+     * Throws `TupleAlreadyExistsException` (a subclass of
+     * `OpenFgaApiException`) when OpenFGA rejects the write because the
+     * tuple already exists. Callers managing idempotent grants should treat
+     * that as a benign no-op. Genuine FGA failures surface as the base
+     * `OpenFgaApiException` and remain fatal.
+     *
      * @param string $user     User identifier
      * @param string $relation Relation name
      * @param string $object   Object identifier
-     * @throws RuntimeException If the API request fails
+     * @throws TupleAlreadyExistsException If the tuple already exists (benign)
+     * @throws OpenFgaApiException         For any other API-level failure
+     * @throws RuntimeException            For transport-level failures
      */
     public function writeTuple(string $user, string $relation, string $object): void
     {
@@ -150,16 +161,37 @@ class OpenFgaClient
             'authorization_model_id' => $this->modelId,
         ];
 
-        $this->post("/stores/{$this->storeId}/write", $payload);
+        try {
+            $this->post("/stores/{$this->storeId}/write", $payload);
+        } catch (OpenFgaApiException $e) {
+            if (self::isDuplicateTupleError($e)) {
+                throw new TupleAlreadyExistsException(
+                    sprintf('Tuple already exists: %s#%s@%s', $object, $relation, $user),
+                    $e->getHttpStatus(),
+                    $e->getErrorCode(),
+                    $e->getResponseBody(),
+                    $e
+                );
+            }
+            throw $e;
+        }
     }
 
     /**
      * Delete a relationship tuple.
      *
+     * Throws `TupleNotFoundException` (a subclass of `OpenFgaApiException`)
+     * when OpenFGA rejects the delete because the tuple does not exist.
+     * Callers managing idempotent revokes should treat that as a benign
+     * no-op. Genuine FGA failures surface as the base `OpenFgaApiException`
+     * and remain fatal.
+     *
      * @param string $user     User identifier
      * @param string $relation Relation name
      * @param string $object   Object identifier
-     * @throws RuntimeException If the API request fails
+     * @throws TupleNotFoundException If the tuple does not exist (benign)
+     * @throws OpenFgaApiException    For any other API-level failure
+     * @throws RuntimeException       For transport-level failures
      */
     public function deleteTuple(string $user, string $relation, string $object): void
     {
@@ -176,7 +208,66 @@ class OpenFgaClient
             'authorization_model_id' => $this->modelId,
         ];
 
-        $this->post("/stores/{$this->storeId}/write", $payload);
+        try {
+            $this->post("/stores/{$this->storeId}/write", $payload);
+        } catch (OpenFgaApiException $e) {
+            if (self::isMissingTupleError($e)) {
+                throw new TupleNotFoundException(
+                    sprintf('Tuple not found: %s#%s@%s', $object, $relation, $user),
+                    $e->getHttpStatus(),
+                    $e->getErrorCode(),
+                    $e->getResponseBody(),
+                    $e
+                );
+            }
+            throw $e;
+        }
+    }
+
+    /**
+     * Detect "tuple already exists" OpenFGA responses for `writeTuple` benign
+     * re-throw. Modern OpenFGA reports this as
+     * `cannot_allow_duplicate_tuple`; older versions return
+     * `write_failed_due_to_invalid_input` with the cause carried only in the
+     * message body. Match on both shapes so the classifier is version-
+     * tolerant.
+     */
+    private static function isDuplicateTupleError(OpenFgaApiException $e): bool
+    {
+        $code = $e->getErrorCode();
+        if ($code === 'cannot_allow_duplicate_tuple') {
+            return true;
+        }
+        if ($code === 'write_failed_due_to_invalid_input' || $code === null) {
+            $msg = strtolower($e->getMessage());
+            if (str_contains($msg, 'already exists') || str_contains($msg, 'duplicate')) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Detect "tuple not found" OpenFGA responses for `deleteTuple` benign
+     * re-throw. Modern OpenFGA reports this as
+     * `cannot_allow_unknown_tuple_to_be_deleted`; older versions return
+     * `write_failed_due_to_invalid_input` with the cause carried only in the
+     * message body. Match on both shapes so the classifier is version-
+     * tolerant.
+     */
+    private static function isMissingTupleError(OpenFgaApiException $e): bool
+    {
+        $code = $e->getErrorCode();
+        if ($code === 'cannot_allow_unknown_tuple_to_be_deleted') {
+            return true;
+        }
+        if ($code === 'write_failed_due_to_invalid_input' || $code === null) {
+            $msg = strtolower($e->getMessage());
+            if (str_contains($msg, 'not found') || str_contains($msg, 'does not exist')) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -352,9 +443,13 @@ class OpenFgaClient
         // OpenFGA returns 200 for successful checks and writes.
         // Non-200 responses indicate errors.
         if ($httpCode !== 200) {
-            $message = is_string($decoded['message'] ?? null) ? $decoded['message'] : 'Unknown error';
-            throw new RuntimeException(
-                sprintf('OpenFGA API error (HTTP %d): %s', $httpCode, $message)
+            $message   = is_string($decoded['message'] ?? null) ? $decoded['message'] : 'Unknown error';
+            $errorCode = is_string($decoded['code'] ?? null) ? $decoded['code'] : null;
+            throw new OpenFgaApiException(
+                sprintf('OpenFGA API error (HTTP %d): %s', $httpCode, $message),
+                $httpCode,
+                $errorCode,
+                $decoded
             );
         }
 
