@@ -17,31 +17,70 @@ class LoginRateLimitTest extends ApiTestCase
     private string $testIp = '';
 
     /**
-     * Each test method gets its own synthetic client IP from RFC 5737 TEST-NET-1
-     * (192.0.2.0/24). The login rate limiter keys on client IP, so per-method
-     * isolation gives every test a fresh budget — no shared state across tests,
-     * across full-suite reruns within the 15-minute window, or between the host
-     * test runner and a containerized API. The earlier reset-by-filesystem-delete
-     * approach didn't work in containerized setups.
+     * Stable mapping from `test*` method name → unique synthetic client IP
+     * in RFC 5737 TEST-NET-1 (192.0.2.0/24). Built once per class run via
+     * reflection: all public methods starting with `test` are enumerated,
+     * sorted alphabetically for determinism, and assigned consecutive
+     * octets starting from a per-run random offset. Each method ends up
+     * on its own dedicated bucket, so within-class birthday collisions
+     * become structurally impossible — fixing the residual ~4% flake the
+     * prior `crc32 % 254` scheme retained.
      *
-     * The hash mixes in `getmypid()` so the same test method picks a different
-     * IP on each PHP process. A bucket exhausted by one composer-test run no
-     * longer 429s the next run — the next run uses a different IP. (Within a
-     * single run, the PID is stable, so each test method's IP stays consistent
-     * across its own setUp/exhaustRateLimit/assertion calls.) Hashes still mod
-     * by 99 so the resulting octet stays in the 1-99 reservation; rare
-     * collisions across PID boundaries reduce the rerun-failure rate from
-     * 100% to ~1%.
+     * Per-run rotation: the random offset varies on every class run
+     * (host or CI, PID 1 or otherwise), so a bucket exhausted by one
+     * run is unlikely to be hit by the next within the 15-minute
+     * rate-limit window — same inter-run-isolation property the prior
+     * `runSeed` provided, just driving the IP space directly instead
+     * of via hash.
      *
-     * Octet range 1-99 is reserved for per-method IPs so they never collide
-     * with CalendarTest's bucket-rotation range (100-199) or ApiTestCase's
-     * per-class range (200-254).
+     * Cross-class IP overlap with CalendarTest (100-199) or ApiTestCase
+     * (200-254) is harmless: the rate limiter SHA-256s its identifier
+     * (`src/Services/RateLimiter.php:70`) and `LoginHandler` records
+     * attempts under the raw IP, while `ApiKeyRateLimitMiddleware`
+     * prefixes with `ip_` (`src/Http/Middleware/ApiKeyRateLimitMiddleware.php:65`)
+     * — so `192.0.2.150` under login and `192.0.2.150` under calendar
+     * are different bucket files regardless of overlap.
+     *
+     * DataProvider note: `$this->name()` returns the bare method name in
+     * PHPUnit 12+ (data set qualifiers are exposed via `nameWithDataSet()`),
+     * so all rows of a parameterized test share their method's slot. None
+     * of this file's tests are parameterized today.
+     *
+     * Capacity: 254 candidate octets. Beyond 254 test methods the modulus
+     * wraps and birthday collisions re-emerge; this class is well under
+     * that limit (5 methods at last count).
+     *
+     * @var array<string, string>|null
      */
+    private static ?array $methodToIp = null;
+
     protected function setUp(): void
     {
         parent::setUp();
-        $hash         = crc32($this->name() . '|' . getmypid());
-        $this->testIp = '192.0.2.' . ( ( abs($hash) % 99 ) + 1 );
+
+        if (self::$methodToIp === null) {
+            $reflection  = new \ReflectionClass(static::class);
+            $methodNames = [];
+            foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+                if (str_starts_with($method->getName(), 'test')) {
+                    $methodNames[] = $method->getName();
+                }
+            }
+            sort($methodNames);
+
+            $offset           = random_int(0, 253);
+            self::$methodToIp = [];
+            foreach ($methodNames as $i => $name) {
+                self::$methodToIp[$name] = '192.0.2.' . ( ( ( $offset + $i ) % 254 ) + 1 );
+            }
+        }
+
+        // Defensive fallback for any name not in the map (e.g. a
+        // DataProvider variant the bare-name lookup misses, or a method
+        // added at runtime via reflection in a future test). 192.0.2.1
+        // is a single shared bucket — acceptable for the safety net,
+        // not the happy path.
+        $this->testIp = self::$methodToIp[$this->name()] ?? '192.0.2.1';
     }
 
     /**
@@ -60,16 +99,51 @@ class LoginRateLimitTest extends ApiTestCase
     }
 
     /**
+     * Read RATE_LIMIT_LOGIN_ATTEMPTS from $_ENV with safe coercion.
+     *
+     * `$_ENV[...]` is typed as mixed; raw `(int) (...)` silently coerces
+     * arrays or objects to 1 / throws respectively, which PHPStan L10
+     * rightly rejects. Gate the cast on `is_numeric()` so anything else
+     * falls back to the documented default of 5.
+     */
+    private function loginRateLimit(): int
+    {
+        $raw = $_ENV['RATE_LIMIT_LOGIN_ATTEMPTS'] ?? null;
+        return is_numeric($raw) ? (int) $raw : 5;
+    }
+
+    /**
+     * Non-nullable accessor for the shared HTTP client.
+     *
+     * `ApiTestCase::$http` is declared `?Client` and initialised in
+     * `setUpBeforeClass`, but PHPStan can't carry that narrowing across
+     * the static-property boundary into every call site. Routing all
+     * test-class access through one strongly-typed getter satisfies the
+     * type checker without sprinkling `\assert` everywhere, and gives a
+     * clean fail-fast when somebody calls the API before the base class
+     * has had a chance to build the client.
+     */
+    private static function http(): \GuzzleHttp\Client
+    {
+        if (self::$http === null) {
+            throw new \LogicException(
+                'ApiTestCase::$http not initialised — ApiTestCase::setUpBeforeClass must run first.'
+            );
+        }
+        return self::$http;
+    }
+
+    /**
      * Exhaust the rate limit by making failed login attempts up to the configured maximum.
      *
      * @return \Psr\Http\Message\ResponseInterface The rate-limited (429) response after exceeding the limit.
      */
     private function exhaustRateLimit(): \Psr\Http\Message\ResponseInterface
     {
-        $maxAttempts = (int) ( $_ENV['RATE_LIMIT_LOGIN_ATTEMPTS'] ?? 5 );
+        $maxAttempts = $this->loginRateLimit();
 
         for ($i = 0; $i < $maxAttempts; $i++) {
-            $response = self::$http->post('/auth/login', [
+            $response = self::http()->post('/auth/login', [
                 'headers' => $this->loginHeaders(),
                 'json'    => [
                     'username' => 'admin',
@@ -85,7 +159,7 @@ class LoginRateLimitTest extends ApiTestCase
         }
 
         // Return the rate-limited response
-        return self::$http->post('/auth/login', [
+        return self::http()->post('/auth/login', [
             'headers' => $this->loginHeaders(),
             'json'    => [
                 'username' => 'admin',
@@ -101,7 +175,7 @@ class LoginRateLimitTest extends ApiTestCase
      */
     public function testLoginFailsWithInvalidCredentials(): void
     {
-        $response = self::$http->post('/auth/login', [
+        $response = self::http()->post('/auth/login', [
             'headers' => $this->loginHeaders(),
             'json'    => [
                 'username' => 'admin',
@@ -125,11 +199,11 @@ class LoginRateLimitTest extends ApiTestCase
     public function testRateLimitingTriggeredAfterMaxAttempts(): void
     {
         // Get the configured rate limit (default is 5)
-        $maxAttempts = (int) ( $_ENV['RATE_LIMIT_LOGIN_ATTEMPTS'] ?? 5 );
+        $maxAttempts = $this->loginRateLimit();
 
         // Make failed login attempts up to the limit
         for ($i = 0; $i < $maxAttempts; $i++) {
-            $response = self::$http->post('/auth/login', [
+            $response = self::http()->post('/auth/login', [
                 'headers' => $this->loginHeaders(),
                 'json'    => [
                     'username' => 'admin',
@@ -146,7 +220,7 @@ class LoginRateLimitTest extends ApiTestCase
         }
 
         // The next attempt should be rate limited (429)
-        $response = self::$http->post('/auth/login', [
+        $response = self::http()->post('/auth/login', [
             'headers' => $this->loginHeaders(),
             'json'    => [
                 'username' => 'admin',
@@ -210,12 +284,12 @@ class LoginRateLimitTest extends ApiTestCase
     public function testSuccessfulLoginClearsRateLimit(): void
     {
         // Get the configured rate limit (default is 5)
-        $maxAttempts = (int) ( $_ENV['RATE_LIMIT_LOGIN_ATTEMPTS'] ?? 5 );
+        $maxAttempts = $this->loginRateLimit();
 
         // Make some failed attempts (but not enough to trigger rate limiting)
         $failedAttempts = max(1, $maxAttempts - 2);
         for ($i = 0; $i < $failedAttempts; $i++) {
-            $response = self::$http->post('/auth/login', [
+            $response = self::http()->post('/auth/login', [
                 'headers' => $this->loginHeaders(),
                 'json'    => [
                     'username' => 'admin',
@@ -226,7 +300,7 @@ class LoginRateLimitTest extends ApiTestCase
         }
 
         // Now login successfully
-        $response = self::$http->post('/auth/login', [
+        $response = self::http()->post('/auth/login', [
             'headers' => $this->loginHeaders(),
             'json'    => [
                 'username' => $_ENV['ADMIN_USERNAME'] ?? 'admin',
@@ -243,7 +317,7 @@ class LoginRateLimitTest extends ApiTestCase
         // Now we should be able to make failed attempts again without being rate limited
         // Make the same number of failed attempts as before
         for ($i = 0; $i < $failedAttempts; $i++) {
-            $response = self::$http->post('/auth/login', [
+            $response = self::http()->post('/auth/login', [
                 'headers' => $this->loginHeaders(),
                 'json'    => [
                     'username' => 'admin',
