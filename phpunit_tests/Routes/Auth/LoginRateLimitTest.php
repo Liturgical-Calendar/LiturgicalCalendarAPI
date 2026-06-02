@@ -17,57 +17,70 @@ class LoginRateLimitTest extends ApiTestCase
     private string $testIp = '';
 
     /**
-     * Per-PHPUnit-run random seed mixed into the IP hash. Initialised once
-     * per class run (first setUp call wins) so that every test method in a
-     * single run hashes against the same seed — within a run, `setUp()`
-     * recomputes the same IP for the same test name, which is what
-     * `exhaustRateLimit()` and the subsequent rate-limit assertions rely
-     * on. Across runs, the seed differs and the IP space rotates.
+     * Stable mapping from `test*` method name → unique synthetic client IP
+     * in RFC 5737 TEST-NET-1 (192.0.2.0/24). Built once per class run via
+     * reflection: all public methods starting with `test` are enumerated,
+     * sorted alphabetically for determinism, and assigned consecutive
+     * octets starting from a per-run random offset. Each method ends up
+     * on its own dedicated bucket, so within-class birthday collisions
+     * become structurally impossible — fixing the residual ~4% flake the
+     * prior `crc32 % 254` scheme retained.
      *
-     * Why this exists on top of `getmypid()`: in containerised CI (Docker,
-     * GitHub Actions runners) the PHP process is consistently PID 1, so
-     * the `getmypid()` salt collapses to 0 entropy and the prior version
-     * of this test failed identically on every CI run within the 15-minute
-     * rate-limit window. `random_int()` is host-PID-independent and gives
-     * back the inter-run isolation the original docstring claimed.
+     * Per-run rotation: the random offset varies on every class run
+     * (host or CI, PID 1 or otherwise), so a bucket exhausted by one
+     * run is unlikely to be hit by the next within the 15-minute
+     * rate-limit window — same inter-run-isolation property the prior
+     * `runSeed` provided, just driving the IP space directly instead
+     * of via hash.
+     *
+     * Cross-class IP overlap with CalendarTest (100-199) or ApiTestCase
+     * (200-254) is harmless: the rate limiter SHA-256s its identifier
+     * (`src/Services/RateLimiter.php:70`) and `LoginHandler` records
+     * attempts under the raw IP, while `ApiKeyRateLimitMiddleware`
+     * prefixes with `ip_` (`src/Http/Middleware/ApiKeyRateLimitMiddleware.php:65`)
+     * — so `192.0.2.150` under login and `192.0.2.150` under calendar
+     * are different bucket files regardless of overlap.
+     *
+     * DataProvider note: `$this->name()` returns the bare method name in
+     * PHPUnit 12+ (data set qualifiers are exposed via `nameWithDataSet()`),
+     * so all rows of a parameterized test share their method's slot. None
+     * of this file's tests are parameterized today.
+     *
+     * Capacity: 254 candidate octets. Beyond 254 test methods the modulus
+     * wraps and birthday collisions re-emerge; this class is well under
+     * that limit (5 methods at last count).
+     *
+     * @var array<string, string>|null
      */
-    private static ?int $runSeed = null;
+    private static ?array $methodToIp = null;
 
-    /**
-     * Each test method gets its own synthetic client IP from RFC 5737
-     * TEST-NET-1 (192.0.2.0/24). The login rate limiter keys on client IP,
-     * so per-method isolation gives every test a fresh budget — no shared
-     * state across tests, across full-suite reruns within the 15-minute
-     * window, or between the host test runner and a containerized API. The
-     * earlier reset-by-filesystem-delete approach didn't work in
-     * containerized setups.
-     *
-     * The hash mixes the test method name, `getmypid()`, and a per-class-
-     * run random seed. Stable within a run (so each test method's IP
-     * survives its own setUp/exhaustRateLimit/assertion calls); fresh
-     * across runs (so a bucket exhausted by a previous run no longer 429s
-     * this one — including under Docker where PID is always 1).
-     *
-     * The octet space is the full 1..254. Earlier revisions of this file
-     * carried a comment claiming octets 1-99 were reserved here so they
-     * wouldn't collide with CalendarTest's 100-199 or ApiTestCase's
-     * 200-254. That isolation guarantee was always provided by the rate
-     * limiter, not by the IP range: `LoginHandler` records attempts under
-     * the raw IP, while `ApiKeyRateLimitMiddleware` prefixes with `ip_`
-     * (src/Http/Middleware/ApiKeyRateLimitMiddleware.php:65), and
-     * `RateLimiter::getFilePath()` SHA-256s the identifier — so the
-     * bucket file for `192.0.2.150` from a login attempt and the bucket
-     * file for `192.0.2.150` from a calendar request are different files
-     * regardless of IP overlap. Expanding to the full 254 buckets reduces
-     * within-class birthday collisions from ~10% (5 methods over 99) to
-     * ~4% (over 254).
-     */
     protected function setUp(): void
     {
         parent::setUp();
-        self::$runSeed ??= random_int(1, PHP_INT_MAX);
-        $hash            = crc32($this->name() . '|' . getmypid() . '|' . self::$runSeed);
-        $this->testIp    = '192.0.2.' . ( ( abs($hash) % 254 ) + 1 );
+
+        if (self::$methodToIp === null) {
+            $reflection  = new \ReflectionClass(static::class);
+            $methodNames = [];
+            foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+                if (str_starts_with($method->getName(), 'test')) {
+                    $methodNames[] = $method->getName();
+                }
+            }
+            sort($methodNames);
+
+            $offset           = random_int(0, 253);
+            self::$methodToIp = [];
+            foreach ($methodNames as $i => $name) {
+                self::$methodToIp[$name] = '192.0.2.' . ( ( ( $offset + $i ) % 254 ) + 1 );
+            }
+        }
+
+        // Defensive fallback for any name not in the map (e.g. a
+        // DataProvider variant the bare-name lookup misses, or a method
+        // added at runtime via reflection in a future test). 192.0.2.1
+        // is a single shared bucket — acceptable for the safety net,
+        // not the happy path.
+        $this->testIp = self::$methodToIp[$this->name()] ?? '192.0.2.1';
     }
 
     /**
