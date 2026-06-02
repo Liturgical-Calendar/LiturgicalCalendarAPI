@@ -31,7 +31,7 @@ abstract class RepositoryTestCase extends TestCase
     protected static ?PDO $pdo = null;
 
     /** @var array<int,string> Tables truncated before each test, in any order — CASCADE handles FKs. */
-    protected const TABLES = ['api_keys', 'applications', 'access_requests', 'audit_log'];
+    protected const TABLES = ['api_keys', 'applications', 'access_requests', 'audit_log', 'openfga_outbox'];
 
     public static function setUpBeforeClass(): void
     {
