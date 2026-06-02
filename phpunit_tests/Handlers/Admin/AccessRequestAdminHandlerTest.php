@@ -636,4 +636,64 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertNotNull($row);
         self::assertSame('approved', $row['status']);
     }
+
+    // --- isFgaClientAvailable() fail-closed guards -----------------------
+
+    public function testRequireAdminForAllResourcesForbidsResourceAdminWhenFgaUnavailable(): void
+    {
+        // Non-global admin (no 'admin' role) attempting to approve when no
+        // OpenFgaClient is reachable — neither injected nor env-configured.
+        // requireAdminForAllResources must fail closed with 403.
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+        ]);
+
+        $this->expectException(\LiturgicalCalendar\Api\Http\Exception\ForbiddenException::class);
+        $this->expectExceptionMessage('Admin role required');
+
+        $this->withoutEnv(
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+            fn() => ( new AccessRequestAdminHandler() )->handle(
+                $this->withOidcUser(
+                    $this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/approve',
+                        [],
+                        ['notes' => 'try']
+                    ),
+                    'resource-admin-1',
+                    ['calendar_editor']
+                )
+            )
+        );
+    }
+
+    public function testListRequestsAsResourceAdminWithoutFgaReturnsEmpty(): void
+    {
+        // Non-global admin listing when OpenFGA is unreachable —
+        // filterByAdminAccess fails closed by returning [], so the visible
+        // set is empty regardless of how many requests exist.
+        $repo = new AccessRequestRepository(self::$pdo);
+        $repo->create('user-a', 'a@x.test', null, 'developer', []);
+        $repo->create('user-b', 'b@x.test', null, 'developer', []);
+
+        $response = $this->withoutEnv(
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+            fn() => ( new AccessRequestAdminHandler() )->handle(
+                $this->withOidcUser(
+                    $this->requestFor('GET', '/admin/access-requests'),
+                    'resource-admin-1',
+                    ['calendar_editor']
+                )
+            )
+        );
+
+        $body = $this->decodeJsonBody($response);
+        self::assertSame([], $body['requests']);
+        self::assertSame(0, $body['count']);
+        // total reflects the SQL paginator's pre-filter count, not the
+        // empty post-filter visible set.
+        self::assertSame(2, $body['total']);
+    }
 }
