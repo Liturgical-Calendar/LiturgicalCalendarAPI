@@ -99,16 +99,51 @@ class LoginRateLimitTest extends ApiTestCase
     }
 
     /**
+     * Read RATE_LIMIT_LOGIN_ATTEMPTS from $_ENV with safe coercion.
+     *
+     * `$_ENV[...]` is typed as mixed; raw `(int) (...)` silently coerces
+     * arrays or objects to 1 / throws respectively, which PHPStan L10
+     * rightly rejects. Gate the cast on `is_numeric()` so anything else
+     * falls back to the documented default of 5.
+     */
+    private function loginRateLimit(): int
+    {
+        $raw = $_ENV['RATE_LIMIT_LOGIN_ATTEMPTS'] ?? null;
+        return is_numeric($raw) ? (int) $raw : 5;
+    }
+
+    /**
      * Exhaust the rate limit by making failed login attempts up to the configured maximum.
      *
      * @return \Psr\Http\Message\ResponseInterface The rate-limited (429) response after exceeding the limit.
      */
+    /**
+     * Non-nullable accessor for the shared HTTP client.
+     *
+     * `ApiTestCase::$http` is declared `?Client` and initialised in
+     * `setUpBeforeClass`, but PHPStan can't carry that narrowing across
+     * the static-property boundary into every call site. Routing all
+     * test-class access through one strongly-typed getter satisfies the
+     * type checker without sprinkling `\assert` everywhere, and gives a
+     * clean fail-fast when somebody calls the API before the base class
+     * has had a chance to build the client.
+     */
+    private static function http(): \GuzzleHttp\Client
+    {
+        if (self::$http === null) {
+            throw new \LogicException(
+                'ApiTestCase::$http not initialised — ApiTestCase::setUpBeforeClass must run first.'
+            );
+        }
+        return self::$http;
+    }
+
     private function exhaustRateLimit(): \Psr\Http\Message\ResponseInterface
     {
-        $maxAttempts = (int) ( $_ENV['RATE_LIMIT_LOGIN_ATTEMPTS'] ?? 5 );
+        $maxAttempts = $this->loginRateLimit();
 
         for ($i = 0; $i < $maxAttempts; $i++) {
-            $response = self::$http->post('/auth/login', [
+            $response = self::http()->post('/auth/login', [
                 'headers' => $this->loginHeaders(),
                 'json'    => [
                     'username' => 'admin',
@@ -124,7 +159,7 @@ class LoginRateLimitTest extends ApiTestCase
         }
 
         // Return the rate-limited response
-        return self::$http->post('/auth/login', [
+        return self::http()->post('/auth/login', [
             'headers' => $this->loginHeaders(),
             'json'    => [
                 'username' => 'admin',
@@ -140,7 +175,7 @@ class LoginRateLimitTest extends ApiTestCase
      */
     public function testLoginFailsWithInvalidCredentials(): void
     {
-        $response = self::$http->post('/auth/login', [
+        $response = self::http()->post('/auth/login', [
             'headers' => $this->loginHeaders(),
             'json'    => [
                 'username' => 'admin',
@@ -164,11 +199,11 @@ class LoginRateLimitTest extends ApiTestCase
     public function testRateLimitingTriggeredAfterMaxAttempts(): void
     {
         // Get the configured rate limit (default is 5)
-        $maxAttempts = (int) ( $_ENV['RATE_LIMIT_LOGIN_ATTEMPTS'] ?? 5 );
+        $maxAttempts = $this->loginRateLimit();
 
         // Make failed login attempts up to the limit
         for ($i = 0; $i < $maxAttempts; $i++) {
-            $response = self::$http->post('/auth/login', [
+            $response = self::http()->post('/auth/login', [
                 'headers' => $this->loginHeaders(),
                 'json'    => [
                     'username' => 'admin',
@@ -185,7 +220,7 @@ class LoginRateLimitTest extends ApiTestCase
         }
 
         // The next attempt should be rate limited (429)
-        $response = self::$http->post('/auth/login', [
+        $response = self::http()->post('/auth/login', [
             'headers' => $this->loginHeaders(),
             'json'    => [
                 'username' => 'admin',
@@ -249,12 +284,12 @@ class LoginRateLimitTest extends ApiTestCase
     public function testSuccessfulLoginClearsRateLimit(): void
     {
         // Get the configured rate limit (default is 5)
-        $maxAttempts = (int) ( $_ENV['RATE_LIMIT_LOGIN_ATTEMPTS'] ?? 5 );
+        $maxAttempts = $this->loginRateLimit();
 
         // Make some failed attempts (but not enough to trigger rate limiting)
         $failedAttempts = max(1, $maxAttempts - 2);
         for ($i = 0; $i < $failedAttempts; $i++) {
-            $response = self::$http->post('/auth/login', [
+            $response = self::http()->post('/auth/login', [
                 'headers' => $this->loginHeaders(),
                 'json'    => [
                     'username' => 'admin',
@@ -265,7 +300,7 @@ class LoginRateLimitTest extends ApiTestCase
         }
 
         // Now login successfully
-        $response = self::$http->post('/auth/login', [
+        $response = self::http()->post('/auth/login', [
             'headers' => $this->loginHeaders(),
             'json'    => [
                 'username' => $_ENV['ADMIN_USERNAME'] ?? 'admin',
@@ -282,7 +317,7 @@ class LoginRateLimitTest extends ApiTestCase
         // Now we should be able to make failed attempts again without being rate limited
         // Make the same number of failed attempts as before
         for ($i = 0; $i < $failedAttempts; $i++) {
-            $response = self::$http->post('/auth/login', [
+            $response = self::http()->post('/auth/login', [
                 'headers' => $this->loginHeaders(),
                 'json'    => [
                     'username' => 'admin',
