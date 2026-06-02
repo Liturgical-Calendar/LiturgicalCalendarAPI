@@ -293,4 +293,93 @@ final class AccessRequestRepositoryTest extends RepositoryTestCase
         self::assertNotNull($pendingRow);
         self::assertCount(2, $pendingRow['permissions']);
     }
+
+    // --- Pagination (issue #572) -----------------------------------------
+
+    public function testGetAllWithLimitAndOffsetReturnsSlice(): void
+    {
+        // Three pending rows, ordered (oldest → newest) as $a, $b, $c.
+        // getAll() returns DESC by created_at, so the returned order is c, b, a.
+        $a = $this->repo->create('user-a', 'a@b.test', null, 'developer', []);
+        usleep(2000);
+        $b = $this->repo->create('user-b', 'b@b.test', null, 'developer', []);
+        usleep(2000);
+        $c = $this->repo->create('user-c', 'c@b.test', null, 'developer', []);
+
+        $firstTwo = $this->repo->getAll(null, 2, 0);
+        self::assertCount(2, $firstTwo);
+        self::assertSame($c, $firstTwo[0]['id']);
+        self::assertSame($b, $firstTwo[1]['id']);
+
+        $middle = $this->repo->getAll(null, 1, 1);
+        self::assertCount(1, $middle);
+        self::assertSame($b, $middle[0]['id']);
+
+        $last = $this->repo->getAll(null, 10, 2);
+        self::assertCount(1, $last);
+        self::assertSame($a, $last[0]['id']);
+
+        // Past-the-end offset returns an empty page.
+        self::assertCount(0, $this->repo->getAll(null, 10, 100));
+    }
+
+    public function testGetByUserWithLimitAndOffsetReturnsSlice(): void
+    {
+        // Same user, three rows, plus one for another user that must not leak in.
+        $a = $this->repo->create('user-1', 'a@b.test', null, 'developer', []);
+        usleep(2000);
+        $b = $this->repo->create('user-1', 'a@b.test', null, 'calendar_editor', []);
+        usleep(2000);
+        $c = $this->repo->create('user-1', 'a@b.test', null, 'test_editor', []);
+        $this->repo->create('user-2', 'b@b.test', null, 'developer', []);
+
+        $firstTwo = $this->repo->getByUser('user-1', 2, 0);
+        self::assertCount(2, $firstTwo);
+        self::assertSame($c, $firstTwo[0]['id']);
+        self::assertSame($b, $firstTwo[1]['id']);
+        foreach ($firstTwo as $row) {
+            self::assertSame('user-1', $row['zitadel_user_id']);
+        }
+
+        $middle = $this->repo->getByUser('user-1', 1, 1);
+        self::assertCount(1, $middle);
+        self::assertSame($b, $middle[0]['id']);
+
+        $last = $this->repo->getByUser('user-1', 10, 2);
+        self::assertCount(1, $last);
+        self::assertSame($a, $last[0]['id']);
+    }
+
+    public function testCountAllMatchesGetAllSize(): void
+    {
+        $this->repo->create('user-1', 'a@b.test', null, 'developer', []);
+        $approvedId = $this->repo->create('user-2', 'b@b.test', null, 'developer', []);
+        $this->repo->approve($approvedId, 'admin');
+        $rejectedId = $this->repo->create('user-3', 'c@b.test', null, 'developer', []);
+        $this->repo->reject($rejectedId, 'admin');
+
+        self::assertSame(3, $this->repo->countAll());
+        self::assertSame(1, $this->repo->countAll('pending'));
+        self::assertSame(1, $this->repo->countAll('approved'));
+        self::assertSame(1, $this->repo->countAll('rejected'));
+        self::assertSame(0, $this->repo->countAll('revoked'));
+    }
+
+    public function testCountByUserMatchesGetByUserSize(): void
+    {
+        $this->repo->create('user-1', 'a@b.test', null, 'developer', []);
+        $this->repo->create('user-1', 'a@b.test', null, 'calendar_editor', []);
+        $this->repo->create('user-2', 'b@b.test', null, 'developer', []);
+
+        self::assertSame(2, $this->repo->countByUser('user-1'));
+        self::assertSame(1, $this->repo->countByUser('user-2'));
+        self::assertSame(0, $this->repo->countByUser('user-nobody'));
+    }
+
+    public function testCountAllRejectsInvalidStatus(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        $this->repo->countAll('weird');
+    }
 }
