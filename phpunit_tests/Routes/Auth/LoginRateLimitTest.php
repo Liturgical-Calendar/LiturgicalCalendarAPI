@@ -113,11 +113,6 @@ class LoginRateLimitTest extends ApiTestCase
     }
 
     /**
-     * Exhaust the rate limit by making failed login attempts up to the configured maximum.
-     *
-     * @return \Psr\Http\Message\ResponseInterface The rate-limited (429) response after exceeding the limit.
-     */
-    /**
      * Non-nullable accessor for the shared HTTP client.
      *
      * `ApiTestCase::$http` is declared `?Client` and initialised in
@@ -138,6 +133,11 @@ class LoginRateLimitTest extends ApiTestCase
         return self::$http;
     }
 
+    /**
+     * Exhaust the rate limit by making failed login attempts up to the configured maximum.
+     *
+     * @return \Psr\Http\Message\ResponseInterface The rate-limited (429) response after exceeding the limit.
+     */
     private function exhaustRateLimit(): \Psr\Http\Message\ResponseInterface
     {
         $maxAttempts = $this->loginRateLimit();
