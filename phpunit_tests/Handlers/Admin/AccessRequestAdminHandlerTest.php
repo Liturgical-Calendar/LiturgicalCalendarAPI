@@ -28,6 +28,59 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
 
     protected static bool $requiresDatabase = true;
 
+    /**
+     * Extract and narrow the `requests` field of a decoded response body.
+     *
+     * `decodeJsonBody()` returns `array<string, mixed>`, so direct access
+     * to `$body['requests']` and any further descent is `mixed` —
+     * `assertCount`, `assertArrayHasKey`, and offset access all reject
+     * that. This helper does the runtime narrowing once per call site so
+     * the downstream test code stays readable.
+     *
+     * @param array<string, mixed> $body
+     * @return list<array<int|string, mixed>>
+     */
+    private static function requestsFrom(array $body): array
+    {
+        self::assertArrayHasKey('requests', $body);
+        self::assertIsArray($body['requests']);
+        $out = [];
+        foreach ($body['requests'] as $row) {
+            self::assertIsArray($row);
+            $out[] = $row;
+        }
+        return $out;
+    }
+
+    /**
+     * Extract and narrow an array-typed top-level body field. Used for
+     * the various list-shaped fields the admin handler returns
+     * (`tuples_created`, `tuples_deleted`, `fga_errors`, etc.) which
+     * arrive typed `mixed` through `decodeJsonBody`.
+     *
+     * @param array<string, mixed> $body
+     * @return array<int|string, mixed>
+     */
+    private static function arrayFieldFrom(array $body, string $key): array
+    {
+        self::assertArrayHasKey($key, $body);
+        self::assertIsArray($body[$key]);
+        return $body[$key];
+    }
+
+    /**
+     * Extract and narrow a string-typed top-level body field. Used for
+     * `message` (and other narrative fields) before assertStringContainsString.
+     *
+     * @param array<string, mixed> $body
+     */
+    private static function stringFieldFrom(array $body, string $key): string
+    {
+        self::assertArrayHasKey($key, $body);
+        self::assertIsString($body[$key]);
+        return $body[$key];
+    }
+
     public function testOptionsPreflightSucceeds(): void
     {
         $response = ( new AccessRequestAdminHandler() )->handle(
@@ -247,8 +300,9 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         );
 
         self::assertSame(200, $response->getStatusCode());
-        $body = $this->decodeJsonBody($response);
-        self::assertCount(2, $body['requests']);
+        $body     = $this->decodeJsonBody($response);
+        $requests = self::requestsFrom($body);
+        self::assertCount(2, $requests);
         self::assertSame(2, $body['count']);
         self::assertSame(2, $body['total']);
         self::assertSame(100, $body['limit']);
@@ -269,8 +323,9 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
             $this->withOidcUser($this->requestFor('GET', '/admin/access-requests?limit=1&offset=1'))
         );
 
-        $body = $this->decodeJsonBody($response);
-        self::assertCount(1, $body['requests']);
+        $body     = $this->decodeJsonBody($response);
+        $requests = self::requestsFrom($body);
+        self::assertCount(1, $requests);
         self::assertSame(1, $body['count']);
         self::assertSame(3, $body['total']);
         self::assertSame(1, $body['limit']);
@@ -292,13 +347,14 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
             $this->withOidcUser($this->requestFor('GET', '/admin/access-requests?status=pending&limit=1&offset=0'))
         );
 
-        $body = $this->decodeJsonBody($response);
-        self::assertCount(1, $body['requests']);
+        $body     = $this->decodeJsonBody($response);
+        $requests = self::requestsFrom($body);
+        self::assertCount(1, $requests);
         self::assertSame(1, $body['count']);
         // total counts only matching (pending) rows, ignoring limit/offset.
         self::assertSame(2, $body['total']);
         self::assertTrue($body['has_more']); // 0 + 1 = 1 < 2
-        self::assertSame('pending', $body['requests'][0]['status']);
+        self::assertSame('pending', $requests[0]['status']);
     }
 
     /** @return iterable<string, array{0:string,1:string}> */
@@ -355,9 +411,10 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
             $this->withOidcUser($this->requestFor('GET', '/admin/access-requests'))
         );
 
-        $body = $this->decodeJsonBody($response);
-        self::assertCount(1, $body['requests']);
-        $row = $body['requests'][0];
+        $body     = $this->decodeJsonBody($response);
+        $requests = self::requestsFrom($body);
+        self::assertCount(1, $requests);
+        $row = $requests[0];
 
         self::assertArrayHasKey('reviewed_by', $row);
         self::assertSame('admin-bob', $row['reviewed_by']);
@@ -375,8 +432,10 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
      * this client injected, set the OPENFGA_* env vars so
      * `OpenFgaClient::isConfigured()` returns true (otherwise the tuple-
      * write loop is skipped), and undo both at the end of the test.
+     *
+     * @param callable(OpenFgaClient): \Psr\Http\Message\ResponseInterface $fn
      */
-    private function withMockOpenFgaClient(MockHandler $mock, callable $fn): mixed
+    private function withMockOpenFgaClient(MockHandler $mock, callable $fn): \Psr\Http\Message\ResponseInterface
     {
         $stack  = HandlerStack::create($mock);
         $guzzle = new GuzzleClient(['handler' => $stack]);
@@ -441,7 +500,7 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertSame(200, $response->getStatusCode());
         $body = $this->decodeJsonBody($response);
         self::assertTrue($body['success']);
-        self::assertCount(2, $body['tuples_created']);
+        self::assertCount(2, self::arrayFieldFrom($body, 'tuples_created'));
         self::assertSame([], $body['fga_errors']);
 
         $row = $repo->getById($id);
@@ -480,7 +539,7 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
 
         $body = $this->decodeJsonBody($response);
         self::assertTrue($body['success']);
-        self::assertCount(1, $body['tuples_created']);
+        self::assertCount(1, self::arrayFieldFrom($body, 'tuples_created'));
         self::assertSame([], $body['fga_errors']);
 
         $row = $repo->getById($id);
@@ -519,8 +578,8 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
 
         $body = $this->decodeJsonBody($response);
         self::assertFalse($body['success']);
-        self::assertCount(1, $body['fga_errors']);
-        self::assertStringContainsString('Approval aborted', $body['message']);
+        self::assertCount(1, self::arrayFieldFrom($body, 'fga_errors'));
+        self::assertStringContainsString('Approval aborted', self::stringFieldFrom($body, 'message'));
 
         // DB row must still be pending — the request was NOT approved.
         $row = $repo->getById($id);
@@ -554,7 +613,7 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
 
         $body = $this->decodeJsonBody($response);
         self::assertTrue($body['success']);
-        self::assertCount(1, $body['tuples_deleted']);
+        self::assertCount(1, self::arrayFieldFrom($body, 'tuples_deleted'));
         self::assertSame([], $body['fga_errors']);
 
         $row = $repo->getById($id);
@@ -591,7 +650,7 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
 
         $body = $this->decodeJsonBody($response);
         self::assertTrue($body['success']);
-        self::assertCount(1, $body['tuples_deleted']);
+        self::assertCount(1, self::arrayFieldFrom($body, 'tuples_deleted'));
         self::assertSame([], $body['fga_errors']);
 
         $row = $repo->getById($id);
@@ -628,8 +687,8 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
 
         $body = $this->decodeJsonBody($response);
         self::assertFalse($body['success']);
-        self::assertCount(1, $body['fga_errors']);
-        self::assertStringContainsString('Revocation aborted', $body['message']);
+        self::assertCount(1, self::arrayFieldFrom($body, 'fga_errors'));
+        self::assertStringContainsString('Revocation aborted', self::stringFieldFrom($body, 'message'));
 
         // DB row must still be approved — the revoke was NOT committed.
         $row = $repo->getById($id);
