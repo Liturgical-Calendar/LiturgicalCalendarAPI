@@ -83,6 +83,18 @@ final class AccessRequestAdminHandler extends AbstractHandler
         return $this->fgaClient;
     }
 
+    /**
+     * True when an OpenFGA client is reachable: either one was constructor-
+     * injected (test path), or the env-based static is configured (prod
+     * path). Replaces direct `OpenFgaClient::isConfigured()` checks at the
+     * sites that gate tuple-write / admin-check work, so an injected mock
+     * is honored without also requiring OPENFGA_* env vars to be set.
+     */
+    private function isFgaClientAvailable(): bool
+    {
+        return $this->fgaClient !== null || OpenFgaClient::isConfigured();
+    }
+
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $response = static::initResponse($request);
@@ -282,7 +294,7 @@ final class AccessRequestAdminHandler extends AbstractHandler
         $createdTuples = [];
         $fgaErrors     = [];
 
-        if (OpenFgaClient::isConfigured() && !empty($permissions)) {
+        if ($this->isFgaClientAvailable() && !empty($permissions)) {
             $fgaUser = "user:{$userId}";
 
             foreach ($permissions as $perm) {
@@ -468,7 +480,7 @@ final class AccessRequestAdminHandler extends AbstractHandler
         $deletedTuples = [];
         $fgaErrors     = [];
 
-        if (OpenFgaClient::isConfigured() && !empty($permissions)) {
+        if ($this->isFgaClientAvailable() && !empty($permissions)) {
             $fgaUser = "user:{$userId}";
 
             foreach ($permissions as $perm) {
@@ -590,7 +602,7 @@ final class AccessRequestAdminHandler extends AbstractHandler
             return;
         }
 
-        if (!OpenFgaClient::isConfigured()) {
+        if (!$this->isFgaClientAvailable()) {
             throw new ForbiddenException('Admin role required');
         }
 
@@ -629,7 +641,7 @@ final class AccessRequestAdminHandler extends AbstractHandler
      */
     private function filterByAdminAccess(array $requests, string $adminId): array
     {
-        if (!OpenFgaClient::isConfigured()) {
+        if (!$this->isFgaClientAvailable()) {
             return [];
         }
 

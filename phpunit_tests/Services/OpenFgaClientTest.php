@@ -328,6 +328,47 @@ class OpenFgaClientTest extends TestCase
         }
     }
 
+    public function testWriteTupleDoesNotMisclassifyCodelessResponseWithDuplicateInMessage(): void
+    {
+        // Regression guard: a 500 response with no `code` field whose
+        // message happens to contain "duplicate" must surface as the base
+        // OpenFgaApiException, NOT as the benign
+        // TupleAlreadyExistsException. The substring fallback is reserved
+        // for the documented legacy `write_failed_due_to_invalid_input`
+        // code — unrelated errors stay fatal.
+        $mock   = new MockHandler([
+            new Response(500, [], (string) json_encode(['message' => 'database returned duplicate key error'])),
+        ]);
+        $client = $this->createClientWithMock($mock);
+
+        try {
+            $client->writeTuple('user:test', 'editor', 'national_calendar:IT');
+            $this->fail('Expected base OpenFgaApiException');
+        } catch (OpenFgaApiException $e) {
+            $this->assertNotInstanceOf(TupleAlreadyExistsException::class, $e);
+            $this->assertSame(500, $e->getHttpStatus());
+            $this->assertNull($e->getErrorCode());
+        }
+    }
+
+    public function testDeleteTupleDoesNotMisclassifyCodelessResponseWithNotFoundInMessage(): void
+    {
+        // Symmetric regression guard for the delete side.
+        $mock   = new MockHandler([
+            new Response(500, [], (string) json_encode(['message' => 'upstream service not found'])),
+        ]);
+        $client = $this->createClientWithMock($mock);
+
+        try {
+            $client->deleteTuple('user:test', 'editor', 'national_calendar:IT');
+            $this->fail('Expected base OpenFgaApiException');
+        } catch (OpenFgaApiException $e) {
+            $this->assertNotInstanceOf(TupleNotFoundException::class, $e);
+            $this->assertSame(500, $e->getHttpStatus());
+            $this->assertNull($e->getErrorCode());
+        }
+    }
+
     public function testReadTuplesReturnsParsedTuples(): void
     {
         $mock   = new MockHandler([

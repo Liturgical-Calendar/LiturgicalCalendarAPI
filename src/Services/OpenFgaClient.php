@@ -238,7 +238,15 @@ class OpenFgaClient
         if ($code === 'cannot_allow_duplicate_tuple') {
             return true;
         }
-        if ($code === 'write_failed_due_to_invalid_input' || $code === null) {
+        // Only fall through to substring matching when OpenFGA returned the
+        // documented legacy generic-input code. Responses with no `code`
+        // field at all (transport errors, malformed bodies, server-side
+        // 5xx without structured detail) carry no contract that the
+        // message text is about a tuple-duplicate condition, so we
+        // intentionally let them bubble up as base OpenFgaApiException
+        // rather than risk misclassifying e.g. an unrelated 500 carrying
+        // the word "duplicate" as a benign already-exists.
+        if ($code === 'write_failed_due_to_invalid_input') {
             $msg = strtolower($e->getMessage());
             if (str_contains($msg, 'already exists') || str_contains($msg, 'duplicate')) {
                 return true;
@@ -261,7 +269,12 @@ class OpenFgaClient
         if ($code === 'cannot_allow_unknown_tuple_to_be_deleted') {
             return true;
         }
-        if ($code === 'write_failed_due_to_invalid_input' || $code === null) {
+        // Same tightening as isDuplicateTupleError — only fall through to
+        // substring matching for the documented legacy code, not for
+        // missing-`code` responses. Prevents an unrelated 500 carrying
+        // "not found" in its message from being misclassified as a
+        // benign already-deleted tuple.
+        if ($code === 'write_failed_due_to_invalid_input') {
             $msg = strtolower($e->getMessage());
             if (str_contains($msg, 'not found') || str_contains($msg, 'does not exist')) {
                 return true;
