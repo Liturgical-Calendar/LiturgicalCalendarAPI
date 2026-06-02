@@ -368,8 +368,8 @@ class LocaleDateFormatterTest extends TestCase
     {
         $formatter = new LocaleDateFormatter('it_IT');
 
-        // Inject a mock formatter that returns false
-        $mockFormatter = $this->createMock(IntlDateFormatter::class);
+        // Inject a stub formatter that returns false
+        $mockFormatter = $this->createStub(IntlDateFormatter::class);
         $mockFormatter->method('format')->willReturn(false);
         $formatter->setDayAndMonthFormatter($mockFormatter);
 
@@ -389,8 +389,8 @@ class LocaleDateFormatterTest extends TestCase
     {
         $formatter = new LocaleDateFormatter('it_IT');
 
-        // Inject a mock formatter that returns false
-        $mockFormatter = $this->createMock(IntlDateFormatter::class);
+        // Inject a stub formatter that returns false
+        $mockFormatter = $this->createStub(IntlDateFormatter::class);
         $mockFormatter->method('format')->willReturn(false);
         $formatter->setDayAndMonthFormatter($mockFormatter);
 
@@ -411,8 +411,8 @@ class LocaleDateFormatterTest extends TestCase
     {
         $formatter = new LocaleDateFormatter('fr_FR');
 
-        // Inject a mock formatter that returns false
-        $mockFormatter = $this->createMock(IntlDateFormatter::class);
+        // Inject a stub formatter that returns false
+        $mockFormatter = $this->createStub(IntlDateFormatter::class);
         $mockFormatter->method('format')->willReturn(false);
         $formatter->setDayOfTheWeekFormatter($mockFormatter);
 
@@ -471,7 +471,7 @@ class LocaleDateFormatterTest extends TestCase
     public function testSetDayAndMonthFormatterReturnsSelf(): void
     {
         $formatter     = new LocaleDateFormatter('en_US');
-        $mockFormatter = $this->createMock(IntlDateFormatter::class);
+        $mockFormatter = $this->createStub(IntlDateFormatter::class);
 
         $result = $formatter->setDayAndMonthFormatter($mockFormatter);
 
@@ -484,7 +484,7 @@ class LocaleDateFormatterTest extends TestCase
     public function testSetDayOfTheWeekFormatterReturnsSelf(): void
     {
         $formatter     = new LocaleDateFormatter('en_US');
-        $mockFormatter = $this->createMock(IntlDateFormatter::class);
+        $mockFormatter = $this->createStub(IntlDateFormatter::class);
 
         $result = $formatter->setDayOfTheWeekFormatter($mockFormatter);
 
