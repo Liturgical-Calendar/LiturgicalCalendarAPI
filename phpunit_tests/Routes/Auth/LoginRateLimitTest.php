@@ -17,31 +17,49 @@ class LoginRateLimitTest extends ApiTestCase
     private string $testIp = '';
 
     /**
-     * Each test method gets its own synthetic client IP from RFC 5737 TEST-NET-1
-     * (192.0.2.0/24). The login rate limiter keys on client IP, so per-method
-     * isolation gives every test a fresh budget — no shared state across tests,
-     * across full-suite reruns within the 15-minute window, or between the host
-     * test runner and a containerized API. The earlier reset-by-filesystem-delete
-     * approach didn't work in containerized setups.
+     * Per-PHPUnit-run random seed mixed into the IP hash. Initialised once
+     * per class run (first setUp call wins) so that every test method in a
+     * single run hashes against the same seed — within a run, `setUp()`
+     * recomputes the same IP for the same test name, which is what
+     * `exhaustRateLimit()` and the subsequent rate-limit assertions rely
+     * on. Across runs, the seed differs and the IP space rotates.
      *
-     * The hash mixes in `getmypid()` so the same test method picks a different
-     * IP on each PHP process. A bucket exhausted by one composer-test run no
-     * longer 429s the next run — the next run uses a different IP. (Within a
-     * single run, the PID is stable, so each test method's IP stays consistent
-     * across its own setUp/exhaustRateLimit/assertion calls.) Hashes still mod
-     * by 99 so the resulting octet stays in the 1-99 reservation; rare
-     * collisions across PID boundaries reduce the rerun-failure rate from
-     * 100% to ~1%.
+     * Why this exists on top of `getmypid()`: in containerised CI (Docker,
+     * GitHub Actions runners) the PHP process is consistently PID 1, so
+     * the `getmypid()` salt collapses to 0 entropy and the prior version
+     * of this test failed identically on every CI run within the 15-minute
+     * rate-limit window. `random_int()` is host-PID-independent and gives
+     * back the inter-run isolation the original docstring claimed.
+     */
+    private static ?int $runSeed = null;
+
+    /**
+     * Each test method gets its own synthetic client IP from RFC 5737
+     * TEST-NET-1 (192.0.2.0/24). The login rate limiter keys on client IP,
+     * so per-method isolation gives every test a fresh budget — no shared
+     * state across tests, across full-suite reruns within the 15-minute
+     * window, or between the host test runner and a containerized API. The
+     * earlier reset-by-filesystem-delete approach didn't work in
+     * containerized setups.
      *
-     * Octet range 1-99 is reserved for per-method IPs so they never collide
-     * with CalendarTest's bucket-rotation range (100-199) or ApiTestCase's
-     * per-class range (200-254).
+     * The hash mixes the test method name, `getmypid()`, and a per-class-
+     * run random seed. Stable within a run (so each test method's IP
+     * survives its own setUp/exhaustRateLimit/assertion calls); fresh
+     * across runs (so a bucket exhausted by a previous run no longer 429s
+     * this one — including under Docker where PID is always 1). Modding
+     * by 99 keeps the octet in the 1-99 reservation; rare collisions
+     * across runs reduce the rerun-failure rate from 100% to ~1%.
+     *
+     * Octet range 1-99 is reserved for per-method IPs so they never
+     * collide with CalendarTest's bucket-rotation range (100-199) or
+     * ApiTestCase's per-class range (200-254).
      */
     protected function setUp(): void
     {
         parent::setUp();
-        $hash         = crc32($this->name() . '|' . getmypid());
-        $this->testIp = '192.0.2.' . ( ( abs($hash) % 99 ) + 1 );
+        self::$runSeed ??= random_int(1, PHP_INT_MAX);
+        $hash            = crc32($this->name() . '|' . getmypid() . '|' . self::$runSeed);
+        $this->testIp    = '192.0.2.' . ( ( abs($hash) % 99 ) + 1 );
     }
 
     /**

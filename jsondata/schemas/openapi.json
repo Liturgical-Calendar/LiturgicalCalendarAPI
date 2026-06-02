@@ -1261,13 +1261,42 @@
                   },
                   "lastPage": {
                     "summary": "Last page (has_more false)",
-                    "description": "Final page of a paginated traversal — `has_more` is false and clients can stop.",
+                    "description": "Final page of the requester's listing: `offset + count == total`, so `has_more` is false and the client stops paging. With `total: 2` and the default `limit: 100`, the first page already exhausts the dataset — this example is the same shape as `firstPage` for that reason.",
                     "value": {
-                      "requests": [],
-                      "count": 0,
+                      "requests": [
+                        {
+                          "id": "0e7c4f88-1111-4111-8111-111111111111",
+                          "zitadel_user_id": "user-alice",
+                          "user_email": "alice@example.test",
+                          "user_name": "Alice Example",
+                          "requested_role": "calendar_editor",
+                          "permissions": [
+                            {
+                              "object_type": "national_calendar",
+                              "object_id": "IT",
+                              "relation": "editor"
+                            }
+                          ],
+                          "justification": "I help maintain the IT calendar.",
+                          "status": "pending",
+                          "created_at": "2026-05-30T12:00:00Z"
+                        },
+                        {
+                          "id": "0e7c4f88-2222-4222-8222-222222222222",
+                          "zitadel_user_id": "user-alice",
+                          "user_email": "alice@example.test",
+                          "user_name": "Alice Example",
+                          "requested_role": "developer",
+                          "permissions": [],
+                          "status": "approved",
+                          "created_at": "2026-05-15T08:30:00Z",
+                          "reviewed_at": "2026-05-15T09:00:00Z"
+                        }
+                      ],
+                      "count": 2,
                       "total": 2,
                       "limit": 100,
-                      "offset": 100,
+                      "offset": 0,
                       "has_more": false
                     }
                   }
@@ -1581,13 +1610,36 @@
                   },
                   "lastPage": {
                     "summary": "Last page (has_more false)",
-                    "description": "Final page reached: `offset + count == total`, so `has_more` is false and the client stops paging.",
+                    "description": "Abbreviated sample of the final page of an admin traversal. `offset + count == total` (100 + 37 = 137), so `has_more` is false and the client stops. Only one representative `requests[]` entry is shown — a real response on this page would carry 37 items.",
                     "value": {
-                      "requests": [],
-                      "count": 0,
+                      "requests": [
+                        {
+                          "id": "0e7c4f88-5555-4555-8555-555555555555",
+                          "zitadel_user_id": "user-erin",
+                          "user_email": "erin@example.test",
+                          "user_name": "Erin Example",
+                          "requested_role": "test_editor",
+                          "permissions": [
+                            {
+                              "object_type": "test_definition",
+                              "object_id": "all",
+                              "relation": "viewer"
+                            }
+                          ],
+                          "justification": "Reviewing the test corpus.",
+                          "status": "rejected",
+                          "reviewed_by": "admin-user-1",
+                          "review_notes": "Insufficient context; resubmit with role-mapping rationale.",
+                          "zitadel_sync_status": null,
+                          "zitadel_sync_error": null,
+                          "created_at": "2026-04-30T10:00:00Z",
+                          "reviewed_at": "2026-05-01T11:00:00Z"
+                        }
+                      ],
+                      "count": 37,
                       "total": 137,
                       "limit": 100,
-                      "offset": 200,
+                      "offset": 100,
                       "has_more": false
                     }
                   }
