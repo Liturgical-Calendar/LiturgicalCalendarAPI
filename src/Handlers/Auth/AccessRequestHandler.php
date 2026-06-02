@@ -421,11 +421,31 @@ final class AccessRequestHandler extends AbstractHandler
     }
 
     /**
+     * Fields present on the DB row but intentionally absent from the public
+     * AccessRequest schema (per #566). Admin-facing endpoints return the
+     * full row via AccessRequestAdmin; self-list strips these so the
+     * payload validates against the public schema's
+     * `additionalProperties: false`.
+     *
+     * @var array<string, bool>
+     */
+    private const PUBLIC_REQUEST_HIDDEN_FIELDS = [
+        'reviewed_by'         => true,
+        'zitadel_sync_status' => true,
+        'zitadel_sync_error'  => true,
+    ];
+
+    /**
      * GET /auth/access-requests — List the user's own requests, paginated.
      *
      * Query params (validated via OffsetPaginationTrait):
      *   - limit  (1..500, default 100)
      *   - offset (>=0, default 0)
+     *
+     * Each row is projected to the public AccessRequest shape — admin-only
+     * fields (reviewed_by, zitadel_sync_status, zitadel_sync_error) are
+     * stripped. See the AccessRequest / AccessRequestAdmin component
+     * definitions in jsondata/schemas/openapi.json.
      *
      * Response envelope: requests[], count, total, limit, offset, has_more.
      */
@@ -442,13 +462,18 @@ final class AccessRequestHandler extends AbstractHandler
         $requests = $repo->getByUser($userId, $limit, $offset);
         $total    = $repo->countByUser($userId);
 
+        $publicRequests = array_map(
+            static fn(array $row): array => array_diff_key($row, self::PUBLIC_REQUEST_HIDDEN_FIELDS),
+            $requests
+        );
+
         return $this->encodeResponseBody($response, [
-            'requests' => $requests,
-            'count'    => count($requests),
+            'requests' => $publicRequests,
+            'count'    => count($publicRequests),
             'total'    => $total,
             'limit'    => $limit,
             'offset'   => $offset,
-            'has_more' => ( $offset + count($requests) ) < $total,
+            'has_more' => ( $offset + count($publicRequests) ) < $total,
         ]);
     }
 

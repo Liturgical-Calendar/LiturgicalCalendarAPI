@@ -429,4 +429,37 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
 
         ( new AccessRequestHandler() )->handle($request);
     }
+
+    // --- Public/admin schema split (issue #566) --------------------------
+
+    public function testListOwnRequestsStripsAdminOnlyFields(): void
+    {
+        // Seed a request and put it through the full admin lifecycle so each
+        // admin-only DB column has a non-null value to strip. Then list as
+        // the requesting user and assert none of the three appear.
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-alice', 'a@x.test', null, 'developer', []);
+        $repo->approve($id, 'admin-bob', 'looks good');
+        $repo->updateZitadelSyncStatus($id, 'failed', 'token expired');
+
+        $request = $this->requestFor('GET', '/auth/access-requests')
+            ->withAttribute('oidc_user', $this->oidcUser());
+
+        $response = ( new AccessRequestHandler() )->handle($request);
+        $body     = $this->decodeJsonBody($response);
+
+        self::assertCount(1, $body['requests']);
+        $row = $body['requests'][0];
+
+        // Strip targets: not in the public response, regardless of value.
+        self::assertArrayNotHasKey('reviewed_by', $row);
+        self::assertArrayNotHasKey('zitadel_sync_status', $row);
+        self::assertArrayNotHasKey('zitadel_sync_error', $row);
+
+        // Sanity: public fields still present, including review_notes
+        // (public per the issue — rejected requesters need to see why).
+        self::assertSame($id, $row['id']);
+        self::assertSame('approved', $row['status']);
+        self::assertSame('looks good', $row['review_notes']);
+    }
 }

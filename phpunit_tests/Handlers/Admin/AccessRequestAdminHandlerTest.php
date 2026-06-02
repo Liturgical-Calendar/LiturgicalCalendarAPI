@@ -332,4 +332,32 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
             $this->withOidcUser($this->requestFor('GET', '/admin/access-requests?' . $query))
         );
     }
+
+    // --- Public/admin schema split (issue #566) --------------------------
+
+    public function testListRequestsKeepsAdminOnlyFields(): void
+    {
+        // Mirror of testListOwnRequestsStripsAdminOnlyFields on the public
+        // handler: seed a row with all admin-only columns populated, then
+        // list as admin and assert each field is present in the response.
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', []);
+        $repo->approve($id, 'admin-bob', 'ok');
+        $repo->updateZitadelSyncStatus($id, 'failed', 'token expired');
+
+        $response = ( new AccessRequestAdminHandler() )->handle(
+            $this->withOidcUser($this->requestFor('GET', '/admin/access-requests'))
+        );
+
+        $body = $this->decodeJsonBody($response);
+        self::assertCount(1, $body['requests']);
+        $row = $body['requests'][0];
+
+        self::assertArrayHasKey('reviewed_by', $row);
+        self::assertSame('admin-bob', $row['reviewed_by']);
+        self::assertArrayHasKey('zitadel_sync_status', $row);
+        self::assertSame('failed', $row['zitadel_sync_status']);
+        self::assertArrayHasKey('zitadel_sync_error', $row);
+        self::assertSame('token expired', $row['zitadel_sync_error']);
+    }
 }

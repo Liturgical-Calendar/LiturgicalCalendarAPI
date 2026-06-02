@@ -1249,8 +1249,7 @@
                           "permissions": [],
                           "status": "approved",
                           "created_at": "2026-05-15T08:30:00Z",
-                          "reviewed_at": "2026-05-15T09:00:00Z",
-                          "reviewed_by": "admin"
+                          "reviewed_at": "2026-05-15T09:00:00Z"
                         }
                       ],
                       "count": 2,
@@ -1524,11 +1523,11 @@
         ],
         "responses": {
           "200": {
-            "description": "OK: Paginated page of access requests",
+            "description": "OK: Paginated page of access requests (admin view, with reviewer/sync fields)",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AccessRequestListResponse"
+                  "$ref": "#/components/schemas/AdminAccessRequestListResponse"
                 },
                 "examples": {
                   "firstPage": {
@@ -1551,7 +1550,26 @@
                           ],
                           "justification": "I work on the US calendar.",
                           "status": "pending",
+                          "reviewed_by": null,
+                          "zitadel_sync_status": null,
+                          "zitadel_sync_error": null,
                           "created_at": "2026-05-31T11:00:00Z"
+                        },
+                        {
+                          "id": "0e7c4f88-4444-4444-8444-444444444444",
+                          "zitadel_user_id": "user-claire",
+                          "user_email": "claire@example.test",
+                          "user_name": "Claire Example",
+                          "requested_role": "developer",
+                          "permissions": [],
+                          "justification": "Working on a downstream client.",
+                          "status": "approved",
+                          "reviewed_by": "admin-user-1",
+                          "review_notes": "Approved after CFA verification.",
+                          "zitadel_sync_status": "synced",
+                          "zitadel_sync_error": null,
+                          "created_at": "2026-05-30T08:00:00Z",
+                          "reviewed_at": "2026-05-30T09:14:00Z"
                         }
                       ],
                       "count": 100,
@@ -7220,7 +7238,7 @@
       },
       "AccessRequest": {
         "type": "object",
-        "description": "A unified access request combining role and permission requests",
+        "description": "An access request from the requester's perspective. Returned by GET /auth/access-requests (self-list) and used as the row shape inside AccessRequestListResponse. Admin-only review/sync fields (reviewed_by, zitadel_sync_status, zitadel_sync_error) are intentionally absent here — admin-facing endpoints return AccessRequestAdmin instead. `credentials` stays public so the requester sees what they themselves submitted.",
         "properties": {
           "id": {
             "type": "string",
@@ -7274,10 +7292,90 @@
               "revoked"
             ]
           },
-          "reviewed_by": {
+          "review_notes": {
             "type": [
               "string",
               "null"
+            ],
+            "description": "Reviewer-written note left during approve/reject/revoke. Public because rejected requesters need to see why and may use it to resubmit."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reviewed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "zitadel_user_id",
+          "user_email",
+          "requested_role",
+          "permissions",
+          "status",
+          "created_at"
+        ],
+        "additionalProperties": false
+      },
+      "AccessRequestAdmin": {
+        "type": "object",
+        "description": "Admin-only view of an access request. Same shape as AccessRequest plus reviewer identity (`reviewed_by`) and Zitadel-sync diagnostics (`zitadel_sync_status`, `zitadel_sync_error`). The common fields are documented on AccessRequest. Duplicated inline (rather than composed via `allOf` over AccessRequest) because `allOf + additionalProperties: false` doesn't compose under Redocly's strict validator — each sub-schema's `additionalProperties` only sees its own properties and rejects the other side's fields.",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "zitadel_user_id": {
+            "type": "string"
+          },
+          "user_email": {
+            "type": "string",
+            "format": "email"
+          },
+          "user_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "requested_role": {
+            "type": "string",
+            "enum": [
+              "developer",
+              "calendar_editor",
+              "test_editor"
+            ]
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
+          },
+          "justification": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "credentials": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected",
+              "revoked"
             ]
           },
           "review_notes": {
@@ -7285,6 +7383,13 @@
               "string",
               "null"
             ]
+          },
+          "reviewed_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Admin-only. Zitadel user ID of the admin who actioned the request, or the literal 'system:cascade' for cascade-revokes. Null while the request is still pending."
           },
           "zitadel_sync_status": {
             "type": [
@@ -7296,13 +7401,15 @@
               "synced",
               "failed",
               null
-            ]
+            ],
+            "description": "Admin-only. Tracks whether the role grant/revoke was successfully synced to Zitadel after the DB transaction committed. Null until the first sync attempt."
           },
           "zitadel_sync_error": {
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "description": "Admin-only. Error message from the most recent failed Zitadel sync, if any. Cleared on the next successful sync."
           },
           "created_at": {
             "type": "string",
@@ -7422,7 +7529,7 @@
       },
       "AccessRequestListResponse": {
         "type": "object",
-        "description": "Offset-paginated page of access requests returned by GET /auth/access-requests and GET /admin/access-requests. When a resource admin (non-global) calls /admin/access-requests, filterByAdminAccess is applied to each page after fetching: `count` may be smaller than `limit`, and `total` reflects the pre-filter SQL count. Clients should page until `has_more` is false even when individual pages come back short.",
+        "description": "Offset-paginated page of access requests returned by GET /auth/access-requests (the requester's own list). Each item is the public AccessRequest shape — admin-only review/sync fields are not present. See AdminAccessRequestListResponse for the /admin/access-requests envelope.",
         "properties": {
           "requests": {
             "type": "array",
@@ -7433,12 +7540,12 @@
           "count": {
             "type": "integer",
             "minimum": 0,
-            "description": "Number of items in this page. May be less than `limit` on the last page, or smaller still for resource admins after post-filtering."
+            "description": "Number of items in this page. May be less than `limit` on the last page."
           },
           "total": {
             "type": "integer",
             "minimum": 0,
-            "description": "Total matching rows ignoring limit/offset. For resource admins on /admin/access-requests, this is the pre-filter SQL count."
+            "description": "Total matching rows for this user, ignoring limit/offset."
           },
           "limit": {
             "type": "integer",
@@ -7453,7 +7560,53 @@
           },
           "has_more": {
             "type": "boolean",
-            "description": "True iff more rows are available beyond this page. For global admins (and /auth/access-requests), equals `(offset + count) < total`. For non-global admins on /admin/access-requests this reflects the SQL paginator's state — `(offset + pre-filter SQL page size) < total` — rather than the post-filter `count`, so the client stops correctly on the final SQL page even when filterByAdminAccess trimmed it."
+            "description": "True iff `(offset + count) < total`. False on the final page."
+          }
+        },
+        "required": [
+          "requests",
+          "count",
+          "total",
+          "limit",
+          "offset",
+          "has_more"
+        ],
+        "additionalProperties": false
+      },
+      "AdminAccessRequestListResponse": {
+        "type": "object",
+        "description": "Offset-paginated page of access requests returned by GET /admin/access-requests. Each item is the AccessRequestAdmin shape, which extends AccessRequest with reviewer identity and Zitadel-sync diagnostics. When a resource admin (non-global) calls this endpoint, filterByAdminAccess is applied to each page after fetching: `count` may be smaller than `limit`, and `total` reflects the pre-filter SQL count; `has_more` still reflects the SQL paginator, so clients should page until `has_more` is false even when individual pages come back short.",
+        "properties": {
+          "requests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AccessRequestAdmin"
+            }
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of items in this page. May be less than `limit` on the last page, or smaller still for resource admins after post-filtering."
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total matching rows ignoring limit/offset. For resource admins, this is the pre-filter SQL count."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500,
+            "description": "Effective limit applied to this page (default 100 if not supplied)."
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Effective offset of the first item in this page (default 0 if not supplied)."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "True iff more rows are available beyond this page. For global admins, equals `(offset + count) < total`. For non-global admins, reflects the SQL paginator state — `(offset + pre-filter SQL page size) < total` — rather than the post-filter `count`, so the client stops correctly on the final SQL page even when filterByAdminAccess trimmed it."
           }
         },
         "required": [
