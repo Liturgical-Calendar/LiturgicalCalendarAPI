@@ -267,4 +267,78 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         self::assertArrayNotHasKey('tuple_key', $payload);
         self::assertSame(100, $payload['page_size']);
     }
+
+    // --- filterByAdminAccess uses ListObjects (issue #571) ---------------
+
+    public function testListAsResourceAdminUsesListObjectsInOneRoundTrip(): void
+    {
+        // Non-global admin (no 'admin' role) listing without object_id —
+        // triggers filterByAdminAccess. Before #571, this made one check()
+        // call per unique object_id in the tuples page; after, it makes a
+        // single listObjects() call regardless of N. We pin the new wire
+        // pattern: exactly two HTTP calls (readTuples + listObjects),
+        // never N+1.
+        //
+        // Tuples page returns 3 objects (IT, US, FR). listObjects returns
+        // 2 IDs the admin can see (IT, US). Expected filtered output: 2
+        // tuples (the one on FR is dropped).
+        $requestHistory = [];
+        $mock           = new MockHandler([
+            // readTuples: 3 tuples on national_calendar
+            new Response(200, [], (string) json_encode([
+                'tuples'             => [
+                    ['key' => ['user' => 'user:alice', 'relation' => 'editor', 'object' => 'national_calendar:IT']],
+                    ['key' => ['user' => 'user:bob',   'relation' => 'viewer', 'object' => 'national_calendar:US']],
+                    ['key' => ['user' => 'user:carol', 'relation' => 'editor', 'object' => 'national_calendar:FR']],
+                ],
+                'continuation_token' => '',
+            ])),
+            // listObjects: admin allowed on IT + US (NOT FR)
+            new Response(200, [], (string) json_encode([
+                'objects' => [
+                    'national_calendar:IT',
+                    'national_calendar:US',
+                ],
+            ])),
+        ]);
+        $handlerStack = HandlerStack::create($mock);
+        $handlerStack->push(\GuzzleHttp\Middleware::history($requestHistory));
+        $httpClient = new Client(['handler' => $handlerStack]);
+        $psr17      = new \Nyholm\Psr7\Factory\Psr17Factory();
+        $fgaClient  = new OpenFgaClient(
+            'http://localhost:8083',
+            'store-123',
+            'model-456',
+            $httpClient,
+            $psr17,
+            $psr17
+        );
+
+        $request = $this->withOidcUser(
+            $this->requestFor('GET', '/admin/permissions?object_type=national_calendar'),
+            'resource-admin-1',
+            ['calendar_editor']
+        );
+
+        $response = ( new PermissionAdminHandler($fgaClient) )->handle($request);
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertCount(2, $body['permissions']);
+        $allowedObjects = array_column($body['permissions'], 'object');
+        sort($allowedObjects);
+        self::assertSame(['national_calendar:IT', 'national_calendar:US'], $allowedObjects);
+
+        // Exactly two HTTP calls: readTuples + listObjects. Never N+1.
+        self::assertCount(2, $requestHistory);
+        self::assertStringContainsString('/read', (string) $requestHistory[0]['request']->getUri());
+        self::assertStringContainsString('/list-objects', (string) $requestHistory[1]['request']->getUri());
+
+        // listObjects payload exercises the right relation/type.
+        $listPayload = json_decode((string) $requestHistory[1]['request']->getBody(), true);
+        self::assertIsArray($listPayload);
+        self::assertSame('user:resource-admin-1', $listPayload['user']);
+        self::assertSame('admin', $listPayload['relation']);
+        self::assertSame('national_calendar', $listPayload['type']);
+    }
 }

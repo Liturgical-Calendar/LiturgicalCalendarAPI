@@ -17,6 +17,9 @@ use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
+use LiturgicalCalendar\Api\Services\Exception\OpenFgaApiException;
+use LiturgicalCalendar\Api\Services\Exception\TupleAlreadyExistsException;
+use LiturgicalCalendar\Api\Services\Exception\TupleNotFoundException;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\RoleCascadeService;
 use LiturgicalCalendar\Api\Services\ZitadelService;
@@ -45,9 +48,18 @@ final class AccessRequestAdminHandler extends AbstractHandler
     private ?AccessRequestRepository $repository = null;
     private ?OpenFgaClient $fgaClient            = null;
 
-    public function __construct()
+    /**
+     * The OpenFGA client is constructor-injectable for tests — pass a
+     * MockHandler-backed instance to verify the typed-exception integration
+     * without touching the runtime env. Production calls use the zero-arg
+     * form and the lazy `fromEnv()` fallback in `getFgaClient()`. Mirrors
+     * the pattern PR #623 introduced for `PermissionAdminHandler`.
+     */
+    public function __construct(?OpenFgaClient $fgaClient = null)
     {
         parent::__construct();
+
+        $this->fgaClient = $fgaClient;
 
         $this->allowedRequestMethods      = [RequestMethod::GET, RequestMethod::POST];
         $this->allowedAcceptHeaders       = [AcceptHeader::JSON];
@@ -69,6 +81,18 @@ final class AccessRequestAdminHandler extends AbstractHandler
             $this->fgaClient = OpenFgaClient::fromEnv();
         }
         return $this->fgaClient;
+    }
+
+    /**
+     * True when an OpenFGA client is reachable: either one was constructor-
+     * injected (test path), or the env-based static is configured (prod
+     * path). Replaces direct `OpenFgaClient::isConfigured()` checks at the
+     * sites that gate tuple-write / admin-check work, so an injected mock
+     * is honored without also requiring OPENFGA_* env vars to be set.
+     */
+    private function isFgaClientAvailable(): bool
+    {
+        return $this->fgaClient !== null || OpenFgaClient::isConfigured();
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -259,11 +283,18 @@ final class AccessRequestAdminHandler extends AbstractHandler
         // Check admin authority over ALL requested resources
         $this->requireAdminForAllResources($adminId, $isGlobalAdmin, $permissions);
 
-        // Step 1: Create OpenFGA tuples for each permission
+        // Step 1: Create OpenFGA tuples for each permission.
+        //
+        // TupleAlreadyExistsException is treated as benign — the tuple is in
+        // the desired state already, so re-approval after a partial first
+        // attempt converges instead of double-failing. Any other
+        // OpenFgaApiException (validation, auth, server) is fatal: the
+        // response will surface success: false with the structured error
+        // list so the admin knows there's drift to repair.
         $createdTuples = [];
         $fgaErrors     = [];
 
-        if (OpenFgaClient::isConfigured() && !empty($permissions)) {
+        if ($this->isFgaClientAvailable() && !empty($permissions)) {
             $fgaUser = "user:{$userId}";
 
             foreach ($permissions as $perm) {
@@ -279,8 +310,15 @@ final class AccessRequestAdminHandler extends AbstractHandler
                         'relation' => $relation,
                         'object'   => $fgaObject,
                     ];
-                } catch (\Exception $e) {
-                    // Tuple may already exist — log but continue
+                } catch (TupleAlreadyExistsException) {
+                    // Idempotent — tuple already exists. Count it as created
+                    // so the response shows the user's effective grants.
+                    $createdTuples[] = [
+                        'user'     => $fgaUser,
+                        'relation' => $relation,
+                        'object'   => $fgaObject,
+                    ];
+                } catch (OpenFgaApiException $e) {
                     $fgaErrors[] = [
                         'object'   => $fgaObject,
                         'relation' => $relation,
@@ -288,6 +326,25 @@ final class AccessRequestAdminHandler extends AbstractHandler
                     ];
                 }
             }
+        }
+
+        // If we couldn't write some of the tuples, bail before mutating the
+        // DB — leaving the request 'pending' lets the admin retry cleanly,
+        // and avoids the silent under-provisioning the issue flags
+        // ("row marked approved while user is missing the failed tuples").
+        if (!empty($fgaErrors)) {
+            return $this->encodeResponseBody($response, [
+                'success'        => false,
+                'role_assigned'  => false,
+                'zitadel_error'  => null,
+                'tuples_created' => $createdTuples,
+                'fga_errors'     => $fgaErrors,
+                'message'        => sprintf(
+                    'Approval aborted: %d of %d permission tuple(s) could not be written. The request remains pending; retry once the underlying OpenFGA error is resolved.',
+                    count($fgaErrors),
+                    count($permissions)
+                ),
+            ]);
         }
 
         // Step 2: Approve in database
@@ -413,11 +470,17 @@ final class AccessRequestAdminHandler extends AbstractHandler
 
         $this->requireAdminForAllResources($adminId, $isGlobalAdmin, $permissions);
 
-        // Step 1: Delete OpenFGA tuples
+        // Step 1: Delete OpenFGA tuples.
+        //
+        // TupleNotFoundException is treated as benign — the tuple is already
+        // gone, so re-revoke after a partial first attempt converges instead
+        // of double-failing. Any other OpenFgaApiException is fatal: the
+        // response will surface success: false with the structured error
+        // list so the admin knows there's drift to repair.
         $deletedTuples = [];
         $fgaErrors     = [];
 
-        if (OpenFgaClient::isConfigured() && !empty($permissions)) {
+        if ($this->isFgaClientAvailable() && !empty($permissions)) {
             $fgaUser = "user:{$userId}";
 
             foreach ($permissions as $perm) {
@@ -433,8 +496,15 @@ final class AccessRequestAdminHandler extends AbstractHandler
                         'relation' => $relation,
                         'object'   => $fgaObject,
                     ];
-                } catch (\Exception $e) {
-                    // Tuple may already be deleted — log but continue
+                } catch (TupleNotFoundException) {
+                    // Idempotent — tuple already deleted. Count it as deleted
+                    // so the response shows the user's effective state.
+                    $deletedTuples[] = [
+                        'user'     => $fgaUser,
+                        'relation' => $relation,
+                        'object'   => $fgaObject,
+                    ];
+                } catch (OpenFgaApiException $e) {
                     $fgaErrors[] = [
                         'object'   => $fgaObject,
                         'relation' => $relation,
@@ -442,6 +512,25 @@ final class AccessRequestAdminHandler extends AbstractHandler
                     ];
                 }
             }
+        }
+
+        // If we couldn't delete some of the tuples, bail before mutating the
+        // DB — leaving the request 'approved' lets the admin retry cleanly,
+        // and avoids the silent over-provisioning the issue flags
+        // ("row marked revoked while stale tuples remain in OpenFGA").
+        if (!empty($fgaErrors)) {
+            return $this->encodeResponseBody($response, [
+                'success'        => false,
+                'role_removed'   => false,
+                'zitadel_error'  => null,
+                'tuples_deleted' => $deletedTuples,
+                'fga_errors'     => $fgaErrors,
+                'message'        => sprintf(
+                    'Revocation aborted: %d of %d permission tuple(s) could not be deleted. The request remains approved; retry once the underlying OpenFGA error is resolved.',
+                    count($fgaErrors),
+                    count($permissions)
+                ),
+            ]);
         }
 
         // Step 2: Revoke in database
@@ -513,7 +602,7 @@ final class AccessRequestAdminHandler extends AbstractHandler
             return;
         }
 
-        if (!OpenFgaClient::isConfigured()) {
+        if (!$this->isFgaClientAvailable()) {
             throw new ForbiddenException('Admin role required');
         }
 
@@ -552,7 +641,7 @@ final class AccessRequestAdminHandler extends AbstractHandler
      */
     private function filterByAdminAccess(array $requests, string $adminId): array
     {
-        if (!OpenFgaClient::isConfigured()) {
+        if (!$this->isFgaClientAvailable()) {
             return [];
         }
 

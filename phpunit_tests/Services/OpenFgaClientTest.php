@@ -7,6 +7,9 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
+use LiturgicalCalendar\Api\Services\Exception\OpenFgaApiException;
+use LiturgicalCalendar\Api\Services\Exception\TupleAlreadyExistsException;
+use LiturgicalCalendar\Api\Services\Exception\TupleNotFoundException;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\TestCase;
@@ -201,6 +204,169 @@ class OpenFgaClientTest extends TestCase
 
         $client->deleteTuple('user:test', 'editor', 'national_calendar:IT');
         $this->assertEquals(0, $mock->count());
+    }
+
+    // --- Typed exceptions for benign write/delete errors (issue #567) ----
+
+    public function testWriteTupleTranslatesDuplicateErrorByOpenFgaCode(): void
+    {
+        $mock   = new MockHandler([
+            new Response(400, [], (string) json_encode([
+                'code'    => 'cannot_allow_duplicate_tuple',
+                'message' => 'cannot write duplicate tuple',
+            ])),
+        ]);
+        $client = $this->createClientWithMock($mock);
+
+        $this->expectException(TupleAlreadyExistsException::class);
+        $client->writeTuple('user:test', 'editor', 'national_calendar:IT');
+    }
+
+    public function testWriteTupleTranslatesDuplicateErrorByMessageSubstring(): void
+    {
+        // Older OpenFGA versions return the generic input-error code and carry
+        // the cause only in the message. The classifier should still spot it.
+        $mock   = new MockHandler([
+            new Response(400, [], (string) json_encode([
+                'code'    => 'write_failed_due_to_invalid_input',
+                'message' => 'tuple_key already exists',
+            ])),
+        ]);
+        $client = $this->createClientWithMock($mock);
+
+        $this->expectException(TupleAlreadyExistsException::class);
+        $client->writeTuple('user:test', 'editor', 'national_calendar:IT');
+    }
+
+    public function testWriteTupleRethrowsNonBenignErrorsAsApiException(): void
+    {
+        $mock   = new MockHandler([
+            new Response(400, [], (string) json_encode([
+                'code'    => 'validation_error',
+                'message' => 'invalid relation',
+            ])),
+        ]);
+        $client = $this->createClientWithMock($mock);
+
+        try {
+            $client->writeTuple('user:test', 'editor', 'national_calendar:IT');
+            $this->fail('Expected OpenFgaApiException');
+        } catch (OpenFgaApiException $e) {
+            // Should be the base class, not the benign subclass.
+            $this->assertNotInstanceOf(TupleAlreadyExistsException::class, $e);
+            $this->assertSame(400, $e->getHttpStatus());
+            $this->assertSame('validation_error', $e->getErrorCode());
+        }
+    }
+
+    public function testDeleteTupleTranslatesNotFoundErrorByOpenFgaCode(): void
+    {
+        $mock   = new MockHandler([
+            new Response(400, [], (string) json_encode([
+                'code'    => 'cannot_allow_unknown_tuple_to_be_deleted',
+                'message' => 'cannot delete unknown tuple',
+            ])),
+        ]);
+        $client = $this->createClientWithMock($mock);
+
+        $this->expectException(TupleNotFoundException::class);
+        $client->deleteTuple('user:test', 'editor', 'national_calendar:IT');
+    }
+
+    public function testDeleteTupleTranslatesNotFoundErrorByMessageSubstring(): void
+    {
+        $mock   = new MockHandler([
+            new Response(400, [], (string) json_encode([
+                'code'    => 'write_failed_due_to_invalid_input',
+                'message' => 'tuple_key not found',
+            ])),
+        ]);
+        $client = $this->createClientWithMock($mock);
+
+        $this->expectException(TupleNotFoundException::class);
+        $client->deleteTuple('user:test', 'editor', 'national_calendar:IT');
+    }
+
+    public function testDeleteTupleRethrowsNonBenignErrorsAsApiException(): void
+    {
+        $mock   = new MockHandler([
+            new Response(500, [], (string) json_encode([
+                'code'    => 'internal_error',
+                'message' => 'internal server error',
+            ])),
+        ]);
+        $client = $this->createClientWithMock($mock);
+
+        try {
+            $client->deleteTuple('user:test', 'editor', 'national_calendar:IT');
+            $this->fail('Expected OpenFgaApiException');
+        } catch (OpenFgaApiException $e) {
+            $this->assertNotInstanceOf(TupleNotFoundException::class, $e);
+            $this->assertSame(500, $e->getHttpStatus());
+            $this->assertSame('internal_error', $e->getErrorCode());
+        }
+    }
+
+    public function testOpenFgaApiExceptionCarriesResponseBody(): void
+    {
+        $mock   = new MockHandler([
+            new Response(400, [], (string) json_encode([
+                'code'    => 'validation_error',
+                'message' => 'invalid',
+                'detail'  => 'extra structured field',
+            ])),
+        ]);
+        $client = $this->createClientWithMock($mock);
+
+        try {
+            $client->check('user:test', 'editor', 'national_calendar:IT');
+            $this->fail('Expected OpenFgaApiException');
+        } catch (OpenFgaApiException $e) {
+            $body = $e->getResponseBody();
+            $this->assertSame('validation_error', $body['code']);
+            $this->assertSame('extra structured field', $body['detail']);
+        }
+    }
+
+    public function testWriteTupleDoesNotMisclassifyCodelessResponseWithDuplicateInMessage(): void
+    {
+        // Regression guard: a 500 response with no `code` field whose
+        // message happens to contain "duplicate" must surface as the base
+        // OpenFgaApiException, NOT as the benign
+        // TupleAlreadyExistsException. The substring fallback is reserved
+        // for the documented legacy `write_failed_due_to_invalid_input`
+        // code — unrelated errors stay fatal.
+        $mock   = new MockHandler([
+            new Response(500, [], (string) json_encode(['message' => 'database returned duplicate key error'])),
+        ]);
+        $client = $this->createClientWithMock($mock);
+
+        try {
+            $client->writeTuple('user:test', 'editor', 'national_calendar:IT');
+            $this->fail('Expected base OpenFgaApiException');
+        } catch (OpenFgaApiException $e) {
+            $this->assertNotInstanceOf(TupleAlreadyExistsException::class, $e);
+            $this->assertSame(500, $e->getHttpStatus());
+            $this->assertNull($e->getErrorCode());
+        }
+    }
+
+    public function testDeleteTupleDoesNotMisclassifyCodelessResponseWithNotFoundInMessage(): void
+    {
+        // Symmetric regression guard for the delete side.
+        $mock   = new MockHandler([
+            new Response(500, [], (string) json_encode(['message' => 'upstream service not found'])),
+        ]);
+        $client = $this->createClientWithMock($mock);
+
+        try {
+            $client->deleteTuple('user:test', 'editor', 'national_calendar:IT');
+            $this->fail('Expected base OpenFgaApiException');
+        } catch (OpenFgaApiException $e) {
+            $this->assertNotInstanceOf(TupleNotFoundException::class, $e);
+            $this->assertSame(500, $e->getHttpStatus());
+            $this->assertNull($e->getErrorCode());
+        }
     }
 
     public function testReadTuplesReturnsParsedTuples(): void

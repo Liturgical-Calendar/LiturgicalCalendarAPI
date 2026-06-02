@@ -479,6 +479,15 @@ final class PermissionAdminHandler extends AbstractHandler
     /**
      * Filter tuples to only those on resources the user administers.
      *
+     * Resolves the admin's allowed-object set via OpenFGA's `ListObjects`
+     * in one round-trip — issue #571's fix for the previous N+1 `check()`
+     * loop, one call per unique `object_id` in the page. The trade-off is
+     * payload size: `ListObjects` returns every object of `objectType` the
+     * user has the `admin` relation on, which may exceed the N referenced
+     * in this page. In practice the admin's administered set is bounded by
+     * their actual responsibilities, while the tuple page size grows with
+     * traffic; one HTTP call per page comfortably wins on cold caches.
+     *
      * @param array<int, array{user: string, relation: string, object: string}> $tuples All tuples
      * @param string $userId The current user's Zitadel ID
      * @param string $objectType The object type being listed
@@ -486,26 +495,10 @@ final class PermissionAdminHandler extends AbstractHandler
      */
     private function filterByAdminAccess(array $tuples, string $userId, string $objectType): array
     {
-        // Collect unique object IDs from the tuples
-        $objectIds = [];
-        foreach ($tuples as $tuple) {
-            $parts = explode(':', $tuple['object'], 2);
-            if (count($parts) === 2 && $parts[1] !== '') {
-                $objectIds[$parts[1]] = true;
-            }
-        }
+        $allowedIds = array_flip(
+            $this->getClient()->listObjects("user:{$userId}", 'admin', $objectType)
+        );
 
-        // Check admin access for each unique object
-        $fgaUser    = "user:{$userId}";
-        $allowedIds = [];
-        foreach (array_keys($objectIds) as $objId) {
-            $fgaObject = "{$objectType}:{$objId}";
-            if ($this->getClient()->check($fgaUser, 'admin', $fgaObject)) {
-                $allowedIds[$objId] = true;
-            }
-        }
-
-        // Filter tuples
         return array_values(array_filter($tuples, function (array $tuple) use ($allowedIds): bool {
             $parts = explode(':', $tuple['object'], 2);
             $objId = $parts[1] ?? '';
