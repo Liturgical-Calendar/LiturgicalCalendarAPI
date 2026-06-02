@@ -46,20 +46,28 @@ class LoginRateLimitTest extends ApiTestCase
      * run random seed. Stable within a run (so each test method's IP
      * survives its own setUp/exhaustRateLimit/assertion calls); fresh
      * across runs (so a bucket exhausted by a previous run no longer 429s
-     * this one — including under Docker where PID is always 1). Modding
-     * by 99 keeps the octet in the 1-99 reservation; rare collisions
-     * across runs reduce the rerun-failure rate from 100% to ~1%.
+     * this one — including under Docker where PID is always 1).
      *
-     * Octet range 1-99 is reserved for per-method IPs so they never
-     * collide with CalendarTest's bucket-rotation range (100-199) or
-     * ApiTestCase's per-class range (200-254).
+     * The octet space is the full 1..254. Earlier revisions of this file
+     * carried a comment claiming octets 1-99 were reserved here so they
+     * wouldn't collide with CalendarTest's 100-199 or ApiTestCase's
+     * 200-254. That isolation guarantee was always provided by the rate
+     * limiter, not by the IP range: `LoginHandler` records attempts under
+     * the raw IP, while `ApiKeyRateLimitMiddleware` prefixes with `ip_`
+     * (src/Http/Middleware/ApiKeyRateLimitMiddleware.php:65), and
+     * `RateLimiter::getFilePath()` SHA-256s the identifier — so the
+     * bucket file for `192.0.2.150` from a login attempt and the bucket
+     * file for `192.0.2.150` from a calendar request are different files
+     * regardless of IP overlap. Expanding to the full 254 buckets reduces
+     * within-class birthday collisions from ~10% (5 methods over 99) to
+     * ~4% (over 254).
      */
     protected function setUp(): void
     {
         parent::setUp();
         self::$runSeed ??= random_int(1, PHP_INT_MAX);
         $hash            = crc32($this->name() . '|' . getmypid() . '|' . self::$runSeed);
-        $this->testIp    = '192.0.2.' . ( ( abs($hash) % 99 ) + 1 );
+        $this->testIp    = '192.0.2.' . ( ( abs($hash) % 254 ) + 1 );
     }
 
     /**
