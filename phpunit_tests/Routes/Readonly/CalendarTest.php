@@ -149,7 +149,15 @@ final class CalendarTest extends ApiTestCase
                     // a single IP's unauthenticated budget. 192.0.2.100-199 are reserved
                     // here for this bucket-rotation; ApiTestCase's per-class default is
                     // skipped because we're setting the header explicitly.
-                    $bucketIp = '192.0.2.' . ( 100 + intdiv($idx, 500) % 100 );
+                    //
+                    // The starting offset includes getmypid() so each composer-test run
+                    // walks the 100-IP range from a different position. The API key
+                    // rate-limit window is 1 hour and storage is file-backed inside the
+                    // litcal-api container; without the PID salt, two suite runs within
+                    // that window would touch the same buckets and trip 429s mid-run.
+                    // (The intdiv/%100 rotation between requests within a single run is
+                    // unchanged.)
+                    $bucketIp = '192.0.2.' . ( 100 + ( ( intdiv($idx, 500) + getmypid() ) % 100 ) );
                     yield self::$http
                         ->getAsync($request['uri'], [
                             'http_errors' => false,
