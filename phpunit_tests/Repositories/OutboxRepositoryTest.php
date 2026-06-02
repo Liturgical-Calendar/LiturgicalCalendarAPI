@@ -90,4 +90,72 @@ final class OutboxRepositoryTest extends RepositoryTestCase
     {
         self::assertNull($this->repo->getById(999999));
     }
+
+    public function testMarkSucceededSetsTerminalStateAndCompletedAt(): void
+    {
+        [$id] = $this->repo->insertBatch($this->samplePayload());
+
+        $this->repo->markSucceeded($id);
+
+        $row = $this->repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame(OutboxStatus::SUCCEEDED, $row->status);
+        self::assertNotNull($row->completedAt);
+    }
+
+    public function testMarkSucceededOnAlreadyTerminalIsNoOp(): void
+    {
+        [$id] = $this->repo->insertBatch($this->samplePayload());
+        $this->repo->markSucceeded($id);
+        $firstCompleted = $this->repo->getById($id)?->completedAt;
+
+        // Sleep 1 second so completed_at would observably change if a second call rewrote it.
+        sleep(1);
+        $this->repo->markSucceeded($id);
+
+        $secondCompleted = $this->repo->getById($id)?->completedAt;
+        self::assertEquals($firstCompleted, $secondCompleted, 'completed_at must not change on second markSucceeded');
+    }
+
+    public function testMarkRetryableIncrementsAttemptsAndSchedulesNext(): void
+    {
+        [$id]   = $this->repo->insertBatch($this->samplePayload());
+        $nextAt = ( new \DateTimeImmutable('now') )->modify('+8 seconds');
+
+        $this->repo->markRetryable($id, attempts: 3, nextAttemptAt: $nextAt, lastError: 'OpenFGA 503', lastErrorCode: null);
+
+        $row = $this->repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame(OutboxStatus::RETRYING, $row->status);
+        self::assertSame(3, $row->attempts);
+        self::assertSame('OpenFGA 503', $row->lastError);
+        self::assertEqualsWithDelta(
+            $nextAt->getTimestamp(),
+            $row->nextAttemptAt->getTimestamp(),
+            1.0,
+            'next_attempt_at within 1s of requested',
+        );
+    }
+
+    public function testMarkFailedTerminalIsSticky(): void
+    {
+        [$id] = $this->repo->insertBatch($this->samplePayload());
+
+        $this->repo->markFailedTerminal($id, lastError: 'validation_error', lastErrorCode: 'validation_error');
+
+        $row = $this->repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame(OutboxStatus::FAILED_TERMINAL, $row->status);
+        self::assertSame('validation_error', $row->lastErrorCode);
+
+        // Subsequent markRetryable on a terminal row must NOT downgrade it.
+        $this->repo->markRetryable($id, attempts: 4, nextAttemptAt: new \DateTimeImmutable(), lastError: 'late retry', lastErrorCode: null);
+        $row = $this->repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame(
+            OutboxStatus::FAILED_TERMINAL,
+            $row->status,
+            'markRetryable must not overwrite a terminal status',
+        );
+    }
 }

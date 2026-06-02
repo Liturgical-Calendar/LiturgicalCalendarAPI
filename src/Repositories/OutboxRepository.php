@@ -108,6 +108,63 @@ final class OutboxRepository
         return $this->hydrate($row);
     }
 
+    public function markSucceeded(int $id): void
+    {
+        // Guard against terminal-status downgrades: only mark succeeded if currently
+        // in a non-terminal state. Re-applying succeeded is a no-op (completed_at preserved).
+        $stmt = $this->db->prepare(<<<'SQL'
+            UPDATE openfga_outbox
+            SET status = 'succeeded',
+                completed_at = COALESCE(completed_at, NOW())
+            WHERE id = :id AND status IN ('pending', 'retrying', 'succeeded')
+        SQL);
+        $stmt->execute([':id' => $id]);
+    }
+
+    public function markRetryable(
+        int $id,
+        int $attempts,
+        \DateTimeImmutable $nextAttemptAt,
+        string $lastError,
+        ?string $lastErrorCode,
+    ): void {
+        // Only transition out of pending/retrying. A failed_terminal row must
+        // stay terminal — admin retry has its own path (resetForRetry).
+        $stmt = $this->db->prepare(<<<'SQL'
+            UPDATE openfga_outbox
+            SET status = 'retrying',
+                attempts = :attempts,
+                next_attempt_at = :next_attempt_at,
+                last_error = :last_error,
+                last_error_code = :last_error_code
+            WHERE id = :id AND status IN ('pending', 'retrying')
+        SQL);
+        $stmt->execute([
+            ':id'              => $id,
+            ':attempts'        => $attempts,
+            ':next_attempt_at' => $nextAttemptAt->format('Y-m-d H:i:sP'),
+            ':last_error'      => $lastError,
+            ':last_error_code' => $lastErrorCode,
+        ]);
+    }
+
+    public function markFailedTerminal(int $id, string $lastError, ?string $lastErrorCode): void
+    {
+        $stmt = $this->db->prepare(<<<'SQL'
+            UPDATE openfga_outbox
+            SET status = 'failed_terminal',
+                last_error = :last_error,
+                last_error_code = :last_error_code,
+                completed_at = NOW()
+            WHERE id = :id AND status IN ('pending', 'retrying')
+        SQL);
+        $stmt->execute([
+            ':id'              => $id,
+            ':last_error'      => $lastError,
+            ':last_error_code' => $lastErrorCode,
+        ]);
+    }
+
     /**
      * @param array<string, mixed> $row
      */
