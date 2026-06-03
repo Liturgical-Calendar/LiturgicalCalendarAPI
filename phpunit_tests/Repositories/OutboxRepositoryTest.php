@@ -279,4 +279,27 @@ final class OutboxRepositoryTest extends RepositoryTestCase
         self::assertSame(1, $counts['succeeded'] ?? 0);
         self::assertSame(1, $counts['failed_terminal'] ?? 0);
     }
+
+    public function testMarkRetryableRoundtripsMicrosecondPrecision(): void
+    {
+        [$id]   = $this->repo->insertBatch([$this->samplePayload()[0]]);
+        $nextAt = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s.u', '2026-06-02 12:34:56.123456');
+        self::assertInstanceOf(\DateTimeImmutable::class, $nextAt);
+
+        $this->repo->markRetryable(
+            $id,
+            attempts: 1,
+            nextAttemptAt: $nextAt,
+            lastError: 'transient',
+            lastErrorCode: null,
+        );
+
+        $row = $this->repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame(
+            $nextAt->format('u'),
+            $row->nextAttemptAt->format('u'),
+            'next_attempt_at microseconds must survive the write/read roundtrip',
+        );
+    }
 }

@@ -143,7 +143,7 @@ final class OutboxRepository
         $stmt->execute([
             ':id'              => $id,
             ':attempts'        => $attempts,
-            ':next_attempt_at' => $nextAttemptAt->format('Y-m-d H:i:sP'),
+            ':next_attempt_at' => $nextAttemptAt->format('Y-m-d H:i:s.uP'),
             ':last_error'      => $lastError,
             ':last_error_code' => $lastErrorCode,
         ]);
