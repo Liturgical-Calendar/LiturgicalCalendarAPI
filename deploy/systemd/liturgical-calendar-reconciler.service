@@ -1,0 +1,25 @@
+[Unit]
+Description=Liturgical Calendar OpenFGA outbox reconciler
+After=network-online.target postgresql.service redis-server.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=litcal
+Group=litcal
+WorkingDirectory=/opt/liturgical-calendar
+EnvironmentFile=/opt/liturgical-calendar/.env.local
+ExecStart=/usr/bin/php /opt/liturgical-calendar/bin/reconcile-outbox consumer
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=litcal-reconciler
+
+# Hardening (adjust per ops policy)
+ProtectSystem=full
+PrivateTmp=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

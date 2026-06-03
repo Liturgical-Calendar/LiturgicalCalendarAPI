@@ -5,15 +5,24 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Handlers\Admin;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
+use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use LiturgicalCalendar\Api\Handlers\Admin\PermissionAdminHandler;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxNotifier;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxStatus;
 use LiturgicalCalendar\Tests\Handlers\AbstractHandlerTestCase;
+use LiturgicalCalendar\Tests\Support\EnvIsolationTrait;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -26,6 +35,70 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(PermissionAdminHandler::class)]
 final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
 {
+    use EnvIsolationTrait;
+
+    protected static bool $requiresDatabase = true;
+
+    /**
+     * Build a real OpenFgaClient backed by a Guzzle MockHandler that
+     * replays the queued HTTP responses. We set the OPENFGA_* env vars so
+     * `OpenFgaClient::isConfigured()` returns true (otherwise the outbox
+     * fast-path's getClient() call would hit the env gate), and undo both
+     * at the end of the test. Mirrors the pattern in AccessRequestAdminHandlerTest.
+     *
+     * @param callable(OpenFgaClient): \Psr\Http\Message\ResponseInterface $fn
+     */
+    private function withMockOpenFgaClient(MockHandler $mock, callable $fn): \Psr\Http\Message\ResponseInterface
+    {
+        $stack  = HandlerStack::create($mock);
+        $guzzle = new GuzzleClient(['handler' => $stack]);
+        $psr17  = new Psr17Factory();
+        $client = new OpenFgaClient(
+            apiUrl: 'http://openfga.test',
+            storeId: 'test-store',
+            modelId: 'test-model',
+            httpClient: $guzzle,
+            requestFactory: $psr17,
+            streamFactory: $psr17,
+            apiToken: 'test-token'
+        );
+
+        $savedEnv = [];
+        foreach (['OPENFGA_API_URL', 'OPENFGA_STORE_ID', 'OPENFGA_MODEL_ID'] as $name) {
+            $savedEnv[$name] = getenv($name);
+            putenv("{$name}=stub");
+            $_ENV[$name] = 'stub';
+        }
+
+        try {
+            return $fn($client);
+        } finally {
+            foreach ($savedEnv as $name => $original) {
+                if ($original === false) {
+                    putenv($name);
+                    unset($_ENV[$name]);
+                } else {
+                    putenv("{$name}={$original}");
+                    $_ENV[$name] = $original;
+                }
+            }
+        }
+    }
+
+    /**
+     * Extract and narrow an array-typed top-level body field (same helper
+     * as in AccessRequestAdminHandlerTest, duplicated to keep tests self-contained).
+     *
+     * @param array<string, mixed> $body
+     * @return array<int|string, mixed>
+     */
+    private static function arrayFieldFrom(array $body, string $key): array
+    {
+        self::assertArrayHasKey($key, $body);
+        self::assertIsArray($body[$key]);
+        return $body[$key];
+    }
+
     public function testOptionsPreflightSucceeds(): void
     {
         $response = ( new PermissionAdminHandler() )->handle(
@@ -340,5 +413,400 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         self::assertSame('user:resource-admin-1', $listPayload['user']);
         self::assertSame('admin', $listPayload['relation']);
         self::assertSame('national_calendar', $listPayload['type']);
+    }
+
+    // --- Outbox pattern: grantPermission (Task 22) -----------------------
+
+    public function testGrantPersistsOutboxRowAndAppliesViaSyncFastPath(): void
+    {
+        // Global admin granting a permission. FGA returns 200. After the
+        // outbox sync fast path the outbox row must be in 'succeeded' state
+        // and the response shape must include outbox counters.
+        $mock = new MockHandler([
+            new GuzzleResponse(200, [], '{}'), // writeTuple OK
+        ]);
+
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withMockOpenFgaClient(
+            $mock,
+            function (OpenFgaClient $client) use ($outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new PermissionAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/permissions',
+                        [],
+                        [
+                            'user'        => 'user-alice',
+                            'object_type' => 'national_calendar',
+                            'object_id'   => 'IT',
+                            'relation'    => 'editor',
+                        ]
+                    ))
+                );
+            }
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame(0, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+        self::assertCount(1, self::arrayFieldFrom($body, 'outbox_ids'));
+
+        // Verify outbox row was created and marked succeeded.
+        $outboxIds = self::arrayFieldFrom($body, 'outbox_ids');
+        $outboxRow = $outboxRepo->getById((int) $outboxIds[0]);
+        self::assertNotNull($outboxRow);
+        self::assertSame(OutboxStatus::SUCCEEDED, $outboxRow->status);
+        self::assertSame(OutboxOperation::WRITE_TUPLE, $outboxRow->operation);
+    }
+
+    public function testGrantIsIdempotentOnReissue(): void
+    {
+        // Two sequential grant calls for the same tuple from the same admin
+        // must collapse to the same outbox row IDs (idempotency_key).
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $requestBody = [
+            'user'        => 'user-alice',
+            'object_type' => 'national_calendar',
+            'object_id'   => 'IT',
+            'relation'    => 'editor',
+        ];
+
+        $mock1 = new MockHandler([new GuzzleResponse(200, [], '{}')]);
+        $body1 = $this->withMockOpenFgaClient(
+            $mock1,
+            function (OpenFgaClient $client) use ($outboxRepo, $notifier, $requestBody): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new PermissionAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor('POST', '/admin/permissions', [], $requestBody))
+                );
+            }
+        );
+
+        $mock2 = new MockHandler([new GuzzleResponse(200, [], '{}')]);
+        $body2 = $this->withMockOpenFgaClient(
+            $mock2,
+            function (OpenFgaClient $client) use ($outboxRepo, $notifier, $requestBody): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new PermissionAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor('POST', '/admin/permissions', [], $requestBody))
+                );
+            }
+        );
+
+        $ids1 = self::arrayFieldFrom($this->decodeJsonBody($body1), 'outbox_ids');
+        $ids2 = self::arrayFieldFrom($this->decodeJsonBody($body2), 'outbox_ids');
+
+        self::assertSame(
+            $ids1,
+            $ids2,
+            'idempotency_key must collapse second grant to same outbox row IDs'
+        );
+    }
+
+    public function testGrantSurfacesTransientFailureAsOutboxPending(): void
+    {
+        // FGA returns 503 (transient). The outbox row must end up in 'retrying'
+        // state and outbox_pending must be 1.
+        $mock = new MockHandler([
+            new GuzzleResponse(503, [], ''), // transient → RETRY
+        ]);
+
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withMockOpenFgaClient(
+            $mock,
+            function (OpenFgaClient $client) use ($outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new PermissionAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/permissions',
+                        [],
+                        [
+                            'user'        => 'user-alice',
+                            'object_type' => 'national_calendar',
+                            'object_id'   => 'IT',
+                            'relation'    => 'editor',
+                        ]
+                    ))
+                );
+            }
+        );
+
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame(1, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+
+        $outboxIds = self::arrayFieldFrom($body, 'outbox_ids');
+        $outboxRow = $outboxRepo->getById((int) $outboxIds[0]);
+        self::assertNotNull($outboxRow);
+        self::assertSame(OutboxStatus::RETRYING, $outboxRow->status);
+    }
+
+    public function testGrantTreatsDuplicateTupleAsBenignSuccess(): void
+    {
+        // FGA returns 400 with cannot_allow_duplicate_tuple (already exists).
+        // OutboxClassifier must classify this as BENIGN_SUCCESS — the row ends
+        // up in 'succeeded' state and outbox_pending/failed are both 0.
+        $mock = new MockHandler([
+            new GuzzleResponse(400, [], (string) json_encode([
+                'code'    => 'cannot_allow_duplicate_tuple',
+                'message' => 'cannot write duplicate tuple',
+            ])),
+        ]);
+
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withMockOpenFgaClient(
+            $mock,
+            function (OpenFgaClient $client) use ($outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new PermissionAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/permissions',
+                        [],
+                        [
+                            'user'        => 'user-alice',
+                            'object_type' => 'national_calendar',
+                            'object_id'   => 'IT',
+                            'relation'    => 'editor',
+                        ]
+                    ))
+                );
+            }
+        );
+
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame(0, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+        self::assertCount(1, self::arrayFieldFrom($body, 'tuples_created'));
+    }
+
+    // --- Outbox pattern: revokePermission (Task 22) ----------------------
+
+    public function testRevokePersistsOutboxRowAndAppliesViaSyncFastPath(): void
+    {
+        // Global admin revoking a permission. FGA returns 200. After the
+        // outbox sync fast path the outbox row must be in 'succeeded' state.
+        $mock = new MockHandler([
+            new GuzzleResponse(200, [], '{}'), // deleteTuple OK
+        ]);
+
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withoutEnv(
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+            fn() => $this->withMockOpenFgaClient(
+                $mock,
+                function (OpenFgaClient $client) use ($outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                    $processor = new OutboxProcessor($outboxRepo, $client);
+                    $handler   = new PermissionAdminHandler($client);
+                    $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                    return $handler->handle(
+                        $this->withOidcUser($this->requestFor(
+                            'DELETE',
+                            '/admin/permissions',
+                            [],
+                            [
+                                'user'        => 'user-alice',
+                                'object_type' => 'national_calendar',
+                                'object_id'   => 'IT',
+                                'relation'    => 'editor',
+                            ]
+                        ))
+                    );
+                }
+            )
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame(0, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+        self::assertCount(1, self::arrayFieldFrom($body, 'outbox_ids'));
+        self::assertCount(1, self::arrayFieldFrom($body, 'tuples_deleted'));
+
+        // Verify outbox row was created and marked succeeded with delete_tuple operation.
+        $outboxIds = self::arrayFieldFrom($body, 'outbox_ids');
+        $outboxRow = $outboxRepo->getById((int) $outboxIds[0]);
+        self::assertNotNull($outboxRow);
+        self::assertSame(OutboxStatus::SUCCEEDED, $outboxRow->status);
+        self::assertSame(OutboxOperation::DELETE_TUPLE, $outboxRow->operation);
+    }
+
+    public function testRevokeSurfacesTransientFailureAsOutboxPending(): void
+    {
+        // FGA returns 503 (transient). The outbox row must end up in 'retrying'
+        // state and outbox_pending must be 1. success must still be true
+        // (the outbox row committed to the DB before the sync attempt).
+        $mock = new MockHandler([
+            new GuzzleResponse(503, [], ''), // transient → RETRY
+        ]);
+
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withoutEnv(
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+            fn() => $this->withMockOpenFgaClient(
+                $mock,
+                function (OpenFgaClient $client) use ($outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                    $processor = new OutboxProcessor($outboxRepo, $client);
+                    $handler   = new PermissionAdminHandler($client);
+                    $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                    return $handler->handle(
+                        $this->withOidcUser($this->requestFor(
+                            'DELETE',
+                            '/admin/permissions',
+                            [],
+                            [
+                                'user'        => 'user-alice',
+                                'object_type' => 'national_calendar',
+                                'object_id'   => 'IT',
+                                'relation'    => 'editor',
+                            ]
+                        ))
+                    );
+                }
+            )
+        );
+
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame(1, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+
+        $outboxIds = self::arrayFieldFrom($body, 'outbox_ids');
+        $outboxRow = $outboxRepo->getById((int) $outboxIds[0]);
+        self::assertNotNull($outboxRow);
+        self::assertSame(OutboxStatus::RETRYING, $outboxRow->status);
+    }
+
+    public function testRevokeTreatsMissingTupleAsBenignSuccess(): void
+    {
+        // FGA returns 400 with cannot_allow_unknown_tuple_to_be_deleted
+        // (tuple not found — already gone). OutboxClassifier must classify this
+        // as BENIGN_SUCCESS — the row ends up in 'succeeded' state.
+        $mock = new MockHandler([
+            new GuzzleResponse(400, [], (string) json_encode([
+                'code'    => 'cannot_allow_unknown_tuple_to_be_deleted',
+                'message' => 'cannot delete unknown tuple',
+            ])),
+        ]);
+
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withoutEnv(
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+            fn() => $this->withMockOpenFgaClient(
+                $mock,
+                function (OpenFgaClient $client) use ($outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                    $processor = new OutboxProcessor($outboxRepo, $client);
+                    $handler   = new PermissionAdminHandler($client);
+                    $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                    return $handler->handle(
+                        $this->withOidcUser($this->requestFor(
+                            'DELETE',
+                            '/admin/permissions',
+                            [],
+                            [
+                                'user'        => 'user-alice',
+                                'object_type' => 'national_calendar',
+                                'object_id'   => 'IT',
+                                'relation'    => 'editor',
+                            ]
+                        ))
+                    );
+                }
+            )
+        );
+
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame(0, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+        // BENIGN_SUCCESS → counted in tuples_deleted (idempotent — tuple already gone).
+        self::assertCount(1, self::arrayFieldFrom($body, 'tuples_deleted'));
+    }
+
+    public function testRevokeIsIdempotentOnReissue(): void
+    {
+        // Two sequential revoke calls for the same tuple from the same admin
+        // must collapse to the same outbox row IDs (idempotency_key).
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $requestBody = [
+            'user'        => 'user-alice',
+            'object_type' => 'national_calendar',
+            'object_id'   => 'IT',
+            'relation'    => 'editor',
+        ];
+
+        $mock1 = new MockHandler([new GuzzleResponse(200, [], '{}')]);
+        $body1 = $this->withoutEnv(
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+            fn() => $this->withMockOpenFgaClient(
+                $mock1,
+                function (OpenFgaClient $client) use ($outboxRepo, $notifier, $requestBody): \Psr\Http\Message\ResponseInterface {
+                    $processor = new OutboxProcessor($outboxRepo, $client);
+                    $handler   = new PermissionAdminHandler($client);
+                    $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                    return $handler->handle(
+                        $this->withOidcUser($this->requestFor('DELETE', '/admin/permissions', [], $requestBody))
+                    );
+                }
+            )
+        );
+
+        $mock2 = new MockHandler([new GuzzleResponse(200, [], '{}')]);
+        $body2 = $this->withoutEnv(
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+            fn() => $this->withMockOpenFgaClient(
+                $mock2,
+                function (OpenFgaClient $client) use ($outboxRepo, $notifier, $requestBody): \Psr\Http\Message\ResponseInterface {
+                    $processor = new OutboxProcessor($outboxRepo, $client);
+                    $handler   = new PermissionAdminHandler($client);
+                    $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                    return $handler->handle(
+                        $this->withOidcUser($this->requestFor('DELETE', '/admin/permissions', [], $requestBody))
+                    );
+                }
+            )
+        );
+
+        $ids1 = self::arrayFieldFrom($this->decodeJsonBody($body1), 'outbox_ids');
+        $ids2 = self::arrayFieldFrom($this->decodeJsonBody($body2), 'outbox_ids');
+
+        self::assertSame(
+            $ids1,
+            $ids2,
+            'idempotency_key must collapse second revoke to same outbox row IDs'
+        );
     }
 }

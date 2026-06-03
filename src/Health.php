@@ -14,6 +14,7 @@ use React\Promise\Deferred;
 use React\Promise\PromiseInterface;
 use React\Filesystem\Factory;
 use React\EventLoop\Loop;
+use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Enum\ICSErrorLevel;
 use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\Route;
@@ -22,6 +23,7 @@ use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
+use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use Symfony\Component\Yaml\Yaml;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
@@ -1810,6 +1812,132 @@ class Health implements MessageComponentInterface
                 return null;
         }
         return null;
+    }
+
+    /**
+     * Build the openfga_outbox block for the HTTP /health endpoint.
+     *
+     * Fetches PG-side status counts and oldest-pending age from OutboxRepository,
+     * and Redis-side consumer group info via xInfo GROUPS.
+     *
+     * Designed to be called from HealthHandler (HTTP context), which is why it is
+     * public static — the Redis connection here is a short-lived probe, independent
+     * of the WebSocket server's cached self::$redis.
+     *
+     * @return array{
+     *   pending: int,
+     *   retrying: int,
+     *   succeeded: int,
+     *   failed_terminal: int,
+     *   oldest_pending_age_seconds: int,
+     *   consumer: array{
+     *     redis_reachable: bool,
+     *     stream_name: string,
+     *     group_name: string,
+     *     pending_entries: int,
+     *     oldest_pel_idle_seconds: int
+     *   }
+     * }
+     */
+    public static function buildOutboxStats(): array
+    {
+        $counts    = [
+            'pending'         => 0,
+            'retrying'        => 0,
+            'succeeded'       => 0,
+            'failed_terminal' => 0,
+        ];
+        $oldestAge = 0;
+
+        if (Connection::isConfigured()) {
+            try {
+                $repo      = new OutboxRepository(Connection::getInstance());
+                $rawCounts = $repo->countByStatus();
+                foreach ($rawCounts as $status => $n) {
+                    if (array_key_exists($status, $counts)) {
+                        $counts[$status] = $n;
+                    }
+                }
+                $oldestAge = $repo->oldestPendingAgeSeconds();
+            } catch (\Throwable) {
+                // PG unreachable — leave zeros; the health endpoint's DB section surfaces the failure.
+            }
+        }
+
+        $streamName = isset($_ENV['REDIS_OUTBOX_STREAM']) && is_string($_ENV['REDIS_OUTBOX_STREAM'])
+            ? $_ENV['REDIS_OUTBOX_STREAM']
+            : 'litcal:reconcile-stream';
+        $groupName  = isset($_ENV['REDIS_OUTBOX_GROUP']) && is_string($_ENV['REDIS_OUTBOX_GROUP'])
+            ? $_ENV['REDIS_OUTBOX_GROUP']
+            : 'reconciler';
+
+        $consumer = [
+            'redis_reachable'         => false,
+            'stream_name'             => $streamName,
+            'group_name'              => $groupName,
+            'pending_entries'         => 0,
+            'oldest_pel_idle_seconds' => 0,
+        ];
+
+        if (extension_loaded('redis')) {
+            try {
+                $redis       = new \Redis();
+                $redisSocket = isset($_ENV['REDIS_SOCKET']) && is_string($_ENV['REDIS_SOCKET'])
+                    ? $_ENV['REDIS_SOCKET']
+                    : null;
+                if ($redisSocket !== null && $redisSocket !== '') {
+                    $connected = $redis->connect($redisSocket, 0, 2.0);
+                } else {
+                    $redisHost = isset($_ENV['REDIS_HOST']) && is_string($_ENV['REDIS_HOST'])
+                        ? $_ENV['REDIS_HOST']
+                        : '127.0.0.1';
+                    $redisPort = isset($_ENV['REDIS_PORT']) && is_numeric($_ENV['REDIS_PORT'])
+                        ? (int) $_ENV['REDIS_PORT']
+                        : 6379;
+                    $connected = $redis->connect($redisHost, $redisPort, 2.0);
+                }
+                if ($connected) {
+                    $redisPassword = isset($_ENV['REDIS_PASSWORD']) && is_string($_ENV['REDIS_PASSWORD'])
+                        ? $_ENV['REDIS_PASSWORD']
+                        : null;
+                    if ($redisPassword !== null && $redisPassword !== '') {
+                        $redis->auth($redisPassword);
+                    }
+                    $redis->ping();
+                    $consumer['redis_reachable'] = true;
+                    $info                        = $redis->xInfo('GROUPS', $streamName);
+                    if (is_array($info)) {
+                        foreach ($info as $group) {
+                            if (is_array($group) && ( $group['name'] ?? null ) === $groupName) {
+                                $pending                     = $group['pending'] ?? 0;
+                                $consumer['pending_entries'] = is_numeric($pending) ? (int) $pending : 0;
+                            }
+                        }
+                    }
+                    // Populate oldest_pel_idle_seconds via the xPending detail form.
+                    // Response shape: list of [msgId, consumer, idle_ms, deliveries].
+                    try {
+                        $pel = $redis->xPending($streamName, $groupName, '-', '+', 1);
+                        if (is_array($pel) && count($pel) > 0 && is_array($pel[0]) && isset($pel[0][2]) && is_numeric($pel[0][2])) {
+                            $consumer['oldest_pel_idle_seconds'] = intdiv((int) $pel[0][2], 1000);
+                        }
+                    } catch (\Throwable) {
+                        // Best-effort — don't let a secondary Redis call break the health response.
+                    }
+                }
+            } catch (\Throwable) {
+                $consumer['redis_reachable'] = false;
+            }
+        }
+
+        return [
+            'pending'                    => $counts['pending'],
+            'retrying'                   => $counts['retrying'],
+            'succeeded'                  => $counts['succeeded'],
+            'failed_terminal'            => $counts['failed_terminal'],
+            'oldest_pending_age_seconds' => $oldestAge,
+            'consumer'                   => $consumer,
+        ];
     }
 
     /**

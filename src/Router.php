@@ -28,10 +28,12 @@ use LiturgicalCalendar\Api\Handlers\Auth\EmailVerificationHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\AccessRequestAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\ApplicationAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\NotificationsHandler as AdminNotificationsHandler;
+use LiturgicalCalendar\Api\Handlers\Admin\OutboxAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\NotificationsHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\PermissionAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\UsersHandler;
 use LiturgicalCalendar\Api\Handlers\ApplicationsHandler;
+use LiturgicalCalendar\Api\Handlers\Ops\HealthHandler;
 use LiturgicalCalendar\Api\Handlers\Ops\MigrateHandler;
 use LiturgicalCalendar\Api\Handlers\Ops\OpcacheResetHandler;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
@@ -411,6 +413,12 @@ class Router
                         // POST /admin/applications/{uuid}/revoke - Revoke an approved application
                         $applicationAdminHandler = new ApplicationAdminHandler();
                         $this->handler           = $applicationAdminHandler;
+                    } elseif ($adminRoute === 'outbox') {
+                        // Admin outbox management routes
+                        // GET  /admin/outbox?status=…&summary=…  - List/summary
+                        // POST /admin/outbox/{id}/retry           - Reset failed_terminal row to pending
+                        $outboxAdminHandler = new OutboxAdminHandler();
+                        $this->handler      = $outboxAdminHandler;
                     } else {
                         $this->response = new Response(StatusCode::NOT_FOUND->value, [], null, $this->request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
                         $this->emitResponse();
@@ -531,6 +539,11 @@ class Router
                 }
                 $this->handler = $temporaleHandler;
                 break;
+            case 'health':
+                $healthHandler = new HealthHandler();
+                $healthHandler->setAllowedRequestMethods([RequestMethod::GET]);
+                $this->handler = $healthHandler;
+                break;
             case '_ops':
                 if (count($requestPathParts) === 1 && $requestPathParts[0] === 'migrate') {
                     $migrateHandler = new MigrateHandler();
@@ -561,8 +574,13 @@ class Router
         // Parse JSON request bodies into getParsedBody() for all routes
         $pipeline->pipe(new JsonBodyParserMiddleware());
 
-        // Apply API key validation and rate limiting for public API routes
-        if (!in_array($route, ['auth', 'admin', 'applications', '_ops'], true)) {
+        // Apply API key validation and rate limiting for public API routes.
+        // /health is an unauthenticated monitoring endpoint — exclude it from
+        // the API-key check but KEEP IP-based rate limiting, because /health
+        // touches openfga_outbox and PG on every request; without rate
+        // limiting an unauthenticated flood could exhaust DB capacity.
+        $skipAuthRoutes = ['auth', 'admin', 'applications', '_ops', 'health'];
+        if (!in_array($route, $skipAuthRoutes, true)) {
             if (Connection::isConfigured()) {
                 $pipeline->pipe(new ApiKeyMiddleware(
                     new \LiturgicalCalendar\Api\Repositories\ApiKeyRepository(),
@@ -574,6 +592,9 @@ class Router
                 // Apply IP-only rate limiting for unauthenticated requests.
                 $pipeline->pipe(ApiKeyRateLimitMiddleware::fromEnv());
             }
+        } elseif ($route === 'health') {
+            // /health still needs IP-based throttling — see comment above.
+            $pipeline->pipe(ApiKeyRateLimitMiddleware::fromEnv());
         }
 
         // Apply HTTPS enforcement middleware for auth, admin, and applications routes in production
