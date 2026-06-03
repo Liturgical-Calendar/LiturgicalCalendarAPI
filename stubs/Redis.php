@@ -93,11 +93,12 @@ if (!class_exists(\Redis::class)) {
         }
 
         /**
-         * @param string        $key
-         * @param string        $group
-         * @param string        $consumer
-         * @param int           $minIdleMs
-         * @param array<string> $ids
+         * @param string                $key
+         * @param string                $group
+         * @param string                $consumer
+         * @param int                   $minIdleMs
+         * @param array<string>         $ids
+         * @param array<string, mixed>  $options
          * @return array<string, array<string, string>>|false
          */
         public function xClaim(
@@ -106,6 +107,7 @@ if (!class_exists(\Redis::class)) {
             string $consumer,
             int $minIdleMs,
             array $ids,
+            array $options = [],
         ): array|false {
             return false;
         }

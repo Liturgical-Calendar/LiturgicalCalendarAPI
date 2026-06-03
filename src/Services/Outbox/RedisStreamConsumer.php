@@ -158,6 +158,10 @@ final class RedisStreamConsumer implements StreamConsumerInterface
             $this->consumerName,
             self::CLAIM_IDLE_MS,
             $staleIds,
+            // CI's ext-redis requires the options array even when empty —
+            // newer phpredis builds reject the 5-arg form. [] keeps the
+            // default behavior (no JUSTID/FORCE/IDLE/RETRYCOUNT).
+            [],
         );
         if ($claimed === false || empty($claimed)) {
             return;
