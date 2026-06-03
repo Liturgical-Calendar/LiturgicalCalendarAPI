@@ -200,16 +200,18 @@ final class OutboxRepositoryTest extends RepositoryTestCase
     {
         $ids = $this->repo->insertBatch($this->samplePayload()); // 2 rows
 
-        // Open a second PDO connection to the same DB.
-        $other = new \PDO(
-            sprintf(
-                'pgsql:host=%s;port=%s;dbname=%s',
-                (string) ( $_ENV['DB_HOST'] ?? 'localhost' ),
-                (string) ( $_ENV['DB_PORT'] ?? '5432' ),
-                (string) ( $_ENV['DB_NAME'] ?? '' ),
-            ),
-            (string) ( $_ENV['DB_USER'] ?? '' ),
-            (string) ( $_ENV['DB_PASSWORD'] ?? '' ),
+        // Open a second PDO connection to the same DB. Use the same env
+        // resolution the base class uses (env array first, getenv fallback)
+        // so this works in CI where DB_* may live only in getenv().
+        $host     = self::env('DB_HOST') ?? 'localhost';
+        $port     = self::env('DB_PORT') ?? '5432';
+        $name     = self::env('DB_NAME') ?? '';
+        $user     = self::env('DB_USER') ?? '';
+        $password = self::env('DB_PASSWORD') ?? '';
+        $other    = new \PDO(
+            sprintf('pgsql:host=%s;port=%s;dbname=%s', $host, $port, $name),
+            $user,
+            $password,
             [
                 \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
                 \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
@@ -220,15 +222,27 @@ final class OutboxRepositoryTest extends RepositoryTestCase
         $otherRepo = new OutboxRepository($other);
 
         // Both runners start a tx and call pickupPending with limit: 1;
-        // SKIP LOCKED must give each one a distinct row.
-        self::$pdo->beginTransaction();
-        $picked1 = $this->repo->pickupPending(limit: 1, now: new \DateTimeImmutable());
+        // SKIP LOCKED must give each one a distinct row. Wrap in try/finally
+        // so a mid-test assertion failure can't leave open transactions on
+        // the shared connections — those would cascade into TRUNCATE failures
+        // in the next test's setUp.
+        try {
+            self::$pdo->beginTransaction();
+            $picked1 = $this->repo->pickupPending(limit: 1, now: new \DateTimeImmutable());
 
-        $other->beginTransaction();
-        $picked2 = $otherRepo->pickupPending(limit: 1, now: new \DateTimeImmutable());
+            $other->beginTransaction();
+            $picked2 = $otherRepo->pickupPending(limit: 1, now: new \DateTimeImmutable());
 
-        self::$pdo->commit();
-        $other->commit();
+            self::$pdo->commit();
+            $other->commit();
+        } finally {
+            if (self::$pdo->inTransaction()) {
+                self::$pdo->rollBack();
+            }
+            if ($other->inTransaction()) {
+                $other->rollBack();
+            }
+        }
 
         $idsPicked = array_merge(
             array_map(static fn ($r): int => $r->id, $picked1),

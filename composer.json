@@ -22,6 +22,8 @@
         "ext-json": "*",
         "ext-libxml": "*",
         "ext-mbstring": "*",
+        "ext-pdo": "*",
+        "ext-pdo_pgsql": "*",
         "ext-simplexml": "*",
         "ext-xml": "*",
         "ext-zip": "*",
@@ -53,7 +55,9 @@
         "captainhook/hook-installer": "^1.0",
         "phpunit/phpunit": "^12.3@stable"
     },
-    "suggest": {},
+    "suggest": {
+        "ext-redis": "Required only for the long-lived `bin/reconcile-outbox consumer` (XREADGROUP) and best-effort outbox notifications. The backstop drains everything regardless when ext-redis is absent."
+    },
     "license": "Apache-2.0",
     "autoload": {
         "psr-4": {

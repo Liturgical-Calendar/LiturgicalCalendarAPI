@@ -92,7 +92,13 @@ abstract class RepositoryTestCase extends TestCase
 
     private static ?string $skipReason = null;
 
-    private static function env(string $name): ?string
+    /**
+     * Resolve a DB env var. Subclasses that need to open a second PDO
+     * connection should reuse this rather than reading $_ENV directly,
+     * so the resolution rules (env array first, getenv() fallback) stay
+     * consistent with setUpBeforeClass().
+     */
+    protected static function env(string $name): ?string
     {
         if (isset($_ENV[$name]) && $_ENV[$name] !== '') {
             return (string) $_ENV[$name];
