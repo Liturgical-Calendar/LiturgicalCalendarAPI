@@ -95,7 +95,9 @@
         "db:migrations:status": "@php bin/doctrine-migrations status",
         "db:migrations:generate": "@php bin/doctrine-migrations generate",
         "db:migrations:sync": "@php bin/doctrine-migrations sync-metadata-storage",
-        "db:migrations:mark-applied": "@php bin/doctrine-migrations version --add --all --no-interaction"
+        "db:migrations:mark-applied": "@php bin/doctrine-migrations version --add --all --no-interaction",
+        "reconciler:consumer": "@php bin/reconcile-outbox consumer",
+        "reconciler:backstop": "@php bin/reconcile-outbox backstop"
     },
     "config": {
         "allow-plugins": {

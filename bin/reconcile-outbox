@@ -1,0 +1,101 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Subcommands:
+ *   consumer  — long-lived; systemd manages restart on failure
+ *   backstop  — one-shot scan; cron invokes every 5 min
+ *
+ * Both route through OutboxProcessor so the OpenFGA contact surface
+ * stays single-source.
+ */
+
+use Dotenv\Dotenv;
+use LiturgicalCalendar\Api\Repositories\OutboxRepository;
+use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\Outbox\BackstopRunner;
+use LiturgicalCalendar\Api\Services\Outbox\ConsumerLoop;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
+use LiturgicalCalendar\Api\Services\Outbox\RedisStreamConsumer;
+
+$root = dirname(__DIR__);
+require $root . '/vendor/autoload.php';
+
+if (file_exists($root . '/.env.local')) {
+    Dotenv::createImmutable($root, '.env.local')->safeLoad();
+} elseif (file_exists($root . '/.env')) {
+    Dotenv::createImmutable($root)->safeLoad();
+}
+
+$mode = $argv[1] ?? '';
+if ($mode !== 'consumer' && $mode !== 'backstop') {
+    fwrite(STDERR, "Usage: reconcile-outbox consumer|backstop\n");
+    exit(2);
+}
+
+// --- Build PDO ---
+$pdo = new PDO(
+    sprintf(
+        'pgsql:host=%s;port=%s;dbname=%s',
+        (string) ($_ENV['DB_HOST'] ?? 'localhost'),
+        (string) ($_ENV['DB_PORT'] ?? '5432'),
+        (string) ($_ENV['DB_NAME'] ?? ''),
+    ),
+    (string) ($_ENV['DB_USER'] ?? ''),
+    (string) ($_ENV['DB_PASSWORD'] ?? ''),
+    [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_EMULATE_PREPARES   => false,
+    ],
+);
+$pdo->exec("SET timezone TO 'Europe/Vatican'");
+
+$repo = new OutboxRepository($pdo);
+
+// --- Build OpenFgaClient ---
+// OpenFgaClient::fromEnv() reads OPENFGA_API_URL, OPENFGA_STORE_ID,
+// and OPENFGA_MODEL_ID from the environment.
+$fga = OpenFgaClient::fromEnv();
+
+$processor = new OutboxProcessor($repo, $fga);
+
+if ($mode === 'backstop') {
+    $runner    = new BackstopRunner(
+        $repo,
+        $processor,
+        graceSeconds: (int) ($_ENV['OUTBOX_BACKSTOP_GRACE_SECONDS'] ?? 60),
+    );
+    $processed = $runner->runOnce(limit: 200);
+    fwrite(STDOUT, sprintf("backstop processed=%d\n", $processed));
+    exit(0);
+}
+
+// consumer mode
+if (!extension_loaded('redis')) {
+    fwrite(STDERR, "ext-redis is required for consumer mode but is not installed.\n");
+    exit(2);
+}
+$redis = new \Redis();
+if (isset($_ENV['REDIS_SOCKET']) && is_string($_ENV['REDIS_SOCKET']) && $_ENV['REDIS_SOCKET'] !== '') {
+    $redis->connect((string) $_ENV['REDIS_SOCKET']);
+} else {
+    $redis->connect(
+        (string) ($_ENV['REDIS_HOST'] ?? '127.0.0.1'),
+        (int) ($_ENV['REDIS_PORT'] ?? 6379),
+    );
+}
+if (isset($_ENV['REDIS_PASSWORD']) && is_string($_ENV['REDIS_PASSWORD']) && $_ENV['REDIS_PASSWORD'] !== '') {
+    $redis->auth((string) $_ENV['REDIS_PASSWORD']);
+}
+
+$streamName   = (string) ($_ENV['REDIS_OUTBOX_STREAM']        ?? 'litcal:reconcile-stream');
+$groupName    = (string) ($_ENV['REDIS_OUTBOX_GROUP']         ?? 'reconciler');
+$consumerName = (string) ($_ENV['REDIS_OUTBOX_CONSUMER_NAME'] ?? (gethostname() ?: 'consumer'));
+
+$stream = new RedisStreamConsumer($redis, $streamName, $groupName, $consumerName);
+$loop   = new ConsumerLoop($stream, $processor, blockMs: 5000);
+
+$loop->run();
