@@ -60,7 +60,7 @@ $repo = new OutboxRepository($pdo);
 // and OPENFGA_MODEL_ID from the environment.
 $fga = OpenFgaClient::fromEnv();
 
-$processor = new OutboxProcessor($repo, $fga);
+$processor = new OutboxProcessor($repo, $fga, (int) ($_ENV['OUTBOX_MAX_ATTEMPTS'] ?? 10));
 
 if ($mode === 'backstop') {
     $runner    = new BackstopRunner(

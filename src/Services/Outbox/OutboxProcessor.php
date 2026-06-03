@@ -22,12 +22,14 @@ use LiturgicalCalendar\Api\Services\OpenFgaClient;
  */
 final class OutboxProcessor implements OutboxProcessorInterface
 {
-    private const MAX_ATTEMPTS = 10;
+    private readonly int $maxAttempts;
 
     public function __construct(
         private readonly OutboxRepository $repo,
         private readonly OpenFgaClient $client,
+        int $maxAttempts = 10,
     ) {
+        $this->maxAttempts = $maxAttempts;
     }
 
     public function processOne(int $rowId): OutboxDisposition
@@ -63,7 +65,7 @@ final class OutboxProcessor implements OutboxProcessorInterface
 
                 case OutboxDisposition::RETRY:
                     $newAttempts = $row->attempts + 1;
-                    if ($newAttempts >= self::MAX_ATTEMPTS) {
+                    if ($newAttempts >= $this->maxAttempts) {
                         $this->repo->markFailedTerminal($row->id, $message, $code);
                         return OutboxDisposition::TERMINAL;
                     }

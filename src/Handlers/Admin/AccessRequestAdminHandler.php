@@ -142,7 +142,11 @@ final class AccessRequestAdminHandler extends AbstractHandler
     private function getOutboxProcessor(): OutboxProcessor
     {
         if ($this->outboxProcessor === null) {
-            $this->outboxProcessor = new OutboxProcessor($this->getOutboxRepository(), $this->getFgaClient());
+            $this->outboxProcessor = new OutboxProcessor(
+                $this->getOutboxRepository(),
+                $this->getFgaClient(),
+                (int) ( $_ENV['OUTBOX_MAX_ATTEMPTS'] ?? 10 ),
+            );
         }
         return $this->outboxProcessor;
     }

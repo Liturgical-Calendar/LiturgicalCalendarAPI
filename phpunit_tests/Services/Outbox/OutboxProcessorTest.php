@@ -136,6 +136,32 @@ final class OutboxProcessorTest extends RepositoryTestCase
         );
     }
 
+    public function testCustomMaxAttemptsConfigurable(): void
+    {
+        [$id] = $this->seedOneWrite();
+        // Pre-set the row to attempts=2 so this call is the 3rd attempt.
+        $this->repo->markRetryable(
+            $id,
+            attempts: 2,
+            nextAttemptAt: new \DateTimeImmutable('-1 second'),
+            lastError: 'prior transient',
+            lastErrorCode: null,
+        );
+        $mock = new MockHandler([new Response(503, [], '')]);
+        // Processor with maxAttempts=3: the 3rd attempt (attempts=2 → newAttempts=3 >= 3) must go terminal.
+        $proc = new OutboxProcessor($this->repo, $this->makeClient($mock), maxAttempts: 3);
+
+        $proc->processOne($id);
+
+        $row = $this->repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame(
+            OutboxStatus::FAILED_TERMINAL,
+            $row->status,
+            'custom maxAttempts=3 must cause failed_terminal on the 3rd attempt',
+        );
+    }
+
     public function testProcessOneBenignAlreadyExistsCountsAsSuccess(): void
     {
         [$id] = $this->seedOneWrite();
