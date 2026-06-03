@@ -105,6 +105,7 @@ final class OutboxRepository
         if ($row === false) {
             return null;
         }
+        /** @var array<string, mixed> $row */
         return $this->hydrate($row);
     }
 
@@ -195,6 +196,7 @@ final class OutboxRepository
 
         $rows = [];
         while (( $r = $stmt->fetch(PDO::FETCH_ASSOC) ) !== false) {
+            /** @var array<string, mixed> $r */
             $rows[] = $this->hydrate($r);
         }
         return $rows;
@@ -253,20 +255,45 @@ final class OutboxRepository
         /** @var array<string, mixed> $metadata */
         $metadata = json_decode($metadataJson, true, flags: JSON_THROW_ON_ERROR);
 
+        /** @var int|string $id */
+        $id = $row['id'];
+        /** @var string $operation */
+        $operation = $row['operation'];
+        /** @var string $fgaUser */
+        $fgaUser = $row['fga_user'];
+        /** @var string $fgaRelation */
+        $fgaRelation = $row['fga_relation'];
+        /** @var string $fgaObject */
+        $fgaObject = $row['fga_object'];
+        /** @var string $status */
+        $status = $row['status'];
+        /** @var int|string $attempts */
+        $attempts = $row['attempts'];
+        /** @var string $nextAttemptAt */
+        $nextAttemptAt = $row['next_attempt_at'];
+        /** @var string|null $lastError */
+        $lastError = $row['last_error'];
+        /** @var string|null $lastErrorCode */
+        $lastErrorCode = $row['last_error_code'];
+        /** @var string $createdAt */
+        $createdAt = $row['created_at'];
+        /** @var string|null $completedAt */
+        $completedAt = $row['completed_at'];
+
         return new OutboxRow(
-            id: (int) $row['id'],
-            operation: OutboxOperation::from((string) $row['operation']),
-            fgaUser: (string) $row['fga_user'],
-            fgaRelation: (string) $row['fga_relation'],
-            fgaObject: (string) $row['fga_object'],
-            status: OutboxStatus::from((string) $row['status']),
-            attempts: (int) $row['attempts'],
-            nextAttemptAt: new \DateTimeImmutable((string) $row['next_attempt_at']),
-            lastError: $row['last_error'] !== null ? (string) $row['last_error'] : null,
-            lastErrorCode: $row['last_error_code'] !== null ? (string) $row['last_error_code'] : null,
+            id: (int) $id,
+            operation: OutboxOperation::from($operation),
+            fgaUser: $fgaUser,
+            fgaRelation: $fgaRelation,
+            fgaObject: $fgaObject,
+            status: OutboxStatus::from($status),
+            attempts: (int) $attempts,
+            nextAttemptAt: new \DateTimeImmutable($nextAttemptAt),
+            lastError: $lastError,
+            lastErrorCode: $lastErrorCode,
             metadata: $metadata,
-            createdAt: new \DateTimeImmutable((string) $row['created_at']),
-            completedAt: $row['completed_at'] !== null ? new \DateTimeImmutable((string) $row['completed_at']) : null,
+            createdAt: new \DateTimeImmutable($createdAt),
+            completedAt: $completedAt !== null ? new \DateTimeImmutable($completedAt) : null,
         );
     }
 }
