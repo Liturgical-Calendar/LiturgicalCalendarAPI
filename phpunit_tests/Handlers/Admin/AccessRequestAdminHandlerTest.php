@@ -1163,4 +1163,145 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
             }
         ));
     }
+
+    // -----------------------------------------------------------------------
+    // Empty-permissions fast path — exercises the early-return branch in
+    // both approveRequest and revokeRequest where no tuples are written/
+    // deleted and the outbox is bypassed entirely. Closes the bulk of the
+    // uncovered lines in the no-perms branch (lines ~373-390 / ~666-694
+    // per the coverage report).
+    // -----------------------------------------------------------------------
+
+    public function testApproveWithEmptyPermissionsTakesFastPathWithNoOutboxRows(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-fast', 'fast@x.test', null, 'developer', []);
+
+        $response = $this->withoutEnv(
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+            fn() => ( new AccessRequestAdminHandler() )->handle(
+                $this->withOidcUser($this->requestFor('POST', '/admin/access-requests/' . $id . '/approve', [], ['notes' => 'ok']))
+            )
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        // No permissions ⇒ no outbox rows ⇒ no fga_errors entries.
+        self::assertSame([], $body['tuples_created']);
+        self::assertSame([], $body['fga_errors']);
+        self::assertSame([], $body['outbox_ids']);
+        self::assertSame(0, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+
+        // DB row is now approved.
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('approved', $row['status']);
+
+        // Outbox is empty (the fast path never inserts when permissions=[]).
+        $outboxCount = (int) self::$pdo->query("SELECT COUNT(*) FROM openfga_outbox WHERE metadata->>'access_request_id' = " . self::$pdo->quote($id))->fetchColumn();
+        self::assertSame(0, $outboxCount, 'fast path must not insert outbox rows');
+    }
+
+    public function testRevokeWithEmptyPermissionsTakesFastPathWithNoOutboxRows(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-fast', 'fast@x.test', null, 'developer', []);
+        $repo->approve($id, 'admin');
+
+        $response = $this->withoutEnv(
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+            fn() => ( new AccessRequestAdminHandler() )->handle(
+                $this->withOidcUser($this->requestFor('POST', '/admin/access-requests/' . $id . '/revoke', [], []))
+            )
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame([], $body['tuples_deleted']);
+        self::assertSame([], $body['fga_errors']);
+        self::assertSame([], $body['outbox_ids']);
+        self::assertSame(0, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('revoked', $row['status']);
+
+        $outboxCount = (int) self::$pdo->query("SELECT COUNT(*) FROM openfga_outbox WHERE metadata->>'access_request_id' = " . self::$pdo->quote($id))->fetchColumn();
+        self::assertSame(0, $outboxCount, 'fast path must not insert outbox rows');
+    }
+
+    // -----------------------------------------------------------------------
+    // approvalMessage / revocationMessage variants — exercise the deferral
+    // and failure-suffix branches that the existing happy-path tests don't
+    // touch (lines ~879-908 per the coverage report).
+    // -----------------------------------------------------------------------
+
+    public function testApprovalMessageIncludesBothDeferredAndFailedSuffix(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        // Two permissions: one will get a 503 (transient → deferred), one
+        // will get a validation_error 400 (terminal → failed).
+        $id = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+            ['object_type' => 'national_calendar', 'object_id' => 'US', 'relation' => 'editor'],
+        ]);
+
+        $mock = new MockHandler([
+            new \GuzzleHttp\Psr7\Response(503, [], ''),
+            new \GuzzleHttp\Psr7\Response(400, [], (string) json_encode(['code' => 'validation_error', 'message' => 'bad type'])),
+        ]);
+
+        $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock,
+            function (OpenFgaClient $client) use ($id): \Psr\Http\Message\ResponseInterface {
+                $handler = new AccessRequestAdminHandler($client);
+                return $handler->handle($this->withOidcUser(
+                    $this->requestFor('POST', '/admin/access-requests/' . $id . '/approve', [], ['notes' => 'ok'])
+                ));
+            }
+        ));
+
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame(1, $body['outbox_pending']);
+        self::assertSame(1, $body['outbox_failed']);
+        self::assertStringContainsString('deferred for async delivery', $body['message']);
+        self::assertStringContainsString('failed terminally', $body['message']);
+    }
+
+    public function testRevocationMessageIncludesBothDeferredAndFailedSuffix(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+            ['object_type' => 'national_calendar', 'object_id' => 'US', 'relation' => 'editor'],
+        ]);
+        $repo->approve($id, 'admin');
+
+        $mock = new MockHandler([
+            new \GuzzleHttp\Psr7\Response(503, [], ''),
+            new \GuzzleHttp\Psr7\Response(400, [], (string) json_encode(['code' => 'validation_error', 'message' => 'bad type'])),
+        ]);
+
+        $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock,
+            function (OpenFgaClient $client) use ($id): \Psr\Http\Message\ResponseInterface {
+                $handler = new AccessRequestAdminHandler($client);
+                return $handler->handle($this->withOidcUser(
+                    $this->requestFor('POST', '/admin/access-requests/' . $id . '/revoke', [], [])
+                ));
+            }
+        ));
+
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame(1, $body['outbox_pending']);
+        self::assertSame(1, $body['outbox_failed']);
+        self::assertStringContainsString('deferred for async deletion', $body['message']);
+        self::assertStringContainsString('failed terminally', $body['message']);
+    }
 }
