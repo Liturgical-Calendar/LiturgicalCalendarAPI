@@ -158,4 +158,86 @@ final class OutboxRepositoryTest extends RepositoryTestCase
             'markRetryable must not overwrite a terminal status',
         );
     }
+
+    public function testPickupPendingReturnsOnlyEligibleRows(): void
+    {
+        $ids = $this->repo->insertBatch($this->samplePayload());
+        $this->repo->markSucceeded($ids[0]); // exclude succeeded
+        $this->repo->markFailedTerminal($ids[1], 'x', null); // exclude failed_terminal
+
+        $picked = $this->repo->pickupPending(limit: 10, now: new \DateTimeImmutable());
+
+        self::assertSame([], $picked, 'no eligible rows after both are terminal');
+    }
+
+    public function testPickupPendingRespectsNextAttemptAt(): void
+    {
+        [$id] = $this->repo->insertBatch([$this->samplePayload()[0]]);
+
+        // Schedule the next attempt 60 seconds into the future.
+        $this->repo->markRetryable(
+            $id,
+            attempts: 1,
+            nextAttemptAt: ( new \DateTimeImmutable() )->modify('+60 seconds'),
+            lastError: 'transient',
+            lastErrorCode: null,
+        );
+
+        $tooEarly = $this->repo->pickupPending(limit: 10, now: new \DateTimeImmutable());
+        self::assertSame([], $tooEarly);
+
+        // Far-future cutoff should pick it up.
+        $picked = $this->repo->pickupPending(limit: 10, now: ( new \DateTimeImmutable() )->modify('+120 seconds'));
+        self::assertCount(1, $picked);
+        self::assertSame($id, $picked[0]->id);
+    }
+
+    /**
+     * Two concurrent transactions must each get distinct rows
+     * thanks to FOR UPDATE SKIP LOCKED. Load-bearing for consumer + backstop topology.
+     */
+    public function testPickupPendingSkipLockedSeparatesConcurrentRunners(): void
+    {
+        $ids = $this->repo->insertBatch($this->samplePayload()); // 2 rows
+
+        // Open a second PDO connection to the same DB.
+        $other = new \PDO(
+            sprintf(
+                'pgsql:host=%s;port=%s;dbname=%s',
+                (string) ( $_ENV['DB_HOST'] ?? 'localhost' ),
+                (string) ( $_ENV['DB_PORT'] ?? '5432' ),
+                (string) ( $_ENV['DB_NAME'] ?? '' ),
+            ),
+            (string) ( $_ENV['DB_USER'] ?? '' ),
+            (string) ( $_ENV['DB_PASSWORD'] ?? '' ),
+            [
+                \PDO::ATTR_ERRMODE            => \PDO::ERRMODE_EXCEPTION,
+                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+                \PDO::ATTR_EMULATE_PREPARES   => false,
+            ],
+        );
+        $other->exec("SET timezone TO 'Europe/Vatican'");
+        $otherRepo = new OutboxRepository($other);
+
+        // Both runners start a tx and call pickupPending with limit: 1;
+        // SKIP LOCKED must give each one a distinct row.
+        self::$pdo->beginTransaction();
+        $picked1 = $this->repo->pickupPending(limit: 1, now: new \DateTimeImmutable());
+
+        $other->beginTransaction();
+        $picked2 = $otherRepo->pickupPending(limit: 1, now: new \DateTimeImmutable());
+
+        self::$pdo->commit();
+        $other->commit();
+
+        $idsPicked = array_merge(
+            array_map(static fn ($r): int => $r->id, $picked1),
+            array_map(static fn ($r): int => $r->id, $picked2),
+        );
+        sort($idsPicked);
+        sort($ids);
+        self::assertSame($ids, $idsPicked, 'two transactions must collectively pick up every row exactly once');
+        self::assertCount(1, $picked1);
+        self::assertCount(1, $picked2);
+    }
 }

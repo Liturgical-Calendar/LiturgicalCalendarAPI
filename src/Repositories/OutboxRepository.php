@@ -166,6 +166,41 @@ final class OutboxRepository
     }
 
     /**
+     * Pick up rows ready for the consumer / backstop to process.
+     *
+     * Uses FOR UPDATE SKIP LOCKED so concurrent runners don't collide:
+     * each runner gets a distinct slice of the eligible rows. Caller is
+     * responsible for COMMIT/ROLLBACK of the surrounding transaction
+     * (the lock is held until the runner finishes processing or rolls
+     * back).
+     *
+     * @return list<OutboxRow>
+     */
+    public function pickupPending(int $limit, \DateTimeImmutable $now): array
+    {
+        $stmt = $this->db->prepare(<<<'SQL'
+            SELECT id, operation, fga_user, fga_relation, fga_object,
+                   status, attempts, next_attempt_at, last_error, last_error_code,
+                   metadata, created_at, completed_at
+            FROM openfga_outbox
+            WHERE status IN ('pending', 'retrying')
+              AND next_attempt_at <= :now
+            ORDER BY next_attempt_at ASC, id ASC
+            LIMIT :limit
+            FOR UPDATE SKIP LOCKED
+        SQL);
+        $stmt->bindValue(':now', $now->format('Y-m-d H:i:s.uP'), PDO::PARAM_STR);
+        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $rows = [];
+        while (( $r = $stmt->fetch(PDO::FETCH_ASSOC) ) !== false) {
+            $rows[] = $this->hydrate($r);
+        }
+        return $rows;
+    }
+
+    /**
      * @param array<string, mixed> $row
      */
     private function hydrate(array $row): OutboxRow
