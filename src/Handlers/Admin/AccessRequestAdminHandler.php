@@ -18,8 +18,6 @@ use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
-use LiturgicalCalendar\Api\Services\Exception\OpenFgaApiException;
-use LiturgicalCalendar\Api\Services\Exception\TupleNotFoundException;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxDisposition;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxNotifier;
@@ -618,11 +616,24 @@ final class AccessRequestAdminHandler extends AbstractHandler
     /**
      * POST /admin/access-requests/{id}/revoke — Revoke a previously approved request.
      *
-     * Flow:
+     * Flow (outbox pattern, mirrors approveRequest):
      * 1. Validate request exists and is approved
-     * 2. Delete all OpenFGA tuples
-     * 3. Remove Zitadel role
-     * 4. Update DB status to revoked
+     * 2. Check admin has authority (global admin OR resource admin for ALL requested resources)
+     * 3. If permissions is empty: revoke in DB and return immediately
+     * 4. Otherwise:
+     *    a. PG BEGIN
+     *       - repo.revoke(requestId, adminId, notes)
+     *       - outbox.insertBatch(rows) — one row per permission, idempotency_key ensures
+     *         that re-revoking the same request collapses to the same outbox row IDs
+     *    b. PG COMMIT
+     *    c. For each outbox row: processor.processSync(), then notifier.notify() when
+     *       row is still in a non-terminal state (pending/retrying)
+     * 5. Sync role cascade to Zitadel (unchanged)
+     * 6. Return response with success=true (whenever DB committed), plus outbox counters
+     *
+     * `success` is true whenever the DB commit succeeded. Tuple deletion failures
+     * surface via outbox_pending / outbox_failed / fga_errors rather than aborting
+     * the entire revocation.
      */
     private function revokeRequest(
         ResponseInterface $response,
@@ -655,85 +666,158 @@ final class AccessRequestAdminHandler extends AbstractHandler
 
         $this->requireAdminForAllResources($adminId, $isGlobalAdmin, $permissions);
 
-        // Step 1: Delete OpenFGA tuples.
-        //
-        // TupleNotFoundException is treated as benign — the tuple is already
-        // gone, so re-revoke after a partial first attempt converges instead
-        // of double-failing. Any other OpenFgaApiException is fatal: the
-        // response will surface success: false with the structured error
-        // list so the admin knows there's drift to repair.
-        $deletedTuples = [];
-        $fgaErrors     = [];
-
-        if ($this->isFgaClientAvailable() && !empty($permissions)) {
-            $fgaUser = "user:{$userId}";
-
-            foreach ($permissions as $perm) {
-                $objectType = $perm['object_type'] ?? '';
-                $objectId   = $perm['object_id'] ?? '';
-                $relation   = $perm['relation'] ?? '';
-                $fgaObject  = "{$objectType}:{$objectId}";
-
-                try {
-                    $this->getFgaClient()->deleteTuple($fgaUser, $relation, $fgaObject);
-                    $deletedTuples[] = [
-                        'user'     => $fgaUser,
-                        'relation' => $relation,
-                        'object'   => $fgaObject,
-                    ];
-                } catch (TupleNotFoundException) {
-                    // Idempotent — tuple already deleted. Count it as deleted
-                    // so the response shows the user's effective state.
-                    $deletedTuples[] = [
-                        'user'     => $fgaUser,
-                        'relation' => $relation,
-                        'object'   => $fgaObject,
-                    ];
-                } catch (OpenFgaApiException $e) {
-                    $fgaErrors[] = [
-                        'object'   => $fgaObject,
-                        'relation' => $relation,
-                        'error'    => $e->getMessage(),
-                    ];
-                }
+        // Fast path: no permissions to delete — just revoke in DB and return.
+        if (empty($permissions) || !$this->isFgaClientAvailable()) {
+            $revoked = $repo->revoke($requestId, $adminId, $notes);
+            if (!$revoked) {
+                throw new NotFoundException('Request not found or not in approved status');
             }
-        }
 
-        // If we couldn't delete some of the tuples, bail before mutating the
-        // DB — leaving the request 'approved' lets the admin retry cleanly,
-        // and avoids the silent over-provisioning the issue flags
-        // ("row marked revoked while stale tuples remain in OpenFGA").
-        if (!empty($fgaErrors)) {
+            [$roleRemoved, $zitadelError] = $this->syncZitadelRoleRevoke($repo, $requestId, $userId, $requestedRole);
+
             return $this->encodeResponseBody($response, [
-                'success'        => false,
-                'role_removed'   => false,
-                'zitadel_error'  => null,
-                'tuples_deleted' => $deletedTuples,
-                'fga_errors'     => $fgaErrors,
-                'message'        => sprintf(
-                    'Revocation aborted: %d of %d permission tuple(s) could not be deleted. The request remains approved; retry once the underlying OpenFGA error is resolved.',
-                    count($fgaErrors),
-                    count($permissions)
-                ),
+                'success'        => true,
+                'role_removed'   => $roleRemoved,
+                'zitadel_error'  => $zitadelError,
+                'tuples_deleted' => [],
+                'fga_errors'     => [],
+                'outbox_ids'     => [],
+                'outbox_pending' => 0,
+                'outbox_failed'  => 0,
+                'message'        => $this->revocationMessage($roleRemoved, $zitadelError, 0, 0),
             ]);
         }
 
-        // Step 2: Revoke in database
-        $revoked = $repo->revoke($requestId, $adminId, $notes);
-        if (!$revoked) {
-            throw new NotFoundException('Request not found or not in approved status');
+        // Step 1: Build outbox rows — one per permission tuple.
+        $fgaUser    = "user:{$userId}";
+        $outboxRows = [];
+        foreach ($permissions as $perm) {
+            $objectType = is_string($perm['object_type'] ?? null) ? $perm['object_type'] : '';
+            $objectId   = is_string($perm['object_id'] ?? null) ? $perm['object_id'] : '';
+            $relation   = is_string($perm['relation'] ?? null) ? $perm['relation'] : '';
+            $fgaObject  = "{$objectType}:{$objectId}";
+
+            // Idempotency key: scoped to this access request + the specific tuple,
+            // so re-revoking the same request after a partial first attempt collapses
+            // to the same row rather than inserting a duplicate.
+            $idempotencyKey = "access_request:{$requestId}:delete_tuple:{$fgaUser}:{$relation}:{$fgaObject}";
+
+            $outboxRows[] = [
+                'operation'       => OutboxOperation::DELETE_TUPLE,
+                'fga_user'        => $fgaUser,
+                'fga_relation'    => $relation,
+                'fga_object'      => $fgaObject,
+                'idempotency_key' => $idempotencyKey,
+                'metadata'        => ['access_request_id' => $requestId],
+            ];
         }
 
-        // Step 3: Conditionally remove role from Zitadel.
-        // Cascade rule: only revoke the role if the user has zero remaining
-        // tuples in the role's scope. Other access_requests may still grant
-        // tuples for the same role — revoking unconditionally would strip
-        // those legitimate grants.
+        // Step 2: Atomically revoke in DB + insert outbox rows in one PG transaction.
+        $pdo    = Connection::getInstance();
+        $outbox = $this->getOutboxRepository();
+
+        $pdo->beginTransaction();
+        try {
+            $revoked = $repo->revoke($requestId, $adminId, $notes);
+            if (!$revoked) {
+                $pdo->rollBack();
+                throw new NotFoundException('Request not found or not in approved status');
+            }
+            $outboxIds = $outbox->insertBatch($outboxRows);
+            $pdo->commit();
+        } catch (\Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            throw $e;
+        }
+
+        // Step 3: Sync fast path — attempt each outbox row immediately.
+        // Rows that fail (transient errors) stay in 'retrying' state and will be
+        // picked up by the cron backstop. Rows that fail terminally (4xx validation)
+        // are marked 'failed_terminal' and surface in outbox_failed.
+        $processor = $this->getOutboxProcessor();
+        $notifier  = $this->getOutboxNotifier();
+
+        /** @var list<array{id: int, disposition: string, status: string}> $outboxResult */
+        $outboxResult  = [];
+        $deletedTuples = [];
+        $fgaErrors     = [];
+
+        foreach ($outboxIds as $rowId) {
+            $disposition = $processor->processSync($rowId);
+            $current     = $outbox->getById($rowId);
+            $statusValue = $current !== null ? $current->status->value : OutboxStatus::PENDING->value;
+
+            $outboxResult[] = [
+                'id'          => $rowId,
+                'disposition' => $disposition->name,
+                'status'      => $statusValue,
+            ];
+
+            if ($disposition === OutboxDisposition::BENIGN_SUCCESS) {
+                // Row is in succeeded state (or was already succeeded idempotently).
+                $deletedTuples[] = [
+                    'user'     => $current !== null ? $current->fgaUser     : $fgaUser,
+                    'relation' => $current !== null ? $current->fgaRelation : '',
+                    'object'   => $current !== null ? $current->fgaObject   : '',
+                ];
+            } else {
+                // RETRY or TERMINAL — surface in fga_errors for back-compat.
+                $fgaErrors[] = [
+                    'outbox_id' => $rowId,
+                    'status'    => $statusValue,
+                    'error'     => $current !== null ? ( $current->lastError ?? 'unknown' ) : 'unknown',
+                ];
+            }
+
+            // Notify the async consumer if the row is still non-terminal.
+            if (
+                $current !== null
+                && in_array($current->status, [OutboxStatus::PENDING, OutboxStatus::RETRYING], true)
+            ) {
+                $notifier->notify($rowId, OutboxOperation::DELETE_TUPLE->value);
+            }
+        }
+
+        $outboxPending = count(array_filter($outboxResult, static fn($r) => $r['status'] === OutboxStatus::RETRYING->value || $r['status'] === OutboxStatus::PENDING->value));
+        $outboxFailed  = count(array_filter($outboxResult, static fn($r) => $r['status'] === OutboxStatus::FAILED_TERMINAL->value));
+
+        // Step 4: Conditionally remove role from Zitadel (unchanged)
+        [$roleRemoved, $zitadelError] = $this->syncZitadelRoleRevoke($repo, $requestId, $userId, $requestedRole);
+
+        return $this->encodeResponseBody($response, [
+            'success'        => true,
+            'role_removed'   => $roleRemoved,
+            'zitadel_error'  => $zitadelError,
+            'tuples_deleted' => $deletedTuples,
+            'fga_errors'     => $fgaErrors,
+            'outbox_ids'     => $outboxIds,
+            'outbox_pending' => $outboxPending,
+            'outbox_failed'  => $outboxFailed,
+            'message'        => $this->revocationMessage($roleRemoved, $zitadelError, $outboxPending, $outboxFailed),
+        ]);
+    }
+
+    /**
+     * Sync a Zitadel role revocation (cascade) after DB revoke.
+     *
+     * Extracted to avoid duplicating the same try/catch in the fast-path and
+     * the outbox-path branches of revokeRequest.
+     *
+     * @return array{0: bool, 1: string|null}  [roleRemoved, zitadelError]
+     */
+    private function syncZitadelRoleRevoke(
+        AccessRequestRepository $repo,
+        string $requestId,
+        string $userId,
+        string $requestedRole,
+    ): array {
         $roleRemoved  = false;
         $zitadelError = null;
 
         if (ZitadelService::isConfigured()) {
-            if (empty($userId) || empty($requestedRole)) {
+            if ($userId === '' || $requestedRole === '') {
                 $zitadelError = 'Missing user ID or role in revoked request';
                 $repo->updateZitadelSyncStatus($requestId, 'failed', $zitadelError);
             } else {
@@ -751,20 +835,52 @@ final class AccessRequestAdminHandler extends AbstractHandler
             }
         }
 
-        return $this->encodeResponseBody($response, [
-            'success'        => true,
-            'role_removed'   => $roleRemoved,
-            'zitadel_error'  => $zitadelError,
-            'tuples_deleted' => $deletedTuples,
-            'fga_errors'     => $fgaErrors,
-            'message'        => $roleRemoved
-                ? 'Access revoked, role removed (no remaining permissions in scope) and permissions deleted'
-                : ( $zitadelError !== null
-                    ? 'Access revoked but Zitadel sync failed (will retry)'
-                    : ( ZitadelService::isConfigured()
-                        ? 'Access revoked, permissions deleted; role retained (other in-scope permissions remain)'
-                        : 'Access revoked (Zitadel not configured)' ) ),
-        ]);
+        return [$roleRemoved, $zitadelError];
+    }
+
+    /**
+     * Build the human-readable revocation message, incorporating outbox deferral/failure notes.
+     */
+    private function revocationMessage(
+        bool $roleRemoved,
+        ?string $zitadelError,
+        int $outboxPending,
+        int $outboxFailed,
+    ): string {
+        $base = $roleRemoved
+            ? 'Access revoked, role removed (no remaining permissions in scope) and permissions deleted'
+            : ( $zitadelError !== null
+                ? 'Access revoked but Zitadel sync failed (will retry)'
+                : ( ZitadelService::isConfigured()
+                    ? 'Access revoked, permissions deleted; role retained (other in-scope permissions remain)'
+                    : 'Access revoked (Zitadel not configured)' ) );
+
+        if ($outboxPending > 0 && $outboxFailed > 0) {
+            return sprintf(
+                '%s; %d permission tuple(s) deferred for async deletion, %d failed terminally (check outbox)',
+                $base,
+                $outboxPending,
+                $outboxFailed,
+            );
+        }
+
+        if ($outboxPending > 0) {
+            return sprintf(
+                '%s; %d permission tuple(s) deferred for async deletion',
+                $base,
+                $outboxPending,
+            );
+        }
+
+        if ($outboxFailed > 0) {
+            return sprintf(
+                '%s; %d permission tuple(s) failed terminally (check outbox)',
+                $base,
+                $outboxFailed,
+            );
+        }
+
+        return $base;
     }
 
     /**
