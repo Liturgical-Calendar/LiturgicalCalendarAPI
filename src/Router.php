@@ -28,6 +28,7 @@ use LiturgicalCalendar\Api\Handlers\Auth\EmailVerificationHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\AccessRequestAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\ApplicationAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\NotificationsHandler as AdminNotificationsHandler;
+use LiturgicalCalendar\Api\Handlers\Admin\OutboxAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\NotificationsHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\PermissionAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\UsersHandler;
@@ -411,6 +412,12 @@ class Router
                         // POST /admin/applications/{uuid}/revoke - Revoke an approved application
                         $applicationAdminHandler = new ApplicationAdminHandler();
                         $this->handler           = $applicationAdminHandler;
+                    } elseif ($adminRoute === 'outbox') {
+                        // Admin outbox management routes
+                        // GET  /admin/outbox?status=…&summary=…  - List/summary
+                        // POST /admin/outbox/{id}/retry           - Reset failed_terminal row to pending
+                        $outboxAdminHandler = new OutboxAdminHandler();
+                        $this->handler      = $outboxAdminHandler;
                     } else {
                         $this->response = new Response(StatusCode::NOT_FOUND->value, [], null, $this->request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
                         $this->emitResponse();
