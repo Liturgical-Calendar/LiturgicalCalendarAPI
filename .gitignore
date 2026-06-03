@@ -6,6 +6,7 @@ vendor/*
 .env
 .env.*
 !.env.example
+!.env.production.example
 phpstan.neon
 !phpstan.neon.dist
 phpunit.xml
