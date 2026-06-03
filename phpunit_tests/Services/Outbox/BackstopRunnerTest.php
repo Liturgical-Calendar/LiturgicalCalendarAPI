@@ -12,7 +12,9 @@ use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\Outbox\BackstopRunner;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxDisposition;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessorInterface;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxStatus;
 use LiturgicalCalendar\Tests\Repositories\RepositoryTestCase;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -99,5 +101,44 @@ final class BackstopRunnerTest extends RepositoryTestCase
         $processed = $runner->runOnce(limit: 100);
 
         self::assertSame(0, $processed, 'row is too fresh — under the 60s grace window');
+    }
+
+    public function testRunOnceRollsBackAndRethrowsWhenProcessorThrows(): void
+    {
+        self::assertNotNull(self::$pdo);
+        $repo = new OutboxRepository(self::$pdo);
+
+        $repo->insertBatch([
+            [
+                'operation'       => OutboxOperation::WRITE_TUPLE,
+                'fga_user'        => 'user:x',
+                'fga_relation'    => 'editor',
+                'fga_object'      => 'national_calendar:ES',
+                'idempotency_key' => 'rollback-' . bin2hex(random_bytes(4)),
+                'metadata'        => [],
+            ],
+        ]);
+
+        // Processor stub that always throws — exercises the try/catch in
+        // runOnce(): the surrounding tx must be rolled back, and the
+        // exception must propagate so the cron job exits non-zero.
+        // createStub (not createMock) because we don't assert call counts;
+        // PHPUnit 12 emits a notice when createMock has no expectations.
+        $processor = $this->createStub(OutboxProcessorInterface::class);
+        $processor->method('processOne')->willThrowException(new \RuntimeException('processor blew up'));
+
+        $runner = new BackstopRunner($repo, $processor, self::$pdo, graceSeconds: 0);
+
+        try {
+            $runner->runOnce(limit: 100);
+            self::fail('Expected the runner to rethrow the processor exception');
+        } catch (\RuntimeException $e) {
+            self::assertSame('processor blew up', $e->getMessage());
+        }
+
+        // After the failed runOnce, the connection must NOT be left in a
+        // transaction — that would cascade into TRUNCATE failures in the
+        // next test's setUp.
+        self::assertFalse(self::$pdo->inTransaction(), 'BackstopRunner must roll back its tx before re-raising');
     }
 }

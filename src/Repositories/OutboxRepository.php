@@ -248,7 +248,11 @@ final class OutboxRepository
               AND (:access_request_id_null OR metadata->>'access_request_id' = :access_request_id_val)
         SQL);
         $countStmt->bindValue(':status_null', $status === null, PDO::PARAM_BOOL);
-        $countStmt->bindValue(':status_val', $status ?? '', PDO::PARAM_STR);
+        // Bind a valid enum literal even when not filtering by status: PG
+        // evaluates `::outbox_status` at plan time, so passing '' would
+        // trip "invalid input value for enum outbox_status" before the
+        // `:status_null OR ...` short-circuit ever runs at row time.
+        $countStmt->bindValue(':status_val', $status ?? 'pending', PDO::PARAM_STR);
         $countStmt->bindValue(':access_request_id_null', $accessRequestId === null, PDO::PARAM_BOOL);
         $countStmt->bindValue(':access_request_id_val', $accessRequestId ?? '', PDO::PARAM_STR);
         $countStmt->execute();
@@ -266,7 +270,8 @@ final class OutboxRepository
             LIMIT :limit OFFSET :offset
         SQL);
         $dataStmt->bindValue(':status_null', $status === null, PDO::PARAM_BOOL);
-        $dataStmt->bindValue(':status_val', $status ?? '', PDO::PARAM_STR);
+        // See countStmt above — placeholder must be a valid enum value.
+        $dataStmt->bindValue(':status_val', $status ?? 'pending', PDO::PARAM_STR);
         $dataStmt->bindValue(':access_request_id_null', $accessRequestId === null, PDO::PARAM_BOOL);
         $dataStmt->bindValue(':access_request_id_val', $accessRequestId ?? '', PDO::PARAM_STR);
         $dataStmt->bindValue(':limit', $limit, PDO::PARAM_INT);

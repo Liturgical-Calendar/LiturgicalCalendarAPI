@@ -300,6 +300,10 @@ final class OutboxRepositoryTest extends RepositoryTestCase
         $nextAt = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s.u', '2026-06-02 12:34:56.123456');
         self::assertInstanceOf(\DateTimeImmutable::class, $nextAt);
 
+        // ----- list() coverage -----
+        // Seeded below by the trailing tests; reset is fine since each test
+        // gets a fresh TRUNCATE via RepositoryTestCase.
+
         $this->repo->markRetryable(
             $id,
             attempts: 1,
@@ -315,5 +319,95 @@ final class OutboxRepositoryTest extends RepositoryTestCase
             $row->nextAttemptAt->format('u'),
             'next_attempt_at microseconds must survive the write/read roundtrip',
         );
+    }
+
+    // -----------------------------------------------------------------------
+    // list() — used by OutboxAdminHandler::handleGet for the paginated list
+    // surface. Exercises both filter dimensions and pagination.
+    // -----------------------------------------------------------------------
+
+    /**
+     * @return list<int>
+     */
+    private function seedThreeMixedRows(): array
+    {
+        // Same `access_request_id` for first two, third has a different one.
+        return $this->repo->insertBatch([
+            [
+                'operation'       => OutboxOperation::WRITE_TUPLE,
+                'fga_user'        => 'user:a',
+                'fga_relation'    => 'editor',
+                'fga_object'      => 'national_calendar:IT',
+                'idempotency_key' => 'list-k1-' . bin2hex(random_bytes(4)),
+                'metadata'        => ['access_request_id' => 'r-A'],
+            ],
+            [
+                'operation'       => OutboxOperation::WRITE_TUPLE,
+                'fga_user'        => 'user:b',
+                'fga_relation'    => 'viewer',
+                'fga_object'      => 'national_calendar:US',
+                'idempotency_key' => 'list-k2-' . bin2hex(random_bytes(4)),
+                'metadata'        => ['access_request_id' => 'r-A'],
+            ],
+            [
+                'operation'       => OutboxOperation::DELETE_TUPLE,
+                'fga_user'        => 'user:c',
+                'fga_relation'    => 'editor',
+                'fga_object'      => 'national_calendar:FR',
+                'idempotency_key' => 'list-k3-' . bin2hex(random_bytes(4)),
+                'metadata'        => ['access_request_id' => 'r-B'],
+            ],
+        ]);
+    }
+
+    public function testListWithoutFiltersReturnsAllRowsAndTotal(): void
+    {
+        $this->seedThreeMixedRows();
+
+        $page = $this->repo->list(status: null, accessRequestId: null, limit: 100, offset: 0);
+
+        self::assertSame(3, $page['total']);
+        self::assertCount(3, $page['rows']);
+    }
+
+    public function testListWithStatusFilterReturnsMatchingRowsOnly(): void
+    {
+        $ids = $this->seedThreeMixedRows();
+        $this->repo->markFailedTerminal($ids[0], 'validation_error', 'validation_error');
+
+        $page = $this->repo->list(status: 'failed_terminal', accessRequestId: null, limit: 100, offset: 0);
+
+        self::assertSame(1, $page['total']);
+        self::assertCount(1, $page['rows']);
+        self::assertSame($ids[0], $page['rows'][0]->id);
+        self::assertSame(OutboxStatus::FAILED_TERMINAL, $page['rows'][0]->status);
+    }
+
+    public function testListWithAccessRequestIdFilterReturnsMatchingRowsOnly(): void
+    {
+        $this->seedThreeMixedRows();
+
+        $page = $this->repo->list(status: null, accessRequestId: 'r-A', limit: 100, offset: 0);
+
+        self::assertSame(2, $page['total']);
+        self::assertCount(2, $page['rows']);
+        foreach ($page['rows'] as $row) {
+            self::assertSame('r-A', $row->metadata['access_request_id']);
+        }
+    }
+
+    public function testListRespectsLimitAndOffset(): void
+    {
+        $this->seedThreeMixedRows();
+
+        // total is still 3 regardless of pagination
+        $page = $this->repo->list(status: null, accessRequestId: null, limit: 2, offset: 0);
+        self::assertSame(3, $page['total']);
+        self::assertCount(2, $page['rows']);
+
+        // offset 2 → just the last row
+        $page = $this->repo->list(status: null, accessRequestId: null, limit: 2, offset: 2);
+        self::assertSame(3, $page['total']);
+        self::assertCount(1, $page['rows']);
     }
 }

@@ -200,4 +200,32 @@ final class OutboxProcessorTest extends RepositoryTestCase
         self::assertNotNull($row);
         self::assertSame(OutboxStatus::SUCCEEDED, $row->status);
     }
+
+    public function testProcessOneOnRetryingRowWithFutureNextAttemptIsNoOp(): void
+    {
+        // Pin the RETRYING + future-next-attempt guard: if XCLAIM-from-PEL
+        // hands us a row that another runner already rescheduled, we must
+        // honor the backoff rather than firing the OpenFGA call early.
+        [$id] = $this->seedOneWrite();
+        $this->repo->markRetryable(
+            $id,
+            attempts: 2,
+            nextAttemptAt: ( new \DateTimeImmutable('now', new \DateTimeZone('Europe/Vatican')) )->modify('+5 minutes'),
+            lastError: 'transient earlier',
+            lastErrorCode: null,
+        );
+
+        // MockHandler with no queued responses — if processOne tries to call
+        // OpenFGA, the test will fail with "No more handlers in stack".
+        $mock = new MockHandler([]);
+        $proc = new OutboxProcessor($this->repo, $this->makeClient($mock));
+
+        $disp = $proc->processOne($id);
+
+        self::assertSame(OutboxDisposition::BENIGN_SUCCESS, $disp, 'RETRYING + future next_attempt_at must short-circuit to BENIGN_SUCCESS');
+        $row = $this->repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame(OutboxStatus::RETRYING, $row->status, 'row must stay RETRYING — no transition triggered');
+        self::assertSame(2, $row->attempts, 'attempts must NOT increment on a skipped pass');
+    }
 }
