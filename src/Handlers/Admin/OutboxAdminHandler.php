@@ -215,12 +215,15 @@ final class OutboxAdminHandler extends AbstractHandler
             return $this->encodeResponseBody($response, ['error' => 'Row must be in failed_terminal state to retry'], StatusCode::CONFLICT);
         }
 
-        $row = $repo->getById($id);
+        // Re-fetch to return the updated row shape. PHPStan correctly narrows
+        // the return type to OutboxRow here because the null-guard above
+        // (404 return) eliminates the null branch for this $id.
+        $updatedRow = $repo->getById($id);
 
         return $this->encodeResponseBody($response, [
             'success' => true,
             'id'      => $id,
-            'row'     => $row !== null ? self::rowToArray($row) : null,
+            'row'     => self::rowToArray($updatedRow),
         ]);
     }
 

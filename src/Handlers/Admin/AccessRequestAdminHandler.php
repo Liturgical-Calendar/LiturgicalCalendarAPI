@@ -142,10 +142,13 @@ final class AccessRequestAdminHandler extends AbstractHandler
     private function getOutboxProcessor(): OutboxProcessor
     {
         if ($this->outboxProcessor === null) {
+            $maxAttempts           = is_numeric($_ENV['OUTBOX_MAX_ATTEMPTS'] ?? null)
+                ? (int) $_ENV['OUTBOX_MAX_ATTEMPTS']
+                : 10;
             $this->outboxProcessor = new OutboxProcessor(
                 $this->getOutboxRepository(),
                 $this->getFgaClient(),
-                (int) ( $_ENV['OUTBOX_MAX_ATTEMPTS'] ?? 10 ),
+                $maxAttempts,
             );
         }
         return $this->outboxProcessor;
