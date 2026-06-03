@@ -253,12 +253,10 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         ]);
         $repo->approve($id, 'admin');
 
-        // Mirror testApproveHappyPathWithoutFgaOrZitadel — clear both gate's
-        // env vars so the handler hits the not-configured branch for each
-        // service. Seeding with a real permission (rather than the previous
-        // empty []) makes the "tuples_deleted=[]" assertion meaningful: an
-        // FGA-configured run would have tuples to delete; here it shouldn't
-        // even try.
+        // When FGA is unavailable the handler MUST still create outbox rows
+        // for the delete operations — they're durable in PG and the cron
+        // backstop will drain them once FGA comes back. The earlier
+        // contract (drop the work) silently left stale tuples behind.
         $response = $this->withoutEnv(
             array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
             fn() => ( new AccessRequestAdminHandler() )->handle(
@@ -271,12 +269,21 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertTrue($body['success']);
         self::assertFalse($body['role_removed']);
         self::assertNull($body['zitadel_error']);
-        self::assertSame([], $body['tuples_deleted']);
-        self::assertSame([], $body['fga_errors']);
-
+        // DB revoke happened atomically with the outbox insert.
         $row = $repo->getById($id);
         self::assertNotNull($row);
         self::assertSame('revoked', $row['status']);
+
+        // The delete is queued for the backstop. tuples_deleted stays empty
+        // (sync attempt was skipped because FGA is unavailable); the row
+        // shows up as outbox_pending and outbox_ids carries its ID so the
+        // admin can follow up via /admin/outbox.
+        self::assertSame([], $body['tuples_deleted']);
+        self::assertSame(1, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+        self::assertCount(1, $body['outbox_ids']);
+        self::assertCount(1, $body['fga_errors']);
+        self::assertSame('pending', $body['fga_errors'][0]['status']);
     }
 
     public function testUnknownActionIsValidationError(): void

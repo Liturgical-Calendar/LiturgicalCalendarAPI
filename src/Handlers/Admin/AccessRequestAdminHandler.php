@@ -366,7 +366,10 @@ final class AccessRequestAdminHandler extends AbstractHandler
         $this->requireAdminForAllResources($adminId, $isGlobalAdmin, $permissions);
 
         // Fast path: no permissions to write — just approve in DB and return.
-        if (empty($permissions) || !$this->isFgaClientAvailable()) {
+        // (FGA-unavailable does NOT short-circuit here: the outbox rows are
+        // still persisted below so the backstop can drain them once FGA
+        // comes back. Skipping that would silently lose tuple writes.)
+        if (empty($permissions)) {
             $approved = $repo->approve($requestId, $adminId, $notes);
             if (!$approved) {
                 throw new ValidationException('Failed to approve request');
@@ -435,8 +438,13 @@ final class AccessRequestAdminHandler extends AbstractHandler
         // Rows that fail (transient errors) stay in 'retrying' state and will be
         // picked up by the cron backstop. Rows that fail terminally (4xx validation)
         // are marked 'failed_terminal' and surface in outbox_failed.
-        $processor = $this->getOutboxProcessor();
-        $notifier  = $this->getOutboxNotifier();
+        //
+        // When FGA is unavailable we skip the inline attempt — the rows are
+        // already durable in PG and the backstop will pick them up once the
+        // client is reachable. Notifier XADD is still best-effort.
+        $fgaAvailable = $this->isFgaClientAvailable();
+        $processor    = $fgaAvailable ? $this->getOutboxProcessor() : null;
+        $notifier     = $this->getOutboxNotifier();
 
         /** @var list<array{id: int, disposition: string, status: string}> $outboxResult */
         $outboxResult  = [];
@@ -444,7 +452,9 @@ final class AccessRequestAdminHandler extends AbstractHandler
         $fgaErrors     = [];
 
         foreach ($outboxIds as $rowId) {
-            $disposition = $processor->processSync($rowId);
+            $disposition = $processor !== null
+                ? $processor->processSync($rowId)
+                : OutboxDisposition::RETRY;
             $current     = $outbox->getById($rowId);
             $statusValue = $current !== null ? $current->status->value : OutboxStatus::PENDING->value;
 
@@ -674,7 +684,11 @@ final class AccessRequestAdminHandler extends AbstractHandler
         $this->requireAdminForAllResources($adminId, $isGlobalAdmin, $permissions);
 
         // Fast path: no permissions to delete — just revoke in DB and return.
-        if (empty($permissions) || !$this->isFgaClientAvailable()) {
+        // (FGA-unavailable does NOT short-circuit here: the outbox delete
+        // rows are still persisted below so the backstop can drain them
+        // once FGA comes back. Skipping that would silently leave stale
+        // tuples in OpenFGA after the DB row was revoked.)
+        if (empty($permissions)) {
             $revoked = $repo->revoke($requestId, $adminId, $notes);
             if (!$revoked) {
                 throw new NotFoundException('Request not found or not in approved status');
@@ -743,8 +757,13 @@ final class AccessRequestAdminHandler extends AbstractHandler
         // Rows that fail (transient errors) stay in 'retrying' state and will be
         // picked up by the cron backstop. Rows that fail terminally (4xx validation)
         // are marked 'failed_terminal' and surface in outbox_failed.
-        $processor = $this->getOutboxProcessor();
-        $notifier  = $this->getOutboxNotifier();
+        //
+        // When FGA is unavailable we skip the inline attempt — the rows are
+        // already durable in PG and the backstop will pick them up once the
+        // client is reachable.
+        $fgaAvailable = $this->isFgaClientAvailable();
+        $processor    = $fgaAvailable ? $this->getOutboxProcessor() : null;
+        $notifier     = $this->getOutboxNotifier();
 
         /** @var list<array{id: int, disposition: string, status: string}> $outboxResult */
         $outboxResult  = [];
@@ -752,7 +771,9 @@ final class AccessRequestAdminHandler extends AbstractHandler
         $fgaErrors     = [];
 
         foreach ($outboxIds as $rowId) {
-            $disposition = $processor->processSync($rowId);
+            $disposition = $processor !== null
+                ? $processor->processSync($rowId)
+                : OutboxDisposition::RETRY;
             $current     = $outbox->getById($rowId);
             $statusValue = $current !== null ? $current->status->value : OutboxStatus::PENDING->value;
 
