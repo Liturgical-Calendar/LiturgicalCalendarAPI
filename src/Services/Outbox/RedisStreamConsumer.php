@@ -36,7 +36,13 @@ final class RedisStreamConsumer implements StreamConsumerInterface
     public function ensureGroup(): void
     {
         try {
-            $this->redis->xGroup('CREATE', $this->streamName, $this->groupName, '$', true);
+            // Start ID '0' (not '$') so the group can read any pre-existing
+            // messages still on the stream when the consumer first starts.
+            // The DB outbox is the source of truth — re-delivering an old
+            // message is safe (the row is already terminal or already due,
+            // and processOne handles both idempotently). '$' would silently
+            // drop messages added before the consumer first started.
+            $this->redis->xGroup('CREATE', $this->streamName, $this->groupName, '0', true);
         } catch (\RedisException $e) {
             if (str_contains($e->getMessage(), 'BUSYGROUP')) {
                 return;

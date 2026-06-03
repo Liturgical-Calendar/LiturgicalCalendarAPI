@@ -16,7 +16,7 @@ final class RedisStreamConsumerTest extends TestCase
         $redis = $this->createMock(\Redis::class);
         $redis->expects(self::once())
             ->method('xGroup')
-            ->with('CREATE', 'litcal:reconcile-stream', 'reconciler', '$', true)
+            ->with('CREATE', 'litcal:reconcile-stream', 'reconciler', '0', true)
             ->willReturn(true);
 
         $consumer = new RedisStreamConsumer($redis, 'litcal:reconcile-stream', 'reconciler', 'consumer-1');

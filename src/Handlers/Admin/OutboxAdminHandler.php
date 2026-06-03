@@ -15,6 +15,7 @@ use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxNotifier;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxRow;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -36,12 +37,14 @@ final class OutboxAdminHandler extends AbstractHandler
     private const MAX_LIMIT     = 200;
 
     private ?OutboxRepository $repository;
+    private ?OutboxNotifier $notifier;
 
-    public function __construct(?OutboxRepository $repository = null)
+    public function __construct(?OutboxRepository $repository = null, ?OutboxNotifier $notifier = null)
     {
         parent::__construct();
 
         $this->repository = $repository;
+        $this->notifier   = $notifier;
 
         $this->allowedRequestMethods      = [RequestMethod::GET, RequestMethod::POST];
         $this->allowedAcceptHeaders       = [AcceptHeader::JSON];
@@ -55,6 +58,41 @@ final class OutboxAdminHandler extends AbstractHandler
             $this->repository = new OutboxRepository(Connection::getInstance());
         }
         return $this->repository;
+    }
+
+    /**
+     * Lazy notifier — falls back to null \Redis when ext-redis is absent or
+     * REDIS_* env vars are missing. OutboxNotifier::notify is best-effort
+     * either way: the row is durable in PG, the backstop is the safety net.
+     */
+    private function getNotifier(): OutboxNotifier
+    {
+        if ($this->notifier !== null) {
+            return $this->notifier;
+        }
+        $redis = null;
+        if (extension_loaded('redis')) {
+            try {
+                $r = new \Redis();
+                if (isset($_ENV['REDIS_SOCKET']) && is_string($_ENV['REDIS_SOCKET']) && $_ENV['REDIS_SOCKET'] !== '') {
+                    $r->connect((string) $_ENV['REDIS_SOCKET']);
+                } elseif (isset($_ENV['REDIS_HOST']) && is_string($_ENV['REDIS_HOST']) && $_ENV['REDIS_HOST'] !== '') {
+                    $port = is_numeric($_ENV['REDIS_PORT'] ?? null) ? (int) $_ENV['REDIS_PORT'] : 6379;
+                    $r->connect($_ENV['REDIS_HOST'], $port);
+                }
+                if (isset($_ENV['REDIS_PASSWORD']) && is_string($_ENV['REDIS_PASSWORD']) && $_ENV['REDIS_PASSWORD'] !== '') {
+                    $r->auth($_ENV['REDIS_PASSWORD']);
+                }
+                $redis = $r;
+            } catch (\Throwable) {
+                $redis = null;
+            }
+        }
+        $stream         = isset($_ENV['REDIS_OUTBOX_STREAM']) && is_string($_ENV['REDIS_OUTBOX_STREAM']) && $_ENV['REDIS_OUTBOX_STREAM'] !== ''
+            ? $_ENV['REDIS_OUTBOX_STREAM']
+            : 'litcal:reconcile-stream';
+        $this->notifier = new OutboxNotifier($redis, $stream);
+        return $this->notifier;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -219,6 +257,13 @@ final class OutboxAdminHandler extends AbstractHandler
         // the return type to OutboxRow here because the null-guard above
         // (404 return) eliminates the null branch for this $id.
         $updatedRow = $repo->getById($id);
+
+        // Wake the consumer so it picks up the reset row immediately rather
+        // than waiting for the next cron backstop run (best-effort; the
+        // notifier swallows Redis errors and the backstop is the backstop).
+        // PHPStan correctly narrows $updatedRow to non-null after the 404
+        // guard above + the successful resetForRetry — no null check needed.
+        $this->getNotifier()->notify($id, $updatedRow->operation->value);
 
         return $this->encodeResponseBody($response, [
             'success' => true,
