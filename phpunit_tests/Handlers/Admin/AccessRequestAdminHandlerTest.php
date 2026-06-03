@@ -14,7 +14,11 @@ use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
+use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxNotifier;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxStatus;
 use LiturgicalCalendar\Tests\Handlers\AbstractHandlerTestCase;
 use LiturgicalCalendar\Tests\Support\EnvIsolationTrait;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -485,16 +489,24 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
             new GuzzleResponse(200, [], '{}'), // tuple 2 write OK
         ]);
 
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
         $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
             $mock,
-            fn(OpenFgaClient $client) => ( new AccessRequestAdminHandler($client) )->handle(
-                $this->withOidcUser($this->requestFor(
-                    'POST',
-                    '/admin/access-requests/' . $id . '/approve',
-                    [],
-                    ['notes' => 'ok']
-                ))
-            )
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/approve',
+                        [],
+                        ['notes' => 'ok']
+                    ))
+                );
+            }
         ));
 
         self::assertSame(200, $response->getStatusCode());
@@ -502,6 +514,9 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertTrue($body['success']);
         self::assertCount(2, self::arrayFieldFrom($body, 'tuples_created'));
         self::assertSame([], $body['fga_errors']);
+        self::assertSame(0, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+        self::assertCount(2, self::arrayFieldFrom($body, 'outbox_ids'));
 
         $row = $repo->getById($id);
         self::assertNotNull($row);
@@ -510,9 +525,9 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
 
     public function testApproveTreatsDuplicateTupleAsBenign(): void
     {
-        // Idempotent re-approval: one tuple already exists. The handler
-        // should treat that write as success, still mutate the DB, and
-        // return success: true.
+        // Idempotent re-approval: one tuple already exists. The outbox processor
+        // classifies TupleAlreadyExistsException as BENIGN_SUCCESS, so the row
+        // ends up in 'succeeded' state. The DB is mutated and success is true.
         $repo = new AccessRequestRepository(self::$pdo);
         $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
             ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
@@ -525,33 +540,47 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
             ])),
         ]);
 
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
         $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
             $mock,
-            fn(OpenFgaClient $client) => ( new AccessRequestAdminHandler($client) )->handle(
-                $this->withOidcUser($this->requestFor(
-                    'POST',
-                    '/admin/access-requests/' . $id . '/approve',
-                    [],
-                    ['notes' => 'retry']
-                ))
-            )
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/approve',
+                        [],
+                        ['notes' => 'retry']
+                    ))
+                );
+            }
         ));
 
         $body = $this->decodeJsonBody($response);
         self::assertTrue($body['success']);
+        // BENIGN_SUCCESS → goes into tuples_created (row is succeeded in outbox).
         self::assertCount(1, self::arrayFieldFrom($body, 'tuples_created'));
         self::assertSame([], $body['fga_errors']);
+        self::assertSame(0, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
 
         $row = $repo->getById($id);
         self::assertNotNull($row);
         self::assertSame('approved', $row['status']);
     }
 
-    public function testApproveBailsAndKeepsRequestPendingOnRealFgaError(): void
+    public function testApproveCommitsDbAndSurfacesTerminalOutboxFailureOnRealFgaError(): void
     {
-        // Genuine OpenFGA failure (e.g. validation error). The handler must
-        // NOT mark the DB as approved — leaving it pending lets the admin
-        // retry once the underlying error is resolved.
+        // Genuine terminal OpenFGA failure (e.g. validation_error 400 with a
+        // known-terminal error code). Under the outbox pattern:
+        // - The DB IS committed (approved) — success: true.
+        // - The outbox row ends up in 'failed_terminal' state.
+        // - outbox_failed == 1 and fga_errors carries the structured error.
+        // - The admin can retry the outbox row via the outbox retry endpoint.
         $repo = new AccessRequestRepository(self::$pdo);
         $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
             ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
@@ -564,27 +593,45 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
             ])),
         ]);
 
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
         $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
             $mock,
-            fn(OpenFgaClient $client) => ( new AccessRequestAdminHandler($client) )->handle(
-                $this->withOidcUser($this->requestFor(
-                    'POST',
-                    '/admin/access-requests/' . $id . '/approve',
-                    [],
-                    ['notes' => 'try']
-                ))
-            )
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/approve',
+                        [],
+                        ['notes' => 'try']
+                    ))
+                );
+            }
         ));
 
         $body = $this->decodeJsonBody($response);
-        self::assertFalse($body['success']);
+        // DB committed → success: true (deliberate semantic shift from #628).
+        self::assertTrue($body['success']);
+        self::assertSame(0, $body['outbox_pending']);
+        self::assertSame(1, $body['outbox_failed']);
         self::assertCount(1, self::arrayFieldFrom($body, 'fga_errors'));
-        self::assertStringContainsString('Approval aborted', self::stringFieldFrom($body, 'message'));
+        self::assertStringContainsString('failed terminally', self::stringFieldFrom($body, 'message'));
 
-        // DB row must still be pending — the request was NOT approved.
+        // DB row IS approved — the outbox captures the failure, not the DB transaction.
         $row = $repo->getById($id);
         self::assertNotNull($row);
-        self::assertSame('pending', $row['status']);
+        self::assertSame('approved', $row['status']);
+
+        // Verify the outbox row itself is in failed_terminal state.
+        $outboxIds = self::arrayFieldFrom($body, 'outbox_ids');
+        self::assertCount(1, $outboxIds);
+        $outboxRow = $outboxRepo->getById((int) $outboxIds[0]);
+        self::assertNotNull($outboxRow);
+        self::assertSame(OutboxStatus::FAILED_TERMINAL, $outboxRow->status);
     }
 
     public function testRevokeSucceedsWhenAllTupleDeletesSucceed(): void
@@ -754,5 +801,156 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         // total reflects the SQL paginator's pre-filter count, not the
         // empty post-filter visible set.
         self::assertSame(2, $body['total']);
+    }
+
+    // --- Outbox pattern (Task 20: issue #567 Options B+C) ----------------
+
+    public function testApproveCommitsOutboxRowsAtomicallyWithDbWrite(): void
+    {
+        // Two permissions: first call returns 503 (transient — RETRY → retrying),
+        // second call returns 200 (success → succeeded). After the sync fast path:
+        // - success: true (DB committed)
+        // - outbox_pending: 1 (the retrying row)
+        // - outbox_failed: 0
+        // - outbox_ids: 2 entries
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+            ['object_type' => 'diocesan_calendar', 'object_id' => 'roma_it', 'relation' => 'viewer'],
+        ]);
+
+        $mock = new MockHandler([
+            new GuzzleResponse(503, [], ''), // tuple 1: transient → RETRY
+            new GuzzleResponse(200, [], '{}'), // tuple 2: OK → BENIGN_SUCCESS
+        ]);
+
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock,
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/approve',
+                        [],
+                        ['notes' => 'ok']
+                    ))
+                );
+            }
+        ));
+
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame(1, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+        self::assertCount(2, self::arrayFieldFrom($body, 'outbox_ids'));
+
+        // Verify the DB row is approved.
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('approved', $row['status']);
+
+        // Verify the outbox row statuses: one retrying, one succeeded.
+        $outboxIds = self::arrayFieldFrom($body, 'outbox_ids');
+        $statuses  = [];
+        foreach ($outboxIds as $rowId) {
+            $outboxRow = $outboxRepo->getById((int) $rowId);
+            self::assertNotNull($outboxRow);
+            $statuses[] = $outboxRow->status->value;
+        }
+        sort($statuses);
+        self::assertSame([OutboxStatus::RETRYING->value, OutboxStatus::SUCCEEDED->value], $statuses);
+    }
+
+    public function testApproveIsIdempotentOnReissue(): void
+    {
+        // First approval: all tuples succeed → outbox rows in 'succeeded'.
+        // Second approval of the same request: repo.approve() returns false
+        // (status is already 'approved'), so the handler throws ValidationException.
+        // This test therefore verifies that the idempotency_key in insertBatch
+        // collapses duplicate inserts to the same row IDs when the first call
+        // succeeded and the second call cannot re-enter the approval flow.
+        //
+        // To test the actual idempotency_key collapse, we directly call insertBatch
+        // twice on the outbox repo with the same key and assert same IDs are returned.
+        $outboxRepo     = new OutboxRepository(self::$pdo);
+        $idempotencyKey = 'access_request:test-uuid:write_tuple:user:alice:editor:national_calendar:IT';
+
+        $rows = [
+            [
+                'operation'       => \LiturgicalCalendar\Api\Services\Outbox\OutboxOperation::WRITE_TUPLE,
+                'fga_user'        => 'user:alice',
+                'fga_relation'    => 'editor',
+                'fga_object'      => 'national_calendar:IT',
+                'idempotency_key' => $idempotencyKey,
+                'metadata'        => ['access_request_id' => 'test-uuid'],
+            ],
+        ];
+
+        $firstIds  = $outboxRepo->insertBatch($rows);
+        $secondIds = $outboxRepo->insertBatch($rows); // same key → same row
+
+        self::assertSame(
+            $firstIds,
+            $secondIds,
+            'idempotency_key must collapse second insert to same row IDs'
+        );
+
+        // Now verify the handler-level idempotency: re-approving an already-approved
+        // request must be rejected with a ValidationException (not crash or duplicate rows).
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+        ]);
+
+        $mock1 = new MockHandler([new GuzzleResponse(200, [], '{}')]);
+
+        $notifier = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        // First approval succeeds.
+        $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock1,
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/approve',
+                        [],
+                        []
+                    ))
+                );
+            }
+        ));
+
+        // Second approval on the same (now 'approved') request must be rejected.
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Cannot approve a request with status: approved');
+
+        $mock2 = new MockHandler([]);
+
+        $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock2,
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/approve',
+                        [],
+                        []
+                    ))
+                );
+            }
+        ));
     }
 }

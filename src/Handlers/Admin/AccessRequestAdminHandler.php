@@ -17,10 +17,15 @@ use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
+use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\Exception\OpenFgaApiException;
-use LiturgicalCalendar\Api\Services\Exception\TupleAlreadyExistsException;
 use LiturgicalCalendar\Api\Services\Exception\TupleNotFoundException;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxDisposition;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxNotifier;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxStatus;
 use LiturgicalCalendar\Api\Services\RoleCascadeService;
 use LiturgicalCalendar\Api\Services\ZitadelService;
 use Psr\Http\Message\ResponseInterface;
@@ -47,6 +52,9 @@ final class AccessRequestAdminHandler extends AbstractHandler
 
     private ?AccessRequestRepository $repository = null;
     private ?OpenFgaClient $fgaClient            = null;
+    private ?OutboxRepository $outboxRepository  = null;
+    private ?OutboxNotifier $outboxNotifier      = null;
+    private ?OutboxProcessor $outboxProcessor    = null;
 
     /**
      * The OpenFGA client is constructor-injectable for tests — pass a
@@ -67,6 +75,20 @@ final class AccessRequestAdminHandler extends AbstractHandler
         $this->allowCredentials           = true;
     }
 
+    /**
+     * Inject outbox dependencies — primarily for tests (avoids real Redis / env).
+     * Production calls use the lazy getters below, which build from env vars.
+     */
+    public function setOutboxDependencies(
+        OutboxRepository $repo,
+        OutboxNotifier $notifier,
+        OutboxProcessor $processor,
+    ): void {
+        $this->outboxRepository = $repo;
+        $this->outboxNotifier   = $notifier;
+        $this->outboxProcessor  = $processor;
+    }
+
     private function getRepository(): AccessRequestRepository
     {
         if ($this->repository === null) {
@@ -81,6 +103,50 @@ final class AccessRequestAdminHandler extends AbstractHandler
             $this->fgaClient = OpenFgaClient::fromEnv();
         }
         return $this->fgaClient;
+    }
+
+    private function getOutboxRepository(): OutboxRepository
+    {
+        if ($this->outboxRepository === null) {
+            $this->outboxRepository = new OutboxRepository(Connection::getInstance());
+        }
+        return $this->outboxRepository;
+    }
+
+    private function getOutboxNotifier(): OutboxNotifier
+    {
+        if ($this->outboxNotifier === null) {
+            $redis = null;
+            if (extension_loaded('redis') && ( isset($_ENV['REDIS_HOST']) || isset($_ENV['REDIS_SOCKET']) )) {
+                try {
+                    $redis = new \Redis();
+                    if (isset($_ENV['REDIS_SOCKET']) && is_string($_ENV['REDIS_SOCKET']) && $_ENV['REDIS_SOCKET'] !== '') {
+                        $redis->connect((string) $_ENV['REDIS_SOCKET']);
+                    } else {
+                        $redisHost = is_string($_ENV['REDIS_HOST'] ?? null) ? $_ENV['REDIS_HOST'] : '127.0.0.1';
+                        $redisPort = is_numeric($_ENV['REDIS_PORT'] ?? null) ? (int) $_ENV['REDIS_PORT'] : 6379;
+                        $redis->connect($redisHost, $redisPort);
+                    }
+                    if (isset($_ENV['REDIS_PASSWORD']) && is_string($_ENV['REDIS_PASSWORD']) && $_ENV['REDIS_PASSWORD'] !== '') {
+                        $redis->auth((string) $_ENV['REDIS_PASSWORD']);
+                    }
+                } catch (\Throwable) {
+                    $redis = null; // Best-effort; fall back to PG-only durability.
+                }
+            }
+            $redisStream          = is_string($_ENV['REDIS_OUTBOX_STREAM'] ?? null) ? $_ENV['REDIS_OUTBOX_STREAM'] : 'litcal:reconcile-stream';
+            $streamName           = $redisStream;
+            $this->outboxNotifier = new OutboxNotifier($redis, $streamName);
+        }
+        return $this->outboxNotifier;
+    }
+
+    private function getOutboxProcessor(): OutboxProcessor
+    {
+        if ($this->outboxProcessor === null) {
+            $this->outboxProcessor = new OutboxProcessor($this->getOutboxRepository(), $this->getFgaClient());
+        }
+        return $this->outboxProcessor;
     }
 
     /**
@@ -243,13 +309,24 @@ final class AccessRequestAdminHandler extends AbstractHandler
     /**
      * POST /admin/access-requests/{id}/approve — Approve access request.
      *
-     * Flow:
+     * Flow (outbox pattern):
      * 1. Validate request exists and is pending
      * 2. Check admin has authority (global admin OR resource admin for ALL requested resources)
-     * 3. Create OpenFGA tuples first (for each permission in the array)
-     * 4. Assign Zitadel role
-     * 5. Update DB status to approved
-     * 6. Track Zitadel sync status
+     * 3. If permissions is empty: approve in DB and return immediately
+     * 4. Otherwise:
+     *    a. PG BEGIN
+     *       - repo.approve(requestId, adminId, notes)
+     *       - outbox.insertBatch(rows) — one row per permission, idempotency_key ensures
+     *         that re-approving the same request collapses to the same outbox row IDs
+     *    b. PG COMMIT
+     *    c. For each outbox row: processor.processSync(), then notifier.notify() when
+     *       row is still in a non-terminal state (pending/retrying)
+     * 5. Sync role to Zitadel (unchanged)
+     * 6. Return response with success=true (whenever DB committed), plus outbox counters
+     *
+     * `success` is true whenever the DB commit succeeded — this is the deliberate
+     * semantic shift from #628. Tuple delivery failures surface via outbox_pending /
+     * outbox_failed / fga_errors rather than aborting the entire approval.
      */
     private function approveRequest(
         ResponseInterface $response,
@@ -283,82 +360,158 @@ final class AccessRequestAdminHandler extends AbstractHandler
         // Check admin authority over ALL requested resources
         $this->requireAdminForAllResources($adminId, $isGlobalAdmin, $permissions);
 
-        // Step 1: Create OpenFGA tuples for each permission.
-        //
-        // TupleAlreadyExistsException is treated as benign — the tuple is in
-        // the desired state already, so re-approval after a partial first
-        // attempt converges instead of double-failing. Any other
-        // OpenFgaApiException (validation, auth, server) is fatal: the
-        // response will surface success: false with the structured error
-        // list so the admin knows there's drift to repair.
-        $createdTuples = [];
-        $fgaErrors     = [];
-
-        if ($this->isFgaClientAvailable() && !empty($permissions)) {
-            $fgaUser = "user:{$userId}";
-
-            foreach ($permissions as $perm) {
-                $objectType = $perm['object_type'] ?? '';
-                $objectId   = $perm['object_id'] ?? '';
-                $relation   = $perm['relation'] ?? '';
-                $fgaObject  = "{$objectType}:{$objectId}";
-
-                try {
-                    $this->getFgaClient()->writeTuple($fgaUser, $relation, $fgaObject);
-                    $createdTuples[] = [
-                        'user'     => $fgaUser,
-                        'relation' => $relation,
-                        'object'   => $fgaObject,
-                    ];
-                } catch (TupleAlreadyExistsException) {
-                    // Idempotent — tuple already exists. Count it as created
-                    // so the response shows the user's effective grants.
-                    $createdTuples[] = [
-                        'user'     => $fgaUser,
-                        'relation' => $relation,
-                        'object'   => $fgaObject,
-                    ];
-                } catch (OpenFgaApiException $e) {
-                    $fgaErrors[] = [
-                        'object'   => $fgaObject,
-                        'relation' => $relation,
-                        'error'    => $e->getMessage(),
-                    ];
-                }
+        // Fast path: no permissions to write — just approve in DB and return.
+        if (empty($permissions) || !$this->isFgaClientAvailable()) {
+            $approved = $repo->approve($requestId, $adminId, $notes);
+            if (!$approved) {
+                throw new ValidationException('Failed to approve request');
             }
-        }
 
-        // If we couldn't write some of the tuples, bail before mutating the
-        // DB — leaving the request 'pending' lets the admin retry cleanly,
-        // and avoids the silent under-provisioning the issue flags
-        // ("row marked approved while user is missing the failed tuples").
-        if (!empty($fgaErrors)) {
+            [$roleAssigned, $zitadelError] = $this->syncZitadelRole($repo, $requestId, $userId, $requestedRole);
+
             return $this->encodeResponseBody($response, [
-                'success'        => false,
-                'role_assigned'  => false,
-                'zitadel_error'  => null,
-                'tuples_created' => $createdTuples,
-                'fga_errors'     => $fgaErrors,
-                'message'        => sprintf(
-                    'Approval aborted: %d of %d permission tuple(s) could not be written. The request remains pending; retry once the underlying OpenFGA error is resolved.',
-                    count($fgaErrors),
-                    count($permissions)
-                ),
+                'success'        => true,
+                'role_assigned'  => $roleAssigned,
+                'zitadel_error'  => $zitadelError,
+                'tuples_created' => [],
+                'fga_errors'     => [],
+                'outbox_ids'     => [],
+                'outbox_pending' => 0,
+                'outbox_failed'  => 0,
+                'message'        => $this->approvalMessage($roleAssigned, $zitadelError, 0, 0),
             ]);
         }
 
-        // Step 2: Approve in database
-        $approved = $repo->approve($requestId, $adminId, $notes);
-        if (!$approved) {
-            throw new ValidationException('Failed to approve request');
+        // Step 1: Build outbox rows — one per permission tuple.
+        $fgaUser    = "user:{$userId}";
+        $outboxRows = [];
+        foreach ($permissions as $perm) {
+            $objectType = is_string($perm['object_type'] ?? null) ? $perm['object_type'] : '';
+            $objectId   = is_string($perm['object_id'] ?? null) ? $perm['object_id'] : '';
+            $relation   = is_string($perm['relation'] ?? null) ? $perm['relation'] : '';
+            $fgaObject  = "{$objectType}:{$objectId}";
+
+            // Idempotency key: scoped to this access request + the specific tuple,
+            // so re-approving the same request after a partial first attempt collapses
+            // to the same row rather than inserting a duplicate.
+            $idempotencyKey = "access_request:{$requestId}:write_tuple:{$fgaUser}:{$relation}:{$fgaObject}";
+
+            $outboxRows[] = [
+                'operation'       => OutboxOperation::WRITE_TUPLE,
+                'fga_user'        => $fgaUser,
+                'fga_relation'    => $relation,
+                'fga_object'      => $fgaObject,
+                'idempotency_key' => $idempotencyKey,
+                'metadata'        => ['access_request_id' => $requestId],
+            ];
         }
 
-        // Step 3: Sync role to Zitadel
+        // Step 2: Atomically approve in DB + insert outbox rows in one PG transaction.
+        $pdo    = Connection::getInstance();
+        $outbox = $this->getOutboxRepository();
+
+        $pdo->beginTransaction();
+        try {
+            $approved = $repo->approve($requestId, $adminId, $notes);
+            if (!$approved) {
+                $pdo->rollBack();
+                throw new ValidationException('Failed to approve request');
+            }
+            $outboxIds = $outbox->insertBatch($outboxRows);
+            $pdo->commit();
+        } catch (\Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            throw $e;
+        }
+
+        // Step 3: Sync fast path — attempt each outbox row immediately.
+        // Rows that fail (transient errors) stay in 'retrying' state and will be
+        // picked up by the cron backstop. Rows that fail terminally (4xx validation)
+        // are marked 'failed_terminal' and surface in outbox_failed.
+        $processor = $this->getOutboxProcessor();
+        $notifier  = $this->getOutboxNotifier();
+
+        /** @var list<array{id: int, disposition: string, status: string}> $outboxResult */
+        $outboxResult  = [];
+        $createdTuples = [];
+        $fgaErrors     = [];
+
+        foreach ($outboxIds as $rowId) {
+            $disposition = $processor->processSync($rowId);
+            $current     = $outbox->getById($rowId);
+            $statusValue = $current !== null ? $current->status->value : OutboxStatus::PENDING->value;
+
+            $outboxResult[] = [
+                'id'          => $rowId,
+                'disposition' => $disposition->name,
+                'status'      => $statusValue,
+            ];
+
+            if ($disposition === OutboxDisposition::BENIGN_SUCCESS) {
+                // Row is in succeeded state (or was already succeeded idempotently).
+                $createdTuples[] = [
+                    'user'     => $current !== null ? $current->fgaUser     : $fgaUser,
+                    'relation' => $current !== null ? $current->fgaRelation : '',
+                    'object'   => $current !== null ? $current->fgaObject   : '',
+                ];
+            } else {
+                // RETRY or TERMINAL — surface in fga_errors for back-compat.
+                $fgaErrors[] = [
+                    'outbox_id' => $rowId,
+                    'status'    => $statusValue,
+                    'error'     => $current !== null ? ( $current->lastError ?? 'unknown' ) : 'unknown',
+                ];
+            }
+
+            // Notify the async consumer if the row is still non-terminal.
+            if (
+                $current !== null
+                && in_array($current->status, [OutboxStatus::PENDING, OutboxStatus::RETRYING], true)
+            ) {
+                $notifier->notify($rowId, OutboxOperation::WRITE_TUPLE->value);
+            }
+        }
+
+        $outboxPending = count(array_filter($outboxResult, static fn($r) => $r['status'] === OutboxStatus::RETRYING->value || $r['status'] === OutboxStatus::PENDING->value));
+        $outboxFailed  = count(array_filter($outboxResult, static fn($r) => $r['status'] === OutboxStatus::FAILED_TERMINAL->value));
+
+        // Step 4: Sync role to Zitadel (unchanged)
+        [$roleAssigned, $zitadelError] = $this->syncZitadelRole($repo, $requestId, $userId, $requestedRole);
+
+        return $this->encodeResponseBody($response, [
+            'success'        => true,
+            'role_assigned'  => $roleAssigned,
+            'zitadel_error'  => $zitadelError,
+            'tuples_created' => $createdTuples,
+            'fga_errors'     => $fgaErrors,
+            'outbox_ids'     => $outboxIds,
+            'outbox_pending' => $outboxPending,
+            'outbox_failed'  => $outboxFailed,
+            'message'        => $this->approvalMessage($roleAssigned, $zitadelError, $outboxPending, $outboxFailed),
+        ]);
+    }
+
+    /**
+     * Sync a Zitadel role assignment after DB approval.
+     *
+     * Extracted to avoid duplicating the same try/catch in the fast-path and
+     * the outbox-path branches of approveRequest.
+     *
+     * @return array{0: bool, 1: string|null}  [roleAssigned, zitadelError]
+     */
+    private function syncZitadelRole(
+        AccessRequestRepository $repo,
+        string $requestId,
+        string $userId,
+        string $requestedRole,
+    ): array {
         $roleAssigned = false;
         $zitadelError = null;
 
         if (ZitadelService::isConfigured()) {
-            if (empty($userId) || empty($requestedRole)) {
+            if ($userId === '' || $requestedRole === '') {
                 $zitadelError = 'Missing user ID or role in approved request';
                 $repo->updateZitadelSyncStatus($requestId, 'failed', $zitadelError);
             } else {
@@ -377,18 +530,50 @@ final class AccessRequestAdminHandler extends AbstractHandler
             }
         }
 
-        return $this->encodeResponseBody($response, [
-            'success'        => true,
-            'role_assigned'  => $roleAssigned,
-            'zitadel_error'  => $zitadelError,
-            'tuples_created' => $createdTuples,
-            'fga_errors'     => $fgaErrors,
-            'message'        => $roleAssigned
-                ? 'Access request approved, role assigned and permissions granted'
-                : ( $zitadelError !== null
-                    ? 'Access request approved but Zitadel sync failed (will retry)'
-                    : 'Access request approved (Zitadel not configured)' ),
-        ]);
+        return [$roleAssigned, $zitadelError];
+    }
+
+    /**
+     * Build the human-readable approval message, incorporating outbox deferral/failure notes.
+     */
+    private function approvalMessage(
+        bool $roleAssigned,
+        ?string $zitadelError,
+        int $outboxPending,
+        int $outboxFailed,
+    ): string {
+        $base = $roleAssigned
+            ? 'Access request approved, role assigned and permissions granted'
+            : ( $zitadelError !== null
+                ? 'Access request approved but Zitadel sync failed (will retry)'
+                : 'Access request approved (Zitadel not configured)' );
+
+        if ($outboxPending > 0 && $outboxFailed > 0) {
+            return sprintf(
+                '%s; %d permission tuple(s) deferred for async delivery, %d failed terminally (check outbox)',
+                $base,
+                $outboxPending,
+                $outboxFailed,
+            );
+        }
+
+        if ($outboxPending > 0) {
+            return sprintf(
+                '%s; %d permission tuple(s) deferred for async delivery',
+                $base,
+                $outboxPending,
+            );
+        }
+
+        if ($outboxFailed > 0) {
+            return sprintf(
+                '%s; %d permission tuple(s) failed terminally (check outbox)',
+                $base,
+                $outboxFailed,
+            );
+        }
+
+        return $base;
     }
 
     /**
