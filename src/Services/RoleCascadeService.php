@@ -4,7 +4,14 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Services;
 
+use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
+use LiturgicalCalendar\Api\Repositories\OutboxRepository;
+use LiturgicalCalendar\Api\Services\Exception\OpenFgaApiException;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxClassifier;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxDisposition;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxNotifier;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -23,7 +30,9 @@ class RoleCascadeService
         private OpenFgaClient $fga,
         private ZitadelService $zitadel,
         private AccessRequestRepository $repo,
-        private ?LoggerInterface $logger = null
+        private ?LoggerInterface $logger = null,
+        private ?OutboxRepository $outboxRepo = null,
+        private ?OutboxNotifier $outboxNotifier = null,
     ) {
     }
 
@@ -32,11 +41,33 @@ class RoleCascadeService
      */
     public static function fromEnv(?LoggerInterface $logger = null): self
     {
+        $redis = null;
+        if (extension_loaded('redis') && ( isset($_ENV['REDIS_HOST']) || isset($_ENV['REDIS_SOCKET']) )) {
+            try {
+                $redis = new \Redis();
+                if (isset($_ENV['REDIS_SOCKET']) && is_string($_ENV['REDIS_SOCKET']) && $_ENV['REDIS_SOCKET'] !== '') {
+                    $redis->connect((string) $_ENV['REDIS_SOCKET']);
+                } else {
+                    $redisHost = is_string($_ENV['REDIS_HOST'] ?? null) ? $_ENV['REDIS_HOST'] : '127.0.0.1';
+                    $redisPort = is_numeric($_ENV['REDIS_PORT'] ?? null) ? (int) $_ENV['REDIS_PORT'] : 6379;
+                    $redis->connect($redisHost, $redisPort);
+                }
+                if (isset($_ENV['REDIS_PASSWORD']) && is_string($_ENV['REDIS_PASSWORD']) && $_ENV['REDIS_PASSWORD'] !== '') {
+                    $redis->auth((string) $_ENV['REDIS_PASSWORD']);
+                }
+            } catch (\Throwable) {
+                $redis = null; // Best-effort; fall back to PG-only durability.
+            }
+        }
+        $streamName = is_string($_ENV['REDIS_OUTBOX_STREAM'] ?? null) ? $_ENV['REDIS_OUTBOX_STREAM'] : 'litcal:reconcile-stream';
+
         return new self(
             OpenFgaClient::fromEnv(),
             ZitadelService::fromEnv($logger),
             new AccessRequestRepository(),
-            $logger
+            $logger,
+            new OutboxRepository(Connection::getInstance()),
+            new OutboxNotifier($redis, $streamName, $logger),
         );
     }
 
@@ -131,13 +162,55 @@ class RoleCascadeService
                             'object'   => $fgaObject,
                         ];
                     } catch (\Throwable $e) {
-                        $this->logger?->warning('RoleCascadeService: deleteTuple failed during cascade', [
-                            'user_id'  => $userId,
-                            'role'     => $role,
-                            'relation' => $relation,
-                            'object'   => $fgaObject,
-                            'error'    => $e->getMessage(),
-                        ]);
+                        $disp = OutboxClassifier::classify($e);
+                        if ($disp === OutboxDisposition::BENIGN_SUCCESS) {
+                            // Tuple already gone — cascade is already consistent.
+                            $this->logger?->info('RoleCascadeService: deleteTuple benign during cascade', [
+                                'user_id'  => $userId,
+                                'role'     => $role,
+                                'relation' => $relation,
+                                'object'   => $fgaObject,
+                            ]);
+                            continue;
+                        }
+
+                        $idempotencyKey = sprintf(
+                            'role_cascade:%s:%s:delete_tuple:%s:%s:%s',
+                            $userId,
+                            $role,
+                            $fgaUser,
+                            $relation,
+                            $fgaObject,
+                        );
+                        $ids            = $this->outboxRepo?->insertBatch([
+                            [
+                                'operation'       => OutboxOperation::DELETE_TUPLE,
+                                'fga_user'        => $fgaUser,
+                                'fga_relation'    => $relation,
+                                'fga_object'      => $fgaObject,
+                                'idempotency_key' => $idempotencyKey,
+                                'metadata'        => [
+                                    'idempotency_key'   => $idempotencyKey,
+                                    'role_cascade_user' => $userId,
+                                    'role_cascade_role' => $role,
+                                ],
+                            ]
+                        ]) ?? [];
+                        foreach ($ids as $rowId) {
+                            $this->outboxNotifier?->notify($rowId, OutboxOperation::DELETE_TUPLE->value);
+                        }
+                        $this->logger?->warning(
+                            'RoleCascadeService: deleteTuple failed during cascade — outbox enqueued',
+                            [
+                                'user_id'        => $userId,
+                                'role'           => $role,
+                                'relation'       => $relation,
+                                'object'         => $fgaObject,
+                                'outbox_row_ids' => $ids,
+                                'error_code'     => $e instanceof OpenFgaApiException ? $e->getErrorCode() : null,
+                                'error'          => $e->getMessage(),
+                            ]
+                        );
                     }
                 }
             }
