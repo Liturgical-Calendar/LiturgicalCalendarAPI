@@ -574,9 +574,13 @@ class Router
         // Parse JSON request bodies into getParsedBody() for all routes
         $pipeline->pipe(new JsonBodyParserMiddleware());
 
-        // Apply API key validation and rate limiting for public API routes
-        // health is unauthenticated monitoring endpoint — exclude from key/rate checks
-        if (!in_array($route, ['auth', 'admin', 'applications', '_ops', 'health'], true)) {
+        // Apply API key validation and rate limiting for public API routes.
+        // /health is an unauthenticated monitoring endpoint — exclude it from
+        // the API-key check but KEEP IP-based rate limiting, because /health
+        // touches openfga_outbox and PG on every request; without rate
+        // limiting an unauthenticated flood could exhaust DB capacity.
+        $skipAuthRoutes = ['auth', 'admin', 'applications', '_ops', 'health'];
+        if (!in_array($route, $skipAuthRoutes, true)) {
             if (Connection::isConfigured()) {
                 $pipeline->pipe(new ApiKeyMiddleware(
                     new \LiturgicalCalendar\Api\Repositories\ApiKeyRepository(),
@@ -588,6 +592,9 @@ class Router
                 // Apply IP-only rate limiting for unauthenticated requests.
                 $pipeline->pipe(ApiKeyRateLimitMiddleware::fromEnv());
             }
+        } elseif ($route === 'health') {
+            // /health still needs IP-based throttling — see comment above.
+            $pipeline->pipe(ApiKeyRateLimitMiddleware::fromEnv());
         }
 
         // Apply HTTPS enforcement middleware for auth, admin, and applications routes in production
