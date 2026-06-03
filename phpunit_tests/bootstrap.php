@@ -35,6 +35,13 @@ if (null === $autoloaderPath) {
 
 require_once $autoloaderPath;
 
+// Load Redis stubs when ext-redis is not installed (CI / dev environments
+// without the extension). The stub file is guarded by class_exists() so it
+// is safe to include unconditionally — in production the real extension wins.
+if (!extension_loaded('redis')) {
+    require_once dirname(__DIR__) . '/stubs/Redis.php';
+}
+
 use Dotenv\Dotenv;
 
 $dotenv = Dotenv::createMutable($projectFolder, ['.env', '.env.local', '.env.development', '.env.staging', '.env.production'], false);
