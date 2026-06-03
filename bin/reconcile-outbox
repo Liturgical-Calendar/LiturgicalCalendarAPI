@@ -67,6 +67,7 @@ if ($mode === 'backstop') {
     $runner    = new BackstopRunner(
         $repo,
         $processor,
+        $pdo,
         graceSeconds: (int) ($_ENV['OUTBOX_BACKSTOP_GRACE_SECONDS'] ?? 60),
     );
     $processed = $runner->runOnce(limit: 200);

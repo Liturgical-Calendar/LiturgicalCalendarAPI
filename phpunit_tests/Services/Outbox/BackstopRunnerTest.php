@@ -60,7 +60,7 @@ final class BackstopRunnerTest extends RepositoryTestCase
             ],
         ]);
 
-        $runner    = new BackstopRunner($repo, $processor, graceSeconds: 0);
+        $runner    = new BackstopRunner($repo, $processor, self::$pdo, graceSeconds: 0);
         $processed = $runner->runOnce(limit: 100);
 
         self::assertSame(2, $processed);
@@ -95,7 +95,7 @@ final class BackstopRunnerTest extends RepositoryTestCase
             ]
         ]);
 
-        $runner    = new BackstopRunner($repo, $processor, graceSeconds: 60);
+        $runner    = new BackstopRunner($repo, $processor, self::$pdo, graceSeconds: 60);
         $processed = $runner->runOnce(limit: 100);
 
         self::assertSame(0, $processed, 'row is too fresh — under the 60s grace window');

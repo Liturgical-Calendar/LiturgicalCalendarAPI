@@ -45,6 +45,19 @@ final class OutboxProcessor implements OutboxProcessorInterface
             return OutboxDisposition::BENIGN_SUCCESS;
         }
 
+        // If the row is in RETRYING and its scheduled next attempt is still
+        // in the future, honor the backoff window. The backstop's
+        // pickupPending() already filters on next_attempt_at, but the
+        // consumer's XCLAIM-from-PEL path can hand us a row whose retry
+        // was just rescheduled by another runner; don't bypass the schedule.
+        // Vatican TZ to match the repo's storage convention.
+        if ($row->status === OutboxStatus::RETRYING) {
+            $now = new \DateTimeImmutable('now', new \DateTimeZone('Europe/Vatican'));
+            if ($row->nextAttemptAt > $now) {
+                return OutboxDisposition::BENIGN_SUCCESS;
+            }
+        }
+
         try {
             $this->invoke($row);
             $this->repo->markSucceeded($row->id);
@@ -70,7 +83,8 @@ final class OutboxProcessor implements OutboxProcessorInterface
                         return OutboxDisposition::TERMINAL;
                     }
                     $delay = OutboxBackoff::secondsForAttempt($newAttempts);
-                    $next  = ( new \DateTimeImmutable() )->modify("+{$delay} seconds");
+                    $next  = ( new \DateTimeImmutable('now', new \DateTimeZone('Europe/Vatican')) )
+                        ->modify("+{$delay} seconds");
                     $this->repo->markRetryable($row->id, $newAttempts, $next, $message, $code);
                     return OutboxDisposition::RETRY;
             }

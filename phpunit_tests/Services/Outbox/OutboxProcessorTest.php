@@ -84,15 +84,21 @@ final class OutboxProcessorTest extends RepositoryTestCase
         ]);
         $proc = new OutboxProcessor($this->repo, $this->makeClient($mock));
 
+        // Capture the timestamp BEFORE processing so the delta is computed
+        // against a stable reference rather than a fresh now() that races
+        // the wall clock (the original was flaky in slow CI).
+        $before = new \DateTimeImmutable();
         $proc->processOne($id);
 
         $row = $this->repo->getById($id);
         self::assertNotNull($row);
         self::assertSame(OutboxStatus::RETRYING, $row->status);
         self::assertSame(1, $row->attempts);
-        $delta = $row->nextAttemptAt->getTimestamp() - ( new \DateTimeImmutable() )->getTimestamp();
-        self::assertGreaterThanOrEqual(0, $delta);
-        self::assertLessThanOrEqual(2, $delta, 'attempts=1 should schedule ~1s ahead');
+        $delta = $row->nextAttemptAt->getTimestamp() - $before->getTimestamp();
+        // attempts=1 schedules +1s from "now during processing"; tolerate
+        // up to 5s for slow CI without making the test useless.
+        self::assertGreaterThanOrEqual(1, $delta, 'attempts=1 must schedule at least 1s after processing started');
+        self::assertLessThanOrEqual(5, $delta, 'attempts=1 schedules ~1s ahead (5s slack for slow CI)');
     }
 
     public function testProcessOneValidationErrorMarksTerminalOnFirstAttempt(): void

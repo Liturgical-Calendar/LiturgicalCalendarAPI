@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Services\Outbox;
 
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
+use PDO;
 
 /**
  * One-shot scan of openfga_outbox for the cron backstop.
@@ -21,17 +22,35 @@ final class BackstopRunner
     public function __construct(
         private readonly OutboxRepository $repo,
         private readonly OutboxProcessorInterface $processor,
+        private readonly PDO $pdo,
         private readonly int $graceSeconds = 60,
     ) {
     }
 
     public function runOnce(int $limit = 100): int
     {
-        $cutoff = ( new \DateTimeImmutable() )->modify("-{$this->graceSeconds} seconds");
-        $rows   = $this->repo->pickupPending($limit, $cutoff);
+        // FOR UPDATE SKIP LOCKED inside pickupPending only holds locks for
+        // the lifetime of the surrounding transaction. Without an explicit
+        // tx the locks would be released immediately by PG's autocommit,
+        // defeating the SKIP LOCKED guarantee (concurrent runners could
+        // double-process). Wrap pickup + processing in one tx so the row
+        // locks survive across processOne() for every picked row.
+        // Timezone pinned to Europe/Vatican per the project-wide convention.
+        $cutoff = ( new \DateTimeImmutable('now', new \DateTimeZone('Europe/Vatican')) )
+            ->modify("-{$this->graceSeconds} seconds");
 
-        foreach ($rows as $row) {
-            $this->processor->processOne($row->id);
+        $this->pdo->beginTransaction();
+        try {
+            $rows = $this->repo->pickupPending($limit, $cutoff);
+            foreach ($rows as $row) {
+                $this->processor->processOne($row->id);
+            }
+            $this->pdo->commit();
+        } catch (\Throwable $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            throw $e;
         }
 
         return count($rows);
