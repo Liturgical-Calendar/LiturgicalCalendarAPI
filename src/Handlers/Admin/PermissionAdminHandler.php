@@ -16,7 +16,13 @@ use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use LiturgicalCalendar\Api\Http\Middleware\OidcAuthMiddleware;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
+use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxDisposition;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxNotifier;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxStatus;
 use LiturgicalCalendar\Api\Services\RoleCascadeService;
 use LiturgicalCalendar\Api\Services\ZitadelService;
 use Psr\Http\Message\ResponseInterface;
@@ -62,7 +68,10 @@ final class PermissionAdminHandler extends AbstractHandler
     private const DEFAULT_LIMIT = 100;
     private const MAX_LIMIT     = 500;
 
-    private ?OpenFgaClient $fgaClient = null;
+    private ?OpenFgaClient $fgaClient           = null;
+    private ?OutboxRepository $outboxRepository = null;
+    private ?OutboxNotifier $outboxNotifier     = null;
+    private ?OutboxProcessor $outboxProcessor   = null;
     private LoggerInterface $logger;
 
     public function __construct(?OpenFgaClient $client = null)
@@ -88,6 +97,64 @@ final class PermissionAdminHandler extends AbstractHandler
             $this->fgaClient = OpenFgaClient::fromEnv();
         }
         return $this->fgaClient;
+    }
+
+    /**
+     * Inject outbox dependencies — primarily for tests (avoids real Redis / env).
+     * Production calls use the lazy getters below, which build from env vars.
+     */
+    public function setOutboxDependencies(
+        OutboxRepository $repo,
+        OutboxNotifier $notifier,
+        OutboxProcessor $processor,
+    ): void {
+        $this->outboxRepository = $repo;
+        $this->outboxNotifier   = $notifier;
+        $this->outboxProcessor  = $processor;
+    }
+
+    private function getOutboxRepository(): OutboxRepository
+    {
+        if ($this->outboxRepository === null) {
+            $this->outboxRepository = new OutboxRepository(Connection::getInstance());
+        }
+        return $this->outboxRepository;
+    }
+
+    private function getOutboxNotifier(): OutboxNotifier
+    {
+        if ($this->outboxNotifier === null) {
+            $redis = null;
+            if (extension_loaded('redis') && ( isset($_ENV['REDIS_HOST']) || isset($_ENV['REDIS_SOCKET']) )) {
+                try {
+                    $redis = new \Redis();
+                    if (isset($_ENV['REDIS_SOCKET']) && is_string($_ENV['REDIS_SOCKET']) && $_ENV['REDIS_SOCKET'] !== '') {
+                        $redis->connect((string) $_ENV['REDIS_SOCKET']);
+                    } else {
+                        $redisHost = is_string($_ENV['REDIS_HOST'] ?? null) ? $_ENV['REDIS_HOST'] : '127.0.0.1';
+                        $redisPort = is_numeric($_ENV['REDIS_PORT'] ?? null) ? (int) $_ENV['REDIS_PORT'] : 6379;
+                        $redis->connect($redisHost, $redisPort);
+                    }
+                    if (isset($_ENV['REDIS_PASSWORD']) && is_string($_ENV['REDIS_PASSWORD']) && $_ENV['REDIS_PASSWORD'] !== '') {
+                        $redis->auth((string) $_ENV['REDIS_PASSWORD']);
+                    }
+                } catch (\Throwable) {
+                    $redis = null; // Best-effort; fall back to PG-only durability.
+                }
+            }
+            $redisStream          = is_string($_ENV['REDIS_OUTBOX_STREAM'] ?? null) ? $_ENV['REDIS_OUTBOX_STREAM'] : 'litcal:reconcile-stream';
+            $streamName           = $redisStream;
+            $this->outboxNotifier = new OutboxNotifier($redis, $streamName);
+        }
+        return $this->outboxNotifier;
+    }
+
+    private function getOutboxProcessor(): OutboxProcessor
+    {
+        if ($this->outboxProcessor === null) {
+            $this->outboxProcessor = new OutboxProcessor($this->getOutboxRepository(), $this->getClient());
+        }
+        return $this->outboxProcessor;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -311,6 +378,19 @@ final class PermissionAdminHandler extends AbstractHandler
      *   - object_type: string (required) — e.g., "national_calendar"
      *   - object_id: string (required) — e.g., "IT"
      *   - relation: string (required) — "admin", "viewer", "editor", or "deleter"
+     *
+     * Flow (outbox pattern):
+     * 1. Validate and authorize
+     * 2. PG BEGIN
+     *    - outbox.insertBatch([row]) — one row, idempotency_key ensures
+     *      re-granting the same tuple collapses to the same outbox row ID
+     * 3. PG COMMIT
+     * 4. processor.processSync(), then notifier.notify() when row is still non-terminal
+     * 5. Return response with success=true, plus outbox counters
+     *
+     * `success` is true whenever the DB commit succeeded. Tuple delivery
+     * failures surface via outbox_pending / outbox_failed rather than
+     * aborting the grant.
      */
     private function grantPermission(
         ServerRequestInterface $request,
@@ -334,21 +414,92 @@ final class PermissionAdminHandler extends AbstractHandler
         $fgaUser   = $this->normalizeUser($user);
         $fgaObject = "{$objectType}:{$objectId}";
 
+        // Idempotency key: scoped to the admin + the specific tuple, so
+        // re-granting the same permission collapses to the same outbox row ID.
+        $idempotencyKey = "permission_grant:{$userId}:write_tuple:{$fgaUser}:{$relation}:{$fgaObject}";
+
+        $outboxRow = [
+            'operation'       => OutboxOperation::WRITE_TUPLE,
+            'fga_user'        => $fgaUser,
+            'fga_relation'    => $relation,
+            'fga_object'      => $fgaObject,
+            'idempotency_key' => $idempotencyKey,
+            'metadata'        => ['admin_user' => "user:{$userId}"],
+        ];
+
+        // Atomically insert the outbox row in a PG transaction for durability
+        // before any sync fast-path is attempted.
+        $pdo    = Connection::getInstance();
+        $outbox = $this->getOutboxRepository();
+
+        $pdo->beginTransaction();
         try {
-            $this->getClient()->writeTuple($fgaUser, $relation, $fgaObject);
-        } catch (\RuntimeException $e) {
-            // Treat "tuple already exists" as success (idempotent grant)
-            if (!str_contains($e->getMessage(), 'cannot write a tuple which already exists')) {
-                throw $e;
+            $outboxIds = $outbox->insertBatch([$outboxRow]);
+            $pdo->commit();
+        } catch (\Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            throw $e;
+        }
+
+        // Sync fast path — attempt the outbox row immediately.
+        $processor = $this->getOutboxProcessor();
+        $notifier  = $this->getOutboxNotifier();
+
+        /** @var list<array{id: int, disposition: string, status: string}> $outboxResult */
+        $outboxResult  = [];
+        $createdTuples = [];
+        $fgaErrors     = [];
+
+        foreach ($outboxIds as $rowId) {
+            $disposition = $processor->processSync($rowId);
+            $current     = $outbox->getById($rowId);
+            $statusValue = $current !== null ? $current->status->value : OutboxStatus::PENDING->value;
+
+            $outboxResult[] = [
+                'id'          => $rowId,
+                'disposition' => $disposition->name,
+                'status'      => $statusValue,
+            ];
+
+            if ($disposition === OutboxDisposition::BENIGN_SUCCESS) {
+                $createdTuples[] = [
+                    'user'     => $current !== null ? $current->fgaUser     : $fgaUser,
+                    'relation' => $current !== null ? $current->fgaRelation : '',
+                    'object'   => $current !== null ? $current->fgaObject   : '',
+                ];
+            } else {
+                $fgaErrors[] = [
+                    'outbox_id' => $rowId,
+                    'status'    => $statusValue,
+                    'error'     => $current !== null ? ( $current->lastError ?? 'unknown' ) : 'unknown',
+                ];
+            }
+
+            // Notify the async consumer if the row is still non-terminal.
+            if (
+                $current !== null
+                && in_array($current->status, [OutboxStatus::PENDING, OutboxStatus::RETRYING], true)
+            ) {
+                $notifier->notify($rowId, OutboxOperation::WRITE_TUPLE->value);
             }
         }
 
+        $outboxPending = count(array_filter($outboxResult, static fn($r) => $r['status'] === OutboxStatus::RETRYING->value || $r['status'] === OutboxStatus::PENDING->value));
+        $outboxFailed  = count(array_filter($outboxResult, static fn($r) => $r['status'] === OutboxStatus::FAILED_TERMINAL->value));
+
         return $this->encodeResponseBody($response, [
-            'success'  => true,
-            'message'  => 'Permission granted',
-            'user'     => $fgaUser,
-            'relation' => $relation,
-            'object'   => $fgaObject,
+            'success'        => true,
+            'message'        => 'Permission granted',
+            'user'           => $fgaUser,
+            'relation'       => $relation,
+            'object'         => $fgaObject,
+            'tuples_created' => $createdTuples,
+            'fga_errors'     => $fgaErrors,
+            'outbox_ids'     => $outboxIds,
+            'outbox_pending' => $outboxPending,
+            'outbox_failed'  => $outboxFailed,
         ]);
     }
 
@@ -360,6 +511,20 @@ final class PermissionAdminHandler extends AbstractHandler
      *   - object_type: string (required)
      *   - object_id: string (required)
      *   - relation: string (required)
+     *
+     * Flow (outbox pattern, mirrors grantPermission):
+     * 1. Validate and authorize
+     * 2. PG BEGIN
+     *    - outbox.insertBatch([row]) — one row, idempotency_key ensures
+     *      re-revoking the same tuple collapses to the same outbox row ID
+     * 3. PG COMMIT
+     * 4. processor.processSync(), then notifier.notify() when row is still non-terminal
+     * 5. DB sync and role cascade (non-fatal post-commit work)
+     * 6. Return response with success=true, plus outbox counters
+     *
+     * `success` is true whenever the DB commit succeeded. Tuple deletion
+     * failures surface via outbox_pending / outbox_failed rather than
+     * aborting the revoke.
      */
     private function revokePermission(
         ServerRequestInterface $request,
@@ -383,17 +548,84 @@ final class PermissionAdminHandler extends AbstractHandler
         $fgaUser   = $this->normalizeUser($user);
         $fgaObject = "{$objectType}:{$objectId}";
 
+        // Idempotency key: scoped to the admin + the specific tuple, so
+        // re-revoking the same permission collapses to the same outbox row ID.
+        $idempotencyKey = "permission_revoke:{$userId}:delete_tuple:{$fgaUser}:{$relation}:{$fgaObject}";
+
+        $outboxRow = [
+            'operation'       => OutboxOperation::DELETE_TUPLE,
+            'fga_user'        => $fgaUser,
+            'fga_relation'    => $relation,
+            'fga_object'      => $fgaObject,
+            'idempotency_key' => $idempotencyKey,
+            'metadata'        => ['admin_user' => "user:{$userId}"],
+        ];
+
+        // Atomically insert the outbox row in a PG transaction for durability
+        // before any sync fast-path is attempted.
+        $pdo    = Connection::getInstance();
+        $outbox = $this->getOutboxRepository();
+
+        $pdo->beginTransaction();
         try {
-            $this->getClient()->deleteTuple($fgaUser, $relation, $fgaObject);
-        } catch (\RuntimeException $e) {
-            // Treat "tuple not found" as success (idempotent revoke)
-            if (!str_contains($e->getMessage(), 'cannot delete a tuple which does not exist')) {
-                throw $e;
+            $outboxIds = $outbox->insertBatch([$outboxRow]);
+            $pdo->commit();
+        } catch (\Throwable $e) {
+            if ($pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+            throw $e;
+        }
+
+        // Sync fast path — attempt the outbox row immediately.
+        $processor = $this->getOutboxProcessor();
+        $notifier  = $this->getOutboxNotifier();
+
+        /** @var list<array{id: int, disposition: string, status: string}> $outboxResult */
+        $outboxResult  = [];
+        $deletedTuples = [];
+        $fgaErrors     = [];
+
+        foreach ($outboxIds as $rowId) {
+            $disposition = $processor->processSync($rowId);
+            $current     = $outbox->getById($rowId);
+            $statusValue = $current !== null ? $current->status->value : OutboxStatus::PENDING->value;
+
+            $outboxResult[] = [
+                'id'          => $rowId,
+                'disposition' => $disposition->name,
+                'status'      => $statusValue,
+            ];
+
+            if ($disposition === OutboxDisposition::BENIGN_SUCCESS) {
+                $deletedTuples[] = [
+                    'user'     => $current !== null ? $current->fgaUser     : $fgaUser,
+                    'relation' => $current !== null ? $current->fgaRelation : '',
+                    'object'   => $current !== null ? $current->fgaObject   : '',
+                ];
+            } else {
+                $fgaErrors[] = [
+                    'outbox_id' => $rowId,
+                    'status'    => $statusValue,
+                    'error'     => $current !== null ? ( $current->lastError ?? 'unknown' ) : 'unknown',
+                ];
+            }
+
+            // Notify the async consumer if the row is still non-terminal.
+            if (
+                $current !== null
+                && in_array($current->status, [OutboxStatus::PENDING, OutboxStatus::RETRYING], true)
+            ) {
+                $notifier->notify($rowId, OutboxOperation::DELETE_TUPLE->value);
             }
         }
 
+        $outboxPending = count(array_filter($outboxResult, static fn($r) => $r['status'] === OutboxStatus::RETRYING->value || $r['status'] === OutboxStatus::PENDING->value));
+        $outboxFailed  = count(array_filter($outboxResult, static fn($r) => $r['status'] === OutboxStatus::FAILED_TERMINAL->value));
+
         // Keep access_requests DB in sync: remove this permission from
-        // any approved access request for this user
+        // any approved access request for this user. This is a best-effort
+        // post-commit sync; failures here are non-fatal.
         $bareUserId = str_starts_with($fgaUser, 'user:')
             ? substr($fgaUser, 5)
             : $fgaUser;
@@ -406,8 +638,8 @@ final class PermissionAdminHandler extends AbstractHandler
         // Cascade: if this delete leaves any of the user's currently-held roles
         // with zero in-scope tuples, revoke the role too. Only check roles whose
         // scope includes the deleted tuple's object_type — others can't have
-        // been affected. Failures here are non-fatal: the tuple delete already
-        // succeeded.
+        // been affected. Failures here are non-fatal: the outbox row already
+        // committed.
         $cascadedRoles = [];
         if (ZitadelService::isConfigured() && OpenFgaClient::isConfigured()) {
             try {
@@ -427,15 +659,22 @@ final class PermissionAdminHandler extends AbstractHandler
             }
         }
 
+        $message = empty($cascadedRoles)
+            ? 'Permission revoked'
+            : 'Permission revoked; cascaded role(s) revoked: ' . implode(', ', $cascadedRoles);
+
         return $this->encodeResponseBody($response, [
             'success'        => true,
-            'message'        => empty($cascadedRoles)
-                ? 'Permission revoked'
-                : 'Permission revoked; cascaded role(s) revoked: ' . implode(', ', $cascadedRoles),
+            'message'        => $message,
             'user'           => $fgaUser,
             'relation'       => $relation,
             'object'         => $fgaObject,
             'cascaded_roles' => $cascadedRoles,
+            'tuples_deleted' => $deletedTuples,
+            'fga_errors'     => $fgaErrors,
+            'outbox_ids'     => $outboxIds,
+            'outbox_pending' => $outboxPending,
+            'outbox_failed'  => $outboxFailed,
         ]);
     }
 
