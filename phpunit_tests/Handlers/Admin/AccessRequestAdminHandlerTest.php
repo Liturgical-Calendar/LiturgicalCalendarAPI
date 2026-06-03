@@ -226,6 +226,15 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         $row = $repo->getById($id);
         self::assertNotNull($row);
         self::assertSame('approved', $row['status']);
+
+        // FGA-unavailable + non-empty permissions: outbox rows are still
+        // persisted so the backstop can drain them when FGA comes back.
+        // Mirror of testRevokeHappyPathWithoutFgaOrZitadel.
+        self::assertSame(1, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+        self::assertCount(1, $body['outbox_ids']);
+        self::assertCount(1, $body['fga_errors']);
+        self::assertSame('pending', $body['fga_errors'][0]['status']);
     }
 
     public function testRejectHappyPath(): void
