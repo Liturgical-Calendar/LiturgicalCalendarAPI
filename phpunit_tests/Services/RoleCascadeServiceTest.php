@@ -167,6 +167,9 @@ final class RoleCascadeServiceTest extends TestCase
 
     public function testCascadeTupleRevokeForRoleSwallowsDeleteFailures(): void
     {
+        // deleteTuple throws a generic Throwable (classified as RETRY).
+        // With no outboxRepo injected the nullsafe insertBatch call is a no-op,
+        // but cascadeRevokeByRole must still run and no tuples are recorded.
         $fga = $this->createStub(OpenFgaClient::class);
         $fga->method('listObjects')->willReturn(['t1']);
         $fga->method('deleteTuple')

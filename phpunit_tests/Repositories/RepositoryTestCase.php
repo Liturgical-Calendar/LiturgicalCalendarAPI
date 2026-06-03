@@ -31,7 +31,7 @@ abstract class RepositoryTestCase extends TestCase
     protected static ?PDO $pdo = null;
 
     /** @var array<int,string> Tables truncated before each test, in any order — CASCADE handles FKs. */
-    protected const TABLES = ['api_keys', 'applications', 'access_requests', 'audit_log'];
+    protected const TABLES = ['api_keys', 'applications', 'access_requests', 'audit_log', 'openfga_outbox'];
 
     public static function setUpBeforeClass(): void
     {
@@ -92,7 +92,13 @@ abstract class RepositoryTestCase extends TestCase
 
     private static ?string $skipReason = null;
 
-    private static function env(string $name): ?string
+    /**
+     * Resolve a DB env var. Subclasses that need to open a second PDO
+     * connection should reuse this rather than reading $_ENV directly,
+     * so the resolution rules (env array first, getenv() fallback) stay
+     * consistent with setUpBeforeClass().
+     */
+    protected static function env(string $name): ?string
     {
         if (isset($_ENV[$name]) && $_ENV[$name] !== '') {
             return (string) $_ENV[$name];

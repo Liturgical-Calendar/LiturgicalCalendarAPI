@@ -14,7 +14,12 @@ use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
+use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxNotifier;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxStatus;
 use LiturgicalCalendar\Tests\Handlers\AbstractHandlerTestCase;
 use LiturgicalCalendar\Tests\Support\EnvIsolationTrait;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -221,6 +226,15 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         $row = $repo->getById($id);
         self::assertNotNull($row);
         self::assertSame('approved', $row['status']);
+
+        // FGA-unavailable + non-empty permissions: outbox rows are still
+        // persisted so the backstop can drain them when FGA comes back.
+        // Mirror of testRevokeHappyPathWithoutFgaOrZitadel.
+        self::assertSame(1, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+        self::assertCount(1, $body['outbox_ids']);
+        self::assertCount(1, $body['fga_errors']);
+        self::assertSame('pending', $body['fga_errors'][0]['status']);
     }
 
     public function testRejectHappyPath(): void
@@ -248,12 +262,10 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         ]);
         $repo->approve($id, 'admin');
 
-        // Mirror testApproveHappyPathWithoutFgaOrZitadel — clear both gate's
-        // env vars so the handler hits the not-configured branch for each
-        // service. Seeding with a real permission (rather than the previous
-        // empty []) makes the "tuples_deleted=[]" assertion meaningful: an
-        // FGA-configured run would have tuples to delete; here it shouldn't
-        // even try.
+        // When FGA is unavailable the handler MUST still create outbox rows
+        // for the delete operations — they're durable in PG and the cron
+        // backstop will drain them once FGA comes back. The earlier
+        // contract (drop the work) silently left stale tuples behind.
         $response = $this->withoutEnv(
             array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
             fn() => ( new AccessRequestAdminHandler() )->handle(
@@ -266,12 +278,21 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertTrue($body['success']);
         self::assertFalse($body['role_removed']);
         self::assertNull($body['zitadel_error']);
-        self::assertSame([], $body['tuples_deleted']);
-        self::assertSame([], $body['fga_errors']);
-
+        // DB revoke happened atomically with the outbox insert.
         $row = $repo->getById($id);
         self::assertNotNull($row);
         self::assertSame('revoked', $row['status']);
+
+        // The delete is queued for the backstop. tuples_deleted stays empty
+        // (sync attempt was skipped because FGA is unavailable); the row
+        // shows up as outbox_pending and outbox_ids carries its ID so the
+        // admin can follow up via /admin/outbox.
+        self::assertSame([], $body['tuples_deleted']);
+        self::assertSame(1, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+        self::assertCount(1, $body['outbox_ids']);
+        self::assertCount(1, $body['fga_errors']);
+        self::assertSame('pending', $body['fga_errors'][0]['status']);
     }
 
     public function testUnknownActionIsValidationError(): void
@@ -485,16 +506,24 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
             new GuzzleResponse(200, [], '{}'), // tuple 2 write OK
         ]);
 
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
         $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
             $mock,
-            fn(OpenFgaClient $client) => ( new AccessRequestAdminHandler($client) )->handle(
-                $this->withOidcUser($this->requestFor(
-                    'POST',
-                    '/admin/access-requests/' . $id . '/approve',
-                    [],
-                    ['notes' => 'ok']
-                ))
-            )
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/approve',
+                        [],
+                        ['notes' => 'ok']
+                    ))
+                );
+            }
         ));
 
         self::assertSame(200, $response->getStatusCode());
@@ -502,6 +531,9 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertTrue($body['success']);
         self::assertCount(2, self::arrayFieldFrom($body, 'tuples_created'));
         self::assertSame([], $body['fga_errors']);
+        self::assertSame(0, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+        self::assertCount(2, self::arrayFieldFrom($body, 'outbox_ids'));
 
         $row = $repo->getById($id);
         self::assertNotNull($row);
@@ -510,9 +542,9 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
 
     public function testApproveTreatsDuplicateTupleAsBenign(): void
     {
-        // Idempotent re-approval: one tuple already exists. The handler
-        // should treat that write as success, still mutate the DB, and
-        // return success: true.
+        // Idempotent re-approval: one tuple already exists. The outbox processor
+        // classifies TupleAlreadyExistsException as BENIGN_SUCCESS, so the row
+        // ends up in 'succeeded' state. The DB is mutated and success is true.
         $repo = new AccessRequestRepository(self::$pdo);
         $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
             ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
@@ -525,33 +557,47 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
             ])),
         ]);
 
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
         $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
             $mock,
-            fn(OpenFgaClient $client) => ( new AccessRequestAdminHandler($client) )->handle(
-                $this->withOidcUser($this->requestFor(
-                    'POST',
-                    '/admin/access-requests/' . $id . '/approve',
-                    [],
-                    ['notes' => 'retry']
-                ))
-            )
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/approve',
+                        [],
+                        ['notes' => 'retry']
+                    ))
+                );
+            }
         ));
 
         $body = $this->decodeJsonBody($response);
         self::assertTrue($body['success']);
+        // BENIGN_SUCCESS → goes into tuples_created (row is succeeded in outbox).
         self::assertCount(1, self::arrayFieldFrom($body, 'tuples_created'));
         self::assertSame([], $body['fga_errors']);
+        self::assertSame(0, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
 
         $row = $repo->getById($id);
         self::assertNotNull($row);
         self::assertSame('approved', $row['status']);
     }
 
-    public function testApproveBailsAndKeepsRequestPendingOnRealFgaError(): void
+    public function testApproveCommitsDbAndSurfacesTerminalOutboxFailureOnRealFgaError(): void
     {
-        // Genuine OpenFGA failure (e.g. validation error). The handler must
-        // NOT mark the DB as approved — leaving it pending lets the admin
-        // retry once the underlying error is resolved.
+        // Genuine terminal OpenFGA failure (e.g. validation_error 400 with a
+        // known-terminal error code). Under the outbox pattern:
+        // - The DB IS committed (approved) — success: true.
+        // - The outbox row ends up in 'failed_terminal' state.
+        // - outbox_failed == 1 and fga_errors carries the structured error.
+        // - The admin can retry the outbox row via the outbox retry endpoint.
         $repo = new AccessRequestRepository(self::$pdo);
         $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
             ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
@@ -564,27 +610,45 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
             ])),
         ]);
 
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
         $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
             $mock,
-            fn(OpenFgaClient $client) => ( new AccessRequestAdminHandler($client) )->handle(
-                $this->withOidcUser($this->requestFor(
-                    'POST',
-                    '/admin/access-requests/' . $id . '/approve',
-                    [],
-                    ['notes' => 'try']
-                ))
-            )
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/approve',
+                        [],
+                        ['notes' => 'try']
+                    ))
+                );
+            }
         ));
 
         $body = $this->decodeJsonBody($response);
-        self::assertFalse($body['success']);
+        // DB committed → success: true (deliberate semantic shift from #628).
+        self::assertTrue($body['success']);
+        self::assertSame(0, $body['outbox_pending']);
+        self::assertSame(1, $body['outbox_failed']);
         self::assertCount(1, self::arrayFieldFrom($body, 'fga_errors'));
-        self::assertStringContainsString('Approval aborted', self::stringFieldFrom($body, 'message'));
+        self::assertStringContainsString('failed terminally', self::stringFieldFrom($body, 'message'));
 
-        // DB row must still be pending — the request was NOT approved.
+        // DB row IS approved — the outbox captures the failure, not the DB transaction.
         $row = $repo->getById($id);
         self::assertNotNull($row);
-        self::assertSame('pending', $row['status']);
+        self::assertSame('approved', $row['status']);
+
+        // Verify the outbox row itself is in failed_terminal state.
+        $outboxIds = self::arrayFieldFrom($body, 'outbox_ids');
+        self::assertCount(1, $outboxIds);
+        $outboxRow = $outboxRepo->getById((int) $outboxIds[0]);
+        self::assertNotNull($outboxRow);
+        self::assertSame(OutboxStatus::FAILED_TERMINAL, $outboxRow->status);
     }
 
     public function testRevokeSucceedsWhenAllTupleDeletesSucceed(): void
@@ -599,22 +663,33 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
             new GuzzleResponse(200, [], '{}'), // delete OK
         ]);
 
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
         $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
             $mock,
-            fn(OpenFgaClient $client) => ( new AccessRequestAdminHandler($client) )->handle(
-                $this->withOidcUser($this->requestFor(
-                    'POST',
-                    '/admin/access-requests/' . $id . '/revoke',
-                    [],
-                    []
-                ))
-            )
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/revoke',
+                        [],
+                        []
+                    ))
+                );
+            }
         ));
 
         $body = $this->decodeJsonBody($response);
         self::assertTrue($body['success']);
         self::assertCount(1, self::arrayFieldFrom($body, 'tuples_deleted'));
         self::assertSame([], $body['fga_errors']);
+        self::assertSame(0, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+        self::assertCount(1, self::arrayFieldFrom($body, 'outbox_ids'));
 
         $row = $repo->getById($id);
         self::assertNotNull($row);
@@ -623,6 +698,9 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
 
     public function testRevokeTreatsMissingTupleAsBenign(): void
     {
+        // TupleNotFoundException (cannot_allow_unknown_tuple_to_be_deleted) is
+        // classified as BENIGN_SUCCESS by OutboxClassifier — the row lands in
+        // 'succeeded' state and appears in tuples_deleted (idempotent re-revoke).
         $repo = new AccessRequestRepository(self::$pdo);
         $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
             ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
@@ -636,30 +714,46 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
             ])),
         ]);
 
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
         $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
             $mock,
-            fn(OpenFgaClient $client) => ( new AccessRequestAdminHandler($client) )->handle(
-                $this->withOidcUser($this->requestFor(
-                    'POST',
-                    '/admin/access-requests/' . $id . '/revoke',
-                    [],
-                    []
-                ))
-            )
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/revoke',
+                        [],
+                        []
+                    ))
+                );
+            }
         ));
 
         $body = $this->decodeJsonBody($response);
         self::assertTrue($body['success']);
+        // BENIGN_SUCCESS → counted in tuples_deleted (idempotent — tuple already gone).
         self::assertCount(1, self::arrayFieldFrom($body, 'tuples_deleted'));
         self::assertSame([], $body['fga_errors']);
+        self::assertSame(0, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
 
         $row = $repo->getById($id);
         self::assertNotNull($row);
         self::assertSame('revoked', $row['status']);
     }
 
-    public function testRevokeBailsAndKeepsRequestApprovedOnRealFgaError(): void
+    public function testRevokeCommitsDbAndSurfacesTransientOutboxFailureOnFgaError(): void
     {
+        // A 500 (transient / retryable) from OpenFGA. Under the outbox pattern:
+        // - The DB IS committed (revoked) — success: true.
+        // - The outbox row ends up in 'retrying' state.
+        // - outbox_pending == 1 and fga_errors carries the structured error.
+        // - The cron backstop or async consumer will retry the deletion.
         $repo = new AccessRequestRepository(self::$pdo);
         $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
             ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
@@ -673,27 +767,44 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
             ])),
         ]);
 
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
         $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
             $mock,
-            fn(OpenFgaClient $client) => ( new AccessRequestAdminHandler($client) )->handle(
-                $this->withOidcUser($this->requestFor(
-                    'POST',
-                    '/admin/access-requests/' . $id . '/revoke',
-                    [],
-                    []
-                ))
-            )
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/revoke',
+                        [],
+                        []
+                    ))
+                );
+            }
         ));
 
         $body = $this->decodeJsonBody($response);
-        self::assertFalse($body['success']);
+        // DB committed → success: true (outbox pattern — mirrors approveRequest semantics).
+        self::assertTrue($body['success']);
+        self::assertSame(1, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
         self::assertCount(1, self::arrayFieldFrom($body, 'fga_errors'));
-        self::assertStringContainsString('Revocation aborted', self::stringFieldFrom($body, 'message'));
 
-        // DB row must still be approved — the revoke was NOT committed.
+        // DB row IS revoked — the outbox captures the failure, not the DB transaction.
         $row = $repo->getById($id);
         self::assertNotNull($row);
-        self::assertSame('approved', $row['status']);
+        self::assertSame('revoked', $row['status']);
+
+        // Verify the outbox row itself is in retrying state.
+        $outboxIds = self::arrayFieldFrom($body, 'outbox_ids');
+        self::assertCount(1, $outboxIds);
+        $outboxRow = $outboxRepo->getById((int) $outboxIds[0]);
+        self::assertNotNull($outboxRow);
+        self::assertSame(OutboxStatus::RETRYING, $outboxRow->status);
     }
 
     // --- isFgaClientAvailable() fail-closed guards -----------------------
@@ -754,5 +865,443 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         // total reflects the SQL paginator's pre-filter count, not the
         // empty post-filter visible set.
         self::assertSame(2, $body['total']);
+    }
+
+    // --- Outbox pattern (Task 20: issue #567 Options B+C) ----------------
+
+    public function testApproveCommitsOutboxRowsAtomicallyWithDbWrite(): void
+    {
+        // Two permissions: first call returns 503 (transient — RETRY → retrying),
+        // second call returns 200 (success → succeeded). After the sync fast path:
+        // - success: true (DB committed)
+        // - outbox_pending: 1 (the retrying row)
+        // - outbox_failed: 0
+        // - outbox_ids: 2 entries
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+            ['object_type' => 'diocesan_calendar', 'object_id' => 'roma_it', 'relation' => 'viewer'],
+        ]);
+
+        $mock = new MockHandler([
+            new GuzzleResponse(503, [], ''), // tuple 1: transient → RETRY
+            new GuzzleResponse(200, [], '{}'), // tuple 2: OK → BENIGN_SUCCESS
+        ]);
+
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock,
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/approve',
+                        [],
+                        ['notes' => 'ok']
+                    ))
+                );
+            }
+        ));
+
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame(1, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+        self::assertCount(2, self::arrayFieldFrom($body, 'outbox_ids'));
+
+        // Verify the DB row is approved.
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('approved', $row['status']);
+
+        // Verify the outbox row statuses: one retrying, one succeeded.
+        $outboxIds = self::arrayFieldFrom($body, 'outbox_ids');
+        $statuses  = [];
+        foreach ($outboxIds as $rowId) {
+            $outboxRow = $outboxRepo->getById((int) $rowId);
+            self::assertNotNull($outboxRow);
+            $statuses[] = $outboxRow->status->value;
+        }
+        sort($statuses);
+        self::assertSame([OutboxStatus::RETRYING->value, OutboxStatus::SUCCEEDED->value], $statuses);
+    }
+
+    public function testApproveIsIdempotentOnReissue(): void
+    {
+        // First approval: all tuples succeed → outbox rows in 'succeeded'.
+        // Second approval of the same request: repo.approve() returns false
+        // (status is already 'approved'), so the handler throws ValidationException.
+        // This test therefore verifies that the idempotency_key in insertBatch
+        // collapses duplicate inserts to the same row IDs when the first call
+        // succeeded and the second call cannot re-enter the approval flow.
+        //
+        // To test the actual idempotency_key collapse, we directly call insertBatch
+        // twice on the outbox repo with the same key and assert same IDs are returned.
+        $outboxRepo     = new OutboxRepository(self::$pdo);
+        $idempotencyKey = 'access_request:test-uuid:write_tuple:user:alice:editor:national_calendar:IT';
+
+        $rows = [
+            [
+                'operation'       => \LiturgicalCalendar\Api\Services\Outbox\OutboxOperation::WRITE_TUPLE,
+                'fga_user'        => 'user:alice',
+                'fga_relation'    => 'editor',
+                'fga_object'      => 'national_calendar:IT',
+                'idempotency_key' => $idempotencyKey,
+                'metadata'        => ['access_request_id' => 'test-uuid'],
+            ],
+        ];
+
+        $firstIds  = $outboxRepo->insertBatch($rows);
+        $secondIds = $outboxRepo->insertBatch($rows); // same key → same row
+
+        self::assertSame(
+            $firstIds,
+            $secondIds,
+            'idempotency_key must collapse second insert to same row IDs'
+        );
+
+        // Now verify the handler-level idempotency: re-approving an already-approved
+        // request must be rejected with a ValidationException (not crash or duplicate rows).
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+        ]);
+
+        $mock1 = new MockHandler([new GuzzleResponse(200, [], '{}')]);
+
+        $notifier = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        // First approval succeeds.
+        $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock1,
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/approve',
+                        [],
+                        []
+                    ))
+                );
+            }
+        ));
+
+        // Second approval on the same (now 'approved') request must be rejected.
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Cannot approve a request with status: approved');
+
+        $mock2 = new MockHandler([]);
+
+        $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock2,
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/approve',
+                        [],
+                        []
+                    ))
+                );
+            }
+        ));
+    }
+
+    // --- Outbox pattern (Task 21: revokeRequest) --------------------------
+
+    public function testRevokeCommitsOutboxRowsAtomicallyWithDbWrite(): void
+    {
+        // Two permissions: first call returns 503 (transient — RETRY → retrying),
+        // second call returns 200 (success → succeeded). After the sync fast path:
+        // - success: true (DB committed)
+        // - outbox_pending: 1 (the retrying row)
+        // - outbox_failed: 0
+        // - outbox_ids: 2 entries
+        // Both outbox rows have operation 'delete_tuple'.
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+            ['object_type' => 'diocesan_calendar', 'object_id' => 'roma_it', 'relation' => 'viewer'],
+        ]);
+        $repo->approve($id, 'admin-bob');
+
+        $mock = new MockHandler([
+            new GuzzleResponse(503, [], ''),   // tuple 1: transient → RETRY
+            new GuzzleResponse(200, [], '{}'), // tuple 2: OK → BENIGN_SUCCESS
+        ]);
+
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock,
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/revoke',
+                        [],
+                        []
+                    ))
+                );
+            }
+        ));
+
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame(1, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+        self::assertCount(2, self::arrayFieldFrom($body, 'outbox_ids'));
+
+        // DB row is revoked (commit happened before the FGA sync attempt).
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('revoked', $row['status']);
+
+        // Outbox rows: one retrying, one succeeded — both delete_tuple.
+        $outboxIds = self::arrayFieldFrom($body, 'outbox_ids');
+        $statuses  = [];
+        foreach ($outboxIds as $rowId) {
+            $outboxRow = $outboxRepo->getById((int) $rowId);
+            self::assertNotNull($outboxRow);
+            $statuses[] = $outboxRow->status->value;
+            self::assertSame(OutboxOperation::DELETE_TUPLE, $outboxRow->operation);
+        }
+        sort($statuses);
+        self::assertSame([OutboxStatus::RETRYING->value, OutboxStatus::SUCCEEDED->value], $statuses);
+    }
+
+    public function testRevokeIsIdempotentOnReissue(): void
+    {
+        // Verify idempotency_key collapse for delete_tuple rows.
+        $outboxRepo     = new OutboxRepository(self::$pdo);
+        $idempotencyKey = 'access_request:test-uuid:delete_tuple:user:alice:editor:national_calendar:IT';
+
+        $rows = [
+            [
+                'operation'       => OutboxOperation::DELETE_TUPLE,
+                'fga_user'        => 'user:alice',
+                'fga_relation'    => 'editor',
+                'fga_object'      => 'national_calendar:IT',
+                'idempotency_key' => $idempotencyKey,
+                'metadata'        => ['access_request_id' => 'test-uuid'],
+            ],
+        ];
+
+        $firstIds  = $outboxRepo->insertBatch($rows);
+        $secondIds = $outboxRepo->insertBatch($rows); // same key → same row
+
+        self::assertSame(
+            $firstIds,
+            $secondIds,
+            'idempotency_key must collapse second insert to same row IDs'
+        );
+
+        // Handler-level: re-revoking an already-revoked request must be rejected
+        // with a ValidationException (status is no longer 'approved').
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+        ]);
+        $repo->approve($id, 'admin-bob');
+
+        $notifier = new OutboxNotifier(null, 'litcal:reconcile-stream');
+        $mock1    = new MockHandler([new GuzzleResponse(200, [], '{}')]);
+
+        // First revoke succeeds.
+        $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock1,
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/revoke',
+                        [],
+                        []
+                    ))
+                );
+            }
+        ));
+
+        // Second revoke on the same (now 'revoked') request must be rejected.
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Cannot revoke a request with status: revoked');
+
+        $mock2 = new MockHandler([]);
+
+        $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock2,
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/revoke',
+                        [],
+                        []
+                    ))
+                );
+            }
+        ));
+    }
+
+    // -----------------------------------------------------------------------
+    // Empty-permissions fast path — exercises the early-return branch in
+    // both approveRequest and revokeRequest where no tuples are written/
+    // deleted and the outbox is bypassed entirely. Closes the bulk of the
+    // uncovered lines in the no-perms branch (lines ~373-390 / ~666-694
+    // per the coverage report).
+    // -----------------------------------------------------------------------
+
+    public function testApproveWithEmptyPermissionsTakesFastPathWithNoOutboxRows(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-fast', 'fast@x.test', null, 'developer', []);
+
+        $response = $this->withoutEnv(
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+            fn() => ( new AccessRequestAdminHandler() )->handle(
+                $this->withOidcUser($this->requestFor('POST', '/admin/access-requests/' . $id . '/approve', [], ['notes' => 'ok']))
+            )
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        // No permissions ⇒ no outbox rows ⇒ no fga_errors entries.
+        self::assertSame([], $body['tuples_created']);
+        self::assertSame([], $body['fga_errors']);
+        self::assertSame([], $body['outbox_ids']);
+        self::assertSame(0, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+
+        // DB row is now approved.
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('approved', $row['status']);
+
+        // Outbox is empty (the fast path never inserts when permissions=[]).
+        $outboxCount = (int) self::$pdo->query("SELECT COUNT(*) FROM openfga_outbox WHERE metadata->>'access_request_id' = " . self::$pdo->quote($id))->fetchColumn();
+        self::assertSame(0, $outboxCount, 'fast path must not insert outbox rows');
+    }
+
+    public function testRevokeWithEmptyPermissionsTakesFastPathWithNoOutboxRows(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-fast', 'fast@x.test', null, 'developer', []);
+        $repo->approve($id, 'admin');
+
+        $response = $this->withoutEnv(
+            array_merge(self::ZITADEL_ENV_VARS, self::OPENFGA_ENV_VARS),
+            fn() => ( new AccessRequestAdminHandler() )->handle(
+                $this->withOidcUser($this->requestFor('POST', '/admin/access-requests/' . $id . '/revoke', [], []))
+            )
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame([], $body['tuples_deleted']);
+        self::assertSame([], $body['fga_errors']);
+        self::assertSame([], $body['outbox_ids']);
+        self::assertSame(0, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('revoked', $row['status']);
+
+        $outboxCount = (int) self::$pdo->query("SELECT COUNT(*) FROM openfga_outbox WHERE metadata->>'access_request_id' = " . self::$pdo->quote($id))->fetchColumn();
+        self::assertSame(0, $outboxCount, 'fast path must not insert outbox rows');
+    }
+
+    // -----------------------------------------------------------------------
+    // approvalMessage / revocationMessage variants — exercise the deferral
+    // and failure-suffix branches that the existing happy-path tests don't
+    // touch (lines ~879-908 per the coverage report).
+    // -----------------------------------------------------------------------
+
+    public function testApprovalMessageIncludesBothDeferredAndFailedSuffix(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        // Two permissions: one will get a 503 (transient → deferred), one
+        // will get a validation_error 400 (terminal → failed).
+        $id = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+            ['object_type' => 'national_calendar', 'object_id' => 'US', 'relation' => 'editor'],
+        ]);
+
+        $mock = new MockHandler([
+            new \GuzzleHttp\Psr7\Response(503, [], ''),
+            new \GuzzleHttp\Psr7\Response(400, [], (string) json_encode(['code' => 'validation_error', 'message' => 'bad type'])),
+        ]);
+
+        $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock,
+            function (OpenFgaClient $client) use ($id): \Psr\Http\Message\ResponseInterface {
+                $handler = new AccessRequestAdminHandler($client);
+                return $handler->handle($this->withOidcUser(
+                    $this->requestFor('POST', '/admin/access-requests/' . $id . '/approve', [], ['notes' => 'ok'])
+                ));
+            }
+        ));
+
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame(1, $body['outbox_pending']);
+        self::assertSame(1, $body['outbox_failed']);
+        self::assertStringContainsString('deferred for async delivery', $body['message']);
+        self::assertStringContainsString('failed terminally', $body['message']);
+    }
+
+    public function testRevocationMessageIncludesBothDeferredAndFailedSuffix(): void
+    {
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+            ['object_type' => 'national_calendar', 'object_id' => 'US', 'relation' => 'editor'],
+        ]);
+        $repo->approve($id, 'admin');
+
+        $mock = new MockHandler([
+            new \GuzzleHttp\Psr7\Response(503, [], ''),
+            new \GuzzleHttp\Psr7\Response(400, [], (string) json_encode(['code' => 'validation_error', 'message' => 'bad type'])),
+        ]);
+
+        $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock,
+            function (OpenFgaClient $client) use ($id): \Psr\Http\Message\ResponseInterface {
+                $handler = new AccessRequestAdminHandler($client);
+                return $handler->handle($this->withOidcUser(
+                    $this->requestFor('POST', '/admin/access-requests/' . $id . '/revoke', [], [])
+                ));
+            }
+        ));
+
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertSame(1, $body['outbox_pending']);
+        self::assertSame(1, $body['outbox_failed']);
+        self::assertStringContainsString('deferred for async deletion', $body['message']);
+        self::assertStringContainsString('failed terminally', $body['message']);
     }
 }

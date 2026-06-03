@@ -422,15 +422,32 @@ Use `LoggerFactory::create()` to instantiate PSR-3 compliant Monolog loggers:
 
 **PHPUnit Tests:** `phpunit_tests/`
 
-- `ApiTestCase.php`: Base test class with common functionality
-- `Routes/`: Tests for each route handler
-- `Methods/`: HTTP method validation tests
-- `Enum/`: Enum behavior tests
+Test classes extend a layered base class depending on what surface they exercise. There is NOT a single "the" base class — use the one that matches the layer
+being tested:
+
+| Layer (path)     | Base class                   | When to use                                                                                                       |
+| ---------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `Routes/*`       | `ApiTestCase`                | Full HTTP-level integration tests. Hits the running API (Guzzle). Skipped when `localhost:8000` is unreachable.   |
+| `Handlers/*`     | `AbstractHandlerTestCase`    | In-process handler tests via direct `handle()` invocation. No HTTP server needed. 14+ existing tests follow this. |
+| `Repositories/*` | `RepositoryTestCase`         | PG-only repository tests. Auto-TRUNCATEs project tables; skipped when `DB_*` env unset. 6+ existing tests.        |
+| Pure-logic       | `PHPUnit\Framework\TestCase` | `Methods/`, `Enum/`, `Models/`, `Params/`, etc. — no I/O, extend the framework's `TestCase` directly.             |
+
+Rule of thumb: use the layered base whose surface you're actually exercising. A handler test that goes through `ApiTestCase` would unnecessarily require a running
+server; a route test that uses `AbstractHandlerTestCase` would bypass the Router and middleware pipeline.
+
+Other notable test infrastructure:
+
+- `phpunit_tests/Support/EnvIsolationTrait.php`: `withoutEnv(array $keys, callable $fn)` helper used by handler tests to exercise
+  "service not configured" branches without leaking host `.env.local` values into assertions.
+- `phpunit_tests/Services/OpenFgaClientTest.php`: pattern for `MockHandler`-backed `OpenFgaClient` (Guzzle `MockHandler` injected into
+  the HTTP client) — reused by every test that exercises FGA-calling code with mocked responses.
 
 **Test Groups:**
 
-- Regular tests: Fast validation tests
-- `@group slow`: Integration tests requiring API calls
+- Regular tests: Fast validation tests.
+- `@group slow`: Reserved for tests with **measurable** runtime cost — e.g., multi-year calendar calculations (`Routes/Readonly/TemporaleTest`), rate-limit
+  window waits (`Services/RateLimiterTest`), or full-schema-corpus validation (`Schemas/SchemaValidationTest`). Integration tests are NOT automatically slow:
+  most `Routes/*` tests run in < 200 ms and are excluded from `@group slow`.
 
 **Integrity Checks:**
 External web interface at [Liturgical-Calendar/UnitTestInterface](https://github.com/Liturgical-Calendar/UnitTestInterface) provides comprehensive calendar
