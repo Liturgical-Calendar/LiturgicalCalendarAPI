@@ -1,0 +1,5 @@
+# Liturgical Calendar OpenFGA outbox backstop — every 5 minutes.
+# Picks up rows older than the grace window that the consumer missed
+# (e.g. Redis was down or the API process died between PG commit and XADD).
+# Install: copy to /etc/cron.d/litcal-outbox-backstop and `systemctl restart cron`.
+*/5 * * * * litcal /usr/bin/php /opt/liturgical-calendar/bin/reconcile-outbox backstop >> /var/log/litcal-backstop.log 2>&1
