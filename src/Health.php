@@ -1914,6 +1914,16 @@ class Health implements MessageComponentInterface
                             }
                         }
                     }
+                    // Populate oldest_pel_idle_seconds via the xPending detail form.
+                    // Response shape: list of [msgId, consumer, idle_ms, deliveries].
+                    try {
+                        $pel = $redis->xPending($streamName, $groupName, '-', '+', 1);
+                        if (is_array($pel) && count($pel) > 0 && is_array($pel[0]) && isset($pel[0][2]) && is_numeric($pel[0][2])) {
+                            $consumer['oldest_pel_idle_seconds'] = intdiv((int) $pel[0][2], 1000);
+                        }
+                    } catch (\Throwable) {
+                        // Best-effort — don't let a secondary Redis call break the health response.
+                    }
                 }
             } catch (\Throwable) {
                 $consumer['redis_reachable'] = false;
