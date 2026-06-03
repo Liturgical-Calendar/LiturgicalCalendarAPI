@@ -227,6 +227,79 @@ final class OutboxRepository
     }
 
     /**
+     * List outbox rows with optional filters and offset pagination.
+     *
+     * @return array{rows: list<OutboxRow>, total: int}
+     */
+    public function list(
+        ?string $status,
+        ?string $accessRequestId,
+        int $limit,
+        int $offset,
+    ): array {
+        // Count query.
+        // We use two parameters for the status filter to avoid PostgreSQL's
+        // "could not determine data type of parameter" ambiguity when the same
+        // placeholder appears in both `IS NULL` and a cast expression.
+        $countStmt = $this->db->prepare(<<<'SQL'
+            SELECT COUNT(*)::int AS total
+            FROM openfga_outbox
+            WHERE (:status_null OR status = :status_val::outbox_status)
+              AND (:access_request_id_null OR metadata->>'access_request_id' = :access_request_id_val)
+        SQL);
+        $countStmt->bindValue(':status_null', $status === null, PDO::PARAM_BOOL);
+        $countStmt->bindValue(':status_val', $status ?? '', PDO::PARAM_STR);
+        $countStmt->bindValue(':access_request_id_null', $accessRequestId === null, PDO::PARAM_BOOL);
+        $countStmt->bindValue(':access_request_id_val', $accessRequestId ?? '', PDO::PARAM_STR);
+        $countStmt->execute();
+        $total = (int) $countStmt->fetchColumn();
+
+        // Data query — same split-param trick.
+        $dataStmt = $this->db->prepare(<<<'SQL'
+            SELECT id, operation, fga_user, fga_relation, fga_object,
+                   status, attempts, next_attempt_at, last_error, last_error_code,
+                   metadata, created_at, completed_at
+            FROM openfga_outbox
+            WHERE (:status_null OR status = :status_val::outbox_status)
+              AND (:access_request_id_null OR metadata->>'access_request_id' = :access_request_id_val)
+            ORDER BY id DESC
+            LIMIT :limit OFFSET :offset
+        SQL);
+        $dataStmt->bindValue(':status_null', $status === null, PDO::PARAM_BOOL);
+        $dataStmt->bindValue(':status_val', $status ?? '', PDO::PARAM_STR);
+        $dataStmt->bindValue(':access_request_id_null', $accessRequestId === null, PDO::PARAM_BOOL);
+        $dataStmt->bindValue(':access_request_id_val', $accessRequestId ?? '', PDO::PARAM_STR);
+        $dataStmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $dataStmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+        $dataStmt->execute();
+
+        $rows = [];
+        while (( $r = $dataStmt->fetch(PDO::FETCH_ASSOC) ) !== false) {
+            /** @var array<string, mixed> $r */
+            $rows[] = $this->hydrate($r);
+        }
+
+        return ['rows' => $rows, 'total' => $total];
+    }
+
+    /**
+     * Return the age in seconds of the oldest pending/retrying row, or 0 when none.
+     */
+    public function oldestPendingAgeSeconds(): int
+    {
+        $stmt = $this->db->query(<<<'SQL'
+            SELECT COALESCE(EXTRACT(EPOCH FROM (NOW() - MIN(created_at)))::int, 0)
+            FROM openfga_outbox
+            WHERE status IN ('pending', 'retrying')
+        SQL);
+        if ($stmt === false) {
+            return 0;
+        }
+        $val = $stmt->fetchColumn();
+        return is_numeric($val) ? (int) $val : 0;
+    }
+
+    /**
      * @return array<string, int>
      */
     public function countByStatus(): array
