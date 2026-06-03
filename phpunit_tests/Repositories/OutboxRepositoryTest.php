@@ -240,4 +240,43 @@ final class OutboxRepositoryTest extends RepositoryTestCase
         self::assertCount(1, $picked1);
         self::assertCount(1, $picked2);
     }
+
+    public function testResetForRetryClearsAttemptsAndStatus(): void
+    {
+        [$id] = $this->repo->insertBatch([$this->samplePayload()[0]]);
+        $this->repo->markFailedTerminal($id, 'validation_error', 'validation_error');
+
+        $changed = $this->repo->resetForRetry($id);
+
+        self::assertTrue($changed, 'resetForRetry must return true when a row was reset');
+        $row = $this->repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame(OutboxStatus::PENDING, $row->status);
+        self::assertSame(0, $row->attempts);
+        self::assertNull($row->lastError);
+        self::assertNull($row->lastErrorCode);
+        self::assertNull($row->completedAt);
+    }
+
+    public function testResetForRetryReturnsFalseForNonTerminalRow(): void
+    {
+        [$id] = $this->repo->insertBatch([$this->samplePayload()[0]]);
+        // Row is still 'pending' — admin retry must refuse.
+        $changed = $this->repo->resetForRetry($id);
+        self::assertFalse($changed);
+    }
+
+    public function testCountByStatusBucketsAllFour(): void
+    {
+        $ids = $this->repo->insertBatch($this->samplePayload());
+        $this->repo->markSucceeded($ids[0]);
+        $this->repo->markFailedTerminal($ids[1], 'x', null);
+
+        $counts = $this->repo->countByStatus();
+
+        self::assertSame(0, $counts['pending'] ?? 0);
+        self::assertSame(0, $counts['retrying'] ?? 0);
+        self::assertSame(1, $counts['succeeded'] ?? 0);
+        self::assertSame(1, $counts['failed_terminal'] ?? 0);
+    }
 }

@@ -201,6 +201,50 @@ final class OutboxRepository
     }
 
     /**
+     * Reset a failed_terminal row back to pending so the consumer/backstop
+     * will retry it. Only failed_terminal rows are eligible — admin retry on
+     * a pending/retrying row is a 409 from the handler.
+     *
+     * Returns true if a row was reset; false if the row was not in
+     * failed_terminal state.
+     */
+    public function resetForRetry(int $id): bool
+    {
+        $stmt = $this->db->prepare(<<<'SQL'
+            UPDATE openfga_outbox
+            SET status = 'pending',
+                attempts = 0,
+                last_error = NULL,
+                last_error_code = NULL,
+                completed_at = NULL,
+                next_attempt_at = NOW()
+            WHERE id = :id AND status = 'failed_terminal'
+        SQL);
+        $stmt->execute([':id' => $id]);
+        return $stmt->rowCount() === 1;
+    }
+
+    /**
+     * @return array<string, int>
+     */
+    public function countByStatus(): array
+    {
+        $stmt = $this->db->query(<<<'SQL'
+            SELECT status::text AS status, COUNT(*)::int AS n
+            FROM openfga_outbox
+            GROUP BY status
+        SQL);
+        $out  = [];
+        if ($stmt !== false) {
+            /** @var array{status: string, n: int} $r */
+            foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $r) {
+                $out[$r['status']] = $r['n'];
+            }
+        }
+        return $out;
+    }
+
+    /**
      * @param array<string, mixed> $row
      */
     private function hydrate(array $row): OutboxRow
