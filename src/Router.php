@@ -33,6 +33,7 @@ use LiturgicalCalendar\Api\Handlers\Auth\NotificationsHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\PermissionAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\UsersHandler;
 use LiturgicalCalendar\Api\Handlers\ApplicationsHandler;
+use LiturgicalCalendar\Api\Handlers\Ops\HealthHandler;
 use LiturgicalCalendar\Api\Handlers\Ops\MigrateHandler;
 use LiturgicalCalendar\Api\Handlers\Ops\OpcacheResetHandler;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
@@ -538,6 +539,11 @@ class Router
                 }
                 $this->handler = $temporaleHandler;
                 break;
+            case 'health':
+                $healthHandler = new HealthHandler();
+                $healthHandler->setAllowedRequestMethods([RequestMethod::GET]);
+                $this->handler = $healthHandler;
+                break;
             case '_ops':
                 if (count($requestPathParts) === 1 && $requestPathParts[0] === 'migrate') {
                     $migrateHandler = new MigrateHandler();
@@ -569,7 +575,8 @@ class Router
         $pipeline->pipe(new JsonBodyParserMiddleware());
 
         // Apply API key validation and rate limiting for public API routes
-        if (!in_array($route, ['auth', 'admin', 'applications', '_ops'], true)) {
+        // health is unauthenticated monitoring endpoint — exclude from key/rate checks
+        if (!in_array($route, ['auth', 'admin', 'applications', '_ops', 'health'], true)) {
             if (Connection::isConfigured()) {
                 $pipeline->pipe(new ApiKeyMiddleware(
                     new \LiturgicalCalendar\Api\Repositories\ApiKeyRepository(),
