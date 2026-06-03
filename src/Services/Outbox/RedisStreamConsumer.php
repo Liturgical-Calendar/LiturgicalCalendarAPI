@@ -14,7 +14,7 @@ use Psr\Log\NullLogger;
  * outbox row, invoke OutboxProcessor) doesn't get tangled with Redis
  * Streams plumbing, and so we can unit-test by mocking \Redis.
  */
-final class RedisStreamConsumer
+final class RedisStreamConsumer implements StreamConsumerInterface
 {
     private const CLAIM_IDLE_MS = 30_000;
 

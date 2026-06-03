@@ -20,7 +20,7 @@ use LiturgicalCalendar\Api\Services\OpenFgaClient;
  * processOne() is idempotent on terminal rows — re-running on a
  * succeeded or failed_terminal row is a no-op.
  */
-final class OutboxProcessor
+final class OutboxProcessor implements OutboxProcessorInterface
 {
     private const MAX_ATTEMPTS = 10;
 
