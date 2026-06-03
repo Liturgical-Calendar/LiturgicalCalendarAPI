@@ -220,4 +220,22 @@ final class OutboxAdminHandlerTest extends AbstractHandlerTestCase
         self::assertArrayHasKey('error', $body);
         self::assertStringContainsStringIgnoringCase('failed_terminal', (string) $body['error']);
     }
+
+    // -----------------------------------------------------------------------
+    // Test 5: POST retry returns 404 for missing row
+    // -----------------------------------------------------------------------
+
+    public function testPostRetryReturns404ForMissingRow(): void
+    {
+        $response = $this->makeHandler()->handle(
+            $this->withOidcUser(
+                $this->requestFor('POST', '/admin/outbox/999999/retry')
+            )
+        );
+
+        self::assertSame(404, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertArrayHasKey('error', $body);
+        self::assertStringContainsStringIgnoringCase('not found', (string) $body['error']);
+    }
 }

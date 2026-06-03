@@ -201,12 +201,18 @@ final class OutboxAdminHandler extends AbstractHandler
         ResponseInterface $response,
         int $id
     ): ResponseInterface {
-        $repo  = $this->getRepository();
+        $repo = $this->getRepository();
+
+        // Distinguish missing row (404) from non-terminal row (409).
+        if ($repo->getById($id) === null) {
+            return $this->encodeResponseBody($response, ['error' => 'Outbox row not found', 'id' => $id], StatusCode::NOT_FOUND);
+        }
+
         $reset = $repo->resetForRetry($id);
 
         if (!$reset) {
-            // Row doesn't exist or is not in failed_terminal state
-            return $this->encodeResponseBody($response, ['error' => 'Row must be in failed_terminal state to retry; if the row does not exist, check the id.'], StatusCode::CONFLICT);
+            // Row exists but is not in failed_terminal state.
+            return $this->encodeResponseBody($response, ['error' => 'Row must be in failed_terminal state to retry'], StatusCode::CONFLICT);
         }
 
         $row = $repo->getById($id);
