@@ -180,4 +180,80 @@ final class CascadeReconcilerTest extends TestCase
         ( new CascadeReconciler($repo, $cascade) )->evaluate(1);
         $this->expectNotToPerformAssertions();
     }
+
+    public function testPermissionRevokeFiresMaybeCascadePerCandidateRole(): void
+    {
+        $row  = $this->row(metadata: [
+            'cascade_kind'            => 'permission_revoke',
+            'cascade_user_id'         => 'u1',
+            'cascade_role_candidates' => ['editor', 'viewer'],
+        ]);
+        $repo = $this->createMock(OutboxRepositoryInterface::class);
+        $repo->method('getById')->willReturn($row);
+        $repo->expects(self::never())->method('countSiblingNonTerminalDeletes');
+
+        $cascade = $this->createMock(RoleCascadeService::class);
+        $matcher = self::exactly(2);
+        $cascade->expects($matcher)
+            ->method('maybeCascadeRoleRevoke')
+            ->willReturnCallback(function (string $userId, string $role) use ($matcher): bool {
+                self::assertSame('u1', $userId);
+                self::assertSame(['editor', 'viewer'][$matcher->numberOfInvocations() - 1], $role);
+                return false;
+            });
+
+        ( new CascadeReconciler($repo, $cascade) )->evaluate(1);
+    }
+
+    public function testPermissionRevokeNoOpsWhenCandidatesEmpty(): void
+    {
+        $row  = $this->row(metadata: [
+            'cascade_kind'            => 'permission_revoke',
+            'cascade_user_id'         => 'u1',
+            'cascade_role_candidates' => [],
+        ]);
+        $repo = $this->createStub(OutboxRepositoryInterface::class);
+        $repo->method('getById')->willReturn($row);
+
+        $cascade = $this->createMock(RoleCascadeService::class);
+        $cascade->expects(self::never())->method('maybeCascadeRoleRevoke');
+
+        ( new CascadeReconciler($repo, $cascade) )->evaluate(1);
+    }
+
+    public function testPermissionRevokeNoOpsWhenCascadeUserIdMissing(): void
+    {
+        $row  = $this->row(metadata: [
+            'cascade_kind'            => 'permission_revoke',
+            'cascade_role_candidates' => ['editor'],
+        ]);
+        $repo = $this->createStub(OutboxRepositoryInterface::class);
+        $repo->method('getById')->willReturn($row);
+
+        $cascade = $this->createMock(RoleCascadeService::class);
+        $cascade->expects(self::never())->method('maybeCascadeRoleRevoke');
+
+        ( new CascadeReconciler($repo, $cascade) )->evaluate(1);
+    }
+
+    public function testPermissionRevokeContinuesAfterOneCandidateThrows(): void
+    {
+        $row  = $this->row(metadata: [
+            'cascade_kind'            => 'permission_revoke',
+            'cascade_user_id'         => 'u1',
+            'cascade_role_candidates' => ['editor', 'viewer'],
+        ]);
+        $repo = $this->createStub(OutboxRepositoryInterface::class);
+        $repo->method('getById')->willReturn($row);
+
+        $cascade = $this->createMock(RoleCascadeService::class);
+        $cascade->expects(self::exactly(2))
+            ->method('maybeCascadeRoleRevoke')
+            ->willReturnOnConsecutiveCalls(
+                self::throwException(new \RuntimeException('boom')),
+                true,
+            );
+
+        ( new CascadeReconciler($repo, $cascade) )->evaluate(1);
+    }
 }

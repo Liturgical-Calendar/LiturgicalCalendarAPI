@@ -120,9 +120,37 @@ final class CascadeReconciler
         }
     }
 
-    private function dispatchPermissionRevoke(OutboxRow $row): void // @phpstan-ignore void.pure
+    private function dispatchPermissionRevoke(OutboxRow $row): void
     {
-        // Implemented in Task 4.
-        unset($row);
+        $userId     = is_string($row->metadata['cascade_user_id'] ?? null)
+            ? $row->metadata['cascade_user_id']
+            : null;
+        $candidates = $row->metadata['cascade_role_candidates'] ?? null;
+
+        if ($userId === null || !is_array($candidates)) {
+            $this->logger?->warning(
+                'CascadeReconciler: permission_revoke row missing cascade fields',
+                ['row_id' => $row->id, 'has_user_id' => $userId !== null, 'has_candidates' => is_array($candidates)],
+            );
+            return;
+        }
+
+        foreach ($candidates as $role) {
+            if (!is_string($role) || $role === '') {
+                continue;
+            }
+            try {
+                $removed = $this->cascade->maybeCascadeRoleRevoke($userId, $role);
+                $this->logger?->info(
+                    'CascadeReconciler: evaluated permission-revoke cascade for role',
+                    ['row_id' => $row->id, 'user_id' => $userId, 'role' => $role, 'role_removed' => $removed],
+                );
+            } catch (\Throwable $e) {
+                $this->logger?->warning(
+                    'CascadeReconciler: maybeCascadeRoleRevoke threw for one candidate — continuing',
+                    ['row_id' => $row->id, 'user_id' => $userId, 'role' => $role, 'error' => $e->getMessage()],
+                );
+            }
+        }
     }
 }
