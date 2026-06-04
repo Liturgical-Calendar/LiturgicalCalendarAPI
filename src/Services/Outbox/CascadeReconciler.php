@@ -23,7 +23,7 @@ use Psr\Log\LoggerInterface;
  * See docs/superpowers/specs/2026-06-03-issue-632-deferred-delete-coordination-design.md
  * for the design and acceptance criteria.
  */
-final class CascadeReconciler
+final class CascadeReconciler implements CascadeReconcilerInterface
 {
     public function __construct(
         private readonly OutboxRepositoryInterface $outboxRepo,
