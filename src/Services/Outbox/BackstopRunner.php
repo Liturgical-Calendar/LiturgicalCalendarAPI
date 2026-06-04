@@ -11,7 +11,10 @@ use PDO;
  * One-shot scan of openfga_outbox for the cron backstop.
  *
  * Picks up rows older than the grace window (default 60s — the consumer
- * gets first crack), processes them via OutboxProcessorInterface, exits.
+ * gets first crack), processes them via OutboxProcessorInterface, and
+ * (optionally) invokes CascadeReconcilerInterface on every BENIGN_SUCCESS
+ * so the Zitadel role-cascade decision is re-evaluated in the same
+ * idempotent way the consumer's hot path does.
  *
  * The grace window is the durability buffer: the consumer's XREADGROUP
  * wake-up is sub-second on the happy path, so the backstop should only
@@ -24,6 +27,7 @@ final class BackstopRunner
         private readonly OutboxProcessorInterface $processor,
         private readonly PDO $pdo,
         private readonly int $graceSeconds = 60,
+        private readonly ?CascadeReconcilerInterface $cascade = null,
     ) {
     }
 
@@ -43,7 +47,15 @@ final class BackstopRunner
         try {
             $rows = $this->repo->pickupPending($limit, $cutoff);
             foreach ($rows as $row) {
-                $this->processor->processOne($row->id);
+                $disposition = $this->processor->processOne($row->id);
+                if ($disposition === OutboxDisposition::BENIGN_SUCCESS && $this->cascade !== null) {
+                    try {
+                        $this->cascade->evaluate($row->id);
+                    } catch (\Throwable) {
+                        // Never fail the backstop over a cascade decision; same
+                        // rationale as ConsumerLoop::tick.
+                    }
+                }
             }
             $this->pdo->commit();
         } catch (\Throwable $e) {
