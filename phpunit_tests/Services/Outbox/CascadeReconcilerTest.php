@@ -256,4 +256,13 @@ final class CascadeReconcilerTest extends TestCase
 
         ( new CascadeReconciler($repo, $cascade) )->evaluate(1);
     }
+
+    public function testFromEnvReturnsCorrectInstance(): void
+    {
+        // Confirms fromEnv() returns a CascadeReconciler instance when its
+        // dependencies (DB / Zitadel / FGA) are all reachable. Connection::getInstance()
+        // is eager, so this test requires DB env to be set; CI provides it via .env.local.
+        $reconciler = CascadeReconciler::fromEnv();
+        self::assertInstanceOf(CascadeReconciler::class, $reconciler);
+    }
 }

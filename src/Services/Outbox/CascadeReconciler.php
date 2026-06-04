@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Services\Outbox;
 
+use LiturgicalCalendar\Api\Database\Connection;
+use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Repositories\OutboxRepositoryInterface;
 use LiturgicalCalendar\Api\Services\RoleCascadeService;
 use Psr\Log\LoggerInterface;
@@ -28,6 +30,24 @@ final class CascadeReconciler
         private readonly RoleCascadeService $cascade,
         private readonly ?LoggerInterface $logger = null,
     ) {
+    }
+
+    /**
+     * Build a reconciler from environment-configured collaborators.
+     *
+     * Matches the fromEnv() pattern used by RoleCascadeService and OpenFgaClient.
+     * Reads DB / OpenFGA / Zitadel / Redis settings from $_ENV. The reconciler
+     * holds these as constructor-injected services; if any are misconfigured,
+     * the underlying evaluate() call will surface that at use time (per-row
+     * try/catch), not here at construction.
+     */
+    public static function fromEnv(?LoggerInterface $logger = null): self
+    {
+        return new self(
+            new OutboxRepository(Connection::getInstance()),
+            RoleCascadeService::fromEnv($logger),
+            $logger,
+        );
     }
 
     public function evaluate(int $rowId): void
