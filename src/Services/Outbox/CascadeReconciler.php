@@ -25,7 +25,6 @@ final class CascadeReconciler
 {
     public function __construct(
         private readonly OutboxRepositoryInterface $outboxRepo,
-        /** @phpstan-ignore property.onlyWritten (read in Task 3 + Task 4 dispatchers) */
         private readonly RoleCascadeService $cascade,
         private readonly ?LoggerInterface $logger = null,
     ) {
@@ -61,10 +60,64 @@ final class CascadeReconciler
         };
     }
 
-    private function dispatchAccessRequestRevoke(OutboxRow $row): void // @phpstan-ignore void.pure
+    private function dispatchAccessRequestRevoke(OutboxRow $row): void
     {
-        // Implemented in Task 3.
-        unset($row);
+        $accessRequestId = is_string($row->metadata['access_request_id'] ?? null)
+            ? $row->metadata['access_request_id']
+            : null;
+        $userId          = is_string($row->metadata['cascade_user_id'] ?? null)
+            ? $row->metadata['cascade_user_id']
+            : null;
+        $role            = is_string($row->metadata['cascade_role'] ?? null)
+            ? $row->metadata['cascade_role']
+            : null;
+
+        if ($accessRequestId === null || $userId === null || $role === null) {
+            $this->logger?->warning(
+                'CascadeReconciler: access_request_revoke row missing cascade fields',
+                [
+                    'row_id'         => $row->id,
+                    'has_request_id' => $accessRequestId !== null,
+                    'has_user_id'    => $userId !== null,
+                    'has_role'       => $role !== null
+                ],
+            );
+            return;
+        }
+
+        $pending = $this->outboxRepo->countSiblingNonTerminalDeletes($accessRequestId);
+        if ($pending > 0) {
+            $this->logger?->info(
+                'CascadeReconciler: deferring access-request cascade — siblings still in flight',
+                ['row_id' => $row->id, 'access_request_id' => $accessRequestId, 'pending' => $pending],
+            );
+            return;
+        }
+
+        try {
+            $removed = $this->cascade->maybeCascadeRoleRevoke($userId, $role);
+            $this->logger?->info(
+                'CascadeReconciler: evaluated access-request cascade',
+                [
+                    'row_id'            => $row->id,
+                    'access_request_id' => $accessRequestId,
+                    'user_id'           => $userId,
+                    'role'              => $role,
+                    'role_removed'      => $removed
+                ],
+            );
+        } catch (\Throwable $e) {
+            $this->logger?->warning(
+                'CascadeReconciler: maybeCascadeRoleRevoke threw — continuing',
+                [
+                    'row_id'            => $row->id,
+                    'access_request_id' => $accessRequestId,
+                    'user_id'           => $userId,
+                    'role'              => $role,
+                    'error'             => $e->getMessage()
+                ],
+            );
+        }
     }
 
     private function dispatchPermissionRevoke(OutboxRow $row): void // @phpstan-ignore void.pure

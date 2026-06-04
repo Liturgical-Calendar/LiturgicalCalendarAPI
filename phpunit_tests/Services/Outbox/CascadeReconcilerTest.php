@@ -102,4 +102,82 @@ final class CascadeReconcilerTest extends TestCase
 
         ( new CascadeReconciler($repo, $cascade) )->evaluate(1);
     }
+
+    public function testAccessRequestRevokeDefersWhenSiblingsStillPending(): void
+    {
+        $row  = $this->row(metadata: [
+            'cascade_kind'      => 'access_request_revoke',
+            'access_request_id' => 'r1',
+            'cascade_user_id'   => 'u1',
+            'cascade_role'      => 'editor',
+        ]);
+        $repo = $this->createMock(OutboxRepositoryInterface::class);
+        $repo->method('getById')->willReturn($row);
+        $repo->expects(self::once())
+            ->method('countSiblingNonTerminalDeletes')
+            ->with('r1')
+            ->willReturn(2);
+
+        $cascade = $this->createMock(RoleCascadeService::class);
+        $cascade->expects(self::never())->method('maybeCascadeRoleRevoke');
+
+        ( new CascadeReconciler($repo, $cascade) )->evaluate(1);
+    }
+
+    public function testAccessRequestRevokeFiresCascadeWhenAllSiblingsSettled(): void
+    {
+        $row  = $this->row(metadata: [
+            'cascade_kind'      => 'access_request_revoke',
+            'access_request_id' => 'r1',
+            'cascade_user_id'   => 'u1',
+            'cascade_role'      => 'editor',
+        ]);
+        $repo = $this->createStub(OutboxRepositoryInterface::class);
+        $repo->method('getById')->willReturn($row);
+        $repo->method('countSiblingNonTerminalDeletes')->willReturn(0);
+
+        $cascade = $this->createMock(RoleCascadeService::class);
+        $cascade->expects(self::once())
+            ->method('maybeCascadeRoleRevoke')
+            ->with('u1', 'editor')
+            ->willReturn(true);
+
+        ( new CascadeReconciler($repo, $cascade) )->evaluate(1);
+    }
+
+    public function testAccessRequestRevokeNoOpsWhenCascadeFieldsMissing(): void
+    {
+        // discriminator present, but cascade_user_id/cascade_role absent (defensive)
+        $row  = $this->row(metadata: [
+            'cascade_kind'      => 'access_request_revoke',
+            'access_request_id' => 'r1',
+        ]);
+        $repo = $this->createStub(OutboxRepositoryInterface::class);
+        $repo->method('getById')->willReturn($row);
+
+        $cascade = $this->createMock(RoleCascadeService::class);
+        $cascade->expects(self::never())->method('maybeCascadeRoleRevoke');
+
+        ( new CascadeReconciler($repo, $cascade) )->evaluate(1);
+    }
+
+    public function testAccessRequestRevokeSwallowsCascadeException(): void
+    {
+        $row  = $this->row(metadata: [
+            'cascade_kind'      => 'access_request_revoke',
+            'access_request_id' => 'r1',
+            'cascade_user_id'   => 'u1',
+            'cascade_role'      => 'editor',
+        ]);
+        $repo = $this->createStub(OutboxRepositoryInterface::class);
+        $repo->method('getById')->willReturn($row);
+        $repo->method('countSiblingNonTerminalDeletes')->willReturn(0);
+
+        $cascade = $this->createStub(RoleCascadeService::class);
+        $cascade->method('maybeCascadeRoleRevoke')->willThrowException(new \RuntimeException('zitadel down'));
+
+        // Must not propagate.
+        ( new CascadeReconciler($repo, $cascade) )->evaluate(1);
+        $this->expectNotToPerformAssertions();
+    }
 }
