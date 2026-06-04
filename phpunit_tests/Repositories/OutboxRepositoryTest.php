@@ -410,4 +410,67 @@ final class OutboxRepositoryTest extends RepositoryTestCase
         self::assertSame(3, $page['total']);
         self::assertCount(1, $page['rows']);
     }
+
+    public function testCountSiblingNonTerminalDeletesCountsOnlyPendingAndRetryingDeletesForRequest(): void
+    {
+        // Three rows for request "r1": pending delete, retrying delete, succeeded delete.
+        // One row for request "r1" that's a WRITE_TUPLE (must be ignored — wrong op).
+        // One row for request "r2" (must be ignored — wrong request id).
+        $ids = $this->repo->insertBatch([
+            [
+                'operation'       => OutboxOperation::DELETE_TUPLE,
+                'fga_user'        => 'user:alice',
+                'fga_relation'    => 'editor',
+                'fga_object'      => 'national_calendar:IT',
+                'idempotency_key' => 't1:pending',
+                'metadata'        => ['access_request_id' => 'r1'],
+            ],
+            [
+                'operation'       => OutboxOperation::DELETE_TUPLE,
+                'fga_user'        => 'user:alice',
+                'fga_relation'    => 'editor',
+                'fga_object'      => 'national_calendar:US',
+                'idempotency_key' => 't2:retrying',
+                'metadata'        => ['access_request_id' => 'r1'],
+            ],
+            [
+                'operation'       => OutboxOperation::DELETE_TUPLE,
+                'fga_user'        => 'user:alice',
+                'fga_relation'    => 'editor',
+                'fga_object'      => 'national_calendar:DE',
+                'idempotency_key' => 't3:succeeded',
+                'metadata'        => ['access_request_id' => 'r1'],
+            ],
+            [
+                'operation'       => OutboxOperation::WRITE_TUPLE,
+                'fga_user'        => 'user:alice',
+                'fga_relation'    => 'editor',
+                'fga_object'      => 'national_calendar:FR',
+                'idempotency_key' => 't4:write_ignored',
+                'metadata'        => ['access_request_id' => 'r1'],
+            ],
+            [
+                'operation'       => OutboxOperation::DELETE_TUPLE,
+                'fga_user'        => 'user:bob',
+                'fga_relation'    => 'editor',
+                'fga_object'      => 'national_calendar:IT',
+                'idempotency_key' => 't5:other_request',
+                'metadata'        => ['access_request_id' => 'r2'],
+            ],
+        ]);
+
+        // Drive row 2 to retrying and row 3 to succeeded.
+        $this->repo->markRetryable(
+            $ids[1],
+            1,
+            new \DateTimeImmutable('+10 seconds', new \DateTimeZone('Europe/Vatican')),
+            'transient',
+            null,
+        );
+        $this->repo->markSucceeded($ids[2]);
+
+        self::assertSame(2, $this->repo->countSiblingNonTerminalDeletes('r1'));
+        self::assertSame(1, $this->repo->countSiblingNonTerminalDeletes('r2'));
+        self::assertSame(0, $this->repo->countSiblingNonTerminalDeletes('nonexistent'));
+    }
 }
