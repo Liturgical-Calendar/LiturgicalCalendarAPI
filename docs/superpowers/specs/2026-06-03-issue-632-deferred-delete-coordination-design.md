@@ -117,23 +117,27 @@ final class CascadeReconciler
 
 ### 4.2 `evaluate($rowId)` behaviour
 
-Read the row once via `OutboxRepository::getById`. Switch on operation + metadata:
+Read the row once via `OutboxRepository::getById`. Both new metadata shapes carry a
+`cascade_kind: string` discriminator so the reconciler's dispatch is a single `match` on one key. Switch on
+operation + metadata:
 
-1. **Row missing, status != `succeeded`, or operation != `DELETE_TUPLE`** → no-op (log INFO at debug-ish detail).
-2. **`metadata.access_request_id` present** (access-request revoke path):
-   - Read `cascade_user_id` and `cascade_role` from metadata. If either missing, log WARNING and no-op
-     (pre-#632 row).
+1. **Row missing, status != `succeeded`, or operation != `DELETE_TUPLE`** → no-op (log INFO at debug-ish
+   detail).
+2. **`metadata.cascade_kind === 'access_request_revoke'`** (access-request revoke path):
+   - Read `access_request_id`, `cascade_user_id`, and `cascade_role` from metadata. If any missing, log
+     WARNING and no-op (defensive — handler is the only writer and always sets all three).
    - Call `outboxRepo->countSiblingNonTerminalDeletes($accessRequestId)`. If > 0, defer — a later sibling's
      success will re-trigger evaluation.
    - If 0, call `cascade->maybeCascadeRoleRevoke($cascadeUserId, $cascadeRole)`. Log INFO with the boolean
      result.
-3. **`metadata.cascade_permission_revoke === true`** (direct permission revoke path):
+3. **`metadata.cascade_kind === 'permission_revoke'`** (direct permission revoke path):
    - Read `cascade_user_id` and `cascade_role_candidates: string[]` from metadata.
    - For each role in candidates: call `cascade->maybeCascadeRoleRevoke($cascadeUserId, $role)`. Each call
      is independently idempotent.
-4. **Any other metadata shape** (e.g., `role_cascade_user/role` rows enqueued by
-   `RoleCascadeService::cascadeTupleRevokeForRole`): no-op. Those rows belong to the forward role-revoke
-   direction; the role is already removed from Zitadel at the call site.
+4. **No `cascade_kind` key** (rows enqueued by `RoleCascadeService::cascadeTupleRevokeForRole`, or pre-#632
+   rows in flight during deploy): no-op. The forward role-revoke direction already removed the role from
+   Zitadel at its call site; pre-#632 rows have no cascade hint and operator can re-revoke if needed.
+5. **Unknown `cascade_kind` value** (e.g., from a newer schema rolled back): log WARNING and no-op.
 
 ### 4.3 Why metadata over a fresh Zitadel/DB read
 
@@ -172,7 +176,7 @@ no-ops on a role the user no longer has. Harmless.
 
 ### 5.1 `AccessRequestAdminHandler::revokeRequest`
 
-**Outbox row metadata** grows two keys (already has `access_request_id`):
+**Outbox row metadata** grows three keys (already has `access_request_id`):
 
 ```php
 $outboxRows[] = [
@@ -183,8 +187,9 @@ $outboxRows[] = [
     'idempotency_key' => $idempotencyKey,
     'metadata'        => [
         'access_request_id' => $requestId,
-        'cascade_user_id'   => $userId,         // NEW
-        'cascade_role'      => $requestedRole,  // NEW
+        'cascade_kind'      => 'access_request_revoke', // NEW — discriminator
+        'cascade_user_id'   => $userId,                 // NEW
+        'cascade_role'      => $requestedRole,          // NEW
     ],
 ];
 ```
@@ -265,11 +270,11 @@ $outboxRow = [
     'operation'       => OutboxOperation::DELETE_TUPLE,
     // ...tuple fields, idempotency_key...
     'metadata' => [
-        'admin_user'                => "user:{$userId}",          // existing
-        'cascade_permission_revoke' => true,                       // NEW — discriminator
-        'cascade_user_id'           => $bareUserId,                // NEW
-        'cascade_object_type'       => $objectType,                // NEW — for audit
-        'cascade_role_candidates'   => $cascadeRoleCandidates,     // NEW
+        'admin_user'              => "user:{$userId}",          // existing
+        'cascade_kind'            => 'permission_revoke',       // NEW — discriminator
+        'cascade_user_id'         => $bareUserId,               // NEW
+        'cascade_object_type'     => $objectType,               // NEW — for audit
+        'cascade_role_candidates' => $cascadeRoleCandidates,    // NEW
     ],
 ];
 ```
