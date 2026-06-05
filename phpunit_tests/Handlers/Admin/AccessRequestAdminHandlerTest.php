@@ -16,6 +16,7 @@ use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\ZitadelService;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxNotifier;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
@@ -861,10 +862,16 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertNull($body['zitadel_error']);
         self::assertStringContainsString('deferred', $this->stringFieldFrom($body, 'message'));
 
-        // Zitadel sync status is 'pending' (deferred marker), NOT 'synced' or 'failed'.
-        $row = $repo->getById($id);
-        self::assertNotNull($row);
-        self::assertSame('pending', $row['zitadel_sync_status'] ?? null);
+        // Zitadel sync status is 'pending' (deferred marker), NOT 'synced' or 'failed' —
+        // but the handler only writes that column when ZitadelService::isConfigured() is
+        // true (the status column tracks Zitadel state). In CI without Zitadel env, the
+        // column stays null; the response-level cascade_deferred assertion above is the
+        // contract that holds in all environments.
+        if (ZitadelService::isConfigured()) {
+            $row = $repo->getById($id);
+            self::assertNotNull($row);
+            self::assertSame('pending', $row['zitadel_sync_status'] ?? null);
+        }
     }
 
     // --- isFgaClientAvailable() fail-closed guards -----------------------
