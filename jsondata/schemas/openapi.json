@@ -2255,13 +2255,71 @@
                     },
                     "object": {
                       "type": "string"
+                    },
+                    "cascade_deferred": {
+                      "type": "boolean",
+                      "description": "True when the Zitadel role-cascade decision was deferred because the delete-tuple row is still in the outbox (non-terminal). CascadeReconciler runs the decision once the row drains. See issue #632."
+                    },
+                    "cascaded_roles": {
+                      "type": "array",
+                      "description": "Zitadel role names that were cascade-revoked synchronously because the deleted tuple was the user's last in-scope tuple for the role. Empty when cascade_deferred is true, when no role lost its last tuple, or when Zitadel/OpenFGA is unconfigured.",
+                      "items": { "type": "string" }
+                    },
+                    "tuples_deleted": {
+                      "type": "array",
+                      "description": "OpenFGA permission tuple(s) that the handler observed as successfully deleted (BENIGN_SUCCESS on the sync fast-path). Empty when the single outbox row stayed in pending or retrying.",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "user": { "type": "string" },
+                          "relation": { "type": "string" },
+                          "object": { "type": "string" }
+                        },
+                        "required": ["user", "relation", "object"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "fga_errors": {
+                      "type": "array",
+                      "description": "Outbox row(s) whose OpenFGA delete did not reach BENIGN_SUCCESS synchronously (pending/retrying or failed_terminal). Pending rows will be drained by the consumer/backstop.",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "outbox_id": { "type": "integer" },
+                          "status": { "type": "string" },
+                          "error": { "type": "string" }
+                        },
+                        "required": ["outbox_id", "status", "error"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "outbox_ids": {
+                      "type": "array",
+                      "description": "Outbox row IDs created by this revoke. The handler always inserts exactly one row per call, so this is a single-element array.",
+                      "items": { "type": "integer" }
+                    },
+                    "outbox_pending": {
+                      "type": "integer",
+                      "description": "Count of outbox rows still in pending or retrying after the sync fast-path (0 or 1)."
+                    },
+                    "outbox_failed": {
+                      "type": "integer",
+                      "description": "Count of outbox rows in failed_terminal after the sync fast-path (0 or 1)."
                     }
                   },
                   "required": [
                     "success",
+                    "message",
                     "user",
                     "relation",
-                    "object"
+                    "object",
+                    "cascade_deferred",
+                    "cascaded_roles",
+                    "tuples_deleted",
+                    "fga_errors",
+                    "outbox_ids",
+                    "outbox_pending",
+                    "outbox_failed"
                   ]
                 }
               }
@@ -7801,9 +7859,9 @@
           "role_removed": {
             "type": "boolean"
           },
-          "tuples_deleted": {
-            "type": "integer",
-            "description": "Number of OpenFGA permission tuples deleted"
+          "cascade_deferred": {
+            "type": "boolean",
+            "description": "True when the Zitadel role-cascade decision was deferred because one or more delete-tuple rows are still in the outbox. CascadeReconciler runs the decision once the rows drain. See issue #632."
           },
           "zitadel_error": {
             "type": [
@@ -7811,19 +7869,59 @@
               "null"
             ]
           },
-          "tuple_errors": {
+          "tuples_deleted": {
             "type": "array",
+            "description": "OpenFGA permission tuples that the handler observed as successfully deleted (BENIGN_SUCCESS on the sync fast-path).",
             "items": {
-              "type": "string"
-            },
-            "description": "Errors encountered while deleting permission tuples"
+              "type": "object",
+              "properties": {
+                "user": { "type": "string" },
+                "relation": { "type": "string" },
+                "object": { "type": "string" }
+              },
+              "required": ["user", "relation", "object"],
+              "additionalProperties": false
+            }
+          },
+          "fga_errors": {
+            "type": "array",
+            "description": "Outbox rows whose OpenFGA delete did not reach BENIGN_SUCCESS synchronously (pending/retrying or failed_terminal). Pending rows will be drained by the consumer/backstop.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "outbox_id": { "type": "integer" },
+                "status": { "type": "string" },
+                "error": { "type": "string" }
+              },
+              "required": ["outbox_id", "status", "error"],
+              "additionalProperties": false
+            }
+          },
+          "outbox_ids": {
+            "type": "array",
+            "description": "Outbox row IDs created by this revoke (one per permission tuple). Empty on the no-permissions fast path.",
+            "items": { "type": "integer" }
+          },
+          "outbox_pending": {
+            "type": "integer",
+            "description": "Count of outbox rows still in pending or retrying after the sync fast-path."
+          },
+          "outbox_failed": {
+            "type": "integer",
+            "description": "Count of outbox rows in failed_terminal after the sync fast-path."
           }
         },
         "required": [
           "success",
           "message",
           "role_removed",
-          "tuples_deleted"
+          "cascade_deferred",
+          "zitadel_error",
+          "tuples_deleted",
+          "fga_errors",
+          "outbox_ids",
+          "outbox_pending",
+          "outbox_failed"
         ],
         "additionalProperties": false
       },
