@@ -697,15 +697,16 @@ final class AccessRequestAdminHandler extends AbstractHandler
             [$roleRemoved, $zitadelError] = $this->syncZitadelRoleRevoke($repo, $requestId, $userId, $requestedRole);
 
             return $this->encodeResponseBody($response, [
-                'success'        => true,
-                'role_removed'   => $roleRemoved,
-                'zitadel_error'  => $zitadelError,
-                'tuples_deleted' => [],
-                'fga_errors'     => [],
-                'outbox_ids'     => [],
-                'outbox_pending' => 0,
-                'outbox_failed'  => 0,
-                'message'        => $this->revocationMessage($roleRemoved, $zitadelError, 0, 0),
+                'success'          => true,
+                'role_removed'     => $roleRemoved,
+                'cascade_deferred' => false,
+                'zitadel_error'    => $zitadelError,
+                'tuples_deleted'   => [],
+                'fga_errors'       => [],
+                'outbox_ids'       => [],
+                'outbox_pending'   => 0,
+                'outbox_failed'    => 0,
+                'message'          => $this->revocationMessage($roleRemoved, $zitadelError, 0, 0, false),
             ]);
         }
 
@@ -729,7 +730,12 @@ final class AccessRequestAdminHandler extends AbstractHandler
                 'fga_relation'    => $relation,
                 'fga_object'      => $fgaObject,
                 'idempotency_key' => $idempotencyKey,
-                'metadata'        => ['access_request_id' => $requestId],
+                'metadata'        => [
+                    'access_request_id' => $requestId,
+                    'cascade_kind'      => 'access_request_revoke',
+                    'cascade_user_id'   => $userId,
+                    'cascade_role'      => $requestedRole,
+                ],
             ];
         }
 
@@ -811,19 +817,37 @@ final class AccessRequestAdminHandler extends AbstractHandler
         $outboxPending = count(array_filter($outboxResult, static fn($r) => $r['status'] === OutboxStatus::RETRYING->value || $r['status'] === OutboxStatus::PENDING->value));
         $outboxFailed  = count(array_filter($outboxResult, static fn($r) => $r['status'] === OutboxStatus::FAILED_TERMINAL->value));
 
-        // Step 4: Conditionally remove role from Zitadel (unchanged)
-        [$roleRemoved, $zitadelError] = $this->syncZitadelRoleRevoke($repo, $requestId, $userId, $requestedRole);
+        // Step 4: Conditionally remove role from Zitadel.
+        // When the sync fast-path drained every outbox row (outbox_pending === 0),
+        // today's synchronous cascade still runs. When one or more rows are still
+        // in pending/retrying, the cascade decision is racy (FGA would see stale
+        // tuples) — defer to CascadeReconciler in the consumer/backstop instead.
+        $cascadeDeferred = false;
+        $roleRemoved     = false;
+        $zitadelError    = null;
+
+        if ($outboxPending === 0) {
+            [$roleRemoved, $zitadelError] = $this->syncZitadelRoleRevoke($repo, $requestId, $userId, $requestedRole);
+        } else {
+            $cascadeDeferred = true;
+            if (ZitadelService::isConfigured()) {
+                // Mark sync status 'pending' so operators see the deferral explicitly
+                // rather than a stale prior status.
+                $repo->updateZitadelSyncStatus($requestId, 'pending');
+            }
+        }
 
         return $this->encodeResponseBody($response, [
-            'success'        => true,
-            'role_removed'   => $roleRemoved,
-            'zitadel_error'  => $zitadelError,
-            'tuples_deleted' => $deletedTuples,
-            'fga_errors'     => $fgaErrors,
-            'outbox_ids'     => $outboxIds,
-            'outbox_pending' => $outboxPending,
-            'outbox_failed'  => $outboxFailed,
-            'message'        => $this->revocationMessage($roleRemoved, $zitadelError, $outboxPending, $outboxFailed),
+            'success'          => true,
+            'role_removed'     => $roleRemoved,
+            'cascade_deferred' => $cascadeDeferred,
+            'zitadel_error'    => $zitadelError,
+            'tuples_deleted'   => $deletedTuples,
+            'fga_errors'       => $fgaErrors,
+            'outbox_ids'       => $outboxIds,
+            'outbox_pending'   => $outboxPending,
+            'outbox_failed'    => $outboxFailed,
+            'message'          => $this->revocationMessage($roleRemoved, $zitadelError, $outboxPending, $outboxFailed, $cascadeDeferred),
         ]);
     }
 
@@ -874,6 +898,7 @@ final class AccessRequestAdminHandler extends AbstractHandler
         ?string $zitadelError,
         int $outboxPending,
         int $outboxFailed,
+        bool $cascadeDeferred = false,
     ): string {
         $base = $roleRemoved
             ? 'Access revoked, role removed (no remaining permissions in scope) and permissions deleted'
@@ -882,6 +907,13 @@ final class AccessRequestAdminHandler extends AbstractHandler
                 : ( ZitadelService::isConfigured()
                     ? 'Access revoked, permissions deleted; role retained (other in-scope permissions remain)'
                     : 'Access revoked (Zitadel not configured)' ) );
+
+        if ($cascadeDeferred && $outboxPending > 0) {
+            return sprintf(
+                'Access revoked, permissions queued for deletion; role revocation deferred until %d permission tuple(s) drain',
+                $outboxPending,
+            );
+        }
 
         if ($outboxPending > 0 && $outboxFailed > 0) {
             return sprintf(
