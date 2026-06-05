@@ -552,8 +552,33 @@ final class PermissionAdminHandler extends AbstractHandler
         $this->validateTupleParams($user, $objectType, $objectId, $relation);
         $this->requireResourceAdmin($userId, $isGlobalAdmin, $objectType, $objectId);
 
-        $fgaUser   = $this->normalizeUser($user);
-        $fgaObject = "{$objectType}:{$objectId}";
+        $fgaUser    = $this->normalizeUser($user);
+        $fgaObject  = "{$objectType}:{$objectId}";
+        $bareUserId = str_starts_with($fgaUser, 'user:')
+            ? substr($fgaUser, 5)
+            : $fgaUser;
+
+        // Resolve which roles' scopes include the object_type being revoked so we
+        // can hand the cascade reconciler a pre-computed candidate list. Failures
+        // are non-fatal — an empty list means the consumer-side cascade is a no-op
+        // and the admin can re-revoke if they want a retry.
+        $cascadeRoleCandidates = [];
+        if (ZitadelService::isConfigured() && OpenFgaClient::isConfigured()) {
+            try {
+                $userRoles = ZitadelService::fromEnv()->getUserRoles($bareUserId);
+                foreach ($userRoles as $role) {
+                    $allowedTypes = AccessRequestRepository::ROLE_OBJECT_TYPES[$role] ?? [];
+                    if (in_array($objectType, $allowedTypes, true)) {
+                        $cascadeRoleCandidates[] = $role;
+                    }
+                }
+            } catch (\Throwable $e) {
+                $this->logger->warning(
+                    'PermissionAdminHandler: failed to resolve cascade candidates; revoke continues without cascade hint',
+                    ['exception' => $e],
+                );
+            }
+        }
 
         // Idempotency key: scoped to the admin + the specific tuple, so
         // re-revoking the same permission collapses to the same outbox row ID.
@@ -565,7 +590,13 @@ final class PermissionAdminHandler extends AbstractHandler
             'fga_relation'    => $relation,
             'fga_object'      => $fgaObject,
             'idempotency_key' => $idempotencyKey,
-            'metadata'        => ['admin_user' => "user:{$userId}"],
+            'metadata'        => [
+                'admin_user'              => "user:{$userId}",
+                'cascade_kind'            => 'permission_revoke',
+                'cascade_user_id'         => $bareUserId,
+                'cascade_object_type'     => $objectType,
+                'cascade_role_candidates' => $cascadeRoleCandidates,
+            ],
         ];
 
         // Atomically insert the outbox row in a PG transaction for durability
@@ -633,55 +664,57 @@ final class PermissionAdminHandler extends AbstractHandler
         // Keep access_requests DB in sync: remove this permission from
         // any approved access request for this user. This is a best-effort
         // post-commit sync; failures here are non-fatal.
-        $bareUserId = str_starts_with($fgaUser, 'user:')
-            ? substr($fgaUser, 5)
-            : $fgaUser;
-
         if (Connection::isConfigured()) {
             $repo = new AccessRequestRepository();
             $repo->removePermissionTuple($bareUserId, $objectType, $objectId, $relation);
         }
 
-        // Cascade: if this delete leaves any of the user's currently-held roles
-        // with zero in-scope tuples, revoke the role too. Only check roles whose
-        // scope includes the deleted tuple's object_type — others can't have
-        // been affected. Failures here are non-fatal: the outbox row already
-        // committed.
-        $cascadedRoles = [];
-        if (ZitadelService::isConfigured() && OpenFgaClient::isConfigured()) {
-            try {
-                $cascade   = RoleCascadeService::fromEnv();
-                $userRoles = ZitadelService::fromEnv()->getUserRoles($bareUserId);
-                foreach ($userRoles as $role) {
-                    $allowedTypes = AccessRequestRepository::ROLE_OBJECT_TYPES[$role] ?? [];
-                    if (!in_array($objectType, $allowedTypes, true)) {
-                        continue;
+        // Cascade: when the single outbox row drained synchronously (succeeded
+        // inline), run today's role cascade. When it's still pending/retrying,
+        // defer to CascadeReconciler in the consumer/backstop — its metadata
+        // already carries cascade_user_id + cascade_role_candidates so the
+        // reconciler has what it needs.
+        $current             = $outbox->getById($outboxIds[0]);
+        $singleSucceededSync = $current !== null && $current->status === OutboxStatus::SUCCEEDED;
+
+        $cascadedRoles   = [];
+        $cascadeDeferred = false;
+        if ($singleSucceededSync) {
+            if (ZitadelService::isConfigured() && OpenFgaClient::isConfigured()) {
+                try {
+                    $cascade = RoleCascadeService::fromEnv();
+                    foreach ($cascadeRoleCandidates as $role) {
+                        if ($cascade->maybeCascadeRoleRevoke($bareUserId, $role)) {
+                            $cascadedRoles[] = $role;
+                        }
                     }
-                    if ($cascade->maybeCascadeRoleRevoke($bareUserId, $role)) {
-                        $cascadedRoles[] = $role;
-                    }
+                } catch (\Throwable $e) {
+                    $this->logger->error('PermissionAdminHandler cascade check failed', ['exception' => $e]);
                 }
-            } catch (\Throwable $e) {
-                $this->logger->error('PermissionAdminHandler cascade check failed', ['exception' => $e]);
             }
+        } else {
+            $cascadeDeferred = true;
         }
 
-        $message = empty($cascadedRoles)
-            ? 'Permission revoked'
-            : 'Permission revoked; cascaded role(s) revoked: ' . implode(', ', $cascadedRoles);
+        $message = $cascadeDeferred
+            ? 'Permission revoked, queued for async deletion; role cascade deferred'
+            : ( empty($cascadedRoles)
+                ? 'Permission revoked'
+                : 'Permission revoked; cascaded role(s) revoked: ' . implode(', ', $cascadedRoles) );
 
         return $this->encodeResponseBody($response, [
-            'success'        => true,
-            'message'        => $message,
-            'user'           => $fgaUser,
-            'relation'       => $relation,
-            'object'         => $fgaObject,
-            'cascaded_roles' => $cascadedRoles,
-            'tuples_deleted' => $deletedTuples,
-            'fga_errors'     => $fgaErrors,
-            'outbox_ids'     => $outboxIds,
-            'outbox_pending' => $outboxPending,
-            'outbox_failed'  => $outboxFailed,
+            'success'          => true,
+            'message'          => $message,
+            'user'             => $fgaUser,
+            'relation'         => $relation,
+            'object'           => $fgaObject,
+            'cascaded_roles'   => $cascadedRoles,
+            'cascade_deferred' => $cascadeDeferred,
+            'tuples_deleted'   => $deletedTuples,
+            'fga_errors'       => $fgaErrors,
+            'outbox_ids'       => $outboxIds,
+            'outbox_pending'   => $outboxPending,
+            'outbox_failed'    => $outboxFailed,
         ]);
     }
 

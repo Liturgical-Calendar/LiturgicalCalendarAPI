@@ -99,6 +99,53 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         return $body[$key];
     }
 
+    /**
+     * Extract and narrow a string-typed top-level body field.
+     *
+     * @param array<string, mixed> $body
+     */
+    private static function stringFieldFrom(array $body, string $key): string
+    {
+        self::assertArrayHasKey($key, $body);
+        self::assertIsString($body[$key]);
+        return $body[$key];
+    }
+
+    /**
+     * Dispatch DELETE /admin/permissions with the given tuple fields.
+     * Zitadel and OpenFGA env vars are stripped so only the mock client is used.
+     *
+     * @param \LiturgicalCalendar\Api\Repositories\OutboxRepository $outboxRepo
+     * @param \LiturgicalCalendar\Api\Services\Outbox\OutboxNotifier $notifier
+     * @param \LiturgicalCalendar\Api\Services\OpenFgaClient $client
+     */
+    private function dispatchRevokePermission(
+        string $user,
+        string $objectType,
+        string $objectId,
+        string $relation,
+        \LiturgicalCalendar\Api\Repositories\OutboxRepository $outboxRepo,
+        \LiturgicalCalendar\Api\Services\Outbox\OutboxNotifier $notifier,
+        \LiturgicalCalendar\Api\Services\OpenFgaClient $client
+    ): \Psr\Http\Message\ResponseInterface {
+        $processor = new OutboxProcessor($outboxRepo, $client);
+        $handler   = new PermissionAdminHandler($client);
+        $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+        return $handler->handle(
+            $this->withOidcUser($this->requestFor(
+                'DELETE',
+                '/admin/permissions',
+                [],
+                [
+                    'user'        => $user,
+                    'object_type' => $objectType,
+                    'object_id'   => $objectId,
+                    'relation'    => $relation,
+                ]
+            ))
+        );
+    }
+
     public function testOptionsPreflightSucceeds(): void
     {
         $response = ( new PermissionAdminHandler() )->handle(
@@ -647,6 +694,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         self::assertTrue($body['success']);
         self::assertSame(0, $body['outbox_pending']);
         self::assertSame(0, $body['outbox_failed']);
+        self::assertSame(false, $body['cascade_deferred']);
         self::assertCount(1, self::arrayFieldFrom($body, 'outbox_ids'));
         self::assertCount(1, self::arrayFieldFrom($body, 'tuples_deleted'));
 
@@ -699,6 +747,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         self::assertTrue($body['success']);
         self::assertSame(1, $body['outbox_pending']);
         self::assertSame(0, $body['outbox_failed']);
+        self::assertSame(true, $body['cascade_deferred']);
 
         $outboxIds = self::arrayFieldFrom($body, 'outbox_ids');
         $outboxRow = $outboxRepo->getById((int) $outboxIds[0]);
@@ -750,6 +799,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         self::assertTrue($body['success']);
         self::assertSame(0, $body['outbox_pending']);
         self::assertSame(0, $body['outbox_failed']);
+        self::assertSame(false, $body['cascade_deferred']);
         // BENIGN_SUCCESS → counted in tuples_deleted (idempotent — tuple already gone).
         self::assertCount(1, self::arrayFieldFrom($body, 'tuples_deleted'));
     }
@@ -808,5 +858,39 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
             $ids2,
             'idempotency_key must collapse second revoke to same outbox row IDs'
         );
+    }
+
+    public function testRevokePermissionWithDeferredRowDefersCascade(): void
+    {
+        // Single delete tuple, FGA returns 503 → row stays in retrying.
+        // Zitadel stays CONFIGURED so we can verify the handler chose not to call it.
+        $fgaMock = new MockHandler([
+            new GuzzleResponse(503, [], '{"code":"service_unavailable"}'),
+        ]);
+
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withMockOpenFgaClient(
+            $fgaMock,
+            fn(OpenFgaClient $client) => $this->dispatchRevokePermission(
+                user: 'user:user-d9-12345',
+                objectType: 'national_calendar',
+                objectId: 'IT',
+                relation: 'editor',
+                outboxRepo: $outboxRepo,
+                notifier: $notifier,
+                client: $client,
+            )
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+
+        self::assertTrue($body['success']);
+        self::assertSame(true, $body['cascade_deferred']);
+        self::assertSame([], $body['cascaded_roles']);
+        self::assertSame(1, $body['outbox_pending']);
+        self::assertStringContainsString('role cascade deferred', $this->stringFieldFrom($body, 'message'));
     }
 }
