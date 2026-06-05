@@ -11,6 +11,7 @@ use GuzzleHttp\Psr7\Response;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\Outbox\BackstopRunner;
+use LiturgicalCalendar\Api\Services\Outbox\CascadeReconcilerInterface;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxDisposition;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
@@ -140,5 +141,114 @@ final class BackstopRunnerTest extends RepositoryTestCase
         // transaction — that would cascade into TRUNCATE failures in the
         // next test's setUp.
         self::assertFalse(self::$pdo->inTransaction(), 'BackstopRunner must roll back its tx before re-raising');
+    }
+
+    public function testRunOnceInvokesReconcilerOnEachBenignSuccess(): void
+    {
+        self::assertNotNull(self::$pdo);
+        $repo  = new OutboxRepository(self::$pdo);
+        $psr17 = new Psr17Factory();
+        // FGA mock: two successful writes for the two rows below.
+        $mock      = new MockHandler([
+            new Response(200, [], ''),
+            new Response(200, [], ''),
+        ]);
+        $client    = new OpenFgaClient(
+            'http://localhost:8083',
+            'store-123',
+            'model-456',
+            new Client(['handler' => HandlerStack::create($mock)]),
+            $psr17,
+            $psr17,
+        );
+        $processor = new OutboxProcessor($repo, $client);
+
+        $ids = $repo->insertBatch([
+            [
+                'operation'       => OutboxOperation::WRITE_TUPLE,
+                'fga_user'        => 'user:a',
+                'fga_relation'    => 'editor',
+                'fga_object'      => 'national_calendar:IT',
+                'idempotency_key' => 'recon-a-' . bin2hex(random_bytes(4)),
+                'metadata'        => [],
+            ],
+            [
+                'operation'       => OutboxOperation::WRITE_TUPLE,
+                'fga_user'        => 'user:b',
+                'fga_relation'    => 'editor',
+                'fga_object'      => 'national_calendar:US',
+                'idempotency_key' => 'recon-b-' . bin2hex(random_bytes(4)),
+                'metadata'        => [],
+            ],
+        ]);
+
+        // Expect evaluate() to be called exactly twice, once per row id.
+        $reconciler = $this->createMock(CascadeReconcilerInterface::class);
+        $reconciler->expects(self::exactly(2))
+            ->method('evaluate')
+            ->willReturnCallback(function (int $rowId) use ($ids): void {
+                self::assertContains($rowId, $ids);
+            });
+
+        $runner    = new BackstopRunner($repo, $processor, self::$pdo, graceSeconds: 0, cascade: $reconciler);
+        $processed = $runner->runOnce(limit: 100);
+
+        self::assertSame(2, $processed);
+    }
+
+    public function testRunOnceSwallowsReconcilerThrowsAndContinues(): void
+    {
+        self::assertNotNull(self::$pdo);
+        $repo      = new OutboxRepository(self::$pdo);
+        $psr17     = new Psr17Factory();
+        $mock      = new MockHandler([
+            new Response(200, [], ''),
+            new Response(200, [], ''),
+        ]);
+        $client    = new OpenFgaClient(
+            'http://localhost:8083',
+            'store-123',
+            'model-456',
+            new Client(['handler' => HandlerStack::create($mock)]),
+            $psr17,
+            $psr17,
+        );
+        $processor = new OutboxProcessor($repo, $client);
+
+        $ids = $repo->insertBatch([
+            [
+                'operation'       => OutboxOperation::WRITE_TUPLE,
+                'fga_user'        => 'user:c',
+                'fga_relation'    => 'editor',
+                'fga_object'      => 'national_calendar:DE',
+                'idempotency_key' => 'recon-c-' . bin2hex(random_bytes(4)),
+                'metadata'        => [],
+            ],
+            [
+                'operation'       => OutboxOperation::WRITE_TUPLE,
+                'fga_user'        => 'user:d',
+                'fga_relation'    => 'editor',
+                'fga_object'      => 'national_calendar:FR',
+                'idempotency_key' => 'recon-d-' . bin2hex(random_bytes(4)),
+                'metadata'        => [],
+            ],
+        ]);
+
+        // First evaluate() throws, second succeeds. runOnce() must complete without raising.
+        $reconciler = $this->createMock(CascadeReconcilerInterface::class);
+        $reconciler->expects(self::exactly(2))
+            ->method('evaluate')
+            ->willReturnOnConsecutiveCalls(
+                self::throwException(new \RuntimeException('boom')),
+                null,
+            );
+
+        $runner    = new BackstopRunner($repo, $processor, self::$pdo, graceSeconds: 0, cascade: $reconciler);
+        $processed = $runner->runOnce(limit: 100);
+
+        self::assertSame(2, $processed);
+        // Both rows should still be marked SUCCEEDED — reconciler failure must not roll back row processing.
+        self::assertSame(OutboxStatus::SUCCEEDED, $repo->getById($ids[0])?->status);
+        self::assertSame(OutboxStatus::SUCCEEDED, $repo->getById($ids[1])?->status);
     }
 }

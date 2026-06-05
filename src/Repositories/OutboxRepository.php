@@ -16,7 +16,7 @@ use PDO;
  * handler's tx with the business write) and pickupPending (the consumer
  * and backstop both call this).
  */
-final class OutboxRepository
+final class OutboxRepository implements OutboxRepositoryInterface
 {
     public function __construct(private readonly PDO $db)
     {
@@ -322,6 +322,30 @@ final class OutboxRepository
             }
         }
         return $out;
+    }
+
+    /**
+     * Count `delete_tuple` rows for an access_request that haven't reached a terminal
+     * status. Used by CascadeReconciler to decide whether the access-request's role
+     * cascade can fire.
+     *
+     * "Non-terminal" = pending OR retrying. `failed_terminal` counts as settled because
+     * the cascade decision should still run; maybeCascadeRoleRevoke's own FGA read will
+     * correctly see any leftover orphan tuple and decline.
+     */
+    public function countSiblingNonTerminalDeletes(string $accessRequestId): int
+    {
+        $stmt = $this->db->prepare(<<<'SQL'
+            SELECT COUNT(*)::int AS c
+            FROM openfga_outbox
+            WHERE metadata->>'access_request_id' = :access_request_id
+              AND operation = 'delete_tuple'
+              AND status IN ('pending', 'retrying')
+        SQL);
+        $stmt->execute([':access_request_id' => $accessRequestId]);
+        /** @var array{c: int}|false $row */
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row !== false ? (int) $row['c'] : 0;
     }
 
     /**

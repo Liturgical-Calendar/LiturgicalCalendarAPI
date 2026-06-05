@@ -16,6 +16,7 @@ use Dotenv\Dotenv;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\Outbox\BackstopRunner;
+use LiturgicalCalendar\Api\Services\Outbox\CascadeReconciler;
 use LiturgicalCalendar\Api\Services\Outbox\ConsumerLoop;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
 use LiturgicalCalendar\Api\Services\Outbox\RedisStreamConsumer;
@@ -63,12 +64,20 @@ $fga = OpenFgaClient::fromEnv();
 $maxAttempts = is_numeric($_ENV['OUTBOX_MAX_ATTEMPTS'] ?? null) ? (int) $_ENV['OUTBOX_MAX_ATTEMPTS'] : 10;
 $processor   = new OutboxProcessor($repo, $fga, $maxAttempts);
 
+// CascadeReconciler is constructed once and passed to both BackstopRunner and
+// ConsumerLoop. fromEnv() reads its DB / OpenFGA / Zitadel / Redis env at construct
+// time; if any of those are unconfigured the underlying evaluate() call will
+// surface that at use time via the per-row try/catch (see
+// docs/superpowers/specs/2026-06-03-issue-632-deferred-delete-coordination-design.md §4.5).
+$cascade = CascadeReconciler::fromEnv();
+
 if ($mode === 'backstop') {
     $runner    = new BackstopRunner(
         $repo,
         $processor,
         $pdo,
         graceSeconds: (int) ($_ENV['OUTBOX_BACKSTOP_GRACE_SECONDS'] ?? 60),
+        cascade: $cascade,
     );
     $processed = $runner->runOnce(limit: 200);
     fwrite(STDOUT, sprintf("backstop processed=%d\n", $processed));
@@ -98,6 +107,6 @@ $groupName    = (string) ($_ENV['REDIS_OUTBOX_GROUP']         ?? 'reconciler');
 $consumerName = (string) ($_ENV['REDIS_OUTBOX_CONSUMER_NAME'] ?? (gethostname() ?: 'consumer'));
 
 $stream = new RedisStreamConsumer($redis, $streamName, $groupName, $consumerName);
-$loop   = new ConsumerLoop($stream, $processor, blockMs: 5000);
+$loop   = new ConsumerLoop($stream, $processor, blockMs: 5000, cascade: $cascade);
 
 $loop->run();

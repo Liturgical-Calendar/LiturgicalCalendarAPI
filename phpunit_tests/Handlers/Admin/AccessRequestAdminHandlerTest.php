@@ -16,6 +16,7 @@ use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\ZitadelService;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxNotifier;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
@@ -293,6 +294,7 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertCount(1, $body['outbox_ids']);
         self::assertCount(1, $body['fga_errors']);
         self::assertSame('pending', $body['fga_errors'][0]['status']);
+        self::assertSame(true, $body['cascade_deferred']);
     }
 
     public function testUnknownActionIsValidationError(): void
@@ -690,6 +692,7 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertSame(0, $body['outbox_pending']);
         self::assertSame(0, $body['outbox_failed']);
         self::assertCount(1, self::arrayFieldFrom($body, 'outbox_ids'));
+        self::assertSame(false, $body['cascade_deferred']);
 
         $row = $repo->getById($id);
         self::assertNotNull($row);
@@ -741,6 +744,7 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertSame([], $body['fga_errors']);
         self::assertSame(0, $body['outbox_pending']);
         self::assertSame(0, $body['outbox_failed']);
+        self::assertSame(false, $body['cascade_deferred']);
 
         $row = $repo->getById($id);
         self::assertNotNull($row);
@@ -793,6 +797,7 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertSame(1, $body['outbox_pending']);
         self::assertSame(0, $body['outbox_failed']);
         self::assertCount(1, self::arrayFieldFrom($body, 'fga_errors'));
+        self::assertSame(true, $body['cascade_deferred']);
 
         // DB row IS revoked — the outbox captures the failure, not the DB transaction.
         $row = $repo->getById($id);
@@ -805,6 +810,68 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         $outboxRow = $outboxRepo->getById((int) $outboxIds[0]);
         self::assertNotNull($outboxRow);
         self::assertSame(OutboxStatus::RETRYING, $outboxRow->status);
+    }
+
+    public function testRevokeWithPendingOutboxDefersCascade(): void
+    {
+        // Seed an approved access request with TWO permissions so we get TWO outbox rows.
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('def-12345', 'def@x.test', null, 'calendar_editor', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+            ['object_type' => 'national_calendar', 'object_id' => 'US', 'relation' => 'editor'],
+        ]);
+        $repo->approve($id, 'admin-bob');
+
+        // FGA mock returns 503 on every deleteTuple → both outbox rows stay in retrying.
+        // No listObjects calls expected (cascade is deferred, so userHasAnyTupleInRoleScope is never called).
+        $fgaMock = new MockHandler([
+            new GuzzleResponse(503, [], '{"code":"service_unavailable"}'),
+            new GuzzleResponse(503, [], '{"code":"service_unavailable"}'),
+        ]);
+
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        // Keep Zitadel CONFIGURED for this test so we can verify the handler chose NOT to call it.
+        // We do NOT wrap in withoutEnv(ZITADEL_ENV_VARS) intentionally.
+        $response = $this->withMockOpenFgaClient(
+            $fgaMock,
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser($this->requestFor(
+                        'POST',
+                        '/admin/access-requests/' . $id . '/revoke',
+                        [],
+                        []
+                    ))
+                );
+            }
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+
+        self::assertTrue($body['success']);
+        self::assertSame(false, $body['role_removed']);
+        self::assertSame(true, $body['cascade_deferred']);
+        self::assertSame(2, $body['outbox_pending']);
+        self::assertSame(0, $body['outbox_failed']);
+        self::assertNull($body['zitadel_error']);
+        self::assertStringContainsString('deferred', $this->stringFieldFrom($body, 'message'));
+
+        // Zitadel sync status is 'pending' (deferred marker), NOT 'synced' or 'failed' —
+        // but the handler only writes that column when ZitadelService::isConfigured() is
+        // true (the status column tracks Zitadel state). In CI without Zitadel env, the
+        // column stays null; the response-level cascade_deferred assertion above is the
+        // contract that holds in all environments.
+        if (ZitadelService::isConfigured()) {
+            $row = $repo->getById($id);
+            self::assertNotNull($row);
+            self::assertSame('pending', $row['zitadel_sync_status'] ?? null);
+        }
     }
 
     // --- isFgaClientAvailable() fail-closed guards -----------------------
@@ -1066,6 +1133,7 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertSame(1, $body['outbox_pending']);
         self::assertSame(0, $body['outbox_failed']);
         self::assertCount(2, self::arrayFieldFrom($body, 'outbox_ids'));
+        self::assertSame(true, $body['cascade_deferred']);
 
         // DB row is revoked (commit happened before the FGA sync attempt).
         $row = $repo->getById($id);
@@ -1225,6 +1293,7 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertSame([], $body['outbox_ids']);
         self::assertSame(0, $body['outbox_pending']);
         self::assertSame(0, $body['outbox_failed']);
+        self::assertSame(false, $body['cascade_deferred']);
 
         $row = $repo->getById($id);
         self::assertNotNull($row);
@@ -1301,7 +1370,9 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertTrue($body['success']);
         self::assertSame(1, $body['outbox_pending']);
         self::assertSame(1, $body['outbox_failed']);
-        self::assertStringContainsString('deferred for async deletion', $body['message']);
-        self::assertStringContainsString('failed terminally', $body['message']);
+        self::assertSame(true, $body['cascade_deferred']);
+        // When cascade is deferred (outbox_pending > 0), the message is the deferred
+        // template only — the failed-terminally suffix is part of the non-deferred path.
+        self::assertStringContainsString('deferred', $body['message']);
     }
 }
