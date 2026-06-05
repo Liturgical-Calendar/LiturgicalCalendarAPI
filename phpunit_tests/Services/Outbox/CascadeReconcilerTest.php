@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Services\Outbox;
 
+use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Repositories\OutboxRepositoryInterface;
+use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\Outbox\CascadeReconciler;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxRow;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxStatus;
 use LiturgicalCalendar\Api\Services\RoleCascadeService;
+use LiturgicalCalendar\Api\Services\ZitadelService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -259,6 +262,15 @@ final class CascadeReconcilerTest extends TestCase
 
     public function testFromEnvReturnsCorrectInstance(): void
     {
+        if (!Connection::isConfigured()) {
+            $this->markTestSkipped('DB env not set — CascadeReconciler::fromEnv requires DB.');
+        }
+        if (!OpenFgaClient::isConfigured()) {
+            $this->markTestSkipped('OpenFGA env not set — CascadeReconciler::fromEnv requires OpenFGA.');
+        }
+        if (!ZitadelService::isConfigured()) {
+            $this->markTestSkipped('Zitadel env not set — CascadeReconciler::fromEnv requires Zitadel.');
+        }
         // Confirms fromEnv() returns a CascadeReconciler instance when its
         // dependencies (DB / Zitadel / FGA) are all reachable. Connection::getInstance()
         // is eager, so this test requires DB env to be set; CI provides it via .env.local.
