@@ -681,15 +681,22 @@ final class PermissionAdminHandler extends AbstractHandler
         $cascadeDeferred = false;
         if ($singleSucceededSync) {
             if (ZitadelService::isConfigured() && OpenFgaClient::isConfigured()) {
-                try {
-                    $cascade = RoleCascadeService::fromEnv();
-                    foreach ($cascadeRoleCandidates as $role) {
+                // Per-candidate try/catch: one role's cascade failure must not abort
+                // the rest. Mirrors CascadeReconciler::dispatchPermissionRevoke's
+                // per-call isolation so the handler's sync path matches the
+                // reconciler's async path semantics.
+                $cascade = RoleCascadeService::fromEnv();
+                foreach ($cascadeRoleCandidates as $role) {
+                    try {
                         if ($cascade->maybeCascadeRoleRevoke($bareUserId, $role)) {
                             $cascadedRoles[] = $role;
                         }
+                    } catch (\Throwable $e) {
+                        $this->logger->error(
+                            'PermissionAdminHandler cascade check failed',
+                            ['exception' => $e, 'role' => $role],
+                        );
                     }
-                } catch (\Throwable $e) {
-                    $this->logger->error('PermissionAdminHandler cascade check failed', ['exception' => $e]);
                 }
             }
         } else {
