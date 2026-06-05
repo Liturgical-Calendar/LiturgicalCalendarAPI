@@ -2255,13 +2255,18 @@
                     },
                     "object": {
                       "type": "string"
+                    },
+                    "cascade_deferred": {
+                      "type": "boolean",
+                      "description": "True when the Zitadel role-cascade decision was deferred because one or more delete-tuple rows are still in the outbox. CascadeReconciler runs the decision once the rows drain. See issue #632."
                     }
                   },
                   "required": [
                     "success",
                     "user",
                     "relation",
-                    "object"
+                    "object",
+                    "cascade_deferred"
                   ]
                 }
               }
@@ -7801,6 +7806,10 @@
           "role_removed": {
             "type": "boolean"
           },
+          "cascade_deferred": {
+            "type": "boolean",
+            "description": "True when the Zitadel role-cascade decision was deferred because one or more delete-tuple rows are still in the outbox. CascadeReconciler runs the decision once the rows drain. See issue #632."
+          },
           "tuples_deleted": {
             "type": "integer",
             "description": "Number of OpenFGA permission tuples deleted"
@@ -7823,6 +7832,7 @@
           "success",
           "message",
           "role_removed",
+          "cascade_deferred",
           "tuples_deleted"
         ],
         "additionalProperties": false
