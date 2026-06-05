@@ -15,6 +15,7 @@ use LiturgicalCalendar\Api\Services\RoleCascadeService;
 use LiturgicalCalendar\Api\Services\ZitadelService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 #[CoversClass(CascadeReconciler::class)]
 final class CascadeReconcilerTest extends TestCase
@@ -106,6 +107,29 @@ final class CascadeReconcilerTest extends TestCase
         ( new CascadeReconciler($repo, $cascade) )->evaluate(1);
     }
 
+    public function testEvaluateLogsWarningOnUnknownCascadeKindWhenLoggerInjected(): void
+    {
+        // Exercises the default-arm body of the match() dispatch inside evaluate().
+        // Without a Logger the ?-> nullsafe short-circuits and the warning body
+        // is never reached; with one we verify it fires with row_id + cascade_kind.
+        $repo = $this->createStub(OutboxRepositoryInterface::class);
+        $repo->method('getById')->willReturn($this->row(metadata: ['cascade_kind' => 'future_kind_v3']));
+
+        $cascade = $this->createMock(RoleCascadeService::class);
+        $cascade->expects(self::never())->method('maybeCascadeRoleRevoke');
+
+        $logger = $this->createMock(LoggerInterface::class);
+        $logger->expects(self::once())
+            ->method('warning')
+            ->with(
+                'CascadeReconciler: unknown cascade_kind, ignoring row',
+                self::callback(static fn(array $ctx): bool
+                    => ( $ctx['row_id'] ?? null ) === 1 && ( $ctx['cascade_kind'] ?? null ) === 'future_kind_v3'),
+            );
+
+        ( new CascadeReconciler($repo, $cascade, $logger) )->evaluate(1);
+    }
+
     public function testAccessRequestRevokeDefersWhenSiblingsStillPending(): void
     {
         $row  = $this->row(metadata: [
@@ -144,6 +168,25 @@ final class CascadeReconcilerTest extends TestCase
             ->method('maybeCascadeRoleRevoke')
             ->with('u1', 'editor')
             ->willReturn(true);
+
+        ( new CascadeReconciler($repo, $cascade) )->evaluate(1);
+    }
+
+    public function testAccessRequestRevokeNoOpsWhenAccessRequestIdIsMissing(): void
+    {
+        // Exercises the `: null` falsy branch on access_request_id extraction —
+        // distinct from CascadeFieldsMissing which only omits cascade_user_id/role.
+        $row = $this->row(metadata: [
+            'cascade_kind'    => 'access_request_revoke',
+            'cascade_user_id' => 'u1',
+            'cascade_role'    => 'editor',
+            // access_request_id deliberately absent
+        ]);
+        $repo = $this->createStub(OutboxRepositoryInterface::class);
+        $repo->method('getById')->willReturn($row);
+
+        $cascade = $this->createMock(RoleCascadeService::class);
+        $cascade->expects(self::never())->method('maybeCascadeRoleRevoke');
 
         ( new CascadeReconciler($repo, $cascade) )->evaluate(1);
     }
@@ -235,6 +278,28 @@ final class CascadeReconcilerTest extends TestCase
 
         $cascade = $this->createMock(RoleCascadeService::class);
         $cascade->expects(self::never())->method('maybeCascadeRoleRevoke');
+
+        ( new CascadeReconciler($repo, $cascade) )->evaluate(1);
+    }
+
+    public function testPermissionRevokeSkipsNonStringAndEmptyCandidates(): void
+    {
+        // Exercises the `continue` branch when a candidate fails the
+        // is_string / non-empty guard inside the foreach.
+        $row  = $this->row(metadata: [
+            'cascade_kind'            => 'permission_revoke',
+            'cascade_user_id'         => 'u1',
+            // Mixed: int (non-string), empty string, valid role. Only 'editor' should reach maybeCascadeRoleRevoke.
+            'cascade_role_candidates' => [123, '', 'editor'],
+        ]);
+        $repo = $this->createStub(OutboxRepositoryInterface::class);
+        $repo->method('getById')->willReturn($row);
+
+        $cascade = $this->createMock(RoleCascadeService::class);
+        $cascade->expects(self::once())
+            ->method('maybeCascadeRoleRevoke')
+            ->with('u1', 'editor')
+            ->willReturn(false);
 
         ( new CascadeReconciler($repo, $cascade) )->evaluate(1);
     }
