@@ -4363,6 +4363,35 @@ final class CalendarHandler extends AbstractHandler
 
 
     /**
+     * Resolve the GitHub release object whose `published_at` becomes each ICS
+     * VEVENT's CREATED timestamp.
+     *
+     * The release lookup is non-essential metadata: when it failed (GitHub
+     * unreachable or rate-limited with HTTP 403), it must not take the whole
+     * calendar down with a 503. Fall back to the current UTC time and log a
+     * warning so the ICS still renders.
+     *
+     * @param GitHubReleaseInfoSuccess|GitHubReleaseInfoError $infoObj result of {@see self::getGithubReleaseInfo()}
+     * @return \stdClass an object exposing a `published_at` string for {@see self::produceIcal()}
+     */
+    private function resolveIcalReleaseObject(\stdClass $infoObj): \stdClass
+    {
+        if ($infoObj->status === 'success') {
+            /** @var GitHubReleaseInfoSuccess $infoObj */
+            return $infoObj->obj;
+        }
+
+        /** @var GitHubReleaseInfoError $infoObj */
+        $logger = LoggerFactory::create('calendar', null, 30, false, true, false);
+        $logger->warning('GitHub release info unavailable; using fallback timestamp for ICS CREATED', [
+            'reason' => $infoObj->message,
+        ]);
+
+        return (object) ['published_at' => gmdate('Y-m-d\TH:i:s\Z')];
+    }
+
+
+    /**
      * This function generates the response for the requested Liturgical Calendar.
      *
      * Depending on the value of $this->CalendarParams->ReturnType, it will either return a JSON object,
@@ -4468,23 +4497,7 @@ final class CalendarHandler extends AbstractHandler
                 }
                 break;
             case ReturnTypeParam::ICS:
-                $infoObj = $this->getGithubReleaseInfo();
-                if ($infoObj->status === 'success') {
-                    /** @var GitHubReleaseInfoSuccess $infoObj */
-                    $releaseObj = $infoObj->obj;
-                } else {
-                    // The GitHub release lookup supplies only the per-event ICS
-                    // CREATED timestamp, which is non-essential metadata. When
-                    // GitHub is unreachable or rate-limited (HTTP 403), don't make
-                    // the entire calendar unavailable (503) — fall back to the
-                    // current UTC time and log a warning so the ICS still renders.
-                    /** @var GitHubReleaseInfoError $infoObj */
-                    $logger = LoggerFactory::create('calendar', null, 30, false, true, false);
-                    $logger->warning('GitHub release info unavailable; using fallback timestamp for ICS CREATED', [
-                        'reason' => $infoObj->message,
-                    ]);
-                    $releaseObj = (object) ['published_at' => gmdate('Y-m-d\TH:i:s\Z')];
-                }
+                $releaseObj   = $this->resolveIcalReleaseObject($this->getGithubReleaseInfo());
                 $responseBody = $this->produceIcal($SerializeableLitCal, $releaseObj);
                 break;
             default:
