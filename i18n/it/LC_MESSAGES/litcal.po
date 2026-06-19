@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # Ubuntu <priest@johnromanodorazio.com>, 2021.
 # John R. D'Orazio <priest@johnromanodorazio.com>, 2022, 2023.
-# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024, 2025.
+# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024, 2025, 2026.
 # Weblate Admin <admin@example.com>, 2024.
 # OpenAI <noreply-mt-openai@weblate.org>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-05-06 20:23+0000\n"
-"PO-Revision-Date: 2025-12-16 09:49+0000\n"
+"PO-Revision-Date: 2026-06-19 19:52+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/it/>\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.13.3\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:30
@@ -741,8 +741,8 @@ msgid ""
 "The Solemnity '%1$s' falls on %2$s in the year %3$d, the celebration has "
 "been transferred to %4$s (%5$s) as per the %6$s."
 msgstr ""
-"La Solennità <i>'%1$s'</i> cade di %2$s nell'anno %3$d, pertanto la "
-"celebrazione è stata trasferita al %4$s (%5$s) in accordo con il %6$s."
+"La Solennità '%1$s' cade di %2$s nell'anno %3$d, pertanto la celebrazione è "
+"stata trasferita al %4$s (%5$s) in accordo con il %6$s."
 
 #: src/Handlers/CalendarHandler.php:1285
 msgid "the Saturday preceding Palm Sunday"
@@ -794,8 +794,8 @@ msgid ""
 "Seeing that the Solemnity '%1$s' coincides with the Solemnity '%2$s' in the "
 "year %3$d, it has been anticipated by one day as per %4$s."
 msgstr ""
-"Visto che la Solennità <i>'%1$s'</i> coincide con la Solennità <i>'%2$s'</i> "
-"nell'anno %3$d, la prima è stata anticipata di un giorno come da %4$s."
+"Visto che la Solennità '%1$s' coincide con la Solennità '%2$s' nell'anno "
+"%3$d, la prima è stata anticipata di un giorno come da %4$s."
 
 #. translators: 1: LiturgicalEvent name (Christmas), 2: Requested calendar year, 3: LiturgicalEvent name (Holy Family), 4: New date for Holy Family
 #: src/Handlers/CalendarHandler.php:1493
@@ -804,8 +804,8 @@ msgid ""
 "'%1$s' falls on a Sunday in the year %2$d, therefore the Feast '%3$s' is "
 "celebrated on %4$s rather than on the Sunday after Christmas."
 msgstr ""
-"'%1$s' coincide con una Domenica nell'anno %2$d, pertanto la Festa "
-"<i>'%3$s'</i> viene celebrata il %4$s anziché la Domenica dopo Natale."
+"'%1$s' coincide con una Domenica nell'anno %2$d, pertanto la Festa '%3$s' "
+"viene celebrata il %4$s anziché la Domenica dopo Natale."
 
 #. translators: You can ignore this translation if the Feast has not been inserted by the Episcopal Conference
 #: src/Handlers/CalendarHandler.php:1519
@@ -830,7 +830,7 @@ msgstr ""
 #: src/Handlers/CalendarHandler.php:1592 src/Handlers/CalendarHandler.php:1638
 #, php-format
 msgid "'%1$s' is superseded by the %2$s '%3$s' in the year %4$d."
-msgstr "<i>'%1$s'</i> è soppiantata dalla %2$s <i>'%3$s'</i> nell'anno %4$d."
+msgstr "'%1$s' è soppiantata dalla %2$s '%3$s' nell'anno %4$d."
 
 #. translators:
 #.  1. Grade or rank of the liturgical event
