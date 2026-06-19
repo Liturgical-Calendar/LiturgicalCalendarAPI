@@ -4,14 +4,14 @@
 # Bonaventura Galang <bonaventuragal@gmail.com>, 2024.
 # User_425 <user425.itsme@gmail.com>, 2024.
 # "John R. D'Orazio" <priest@johnromanodorazio.com>, 2025.
-# OpenAI <noreply-mt-openai@weblate.org>, 2025.
+# OpenAI <noreply-mt-openai@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-05-06 20:23+0000\n"
-"PO-Revision-Date: 2025-12-16 09:49+0000\n"
-"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2026-06-19 18:50+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Indonesian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/id/>\n"
 "Language: id\n"
@@ -19,37 +19,37 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.13.3\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:30
 msgid "green"
-msgstr ""
+msgstr "hijau"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:32
 msgid "purple"
-msgstr ""
+msgstr "ungu"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:34
 msgid "white"
-msgstr ""
+msgstr "putih"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:36
 msgid "red"
-msgstr ""
+msgstr "merah"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:38
 msgid "rose"
-msgstr ""
+msgstr "merah muda"
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
 msgid "Proper"
-msgstr ""
+msgstr "Khusus"
 
 #. translators: context = from the Common of the Dedication of a Church
 #: src/Enum/LitCommon.php:168
@@ -119,7 +119,7 @@ msgstr "Untuk Seorang Martir Perawan"
 #. translators: context = from the Common of Martyrs: For a Holy Woman Martyr
 #: src/Enum/LitCommon.php:194
 msgid "For a Holy Woman Martyr"
-msgstr ""
+msgstr "Bagi Wanita Kudus Martir"
 
 #. translators: context = from the Common of Pastors: For a Pope
 #: src/Enum/LitCommon.php:196
@@ -200,126 +200,126 @@ msgstr "Untuk Seorang Biarawati"
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitCommon.php:226 src/Enum/LitMassVariousNeeds.php:237
 msgid "For Religious"
-msgstr ""
+msgstr "Bagi Religius"
 
 #. translators: context = from the Common of Holy Men and Women: For Those Who Practiced Works of Mercy
 #: src/Enum/LitCommon.php:228
 msgid "For Those Who Practiced Works of Mercy"
-msgstr ""
+msgstr "Bagi Mereka yang Melakukan Karya Belas Kasihan"
 
 #. translators: context = from the Common of Holy Men and Women: For Educators
 #: src/Enum/LitCommon.php:230
 msgid "For Educators"
-msgstr ""
+msgstr "Bagi Pendidik"
 
 #. translators: context = from the Common of Holy Men and Women: For Holy Women
 #: src/Enum/LitCommon.php:232
 msgid "For Holy Women"
-msgstr ""
+msgstr "Bagi Wanita Kudus"
 
 #. translators: "From the Common [of the] Blessed Virgin Mary|Dedication of a Church" (singular feminine). Latin: leave empty!
 #: src/Enum/LitCommon.php:256
 msgctxt "(SING_FEMM)"
 msgid "of the"
-msgstr ""
+msgstr "dari"
 
 #. translators: "From the Common [of] Virgins" (plural feminine). Latin: leave empty!
 #: src/Enum/LitCommon.php:258
 msgctxt "(PLUR_FEMM)"
 msgid "of"
-msgstr ""
+msgstr "dari"
 
 #. translators: "From the Common [of] Martyrs|Pastors|Doctors|Holy Men and Women" (plural masculine). Latin: leave empty!
 #: src/Enum/LitCommon.php:260
 msgctxt "(PLUR_MASC)"
 msgid "of"
-msgstr ""
+msgstr "dari"
 
 #. translators: "From the Common [of the] (no current cases)" (singular masculine). Latin: leave empty!
 #: src/Enum/LitCommon.php:262
 msgctxt "(SING_MASC)"
 msgid "of the"
-msgstr ""
+msgstr "dari"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:137
 msgid "weekday"
-msgstr ""
+msgstr "hari biasa"
 
 #. translators: liturgical rank 'WEEKDAY' in abbreviated form
 #: src/Enum/LitGrade.php:139
 msgid "w"
-msgstr ""
+msgstr "w"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:144
 msgid "commemoration"
-msgstr ""
+msgstr "peringatan"
 
 #. translators: liturgical rank 'COMMEMORATION' in abbreviated form
 #: src/Enum/LitGrade.php:146
 msgid "m*"
-msgstr ""
+msgstr "m*"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:151
 msgid "optional memorial"
-msgstr ""
+msgstr "peringatan opsional"
 
 #. translators: liturgical rank 'OPTIONAL MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:153
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #. translators: liturgical rank. Keep Capitalized
 #: src/Enum/LitGrade.php:158
 msgid "Memorial"
-msgstr ""
+msgstr "Peringatan"
 
 #. translators: liturgical rank 'MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:160
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:165
 msgid "FEAST"
-msgstr ""
+msgstr "Pesta"
 
 #. translators: liturgical rank 'FEAST' in abbreviated form
 #: src/Enum/LitGrade.php:167
 msgid "F"
-msgstr ""
+msgstr "F"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:172
 msgid "FEAST OF THE LORD"
-msgstr ""
+msgstr "Pesta Tuhan"
 
 #. translators: liturgical rank 'FEAST OF THE LORD' in abbreviated form
 #: src/Enum/LitGrade.php:174
 msgid "F✝"
-msgstr ""
+msgstr "F✝"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:179
 msgid "SOLEMNITY"
-msgstr ""
+msgstr "Hari Raya"
 
 #. translators: liturgical rank 'SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:181
 msgid "S"
-msgstr ""
+msgstr "S"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:186
 msgid "celebration with precedence over solemnities"
-msgstr ""
+msgstr "perayaan dengan prioritas di atas hari raya"
 
 #. translators: liturgical rank 'HIGHER SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:188
 msgid "S✝"
-msgstr ""
+msgstr "S✝"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:207
@@ -614,13 +614,13 @@ msgstr "Paskah"
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:128
 msgid "Ordinary Time"
-msgstr ""
+msgstr "Waktu Biasa"
 
 #. translators: %s is a day number (17, 18, etc.) - for Advent weekdays Dec 17-24
 #: src/FerialEventNameGenerator.php:366
 #, php-format
 msgid "December %s"
-msgstr ""
+msgstr "Desember %s"
 
 #. translators: %s is an ordinal number (1st, 2nd, 3rd)
 #. translators: %s is an ordinal number (first, second...)
@@ -641,13 +641,13 @@ msgstr "Hari %s pada Oktaf Natal"
 #: src/FerialEventNameGenerator.php:418 src/FerialEventNameGenerator.php:452
 #, php-format
 msgid "January %s"
-msgstr ""
+msgstr "Januari %s"
 
 #. translators: %s is a day of the week - for days after Epiphany
 #: src/FerialEventNameGenerator.php:435
 #, php-format
 msgid "%s after Epiphany"
-msgstr ""
+msgstr "%s setelah Epifani"
 
 #. translators: Day after Ash Wednesday pattern
 #: src/FerialEventNameGenerator.php:467 src/Handlers/CalendarHandler.php:1880
@@ -684,7 +684,7 @@ msgstr "Pekan Biasa %s"
 #: src/FerialEventNameGenerator.php:552
 #, php-format
 msgid "%s of Holy Week"
-msgstr ""
+msgstr "%s Pekan Suci"
 
 #: src/Handlers/CalendarHandler.php:433
 #, php-format
@@ -805,7 +805,7 @@ msgstr ""
 #. translators: You can ignore this translation if the Feast has not been inserted by the Episcopal Conference
 #: src/Handlers/CalendarHandler.php:1519
 msgid "Our Lord Jesus Christ, The Eternal High Priest"
-msgstr ""
+msgstr "Tuhan Kita Yesus Kristus, Imam Agung Abadi"
 
 #. translators: 1: National Calendar, 2: Requested calendar year, 3: source of the rule
 #: src/Handlers/CalendarHandler.php:1531
@@ -1116,7 +1116,7 @@ msgstr ""
 
 #: src/Handlers/CalendarHandler.php:3032
 msgid "Saturday Memorial of the Blessed Virgin Mary"
-msgstr ""
+msgstr "Peringatan Sabtu Santa Perawan Maria"
 
 #. translators: 1: wider_region, 2: metadata, 3: calendar_id
 #: src/Handlers/CalendarHandler.php:3107
@@ -1483,6 +1483,8 @@ msgid ""
 "The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
 "on %4$s, is suppressed by the %5$s %6$s in the year %7$d."
 msgstr ""
+"%1$s '%2$s', yang sesuai dengan kalender %3$s dan biasanya dirayakan pada "
+"%4$s, dibatalkan oleh %5$s %6$s pada tahun %7$d."
 
 #: src/Handlers/CalendarHandler.php:4448
 msgid "Error converting Liturgical Calendar to XML."
@@ -1503,7 +1505,7 @@ msgstr "Kesalahan saat melakukan serialisasi Kalender Liturgi."
 #: src/LocaleDateFormatter.php:169
 #, php-format
 msgid "%s - Christmas Weekday"
-msgstr ""
+msgstr "%s - Hari Biasa Natal"
 
 #: src/Models/Calendar/LitCommons.php:200
 msgid "From the Common"
@@ -1512,11 +1514,11 @@ msgstr "Dari Bagian Umum"
 #. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
 #: src/Models/Calendar/LiturgicalEventCollection.php:172
 msgid "YEAR"
-msgstr ""
+msgstr "TAHUN"
 
 #: src/Models/Calendar/LiturgicalEventCollection.php:173
 msgid "Vigil Mass"
-msgstr ""
+msgstr "Misa Vigili"
 
 #: src/Models/Calendar/LiturgicalEventCollection.php:1473
 #, php-format
