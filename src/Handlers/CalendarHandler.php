@@ -4471,17 +4471,21 @@ final class CalendarHandler extends AbstractHandler
                 $infoObj = $this->getGithubReleaseInfo();
                 if ($infoObj->status === 'success') {
                     /** @var GitHubReleaseInfoSuccess $infoObj */
-                    $responseBody = $this->produceIcal($SerializeableLitCal, $infoObj->obj);
+                    $releaseObj = $infoObj->obj;
                 } else {
-                    // if we cannot get the latest release info, we return an error
-                    // and we do not produce the iCal file
+                    // The GitHub release lookup supplies only the per-event ICS
+                    // CREATED timestamp, which is non-essential metadata. When
+                    // GitHub is unreachable or rate-limited (HTTP 403), don't make
+                    // the entire calendar unavailable (503) — fall back to the
+                    // current UTC time and log a warning so the ICS still renders.
                     /** @var GitHubReleaseInfoError $infoObj */
-                    $message = sprintf(
-                        _('Error receiving or parsing info from GitHub about latest release: %s.'),
-                        $infoObj->message
-                    );
-                    throw new ServiceUnavailableException($message);
+                    $logger = LoggerFactory::create('calendar', null, 30, false, true, false);
+                    $logger->warning('GitHub release info unavailable; using fallback timestamp for ICS CREATED', [
+                        'reason' => $infoObj->message,
+                    ]);
+                    $releaseObj = (object) ['published_at' => gmdate('Y-m-d\TH:i:s\Z')];
                 }
+                $responseBody = $this->produceIcal($SerializeableLitCal, $releaseObj);
                 break;
             default:
                 $responseBody = json_encode($SerializeableLitCal, JSON_THROW_ON_ERROR);
