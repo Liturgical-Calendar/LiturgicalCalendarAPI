@@ -6,14 +6,14 @@
 # Jeff Roedel <jeff.roedel.isp@gmail.com>, 2022.
 # OpenAI <noreply-mt-openai@weblate.org>, 2024.
 # Weblate Admin <admin@example.com>, 2024.
-# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024, 2025.
+# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024, 2025, 2026.
 # Miguel Galvez <miggalvez@gmail.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-05-06 20:23+0000\n"
-"PO-Revision-Date: 2025-12-15 21:38+0000\n"
+"PO-Revision-Date: 2026-06-19 19:52+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Spanish <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/es/>\n"
@@ -22,7 +22,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.13.3\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:30
@@ -741,8 +741,8 @@ msgid ""
 "The Solemnity '%1$s' falls on %2$s in the year %3$d, the celebration has "
 "been transferred to %4$s (%5$s) as per the %6$s."
 msgstr ""
-"La Solemnidad <i>'%1$s'</i> coincide con <b>%2$s</b> en el año %3$d, por "
-"tanto, la celebración ha sido trasladada a %4$s (%5$s) según el %6$s."
+"La Solemnidad '%1$s' coincide con %2$s en el año %3$d, por tanto, la "
+"celebración ha sido trasladada a %4$s (%5$s) según el %6$s."
 
 #: src/Handlers/CalendarHandler.php:1285
 msgid "the Saturday preceding Palm Sunday"
