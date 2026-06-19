@@ -142,11 +142,14 @@ jobs:
       # merge here, in the same push-triggered run that opened the PR. Branch
       # protection on the base requires neither reviews nor status checks, so
       # GITHUB_TOKEN can merge immediately; --auto is belt-and-suspenders for
-      # the brief window after creation. delete_branch_on_merge cleans up the
-      # automated/update-pot branch.
+      # the brief window after creation, and --delete-branch removes the
+      # automated/update-pot head branch (explicit, not relying on the repo's
+      # delete_branch_on_merge setting). The github.ref guard pins auto-merge to
+      # development, so widening the push filter above can never cause an
+      # accidental auto-merge into another branch (e.g. stable).
       - name: Auto-merge the POT update PR
-        if: ${{ steps.cpr.outputs.pull-request-number }}
-        run: gh pr merge "$PR_NUMBER" --merge --auto
+        if: ${{ steps.cpr.outputs.pull-request-number && github.ref == 'refs/heads/development' }}
+        run: gh pr merge "$PR_NUMBER" --merge --auto --delete-branch
         env:
           PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
