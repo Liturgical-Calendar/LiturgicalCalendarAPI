@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # Gábor <pleineux@gmail.com>, 2025.
 # "John R. D'Orazio" <priest@johnromanodorazio.com>, 2025.
-# OpenAI <noreply-mt-openai@weblate.org>, 2025.
+# OpenAI <noreply-mt-openai@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-05-06 20:23+0000\n"
-"PO-Revision-Date: 2025-12-06 12:42+0000\n"
-"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2026-06-19 18:50+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Hungarian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/hu/>\n"
 "Language: hu\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.13.3\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:30
@@ -188,102 +188,102 @@ msgstr "Egy apátért"
 #. translators: context = from the Common of Holy Men and Women: For a Monk
 #: src/Enum/LitCommon.php:222
 msgid "For a Monk"
-msgstr ""
+msgstr "Szerzetesnek"
 
 #. translators: context = from the Common of Holy Men and Women: For a Nun
 #: src/Enum/LitCommon.php:224
 msgid "For a Nun"
-msgstr ""
+msgstr "Apácának"
 
 #. translators: context = from the Common of Holy Men and Women: For Religious
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitCommon.php:226 src/Enum/LitMassVariousNeeds.php:237
 msgid "For Religious"
-msgstr ""
+msgstr "Szerzetesi"
 
 #. translators: context = from the Common of Holy Men and Women: For Those Who Practiced Works of Mercy
 #: src/Enum/LitCommon.php:228
 msgid "For Those Who Practiced Works of Mercy"
-msgstr ""
+msgstr "Akik Irgalmas Cselekedeteket Gyakoroltak"
 
 #. translators: context = from the Common of Holy Men and Women: For Educators
 #: src/Enum/LitCommon.php:230
 msgid "For Educators"
-msgstr ""
+msgstr "Pedagógusoknak"
 
 #. translators: context = from the Common of Holy Men and Women: For Holy Women
 #: src/Enum/LitCommon.php:232
 msgid "For Holy Women"
-msgstr ""
+msgstr "Szent Nőknek"
 
 #. translators: "From the Common [of the] Blessed Virgin Mary|Dedication of a Church" (singular feminine). Latin: leave empty!
 #: src/Enum/LitCommon.php:256
 msgctxt "(SING_FEMM)"
 msgid "of the"
-msgstr ""
+msgstr "a"
 
 #. translators: "From the Common [of] Virgins" (plural feminine). Latin: leave empty!
 #: src/Enum/LitCommon.php:258
 msgctxt "(PLUR_FEMM)"
 msgid "of"
-msgstr ""
+msgstr "nak"
 
 #. translators: "From the Common [of] Martyrs|Pastors|Doctors|Holy Men and Women" (plural masculine). Latin: leave empty!
 #: src/Enum/LitCommon.php:260
 msgctxt "(PLUR_MASC)"
 msgid "of"
-msgstr ""
+msgstr "nak"
 
 #. translators: "From the Common [of the] (no current cases)" (singular masculine). Latin: leave empty!
 #: src/Enum/LitCommon.php:262
 msgctxt "(SING_MASC)"
 msgid "of the"
-msgstr ""
+msgstr "a"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:137
 msgid "weekday"
-msgstr ""
+msgstr "hétköznap"
 
 #. translators: liturgical rank 'WEEKDAY' in abbreviated form
 #: src/Enum/LitGrade.php:139
 msgid "w"
-msgstr ""
+msgstr "v"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:144
 msgid "commemoration"
-msgstr ""
+msgstr "megemlékezés"
 
 #. translators: liturgical rank 'COMMEMORATION' in abbreviated form
 #: src/Enum/LitGrade.php:146
 msgid "m*"
-msgstr ""
+msgstr "h*"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:151
 msgid "optional memorial"
-msgstr ""
+msgstr "választható emléknap"
 
 #. translators: liturgical rank 'OPTIONAL MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:153
 msgid "m"
-msgstr ""
+msgstr "e"
 
 #. translators: liturgical rank. Keep Capitalized
 #: src/Enum/LitGrade.php:158
 msgid "Memorial"
-msgstr ""
+msgstr "Emléknap"
 
 #. translators: liturgical rank 'MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:160
 msgid "M"
-msgstr ""
+msgstr "E"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:165
 msgid "FEAST"
-msgstr ""
+msgstr "ÜNNEP"
 
 #. translators: liturgical rank 'FEAST' in abbreviated form
 #: src/Enum/LitGrade.php:167
@@ -388,201 +388,201 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:233
 msgid "On the Anniversaries of Marriage: On the Fiftieth Anniversary"
-msgstr ""
+msgstr "Házassági évfordulókra: Az ötvenedik évfordulón"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:235
 msgid "For the Family"
-msgstr ""
+msgstr "A családért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:239
 msgid "On the Twenty-Fifth or Fiftieth Anniversary of Religious Profession"
-msgstr ""
+msgstr "A szerzetesi fogadalom huszonötödik vagy ötvenedik évfordulóján"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:241
 msgid "For Vocations to Religious Life"
-msgstr ""
+msgstr "A szerzetesi hivatásokért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:243
 msgid "For Promoting Harmony"
-msgstr ""
+msgstr "A harmónia előmozdításáért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:245
 msgid "For Reconciliation"
-msgstr ""
+msgstr "A megbékélésért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:247
 msgid "For the Unity of Christians"
-msgstr ""
+msgstr "A keresztények egységéért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:249
 msgid "For the Evangelization of Peoples"
-msgstr ""
+msgstr "A népek evangelizációjáért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:251
 msgid "For Persecuted Christians"
-msgstr ""
+msgstr "Az üldözött keresztényekért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:253
 msgid "For a Spiritual or Pastoral Gathering"
-msgstr ""
+msgstr "Lelki vagy lelkipásztori összejövetelre"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:255
 msgid "For the Nation or State"
-msgstr ""
+msgstr "A nemzetért vagy az államért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:257
 msgid "For Those in Public Office"
-msgstr ""
+msgstr "A közhivatalban lévőkért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:259
 msgid "For a Governing Assembly"
-msgstr ""
+msgstr "Egy kormányzó testületért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:261
 msgid "For the Head of State or Ruler"
-msgstr ""
+msgstr "A vezető vagy államfőért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:263
 msgid "At the Beginning of the Civil Year"
-msgstr ""
+msgstr "A polgári év kezdetén"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:265
 msgid "For the Sanctification of Human Labor"
-msgstr ""
+msgstr "Az emberi munka megszenteléséért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:267
 msgid "At Seedtime"
-msgstr ""
+msgstr "A vetés idején"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:269
 msgid "After the Harvest"
-msgstr ""
+msgstr "Aratás után"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:271
 msgid "For the Progress of Peoples"
-msgstr ""
+msgstr "A népek fejlődéséért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:273
 msgid "For the Preservation of Peace and Justice"
-msgstr ""
+msgstr "A béke és igazság megőrzéséért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:275
 msgid "In Time of War or Civil Disturbance"
-msgstr ""
+msgstr "Háború vagy zavargások idején"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:277
 msgid "For Refugees and Exiles"
-msgstr ""
+msgstr "Menekültekért és számkivetettekért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:279
 msgid "In Time of Famine or for Those Suffering Hunger"
-msgstr ""
+msgstr "Éhínség idején vagy éhezőkért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:281
 msgid "In Time of Earthquake"
-msgstr ""
+msgstr "Földrengés idején"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:283
 msgid "For Rain"
-msgstr ""
+msgstr "Esőért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:285
 msgid "For Fine Weather"
-msgstr ""
+msgstr "Szép időért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:287
 msgid "For an End to Storms"
-msgstr ""
+msgstr "Viharok megszűnéséért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:289
 msgid "For the Forgiveness of Sins"
-msgstr ""
+msgstr "Bűnök bocsánatáért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:291
 msgid "For Chastity"
-msgstr ""
+msgstr "Tisztaságért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:293
 msgid "For Charity"
-msgstr ""
+msgstr "Szeretetért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:295
 msgid "For Relatives and Friends"
-msgstr ""
+msgstr "Rokonságért és barátokért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:297
 msgid "For Our Oppressors"
-msgstr ""
+msgstr "Elnyomóinkért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:299
 msgid "For Those Held in Captivity"
-msgstr ""
+msgstr "Fogva tartottakért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:301
 msgid "For Those in Prison"
-msgstr ""
+msgstr "Fogvatartottakért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:303
 msgid "For the Sick"
-msgstr ""
+msgstr "Betegekért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:305
 msgid "For the Dying"
-msgstr ""
+msgstr "Halódókért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:307
 msgid "For the Grace of a Happy Death"
-msgstr ""
+msgstr "A boldog halál kegyelméért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:309
 msgid "In Any Need"
-msgstr ""
+msgstr "Bármilyen szükség esetén"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:311
 msgid "For Giving Thanks to God"
-msgstr ""
+msgstr "Istennek adott hálaadásért"
 
 #: src/Enum/LitMassVariousNeeds.php:328
 msgid "Masses and Prayers for Various Needs and Occasions"
-msgstr ""
+msgstr "Misék és imák különböző szükségletekért és alkalmakra"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:118
@@ -618,7 +618,7 @@ msgstr "Évközi időszak"
 #: src/FerialEventNameGenerator.php:366
 #, php-format
 msgid "December %s"
-msgstr ""
+msgstr "%s december"
 
 #. translators: %s is an ordinal number (1st, 2nd, 3rd)
 #. translators: %s is an ordinal number (first, second...)
@@ -639,13 +639,13 @@ msgstr "Karácsony oktávájának %s napja"
 #: src/FerialEventNameGenerator.php:418 src/FerialEventNameGenerator.php:452
 #, php-format
 msgid "January %s"
-msgstr ""
+msgstr "%s január"
 
 #. translators: %s is a day of the week - for days after Epiphany
 #: src/FerialEventNameGenerator.php:435
 #, php-format
 msgid "%s after Epiphany"
-msgstr ""
+msgstr "Epiphania után %s"
 
 #. translators: Day after Ash Wednesday pattern
 #: src/FerialEventNameGenerator.php:467 src/Handlers/CalendarHandler.php:1880
@@ -661,9 +661,9 @@ msgstr "Nagyböjt %s hetében"
 
 #. translators: %s is a day of the week - Easter Octave pattern
 #: src/FerialEventNameGenerator.php:501
-#, fuzzy, php-format
+#, php-format
 msgid "%s within the Octave of Easter"
-msgstr "Karácsony oktávájának %s napja"
+msgstr "Húsvét-nyolcad során %s"
 
 #. translators: %s is an ordinal number (2nd, 3rd, etc.)
 #: src/FerialEventNameGenerator.php:517 src/Handlers/CalendarHandler.php:2869
@@ -682,7 +682,7 @@ msgstr "Évközi idő %s hetében"
 #: src/FerialEventNameGenerator.php:552
 #, php-format
 msgid "%s of Holy Week"
-msgstr ""
+msgstr "Nagyhét %s"
 
 #: src/Handlers/CalendarHandler.php:433
 #, php-format
@@ -1484,6 +1484,8 @@ msgid ""
 "The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
 "on %4$s, is suppressed by the %5$s %6$s in the year %7$d."
 msgstr ""
+"A %3$s-i naptárhoz tartozó, és általában %4$s-án ünnepelt %1$s '%2$s' el "
+"lett törölve a %5$s %6$s által %7$d-ben."
 
 #: src/Handlers/CalendarHandler.php:4448
 msgid "Error converting Liturgical Calendar to XML."
@@ -1508,7 +1510,7 @@ msgstr "%s - Karácsony hétköznapja"
 
 #: src/Models/Calendar/LitCommons.php:200
 msgid "From the Common"
-msgstr ""
+msgstr "Az Általános"
 
 #. translators: in reference to the cycle of liturgical years (A, B, C; I, II)
 #: src/Models/Calendar/LiturgicalEventCollection.php:172
