@@ -4,14 +4,14 @@
 # Ubuntu <priest@johnromanodorazio.com>, 2021.
 # John R. D'Orazio <priest@johnromanodorazio.com>, 2022.
 # Weblate Admin <admin@example.com>, 2024.
-# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2025.
+# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2025, 2026.
 # OpenAI <noreply-mt-openai@weblate.org>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-05-06 20:23+0000\n"
-"PO-Revision-Date: 2025-12-15 21:38+0000\n"
+"PO-Revision-Date: 2026-06-19 19:52+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/la/>\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.13.3\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:30
@@ -752,8 +752,8 @@ msgid ""
 "The Solemnity '%1$s' falls on %2$s in the year %3$d, the celebration has "
 "been transferred to %4$s (%5$s) as per the %6$s."
 msgstr ""
-"Coincidet enim Sollemnitas <i>'%1$s'</i> cum <b>%2$s</b> in anno %3$d, ergo "
-"traslata est celebratio ad %4$s (%5$s) secundum %6$s."
+"Coincidet enim Sollemnitas '%1$s' cum %2$s in anno %3$d, ergo traslata est "
+"celebratio ad %4$s (%5$s) secundum %6$s."
 
 #: src/Handlers/CalendarHandler.php:1285
 msgid "the Saturday preceding Palm Sunday"
@@ -804,8 +804,8 @@ msgid ""
 "Seeing that the Solemnity '%1$s' coincides with the Solemnity '%2$s' in the "
 "year %3$d, it has been anticipated by one day as per %4$s."
 msgstr ""
-"Ex causa Sollemnitas <i>'%1$s'</i> coincidet cum Sollemnitate <i>'%2$s'</i> "
-"in anno %3$d, anticipata est ab uno die secundum %4$s."
+"Ex causa Sollemnitas '%1$s' coincidet cum Sollemnitate '%2$s' in anno %3$d, "
+"anticipata est ab uno die secundum %4$s."
 
 #. translators: 1: LiturgicalEvent name (Christmas), 2: Requested calendar year, 3: LiturgicalEvent name (Holy Family), 4: New date for Holy Family
 #: src/Handlers/CalendarHandler.php:1493
@@ -814,8 +814,8 @@ msgid ""
 "'%1$s' falls on a Sunday in the year %2$d, therefore the Feast '%3$s' is "
 "celebrated on %4$s rather than on the Sunday after Christmas."
 msgstr ""
-"'%1$s' coincidet cum Dominica in anno %2$d, ergo Festum <i>'%3$s'</i> "
-"celebrentur die %4$s quam Dominica post Nativitate."
+"'%1$s' coincidet cum Dominica in anno %2$d, ergo Festum '%3$s' celebrentur "
+"die %4$s quam Dominica post Nativitate."
 
 #. translators: You can ignore this translation if the Feast has not been inserted by the Episcopal Conference
 #: src/Handlers/CalendarHandler.php:1519
@@ -840,7 +840,7 @@ msgstr ""
 #: src/Handlers/CalendarHandler.php:1592 src/Handlers/CalendarHandler.php:1638
 #, php-format
 msgid "'%1$s' is superseded by the %2$s '%3$s' in the year %4$d."
-msgstr "<i>'%1$s'</i> subplantata est ab %2$s <i>'%3$s'</i> in anno %4$d."
+msgstr "'%1$s' subplantata est ab %2$s '%3$s' in anno %4$d."
 
 #. translators:
 #.  1. Grade or rank of the liturgical event
@@ -873,8 +873,8 @@ msgid ""
 "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
 "applicable to the year %6$d."
 msgstr ""
-"%1$s <i>'%2$s'</i> aggregata est igitur in die %3$s ab anno %4$d (%5$s), "
-"ergo viget in anno %6$d."
+"%1$s '%2$s' aggregata est igitur in die %3$s ab anno %4$d (%5$s), ergo viget "
+"in anno %6$d."
 
 #: src/Handlers/CalendarHandler.php:1960 src/Handlers/CalendarHandler.php:2150
 msgid ""
@@ -891,7 +891,7 @@ msgid ""
 "Octave of Christmas, or on the weekdays of the Lenten season in the year "
 "%3$d, rank reduced to Commemoration."
 msgstr ""
-"Accidit %1$s <i>'%2$s'</i> aut infra 17 Dec. et 24 Dec. aut infra Octavam "
+"Accidit %1$s '%2$s' aut infra 17 Dec. et 24 Dec. aut infra Octavam "
 "Nativitatis aut infra ferias Quadragesimae in anno %3$d, ergo reductus est "
 "gradus ad Commemorationem."
 
@@ -1088,8 +1088,8 @@ msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
 "since the year 2002 (%2$s), applicable to the year %3$d."
 msgstr ""
-"Memoria ad libitum <i>'%1$s'</i> traslata est de 12 Dec. ad 12 Aug. ab anno "
-"2002 (%2$s), ergo viget in anno %3$d."
+"Memoria ad libitum '%1$s' traslata est de 12 Dec. ad 12 Aug. ab anno 2002 "
+"(%2$s), ergo viget in anno %3$d."
 
 #. translators: 1: LiturgicalEvent name, 2: Source of the information, 3: Requested calendar year
 #: src/Handlers/CalendarHandler.php:2760
@@ -1099,7 +1099,7 @@ msgid ""
 "a Sunday or Solemnity were it on Dec. 12, has however been transferred to "
 "Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d."
 msgstr ""
-"Memoria ad libitum <i>'%1$s'</i> qua subplantata fuisset ab Dominica aut "
+"Memoria ad libitum '%1$s' qua subplantata fuisset ab Dominica aut "
 "Sollemnitate si celebrata fuisset in die 12 Dec., nihilominus traslata est "
 "ad 12 Aug. ab anno 2002 (%2$s), ergo viget in anno %3$d."
 
@@ -1427,8 +1427,8 @@ msgid ""
 "The %1$s '%2$s' is transferred from %5$s to %6$s as per the %7$s, to make "
 "room for '%3$s': applicable to the year %4$d."
 msgstr ""
-"%1$s <i>'%2$s'</i> traslata est de die %5$s ad diem %6$s secundum %7$s, cum "
-"spatium facere in gratiam '%3$s': ergo viget in anno %4$d."
+"%1$s '%2$s' traslata est de die %5$s ad diem %6$s secundum %7$s, cum spatium "
+"facere in gratiam '%3$s': ergo viget in anno %4$d."
 
 #. translators: 1. LiturgicalEvent grade, 2. LiturgicalEvent name, 3. Old date, 4. New date, 5. Source of the information, 6. New liturgical event name, 7. Superseding liturgical event grade, 8. Superseding liturgical event name, 9: Requested calendar year
 #: src/Handlers/CalendarHandler.php:3883
