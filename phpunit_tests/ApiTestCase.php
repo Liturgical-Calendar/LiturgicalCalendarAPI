@@ -27,6 +27,44 @@ abstract class ApiTestCase extends TestCase
     private static string $addr               = '';
     protected static string $currentTestIp    = '192.0.2.1';
 
+    /**
+     * Suite-wide cache for the authenticated access token.
+     *
+     * The whole point: obtain a JWT exactly once per process and reuse it
+     * across every authenticated test in every class, instead of re-hitting
+     * `/auth/login` per test method. Two reasons:
+     *
+     *   1. Correctness. `/auth/login` is rate-limited per client IP
+     *      (`LoginHandler` → `RateLimiter`, default 5 failed attempts / 900 s).
+     *      The per-class synthetic IPs assigned in `setUpBeforeClass()` draw
+     *      from only 55 buckets (192.0.2.200-254), so two classes can collide
+     *      on one bucket; if a colliding class trips it with failed logins,
+     *      every subsequent `getJwtToken()` on that bucket gets a 429 and
+     *      returns null — surfacing as a burst of "Failed to obtain JWT token"
+     *      failures in whichever authenticated class ran next. Logging in once,
+     *      on a dedicated never-rate-limited IP (see AUTH_TOKEN_CLIENT_IP),
+     *      removes that coupling entirely.
+     *   2. Speed. One login instead of dozens across the suite.
+     *
+     * Only *successful* tokens are cached (see getJwtToken): caching a
+     * transient failure would amplify a single bad login into a suite-wide
+     * auth wipeout. A JWT lives JWT_EXPIRY seconds (default 3600) — far longer
+     * than a full test run — so no in-run invalidation is needed.
+     */
+    private static ?string $cachedJwtToken = null;
+
+    /**
+     * Dedicated client IP for the one-shot token-acquisition login.
+     *
+     * RFC 5737 TEST-NET-2 (198.51.100.0/24), deliberately disjoint from the
+     * 192.0.2.0/24 (TEST-NET-1) space every other test uses for its synthetic
+     * per-class / per-method IPs. Only correct-credential logins are ever sent
+     * from this IP, so its rate-limit bucket never accumulates failed attempts
+     * and can never be tripped by another test. Honoured as the client IP only
+     * when APP_ENV is dev/test (see ClientIpTrait::getClientIp()).
+     */
+    private const AUTH_TOKEN_CLIENT_IP = '198.51.100.1';
+
     public static function setUpBeforeClass(): void
     {
         // Per-class synthetic client IP (RFC 5737 TEST-NET-1). Each test class
@@ -268,25 +306,35 @@ abstract class ApiTestCase extends TestCase
     /**
      * Obtain an access token for authenticated tests.
      *
-     * Attempts Zitadel OIDC authentication first (via JWT Profile grant using a service account key),
+     * The token is acquired once per process and cached for the lifetime of
+     * the suite (see $cachedJwtToken for the rationale). Attempts Zitadel OIDC
+     * authentication first (via JWT Profile grant using a service account key),
      * then falls back to legacy JWT authentication via /auth/login.
      *
      * @return string|null The access token, or null if authentication fails.
      */
     protected static function getJwtToken(): ?string
     {
+        // Reuse the suite-wide token if we already obtained one.
+        if (self::$cachedJwtToken !== null) {
+            return self::$cachedJwtToken;
+        }
+
         if (self::$http === null) {
             return null;
         }
 
-        // Try Zitadel OIDC token first
-        $oidcToken = self::getZitadelToken();
-        if ($oidcToken !== null) {
-            return $oidcToken;
+        // Try Zitadel OIDC token first, then fall back to legacy /auth/login.
+        $token = self::getZitadelToken() ?? self::getLegacyJwtToken();
+
+        // Cache successes only: caching a transient failure would convert one
+        // flaky login into a suite-wide auth wipeout. A failed attempt simply
+        // returns null here and lets a later test retry.
+        if ($token !== null) {
+            self::$cachedJwtToken = $token;
         }
 
-        // Fall back to legacy JWT authentication
-        return self::getLegacyJwtToken();
+        return $token;
     }
 
     /**
@@ -369,8 +417,13 @@ abstract class ApiTestCase extends TestCase
 
         $response = self::$http->post('/auth/login', [
             'headers' => [
-                'Content-Type' => 'application/json',
-                'Accept'       => 'application/json'
+                // Pin to a dedicated reserved IP so this login never shares a
+                // rate-limit bucket with any other test. Set explicitly here
+                // because the per-class X-Forwarded-For middleware only fills
+                // in the header when it is absent.
+                'X-Forwarded-For' => self::AUTH_TOKEN_CLIENT_IP,
+                'Content-Type'    => 'application/json',
+                'Accept'          => 'application/json'
             ],
             'json'    => [
                 'username' => $_ENV['ADMIN_USERNAME'] ?? 'admin',
