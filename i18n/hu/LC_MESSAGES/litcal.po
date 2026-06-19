@@ -7,8 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
-"POT-Creation-Date: 2026-05-06 20:23+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-19 20:46+0000\n"
 "PO-Revision-Date: 2026-06-19 18:50+0000\n"
 "Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Hungarian <https://translate.johnromanodorazio.com/projects/"
@@ -1487,18 +1487,11 @@ msgstr ""
 "A %3$s-i naptárhoz tartozó, és általában %4$s-án ünnepelt %1$s '%2$s' el "
 "lett törölve a %5$s %6$s által %7$d-ben."
 
-#: src/Handlers/CalendarHandler.php:4448
+#: src/Handlers/CalendarHandler.php:4477
 msgid "Error converting Liturgical Calendar to XML."
 msgstr "Hiba a liturgikus naptár XML-re konvertálásakor."
 
-#: src/Handlers/CalendarHandler.php:4480
-#, php-format
-msgid "Error receiving or parsing info from GitHub about latest release: %s."
-msgstr ""
-"Hiba a GitHub-ról érkező információk fogadásában vagy elemzésében a legújabb "
-"kiadásról: %s."
-
-#: src/Handlers/CalendarHandler.php:4491
+#: src/Handlers/CalendarHandler.php:4508
 msgid "Error serializing Liturgical Calendar."
 msgstr "Hiba a liturgikus naptár sorosításánál."
 
@@ -1568,6 +1561,13 @@ msgstr ""
 "A %1$s '%2$s' virrasztó mise egybeesik a %3$s '%4$s' eseménnyel a %5$d "
 "évben. Meg kellene kérdeznünk az Istentiszteleti és Szentségi Fegyelmi "
 "Dikasztériumot, mit tegyünk ebben az ügyben!"
+
+#, php-format
+#~ msgid ""
+#~ "Error receiving or parsing info from GitHub about latest release: %s."
+#~ msgstr ""
+#~ "Hiba a GitHub-ról érkező információk fogadásában vagy elemzésében a "
+#~ "legújabb kiadásról: %s."
 
 #~ msgid ""
 #~ "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "

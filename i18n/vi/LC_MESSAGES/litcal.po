@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-06 20:23+0000\n"
+"POT-Creation-Date: 2026-06-19 20:46+0000\n"
 "PO-Revision-Date: 2025-10-18 13:19+0000\n"
 "Last-Translator: Mai Lê Bảo Khang <baokhang48812002@gmail.com>\n"
 "Language-Team: Vietnamese <https://translate.johnromanodorazio.com/projects/"
@@ -1475,17 +1475,11 @@ msgstr ""
 "Lễ %1$s '%2$s', thuộc lịch của %3$s và thường được cử hành vào ngày %4$s, bị "
 "hủy bỏ bởi %5$s %6$s vào năm %7$d."
 
-#: src/Handlers/CalendarHandler.php:4448
+#: src/Handlers/CalendarHandler.php:4477
 msgid "Error converting Liturgical Calendar to XML."
 msgstr "Lỗi chuyển đổi Lịch Phụng vụ sang XML."
 
-#: src/Handlers/CalendarHandler.php:4480
-#, php-format
-msgid "Error receiving or parsing info from GitHub about latest release: %s."
-msgstr ""
-"Lỗi nhận hoặc phân tích thông tin từ GitHub về bản phát hành mới nhất: %s."
-
-#: src/Handlers/CalendarHandler.php:4491
+#: src/Handlers/CalendarHandler.php:4508
 msgid "Error serializing Liturgical Calendar."
 msgstr "Lỗi tuần tự hóa Lịch Phụng vụ."
 
@@ -1552,6 +1546,12 @@ msgid ""
 msgstr ""
 "Thánh lễ Canh thức cho %1$s '%2$s' trùng với %3$s '%4$s' vào năm %5$d. Chúng "
 "ta nên hỏi Bộ Phụng tự và Kỷ luật Bí tích làm gì với trường hợp này!"
+
+#, php-format
+#~ msgid ""
+#~ "Error receiving or parsing info from GitHub about latest release: %s."
+#~ msgstr ""
+#~ "Lỗi nhận hoặc phân tích thông tin từ GitHub về bản phát hành mới nhất: %s."
 
 #~ msgid ""
 #~ "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "

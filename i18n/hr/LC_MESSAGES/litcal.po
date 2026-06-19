@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-06 20:23+0000\n"
+"POT-Creation-Date: 2026-06-19 20:46+0000\n"
 "PO-Revision-Date: 2025-12-19 19:23+0000\n"
 "Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: Croatian <https://translate.johnromanodorazio.com/projects/"
@@ -1480,18 +1480,11 @@ msgstr ""
 "%1$s '%2$s', vlastitom kalendaru %3$s i obično slavljen %4$s, potisnut je od "
 "%5$s %6$s u godini %7$d."
 
-#: src/Handlers/CalendarHandler.php:4448
+#: src/Handlers/CalendarHandler.php:4477
 msgid "Error converting Liturgical Calendar to XML."
 msgstr "Greška pri pretvaranju liturgijskog kalendara u XML."
 
-#: src/Handlers/CalendarHandler.php:4480
-#, php-format
-msgid "Error receiving or parsing info from GitHub about latest release: %s."
-msgstr ""
-"Greška pri primanju ili parsiranju informacija sa GitHub-a o najnovijem "
-"izdanju: %s."
-
-#: src/Handlers/CalendarHandler.php:4491
+#: src/Handlers/CalendarHandler.php:4508
 msgid "Error serializing Liturgical Calendar."
 msgstr "Pogreška pri serijalizaciji liturgijskog kalendara."
 
@@ -1559,6 +1552,13 @@ msgstr ""
 "Vigilijska misa za %1$s '%2$s' podudara se s %3$s '%4$s' u godini %5$d. "
 "Trebali bismo pitati Dikasterij za bogoštovlje i disciplinu sakramenata što "
 "učiniti povodom toga!"
+
+#, php-format
+#~ msgid ""
+#~ "Error receiving or parsing info from GitHub about latest release: %s."
+#~ msgstr ""
+#~ "Greška pri primanju ili parsiranju informacija sa GitHub-a o najnovijem "
+#~ "izdanju: %s."
 
 #~ msgid ""
 #~ "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "

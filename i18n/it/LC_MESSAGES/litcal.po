@@ -9,8 +9,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
-"POT-Creation-Date: 2026-05-06 20:23+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-19 20:46+0000\n"
 "PO-Revision-Date: 2026-06-19 19:52+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -1494,18 +1494,11 @@ msgstr ""
 "La %1$s '%2$s', propria del calendario del %3$s e solitamente celebrata il "
 "%4$s, viene soppressa dalla %5$s %6$s nell'anno %7$d."
 
-#: src/Handlers/CalendarHandler.php:4448
+#: src/Handlers/CalendarHandler.php:4477
 msgid "Error converting Liturgical Calendar to XML."
 msgstr "Errore nella conversione del Calendario Liturgico in XML."
 
-#: src/Handlers/CalendarHandler.php:4480
-#, php-format
-msgid "Error receiving or parsing info from GitHub about latest release: %s."
-msgstr ""
-"Errore nel ricevere o nel leggere le informazioni da GitHub sull'ultimo "
-"rilascio: %s."
-
-#: src/Handlers/CalendarHandler.php:4491
+#: src/Handlers/CalendarHandler.php:4508
 msgid "Error serializing Liturgical Calendar."
 msgstr "Errore nella serializzazione del Calendario Liturgico."
 
@@ -1575,6 +1568,13 @@ msgstr ""
 "La Messa della Vigilia per il %1$s '%2$s' coincide con il %3$s '%4$s' "
 "nell'anno %5$d. Dovremmo chiedere al Dicastero per il Culto Divino e la "
 "Disciplina dei Sacramenti cosa fare al riguardo!"
+
+#, php-format
+#~ msgid ""
+#~ "Error receiving or parsing info from GitHub about latest release: %s."
+#~ msgstr ""
+#~ "Errore nel ricevere o nel leggere le informazioni da GitHub sull'ultimo "
+#~ "rilascio: %s."
 
 #~ msgid ""
 #~ "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
