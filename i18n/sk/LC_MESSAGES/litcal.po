@@ -3,13 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024, 2025.
 # Milan Šalka <salka.milan@googlemail.com>, 2024.
-# OpenAI <noreply-mt-openai@weblate.org>, 2025.
+# OpenAI <noreply-mt-openai@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-05-06 20:23+0000\n"
-"PO-Revision-Date: 2025-12-16 09:49+0000\n"
+"PO-Revision-Date: 2026-06-19 18:50+0000\n"
 "Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Slovak <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/sk/>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Weblate 5.13.3\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:30
@@ -248,29 +248,27 @@ msgstr "pracovný deň"
 #. translators: liturgical rank 'WEEKDAY' in abbreviated form
 #: src/Enum/LitGrade.php:139
 msgid "w"
-msgstr ""
+msgstr "spomienka"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:144
-#, fuzzy
 msgid "commemoration"
-msgstr "Spomienka"
+msgstr "spomienka"
 
 #. translators: liturgical rank 'COMMEMORATION' in abbreviated form
 #: src/Enum/LitGrade.php:146
 msgid "m*"
-msgstr ""
+msgstr "m*"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:151
-#, fuzzy
 msgid "optional memorial"
-msgstr "Ľubovoľná spomienka"
+msgstr "ľubovoľná spomienka"
 
 #. translators: liturgical rank 'OPTIONAL MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:153
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #. translators: liturgical rank. Keep Capitalized
 #: src/Enum/LitGrade.php:158
@@ -280,7 +278,7 @@ msgstr "Pamiatka"
 #. translators: liturgical rank 'MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:160
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:165
@@ -290,7 +288,7 @@ msgstr "SVIATOK"
 #. translators: liturgical rank 'FEAST' in abbreviated form
 #: src/Enum/LitGrade.php:167
 msgid "F"
-msgstr ""
+msgstr "F"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:172
@@ -300,7 +298,7 @@ msgstr "SVIATOK PÁNA"
 #. translators: liturgical rank 'FEAST OF THE LORD' in abbreviated form
 #: src/Enum/LitGrade.php:174
 msgid "F✝"
-msgstr ""
+msgstr "F✝"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:179
@@ -310,7 +308,7 @@ msgstr "SLÁVNOSŤ"
 #. translators: liturgical rank 'SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:181
 msgid "S"
-msgstr ""
+msgstr "S"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:186
@@ -320,7 +318,7 @@ msgstr "slávenie s prednosťou pred slávnosťami"
 #. translators: liturgical rank 'HIGHER SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:188
 msgid "S✝"
-msgstr ""
+msgstr "S✝"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:207
@@ -620,7 +618,7 @@ msgstr "Obdobie cez rok"
 #: src/FerialEventNameGenerator.php:366
 #, php-format
 msgid "December %s"
-msgstr ""
+msgstr "december %s"
 
 #. translators: %s is an ordinal number (1st, 2nd, 3rd)
 #. translators: %s is an ordinal number (first, second...)
@@ -641,13 +639,13 @@ msgstr "%s deň oktávy Vianoc"
 #: src/FerialEventNameGenerator.php:418 src/FerialEventNameGenerator.php:452
 #, php-format
 msgid "January %s"
-msgstr ""
+msgstr "január %s"
 
 #. translators: %s is a day of the week - for days after Epiphany
 #: src/FerialEventNameGenerator.php:435
 #, php-format
 msgid "%s after Epiphany"
-msgstr ""
+msgstr "%s po Zjavení Pána"
 
 #. translators: Day after Ash Wednesday pattern
 #: src/FerialEventNameGenerator.php:467 src/Handlers/CalendarHandler.php:1880
@@ -663,9 +661,9 @@ msgstr "týždňa pôstu %s"
 
 #. translators: %s is a day of the week - Easter Octave pattern
 #: src/FerialEventNameGenerator.php:501
-#, fuzzy, php-format
+#, php-format
 msgid "%s within the Octave of Easter"
-msgstr "%s deň oktávy Vianoc"
+msgstr "%s v oktáve Veľkej noci"
 
 #. translators: %s is an ordinal number (2nd, 3rd, etc.)
 #: src/FerialEventNameGenerator.php:517 src/Handlers/CalendarHandler.php:2869
@@ -682,9 +680,9 @@ msgstr "týždňa v období cez rok %s"
 
 #. translators: %s is a day of the week - Holy Week pattern
 #: src/FerialEventNameGenerator.php:552
-#, fuzzy, php-format
+#, php-format
 msgid "%s of Holy Week"
-msgstr "Za sväté ženy"
+msgstr "%s Veľkého týždňa"
 
 #: src/Handlers/CalendarHandler.php:433
 #, php-format
@@ -960,22 +958,23 @@ msgstr ""
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
 #: src/Handlers/CalendarHandler.php:2316
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': can only be relative to "
 "liturgical event with key '%2$s' using keywords %3$s"
 msgstr ""
-"Nie je možné vytvoriť mobilnú slávnosť '%1$s': môže byť relatívna len k "
-"slávnosti s kľúčom '%2$s' pomocou kľúčových slov %3$s"
+"Nemožno vytvoriť mobilnú liturgickú udalosť '%1$s': možno ju vytvoriť iba vo "
+"vzťahu k liturgickej udalosti s kľúčom '%2$s' pomocou kľúčových slov %3$s."
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
 #: src/Handlers/CalendarHandler.php:2330
-#, fuzzy, php-format
+#, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s' relative to liturgical event "
 "with key '%2$s'"
 msgstr ""
-"Nemožno vytvoriť mobilnú slávnosť '%1$s' vzhľadom na slávnosť s kľúčom '%2$s'"
+"Nemožno vytvoriť mobilnú liturgickú udalosť '%1$s' vo vzťahu k liturgickej "
+"udalosti s kľúčom '%2$s'."
 
 #. translators:
 #.  1. Grade or rank of the liturgical event
@@ -1118,7 +1117,7 @@ msgstr "Sobotná pamiatka Preblahoslavenej Panny Márie"
 #, php-format
 msgid ""
 "Could not find a %1$s property in the %2$s for the National Calendar %3$s."
-msgstr ""
+msgstr "Nepodarilo sa nájsť vlastnosť %1$s v %2$s pre národný kalendár %3$s."
 
 #. translators: 1: Event key, 2: Original date, 3: New date, 4: Requested calendar year
 #: src/Handlers/CalendarHandler.php:3137
@@ -1212,15 +1211,17 @@ msgid ""
 "liturgical event is greater than the number of days (%3$d) in the month "
 "(%4$d) of the liturgical event year (%5$d)."
 msgstr ""
+"Nemožno vytvoriť liturgickú udalosť s kľúčom \"%1$s\": deň (%2$d) "
+"liturgickej udalosti je väčší ako počet dní (%3$d) v mesiaci (%4$d) roka "
+"liturgickej udalosti (%5$d)."
 
 #: src/Handlers/CalendarHandler.php:3412
-#, fuzzy
 msgid ""
 "We should be creating a new liturgical event, however we do not seem to have "
 "the correct date information in order to proceed"
 msgstr ""
-"Mali by sme vytvoriť nový sviatok, ale zdá sa, že nemáme správne informácie "
-"o dátume, aby sme mohli pokračovať"
+"Mali by sme vytvoriť novú liturgickú udalosť, avšak zdá sa, že nemáme "
+"správne informácie o dátume, aby sme mohli pokračovať."
 
 #. translators:
 #.  1. Grade or rank of the liturgical event
@@ -1475,18 +1476,17 @@ msgstr ""
 
 #: src/Handlers/CalendarHandler.php:4448
 msgid "Error converting Liturgical Calendar to XML."
-msgstr ""
+msgstr "Chyba pri konverzii liturgického kalendára do XML."
 
 #: src/Handlers/CalendarHandler.php:4480
-#, fuzzy, php-format
+#, php-format
 msgid "Error receiving or parsing info from GitHub about latest release: %s."
 msgstr ""
-"Chyba pri prijímaní alebo spracovaní informácií z GitHubu o najnovšom "
-"vydaní: %s."
+"Chyba pri prijímaní alebo analýze informácií z GitHub o poslednej verzii: %s."
 
 #: src/Handlers/CalendarHandler.php:4491
 msgid "Error serializing Liturgical Calendar."
-msgstr ""
+msgstr "Chyba pri serializovaní liturgického kalendára."
 
 #. translators: Christmas weekday name pattern
 #: src/LocaleDateFormatter.php:169
