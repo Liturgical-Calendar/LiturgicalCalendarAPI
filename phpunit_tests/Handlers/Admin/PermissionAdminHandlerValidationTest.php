@@ -60,4 +60,9 @@ final class PermissionAdminHandlerValidationTest extends AbstractHandlerTestCase
     {
         self::assertFalse($this->tupleParamsValid('user:abc', 'general_roman_calendar', 'nonsense', 'editor'));
     }
+
+    public function testGrantTupleWithInvalidObjectTypeFails(): void
+    {
+        self::assertFalse($this->tupleParamsValid('user:abc', 'not_a_real_type', 'temporale', 'editor'));
+    }
 }

@@ -154,4 +154,27 @@ final class AccessRequestHandlerValidationTest extends AbstractHandlerTestCase
 
         ( new AccessRequestHandler() )->handle($request);
     }
+
+    public function testResubmitWithInvalidObjectTypeIsRejected(): void
+    {
+        $repo  = new AccessRequestRepository(self::$pdo);
+        $reqId = $repo->create('user-grc-test', 'grc@x.test', null, 'calendar_editor', []);
+        $repo->reject($reqId, 'admin');
+
+        $request = $this->requestFor(
+            'POST',
+            '/auth/access-requests/' . $reqId . '/resubmit',
+            [],
+            [
+                'permissions' => [
+                    ['object_type' => 'not_a_real_type', 'object_id' => 'temporale', 'relation' => 'editor'],
+                ],
+            ]
+        )->withAttribute('oidc_user', $this->oidcUser());
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessageMatches('/object_type.*is invalid/i');
+
+        ( new AccessRequestHandler() )->handle($request);
+    }
 }
