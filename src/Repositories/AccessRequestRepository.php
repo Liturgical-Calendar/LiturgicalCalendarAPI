@@ -42,9 +42,16 @@ class AccessRequestRepository
     public const VALID_RELATIONS = ['admin', 'viewer', 'editor', 'deleter'];
 
     /**
+     * The fixed, enumerated set of object IDs valid for the general_roman_calendar type.
+     *
+     * @var array<int, string>
+     */
+    public const GRC_OBJECT_IDS = ['temporale', 'EDITIO_TYPICA_1970', 'EDITIO_TYPICA_2002', 'EDITIO_TYPICA_2008', 'decrees'];
+
+    /**
      * Valid OpenFGA object types on permission tuples.
      */
-    public const VALID_OBJECT_TYPES = ['national_calendar', 'diocesan_calendar', 'wider_region', 'test_definition'];
+    public const VALID_OBJECT_TYPES = ['national_calendar', 'diocesan_calendar', 'wider_region', 'test_definition', 'general_roman_calendar'];
 
     /**
      * Object types each role is permitted to hold tuples for. Used by RoleCascadeService
@@ -54,14 +61,29 @@ class AccessRequestRepository
      * @var array<string, array<int, string>>
      */
     public const ROLE_OBJECT_TYPES = [
-        'developer'       => ['national_calendar', 'diocesan_calendar', 'wider_region', 'test_definition'],
-        'calendar_editor' => ['national_calendar', 'diocesan_calendar', 'wider_region'],
+        'developer'       => ['national_calendar', 'diocesan_calendar', 'wider_region', 'test_definition', 'general_roman_calendar'],
+        'calendar_editor' => ['national_calendar', 'diocesan_calendar', 'wider_region', 'general_roman_calendar'],
         'test_editor'     => ['test_definition'],
     ];
 
     public function __construct(?PDO $db = null)
     {
         $this->db = $db ?? Connection::getInstance();
+    }
+
+    /**
+     * Validate an object_id for a given object_type.
+     *
+     * general_roman_calendar uses a fixed enumerated id set; all other types accept any
+     * non-empty id (the resource itself is validated downstream by the handler).
+     */
+    public static function isValidObjectIdForType(string $objectType, string $objectId): bool
+    {
+        if ($objectType === 'general_roman_calendar') {
+            return in_array($objectId, self::GRC_OBJECT_IDS, true);
+        }
+
+        return $objectId !== '';
     }
 
     /**
