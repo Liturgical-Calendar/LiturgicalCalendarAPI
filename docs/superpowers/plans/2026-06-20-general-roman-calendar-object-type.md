@@ -563,19 +563,17 @@ public function testGrcPermissionWithInvalidObjectIdIsRejected(): void
 Run: `vendor/bin/phpunit phpunit_tests/Handlers/Auth/AccessRequestHandlerValidationTest.php`
 Expected: FAIL — GRC type rejected as invalid object_type.
 
-- [ ] **Step 3: Implement**
+- [ ] **Step 3: Implement (consolidate object-type list onto the repository constant)**
 
-Add `'general_roman_calendar'` to the `VALID_OBJECT_TYPES` constant (line ~41):
+Per the consolidation decision, do NOT add a fifth entry to a private copy. Instead, remove this
+handler's private `VALID_OBJECT_TYPES` constant (lines ~41-46) entirely and point every usage at the
+single authoritative source `AccessRequestRepository::VALID_OBJECT_TYPES` (updated in Task A2).
 
-```php
-    private const VALID_OBJECT_TYPES = [
-        'national_calendar',
-        'diocesan_calendar',
-        'wider_region',
-        'test_definition',
-        'general_roman_calendar',
-    ];
-```
+- Delete the `private const VALID_OBJECT_TYPES = [ ... ];` declaration.
+- Replace each `self::VALID_OBJECT_TYPES` reference in this file (the submit loop ~line 218 and the
+  approve loop ~line 379) with `AccessRequestRepository::VALID_OBJECT_TYPES`.
+- Leave the private `VALID_RELATIONS` constant unchanged (relations are not part of this consolidation).
+- Ensure `use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;` is imported.
 
 In the submit-validation loop, after the `object_id === ''` check (line ~233), add:
 
@@ -607,7 +605,7 @@ In the approve-validation loop, after the `in_array($objType, ...)` check (line 
             }
 ```
 
-Ensure `use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;` is imported (it likely already is; add if missing).
+(`AccessRequestRepository` is already imported per the consolidation step above.)
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -656,19 +654,17 @@ public function testGrantGrcTupleWithInvalidIdFails(): void
 Run: `vendor/bin/phpunit phpunit_tests/Handlers/Admin/PermissionAdminHandlerValidationTest.php`
 Expected: FAIL — GRC type invalid.
 
-- [ ] **Step 3: Implement**
+- [ ] **Step 3: Implement (consolidate object-type list onto the repository constant)**
 
-Add `'general_roman_calendar'` to `VALID_OBJECT_TYPES` (line ~54):
+Per the consolidation decision, remove this handler's private `VALID_OBJECT_TYPES` constant
+(lines ~54-59) entirely and point every usage at `AccessRequestRepository::VALID_OBJECT_TYPES`
+(updated in Task A2).
 
-```php
-    private const VALID_OBJECT_TYPES = [
-        'national_calendar',
-        'diocesan_calendar',
-        'wider_region',
-        'test_definition',
-        'general_roman_calendar',
-    ];
-```
+- Delete the `private const VALID_OBJECT_TYPES = [ ... ];` declaration.
+- Replace each `self::VALID_OBJECT_TYPES` reference in this file (the list-filter validation ~line 330
+  and `validateTupleParams` ~line 816) with `AccessRequestRepository::VALID_OBJECT_TYPES`.
+- Leave the private `VALID_RELATIONS` constant unchanged.
+- Ensure `use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;` is imported.
 
 In `validateTupleParams()`, after the `$objectId === ''` check (line ~824), add:
 
@@ -685,7 +681,7 @@ In `validateTupleParams()`, after the `$objectId === ''` check (line ~824), add:
         }
 ```
 
-Add `use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;` if not already imported.
+(`AccessRequestRepository` is already imported per the consolidation step above.)
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -994,9 +990,10 @@ gh pr create --base development --title "feat(ui): general_roman_calendar object
 
 ## Self-Review notes (for the implementer)
 
-- **Three object-type lists** exist in the API (`AccessRequestRepository`, `AccessRequestHandler`,
-  `PermissionAdminHandler`) — Tasks A2/A5/A6 update all three. They are intentionally kept separate
-  (existing pattern); a future consolidation is out of scope.
+- **Object-type list consolidation:** the API previously had three duplicated `VALID_OBJECT_TYPES`
+  lists (`AccessRequestRepository`, `AccessRequestHandler`, `PermissionAdminHandler`). Per the
+  consolidation decision, Task A2 keeps the authoritative copy on `AccessRequestRepository`, and
+  Tasks A5/A6 delete the two handler-private copies and reference the repository constant instead.
 - **Cascade** (`RoleCascadeService`) needs no change: it discovers object ids via OpenFGA `listObjects`
   over `ROLE_OBJECT_TYPES`, so adding GRC to that map (Task A2) is sufficient.
 - **Naming consistency:** the factory `forGeneralRomanCalendar`, helper `isValidObjectIdForType`,
