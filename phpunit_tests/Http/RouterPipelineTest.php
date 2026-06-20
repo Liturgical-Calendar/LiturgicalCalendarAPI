@@ -245,4 +245,34 @@ final class RouterPipelineTest extends TestCase
         self::assertSame('general_roman_calendar', $this->getPrivateProp($fgaMw, 'objectType'));
         self::assertSame('EDITIO_TYPICA_2002', $this->getPrivateProp($fgaMw, 'fixedObjectId'));
     }
+
+    public function testMissalsWithoutIdRequiresAdminAndSkipsFga(): void
+    {
+        $router   = $this->routerWithoutConstructor();
+        $pipeline = $this->emptyPipeline();
+
+        // A collection-level write (no missal id) cannot be resource-authorized, so it must
+        // fail closed to admin rather than fall back to calendar_editor + no FGA check.
+        $this->callConfigurePipeline($router, $pipeline, 'missals', []);
+
+        $queue = $this->getQueue($pipeline);
+
+        $authMw = null;
+        foreach ($queue as $mw) {
+            if ($mw instanceof AuthorizationMiddleware) {
+                $authMw = $mw;
+                break;
+            }
+        }
+        self::assertNotNull($authMw, 'Expected an AuthorizationMiddleware for an id-less missals write');
+        self::assertSame('admin', $this->getPrivateProp($authMw, 'requiredRole'));
+
+        foreach ($queue as $mw) {
+            self::assertNotInstanceOf(
+                OpenFgaAuthorizationMiddleware::class,
+                $mw,
+                'No fine-grained FGA middleware should be added when the missal id is absent'
+            );
+        }
+    }
 }

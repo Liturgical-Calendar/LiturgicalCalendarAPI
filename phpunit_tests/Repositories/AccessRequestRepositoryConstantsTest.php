@@ -23,7 +23,14 @@ final class AccessRequestRepositoryConstantsTest extends TestCase
 
     public function testGrcObjectIdValidation(): void
     {
-        foreach (['temporale', 'EDITIO_TYPICA_1970', 'EDITIO_TYPICA_2002', 'EDITIO_TYPICA_2008', 'decrees'] as $id) {
+        // Independently pin the exact set of valid ids, so this test fails if the
+        // production constant gains, loses, or reorders an entry.
+        self::assertSame(
+            ['temporale', 'EDITIO_TYPICA_1970', 'EDITIO_TYPICA_2002', 'EDITIO_TYPICA_2008', 'decrees'],
+            AccessRequestRepository::GRC_OBJECT_IDS
+        );
+
+        foreach (AccessRequestRepository::GRC_OBJECT_IDS as $id) {
             self::assertTrue(AccessRequestRepository::isValidObjectIdForType('general_roman_calendar', $id));
         }
         self::assertFalse(AccessRequestRepository::isValidObjectIdForType('general_roman_calendar', 'EDITIO_TYPICA_1971'));

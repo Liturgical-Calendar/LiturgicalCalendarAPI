@@ -710,9 +710,18 @@ class Router
                 $pipeline->pipe(OpenFgaAuthorizationMiddleware::forGeneralRomanCalendar($fgaClient, 'decrees'));
             }
         } elseif ($route === 'missals') {
-            $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
-            if ($oidcAvailable && $fgaClient !== null && count($requestPathParts) >= 1) {
-                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forMissals($fgaClient, $requestPathParts[0]));
+            // The missal id identifies the resource being authorized. With an id, gate by
+            // calendar_editor + fine-grained FGA (Editio Typica -> general_roman_calendar,
+            // national missal -> national_calendar). Without an id (a collection-level write,
+            // e.g. creating a new missal) no resource-level check is possible, so fail closed
+            // to admin rather than falling back to role-only authorization.
+            if (count($requestPathParts) >= 1) {
+                $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
+                if ($oidcAvailable && $fgaClient !== null) {
+                    $pipeline->pipe(OpenFgaAuthorizationMiddleware::forMissals($fgaClient, $requestPathParts[0]));
+                }
+            } else {
+                $pipeline->pipe(AuthorizationMiddleware::forAdmin());
             }
         }
     }
