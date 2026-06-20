@@ -9,8 +9,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
-"POT-Creation-Date: 2026-05-06 20:23+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-19 20:46+0000\n"
 "PO-Revision-Date: 2026-06-19 19:52+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
@@ -1496,18 +1496,11 @@ msgstr ""
 "%1$s '%2$s', proprio calendario %3$s et plerumque celebratur die %4$s, "
 "supprimetur a %5$s %6$s anno %7$d."
 
-#: src/Handlers/CalendarHandler.php:4448
+#: src/Handlers/CalendarHandler.php:4477
 msgid "Error converting Liturgical Calendar to XML."
 msgstr "Error convertendi Calendarium Liturgicum ad XML."
 
-#: src/Handlers/CalendarHandler.php:4480
-#, php-format
-msgid "Error receiving or parsing info from GitHub about latest release: %s."
-msgstr ""
-"Error accipiendi aut interpretandi informationes de ultimis emissionibus ex "
-"GitHub: %s."
-
-#: src/Handlers/CalendarHandler.php:4491
+#: src/Handlers/CalendarHandler.php:4508
 msgid "Error serializing Liturgical Calendar."
 msgstr "Error serializationis Calendarii Liturgici."
 
@@ -1577,6 +1570,13 @@ msgstr ""
 "Missa Vigiliae pro %1$s '%2$s' cum %3$s '%4$s' anno %5$d coincidit. A "
 "Dicasterio de Cultu Divino et Disciplina Sacramentorum quid agendum sit "
 "quaeramus!"
+
+#, php-format
+#~ msgid ""
+#~ "Error receiving or parsing info from GitHub about latest release: %s."
+#~ msgstr ""
+#~ "Error accipiendi aut interpretandi informationes de ultimis emissionibus "
+#~ "ex GitHub: %s."
 
 #~ msgid ""
 #~ "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "

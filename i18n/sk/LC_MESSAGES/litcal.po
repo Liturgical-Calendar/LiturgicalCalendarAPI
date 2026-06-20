@@ -7,8 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
-"POT-Creation-Date: 2026-05-06 20:23+0000\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-19 20:46+0000\n"
 "PO-Revision-Date: 2026-06-19 20:58+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Slovak <https://translate.johnromanodorazio.com/projects/"
@@ -1474,17 +1474,11 @@ msgstr ""
 "Slávnosť %1$s '%2$s', vlastná pre kalendár %3$s a obvykle slávená %4$s, je "
 "potlačená %5$s %6$s v roku %7$d."
 
-#: src/Handlers/CalendarHandler.php:4448
+#: src/Handlers/CalendarHandler.php:4477
 msgid "Error converting Liturgical Calendar to XML."
 msgstr "Chyba pri konverzii liturgického kalendára do XML."
 
-#: src/Handlers/CalendarHandler.php:4480
-#, php-format
-msgid "Error receiving or parsing info from GitHub about latest release: %s."
-msgstr ""
-"Chyba pri prijímaní alebo analýze informácií z GitHub o poslednej verzii: %s."
-
-#: src/Handlers/CalendarHandler.php:4491
+#: src/Handlers/CalendarHandler.php:4508
 msgid "Error serializing Liturgical Calendar."
 msgstr "Chyba pri serializovaní liturgického kalendára."
 
@@ -1552,6 +1546,13 @@ msgstr ""
 "Omša vigílie pre %1$s '%2$s' sa zhoduje s %3$s '%4$s' v roku %5$d. Mali by "
 "sme sa opýtať Dikastéria pre Boží kult a disciplínu sviatostí, čo s tým "
 "urobiť!"
+
+#, php-format
+#~ msgid ""
+#~ "Error receiving or parsing info from GitHub about latest release: %s."
+#~ msgstr ""
+#~ "Chyba pri prijímaní alebo analýze informácií z GitHub o poslednej verzii: "
+#~ "%s."
 
 #~ msgid ""
 #~ "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
