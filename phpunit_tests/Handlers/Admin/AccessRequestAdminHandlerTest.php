@@ -934,6 +934,148 @@ final class AccessRequestAdminHandlerTest extends AbstractHandlerTestCase
         self::assertSame(2, $body['total']);
     }
 
+    // --- resource-admin (non-global) WITH FGA available (issue #633) -----
+    //
+    // The fail-closed guards above cover the FGA-UNAVAILABLE resource-admin
+    // branches. These two cover the FGA-AVAILABLE path that #633 flagged as
+    // uncovered: a resource admin whose requireAdminForAllResources check()
+    // fan-out actually runs — once denied (403), once allowed (full approve).
+
+    public function testApproveAsResourceAdminWithoutFgaAdminOnResourceIsForbidden(): void
+    {
+        // Resource admin (no global 'admin' role) approving a request for a
+        // resource they lack the FGA 'admin' relation on. The single check()
+        // returns allowed=false, so requireAdminForAllResources throws before
+        // any tuple write — the FGA-available deny branch.
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+        ]);
+
+        $mock = new MockHandler([
+            new GuzzleResponse(200, [], '{"allowed":false}'), // admin check denied
+        ]);
+
+        $this->expectException(\LiturgicalCalendar\Api\Http\Exception\ForbiddenException::class);
+        $this->expectExceptionMessage('No admin permission for national_calendar:IT');
+
+        $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock,
+            fn(OpenFgaClient $client): \Psr\Http\Message\ResponseInterface =>
+                ( new AccessRequestAdminHandler($client) )->handle(
+                    $this->withOidcUser(
+                        $this->requestFor(
+                            'POST',
+                            '/admin/access-requests/' . $id . '/approve',
+                            [],
+                            ['notes' => 'try']
+                        ),
+                        'resource-admin-1',
+                        ['calendar_editor']
+                    )
+                )
+        ));
+    }
+
+    public function testApproveAsResourceAdminWithFgaAdminAccessSucceeds(): void
+    {
+        // Resource admin WITH the FGA 'admin' relation on the requested
+        // resource: check() returns allowed=true so requireAdminForAllResources
+        // passes, then the single tuple write succeeds — the FGA-available
+        // allow path. The mock queue is ordered check-then-write because the
+        // admin authorization gate runs before the approval writes.
+        $repo = new AccessRequestRepository(self::$pdo);
+        $id   = $repo->create('user-a', 'a@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+        ]);
+
+        $mock = new MockHandler([
+            new GuzzleResponse(200, [], '{"allowed":true}'), // admin check allowed
+            new GuzzleResponse(200, [], '{}'),               // tuple write OK
+        ]);
+
+        $outboxRepo = new OutboxRepository(self::$pdo);
+        $notifier   = new OutboxNotifier(null, 'litcal:reconcile-stream');
+
+        $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock,
+            function (OpenFgaClient $client) use ($id, $outboxRepo, $notifier): \Psr\Http\Message\ResponseInterface {
+                $processor = new OutboxProcessor($outboxRepo, $client);
+                $handler   = new AccessRequestAdminHandler($client);
+                $handler->setOutboxDependencies($outboxRepo, $notifier, $processor);
+                return $handler->handle(
+                    $this->withOidcUser(
+                        $this->requestFor(
+                            'POST',
+                            '/admin/access-requests/' . $id . '/approve',
+                            [],
+                            ['notes' => 'ok']
+                        ),
+                        'resource-admin-1',
+                        ['calendar_editor']
+                    )
+                );
+            }
+        ));
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertTrue($body['success']);
+        self::assertCount(1, self::arrayFieldFrom($body, 'tuples_created'));
+
+        $row = $repo->getById($id);
+        self::assertNotNull($row);
+        self::assertSame('approved', $row['status']);
+    }
+
+    public function testListAsResourceAdminFiltersToResourcesWithFgaAdmin(): void
+    {
+        // Resource admin (non-global) listing: filterByAdminAccess keeps only
+        // the requests whose every permission the admin holds the FGA 'admin'
+        // relation on. The admin has admin on national_calendar:IT but not :US,
+        // so the IT request is visible and the US request is filtered out — the
+        // FGA-available list-filtering branch (issue #633).
+        $repo = new AccessRequestRepository(self::$pdo);
+        $repo->create('user-it', 'it@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+        ]);
+        $repo->create('user-us', 'us@x.test', null, 'developer', [
+            ['object_type' => 'national_calendar', 'object_id' => 'US', 'relation' => 'editor'],
+        ]);
+
+        // Respond from the object in the check payload rather than queue order,
+        // so the test does not depend on the created_at DESC page ordering.
+        $checkResponder = static function (\Psr\Http\Message\RequestInterface $req): GuzzleResponse {
+            /** @var array{tuple_key?: array{object?: string}}|null $payload */
+            $payload = json_decode((string) $req->getBody(), true);
+            $object  = is_array($payload) ? (string) ( $payload['tuple_key']['object'] ?? '' ) : '';
+            return new GuzzleResponse(200, [], (string) json_encode(['allowed' => $object === 'national_calendar:IT']));
+        };
+        $mock           = new MockHandler([$checkResponder, $checkResponder]);
+
+        $response = $this->withoutEnv(self::ZITADEL_ENV_VARS, fn() => $this->withMockOpenFgaClient(
+            $mock,
+            fn(OpenFgaClient $client): \Psr\Http\Message\ResponseInterface =>
+                ( new AccessRequestAdminHandler($client) )->handle(
+                    $this->withOidcUser(
+                        $this->requestFor('GET', '/admin/access-requests'),
+                        'resource-admin-1',
+                        ['calendar_editor']
+                    )
+                )
+        ));
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        // Only the IT request survives the FGA admin filter; total stays at the
+        // pre-filter SQL count of both rows.
+        self::assertSame(1, $body['count']);
+        self::assertSame(2, $body['total']);
+        $visible = self::arrayFieldFrom($body, 'requests');
+        self::assertCount(1, $visible);
+        self::assertSame('user-it', $visible[0]['zitadel_user_id']);
+    }
+
     // --- Outbox pattern (Task 20: issue #567 Options B+C) ----------------
 
     public function testApproveCommitsOutboxRowsAtomicallyWithDbWrite(): void
