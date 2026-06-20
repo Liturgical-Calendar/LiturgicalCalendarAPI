@@ -47,18 +47,6 @@ use Psr\Log\LoggerInterface;
 final class PermissionAdminHandler extends AbstractHandler
 {
     /**
-     * Valid OpenFGA object types that can be managed.
-     *
-     * @var array<string>
-     */
-    private const VALID_OBJECT_TYPES = [
-        'national_calendar',
-        'diocesan_calendar',
-        'wider_region',
-        'test_definition',
-    ];
-
-    /**
      * Valid OpenFGA relations.
      *
      * @var array<string>
@@ -327,9 +315,9 @@ final class PermissionAdminHandler extends AbstractHandler
             throw new ValidationException('Resource admins must specify object_type filter');
         }
 
-        if ($objectType !== '' && !in_array($objectType, self::VALID_OBJECT_TYPES, true)) {
+        if ($objectType !== '' && !in_array($objectType, AccessRequestRepository::VALID_OBJECT_TYPES, true)) {
             throw new ValidationException(
-                sprintf('Invalid object_type. Valid types: %s', implode(', ', self::VALID_OBJECT_TYPES))
+                sprintf('Invalid object_type. Valid types: %s', implode(', ', AccessRequestRepository::VALID_OBJECT_TYPES))
             );
         }
 
@@ -813,14 +801,25 @@ final class PermissionAdminHandler extends AbstractHandler
             throw new ValidationException('Missing required parameter: object_type');
         }
 
-        if (!in_array($objectType, self::VALID_OBJECT_TYPES, true)) {
+        if (!in_array($objectType, AccessRequestRepository::VALID_OBJECT_TYPES, true)) {
             throw new ValidationException(
-                sprintf('Invalid object_type "%s". Valid types: %s', $objectType, implode(', ', self::VALID_OBJECT_TYPES))
+                sprintf('Invalid object_type "%s". Valid types: %s', $objectType, implode(', ', AccessRequestRepository::VALID_OBJECT_TYPES))
             );
         }
 
         if ($objectId === '') {
             throw new ValidationException('Missing required parameter: object_id');
+        }
+
+        if (!AccessRequestRepository::isValidObjectIdForType($objectType, $objectId)) {
+            throw new ValidationException(
+                sprintf(
+                    'Invalid object_id "%s" for object_type "%s". Valid ids: %s',
+                    $objectId,
+                    $objectType,
+                    implode(', ', AccessRequestRepository::GRC_OBJECT_IDS)
+                )
+            );
         }
 
         if ($relation === '') {

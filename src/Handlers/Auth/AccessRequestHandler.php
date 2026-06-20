@@ -38,16 +38,6 @@ final class AccessRequestHandler extends AbstractHandler
     /**
      * @var array<string>
      */
-    private const VALID_OBJECT_TYPES = [
-        'national_calendar',
-        'diocesan_calendar',
-        'wider_region',
-        'test_definition',
-    ];
-
-    /**
-     * @var array<string>
-     */
     private const VALID_RELATIONS = ['admin', 'viewer', 'editor', 'deleter'];
 
     /**
@@ -59,6 +49,7 @@ final class AccessRequestHandler extends AbstractHandler
         'national_calendar',
         'diocesan_calendar',
         'wider_region',
+        'general_roman_calendar',
     ];
 
     private ?AccessRequestRepository $repository = null;
@@ -215,13 +206,13 @@ final class AccessRequestHandler extends AbstractHandler
                 );
             }
 
-            if (!in_array($objectType, self::VALID_OBJECT_TYPES, true)) {
+            if (!in_array($objectType, AccessRequestRepository::VALID_OBJECT_TYPES, true)) {
                 throw new ValidationException(
                     sprintf(
                         'permissions[%d].object_type "%s" is invalid. Valid types: %s',
                         $index,
                         $objectType,
-                        implode(', ', self::VALID_OBJECT_TYPES)
+                        implode(', ', AccessRequestRepository::VALID_OBJECT_TYPES)
                     )
                 );
             }
@@ -229,6 +220,18 @@ final class AccessRequestHandler extends AbstractHandler
             if ($objectId === '') {
                 throw new ValidationException(
                     sprintf('permissions[%d].object_id is required', $index)
+                );
+            }
+
+            if (!AccessRequestRepository::isValidObjectIdForType($objectType, $objectId)) {
+                throw new ValidationException(
+                    sprintf(
+                        'permissions[%d].object_id "%s" is invalid for object_type "%s". Valid ids: %s',
+                        $index,
+                        $objectId,
+                        $objectType,
+                        implode(', ', AccessRequestRepository::GRC_OBJECT_IDS)
+                    )
                 );
             }
 
@@ -376,12 +379,22 @@ final class AccessRequestHandler extends AbstractHandler
                 throw new ValidationException('Each permission requires object_type, object_id, and relation');
             }
 
-            if (!in_array($objType, self::VALID_OBJECT_TYPES, true)) {
+            if (!in_array($objType, AccessRequestRepository::VALID_OBJECT_TYPES, true)) {
                 throw new ValidationException(sprintf(
                     'permissions[%d].object_type "%s" is invalid. Valid types: %s',
                     $index,
                     $objType,
-                    implode(', ', self::VALID_OBJECT_TYPES)
+                    implode(', ', AccessRequestRepository::VALID_OBJECT_TYPES)
+                ));
+            }
+
+            if (!AccessRequestRepository::isValidObjectIdForType($objType, $objId)) {
+                throw new ValidationException(sprintf(
+                    'permissions[%d].object_id "%s" is invalid for object_type "%s". Valid ids: %s',
+                    $index,
+                    $objId,
+                    $objType,
+                    implode(', ', AccessRequestRepository::GRC_OBJECT_IDS)
                 ));
             }
 

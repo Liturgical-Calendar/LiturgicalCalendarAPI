@@ -628,7 +628,7 @@ class Router
 
         // Apply authentication middleware for protected routes
         if (
-            in_array($route, ['data', 'tests', 'temporale'], true)
+            in_array($route, ['data', 'tests', 'temporale', 'missals', 'decrees'], true)
             && in_array($this->request->getMethod(), [RequestMethod::PUT->value, RequestMethod::PATCH->value, RequestMethod::DELETE->value], true)
         ) {
             // Use OIDC (Zitadel) authentication if configured (with legacy JWT fallback),
@@ -700,8 +700,29 @@ class Router
                 $pipeline->pipe(OpenFgaAuthorizationMiddleware::forTestDefinition($fgaClient));
             }
         } elseif ($route === 'temporale') {
-            // Temporale requires admin role (General Roman Calendar)
-            $pipeline->pipe(AuthorizationMiddleware::forAdmin());
+            $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
+            if ($oidcAvailable && $fgaClient !== null) {
+                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forGeneralRomanCalendar($fgaClient, 'temporale'));
+            }
+        } elseif ($route === 'decrees') {
+            $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
+            if ($oidcAvailable && $fgaClient !== null) {
+                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forGeneralRomanCalendar($fgaClient, 'decrees'));
+            }
+        } elseif ($route === 'missals') {
+            // The missal id identifies the resource being authorized. With an id, gate by
+            // calendar_editor + fine-grained FGA (Editio Typica -> general_roman_calendar,
+            // national missal -> national_calendar). Without an id (a collection-level write,
+            // e.g. creating a new missal) no resource-level check is possible, so fail closed
+            // to admin rather than falling back to role-only authorization.
+            if (count($requestPathParts) >= 1) {
+                $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
+                if ($oidcAvailable && $fgaClient !== null) {
+                    $pipeline->pipe(OpenFgaAuthorizationMiddleware::forMissals($fgaClient, $requestPathParts[0]));
+                }
+            } else {
+                $pipeline->pipe(AuthorizationMiddleware::forAdmin());
+            }
         }
     }
 
