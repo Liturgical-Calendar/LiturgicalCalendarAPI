@@ -628,7 +628,7 @@ class Router
 
         // Apply authentication middleware for protected routes
         if (
-            in_array($route, ['data', 'tests', 'temporale'], true)
+            in_array($route, ['data', 'tests', 'temporale', 'missals', 'decrees'], true)
             && in_array($this->request->getMethod(), [RequestMethod::PUT->value, RequestMethod::PATCH->value, RequestMethod::DELETE->value], true)
         ) {
             // Use OIDC (Zitadel) authentication if configured (with legacy JWT fallback),
@@ -700,8 +700,20 @@ class Router
                 $pipeline->pipe(OpenFgaAuthorizationMiddleware::forTestDefinition($fgaClient));
             }
         } elseif ($route === 'temporale') {
-            // Temporale requires admin role (General Roman Calendar)
-            $pipeline->pipe(AuthorizationMiddleware::forAdmin());
+            $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
+            if ($oidcAvailable && $fgaClient !== null) {
+                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forGeneralRomanCalendar($fgaClient, 'temporale'));
+            }
+        } elseif ($route === 'decrees') {
+            $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
+            if ($oidcAvailable && $fgaClient !== null) {
+                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forGeneralRomanCalendar($fgaClient, 'decrees'));
+            }
+        } elseif ($route === 'missals') {
+            $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
+            if ($oidcAvailable && $fgaClient !== null && count($requestPathParts) >= 1) {
+                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forMissals($fgaClient, $requestPathParts[0]));
+            }
         }
     }
 
