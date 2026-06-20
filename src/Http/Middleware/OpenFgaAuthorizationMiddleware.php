@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Http\Middleware;
 
+use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
@@ -24,10 +25,13 @@ use Psr\Http\Server\RequestHandlerInterface;
  *   DELETE     → "deleter" relation
  *
  * Object types:
- *   /data/nation/{id}      → national_calendar:{id}
+ *   /data/nation/{id}       → national_calendar:{id}
  *   /data/diocese/{id}      → diocesan_calendar:{id}
  *   /data/widerregion/{id}  → wider_region:{id}
  *   /tests/{id}             → test_definition:{id}
+ *   /temporale, /decrees    → general_roman_calendar:{fixedId}
+ *   /missals/{editio_typica}→ general_roman_calendar:{missalId}
+ *   /missals/{national}     → national_calendar:{nation}
  */
 final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
 {
@@ -65,14 +69,21 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
      */
     private string $resourceIdAttribute;
 
+    /**
+     * When non-null, this fixed object id is used instead of a request attribute.
+     */
+    private ?string $fixedObjectId;
+
     public function __construct(
         OpenFgaClient $client,
         string $objectType,
-        string $resourceIdAttribute = 'calendar_id'
+        string $resourceIdAttribute = 'calendar_id',
+        ?string $fixedObjectId = null
     ) {
         $this->client              = $client;
         $this->objectType          = $objectType;
         $this->resourceIdAttribute = $resourceIdAttribute;
+        $this->fixedObjectId       = $fixedObjectId;
     }
 
     /**
@@ -145,9 +156,16 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
 
     /**
      * Extract the resource ID from the request.
+     *
+     * When a fixed object id was supplied at construction time it is returned
+     * immediately; otherwise the value is read from the named request attribute.
      */
     private function extractResourceId(ServerRequestInterface $request): ?string
     {
+        if ($this->fixedObjectId !== null) {
+            return $this->fixedObjectId;
+        }
+
         $value = $request->getAttribute($this->resourceIdAttribute);
         if ($value !== null && ( is_string($value) || is_int($value) )) {
             return (string) $value;
@@ -185,5 +203,38 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
     public static function forTestDefinition(OpenFgaClient $client): self
     {
         return new self($client, 'test_definition', 'test_id');
+    }
+
+    /**
+     * Create middleware for a General Roman Calendar sub-resource with a fixed object id
+     * (e.g. "temporale" or "decrees").
+     *
+     * @param OpenFgaClient $client   The OpenFGA client
+     * @param string        $objectId Fixed object id (e.g. "temporale")
+     * @return self Configured middleware
+     */
+    public static function forGeneralRomanCalendar(OpenFgaClient $client, string $objectId): self
+    {
+        return new self($client, 'general_roman_calendar', 'calendar_id', $objectId);
+    }
+
+    /**
+     * Create middleware for a missal write.
+     *
+     * Editio Typica (Latin) missals are General Roman Calendar Sanctorale sub-resources;
+     * national/regional missals follow the owning national calendar's grants (id prefix).
+     *
+     * @param OpenFgaClient $client   The OpenFGA client
+     * @param string        $missalId The missal identifier (e.g. "EDITIO_TYPICA_2002" or "IT_1983")
+     * @return self Configured middleware
+     */
+    public static function forMissals(OpenFgaClient $client, string $missalId): self
+    {
+        if (RomanMissal::isLatinMissal($missalId)) {
+            return new self($client, 'general_roman_calendar', 'calendar_id', $missalId);
+        }
+
+        $nation = explode('_', $missalId)[0];
+        return new self($client, 'national_calendar', 'calendar_id', $nation);
     }
 }

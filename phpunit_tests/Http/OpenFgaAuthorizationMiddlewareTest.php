@@ -234,4 +234,52 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $response = $middleware->process($request, $this->nextHandler);
         $this->assertEquals(200, $response->getStatusCode());
     }
+
+    public function testForGeneralRomanCalendarChecksFixedObjectId(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:abc', 'editor', 'general_roman_calendar:temporale')
+            ->willReturn(true);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forGeneralRomanCalendar($client, 'temporale');
+        $request    = ( new ServerRequest('PUT', '/temporale') )
+            ->withAttribute('oidc_user', ['sub' => 'abc', 'roles' => ['calendar_editor']]);
+
+        $response = $middleware->process($request, $this->nextHandler);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testForMissalsEditioTypicaChecksGeneralRomanCalendar(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:abc', 'editor', 'general_roman_calendar:EDITIO_TYPICA_2002')
+            ->willReturn(true);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'EDITIO_TYPICA_2002');
+        $request    = ( new ServerRequest('PATCH', '/missals/EDITIO_TYPICA_2002') )
+            ->withAttribute('oidc_user', ['sub' => 'abc', 'roles' => ['calendar_editor']]);
+
+        $response = $middleware->process($request, $this->nextHandler);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testForMissalsNationalChecksNationalCalendarByPrefix(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:abc', 'editor', 'national_calendar:IT')
+            ->willReturn(true);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'IT_1983');
+        $request    = ( new ServerRequest('PUT', '/missals/IT_1983') )
+            ->withAttribute('oidc_user', ['sub' => 'abc', 'roles' => ['calendar_editor']]);
+
+        $response = $middleware->process($request, $this->nextHandler);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
 }
