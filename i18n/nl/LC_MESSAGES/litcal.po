@@ -3,14 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # John R. D'Orazio <priest@johnromanodorazio.com>, 2022, 2023.
 # Steven van Roode <stevenvanroode@gmail.com>, 2022.
-# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024, 2025.
+# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024, 2025, 2026.
 # Weblate Admin <admin@example.com>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-06-19 20:46+0000\n"
-"PO-Revision-Date: 2025-12-16 09:49+0000\n"
+"PO-Revision-Date: 2026-06-22 13:52+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Dutch <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/nl/>\n"
@@ -19,7 +19,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.13.3\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:30
@@ -611,7 +611,7 @@ msgstr "Paastriduüm"
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:126
 msgid "Easter"
-msgstr "Paasseizoen"
+msgstr "Pasen"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:128
