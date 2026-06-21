@@ -137,12 +137,12 @@ final class ResourceAdminServiceTest extends TestCase
         self::assertSame(['A'], array_column($filtered, 'id'));
     }
 
-    public function testFilterByAdminAccessPropagatesRuntimeException(): void
+    public function testFilterByAdminAccessFailsClosedOnRuntimeException(): void
     {
-        // filterByAdminAccess does NOT catch RuntimeException (contrast with
-        // resolveScopes, which fails closed on error). A 500 response from
-        // OpenFGA causes OpenFgaApiException (which extends RuntimeException)
-        // to propagate out of the method uncaught.
+        // filterByAdminAccess fails closed (like resolveScopes): a 500 response
+        // from OpenFGA raises OpenFgaApiException (extends RuntimeException),
+        // which is caught per-request so the offending request is excluded
+        // rather than surfacing a 500 to the caller.
         $service = $this->serviceWith([
             new GuzzleResponse(500, [], 'boom'),
         ]);
@@ -151,7 +151,7 @@ final class ResourceAdminServiceTest extends TestCase
             ['id' => 'A', 'permissions' => [['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor']]],
         ];
 
-        $this->expectException(\RuntimeException::class);
-        $service->filterByAdminAccess($requests, 'cei-admin');
+        $filtered = $service->filterByAdminAccess($requests, 'cei-admin');
+        $this->assertSame([], $filtered);
     }
 }

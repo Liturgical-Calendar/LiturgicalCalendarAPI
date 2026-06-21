@@ -1569,7 +1569,7 @@
         ],
         "summary": "List all access requests",
         "operationId": "adminListAccessRequests",
-        "description": "List a paginated page of access requests with optional status filter. Default page size is 100; clients page via `limit` and `offset`, inspecting `has_more` (or comparing `offset + count` against `total`). Global admins see all rows. Resource admins see only requests over resources they administer \u2014 for those, the post-fetch filter may shrink the returned page below `limit`, but `total` and `has_more` reflect the pre-filter SQL paginator; clients should keep paging until `has_more` is false. Requires admin role.",
+        "description": "List a paginated page of access requests with optional status filter. Default page size is 100; clients page via `limit` and `offset`, inspecting `has_more` (or comparing `offset + count` against `total`). Global admins see all rows. Resource admins see only requests over resources they administer \u2014 for those, the post-fetch filter may shrink the returned page below `limit`, but `total` and `has_more` reflect the pre-filter SQL paginator; clients should keep paging until `has_more` is false. Requires either the global admin role or OpenFGA resource-admin access; resource admins receive role-based filtered results.",
         "parameters": [
           {
             "name": "status",

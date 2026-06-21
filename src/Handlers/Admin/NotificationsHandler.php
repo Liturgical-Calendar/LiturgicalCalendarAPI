@@ -157,8 +157,10 @@ final class NotificationsHandler extends AbstractHandler
         $applicationRepo                       = $this->getApplicationRepository();
         $notifications['pending_applications'] = $applicationRepo->countPendingApplications();
 
+        // getPendingApplications() returns oldest-first (ORDER BY created_at ASC),
+        // so take the last 5 to include the most recent pending applications.
         $pendingApps = $applicationRepo->getPendingApplications();
-        foreach (array_slice($pendingApps, 0, 5) as $app) {
+        foreach (array_slice($pendingApps, -5) as $app) {
             $notifications['items'][] = [
                 'type'            => 'application',
                 'id'              => $app['id'] ?? '',

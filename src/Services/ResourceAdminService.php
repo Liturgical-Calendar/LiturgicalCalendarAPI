@@ -78,7 +78,13 @@ final class ResourceAdminService
         return array_values(array_filter($requests, function (array $req) use ($fgaUser, &$cache): bool {
             /** @var array<int, array{object_type: string, object_id: string, relation: string}> $permissions */
             $permissions = is_array($req['permissions'] ?? null) ? $req['permissions'] : [];
-            return $this->administersAllResources($permissions, $fgaUser, $cache);
+            try {
+                return $this->administersAllResources($permissions, $fgaUser, $cache);
+            } catch (\RuntimeException) {
+                // Fail closed — a transient OpenFGA failure excludes the request
+                // rather than surfacing a 500. Mirrors resolveScopes().
+                return false;
+            }
         }));
     }
 
