@@ -90,8 +90,11 @@ final class ResourceAdminService
      * requests). The $cache de-duplicates OpenFGA `check` calls per resource.
      *
      * @param array<int, array{object_type: string, object_id: string, relation: string}> $permissions
-     * @param string $fgaUser Fully-qualified FGA user (e.g. "user:cei-admin")
+     * @param string $fgaUser Fully-qualified FGA user string in `user:{sub}` form (already
+     *                        prefixed). Contrast with {@see filterByAdminAccess()}, which accepts
+     *                        a raw Zitadel sub and prepends the `user:` prefix internally.
      * @param array<string, bool> $cache Shared per-call check cache (by reference)
+     * @return bool True iff the caller holds `admin` on every listed resource
      */
     public function administersAllResources(array $permissions, string $fgaUser, array &$cache): bool
     {

@@ -25,7 +25,9 @@ use Psr\Http\Message\ServerRequestInterface;
  * Returns notification counts for admin users.
  * GET /admin/notifications - Get counts of pending items
  *
- * Requires admin role.
+ * Requires admin role or OpenFGA resource-admin access.
+ * Global admins receive unscoped counts across all resources;
+ * resource-admins receive counts scoped to their administered resources.
  */
 final class NotificationsHandler extends AbstractHandler
 {
