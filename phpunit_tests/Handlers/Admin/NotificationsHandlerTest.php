@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Handlers\Admin;
 
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use LiturgicalCalendar\Api\Handlers\Admin\NotificationsHandler;
 use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Api\Repositories\ApplicationRepository;
+use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Tests\Handlers\AbstractHandlerTestCase;
+use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(NotificationsHandler::class)]
@@ -101,5 +107,83 @@ final class NotificationsHandlerTest extends AbstractHandlerTestCase
 
         $types = array_column($body['items'], 'type');
         self::assertSame(['application', 'access_request', 'access_request'], $types);
+    }
+
+    /**
+     * @param array<int, GuzzleResponse> $responses
+     */
+    private function handlerWithFga(array $responses): NotificationsHandler
+    {
+        $stack  = HandlerStack::create(new MockHandler($responses));
+        $guzzle = new GuzzleClient(['handler' => $stack]);
+        $psr17  = new Psr17Factory();
+        $client = new OpenFgaClient(
+            apiUrl: 'http://openfga.test',
+            storeId: 'test-store',
+            modelId: 'test-model',
+            httpClient: $guzzle,
+            requestFactory: $psr17,
+            streamFactory: $psr17,
+            apiToken: 'test-token'
+        );
+        return new NotificationsHandler($client);
+    }
+
+    public function testResourceAdminGetsScopedCount(): void
+    {
+        $accessRepo = new AccessRequestRepository(self::$pdo);
+        // Request the resource-admin administers (national_calendar:IT)
+        $accessRepo->create('user-it', 'it@x.test', 'ItUser', 'calendar_editor', [
+            ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+        ]);
+        usleep(2000);
+        // Request the resource-admin does NOT administer (national_calendar:US)
+        $accessRepo->create('user-us', 'us@x.test', 'UsUser', 'calendar_editor', [
+            ['object_type' => 'national_calendar', 'object_id' => 'US', 'relation' => 'editor'],
+        ]);
+
+        // resolveScopes: 4 list-objects calls (national_calendar -> IT, rest empty),
+        // then filterByAdminAccess: 1 check() per request (IT -> allowed, US -> denied).
+        $handler = $this->handlerWithFga([
+            new GuzzleResponse(200, [], '{"objects":["national_calendar:IT"]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"allowed":true}'),
+            new GuzzleResponse(200, [], '{"allowed":false}'),
+        ]);
+
+        $request = $this->requestFor('GET', '/admin/notifications')
+            ->withAttribute('oidc_user', ['sub' => 'cei-admin', 'roles' => ['calendar_editor']]);
+
+        $response = $handler->handle($request);
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertSame(1, $body['pending_access_requests']);
+        self::assertSame(0, $body['pending_applications']);
+        self::assertSame(1, $body['total']);
+        self::assertCount(1, $body['items']);
+        self::assertSame('access_request', $body['items'][0]['type']);
+        self::assertSame('admin-permissions.php', $body['items'][0]['url']);
+    }
+
+    public function testPlainEditorWithNoScopesIsForbidden(): void
+    {
+        // resolveScopes: 4 empty list-objects responses -> no scopes -> rejected.
+        $handler = $this->handlerWithFga([
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+        ]);
+
+        $request = $this->requestFor('GET', '/admin/notifications')
+            ->withAttribute('oidc_user', ['sub' => 'plain-editor', 'roles' => ['calendar_editor']]);
+
+        $this->expectException(ForbiddenException::class);
+        $this->expectExceptionMessage('Admin role required');
+
+        $handler->handle($request);
     }
 }

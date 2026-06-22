@@ -1079,6 +1079,48 @@
         }
       }
     },
+    "/auth/admin-scopes": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Get the caller's admin scopes",
+        "operationId": "authAdminScopes",
+        "description": "Returns whether the authenticated user is a global admin or an OpenFGA resource-admin, together with the list of objects they administer. Returns HTTP 200 with `is_global_admin=false` and an empty `admin_scopes` array when the user holds no admin relation at all. Response is not cacheable (`Cache-Control: no-store`).",
+        "responses": {
+          "200": {
+            "description": "OK: Admin scope information",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "example": "no-store"
+                },
+                "description": "Always set to `no-store` to prevent caching of auth state."
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminScopesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          }
+        }
+      }
+    },
     "/auth/notifications": {
       "get": {
         "tags": [
@@ -1220,7 +1262,7 @@
                 "examples": {
                   "firstPage": {
                     "summary": "First page (defaults)",
-                    "description": "Default request — no `limit` / `offset` supplied — returning the first page of the user's two access requests.",
+                    "description": "Default request \u2014 no `limit` / `offset` supplied \u2014 returning the first page of the user's two access requests.",
                     "value": {
                       "requests": [
                         {
@@ -1261,7 +1303,7 @@
                   },
                   "lastPage": {
                     "summary": "Last page (has_more false)",
-                    "description": "Final page of the requester's listing: `offset + count == total`, so `has_more` is false and the client stops paging. With `total: 2` and the default `limit: 100`, the first page already exhausts the dataset — this example is the same shape as `firstPage` for that reason.",
+                    "description": "Final page of the requester's listing: `offset + count == total`, so `has_more` is false and the client stops paging. With `total: 2` and the default `limit: 100`, the first page already exhausts the dataset \u2014 this example is the same shape as `firstPage` for that reason.",
                     "value": {
                       "requests": [
                         {
@@ -1426,7 +1468,7 @@
         ],
         "summary": "Resubmit a rejected access request",
         "operationId": "resubmitAccessRequest",
-        "description": "Resubmit a previously rejected access request with updated permissions (and optionally an updated justification). Only the user who created the request may resubmit it, and only when its current status is `rejected` — the request transitions back to `pending` for admin re-review. The role originally requested cannot be changed; create a new request via POST /auth/access-requests for a different role. Permissions in the body are validated identically to POST /auth/access-requests (object_type and relation must match the same enums; role-permission consistency is enforced).",
+        "description": "Resubmit a previously rejected access request with updated permissions (and optionally an updated justification). Only the user who created the request may resubmit it, and only when its current status is `rejected` \u2014 the request transitions back to `pending` for admin re-review. The role originally requested cannot be changed; create a new request via POST /auth/access-requests for a different role. Permissions in the body are validated identically to POST /auth/access-requests (object_type and relation must match the same enums; role-permission consistency is enforced).",
         "parameters": [
           {
             "name": "id",
@@ -1527,7 +1569,7 @@
         ],
         "summary": "List all access requests",
         "operationId": "adminListAccessRequests",
-        "description": "List a paginated page of access requests with optional status filter. Default page size is 100; clients page via `limit` and `offset`, inspecting `has_more` (or comparing `offset + count` against `total`). Global admins see all rows. Resource admins see only requests over resources they administer — for those, the post-fetch filter may shrink the returned page below `limit`, but `total` and `has_more` reflect the pre-filter SQL paginator; clients should keep paging until `has_more` is false. Requires admin role.",
+        "description": "List a paginated page of access requests with optional status filter. Default page size is 100; clients page via `limit` and `offset`, inspecting `has_more` (or comparing `offset + count` against `total`). Global admins see all rows. Resource admins see only requests over resources they administer \u2014 for those, the post-fetch filter may shrink the returned page below `limit`, but `total` and `has_more` reflect the pre-filter SQL paginator; clients should keep paging until `has_more` is false. Requires either the global admin role or OpenFGA resource-admin access; resource admins receive role-based filtered results.",
         "parameters": [
           {
             "name": "status",
@@ -1561,7 +1603,7 @@
                 "examples": {
                   "firstPage": {
                     "summary": "First page (defaults)",
-                    "description": "Abbreviated sample of the first page returned by a default admin listing — no `limit` / `offset` supplied. `total: 137` and `count: 100` would be realistic over a populated table; only one representative `requests[]` entry is shown here to keep the doc readable. `has_more: true` because `offset + count < total`.",
+                    "description": "Abbreviated sample of the first page returned by a default admin listing \u2014 no `limit` / `offset` supplied. `total: 137` and `count: 100` would be realistic over a populated table; only one representative `requests[]` entry is shown here to keep the doc readable. `has_more: true` because `offset + count < total`.",
                     "value": {
                       "requests": [
                         {
@@ -1610,7 +1652,7 @@
                   },
                   "lastPage": {
                     "summary": "Last page (has_more false)",
-                    "description": "Abbreviated sample of the final page of an admin traversal. `offset + count == total` (100 + 37 = 137), so `has_more` is false and the client stops. Only one representative `requests[]` entry is shown — a real response on this page would carry 37 items.",
+                    "description": "Abbreviated sample of the final page of an admin traversal. `offset + count == total` (100 + 37 = 137), so `has_more` is false and the client stops. Only one representative `requests[]` entry is shown \u2014 a real response on this page would carry 37 items.",
                     "value": {
                       "requests": [
                         {
@@ -1866,7 +1908,7 @@
         ],
         "summary": "Get admin notification counts",
         "operationId": "adminGetNotifications",
-        "description": "Get counts of pending items requiring admin attention. Requires admin role.",
+        "description": "Get counts of pending items requiring admin attention. Requires admin role or OpenFGA resource-admin access. Global admins receive unscoped counts across all resources; resource-admins receive counts scoped to the resources they administer.",
         "responses": {
           "200": {
             "description": "OK: Notification counts",
@@ -2025,7 +2067,7 @@
         ],
         "summary": "List permission tuples",
         "operationId": "adminListPermissions",
-        "description": "List OpenFGA permission tuples. Global admins see all; resource admins see only tuples on resources they administer. Supports filtering by user, object_type, object_id, and relation. **Resource admins must supply `object_type`** to scope the listing — calling without one returns 400.",
+        "description": "List OpenFGA permission tuples. Global admins see all; resource admins see only tuples on resources they administer. Supports filtering by user, object_type, object_id, and relation. **Resource admins must supply `object_type`** to scope the listing \u2014 calling without one returns 400.",
         "parameters": [
           {
             "name": "user",
@@ -2098,14 +2140,24 @@
             "description": "Paginated list of permission tuples.",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/AdminListPermissionsResponse" },
+                "schema": {
+                  "$ref": "#/components/schemas/AdminListPermissionsResponse"
+                },
                 "examples": {
                   "firstPage": {
-                    "summary": "First page of results — more remain",
+                    "summary": "First page of results \u2014 more remain",
                     "value": {
                       "permissions": [
-                        { "user": "user:zitadel-123", "relation": "editor", "object": "national_calendar:IT" },
-                        { "user": "user:zitadel-456", "relation": "viewer", "object": "national_calendar:IT" }
+                        {
+                          "user": "user:zitadel-123",
+                          "relation": "editor",
+                          "object": "national_calendar:IT"
+                        },
+                        {
+                          "user": "user:zitadel-456",
+                          "relation": "viewer",
+                          "object": "national_calendar:IT"
+                        }
                       ],
                       "count": 2,
                       "has_more": true,
@@ -2113,10 +2165,14 @@
                     }
                   },
                   "lastPage": {
-                    "summary": "Final page — no more results",
+                    "summary": "Final page \u2014 no more results",
                     "value": {
                       "permissions": [
-                        { "user": "user:zitadel-789", "relation": "deleter", "object": "national_calendar:IT" }
+                        {
+                          "user": "user:zitadel-789",
+                          "relation": "deleter",
+                          "object": "national_calendar:IT"
+                        }
                       ],
                       "count": 1,
                       "has_more": false,
@@ -2263,7 +2319,9 @@
                     "cascaded_roles": {
                       "type": "array",
                       "description": "Zitadel role names that were cascade-revoked synchronously because the deleted tuple was the user's last in-scope tuple for the role. Empty when cascade_deferred is true, when no role lost its last tuple, or when Zitadel/OpenFGA is unconfigured.",
-                      "items": { "type": "string" }
+                      "items": {
+                        "type": "string"
+                      }
                     },
                     "tuples_deleted": {
                       "type": "array",
@@ -2271,11 +2329,21 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "user": { "type": "string" },
-                          "relation": { "type": "string" },
-                          "object": { "type": "string" }
+                          "user": {
+                            "type": "string"
+                          },
+                          "relation": {
+                            "type": "string"
+                          },
+                          "object": {
+                            "type": "string"
+                          }
                         },
-                        "required": ["user", "relation", "object"],
+                        "required": [
+                          "user",
+                          "relation",
+                          "object"
+                        ],
                         "additionalProperties": false
                       }
                     },
@@ -2285,18 +2353,30 @@
                       "items": {
                         "type": "object",
                         "properties": {
-                          "outbox_id": { "type": "integer" },
-                          "status": { "type": "string" },
-                          "error": { "type": "string" }
+                          "outbox_id": {
+                            "type": "integer"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "error": {
+                            "type": "string"
+                          }
                         },
-                        "required": ["outbox_id", "status", "error"],
+                        "required": [
+                          "outbox_id",
+                          "status",
+                          "error"
+                        ],
                         "additionalProperties": false
                       }
                     },
                     "outbox_ids": {
                       "type": "array",
                       "description": "Outbox row IDs created by this revoke. The handler always inserts exactly one row per call, so this is a single-element array.",
-                      "items": { "type": "integer" }
+                      "items": {
+                        "type": "integer"
+                      }
                     },
                     "outbox_pending": {
                       "type": "integer",
@@ -3398,7 +3478,7 @@
                         "gospel_acclamation": "Matteo 23, 9b.10b",
                         "gospel": "Matteo 23, 8-12"
                       },
-                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
+                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesi\u00e6 doctorum",
                       "missal": "VATICAN_1970"
                     },
                     "StRayPenyafort": {
@@ -3486,7 +3566,7 @@
                         "gospel_acclamation": "Mt 23, 9b.10b",
                         "gospel": "Mt 23, 8-12"
                       },
-                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
+                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesi\u00e6 doctorum",
                       "missal": "VATICAN_1970"
                     },
                     "StRayPenyafort": {
@@ -3593,7 +3673,7 @@
                         "gospel_acclamation": "Mt 23, 9b.10b",
                         "gospel": "Mt 23, 8-12"
                       },
-                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
+                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesi\u00e6 doctorum",
                       "missal": "VATICAN_1970"
                     },
                     "StRayPenyafort": {
@@ -3698,7 +3778,7 @@
                         "gospel_acclamation": "Mt 23, 9b.10b",
                         "gospel": "Mt 23, 8-12"
                       },
-                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
+                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesi\u00e6 doctorum",
                       "missal": "VATICAN_1970"
                     },
                     "StRayPenyafort": {
@@ -3797,7 +3877,7 @@
                         "gospel_acclamation": "Matteo 23, 9b.10b",
                         "gospel": "Matteo 23, 8-12"
                       },
-                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
+                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesi\u00e6 doctorum",
                       "missal": "VATICAN_1970"
                     },
                     "StRayPenyafort": {
@@ -3894,7 +3974,7 @@
                         "gospel_acclamation": "Mt 23, 9b.10b",
                         "gospel": "Mt 23, 8-12"
                       },
-                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiæ doctorum",
+                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesi\u00e6 doctorum",
                       "missal": "VATICAN_1970"
                     },
                     "StRayPenyafort": {
@@ -7348,7 +7428,7 @@
       },
       "AccessRequest": {
         "type": "object",
-        "description": "An access request from the requester's perspective. Returned by GET /auth/access-requests (self-list) and used as the row shape inside AccessRequestListResponse. Admin-only review/sync fields (reviewed_by, zitadel_sync_status, zitadel_sync_error) are intentionally absent here — admin-facing endpoints return AccessRequestAdmin instead. `credentials` stays public so the requester sees what they themselves submitted.",
+        "description": "An access request from the requester's perspective. Returned by GET /auth/access-requests (self-list) and used as the row shape inside AccessRequestListResponse. Admin-only review/sync fields (reviewed_by, zitadel_sync_status, zitadel_sync_error) are intentionally absent here \u2014 admin-facing endpoints return AccessRequestAdmin instead. `credentials` stays public so the requester sees what they themselves submitted.",
         "properties": {
           "id": {
             "type": "string",
@@ -7434,7 +7514,7 @@
       },
       "AccessRequestAdmin": {
         "type": "object",
-        "description": "Admin-only view of an access request. Same shape as AccessRequest plus reviewer identity (`reviewed_by`) and Zitadel-sync diagnostics (`zitadel_sync_status`, `zitadel_sync_error`). The common fields are documented on AccessRequest. Duplicated inline (rather than composed via `allOf` over AccessRequest) because `allOf + additionalProperties: false` doesn't compose under Redocly's strict validator — each sub-schema's `additionalProperties` only sees its own properties and rejects the other side's fields.",
+        "description": "Admin-only view of an access request. Same shape as AccessRequest plus reviewer identity (`reviewed_by`) and Zitadel-sync diagnostics (`zitadel_sync_status`, `zitadel_sync_error`). The common fields are documented on AccessRequest. Duplicated inline (rather than composed via `allOf` over AccessRequest) because `allOf + additionalProperties: false` doesn't compose under Redocly's strict validator \u2014 each sub-schema's `additionalProperties` only sees its own properties and rejects the other side's fields.",
         "properties": {
           "id": {
             "type": "string",
@@ -7639,7 +7719,7 @@
       },
       "AccessRequestListResponse": {
         "type": "object",
-        "description": "Offset-paginated page of access requests returned by GET /auth/access-requests (the requester's own list). Each item is the public AccessRequest shape — admin-only review/sync fields are not present. See AdminAccessRequestListResponse for the /admin/access-requests envelope.",
+        "description": "Offset-paginated page of access requests returned by GET /auth/access-requests (the requester's own list). Each item is the public AccessRequest shape \u2014 admin-only review/sync fields are not present. See AdminAccessRequestListResponse for the /admin/access-requests envelope.",
         "properties": {
           "requests": {
             "type": "array",
@@ -7716,7 +7796,7 @@
           },
           "has_more": {
             "type": "boolean",
-            "description": "True iff more rows are available beyond this page. For global admins, equals `(offset + count) < total`. For non-global admins, reflects the SQL paginator state — `(offset + pre-filter SQL page size) < total` — rather than the post-filter `count`, so the client stops correctly on the final SQL page even when filterByAdminAccess trimmed it."
+            "description": "True iff more rows are available beyond this page. For global admins, equals `(offset + count) < total`. For non-global admins, reflects the SQL paginator state \u2014 `(offset + pre-filter SQL page size) < total` \u2014 rather than the post-filter `count`, so the client stops correctly on the final SQL page even when filterByAdminAccess trimmed it."
           }
         },
         "required": [
@@ -7875,11 +7955,21 @@
             "items": {
               "type": "object",
               "properties": {
-                "user": { "type": "string" },
-                "relation": { "type": "string" },
-                "object": { "type": "string" }
+                "user": {
+                  "type": "string"
+                },
+                "relation": {
+                  "type": "string"
+                },
+                "object": {
+                  "type": "string"
+                }
               },
-              "required": ["user", "relation", "object"],
+              "required": [
+                "user",
+                "relation",
+                "object"
+              ],
               "additionalProperties": false
             }
           },
@@ -7889,18 +7979,30 @@
             "items": {
               "type": "object",
               "properties": {
-                "outbox_id": { "type": "integer" },
-                "status": { "type": "string" },
-                "error": { "type": "string" }
+                "outbox_id": {
+                  "type": "integer"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "error": {
+                  "type": "string"
+                }
               },
-              "required": ["outbox_id", "status", "error"],
+              "required": [
+                "outbox_id",
+                "status",
+                "error"
+              ],
               "additionalProperties": false
             }
           },
           "outbox_ids": {
             "type": "array",
             "description": "Outbox row IDs created by this revoke (one per permission tuple). Empty on the no-permissions fast path.",
-            "items": { "type": "integer" }
+            "items": {
+              "type": "integer"
+            }
           },
           "outbox_pending": {
             "type": "integer",
@@ -8161,28 +8263,38 @@
       },
       "AdminListPermissionsResponse": {
         "type": "object",
-        "description": "Cursor-paginated page of OpenFGA permission tuples. Use `next_page_token` to fetch the next page; `null` means this was the last page. Note: when the handler applies a server-side admin-access filter, the returned `permissions` array may be shorter than `limit` — clients should keep paging until `has_more` is false.",
+        "description": "Cursor-paginated page of OpenFGA permission tuples. Use `next_page_token` to fetch the next page; `null` means this was the last page. Note: when the handler applies a server-side admin-access filter, the returned `permissions` array may be shorter than `limit` \u2014 clients should keep paging until `has_more` is false.",
         "properties": {
           "permissions": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/PermissionTuple" },
+            "items": {
+              "$ref": "#/components/schemas/PermissionTuple"
+            },
             "description": "Tuples in this page, up to the requested `limit` (may be fewer after server-side filtering)."
           },
           "count": {
             "type": "integer",
             "minimum": 0,
-            "description": "Number of tuples in this page (`permissions.length`). NOT a total count across all pages — OpenFGA does not expose an O(1) total."
+            "description": "Number of tuples in this page (`permissions.length`). NOT a total count across all pages \u2014 OpenFGA does not expose an O(1) total."
           },
           "has_more": {
             "type": "boolean",
             "description": "True iff the OpenFGA store has more tuples matching the filter beyond this page."
           },
           "next_page_token": {
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "Opaque continuation token to pass back as `page_token` for the next page. `null` when `has_more` is false."
           }
         },
-        "required": ["permissions", "count", "has_more", "next_page_token"],
+        "required": [
+          "permissions",
+          "count",
+          "has_more",
+          "next_page_token"
+        ],
         "additionalProperties": false
       },
       "SuccessResponse": {
@@ -8759,7 +8871,7 @@
       },
       "UserNotificationsResponse": {
         "type": "object",
-        "description": "Response from GET /auth/notifications — the inbox with unread badge metadata.",
+        "description": "Response from GET /auth/notifications \u2014 the inbox with unread badge metadata.",
         "properties": {
           "items": {
             "type": "array",
@@ -8785,6 +8897,49 @@
           "total",
           "unread_count",
           "last_seen_at"
+        ],
+        "additionalProperties": false
+      },
+      "AdminScopesResponse": {
+        "type": "object",
+        "properties": {
+          "is_global_admin": {
+            "type": "boolean",
+            "description": "True when the caller holds the global `admin` Zitadel role."
+          },
+          "is_resource_admin": {
+            "type": "boolean",
+            "description": "True when the caller holds an OpenFGA `admin` relation on at least one resource."
+          },
+          "admin_scopes": {
+            "type": "array",
+            "description": "Resources the caller administers via OpenFGA. Empty when `is_resource_admin` is false.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "object_type": {
+                  "type": "string",
+                  "example": "national_calendar",
+                  "description": "The OpenFGA object type."
+                },
+                "object_id": {
+                  "type": "string",
+                  "example": "IT",
+                  "description": "The OpenFGA object ID."
+                }
+              },
+              "required": [
+                "object_type",
+                "object_id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "is_global_admin",
+          "is_resource_admin",
+          "admin_scopes"
         ],
         "additionalProperties": false
       }
@@ -9344,7 +9499,7 @@
           },
           "i18n": {
             "ja_JP": {
-              "StFrancisXavier": "聖フランシスコ・ザビエル司祭"
+              "StFrancisXavier": "\u8056\u30d5\u30e9\u30f3\u30b7\u30b9\u30b3\u30fb\u30b6\u30d3\u30a8\u30eb\u53f8\u796d"
             }
           }
         }
@@ -9642,7 +9797,7 @@
             "schema": {
               "type": "string"
             },
-            "example": "BEGIN:VCALENDAR\nPRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-MS-OLK-FORCEINSPECTOROPEN:FALSE\nX-WR-CALNAME:Roman Catholic Universal Liturgical Calendar LA\nX-WR-TIMEZONE:Europe/Vatican\nX-PUBLISHED-TTL:PT1D\nBEGIN:VEVENT\nCLASS:PUBLIC\nDTSTART;VALUE=DATE:20291231\nDTSTAMP:20240422T062620Z\nUID:c0e7126a841a70761e4057e58b5e2d52\nCREATED:\nDESCRIPTION:\\nSOLLEMNITAS\\nalbus\nLAST-MODIFIED:\nSUMMARY;LANGUAGE=la:SOLLEMNITAS SANCTÆ DEI GENITRICIS MARIÆ Missa in Vigi\n  lia\nTRANSP:TRANSPARENT\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nX-MICROSOFT-DISALLOW-COUNTER:TRUE\nX-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.\n  2//EN\">\\n<HTML>\\n<BODY>\\n\\n<P DIR=LTR><BR><B>SOLLEMNITAS</B><BR><B><I><\n  SPAN LANG=la><FONT FACE=\"Calibri\" COLOR=\"#AAAAAA\">albus</FONT></SPAN></\n  I></B><BR>ANNUM B</P>\\n\\n</BODY>\\n</HTML>\nEND:VEVENT\nEND:VCALENDAR"
+            "example": "BEGIN:VCALENDAR\nPRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-MS-OLK-FORCEINSPECTOROPEN:FALSE\nX-WR-CALNAME:Roman Catholic Universal Liturgical Calendar LA\nX-WR-TIMEZONE:Europe/Vatican\nX-PUBLISHED-TTL:PT1D\nBEGIN:VEVENT\nCLASS:PUBLIC\nDTSTART;VALUE=DATE:20291231\nDTSTAMP:20240422T062620Z\nUID:c0e7126a841a70761e4057e58b5e2d52\nCREATED:\nDESCRIPTION:\\nSOLLEMNITAS\\nalbus\nLAST-MODIFIED:\nSUMMARY;LANGUAGE=la:SOLLEMNITAS SANCT\u00c6 DEI GENITRICIS MARI\u00c6 Missa in Vigi\n  lia\nTRANSP:TRANSPARENT\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nX-MICROSOFT-DISALLOW-COUNTER:TRUE\nX-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.\n  2//EN\">\\n<HTML>\\n<BODY>\\n\\n<P DIR=LTR><BR><B>SOLLEMNITAS</B><BR><B><I><\n  SPAN LANG=la><FONT FACE=\"Calibri\" COLOR=\"#AAAAAA\">albus</FONT></SPAN></\n  I></B><BR>ANNUM B</P>\\n\\n</BODY>\\n</HTML>\nEND:VEVENT\nEND:VCALENDAR"
           },
           "application/xml": {
             "schema": {

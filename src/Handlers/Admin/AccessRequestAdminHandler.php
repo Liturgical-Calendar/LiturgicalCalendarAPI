@@ -24,6 +24,7 @@ use LiturgicalCalendar\Api\Services\Outbox\OutboxNotifier;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxStatus;
+use LiturgicalCalendar\Api\Services\ResourceAdminService;
 use LiturgicalCalendar\Api\Services\RoleCascadeService;
 use LiturgicalCalendar\Api\Services\ZitadelService;
 use Psr\Http\Message\ResponseInterface;
@@ -1006,36 +1007,6 @@ final class AccessRequestAdminHandler extends AbstractHandler
             return [];
         }
 
-        $fgaUser = "user:{$adminId}";
-
-        // Cache admin checks to avoid redundant API calls
-        /** @var array<string, bool> $cache */
-        $cache = [];
-
-        return array_values(array_filter($requests, function (array $req) use ($fgaUser, &$cache): bool {
-            /** @var array<int, array{object_type: string, object_id: string, relation: string}> $permissions */
-            $permissions = is_array($req['permissions'] ?? null) ? $req['permissions'] : [];
-
-            if (empty($permissions)) {
-                return false;
-            }
-
-            // Admin must have access to ALL resources in the request
-            foreach ($permissions as $perm) {
-                $objectType = $perm['object_type'] ?? '';
-                $objectId   = $perm['object_id'] ?? '';
-                $key        = "{$objectType}:{$objectId}";
-
-                if (!isset($cache[$key])) {
-                    $cache[$key] = $this->getFgaClient()->check($fgaUser, 'admin', $key);
-                }
-
-                if (!$cache[$key]) {
-                    return false;
-                }
-            }
-
-            return true;
-        }));
+        return ( new ResourceAdminService($this->getFgaClient()) )->filterByAdminAccess($requests, $adminId);
     }
 }
