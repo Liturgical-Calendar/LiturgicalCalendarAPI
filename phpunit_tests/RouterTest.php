@@ -99,6 +99,37 @@ final class RouterTest extends TestCase
         self::assertFalse(Router::isLocalhost());
     }
 
+    public function testResolveServerHostFromServerName(): void
+    {
+        $_SERVER['SERVER_NAME'] = 'api.example.com';
+        self::assertSame('api.example.com', Router::resolveServerHost());
+    }
+
+    public function testResolveServerHostFallsBackToServerAddr(): void
+    {
+        $_SERVER['SERVER_ADDR'] = '203.0.113.42';
+        self::assertSame('203.0.113.42', Router::resolveServerHost());
+    }
+
+    public function testResolveServerHostDefaultsToLocalhost(): void
+    {
+        self::assertSame('localhost', Router::resolveServerHost());
+    }
+
+    public function testResolveServerHostNormalizesWildcardServerName(): void
+    {
+        // Under `php -S 0.0.0.0:8000` (e.g. in CI containers) SERVER_NAME is the
+        // wildcard bind address, which is not reliably routable for self-calls.
+        $_SERVER['SERVER_NAME'] = '0.0.0.0';
+        self::assertSame('127.0.0.1', Router::resolveServerHost());
+    }
+
+    public function testResolveServerHostNormalizesWildcardServerAddr(): void
+    {
+        $_SERVER['SERVER_ADDR'] = '0.0.0.0';
+        self::assertSame('127.0.0.1', Router::resolveServerHost());
+    }
+
     public function testGetApiPathsCliMode(): void
     {
         // In CLI mode (PHP_SAPI === 'cli', which is true under PHPUnit),

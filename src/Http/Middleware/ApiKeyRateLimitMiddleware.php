@@ -62,7 +62,21 @@ class ApiKeyRateLimitMiddleware implements MiddlewareInterface
             $limit      = is_int($rateLimit) ? $rateLimit : ( is_numeric($rateLimit) ? intval($rateLimit) : $this->defaultLimit );
         } else {
             // Unauthenticated: rate limit by IP address
-            $identifier = 'ip_' . $this->getClientIp($request);
+            $clientIp = $this->getClientIp($request);
+
+            // Exempt loopback self-calls. The API issues internal HTTP requests
+            // to its own endpoints (e.g. RegionalDataHandler and EventsParams
+            // fetching /calendars); these originate from 127.0.0.0/8 or ::1 and
+            // must not be charged against the public unauthenticated quota —
+            // otherwise the API throttles itself once UNAUTHENTICATED_RATE_LIMIT
+            // internal calls occur within the window. Deployments that terminate
+            // client traffic on the same host must set TRUST_PROXY_HEADERS=true
+            // so real clients resolve to their forwarded address, not loopback.
+            if (self::isLoopbackAddress($clientIp)) {
+                return $handler->handle($request);
+            }
+
+            $identifier = 'ip_' . $clientIp;
             $limit      = $this->defaultLimit;
         }
 
@@ -143,5 +157,29 @@ class ApiKeyRateLimitMiddleware implements MiddlewareInterface
         $serverParams = $request->getServerParams();
         $remoteAddr   = $serverParams['REMOTE_ADDR'] ?? '127.0.0.1';
         return is_string($remoteAddr) ? $remoteAddr : '127.0.0.1';
+    }
+
+    /**
+     * Determine whether an IP address is a loopback (self-call) address.
+     *
+     * Covers the IPv4 loopback range 127.0.0.0/8, the IPv6 loopback ::1, and
+     * the IPv4-mapped IPv6 form (::ffff:127.0.0.0/8).
+     *
+     * @param string $ip
+     * @return bool
+     */
+    private static function isLoopbackAddress(string $ip): bool
+    {
+        if ($ip === '::1') {
+            return true;
+        }
+
+        // IPv4-mapped IPv6 loopback, e.g. ::ffff:127.0.0.1
+        if (stripos($ip, '::ffff:') === 0) {
+            $ip = substr($ip, 7);
+        }
+
+        return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false
+            && str_starts_with($ip, '127.');
     }
 }
