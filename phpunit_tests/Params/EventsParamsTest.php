@@ -69,14 +69,24 @@ final class EventsParamsTest extends TestCase
 
     public function testEmptyLocaleStringIsRejected(): void
     {
-        // Locale::canonicalize('') returns 'en_US_POSIX' on this build, which
-        // is unsupported — so empty strings end up in the new unsupported-locale
-        // arm rather than the upstream null-canonicalize guard. Either way, the
-        // user gets a ValidationException with the locale-rejection message.
+        // An empty locale is now rejected deterministically by an explicit
+        // empty/whitespace guard, independent of the ambient ICU default locale
+        // (\Locale::getDefault()), which other requests/tests can mutate via
+        // \Locale::setDefault(). Previously this relied on canonicalize('')
+        // happening to yield the unsupported 'en_US_POSIX', which made the test
+        // order-dependent.
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('param `locale`');
 
         new EventsParams(['locale' => '']);
+    }
+
+    public function testWhitespaceOnlyLocaleStringIsRejected(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('param `locale`');
+
+        new EventsParams(['locale' => '   ']);
     }
 
     public function testNationalCalendarFromMetadataIsAccepted(): void

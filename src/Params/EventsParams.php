@@ -109,6 +109,14 @@ class EventsParams implements ParamsInterface
             if (in_array($key, self::ALLOWED_PARAMS)) {
                 switch ($key) {
                     case 'locale':
+                        // Reject empty/whitespace-only locales explicitly. Otherwise
+                        // \Locale::canonicalize('') resolves to the ambient ICU default
+                        // (\Locale::getDefault()), which a prior request in the same
+                        // worker may have mutated via \Locale::setDefault() — making an
+                        // empty locale param non-deterministically "valid".
+                        if (trim($value) === '') {
+                            throw new ValidationException('Invalid empty value for param `locale`');
+                        }
                         $locale = \Locale::canonicalize($value);
                         if (null === $locale) {
                             throw new ValidationException('Invalid locale string: ' . $value);

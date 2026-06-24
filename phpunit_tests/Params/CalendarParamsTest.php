@@ -216,6 +216,29 @@ final class CalendarParamsTest extends TestCase
         $params->setParams(['locale' => 'xx_YY']);
     }
 
+    public function testEmptyLocaleStringIsRejected(): void
+    {
+        // Rejected deterministically by an explicit empty/whitespace guard,
+        // independent of the ambient ICU default (\Locale::getDefault()), which
+        // other requests/tests can mutate via \Locale::setDefault().
+        $params = new CalendarParams();
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('parameter `locale`');
+
+        $params->setParams(['locale' => '']);
+    }
+
+    public function testWhitespaceOnlyLocaleStringIsRejected(): void
+    {
+        $params = new CalendarParams();
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('parameter `locale`');
+
+        $params->setParams(['locale' => '   ']);
+    }
+
     public function testReturnTypeIsApplied(): void
     {
         $params = new CalendarParams();

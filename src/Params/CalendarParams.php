@@ -344,6 +344,14 @@ class CalendarParams implements ParamsInterface
 
     private static function normalizeLocale(string $input): string
     {
+        // Reject empty/whitespace-only locales explicitly. Otherwise
+        // \Locale::canonicalize('') resolves to the ambient ICU default
+        // (\Locale::getDefault()), which a prior request in the same worker may
+        // have mutated via \Locale::setDefault() — making an empty locale param
+        // non-deterministically "valid".
+        if (trim($input) === '') {
+            throw new ValidationException('Invalid empty value for parameter `locale`');
+        }
         $locale = \Locale::canonicalize($input);
         if (null === $locale || '' === $locale) {
             throw new ValidationException('Invalid locale string: ' . $input . '. “If they were scattered abroad into foreign tongues, it was because their intention was profane. But now, by the distribution of tongues, the impiety is dissolved and the unity of the Spirit is restored.”
