@@ -210,6 +210,32 @@ final class EventsParamsTest extends TestCase
         new EventsParams(['diocesan_calendar' => 'nowhere']);
     }
 
+    public function testNonStringLocaleIsRejectedAsValidationError(): void
+    {
+        // A non-string locale (e.g. ?locale[]=en in a POST body) must surface as
+        // a 400 ValidationException, not a 500 TypeError from string operations.
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('locale');
+
+        new EventsParams(['locale' => ['en']]); // @phpstan-ignore-line
+    }
+
+    public function testNonStringNationalCalendarIsRejectedAsValidationError(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('national_calendar');
+
+        new EventsParams(['national_calendar' => ['IT']]); // @phpstan-ignore-line
+    }
+
+    public function testNonStringDiocesanCalendarIsRejectedAsValidationError(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('diocesan_calendar');
+
+        new EventsParams(['diocesan_calendar' => ['romamo_it']]); // @phpstan-ignore-line
+    }
+
     public function testEternalHighPriestAcceptsBooleanish(): void
     {
         $params = new EventsParams(['eternal_high_priest' => 'true']); // @phpstan-ignore-line
