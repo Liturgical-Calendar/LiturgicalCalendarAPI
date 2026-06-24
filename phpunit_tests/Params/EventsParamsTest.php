@@ -165,9 +165,9 @@ final class EventsParamsTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('eternal_high_priest');
 
-        new EventsParams([
+        new EventsParams([ // @phpstan-ignore argument.type
             'national_calendar'   => 'VA',
-            'eternal_high_priest' => 'maybe', // @phpstan-ignore-line
+            'eternal_high_priest' => 'maybe',
         ]);
     }
 
@@ -217,7 +217,7 @@ final class EventsParamsTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('locale');
 
-        new EventsParams(['locale' => ['en']]); // @phpstan-ignore-line
+        new EventsParams(['locale' => ['en']]); // @phpstan-ignore argument.type
     }
 
     public function testNonStringNationalCalendarIsRejectedAsValidationError(): void
@@ -225,7 +225,7 @@ final class EventsParamsTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('national_calendar');
 
-        new EventsParams(['national_calendar' => ['IT']]); // @phpstan-ignore-line
+        new EventsParams(['national_calendar' => ['IT']]); // @phpstan-ignore argument.type
     }
 
     public function testNonStringDiocesanCalendarIsRejectedAsValidationError(): void
@@ -233,7 +233,7 @@ final class EventsParamsTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('diocesan_calendar');
 
-        new EventsParams(['diocesan_calendar' => ['romamo_it']]); // @phpstan-ignore-line
+        new EventsParams(['diocesan_calendar' => ['romamo_it']]); // @phpstan-ignore argument.type
     }
 
     public function testObjectLocaleIsRejectedAsValidationError(): void
@@ -242,7 +242,7 @@ final class EventsParamsTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('locale');
 
-        new EventsParams(['locale' => (object) ['en']]); // @phpstan-ignore-line
+        new EventsParams(['locale' => (object) ['en']]); // @phpstan-ignore argument.type
     }
 
     public function testObjectNationalCalendarIsRejectedAsValidationError(): void
@@ -250,7 +250,7 @@ final class EventsParamsTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('national_calendar');
 
-        new EventsParams(['national_calendar' => (object) ['IT']]); // @phpstan-ignore-line
+        new EventsParams(['national_calendar' => (object) ['IT']]); // @phpstan-ignore argument.type
     }
 
     public function testObjectDiocesanCalendarIsRejectedAsValidationError(): void
@@ -258,12 +258,12 @@ final class EventsParamsTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('diocesan_calendar');
 
-        new EventsParams(['diocesan_calendar' => (object) ['romamo_it']]); // @phpstan-ignore-line
+        new EventsParams(['diocesan_calendar' => (object) ['romamo_it']]); // @phpstan-ignore argument.type
     }
 
     public function testEternalHighPriestAcceptsBooleanish(): void
     {
-        $params = new EventsParams(['eternal_high_priest' => 'true']); // @phpstan-ignore-line
+        $params = new EventsParams(['eternal_high_priest' => 'true']); // @phpstan-ignore argument.type
 
         self::assertTrue($params->EternalHighPriest);
     }
@@ -273,12 +273,12 @@ final class EventsParamsTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('eternal_high_priest');
 
-        new EventsParams(['eternal_high_priest' => 'maybe']); // @phpstan-ignore-line
+        new EventsParams(['eternal_high_priest' => 'maybe']); // @phpstan-ignore argument.type
     }
 
     public function testUnknownKeysAreSilentlyIgnored(): void
     {
-        $params = new EventsParams(['locale' => 'en_US', 'noise' => 'whatever']); // @phpstan-ignore-line
+        $params = new EventsParams(['locale' => 'en_US', 'noise' => 'whatever']);
 
         self::assertSame('en_US', $params->Locale);
     }
