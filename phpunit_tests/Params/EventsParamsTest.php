@@ -14,23 +14,25 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(EventsParams::class)]
 final class EventsParamsTest extends TestCase
 {
-    private static string $savedApiPath = '';
+    private static string $savedApiPath     = '';
+    private static string $savedApiFilePath = '';
 
     public static function setUpBeforeClass(): void
     {
-        $fixturePath = realpath(__DIR__ . '/../fixtures/api');
-        if ($fixturePath === false) {
-            throw new \RuntimeException(
-                'Missing fixture directory: ' . __DIR__ . '/../fixtures/api'
-            );
-        }
-        self::$savedApiPath = Router::$apiPath ?? '';
-        Router::$apiPath    = 'file://' . $fixturePath;
+        // EventsParams builds the calendars metadata index in-process from local
+        // source data (no HTTP self-call), so pin Router::$apiPath/$apiFilePath
+        // to the real project root the way the production Router does, making
+        // JsonData::*->path() resolve to the bundled sourcedata.
+        self::$savedApiPath     = isset(Router::$apiPath) ? Router::$apiPath : '';
+        self::$savedApiFilePath = isset(Router::$apiFilePath) ? Router::$apiFilePath : '';
+        Router::$apiPath        = '';
+        Router::$apiFilePath    = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR;
     }
 
     public static function tearDownAfterClass(): void
     {
-        Router::$apiPath = self::$savedApiPath;
+        Router::$apiPath     = self::$savedApiPath;
+        Router::$apiFilePath = self::$savedApiFilePath;
     }
 
     public function testConstructorAppliesDefaults(): void
@@ -42,6 +44,22 @@ final class EventsParamsTest extends TestCase
         self::assertNull($params->NationalCalendar);
         self::assertNull($params->DiocesanCalendar);
         self::assertNotEmpty($params->calendarsMetadata->national_calendars_keys);
+        // Locale defaults to Latin even when no locale param is supplied, per the
+        // documented contract (previously left uninitialized).
+        self::assertSame(LitLocale::LATIN, $params->Locale);
+        self::assertSame(LitLocale::LATIN_PRIMARY_LANGUAGE, $params->baseLocale);
+    }
+
+    public function testLocaleDefaultsToLatinWhenOnlyNonLocaleParamsGiven(): void
+    {
+        // Regression: a national_calendar (or any non-locale param) without a
+        // locale must still leave Locale/baseLocale initialized to the Latin
+        // default rather than uninitialized typed properties (an Error on access).
+        $params = new EventsParams(['national_calendar' => 'IT']);
+
+        self::assertSame('IT', $params->NationalCalendar);
+        self::assertSame(LitLocale::LATIN, $params->Locale);
+        self::assertSame(LitLocale::LATIN_PRIMARY_LANGUAGE, $params->baseLocale);
     }
 
     public function testValidLocaleSplitsLocaleAndBase(): void
@@ -67,14 +85,24 @@ final class EventsParamsTest extends TestCase
 
     public function testEmptyLocaleStringIsRejected(): void
     {
-        // Locale::canonicalize('') returns 'en_US_POSIX' on this build, which
-        // is unsupported — so empty strings end up in the new unsupported-locale
-        // arm rather than the upstream null-canonicalize guard. Either way, the
-        // user gets a ValidationException with the locale-rejection message.
+        // An empty locale is now rejected deterministically by an explicit
+        // empty/whitespace guard, independent of the ambient ICU default locale
+        // (\Locale::getDefault()), which other requests/tests can mutate via
+        // \Locale::setDefault(). Previously this relied on canonicalize('')
+        // happening to yield the unsupported 'en_US_POSIX', which made the test
+        // order-dependent.
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('param `locale`');
 
         new EventsParams(['locale' => '']);
+    }
+
+    public function testWhitespaceOnlyLocaleStringIsRejected(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('param `locale`');
+
+        new EventsParams(['locale' => '   ']);
     }
 
     public function testNationalCalendarFromMetadataIsAccepted(): void

@@ -8,11 +8,11 @@ use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\CorpusChristi;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
-use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
+use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 use LiturgicalCalendar\Api\Utilities;
 
 /**
@@ -129,13 +129,18 @@ class CalendarParams implements ParamsInterface
         $this->Year               = (int) date('Y');
         $this->Locale             = LitLocale::LATIN;
 
-        $calendarsRoute = Route::CALENDARS->path();
-        $metadata       = Utilities::jsonUrlToObject($calendarsRoute);
-
-        if (property_exists($metadata, 'litcal_metadata') && $metadata->litcal_metadata instanceof \stdClass) {
-            $this->calendars = MetadataCalendars::fromObject($metadata->litcal_metadata);
-        } else {
-            throw new ServiceUnavailableException('Unable to load calendars metadata');
+        // Build the calendars metadata index in-process from local source data
+        // (single source of truth) instead of looping back through GET /calendars.
+        // Map a build failure (e.g. unreadable source data) to the documented
+        // 503 contract rather than letting it surface as a generic 500.
+        try {
+            $this->calendars = CalendarMetadataProvider::create();
+        } catch (ServiceUnavailableException $e) {
+            // Already the documented 503 (e.g. a missing source file) — preserve
+            // its specific message rather than re-wrapping it generically.
+            throw $e;
+        } catch (\RuntimeException $e) {
+            throw new ServiceUnavailableException('Unable to load calendars metadata', $e);
         }
     }
 
@@ -349,6 +354,14 @@ class CalendarParams implements ParamsInterface
 
     private static function normalizeLocale(string $input): string
     {
+        // Reject empty/whitespace-only locales explicitly. Otherwise
+        // \Locale::canonicalize('') resolves to the ambient ICU default
+        // (\Locale::getDefault()), which a prior request in the same worker may
+        // have mutated via \Locale::setDefault() — making an empty locale param
+        // non-deterministically "valid".
+        if (trim($input) === '') {
+            throw new ValidationException('Invalid empty value for parameter `locale`');
+        }
         $locale = \Locale::canonicalize($input);
         if (null === $locale || '' === $locale) {
             throw new ValidationException('Invalid locale string: ' . $input . '. “If they were scattered abroad into foreign tongues, it was because their intention was profane. But now, by the distribution of tongues, the impiety is dissolved and the unity of the Spirit is restored.”

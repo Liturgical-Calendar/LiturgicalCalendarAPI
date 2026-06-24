@@ -7,7 +7,6 @@ namespace LiturgicalCalendar\Tests\Handlers;
 use LiturgicalCalendar\Api\Handlers\RegionalDataHandler;
 use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
-use LiturgicalCalendar\Api\Router;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -20,16 +19,11 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(RegionalDataHandler::class)]
 final class RegionalDataHandlerTest extends AbstractHandlerTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        // The handler resolves national/diocesan keys against the /calendars
-        // metadata; route the fetch at the M1 fixture so the lookups succeed
-        // deterministically without an HTTP server.
-        $fixturePath = realpath(__DIR__ . '/../fixtures/api');
-        self::assertNotFalse($fixturePath, 'M1 calendars fixture must be present');
-        Router::$apiPath = 'file://' . $fixturePath;
-    }
+    // The handler resolves national/diocesan keys against the calendars metadata
+    // index, which RegionalDataHandler now builds in-process from local source
+    // data (CalendarMetadataProvider). AbstractHandlerTestCase already pins
+    // Router::$apiFilePath to the project root, so those lookups resolve against
+    // the bundled sourcedata with no HTTP server or fixture needed.
 
     public function testOptionsPreflightSucceeds(): void
     {
