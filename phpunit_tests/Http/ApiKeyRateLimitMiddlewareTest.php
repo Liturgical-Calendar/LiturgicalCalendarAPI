@@ -172,6 +172,83 @@ final class ApiKeyRateLimitMiddlewareTest extends TestCase
         $this->assertSame((string) ( $limit - 1 ), $other->getHeaderLine('X-RateLimit-Remaining'));
     }
 
+    private function makeLoopbackRequest(string $remoteAddr): ServerRequestInterface
+    {
+        // A genuine API self-call (RegionalDataHandler / EventsParams fetching
+        // /calendars) carries no X-Forwarded-For and arrives from loopback.
+        return new ServerRequest(
+            'GET',
+            '/calendars',
+            [],
+            null,
+            '1.1',
+            ['REMOTE_ADDR' => $remoteAddr]
+        );
+    }
+
+    public function testLoopbackIpv4SelfCallsAreExemptFromRateLimit(): void
+    {
+        $_ENV['APP_ENV'] = 'production';
+        putenv('APP_ENV=production');
+
+        $limit      = 2;
+        $middleware = new ApiKeyRateLimitMiddleware($limit, $this->storagePath, false);
+
+        // Far more than `$limit` loopback self-calls must all pass: the API
+        // must never throttle its own internal requests to itself.
+        for ($i = 0; $i < $limit + 5; $i++) {
+            $response = $middleware->process($this->makeLoopbackRequest('127.0.0.1'), $this->okHandler);
+            $this->assertSame(200, $response->getStatusCode());
+        }
+    }
+
+    public function testLoopbackIpv6SelfCallsAreExemptFromRateLimit(): void
+    {
+        $_ENV['APP_ENV'] = 'production';
+        putenv('APP_ENV=production');
+
+        $limit      = 2;
+        $middleware = new ApiKeyRateLimitMiddleware($limit, $this->storagePath, false);
+
+        for ($i = 0; $i < $limit + 5; $i++) {
+            $response = $middleware->process($this->makeLoopbackRequest('::1'), $this->okHandler);
+            $this->assertSame(200, $response->getStatusCode());
+        }
+    }
+
+    public function testIpv4MappedIpv6LoopbackSelfCallsAreExemptFromRateLimit(): void
+    {
+        // Dual-stack IPv6 sockets can surface IPv4 loopback connections as the
+        // IPv4-mapped form ::ffff:127.0.0.1 — this must be exempt too.
+        $_ENV['APP_ENV'] = 'production';
+        putenv('APP_ENV=production');
+
+        $limit      = 2;
+        $middleware = new ApiKeyRateLimitMiddleware($limit, $this->storagePath, false);
+
+        for ($i = 0; $i < $limit + 5; $i++) {
+            $response = $middleware->process($this->makeLoopbackRequest('::ffff:127.0.0.1'), $this->okHandler);
+            $this->assertSame(200, $response->getStatusCode());
+        }
+    }
+
+    public function testLoopbackExemptionDoesNotExemptOtherIps(): void
+    {
+        $_ENV['APP_ENV'] = 'production';
+        putenv('APP_ENV=production');
+
+        $limit      = 2;
+        $middleware = new ApiKeyRateLimitMiddleware($limit, $this->storagePath, false);
+
+        // A non-loopback REMOTE_ADDR must still be throttled normally, proving
+        // the exemption is scoped strictly to loopback self-calls.
+        $middleware->process($this->makeLoopbackRequest('203.0.113.7'), $this->okHandler);
+        $middleware->process($this->makeLoopbackRequest('203.0.113.7'), $this->okHandler);
+
+        $this->expectException(TooManyRequestsException::class);
+        $middleware->process($this->makeLoopbackRequest('203.0.113.7'), $this->okHandler);
+    }
+
     public function testTrustProxyHeadersOverridesProductionEnv(): void
     {
         $_ENV['APP_ENV'] = 'production';

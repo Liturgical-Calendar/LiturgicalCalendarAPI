@@ -789,6 +789,32 @@ class Router
         return 'http';
     }
 
+    /**
+     * Resolve the host used to build the API's own base URL (self-referential requests).
+     *
+     * Prefers SERVER_NAME, falls back to SERVER_ADDR, then to 'localhost'. The wildcard
+     * bind address 0.0.0.0 (reported by SERVER_NAME/SERVER_ADDR under `php -S 0.0.0.0:8000`,
+     * as used in CI containers) is normalized to the loopback address: 0.0.0.0 is valid for
+     * binding but not reliably routable as a request target, so self-calls such as
+     * RegionalDataHandler validating against /calendars would otherwise fail.
+     */
+    public static function resolveServerHost(): string
+    {
+        $host = isset($_SERVER['SERVER_NAME']) && is_string($_SERVER['SERVER_NAME']) && '' !== $_SERVER['SERVER_NAME']
+            ? $_SERVER['SERVER_NAME']
+            : (
+                isset($_SERVER['SERVER_ADDR']) && is_string($_SERVER['SERVER_ADDR']) && '' !== $_SERVER['SERVER_ADDR']
+                ? $_SERVER['SERVER_ADDR']
+                : 'localhost'
+            );
+
+        if ('0.0.0.0' === $host) {
+            $host = '127.0.0.1';
+        }
+
+        return $host;
+    }
+
     public static function getApiPaths(): void
     {
         // The websocket server will be running in CLI mode,
@@ -835,13 +861,7 @@ class Router
         /**
          * Detect server name or server address if name is not available
          */
-        $api_full_path .= isset($_SERVER['SERVER_NAME']) && is_string($_SERVER['SERVER_NAME'])
-            ? $_SERVER['SERVER_NAME']
-            : (
-                isset($_SERVER['SERVER_ADDR']) && is_string($_SERVER['SERVER_ADDR'])
-                ? $_SERVER['SERVER_ADDR']
-                : 'localhost'
-            );
+        $api_full_path .= self::resolveServerHost();
 
 
         /**
