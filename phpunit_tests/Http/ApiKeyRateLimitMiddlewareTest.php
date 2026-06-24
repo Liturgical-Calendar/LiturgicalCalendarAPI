@@ -216,6 +216,22 @@ final class ApiKeyRateLimitMiddlewareTest extends TestCase
         }
     }
 
+    public function testIpv4MappedIpv6LoopbackSelfCallsAreExemptFromRateLimit(): void
+    {
+        // Dual-stack IPv6 sockets can surface IPv4 loopback connections as the
+        // IPv4-mapped form ::ffff:127.0.0.1 — this must be exempt too.
+        $_ENV['APP_ENV'] = 'production';
+        putenv('APP_ENV=production');
+
+        $limit      = 2;
+        $middleware = new ApiKeyRateLimitMiddleware($limit, $this->storagePath, false);
+
+        for ($i = 0; $i < $limit + 5; $i++) {
+            $response = $middleware->process($this->makeLoopbackRequest('::ffff:127.0.0.1'), $this->okHandler);
+            $this->assertSame(200, $response->getStatusCode());
+        }
+    }
+
     public function testLoopbackExemptionDoesNotExemptOtherIps(): void
     {
         $_ENV['APP_ENV'] = 'production';
