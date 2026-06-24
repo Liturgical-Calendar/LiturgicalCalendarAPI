@@ -7,23 +7,16 @@ namespace LiturgicalCalendar\Tests\Handlers;
 use LiturgicalCalendar\Api\Handlers\EventsHandler;
 use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
-use LiturgicalCalendar\Api\Router;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(EventsHandler::class)]
 final class EventsHandlerTest extends AbstractHandlerTestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-        // EventsHandler constructs an EventsParams, which fetches
-        // /calendars metadata via file_get_contents during its constructor.
-        // Point Router::$apiPath at the file:// fixture introduced in M1 so
-        // the fetch is deterministic and offline.
-        $fixturePath = realpath(__DIR__ . '/../fixtures/api');
-        self::assertNotFalse($fixturePath, 'M1 calendars fixture must be present');
-        Router::$apiPath = 'file://' . $fixturePath;
-    }
+    // EventsHandler constructs an EventsParams, which now builds the calendars
+    // metadata index in-process from local source data (CalendarMetadataProvider)
+    // rather than fetching /calendars over HTTP. AbstractHandlerTestCase already
+    // pins Router::$apiFilePath to the project root, so the build resolves
+    // against the bundled sourcedata with no HTTP server or fixture needed.
 
     public function testOptionsPreflightSucceeds(): void
     {

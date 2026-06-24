@@ -3,10 +3,9 @@
 namespace LiturgicalCalendar\Api\Params;
 
 use LiturgicalCalendar\Api\Enum\LitLocale;
-use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
-use LiturgicalCalendar\Api\Utilities;
+use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 
 /**
  * This class encapsulates the parameters that can be passed to the Events endpoint.
@@ -20,8 +19,6 @@ use LiturgicalCalendar\Api\Utilities;
  *
  * The class also provides a way to retrieve the last error message set by the class,
  * as well as to check if the parameters are valid.
- *
- * @phpstan-import-type MetadataCalendarsObject from \LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars
  */
 class EventsParams implements ParamsInterface
 {
@@ -67,9 +64,9 @@ class EventsParams implements ParamsInterface
      */
     public function __construct($params = [])
     {
-        /** @var \stdClass&object{litcal_metadata:MetadataCalendarsObject} $calendarsMetadataObj */
-        $calendarsMetadataObj    = Utilities::jsonUrlToObject(Route::CALENDARS->path());
-        $this->calendarsMetadata = MetadataCalendars::fromObject($calendarsMetadataObj->litcal_metadata);
+        // Build the calendars metadata index in-process from local source data
+        // (single source of truth) instead of looping back through GET /calendars.
+        $this->calendarsMetadata = CalendarMetadataProvider::create();
 
         // We need at least a default value for the current year and for the locale
         //   (which we already took from the request headers)

@@ -19,25 +19,25 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(CalendarParams::class)]
 final class CalendarParamsTest extends TestCase
 {
-    private static string $savedApiPath = '';
+    private static string $savedApiPath     = '';
+    private static string $savedApiFilePath = '';
 
     public static function setUpBeforeClass(): void
     {
-        // Stand in a file:// URL pointing at the bundled metadata fixture so
-        // the constructor's HTTP fetch resolves locally and deterministically.
-        $fixturePath = realpath(__DIR__ . '/../fixtures/api');
-        if ($fixturePath === false) {
-            throw new \RuntimeException(
-                'Missing fixture directory: ' . __DIR__ . '/../fixtures/api'
-            );
-        }
-        self::$savedApiPath = Router::$apiPath ?? '';
-        Router::$apiPath    = 'file://' . $fixturePath;
+        // CalendarParams builds the calendars metadata index in-process from
+        // local source data (no HTTP self-call), so pin Router::$apiPath/
+        // $apiFilePath to the real project root the way the production Router
+        // does, making JsonData::*->path() resolve to the bundled sourcedata.
+        self::$savedApiPath     = isset(Router::$apiPath) ? Router::$apiPath : '';
+        self::$savedApiFilePath = isset(Router::$apiFilePath) ? Router::$apiFilePath : '';
+        Router::$apiPath        = '';
+        Router::$apiFilePath    = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR;
     }
 
     public static function tearDownAfterClass(): void
     {
-        Router::$apiPath = self::$savedApiPath;
+        Router::$apiPath     = self::$savedApiPath;
+        Router::$apiFilePath = self::$savedApiFilePath;
     }
 
     public function testConstructorAppliesDefaults(): void

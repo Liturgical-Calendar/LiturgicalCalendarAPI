@@ -8,11 +8,11 @@ use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\CorpusChristi;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
-use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
+use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 use LiturgicalCalendar\Api\Utilities;
 
 /**
@@ -129,14 +129,9 @@ class CalendarParams implements ParamsInterface
         $this->Year               = (int) date('Y');
         $this->Locale             = LitLocale::LATIN;
 
-        $calendarsRoute = Route::CALENDARS->path();
-        $metadata       = Utilities::jsonUrlToObject($calendarsRoute);
-
-        if (property_exists($metadata, 'litcal_metadata') && $metadata->litcal_metadata instanceof \stdClass) {
-            $this->calendars = MetadataCalendars::fromObject($metadata->litcal_metadata);
-        } else {
-            throw new ServiceUnavailableException('Unable to load calendars metadata');
-        }
+        // Build the calendars metadata index in-process from local source data
+        // (single source of truth) instead of looping back through GET /calendars.
+        $this->calendars = CalendarMetadataProvider::create();
     }
 
     /**

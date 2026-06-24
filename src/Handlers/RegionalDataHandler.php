@@ -6,7 +6,7 @@ use Swaggest\JsonSchema\Schema;
 use Swaggest\JsonSchema\InvalidValue;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
-use LiturgicalCalendar\Api\Enum\Route;
+use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 use LiturgicalCalendar\Api\Handlers\Auth\ClientIpTrait;
 use LiturgicalCalendar\Api\JsonFormatter;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
@@ -45,7 +45,6 @@ use Nyholm\Psr7\Stream;
  * The source data for these calendars can be created (PUT), or updated (PATCH),
  * or retrieved (GET), or deleted (DELETE).
  *
- * @phpstan-import-type MetadataCalendarsObject from \LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars
  * @phpstan-import-type LitCalItemObject from \LiturgicalCalendar\Api\Models\LitCalItem
  * @phpstan-import-type DiocesanLitCalItemObject from \LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItem
  * @phpstan-import-type NationalCalendarDataObject from \LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData
@@ -69,9 +68,9 @@ final class RegionalDataHandler extends AbstractHandler
         parent::__construct($requestPathParams);
         // Allow credentials for cross-origin cookie requests (required for authenticated PUT/PATCH/DELETE)
         $this->allowCredentials = true;
-        /** @var \stdClass&object{litcal_metadata:MetadataCalendarsObject} $metadataObj */
-        $metadataObj             = Utilities::jsonUrlToObject(Route::CALENDARS->path());
-        $this->CalendarsMetadata = MetadataCalendars::fromObject($metadataObj->litcal_metadata);
+        // Build the calendars metadata index in-process from local source data
+        // (single source of truth) instead of looping back through GET /calendars.
+        $this->CalendarsMetadata = CalendarMetadataProvider::create();
         // Initialize the list of available locales
         LitLocale::init();
         // Initialize audit logger for write operations
