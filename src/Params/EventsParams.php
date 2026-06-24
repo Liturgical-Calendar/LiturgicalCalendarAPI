@@ -111,6 +111,13 @@ class EventsParams implements ParamsInterface
 
         foreach ($params as $key => $value) {
             if (in_array($key, self::ALLOWED_PARAMS)) {
+                // The string-typed params must be validated as strings up front so
+                // a non-string payload (e.g. ?locale[]=en in a POST body) is a 400
+                // ValidationException rather than a 500 TypeError from trim() /
+                // \Locale::canonicalize() / isValid*() / strtoupper().
+                if (in_array($key, ['locale', 'national_calendar', 'diocesan_calendar'], true)) {
+                    $value = $this->validateStringValue($key, $value);
+                }
                 switch ($key) {
                     case 'locale':
                         // Reject empty/whitespace-only locales explicitly. Otherwise
@@ -179,6 +186,30 @@ class EventsParams implements ParamsInterface
             // call that switches to VA fully resets the request shape.
             $this->NationalCalendar = null;
         }
+    }
+
+    /**
+     * Assert that a string-typed request parameter value really is a string.
+     *
+     * Rejects non-string input (e.g. an array from `?locale[]=en` in a POST body)
+     * with a ValidationException (400) so it never reaches string-only operations
+     * — trim(), \Locale::canonicalize(), isValid*(), strtoupper() — as a
+     * TypeError (500). Empty/whitespace handling and metadata validation remain
+     * the responsibility of each param's own branch (which produce clearer,
+     * param-specific messages), so this guard deliberately does not reject or
+     * mutate the string contents.
+     *
+     * @param string $key   The parameter name (for the error message).
+     * @param mixed  $value The raw request value.
+     * @return string The validated string value.
+     */
+    private function validateStringValue(string $key, mixed $value): string
+    {
+        if (!is_string($value)) {
+            throw new ValidationException("Expected value of type String for parameter `{$key}`, instead found type " . gettype($value));
+        }
+
+        return $value;
     }
 
     private function isValidNationalCalendar(string $calendar): bool
