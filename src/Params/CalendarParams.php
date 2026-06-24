@@ -131,7 +131,17 @@ class CalendarParams implements ParamsInterface
 
         // Build the calendars metadata index in-process from local source data
         // (single source of truth) instead of looping back through GET /calendars.
-        $this->calendars = CalendarMetadataProvider::create();
+        // Map a build failure (e.g. unreadable source data) to the documented
+        // 503 contract rather than letting it surface as a generic 500.
+        try {
+            $this->calendars = CalendarMetadataProvider::create();
+        } catch (ServiceUnavailableException $e) {
+            // Already the documented 503 (e.g. a missing source file) — preserve
+            // its specific message rather than re-wrapping it generically.
+            throw $e;
+        } catch (\RuntimeException $e) {
+            throw new ServiceUnavailableException('Unable to load calendars metadata', $e);
+        }
     }
 
     /**

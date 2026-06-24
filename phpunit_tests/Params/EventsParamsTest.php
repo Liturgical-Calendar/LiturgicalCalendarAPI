@@ -44,6 +44,22 @@ final class EventsParamsTest extends TestCase
         self::assertNull($params->NationalCalendar);
         self::assertNull($params->DiocesanCalendar);
         self::assertNotEmpty($params->calendarsMetadata->national_calendars_keys);
+        // Locale defaults to Latin even when no locale param is supplied, per the
+        // documented contract (previously left uninitialized).
+        self::assertSame(LitLocale::LATIN, $params->Locale);
+        self::assertSame(LitLocale::LATIN_PRIMARY_LANGUAGE, $params->baseLocale);
+    }
+
+    public function testLocaleDefaultsToLatinWhenOnlyNonLocaleParamsGiven(): void
+    {
+        // Regression: a national_calendar (or any non-locale param) without a
+        // locale must still leave Locale/baseLocale initialized to the Latin
+        // default rather than uninitialized typed properties (an Error on access).
+        $params = new EventsParams(['national_calendar' => 'IT']);
+
+        self::assertSame('IT', $params->NationalCalendar);
+        self::assertSame(LitLocale::LATIN, $params->Locale);
+        self::assertSame(LitLocale::LATIN_PRIMARY_LANGUAGE, $params->baseLocale);
     }
 
     public function testValidLocaleSplitsLocaleAndBase(): void

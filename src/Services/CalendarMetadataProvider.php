@@ -265,9 +265,12 @@ final class CalendarMetadataProvider
         // we remove those locales from the list of supported locales
         $folderGlob = self::globOrThrow(Router::$apiFilePath . 'i18n/*', GLOB_ONLYDIR, 'CalendarMetadataProvider::buildLocales');
 
-        $metadata->locales = array_values(array_intersect(
+        // array_unique guards against a duplicate 'en' if an i18n/en/ folder is
+        // ever added (en is prepended explicitly as the untranslated source
+        // language, and array_intersect preserves duplicates from its first arg).
+        $metadata->locales = array_values(array_unique(array_intersect(
             array_merge(['en'], array_map('basename', $folderGlob)),
             self::FULLY_TRANSLATED_LOCALES
-        ));
+        )));
     }
 }

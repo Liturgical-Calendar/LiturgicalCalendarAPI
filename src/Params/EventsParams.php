@@ -69,8 +69,12 @@ class EventsParams implements ParamsInterface
         $this->calendarsMetadata = CalendarMetadataProvider::create();
 
         // We need at least a default value for the current year and for the locale
-        //   (which we already took from the request headers)
-        $this->Year = (int) date('Y');
+        //   (which we already took from the request headers). The Latin defaults
+        //   match the documented contract and guard against Locale/baseLocale
+        //   being left uninitialized when setParams() receives no locale.
+        $this->Year       = (int) date('Y');
+        $this->Locale     = LitLocale::LATIN;
+        $this->baseLocale = LitLocale::LATIN_PRIMARY_LANGUAGE;
         $this->setParams($params);
     }
 
