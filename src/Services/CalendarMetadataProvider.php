@@ -66,6 +66,26 @@ final class CalendarMetadataProvider
     }
 
     /**
+     * glob() that throws instead of returning the system-error sentinel `false`.
+     *
+     * glob() returns an empty array (not false) when a readable directory simply
+     * has no matches, so the false branch only fires on a genuine filesystem
+     * error against a directory we expect to exist — an unreachable defensive
+     * guard in normal operation, hence excluded from coverage.
+     *
+     * @return string[]
+     * @codeCoverageIgnore
+     */
+    private static function globOrThrow(string $pattern, int $flags, string $context): array
+    {
+        $result = glob($pattern, $flags);
+        if (false === $result) {
+            throw new \RuntimeException($context . ': glob failed');
+        }
+        return $result;
+    }
+
+    /**
      * Scans the JsonData::NATIONAL_CALENDARS_FOLDER directory and builds an index of all National calendars,
      * their metadata and their supported locales.
      *
@@ -109,10 +129,7 @@ final class CalendarMetadataProvider
         ]);
         $metadata->pushNationalCalendarMetadata($metadataNationalCalendarItem);
 
-        $folderGlob = glob(JsonData::NATIONAL_CALENDARS_FOLDER->path() . '/*', GLOB_ONLYDIR);
-        if (false === $folderGlob) {
-            throw new \RuntimeException('CalendarMetadataProvider::buildNationalCalendarData: glob failed');
-        }
+        $folderGlob = self::globOrThrow(JsonData::NATIONAL_CALENDARS_FOLDER->path() . '/*', GLOB_ONLYDIR, 'CalendarMetadataProvider::buildNationalCalendarData');
 
         /** @var string[] $countryISOs */
         $countryISOs = array_map('basename', $folderGlob);
@@ -154,25 +171,24 @@ final class CalendarMetadataProvider
      */
     private static function buildDiocesanCalendarData(MetadataCalendars $metadata): void
     {
-        $countryFolders = glob(JsonData::DIOCESAN_CALENDARS_FOLDER->path() . '/*', GLOB_ONLYDIR);
-        if (false === $countryFolders) {
-            throw new \RuntimeException('CalendarMetadataProvider::buildDiocesanCalendarData: diocesan calendars folder glob failed');
-        }
+        $countryFolders = self::globOrThrow(JsonData::DIOCESAN_CALENDARS_FOLDER->path() . '/*', GLOB_ONLYDIR, 'CalendarMetadataProvider::buildDiocesanCalendarData');
 
         foreach ($countryFolders as $countryFolder) {
             $nation         = basename($countryFolder);
-            $dioceseFolders = glob($countryFolder . '/*', GLOB_ONLYDIR);
-            if (false === $dioceseFolders) {
-                throw new \RuntimeException('CalendarMetadataProvider::buildDiocesanCalendarData: countryFolder glob failed');
-            }
+            $dioceseFolders = self::globOrThrow($countryFolder . '/*', GLOB_ONLYDIR, 'CalendarMetadataProvider::buildDiocesanCalendarData');
 
             /** @var string[] $dioceseIDs */
             $dioceseIDs = array_map('basename', $dioceseFolders);
             foreach ($dioceseIDs as $calendar_id) {
                 $dioceseName = self::dioceseIdToName($nation, $calendar_id);
+                // @codeCoverageIgnoreStart
+                // Defensive: every bundled diocese folder maps to a name in
+                // world_dioceses.json, so this guard only fires on inconsistent
+                // source data and is unreachable in unit tests.
                 if (null === $dioceseName) {
                     throw new \RuntimeException("CalendarMetadataProvider::buildDiocesanCalendarData: diocese name not found for nation = `{$nation}` and calendar_id = `{$calendar_id}`");
                 }
+                // @codeCoverageIgnoreEnd
                 $diocesanCalendarFile = JsonData::DIOCESAN_CALENDARS_FOLDER->path() . "/$nation/$calendar_id/$dioceseName.json";
                 $diocesanCalendarData = Utilities::jsonFileToObject($diocesanCalendarFile);
                 /** @var DiocesanCalendarDataObject $diocesanCalendarData */
@@ -201,10 +217,7 @@ final class CalendarMetadataProvider
      */
     private static function buildWiderRegionData(MetadataCalendars $metadata): void
     {
-        $folderGlob = glob(JsonData::WIDER_REGIONS_FOLDER->path() . '/*', GLOB_ONLYDIR);
-        if (false === $folderGlob) {
-            throw new \RuntimeException('CalendarMetadataProvider::buildWiderRegionData: wider regions folder glob failed');
-        }
+        $folderGlob = self::globOrThrow(JsonData::WIDER_REGIONS_FOLDER->path() . '/*', GLOB_ONLYDIR, 'CalendarMetadataProvider::buildWiderRegionData');
 
         /** @var string[] $widerRegionIDs */
         $widerRegionIDs = array_map('basename', $folderGlob);
@@ -220,10 +233,7 @@ final class CalendarMetadataProvider
                     [ '{wider_region}' => $widerRegionId ]
                 );
 
-                $folderGlob = glob($widerRegionI18nFolder . '/*.json');
-                if (false === $folderGlob) {
-                    throw new \RuntimeException('CalendarMetadataProvider::buildWiderRegionData: wider region i18n folder glob failed');
-                }
+                $folderGlob = self::globOrThrow($widerRegionI18nFolder . '/*.json', 0, 'CalendarMetadataProvider::buildWiderRegionData');
 
                 $locales = array_map(
                     fn (string $filename) => pathinfo($filename, PATHINFO_FILENAME),
@@ -253,10 +263,7 @@ final class CalendarMetadataProvider
     {
         // Since we can't actually request the General Roman Calendar for locales that are not fully translated,
         // we remove those locales from the list of supported locales
-        $folderGlob = glob(Router::$apiFilePath . 'i18n/*', GLOB_ONLYDIR);
-        if (false === $folderGlob) {
-            throw new \RuntimeException('CalendarMetadataProvider::buildLocales: i18n folder glob failed');
-        }
+        $folderGlob = self::globOrThrow(Router::$apiFilePath . 'i18n/*', GLOB_ONLYDIR, 'CalendarMetadataProvider::buildLocales');
 
         $metadata->locales = array_values(array_intersect(
             array_merge(['en'], array_map('basename', $folderGlob)),
