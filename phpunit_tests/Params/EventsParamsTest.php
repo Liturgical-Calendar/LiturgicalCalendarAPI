@@ -236,6 +236,31 @@ final class EventsParamsTest extends TestCase
         new EventsParams(['diocesan_calendar' => ['romamo_it']]); // @phpstan-ignore-line
     }
 
+    public function testObjectLocaleIsRejectedAsValidationError(): void
+    {
+        // Object payloads must be rejected as 400s too, the same way arrays are.
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('locale');
+
+        new EventsParams(['locale' => (object) ['en']]); // @phpstan-ignore-line
+    }
+
+    public function testObjectNationalCalendarIsRejectedAsValidationError(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('national_calendar');
+
+        new EventsParams(['national_calendar' => (object) ['IT']]); // @phpstan-ignore-line
+    }
+
+    public function testObjectDiocesanCalendarIsRejectedAsValidationError(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('diocesan_calendar');
+
+        new EventsParams(['diocesan_calendar' => (object) ['romamo_it']]); // @phpstan-ignore-line
+    }
+
     public function testEternalHighPriestAcceptsBooleanish(): void
     {
         $params = new EventsParams(['eternal_high_priest' => 'true']); // @phpstan-ignore-line
