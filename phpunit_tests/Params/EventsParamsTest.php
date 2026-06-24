@@ -165,9 +165,9 @@ final class EventsParamsTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('eternal_high_priest');
 
-        new EventsParams([
+        new EventsParams([ // @phpstan-ignore argument.type
             'national_calendar'   => 'VA',
-            'eternal_high_priest' => 'maybe', // @phpstan-ignore-line
+            'eternal_high_priest' => 'maybe',
         ]);
     }
 
@@ -210,9 +210,60 @@ final class EventsParamsTest extends TestCase
         new EventsParams(['diocesan_calendar' => 'nowhere']);
     }
 
+    public function testNonStringLocaleIsRejectedAsValidationError(): void
+    {
+        // A non-string locale (e.g. ?locale[]=en in a POST body) must surface as
+        // a 400 ValidationException, not a 500 TypeError from string operations.
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('locale');
+
+        new EventsParams(['locale' => ['en']]); // @phpstan-ignore argument.type
+    }
+
+    public function testNonStringNationalCalendarIsRejectedAsValidationError(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('national_calendar');
+
+        new EventsParams(['national_calendar' => ['IT']]); // @phpstan-ignore argument.type
+    }
+
+    public function testNonStringDiocesanCalendarIsRejectedAsValidationError(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('diocesan_calendar');
+
+        new EventsParams(['diocesan_calendar' => ['romamo_it']]); // @phpstan-ignore argument.type
+    }
+
+    public function testObjectLocaleIsRejectedAsValidationError(): void
+    {
+        // Object payloads must be rejected as 400s too, the same way arrays are.
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('locale');
+
+        new EventsParams(['locale' => (object) ['en']]); // @phpstan-ignore argument.type
+    }
+
+    public function testObjectNationalCalendarIsRejectedAsValidationError(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('national_calendar');
+
+        new EventsParams(['national_calendar' => (object) ['IT']]); // @phpstan-ignore argument.type
+    }
+
+    public function testObjectDiocesanCalendarIsRejectedAsValidationError(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('diocesan_calendar');
+
+        new EventsParams(['diocesan_calendar' => (object) ['romamo_it']]); // @phpstan-ignore argument.type
+    }
+
     public function testEternalHighPriestAcceptsBooleanish(): void
     {
-        $params = new EventsParams(['eternal_high_priest' => 'true']); // @phpstan-ignore-line
+        $params = new EventsParams(['eternal_high_priest' => 'true']); // @phpstan-ignore argument.type
 
         self::assertTrue($params->EternalHighPriest);
     }
@@ -222,12 +273,12 @@ final class EventsParamsTest extends TestCase
         $this->expectException(ValidationException::class);
         $this->expectExceptionMessage('eternal_high_priest');
 
-        new EventsParams(['eternal_high_priest' => 'maybe']); // @phpstan-ignore-line
+        new EventsParams(['eternal_high_priest' => 'maybe']); // @phpstan-ignore argument.type
     }
 
     public function testUnknownKeysAreSilentlyIgnored(): void
     {
-        $params = new EventsParams(['locale' => 'en_US', 'noise' => 'whatever']); // @phpstan-ignore-line
+        $params = new EventsParams(['locale' => 'en_US', 'noise' => 'whatever']);
 
         self::assertSame('en_US', $params->Locale);
     }
