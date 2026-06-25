@@ -1663,8 +1663,8 @@
                           "requested_role": "test_editor",
                           "permissions": [
                             {
-                              "object_type": "test_definition",
-                              "object_id": "all",
+                              "object_type": "national_calendar_test",
+                              "object_id": "IT",
                               "relation": "viewer"
                             }
                           ],
@@ -2087,7 +2087,9 @@
                 "national_calendar",
                 "diocesan_calendar",
                 "wider_region",
-                "test_definition"
+                "national_calendar_test",
+                "diocesan_calendar_test",
+                "general_roman_calendar_test"
               ]
             }
           },
@@ -2452,7 +2454,9 @@
                 "national_calendar",
                 "diocesan_calendar",
                 "wider_region",
-                "test_definition"
+                "national_calendar_test",
+                "diocesan_calendar_test",
+                "general_roman_calendar_test"
               ]
             }
           },
@@ -7400,7 +7404,9 @@
               "national_calendar",
               "diocesan_calendar",
               "wider_region",
-              "test_definition"
+              "national_calendar_test",
+              "diocesan_calendar_test",
+              "general_roman_calendar_test"
             ],
             "description": "OpenFGA object type"
           },
@@ -7852,7 +7858,9 @@
               "national_calendar",
               "diocesan_calendar",
               "wider_region",
-              "test_definition"
+              "national_calendar_test",
+              "diocesan_calendar_test",
+              "general_roman_calendar_test"
             ]
           },
           "object_id": {
