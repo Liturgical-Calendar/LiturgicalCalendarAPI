@@ -1,0 +1,8 @@
+{
+    "name": "FooTest",
+    "event_key": "FooEvent",
+    "applies_to": {
+        "diocesan_calendar": "rotter_nl"
+    },
+    "assertions": []
+}
