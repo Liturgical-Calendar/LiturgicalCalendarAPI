@@ -18,7 +18,7 @@ use PDO;
  * deletion (it authorizes recreating the resource — see #669). Shared by the
  * resource delete handlers and the reconciler sweep.
  */
-final class ResourceTuplePurgeService
+class ResourceTuplePurgeService
 {
     public function __construct(
         private readonly OpenFgaClient $client,

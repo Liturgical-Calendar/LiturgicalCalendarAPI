@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 use LiturgicalCalendar\Api\Handlers\Auth\ClientIpTrait;
+use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesOutboxTooling;
 use LiturgicalCalendar\Api\JsonFormatter;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
@@ -56,6 +57,7 @@ use Nyholm\Psr7\Stream;
 final class RegionalDataHandler extends AbstractHandler
 {
     use ClientIpTrait;
+    use ResolvesOutboxTooling;
 
     private readonly MetadataCalendars $CalendarsMetadata;
     private RegionalDataParams $params;
@@ -898,6 +900,21 @@ final class RegionalDataHandler extends AbstractHandler
     }
 
     /**
+     * Map the delete path category to its FGA object type string.
+     *
+     * Returns null for any category that has no corresponding FGA object type,
+     * which causes the purge call to be skipped silently.
+     */
+    private function fgaObjectTypeForCategory(): string
+    {
+        return match ($this->params->category) {
+            PathCategory::NATION      => 'national_calendar',
+            PathCategory::DIOCESE     => 'diocesan_calendar',
+            PathCategory::WIDERREGION => 'wider_region',
+        };
+    }
+
+    /**
      * Get the paths for deleting a regional calendar data resource.
      *
      * The return value is an array with two elements:
@@ -1048,6 +1065,15 @@ final class RegionalDataHandler extends AbstractHandler
         } else {
             $description = "The resource '{$this->params->key}' requested for deletion (or the relative i18n folder) was not found on this server.";
             throw new NotFoundException($description);
+        }
+
+        // Purge operational (editor/viewer) FGA tuples orphaned by the file
+        // deletion. The admin (governance) tuple is intentionally retained so
+        // the resource can be recreated without losing ownership.
+        $objectType = $this->fgaObjectTypeForCategory();
+        $purge      = $this->getPurgeService();
+        if ($purge !== null) {
+            $purge->purgeForObject("{$objectType}:{$this->params->key}");
         }
 
         // Log successful deletion
