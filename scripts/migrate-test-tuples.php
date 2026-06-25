@@ -58,7 +58,8 @@ $apply  = in_array('--apply', $argv, true);
 $dryRun = !$apply;
 
 $modeName = $dryRun ? 'DRY RUN' : 'APPLY';
-echo "Mode: {$modeName}" . ($dryRun ? ' (pass --apply to apply changes)' : '') . PHP_EOL;
+$modeHint = $dryRun ? ' (pass --apply to apply changes)' : '';
+echo "Mode: {$modeName}{$modeHint}" . PHP_EOL;
 echo PHP_EOL;
 
 // ---------------------------------------------------------------------------
