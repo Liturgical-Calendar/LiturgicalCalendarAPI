@@ -1,0 +1,8 @@
+{
+    "name": "BarTest",
+    "event_key": "BarEvent",
+    "applies_to": {
+        "national_calendar": "US"
+    },
+    "assertions": []
+}

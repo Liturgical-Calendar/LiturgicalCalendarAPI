@@ -37,11 +37,13 @@ final class RoleCascadeServiceTest extends TestCase
     public function testUserHasAnyTupleInRoleScopeTrueOnFirstHit(): void
     {
         $fga = $this->createMock(OpenFgaClient::class);
-        // 'test_editor' role: types=[test_definition], relations=[admin,viewer,editor,deleter].
-        // First listObjects call returns non-empty → method returns true.
+        // 'test_editor' role: types=[national_calendar_test, diocesan_calendar_test,
+        // general_roman_calendar_test], relations=[admin,viewer,editor,deleter].
+        // First listObjects call (type=national_calendar_test, relation=admin) returns
+        // non-empty → method short-circuits and returns true.
         $fga->expects(self::once())
             ->method('listObjects')
-            ->with('user:u1', 'admin', 'test_definition')
+            ->with('user:u1', 'admin', 'national_calendar_test')
             ->willReturn(['some-id']);
 
         $svc = $this->service(
@@ -138,17 +140,21 @@ final class RoleCascadeServiceTest extends TestCase
     public function testCascadeTupleRevokeForRoleDeletesTuplesAndCascadesDb(): void
     {
         $fga = $this->createMock(OpenFgaClient::class);
-        // 'test_editor' role only has 'test_definition' as a valid type.
-        // First relation (admin) returns one object id; the rest return empty.
+        // 'test_editor' role has 3 types: national_calendar_test, diocesan_calendar_test,
+        // general_roman_calendar_test. Only the first type's admin relation returns an object
+        // id; all other (type, relation) pairs return empty. cascadeTupleRevokeForRole does
+        // not short-circuit — it probes all 3 types × 4 relations = 12 listObjects calls.
         $listCalls = 0;
         $fga->method('listObjects')
-            ->willReturnCallback(function (string $user, string $relation) use (&$listCalls): array {
-                $listCalls++;
-                return $relation === 'admin' ? ['t1'] : [];
-            });
+            ->willReturnCallback(
+                function (string $user, string $relation, string $type) use (&$listCalls): array {
+                    $listCalls++;
+                    return ( $relation === 'admin' && $type === 'national_calendar_test' ) ? ['t1'] : [];
+                }
+            );
         $fga->expects(self::once())
             ->method('deleteTuple')
-            ->with('user:u1', 'admin', 'test_definition:t1');
+            ->with('user:u1', 'admin', 'national_calendar_test:t1');
 
         $repo = $this->createMock(AccessRequestRepository::class);
         $repo->expects(self::once())
@@ -161,8 +167,8 @@ final class RoleCascadeServiceTest extends TestCase
         self::assertCount(1, $deleted);
         self::assertSame('user:u1', $deleted[0]['user']);
         self::assertSame('admin', $deleted[0]['relation']);
-        self::assertSame('test_definition:t1', $deleted[0]['object']);
-        self::assertGreaterThanOrEqual(4, $listCalls, 'listObjects should be probed for every (type, relation) pair');
+        self::assertSame('national_calendar_test:t1', $deleted[0]['object']);
+        self::assertGreaterThanOrEqual(12, $listCalls, 'listObjects should be probed for every (type × relation) pair');
     }
 
     public function testCascadeTupleRevokeForRoleSwallowsDeleteFailures(): void

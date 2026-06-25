@@ -34,4 +34,14 @@ class OpenFgaModelTest extends TestCase
             );
         }
     }
+
+    public function testScopedTestTypesPresentWithFourRelations(): void
+    {
+        $model = $this->loadModel();
+        $types = array_column($model['type_definitions'], 'relations', 'type');
+        foreach (['national_calendar_test', 'diocesan_calendar_test', 'general_roman_calendar_test'] as $t) {
+            $this->assertArrayHasKey($t, $types, "missing type $t");
+            $this->assertSame(['admin', 'viewer', 'editor', 'deleter'], array_keys($types[$t]));
+        }
+    }
 }
