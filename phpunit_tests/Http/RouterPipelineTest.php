@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Http\Middleware\AuthorizationMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\OpenFgaAuthorizationMiddleware;
 use LiturgicalCalendar\Api\Http\Server\MiddlewarePipeline;
 use LiturgicalCalendar\Api\Router;
+use Nyholm\Psr7\ServerRequest;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -35,6 +36,9 @@ final class RouterPipelineTest extends TestCase
     /** @var array<string, string|false> */
     private array $savedEnv = [];
 
+    /** Whether Router::$apiFilePath was initialized before our setUp(). */
+    private bool $apiFilePathWasSet = false;
+
     private const ENV_VARS = [
         'ZITADEL_ISSUER'    => 'https://issuer.example',
         'ZITADEL_CLIENT_ID' => 'test-client-id',
@@ -58,6 +62,16 @@ final class RouterPipelineTest extends TestCase
             putenv("{$name}={$value}");
             $_ENV[$name] = $value;
         }
+
+        // Router::$apiFilePath is a public static typed property set by the
+        // Router constructor. configureAuthorizationPipeline() for the 'tests'
+        // route instantiates TestScopeResolver(), which calls
+        // JsonData::TESTS_FOLDER->path() → Router::$apiFilePath. We must
+        // initialize it here so those tests don't throw on uninitialized static.
+        $this->apiFilePathWasSet = isset(Router::$apiFilePath);
+        if (!$this->apiFilePathWasSet) {
+            Router::$apiFilePath = sys_get_temp_dir() . DIRECTORY_SEPARATOR;
+        }
     }
 
     protected function tearDown(): void
@@ -72,6 +86,12 @@ final class RouterPipelineTest extends TestCase
             }
         }
 
+        // Router::$apiFilePath is a typed static property: PHP does not allow
+        // unsetting typed statics, so we cannot restore it to the uninitialized
+        // state if it was unset before setUp. Tests that need the real API file
+        // path will set it themselves; none of the tests in this class depend on
+        // the exact value, only on the property being initialized.
+
         parent::tearDown();
     }
 
@@ -79,10 +99,24 @@ final class RouterPipelineTest extends TestCase
 
     /**
      * Build a Router instance without calling the constructor.
+     *
+     * @param \Psr\Http\Message\ServerRequestInterface|null $request
+     *   When supplied, pre-initializes the private $request property so that
+     *   configureAuthorizationPipeline() branches that call
+     *   `$this->request->withAttribute()` do not throw on uninitialized property.
      */
-    private function routerWithoutConstructor(): Router
-    {
-        return ( new ReflectionClass(Router::class) )->newInstanceWithoutConstructor();
+    private function routerWithoutConstructor(
+        ?\Psr\Http\Message\ServerRequestInterface $request = null
+    ): Router {
+        $rc     = new ReflectionClass(Router::class);
+        $router = $rc->newInstanceWithoutConstructor();
+
+        if ($request !== null) {
+            $prop = $rc->getProperty('request');
+            $prop->setValue($router, $request);
+        }
+
+        return $router;
     }
 
     /**
@@ -244,6 +278,68 @@ final class RouterPipelineTest extends TestCase
         self::assertNotNull($fgaMw, 'Expected OpenFgaAuthorizationMiddleware in pipeline for missals');
         self::assertSame('general_roman_calendar', $this->getPrivateProp($fgaMw, 'objectType'));
         self::assertSame('EDITIO_TYPICA_2002', $this->getPrivateProp($fgaMw, 'fixedObjectId'));
+    }
+
+    // ── tests: /tests route ─────────────────────────────────────────────────
+
+    public function testTestsRouteAddsTestEditorMiddleware(): void
+    {
+        $router   = $this->routerWithoutConstructor(new ServerRequest('PATCH', '/tests/some-test'));
+        $pipeline = $this->emptyPipeline();
+
+        $this->callConfigurePipeline($router, $pipeline, 'tests', ['some-test']);
+
+        $queue = $this->getQueue($pipeline);
+        $types = array_map('get_class', $queue);
+
+        self::assertContains(AuthorizationMiddleware::class, $types, 'Expected AuthorizationMiddleware in pipeline');
+    }
+
+    public function testTestsRouteAddsOpenFgaMiddlewareWithObjectResolver(): void
+    {
+        $router   = $this->routerWithoutConstructor(new ServerRequest('PATCH', '/tests/some-test'));
+        $pipeline = $this->emptyPipeline();
+
+        $this->callConfigurePipeline($router, $pipeline, 'tests', ['some-test']);
+
+        $queue = $this->getQueue($pipeline);
+        $fgaMw = null;
+        foreach ($queue as $mw) {
+            if ($mw instanceof OpenFgaAuthorizationMiddleware) {
+                $fgaMw = $mw;
+                break;
+            }
+        }
+
+        self::assertNotNull($fgaMw, 'Expected OpenFgaAuthorizationMiddleware in pipeline for /tests write');
+
+        // forTestScopes() uses empty-string sentinels for objectType/resourceIdAttribute
+        // because objectResolver is the real source of [type, id] at request time.
+        self::assertSame('', $this->getPrivateProp($fgaMw, 'objectType'));
+        self::assertNotNull(
+            $this->getPrivateProp($fgaMw, 'objectResolver'),
+            'objectResolver must be set by forTestScopes()'
+        );
+    }
+
+    public function testTestsRouteWithoutPathPartSkipsFga(): void
+    {
+        // Without a path part (no test id) the fine-grained FGA middleware must not
+        // be added — there is nothing to resolve a scope from.
+        $router   = $this->routerWithoutConstructor();
+        $pipeline = $this->emptyPipeline();
+
+        $this->callConfigurePipeline($router, $pipeline, 'tests', []);
+
+        $queue = $this->getQueue($pipeline);
+
+        foreach ($queue as $mw) {
+            self::assertNotInstanceOf(
+                OpenFgaAuthorizationMiddleware::class,
+                $mw,
+                'No FGA middleware should be added when the test id is absent'
+            );
+        }
     }
 
     public function testMissalsWithoutIdRequiresAdminAndSkipsFga(): void
