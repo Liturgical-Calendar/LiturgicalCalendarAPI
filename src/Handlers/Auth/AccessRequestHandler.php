@@ -224,13 +224,19 @@ final class AccessRequestHandler extends AbstractHandler
             }
 
             if (!AccessRequestRepository::isValidObjectIdForType($objectType, $objectId)) {
+                // general_roman_calendar_test accepts only the literal id
+                // 'general_roman_calendar'. All other types that reach this branch
+                // are general_roman_calendar itself, whose valid ids are the GRC set.
+                $validIdsLabel = $objectType === 'general_roman_calendar_test'
+                    ? 'general_roman_calendar'
+                    : implode(', ', AccessRequestRepository::GRC_OBJECT_IDS);
                 throw new ValidationException(
                     sprintf(
                         'permissions[%d].object_id "%s" is invalid for object_type "%s". Valid ids: %s',
                         $index,
                         $objectId,
                         $objectType,
-                        implode(', ', AccessRequestRepository::GRC_OBJECT_IDS)
+                        $validIdsLabel
                     )
                 );
             }

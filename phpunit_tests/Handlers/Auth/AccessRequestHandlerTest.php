@@ -501,4 +501,35 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
 
         ( new AccessRequestHandler() )->handle($request);
     }
+
+    public function testCreateGrcTestWithInvalidObjectIdMentionsGeneralRomanCalendarNotTemporale(): void
+    {
+        // For general_roman_calendar_test the only valid object_id is the literal
+        // 'general_roman_calendar'. The error message must say so — NOT list the
+        // GRC_OBJECT_IDS set (temporale, EDITIO_TYPICA_*, decrees), which belongs
+        // to the general_roman_calendar type, not the _test variant.
+        $request = $this->requestFor(
+            'POST',
+            '/auth/access-requests',
+            [],
+            [
+                'requested_role' => 'test_editor',
+                'permissions'    => [
+                    [
+                        'object_type' => 'general_roman_calendar_test',
+                        'object_id'   => 'bad_id',
+                        'relation'    => 'editor',
+                    ],
+                ],
+            ]
+        )->withAttribute('oidc_user', $this->oidcUser());
+
+        try {
+            ( new AccessRequestHandler() )->handle($request);
+            $this->fail('Expected ValidationException was not thrown');
+        } catch (ValidationException $e) {
+            self::assertStringContainsString('general_roman_calendar', $e->getMessage());
+            self::assertStringNotContainsString('temporale', $e->getMessage());
+        }
+    }
 }
