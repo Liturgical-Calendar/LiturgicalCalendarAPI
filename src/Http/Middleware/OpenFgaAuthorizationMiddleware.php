@@ -222,17 +222,6 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
     }
 
     /**
-     * Create middleware for test definition routes.
-     *
-     * @param OpenFgaClient $client The OpenFGA client
-     * @return self Configured middleware
-     */
-    public static function forTestDefinition(OpenFgaClient $client): self
-    {
-        return new self($client, 'test_definition', 'test_id');
-    }
-
-    /**
      * Create middleware for test routes with dynamic scope resolution.
      *
      * The `test_id` request attribute is passed to `$resolver->resolve()` to

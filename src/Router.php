@@ -53,6 +53,7 @@ use LiturgicalCalendar\Api\Http\Middleware\OidcAvailabilityMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\OpenFgaAuthorizationMiddleware;
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\TestScopeResolver;
 use LiturgicalCalendar\Api\Http\Server\MiddlewarePipeline;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
@@ -702,7 +703,7 @@ class Router
             // OpenFGA fine-grained authorization for test definitions
             if ($oidcAvailable && $fgaClient !== null && count($requestPathParts) >= 1) {
                 $this->request = $this->request->withAttribute('test_id', $requestPathParts[0]);
-                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forTestDefinition($fgaClient));
+                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forTestScopes($fgaClient, new TestScopeResolver()));
             }
         } elseif ($route === 'temporale') {
             $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());

@@ -210,32 +210,6 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $this->assertNull($middleware);
     }
 
-    public function testForTestDefinitionCreatesMiddleware(): void
-    {
-        $client     = $this->createStub(OpenFgaClient::class);
-        $middleware = OpenFgaAuthorizationMiddleware::forTestDefinition($client);
-
-        $this->assertInstanceOf(OpenFgaAuthorizationMiddleware::class, $middleware);
-    }
-
-    public function testForTestDefinitionUsesTestIdAttribute(): void
-    {
-        $client = $this->createMock(OpenFgaClient::class);
-        $client->expects($this->once())
-            ->method('check')
-            ->with('user:user-123', 'editor', 'test_definition:my-test')
-            ->willReturn(true);
-
-        $middleware = OpenFgaAuthorizationMiddleware::forTestDefinition($client);
-
-        $request = ( new ServerRequest('PUT', '/tests/my-test') )
-            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
-            ->withAttribute('test_id', 'my-test');
-
-        $response = $middleware->process($request, $this->nextHandler);
-        $this->assertEquals(200, $response->getStatusCode());
-    }
-
     public function testForGeneralRomanCalendarChecksFixedObjectId(): void
     {
         $client = $this->createMock(OpenFgaClient::class);
