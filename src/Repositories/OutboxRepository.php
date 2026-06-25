@@ -16,7 +16,7 @@ use PDO;
  * handler's tx with the business write) and pickupPending (the consumer
  * and backstop both call this).
  */
-final class OutboxRepository implements OutboxRepositoryInterface
+final class OutboxRepository implements OutboxRepositoryInterface, OutboxBatchInsertInterface
 {
     public function __construct(private readonly PDO $db)
     {
