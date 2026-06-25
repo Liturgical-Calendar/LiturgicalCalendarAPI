@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\TestScopeResolver;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -74,16 +75,33 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
      */
     private ?string $fixedObjectId;
 
+    /**
+     * Optional dynamic object resolver.
+     *
+     * When set, `process()` calls this closure with the current request to
+     * derive the FGA [objectType, objectId] pair instead of using
+     * `$this->objectType` + `extractResourceId()`. A `null` return means the
+     * scope cannot be determined and the request is denied (fail-closed).
+     *
+     * @var (\Closure(\Psr\Http\Message\ServerRequestInterface): (array{0: string, 1: string}|null))|null
+     */
+    private ?\Closure $objectResolver;
+
+    /**
+     * @phpstan-param (\Closure(\Psr\Http\Message\ServerRequestInterface): (array{0: string, 1: string}|null))|null $objectResolver
+     */
     public function __construct(
         OpenFgaClient $client,
         string $objectType,
         string $resourceIdAttribute = 'calendar_id',
-        ?string $fixedObjectId = null
+        ?string $fixedObjectId = null,
+        ?\Closure $objectResolver = null
     ) {
         $this->client              = $client;
         $this->objectType          = $objectType;
         $this->resourceIdAttribute = $resourceIdAttribute;
         $this->fixedObjectId       = $fixedObjectId;
+        $this->objectResolver      = $objectResolver;
     }
 
     /**
@@ -127,17 +145,26 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
             return $handler->handle($request);
         }
 
-        // Extract resource ID — fail closed for write operations
-        $resourceId = $this->extractResourceId($request);
-        if ($resourceId === null) {
-            throw new ForbiddenException(
-                sprintf('Missing resource ID for %s authorization check', $this->objectType)
-            );
-        }
+        // Derive FGA object — object-resolver mode takes priority
+        $fgaUser = "user:{$userId}";
 
-        // Check OpenFGA permission
-        $fgaUser   = "user:{$userId}";
-        $fgaObject = "{$this->objectType}:{$resourceId}";
+        if ($this->objectResolver !== null) {
+            $resolved = ( $this->objectResolver )($request);
+            if ($resolved === null) {
+                throw new ForbiddenException('Cannot resolve authorization scope for this request');
+            }
+            [$resolvedType, $resolvedId] = $resolved;
+            $fgaObject                   = "{$resolvedType}:{$resolvedId}";
+        } else {
+            // Extract resource ID — fail closed for write operations
+            $resourceId = $this->extractResourceId($request);
+            if ($resourceId === null) {
+                throw new ForbiddenException(
+                    sprintf('Missing resource ID for %s authorization check', $this->objectType)
+                );
+            }
+            $fgaObject = "{$this->objectType}:{$resourceId}";
+        }
 
         $allowed = $this->client->check($fgaUser, $relation, $fgaObject);
 
@@ -203,6 +230,31 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
     public static function forTestDefinition(OpenFgaClient $client): self
     {
         return new self($client, 'test_definition', 'test_id');
+    }
+
+    /**
+     * Create middleware for test routes with dynamic scope resolution.
+     *
+     * The `test_id` request attribute is passed to `$resolver->resolve()` to
+     * derive the FGA [objectType, objectId] pair at request time. If the
+     * attribute is absent or the resolver returns null the request is denied
+     * (fail-closed).
+     *
+     * @param OpenFgaClient     $client   The OpenFGA client
+     * @param TestScopeResolver $resolver Scope resolver for the test
+     * @return self Configured middleware
+     */
+    public static function forTestScopes(OpenFgaClient $client, TestScopeResolver $resolver): self
+    {
+        $objectResolver = static function (ServerRequestInterface $request) use ($resolver): ?array {
+            $testId = $request->getAttribute('test_id');
+            if (!is_string($testId) || trim($testId) === '') {
+                return null;
+            }
+            return $resolver->resolve($testId);
+        };
+
+        return new self($client, 'test_definition', 'test_id', null, $objectResolver);
     }
 
     /**
