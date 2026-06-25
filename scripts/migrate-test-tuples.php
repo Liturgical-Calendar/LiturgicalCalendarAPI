@@ -1,8 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-declare(strict_types=1);
-
 /**
  * Idempotent migration: remap all `test_definition` OpenFGA tuples to their
  * scoped counterparts (diocesan_calendar_test, national_calendar_test, or
@@ -31,6 +29,8 @@ declare(strict_types=1);
  *   OPENFGA_API_TOKEN
  */
 
+declare(strict_types=1);
+
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use Dotenv\Dotenv;
@@ -44,7 +44,11 @@ use LiturgicalCalendar\Api\Services\TestTupleMigration;
 // Bootstrap: load environment from .env* files if present
 // ---------------------------------------------------------------------------
 $projectRoot = dirname(__DIR__);
-$dotenv      = Dotenv::createImmutable($projectRoot, ['.env', '.env.local', '.env.development', '.env.test', '.env.staging', '.env.production'], false);
+$dotenv      = Dotenv::createImmutable(
+    $projectRoot,
+    ['.env', '.env.local', '.env.development', '.env.test', '.env.staging', '.env.production'],
+    false
+);
 $dotenv->safeLoad();
 
 // ---------------------------------------------------------------------------
