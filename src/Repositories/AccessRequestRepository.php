@@ -112,7 +112,30 @@ class AccessRequestRepository
             return $objectId === 'general_roman_calendar';
         }
 
+        if ($objectType === 'national_calendar') {
+            return self::isValidNationCode($objectId);
+        }
+
         return $objectId !== '';
+    }
+
+    /**
+     * Valid ISO 3166-1 alpha-2 region code (per ICU), including the special VA.
+     *
+     * Accepts prospective nations (a valid code whose calendar does not exist
+     * yet) so a national liturgy office can request `admin` to create it (#669);
+     * rejects unknown/private-use codes (ZZ, XX), lowercase, and arbitrary strings.
+     */
+    private static function isValidNationCode(string $code): bool
+    {
+        if (preg_match('/^[A-Z]{2}$/', $code) !== 1) {
+            return false;
+        }
+        $display = \Locale::getDisplayRegion('und-' . $code, 'en');
+        if (!is_string($display) || $display === $code) {
+            return false;
+        }
+        return stripos($display, 'Unknown Region') === false;
     }
 
     /**

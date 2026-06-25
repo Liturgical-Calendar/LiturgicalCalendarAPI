@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Tests\Repositories;
 
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(AccessRequestRepository::class)]
 final class AccessRequestRepositoryTest extends RepositoryTestCase
@@ -381,5 +382,28 @@ final class AccessRequestRepositoryTest extends RepositoryTestCase
         $this->expectException(\InvalidArgumentException::class);
 
         $this->repo->countAll('weird');
+    }
+
+    #[DataProvider('provideNationCodes')]
+    public function testNationalCalendarObjectIdValidation(string $code, bool $expected): void
+    {
+        self::assertSame($expected, AccessRequestRepository::isValidObjectIdForType('national_calendar', $code));
+    }
+
+    /** @return array<string, array{0: string, 1: bool}> */
+    public static function provideNationCodes(): array
+    {
+        return [
+            'IT existing'    => ['IT', true],
+            'US existing'    => ['US', true],
+            'NZ prospective' => ['NZ', true],   // valid ISO, may have no calendar yet
+            'VA vatican'     => ['VA', true],
+            'ZZ unknown'     => ['ZZ', false],
+            'XX private-use' => ['XX', false],
+            'lowercase it'   => ['it', false],
+            'too long'       => ['ITA', false],
+            'empty'          => ['', false],
+            'arbitrary'      => ['FOO', false],
+        ];
     }
 }
