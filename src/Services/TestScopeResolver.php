@@ -33,6 +33,14 @@ final class TestScopeResolver
      */
     public function resolve(string $testName): ?array
     {
+        // Reject any name that could enable path traversal or filesystem injection.
+        // Only allow characters that are safe for use as a bare file-stem: letters,
+        // digits, hyphens, and underscores. This rejects '..', '/', '\', null bytes,
+        // spaces, and every other special character before touching the filesystem.
+        if (!preg_match('/\A[A-Za-z0-9_-]+\z/', $testName)) {
+            return null;
+        }
+
         $filePath = $this->testsDir . DIRECTORY_SEPARATOR . $testName . '.json';
 
         $raw = @file_get_contents($filePath);

@@ -44,4 +44,42 @@ final class TestScopeResolverTest extends TestCase
         $r = new TestScopeResolver($this->fixturesDir);
         $this->assertNull($r->resolve('NonExistentTest'));
     }
+
+    public function testRejectsPathTraversalDotDot(): void
+    {
+        $r = new TestScopeResolver($this->fixturesDir);
+        $this->assertNull($r->resolve('../../etc/passwd'));
+    }
+
+    public function testRejectsPathWithDirectorySeparator(): void
+    {
+        $r = new TestScopeResolver($this->fixturesDir);
+        $this->assertNull($r->resolve('Foo/Bar'));
+    }
+
+    public function testRejectsNameWithNullByte(): void
+    {
+        $r = new TestScopeResolver($this->fixturesDir);
+        $this->assertNull($r->resolve("Foo\x00Bar"));
+    }
+
+    public function testRejectsNameWithDisallowedCharacter(): void
+    {
+        $r = new TestScopeResolver($this->fixturesDir);
+        $this->assertNull($r->resolve('Foo Bar'));
+    }
+
+    public function testAcceptsValidAlphanumericDashUnderscoreName(): void
+    {
+        $r = new TestScopeResolver($this->fixturesDir);
+        // FooTest is a known fixture — must still resolve
+        $this->assertSame(['diocesan_calendar_test', 'rotter_nl'], $r->resolve('FooTest'));
+    }
+
+    public function testAcceptsNameWithDashAndUnderscore(): void
+    {
+        $r = new TestScopeResolver($this->fixturesDir);
+        // Non-existent file: no traversal, just a missing file → null
+        $this->assertNull($r->resolve('Valid-Test_Name-123'));
+    }
 }
