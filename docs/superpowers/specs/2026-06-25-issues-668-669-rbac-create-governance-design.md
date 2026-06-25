@@ -167,22 +167,32 @@ missal `PUT`s, because `forMissals` resolves a national missal to the FGA object
 
 ### 6. Cascade-revoke on resource deletion (#668 Part 2)
 
-**New outbox operation `PURGE_OBJECT_TUPLES`.**
+**Mechanism: enqueue concrete `DELETE_TUPLE` rows — no new outbox operation.** The
+`openfga_outbox` table is tuple-shaped (`fga_user`/`fga_relation`/`fga_object` all `TEXT NOT NULL`)
+and `operation` is a fixed Postgres `outbox_op` enum (`write_tuple`/`delete_tuple`). Rather than add
+an enum value + a DB migration + semantically-empty columns, the purge **enumerates the object's
+operational tuples and enqueues one `DELETE_TUPLE` row per tuple** — exactly how the existing
+permission-revoke cascade already works.
 
-- Row: `fga_object = "{type}:{id}"`, `metadata.relations = ['editor','viewer']` (operational only —
-  **never** `admin`), `metadata.idempotency_key`. `fga_user`/`fga_relation` empty.
-- `OutboxProcessor::invoke()` gains a `match` arm → a handler that reads all tuples for the object
-  (`readTuples('', "{type}:{id}", null, …)`, paginated), keeps only the listed operational
-  relations, and `deleteTuple`s each. Idempotent (`TupleNotFound` benign). **`admin` retained.**
-- **Hook points:**
-  - `RegionalDataHandler::deleteCalendar` — derive `{type}` from the path category
-    (`OBJECT_TYPE_MAP`) and `{id}` from the key. **After** successful file deletion (files are
-    authoritative; no DB txn wraps them today), enqueue the purge row in a short DB transaction and
-    process it (`processSync`, mirroring the approval flow). Order: delete files → enqueue purge.
-  - `TestsHandler` delete — resolve `[type, id]` via `TestScopeResolver`, then enqueue the same
-    purge (operational relations only).
-- Governance is removed **only** by an explicit role/permission revoke (the existing
-  `RoleCascadeService` path), never as a side effect of data deletion.
+A shared service **`ResourceTuplePurgeService`** centralises this:
+
+- `purgeForObject(string $fgaObject): int` — `readTuples('', $fgaObject, null, …)` (paginated, full
+  object filter — the reliable form), keep only operational relations
+  (`AccessRequestRepository::OPERATIONAL_RELATIONS = ['viewer','editor']` — **never** `admin`), and
+  for each enqueue a `DELETE_TUPLE` row (idempotency key `resource_purge:{object}:{user}:{relation}`)
+  then `processSync`. No-op when OpenFGA is unconfigured. Idempotent (`TupleNotFound` benign).
+- **`admin` is never enumerated**, so governance survives data deletion.
+
+**Hook points:**
+
+- `RegionalDataHandler::deleteCalendar` — derive `{type}` from the path category (`OBJECT_TYPE_MAP`)
+  and `{id}` from the key. **After** successful file deletion (files are authoritative; no DB txn
+  wraps them today), call `purgeForObject("{type}:{id}")`. Order: delete files → purge.
+- `TestsHandler` delete — resolve `[type, id]` via `TestScopeResolver`, then
+  `purgeForObject("{type}:{id}")`.
+
+Governance is removed **only** by an explicit role/permission revoke (the existing
+`RoleCascadeService` path), never as a side effect of data deletion.
 
 ### 7. Reconciler sweep (defense-in-depth)
 
@@ -193,13 +203,15 @@ the hot `ConsumerLoop`/`BackstopRunner` path because it scans all tuples):
 1. Enumerate all tuples (paginated full scan, then filter in app code — same caveat as
    `migrate-test-tuples.php`).
 2. Group by object; for each object of a calendar/test type whose backing resource **no longer
-   exists** and which still holds `editor`/`viewer` tuples, enqueue a `PURGE_OBJECT_TUPLES` row
-   (idempotency key per object).
+   exists** and which still holds operational (`editor`/`viewer`) tuples, call
+   `ResourceTuplePurgeService::purgeForObject()` (the same enqueue-`DELETE_TUPLE` path as the delete
+   handlers).
 3. **Ignore `admin` tuples** on non-existent resources — intentional governance (per #669), not
    orphans. GRC fixed object ids always "exist".
 
-Resource existence is resolved by a small map from object type+id → backing file path (reusing
-`JsonData` paths, `RegionalDataHandler` path logic, and `TestScopeResolver`).
+Resource existence is resolved by a small `ResourceExistenceChecker` mapping object type+id →
+backing file path (reusing `JsonData` paths, `RegionalDataHandler` path logic, and
+`TestScopeResolver`).
 
 ### 8. `wider_region` membership wiring
 
@@ -255,10 +267,11 @@ Admins bypass OpenFGA throughout, so they are unaffected during the window.
 - [ ] `VALID_RELATIONS` ×3 (`AccessRequestRepository`, `AccessRequestHandler`, `PermissionAdminHandler`)
 - [ ] `AccessRequestRepository::isValidObjectIdForType` (prospective ISO national ids + `VA`)
 - [ ] `jsondata/schemas/openapi.json` (drop `deleter` enums + example; document create semantics)
-- [ ] `OutboxOperation` + `OutboxProcessor` (`PURGE_OBJECT_TUPLES` op + handler)
-- [ ] `RegionalDataHandler` delete → enqueue purge; `PUT` → enqueue `member_nation` sync
-- [ ] `TestsHandler` delete → enqueue purge
-- [ ] `ResourceTuplePurgeReconciler` + `scripts/reconcile-resource-tuples.php`
+- [ ] `ResourceTuplePurgeService` (enqueue one `DELETE_TUPLE` per operational tuple; `admin` never)
+- [ ] `AccessRequestRepository::OPERATIONAL_RELATIONS = ['viewer','editor']`
+- [ ] `RegionalDataHandler` delete → `purgeForObject`; `PUT` national → enqueue `member_nation` sync
+- [ ] `TestsHandler` delete → `purgeForObject`
+- [ ] `ResourceExistenceChecker` + `ResourceTuplePurgeReconciler` + `scripts/reconcile-resource-tuples.php`
 - [ ] `scripts/seed-wider-region-membership.php`
 - [ ] `scripts/migrate-deleter-tuples.php`
 - [ ] Ops runbook doc (`docs/`)
