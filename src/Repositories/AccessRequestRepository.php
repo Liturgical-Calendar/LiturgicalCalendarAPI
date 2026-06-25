@@ -51,7 +51,15 @@ class AccessRequestRepository
     /**
      * Valid OpenFGA object types on permission tuples.
      */
-    public const VALID_OBJECT_TYPES = ['national_calendar', 'diocesan_calendar', 'wider_region', 'test_definition', 'general_roman_calendar'];
+    public const VALID_OBJECT_TYPES = [
+        'national_calendar',
+        'diocesan_calendar',
+        'wider_region',
+        'national_calendar_test',
+        'diocesan_calendar_test',
+        'general_roman_calendar_test',
+        'general_roman_calendar',
+    ];
 
     /**
      * Object types each role is permitted to hold tuples for. Used by RoleCascadeService
@@ -61,9 +69,17 @@ class AccessRequestRepository
      * @var array<string, array<int, string>>
      */
     public const ROLE_OBJECT_TYPES = [
-        'developer'       => ['national_calendar', 'diocesan_calendar', 'wider_region', 'test_definition', 'general_roman_calendar'],
+        'developer'       => [
+            'national_calendar',
+            'diocesan_calendar',
+            'wider_region',
+            'national_calendar_test',
+            'diocesan_calendar_test',
+            'general_roman_calendar_test',
+            'general_roman_calendar',
+        ],
         'calendar_editor' => ['national_calendar', 'diocesan_calendar', 'wider_region', 'general_roman_calendar'],
-        'test_editor'     => ['test_definition'],
+        'test_editor'     => ['national_calendar_test', 'diocesan_calendar_test', 'general_roman_calendar_test'],
     ];
 
     public function __construct(?PDO $db = null)
@@ -74,13 +90,18 @@ class AccessRequestRepository
     /**
      * Validate an object_id for a given object_type.
      *
-     * general_roman_calendar uses a fixed enumerated id set; all other types accept any
+     * general_roman_calendar uses a fixed enumerated id set; general_roman_calendar_test
+     * accepts only the literal id 'general_roman_calendar'; all other types accept any
      * non-empty id (the resource itself is validated downstream by the handler).
      */
     public static function isValidObjectIdForType(string $objectType, string $objectId): bool
     {
         if ($objectType === 'general_roman_calendar') {
             return in_array($objectId, self::GRC_OBJECT_IDS, true);
+        }
+
+        if ($objectType === 'general_roman_calendar_test') {
+            return $objectId === 'general_roman_calendar';
         }
 
         return $objectId !== '';
