@@ -546,7 +546,7 @@ final class AccessRequestHandler extends AbstractHandler
      * Validate that the requested permissions are consistent with the requested role.
      *
      * - calendar_editor: permissions should target calendar types (national_calendar, diocesan_calendar, wider_region)
-     * - test_editor: permissions should target test_definition
+     * - test_editor: permissions should target one of the scoped test types
      * - developer: permissions can target any type
      *
      * @param string $role The requested role
@@ -575,13 +575,14 @@ final class AccessRequestHandler extends AbstractHandler
                 );
             }
 
-            if ($role === 'test_editor' && $objectType !== 'test_definition') {
+            if ($role === 'test_editor' && !in_array($objectType, AccessRequestRepository::ROLE_OBJECT_TYPES['test_editor'], true)) {
                 throw new ValidationException(
                     sprintf(
                         'permissions[%d].object_type "%s" is not valid for role "test_editor". '
-                        . 'Test editors can only request permissions for: test_definition',
+                        . 'Test editors can only request permissions for: %s',
                         $index,
-                        $objectType
+                        $objectType,
+                        implode(', ', AccessRequestRepository::ROLE_OBJECT_TYPES['test_editor'])
                     )
                 );
             }

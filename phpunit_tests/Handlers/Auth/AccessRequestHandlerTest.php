@@ -170,13 +170,14 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
     public function testCreateRejectsCalendarEditorRequestingTestPermission(): void
     {
         // role-permission consistency check: calendar_editor restricted to calendar types.
+        // national_calendar_test is a valid object_type but not in calendar_editor's allowed types.
         $request = $this->requestFor(
             'POST',
             '/auth/access-requests',
             [],
             [
                 'requested_role' => 'calendar_editor',
-                'permissions'    => [['object_type' => 'test_definition', 'object_id' => 'foo', 'relation' => 'editor']],
+                'permissions'    => [['object_type' => 'national_calendar_test', 'object_id' => 'IT', 'relation' => 'editor']],
             ]
         )->withAttribute('oidc_user', $this->oidcUser());
 
@@ -461,5 +462,43 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
         self::assertSame($id, $row['id']);
         self::assertSame('approved', $row['status']);
         self::assertSame('looks good', $row['review_notes']);
+    }
+
+    public function testCreateTestEditorWithScopedTestTypeSucceeds(): void
+    {
+        $request = $this->requestFor(
+            'POST',
+            '/auth/access-requests',
+            [],
+            [
+                'requested_role' => 'test_editor',
+                'permissions'    => [['object_type' => 'national_calendar_test', 'object_id' => 'IT', 'relation' => 'editor']],
+                'justification'  => 'I help test the IT national calendar.',
+            ]
+        )->withAttribute('oidc_user', $this->oidcUser());
+
+        $response = ( new AccessRequestHandler() )->handle($request);
+
+        self::assertSame(201, $response->getStatusCode());
+    }
+
+    public function testCreateTestEditorWithInvalidCalendarTypeThrowsValidationException(): void
+    {
+        $request = $this->requestFor(
+            'POST',
+            '/auth/access-requests',
+            [],
+            [
+                'requested_role' => 'test_editor',
+                'permissions'    => [['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor']],
+            ]
+        )->withAttribute('oidc_user', $this->oidcUser());
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage(
+            implode(', ', AccessRequestRepository::ROLE_OBJECT_TYPES['test_editor'])
+        );
+
+        ( new AccessRequestHandler() )->handle($request);
     }
 }
