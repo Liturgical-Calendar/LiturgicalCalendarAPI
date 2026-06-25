@@ -224,13 +224,19 @@ final class AccessRequestHandler extends AbstractHandler
             }
 
             if (!AccessRequestRepository::isValidObjectIdForType($objectType, $objectId)) {
+                // general_roman_calendar_test accepts only the literal id
+                // 'general_roman_calendar'. All other types that reach this branch
+                // are general_roman_calendar itself, whose valid ids are the GRC set.
+                $validIdsLabel = $objectType === 'general_roman_calendar_test'
+                    ? 'general_roman_calendar'
+                    : implode(', ', AccessRequestRepository::GRC_OBJECT_IDS);
                 throw new ValidationException(
                     sprintf(
                         'permissions[%d].object_id "%s" is invalid for object_type "%s". Valid ids: %s',
                         $index,
                         $objectId,
                         $objectType,
-                        implode(', ', AccessRequestRepository::GRC_OBJECT_IDS)
+                        $validIdsLabel
                     )
                 );
             }
@@ -389,12 +395,18 @@ final class AccessRequestHandler extends AbstractHandler
             }
 
             if (!AccessRequestRepository::isValidObjectIdForType($objType, $objId)) {
+                // general_roman_calendar_test accepts only the literal id
+                // 'general_roman_calendar'. All other types that reach this branch
+                // are general_roman_calendar itself, whose valid ids are the GRC set.
+                $validIdsLabel = $objType === 'general_roman_calendar_test'
+                    ? 'general_roman_calendar'
+                    : implode(', ', AccessRequestRepository::GRC_OBJECT_IDS);
                 throw new ValidationException(sprintf(
                     'permissions[%d].object_id "%s" is invalid for object_type "%s". Valid ids: %s',
                     $index,
                     $objId,
                     $objType,
-                    implode(', ', AccessRequestRepository::GRC_OBJECT_IDS)
+                    $validIdsLabel
                 ));
             }
 
@@ -546,7 +558,7 @@ final class AccessRequestHandler extends AbstractHandler
      * Validate that the requested permissions are consistent with the requested role.
      *
      * - calendar_editor: permissions should target calendar types (national_calendar, diocesan_calendar, wider_region)
-     * - test_editor: permissions should target test_definition
+     * - test_editor: permissions should target one of the scoped test types
      * - developer: permissions can target any type
      *
      * @param string $role The requested role
@@ -575,13 +587,14 @@ final class AccessRequestHandler extends AbstractHandler
                 );
             }
 
-            if ($role === 'test_editor' && $objectType !== 'test_definition') {
+            if ($role === 'test_editor' && !in_array($objectType, AccessRequestRepository::ROLE_OBJECT_TYPES['test_editor'], true)) {
                 throw new ValidationException(
                     sprintf(
                         'permissions[%d].object_type "%s" is not valid for role "test_editor". '
-                        . 'Test editors can only request permissions for: test_definition',
+                        . 'Test editors can only request permissions for: %s',
                         $index,
-                        $objectType
+                        $objectType,
+                        implode(', ', AccessRequestRepository::ROLE_OBJECT_TYPES['test_editor'])
                     )
                 );
             }

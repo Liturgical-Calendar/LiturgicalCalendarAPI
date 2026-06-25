@@ -6,6 +6,7 @@ use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Middleware\OpenFgaAuthorizationMiddleware;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\TestScopeResolver;
 use Nyholm\Psr7\Response;
 use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\TestCase;
@@ -22,10 +23,14 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 {
     private RequestHandlerInterface $nextHandler;
 
+    /** @var list<string> Temp paths created during a test, cleaned up in tearDown(). */
+    private array $tempPaths = [];
+
     protected function setUp(): void
     {
         parent::setUp();
 
+        $this->tempPaths = [];
         // Create a simple next handler that returns 200
         $this->nextHandler = new class () implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
@@ -33,6 +38,20 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
                 return new Response(200);
             }
         };
+    }
+
+    protected function tearDown(): void
+    {
+        // Clean up any temp files/dirs created by tests, even on assertion failure.
+        foreach (array_reverse($this->tempPaths) as $path) {
+            if (is_file($path)) {
+                @unlink($path);
+            } elseif (is_dir($path)) {
+                @rmdir($path);
+            }
+        }
+        $this->tempPaths = [];
+        parent::tearDown();
     }
 
     public function testThrowsUnauthorizedWhenNoOidcUser(): void
@@ -209,32 +228,6 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $this->assertNull($middleware);
     }
 
-    public function testForTestDefinitionCreatesMiddleware(): void
-    {
-        $client     = $this->createStub(OpenFgaClient::class);
-        $middleware = OpenFgaAuthorizationMiddleware::forTestDefinition($client);
-
-        $this->assertInstanceOf(OpenFgaAuthorizationMiddleware::class, $middleware);
-    }
-
-    public function testForTestDefinitionUsesTestIdAttribute(): void
-    {
-        $client = $this->createMock(OpenFgaClient::class);
-        $client->expects($this->once())
-            ->method('check')
-            ->with('user:user-123', 'editor', 'test_definition:my-test')
-            ->willReturn(true);
-
-        $middleware = OpenFgaAuthorizationMiddleware::forTestDefinition($client);
-
-        $request = ( new ServerRequest('PUT', '/tests/my-test') )
-            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
-            ->withAttribute('test_id', 'my-test');
-
-        $response = $middleware->process($request, $this->nextHandler);
-        $this->assertEquals(200, $response->getStatusCode());
-    }
-
     public function testForGeneralRomanCalendarChecksFixedObjectId(): void
     {
         $client = $this->createMock(OpenFgaClient::class);
@@ -281,5 +274,161 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
         $response = $middleware->process($request, $this->nextHandler);
         $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    // -----------------------------------------------------------------
+    // Object-resolver mode tests (Task 5)
+    // -----------------------------------------------------------------
+
+    public function testObjectResolverCheckPassesWhenTuplePresent(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:user-123', 'editor', 'national_calendar_test:US')
+            ->willReturn(true);
+
+        $resolver   = static fn () => ['national_calendar_test', 'US'];
+        $middleware = new OpenFgaAuthorizationMiddleware(
+            $client,
+            'test_definition',
+            'test_id',
+            null,
+            $resolver
+        );
+
+        $request = ( new ServerRequest('PATCH', '/tests/some-test') )
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'some-test');
+
+        $response = $middleware->process($request, $this->nextHandler);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testObjectResolverCheckFailsWhenTupleAbsent(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:user-123', 'editor', 'national_calendar_test:US')
+            ->willReturn(false);
+
+        $resolver   = static fn () => ['national_calendar_test', 'US'];
+        $middleware = new OpenFgaAuthorizationMiddleware(
+            $client,
+            'test_definition',
+            'test_id',
+            null,
+            $resolver
+        );
+
+        $request = ( new ServerRequest('PATCH', '/tests/some-test') )
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'some-test');
+
+        $this->expectException(ForbiddenException::class);
+        $this->expectExceptionMessage('national_calendar_test:US');
+        $middleware->process($request, $this->nextHandler);
+    }
+
+    public function testObjectResolverReturnsNullThrowsForbidden(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->never())->method('check');
+
+        $resolver   = static fn () => null;
+        $middleware = new OpenFgaAuthorizationMiddleware(
+            $client,
+            'test_definition',
+            'test_id',
+            null,
+            $resolver
+        );
+
+        $request = ( new ServerRequest('PATCH', '/tests/unknown-test') )
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'unknown-test');
+
+        $this->expectException(ForbiddenException::class);
+        $middleware->process($request, $this->nextHandler);
+    }
+
+    public function testAdminBypassesObjectResolver(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->never())->method('check');
+
+        $resolverCalled = false;
+        $resolver       = static function () use (&$resolverCalled): array {
+            $resolverCalled = true;
+            return ['national_calendar_test', 'US'];
+        };
+        $middleware     = new OpenFgaAuthorizationMiddleware(
+            $client,
+            'test_definition',
+            'test_id',
+            null,
+            $resolver
+        );
+
+        $request = ( new ServerRequest('PATCH', '/tests/some-test') )
+            ->withAttribute('oidc_user', ['sub' => 'admin-user', 'roles' => ['admin']])
+            ->withAttribute('test_id', 'some-test');
+
+        $response = $middleware->process($request, $this->nextHandler);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertFalse($resolverCalled, 'Resolver must not be called for admin users');
+    }
+
+    public function testForTestScopesFactory(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:user-123', 'editor', 'national_calendar_test:US')
+            ->willReturn(true);
+
+        // TestScopeResolver is final; use a real instance backed by a temp dir.
+        // Track created paths so tearDown() cleans them up even on assertion failure.
+        $tempDir  = sys_get_temp_dir() . '/fga_test_' . uniqid();
+        $tempFile = $tempDir . '/some-test.json';
+        mkdir($tempDir);
+        // Append dir before file so tearDown()'s array_reverse() removes the file first,
+        // then the now-empty dir (rmdir fails on a non-empty dir).
+        $this->tempPaths[] = $tempDir;
+        $this->tempPaths[] = $tempFile;
+        file_put_contents(
+            $tempFile,
+            (string) json_encode(['applies_to' => ['national_calendar' => 'US']])
+        );
+        $scopeResolver = new TestScopeResolver($tempDir);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forTestScopes($client, $scopeResolver);
+
+        $request = ( new ServerRequest('PATCH', '/tests/some-test') )
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'some-test');
+
+        $response = $middleware->process($request, $this->nextHandler);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testForTestScopesFactoryMissingTestIdThrowsForbidden(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->never())->method('check');
+
+        // TestScopeResolver is final; use a real instance — resolve() won't be called
+        // because the closure returns null before reaching it (no test_id attribute)
+        $scopeResolver = new TestScopeResolver(sys_get_temp_dir());
+
+        $middleware = OpenFgaAuthorizationMiddleware::forTestScopes($client, $scopeResolver);
+
+        $request = ( new ServerRequest('PATCH', '/tests/some-test') )
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']]);
+        // No test_id attribute — closure returns null before calling resolve(), fail closed
+
+        $this->expectException(ForbiddenException::class);
+        $middleware->process($request, $this->nextHandler);
     }
 }
