@@ -23,10 +23,14 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 {
     private RequestHandlerInterface $nextHandler;
 
+    /** @var list<string> Temp paths created during a test, cleaned up in tearDown(). */
+    private array $tempPaths = [];
+
     protected function setUp(): void
     {
         parent::setUp();
 
+        $this->tempPaths = [];
         // Create a simple next handler that returns 200
         $this->nextHandler = new class () implements RequestHandlerInterface {
             public function handle(ServerRequestInterface $request): ResponseInterface
@@ -34,6 +38,20 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
                 return new Response(200);
             }
         };
+    }
+
+    protected function tearDown(): void
+    {
+        // Clean up any temp files/dirs created by tests, even on assertion failure.
+        foreach (array_reverse($this->tempPaths) as $path) {
+            if (is_file($path)) {
+                @unlink($path);
+            } elseif (is_dir($path)) {
+                @rmdir($path);
+            }
+        }
+        $this->tempPaths = [];
+        parent::tearDown();
     }
 
     public function testThrowsUnauthorizedWhenNoOidcUser(): void
@@ -370,11 +388,15 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
             ->with('user:user-123', 'editor', 'national_calendar_test:US')
             ->willReturn(true);
 
-        // TestScopeResolver is final; use a real instance backed by a temp dir
-        $tempDir = sys_get_temp_dir() . '/fga_test_' . uniqid();
+        // TestScopeResolver is final; use a real instance backed by a temp dir.
+        // Track created paths so tearDown() cleans them up even on assertion failure.
+        $tempDir  = sys_get_temp_dir() . '/fga_test_' . uniqid();
+        $tempFile = $tempDir . '/some-test.json';
         mkdir($tempDir);
+        $this->tempPaths[] = $tempFile;
+        $this->tempPaths[] = $tempDir;
         file_put_contents(
-            $tempDir . '/some-test.json',
+            $tempFile,
             (string) json_encode(['applies_to' => ['national_calendar' => 'US']])
         );
         $scopeResolver = new TestScopeResolver($tempDir);
@@ -387,9 +409,6 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
         $response = $middleware->process($request, $this->nextHandler);
         $this->assertEquals(200, $response->getStatusCode());
-
-        unlink($tempDir . '/some-test.json');
-        rmdir($tempDir);
     }
 
     public function testForTestScopesFactoryMissingTestIdThrowsForbidden(): void
