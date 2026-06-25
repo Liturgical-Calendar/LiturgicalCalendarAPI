@@ -243,7 +243,9 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
             return $resolver->resolve($testId);
         };
 
-        return new self($client, 'test_definition', 'test_id', null, $objectResolver);
+        // objectType and resourceIdAttribute are unused when objectResolver is set:
+        // process() delegates entirely to the resolver before extractResourceId() is called.
+        return new self($client, '', '', null, $objectResolver);
     }
 
     /**
