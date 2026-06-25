@@ -63,4 +63,63 @@ final class TestTupleMigrationTest extends TestCase
 
         $this->assertNull($migration->mapTuple($tuple, $resolver));
     }
+
+    /**
+     * An object with no ':' separator (no type prefix at all) must return null.
+     * This exercises the `$colonPos === false` guard in mapTuple.
+     */
+    public function testReturnsNullWhenObjectHasNoColon(): void
+    {
+        $resolver  = new TestScopeResolver($this->fixturesDir);
+        $migration = new TestTupleMigration();
+
+        $tuple = [
+            'user'     => 'user:1',
+            'relation' => 'editor',
+            'object'   => 'no_colon_here',
+        ];
+
+        $this->assertNull($migration->mapTuple($tuple, $resolver));
+    }
+
+    /**
+     * An object of `test_definition:` (type prefix but empty name segment) must
+     * return null. This exercises the `$testName === ''` guard in mapTuple.
+     */
+    public function testReturnsNullWhenTestNameIsEmpty(): void
+    {
+        $resolver  = new TestScopeResolver($this->fixturesDir);
+        $migration = new TestTupleMigration();
+
+        $tuple = [
+            'user'     => 'user:1',
+            'relation' => 'editor',
+            'object'   => 'test_definition:',
+        ];
+
+        $this->assertNull($migration->mapTuple($tuple, $resolver));
+    }
+
+    /**
+     * An object whose name segment itself contains a colon (e.g. "Foo:Bar") must
+     * still be treated as the test name "Foo:Bar" — only the FIRST colon is used
+     * as the type/id separator. The resolver will be called with "Foo:Bar" and,
+     * because there is no fixture for that name, return null (which mapTuple
+     * propagates). This verifies that extra colons do not crash the extraction.
+     */
+    public function testHandlesColonInTestName(): void
+    {
+        $resolver  = new TestScopeResolver($this->fixturesDir);
+        $migration = new TestTupleMigration();
+
+        $tuple = [
+            'user'     => 'user:1',
+            'relation' => 'editor',
+            'object'   => 'test_definition:Foo:Bar',
+        ];
+
+        // TestScopeResolver rejects 'Foo:Bar' (contains ':' which is outside
+        // [A-Za-z0-9_-]) → resolve() returns null → mapTuple returns null.
+        $this->assertNull($migration->mapTuple($tuple, $resolver));
+    }
 }

@@ -77,10 +77,18 @@ $allTuples         = [];
 $continuationToken = null;
 
 do {
-    $page          = $client->readTuples('', 'test_definition:', null, null, $continuationToken);
-    $allTuples     = array_merge($allTuples, $page['tuples']);
+    // Read ALL tuples (empty user + empty object = no filter) to avoid relying on
+    // the type-only object filter ("test_definition:" with an empty user), which is
+    // not reliably valid per the OpenFGA Read API spec. Filter in app code below.
+    $page              = $client->readTuples('', '', null, null, $continuationToken);
+    $allTuples         = array_merge($allTuples, $page['tuples']);
     $continuationToken = $page['next_continuation_token'] !== '' ? $page['next_continuation_token'] : null;
 } while ($continuationToken !== null);
+
+// Keep only tuples whose object belongs to the test_definition type.
+$allTuples = array_values(
+    array_filter($allTuples, static fn (array $t): bool => str_starts_with($t['object'], 'test_definition:'))
+);
 
 $totalCount      = count($allTuples);
 $migratedCount   = 0;
