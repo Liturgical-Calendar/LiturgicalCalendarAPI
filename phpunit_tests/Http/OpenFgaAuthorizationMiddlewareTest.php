@@ -97,7 +97,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:user-123', 'editor', 'national_calendar:IT')
+            ->with('user:user-123', 'admin', 'national_calendar:IT')
             ->willReturn(true);
 
         $middleware = new OpenFgaAuthorizationMiddleware($client, 'national_calendar');
@@ -115,7 +115,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:user-123', 'editor', 'national_calendar:IT')
+            ->with('user:user-123', 'admin', 'national_calendar:IT')
             ->willReturn(false);
 
         $middleware = new OpenFgaAuthorizationMiddleware($client, 'national_calendar');
@@ -125,16 +125,16 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
             ->withAttribute('calendar_id', 'IT');
 
         $this->expectException(ForbiddenException::class);
-        $this->expectExceptionMessage('No editor permission for national_calendar:IT');
+        $this->expectExceptionMessage('No admin permission for national_calendar:IT');
         $middleware->process($request, $this->nextHandler);
     }
 
-    public function testDeleteMapsToDeleterRelation(): void
+    public function testDeleteMapsToAdminRelation(): void
     {
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:user-123', 'deleter', 'national_calendar:IT')
+            ->with('user:user-123', 'admin', 'national_calendar:IT')
             ->willReturn(true);
 
         $middleware = new OpenFgaAuthorizationMiddleware($client, 'national_calendar');
@@ -233,7 +233,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:abc', 'editor', 'general_roman_calendar:temporale')
+            ->with('user:abc', 'admin', 'general_roman_calendar:temporale')
             ->willReturn(true);
 
         $middleware = OpenFgaAuthorizationMiddleware::forGeneralRomanCalendar($client, 'temporale');
@@ -265,7 +265,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:abc', 'editor', 'national_calendar:IT')
+            ->with('user:abc', 'admin', 'national_calendar:IT')
             ->willReturn(true);
 
         $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'IT_1983');
@@ -430,5 +430,31 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
         $this->expectException(ForbiddenException::class);
         $middleware->process($request, $this->nextHandler);
+    }
+
+    public function testForTestScopesPutMapsToEditor(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:user-123', 'editor', 'national_calendar_test:US')
+            ->willReturn(true);
+
+        $resolver   = static fn () => ['national_calendar_test', 'US'];
+        $middleware = new OpenFgaAuthorizationMiddleware(
+            $client,
+            'test_definition',
+            'test_id',
+            null,
+            $resolver,
+            ['PUT' => 'editor', 'PATCH' => 'editor', 'DELETE' => 'admin']
+        );
+
+        $request = ( new ServerRequest('PUT', '/tests/some-test') )
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'some-test');
+
+        $response = $middleware->process($request, $this->nextHandler);
+        $this->assertEquals(200, $response->getStatusCode());
     }
 }
