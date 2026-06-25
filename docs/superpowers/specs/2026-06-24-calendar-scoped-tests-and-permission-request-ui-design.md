@@ -63,9 +63,15 @@ fail closed (deny / 404 as today).
 ### Model deployment ordering (no downtime)
 
 OpenFGA models are versioned; write a new model version that **adds** the three new types
-(keep `test_definition` during transition). Sequence: (1) apply new model version →
-(2) migrate tuples → (3) deploy API → (4) deploy frontend → (5) later model version may drop
-`test_definition` once no tuples/usages remain.
+(keep `test_definition` during transition). Sequence: (1) apply additive model version →
+(2) deploy API → (3) migrate tuples (`--dry-run` then `--apply`) → (4) deploy frontend →
+(5) later model version drops `test_definition` once no tuples/usages remain.
+
+**Brief authz window:** Between step 2 (API deploy) and step 3 (`--apply` completing),
+non-admin `test_editor` writes to `/tests` return 403 because scoped tuples are not yet
+written. Admins bypass OpenFGA and are unaffected. Impact is negligible — this is a new
+feature with ~no existing grants — but run migrate immediately after deploy in a low-traffic
+window.
 
 ## Part 2 — Tuple migration (auto-remap, idempotent)
 

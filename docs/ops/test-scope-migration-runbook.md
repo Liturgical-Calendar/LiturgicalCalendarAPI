@@ -85,6 +85,11 @@ Confirm the deployed API is healthy before proceeding:
 curl -s http://localhost:8000/calendars | jq '.settings'
 ```
 
+**Brief authz window:** Between this step and the `--apply` completion in Step 3,
+non-admin `test_editor` writes to `/tests` will return 403 — scoped tuples are not yet
+written. Admins bypass OpenFGA and are unaffected. Impact is negligible (new feature,
+~no existing grants). Run the migration immediately after deploy, in a low-traffic window.
+
 ---
 
 ## Step 3 — Migrate tuples

@@ -396,7 +396,10 @@ sub-route pipes (710/715) unchanged.
       PATCH authz for a scoped user (expect 403 out-of-scope, 2xx in-scope); (5)
       after all envs migrated, a follow-up model version drops `test_definition`
       and a follow-up removes it from any remaining constants. Include the exact
-      curl/CLI verification commands.
+      curl/CLI verification commands. Note: between steps 2 and 3, non-admin
+      `test_editor` `/tests` writes return 403 (scoped tuples not yet written);
+      admins bypass; impact is negligible (~no existing grants); run migrate
+      immediately after deploy in a low-traffic window.
 - [ ] **Step 2:** `composer lint:md` → green.
 - [ ] **Step 3: Commit** — `docs(ops): test-scope migration runbook`
 
