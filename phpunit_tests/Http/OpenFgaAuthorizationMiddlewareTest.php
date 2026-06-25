@@ -393,8 +393,10 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $tempDir  = sys_get_temp_dir() . '/fga_test_' . uniqid();
         $tempFile = $tempDir . '/some-test.json';
         mkdir($tempDir);
-        $this->tempPaths[] = $tempFile;
+        // Append dir before file so tearDown()'s array_reverse() removes the file first,
+        // then the now-empty dir (rmdir fails on a non-empty dir).
         $this->tempPaths[] = $tempDir;
+        $this->tempPaths[] = $tempFile;
         file_put_contents(
             $tempFile,
             (string) json_encode(['applies_to' => ['national_calendar' => 'US']])
