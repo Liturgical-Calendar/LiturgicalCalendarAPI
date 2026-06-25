@@ -50,10 +50,12 @@ final class RoleCascadeServiceOutboxTest extends RepositoryTestCase
     public function testCascadeRevokeEnqueuesOutboxRowOnFgaTransientFailure(): void
     {
         $fga = $this->createStub(OpenFgaClient::class);
-        // 'test_editor' role: first relation (admin) returns one object, rest empty.
+        // 'test_editor' role has 3 types (national_calendar_test, diocesan_calendar_test,
+        // general_roman_calendar_test). Only national_calendar_test + admin returns an
+        // object id so that exactly one deleteTuple call is made and one outbox row inserted.
         $fga->method('listObjects')
-            ->willReturnCallback(static function (string $user, string $relation): array {
-                return $relation === 'admin' ? ['t1'] : [];
+            ->willReturnCallback(static function (string $user, string $relation, string $type): array {
+                return ( $relation === 'admin' && $type === 'national_calendar_test' ) ? ['t1'] : [];
             });
         $fga->method('deleteTuple')
             ->willThrowException(new OpenFgaApiException('Service Unavailable', 503));
@@ -75,7 +77,7 @@ final class RoleCascadeServiceOutboxTest extends RepositoryTestCase
              FROM openfga_outbox
              WHERE fga_user = 'user:u1'
                AND fga_relation = 'admin'
-               AND fga_object = 'test_definition:t1'"
+               AND fga_object = 'national_calendar_test:t1'"
         );
         $rows = $stmt !== false ? $stmt->fetchAll() : [];
 
