@@ -39,7 +39,15 @@ class AccessRequestRepository
     /**
      * Valid OpenFGA relations on permission tuples.
      */
-    public const VALID_RELATIONS = ['admin', 'viewer', 'editor', 'deleter'];
+    public const VALID_RELATIONS = ['admin', 'viewer', 'editor'];
+
+    /**
+     * Operational relations (everything except governance `admin`). Purged when a
+     * resource's data is deleted; `admin` survives (it authorizes recreation).
+     *
+     * @var list<string>
+     */
+    public const OPERATIONAL_RELATIONS = ['viewer', 'editor'];
 
     /**
      * The fixed, enumerated set of object IDs valid for the general_roman_calendar type.

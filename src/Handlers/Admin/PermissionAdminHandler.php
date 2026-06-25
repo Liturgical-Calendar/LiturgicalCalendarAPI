@@ -51,7 +51,7 @@ final class PermissionAdminHandler extends AbstractHandler
      *
      * @var array<string>
      */
-    private const VALID_RELATIONS = ['admin', 'viewer', 'editor', 'deleter'];
+    private const VALID_RELATIONS = ['admin', 'viewer', 'editor'];
 
     private const DEFAULT_LIMIT = 100;
     private const MAX_LIMIT     = 500;
@@ -372,7 +372,7 @@ final class PermissionAdminHandler extends AbstractHandler
      *   - user: string (required) — Zitadel user ID (with or without "user:" prefix)
      *   - object_type: string (required) — e.g., "national_calendar"
      *   - object_id: string (required) — e.g., "IT"
-     *   - relation: string (required) — "admin", "viewer", "editor", or "deleter"
+     *   - relation: string (required) — "admin", "viewer", or "editor"
      *
      * Flow (outbox pattern):
      * 1. Validate and authorize
