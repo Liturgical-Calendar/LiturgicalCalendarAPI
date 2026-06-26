@@ -4037,6 +4037,7 @@
           }
         ],
         "summary": "Create a national calendar data resource",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`.",
         "operationId": "nationalCalendarDataPUT",
         "requestBody": {
           "required": true,
@@ -4111,6 +4112,7 @@
           }
         ],
         "summary": "Create a wider region data resource",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`.",
         "operationId": "widerregionDataPUT",
         "requestBody": {
           "required": true,
@@ -4185,6 +4187,7 @@
           }
         ],
         "summary": "Create a diocesan calendar data resource",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`.",
         "operationId": "diocesanDataPUT",
         "requestBody": {
           "required": true,
