@@ -127,4 +127,67 @@ final class ResourceTuplePurgeReconcilerTest extends TestCase
         $this->assertSame(1, $result['purgedObjects']);
         $this->assertSame(2, $result['enqueued']);
     }
+
+    public function testObjectWithoutColonIsSkipped(): void
+    {
+        // An FGA object with no colon (malformed) must be skipped silently.
+        $client = $this->createStub(OpenFgaClient::class);
+        $client->method('readTuples')->willReturn([
+            'tuples'                  => [
+                ['user' => 'user:a', 'relation' => 'editor', 'object' => 'malformed_no_colon'],
+            ],
+            'next_continuation_token' => '',
+        ]);
+
+        $checker = $this->createMock(ResourceExistenceCheckerInterface::class);
+        $checker->expects($this->never())->method('isResourceType');
+        $checker->expects($this->never())->method('exists');
+
+        $purge = $this->createMock(ResourceTuplePurgeServiceInterface::class);
+        $purge->expects($this->never())->method('purgeForObject');
+
+        $reconciler = new ResourceTuplePurgeReconciler($client, $checker, $purge);
+        $result     = $reconciler->sweep();
+
+        $this->assertSame(1, $result['scanned']);
+        $this->assertSame(0, $result['purgedObjects']);
+        $this->assertSame(0, $result['enqueued']);
+    }
+
+    public function testPaginationFetchesMultiplePages(): void
+    {
+        $client = $this->createStub(OpenFgaClient::class);
+        // Page 1 returns a continuation token; page 2 ends the loop.
+        $client->method('readTuples')->willReturnOnConsecutiveCalls(
+            [
+                'tuples'                  => [
+                    ['user' => 'user:a', 'relation' => 'editor', 'object' => 'national_calendar:ZZ'],
+                ],
+                'next_continuation_token' => 'tok-page2',
+            ],
+            [
+                'tuples'                  => [
+                    ['user' => 'user:b', 'relation' => 'viewer', 'object' => 'national_calendar:ZZ'],
+                ],
+                'next_continuation_token' => '',
+            ]
+        );
+
+        $checker = $this->createStub(ResourceExistenceCheckerInterface::class);
+        $checker->method('isResourceType')->willReturn(true);
+        $checker->method('exists')->willReturn(false); // ZZ is deleted
+
+        $purge = $this->createMock(ResourceTuplePurgeServiceInterface::class);
+        $purge->expects($this->once())
+            ->method('purgeForObject')
+            ->with('national_calendar:ZZ')
+            ->willReturn(2);
+
+        $reconciler = new ResourceTuplePurgeReconciler($client, $checker, $purge);
+        $result     = $reconciler->sweep();
+
+        $this->assertSame(2, $result['scanned']); // 1 tuple per page = 2 total
+        $this->assertSame(1, $result['purgedObjects']);
+        $this->assertSame(2, $result['enqueued']);
+    }
 }
