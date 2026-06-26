@@ -4,6 +4,7 @@ namespace LiturgicalCalendar\Api\Handlers;
 
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
+use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesOutboxTooling;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\JsonData;
@@ -15,6 +16,7 @@ use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Api\Services\TestScopeResolver;
 use LiturgicalCalendar\Api\Utilities;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -22,6 +24,8 @@ use Nyholm\Psr7\Stream;
 
 final class TestsHandler extends AbstractHandler
 {
+    use ResolvesOutboxTooling;
+
     /** @var string[] */
     private static array $propsToSanitize = [
         'description',
@@ -188,7 +192,13 @@ final class TestsHandler extends AbstractHandler
         if (count($this->requestPathParams) === 1) {
             $testName = $this->requestPathParams[0];
             if (file_exists(JsonData::TESTS_FOLDER->path() . "/{$testName}.json")) {
+                $scope = ( new TestScopeResolver() )->resolve($testName);
                 if (unlink(JsonData::TESTS_FOLDER->path() . "/{$testName}.json")) {
+                    $purge = $this->getPurgeService();
+                    if ($scope !== null && $purge !== null) {
+                        [$scopeType, $scopeId] = $scope;
+                        $purge->purgeForObject("{$scopeType}:{$scopeId}");
+                    }
                     return $response->withStatus(StatusCode::NO_CONTENT->value, StatusCode::NO_CONTENT->reason());
                 } else {
                     $description = "Test {$testName} could not be deleted";
