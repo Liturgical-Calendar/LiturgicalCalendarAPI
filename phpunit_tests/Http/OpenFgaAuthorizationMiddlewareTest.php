@@ -432,6 +432,39 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $middleware->process($request, $this->nextHandler);
     }
 
+    public function testForTestScopesFactoryPutMapsToEditor(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:user-123', 'editor', 'national_calendar_test:US')
+            ->willReturn(true);
+
+        // TestScopeResolver is final; use a real instance backed by a temp dir.
+        // Track created paths so tearDown() cleans them up even on assertion failure.
+        $tempDir  = sys_get_temp_dir() . '/fga_test_' . uniqid();
+        $tempFile = $tempDir . '/some-test.json';
+        mkdir($tempDir);
+        // Append dir before file so tearDown()'s array_reverse() removes the file first,
+        // then the now-empty dir (rmdir fails on a non-empty dir).
+        $this->tempPaths[] = $tempDir;
+        $this->tempPaths[] = $tempFile;
+        file_put_contents(
+            $tempFile,
+            (string) json_encode(['applies_to' => ['national_calendar' => 'US']])
+        );
+        $scopeResolver = new TestScopeResolver($tempDir);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forTestScopes($client, $scopeResolver);
+
+        $request = ( new ServerRequest('PUT', '/tests/some-test') )
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'some-test');
+
+        $response = $middleware->process($request, $this->nextHandler);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
     public function testForTestScopesPutMapsToEditor(): void
     {
         $client = $this->createMock(OpenFgaClient::class);
