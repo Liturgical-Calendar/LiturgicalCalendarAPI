@@ -902,8 +902,8 @@ final class RegionalDataHandler extends AbstractHandler
     /**
      * Map the delete path category to its FGA object type string.
      *
-     * Returns null for any category that has no corresponding FGA object type,
-     * which causes the purge call to be skipped silently.
+     * Every valid {@see PathCategory} maps to an FGA object type; the match
+     * is exhaustive so this always returns a non-empty string.
      */
     private function fgaObjectTypeForCategory(): string
     {

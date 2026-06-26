@@ -8,7 +8,7 @@ use LiturgicalCalendar\Api\Handlers\RegionalDataHandler;
 use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Router;
-use LiturgicalCalendar\Api\Services\ResourceTuplePurgeService;
+use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -165,7 +165,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         // --- Build handler with injected mock purge service ------------------
         $handler = new RegionalDataHandler(['nation', 'HR']);
 
-        $purge = $this->createMock(ResourceTuplePurgeService::class);
+        $purge = $this->createMock(ResourceTuplePurgeServiceInterface::class);
         $purge->expects($this->once())
             ->method('purgeForObject')
             ->with('national_calendar:HR');

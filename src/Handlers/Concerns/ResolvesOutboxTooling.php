@@ -9,6 +9,7 @@ use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeService;
+use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
 
 /**
  * Lazy accessors for outbox/purge tooling, shared by write handlers.
@@ -23,14 +24,15 @@ use LiturgicalCalendar\Api\Services\ResourceTuplePurgeService;
  */
 trait ResolvesOutboxTooling
 {
-    private ?ResourceTuplePurgeService $purgeService = null;
-    private ?OutboxRepository $outboxRepository      = null;
+    private ?ResourceTuplePurgeServiceInterface $purgeService = null;
+    private ?OutboxRepository $outboxRepository               = null;
+    private ?\PDO $pdo                                        = null;
 
     // -------------------------------------------------------------------------
     // Test seams
     // -------------------------------------------------------------------------
 
-    public function setPurgeService(ResourceTuplePurgeService $s): void
+    public function setPurgeService(ResourceTuplePurgeServiceInterface $s): void
     {
         $this->purgeService = $s;
     }
@@ -47,7 +49,7 @@ trait ResolvesOutboxTooling
     /**
      * Returns null when OpenFGA is not configured so callers can skip silently.
      */
-    protected function getPurgeService(): ?ResourceTuplePurgeService
+    protected function getPurgeService(): ?ResourceTuplePurgeServiceInterface
     {
         if ($this->purgeService !== null) {
             return $this->purgeService;
@@ -77,12 +79,15 @@ trait ResolvesOutboxTooling
     }
 
     /**
-     * Returns the live PDO connection from the project's singleton.
+     * Returns the live PDO connection from the project's singleton, cached locally.
      * Task 9's create-sync path reuses this directly.
      */
     protected function getOutboxPdo(): \PDO
     {
-        return Connection::getInstance();
+        if ($this->pdo === null) {
+            $this->pdo = Connection::getInstance();
+        }
+        return $this->pdo;
     }
 
     /**
