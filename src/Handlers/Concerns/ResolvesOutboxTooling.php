@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Handlers\Concerns;
 
 use LiturgicalCalendar\Api\Database\Connection;
+use LiturgicalCalendar\Api\Repositories\OutboxBatchInsertInterface;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
@@ -21,11 +22,18 @@ use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
  *
  * Every accessor honours a test-seam override (set*() methods) so unit tests
  * can inject mocks without touching environment variables.
+ *
+ * The `$outboxRepository` field and related seam methods use
+ * {@see OutboxBatchInsertInterface} (rather than the final concrete
+ * {@see OutboxRepository}) so that unit tests can inject a mock without
+ * requiring a live database connection.  When {@see OutboxProcessor} needs
+ * to be instantiated (production only), a concrete {@see OutboxRepository}
+ * is created directly from the PDO singleton inside {@see getPurgeService()}.
  */
 trait ResolvesOutboxTooling
 {
     private ?ResourceTuplePurgeServiceInterface $purgeService = null;
-    private ?OutboxRepository $outboxRepository               = null;
+    private ?OutboxBatchInsertInterface $outboxRepository     = null;
     private ?\PDO $pdo                                        = null;
 
     // -------------------------------------------------------------------------
@@ -37,7 +45,11 @@ trait ResolvesOutboxTooling
         $this->purgeService = $s;
     }
 
-    public function setOutboxRepository(OutboxRepository $r): void
+    /**
+     * Inject a repository for testing — accepts the interface so tests can
+     * pass a mock without needing a live database.
+     */
+    public function setOutboxRepository(OutboxBatchInsertInterface $r): void
     {
         $this->outboxRepository = $r;
     }
@@ -57,19 +69,28 @@ trait ResolvesOutboxTooling
         if (!OpenFgaClient::isConfigured()) {
             return null;
         }
-        $pdo                = $this->getOutboxPdo();
-        $client             = $this->getFgaClient();
-        $repo               = $this->getOutboxRepository();
-        $processor          = new OutboxProcessor($repo, $client);
+        $pdo    = $this->getOutboxPdo();
+        $client = $this->getFgaClient();
+        $repo   = $this->getOutboxRepository();
+        // OutboxProcessor requires the concrete OutboxRepository (it calls
+        // getById / markSucceeded etc.); construct one from the PDO singleton
+        // here rather than relying on $repo, which may be a test double.
+        $fullRepo           = new OutboxRepository($pdo);
+        $processor          = new OutboxProcessor($fullRepo, $client);
         $this->purgeService = new ResourceTuplePurgeService($client, $repo, $processor, $pdo);
         return $this->purgeService;
     }
 
     /**
-     * Returns the shared OutboxRepository, creating it on first call.
-     * Task 9's create-sync path reuses this directly.
+     * Returns the shared batch-insert accessor, creating a live
+     * {@see OutboxRepository} on first call.
+     *
+     * Task 9's create-sync path calls this for {@see OutboxRepository::insertBatch()}.
+     * When a test seam has been injected via {@see setOutboxRepository()},
+     * that object is returned instead (enabling mock-based assertions without
+     * a real database).
      */
-    protected function getOutboxRepository(): OutboxRepository
+    protected function getOutboxRepository(): OutboxBatchInsertInterface
     {
         if ($this->outboxRepository !== null) {
             return $this->outboxRepository;

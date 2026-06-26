@@ -9,6 +9,10 @@ use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 use LiturgicalCalendar\Api\Handlers\Auth\ClientIpTrait;
 use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesOutboxTooling;
+use LiturgicalCalendar\Api\Repositories\OutboxRepository;
+use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
 use LiturgicalCalendar\Api\JsonFormatter;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
@@ -464,6 +468,50 @@ final class RegionalDataHandler extends AbstractHandler
 
         // get the nation name in English from the two letter iso code
         $nationEnglish = \Locale::getDisplayRegion('-' . $nation, 'en');
+
+        // When the payload declares a wider_region, enqueue a WRITE_TUPLE outbox
+        // row so the `national_calendar:<N> member_nation wider_region:<R>` tuple
+        // is propagated to OpenFGA asynchronously (or synchronously when FGA is
+        // available).  The enqueue is also triggered when a test seam repository
+        // has been injected, so unit tests can assert the row without a live DB.
+        $widerRegion = $payload->metadata->wider_region ?? '';
+        if ($widerRegion !== '' && ( OpenFgaClient::isConfigured() || $this->outboxRepository !== null )) {
+            $repo = $this->getOutboxRepository();
+            $row  = [
+                'operation'       => OutboxOperation::WRITE_TUPLE,
+                'fga_user'        => "national_calendar:{$nation}",
+                'fga_relation'    => 'member_nation',
+                'fga_object'      => "wider_region:{$widerRegion}",
+                'idempotency_key' => "member_nation:wider_region:{$widerRegion}:national_calendar:{$nation}",
+                'metadata'        => ['member_nation_seed' => true],
+            ];
+            // Wrap insertBatch in a transaction when a real PDO is available
+            // (i.e. OpenFGA is configured and we are not in a test seam path).
+            $pdo = OpenFgaClient::isConfigured() ? $this->getOutboxPdo() : null;
+            if ($pdo !== null) {
+                $pdo->beginTransaction();
+            }
+            $ids = [];
+            try {
+                $ids = $repo->insertBatch([$row]);
+                if ($pdo !== null) {
+                    $pdo->commit();
+                }
+            } catch (\Throwable $e) {
+                if ($pdo !== null && $pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                throw $e;
+            }
+            // Process synchronously when FGA is configured (fast path).
+            if (OpenFgaClient::isConfigured()) {
+                $fullRepo  = new OutboxRepository($this->getOutboxPdo());
+                $processor = new OutboxProcessor($fullRepo, $this->getFgaClient());
+                foreach ($ids as $id) {
+                    $processor->processSync($id);
+                }
+            }
+        }
 
         // Log successful creation
         $this->auditLogger->info('National calendar created', [
