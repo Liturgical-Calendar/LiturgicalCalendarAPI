@@ -1,8 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-declare(strict_types=1);
-
 /**
  * Read a clover XML file and emit a Markdown-formatted coverage summary
  * (project totals + per-layer breakdown of src/) on stdout.
@@ -19,6 +17,8 @@ declare(strict_types=1);
  *                 their top-level subdirectory (Handlers, Models, …). Defaults
  *                 to <repo>/src.
  */
+
+declare(strict_types=1);
 
 if ($argc < 2 || $argc > 3) {
     fwrite(STDERR, "Usage: {$argv[0]} <clover.xml> [<srcRoot>]\n");
