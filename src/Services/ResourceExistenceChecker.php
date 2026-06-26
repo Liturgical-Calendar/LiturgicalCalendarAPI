@@ -21,7 +21,7 @@ use LiturgicalCalendar\Api\Enum\JsonData;
  *   national_calendar_test       — governance scope; always treated as existing
  *   diocesan_calendar_test       — governance scope; always treated as existing
  */
-final class ResourceExistenceChecker
+final class ResourceExistenceChecker implements ResourceExistenceCheckerInterface
 {
     /** @var list<string> */
     private const RESOURCE_TYPES = [
