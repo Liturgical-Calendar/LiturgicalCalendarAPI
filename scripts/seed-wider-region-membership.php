@@ -23,7 +23,7 @@ Dotenv::createImmutable(
 Router::$apiFilePath = $projectRoot . DIRECTORY_SEPARATOR;
 
 $apply = in_array('--apply', $argv, true);
-echo 'Mode: ' . ($apply ? 'APPLY' : 'DRY RUN (pass --apply to write)') . PHP_EOL . PHP_EOL;
+echo 'Mode: ' . ( $apply ? 'APPLY' : 'DRY RUN (pass --apply to write)' ) . PHP_EOL . PHP_EOL;
 
 if (!OpenFgaClient::isConfigured()) {
     fwrite(STDERR, "Error: OpenFGA is not configured. Set OPENFGA_API_URL, OPENFGA_STORE_ID, and OPENFGA_MODEL_ID.\n");
