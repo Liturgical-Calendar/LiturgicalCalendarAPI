@@ -70,4 +70,63 @@ final class ResolvesOutboxToolingTest extends TestCase
 
         $this->assertSame($host->callGetOutboxRepository(), $host->callGetOutboxRepository());
     }
+
+    // -------------------------------------------------------------------------
+    // Lazy production build path (no test seam injected)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Exercises the real lazy-build branch of getPurgeService(): with OpenFGA
+     * "configured" and a live Postgres reachable, the trait builds the PDO
+     * (Connection::getInstance()), the FGA client (OpenFgaClient::fromEnv() —
+     * construction only, no network call), the OutboxRepository/OutboxProcessor,
+     * and the ResourceTuplePurgeService. Skipped when Postgres is unavailable.
+     */
+    public function testLazyBuildsPurgeServiceWhenConfiguredAndDbAvailable(): void
+    {
+        $dbHost = (string) ( $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?: '' );
+        $dbName = (string) ( $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?: '' );
+        if ($dbHost === '' || $dbName === '') {
+            $this->markTestSkipped('Postgres not configured (DB_HOST/DB_NAME unset).');
+        }
+
+        // Force OpenFGA "configured" so isConfigured() passes and the lazy
+        // build runs; fromEnv() only constructs a client, so fake values work.
+        $fake = [
+            'OPENFGA_API_URL'  => 'http://localhost:8080',
+            'OPENFGA_STORE_ID' => 'store-test',
+            'OPENFGA_MODEL_ID' => 'model-test',
+        ];
+        /** @var array<string, array{0: string|null, 1: string|false}> $saved */
+        $saved = [];
+        foreach ($fake as $key => $value) {
+            $saved[$key] = [array_key_exists($key, $_ENV) ? (string) $_ENV[$key] : null, getenv($key)];
+            $_ENV[$key]  = $value;
+            putenv("{$key}={$value}");
+        }
+
+        try {
+            $host    = new ResolvesOutboxToolingHost();
+            $service = $host->callGetPurgeService();
+
+            $this->assertInstanceOf(ResourceTuplePurgeServiceInterface::class, $service);
+            // Second call returns the cached instance (no rebuild).
+            $this->assertSame($service, $host->callGetPurgeService());
+            // The repository accessor also resolves to a live concrete repository.
+            $this->assertInstanceOf(OutboxBatchInsertInterface::class, $host->callGetOutboxRepository());
+        } finally {
+            foreach ($saved as $key => [$envValue, $getenvValue]) {
+                if ($envValue === null) {
+                    unset($_ENV[$key]);
+                } else {
+                    $_ENV[$key] = $envValue;
+                }
+                if ($getenvValue === false) {
+                    putenv($key);
+                } else {
+                    putenv("{$key}={$getenvValue}");
+                }
+            }
+        }
+    }
 }
