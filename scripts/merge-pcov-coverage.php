@@ -10,7 +10,7 @@
  *
  * - <phpunit-clover.xml>: the clover file PHPUnit generated for in-process tests.
  * - <pcov-dump-dir>:     directory of *.cov files written by public/index.php
- *                        (each file is `serialize(\pcov\collect())`).
+ *                        (each file is `json_encode(\pcov\collect())`).
  * - <out-clover.xml>:    where to write the merged clover.
  *
  * Behavior:
@@ -80,7 +80,7 @@ foreach ($dumpFiles as $dump) {
     if ($raw === false || $raw === '') {
         continue;
     }
-    $data = @unserialize($raw, ['allowed_classes' => false]);
+    $data = json_decode($raw, true);
     if (!is_array($data)) {
         continue;
     }
