@@ -7,6 +7,7 @@ require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 use Dotenv\Dotenv;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\WiderRegionMembershipSeeder;
 
@@ -16,6 +17,10 @@ Dotenv::createImmutable(
     ['.env', '.env.local', '.env.development', '.env.test', '.env.staging', '.env.production'],
     false
 )->safeLoad();
+
+// Initialize the file-path prefix that JsonData::path() requires.
+// Router sets this during HTTP boot; CLI scripts must set it manually.
+Router::$apiFilePath = $projectRoot . DIRECTORY_SEPARATOR;
 
 $apply = in_array('--apply', $argv, true);
 echo 'Mode: ' . ($apply ? 'APPLY' : 'DRY RUN (pass --apply to write)') . PHP_EOL . PHP_EOL;
@@ -28,8 +33,9 @@ if (!OpenFgaClient::isConfigured()) {
 $client     = OpenFgaClient::fromEnv();
 $seeder     = new WiderRegionMembershipSeeder();
 $nationsDir = JsonData::NATIONAL_CALENDARS_FOLDER->path();
+$tuples     = $seeder->computeTuples($nationsDir);
 
-foreach ($seeder->computeTuples($nationsDir) as $t) {
+foreach ($tuples as $t) {
     echo "{$t['object']}#member_nation@{$t['user']}" . PHP_EOL;
 }
 $result = $seeder->seed($client, $nationsDir, $apply);
