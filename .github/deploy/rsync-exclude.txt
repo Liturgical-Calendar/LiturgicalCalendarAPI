@@ -52,11 +52,17 @@ server.pid
 server.vscode.pid
 
 # --- CLI tooling that cannot run in the SSH chroot anyway ---
-# bin/ currently contains only doctrine-migrations, which is invoked
-# in-process via the /_ops/migrate endpoint. doctrine-migrations.php
-# (Doctrine config at the repo root) IS shipped — it's read by
-# MigrateHandler via PhpFile.
-bin/
+# bin/doctrine-migrations is invoked in-process via the /_ops/migrate
+# endpoint, never as a server-side CLI, so it stays off the wire.
+# doctrine-migrations.php (Doctrine config at the repo root) IS shipped —
+# it's read by MigrateHandler via PhpFile.
+#
+# bin/reconcile-outbox, by contrast, MUST ship: the OpenFGA outbox
+# consumer (systemd) and backstop (cron) invoke it as a server-side CLI.
+# Excluding the whole bin/ dir previously kept it off the server, which is
+# why the outbox drain infra could not be installed. Exclude only the one
+# entry that should not ship.
+bin/doctrine-migrations
 
 # --- Composer install-time only (never read at runtime) ---
 # composer.json IS shipped — Router::findProjectRoot() uses it as a
