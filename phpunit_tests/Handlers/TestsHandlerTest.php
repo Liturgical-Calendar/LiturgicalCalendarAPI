@@ -82,15 +82,6 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         ( new TestsHandler() )->handle($req);
     }
 
-    /**
-     * After a successful test DELETE, the handler must call
-     * ResourceTuplePurgeService::purgeForObject() with the correct FGA object
-     * identifier so that editor/viewer operational tuples are cleaned up.
-     *
-     * A temporary fixture file with applies_to.national_calendar = 'US' is
-     * created before the test runs; after a successful DELETE the file is gone.
-     * tearDown removes the file if the test fails before the DELETE executes.
-     */
     public function testDeleteRejectsWrongPathParamCount(): void
     {
         $this->expectException(ValidationException::class);
@@ -130,6 +121,15 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         $this->testFixturePath = null; // handler already removed the file
     }
 
+    /**
+     * After a successful test DELETE, the handler must call
+     * ResourceTuplePurgeService::purgeForObject() with the correct FGA object
+     * identifier so that editor/viewer operational tuples are cleaned up.
+     *
+     * A temporary fixture file with applies_to.national_calendar = 'US' is
+     * created before the test runs; after a successful DELETE the file is gone.
+     * tearDown removes the file if the test fails before the DELETE executes.
+     */
     public function testDeletePurgesScopedTestOperationalTuples(): void
     {
         // --- Arrange: create a temp fixture that TestScopeResolver maps to national_calendar_test:US ---

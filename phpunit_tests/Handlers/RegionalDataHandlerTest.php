@@ -80,7 +80,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
     {
         parent::tearDown();
         $this->restoreHrFixture();
-        $this->restoreItFixture();
+        $this->cleanupMtFixture();
     }
 
     /**
@@ -114,7 +114,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
      * Called unconditionally from tearDown so the tree is always clean,
      * regardless of whether the test passed, failed, or was skipped.
      */
-    private function restoreItFixture(): void
+    private function cleanupMtFixture(): void
     {
         if ($this->mtNationDir === '') {
             return; // create test did not run — nothing to clean up
@@ -183,14 +183,10 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
     }
 
     /**
-     * After a successful calendar DELETE, the handler must call
-     * ResourceTuplePurgeService::purgeForObject() with the correct FGA object
-     * identifier so that editor/viewer operational tuples are cleaned up.
-     *
-     * Croatia (HR) is used as the fixture nation because it has no diocesan
-     * calendars in the bundled source data, so the DELETE pre-check that
-     * rejects nations still in use by diocesan calendars passes cleanly.
-     * The HR files are backed up before the test and restored in tearDown.
+     * A `PUT /data/nation` whose `nation` is a syntactically-valid but unassigned
+     * code (e.g. ZZ) must be rejected: the create path is gated by the
+     * CommonDef.json `Nation` enum — the same ISO 3166-1 alpha-2 set the
+     * access-request flow validates against.
      */
     public function testCreateNationalCalendarRejectsNonIsoNationCode(): void
     {
@@ -267,6 +263,16 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         self::assertSame(200, $response->getStatusCode());
     }
 
+    /**
+     * After a successful calendar DELETE, the handler must call
+     * ResourceTuplePurgeService::purgeForObject() with the correct FGA object
+     * identifier so that editor/viewer operational tuples are cleaned up.
+     *
+     * Croatia (HR) is used as the fixture nation because it has no diocesan
+     * calendars in the bundled source data, so the DELETE pre-check that
+     * rejects nations still in use by diocesan calendars passes cleanly.
+     * The HR files are backed up before the test and restored in tearDown.
+     */
     public function testDeleteCalendarPurgesOperationalTuples(): void
     {
         // --- Arrange: save fixture files so tearDown can restore them --------
@@ -318,7 +324,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
      *   the PUT does not trigger a ResourceConflictException.
      *
      * The new MT files written by the handler are deleted unconditionally in
-     * tearDown via {@see restoreItFixture()} to keep the working tree clean.
+     * tearDown via {@see cleanupMtFixture()} to keep the working tree clean.
      */
     public function testCreateNationalCalendarEnqueuesMemberNationTuple(): void
     {
