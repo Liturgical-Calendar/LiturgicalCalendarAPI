@@ -139,36 +139,6 @@
       }
     },
     {
-      "type": "test_definition",
-      "relations": {
-        "admin": { "this": {} },
-        "editor": {
-          "union": {
-            "child": [
-              { "this": {} },
-              { "computedUserset": { "relation": "admin" } }
-            ]
-          }
-        },
-        "viewer": {
-          "union": {
-            "child": [
-              { "this": {} },
-              { "computedUserset": { "relation": "editor" } },
-              { "computedUserset": { "relation": "admin" } }
-            ]
-          }
-        }
-      },
-      "metadata": {
-        "relations": {
-          "admin":  { "directly_related_user_types": [{ "type": "user" }] },
-          "editor": { "directly_related_user_types": [{ "type": "user" }] },
-          "viewer": { "directly_related_user_types": [{ "type": "user" }] }
-        }
-      }
-    },
-    {
       "type": "national_calendar_test",
       "relations": {
         "admin": { "this": {} },
