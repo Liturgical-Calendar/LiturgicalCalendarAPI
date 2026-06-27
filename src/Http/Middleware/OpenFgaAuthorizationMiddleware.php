@@ -29,7 +29,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  *   /data/nation/{id}       → national_calendar:{id}
  *   /data/diocese/{id}      → diocesan_calendar:{id}
  *   /data/widerregion/{id}  → wider_region:{id}
- *   /tests/{id}             → test_definition:{id}
+ *   /tests/{id}             → {national,diocesan,general_roman}_calendar_test:{scopeId} (via TestScopeResolver)
  *   /temporale, /decrees    → general_roman_calendar:{fixedId}
  *   /missals/{editio_typica}→ general_roman_calendar:{missalId}
  *   /missals/{national}     → national_calendar:{nation}
