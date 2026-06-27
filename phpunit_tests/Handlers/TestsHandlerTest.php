@@ -94,7 +94,10 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
     public function testDeletePurgesScopedTestOperationalTuples(): void
     {
         // --- Arrange: create a temp fixture that TestScopeResolver maps to national_calendar_test:US ---
-        $testName              = 'NationalCalendarPurgeTest';
+        // Unique per-run name so the fixture cannot collide with a real or
+        // shared test file (the handler reads from the real JsonData::TESTS_FOLDER,
+        // so the fixture must live there). tearDown removes it via $testFixturePath.
+        $testName              = 'PurgeFixture_' . bin2hex(random_bytes(6));
         $testsDir              = JsonData::TESTS_FOLDER->path();
         $fixturePath           = $testsDir . DIRECTORY_SEPARATOR . $testName . '.json';
         $this->testFixturePath = $fixturePath;

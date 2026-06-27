@@ -6,12 +6,15 @@ namespace LiturgicalCalendar\Tests\Handlers\Concerns;
 
 use LiturgicalCalendar\Api\Repositories\OutboxBatchInsertInterface;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
+use LiturgicalCalendar\Tests\Handlers\AbstractHandlerTestCase;
 use LiturgicalCalendar\Tests\Support\EnvIsolationTrait;
-use PHPUnit\Framework\TestCase;
 
-final class ResolvesOutboxToolingTest extends TestCase
+final class ResolvesOutboxToolingTest extends AbstractHandlerTestCase
 {
     use EnvIsolationTrait;
+
+    /** This concern's lazy-build path constructs a live PDO, so require Postgres. */
+    protected static bool $requiresDatabase = true;
 
     // -------------------------------------------------------------------------
     // setPurgeService / getPurgeService
@@ -84,12 +87,11 @@ final class ResolvesOutboxToolingTest extends TestCase
      */
     public function testLazyBuildsPurgeServiceWhenConfiguredAndDbAvailable(): void
     {
-        $dbHost = (string) ( $_ENV['DB_HOST'] ?? getenv('DB_HOST') ?: '' );
-        $dbName = (string) ( $_ENV['DB_NAME'] ?? getenv('DB_NAME') ?: '' );
-        if ($dbHost === '' || $dbName === '') {
-            $this->markTestSkipped('Postgres not configured (DB_HOST/DB_NAME unset).');
-        }
-
+        // Postgres availability (real connectivity, not just env presence) is
+        // guaranteed by AbstractHandlerTestCase::$requiresDatabase — setUp skips
+        // this test when the connection attempt fails, so Connection::getInstance()
+        // below is safe to call.
+        //
         // Force OpenFGA "configured" so isConfigured() passes and the lazy
         // build runs; fromEnv() only constructs a client, so fake values work.
         $fake = [

@@ -49,6 +49,13 @@ class WiderRegionMembershipSeederTest extends TestCase
         $this->assertCount(2, $tuples); // XX skipped (no wider_region)
     }
 
+    public function testComputeTuplesThrowsOnInvalidJson(): void
+    {
+        file_put_contents($this->dir . '/IT/IT.json', '{ not valid json');
+        $this->expectException(\RuntimeException::class);
+        ( new WiderRegionMembershipSeeder() )->computeTuples($this->dir);
+    }
+
     public function testComputeTuplesSkipsDirectoryWithNoJsonFile(): void
     {
         // NOFILE directory exists but contains no NOFILE.json — must be skipped

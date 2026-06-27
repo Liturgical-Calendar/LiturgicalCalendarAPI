@@ -35,24 +35,24 @@ final class ResourceTuplePurgeReconciler
      */
     public function sweep(): array
     {
-        /** @var list<array{user: string, relation: string, object: string}> $tuples */
-        $tuples = [];
-        $token  = null;
-        do {
-            $page   = $this->client->readTuples('', '', null, null, $token);
-            $tuples = array_merge($tuples, $page['tuples']);
-            $token  = $page['next_continuation_token'] !== '' ? $page['next_continuation_token'] : null;
-        } while ($token !== null);
-
-        // Collect the set of objects that have at least one operational tuple.
-        // admin/other relations are ignored here — they never trigger a purge.
+        // Stream pages instead of buffering every tuple in memory: keep only the
+        // running scanned count and the distinct objects that carry at least one
+        // operational tuple. admin/other relations are ignored — they never
+        // trigger a purge.
+        $scanned = 0;
+        $token   = null;
         /** @var array<string, true> $objectsWithOperational */
         $objectsWithOperational = [];
-        foreach ($tuples as $t) {
-            if (in_array($t['relation'], AccessRequestRepository::OPERATIONAL_RELATIONS, true)) {
-                $objectsWithOperational[$t['object']] = true;
+        do {
+            $page = $this->client->readTuples('', '', null, null, $token);
+            foreach ($page['tuples'] as $t) {
+                ++$scanned;
+                if (in_array($t['relation'], AccessRequestRepository::OPERATIONAL_RELATIONS, true)) {
+                    $objectsWithOperational[$t['object']] = true;
+                }
             }
-        }
+            $token = $page['next_continuation_token'] !== '' ? $page['next_continuation_token'] : null;
+        } while ($token !== null);
 
         $purgedObjects = 0;
         $enqueued      = 0;
@@ -73,6 +73,6 @@ final class ResourceTuplePurgeReconciler
             ++$purgedObjects;
         }
 
-        return ['scanned' => count($tuples), 'purgedObjects' => $purgedObjects, 'enqueued' => $enqueued];
+        return ['scanned' => $scanned, 'purgedObjects' => $purgedObjects, 'enqueued' => $enqueued];
     }
 }

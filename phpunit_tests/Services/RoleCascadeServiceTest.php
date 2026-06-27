@@ -168,7 +168,7 @@ final class RoleCascadeServiceTest extends TestCase
         self::assertSame('user:u1', $deleted[0]['user']);
         self::assertSame('admin', $deleted[0]['relation']);
         self::assertSame('national_calendar_test:t1', $deleted[0]['object']);
-        self::assertGreaterThanOrEqual(9, $listCalls, 'listObjects should be probed for every (type × relation) pair');
+        self::assertSame(9, $listCalls, 'listObjects should be probed for exactly every (type × relation) pair (3 types × 3 relations)');
     }
 
     public function testCascadeTupleRevokeForRoleSwallowsDeleteFailures(): void

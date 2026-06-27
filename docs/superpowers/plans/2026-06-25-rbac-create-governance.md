@@ -37,7 +37,7 @@ operational tuples and enqueues concrete `DELETE_TUPLE` rows. Spec:
 - `scripts/migrate-deleter-tuples.php` — CLI, `--dry-run`/`--apply`.
 - `scripts/seed-wider-region-membership.php` — CLI, `--dry-run`/`--apply`.
 - `scripts/reconcile-resource-tuples.php` — CLI, `--dry-run`/`--apply`.
-- `docs/rbac-create-governance-runbook.md` — rollout runbook (Task 14).
+- `docs/ops/rbac-create-governance-runbook.md` — rollout runbook (Task 14).
 - Tests: `phpunit_tests/Services/ResourceTuplePurgeServiceTest.php`, `.../ResourceExistenceCheckerTest.php`,
   `.../Outbox/ResourceTuplePurgeReconcilerTest.php`, `.../WiderRegionMembershipSeederTest.php`, `.../DeleterTupleMapperTest.php`.
 
@@ -1719,11 +1719,11 @@ git commit -m "docs(openapi): drop deleter relation enums; document create seman
 
 **Files:**
 
-- Create: `docs/rbac-create-governance-runbook.md`
+- Create: `docs/ops/rbac-create-governance-runbook.md`
 
 - [ ] **Step 1: Write the runbook**
 
-Create `docs/rbac-create-governance-runbook.md` documenting the no-downtime rollout (markdown must pass `markdownlint-cli2`; aligned tables, ≤180-col prose):
+Create `docs/ops/rbac-create-governance-runbook.md` documenting the no-downtime rollout (markdown must pass `markdownlint-cli2`; aligned tables, ≤180-col prose):
 
 1. Apply the additive model: push `scripts/openfga-model.additive.json` to the OpenFGA store (union rewrites + `member_nation`, `deleter` retained).
 2. Deploy the API (this branch).
@@ -1739,7 +1739,7 @@ requests, and inherits `wider_region` admin via membership.
 
 - [ ] **Step 2: Lint markdown**
 
-Run: `npx --yes markdownlint-cli2 "docs/rbac-create-governance-runbook.md"`
+Run: `npx --yes markdownlint-cli2 "docs/ops/rbac-create-governance-runbook.md"`
 Expected: `0 error(s)`.
 
 - [ ] **Step 3: Full verification**
@@ -1753,7 +1753,7 @@ Expected: all green. Fix any regressions before committing. If `composer test` r
 - [ ] **Step 4: Commit + open PR**
 
 ```bash
-git add docs/rbac-create-governance-runbook.md
+git add docs/ops/rbac-create-governance-runbook.md
 git commit -m "docs(ops): RBAC create-governance rollout runbook"
 git push -u origin feat/rbac-create-governance
 gh pr create --base development --title "RBAC: create-governance + admin-superset (#668, #669)" --body "Implements #668 and #669 per docs/superpowers/specs/2026-06-25-issues-668-669-rbac-create-governance-design.md. Frontend deleter-removal is a coordinated follow-up. Diocesan create-governance deferred."

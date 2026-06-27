@@ -54,7 +54,14 @@ $dotenv->safeLoad();
 // ---------------------------------------------------------------------------
 // Argument parsing: --apply enables writes; default is --dry-run
 // ---------------------------------------------------------------------------
-$apply  = in_array('--apply', $argv, true);
+$apply      = in_array('--apply', $argv, true);
+$dryRunFlag = in_array('--dry-run', $argv, true);
+
+if ($apply && $dryRunFlag) {
+    fwrite(STDERR, "Error: --apply and --dry-run are mutually exclusive.\n");
+    exit(1);
+}
+
 $dryRun = !$apply;
 
 $modeName = $dryRun ? 'DRY RUN' : 'APPLY';

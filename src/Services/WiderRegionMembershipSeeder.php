@@ -34,10 +34,12 @@ final class WiderRegionMembershipSeeder
             }
             $raw = file_get_contents($file);
             if ($raw === false) {
-                continue;
+                throw new \RuntimeException("Unable to read national calendar file: {$file}");
             }
-            /** @var array<string, mixed> $data */
-            $data   = json_decode($raw, true) ?: [];
+            $data = json_decode($raw, true);
+            if (!is_array($data)) {
+                throw new \RuntimeException("Invalid JSON in national calendar file: {$file}");
+            }
             $meta   = is_array($data['metadata'] ?? null) ? $data['metadata'] : [];
             $region = is_string($meta['wider_region'] ?? null) ? $meta['wider_region'] : '';
             if ($region === '') {

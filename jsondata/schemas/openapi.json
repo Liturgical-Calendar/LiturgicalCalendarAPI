@@ -5334,6 +5334,9 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
           },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
           "415": {
             "$ref": "#/components/responses/UnsupportedMediaType415"
           },

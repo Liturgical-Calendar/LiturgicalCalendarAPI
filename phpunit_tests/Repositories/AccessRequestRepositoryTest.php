@@ -394,16 +394,20 @@ final class AccessRequestRepositoryTest extends RepositoryTestCase
     public static function provideNationCodes(): array
     {
         return [
-            'IT existing'    => ['IT', true],
-            'US existing'    => ['US', true],
-            'NZ prospective' => ['NZ', true],   // valid ISO, may have no calendar yet
-            'VA vatican'     => ['VA', true],
-            'ZZ unknown'     => ['ZZ', false],
-            'XX private-use' => ['XX', false],
-            'lowercase it'   => ['it', false],
-            'too long'       => ['ITA', false],
-            'empty'          => ['', false],
-            'arbitrary'      => ['FOO', false],
+            'IT existing'      => ['IT', true],
+            'US existing'      => ['US', true],
+            'NZ prospective'   => ['NZ', true],   // valid ISO, may have no calendar yet
+            'VA vatican'       => ['VA', true],
+            'ZZ unknown'       => ['ZZ', false],
+            'EU supranational' => ['EU', false],
+            'EZ eurozone'      => ['EZ', false],
+            'QO macro-region'  => ['QO', false],
+            'UK alias of GB'   => ['UK', false],
+            'XX private-use'   => ['XX', false],
+            'lowercase it'     => ['it', false],
+            'too long'         => ['ITA', false],
+            'empty'            => ['', false],
+            'arbitrary'        => ['FOO', false],
         ];
     }
 }

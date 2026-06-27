@@ -236,10 +236,12 @@ idempotent (`TupleAlreadyExists`/`TupleNotFound` benign).
 ## Rollout (no downtime — mirror the PR #666 runbook)
 
 1. Apply model **v1** (additive: union rewrites + `wider_region.member_nation`; `deleter` kept).
-2. Deploy API (per-instance relation map: create→admin/editor, `DELETE→admin`; validation;
+2. Run `migrate-deleter-tuples.php --dry-run` then `--apply` — **before** the API deploy, so no
+   `deleter`-only grant loses delete access once the API enforces `DELETE→admin` (the additive v1
+   model still defines both `deleter` and `admin`, so the migration is valid here).
+3. Deploy API (per-instance relation map: create→admin/editor, `DELETE→admin`; validation;
    purge-on-delete; create-path membership sync).
-3. Run `seed-wider-region-membership.php --apply`.
-4. Run `migrate-deleter-tuples.php --dry-run` then `--apply`.
+4. Run `seed-wider-region-membership.php --apply`.
 5. Deploy the coordinated frontend PR (drop `deleter` option).
 6. Apply model **v2** (remove `deleter`) once no `deleter` tuples/usages remain.
 7. Schedule `reconcile-resource-tuples.php` (daily).

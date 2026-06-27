@@ -1121,7 +1121,17 @@ final class RegionalDataHandler extends AbstractHandler
         $objectType = $this->fgaObjectTypeForCategory();
         $purge      = $this->getPurgeService();
         if ($purge !== null) {
-            $purge->purgeForObject("{$objectType}:{$this->params->key}");
+            // Best-effort: the calendar files are already deleted, so an
+            // OpenFGA/outbox error must NOT fail the completed deletion —
+            // the reconciler sweep cleans up any stragglers.
+            try {
+                $purge->purgeForObject("{$objectType}:{$this->params->key}");
+            } catch (\Throwable $e) {
+                $this->auditLogger->warning(
+                    'Post-delete tuple purge failed; reconciler will retry',
+                    ['object' => "{$objectType}:{$this->params->key}", 'error' => $e->getMessage()]
+                );
+            }
         }
 
         // Log successful deletion

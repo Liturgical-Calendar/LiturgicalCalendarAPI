@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesOutboxTooling;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use LiturgicalCalendar\Api\JsonFormatter;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
@@ -189,29 +190,43 @@ final class TestsHandler extends AbstractHandler
      */
     private function handleDeleteRequest(ResponseInterface $response): ResponseInterface
     {
-        if (count($this->requestPathParams) === 1) {
-            $testName = $this->requestPathParams[0];
-            if (file_exists(JsonData::TESTS_FOLDER->path() . "/{$testName}.json")) {
-                $scope = ( new TestScopeResolver() )->resolve($testName);
-                if (unlink(JsonData::TESTS_FOLDER->path() . "/{$testName}.json")) {
-                    $purge = $this->getPurgeService();
-                    if ($scope !== null && $purge !== null) {
-                        [$scopeType, $scopeId] = $scope;
-                        $purge->purgeForObject("{$scopeType}:{$scopeId}");
-                    }
-                    return $response->withStatus(StatusCode::NO_CONTENT->value, StatusCode::NO_CONTENT->reason());
-                } else {
-                    $description = "Test {$testName} could not be deleted";
-                    throw new ServiceUnavailableException($description);
-                }
-            } else {
-                $description = "Test {$testName} not found, cannot DELETE.";
-                throw new NotFoundException($description);
-            }
-        } else {
+        if (count($this->requestPathParams) !== 1) {
             $description = 'Expected one and only one path param for DELETE requests, received ' . count($this->requestPathParams) . '.';
             throw new ValidationException($description);
         }
+
+        $testName = $this->requestPathParams[0];
+
+        // Resolve the FGA scope FIRST. A null result means the name failed
+        // validation (path-traversal / unsafe characters) or the test file is
+        // missing/unreadable — in every such case refuse to touch the filesystem,
+        // so unsafe names like "../foo" can never reach unlink().
+        $scope = ( new TestScopeResolver() )->resolve($testName);
+        if ($scope === null) {
+            throw new NotFoundException("Test {$testName} not found, cannot DELETE.");
+        }
+
+        if (false === unlink(JsonData::TESTS_FOLDER->path() . "/{$testName}.json")) {
+            throw new ServiceUnavailableException("Test {$testName} could not be deleted");
+        }
+
+        // Best-effort purge of operational (editor/viewer) tuples orphaned by the
+        // deletion. The file is already gone, so an OpenFGA/outbox error must NOT
+        // fail the DELETE — the reconciler sweep cleans up any stragglers.
+        $purge = $this->getPurgeService();
+        if ($purge !== null) {
+            [$scopeType, $scopeId] = $scope;
+            try {
+                $purge->purgeForObject("{$scopeType}:{$scopeId}");
+            } catch (\Throwable $e) {
+                LoggerFactory::create('audit', null, 90, false, true, false)->warning(
+                    'TestsHandler: post-delete tuple purge failed; reconciler will retry',
+                    ['object' => "{$scopeType}:{$scopeId}", 'error' => $e->getMessage()]
+                );
+            }
+        }
+
+        return $response->withStatus(StatusCode::NO_CONTENT->value, StatusCode::NO_CONTENT->reason());
     }
 
     /**

@@ -45,6 +45,14 @@ final class ResourceTuplePurgeService implements ResourceTuplePurgeServiceInterf
             $token  = $page['next_continuation_token'] !== '' ? $page['next_continuation_token'] : null;
         } while ($token !== null);
 
+        // Per-deletion-episode token so the idempotency key is unique to THIS
+        // purge cycle. A stable per-resource key would let a leftover succeeded
+        // outbox row from an earlier deletion silently suppress (ON CONFLICT DO
+        // NOTHING) the purge of a later recreate→delete of the same object.
+        // Within a single episode every row already differs by user/relation,
+        // and retries are driven by row id, so per-run dedup is unaffected.
+        $episode = bin2hex(random_bytes(8));
+
         $rows = [];
         foreach ($tuples as $t) {
             if (!in_array($t['relation'], AccessRequestRepository::OPERATIONAL_RELATIONS, true)) {
@@ -55,7 +63,7 @@ final class ResourceTuplePurgeService implements ResourceTuplePurgeServiceInterf
                 'fga_user'        => $t['user'],
                 'fga_relation'    => $t['relation'],
                 'fga_object'      => $t['object'],
-                'idempotency_key' => "resource_purge:{$t['object']}:{$t['user']}:{$t['relation']}",
+                'idempotency_key' => "resource_purge:{$episode}:{$t['object']}:{$t['user']}:{$t['relation']}",
                 'metadata'        => ['resource_purge' => true],
             ];
         }

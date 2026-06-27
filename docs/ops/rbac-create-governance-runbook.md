@@ -72,7 +72,36 @@ Grep for `deleter` — it must still appear (retained in this model version).
 
 ---
 
-## Step 2 — Deploy the API
+## Step 2 — Migrate deleter tuples to admin
+
+Run this **before** deploying the API. Once the new API is live it enforces `DELETE → admin`, so any pre-existing
+`deleter`-only grant must already have an equivalent `admin` tuple — otherwise it would lose delete access during the
+window. The additive model from Step 1 still defines both `deleter` and `admin`, so this migration is valid here.
+
+This script paginates all `*#deleter@user` tuples in the store and, for each one, writes the equivalent `*#admin@user` tuple
+(write-before-delete). Users retain delete capability after the model update.
+
+The migration is **idempotent** — re-running after a partial migration is safe.
+
+### 2a. Dry run (always run this first)
+
+```bash
+php scripts/migrate-deleter-tuples.php
+```
+
+Review the output. Each line reports what would be written and deleted. An exit code of `0` means all tuples are accounted for.
+
+### 2b. Apply
+
+```bash
+php scripts/migrate-deleter-tuples.php --apply
+```
+
+Confirm that every `deleter` tuple in the store now has a corresponding `admin` tuple, and that the original `deleter` tuples have been removed.
+
+---
+
+## Step 3 — Deploy the API
 
 Deploy this branch (`feat/rbac-create-governance`) to the target environment.
 
@@ -86,58 +115,34 @@ Confirm the deployed API is healthy before proceeding:
 curl -s http://localhost:8000/calendars | jq '.settings'
 ```
 
-**Brief authz window:** Between this step and completion of Step 3, non-admin users attempting to create national calendars
-via `PUT /data/national/{calendar}` will be subject to the new governance checks. Because `member_nation` tuples and migrated
-`admin` grants are not yet seeded, some grants may be temporarily absent. Admins bypass OpenFGA and are unaffected.
-Run Steps 3 and 4 immediately after this deploy.
+The API now enforces `DELETE → admin`. Because Step 2 already migrated every `deleter` grant to `admin`, there is **no
+delete-access gap**. **Brief create-authz window:** until Step 4 seeds `member_nation` tuples, a non-admin user creating a
+national calendar via `PUT /data/nation/{calendar}` may find a grant temporarily absent. Admins bypass OpenFGA and are
+unaffected. Run Step 4 immediately after this deploy.
 
 ---
 
-## Step 3 — Seed wider-region membership tuples
+## Step 4 — Seed wider-region membership tuples
 
 This script reads each national calendar definition and writes a `wider_region:{REGION}#member_nation@national_calendar:{ISO}` tuple
 for every nation that declares a `wider_region`. It is idempotent.
 
-### 3a. Dry run (always run this first)
+### 4a. Dry run (always run this first)
 
 ```bash
 php scripts/seed-wider-region-membership.php
 ```
 
-Review the output. Each line shows a tuple that would be written. The summary line reports `Planned` vs `Written` (both 0 in dry-run).
+Review the output. Each line shows a tuple that would be written. The summary line reports `Planned` (the number of tuples
+that would be written) and `Written` (`0` in dry-run).
 
-### 3b. Apply
+### 4b. Apply
 
 ```bash
 php scripts/seed-wider-region-membership.php --apply
 ```
 
 Confirm the summary shows `Written > 0` (or `0` if all tuples already existed — idempotent re-runs are safe).
-
----
-
-## Step 4 — Migrate deleter tuples to admin
-
-This script paginates all `*#deleter@user` tuples in the store and, for each one, writes the equivalent `*#admin@user` tuple
-(write-before-delete). Users retain delete capability after the model update.
-
-The migration is **idempotent** — re-running after a partial migration is safe.
-
-### 4a. Dry run (always run this first)
-
-```bash
-php scripts/migrate-deleter-tuples.php
-```
-
-Review the output. Each line reports what would be written and deleted. An exit code of `0` means all tuples are accounted for.
-
-### 4b. Apply
-
-```bash
-php scripts/migrate-deleter-tuples.php --apply
-```
-
-Confirm that every `deleter` tuple in the store now has a corresponding `admin` tuple, and that the original `deleter` tuples have been removed.
 
 ---
 
