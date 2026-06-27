@@ -90,11 +90,23 @@ README.md
 logs/
 
 # --- RUNTIME CACHE (preserve server-side state) ---
-# Excludes contents only; the directories themselves are created on
-# the server in a pre-rsync SSH-exec step so PHP can still write to
-# them. /cache is the OIDC PSR-6 cache (JWKS + Zitadel roles, used by
-# OidcAuthMiddleware). /public/engineCache is the calendar-engine
-# memoization cache (per-locale Easter, per-version computed
-# calendars; written by EasterHandler and CalendarHandler).
-/cache/*
-/public/engineCache/*
+# Dir-level excludes (no `/*`) so `rsync --delete` never descends into them —
+# which also avoids the "cannot delete non-empty directory" notice. Both dirs
+# are created in the pre-rsync SSH-exec step so PHP can write to them.
+#
+# /cache is the OIDC PSR-6 cache (JWKS + Zitadel roles, OidcAuthMiddleware).
+# public/engineCache memoizes computed calendars; it is PRESERVED across
+# deploys and invalidated by CONTENT, not deletion: CalendarHandler keys the
+# cache path by a hash of the source data (jsondata/sourcedata) + compiled
+# translations (i18n .mo), so a deploy that changes that data lands in a fresh
+# vN-<hash> dir and the engine prunes the stale siblings. A deploy that leaves
+# the data untouched reuses the existing cache.
+/cache/
+/public/engineCache/
+
+# --- DEPLOY RESTART SENTINEL (server-managed) ---
+# After rsync, the deploy drops tmp/restart.txt; a root-side systemd
+# path-watcher on the VPS (litcal-fpm-reload.path) reloads php-fpm so new
+# .mo translations take effect, then removes the file. Exclude the contents
+# so --delete never races the sentinel; the dir is created pre-rsync.
+/tmp/*

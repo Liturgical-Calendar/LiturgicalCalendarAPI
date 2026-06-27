@@ -8,7 +8,6 @@ use LiturgicalCalendar\Api\LocaleDateFormatter;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
 use LiturgicalCalendar\Api\Enum\Ascension;
-use LiturgicalCalendar\Api\Enum\CacheDuration;
 use LiturgicalCalendar\Api\Enum\CalEventAction;
 use LiturgicalCalendar\Api\Enum\CorpusChristi;
 use LiturgicalCalendar\Api\Enum\DateRelation;
@@ -123,13 +122,14 @@ final class CalendarHandler extends AbstractHandler
      * Path to the cache directory. Initialized by handle() before any cache operations.
      * Must be set before calling ensureCachePathExists() or prepareResponseBody().
      */
-    private string $CachePath                 = '';
-    private string $CacheFile                 = '';
-    private string $CacheDuration             = '';
-    private ?string $DioceseName              = null;
-    private ?DiocesanData $DiocesanData       = null;
-    private ?NationalData $NationalData       = null;
-    private ?WiderRegionData $WiderRegionData = null;
+    private string $CachePath = '';
+    private string $CacheFile = '';
+    /** Per-process memo of the source-data cache version. {@see self::computeEngineCacheDataVersion()} */
+    private static ?string $engineCacheDataVersion = null;
+    private ?string $DioceseName                   = null;
+    private ?DiocesanData $DiocesanData            = null;
+    private ?NationalData $NationalData            = null;
+    private ?WiderRegionData $WiderRegionData      = null;
     private PropriumDeTemporeMap $PropriumDeTempore;
     private MissalsMap $missalsMap;
     private DecreeItemCollection $decreeItems;
@@ -311,8 +311,7 @@ final class CalendarHandler extends AbstractHandler
     public function __construct(array $requestPathParams = [])
     {
         parent::__construct($requestPathParams);
-        $this->startTime     = hrtime(true);
-        $this->CacheDuration = '_' . CacheDuration::MONTH->value . date('m');
+        $this->startTime = hrtime(true);
     }
 
 
@@ -457,7 +456,8 @@ final class CalendarHandler extends AbstractHandler
      * This function will determine if a cache file is available for the current request.
      * This is done by checking if a file exists in the engine cache directory with the
      * name of the md5 hash of the serialized CalendarParams object, followed by the
-     * CacheDuration (in minutes) and the ReturnType of the request.
+     * ReturnType of the request. Invalidation is handled by the cache directory itself,
+     * which is keyed by the API version and a hash of the source data (see handle()).
      *
      * @return bool true if a cache file is available, false otherwise
      */
@@ -469,7 +469,7 @@ final class CalendarHandler extends AbstractHandler
 
         $paramsHash              = md5(serialize($this->CalendarParams));
         Utilities::$HASH_REQUEST = $paramsHash;
-        $cacheFileName           = $paramsHash . $this->CacheDuration . '.' . strtolower($this->CalendarParams->ReturnType->value);
+        $cacheFileName           = $paramsHash . '.' . strtolower($this->CalendarParams->ReturnType->value);
         $this->CacheFile         = $this->CachePath . $cacheFileName;
         return file_exists($this->CacheFile);
     }
@@ -607,7 +607,8 @@ final class CalendarHandler extends AbstractHandler
             throw new ServiceUnavailableException($description);
         }
 
-        if (false === mkdir($cachePath, 0755, true) && false === is_dir($cachePath)) {
+        $created = mkdir($cachePath, 0755, true);
+        if (false === $created && false === is_dir($cachePath)) {
             $description = sprintf(
                 'Could not create cache folder: %s. Please ensure the path is writable.',
                 $cachePath
@@ -615,8 +616,124 @@ final class CalendarHandler extends AbstractHandler
             throw new ServiceUnavailableException($description);
         }
 
+        // A freshly-created versioned dir means the source-data version (or API
+        // version) changed; sibling vN-* dirs are now stale (their key will never
+        // be requested again), so prune them to bound cache growth across deploys.
+        if (true === $created) {
+            self::pruneStaleEngineCacheVersions($cachePath);
+        }
+
         // Normalize CachePath with trailing separator for consistent usage
         $this->CachePath = $cachePath . DIRECTORY_SEPARATOR;
+    }
+
+    /**
+     * Short content fingerprint of the data that determines calendar output:
+     * the source JSON (jsondata/sourcedata) and the compiled gettext catalogs
+     * (i18n .mo files, which supply the translated event names baked into the
+     * cached response body). It is appended to the engine cache path so the
+     * cache is preserved across deploys that leave this data untouched and is
+     * automatically invalidated when a deploy changes it. Computed once per
+     * worker — the data does not change within a process lifetime.
+     */
+    private static function engineCacheDataVersion(): string
+    {
+        if (null === self::$engineCacheDataVersion) {
+            $root                         = Router::$apiFilePath;
+            self::$engineCacheDataVersion = self::computeEngineCacheDataVersion(
+                [
+                    $root . 'jsondata/sourcedata' => 'json',
+                    $root . 'i18n'                => 'mo',
+                ],
+                $root
+            );
+        }
+        return self::$engineCacheDataVersion;
+    }
+
+    /**
+     * Pure, deterministic 12-hex digest of every file with the given extension
+     * under each directory, keyed by its path relative to $root (so the digest
+     * is stable across deploy locations such as api/dev vs api/v5).
+     *
+     * Exposed for testing; production callers use {@see self::engineCacheDataVersion()}.
+     *
+     * @param array<string,string> $dirsByExtension absolute directory => file extension to include
+     */
+    public static function computeEngineCacheDataVersion(array $dirsByExtension, string $root): string
+    {
+        $entries = [];
+        foreach ($dirsByExtension as $dir => $extension) {
+            if (false === is_dir($dir)) {
+                continue;
+            }
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS)
+            );
+            foreach ($iterator as $fileInfo) {
+                if (false === ( $fileInfo instanceof \SplFileInfo ) || false === $fileInfo->isFile()) {
+                    continue;
+                }
+                if (strtolower($fileInfo->getExtension()) !== $extension) {
+                    continue;
+                }
+                $absolute = $fileInfo->getPathname();
+                $digest   = hash_file('sha256', $absolute);
+                if (false === $digest) {
+                    continue;
+                }
+                $relative           = str_starts_with($absolute, $root)
+                    ? substr($absolute, strlen($root))
+                    : $absolute;
+                $entries[$relative] = $digest;
+            }
+        }
+        ksort($entries);
+        $payload = '';
+        foreach ($entries as $relative => $digest) {
+            $payload .= $relative . ':' . $digest . "\n";
+        }
+        return substr(hash('sha256', $payload), 0, 12);
+    }
+
+    /**
+     * Remove sibling versioned engine-cache dirs (vN-*) other than $currentVersionDir.
+     * Best-effort: concurrent workers may race, so filesystem errors are ignored.
+     */
+    private static function pruneStaleEngineCacheVersions(string $currentVersionDir): void
+    {
+        $keep     = basename($currentVersionDir);
+        $siblings = glob(dirname($currentVersionDir) . DIRECTORY_SEPARATOR . 'v*', GLOB_ONLYDIR);
+        if (false === $siblings) {
+            return;
+        }
+        foreach ($siblings as $sibling) {
+            if (basename($sibling) !== $keep && is_dir($sibling)) {
+                self::removeDirectoryTree($sibling);
+            }
+        }
+    }
+
+    /**
+     * Recursively delete a directory tree. Best-effort (filesystem errors suppressed).
+     */
+    private static function removeDirectoryTree(string $dir): void
+    {
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+        foreach ($iterator as $fileInfo) {
+            if (false === ( $fileInfo instanceof \SplFileInfo )) {
+                continue;
+            }
+            if ($fileInfo->isDir()) {
+                @rmdir($fileInfo->getPathname());
+            } else {
+                @unlink($fileInfo->getPathname());
+            }
+        }
+        @rmdir($dir);
     }
 
     /**
@@ -4287,8 +4404,8 @@ final class CalendarHandler extends AbstractHandler
 
     /**
      * Returns the latest release information from the Liturgical Calendar API
-     * on Github. The response is cached for the amount of time specified in the
-     * CacheDuration property of the class.
+     * on Github. The response is cached under the versioned engine cache dir, so
+     * it is refreshed whenever the API version or source-data hash changes.
      *
      * If the cache file does not exist, it will make a GET request to the Github
      * API to retrieve the latest release. The response is then cached to the
@@ -4300,7 +4417,7 @@ final class CalendarHandler extends AbstractHandler
     private function getGithubReleaseInfo(): \stdClass
     {
         $returnObj          = new \stdClass();
-        $ghReleaseCacheFile = $this->CachePath . 'GHRelease' . $this->CacheDuration . '.json';
+        $ghReleaseCacheFile = $this->CachePath . 'GHRelease.json';
 
         if (file_exists($ghReleaseCacheFile)) {
             /** @var GitHubReleaseInfoSuccess $returnObj */
@@ -4398,10 +4515,10 @@ final class CalendarHandler extends AbstractHandler
      * a string containing an XML representation of the Liturgical Calendar, a YAML representation of the
      * Liturgical Calendar, or an iCal representation of the Liturgical Calendar.
      *
-     * The response is cached for the duration of CacheDuration::LITURGICAL_CALENDAR. If the user requests the
-     * same Liturgical Calendar within this time period, the cached response is returned instead of re-calculating
-     * the Liturgical Calendar. If the file does not exist or is stale, the function will re-calculate the Liturgical
-     * Calendar and cache the response.
+     * The response is cached under a directory keyed by the API version and a hash of the source data
+     * (jsondata/sourcedata + i18n .mo), so the same request returns the cached response until that data
+     * changes. If the cache file does not exist, the function re-calculates the Liturgical Calendar and
+     * caches the response.
      */
     private function prepareResponseBody(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
@@ -4624,31 +4741,6 @@ final class CalendarHandler extends AbstractHandler
         }
     }
 
-    /**
-     * Set the cache duration to use for this calendar.
-     *
-     * Sets the cache duration for the calendar to one of the predefined
-     * values in \LiturgicalCalendar\Api\Enum\CacheDuration.
-     *
-     * @param CacheDuration $duration The cache duration to use.
-     */
-    public function setCacheDuration(CacheDuration $duration): void
-    {
-        switch ($duration) {
-            case CacheDuration::DAY:
-                $this->CacheDuration = '_' . $duration->value . date('z'); //The day of the year ( starting from 0 through 365 )
-                break;
-            case CacheDuration::WEEK:
-                $this->CacheDuration = '_' . $duration->value . date('W'); //ISO-8601 week number of year, weeks starting on Monday
-                break;
-            case CacheDuration::MONTH:
-                $this->CacheDuration = '_' . $duration->value . date('m'); //Numeric representation of a month, with leading zeros
-                break;
-            case CacheDuration::YEAR:
-                $this->CacheDuration = '_' . $duration->value . date('Y'); //A full numeric representation of a year, 4 digits
-                break;
-        }
-    }
 
     /**
      * Set the allowed return types.
@@ -5015,7 +5107,8 @@ final class CalendarHandler extends AbstractHandler
         $this->loadNationalCalendarData();
         $this->updateSettingsBasedOnNationalCalendar();
         $this->updateSettingsBasedOnDiocesanCalendar();
-        $this->CachePath = 'engineCache/v' . str_replace('.', '_', self::API_VERSION) . '/';
+        $this->CachePath = 'engineCache/v' . str_replace('.', '_', self::API_VERSION)
+            . '-' . self::engineCacheDataVersion() . '/';
 
         if (false === Router::isLocalhost() && $this->cacheFileIsAvailable()) {
             // If we already have done the calculation

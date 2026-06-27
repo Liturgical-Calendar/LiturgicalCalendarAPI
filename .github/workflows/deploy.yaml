@@ -209,11 +209,12 @@ jobs:
           DEPLOY_PATH: ${{ steps.params.outputs.deploy_path }}
         run: |
           set -euo pipefail
-          remote_cmd=$(printf 'mkdir -p %q %q %q %q' \
+          remote_cmd=$(printf 'mkdir -p %q %q %q %q %q' \
             "${DEPLOY_PATH}" \
             "${DEPLOY_PATH}/cache" \
             "${DEPLOY_PATH}/public/engineCache" \
-            "${DEPLOY_PATH}/logs")
+            "${DEPLOY_PATH}/logs" \
+            "${DEPLOY_PATH}/tmp")
           # Retry on transient SSH failures (connection reset, fail2ban
           # backoff, MaxStartups contention). 3 attempts with 10s/20s
           # backoff — total worst-case wait 30s before giving up.
@@ -341,6 +342,51 @@ jobs:
             -H "X-Deploy-Token: ${DEPLOY_TOKEN}" \
             -H "Accept: text/plain" \
             "${BASE%/}/${SUBDIR}/_ops/migrate"
+
+      - name: Signal php-fpm reload (apply new translations)
+        if: steps.shape.outputs.skip != 'true'
+        env:
+          VPS_USER: ${{ secrets.VPS_USERNAME }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_PORT: ${{ vars.VPS_SSH_PORT || '22' }}
+          DEPLOY_PATH: ${{ steps.params.outputs.deploy_path }}
+        run: |
+          set -euo pipefail
+          # The OPcache reset above clears shared bytecode, but PHP gettext
+          # caches each .mo PER php-fpm worker for the worker's whole lifetime,
+          # so newly-deployed translations stay stale until workers recycle.
+          # The chrooted deploy user can't reload php-fpm, so drop a sentinel:
+          # a root-side systemd path-watcher on the VPS (litcal-fpm-reload.path)
+          # detects tmp/restart.txt, gracefully reloads php-fpm, and removes it.
+          remote_cmd=$(printf 'mkdir -p %q && touch %q' \
+            "${DEPLOY_PATH}/tmp" \
+            "${DEPLOY_PATH}/tmp/restart.txt")
+          # Same 3-attempt 10s/20s backoff as the mkdir/rsync hops above — this
+          # is the last mutating step, so a transient SSH failure would fail an
+          # already-deployed release just because the reload signal didn't land.
+          attempt=1
+          max=3
+          while true; do
+            if ssh -i ~/.ssh/deploy_key -p "${VPS_PORT}" \
+                -o IdentitiesOnly=yes \
+                -o StrictHostKeyChecking=yes \
+                -o UserKnownHostsFile=~/.ssh/known_hosts \
+                -o ConnectTimeout=10 \
+                -o ServerAliveInterval=15 \
+                -o ServerAliveCountMax=2 \
+                "${VPS_USER}@${VPS_HOST}" \
+                "${remote_cmd}"; then
+              break
+            fi
+            if [ "$attempt" -ge "$max" ]; then
+              echo "::error::ssh fpm-reload signal failed after ${max} attempts" >&2
+              exit 1
+            fi
+            delay=$((attempt * 10))
+            echo "::warning::ssh fpm-reload signal attempt ${attempt} failed; retrying in ${delay}s..." >&2
+            sleep "$delay"
+            attempt=$((attempt + 1))
+          done
 
       - name: Post-deploy health check
         if: steps.shape.outputs.skip != 'true'
