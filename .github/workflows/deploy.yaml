@@ -361,15 +361,32 @@ jobs:
           remote_cmd=$(printf 'mkdir -p %q && touch %q' \
             "${DEPLOY_PATH}/tmp" \
             "${DEPLOY_PATH}/tmp/restart.txt")
-          ssh -i ~/.ssh/deploy_key -p "${VPS_PORT}" \
-            -o IdentitiesOnly=yes \
-            -o StrictHostKeyChecking=yes \
-            -o UserKnownHostsFile=~/.ssh/known_hosts \
-            -o ConnectTimeout=10 \
-            -o ServerAliveInterval=15 \
-            -o ServerAliveCountMax=2 \
-            "${VPS_USER}@${VPS_HOST}" \
-            "${remote_cmd}"
+          # Same 3-attempt 10s/20s backoff as the mkdir/rsync hops above — this
+          # is the last mutating step, so a transient SSH failure would fail an
+          # already-deployed release just because the reload signal didn't land.
+          attempt=1
+          max=3
+          while true; do
+            if ssh -i ~/.ssh/deploy_key -p "${VPS_PORT}" \
+                -o IdentitiesOnly=yes \
+                -o StrictHostKeyChecking=yes \
+                -o UserKnownHostsFile=~/.ssh/known_hosts \
+                -o ConnectTimeout=10 \
+                -o ServerAliveInterval=15 \
+                -o ServerAliveCountMax=2 \
+                "${VPS_USER}@${VPS_HOST}" \
+                "${remote_cmd}"; then
+              break
+            fi
+            if [ "$attempt" -ge "$max" ]; then
+              echo "::error::ssh fpm-reload signal failed after ${max} attempts" >&2
+              exit 1
+            fi
+            delay=$((attempt * 10))
+            echo "::warning::ssh fpm-reload signal attempt ${attempt} failed; retrying in ${delay}s..." >&2
+            sleep "$delay"
+            attempt=$((attempt + 1))
+          done
 
       - name: Post-deploy health check
         if: steps.shape.outputs.skip != 'true'

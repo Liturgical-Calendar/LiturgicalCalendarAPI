@@ -110,6 +110,29 @@ final class CalendarHandlerCacheVersionTest extends TestCase
         }
     }
 
+    public function testPruneRemovesStaleVersionDirsKeepingCurrentAndNonVersioned(): void
+    {
+        $base = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'litcal-prune-' . bin2hex(random_bytes(6));
+        mkdir($base . '/v5_7-aaaaaaaaaaaa/sub', 0777, true);
+        mkdir($base . '/v5_7-bbbbbbbbbbbb', 0777, true);
+        mkdir($base . '/v5_7-cccccccccccc', 0777, true);
+        mkdir($base . '/easter', 0777, true);
+        file_put_contents($base . '/v5_7-aaaaaaaaaaaa/sub/calendar.json', '{}');
+        file_put_contents($base . '/easter/it.json', '{}');
+
+        $current = $base . '/v5_7-bbbbbbbbbbbb';
+        $prune   = new \ReflectionMethod(CalendarHandler::class, 'pruneStaleEngineCacheVersions');
+        try {
+            $prune->invoke(null, $current);
+            self::assertDirectoryExists($current, 'current version dir is kept');
+            self::assertDirectoryExists($base . '/easter', 'non-versioned sibling is kept');
+            self::assertDirectoryDoesNotExist($base . '/v5_7-aaaaaaaaaaaa', 'stale version dir is pruned recursively');
+            self::assertDirectoryDoesNotExist($base . '/v5_7-cccccccccccc', 'stale version dir is pruned');
+        } finally {
+            $this->removeTree($base);
+        }
+    }
+
     private function removeTree(string $dir): void
     {
         if (false === is_dir($dir)) {
