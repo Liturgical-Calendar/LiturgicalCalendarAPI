@@ -24,11 +24,17 @@ use LiturgicalCalendar\Api\Services\Outbox\RedisStreamConsumer;
 $root = dirname(__DIR__);
 require $root . '/vendor/autoload.php';
 
-if (file_exists($root . '/.env.local')) {
-    Dotenv::createImmutable($root, '.env.local')->safeLoad();
-} elseif (file_exists($root . '/.env')) {
-    Dotenv::createImmutable($root)->safeLoad();
-}
+// Load the same env-file chain as public/index.php so this CLI picks up the
+// environment-specific file (.env.staging, .env.production, …) and not just
+// .env.local. Dotenv populates $_ENV itself, which matters here because PHP
+// CLI may run with variables_order=GPCS (no 'E'): a systemd EnvironmentFile or
+// exported shell vars would NOT reach $_ENV, so the entrypoint must read its
+// configuration from the files directly.
+Dotenv::createImmutable(
+    $root,
+    ['.env', '.env.local', '.env.development', '.env.test', '.env.staging', '.env.production'],
+    false
+)->safeLoad();
 
 $mode = $argv[1] ?? '';
 if ($mode !== 'consumer' && $mode !== 'backstop') {
