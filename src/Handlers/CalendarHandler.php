@@ -678,7 +678,7 @@ final class CalendarHandler extends AbstractHandler
                     continue;
                 }
                 $absolute = $fileInfo->getPathname();
-                $digest   = md5_file($absolute);
+                $digest   = hash_file('sha256', $absolute);
                 if (false === $digest) {
                     continue;
                 }
