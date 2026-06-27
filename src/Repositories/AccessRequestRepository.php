@@ -396,11 +396,13 @@ class AccessRequestRepository
      * yet, #669); rejects unknown/private-use codes (ZZ, XX), supranational
      * codes (EU, EZ, QO, UN), lowercase, and arbitrary strings.
      *
-     * Public so the create path (`RegionalDataHandler::createNationalCalendar`)
-     * can gate `PUT /data/nation` with the SAME validator the access-request
-     * flow uses — keeping the two flows consistent.
+     * The set MUST stay identical to the `Nation` enum in
+     * `jsondata/schemas/CommonDef.json` — that schema validates the create path
+     * (`PUT /data/nation`), so keeping the two in lock-step is what makes the
+     * access-request and create flows consistent. `AccessRequestRepositoryTest`
+     * asserts the two sets match so they cannot drift.
      */
-    public static function isValidNationCode(string $code): bool
+    private static function isValidNationCode(string $code): bool
     {
         return isset(self::ISO_3166_1_ALPHA2[$code]);
     }

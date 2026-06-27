@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Handlers\RegionalDataHandler;
 use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Repositories\OutboxBatchInsertInterface;
+use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -191,6 +192,81 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
      * rejects nations still in use by diocesan calendars passes cleanly.
      * The HR files are backed up before the test and restored in tearDown.
      */
+    public function testCreateNationalCalendarRejectsNonIsoNationCode(): void
+    {
+        // 'ZZ' passes NationalMetadata's [A-Z]{2} format check but is NOT an
+        // assigned ISO 3166-1 alpha-2 code, so the create gate must reject it
+        // (the same validator the access-request flow uses).
+        $payload = [
+            'litcal'   => [
+                [
+                    'liturgical_event' => ['event_key' => 'StGeorgeMartyr', 'grade' => 4],
+                    'metadata'         => ['action' => 'makePatron', 'since_year' => 1868, 'url' => 'https://www.vatican.va/'],
+                ],
+            ],
+            'settings' => [
+                'epiphany'               => 'JAN6',
+                'ascension'              => 'SUNDAY',
+                'corpus_christi'         => 'SUNDAY',
+                'eternal_high_priest'    => false,
+                'holydays_of_obligation' => [
+                    'Christmas'            => true,
+                    'Epiphany'             => false,
+                    'Ascension'            => false,
+                    'CorpusChristi'        => false,
+                    'MaryMotherOfGod'      => true,
+                    'ImmaculateConception' => true,
+                    'Assumption'           => true,
+                    'StJoseph'             => false,
+                    'StsPeterPaulAp'       => false,
+                    'AllSaints'            => false,
+                ],
+            ],
+            'metadata' => [
+                'nation'  => 'ZZ',
+                'missals' => ['IT_1983'],
+                'locales' => ['en'],
+            ],
+            'i18n'     => [
+                'en' => ['StGeorgeMartyr' => 'Saint George, Martyr'],
+            ],
+        ];
+
+        $this->expectException(UnprocessableContentException::class);
+        ( new RegionalDataHandler(['nation']) )->handle($this->requestFor('PUT', '/data/nation', [], $payload));
+    }
+
+    public function testDeletePurgeFailureDoesNotFailDeletion(): void
+    {
+        // Same HR fixture approach as testDeleteCalendarPurgesOperationalTuples;
+        // tearDown restores the files from these saved contents.
+        $base              = Router::$apiFilePath . 'jsondata/sourcedata/calendars/nations/HR';
+        $this->hrNationDir = $base;
+        $this->hrJsonPath  = $base . '/HR.json';
+        $this->hrI18nDir   = $base . '/i18n';
+        $this->hrI18nPath  = $base . '/i18n/hr_HR.json';
+
+        $hrJsonContent = file_get_contents($this->hrJsonPath);
+        $hrI18nContent = file_get_contents($this->hrI18nPath);
+        if ($hrJsonContent === false || $hrI18nContent === false) {
+            $this->markTestSkipped('HR national-calendar fixture files not found; skipping purge-failure test.');
+        }
+        $this->hrJsonContent = $hrJsonContent;
+        $this->hrI18nContent = $hrI18nContent;
+
+        // The purge throws, but the calendar files are already deleted — the DELETE
+        // must still succeed (200); the failure is logged and the reconciler retries.
+        $purge = $this->createStub(ResourceTuplePurgeServiceInterface::class);
+        $purge->method('purgeForObject')->willThrowException(new \RuntimeException('FGA unavailable'));
+
+        $handler = new RegionalDataHandler(['nation', 'HR']);
+        $handler->setPurgeService($purge);
+
+        $response = $handler->handle($this->requestFor('DELETE', '/data/nation/HR'));
+
+        self::assertSame(200, $response->getStatusCode());
+    }
+
     public function testDeleteCalendarPurgesOperationalTuples(): void
     {
         // --- Arrange: save fixture files so tearDown can restore them --------
@@ -325,12 +401,40 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
             ],
         ];
 
-        // --- Act: issue PUT (bypasses JWT middleware — in-process) -----------
-        $request  = $this->requestFor('PUT', '/data/nation', [], $payload);
-        $response = $handler->handle($request);
+        // Force OpenFGA "configured" so the create-sync transaction + processSync
+        // branches execute (CI does not configure OpenFGA, so they would otherwise
+        // be skipped). Requires Postgres for the outbox PDO; skip cleanly if absent.
+        try {
+            Connection::getInstance();
+        } catch (\Throwable) {
+            $this->markTestSkipped('Postgres not available for the create-sync coverage path.');
+        }
+        $fake  = ['OPENFGA_API_URL' => 'http://localhost:8080', 'OPENFGA_STORE_ID' => 'store-test', 'OPENFGA_MODEL_ID' => 'model-test'];
+        $saved = [];
+        foreach ($fake as $k => $v) {
+            $saved[$k] = [array_key_exists($k, $_ENV) ? (string) $_ENV[$k] : null, getenv($k)];
+            $_ENV[$k]  = $v;
+            putenv("{$k}={$v}");
+        }
 
-        // --- Assert ----------------------------------------------------------
-        self::assertContains($response->getStatusCode(), [200, 201]);
-        // insertBatch assertion is enforced by the mock expectation above
+        try {
+            // --- Act: issue PUT (bypasses JWT middleware — in-process) -------
+            $response = $handler->handle($this->requestFor('PUT', '/data/nation', [], $payload));
+            self::assertContains($response->getStatusCode(), [200, 201]);
+            // insertBatch assertion is enforced by the mock expectation above
+        } finally {
+            foreach ($saved as $k => [$envVal, $getenvVal]) {
+                if ($envVal === null) {
+                    unset($_ENV[$k]);
+                } else {
+                    $_ENV[$k] = $envVal;
+                }
+                if ($getenvVal === false) {
+                    putenv($k);
+                } else {
+                    putenv("{$k}={$getenvVal}");
+                }
+            }
+        }
     }
 }

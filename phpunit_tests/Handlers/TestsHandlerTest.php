@@ -91,6 +91,45 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
      * created before the test runs; after a successful DELETE the file is gone.
      * tearDown removes the file if the test fails before the DELETE executes.
      */
+    public function testDeleteRejectsWrongPathParamCount(): void
+    {
+        $this->expectException(ValidationException::class);
+        ( new TestsHandler(['a', 'b']) )->handle($this->requestFor('DELETE', '/tests/a/b'));
+    }
+
+    public function testDeleteUnknownOrUnsafeNameReturnsNotFound(): void
+    {
+        // TestScopeResolver::resolve() returns null for a non-existent (or unsafe
+        // path-traversal) name, so the handler must 404 and never reach unlink().
+        $name = 'NoSuchTest_' . bin2hex(random_bytes(4));
+        $this->expectException(NotFoundException::class);
+        ( new TestsHandler([$name]) )->handle($this->requestFor('DELETE', "/tests/{$name}"));
+    }
+
+    public function testDeletePurgeFailureDoesNotFailDeletion(): void
+    {
+        $testName              = 'PurgeFailFixture_' . bin2hex(random_bytes(6));
+        $fixturePath           = JsonData::TESTS_FOLDER->path() . DIRECTORY_SEPARATOR . $testName . '.json';
+        $this->testFixturePath = $fixturePath;
+        file_put_contents($fixturePath, json_encode(
+            ['name' => $testName, 'applies_to' => ['national_calendar' => 'US']],
+            JSON_THROW_ON_ERROR
+        ));
+
+        // The purge throws, but the file is already deleted — the DELETE must
+        // still succeed (204); the failure is logged and the reconciler retries.
+        $purge = $this->createStub(ResourceTuplePurgeServiceInterface::class);
+        $purge->method('purgeForObject')->willThrowException(new \RuntimeException('FGA unavailable'));
+
+        $handler = new TestsHandler([$testName]);
+        $handler->setPurgeService($purge);
+
+        $response = $handler->handle($this->requestFor('DELETE', "/tests/{$testName}"));
+
+        self::assertSame(204, $response->getStatusCode());
+        $this->testFixturePath = null; // handler already removed the file
+    }
+
     public function testDeletePurgesScopedTestOperationalTuples(): void
     {
         // --- Arrange: create a temp fixture that TestScopeResolver maps to national_calendar_test:US ---
