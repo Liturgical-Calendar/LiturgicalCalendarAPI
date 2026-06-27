@@ -219,10 +219,15 @@ final class TestsHandler extends AbstractHandler
             try {
                 $purge->purgeForObject("{$scopeType}:{$scopeId}");
             } catch (\Throwable $e) {
-                LoggerFactory::create('audit', null, 90, false, true, false)->warning(
-                    'TestsHandler: post-delete tuple purge failed; reconciler will retry',
-                    ['object' => "{$scopeType}:{$scopeId}", 'error' => $e->getMessage()]
-                );
+                try {
+                    LoggerFactory::create('audit', null, 90, false, true, false)->warning(
+                        'TestsHandler: post-delete tuple purge failed; reconciler will retry',
+                        ['object' => "{$scopeType}:{$scopeId}", 'error' => $e->getMessage()]
+                    );
+                } catch (\Throwable) {
+                    // Logging is best-effort too; a logger/audit failure must never
+                    // fail a DELETE whose file has already been removed.
+                }
             }
         }
 

@@ -28,6 +28,7 @@ use LiturgicalCalendar\Api\Http\Exception\ResourceConflictException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use LiturgicalCalendar\Api\Http\Negotiator;
 use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
@@ -426,6 +427,16 @@ final class RegionalDataHandler extends AbstractHandler
         }
 
         $nation = $payload->metadata->nation;
+
+        // Gate the create path with the SAME ISO 3166-1 alpha-2 validator the
+        // access-request flow uses, so a code is validated identically in both
+        // places (a system admin, who bypasses OpenFGA, cannot create a calendar
+        // for a non-ISO code such as EU/XK/ZZ that the governance layer rejects).
+        if (false === AccessRequestRepository::isValidNationCode($nation)) {
+            throw new UnprocessableContentException(
+                "Invalid nation identifier $nation. Expected an ISO 3166-1 alpha-2 country code."
+            );
+        }
 
         // Ensure we have all the necessary folders in place
         // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
@@ -1127,10 +1138,14 @@ final class RegionalDataHandler extends AbstractHandler
             try {
                 $purge->purgeForObject("{$objectType}:{$this->params->key}");
             } catch (\Throwable $e) {
-                $this->auditLogger->warning(
-                    'Post-delete tuple purge failed; reconciler will retry',
-                    ['object' => "{$objectType}:{$this->params->key}", 'error' => $e->getMessage()]
-                );
+                try {
+                    $this->auditLogger->warning(
+                        'Post-delete tuple purge failed; reconciler will retry',
+                        ['object' => "{$objectType}:{$this->params->key}", 'error' => $e->getMessage()]
+                    );
+                } catch (\Throwable) {
+                    // Logging is best-effort too; never fail a completed deletion.
+                }
             }
         }
 

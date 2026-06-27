@@ -395,8 +395,12 @@ class AccessRequestRepository
      * Accepts prospective nations (a valid code whose calendar does not exist
      * yet, #669); rejects unknown/private-use codes (ZZ, XX), supranational
      * codes (EU, EZ, QO, UN), lowercase, and arbitrary strings.
+     *
+     * Public so the create path (`RegionalDataHandler::createNationalCalendar`)
+     * can gate `PUT /data/nation` with the SAME validator the access-request
+     * flow uses — keeping the two flows consistent.
      */
-    private static function isValidNationCode(string $code): bool
+    public static function isValidNationCode(string $code): bool
     {
         return isset(self::ISO_3166_1_ALPHA2[$code]);
     }
