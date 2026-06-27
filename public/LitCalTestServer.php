@@ -84,7 +84,7 @@ if (
                 getmypid(),
                 bin2hex(random_bytes(8))
             );
-            @file_put_contents($file, serialize($data), LOCK_EX);
+            @file_put_contents($file, json_encode($data, JSON_THROW_ON_ERROR), LOCK_EX);
         } catch (\Throwable) {
             // Coverage instrumentation must never crash the server. Swallow.
         }

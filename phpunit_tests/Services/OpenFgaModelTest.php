@@ -16,32 +16,55 @@ class OpenFgaModelTest extends TestCase
         return $model;
     }
 
-    public function testGeneralRomanCalendarTypeExistsWithStandardRelations(): void
+    public function testNoTypeDefinesDeleter(): void
     {
         $model = $this->loadModel();
-        $types = [];
         foreach ($model['type_definitions'] as $def) {
-            $types[$def['type']] = $def;
-        }
-
-        self::assertArrayHasKey('general_roman_calendar', $types);
-        $grc = $types['general_roman_calendar'];
-        foreach (['admin', 'viewer', 'editor', 'deleter'] as $relation) {
-            self::assertArrayHasKey($relation, $grc['relations']);
-            self::assertSame(
-                [['type' => 'user']],
-                $grc['metadata']['relations'][$relation]['directly_related_user_types']
+            if (!isset($def['relations'])) {
+                continue;
+            }
+            self::assertArrayNotHasKey('deleter', $def['relations'], "{$def['type']} still defines deleter");
+            self::assertArrayNotHasKey(
+                'deleter',
+                $def['metadata']['relations'] ?? [],
+                "{$def['type']} still has deleter metadata"
             );
         }
     }
 
-    public function testScopedTestTypesPresentWithFourRelations(): void
+    public function testEditorAndViewerAreUnionsOfAdmin(): void
     {
         $model = $this->loadModel();
         $types = array_column($model['type_definitions'], 'relations', 'type');
-        foreach (['national_calendar_test', 'diocesan_calendar_test', 'general_roman_calendar_test'] as $t) {
-            $this->assertArrayHasKey($t, $types, "missing type $t");
-            $this->assertSame(['admin', 'viewer', 'editor', 'deleter'], array_keys($types[$t]));
+        foreach (['national_calendar', 'diocesan_calendar', 'wider_region', 'general_roman_calendar'] as $t) {
+            $editorChildren = $types[$t]['editor']['union']['child'];
+            self::assertContains(['this' => []], $editorChildren, "$t editor missing this");
+            self::assertContains(['computedUserset' => ['relation' => 'admin']], $editorChildren, "$t editor missing admin");
+
+            $viewerChildren = $types[$t]['viewer']['union']['child'];
+            self::assertContains(['computedUserset' => ['relation' => 'editor']], $viewerChildren, "$t viewer missing editor");
+            self::assertContains(['computedUserset' => ['relation' => 'admin']], $viewerChildren, "$t viewer missing admin");
         }
+    }
+
+    public function testWiderRegionHasMemberNationTtu(): void
+    {
+        $model = $this->loadModel();
+        $types = array_column($model['type_definitions'], 'relations', 'type');
+        $meta  = array_column($model['type_definitions'], 'metadata', 'type');
+
+        self::assertArrayHasKey('member_nation', $types['wider_region']);
+        self::assertSame(
+            [['type' => 'national_calendar']],
+            $meta['wider_region']['relations']['member_nation']['directly_related_user_types']
+        );
+
+        $adminChildren = $types['wider_region']['admin']['union']['child'];
+        self::assertContains([
+            'tupleToUserset' => [
+                'tupleset'        => ['relation' => 'member_nation'],
+                'computedUserset' => ['relation' => 'admin'],
+            ],
+        ], $adminChildren, 'wider_region admin missing member_nation TTU');
     }
 }

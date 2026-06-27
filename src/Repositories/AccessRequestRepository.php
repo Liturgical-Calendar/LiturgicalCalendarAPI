@@ -39,7 +39,15 @@ class AccessRequestRepository
     /**
      * Valid OpenFGA relations on permission tuples.
      */
-    public const VALID_RELATIONS = ['admin', 'viewer', 'editor', 'deleter'];
+    public const VALID_RELATIONS = ['admin', 'viewer', 'editor'];
+
+    /**
+     * Operational relations (everything except governance `admin`). Purged when a
+     * resource's data is deleted; `admin` survives (it authorizes recreation).
+     *
+     * @var list<string>
+     */
+    public const OPERATIONAL_RELATIONS = ['viewer', 'editor'];
 
     /**
      * The fixed, enumerated set of object IDs valid for the general_roman_calendar type.
@@ -104,7 +112,299 @@ class AccessRequestRepository
             return $objectId === 'general_roman_calendar';
         }
 
+        if ($objectType === 'national_calendar') {
+            return self::isValidNationCode($objectId);
+        }
+
         return $objectId !== '';
+    }
+
+    /**
+     * Valid ISO 3166-1 alpha-2 region code (per ICU), including the special VA.
+     *
+     * Accepts prospective nations (a valid code whose calendar does not exist
+     * yet) so a national liturgy office can request `admin` to create it (#669);
+     * rejects unknown/private-use codes (ZZ, XX), lowercase, and arbitrary strings.
+     */
+    /**
+     * Officially-assigned ISO 3166-1 alpha-2 country codes (incl. VA / Holy See).
+     *
+     * Used to validate `national_calendar` object ids. ICU's
+     * `Locale::getDisplayRegion()` also resolves supranational and
+     * exceptionally-reserved codes (EU, EZ, QO, UN, UK, AC, TA, …) that are NOT
+     * countries, so we validate against this canonical list rather than CLDR
+     * display names.
+     *
+     * @var array<string, true>
+     */
+    private const ISO_3166_1_ALPHA2 = [
+        'AD' => true,
+        'AE' => true,
+        'AF' => true,
+        'AG' => true,
+        'AI' => true,
+        'AL' => true,
+        'AM' => true,
+        'AO' => true,
+        'AQ' => true,
+        'AR' => true,
+        'AS' => true,
+        'AT' => true,
+        'AU' => true,
+        'AW' => true,
+        'AX' => true,
+        'AZ' => true,
+        'BA' => true,
+        'BB' => true,
+        'BD' => true,
+        'BE' => true,
+        'BF' => true,
+        'BG' => true,
+        'BH' => true,
+        'BI' => true,
+        'BJ' => true,
+        'BL' => true,
+        'BM' => true,
+        'BN' => true,
+        'BO' => true,
+        'BQ' => true,
+        'BR' => true,
+        'BS' => true,
+        'BT' => true,
+        'BV' => true,
+        'BW' => true,
+        'BY' => true,
+        'BZ' => true,
+        'CA' => true,
+        'CC' => true,
+        'CD' => true,
+        'CF' => true,
+        'CG' => true,
+        'CH' => true,
+        'CI' => true,
+        'CK' => true,
+        'CL' => true,
+        'CM' => true,
+        'CN' => true,
+        'CO' => true,
+        'CR' => true,
+        'CU' => true,
+        'CV' => true,
+        'CW' => true,
+        'CX' => true,
+        'CY' => true,
+        'CZ' => true,
+        'DE' => true,
+        'DJ' => true,
+        'DK' => true,
+        'DM' => true,
+        'DO' => true,
+        'DZ' => true,
+        'EC' => true,
+        'EE' => true,
+        'EG' => true,
+        'EH' => true,
+        'ER' => true,
+        'ES' => true,
+        'ET' => true,
+        'FI' => true,
+        'FJ' => true,
+        'FK' => true,
+        'FM' => true,
+        'FO' => true,
+        'FR' => true,
+        'GA' => true,
+        'GB' => true,
+        'GD' => true,
+        'GE' => true,
+        'GF' => true,
+        'GG' => true,
+        'GH' => true,
+        'GI' => true,
+        'GL' => true,
+        'GM' => true,
+        'GN' => true,
+        'GP' => true,
+        'GQ' => true,
+        'GR' => true,
+        'GS' => true,
+        'GT' => true,
+        'GU' => true,
+        'GW' => true,
+        'GY' => true,
+        'HK' => true,
+        'HM' => true,
+        'HN' => true,
+        'HR' => true,
+        'HT' => true,
+        'HU' => true,
+        'ID' => true,
+        'IE' => true,
+        'IL' => true,
+        'IM' => true,
+        'IN' => true,
+        'IO' => true,
+        'IQ' => true,
+        'IR' => true,
+        'IS' => true,
+        'IT' => true,
+        'JE' => true,
+        'JM' => true,
+        'JO' => true,
+        'JP' => true,
+        'KE' => true,
+        'KG' => true,
+        'KH' => true,
+        'KI' => true,
+        'KM' => true,
+        'KN' => true,
+        'KP' => true,
+        'KR' => true,
+        'KW' => true,
+        'KY' => true,
+        'KZ' => true,
+        'LA' => true,
+        'LB' => true,
+        'LC' => true,
+        'LI' => true,
+        'LK' => true,
+        'LR' => true,
+        'LS' => true,
+        'LT' => true,
+        'LU' => true,
+        'LV' => true,
+        'LY' => true,
+        'MA' => true,
+        'MC' => true,
+        'MD' => true,
+        'ME' => true,
+        'MF' => true,
+        'MG' => true,
+        'MH' => true,
+        'MK' => true,
+        'ML' => true,
+        'MM' => true,
+        'MN' => true,
+        'MO' => true,
+        'MP' => true,
+        'MQ' => true,
+        'MR' => true,
+        'MS' => true,
+        'MT' => true,
+        'MU' => true,
+        'MV' => true,
+        'MW' => true,
+        'MX' => true,
+        'MY' => true,
+        'MZ' => true,
+        'NA' => true,
+        'NC' => true,
+        'NE' => true,
+        'NF' => true,
+        'NG' => true,
+        'NI' => true,
+        'NL' => true,
+        'NO' => true,
+        'NP' => true,
+        'NR' => true,
+        'NU' => true,
+        'NZ' => true,
+        'OM' => true,
+        'PA' => true,
+        'PE' => true,
+        'PF' => true,
+        'PG' => true,
+        'PH' => true,
+        'PK' => true,
+        'PL' => true,
+        'PM' => true,
+        'PN' => true,
+        'PR' => true,
+        'PS' => true,
+        'PT' => true,
+        'PW' => true,
+        'PY' => true,
+        'QA' => true,
+        'RE' => true,
+        'RO' => true,
+        'RS' => true,
+        'RU' => true,
+        'RW' => true,
+        'SA' => true,
+        'SB' => true,
+        'SC' => true,
+        'SD' => true,
+        'SE' => true,
+        'SG' => true,
+        'SH' => true,
+        'SI' => true,
+        'SJ' => true,
+        'SK' => true,
+        'SL' => true,
+        'SM' => true,
+        'SN' => true,
+        'SO' => true,
+        'SR' => true,
+        'SS' => true,
+        'ST' => true,
+        'SV' => true,
+        'SX' => true,
+        'SY' => true,
+        'SZ' => true,
+        'TC' => true,
+        'TD' => true,
+        'TF' => true,
+        'TG' => true,
+        'TH' => true,
+        'TJ' => true,
+        'TK' => true,
+        'TL' => true,
+        'TM' => true,
+        'TN' => true,
+        'TO' => true,
+        'TR' => true,
+        'TT' => true,
+        'TV' => true,
+        'TW' => true,
+        'TZ' => true,
+        'UA' => true,
+        'UG' => true,
+        'UM' => true,
+        'US' => true,
+        'UY' => true,
+        'UZ' => true,
+        'VA' => true,
+        'VC' => true,
+        'VE' => true,
+        'VG' => true,
+        'VI' => true,
+        'VN' => true,
+        'VU' => true,
+        'WF' => true,
+        'WS' => true,
+        'YE' => true,
+        'YT' => true,
+        'ZA' => true,
+        'ZM' => true,
+        'ZW' => true,
+    ];
+
+    /**
+     * True iff `$code` is an officially-assigned ISO 3166-1 alpha-2 country code.
+     *
+     * Accepts prospective nations (a valid code whose calendar does not exist
+     * yet, #669); rejects unknown/private-use codes (ZZ, XX), supranational
+     * codes (EU, EZ, QO, UN), lowercase, and arbitrary strings.
+     *
+     * The set MUST stay identical to the `Nation` enum in
+     * `jsondata/schemas/CommonDef.json` — that schema validates the create path
+     * (`PUT /data/nation`), so keeping the two in lock-step is what makes the
+     * access-request and create flows consistent. `AccessRequestRepositoryTest`
+     * asserts the two sets match so they cannot drift.
+     */
+    private static function isValidNationCode(string $code): bool
+    {
+        return isset(self::ISO_3166_1_ALPHA2[$code]);
     }
 
     /**

@@ -8,6 +8,11 @@ use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 use LiturgicalCalendar\Api\Handlers\Auth\ClientIpTrait;
+use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesOutboxTooling;
+use LiturgicalCalendar\Api\Repositories\OutboxRepository;
+use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
+use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
 use LiturgicalCalendar\Api\JsonFormatter;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
@@ -56,6 +61,7 @@ use Nyholm\Psr7\Stream;
 final class RegionalDataHandler extends AbstractHandler
 {
     use ClientIpTrait;
+    use ResolvesOutboxTooling;
 
     private readonly MetadataCalendars $CalendarsMetadata;
     private RegionalDataParams $params;
@@ -462,6 +468,50 @@ final class RegionalDataHandler extends AbstractHandler
 
         // get the nation name in English from the two letter iso code
         $nationEnglish = \Locale::getDisplayRegion('-' . $nation, 'en');
+
+        // When the payload declares a wider_region, enqueue a WRITE_TUPLE outbox
+        // row so the `national_calendar:<N> member_nation wider_region:<R>` tuple
+        // is propagated to OpenFGA asynchronously (or synchronously when FGA is
+        // available).  The enqueue is also triggered when a test seam repository
+        // has been injected, so unit tests can assert the row without a live DB.
+        $widerRegion = $payload->metadata->wider_region ?? '';
+        if ($widerRegion !== '' && ( OpenFgaClient::isConfigured() || $this->outboxRepository !== null )) {
+            $repo = $this->getOutboxRepository();
+            $row  = [
+                'operation'       => OutboxOperation::WRITE_TUPLE,
+                'fga_user'        => "national_calendar:{$nation}",
+                'fga_relation'    => 'member_nation',
+                'fga_object'      => "wider_region:{$widerRegion}",
+                'idempotency_key' => "member_nation:wider_region:{$widerRegion}:national_calendar:{$nation}",
+                'metadata'        => ['member_nation_seed' => true],
+            ];
+            // Wrap insertBatch in a transaction when a real PDO is available
+            // (i.e. OpenFGA is configured and we are not in a test seam path).
+            $pdo = OpenFgaClient::isConfigured() ? $this->getOutboxPdo() : null;
+            if ($pdo !== null) {
+                $pdo->beginTransaction();
+            }
+            $ids = [];
+            try {
+                $ids = $repo->insertBatch([$row]);
+                if ($pdo !== null) {
+                    $pdo->commit();
+                }
+            } catch (\Throwable $e) {
+                if ($pdo !== null && $pdo->inTransaction()) {
+                    $pdo->rollBack();
+                }
+                throw $e;
+            }
+            // Process synchronously when FGA is configured (fast path).
+            if (OpenFgaClient::isConfigured()) {
+                $fullRepo  = new OutboxRepository($this->getOutboxPdo());
+                $processor = new OutboxProcessor($fullRepo, $this->getFgaClient());
+                foreach ($ids as $id) {
+                    $processor->processSync($id);
+                }
+            }
+        }
 
         // Log successful creation
         $this->auditLogger->info('National calendar created', [
@@ -898,6 +948,21 @@ final class RegionalDataHandler extends AbstractHandler
     }
 
     /**
+     * Map the delete path category to its FGA object type string.
+     *
+     * Every valid {@see PathCategory} maps to an FGA object type; the match
+     * is exhaustive so this always returns a non-empty string.
+     */
+    private function fgaObjectTypeForCategory(): string
+    {
+        return match ($this->params->category) {
+            PathCategory::NATION      => 'national_calendar',
+            PathCategory::DIOCESE     => 'diocesan_calendar',
+            PathCategory::WIDERREGION => 'wider_region',
+        };
+    }
+
+    /**
      * Get the paths for deleting a regional calendar data resource.
      *
      * The return value is an array with two elements:
@@ -1048,6 +1113,29 @@ final class RegionalDataHandler extends AbstractHandler
         } else {
             $description = "The resource '{$this->params->key}' requested for deletion (or the relative i18n folder) was not found on this server.";
             throw new NotFoundException($description);
+        }
+
+        // Purge operational (editor/viewer) FGA tuples orphaned by the file
+        // deletion. The admin (governance) tuple is intentionally retained so
+        // the resource can be recreated without losing ownership.
+        $objectType = $this->fgaObjectTypeForCategory();
+        $purge      = $this->getPurgeService();
+        if ($purge !== null) {
+            // Best-effort: the calendar files are already deleted, so an
+            // OpenFGA/outbox error must NOT fail the completed deletion —
+            // the reconciler sweep cleans up any stragglers.
+            try {
+                $purge->purgeForObject("{$objectType}:{$this->params->key}");
+            } catch (\Throwable $e) {
+                try {
+                    $this->auditLogger->warning(
+                        'Post-delete tuple purge failed; reconciler will retry',
+                        ['object' => "{$objectType}:{$this->params->key}", 'error' => $e->getMessage()]
+                    );
+                } catch (\Throwable) {
+                    // Logging is best-effort too; never fail a completed deletion.
+                }
+            }
         }
 
         // Log successful deletion

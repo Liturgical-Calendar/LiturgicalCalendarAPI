@@ -21,9 +21,9 @@ use Psr\Http\Server\RequestHandlerInterface;
  * write operations on calendar data. Maps HTTP methods and route parameters
  * to OpenFGA relationship checks.
  *
- * Mapping:
- *   PUT/PATCH  → "editor" relation
- *   DELETE     → "deleter" relation
+ * Mapping (default; per-instance override via constructor):
+ *   PUT (create) → "admin"   PATCH (edit) → "editor"   DELETE → "admin"
+ *   Calendar tests override PUT → "editor" (creating a test is an editing act).
  *
  * Object types:
  *   /data/nation/{id}       → national_calendar:{id}
@@ -48,15 +48,19 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
     ];
 
     /**
-     * Map of HTTP method to OpenFGA relation.
+     * Default method→relation map. Create (`PUT`) is a governance act → admin.
+     * Edit (`PATCH`) → editor. Delete → admin (admin is a superset; #668).
      *
      * @var array<string, string>
      */
-    private const RELATION_MAP = [
-        'PUT'    => 'editor',
+    private const DEFAULT_RELATION_MAP = [
+        'PUT'    => 'admin',
         'PATCH'  => 'editor',
-        'DELETE' => 'deleter',
+        'DELETE' => 'admin',
     ];
+
+    /** @var array<string, string> */
+    private array $relationMap;
 
     private OpenFgaClient $client;
 
@@ -89,19 +93,22 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
 
     /**
      * @phpstan-param (\Closure(\Psr\Http\Message\ServerRequestInterface): (array{0: string, 1: string}|null))|null $objectResolver
+     * @param array<string, string>|null $relationMap
      */
     public function __construct(
         OpenFgaClient $client,
         string $objectType,
         string $resourceIdAttribute = 'calendar_id',
         ?string $fixedObjectId = null,
-        ?\Closure $objectResolver = null
+        ?\Closure $objectResolver = null,
+        ?array $relationMap = null
     ) {
         $this->client              = $client;
         $this->objectType          = $objectType;
         $this->resourceIdAttribute = $resourceIdAttribute;
         $this->fixedObjectId       = $fixedObjectId;
         $this->objectResolver      = $objectResolver;
+        $this->relationMap         = $relationMap ?? self::DEFAULT_RELATION_MAP;
     }
 
     /**
@@ -137,7 +144,7 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
 
         // Determine the relation to check based on HTTP method
         $method   = strtoupper($request->getMethod());
-        $relation = self::RELATION_MAP[$method] ?? null;
+        $relation = $this->relationMap[$method] ?? null;
 
         if ($relation === null) {
             // Non-write methods should not reach this middleware,
@@ -245,7 +252,14 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
 
         // objectType and resourceIdAttribute are unused when objectResolver is set:
         // process() delegates entirely to the resolver before extractResourceId() is called.
-        return new self($client, '', '', null, $objectResolver);
+        return new self(
+            $client,
+            '',
+            '',
+            null,
+            $objectResolver,
+            ['PUT' => 'editor', 'PATCH' => 'editor', 'DELETE' => 'admin']
+        );
     }
 
     /**

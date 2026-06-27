@@ -76,7 +76,7 @@ $dotenv->ifPresent(['CORS_ALLOWED_ORIGINS'])->notEmpty();
 //   1) the pcov extension is loaded,
 //   2) APP_ENV=test,
 //   3) PCOV_SERVER_COVERAGE_DIR points at a writable directory.
-// Each request appends a serialized \pcov\collect() snapshot under that dir;
+// Each request appends a JSON-encoded \pcov\collect() snapshot under that dir;
 // scripts/merge-pcov-coverage.php folds those snapshots into the clover report.
 // Read PCOV_SERVER_COVERAGE_DIR via getenv() rather than $_ENV because the
 // orchestration layer (CI workflow / coverage helper script) passes it through
@@ -108,7 +108,7 @@ if (
                 getmypid(),
                 bin2hex(random_bytes(8))
             );
-            @file_put_contents($file, serialize($data), LOCK_EX);
+            @file_put_contents($file, json_encode($data, JSON_THROW_ON_ERROR), LOCK_EX);
         } catch (\Throwable) {
             // Coverage instrumentation must never crash a response. Swallow.
         }

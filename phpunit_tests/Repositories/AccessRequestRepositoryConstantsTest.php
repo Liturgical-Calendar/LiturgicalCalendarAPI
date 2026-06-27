@@ -66,4 +66,15 @@ final class AccessRequestRepositoryConstantsTest extends TestCase
         self::assertTrue(AccessRequestRepository::isValidObjectIdForType('diocesan_calendar_test', 'romamo_it'));
         self::assertFalse(AccessRequestRepository::isValidObjectIdForType('diocesan_calendar_test', ''));
     }
+
+    public function testValidRelationsHasNoDeleter(): void
+    {
+        self::assertSame(['admin', 'viewer', 'editor'], AccessRequestRepository::VALID_RELATIONS);
+    }
+
+    public function testOperationalRelationsExcludeAdmin(): void
+    {
+        self::assertSame(['viewer', 'editor'], AccessRequestRepository::OPERATIONAL_RELATIONS);
+        self::assertNotContains('admin', AccessRequestRepository::OPERATIONAL_RELATIONS);
+    }
 }
