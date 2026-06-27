@@ -98,3 +98,10 @@ logs/
 # calendars; written by EasterHandler and CalendarHandler).
 /cache/*
 /public/engineCache/*
+
+# --- DEPLOY RESTART SENTINEL (server-managed) ---
+# After rsync, the deploy drops tmp/restart.txt; a root-side systemd
+# path-watcher on the VPS (litcal-fpm-reload.path) reloads php-fpm so new
+# .mo translations take effect, then removes the file. Exclude the contents
+# so --delete never races the sentinel; the dir is created pre-rsync.
+/tmp/*
