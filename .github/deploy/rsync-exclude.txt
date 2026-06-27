@@ -90,21 +90,19 @@ README.md
 logs/
 
 # --- RUNTIME CACHE (preserve server-side state) ---
-# Excludes contents only; the dir is created on the server in a pre-rsync
-# SSH-exec step so PHP can still write to it. /cache is the OIDC PSR-6
-# cache (JWKS + Zitadel roles, used by OidcAuthMiddleware) — not derived
-# from source data, so it is preserved across deploys.
-/cache/*
-
-# --- public/engineCache is intentionally NOT excluded ---
-# It memoizes computed calendars under engineCache/v<API_VERSION>/, keyed
-# ONLY by API version — so it goes stale whenever source JSON changes
-# without an API-version bump (the common case). Letting `rsync --delete`
-# clear it on every deploy guarantees fresh output; the engine recreates
-# the dir on demand (CalendarHandler::ensureCachePathExists / EasterHandler).
-# Preserving it (the old `/public/engineCache/*` exclude) served stale
-# calendars after any source-data change — and made --delete emit a
-# harmless-looking "cannot delete non-empty directory" notice every deploy.
+# Dir-level excludes (no `/*`) so `rsync --delete` never descends into them —
+# which also avoids the "cannot delete non-empty directory" notice. Both dirs
+# are created in the pre-rsync SSH-exec step so PHP can write to them.
+#
+# /cache is the OIDC PSR-6 cache (JWKS + Zitadel roles, OidcAuthMiddleware).
+# public/engineCache memoizes computed calendars; it is PRESERVED across
+# deploys and invalidated by CONTENT, not deletion: CalendarHandler keys the
+# cache path by a hash of the source data (jsondata/sourcedata) + compiled
+# translations (i18n .mo), so a deploy that changes that data lands in a fresh
+# vN-<hash> dir and the engine prunes the stale siblings. A deploy that leaves
+# the data untouched reuses the existing cache.
+/cache/
+/public/engineCache/
 
 # --- DEPLOY RESTART SENTINEL (server-managed) ---
 # After rsync, the deploy drops tmp/restart.txt; a root-side systemd

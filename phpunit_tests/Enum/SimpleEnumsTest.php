@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Enum;
 
 use LiturgicalCalendar\Api\Enum\Ascension;
-use LiturgicalCalendar\Api\Enum\CacheDuration;
 use LiturgicalCalendar\Api\Enum\CalEventAction;
 use LiturgicalCalendar\Api\Enum\CorpusChristi;
 use LiturgicalCalendar\Api\Enum\DateRelation;
@@ -25,7 +24,6 @@ use PHPUnit\Framework\TestCase;
  * areValid) work where mixed in.
  */
 #[CoversClass(Ascension::class)]
-#[CoversClass(CacheDuration::class)]
 #[CoversClass(CalEventAction::class)]
 #[CoversClass(CorpusChristi::class)]
 #[CoversClass(DateRelation::class)]
@@ -61,16 +59,6 @@ final class SimpleEnumsTest extends TestCase
         self::assertSame(['SUNDAY_JAN2_JAN8', 'JAN6'], Epiphany::names());
         self::assertSame(['SUNDAY_JAN2_JAN8', 'JAN6'], Epiphany::values());
         self::assertTrue(Epiphany::isValid('JAN6'));
-    }
-
-    public function testCacheDurationCases(): void
-    {
-        // No trait — bare enum.
-        self::assertSame('DAY', CacheDuration::DAY->value);
-        self::assertSame('WEEK', CacheDuration::WEEK->value);
-        self::assertSame('MONTH', CacheDuration::MONTH->value);
-        self::assertSame('YEAR', CacheDuration::YEAR->value);
-        self::assertSame(CacheDuration::MONTH, CacheDuration::from('MONTH'));
     }
 
     public function testCalEventActionCases(): void

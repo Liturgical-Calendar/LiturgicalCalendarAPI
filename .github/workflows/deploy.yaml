@@ -209,9 +209,10 @@ jobs:
           DEPLOY_PATH: ${{ steps.params.outputs.deploy_path }}
         run: |
           set -euo pipefail
-          remote_cmd=$(printf 'mkdir -p %q %q %q %q' \
+          remote_cmd=$(printf 'mkdir -p %q %q %q %q %q' \
             "${DEPLOY_PATH}" \
             "${DEPLOY_PATH}/cache" \
+            "${DEPLOY_PATH}/public/engineCache" \
             "${DEPLOY_PATH}/logs" \
             "${DEPLOY_PATH}/tmp")
           # Retry on transient SSH failures (connection reset, fail2ban

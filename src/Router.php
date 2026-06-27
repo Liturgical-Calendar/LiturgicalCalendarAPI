@@ -7,7 +7,6 @@ use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
-use LiturgicalCalendar\Api\Enum\CacheDuration;
 use LiturgicalCalendar\Api\Enum\PathCategory;
 use LiturgicalCalendar\Api\Handlers\CalendarHandler;
 use LiturgicalCalendar\Api\Handlers\EasterHandler;
@@ -173,7 +172,6 @@ class Router
                     ReturnTypeParam::ICS,
                     ReturnTypeParam::YAML
                 ]);
-                $calendarHandler->setCacheDuration(CacheDuration::MONTH);
                 $this->handler = $calendarHandler;
                 break;
             case 'metadata':
