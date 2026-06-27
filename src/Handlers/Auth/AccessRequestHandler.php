@@ -38,7 +38,7 @@ final class AccessRequestHandler extends AbstractHandler
     /**
      * @var array<string>
      */
-    private const VALID_RELATIONS = ['admin', 'viewer', 'editor', 'deleter'];
+    private const VALID_RELATIONS = ['admin', 'viewer', 'editor'];
 
     /**
      * Calendar-related object types for calendar_editor role.

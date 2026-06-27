@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Tests\Repositories;
 
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 #[CoversClass(AccessRequestRepository::class)]
 final class AccessRequestRepositoryTest extends RepositoryTestCase
@@ -381,5 +382,62 @@ final class AccessRequestRepositoryTest extends RepositoryTestCase
         $this->expectException(\InvalidArgumentException::class);
 
         $this->repo->countAll('weird');
+    }
+
+    public function testNationValidationMatchesCommonDefSchemaEnumExactly(): void
+    {
+        // The create path (PUT /data/nation) is validated by the `Nation` enum in
+        // CommonDef.json; the access-request flow is validated by isValidNationCode.
+        // They MUST accept exactly the same set, or a request approved here could
+        // be rejected at create time (or vice versa). Assert the sets are identical.
+        $commonDef = json_decode(
+            (string) file_get_contents(__DIR__ . '/../../jsondata/schemas/CommonDef.json'),
+            true,
+            512,
+            JSON_THROW_ON_ERROR
+        );
+        self::assertIsArray($commonDef);
+        /** @var list<string> $enum */
+        $enum    = $commonDef['definitions']['Nation']['enum'];
+        $enumSet = array_flip($enum);
+
+        $letters = range('A', 'Z');
+        foreach ($letters as $a) {
+            foreach ($letters as $b) {
+                $code = $a . $b;
+                self::assertSame(
+                    isset($enumSet[$code]),
+                    AccessRequestRepository::isValidObjectIdForType('national_calendar', $code),
+                    "Validation of '{$code}' differs between CommonDef.json and the access-request validator"
+                );
+            }
+        }
+    }
+
+    #[DataProvider('provideNationCodes')]
+    public function testNationalCalendarObjectIdValidation(string $code, bool $expected): void
+    {
+        self::assertSame($expected, AccessRequestRepository::isValidObjectIdForType('national_calendar', $code));
+    }
+
+    /** @return array<string, array{0: string, 1: bool}> */
+    public static function provideNationCodes(): array
+    {
+        return [
+            'IT existing'      => ['IT', true],
+            'US existing'      => ['US', true],
+            'NZ prospective'   => ['NZ', true],   // valid ISO, may have no calendar yet
+            'VA vatican'       => ['VA', true],
+            'ZZ unknown'       => ['ZZ', false],
+            'EU supranational' => ['EU', false],
+            'EZ eurozone'      => ['EZ', false],
+            'QO macro-region'  => ['QO', false],
+            'UK alias of GB'   => ['UK', false],
+            'XX private-use'   => ['XX', false],
+            'lowercase it'     => ['it', false],
+            'too long'         => ['ITA', false],
+            'empty'            => ['', false],
+            'arbitrary'        => ['FOO', false],
+        ];
     }
 }

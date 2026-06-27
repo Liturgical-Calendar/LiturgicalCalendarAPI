@@ -109,7 +109,7 @@ class OpenFgaClient
      * Check if a user has a specific relation on an object.
      *
      * @param string $user    User identifier (e.g., "user:zitadel-user-id")
-     * @param string $relation Relation to check (e.g., "editor", "deleter", "viewer")
+     * @param string $relation Relation to check (e.g., "admin", "editor", "viewer")
      * @param string $object   Object identifier (e.g., "national_calendar:IT")
      * @return bool True if the user has the relation
      * @throws RuntimeException If the API request fails

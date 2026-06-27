@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /**
  * Merge per-request pcov dumps produced by the dev-server instrumentation hook
  * in public/index.php into a clover report produced by PHPUnit's
@@ -12,7 +10,7 @@ declare(strict_types=1);
  *
  * - <phpunit-clover.xml>: the clover file PHPUnit generated for in-process tests.
  * - <pcov-dump-dir>:     directory of *.cov files written by public/index.php
- *                        (each file is `serialize(\pcov\collect())`).
+ *                        (each file is `json_encode(\pcov\collect())`).
  * - <out-clover.xml>:    where to write the merged clover.
  *
  * Behavior:
@@ -26,6 +24,8 @@ declare(strict_types=1);
  *   (driven by PHPUnit's source filter), and a divergence in pcov-seen lines
  *   indicates either dead code or a file outside `<source><include>`.
  */
+
+declare(strict_types=1);
 
 if ($argc !== 4) {
     fwrite(STDERR, "Usage: {$argv[0]} <phpunit-clover.xml> <pcov-dump-dir> <out-clover.xml>\n");
@@ -80,7 +80,7 @@ foreach ($dumpFiles as $dump) {
     if ($raw === false || $raw === '') {
         continue;
     }
-    $data = @unserialize($raw, ['allowed_classes' => false]);
+    $data = json_decode($raw, true);
     if (!is_array($data)) {
         continue;
     }

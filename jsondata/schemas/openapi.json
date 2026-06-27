@@ -2110,8 +2110,7 @@
               "enum": [
                 "admin",
                 "viewer",
-                "editor",
-                "deleter"
+                "editor"
               ]
             }
           },
@@ -2172,7 +2171,7 @@
                       "permissions": [
                         {
                           "user": "user:zitadel-789",
-                          "relation": "deleter",
+                          "relation": "admin",
                           "object": "national_calendar:IT"
                         }
                       ],
@@ -2477,8 +2476,7 @@
               "enum": [
                 "admin",
                 "viewer",
-                "editor",
-                "deleter"
+                "editor"
               ]
             }
           }
@@ -4039,6 +4037,7 @@
           }
         ],
         "summary": "Create a national calendar data resource",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`.",
         "operationId": "nationalCalendarDataPUT",
         "requestBody": {
           "required": true,
@@ -4113,6 +4112,7 @@
           }
         ],
         "summary": "Create a wider region data resource",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`.",
         "operationId": "widerregionDataPUT",
         "requestBody": {
           "required": true,
@@ -4187,6 +4187,7 @@
           }
         ],
         "summary": "Create a diocesan calendar data resource",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`.",
         "operationId": "diocesanDataPUT",
         "requestBody": {
           "required": true,
@@ -4337,6 +4338,7 @@
           }
         ],
         "summary": "Update a national calendar data resource",
+        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`.",
         "operationId": "nationalDataPATCH",
         "parameters": [
           {
@@ -4415,6 +4417,7 @@
           }
         ],
         "summary": "Delete a national calendar data resource",
+        "description": "`DELETE` requires the `admin` relation. `admin` implies `editor` and `viewer`.",
         "operationId": "nationalDataDELETE",
         "parameters": [
           {
@@ -4536,6 +4539,7 @@
           }
         ],
         "summary": "Update a diocesan calendar data resource",
+        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`.",
         "operationId": "diocesanDataPATCH",
         "parameters": [
           {
@@ -4613,6 +4617,7 @@
           }
         ],
         "summary": "Delete a diocesan calendar data resource",
+        "description": "`DELETE` requires the `admin` relation. `admin` implies `editor` and `viewer`.",
         "operationId": "diocesanDataDELETE",
         "parameters": [
           {
@@ -4733,6 +4738,7 @@
           }
         ],
         "summary": "Update a wider region calendar data resource",
+        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`.",
         "operationId": "widerregionDataPATCH",
         "parameters": [
           {
@@ -4810,6 +4816,7 @@
           }
         ],
         "summary": "Delete a wider region calendar data resource",
+        "description": "`DELETE` requires the `admin` relation. `admin` implies `editor` and `viewer`.",
         "operationId": "widerregionDataDELETE",
         "parameters": [
           {
@@ -5276,6 +5283,7 @@
           }
         ],
         "summary": "Create a new unit test in the API `tests` folder",
+        "description": "Create (`PUT`) requires the `editor` relation.",
         "operationId": "testsIndexPUT",
         "requestBody": {
           "required": true,
@@ -5325,6 +5333,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
           },
           "415": {
             "$ref": "#/components/responses/UnsupportedMediaType415"
@@ -7419,8 +7430,7 @@
             "enum": [
               "admin",
               "viewer",
-              "editor",
-              "deleter"
+              "editor"
             ],
             "description": "Permission relation"
           }
@@ -7828,8 +7838,7 @@
             "enum": [
               "admin",
               "viewer",
-              "editor",
-              "deleter"
+              "editor"
             ]
           },
           "object": {
@@ -7872,8 +7881,7 @@
             "enum": [
               "admin",
               "viewer",
-              "editor",
-              "deleter"
+              "editor"
             ]
           }
         },
