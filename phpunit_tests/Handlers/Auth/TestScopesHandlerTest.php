@@ -38,7 +38,11 @@ final class TestScopesHandlerTest extends AbstractHandlerTestCase
         return new TestScopesHandler($client);
     }
 
-    /** Six list-objects: editor x3 types, then admin x3 types. */
+    /**
+     * Six list-objects: editor x3 types, then admin x3 types.
+     *
+     * @return array<int, GuzzleResponse>
+     */
     private function sixEmpty(): array
     {
         return array_fill(0, 6, new GuzzleResponse(200, [], '{"objects":[]}'));
@@ -48,6 +52,15 @@ final class TestScopesHandlerTest extends AbstractHandlerTestCase
     {
         $this->expectException(UnauthorizedException::class);
         $this->handlerWith([])->handle($this->requestFor('GET', '/auth/test-scopes'));
+    }
+
+    public function testBlankSubIsUnauthorized(): void
+    {
+        $request = $this->requestFor('GET', '/auth/test-scopes')
+            ->withAttribute('oidc_user', ['sub' => '   ', 'roles' => ['test_editor']]);
+
+        $this->expectException(UnauthorizedException::class);
+        $this->handlerWith([])->handle($request);
     }
 
     public function testScopedEditorGetsEditorAndAdminLists(): void
