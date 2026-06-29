@@ -9016,6 +9016,11 @@
               "properties": {
                 "object_type": {
                   "type": "string",
+                  "enum": [
+                    "national_calendar_test",
+                    "diocesan_calendar_test",
+                    "general_roman_calendar_test"
+                  ],
                   "example": "national_calendar_test",
                   "description": "The OpenFGA object type."
                 },
@@ -9040,6 +9045,11 @@
               "properties": {
                 "object_type": {
                   "type": "string",
+                  "enum": [
+                    "national_calendar_test",
+                    "diocesan_calendar_test",
+                    "general_roman_calendar_test"
+                  ],
                   "example": "national_calendar_test",
                   "description": "The OpenFGA object type."
                 },
