@@ -1572,7 +1572,7 @@ class Health implements MessageComponentInterface
             // Other statuses (e.g. a 404 for an unknown calendar) still flow through so the
             // per-format validation can report them at the json-valid phase as before.
             $statusCode = $response->getStatusCode();
-            if ($statusCode === 429 || $statusCode >= 500) {
+            if (self::isUpstreamFailureStatus($statusCode)) {
                 $retryAfter = $response->getHeaderLine('Retry-After');
                 $suffix     = $retryAfter !== '' ? " (Retry-After: {$retryAfter})" : '';
                 $deferred->reject(new \RuntimeException(
@@ -1606,6 +1606,17 @@ class Health implements MessageComponentInterface
         $deferredPromise = $deferred->promise();
         $this->ensureTicking();
         return $deferredPromise;
+    }
+
+    /**
+     * Whether an upstream HTTP status should be surfaced as a hard failure (reject) instead of
+     * being passed to per-format validation. Rate limiting (429) and server errors (5xx) mean the
+     * API could not serve the resource, so their bodies must not be validated as calendar content;
+     * other statuses (e.g. 404 for an unknown calendar) flow through to the validation phases.
+     */
+    private static function isUpstreamFailureStatus(int $statusCode): bool
+    {
+        return $statusCode === 429 || $statusCode >= 500;
     }
 
     /**
