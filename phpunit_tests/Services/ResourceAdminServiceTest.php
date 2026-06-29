@@ -154,4 +154,35 @@ final class ResourceAdminServiceTest extends TestCase
         $filtered = $service->filterByAdminAccess($requests, 'cei-admin');
         $this->assertSame([], $filtered);
     }
+
+    public function testResolveTestScopesGroupsEditorThenAdmin(): void
+    {
+        // Order: editor for the 3 test types, then admin for the 3 test types.
+        $service = $this->serviceWith([
+            new GuzzleResponse(200, [], '{"objects":["national_calendar_test:USA"]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":["national_calendar_test:USA"]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+        ]);
+
+        $scopes = $service->resolveTestScopes('cei-admin');
+
+        self::assertSame(
+            [['object_type' => 'national_calendar_test', 'object_id' => 'USA']],
+            $scopes['editor']
+        );
+        self::assertSame(
+            [['object_type' => 'national_calendar_test', 'object_id' => 'USA']],
+            $scopes['admin']
+        );
+    }
+
+    public function testResolveTestScopesFailsClosedOnError(): void
+    {
+        $service = $this->serviceWith([new GuzzleResponse(500, [], 'boom')]);
+
+        self::assertSame(['editor' => [], 'admin' => []], $service->resolveTestScopes('x'));
+    }
 }
