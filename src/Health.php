@@ -1504,7 +1504,9 @@ class Health implements MessageComponentInterface
      */
     private function cachedGet(string $url, array $options = [], int $ttl = 300, ?ConnectionInterface $conn = null): PromiseInterface
     {
-        $key      = 'http_' . md5($url . serialize($options));
+        $key = 'http_' . md5($url . serialize($options));
+
+        /** @var Deferred<array{data: string, fromCache: bool}> $deferred */
         $deferred = new Deferred();
 
         // Return from cache if available - stagger resolutions to stream results back gradually
@@ -1545,48 +1547,8 @@ class Health implements MessageComponentInterface
 
 
         $resolve = function (ResponseInterface $response) use ($deferred, $key, $ttl, $url) {
-            $body       = (string) $response->getBody();
-            $bodyLength = strlen($body);
-            echo "HTTP request completed for $url\n";
-            if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development') {
-                $date          = date('Y-m-d_H-i-s-u');
-                $color         = $response->getStatusCode() >= 400 ? self::RED : self::GREEN;
-                $debugMessage  = self::YELLOW . 'RESPONSE HTTP/' . $response->getProtocolVersion() . ' ' . $color . $response->getStatusCode() . ' ' . $response->getReasonPhrase() . " received from URL {$url}" . self::NC . PHP_EOL;
-                $debugMessage .= PHP_EOL;
-                $debugMessage .= self::BLUE . 'Incoming response headers' . self::NC . PHP_EOL;
-                foreach ($response->getHeaders() as $name => $values) {
-                    $debugMessage .= $name . ': ' . implode(', ', $values) . PHP_EOL;
-                };
-                $debugMessage .= PHP_EOL;
-                $debugMessage .= self::BLUE . "Incoming response body ({$bodyLength} bytes)" . self::NC . PHP_EOL;
-                $debugMessage .= $body . PHP_EOL . PHP_EOL;
-                file_put_contents(Router::$apiFilePath . 'logs' . DIRECTORY_SEPARATOR . "websocket_response_{$date}.log", $debugMessage);
-            }
-
             --$this->inFlight;
-
-            // Surface rate-limit (429) and server-error (5xx) responses honestly instead of passing
-            // an error body downstream: a 429 returns an RFC 9457 problem+json object that decodes
-            // fine but lacks the calendar keys, which the JSON branch would otherwise mislabel as
-            // "response data was perhaps truncated?". Reject with the real status; don't cache it.
-            // Other statuses (e.g. a 404 for an unknown calendar) still flow through so the
-            // per-format validation can report them at the json-valid phase as before.
-            $statusCode = $response->getStatusCode();
-            if (self::isUpstreamFailureStatus($statusCode)) {
-                $retryAfter = $response->getHeaderLine('Retry-After');
-                $suffix     = $retryAfter !== '' ? " (Retry-After: {$retryAfter})" : '';
-                $deferred->reject(new \RuntimeException(
-                    "HTTP {$statusCode} {$response->getReasonPhrase()} received from {$url}{$suffix}"
-                ));
-                return;
-            }
-
-            if (self::$cacheEnabled) {
-                $stored = self::cacheSet($key, $body, $ttl);
-                echo ( $stored ? "Stored response body in cache\n" : "Failed to store response body in cache\n" );
-                echo self::cacheInfo() . "\n";
-            }
-            $deferred->resolve(['data' => $body, 'fromCache' => false]);
+            self::handleHttpResponse($response, $deferred, $key, $ttl, $url);
         };
 
         $reject = function (\Throwable $e) use ($deferred) {
@@ -1606,6 +1568,64 @@ class Health implements MessageComponentInterface
         $deferredPromise = $deferred->promise();
         $this->ensureTicking();
         return $deferredPromise;
+    }
+
+    /**
+     * Handle a fulfilled HTTP response for a queued {@see cachedGet} request: surface rate-limit
+     * (429) and server-error (5xx) responses as a rejection, otherwise cache the body (when caching
+     * is enabled) and resolve the deferred with it. Extracted from the cachedGet fulfillment closure
+     * so the status/cache branching is unit-testable without the Ratchet/Guzzle event loop; the
+     * caller is responsible for the inFlight bookkeeping.
+     *
+     * @param Deferred<array{data: string, fromCache: bool}> $deferred
+     */
+    private static function handleHttpResponse(
+        ResponseInterface $response,
+        Deferred $deferred,
+        string $key,
+        int $ttl,
+        string $url
+    ): void {
+        $body       = (string) $response->getBody();
+        $bodyLength = strlen($body);
+        echo "HTTP request completed for $url\n";
+        if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development') {
+            $date          = date('Y-m-d_H-i-s-u');
+            $color         = $response->getStatusCode() >= 400 ? self::RED : self::GREEN;
+            $debugMessage  = self::YELLOW . 'RESPONSE HTTP/' . $response->getProtocolVersion() . ' ' . $color . $response->getStatusCode() . ' ' . $response->getReasonPhrase() . " received from URL {$url}" . self::NC . PHP_EOL;
+            $debugMessage .= PHP_EOL;
+            $debugMessage .= self::BLUE . 'Incoming response headers' . self::NC . PHP_EOL;
+            foreach ($response->getHeaders() as $name => $values) {
+                $debugMessage .= $name . ': ' . implode(', ', $values) . PHP_EOL;
+            };
+            $debugMessage .= PHP_EOL;
+            $debugMessage .= self::BLUE . "Incoming response body ({$bodyLength} bytes)" . self::NC . PHP_EOL;
+            $debugMessage .= $body . PHP_EOL . PHP_EOL;
+            file_put_contents(Router::$apiFilePath . 'logs' . DIRECTORY_SEPARATOR . "websocket_response_{$date}.log", $debugMessage);
+        }
+
+        // Surface rate-limit (429) and server-error (5xx) responses honestly instead of passing
+        // an error body downstream: a 429 returns an RFC 9457 problem+json object that decodes
+        // fine but lacks the calendar keys, which the JSON branch would otherwise mislabel as
+        // "response data was perhaps truncated?". Reject with the real status; don't cache it.
+        // Other statuses (e.g. a 404 for an unknown calendar) still flow through so the
+        // per-format validation can report them at the json-valid phase as before.
+        $statusCode = $response->getStatusCode();
+        if (self::isUpstreamFailureStatus($statusCode)) {
+            $retryAfter = $response->getHeaderLine('Retry-After');
+            $suffix     = $retryAfter !== '' ? " (Retry-After: {$retryAfter})" : '';
+            $deferred->reject(new \RuntimeException(
+                "HTTP {$statusCode} {$response->getReasonPhrase()} received from {$url}{$suffix}"
+            ));
+            return;
+        }
+
+        if (self::$cacheEnabled) {
+            $stored = self::cacheSet($key, $body, $ttl);
+            echo ( $stored ? "Stored response body in cache\n" : "Failed to store response body in cache\n" );
+            echo self::cacheInfo() . "\n";
+        }
+        $deferred->resolve(['data' => $body, 'fromCache' => false]);
     }
 
     /**
