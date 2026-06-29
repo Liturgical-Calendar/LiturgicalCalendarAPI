@@ -25,29 +25,36 @@ use React\Promise\Deferred;
 #[CoversClass(Health::class)]
 final class HealthHelpersTest extends TestCase
 {
-    private ?string $apiHostBackup = null;
-    private ?string $appEnvBackup  = null;
+    private ?string $apiHostBackup  = null;
+    private ?string $appEnvBackup   = null;
+    private ?string $wsApiKeyBackup = null;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->apiHostBackup = isset($_ENV['API_HOST']) && is_string($_ENV['API_HOST']) ? $_ENV['API_HOST'] : null;
-        $this->appEnvBackup  = isset($_ENV['APP_ENV']) && is_string($_ENV['APP_ENV']) ? $_ENV['APP_ENV'] : null;
-        // Keep handleHttpResponse() out of its development-only debug-logging branch.
+        $this->apiHostBackup  = isset($_ENV['API_HOST']) && is_string($_ENV['API_HOST']) ? $_ENV['API_HOST'] : null;
+        $this->appEnvBackup   = isset($_ENV['APP_ENV']) && is_string($_ENV['APP_ENV']) ? $_ENV['APP_ENV'] : null;
+        $this->wsApiKeyBackup = isset($_ENV['WS_API_KEY']) && is_string($_ENV['WS_API_KEY']) ? $_ENV['WS_API_KEY'] : null;
+        // Keep handleHttpResponse() out of its development-only debug-logging branch, and start
+        // each test with no ambient WS_API_KEY so the header-injection assertions are deterministic.
         $_ENV['APP_ENV'] = 'test';
+        unset($_ENV['WS_API_KEY']);
     }
 
     protected function tearDown(): void
     {
-        if ($this->apiHostBackup === null) {
-            unset($_ENV['API_HOST']);
-        } else {
-            $_ENV['API_HOST'] = $this->apiHostBackup;
-        }
-        if ($this->appEnvBackup === null) {
-            unset($_ENV['APP_ENV']);
-        } else {
-            $_ENV['APP_ENV'] = $this->appEnvBackup;
+        foreach (
+            [
+                'API_HOST'   => $this->apiHostBackup,
+                'APP_ENV'    => $this->appEnvBackup,
+                'WS_API_KEY' => $this->wsApiKeyBackup,
+            ] as $name => $backup
+        ) {
+            if ($backup === null) {
+                unset($_ENV[$name]);
+            } else {
+                $_ENV[$name] = $backup;
+            }
         }
         parent::tearDown();
     }
@@ -195,5 +202,72 @@ final class HealthHelpersTest extends TestCase
 
         $this->assertNull($result['rejected']);
         $this->assertSame(['data' => $body, 'fromCache' => false], $result['resolved']);
+    }
+
+    /**
+     * @param array{headers?: array<string, string>, stream?: bool} $options
+     * @return array{headers?: array<string, string>, stream?: bool}
+     */
+    private static function withApiKeyHeader(array $options, string $url): array
+    {
+        $method = new \ReflectionMethod(Health::class, 'withApiKeyHeader');
+        /** @var array{headers?: array<string, string>, stream?: bool} $result */
+        $result = $method->invoke(null, $options, $url);
+
+        return $result;
+    }
+
+    public function testWithApiKeyHeaderAttachesForInternalHostAndPreservesExisting(): void
+    {
+        $_ENV['API_HOST']   = 'litcal.example.org';
+        $_ENV['WS_API_KEY'] = 'litcal_test_secret';
+
+        $options = self::withApiKeyHeader(
+            ['headers' => ['Accept' => 'application/json'], 'stream' => true],
+            'https://litcal.example.org/api/dev/calendar/2020'
+        );
+
+        $this->assertSame('litcal_test_secret', $options['headers']['X-Api-Key'] ?? null);
+        $this->assertSame('application/json', $options['headers']['Accept'] ?? null);
+        $this->assertTrue($options['stream'] ?? false);
+    }
+
+    public function testWithApiKeyHeaderDoesNotLeakToForeignHost(): void
+    {
+        $_ENV['API_HOST']   = 'litcal.example.org';
+        $_ENV['WS_API_KEY'] = 'litcal_test_secret';
+
+        $options = self::withApiKeyHeader(
+            ['headers' => ['Accept' => 'application/json']],
+            'https://evil.example.com/x'
+        );
+
+        $this->assertArrayNotHasKey('X-Api-Key', $options['headers'] ?? []);
+    }
+
+    public function testWithApiKeyHeaderNoOpWhenKeyUnset(): void
+    {
+        $_ENV['API_HOST'] = 'litcal.example.org';
+        unset($_ENV['WS_API_KEY']);
+
+        $options = self::withApiKeyHeader(
+            ['headers' => ['Accept' => 'application/json']],
+            'https://litcal.example.org/api/dev/calendar/2020'
+        );
+
+        $this->assertArrayNotHasKey('X-Api-Key', $options['headers'] ?? []);
+    }
+
+    public function testWithApiKeyHeaderNoOpWhenKeyEmpty(): void
+    {
+        $_ENV['API_HOST']   = 'litcal.example.org';
+        $_ENV['WS_API_KEY'] = '';
+
+        $options = self::withApiKeyHeader(
+            ['headers' => ['Accept' => 'application/json']],
+            'https://litcal.example.org/api/dev/calendar/2020'
+        );
+
+        $this->assertArrayNotHasKey('X-Api-Key', $options['headers'] ?? []);
     }
 }

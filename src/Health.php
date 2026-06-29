@@ -1664,6 +1664,27 @@ class Health implements MessageComponentInterface
         return strcasecmp($host, $apiHost) === 0;
     }
 
+    /**
+     * Return $options with the first-party WS_API_KEY attached as an X-Api-Key header, when one is
+     * configured and the URL targets our own API host (see {@see isInternalApiUrl}). Otherwise the
+     * options are returned unchanged, so the key is never sent to an arbitrary external URL. Any
+     * existing headers (e.g. Accept) are preserved.
+     *
+     * @param array{headers?: array<string, string>, stream?: bool} $options
+     * @return array{headers?: array<string, string>, stream?: bool}
+     */
+    private static function withApiKeyHeader(array $options, string $url): array
+    {
+        $wsApiKey = $_ENV['WS_API_KEY'] ?? null;
+        if (is_string($wsApiKey) && $wsApiKey !== '' && self::isInternalApiUrl($url)) {
+            $headers              = $options['headers'] ?? [];
+            $headers['X-Api-Key'] = $wsApiKey;
+            $options['headers']   = $headers;
+        }
+
+        return $options;
+    }
+
     private function processQueue(): void
     {
         echo 'Processing queue, inFlight: ' . $this->inFlight . ', maxConcurrency: ' . $this->maxConcurrency . ', queue size: ' . count($this->queue) . "\n";
@@ -1683,17 +1704,9 @@ class Health implements MessageComponentInterface
                 file_put_contents(Router::$apiFilePath . 'logs' . DIRECTORY_SEPARATOR . 'websocket_requests.log', $debugMessage, FILE_APPEND);
             }
 
-            // Attach the first-party API key (when configured) so the WS server's internal
-            // requests authenticate and bypass the public unauthenticated rate limit. Only attach
-            // it to requests targeting our own API host — never leak the key to an arbitrary
-            // absolute URL (e.g. an external resource validated via executeValidation).
-            $wsApiKey = $_ENV['WS_API_KEY'] ?? null;
-            if (is_string($wsApiKey) && $wsApiKey !== '' && self::isInternalApiUrl($url)) {
-                /** @var array<string, string> $headers */
-                $headers              = $options['headers'] ?? [];
-                $headers['X-Api-Key'] = $wsApiKey;
-                $options['headers']   = $headers;
-            }
+            // Attach the first-party API key (when configured) only for requests targeting our own
+            // API host, so WS_API_KEY is never leaked to an arbitrary absolute URL.
+            $options = self::withApiKeyHeader($options, $url);
 
             $this->http->getAsync($url, $options)
                 ->then(
