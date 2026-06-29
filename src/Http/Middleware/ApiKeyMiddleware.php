@@ -84,6 +84,10 @@ class ApiKeyMiddleware implements MiddlewareInterface
             'owner_id'            => $keyInfo['zitadel_user_id'],
             'scope'               => $keyInfo['scope'],
             'rate_limit_per_hour' => $keyInfo['rate_limit_per_hour'],
+            // First-party "system" applications (is_system=true, set only by the
+            // mint-official-key admin script) yield trusted keys that future FGA
+            // read-authorization MUST treat as ungated. See ApiKeyMiddleware::isSystem().
+            'is_system'           => !empty($keyInfo['app_is_system']),
         ]);
 
         // Log API key usage (validate required fields exist)
@@ -256,5 +260,26 @@ class ApiKeyMiddleware implements MiddlewareInterface
         }
 
         return null;
+    }
+
+    /**
+     * Whether the current request is authenticated with a first-party "system" API key.
+     *
+     * System keys belong to an application flagged is_system=true, which is set ONLY by the
+     * mint-official-key admin script — never by the user-facing application or access-request
+     * flows. They are trusted first-party principals: when API read access is eventually gated
+     * by OpenFGA, the FGA read-authorization middleware MUST bypass the per-resource check when
+     * this returns true, and enforce it otherwise. Returns false for unauthenticated requests or
+     * ordinary (non-system) keys.
+     *
+     * @param ServerRequestInterface $request The request
+     * @return bool True if a valid system API key is present
+     */
+    public static function isSystem(ServerRequestInterface $request): bool
+    {
+        /** @var array{is_system?: bool}|null $apiKey */
+        $apiKey = $request->getAttribute('api_key');
+
+        return is_array($apiKey) && !empty($apiKey['is_system']);
     }
 }

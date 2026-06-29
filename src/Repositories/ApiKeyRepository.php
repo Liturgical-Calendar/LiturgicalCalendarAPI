@@ -97,7 +97,7 @@ class ApiKeyRepository
             'SELECT k.id, k.application_id, k.key_prefix, k.name, k.scope,
                     k.rate_limit_per_hour, k.is_active, k.last_used_at, k.expires_at,
                     a.id AS app_uuid, a.name AS app_name, a.zitadel_user_id,
-                    a.is_active AS app_is_active, a.status AS app_status
+                    a.is_active AS app_is_active, a.status AS app_status, a.is_system AS app_is_system
              FROM api_keys k
              JOIN applications a ON k.application_id = a.id
              WHERE k.key_hash = :key_hash'

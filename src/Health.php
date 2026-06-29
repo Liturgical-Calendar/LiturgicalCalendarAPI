@@ -92,7 +92,7 @@ class Health implements MessageComponentInterface
     private float $staggerInterval;
     private int $maxConcurrency;
     private int $inFlight = 0;
-    /** @var list<array{url:string,options:array{headers?:array{Accept:string}},resolve:\Closure(ResponseInterface):void,reject:\Closure(\Throwable):void}> */
+    /** @var list<array{url:string,options:array{headers?:array<string, string>,stream?:bool},resolve:\Closure(ResponseInterface):void,reject:\Closure(\Throwable):void}> */
     private array $queue  = [];
     private bool $ticking = false;
 
@@ -1498,7 +1498,7 @@ class Health implements MessageComponentInterface
     }
 
     /**
-     * @param array{headers?:array{Accept:string}} $options
+     * @param array{headers?:array<string, string>,stream?:bool} $options
      *
      * @return PromiseInterface<array{data: string, fromCache: bool}>
      */
@@ -1563,12 +1563,27 @@ class Health implements MessageComponentInterface
                 file_put_contents(Router::$apiFilePath . 'logs' . DIRECTORY_SEPARATOR . "websocket_response_{$date}.log", $debugMessage);
             }
 
+            --$this->inFlight;
+
+            // Surface non-2xx responses honestly instead of passing an error body downstream.
+            // A rate-limit 429 returns an RFC 9457 problem+json object that decodes fine but
+            // lacks the calendar keys, which the JSON branch would otherwise mislabel as
+            // "response data was perhaps truncated?". Reject with the real status; don't cache it.
+            $statusCode = $response->getStatusCode();
+            if ($statusCode < 200 || $statusCode >= 300) {
+                $retryAfter = $response->getHeaderLine('Retry-After');
+                $suffix     = $retryAfter !== '' ? " (Retry-After: {$retryAfter})" : '';
+                $deferred->reject(new \RuntimeException(
+                    "HTTP {$statusCode} {$response->getReasonPhrase()} received from {$url}{$suffix}"
+                ));
+                return;
+            }
+
             if (self::$cacheEnabled) {
                 $stored = self::cacheSet($key, $body, $ttl);
                 echo ( $stored ? "Stored response body in cache\n" : "Failed to store response body in cache\n" );
                 echo self::cacheInfo() . "\n";
             }
-            --$this->inFlight;
             $deferred->resolve(['data' => $body, 'fromCache' => false]);
         };
 
@@ -1608,6 +1623,16 @@ class Health implements MessageComponentInterface
                 $date         = date('Y-m-d H:i:s.u');
                 $debugMessage = "{$date}\tREQUEST GET URL " . $url . "\n";
                 file_put_contents(Router::$apiFilePath . 'logs' . DIRECTORY_SEPARATOR . 'websocket_requests.log', $debugMessage, FILE_APPEND);
+            }
+
+            // Attach the first-party API key (when configured) so the WS server's internal
+            // requests authenticate and bypass the public unauthenticated rate limit.
+            $wsApiKey = $_ENV['WS_API_KEY'] ?? null;
+            if (is_string($wsApiKey) && $wsApiKey !== '') {
+                /** @var array<string, string> $headers */
+                $headers              = $options['headers'] ?? [];
+                $headers['X-Api-Key'] = $wsApiKey;
+                $options['headers']   = $headers;
             }
 
             $this->http->getAsync($url, $options)
