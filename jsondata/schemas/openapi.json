@@ -1121,6 +1121,48 @@
         }
       }
     },
+    "/auth/test-scopes": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Get the caller's test scopes",
+        "operationId": "authTestScopes",
+        "description": "Returns whether the authenticated user is a global admin together with the list of test objects they can edit or administer via OpenFGA. Returns HTTP 200 with `is_global_admin=false` and empty `editor`/`admin` arrays when the user holds no relation on any test resource. Response is not cacheable (`Cache-Control: no-store`).",
+        "responses": {
+          "200": {
+            "description": "OK: Test scope information",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "example": "no-store"
+                },
+                "description": "Always set to `no-store` to prevent caching of auth state."
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestScopesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          }
+        }
+      }
+    },
     "/auth/notifications": {
       "get": {
         "tags": [
@@ -8956,6 +8998,79 @@
           "is_global_admin",
           "is_resource_admin",
           "admin_scopes"
+        ],
+        "additionalProperties": false
+      },
+      "TestScopesResponse": {
+        "type": "object",
+        "properties": {
+          "is_global_admin": {
+            "type": "boolean",
+            "description": "True when the caller holds the global `admin` Zitadel role."
+          },
+          "editor": {
+            "type": "array",
+            "description": "Test resources the caller can edit via OpenFGA. Empty when the user holds no `editor` relation on any test resource.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "object_type": {
+                  "type": "string",
+                  "enum": [
+                    "national_calendar_test",
+                    "diocesan_calendar_test",
+                    "general_roman_calendar_test"
+                  ],
+                  "example": "national_calendar_test",
+                  "description": "The OpenFGA object type."
+                },
+                "object_id": {
+                  "type": "string",
+                  "example": "IT",
+                  "description": "The OpenFGA object ID."
+                }
+              },
+              "required": [
+                "object_type",
+                "object_id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "admin": {
+            "type": "array",
+            "description": "Test resources the caller administers via OpenFGA. Empty when the user holds no `admin` relation on any test resource.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "object_type": {
+                  "type": "string",
+                  "enum": [
+                    "national_calendar_test",
+                    "diocesan_calendar_test",
+                    "general_roman_calendar_test"
+                  ],
+                  "example": "national_calendar_test",
+                  "description": "The OpenFGA object type."
+                },
+                "object_id": {
+                  "type": "string",
+                  "example": "IT",
+                  "description": "The OpenFGA object ID."
+                }
+              },
+              "required": [
+                "object_type",
+                "object_id"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "is_global_admin",
+          "editor",
+          "admin"
         ],
         "additionalProperties": false
       }

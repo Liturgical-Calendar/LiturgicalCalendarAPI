@@ -29,6 +29,7 @@ use LiturgicalCalendar\Api\Handlers\Admin\ApplicationAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\NotificationsHandler as AdminNotificationsHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\OutboxAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\AdminScopesHandler;
+use LiturgicalCalendar\Api\Handlers\Auth\TestScopesHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\NotificationsHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\PermissionAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\UsersHandler;
@@ -367,6 +368,10 @@ class Router
                         // GET /auth/admin-scopes - Report caller's global/resource admin status + scopes
                         $adminScopesHandler = new AdminScopesHandler();
                         $this->handler      = $adminScopesHandler;
+                    } elseif ($authRoute === 'test-scopes') {
+                        // GET /auth/test-scopes - Report caller's test editor/admin scopes
+                        $testScopesHandler = new TestScopesHandler();
+                        $this->handler     = $testScopesHandler;
                     } else {
                         $this->response = new Response(StatusCode::NOT_FOUND->value, [], null, $this->request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
                         $this->emitResponse();
@@ -614,7 +619,7 @@ class Router
         // Apply OIDC authentication for auth routes (access-requests, email-verification, notifications), admin, and applications
         // These routes need the oidc_user attribute set before the handler checks authentication
         if (
-            ( $route === 'auth' && count($requestPathParts) >= 1 && in_array($requestPathParts[0], ['access-requests', 'email-verification', 'notifications', 'admin-scopes'], true) )
+            ( $route === 'auth' && count($requestPathParts) >= 1 && in_array($requestPathParts[0], ['access-requests', 'email-verification', 'notifications', 'admin-scopes', 'test-scopes'], true) )
             || $route === 'admin'
             || $route === 'applications'
         ) {
