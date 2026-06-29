@@ -46,12 +46,15 @@ mechanism supports them later but that's separate work.
 
 A CLI admin script (matches existing `scripts/` tooling: seed-*, reconcile-*, migrate-*). Behavior:
 
-1. Resolve the project owner's `zitadel_user_id` (from an existing approved application owned by the
-   project owner, or a `--owner=<id>` arg). Not hardcoded.
-2. Idempotently ensure ONE first-party application row exists:
-   `name='LitCal Official UIs'`, `status='approved'`, `requested_scope='read'`, `is_active=true`,
-   `is_system=true`, `zitadel_user_id=<owner>`. Reuse if already present (lookup by name + owner); if a
-   pre-existing row lacks `is_system`, set it.
+1. Resolve the official application by looking it up by `name` + `is_system`. If it already exists, reuse
+   it (its owner is already set — no `--owner` needed). If it does not exist yet, `--owner=<zitadel_user_id>`
+   must be passed explicitly to create it. The owner is never inferred or hardcoded.
+2. Idempotent create-or-reuse: if a system application is found, reuse it as-is. Otherwise insert a new
+   first-party row (`name='LitCal Official UIs'`, `status='approved'`, `requested_scope='read'`,
+   `is_active=true`, `is_system=true`, `zitadel_user_id=<owner>`) via
+   `INSERT ... ON CONFLICT (name) WHERE is_system DO NOTHING`, re-selecting on conflict so concurrent runs
+   converge on one row. A partial unique index (`uq_applications_system_name`, added by the migration)
+   enforces single-system-app-per-name at the DB level.
 3. Mint a key via the existing `ApiKeyRepository::generate($appId, $name, 'read', $rateLimit)` — reuses
    the repo's sha256 `key_hash` + `key_prefix` logic so the key cannot be malformed.
 4. Print the plaintext key ONCE (never stored), plus the key prefix/id for later identification.
@@ -65,12 +68,14 @@ minting); raw one-off SQL (must hand-replicate hashing/prefix; not reusable/docu
 ## Part B — Test-runner consumption (`src/Health.php` + live env)
 
 1. `cachedGet()` injects `X-Api-Key: <WS_API_KEY>` (from `$_ENV['WS_API_KEY']`, only when set & non-empty)
-   into the request headers for all internal fetches (validateCalendar, executeUnitTest, metadata).
-   Merge into `$options['headers']` without clobbering an existing `Accept`.
-2. `cachedGet()` resolve closure checks `$response->getStatusCode()`. On non-2xx, reject the deferred with
-   a descriptive error (include status; for 429 include `Retry-After`) instead of resolving with a body
-   that downstream mislabels as "truncated". This permanently fixes the misleading message even if a limit
-   is ever hit again.
+   into the request headers for internal fetches — but **only for URLs targeting our own API host**
+   (relative URLs, or absolute URLs whose host matches `API_HOST`), so the key is never leaked to an
+   arbitrary external URL validated via `executeValidation`. Merge into `$options['headers']` without
+   clobbering an existing `Accept`.
+2. `cachedGet()`'s resolve closure rejects the deferred with a descriptive error (status; `Retry-After`
+   when present) for **rate-limit (429) and server-error (5xx)** responses, instead of resolving with a
+   body that downstream mislabels as "truncated". Other statuses (e.g. a 404 for an unknown calendar)
+   still flow through, so per-format validation reports them at the json-valid phase as before.
 3. Live (`.env.staging` on the Plesk box): add `WS_API_KEY=<minted key>`; restart
    `litcal-websocket.service`. Keep `UNAUTHENTICATED_RATE_LIMIT=100` (interactive portal headroom).
 
@@ -82,12 +87,15 @@ first-party **system** key stay ungated while user-requested keys become gated.
 
 Model first-party-ness at the **application** level:
 
-1. Migration: `ALTER TABLE applications ADD COLUMN is_system BOOLEAN NOT NULL DEFAULT FALSE`.
+1. Migration: `ALTER TABLE applications ADD COLUMN is_system BOOLEAN NOT NULL DEFAULT FALSE`, plus a
+   partial unique index `uq_applications_system_name ON applications (name) WHERE is_system`.
 2. Only the `mint-official-key.php` script sets `is_system=true`. The user-facing paths
    (`ApplicationsHandler`, the access-request flow) never set it — so a user can **never** mint an
    ungated key. The privilege boundary is the application, settable only by an admin out-of-band.
 3. `ApiKeyMiddleware` adds `is_system` to the `api_key` request attribute (alongside id, scope,
-   rate_limit_per_hour, …), sourced from the joined application row.
+   rate_limit_per_hour, …), sourced from the joined application row and **strictly normalized** — only
+   native `true` or the PostgreSQL string `'t'` count as system, so a false-like `'f'` can never become
+   a trusted key. `isSystem()` checks `=== true`.
 4. **Bypass contract (documented, not built now):** when the future FGA read-authorization middleware is
    introduced, it MUST short-circuit (skip the per-resource FGA check) when
    `api_key.is_system === true`, and enforce the check otherwise. `is_system` bypasses only the resource

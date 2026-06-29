@@ -83,7 +83,10 @@ $stmt->execute(['name' => OFFICIAL_APP_NAME]);
 /** @var array{id: string, zitadel_user_id: string}|false $app */
 $app = $stmt->fetch();
 
-if ($app === false) {
+if ($app !== false) {
+    $appId = $app['id'];
+    echo 'Reusing official application "' . OFFICIAL_APP_NAME . "\" ({$appId}).\n";
+} else {
     if (!is_string($owner) || $owner === '') {
         fwrite(
             STDERR,
@@ -91,9 +94,13 @@ if ($app === false) {
         );
         exit(1);
     }
+
+    // Atomic create-or-reuse: the partial unique index uq_applications_system_name guarantees a
+    // single first-party system application per name, so concurrent runs converge on one row.
     $insert = $pdo->prepare(
         "INSERT INTO applications (zitadel_user_id, name, description, status, requested_scope, is_active, is_system)
          VALUES (:owner, :name, :description, 'approved', 'read', TRUE, TRUE)
+         ON CONFLICT (name) WHERE is_system DO NOTHING
          RETURNING id"
     );
     $insert->execute([
@@ -101,12 +108,24 @@ if ($app === false) {
         'name'        => OFFICIAL_APP_NAME,
         'description' => 'First-party application for official LitCal project UIs (read-only, rate-limit-exempt). Managed via scripts/mint-official-key.php.',
     ]);
-    /** @var string $appId */
-    $appId = $insert->fetchColumn();
-    echo 'Created official application "' . OFFICIAL_APP_NAME . "\" ({$appId}) owned by {$owner}.\n";
-} else {
-    $appId = $app['id'];
-    echo 'Reusing official application "' . OFFICIAL_APP_NAME . "\" ({$appId}).\n";
+    $appId   = $insert->fetchColumn();
+    $created = is_string($appId);
+
+    if (!$created) {
+        // A concurrent run inserted it first (ON CONFLICT DO NOTHING returned no row) — re-select.
+        $reselect = $pdo->prepare('SELECT id FROM applications WHERE name = :name AND is_system = TRUE LIMIT 1');
+        $reselect->execute(['name' => OFFICIAL_APP_NAME]);
+        $appId = $reselect->fetchColumn();
+    }
+
+    if (!is_string($appId)) {
+        fwrite(STDERR, "Error: failed to create or locate the official application.\n");
+        exit(1);
+    }
+
+    echo $created
+        ? 'Created official application "' . OFFICIAL_APP_NAME . "\" ({$appId}) owned by {$owner}.\n"
+        : 'Reusing official application "' . OFFICIAL_APP_NAME . "\" ({$appId}) (created concurrently).\n";
 }
 
 $repo   = new ApiKeyRepository($pdo);

@@ -1565,12 +1565,14 @@ class Health implements MessageComponentInterface
 
             --$this->inFlight;
 
-            // Surface non-2xx responses honestly instead of passing an error body downstream.
-            // A rate-limit 429 returns an RFC 9457 problem+json object that decodes fine but
-            // lacks the calendar keys, which the JSON branch would otherwise mislabel as
+            // Surface rate-limit (429) and server-error (5xx) responses honestly instead of passing
+            // an error body downstream: a 429 returns an RFC 9457 problem+json object that decodes
+            // fine but lacks the calendar keys, which the JSON branch would otherwise mislabel as
             // "response data was perhaps truncated?". Reject with the real status; don't cache it.
+            // Other statuses (e.g. a 404 for an unknown calendar) still flow through so the
+            // per-format validation can report them at the json-valid phase as before.
             $statusCode = $response->getStatusCode();
-            if ($statusCode < 200 || $statusCode >= 300) {
+            if ($statusCode === 429 || $statusCode >= 500) {
                 $retryAfter = $response->getHeaderLine('Retry-After');
                 $suffix     = $retryAfter !== '' ? " (Retry-After: {$retryAfter})" : '';
                 $deferred->reject(new \RuntimeException(
@@ -1606,6 +1608,31 @@ class Health implements MessageComponentInterface
         return $deferredPromise;
     }
 
+    /**
+     * Whether the given URL targets our own API host and is therefore safe to send the
+     * first-party WS_API_KEY to.
+     *
+     * Relative URLs (no host component) target our own API. Absolute URLs must match the
+     * configured API host (API_HOST, default 'localhost'); anything else — e.g. an external
+     * resource validated via executeValidation — must never receive the key. A malformed URL
+     * is treated as untrusted.
+     */
+    private static function isInternalApiUrl(string $url): bool
+    {
+        $host = parse_url($url, PHP_URL_HOST);
+        if ($host === false) {
+            return false;
+        }
+        if ($host === null) {
+            return true;
+        }
+        $apiHost = isset($_ENV['API_HOST']) && is_string($_ENV['API_HOST']) && $_ENV['API_HOST'] !== ''
+            ? $_ENV['API_HOST']
+            : 'localhost';
+
+        return strcasecmp($host, $apiHost) === 0;
+    }
+
     private function processQueue(): void
     {
         echo 'Processing queue, inFlight: ' . $this->inFlight . ', maxConcurrency: ' . $this->maxConcurrency . ', queue size: ' . count($this->queue) . "\n";
@@ -1626,9 +1653,11 @@ class Health implements MessageComponentInterface
             }
 
             // Attach the first-party API key (when configured) so the WS server's internal
-            // requests authenticate and bypass the public unauthenticated rate limit.
+            // requests authenticate and bypass the public unauthenticated rate limit. Only attach
+            // it to requests targeting our own API host — never leak the key to an arbitrary
+            // absolute URL (e.g. an external resource validated via executeValidation).
             $wsApiKey = $_ENV['WS_API_KEY'] ?? null;
-            if (is_string($wsApiKey) && $wsApiKey !== '') {
+            if (is_string($wsApiKey) && $wsApiKey !== '' && self::isInternalApiUrl($url)) {
                 /** @var array<string, string> $headers */
                 $headers              = $options['headers'] ?? [];
                 $headers['X-Api-Key'] = $wsApiKey;

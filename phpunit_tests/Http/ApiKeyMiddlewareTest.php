@@ -126,4 +126,43 @@ final class ApiKeyMiddlewareTest extends TestCase
         $this->assertNull($request->getAttribute('api_key'));
         $this->assertFalse(ApiKeyMiddleware::isSystem($request));
     }
+
+    public function testPostgresStringTrueSurfacesIsSystemTrue(): void
+    {
+        // pdo_pgsql can surface a boolean column as the string 't'; it must be treated as system.
+        $handler    = $this->captureHandler();
+        $middleware = $this->middlewareReturning($this->validKeyRow(['app_is_system' => 't']));
+
+        $middleware->process(new ServerRequest('GET', '/calendar', ['X-Api-Key' => 'litcal_test_abc']), $handler);
+
+        $request = $handler->captured;
+        if (!$request instanceof ServerRequestInterface) {
+            self::fail('Handler did not capture a request.');
+        }
+        /** @var array<string, mixed> $attr */
+        $attr = $request->getAttribute('api_key');
+        $this->assertIsArray($attr);
+        $this->assertTrue($attr['is_system']);
+        $this->assertTrue(ApiKeyMiddleware::isSystem($request));
+    }
+
+    public function testPostgresStringFalseIsNotSystem(): void
+    {
+        // The string 'f' is false-like and must NOT be treated as a trusted system key
+        // (the bug a naive !empty() check would introduce).
+        $handler    = $this->captureHandler();
+        $middleware = $this->middlewareReturning($this->validKeyRow(['app_is_system' => 'f']));
+
+        $middleware->process(new ServerRequest('GET', '/calendar', ['X-Api-Key' => 'litcal_test_abc']), $handler);
+
+        $request = $handler->captured;
+        if (!$request instanceof ServerRequestInterface) {
+            self::fail('Handler did not capture a request.');
+        }
+        /** @var array<string, mixed> $attr */
+        $attr = $request->getAttribute('api_key');
+        $this->assertIsArray($attr);
+        $this->assertFalse($attr['is_system']);
+        $this->assertFalse(ApiKeyMiddleware::isSystem($request));
+    }
 }

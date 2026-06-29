@@ -32,6 +32,11 @@ final class Version20260629120000 extends AbstractMigration
         );
 
         $this->addSql('ALTER TABLE applications ADD COLUMN is_system BOOLEAN NOT NULL DEFAULT FALSE');
+
+        // Enforce at most one first-party "system" application per name, so concurrent
+        // scripts/mint-official-key.php runs converge on a single row (the script's
+        // INSERT ... ON CONFLICT (name) WHERE is_system relies on this partial unique index).
+        $this->addSql('CREATE UNIQUE INDEX uq_applications_system_name ON applications (name) WHERE is_system');
     }
 
     public function down(Schema $schema): void
@@ -41,6 +46,7 @@ final class Version20260629120000 extends AbstractMigration
             'This migration targets PostgreSQL only.'
         );
 
+        $this->addSql('DROP INDEX IF EXISTS uq_applications_system_name');
         $this->addSql('ALTER TABLE applications DROP COLUMN IF EXISTS is_system');
     }
 }
