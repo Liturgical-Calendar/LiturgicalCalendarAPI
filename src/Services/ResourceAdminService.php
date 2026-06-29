@@ -26,6 +26,16 @@ final class ResourceAdminService
         'general_roman_calendar',
     ];
 
+    /**
+     * Test object types a user can hold `editor`/`admin` on. Mirrors the
+     * test-scoped object types in the OpenFGA authorization model.
+     */
+    public const TEST_OBJECT_TYPES = [
+        'national_calendar_test',
+        'diocesan_calendar_test',
+        'general_roman_calendar_test',
+    ];
+
     public function __construct(private readonly OpenFgaClient $fgaClient)
     {
     }
@@ -55,6 +65,42 @@ final class ResourceAdminService
         }
 
         return $scopes;
+    }
+
+    /**
+     * The caller's `editor` and `admin` scopes across TEST_OBJECT_TYPES.
+     *
+     * `editor` is a superset of `admin` (the model grants test `editor` to
+     * `admin`). Used to gate the admin-tests UI: edit requires `editor`,
+     * delete requires `admin`.
+     *
+     * Fails closed: any OpenFGA transport error yields empty scope sets.
+     *
+     * @param string $sub Zitadel user ID (without "user:" prefix)
+     * @return array{editor: list<array{object_type: string, object_id: string}>, admin: list<array{object_type: string, object_id: string}>}
+     */
+    public function resolveTestScopes(string $sub): array
+    {
+        $fgaUser = "user:{$sub}";
+        $editor  = [];
+        $admin   = [];
+
+        try {
+            foreach (self::TEST_OBJECT_TYPES as $type) {
+                foreach ($this->fgaClient->listObjects($fgaUser, 'editor', $type) as $objectId) {
+                    $editor[] = ['object_type' => $type, 'object_id' => $objectId];
+                }
+            }
+            foreach (self::TEST_OBJECT_TYPES as $type) {
+                foreach ($this->fgaClient->listObjects($fgaUser, 'admin', $type) as $objectId) {
+                    $admin[] = ['object_type' => $type, 'object_id' => $objectId];
+                }
+            }
+        } catch (\RuntimeException) {
+            return ['editor' => [], 'admin' => []];
+        }
+
+        return ['editor' => $editor, 'admin' => $admin];
     }
 
     /**
