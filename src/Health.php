@@ -92,7 +92,7 @@ class Health implements MessageComponentInterface
     private float $staggerInterval;
     private int $maxConcurrency;
     private int $inFlight = 0;
-    /** @var list<array{url:string,options:array{headers?:array{Accept:string}},resolve:\Closure(ResponseInterface):void,reject:\Closure(\Throwable):void}> */
+    /** @var list<array{url:string,options:array{headers?:array<string, string>,stream?:bool},resolve:\Closure(ResponseInterface):void,reject:\Closure(\Throwable):void}> */
     private array $queue  = [];
     private bool $ticking = false;
 
@@ -1498,13 +1498,15 @@ class Health implements MessageComponentInterface
     }
 
     /**
-     * @param array{headers?:array{Accept:string}} $options
+     * @param array{headers?:array<string, string>,stream?:bool} $options
      *
      * @return PromiseInterface<array{data: string, fromCache: bool}>
      */
     private function cachedGet(string $url, array $options = [], int $ttl = 300, ?ConnectionInterface $conn = null): PromiseInterface
     {
-        $key      = 'http_' . md5($url . serialize($options));
+        $key = 'http_' . md5($url . serialize($options));
+
+        /** @var Deferred<array{data: string, fromCache: bool}> $deferred */
         $deferred = new Deferred();
 
         // Return from cache if available - stagger resolutions to stream results back gradually
@@ -1545,31 +1547,8 @@ class Health implements MessageComponentInterface
 
 
         $resolve = function (ResponseInterface $response) use ($deferred, $key, $ttl, $url) {
-            $body       = (string) $response->getBody();
-            $bodyLength = strlen($body);
-            echo "HTTP request completed for $url\n";
-            if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development') {
-                $date          = date('Y-m-d_H-i-s-u');
-                $color         = $response->getStatusCode() >= 400 ? self::RED : self::GREEN;
-                $debugMessage  = self::YELLOW . 'RESPONSE HTTP/' . $response->getProtocolVersion() . ' ' . $color . $response->getStatusCode() . ' ' . $response->getReasonPhrase() . " received from URL {$url}" . self::NC . PHP_EOL;
-                $debugMessage .= PHP_EOL;
-                $debugMessage .= self::BLUE . 'Incoming response headers' . self::NC . PHP_EOL;
-                foreach ($response->getHeaders() as $name => $values) {
-                    $debugMessage .= $name . ': ' . implode(', ', $values) . PHP_EOL;
-                };
-                $debugMessage .= PHP_EOL;
-                $debugMessage .= self::BLUE . "Incoming response body ({$bodyLength} bytes)" . self::NC . PHP_EOL;
-                $debugMessage .= $body . PHP_EOL . PHP_EOL;
-                file_put_contents(Router::$apiFilePath . 'logs' . DIRECTORY_SEPARATOR . "websocket_response_{$date}.log", $debugMessage);
-            }
-
-            if (self::$cacheEnabled) {
-                $stored = self::cacheSet($key, $body, $ttl);
-                echo ( $stored ? "Stored response body in cache\n" : "Failed to store response body in cache\n" );
-                echo self::cacheInfo() . "\n";
-            }
             --$this->inFlight;
-            $deferred->resolve(['data' => $body, 'fromCache' => false]);
+            self::handleHttpResponse($response, $deferred, $key, $ttl, $url);
         };
 
         $reject = function (\Throwable $e) use ($deferred) {
@@ -1591,6 +1570,121 @@ class Health implements MessageComponentInterface
         return $deferredPromise;
     }
 
+    /**
+     * Handle a fulfilled HTTP response for a queued {@see cachedGet} request: surface rate-limit
+     * (429) and server-error (5xx) responses as a rejection, otherwise cache the body (when caching
+     * is enabled) and resolve the deferred with it. Extracted from the cachedGet fulfillment closure
+     * so the status/cache branching is unit-testable without the Ratchet/Guzzle event loop; the
+     * caller is responsible for the inFlight bookkeeping.
+     *
+     * @param Deferred<array{data: string, fromCache: bool}> $deferred
+     */
+    private static function handleHttpResponse(
+        ResponseInterface $response,
+        Deferred $deferred,
+        string $key,
+        int $ttl,
+        string $url
+    ): void {
+        $body       = (string) $response->getBody();
+        $bodyLength = strlen($body);
+        echo "HTTP request completed for $url\n";
+        if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development') {
+            $date          = date('Y-m-d_H-i-s-u');
+            $color         = $response->getStatusCode() >= 400 ? self::RED : self::GREEN;
+            $debugMessage  = self::YELLOW . 'RESPONSE HTTP/' . $response->getProtocolVersion() . ' ' . $color . $response->getStatusCode() . ' ' . $response->getReasonPhrase() . " received from URL {$url}" . self::NC . PHP_EOL;
+            $debugMessage .= PHP_EOL;
+            $debugMessage .= self::BLUE . 'Incoming response headers' . self::NC . PHP_EOL;
+            foreach ($response->getHeaders() as $name => $values) {
+                $debugMessage .= $name . ': ' . implode(', ', $values) . PHP_EOL;
+            };
+            $debugMessage .= PHP_EOL;
+            $debugMessage .= self::BLUE . "Incoming response body ({$bodyLength} bytes)" . self::NC . PHP_EOL;
+            $debugMessage .= $body . PHP_EOL . PHP_EOL;
+            file_put_contents(Router::$apiFilePath . 'logs' . DIRECTORY_SEPARATOR . "websocket_response_{$date}.log", $debugMessage);
+        }
+
+        // Surface rate-limit (429) and server-error (5xx) responses honestly instead of passing
+        // an error body downstream: a 429 returns an RFC 9457 problem+json object that decodes
+        // fine but lacks the calendar keys, which the JSON branch would otherwise mislabel as
+        // "response data was perhaps truncated?". Reject with the real status; don't cache it.
+        // Other statuses (e.g. a 404 for an unknown calendar) still flow through so the
+        // per-format validation can report them at the json-valid phase as before.
+        $statusCode = $response->getStatusCode();
+        if (self::isUpstreamFailureStatus($statusCode)) {
+            $retryAfter = $response->getHeaderLine('Retry-After');
+            $suffix     = $retryAfter !== '' ? " (Retry-After: {$retryAfter})" : '';
+            $deferred->reject(new \RuntimeException(
+                "HTTP {$statusCode} {$response->getReasonPhrase()} received from {$url}{$suffix}"
+            ));
+            return;
+        }
+
+        if (self::$cacheEnabled) {
+            $stored = self::cacheSet($key, $body, $ttl);
+            echo ( $stored ? "Stored response body in cache\n" : "Failed to store response body in cache\n" );
+            echo self::cacheInfo() . "\n";
+        }
+        $deferred->resolve(['data' => $body, 'fromCache' => false]);
+    }
+
+    /**
+     * Whether an upstream HTTP status should be surfaced as a hard failure (reject) instead of
+     * being passed to per-format validation. Rate limiting (429) and server errors (5xx) mean the
+     * API could not serve the resource, so their bodies must not be validated as calendar content;
+     * other statuses (e.g. 404 for an unknown calendar) flow through to the validation phases.
+     */
+    private static function isUpstreamFailureStatus(int $statusCode): bool
+    {
+        return $statusCode === 429 || $statusCode >= 500;
+    }
+
+    /**
+     * Whether the given URL targets our own API host and is therefore safe to send the
+     * first-party WS_API_KEY to.
+     *
+     * Relative URLs (no host component) target our own API. Absolute URLs must match the
+     * configured API host (API_HOST, default 'localhost'); anything else — e.g. an external
+     * resource validated via executeValidation — must never receive the key. A malformed URL
+     * is treated as untrusted.
+     */
+    private static function isInternalApiUrl(string $url): bool
+    {
+        $host = parse_url($url, PHP_URL_HOST);
+        if ($host === false) {
+            return false;
+        }
+        if ($host === null) {
+            return true;
+        }
+        $apiHost = isset($_ENV['API_HOST']) && is_string($_ENV['API_HOST']) && $_ENV['API_HOST'] !== ''
+            ? $_ENV['API_HOST']
+            : 'localhost';
+
+        return strcasecmp($host, $apiHost) === 0;
+    }
+
+    /**
+     * Return $options with the first-party WS_API_KEY attached as an X-Api-Key header, when one is
+     * configured and the URL targets our own API host (see {@see isInternalApiUrl}). Otherwise the
+     * options are returned unchanged, so the key is never sent to an arbitrary external URL. Any
+     * existing headers (e.g. Accept) are preserved.
+     *
+     * @param array{headers?: array<string, string>, stream?: bool} $options
+     * @return array{headers?: array<string, string>, stream?: bool}
+     */
+    private static function withApiKeyHeader(array $options, string $url): array
+    {
+        $wsApiKey = $_ENV['WS_API_KEY'] ?? null;
+        if (is_string($wsApiKey) && $wsApiKey !== '' && self::isInternalApiUrl($url)) {
+            $headers              = $options['headers'] ?? [];
+            $headers['X-Api-Key'] = $wsApiKey;
+            $options['headers']   = $headers;
+        }
+
+        return $options;
+    }
+
     private function processQueue(): void
     {
         echo 'Processing queue, inFlight: ' . $this->inFlight . ', maxConcurrency: ' . $this->maxConcurrency . ', queue size: ' . count($this->queue) . "\n";
@@ -1609,6 +1703,10 @@ class Health implements MessageComponentInterface
                 $debugMessage = "{$date}\tREQUEST GET URL " . $url . "\n";
                 file_put_contents(Router::$apiFilePath . 'logs' . DIRECTORY_SEPARATOR . 'websocket_requests.log', $debugMessage, FILE_APPEND);
             }
+
+            // Attach the first-party API key (when configured) only for requests targeting our own
+            // API host, so WS_API_KEY is never leaked to an arbitrary absolute URL.
+            $options = self::withApiKeyHeader($options, $url);
 
             $this->http->getAsync($url, $options)
                 ->then(
