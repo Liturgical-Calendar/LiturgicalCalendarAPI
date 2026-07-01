@@ -43,8 +43,8 @@
                     "properties": {
                         "Accept": {
                             "type": "string",
-                            "description": "If present, must contain at least one of the following",
-                            "pattern": "(?:text/html|application/xml|application/json|text/calendar|application/yaml)"
+                            "description": "If present, must contain at least one of the acceptable media types, or the '*/*' wildcard (sent by clients such as curl or browsers that do not specify an explicit Accept)",
+                            "pattern": "(?:text/html|application/xml|application/json|text/calendar|application/yaml|\\*/\\*)"
                         },
                         "Accept-Language": {
                             "$ref": "./CommonDef.json#/definitions/AcceptLanguage"
