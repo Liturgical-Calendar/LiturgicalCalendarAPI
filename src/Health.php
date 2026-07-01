@@ -96,6 +96,16 @@ class Health implements MessageComponentInterface
     private array $queue  = [];
     private bool $ticking = false;
 
+    /**
+     * Maximum number of outbound API requests to dispatch per rolling 1-second window.
+     * Keeps the WS server under the public API's per-IP rate limit (nginx limit_req) without
+     * relying on server-side IP exemptions. Override via WS_MAX_REQUEST_RATE env var.
+     */
+    private int $maxRequestRate;
+    /** @var list<float> microtime(true) timestamps of dispatches within the trailing 1-second window */
+    private array $dispatchTimes       = [];
+    private bool $rateLimitTimerActive = false;
+
     private static bool $cacheInitialized = false;
     private static bool $cacheEnabled     = false;
     private static string $cacheBackend   = 'none';
@@ -141,6 +151,11 @@ class Health implements MessageComponentInterface
         $this->staggerInterval = isset($_ENV['WS_STAGGER_INTERVAL']) && is_numeric($_ENV['WS_STAGGER_INTERVAL'])
             ? max(0.01, (float) $_ENV['WS_STAGGER_INTERVAL'])
             : 0.05;
+
+        // Cap outbound requests to stay under the public API's per-IP rate limit (nginx limit_req).
+        $this->maxRequestRate = isset($_ENV['WS_MAX_REQUEST_RATE']) && is_numeric($_ENV['WS_MAX_REQUEST_RATE'])
+            ? max(1, (int) $_ENV['WS_MAX_REQUEST_RATE'])
+            : 3;
     }
 
     /**
@@ -1689,6 +1704,33 @@ class Health implements MessageComponentInterface
     {
         echo 'Processing queue, inFlight: ' . $this->inFlight . ', maxConcurrency: ' . $this->maxConcurrency . ', queue size: ' . count($this->queue) . "\n";
         while ($this->inFlight < $this->maxConcurrency && !empty($this->queue)) {
+            // Enforce the outbound request-rate cap: no more than $maxRequestRate dispatches within
+            // any trailing 1-second window. This keeps the WS server under the public API's per-IP
+            // rate limit (nginx limit_req) without needing server-side IP exemptions.
+            $now                 = microtime(true);
+            $this->dispatchTimes = array_values(array_filter(
+                $this->dispatchTimes,
+                static fn (float $t): bool => ( $now - $t ) < 1.0
+            ));
+            if (count($this->dispatchTimes) >= $this->maxRequestRate) {
+                // Window is full: resume dispatching once the oldest dispatch ages out of the window.
+                if (false === $this->rateLimitTimerActive) {
+                    $this->rateLimitTimerActive = true;
+                    $oldest                     = $this->dispatchTimes[0] ?? $now;
+                    $wait                       = 1.0 - ( $now - $oldest );
+                    if ($wait < 0.0) {
+                        $wait = 0.0;
+                    }
+                    Loop::addTimer($wait, function (): void {
+                        $this->rateLimitTimerActive = false;
+                        $this->multiHandler->tick();
+                        $this->processQueue();
+                    });
+                }
+                echo 'Rate limit reached (' . $this->maxRequestRate . '/s), deferring ' . count($this->queue) . " queued request(s)\n";
+                return;
+            }
+
             [
                 'url'     => $url,
                 'options' => $options,
@@ -1697,6 +1739,7 @@ class Health implements MessageComponentInterface
             ] = array_shift($this->queue);
 
             ++$this->inFlight;
+            $this->dispatchTimes[] = microtime(true);
 
             if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'development') {
                 $date         = date('Y-m-d H:i:s.u');
