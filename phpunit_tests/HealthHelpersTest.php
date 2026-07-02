@@ -297,21 +297,18 @@ final class HealthHelpersTest extends TestCase
     }
 
     /**
-     * Regression guard for the stop/restart miscount: an async response must be stamped with the
-     * ORIGINATING request's run token, not whatever token the connection currently has stored. A
-     * newer run (token-NEW) has already overwritten runTokens for this connection, but a response
-     * that belongs to the previous run (token-OLD) still in flight must carry token-OLD so the
-     * client can discard it against the active run.
+     * A minimal Ratchet connection whose send() captures the outbound payload. resourceId is a
+     * dynamic public property Ratchet assigns (not part of ConnectionInterface).
      */
-    public function testSendMessageStampsOriginatingRunTokenOverStoredToken(): void
+    private static function createStubConnection(int $resourceId)
     {
-        // A minimal Ratchet connection: resourceId is a dynamic public property Ratchet assigns
-        // (not part of ConnectionInterface), and send() captures the outbound payload.
-        $conn = new class implements \Ratchet\ConnectionInterface {
-            public int $resourceId = 7;
-
+        return new class ($resourceId) implements \Ratchet\ConnectionInterface {
             /** @var mixed */
             public $sent = null;
+
+            public function __construct(public int $resourceId)
+            {
+            }
 
             public function send($data)
             {
@@ -324,6 +321,18 @@ final class HealthHelpersTest extends TestCase
             {
             }
         };
+    }
+
+    /**
+     * Regression guard for the stop/restart miscount: an async response must be stamped with the
+     * ORIGINATING request's run token, not whatever token the connection currently has stored. A
+     * newer run (token-NEW) has already overwritten runTokens for this connection, but a response
+     * that belongs to the previous run (token-OLD) still in flight must carry token-OLD so the
+     * client can discard it against the active run.
+     */
+    public function testSendMessageStampsOriginatingRunTokenOverStoredToken(): void
+    {
+        $conn = self::createStubConnection(7);
 
         $health   = new Health();
         $property = new \ReflectionProperty(Health::class, 'runTokens');
@@ -347,23 +356,7 @@ final class HealthHelpersTest extends TestCase
      */
     public function testSendMessageFallsBackToStoredTokenWhenRunTokenOmitted(): void
     {
-        $conn = new class implements \Ratchet\ConnectionInterface {
-            public int $resourceId = 11;
-
-            /** @var mixed */
-            public $sent = null;
-
-            public function send($data)
-            {
-                $this->sent = $data;
-
-                return $this;
-            }
-
-            public function close()
-            {
-            }
-        };
+        $conn = self::createStubConnection(11);
 
         $health   = new Health();
         $property = new \ReflectionProperty(Health::class, 'runTokens');

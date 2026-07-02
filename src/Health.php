@@ -474,6 +474,17 @@ class Health implements MessageComponentInterface
     }
 
     /**
+     * Capture the run token currently associated with a connection. Called synchronously at the
+     * start of each request handler (before any async work), so the value is the originating
+     * request's token; that token is then threaded into the handler's async responses so they
+     * are stamped correctly even after a later run overwrites the per-connection stored token.
+     */
+    private function resolveRunToken(ConnectionInterface $conn): ?string
+    {
+        return is_int($conn->resourceId) ? ( $this->runTokens[$conn->resourceId] ?? null ) : null;
+    }
+
+    /**
      * Find diocese metadata by calendar ID.
      *
      * @param string $calendarId The diocese calendar ID to look up.
@@ -515,7 +526,7 @@ class Health implements MessageComponentInterface
      */
     private function executeValidation(\stdClass $validation, ConnectionInterface $to): void
     {
-        $runToken = is_int($to->resourceId) ? ( $this->runTokens[$to->resourceId] ?? null ) : null;
+        $runToken = $this->resolveRunToken($to);
         // First thing is try to determine the schema that we will be validating against,
         // and the path to the source file or folder that we will be validating against the schema.
         // Our purpose here is to set the $pathForSchema and $dataPath variables.
@@ -552,7 +563,7 @@ class Health implements MessageComponentInterface
                             try {
                                 $dioceseMetadata = $this->findDioceseMetadata($matches[2]);
                             } catch (\RuntimeException | NotFoundException $e) {
-                                $this->handleDioceseMetadataError($e, $to, $validation, $matches[2]);
+                                $this->handleDioceseMetadataError($e, $to, $validation, $matches[2], $runToken);
                                 return;
                             }
                             $dataPath = strtr(
@@ -597,7 +608,7 @@ class Health implements MessageComponentInterface
                                 try {
                                     $dioceseMetadata = $this->findDioceseMetadata($matches[2]);
                                 } catch (\RuntimeException | NotFoundException $e) {
-                                    $this->handleDioceseMetadataError($e, $to, $validation, $matches[2]);
+                                    $this->handleDioceseMetadataError($e, $to, $validation, $matches[2], $runToken);
                                     return;
                                 }
                                 $dataPath = strtr(
@@ -770,7 +781,7 @@ class Health implements MessageComponentInterface
                 try {
                     $dioceseMetadata = $this->findDioceseMetadata($dioceseId);
                 } catch (\RuntimeException | NotFoundException $e) {
-                    $this->handleDioceseMetadataError($e, $to, $validation, $dioceseId);
+                    $this->handleDioceseMetadataError($e, $to, $validation, $dioceseId, $runToken);
                     return;
                 }
                 $nation      = $dioceseMetadata->nation;
@@ -883,7 +894,8 @@ class Health implements MessageComponentInterface
         \RuntimeException|NotFoundException $e,
         ConnectionInterface $to,
         \stdClass $validation,
-        string $calendarId
+        string $calendarId,
+        ?string $runToken = null
     ): void {
         $validate = (string) $validation->validate;
 
@@ -905,7 +917,7 @@ class Health implements MessageComponentInterface
         }
 
         $message->classes = ".$validate.diocese-metadata";
-        $this->sendMessage($to, $message);
+        $this->sendMessage($to, $message, $runToken);
     }
 
     /**
@@ -996,7 +1008,7 @@ class Health implements MessageComponentInterface
      */
     private function validateCalendar(string $calendar, int $year, string $category, string $responseType, ConnectionInterface $to): void
     {
-        $runToken        = is_int($to->resourceId) ? ( $this->runTokens[$to->resourceId] ?? null ) : null;
+        $runToken        = $this->resolveRunToken($to);
         $returnTypeParam = ReturnTypeParam::from($responseType);
         $acceptMimeType  = $returnTypeParam->toAcceptMimeType();
         $opts            = [
@@ -1241,7 +1253,7 @@ class Health implements MessageComponentInterface
      */
     private function executeUnitTest(string $test, string $calendar, int $year, string $category, ConnectionInterface $to): void
     {
-        $runToken        = is_int($to->resourceId) ? ( $this->runTokens[$to->resourceId] ?? null ) : null;
+        $runToken        = $this->resolveRunToken($to);
         $returnTypeParam = ReturnTypeParam::JSON;
         $acceptMimeType  = $returnTypeParam->toResponseContentType();
         $opts            = [
