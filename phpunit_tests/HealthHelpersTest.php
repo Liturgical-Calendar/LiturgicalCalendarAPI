@@ -270,4 +270,114 @@ final class HealthHelpersTest extends TestCase
 
         $this->assertArrayNotHasKey('X-Api-Key', $options['headers'] ?? []);
     }
+
+    /**
+     * Invoke the private, non-static sendMessage() on a fresh Health instance and return the raw
+     * payload captured by the connection stub's send(). sendMessage() may echo, so the reflected
+     * call is wrapped in an output buffer. When $runToken is omitted the reflected default (null)
+     * is used, exercising the per-connection stored-token fallback.
+     */
+    private static function invokeSendMessage(
+        Health $health,
+        \Ratchet\ConnectionInterface $from,
+        \stdClass $msg,
+        ?string $runToken = null
+    ): void {
+        $method = new \ReflectionMethod(Health::class, 'sendMessage');
+        ob_start();
+        try {
+            if ($runToken === null) {
+                $method->invoke($health, $from, $msg);
+            } else {
+                $method->invoke($health, $from, $msg, $runToken);
+            }
+        } finally {
+            ob_end_clean();
+        }
+    }
+
+    /**
+     * Regression guard for the stop/restart miscount: an async response must be stamped with the
+     * ORIGINATING request's run token, not whatever token the connection currently has stored. A
+     * newer run (token-NEW) has already overwritten runTokens for this connection, but a response
+     * that belongs to the previous run (token-OLD) still in flight must carry token-OLD so the
+     * client can discard it against the active run.
+     */
+    public function testSendMessageStampsOriginatingRunTokenOverStoredToken(): void
+    {
+        // A minimal Ratchet connection: resourceId is a dynamic public property Ratchet assigns
+        // (not part of ConnectionInterface), and send() captures the outbound payload.
+        $conn = new class implements \Ratchet\ConnectionInterface {
+            public int $resourceId = 7;
+
+            /** @var mixed */
+            public $sent = null;
+
+            public function send($data)
+            {
+                $this->sent = $data;
+
+                return $this;
+            }
+
+            public function close()
+            {
+            }
+        };
+
+        $health   = new Health();
+        $property = new \ReflectionProperty(Health::class, 'runTokens');
+        $property->setValue($health, [$conn->resourceId => 'token-NEW']);
+
+        $msg       = new \stdClass();
+        $msg->type = 'success';
+        $msg->text = 'validation complete';
+
+        self::invokeSendMessage($health, $conn, $msg, 'token-OLD');
+
+        $this->assertIsString($conn->sent);
+        $decoded = json_decode($conn->sent);
+        $this->assertInstanceOf(\stdClass::class, $decoded);
+        $this->assertSame('token-OLD', $decoded->runToken);
+    }
+
+    /**
+     * Backward-compatible fallback: callers that do not pass an originating run token still get the
+     * per-connection stored token stamped onto the outgoing message.
+     */
+    public function testSendMessageFallsBackToStoredTokenWhenRunTokenOmitted(): void
+    {
+        $conn = new class implements \Ratchet\ConnectionInterface {
+            public int $resourceId = 11;
+
+            /** @var mixed */
+            public $sent = null;
+
+            public function send($data)
+            {
+                $this->sent = $data;
+
+                return $this;
+            }
+
+            public function close()
+            {
+            }
+        };
+
+        $health   = new Health();
+        $property = new \ReflectionProperty(Health::class, 'runTokens');
+        $property->setValue($health, [$conn->resourceId => 'stored-token']);
+
+        $msg       = new \stdClass();
+        $msg->type = 'success';
+        $msg->text = 'validation complete';
+
+        self::invokeSendMessage($health, $conn, $msg);
+
+        $this->assertIsString($conn->sent);
+        $decoded = json_decode($conn->sent);
+        $this->assertInstanceOf(\stdClass::class, $decoded);
+        $this->assertSame('stored-token', $decoded->runToken);
+    }
 }
