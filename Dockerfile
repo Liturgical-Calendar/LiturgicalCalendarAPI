@@ -8,8 +8,8 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt-get install -y --no-install-suggests --no-install-recommends \
         libicu-dev libonig-dev libzip-dev libpq-dev gettext libyaml-dev && \
     docker-php-ext-install intl zip calendar gettext pdo pdo_pgsql && \
-    pecl install apcu yaml && \
-    docker-php-ext-enable intl zip calendar apcu yaml gettext && \
+    pecl install apcu yaml redis && \
+    docker-php-ext-enable intl zip calendar apcu yaml gettext redis && \
     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
     rm -rf /var/lib/apt/lists/*
 
