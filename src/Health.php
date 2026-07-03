@@ -92,7 +92,7 @@ class Health implements MessageComponentInterface
     private float $staggerInterval;
     private int $maxConcurrency;
     private int $inFlight = 0;
-    /** @var list<array{url:string,options:array{headers?:array<string, string>,stream?:bool},resolve:\Closure(ResponseInterface):void,reject:\Closure(\Throwable):void}> */
+    /** @var list<array{url:string,options:array{headers?:array<string, string>,stream?:bool},resolve:\Closure(ResponseInterface):void,reject:\Closure(\Throwable):void,resourceId:int|null,runToken:string|null}> */
     private array $queue  = [];
     private bool $ticking = false;
 
@@ -1591,11 +1591,19 @@ class Health implements MessageComponentInterface
             $deferred->reject($e);
         };
 
+        // Tag the queued request with its originating run so processQueue() can drop it if the run
+        // is later superseded (client stopped/restarted). The connection's stored token is still the
+        // current run's here, since cachedGet() is called synchronously while handling that request.
+        $queuedResourceId = ( $conn !== null && is_int($conn->resourceId) ) ? $conn->resourceId : null;
+        $queuedRunToken   = $queuedResourceId !== null ? ( $this->runTokens[$queuedResourceId] ?? null ) : null;
+
         $this->queue[] = [
-            'url'     => $url,
-            'options' => $options,
-            'resolve' => $resolve,
-            'reject'  => $reject
+            'url'        => $url,
+            'options'    => $options,
+            'resolve'    => $resolve,
+            'reject'     => $reject,
+            'resourceId' => $queuedResourceId,
+            'runToken'   => $queuedRunToken
         ];
 
         /** @var PromiseInterface<array{data: string, fromCache: bool}> $deferredPromise */
@@ -1719,8 +1727,30 @@ class Health implements MessageComponentInterface
         return $options;
     }
 
+    /**
+     * Drop queued requests whose run has been superseded: the client stopped and started a new run,
+     * so the connection's stored token has advanced. Their responses would be discarded by the
+     * client anyway, so skipping the work lets a restarted run dispatch immediately instead of first
+     * draining the abandoned run's backlog. Untagged requests (e.g. the metadata fetch on connect)
+     * carry no token and are always kept. In-flight requests are not affected (they are few — capped
+     * at maxConcurrency — and their responses are discarded client-side).
+     */
+    private function dropSupersededQueuedRequests(): void
+    {
+        if (empty($this->queue)) {
+            return;
+        }
+        $this->queue = array_values(array_filter(
+            $this->queue,
+            fn (array $item): bool => null === $item['resourceId']
+                || null === $item['runToken']
+                || ( $this->runTokens[$item['resourceId']] ?? null ) === $item['runToken']
+        ));
+    }
+
     private function processQueue(): void
     {
+        $this->dropSupersededQueuedRequests();
         echo 'Processing queue, inFlight: ' . $this->inFlight . ', maxConcurrency: ' . $this->maxConcurrency . ', queue size: ' . count($this->queue) . "\n";
         while ($this->inFlight < $this->maxConcurrency && !empty($this->queue)) {
             // Enforce the outbound request-rate cap: no more than $maxRequestRate dispatches within

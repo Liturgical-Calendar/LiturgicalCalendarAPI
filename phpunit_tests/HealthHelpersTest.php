@@ -373,4 +373,34 @@ final class HealthHelpersTest extends TestCase
         $this->assertInstanceOf(\stdClass::class, $decoded);
         $this->assertSame('stored-token', $decoded->runToken);
     }
+
+    /**
+     * Restart responsiveness: queued requests from a superseded run (their connection's stored token
+     * has advanced) are dropped, while requests for the current run and untagged requests (e.g. the
+     * metadata fetch on connect) are kept — so a restarted run dispatches immediately instead of
+     * waiting for the stopped run's backlog to drain.
+     */
+    public function testDropSupersededQueuedRequestsKeepsCurrentAndUntaggedDropsStale(): void
+    {
+        $health = new Health();
+        $noop   = static function (): void {
+        };
+
+        // Connection 7 has moved on to run 'B'; connection 9 is on run 'X'.
+        ( new \ReflectionProperty(Health::class, 'runTokens') )->setValue($health, [7 => 'B', 9 => 'X']);
+
+        $queueProp = new \ReflectionProperty(Health::class, 'queue');
+        $queueProp->setValue($health, [
+            ['url' => 'stale',    'options' => [], 'resolve' => $noop, 'reject' => $noop, 'resourceId' => 7,    'runToken' => 'A'],
+            ['url' => 'current',  'options' => [], 'resolve' => $noop, 'reject' => $noop, 'resourceId' => 7,    'runToken' => 'B'],
+            ['url' => 'other',    'options' => [], 'resolve' => $noop, 'reject' => $noop, 'resourceId' => 9,    'runToken' => 'X'],
+            ['url' => 'untagged', 'options' => [], 'resolve' => $noop, 'reject' => $noop, 'resourceId' => null, 'runToken' => null],
+        ]);
+
+        ( new \ReflectionMethod(Health::class, 'dropSupersededQueuedRequests') )->invoke($health);
+
+        $remaining = $queueProp->getValue($health);
+        $this->assertIsArray($remaining);
+        $this->assertSame(['current', 'other', 'untagged'], array_column($remaining, 'url'));
+    }
 }
