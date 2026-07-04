@@ -47,6 +47,13 @@ final class TestsHandler extends AbstractHandler
     public function __construct(array $requestPathParams = [])
     {
         parent::__construct($requestPathParams);
+        // The frontend admin-tests page performs cookie-authenticated writes
+        // (PUT / PATCH / DELETE) against /tests from the browser. On split-origin
+        // deployments (e.g. the docker e2e stack: frontend :3000 → API :8000) a
+        // wildcard Access-Control-Allow-Origin makes the browser reject any
+        // credentialed request, so echo the validated origin and allow credentials
+        // — same as the /auth and /admin handlers.
+        $this->allowCredentials = true;
     }
 
     /**
