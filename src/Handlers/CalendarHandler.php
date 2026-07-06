@@ -4918,15 +4918,14 @@ final class CalendarHandler extends AbstractHandler
             $displayGrade     = '';
             $displayGradeHTML = '';
 
-            if ($liturgicalEvent->grade_display !== null) {
-                $displayGrade = $liturgicalEvent->grade_display;
-            }
-
             if ($liturgicalEvent->event_key === 'DedicationLateran' || $liturgicalEvent->event_key === 'DedicationLateran_vigil') {
+                $displayGrade     = LitGrade::FEAST->i18n($this->CalendarParams->Locale, false);
                 $displayGradeHTML = LitGrade::FEAST->i18n($this->CalendarParams->Locale, true);
             } elseif ($liturgicalEvent->grade_display === null) {
+                $displayGrade     = $liturgicalEvent->grade->i18n($this->CalendarParams->Locale, false);
                 $displayGradeHTML = $liturgicalEvent->grade->i18n($this->CalendarParams->Locale, true);
             } else {
+                $displayGrade = $liturgicalEvent->grade_display;
                 if ($liturgicalEvent->grade_display === '') {
                     $displayGradeHTML = '';
                 } elseif ($liturgicalEvent->grade->value >= LitGrade::FEAST->value) {
@@ -4936,17 +4935,18 @@ final class CalendarHandler extends AbstractHandler
                 }
             }
 
-            $description  = $liturgicalEvent->getCommonLcl();
-            $description .=  '\n' . $displayGrade;
-            $description .= ( count($liturgicalEvent->color) > 0 )
-                ? '\n' . Utilities::parseColorToString($liturgicalEvent->color, $this->CalendarParams->Locale, false)
-                : '';
-            $description .= (
-                    isset($liturgicalEvent->liturgical_year) // no need to check for null value, isset will fail for a null value
-                    && $liturgicalEvent->liturgical_year !== ''
-                )
-                ? '\n' . $liturgicalEvent->liturgical_year
-                : '';
+            // Build the description with real newlines between the non-empty parts:
+            // escapeIcal() takes care of converting them to the '\n' sequences
+            // required by RFC 5545.
+            $descriptionParts = array_filter([
+                $liturgicalEvent->getCommonLcl(),
+                $displayGrade,
+                count($liturgicalEvent->color) > 0
+                    ? Utilities::parseColorToString($liturgicalEvent->color, $this->CalendarParams->Locale, false)
+                    : '',
+                $liturgicalEvent->liturgical_year ?? '',
+            ], static fn (string $part): bool => $part !== '');
+            $description      = implode("\n", $descriptionParts);
 
             $htmlDescription  = '<P DIR=LTR>' . $liturgicalEvent->getCommonLcl();
             $htmlDescription .=  '<BR>' . $displayGradeHTML;

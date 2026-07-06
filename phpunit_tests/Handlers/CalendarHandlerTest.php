@@ -144,4 +144,72 @@ final class CalendarHandlerTest extends AbstractHandlerTestCase
             'Fallback published_at must be an RFC3339 UTC timestamp for the ICS CREATED field'
         );
     }
+
+    /**
+     * Request the 2025 calendar as ICS (Latin locale for deterministic grade
+     * strings) and return the response body with RFC 5545 line folding undone,
+     * so assertions can match logical content lines directly.
+     */
+    private function fetchUnfoldedIcs(): string
+    {
+        // The handler serves cached responses from engineCache/ when one
+        // exists for the same API version + source-data hash; a cache file
+        // produced by earlier (possibly buggy) code would mask regressions,
+        // so force a fresh ICS computation.
+        foreach (glob(dirname(__DIR__, 2) . '/engineCache/v*/*.ics') ?: [] as $staleIcs) {
+            unlink($staleIcs);
+        }
+
+        $response = $this->makeHandler(['2025'])->handle(
+            $this->requestFor('GET', '/calendar/2025', [
+                'Accept'          => 'text/calendar',
+                'Accept-Language' => 'la',
+            ])
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = (string) $response->getBody();
+        self::assertStringStartsWith('BEGIN:VCALENDAR', $body);
+
+        // produceIcal folds long lines with a CRLF + HT continuation sequence.
+        return str_replace("\r\n\t", '', $body);
+    }
+
+    /**
+     * Regression: DESCRIPTION values were built with pre-escaped literal '\n'
+     * sequences, which escapeIcal() then double-escaped to '\\n'. RFC 5545
+     * clients (e.g. Google Calendar) unescape '\\' to a literal backslash and
+     * therefore rendered a literal "\n" instead of a line break.
+     */
+    public function testIcsTextValuesAreNotDoubleEscaped(): void
+    {
+        $unfolded = $this->fetchUnfoldedIcs();
+
+        self::assertStringNotContainsString(
+            '\\\\n',
+            $unfolded,
+            'ICS body must not contain double-escaped newline sequences (backslash-backslash-n)'
+        );
+    }
+
+    /**
+     * Regression: the plain-text DESCRIPTION only included the liturgical
+     * rank when grade_display was explicitly set, which it is not for most
+     * events; unlike the HTML X-ALT-DESC it never fell back to the localized
+     * grade, so the rank never appeared in calendar clients.
+     */
+    public function testIcsDescriptionIncludesLiturgicalGrade(): void
+    {
+        $unfolded = $this->fetchUnfoldedIcs();
+
+        // With a Latin locale LitGrade::MEMORIAL->i18n('la', false) is the
+        // hardcoded string 'Memoria obligatoria' (no gettext involved); the
+        // 2025 General Roman Calendar contains many obligatory memorials, so
+        // at least one DESCRIPTION must carry it on an escaped newline.
+        self::assertStringContainsString(
+            '\nMemoria obligatoria',
+            $unfolded,
+            'ICS DESCRIPTION must include the localized liturgical rank for memorials'
+        );
+    }
 }
