@@ -7,6 +7,13 @@
 # Anything that should live only on the server (env files, runtime
 # logs, server-managed state) MUST be listed here so it isn't wiped
 # on deploy.
+#
+# GOTCHA (consequence of #2): adding a pattern here does NOT clean up
+# copies already on the server from earlier deploys — the new pattern
+# protects them from --delete, fossilizing them. When adding an entry
+# for something previously deployed, also remove it once manually on
+# the server. Never use --delete-excluded for that: it would wipe the
+# server-managed state below (.env.production, logs/, cache/, ...).
 
 # --- VCS / CI / agent metadata ---
 .git/
@@ -28,6 +35,8 @@
 phpunit_tests/
 coverage/
 docs/
+literature/
+stubs/
 
 # --- Build / dev configuration with no runtime role ---
 phpcs.xml
@@ -39,6 +48,8 @@ phpunit.xml.dist
 captainhook.json
 redocly.yaml
 .markdownlint.yml
+.markdownlint-wiki.yml
+.php-version
 docker-compose.yml
 docker-compose.yaml
 Dockerfile
@@ -50,6 +61,33 @@ stop-server.sh
 restart-server.sh
 server.pid
 server.vscode.pid
+# The WebSocket test server does not run from this directory on the VPS.
+ws-start-server.sh
+ws-stop-server.sh
+ws-server.pid
+parseOpenAPI.js
+
+# --- Provisioning sources (installed elsewhere, not read at runtime) ---
+# deploy/ holds systemd/cron unit SOURCES; the installed units live under
+# /etc/systemd and reference /opt/liturgical-calendar, not this vhost.
+# infrastructure/ is Zitadel provisioning material. migrations/ at the
+# repo root is an empty placeholder (.gitkeep) — Doctrine reads
+# src/Migrations per doctrine-migrations.php.
+deploy/
+infrastructure/
+/migrations/
+
+# --- Dev-only entries inside scripts/ ---
+# scripts/ itself MUST ship: the operational scripts (mint-official-key,
+# migrate-*-tuples, reconcile-resource-tuples, seed-wider-region-membership,
+# and the openfga-model*.json they apply) bootstrap from the deployed app
+# root's vendor/ + .env and are run ON the server per the RBAC runbook,
+# since production OpenFGA/Postgres are only reachable there. Exclude only
+# the local coverage tooling and the Docker-bootstrap SQL.
+scripts/coverage-summary.php
+scripts/coverage-with-server.sh
+scripts/merge-pcov-coverage.php
+scripts/init-db.sql
 
 # --- CLI tooling that cannot run in the SSH chroot anyway ---
 # bin/doctrine-migrations is invoked in-process via the /_ops/migrate
@@ -73,6 +111,11 @@ composer.lock
 # --- Project meta files ---
 CLAUDE.md
 README.md
+CHANGELOG.md
+CODE_OF_CONDUCT.md
+CONTRIBUTING.md
+DATA_RETENTION.md
+LICENSE
 
 # --- TRACKED EXAMPLE FILE (transferred + overwritten every deploy) ---
 # The "+" prefix is an rsync include-override: this rule must precede the
