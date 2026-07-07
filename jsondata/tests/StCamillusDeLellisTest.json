@@ -1,0 +1,203 @@
+{
+    "name": "StCamillusDeLellisTest",
+    "event_key": "StCamillusDeLellis",
+    "description": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18, moved from July 14 to make way for bl Kateri Tekakwitha",
+    "test_type": "exactCorrespondence",
+    "applies_to": {
+        "national_calendar": "US"
+    },
+    "assertions": [
+        {
+            "year": 1999,
+            "expected_value": null,
+            "assert": "eventNotExists",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should not exist on July 18"
+        },
+        {
+            "year": 2000,
+            "expected_value": "2000-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2001,
+            "expected_value": "2001-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2002,
+            "expected_value": "2002-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2003,
+            "expected_value": "2003-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2004,
+            "expected_value": null,
+            "assert": "eventNotExists",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should not exist on July 18"
+        },
+        {
+            "year": 2005,
+            "expected_value": "2005-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2006,
+            "expected_value": "2006-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2007,
+            "expected_value": "2007-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2008,
+            "expected_value": "2008-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2009,
+            "expected_value": "2009-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2010,
+            "expected_value": null,
+            "assert": "eventNotExists",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should not exist on July 18"
+        },
+        {
+            "year": 2011,
+            "expected_value": "2011-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2012,
+            "expected_value": "2012-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2013,
+            "expected_value": "2013-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2014,
+            "expected_value": "2014-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2015,
+            "expected_value": "2015-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2016,
+            "expected_value": "2016-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2017,
+            "expected_value": "2017-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2018,
+            "expected_value": "2018-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2019,
+            "expected_value": "2019-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2020,
+            "expected_value": "2020-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2021,
+            "expected_value": null,
+            "assert": "eventNotExists",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should not exist on July 18"
+        },
+        {
+            "year": 2022,
+            "expected_value": "2022-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2023,
+            "expected_value": "2023-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2024,
+            "expected_value": "2024-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2025,
+            "expected_value": "2025-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2026,
+            "expected_value": "2026-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2027,
+            "expected_value": null,
+            "assert": "eventNotExists",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should not exist on July 18"
+        },
+        {
+            "year": 2028,
+            "expected_value": "2028-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2029,
+            "expected_value": "2029-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        },
+        {
+            "year": 2030,
+            "expected_value": "2030-07-18T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Camillus de Lellis, Priest' should fall on July 18"
+        }
+    ]
+}
