@@ -146,6 +146,58 @@ final class CalendarHandlerTest extends AbstractHandlerTestCase
     }
 
     /**
+     * Caching the GitHub release JSON is a non-essential optimization. When the
+     * engine cache directory exists and is writable, cacheDirectoryIsAvailable()
+     * reports true so the caller may persist the release info.
+     */
+    public function testCacheDirectoryIsAvailableReturnsTrueWhenWritable(): void
+    {
+        $handler  = $this->makeHandler();
+        $cacheDir = sys_get_temp_dir() . '/litcal-cache-writable-' . bin2hex(random_bytes(4));
+        self::assertTrue(mkdir($cacheDir, 0755));
+
+        try {
+            ( new \ReflectionProperty(CalendarHandler::class, 'CachePath') )
+                ->setValue($handler, $cacheDir . '/');
+            $available = ( new \ReflectionMethod(CalendarHandler::class, 'cacheDirectoryIsAvailable') )
+                ->invoke($handler);
+            self::assertTrue($available, 'A writable cache directory must report as available');
+        } finally {
+            rmdir($cacheDir);
+        }
+    }
+
+    /**
+     * Regression: on localhost the response cache is skipped entirely, yet
+     * getGithubReleaseInfo() still tried to create the cache directory to
+     * persist GHRelease.json and threw a 503 (ServiceUnavailableException) when
+     * it could not — taking down ICS output even though the release info is
+     * non-essential. cacheDirectoryIsAvailable() must report false instead of
+     * throwing, so the caller can proceed without caching.
+     */
+    public function testCacheDirectoryIsAvailableReturnsFalseWhenParentNotWritable(): void
+    {
+        if (function_exists('posix_getuid') && posix_getuid() === 0) {
+            self::markTestSkipped('Running as root bypasses directory permissions, so a read-only parent cannot be simulated.');
+        }
+
+        $handler  = $this->makeHandler();
+        $roParent = sys_get_temp_dir() . '/litcal-cache-readonly-' . bin2hex(random_bytes(4));
+        self::assertTrue(mkdir($roParent, 0500)); // read + execute only: cannot create children
+
+        try {
+            ( new \ReflectionProperty(CalendarHandler::class, 'CachePath') )
+                ->setValue($handler, $roParent . '/v5_7-deadbeef/');
+            $available = ( new \ReflectionMethod(CalendarHandler::class, 'cacheDirectoryIsAvailable') )
+                ->invoke($handler);
+            self::assertFalse($available, 'An uncreatable cache directory must report as unavailable, not throw');
+        } finally {
+            chmod($roParent, 0700);
+            rmdir($roParent);
+        }
+    }
+
+    /**
      * Request the 2025 calendar as ICS (Latin locale for deterministic grade
      * strings) and return the response body with RFC 5545 line folding undone,
      * so assertions can match logical content lines directly.

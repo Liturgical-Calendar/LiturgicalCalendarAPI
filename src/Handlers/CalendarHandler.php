@@ -628,6 +628,31 @@ final class CalendarHandler extends AbstractHandler
     }
 
     /**
+     * Non-throwing counterpart to {@see self::ensureCachePathExists()}, for callers
+     * whose caching is a best-effort optimization rather than a hard requirement
+     * (currently {@see self::getGithubReleaseInfo()}).
+     *
+     * Returns true when the cache directory exists (or was created) and is writable,
+     * false when it cannot be prepared. A false result must never abort the response:
+     * the caller keeps its in-memory data and simply skips persisting it.
+     *
+     * @return bool Whether the cache directory is available for writing
+     */
+    private function cacheDirectoryIsAvailable(): bool
+    {
+        try {
+            $this->ensureCachePathExists();
+            return true;
+        } catch (ServiceUnavailableException $e) {
+            $logger = LoggerFactory::create('calendar', null, 30, false, true, false);
+            $logger->warning('Cache directory unavailable; proceeding without caching', [
+                'reason' => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
+    /**
      * Short content fingerprint of the data that determines calendar output:
      * the source JSON (jsondata/sourcedata) and the compiled gettext catalogs
      * (i18n .mo files, which supply the translated event names baked into the
@@ -4424,9 +4449,12 @@ final class CalendarHandler extends AbstractHandler
             $returnObj->status = 'success';
             $returnObj->obj    = Utilities::jsonFileToObject($ghReleaseCacheFile);
         } else {
-            // We always create a cache of the Github Release, even for localhost development,
-            // to avoid sending too many requests
-            $this->ensureCachePathExists();
+            // We try to cache the GitHub Release, even for localhost development,
+            // to avoid sending too many requests. Caching is a non-essential
+            // optimization, though: if the cache directory cannot be created
+            // (e.g. a read-only deployment) we must still fetch and return the
+            // release info rather than 503 the whole ICS response.
+            $cacheAvailable = $this->cacheDirectoryIsAvailable();
 
             $GithubReleasesAPI = 'https://api.github.com/repos/Liturgical-Calendar/LiturgicalCalendarAPI/releases/latest';
 
@@ -4458,9 +4486,12 @@ final class CalendarHandler extends AbstractHandler
                     if (false === $GitHubReleaseEncoded) {
                         throw new \Exception('Could not re-encode JSON object');
                     }
-                    $bytes = file_put_contents($ghReleaseCacheFile, $GitHubReleaseEncoded, LOCK_EX);
+                    // Only attempt the write when the cache directory is available;
+                    // we still have the data in memory regardless, so ICS output
+                    // succeeds even when caching is impossible.
+                    $bytes = $cacheAvailable ? @file_put_contents($ghReleaseCacheFile, $GitHubReleaseEncoded, LOCK_EX) : false;
                     if (false === $bytes) {
-                        // Cache write failed, but we have the data in memory - log and continue
+                        // Cache unavailable or write failed - log and continue
                         // This allows ICS responses to succeed even when caching fails
                         $logger = LoggerFactory::create('calendar', null, 30, false, true, false);
                         $logger->warning('Could not write GitHub release cache file', [
