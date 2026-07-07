@@ -4488,11 +4488,11 @@ final class CalendarHandler extends AbstractHandler
                     }
                     // Only attempt the write when the cache directory is available;
                     // we still have the data in memory regardless, so ICS output
-                    // succeeds even when caching is impossible.
-                    $bytes = $cacheAvailable ? @file_put_contents($ghReleaseCacheFile, $GitHubReleaseEncoded, LOCK_EX) : false;
-                    if (false === $bytes) {
-                        // Cache unavailable or write failed - log and continue
-                        // This allows ICS responses to succeed even when caching fails
+                    // succeeds even when caching is impossible. The unavailable
+                    // case is already logged by cacheDirectoryIsAvailable(), so we
+                    // only warn here when an available directory unexpectedly
+                    // rejects the write (e.g. a race or disk error).
+                    if ($cacheAvailable && false === @file_put_contents($ghReleaseCacheFile, $GitHubReleaseEncoded, LOCK_EX)) {
                         $logger = LoggerFactory::create('calendar', null, 30, false, true, false);
                         $logger->warning('Could not write GitHub release cache file', [
                             'cache_file' => $ghReleaseCacheFile

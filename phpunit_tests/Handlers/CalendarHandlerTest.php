@@ -147,23 +147,32 @@ final class CalendarHandlerTest extends AbstractHandlerTestCase
 
     /**
      * Caching the GitHub release JSON is a non-essential optimization. When the
-     * engine cache directory exists and is writable, cacheDirectoryIsAvailable()
-     * reports true so the caller may persist the release info.
+     * versioned cache directory does not yet exist but sits under a writable
+     * parent, cacheDirectoryIsAvailable() must create it (exercising
+     * ensureCachePathExists()'s create-succeeds branch, which is the real
+     * first-request scenario) and report true.
      */
     public function testCacheDirectoryIsAvailableReturnsTrueWhenWritable(): void
     {
-        $handler  = $this->makeHandler();
-        $cacheDir = sys_get_temp_dir() . '/litcal-cache-writable-' . bin2hex(random_bytes(4));
-        self::assertTrue(mkdir($cacheDir, 0755));
+        $handler = $this->makeHandler();
+        $parent  = sys_get_temp_dir() . '/litcal-cache-writable-' . bin2hex(random_bytes(4));
+        self::assertTrue(mkdir($parent, 0755));
+        // A not-yet-existing versioned subdir under the writable parent, mirroring
+        // the vN-<hash> dir that is absent on the first request for a given version.
+        $cacheDir = $parent . '/v5_7-cafef00d';
 
         try {
             ( new \ReflectionProperty(CalendarHandler::class, 'CachePath') )
                 ->setValue($handler, $cacheDir . '/');
             $available = ( new \ReflectionMethod(CalendarHandler::class, 'cacheDirectoryIsAvailable') )
                 ->invoke($handler);
-            self::assertTrue($available, 'A writable cache directory must report as available');
+            self::assertTrue($available, 'A creatable cache directory must report as available');
+            self::assertDirectoryExists($cacheDir, 'The versioned cache directory must have been created');
         } finally {
-            rmdir($cacheDir);
+            if (is_dir($cacheDir)) {
+                rmdir($cacheDir);
+            }
+            rmdir($parent);
         }
     }
 
