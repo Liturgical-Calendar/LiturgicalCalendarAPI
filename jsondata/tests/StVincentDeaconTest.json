@@ -1,0 +1,203 @@
+{
+    "name": "StVincentDeaconTest",
+    "event_key": "StVincentDeacon",
+    "description": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23, moved from January 22 to make way for the National Day of Prayer for the Unborn",
+    "test_type": "exactCorrespondence",
+    "applies_to": {
+        "national_calendar": "US"
+    },
+    "assertions": [
+        {
+            "year": 1999,
+            "expected_value": "1999-01-22T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 22: the transfer to January 23 was only introduced with the 2011 Roman Missal"
+        },
+        {
+            "year": 2000,
+            "expected_value": "2000-01-22T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 22: the transfer to January 23 was only introduced with the 2011 Roman Missal"
+        },
+        {
+            "year": 2001,
+            "expected_value": "2001-01-22T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 22: the transfer to January 23 was only introduced with the 2011 Roman Missal"
+        },
+        {
+            "year": 2002,
+            "expected_value": "2002-01-22T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 22: the transfer to January 23 was only introduced with the 2011 Roman Missal"
+        },
+        {
+            "year": 2003,
+            "expected_value": "2003-01-22T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 22: the transfer to January 23 was only introduced with the 2011 Roman Missal"
+        },
+        {
+            "year": 2004,
+            "expected_value": "2004-01-22T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 22: the transfer to January 23 was only introduced with the 2011 Roman Missal"
+        },
+        {
+            "year": 2005,
+            "expected_value": "2005-01-22T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 22: the transfer to January 23 was only introduced with the 2011 Roman Missal"
+        },
+        {
+            "year": 2006,
+            "expected_value": null,
+            "assert": "eventNotExists",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should not exist in 2006: before the 2011 Roman Missal it falls on January 22, which is a Sunday in 2006"
+        },
+        {
+            "year": 2007,
+            "expected_value": "2007-01-22T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 22: the transfer to January 23 was only introduced with the 2011 Roman Missal"
+        },
+        {
+            "year": 2008,
+            "expected_value": "2008-01-22T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 22: the transfer to January 23 was only introduced with the 2011 Roman Missal"
+        },
+        {
+            "year": 2009,
+            "expected_value": "2009-01-22T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 22: the transfer to January 23 was only introduced with the 2011 Roman Missal"
+        },
+        {
+            "year": 2010,
+            "expected_value": "2010-01-22T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 22: the transfer to January 23 was only introduced with the 2011 Roman Missal"
+        },
+        {
+            "year": 2011,
+            "expected_value": null,
+            "assert": "eventNotExists",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should not exist on January 23"
+        },
+        {
+            "year": 2012,
+            "expected_value": "2012-01-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23"
+        },
+        {
+            "year": 2013,
+            "expected_value": "2013-01-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23"
+        },
+        {
+            "year": 2014,
+            "expected_value": "2014-01-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23"
+        },
+        {
+            "year": 2015,
+            "expected_value": "2015-01-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23"
+        },
+        {
+            "year": 2016,
+            "expected_value": "2016-01-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23"
+        },
+        {
+            "year": 2017,
+            "expected_value": "2017-01-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23"
+        },
+        {
+            "year": 2018,
+            "expected_value": "2018-01-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23"
+        },
+        {
+            "year": 2019,
+            "expected_value": "2019-01-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23"
+        },
+        {
+            "year": 2020,
+            "expected_value": "2020-01-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23"
+        },
+        {
+            "year": 2021,
+            "expected_value": "2021-01-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23"
+        },
+        {
+            "year": 2022,
+            "expected_value": null,
+            "assert": "eventNotExists",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should not exist on January 23"
+        },
+        {
+            "year": 2023,
+            "expected_value": "2023-01-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23"
+        },
+        {
+            "year": 2024,
+            "expected_value": "2024-01-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23"
+        },
+        {
+            "year": 2025,
+            "expected_value": "2025-01-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23"
+        },
+        {
+            "year": 2026,
+            "expected_value": "2026-01-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23"
+        },
+        {
+            "year": 2027,
+            "expected_value": "2027-01-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23"
+        },
+        {
+            "year": 2028,
+            "expected_value": null,
+            "assert": "eventNotExists",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should not exist on January 23"
+        },
+        {
+            "year": 2029,
+            "expected_value": "2029-01-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23"
+        },
+        {
+            "year": 2030,
+            "expected_value": "2030-01-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23"
+        }
+    ]
+}
