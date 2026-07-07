@@ -146,6 +146,67 @@ final class CalendarHandlerTest extends AbstractHandlerTestCase
     }
 
     /**
+     * Caching the GitHub release JSON is a non-essential optimization. When the
+     * versioned cache directory does not yet exist but sits under a writable
+     * parent, cacheDirectoryIsAvailable() must create it (exercising
+     * ensureCachePathExists()'s create-succeeds branch, which is the real
+     * first-request scenario) and report true.
+     */
+    public function testCacheDirectoryIsAvailableReturnsTrueWhenWritable(): void
+    {
+        $handler = $this->makeHandler();
+        $parent  = sys_get_temp_dir() . '/litcal-cache-writable-' . bin2hex(random_bytes(4));
+        self::assertTrue(mkdir($parent, 0755));
+        // A not-yet-existing versioned subdir under the writable parent, mirroring
+        // the vN-<hash> dir that is absent on the first request for a given version.
+        $cacheDir = $parent . '/v5_7-cafef00d';
+
+        try {
+            ( new \ReflectionProperty(CalendarHandler::class, 'CachePath') )
+                ->setValue($handler, $cacheDir . '/');
+            $available = ( new \ReflectionMethod(CalendarHandler::class, 'cacheDirectoryIsAvailable') )
+                ->invoke($handler);
+            self::assertTrue($available, 'A creatable cache directory must report as available');
+            self::assertDirectoryExists($cacheDir, 'The versioned cache directory must have been created');
+        } finally {
+            if (is_dir($cacheDir)) {
+                rmdir($cacheDir);
+            }
+            rmdir($parent);
+        }
+    }
+
+    /**
+     * Regression: on localhost the response cache is skipped entirely, yet
+     * getGithubReleaseInfo() still tried to create the cache directory to
+     * persist GHRelease.json and threw a 503 (ServiceUnavailableException) when
+     * it could not — taking down ICS output even though the release info is
+     * non-essential. cacheDirectoryIsAvailable() must report false instead of
+     * throwing, so the caller can proceed without caching.
+     */
+    public function testCacheDirectoryIsAvailableReturnsFalseWhenParentNotWritable(): void
+    {
+        if (function_exists('posix_getuid') && posix_getuid() === 0) {
+            self::markTestSkipped('Running as root bypasses directory permissions, so a read-only parent cannot be simulated.');
+        }
+
+        $handler  = $this->makeHandler();
+        $roParent = sys_get_temp_dir() . '/litcal-cache-readonly-' . bin2hex(random_bytes(4));
+        self::assertTrue(mkdir($roParent, 0500)); // read + execute only: cannot create children
+
+        try {
+            ( new \ReflectionProperty(CalendarHandler::class, 'CachePath') )
+                ->setValue($handler, $roParent . '/v5_7-deadbeef/');
+            $available = ( new \ReflectionMethod(CalendarHandler::class, 'cacheDirectoryIsAvailable') )
+                ->invoke($handler);
+            self::assertFalse($available, 'An uncreatable cache directory must report as unavailable, not throw');
+        } finally {
+            chmod($roParent, 0700);
+            rmdir($roParent);
+        }
+    }
+
+    /**
      * The handler serves cached responses from engineCache/ when one exists
      * for the same API version + source-data hash; a cache file produced by
      * earlier (possibly buggy) code would mask regressions, so tests that
