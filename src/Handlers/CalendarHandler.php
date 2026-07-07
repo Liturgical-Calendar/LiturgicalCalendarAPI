@@ -3959,31 +3959,29 @@ final class CalendarHandler extends AbstractHandler
                 $this->Cal->moveLiturgicalEventDate($event_key, $newDate);
             } else {
                 // If it was suppressed on the original date because of a higher ranking celebration,
-                //    we should recreate it on the new date
-                //    except in the case of Saint Vincent Deacon when we're dealing with the Roman Missal USA edition,
-                //    since the National Day of Prayer will take over the new date
-                // TODO: this logic needs to be generalized to allow for other cases,
-                //       and needs to be automated from the national calendar JSON file
-                if ($event_key !== 'StVincentDeacon' || $missal !== RomanMissal::USA_EDITION_2011) {
-                    if ($this->Cal->isSuppressed($event_key)) {
-                        $suppressedEvent = $this->Cal->getSuppressedEventByKey($event_key);
-                        if (null === $suppressedEvent) {
-                            throw new ServiceUnavailableException(
-                                'He who was lost, ' . $event_key . ', and was suppressed, ' .
-                                'somehow has now been found. Miracle of miracles.'
-                            );
-                        }
-
-                        $oldDate               = clone($suppressedEvent->date);
-                        $suppressedEvent->date = $newDate;
-                        $suppressedEvent->type = LitEventType::FIXED;
-                        $this->Cal->addLiturgicalEvent($event_key, $suppressedEvent);
-                        // if it was suppressed previously (which it should have been), we should remove from the suppressed events collection
-                        $this->Cal->reinstateEvent($event_key);
-                        $oldDateStr = $this->localeDateFormatter->formatLocalizedDate($oldDate);
-                    } else {
-                        throw new ServiceUnavailableException("This is strange, {$event_key} is not suppressed? Where is it?");
+                //    we should recreate it on the new date.
+                // This holds even when another celebration will later be created on the new date:
+                //    e.g. when January 22 falls on a Sunday, both the National Day of Prayer for the
+                //    Unborn (moved forward per GIRM 373 US adaptation) and the optional memorial of
+                //    Saint Vincent Deacon are observed on January 23 (cf. the USCCB ordo for 2023).
+                if ($this->Cal->isSuppressed($event_key)) {
+                    $suppressedEvent = $this->Cal->getSuppressedEventByKey($event_key);
+                    if (null === $suppressedEvent) {
+                        throw new ServiceUnavailableException(
+                            'He who was lost, ' . $event_key . ', and was suppressed, ' .
+                            'somehow has now been found. Miracle of miracles.'
+                        );
                     }
+
+                    $oldDate               = clone($suppressedEvent->date);
+                    $suppressedEvent->date = $newDate;
+                    $suppressedEvent->type = LitEventType::FIXED;
+                    $this->Cal->addLiturgicalEvent($event_key, $suppressedEvent);
+                    // if it was suppressed previously (which it should have been), we should remove from the suppressed events collection
+                    $this->Cal->reinstateEvent($event_key);
+                    $oldDateStr = $this->localeDateFormatter->formatLocalizedDate($oldDate);
+                } else {
+                    throw new ServiceUnavailableException("This is strange, {$event_key} is not suppressed? Where is it?");
                 }
             }
 

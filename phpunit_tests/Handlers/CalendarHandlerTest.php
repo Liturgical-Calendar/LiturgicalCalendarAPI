@@ -220,6 +220,35 @@ final class CalendarHandlerTest extends AbstractHandlerTestCase
     }
 
     /**
+     * When January 22 falls on a Sunday (e.g. 2023), the National Day of
+     * Prayer for the Unborn moves forward to January 23 (GIRM 373 US
+     * adaptation) and the optional memorial of St Vincent Deacon — suppressed
+     * by the Sunday on January 22 — is recreated on January 23 alongside it,
+     * as confirmed by the USCCB ordo for 2023. A hardcoded special case used
+     * to leave St Vincent out entirely in these years.
+     */
+    public function testMovedEventIsRecreatedAlongsideTransferredDayOfPrayer(): void
+    {
+        $this->purgeEngineCache('json');
+
+        $response = $this->makeHandler(['nation', 'US', '2023'])->handle(
+            $this->requestFor('GET', '/calendar/nation/US/2023', ['Accept-Language' => 'en'])
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $body  = $this->decodeJsonBody($response);
+        $dates = [];
+        foreach ($body['litcal'] as $event) {
+            if (in_array($event['event_key'], ['StVincentDeacon', 'PrayerUnborn'], true)) {
+                $dates[$event['event_key']] = substr($event['date'], 0, 10);
+            }
+        }
+
+        self::assertSame('2023-01-23', $dates['PrayerUnborn'] ?? null, 'Day of Prayer must move to Jan 23 when Jan 22 is a Sunday');
+        self::assertSame('2023-01-23', $dates['StVincentDeacon'] ?? null, 'St Vincent must be recreated on Jan 23 alongside the Day of Prayer');
+    }
+
+    /**
      * Request the 2025 calendar as ICS (Latin locale for deterministic grade
      * strings) and return the response body with RFC 5545 line folding undone,
      * so assertions can match logical content lines directly.
