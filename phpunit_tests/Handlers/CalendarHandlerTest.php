@@ -146,19 +146,87 @@ final class CalendarHandlerTest extends AbstractHandlerTestCase
     }
 
     /**
+     * The handler serves cached responses from engineCache/ when one exists
+     * for the same API version + source-data hash; a cache file produced by
+     * earlier (possibly buggy) code would mask regressions, so tests that
+     * assert on computed calendar content must force a fresh computation.
+     * The md5-named response caches match [0-9a-f]*; GHRelease.json (the
+     * GitHub release cache, unrelated to calendar computation) is left alone.
+     */
+    private function purgeEngineCache(string $extension): void
+    {
+        foreach (glob(dirname(__DIR__, 2) . '/engineCache/v*/[0-9a-f]*.' . $extension) ?: [] as $staleCache) {
+            unlink($staleCache);
+        }
+    }
+
+    /**
+     * Regression for issue #690: the national-calendar 'moveEvent' action was
+     * a silent no-op whenever the event to move was still present in the
+     * calendar (i.e. NOT suppressed by the celebration replacing it) and the
+     * target date was free. US_2011 moves St Camillus de Lellis from July 14
+     * (taken by Blessed Kateri Tekakwitha, whose memorial does not suppress
+     * his optional memorial) to July 18 — a free Saturday in 2026.
+     */
+    public function testNationalCalendarMoveEventMovesCoexistingEvent(): void
+    {
+        $this->purgeEngineCache('json');
+
+        $response = $this->makeHandler(['nation', 'US', '2026'])->handle(
+            $this->requestFor('GET', '/calendar/nation/US/2026', ['Accept-Language' => 'en'])
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $body   = $this->decodeJsonBody($response);
+        $events = array_values(array_filter(
+            $body['litcal'],
+            static fn (array $event): bool => $event['event_key'] === 'StCamillusDeLellis'
+        ));
+
+        self::assertCount(1, $events, 'St Camillus de Lellis must be present in the US 2026 calendar');
+        self::assertStringStartsWith(
+            '2026-07-18',
+            $events[0]['date'],
+            'US_2011 moves St Camillus de Lellis from July 14 to July 18 (moveEvent action)'
+        );
+    }
+
+    /**
+     * Companion regression for issue #690 on a different moveEvent entry:
+     * US_2011 moves St Elizabeth of Portugal from July 4 (taken by
+     * Independence Day) to July 5, which in 2025 is a free Saturday.
+     */
+    public function testNationalCalendarMoveEventMovesElizabethOfPortugal(): void
+    {
+        $this->purgeEngineCache('json');
+
+        $response = $this->makeHandler(['nation', 'US', '2025'])->handle(
+            $this->requestFor('GET', '/calendar/nation/US/2025', ['Accept-Language' => 'en'])
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $body   = $this->decodeJsonBody($response);
+        $events = array_values(array_filter(
+            $body['litcal'],
+            static fn (array $event): bool => $event['event_key'] === 'StElizabethPortugal'
+        ));
+
+        self::assertCount(1, $events, 'St Elizabeth of Portugal must be present in the US 2025 calendar');
+        self::assertStringStartsWith(
+            '2025-07-05',
+            $events[0]['date'],
+            'US_2011 moves St Elizabeth of Portugal from July 4 to July 5 (moveEvent action)'
+        );
+    }
+
+    /**
      * Request the 2025 calendar as ICS (Latin locale for deterministic grade
      * strings) and return the response body with RFC 5545 line folding undone,
      * so assertions can match logical content lines directly.
      */
     private function fetchUnfoldedIcs(): string
     {
-        // The handler serves cached responses from engineCache/ when one
-        // exists for the same API version + source-data hash; a cache file
-        // produced by earlier (possibly buggy) code would mask regressions,
-        // so force a fresh ICS computation.
-        foreach (glob(dirname(__DIR__, 2) . '/engineCache/v*/*.ics') ?: [] as $staleIcs) {
-            unlink($staleIcs);
-        }
+        $this->purgeEngineCache('ics');
 
         $response = $this->makeHandler(['2025'])->handle(
             $this->requestFor('GET', '/calendar/2025', [

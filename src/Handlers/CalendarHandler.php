@@ -3779,6 +3779,18 @@ final class CalendarHandler extends AbstractHandler
                                         $this->CalendarParams->Year
                                     );
                                 }
+                            } else {
+                                // The event is still present in the calendar on its original date
+                                // (its replacement did not suppress it, e.g. a memorial replacing an
+                                // optional memorial that it coexists with): simply move it.
+                                // moveLiturgicalEventDate() also emits the "is transferred from ... to ..."
+                                // message for this case.
+                                $this->moveLiturgicalEventDate(
+                                    $liturgicalEvent->event_key,
+                                    $litEventNewDate,
+                                    $litEventItemMetadata->reason,
+                                    $litEventItemMetadata->missal
+                                );
                             }
                         } else {
                             if (null !== $existingLitEvent) {
