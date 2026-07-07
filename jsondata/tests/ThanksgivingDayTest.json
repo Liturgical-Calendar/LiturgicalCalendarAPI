@@ -1,0 +1,203 @@
+{
+    "name": "ThanksgivingDayTest",
+    "event_key": "ThanksgivingDay",
+    "description": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November",
+    "test_type": "exactCorrespondence",
+    "applies_to": {
+        "national_calendar": "US"
+    },
+    "assertions": [
+        {
+            "year": 1999,
+            "expected_value": "1999-11-25T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2000,
+            "expected_value": "2000-11-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2001,
+            "expected_value": "2001-11-22T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2002,
+            "expected_value": "2002-11-28T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2003,
+            "expected_value": "2003-11-27T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2004,
+            "expected_value": "2004-11-25T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2005,
+            "expected_value": "2005-11-24T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2006,
+            "expected_value": "2006-11-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2007,
+            "expected_value": "2007-11-22T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2008,
+            "expected_value": "2008-11-27T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2009,
+            "expected_value": "2009-11-26T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2010,
+            "expected_value": "2010-11-25T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2011,
+            "expected_value": "2011-11-24T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2012,
+            "expected_value": "2012-11-22T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2013,
+            "expected_value": "2013-11-28T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2014,
+            "expected_value": "2014-11-27T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2015,
+            "expected_value": "2015-11-26T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2016,
+            "expected_value": "2016-11-24T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2017,
+            "expected_value": "2017-11-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2018,
+            "expected_value": "2018-11-22T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2019,
+            "expected_value": "2019-11-28T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2020,
+            "expected_value": "2020-11-26T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2021,
+            "expected_value": "2021-11-25T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2022,
+            "expected_value": "2022-11-24T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2023,
+            "expected_value": "2023-11-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2024,
+            "expected_value": "2024-11-28T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2025,
+            "expected_value": "2025-11-27T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2026,
+            "expected_value": "2026-11-26T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2027,
+            "expected_value": "2027-11-25T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2028,
+            "expected_value": "2028-11-23T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2029,
+            "expected_value": "2029-11-22T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        },
+        {
+            "year": 2030,
+            "expected_value": "2030-11-28T00:00:00+00:00",
+            "assert": "eventExists AND hasExpectedDate",
+            "assertion": "The Memorial of '[ USA ] Thanksgiving' should fall on the fourth Thursday of November"
+        }
+    ]
+}
