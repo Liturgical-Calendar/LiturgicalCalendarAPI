@@ -1112,8 +1112,11 @@ class Health implements MessageComponentInterface
                                 $message->type = 'error';
                                 $errorStrings  = [];
                                 foreach ($result as $error) {
+                                    // sabre/vobject 5.0.0 declares Node/Property as a (non-generic) IteratorAggregate,
+                                    // so PHPStan now flags the `node` shape type as an iterable without a value type.
+                                    // Property is not @template-generic, so no value type can be supplied here.
                                     /** @var array{level:int,message:string,node:VObject\Property} $error */
-                                    $errorLevel = new ICSErrorLevel($error['level']);
+                                    $errorLevel = new ICSErrorLevel($error['level']); // @phpstan-ignore missingType.iterableValue
                                     /** @var int $lineIndex The type is obvious, and declared, yet PHPStan seems to be a bit dumb on this one? */
                                     $lineIndex = $error['node']->lineIndex;
                                     /** @var string $lineString The type is obvious, and declared, yet PHPStan seems to be a bit dumb on this one? */
