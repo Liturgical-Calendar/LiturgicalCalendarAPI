@@ -1108,19 +1108,9 @@ class Health implements MessageComponentInterface
                                 $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                                 $this->sendMessage($to, $message, $runToken);
                             } else {
-                                $message       = new \stdClass();
-                                $message->type = 'error';
-                                $errorStrings  = [];
-                                foreach ($result as $error) {
-                                    /** @var array{level:int,message:string,node:VObject\Property} $error */
-                                    $errorLevel = new ICSErrorLevel($error['level']);
-                                    /** @var int $lineIndex The type is obvious, and declared, yet PHPStan seems to be a bit dumb on this one? */
-                                    $lineIndex = $error['node']->lineIndex;
-                                    /** @var string $lineString The type is obvious, and declared, yet PHPStan seems to be a bit dumb on this one? */
-                                    $lineString     = $error['node']->lineString;
-                                    $errorStrings[] = $errorLevel . ': ' . $error['message'] . " at line {$lineIndex} ({$lineString})";
-                                }
-                                $message->text    = implode('&#013;', $errorStrings);
+                                $message          = new \stdClass();
+                                $message->type    = 'error';
+                                $message->text    = implode('&#013;', $this->formatIcsValidationErrors($result));
                                 $message->classes = ".calendar-$calendar.schema-valid.year-$year";
                                 $this->sendMessage($to, $message, $runToken);
                             }
@@ -1240,6 +1230,33 @@ class Health implements MessageComponentInterface
                 $this->sendMessage($to, $message, $runToken);
             }
         );
+    }
+
+    /**
+     * Formats the schema-validation errors returned by Sabre\VObject's
+     * Document::validate() into human-readable strings for the health-check
+     * WebSocket messages (one entry per error: "<level>: <message> at line
+     * <index> (<source line>)").
+     *
+     * @param array<array-key, mixed> $result The value returned by Document::validate().
+     * @return list<string>
+     */
+    private function formatIcsValidationErrors(array $result): array
+    {
+        $errorStrings = [];
+        foreach ($result as $error) {
+            // sabre/vobject 5.0.0 declares Node/Property as a (non-generic) IteratorAggregate,
+            // so PHPStan now flags the `node` shape type as an iterable without a value type.
+            // Property is not @template-generic, so no value type can be supplied here.
+            /** @var array{level:int,message:string,node:VObject\Property} $error */
+            $errorLevel = new ICSErrorLevel($error['level']); // @phpstan-ignore missingType.iterableValue
+            /** @var int $lineIndex The type is obvious, and declared, yet PHPStan seems to be a bit dumb on this one? */
+            $lineIndex = $error['node']->lineIndex;
+            /** @var string $lineString The type is obvious, and declared, yet PHPStan seems to be a bit dumb on this one? */
+            $lineString     = $error['node']->lineString;
+            $errorStrings[] = $errorLevel . ': ' . $error['message'] . " at line {$lineIndex} ({$lineString})";
+        }
+        return $errorStrings;
     }
 
     /**
