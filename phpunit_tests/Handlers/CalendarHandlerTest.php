@@ -335,8 +335,10 @@ final class CalendarHandlerTest extends AbstractHandlerTestCase
      * Liturgical Days, but the Lord's Solemnity is observed and the Apostles'
      * Solemnity, per Universal Norms n. 60, is transferred to the nearest free
      * day — postponed to 30 June — rather than being silently dropped. When it
-     * lands on 30 June it supersedes the optional memorial of the First Martyrs
-     * of the Church of Rome that normally sits there.
+     * lands on 30 June it supersedes the memorials that sit there: the optional
+     * memorial of the First Martyrs of the Church of Rome and — since the
+     * Immaculate Heart of Mary (Easter+64) always falls on 30 June in these
+     * Easter-on-22-April years — the memorial of the Immaculate Heart too.
      */
     #[DataProvider('sacredHeartImpedesPeterAndPaulYears')]
     public function testPeterAndPaulTransferredWhenImpededBySacredHeart(int $year): void
@@ -371,6 +373,12 @@ final class CalendarHandlerTest extends AbstractHandlerTestCase
             0,
             $byKey('FirstMartyrsRome'),
             "The First Martyrs of Rome memorial must be superseded by the transferred Solemnity on 30 June $year"
+        );
+
+        self::assertCount(
+            0,
+            $byKey('ImmaculateHeart'),
+            "The Immaculate Heart of Mary (30 June in these years) must be superseded by the transferred Solemnity on 30 June $year"
         );
     }
 
