@@ -9,6 +9,7 @@ use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Router;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * CalendarHandler is the heart of the API — it computes the full liturgical
@@ -307,6 +308,70 @@ final class CalendarHandlerTest extends AbstractHandlerTestCase
 
         self::assertSame('2023-01-23', $dates['PrayerUnborn'] ?? null, 'Day of Prayer must move to Jan 23 when Jan 22 is a Sunday');
         self::assertSame('2023-01-23', $dates['StVincentDeacon'] ?? null, 'St Vincent must be recreated on Jan 23 alongside the Day of Prayer');
+    }
+
+    /**
+     * Recurrence years for the Sacred Heart / Saints Peter and Paul collision:
+     * years in which Easter falls on 22 April, so the movable Solemnity of the
+     * Sacred Heart falls on 29 June (Friday after the Second Sunday after
+     * Pentecost) and impedes the fixed Solemnity of Saints Peter and Paul.
+     *
+     * @return array<string, array{int}>
+     */
+    public static function sacredHeartImpedesPeterAndPaulYears(): array
+    {
+        return [
+            '1973' => [1973],
+            '1984' => [1984],
+            '2057' => [2057],
+            '2068' => [2068],
+        ];
+    }
+
+    /**
+     * Regression for issue #564: when the movable Solemnity of the Sacred Heart
+     * (of the Lord) occurs on 29 June it impedes the fixed Solemnity of Saints
+     * Peter and Paul (of the Saints); both are ranked I.3 in the Table of
+     * Liturgical Days, but the Lord's Solemnity is observed and the Apostles'
+     * Solemnity, per Universal Norms n. 60, is transferred to the nearest free
+     * day — postponed to 30 June — rather than being silently dropped. When it
+     * lands on 30 June it supersedes the optional memorial of the First Martyrs
+     * of the Church of Rome that normally sits there.
+     */
+    #[DataProvider('sacredHeartImpedesPeterAndPaulYears')]
+    public function testPeterAndPaulTransferredWhenImpededBySacredHeart(int $year): void
+    {
+        $this->purgeEngineCache('json');
+
+        $response = $this->makeHandler([(string) $year])->handle(
+            $this->requestFor('GET', '/calendar/' . $year, ['Accept-Language' => 'la'])
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+
+        $byKey = static fn (string $key): array => array_values(array_filter(
+            $body['litcal'],
+            static fn (array $event): bool => $event['event_key'] === $key
+        ));
+
+        $sacredHeart = $byKey('SacredHeart');
+        self::assertCount(1, $sacredHeart, "The Sacred Heart must be present in $year");
+        self::assertStringStartsWith("$year-06-29", $sacredHeart[0]['date'], "The Sacred Heart falls on 29 June $year");
+
+        $peterPaul = $byKey('StsPeterPaulAp');
+        self::assertCount(1, $peterPaul, "Saints Peter and Paul must not be dropped when impeded by the Sacred Heart in $year");
+        self::assertStringStartsWith(
+            "$year-06-30",
+            $peterPaul[0]['date'],
+            "Saints Peter and Paul must be transferred to 30 June $year (Universal Norms n. 60)"
+        );
+
+        self::assertCount(
+            0,
+            $byKey('FirstMartyrsRome'),
+            "The First Martyrs of Rome memorial must be superseded by the transferred Solemnity on 30 June $year"
+        );
     }
 
     /**

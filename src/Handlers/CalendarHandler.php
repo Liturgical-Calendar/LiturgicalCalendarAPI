@@ -1500,6 +1500,66 @@ final class CalendarHandler extends AbstractHandler
                             '<a href="https://www.cultodivino.va/content/dam/cultodivino/rivista-notitiae/1990/notitiae-26-(1990)/Notitiae-284-285-1990.pdf" target="_blank">' . _('Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments') . '</a>'
                         );
                     }
+                } elseif (
+                    $propriumDeSanctisEvent->event_key === 'StsPeterPaulAp'
+                    && $this->Cal->solemnityKeyFromDate($currentLitEventDate) === 'SacredHeart'
+                ) {
+                    /**
+                     * In years when Easter falls on 22 April (e.g. 1973, 1984, 2057, 2068, 2114),
+                     *   the movable Solemnity of the Most Sacred Heart of Jesus (the Friday after the
+                     *   Second Sunday after Pentecost) falls on 29 June, impeding the fixed Solemnity
+                     *   of Saints Peter and Paul, Apostles.
+                     *
+                     * Both are ranked I.3 in the Table of Liturgical Days
+                     *   ( << Sollemnitates Domini, beatae Mariae Virginis, Sanctorum in calendario generali
+                     *     inscriptae; commemoratio omnium fidelium defunctorum >> ),
+                     *   but within that rank the Solemnities of the Lord precede those of the Saints, so the
+                     *   Sacred Heart is observed and Saints Peter and Paul, being impeded, is transferred to
+                     *   the nearest free day per the Universal Norms on the Liturgical Year and the Calendar, n. 60:
+                     *   << Attamen sollemnitas, quae impeditur a die liturgico, qui praecedentia gaudeat,
+                     *      ad proximiorem diem transferatur qui sit liber a diebus sub nn. 1-8
+                     *      in tabula praecedentiae recensitis, servatis de quibus n. 5. >>
+                     *
+                     * 29 June is flanked by two equidistant free days: 28 June (memorial of St Irenaeus) and
+                     *   30 June (optional memorial of the First Martyrs of the Church of Rome, plus, in years
+                     *   such as 1973, the memorial of the Immaculate Heart of Mary). All of these are memorials
+                     *   (ranks 10-12, i.e. below nn. 1-8) and so are freely superseded. Since n. 60 does not itself
+                     *   resolve the direction, and no Dicastery dubium addresses this specific pairing (cf. the
+                     *   analogous Nativity of John the Baptist case handled below, which was *anticipated* per the
+                     *   2020 Responsa ad dubia), the impeded Solemnity is *postponed* to the following day, 30 June:
+                     *   postponement is the ordinary preference over anticipation, and the First Martyrs of the
+                     *   Church of Rome on 30 June are the liturgical companions of the Apostles.
+                     *
+                     * See https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/564
+                     */
+                    $coincidingSolemnity = $this->Cal->solemnityFromDate($currentLitEventDate);
+                    if (null === $coincidingSolemnity) {
+                        throw new ServiceUnavailableException('No coinciding Solemnity found for ' . $currentLitEventDate->format('Y-m-d'));
+                    }
+
+                    $StsPeterPaulNewDate = clone( $currentLitEventDate );
+                    $StsPeterPaulNewDate->add(new \DateInterval('P1D'));
+                    if (false === $this->Cal->inSolemnities($StsPeterPaulNewDate)) {
+                        $tempLiturgicalEvent->date = $StsPeterPaulNewDate;
+                        $this->Messages[]          = sprintf(
+                            /**translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Explicatory string for the transferral, 5: actual date for the transferral, 6: Reference to the norm that governs the transferral */
+                            _('The Solemnity \'%1$s\' falls on %2$s in the year %3$d, the celebration has been transferred to %4$s (%5$s) as per the %6$s.'),
+                            $tempLiturgicalEvent->name,
+                            $coincidingSolemnity->name,
+                            $this->CalendarParams->Year,
+                            _('the following day'),
+                            $this->localeDateFormatter->formatLocalizedDate($tempLiturgicalEvent->date),
+                            _('General Norms for the Liturgical Year and the Calendar') . ', n. 60'
+                        );
+                    } else {
+                        $this->Messages[] = '<span style="padding:3px 6px; font-weight: bold; background-color: #FFC;color:Red;border-radius:6px;">IMPORTANT</span> ' . sprintf(
+                            /**translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year */
+                            _('The Solemnity \'%1$s\' coincides with the Solemnity \'%2$s\' in the year %3$d. We should ask the Dicastery for Divine Worship and the Discipline of the Sacraments what to do about this!'),
+                            $propriumDeSanctisEvent->name,
+                            $coincidingSolemnity->name,
+                            $this->CalendarParams->Year
+                        );
+                    }
                 } else {
                     //In all other cases, let's make a note of what's happening and ask the Congegation for Divine Worship
                     $coincidingSolemnity = $this->Cal->solemnityFromDate($currentLitEventDate);
