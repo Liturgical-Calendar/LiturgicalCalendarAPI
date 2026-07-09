@@ -139,17 +139,31 @@ jobs:
       # The .pot PR is created with the default GITHUB_TOKEN, which by design
       # does not trigger further workflows — so a separate pull_request-based
       # auto-merge job (like the Dependabot one) would never fire. Instead we
-      # merge here, in the same push-triggered run that opened the PR. Branch
-      # protection on the base requires neither reviews nor status checks, so
-      # GITHUB_TOKEN can merge immediately; --auto is belt-and-suspenders for
-      # the brief window after creation, and --delete-branch removes the
+      # merge here, in the same push-triggered run that opened the PR.
+      #
+      # Branch protection on the base requires neither reviews nor status checks,
+      # so the PR is immediately mergeable ("clean"). We must NOT use
+      # `gh pr merge --auto` here: enabling auto-merge on an already-clean PR
+      # fails with "Pull request is in clean status (enablePullRequestAutoMerge)",
+      # which left every .pot PR stranded (see issue #684 follow-up). Merge
+      # directly instead, retrying to cover the brief window after creation while
+      # GitHub is still computing mergeability. --delete-branch removes the
       # automated/update-pot head branch (explicit, not relying on the repo's
-      # delete_branch_on_merge setting). The github.ref guard pins auto-merge to
+      # delete_branch_on_merge setting). The github.ref guard pins the merge to
       # development, so widening the push filter above can never cause an
-      # accidental auto-merge into another branch (e.g. stable).
+      # accidental merge into another branch (e.g. stable).
       - name: Auto-merge the POT update PR
         if: ${{ steps.cpr.outputs.pull-request-number && github.ref == 'refs/heads/development' }}
-        run: gh pr merge "$PR_NUMBER" --merge --auto --delete-branch
+        run: |
+          for attempt in 1 2 3 4 5 6; do
+            if gh pr merge "$PR_NUMBER" --merge --delete-branch; then
+              exit 0
+            fi
+            echo "Merge attempt $attempt failed (PR not yet mergeable?); retrying in 5s…"
+            sleep 5
+          done
+          echo "::error::Failed to merge POT update PR #$PR_NUMBER after 6 attempts"
+          exit 1
         env:
           PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
