@@ -4610,6 +4610,93 @@ final class CalendarHandler extends AbstractHandler
 
 
     /**
+     * Re-injects the current request's headers into an already-serialized (and cached)
+     * response body so that `metadata.request_headers` always reflects the actual caller.
+     *
+     * The calendar cache is keyed by request parameters (calendar + year + return type),
+     * NOT by request headers, so a single shared cache entry is served to many clients.
+     * Without this step the headers of whichever client first populated a given entry would
+     * be echoed to every later client for that key (issue #684).
+     *
+     * A full decode + re-encode would be prohibitively expensive on every cache hit
+     * (measured ~235 ms to round-trip a year of YAML, ~2.5 ms for JSON), so instead we do a
+     * targeted textual splice of just the request_headers section (~0.04 ms). ICS output
+     * carries no request_headers and is returned unchanged.
+     */
+    private function injectRequestHeaders(string $responseBody): string
+    {
+        switch ($this->CalendarParams->ReturnType) {
+            case ReturnTypeParam::YAML:
+                return $this->spliceRequestHeadersYaml($responseBody);
+            case ReturnTypeParam::XML:
+                return $this->spliceRequestHeadersXml($responseBody);
+            case ReturnTypeParam::ICS:
+                return $responseBody;
+            case ReturnTypeParam::JSON:
+            default:
+                return $this->spliceRequestHeadersJson($responseBody);
+        }
+    }
+
+    /**
+     * Splices request_headers into a JSON body. Header values never contain a '}', so the
+     * request_headers object is matched unambiguously with `\{[^{}]*\}` (or `[]` when empty).
+     * The replacement is emitted via a callback so its backslashes/`$` are not reinterpreted.
+     */
+    private function spliceRequestHeadersJson(string $responseBody): string
+    {
+        $encoded = json_encode($this->requestHeaders, JSON_THROW_ON_ERROR);
+        return preg_replace_callback(
+            '/"request_headers":(?:\{[^{}]*\}|\[\])/',
+            static fn (): string => '"request_headers":' . $encoded,
+            $responseBody,
+            1
+        ) ?? $responseBody;
+    }
+
+    /**
+     * Splices request_headers into a YAML body. Only the tiny request_headers map is
+     * (re)dumped — cheap and byte-identical to Symfony's own scalar quoting — then indented
+     * two spaces to sit under `metadata` and spliced over the existing entry. The pattern
+     * matches both a non-empty block (`request_headers:` + 4-space-indented children) and the
+     * inline empty form Symfony emits for a header-less caller (`request_headers: {  }`).
+     */
+    private function spliceRequestHeadersYaml(string $responseBody): string
+    {
+        $dumped = Yaml::dump(['request_headers' => $this->requestHeaders], 10, 2);
+        $block  = ( preg_replace('/^/m', '  ', rtrim($dumped, "\n")) ?? $dumped ) . "\n";
+        return preg_replace_callback(
+            '/^  request_headers:.*\n(?:    .*(?:\n|$))*/m',
+            static fn (): string => $block,
+            $responseBody,
+            1
+        ) ?? $responseBody;
+    }
+
+    /**
+     * Splices request_headers into an XML body. The <RequestHeaders> element is contiguous
+     * and cannot nest, so a non-greedy match bounds it exactly; the pattern also matches the
+     * self-closing <RequestHeaders/> that a header-less caller produces. The useful header
+     * names contain no underscores, so they map to element names unchanged (mirroring
+     * Utilities::convertArray2XML), and values are XML-escaped the same way.
+     */
+    private function spliceRequestHeadersXml(string $responseBody): string
+    {
+        $children = '';
+        foreach ($this->requestHeaders as $name => $value) {
+            $tag       = (string) $name;
+            $children .= "\n      <$tag>" . htmlspecialchars((string) $value) . "</$tag>";
+        }
+        $replacement = '<RequestHeaders>' . $children . "\n    </RequestHeaders>";
+        return preg_replace_callback(
+            '#<RequestHeaders(?:\s*/>|>.*?</RequestHeaders>)#s',
+            static fn (): string => $replacement,
+            $responseBody,
+            1
+        ) ?? $responseBody;
+    }
+
+    /**
      * This function generates the response for the requested Liturgical Calendar.
      *
      * Depending on the value of $this->CalendarParams->ReturnType, it will either return a JSON object,
@@ -5216,7 +5303,10 @@ final class CalendarHandler extends AbstractHandler
             //  and stored the results in a cache file
             //  then we're done, just output this and die;
             //  or even better, make the client use it's own cache copy!
-            $responseBody  = Utilities::rawContentsFromFile($this->CacheFile);
+            // The cache entry is shared across clients (keyed by calendar params, not by
+            //   request headers), so re-inject THIS request's headers into
+            //   metadata.request_headers before serving; see injectRequestHeaders() and #684.
+            $responseBody  = $this->injectRequestHeaders(Utilities::rawContentsFromFile($this->CacheFile));
             $responseHash  = md5($responseBody);
             $etag          = '"' . $responseHash . '"';
             $this->endTime = hrtime(true);
@@ -5225,7 +5315,8 @@ final class CalendarHandler extends AbstractHandler
                 ->withHeader('X-LitCal-Starttime', $this->startTime . '')
                 ->withHeader('X-LitCal-Endtime', $this->endTime . '')
                 ->withHeader('X-LitCal-Executiontime', $executionTime . '')
-                ->withHeader('Etag', $etag);
+                ->withHeader('Etag', $etag)
+                ->withHeader('Vary', 'Accept, Accept-Language');
 
             if (
                 $request->getHeaderLine('If-None-Match') !== ''
