@@ -4657,15 +4657,16 @@ final class CalendarHandler extends AbstractHandler
     /**
      * Splices request_headers into a YAML body. Only the tiny request_headers map is
      * (re)dumped — cheap and byte-identical to Symfony's own scalar quoting — then indented
-     * two spaces to sit under `metadata` and spliced over the existing block (matched from
-     * its `request_headers:` key through its 4-space-indented children).
+     * two spaces to sit under `metadata` and spliced over the existing entry. The pattern
+     * matches both a non-empty block (`request_headers:` + 4-space-indented children) and the
+     * inline empty form Symfony emits for a header-less caller (`request_headers: {  }`).
      */
     private function spliceRequestHeadersYaml(string $responseBody): string
     {
         $dumped = Yaml::dump(['request_headers' => $this->requestHeaders], 10, 2);
         $block  = ( preg_replace('/^/m', '  ', rtrim($dumped, "\n")) ?? $dumped ) . "\n";
         return preg_replace_callback(
-            '/^  request_headers:\n(?:    .*(?:\n|$))*/m',
+            '/^  request_headers:.*\n(?:    .*(?:\n|$))*/m',
             static fn (): string => $block,
             $responseBody,
             1
@@ -4674,8 +4675,9 @@ final class CalendarHandler extends AbstractHandler
 
     /**
      * Splices request_headers into an XML body. The <RequestHeaders> element is contiguous
-     * and cannot nest, so a non-greedy match bounds it exactly. The useful header names
-     * contain no underscores, so they map to element names unchanged (mirroring
+     * and cannot nest, so a non-greedy match bounds it exactly; the pattern also matches the
+     * self-closing <RequestHeaders/> that a header-less caller produces. The useful header
+     * names contain no underscores, so they map to element names unchanged (mirroring
      * Utilities::convertArray2XML), and values are XML-escaped the same way.
      */
     private function spliceRequestHeadersXml(string $responseBody): string
@@ -4687,7 +4689,7 @@ final class CalendarHandler extends AbstractHandler
         }
         $replacement = '<RequestHeaders>' . $children . "\n    </RequestHeaders>";
         return preg_replace_callback(
-            '#<RequestHeaders>.*?</RequestHeaders>#s',
+            '#<RequestHeaders(?:\s*/>|>.*?</RequestHeaders>)#s',
             static fn (): string => $replacement,
             $responseBody,
             1

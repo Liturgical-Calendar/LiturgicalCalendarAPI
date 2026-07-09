@@ -61,6 +61,28 @@ final class CalendarRequestHeadersCacheTest extends AbstractHandlerTestCase
         self::assertSame(['Accept' => 'application/json'], $decoded['metadata']['request_headers']);
     }
 
+    public function testYamlSpliceHandlesEmptyCachedHeaders(): void
+    {
+        // A header-less caller serializes request_headers as Symfony's inline empty map.
+        $body = "metadata:\n  request_headers: {  }\n  version: '5.0'\n";
+        $out  = $this->splice('spliceRequestHeadersYaml', ['Accept' => 'application/yaml', 'Accept-Language' => 'it'], $body);
+
+        $parsed = Yaml::parse($out);
+        self::assertSame(['Accept' => 'application/yaml', 'Accept-Language' => 'it'], $parsed['metadata']['request_headers']);
+        self::assertSame('5.0', $parsed['metadata']['version'], 'Everything except request_headers must be untouched');
+    }
+
+    public function testXmlSpliceHandlesEmptyCachedHeaders(): void
+    {
+        // A header-less caller serializes request_headers as a self-closing element.
+        $body = "<LiturgicalCalendar><Metadata>\n    <RequestHeaders/>\n    <Version>5.0</Version></Metadata></LiturgicalCalendar>";
+        $out  = $this->splice('spliceRequestHeadersXml', ['Accept' => 'application/xml'], $body);
+
+        self::assertStringContainsString('<Accept>application/xml</Accept>', $out);
+        self::assertStringContainsString('<Version>5.0</Version>', $out, 'Everything else must be untouched');
+        self::assertNotFalse(simplexml_load_string($out), 'Result must remain well-formed XML');
+    }
+
     public function testXmlSpliceReplacesRequestHeaders(): void
     {
         $body = "<LiturgicalCalendar><Metadata>\n    <RequestHeaders>\n      <Accept>*/*</Accept>\n"
