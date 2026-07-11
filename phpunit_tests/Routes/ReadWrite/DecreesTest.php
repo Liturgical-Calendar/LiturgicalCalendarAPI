@@ -20,6 +20,21 @@ use LiturgicalCalendar\Tests\ApiTestCase;
 final class DecreesTest extends ApiTestCase
 {
     /**
+     * The local dev server may be a stale build without the decrees write
+     * paths (returns 405). In CI the server runs this branch, so a 405 is
+     * a real regression there and must fail loudly.
+     *
+     * @param \Psr\Http\Message\ResponseInterface $response
+     * @return void
+     */
+    private function skipIfStaleServer(\Psr\Http\Message\ResponseInterface $response): void
+    {
+        if ($response->getStatusCode() === 405 && getenv('CI') === false) {
+            $this->markTestSkipped('Server predates decrees write paths (stale local build); exercised in CI.');
+        }
+    }
+
+    /**
      * Build a valid createNew payload for an arbitrary decree_id.
      *
      * Adapted verbatim from DecreesHandlerWriteTest::createNewPayload() so that
@@ -113,6 +128,7 @@ final class DecreesTest extends ApiTestCase
             'body'        => json_encode($payload),
             'http_errors' => false,
         ]);
+        $this->skipIfStaleServer($response);
 
         $this->assertSame(
             409,
@@ -141,6 +157,7 @@ final class DecreesTest extends ApiTestCase
             'body'        => json_encode(['decree_id' => 'StZzTest_Create']),
             'http_errors' => false,
         ]);
+        $this->skipIfStaleServer($response);
 
         $this->assertSame(
             400,
@@ -164,6 +181,7 @@ final class DecreesTest extends ApiTestCase
             'headers'     => self::authHeaders($token),
             'http_errors' => false,
         ]);
+        $this->skipIfStaleServer($response);
 
         $this->assertSame(
             404,
@@ -199,6 +217,7 @@ final class DecreesTest extends ApiTestCase
             'body'        => json_encode($createPayload),
             'http_errors' => false,
         ]);
+        $this->skipIfStaleServer($putResponse);
         $this->assertSame(
             201,
             $putResponse->getStatusCode(),
