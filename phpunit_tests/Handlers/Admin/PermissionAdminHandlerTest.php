@@ -11,6 +11,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use LiturgicalCalendar\Api\Handlers\Admin\PermissionAdminHandler;
+use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
@@ -892,5 +893,100 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         self::assertSame([], $body['cascaded_roles']);
         self::assertSame(1, $body['outbox_pending']);
         self::assertStringContainsString('role cascade deferred', $this->stringFieldFrom($body, 'message'));
+    }
+
+    // --- Self-check exemption on GET /admin/permissions/check (issue #708) -
+
+    public function testCheckSelfPermissionBypassesResourceAdminGate(): void
+    {
+        // A non-admin caller checking THEIR OWN relation on a resource they do
+        // not administer must NOT get ForbiddenException. The handler should
+        // skip requireResourceAdmin and proceed directly to the FGA check().
+        //
+        // Caller sub = 'editor-user-1'. The ?user param can be either bare
+        // ('editor-user-1') or prefixed ('user:editor-user-1') — both must
+        // identify the caller. We use the bare form here.
+        //
+        // The mock FGA check() returns allowed=true.
+        $mock       = new MockHandler([
+            new Response(200, [], (string) json_encode(['allowed' => true])),
+        ]);
+        $httpClient = new Client(['handler' => HandlerStack::create($mock)]);
+        $psr17      = new Psr17Factory();
+        $fgaClient  = new OpenFgaClient(
+            'http://localhost:8083',
+            'store-123',
+            'model-456',
+            $httpClient,
+            $psr17,
+            $psr17
+        );
+
+        $request = $this->withOidcUser(
+            $this->requestFor(
+                'GET',
+                '/admin/permissions/check'
+                    . '?user=editor-user-1'
+                    . '&object_type=general_roman_calendar'
+                    . '&object_id=decrees'
+                    . '&relation=editor'
+            ),
+            'editor-user-1',  // sub — the caller themselves
+            ['calendar_editor'] // not a global admin, not a resource admin
+        );
+
+        // Must NOT throw ForbiddenException — the self-check exemption applies.
+        $response = ( new PermissionAdminHandler($fgaClient) )->handle($request);
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertArrayHasKey('allowed', $body);
+        self::assertTrue($body['allowed']);
+        self::assertSame('user:editor-user-1', $body['user']);
+        self::assertSame('editor', $body['relation']);
+        self::assertSame('general_roman_calendar:decrees', $body['object']);
+    }
+
+    public function testCheckOtherUserPermissionEnforcesResourceAdminGate(): void
+    {
+        // A non-admin caller checking a DIFFERENT user's relation must still
+        // get ForbiddenException (regression guard). No FGA mock needed: the
+        // gate fires before any FGA call, so the handler throws before reaching
+        // getClient(). We let OpenFgaClient use the env path (which will throw
+        // its own RuntimeException) — but the ForbiddenException must arrive
+        // first from requireResourceAdmin when the check() gate fires.
+        //
+        // To ensure requireResourceAdmin's check() actually resolves as false
+        // (not admin) without a real FGA server, we supply a mock that returns
+        // allowed=false for the admin check.
+        $mock       = new MockHandler([
+            new Response(200, [], (string) json_encode(['allowed' => false])),
+        ]);
+        $httpClient = new Client(['handler' => HandlerStack::create($mock)]);
+        $psr17      = new Psr17Factory();
+        $fgaClient  = new OpenFgaClient(
+            'http://localhost:8083',
+            'store-123',
+            'model-456',
+            $httpClient,
+            $psr17,
+            $psr17
+        );
+
+        $request = $this->withOidcUser(
+            $this->requestFor(
+                'GET',
+                '/admin/permissions/check'
+                    . '?user=other-user-99'
+                    . '&object_type=general_roman_calendar'
+                    . '&object_id=decrees'
+                    . '&relation=editor'
+            ),
+            'editor-user-1',  // sub — a different user than ?user=other-user-99
+            ['calendar_editor'] // not a global admin
+        );
+
+        $this->expectException(ForbiddenException::class);
+        ( new PermissionAdminHandler($fgaClient) )->handle($request);
     }
 }
