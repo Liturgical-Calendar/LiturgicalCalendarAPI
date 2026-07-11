@@ -89,7 +89,7 @@ final class SimpleEnumsTest extends TestCase
     {
         self::assertSame('exactCorrespondence', LitEventTestType::EXACT_CORRESPONDENCE->value);
         self::assertSame('exactCorrespondenceSince', LitEventTestType::EXACT_CORRESPONDENCE_SINCE->value);
-        self::assertSame('variableCorrespondence', LitEventTestType::VARIABLE_CORRESPONDENCE->value);
+        self::assertSame('exactCorrespondenceUntil', LitEventTestType::EXACT_CORRESPONDENCE_UNTIL->value);
     }
 
     public function testLitEventTestAssertionCases(): void

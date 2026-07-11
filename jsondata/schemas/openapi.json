@@ -5274,7 +5274,7 @@
                     "name": "StJaneFrancesDeChantalTest",
                     "event_key": "StJaneFrancesDeChantal",
                     "description": "Saint Jane Frances de Chantal was moved from December 12 to August 12 in the 2002 Latin Edition of the Roman Missal, to allow bishops conferences to insert Our Lady of Guadalupe as an optional memorial on December 12. DOES ST JANE FRANCES DE CHANTAL FALL ON THE RIGHT DAY BOTH BEFORE AND AFTER 2002, OR IT CORRECTLY OVERRIDEN BY GREATER FESTIVITIES?",
-                    "test_type": "variableCorrespondence",
+                    "test_type": "exactCorrespondence",
                     "assertions": [
                       {
                         "year": 2001,
@@ -5334,7 +5334,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/ExactOrVariableCorrespondenceUnitTest"
+                    "$ref": "#/components/schemas/ExactCorrespondenceUnitTest"
                   },
                   {
                     "$ref": "#/components/schemas/ExactCorrespondenceSinceUnitTest"
@@ -5420,7 +5420,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/ExactOrVariableCorrespondenceUnitTest"
+                      "$ref": "#/components/schemas/ExactCorrespondenceUnitTest"
                     },
                     {
                       "$ref": "#/components/schemas/ExactCorrespondenceSinceUnitTest"
@@ -5498,7 +5498,7 @@
               "schema": {
                 "oneOf": [
                   {
-                    "$ref": "#/components/schemas/ExactOrVariableCorrespondenceUnitTest"
+                    "$ref": "#/components/schemas/ExactCorrespondenceUnitTest"
                   },
                   {
                     "$ref": "#/components/schemas/ExactCorrespondenceSinceUnitTest"
@@ -6842,7 +6842,7 @@
         "items": {
           "anyOf": [
             {
-              "$ref": "#/components/schemas/ExactOrVariableCorrespondenceUnitTest"
+              "$ref": "#/components/schemas/ExactCorrespondenceUnitTest"
             },
             {
               "$ref": "#/components/schemas/ExactCorrespondenceSinceUnitTest"
@@ -6853,8 +6853,8 @@
           ]
         }
       },
-      "ExactOrVariableCorrespondenceUnitTest": {
-        "title": "Exact or Variable Existence",
+      "ExactCorrespondenceUnitTest": {
+        "title": "Exact Correspondence",
         "description": "test that the liturgical event exists on an expected date in a given year or does not exist in a given year",
         "type": "object",
         "additionalProperties": false,
@@ -6875,11 +6875,8 @@
           },
           "test_type": {
             "type": "string",
-            "description": "* `exactCorrespondence`: the liturgical event should exist on an expected date for each of the years defined in the `years` array\n* `variableCorrespondence`: the liturgical event should not exist for certain years, and should exist on an expected date for other years",
-            "enum": [
-              "exactCorrespondence",
-              "variableCorrespondence"
-            ]
+            "description": "each assertion independently defines the expectation for its year: the liturgical event should either exist on the expected date, or not exist at all, for each of the years defined in the `assertions` array",
+            "const": "exactCorrespondence"
           },
           "assertions": {
             "type": "array",

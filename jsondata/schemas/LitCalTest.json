@@ -53,10 +53,7 @@
                 },
                 "test_type": {
                     "type": "string",
-                    "enum": [
-                        "exactCorrespondence",
-                        "variableCorrespondence"
-                    ]
+                    "const": "exactCorrespondence"
                 },
                 "applies_to": {
                     "$ref": "#/definitions/AppliesToOrExcludes"
