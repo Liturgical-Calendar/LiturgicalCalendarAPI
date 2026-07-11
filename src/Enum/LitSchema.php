@@ -14,6 +14,7 @@ enum LitSchema: string
     case WIDERREGION       = '/WiderRegionCalendar.json';
     case DECREES           = '/LitCalDecreesPath.json';
     case DECREES_SRC       = '/LitCalDecreesSource.json';
+    case DECREE_WRITE      = '/LitCalDecreeWritePayload.json';
     case I18N              = '/LitCalTranslation.json';
     case METADATA          = '/LitCalMetadata.json';
     case LITCAL            = '/LitCal.json';
@@ -41,6 +42,7 @@ enum LitSchema: string
             LitSchema::WIDERREGION       => $ERRMSG . 'Wider Region data not created / updated',
             LitSchema::DECREES           => $ERRMSG . 'Memorials from Decrees data not created / updated',
             LitSchema::DECREES_SRC       => $ERRMSG . 'Memorials from Decrees Source data not created / updated',
+            LitSchema::DECREE_WRITE      => $ERRMSG . 'Decree write payload not valid',
             LitSchema::I18N              => $ERRMSG . 'Translation data not created / updated',
             LitSchema::METADATA => $ERRMSG . 'LitCalMetadata not valid',
             LitSchema::LITCAL   => $ERRMSG . 'LitCal not valid',
@@ -64,6 +66,7 @@ enum LitSchema: string
             LitSchema::WIDERREGION->path()       => LitSchema::WIDERREGION,
             LitSchema::DECREES->path()           => LitSchema::DECREES,
             LitSchema::DECREES_SRC->path()       => LitSchema::DECREES_SRC,
+            LitSchema::DECREE_WRITE->path()      => LitSchema::DECREE_WRITE,
             LitSchema::I18N->path()              => LitSchema::I18N,
             LitSchema::METADATA->path()          => LitSchema::METADATA,
             LitSchema::LITCAL->path()            => LitSchema::LITCAL,
