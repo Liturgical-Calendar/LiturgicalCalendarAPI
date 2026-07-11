@@ -6880,6 +6880,7 @@
           },
           "assertions": {
             "type": "array",
+            "minItems": 1,
             "items": {
               "anyOf": [
                 {
@@ -6939,6 +6940,7 @@
           },
           "assertions": {
             "type": "array",
+            "minItems": 1,
             "items": {
               "anyOf": [
                 {
@@ -6999,6 +7001,7 @@
           },
           "assertions": {
             "type": "array",
+            "minItems": 1,
             "items": {
               "anyOf": [
                 {
