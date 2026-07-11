@@ -225,6 +225,23 @@ final class DecreesHandler extends AbstractHandler
 
         self::$decreesIndex = DecreeItemCollection::fromObject($decrees);
 
+        $locale         = $this->params->Locale ?? LitLocale::LATIN_PRIMARY_LANGUAGE;
+        $lectionaryFile = strtr(JsonData::LECTIONARY_DECREES_FILE->path(), ['{locale}' => $locale]);
+        if (!file_exists($lectionaryFile)) {
+            $baseLocale     = explode('_', $locale)[0];
+            $lectionaryFile = strtr(JsonData::LECTIONARY_DECREES_FILE->path(), ['{locale}' => $baseLocale]);
+        }
+        if (file_exists($lectionaryFile)) {
+            $readings = Utilities::jsonFileToObject($lectionaryFile);
+            foreach (self::$decreesIndex as $decree) {
+                $eventKey      = $decree->liturgical_event->event_key;
+                $eventReadings = property_exists($readings, $eventKey) ? $readings->{$eventKey} : null;
+                if ($eventReadings instanceof \stdClass) {
+                    $decree->liturgical_event->setReadings($eventReadings);
+                }
+            }
+        }
+
         $countPathParams = count($this->requestPathParams);
         if ($countPathParams === 0) {
             $decreesIndex                 = new \stdClass();

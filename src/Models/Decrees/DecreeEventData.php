@@ -13,10 +13,26 @@ abstract class DecreeEventData extends AbstractJsonSrcData
 
     public string $calendar = 'GENERAL ROMAN';
 
+    public ?\stdClass $readings = null;
+
     protected function __construct(string $event_key, string $calendar)
     {
         $this->event_key = $event_key;
         $this->calendar  = $calendar;
+    }
+
+    /**
+     * Attach lectionary readings to this liturgical event.
+     *
+     * The object is temporarily unlocked to set the readings property, then re-locked.
+     *
+     * @param \stdClass $readings The readings object for this event (e.g. first_reading, gospel, etc.).
+     */
+    public function setReadings(\stdClass $readings): void
+    {
+        $this->unlock();
+        $this->readings = $readings;
+        $this->lock();
     }
 
     /**

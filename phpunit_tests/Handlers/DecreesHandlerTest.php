@@ -76,4 +76,14 @@ final class DecreesHandlerTest extends AbstractHandlerTestCase
             $this->requestFor('PUT', '/decrees', ['Accept-Language' => 'en'], ['decree_id' => 'fake'])
         );
     }
+
+    public function testGetDecreeIncludesReadingsFromDecreesLectionary(): void
+    {
+        $resp = ( new DecreesHandler(['MaryMotherChurch_Create']) )->handle(
+            $this->requestFor('GET', '/decrees/MaryMotherChurch_Create', ['Accept-Language' => 'en'])
+        );
+        $body = $this->decodeJsonBody($resp);
+        self::assertArrayHasKey('readings', $body['liturgical_event']);
+        self::assertNotEmpty($body['liturgical_event']['readings']['first_reading']);
+    }
 }
