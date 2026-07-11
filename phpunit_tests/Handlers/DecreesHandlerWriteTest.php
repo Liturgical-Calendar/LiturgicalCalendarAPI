@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Tests\Handlers;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Handlers\DecreesHandler;
 use LiturgicalCalendar\Api\Http\Exception\ConflictException;
+use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use PHPUnit\Framework\Attributes\CoversClass;
 
@@ -111,6 +112,39 @@ final class DecreesHandlerWriteTest extends AbstractHandlerTestCase
         $this->expectException(ValidationException::class);
         ( new DecreesHandler(['StTest_Create']) )->handle(
             $this->requestFor('PUT', '/decrees/StTest_Create', ['Accept-Language' => 'en'], $payload)
+        );
+    }
+
+    public function testPatchUpdatesExistingDecree(): void
+    {
+        // First create, then patch the description and the i18n entry.
+        ( new DecreesHandler(['StTest_Create']) )->handle(
+            $this->requestFor('PUT', '/decrees/StTest_Create', ['Accept-Language' => 'en'], self::createNewPayload())
+        );
+        $patch                = self::createNewPayload();
+        $patch['description'] = 'Amended description.';
+        $patch['i18n']        = ['en' => 'Saint Test, Amended'];
+        unset($patch['readings']); // optional on PATCH
+
+        $resp = ( new DecreesHandler(['StTest_Create']) )->handle(
+            $this->requestFor('PATCH', '/decrees/StTest_Create', ['Accept-Language' => 'en'], $patch)
+        );
+        self::assertSame(200, $resp->getStatusCode());
+
+        $db    = json_decode((string) file_get_contents(JsonData::DECREES_FILE->path()), true);
+        $entry = array_values(array_filter($db, fn ($d) => $d['decree_id'] === 'StTest_Create'))[0];
+        self::assertSame('Amended description.', $entry['description']);
+        self::assertArrayNotHasKey('i18n', $entry); // sidecars never stored in the database
+
+        $en = json_decode((string) file_get_contents(strtr(JsonData::DECREES_I18N_FILE->path(), ['{locale}' => 'en'])), true);
+        self::assertSame('Saint Test, Amended', $en['StTest']);
+    }
+
+    public function testPatchUnknownDecreeIs404(): void
+    {
+        $this->expectException(NotFoundException::class);
+        ( new DecreesHandler(['Nonexistent_Create']) )->handle(
+            $this->requestFor('PATCH', '/decrees/Nonexistent_Create', ['Accept-Language' => 'en'], self::createNewPayload('Nonexistent_Create'))
         );
     }
 }

@@ -413,9 +413,30 @@ final class DecreesHandler extends AbstractHandler
 
     private function handlePatchRequest(ResponseInterface $response): ResponseInterface
     {
-        // TODO: implement updating of a Decree resource
-        return $response
-            ->withStatus(StatusCode::METHOD_NOT_ALLOWED->value, StatusCode::METHOD_NOT_ALLOWED->reason());
+        $decreeId = $this->requireSinglePathParam();
+        $payload  = $this->requireValidatedPayload($decreeId, isCreate: false);
+
+        $decrees = $this->loadDecreesDatabase();
+        $idx     = null;
+        foreach ($decrees as $i => $decree) {
+            if ($decree->decree_id === $decreeId) {
+                $idx = $i;
+                break;
+            }
+        }
+        if (null === $idx) {
+            throw new NotFoundException("No decree found with decree_id `{$decreeId}`; use PUT to create it.");
+        }
+
+        $decrees[$idx] = $this->stripSidecars($payload);
+        $this->saveDecreesDatabase($decrees);
+        $this->applySidecars($payload);
+        $this->auditLog('UPDATE', $decreeId);
+
+        $result          = new \stdClass();
+        $result->success = "Decree `{$decreeId}` updated";
+        $result->decree  = $this->stripSidecars($payload);
+        return $this->encodeResponseBody($response, $result);
     }
 
     private function handleDeleteRequest(ResponseInterface $response): ResponseInterface
