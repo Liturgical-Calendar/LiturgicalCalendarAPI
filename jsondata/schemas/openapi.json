@@ -5145,7 +5145,7 @@
         ],
         "responses": {
           "200": {
-            "description": "OK: an index of defined Decrees",
+            "description": "OK: the decree with the given decree_id",
             "content": {
               "application/json": {
                 "schema": {
@@ -5153,6 +5153,199 @@
                 }
               }
             }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Decrees"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Create a new decree (requires editor permission on general_roman_calendar:decrees)",
+        "description": "Creates a new decree resource identified by `decree_id`. The `decree_id` in the URL must match the `decree_id` field in the request body. Returns 409 if a decree with the given `decree_id` already exists (use PATCH to update). The `i18n` sidecar is required for `createNew`, `makeDoctor`, and `setProperty:name` actions. The `readings` sidecar is required for `createNew` and rejected for `makeDoctor`/`setProperty:name`. Requires the `editor` relation on `general_roman_calendar:decrees`; Zitadel admin role bypasses FGA checks.",
+        "operationId": "decreeByIdPUT",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "decree_id",
+            "schema": {
+              "type": "string",
+              "pattern": "[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecreeWritePayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created: the decree was created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "description": "A message confirming the decree was created",
+                      "example": "Decree `MaryMotherChurch_Create` created"
+                    },
+                    "decree": {
+                      "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "decree"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict409"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Decrees"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Update an existing decree (requires editor permission on general_roman_calendar:decrees)",
+        "description": "Updates an existing decree resource identified by `decree_id`. The `decree_id` in the URL must match the `decree_id` field in the request body. Returns 404 if no decree with the given `decree_id` exists (use PUT to create). The `i18n` sidecar is required for `createNew`, `makeDoctor`, and `setProperty:name` actions and rejected for `setProperty:grade`. The `readings` sidecar is optional on PATCH for all actions. Requires the `editor` relation on `general_roman_calendar:decrees`; Zitadel admin role bypasses FGA checks.",
+        "operationId": "decreeByIdPATCH",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "decree_id",
+            "schema": {
+              "type": "string",
+              "pattern": "[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecreeWritePayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200 OK: the decree was updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "description": "A message confirming the decree was updated",
+                      "example": "Decree `MaryMotherChurch_Create` updated"
+                    },
+                    "decree": {
+                      "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "decree"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Decrees"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Delete a decree (requires admin permission on general_roman_calendar:decrees)",
+        "description": "Deletes the decree resource identified by `decree_id`. If the deleted decree's `liturgical_event.event_key` is no longer referenced by any remaining decree, the corresponding i18n and lectionary sidecar entries are also removed. Requires the `admin` relation on `general_roman_calendar:decrees`; Zitadel admin role bypasses FGA checks.",
+        "operationId": "decreeByIdDELETE",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "decree_id",
+            "schema": {
+              "type": "string",
+              "pattern": "[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DeleteSuccess200"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
@@ -6067,6 +6260,73 @@
           "type",
           "color",
           "readings"
+        ]
+      },
+      "DecreeWritePayload": {
+        "type": "object",
+        "title": "DecreeWritePayload",
+        "description": "Single-decree write payload for PUT/PATCH /decrees/{decree_id}. Mirrors the LitCalDecreeWritePayload.json schema. Method- and action-dependent sidecar requirements (i18n, readings) are enforced by the handler, not by this schema.",
+        "additionalProperties": false,
+        "properties": {
+          "decree_id": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)$",
+            "description": "Unique identifier for the decree. Must match the decree_id path parameter."
+          },
+          "decree_date": {
+            "type": "string",
+            "format": "date",
+            "description": "The date on which the decree was issued, in YYYY-MM-DD format."
+          },
+          "decree_protocol": {
+            "type": "string",
+            "description": "The official protocol or reference number of the decree."
+          },
+          "description": {
+            "type": "string",
+            "description": "A human-readable description of what the decree does."
+          },
+          "liturgical_event": {
+            "$ref": "./LitCalDecreesSource.json#/definitions/LiturgicalEvent"
+          },
+          "metadata": {
+            "$ref": "./LitCalDecreesSource.json#/definitions/Metadata"
+          },
+          "i18n": {
+            "type": "object",
+            "description": "Write-only sidecar: translations of the liturgical event name, keyed by base locale code (e.g. 'en', 'it', 'la'). Required for createNew, makeDoctor, and setProperty:name actions; rejected for setProperty:grade. On PUT for createNew at least one entry is required.",
+            "minProperties": 1,
+            "propertyNames": {
+              "pattern": "^[a-z]{2,3}$"
+            },
+            "additionalProperties": {
+              "type": "string",
+              "minLength": 1
+            },
+            "example": {
+              "en": "The Blessed Virgin Mary, Mother of the Church",
+              "la": "Beatae Mariae Virginis, Matris Ecclesiae"
+            }
+          },
+          "readings": {
+            "type": "object",
+            "description": "Write-only sidecar: lectionary readings for the liturgical event, keyed by base locale code (e.g. 'en', 'la'). Required on PUT for createNew; rejected on PUT for makeDoctor and setProperty:name; optional on PATCH for all actions.",
+            "minProperties": 1,
+            "propertyNames": {
+              "pattern": "^[a-z]{2,3}$"
+            },
+            "additionalProperties": {
+              "$ref": "./CommonDef.json#/definitions/Readings"
+            }
+          }
+        },
+        "required": [
+          "decree_id",
+          "decree_date",
+          "decree_protocol",
+          "description",
+          "liturgical_event",
+          "metadata"
         ]
       },
       "LitCalXML": {
