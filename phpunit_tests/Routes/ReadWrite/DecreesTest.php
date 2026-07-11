@@ -243,15 +243,17 @@ final class DecreesTest extends ApiTestCase
                 "PATCH /decrees/{$decreeId} should return 200 OK"
             );
         } finally {
-            // Step 3: DELETE — remove the test decree (expect 200 OK)
+            // Step 3: DELETE — remove the test decree.
+            // Accept 200 (normal) or 404 (decree was never persisted due to a mid-lifecycle
+            // failure) so that the cleanup itself does not mask the real assertion above.
             $deleteResponse = self::$http->request('DELETE', "/decrees/{$decreeId}", [
                 'headers'     => self::authHeaders($token),
                 'http_errors' => false,
             ]);
-            $this->assertSame(
-                200,
+            $this->assertContains(
                 $deleteResponse->getStatusCode(),
-                "DELETE /decrees/{$decreeId} should return 200 OK"
+                [200, 404],
+                "Cleanup DELETE /decrees/{$decreeId} should return 200 OK or 404 Not Found"
             );
         }
     }

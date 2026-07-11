@@ -382,6 +382,7 @@ final class DecreesHandler extends AbstractHandler
         if ($result === false) {
             throw new ServiceUnavailableException('Could not write decrees database');
         }
+        Utilities::invalidateJsonFileCache($path);
     }
 
     private function stripSidecars(\stdClass $payload): \stdClass
@@ -412,6 +413,7 @@ final class DecreesHandler extends AbstractHandler
             if ($result === false) {
                 throw new ServiceUnavailableException("Could not write i18n file: {$file}");
             }
+            Utilities::invalidateJsonFileCache($file);
         }
     }
 
@@ -436,6 +438,7 @@ final class DecreesHandler extends AbstractHandler
             if ($result === false) {
                 throw new ServiceUnavailableException("Could not write lectionary file: {$file}");
             }
+            Utilities::invalidateJsonFileCache($file);
         }
     }
 
@@ -570,6 +573,7 @@ final class DecreesHandler extends AbstractHandler
                 if ($result === false) {
                     throw new ServiceUnavailableException("Could not write locale file during key removal: {$file}");
                 }
+                Utilities::invalidateJsonFileCache($file);
             }
         }
     }
