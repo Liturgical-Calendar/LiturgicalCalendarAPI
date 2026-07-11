@@ -147,4 +147,75 @@ final class DecreesHandlerWriteTest extends AbstractHandlerTestCase
             $this->requestFor('PATCH', '/decrees/Nonexistent_Create', ['Accept-Language' => 'en'], self::createNewPayload('Nonexistent_Create'))
         );
     }
+
+    public function testDeleteRemovesDecreeAndOrphanedSidecarKeys(): void
+    {
+        ( new DecreesHandler(['StTest_Create']) )->handle(
+            $this->requestFor('PUT', '/decrees/StTest_Create', ['Accept-Language' => 'en'], self::createNewPayload())
+        );
+        $resp = ( new DecreesHandler(['StTest_Create']) )->handle(
+            $this->requestFor('DELETE', '/decrees/StTest_Create', ['Accept-Language' => 'en'])
+        );
+        self::assertSame(200, $resp->getStatusCode());
+
+        $db = json_decode((string) file_get_contents(JsonData::DECREES_FILE->path()), true);
+        self::assertNotContains('StTest_Create', array_column($db, 'decree_id'));
+
+        $en = json_decode((string) file_get_contents(strtr(JsonData::DECREES_I18N_FILE->path(), ['{locale}' => 'en'])), true);
+        self::assertArrayNotHasKey('StTest', $en);
+
+        $lectEn = json_decode((string) file_get_contents(strtr(JsonData::LECTIONARY_DECREES_FILE->path(), ['{locale}' => 'en'])), true);
+        self::assertArrayNotHasKey('StTest', $lectEn);
+    }
+
+    public function testDeletePreservesSidecarKeysSharedWithSurvivingDecrees(): void
+    {
+        // The shipped database has only one decree for StFaustinaKowalska, so the
+        // fixture assumption (two decrees sharing an event_key) does not hold.
+        // We create the second decree via PUT with a makeDoctor payload sharing
+        // the same event_key (StTest) as the first decree (StTest_Create).
+        // makeDoctor payloads must NOT include readings on create, and MUST include
+        // i18n with the locale entry — the sidecar guard enforces this.
+        ( new DecreesHandler(['StTest_Create']) )->handle(
+            $this->requestFor('PUT', '/decrees/StTest_Create', ['Accept-Language' => 'en'], self::createNewPayload())
+        );
+
+        $doctorPayload = [
+            'decree_id'        => 'StTest_Doctor',
+            'decree_date'      => '2025-06-01',
+            'decree_protocol'  => 'Prot. N. 2/25',
+            'description'      => 'Test decree elevating the same event to Doctor of the Church.',
+            'liturgical_event' => [
+                'event_key' => 'StTest',
+                'common'    => ['Proper'],
+                'calendar'  => 'GENERAL ROMAN',
+            ],
+            'metadata'         => [
+                'action'     => 'makeDoctor',
+                'since_year' => 2025,
+                'url'        => 'https://www.vatican.va/roman_curia/congregations/ccdds/documents/test-doctor.html',
+            ],
+            'i18n'             => ['en' => 'Saint Test, Doctor of the Church'],
+        ];
+        ( new DecreesHandler(['StTest_Doctor']) )->handle(
+            $this->requestFor('PUT', '/decrees/StTest_Doctor', ['Accept-Language' => 'en'], $doctorPayload)
+        );
+
+        // Now delete only the first decree — the sidecar key 'StTest' must be preserved
+        // because StTest_Doctor still references it.
+        ( new DecreesHandler(['StTest_Create']) )->handle(
+            $this->requestFor('DELETE', '/decrees/StTest_Create', ['Accept-Language' => 'en'])
+        );
+
+        $en = json_decode((string) file_get_contents(strtr(JsonData::DECREES_I18N_FILE->path(), ['{locale}' => 'en'])), true);
+        self::assertArrayHasKey('StTest', $en);
+    }
+
+    public function testDeleteUnknownDecreeIs404(): void
+    {
+        $this->expectException(NotFoundException::class);
+        ( new DecreesHandler(['Nonexistent_Create']) )->handle(
+            $this->requestFor('DELETE', '/decrees/Nonexistent_Create', ['Accept-Language' => 'en'])
+        );
+    }
 }

@@ -441,8 +441,55 @@ final class DecreesHandler extends AbstractHandler
 
     private function handleDeleteRequest(ResponseInterface $response): ResponseInterface
     {
-        // TODO: implement deletion of a Decree resource
-        return $response
-            ->withStatus(StatusCode::METHOD_NOT_ALLOWED->value, StatusCode::METHOD_NOT_ALLOWED->reason());
+        $decreeId = $this->requireSinglePathParam();
+
+        $decrees = $this->loadDecreesDatabase();
+        $target  = array_find($decrees, fn ($d) => $d->decree_id === $decreeId);
+        if (null === $target) {
+            throw new NotFoundException("No decree found with decree_id `{$decreeId}`");
+        }
+
+        $surviving = array_values(array_filter($decrees, fn ($d) => $d->decree_id !== $decreeId));
+        $this->saveDecreesDatabase($surviving);
+
+        $litEvent = property_exists($target, 'liturgical_event') && $target->liturgical_event instanceof \stdClass
+            ? $target->liturgical_event
+            : null;
+        $eventKey = $litEvent !== null && property_exists($litEvent, 'event_key') && is_string($litEvent->event_key)
+            ? $litEvent->event_key
+            : '';
+        if ($eventKey !== '') {
+            $stillReferenced = null !== array_find(
+                $surviving,
+                fn ($d) => property_exists($d, 'liturgical_event')
+                    && $d->liturgical_event instanceof \stdClass
+                    && property_exists($d->liturgical_event, 'event_key')
+                    && $d->liturgical_event->event_key === $eventKey
+            );
+            if (false === $stillReferenced) {
+                $this->removeKeyFromLocaleFiles($eventKey, JsonData::DECREES_I18N_FOLDER->path());
+                $this->removeKeyFromLocaleFiles($eventKey, JsonData::LECTIONARY_DECREES_FOLDER->path());
+            }
+        }
+        $this->auditLog('DELETE', $decreeId);
+
+        $result          = new \stdClass();
+        $result->success = "Decree `{$decreeId}` deleted";
+        return $this->encodeResponseBody($response, $result);
+    }
+
+    private function removeKeyFromLocaleFiles(string $eventKey, string $folder): void
+    {
+        $files = glob(rtrim($folder, '/') . '/*.json');
+        if (false === $files) {
+            return;
+        }
+        foreach ($files as $file) {
+            $arr = Utilities::jsonFileToArray($file);
+            if (array_key_exists($eventKey, $arr)) {
+                unset($arr[$eventKey]);
+                file_put_contents($file, JsonFormatter::encode($arr) . PHP_EOL, LOCK_EX);
+            }
+        }
     }
 }
