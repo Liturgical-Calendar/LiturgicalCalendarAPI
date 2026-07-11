@@ -236,13 +236,13 @@ class Router
                 if (count($requestPathParts) === 0) {
                     $decreesHandler->setAllowedRequestMethods([
                         RequestMethod::GET,
-                        RequestMethod::POST,
-                        RequestMethod::PUT
+                        RequestMethod::POST
                     ]);
                 } elseif (count($requestPathParts) === 1) {
                     $decreesHandler->setAllowedRequestMethods([
                         RequestMethod::GET,
                         RequestMethod::POST,
+                        RequestMethod::PUT,
                         RequestMethod::PATCH,
                         RequestMethod::DELETE
                     ]);
@@ -716,7 +716,11 @@ class Router
         } elseif ($route === 'decrees') {
             $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
             if ($oidcAvailable && $fgaClient !== null) {
-                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forGeneralRomanCalendar($fgaClient, 'decrees'));
+                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forGeneralRomanCalendar(
+                    $fgaClient,
+                    'decrees',
+                    ['PUT' => 'editor', 'PATCH' => 'editor', 'DELETE' => 'admin']
+                ));
             }
         } elseif ($route === 'missals') {
             // The missal id identifies the resource being authorized. With an id, gate by

@@ -266,13 +266,15 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
      * Create middleware for a General Roman Calendar sub-resource with a fixed object id
      * (e.g. "temporale" or "decrees").
      *
-     * @param OpenFgaClient $client   The OpenFGA client
-     * @param string        $objectId Fixed object id (e.g. "temporale")
+     * @param OpenFgaClient              $client      The OpenFGA client
+     * @param string                     $objectId    Fixed object id (e.g. "temporale")
+     * @param array<string,string>|null  $relationMap Optional method→relation override
+     *                                                (default: PUT/DELETE→admin, PATCH→editor)
      * @return self Configured middleware
      */
-    public static function forGeneralRomanCalendar(OpenFgaClient $client, string $objectId): self
+    public static function forGeneralRomanCalendar(OpenFgaClient $client, string $objectId, ?array $relationMap = null): self
     {
-        return new self($client, 'general_roman_calendar', 'calendar_id', $objectId);
+        return new self($client, 'general_roman_calendar', 'calendar_id', $objectId, null, $relationMap);
     }
 
     /**
