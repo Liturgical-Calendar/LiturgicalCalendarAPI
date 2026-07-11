@@ -276,7 +276,13 @@ final class DecreesHandler extends AbstractHandler
         $decrees[] = $this->stripSidecars($payload);
         $this->saveDecreesDatabase($decrees);
         $this->applySidecars($payload);
-        $this->auditLog('CREATE', $decreeId);
+        // FINDING 7: include touched files in audit context.
+        $auditFiles   = [JsonData::DECREES_FILE->path()];
+        $auditFiles[] = JsonData::DECREES_I18N_FOLDER->path();
+        if (property_exists($payload, 'readings') && $payload->readings instanceof \stdClass) {
+            $auditFiles[] = JsonData::LECTIONARY_DECREES_FOLDER->path();
+        }
+        $this->auditLog('CREATE', $decreeId, $auditFiles);
 
         $result          = new \stdClass();
         $result->success = "Decree `{$decreeId}` created";
@@ -314,10 +320,20 @@ final class DecreesHandler extends AbstractHandler
         // DecreeItemCollection::fromObject() requires name-bearing events (createNew/makeDoctor/setProperty name)
         // to have a `name` property already set (normally done by setNames()). For write payloads, name comes
         // from i18n; inject a synthetic placeholder so the structural validation can proceed.
-        $forValidation = $this->stripSidecars($payload);
-        $metadata      = property_exists($payload, 'metadata') && $payload->metadata instanceof \stdClass ? $payload->metadata : null;
-        $action        = $metadata !== null && property_exists($metadata, 'action') && is_string($metadata->action) ? $metadata->action : null;
-        $propertyProp  = $metadata !== null && property_exists($metadata, 'property') && is_string($metadata->property) ? $metadata->property : null;
+        // FINDING 1: use a deep copy so the placeholder never leaks into the original payload
+        //            (stripSidecars() is a shallow clone — liturgical_event is shared without deep copy).
+        $stripped    = $this->stripSidecars($payload);
+        $jsonEncoded = json_encode($stripped);
+        if ($jsonEncoded === false) {
+            throw new ValidationException('Could not serialize payload for validation');
+        }
+        $forValidation = json_decode($jsonEncoded);
+        if (!$forValidation instanceof \stdClass) {
+            throw new ValidationException('Could not deep-copy payload for validation');
+        }
+        $metadata     = property_exists($payload, 'metadata') && $payload->metadata instanceof \stdClass ? $payload->metadata : null;
+        $action       = $metadata !== null && property_exists($metadata, 'action') && is_string($metadata->action) ? $metadata->action : null;
+        $propertyProp = $metadata !== null && property_exists($metadata, 'property') && is_string($metadata->property) ? $metadata->property : null;
         if (
             in_array($action, ['createNew', 'makeDoctor'], true)
             || ( $action === 'setProperty' && $propertyProp === 'name' )
@@ -386,9 +402,16 @@ final class DecreesHandler extends AbstractHandler
             $locale = basename($file, '.json');
             $arr    = Utilities::jsonFileToArray($file);
             /** @var array<string,string> $arr */
-            $arr[$eventKey] = property_exists($i18n, $locale) && is_string($i18n->{$locale}) ? $i18n->{$locale} : '';
+            // FINDING 2: preserve existing translation when the payload doesn't provide this locale.
+            $arr[$eventKey] = property_exists($i18n, $locale) && is_string($i18n->{$locale})
+                ? $i18n->{$locale}
+                : ( isset($arr[$eventKey]) && is_string($arr[$eventKey]) ? $arr[$eventKey] : '' );
             ksort($arr);
-            file_put_contents($file, JsonFormatter::encode($arr) . PHP_EOL, LOCK_EX);
+            // FINDING 5: check write result; silent partial writes can corrupt sidecar files.
+            $result = file_put_contents($file, JsonFormatter::encode($arr) . PHP_EOL, LOCK_EX);
+            if ($result === false) {
+                throw new ServiceUnavailableException("Could not write i18n file: {$file}");
+            }
         }
     }
 
@@ -408,11 +431,18 @@ final class DecreesHandler extends AbstractHandler
             /** @var array<string,mixed> $arr */
             $arr[$eventKey] = $readings->{$locale};
             ksort($arr);
-            file_put_contents($file, JsonFormatter::encode($arr) . PHP_EOL, LOCK_EX);
+            // FINDING 5: check write result to avoid silent partial writes.
+            $result = file_put_contents($file, JsonFormatter::encode($arr) . PHP_EOL, LOCK_EX);
+            if ($result === false) {
+                throw new ServiceUnavailableException("Could not write lectionary file: {$file}");
+            }
         }
     }
 
-    private function auditLog(string $operation, string $decreeId): void
+    /**
+     * @param string[] $files Paths (files or folders) touched by the operation.
+     */
+    private function auditLog(string $operation, string $decreeId, array $files = []): void
     {
         /** @var array{sub?:string}|null $oidcUser */
         $oidcUser = $this->request->getAttribute('oidc_user');
@@ -425,6 +455,7 @@ final class DecreesHandler extends AbstractHandler
             'decree_id' => $decreeId,
             'user'      => $userSub,
             'ip'        => $this->clientIp,
+            'files'     => $files,
         ]);
     }
 
@@ -445,10 +476,36 @@ final class DecreesHandler extends AbstractHandler
             throw new NotFoundException("No decree found with decree_id `{$decreeId}`; use PUT to create it.");
         }
 
+        // FINDING 3: reject event_key changes — orphans i18n/lectionary entries permanently.
+        $storedLitEvent  = property_exists($decrees[$idx], 'liturgical_event') && $decrees[$idx]->liturgical_event instanceof \stdClass
+            ? $decrees[$idx]->liturgical_event
+            : null;
+        $storedEventKey  = $storedLitEvent !== null && property_exists($storedLitEvent, 'event_key') && is_string($storedLitEvent->event_key)
+            ? $storedLitEvent->event_key
+            : '';
+        $payloadLitEvent = property_exists($payload, 'liturgical_event') && $payload->liturgical_event instanceof \stdClass
+            ? $payload->liturgical_event
+            : null;
+        $payloadEventKey = $payloadLitEvent !== null && property_exists($payloadLitEvent, 'event_key') && is_string($payloadLitEvent->event_key)
+            ? $payloadLitEvent->event_key
+            : '';
+        if ($storedEventKey !== '' && $payloadEventKey !== '' && $payloadEventKey !== $storedEventKey) {
+            throw new ValidationException(
+                "Changing `liturgical_event.event_key` via PATCH is not allowed (stored: `{$storedEventKey}`, payload: `{$payloadEventKey}`). "
+                . 'To change the event_key, DELETE the decree and re-create it with PUT.'
+            );
+        }
+
         $decrees[$idx] = $this->stripSidecars($payload);
         $this->saveDecreesDatabase($decrees);
         $this->applySidecars($payload);
-        $this->auditLog('UPDATE', $decreeId);
+        // FINDING 7: include touched files in audit context.
+        $auditFiles   = [JsonData::DECREES_FILE->path()];
+        $auditFiles[] = JsonData::DECREES_I18N_FOLDER->path();
+        if (property_exists($payload, 'readings') && $payload->readings instanceof \stdClass) {
+            $auditFiles[] = JsonData::LECTIONARY_DECREES_FOLDER->path();
+        }
+        $this->auditLog('UPDATE', $decreeId, $auditFiles);
 
         $result          = new \stdClass();
         $result->success = "Decree `{$decreeId}` updated";
@@ -475,6 +532,8 @@ final class DecreesHandler extends AbstractHandler
         $eventKey = $litEvent !== null && property_exists($litEvent, 'event_key') && is_string($litEvent->event_key)
             ? $litEvent->event_key
             : '';
+        // FINDING 7: track which folders are GC'd for the audit entry.
+        $gcFolders = [];
         if ($eventKey !== '') {
             $stillReferenced = null !== array_find(
                 $surviving,
@@ -486,9 +545,10 @@ final class DecreesHandler extends AbstractHandler
             if (false === $stillReferenced) {
                 $this->removeKeyFromLocaleFiles($eventKey, JsonData::DECREES_I18N_FOLDER->path());
                 $this->removeKeyFromLocaleFiles($eventKey, JsonData::LECTIONARY_DECREES_FOLDER->path());
+                $gcFolders = [JsonData::DECREES_I18N_FOLDER->path(), JsonData::LECTIONARY_DECREES_FOLDER->path()];
             }
         }
-        $this->auditLog('DELETE', $decreeId);
+        $this->auditLog('DELETE', $decreeId, array_merge([JsonData::DECREES_FILE->path()], $gcFolders));
 
         $result          = new \stdClass();
         $result->success = "Decree `{$decreeId}` deleted";
@@ -505,7 +565,11 @@ final class DecreesHandler extends AbstractHandler
             $arr = Utilities::jsonFileToArray($file);
             if (array_key_exists($eventKey, $arr)) {
                 unset($arr[$eventKey]);
-                file_put_contents($file, JsonFormatter::encode($arr) . PHP_EOL, LOCK_EX);
+                // FINDING 5: check write result to avoid silent partial writes.
+                $result = file_put_contents($file, JsonFormatter::encode($arr) . PHP_EOL, LOCK_EX);
+                if ($result === false) {
+                    throw new ServiceUnavailableException("Could not write locale file during key removal: {$file}");
+                }
             }
         }
     }

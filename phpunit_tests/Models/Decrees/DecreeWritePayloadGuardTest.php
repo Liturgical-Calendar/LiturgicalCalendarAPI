@@ -89,4 +89,36 @@ final class DecreeWritePayloadGuardTest extends TestCase
         $this->expectException(ValidationException::class);
         DecreeWritePayloadGuard::assertSidecars(self::payload('setProperty', 'name'), 'en', false);
     }
+
+    // FINDING 4: invalid locale keys in i18n/readings must be rejected; 'la' must pass.
+
+    public function testI18nInvalidLocaleKeyIsRejected(): void
+    {
+        $p = self::payload('createNew', null, [
+            'i18n'     => (object) ['en' => 'Saint Test', 'zz' => 'Bad Locale'],
+            'readings' => (object) ['en' => (object) ['first_reading' => 'Gen 1:1']],
+        ]);
+        $this->expectException(ValidationException::class);
+        DecreeWritePayloadGuard::assertSidecars($p, 'en', true);
+    }
+
+    public function testReadingsInvalidLocaleKeyIsRejected(): void
+    {
+        $p = self::payload('createNew', null, [
+            'i18n'     => (object) ['en' => 'Saint Test'],
+            'readings' => (object) ['en' => (object) ['first_reading' => 'Gen 1:1'], 'zz' => (object) ['first_reading' => 'Gen 1:1']],
+        ]);
+        $this->expectException(ValidationException::class);
+        DecreeWritePayloadGuard::assertSidecars($p, 'en', true);
+    }
+
+    public function testLatinLocaleKeyIsAccepted(): void
+    {
+        $p = self::payload('createNew', null, [
+            'i18n'     => (object) ['en' => 'Saint Test', 'la' => 'Sanctus Test'],
+            'readings' => (object) ['en' => (object) ['first_reading' => 'Gen 1:1'], 'la' => (object) ['first_reading' => 'Gen 1:1']],
+        ]);
+        DecreeWritePayloadGuard::assertSidecars($p, 'en', true);
+        $this->addToAssertionCount(1);
+    }
 }

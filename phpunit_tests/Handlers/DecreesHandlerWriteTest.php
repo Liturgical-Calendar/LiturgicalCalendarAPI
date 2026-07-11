@@ -75,6 +75,13 @@ final class DecreesHandlerWriteTest extends AbstractHandlerTestCase
         );
         self::assertSame(201, $resp->getStatusCode());
 
+        // FINDING 1: placeholder must NOT appear in 201 response body
+        $responseBody = json_decode((string) $resp->getBody(), true);
+        self::assertIsArray($responseBody);
+        self::assertArrayHasKey('decree', $responseBody);
+        self::assertArrayHasKey('liturgical_event', $responseBody['decree']);
+        self::assertArrayNotHasKey('name', $responseBody['decree']['liturgical_event']);
+
         $db = json_decode((string) file_get_contents(JsonData::DECREES_FILE->path()), true);
         self::assertContains('StTest_Create', array_column($db, 'decree_id'));
 
@@ -86,6 +93,15 @@ final class DecreesHandlerWriteTest extends AbstractHandlerTestCase
 
         $lectEn = json_decode((string) file_get_contents(strtr(JsonData::LECTIONARY_DECREES_FILE->path(), ['{locale}' => 'en'])), true);
         self::assertSame('Genesis 1:1', $lectEn['StTest']['first_reading']);
+
+        // FINDING 1: placeholder must NOT leak into stored db entry or 201 response body
+        $entry = array_values(array_filter($db, fn ($d) => $d['decree_id'] === 'StTest_Create'))[0];
+        self::assertArrayNotHasKey('name', $entry['liturgical_event']);
+
+        $body = json_decode((string) file_get_contents(JsonData::DECREES_FILE->path()), true);
+        self::assertIsArray($body);
+        $stored = array_values(array_filter($body, fn ($d) => $d['decree_id'] === 'StTest_Create'))[0];
+        self::assertArrayNotHasKey('name', $stored['liturgical_event']);
     }
 
     public function testPutExistingDecreeIdConflicts(): void
@@ -138,6 +154,55 @@ final class DecreesHandlerWriteTest extends AbstractHandlerTestCase
 
         $en = json_decode((string) file_get_contents(strtr(JsonData::DECREES_I18N_FILE->path(), ['{locale}' => 'en'])), true);
         self::assertSame('Saint Test, Amended', $en['StTest']);
+    }
+
+    public function testPatchPreservesUnprovidedLocaleTranslations(): void
+    {
+        // FINDING 2: PATCH with i18n en+it must not blank locales absent from the payload.
+        // Create with en+it translations.
+        $payload         = self::createNewPayload();
+        $payload['i18n'] = ['en' => 'Saint Test', 'it' => 'San Test'];
+        ( new DecreesHandler(['StTest_Create']) )->handle(
+            $this->requestFor('PUT', '/decrees/StTest_Create', ['Accept-Language' => 'en'], $payload)
+        );
+
+        $itBefore = json_decode((string) file_get_contents(strtr(JsonData::DECREES_I18N_FILE->path(), ['{locale}' => 'it'])), true);
+        self::assertSame('San Test', $itBefore['StTest']);
+
+        // PATCH with en only — Italian translation must be preserved, not blanked.
+        $patch         = self::createNewPayload();
+        $patch['i18n'] = ['en' => 'Saint Test, Amended'];
+        unset($patch['readings']);
+        ( new DecreesHandler(['StTest_Create']) )->handle(
+            $this->requestFor('PATCH', '/decrees/StTest_Create', ['Accept-Language' => 'en'], $patch)
+        );
+
+        $itAfter = json_decode((string) file_get_contents(strtr(JsonData::DECREES_I18N_FILE->path(), ['{locale}' => 'it'])), true);
+        self::assertSame('San Test', $itAfter['StTest'], 'Italian translation must be preserved after PATCH with only English i18n');
+
+        // A locale never provided (fr) should stay as '' (empty, not removed).
+        $frFile = strtr(JsonData::DECREES_I18N_FILE->path(), ['{locale}' => 'fr']);
+        if (file_exists($frFile)) {
+            $frAfter = json_decode((string) file_get_contents($frFile), true);
+            self::assertSame('', $frAfter['StTest'] ?? '', 'Locale fr never provided should remain empty string');
+        }
+    }
+
+    public function testPatchChangingEventKeyIsRejected(): void
+    {
+        // FINDING 3: PATCH must reject 400 when payload changes liturgical_event.event_key.
+        ( new DecreesHandler(['StTest_Create']) )->handle(
+            $this->requestFor('PUT', '/decrees/StTest_Create', ['Accept-Language' => 'en'], self::createNewPayload())
+        );
+
+        $patch                                  = self::createNewPayload();
+        $patch['liturgical_event']['event_key'] = 'StTestRenamed'; // different key
+        unset($patch['readings']);
+
+        $this->expectException(ValidationException::class);
+        ( new DecreesHandler(['StTest_Create']) )->handle(
+            $this->requestFor('PATCH', '/decrees/StTest_Create', ['Accept-Language' => 'en'], $patch)
+        );
     }
 
     public function testPatchUnknownDecreeIs404(): void

@@ -2,6 +2,7 @@
 
 namespace LiturgicalCalendar\Api\Models\Decrees;
 
+use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 
 /**
@@ -68,5 +69,27 @@ final class DecreeWritePayloadGuard
             }
         }
         // On PATCH (isCreate === false) readings are optional for every action.
+
+        // FINDING 4: validate that i18n and readings locale keys are actually valid locales.
+        // The schema regex (^[a-z]{2,3}$) catches format; here we reject codes that are not
+        // recognised by LitLocale (which covers ICU locales plus 'la'/'la_VA').
+        if ($hasI18n) {
+            foreach (array_keys(get_object_vars($payload->i18n)) as $localeKey) {
+                if (!LitLocale::isValid($localeKey)) {
+                    throw new ValidationException(
+                        "The `i18n` object contains an invalid locale key `{$localeKey}`"
+                    );
+                }
+            }
+        }
+        if ($hasRead) {
+            foreach (array_keys(get_object_vars($payload->readings)) as $localeKey) {
+                if (!LitLocale::isValid($localeKey)) {
+                    throw new ValidationException(
+                        "The `readings` object contains an invalid locale key `{$localeKey}`"
+                    );
+                }
+            }
+        }
     }
 }
