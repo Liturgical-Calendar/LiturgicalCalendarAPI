@@ -2,34 +2,49 @@
 
 namespace LiturgicalCalendar\Api\Handlers;
 
+use LiturgicalCalendar\Api\Handlers\Auth\ClientIpTrait;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
+use LiturgicalCalendar\Api\Http\Exception\ConflictException;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use LiturgicalCalendar\Api\Http\Negotiator;
+use LiturgicalCalendar\Api\JsonFormatter;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCollection;
+use LiturgicalCalendar\Api\Models\Decrees\DecreeWritePayloadGuard;
 use LiturgicalCalendar\Api\Params\DecreesParams;
 use LiturgicalCalendar\Api\Utilities;
+use Monolog\Logger;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Swaggest\JsonSchema\Schema;
 
 /**
  * @phpstan-import-type DecreeItemFromObject from \LiturgicalCalendar\Api\Models\Decrees\DecreeItem
  */
 final class DecreesHandler extends AbstractHandler
 {
+    use ClientIpTrait;
+
     public static DecreeItemCollection $decreesIndex;
     public DecreesParams $params;
+    private ServerRequestInterface $request;
+    private Logger $auditLogger;
+    private string $clientIp = 'unknown';
 
     /** @param string[] $requestPathParams */
     public function __construct(array $requestPathParams = [])
     {
         parent::__construct($requestPathParams);
+        $this->auditLogger = LoggerFactory::create('audit', null, 90, false, true, false);
     }
 
     /*
@@ -87,6 +102,14 @@ final class DecreesHandler extends AbstractHandler
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        // Store request for access by private helpers (audit logging, etc.)
+        $this->request = $request;
+
+        // Capture client IP for audit logging
+        /** @var array<string,mixed> $serverParams */
+        $serverParams   = $request->getServerParams();
+        $this->clientIp = $this->getClientIp($request, $serverParams);
+
         // We instantiate a Response object with minimum state
         $response = static::initResponse($request);
 
@@ -225,9 +248,167 @@ final class DecreesHandler extends AbstractHandler
 
     private function handlePutRequest(ResponseInterface $response): ResponseInterface
     {
-        // TODO: implement creation of a Decree resource
-        return $response
-            ->withStatus(StatusCode::METHOD_NOT_ALLOWED->value, StatusCode::METHOD_NOT_ALLOWED->reason());
+        $decreeId = $this->requireSinglePathParam();
+        $payload  = $this->requireValidatedPayload($decreeId, isCreate: true);
+
+        $decrees = $this->loadDecreesDatabase();
+        if (null !== array_find($decrees, fn ($d) => $d->decree_id === $decreeId)) {
+            throw new ConflictException("Decree `{$decreeId}` already exists. Use PATCH to update it.");
+        }
+
+        $decrees[] = $this->stripSidecars($payload);
+        $this->saveDecreesDatabase($decrees);
+        $this->applySidecars($payload);
+        $this->auditLog('CREATE', $decreeId);
+
+        $result          = new \stdClass();
+        $result->success = "Decree `{$decreeId}` created";
+        $result->decree  = $this->stripSidecars($payload);
+        return $this->encodeResponseBody($response, $result, StatusCode::CREATED);
+    }
+
+    private function requireSinglePathParam(): string
+    {
+        if (count($this->requestPathParams) !== 1) {
+            throw new ValidationException('Write operations on the `/decrees` path require exactly one path parameter: /decrees/{decree_id}');
+        }
+        return $this->requestPathParams[0];
+    }
+
+    private function requireValidatedPayload(string $decreeId, bool $isCreate): \stdClass
+    {
+        // $this->params->Payload is guaranteed to be set as \stdClass by handle()
+        // before this helper is called (handle() validates the parsed body at line ~172).
+        $payload = $this->params->Payload;
+        try {
+            $schema = Schema::import(LitSchema::DECREE_WRITE->path());
+            $schema->in($payload);
+        } catch (\Swaggest\JsonSchema\Exception $e) {
+            throw new ValidationException('Decree write payload failed schema validation: ' . $e->getMessage());
+        }
+        $payloadDecreeId = property_exists($payload, 'decree_id') && is_string($payload->decree_id) ? $payload->decree_id : '';
+        if ($payloadDecreeId !== $decreeId) {
+            throw new ValidationException("The `decree_id` in the request body (`{$payloadDecreeId}`) must match the decree_id in the URL (`{$decreeId}`)");
+        }
+        $locale     = $this->params->Locale;
+        $baseLocale = $locale !== null ? explode('_', $locale)[0] : 'la';
+        DecreeWritePayloadGuard::assertSidecars($payload, $baseLocale, $isCreate);
+        // Validate DTO invariants (fixed vs mobile, setProperty->property, etc.).
+        // DecreeItemCollection::fromObject() requires name-bearing events (createNew/makeDoctor/setProperty name)
+        // to have a `name` property already set (normally done by setNames()). For write payloads, name comes
+        // from i18n; inject a synthetic placeholder so the structural validation can proceed.
+        $forValidation = $this->stripSidecars($payload);
+        $metadata      = property_exists($payload, 'metadata') && $payload->metadata instanceof \stdClass ? $payload->metadata : null;
+        $action        = $metadata !== null && property_exists($metadata, 'action') && is_string($metadata->action) ? $metadata->action : null;
+        $propertyProp  = $metadata !== null && property_exists($metadata, 'property') && is_string($metadata->property) ? $metadata->property : null;
+        if (
+            in_array($action, ['createNew', 'makeDoctor'], true)
+            || ( $action === 'setProperty' && $propertyProp === 'name' )
+        ) {
+            $litEvent = property_exists($forValidation, 'liturgical_event') && $forValidation->liturgical_event instanceof \stdClass
+                ? $forValidation->liturgical_event
+                : null;
+            if ($litEvent !== null) {
+                $litEvent->name = '__placeholder__';
+            }
+        }
+        DecreeItemCollection::fromObject([$forValidation]);
+        return $payload;
+    }
+
+    private function applySidecars(\stdClass $payload): void
+    {
+        $litEvent = property_exists($payload, 'liturgical_event') && $payload->liturgical_event instanceof \stdClass
+            ? $payload->liturgical_event
+            : null;
+        $eventKey = $litEvent !== null && property_exists($litEvent, 'event_key') && is_string($litEvent->event_key)
+            ? $litEvent->event_key
+            : '';
+        if ($eventKey === '') {
+            return;
+        }
+        if (property_exists($payload, 'i18n') && $payload->i18n instanceof \stdClass) {
+            $this->distributeI18n($eventKey, $payload->i18n);
+        }
+        if (property_exists($payload, 'readings') && $payload->readings instanceof \stdClass) {
+            $this->distributeReadings($eventKey, $payload->readings);
+        }
+    }
+
+    /** @return \stdClass[] */
+    private function loadDecreesDatabase(): array
+    {
+        return Utilities::jsonFileToObjectArray(JsonData::DECREES_FILE->path());
+    }
+
+    /** @param \stdClass[] $decrees */
+    private function saveDecreesDatabase(array $decrees): void
+    {
+        $path   = JsonData::DECREES_FILE->path();
+        $result = file_put_contents($path, JsonFormatter::encode(array_values($decrees)) . PHP_EOL, LOCK_EX);
+        if ($result === false) {
+            throw new ServiceUnavailableException('Could not write decrees database');
+        }
+    }
+
+    private function stripSidecars(\stdClass $payload): \stdClass
+    {
+        $clone = clone $payload;
+        unset($clone->i18n, $clone->readings);
+        return $clone;
+    }
+
+    private function distributeI18n(string $eventKey, \stdClass $i18n): void
+    {
+        $folder = JsonData::DECREES_I18N_FOLDER->path();
+        $files  = glob($folder . '/*.json');
+        if ($files === false) {
+            return;
+        }
+        foreach ($files as $file) {
+            $locale = basename($file, '.json');
+            $arr    = Utilities::jsonFileToArray($file);
+            /** @var array<string,string> $arr */
+            $arr[$eventKey] = property_exists($i18n, $locale) && is_string($i18n->{$locale}) ? $i18n->{$locale} : '';
+            ksort($arr);
+            file_put_contents($file, JsonFormatter::encode($arr) . PHP_EOL, LOCK_EX);
+        }
+    }
+
+    private function distributeReadings(string $eventKey, \stdClass $readings): void
+    {
+        $folder = JsonData::LECTIONARY_DECREES_FOLDER->path();
+        $files  = glob($folder . '/*.json');
+        if ($files === false) {
+            return;
+        }
+        foreach ($files as $file) {
+            $locale = basename($file, '.json');
+            if (!property_exists($readings, $locale)) {
+                continue;
+            }
+            $arr = Utilities::jsonFileToArray($file);
+            /** @var array<string,mixed> $arr */
+            $arr[$eventKey] = $readings->{$locale};
+            ksort($arr);
+            file_put_contents($file, JsonFormatter::encode($arr) . PHP_EOL, LOCK_EX);
+        }
+    }
+
+    private function auditLog(string $operation, string $decreeId): void
+    {
+        /** @var array{sub?:string}|null $oidcUser */
+        $oidcUser = $this->request->getAttribute('oidc_user');
+        $userSub  = is_array($oidcUser) && isset($oidcUser['sub']) && is_string($oidcUser['sub'])
+            ? $oidcUser['sub']
+            : 'anonymous';
+        $this->auditLogger->info('Decree ' . strtolower($operation), [
+            'operation' => $operation,
+            'resource'  => 'decrees',
+            'decree_id' => $decreeId,
+            'user'      => $userSub,
+            'ip'        => $this->clientIp,
+        ]);
     }
 
     private function handlePatchRequest(ResponseInterface $response): ResponseInterface

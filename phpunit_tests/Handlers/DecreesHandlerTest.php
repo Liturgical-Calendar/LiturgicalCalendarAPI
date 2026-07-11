@@ -69,16 +69,11 @@ final class DecreesHandlerTest extends AbstractHandlerTestCase
             ->handle($this->requestFor('GET', '/decrees/a/b', ['Accept-Language' => 'la']));
     }
 
-    public function testPutIsNotImplemented(): void
+    public function testPutOnCollectionRootIsRejected(): void
     {
-        $resp = ( new DecreesHandler() )->handle(
-            $this->requestFor(
-                'PUT',
-                '/decrees',
-                ['Accept-Language' => 'la'],
-                ['decree_id' => 'fake']
-            )
+        $this->expectException(ValidationException::class);
+        ( new DecreesHandler() )->handle(
+            $this->requestFor('PUT', '/decrees', ['Accept-Language' => 'en'], ['decree_id' => 'fake'])
         );
-        self::assertSame(405, $resp->getStatusCode());
     }
 }
