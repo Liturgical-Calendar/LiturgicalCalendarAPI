@@ -86,4 +86,26 @@ final class DecreesHandlerTest extends AbstractHandlerTestCase
         self::assertArrayHasKey('readings', $body['liturgical_event']);
         self::assertNotEmpty($body['liturgical_event']['readings']['first_reading']);
     }
+
+    public function testGetDecreeWithoutLectionaryEntryOmitsReadingsKey(): void
+    {
+        // StMaryMagdalene_Upgrade event_key is not present in lectionary/en.json,
+        // so `readings` must be ABSENT (not null) in the response.
+        $resp = ( new DecreesHandler(['StMaryMagdalene_Upgrade']) )->handle(
+            $this->requestFor('GET', '/decrees/StMaryMagdalene_Upgrade', ['Accept-Language' => 'en'])
+        );
+        $body = $this->decodeJsonBody($resp);
+        self::assertArrayNotHasKey('readings', $body['liturgical_event']);
+    }
+
+    public function testGetDecreeReadingsFallBackToBaseLocale(): void
+    {
+        // A regional Accept-Language tag (en-US) must resolve readings via the base locale (en).
+        $resp = ( new DecreesHandler(['MaryMotherChurch_Create']) )->handle(
+            $this->requestFor('GET', '/decrees/MaryMotherChurch_Create', ['Accept-Language' => 'en-US'])
+        );
+        $body = $this->decodeJsonBody($resp);
+        self::assertArrayHasKey('readings', $body['liturgical_event']);
+        self::assertNotEmpty($body['liturgical_event']['readings']['first_reading']);
+    }
 }
