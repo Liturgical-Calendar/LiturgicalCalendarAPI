@@ -56,6 +56,32 @@ final class DecreesHandlerTest extends AbstractHandlerTestCase
         self::assertSame($decreeId, $body['decree_id']);
     }
 
+    public function testGetSingleDecreeAggregatesAllTranslationsAndReadings(): void
+    {
+        // MaryMotherChurch_Create has translations in many locales beyond the
+        // GRC-live set and readings in several; the single GET must return them
+        // all as i18n/readings maps (write-body shape) regardless of the request locale.
+        $handler = new DecreesHandler(['MaryMotherChurch_Create']);
+        $resp    = $handler->handle($this->requestFor('GET', '/decrees/MaryMotherChurch_Create', ['Accept-Language' => 'la']));
+
+        self::assertSame(200, $resp->getStatusCode());
+        $body = $this->decodeJsonBody($resp);
+
+        self::assertArrayHasKey('i18n', $body);
+        self::assertIsArray($body['i18n']);
+        // English + Italian + a non-GRC-live locale (Spanish) are all present…
+        self::assertSame('Blessed Virgin Mary, Mother of the Church', $body['i18n']['en']);
+        self::assertArrayHasKey('it', $body['i18n']);
+        self::assertArrayHasKey('es', $body['i18n']);
+        // …and empty translations (e.g. de) are excluded.
+        self::assertArrayNotHasKey('de', $body['i18n']);
+
+        self::assertArrayHasKey('readings', $body);
+        self::assertIsArray($body['readings']);
+        self::assertArrayHasKey('en', $body['readings']);
+        self::assertArrayHasKey('first_reading', $body['readings']['en']);
+    }
+
     public function testUnknownDecreeIsNotFound(): void
     {
         $this->expectException(NotFoundException::class);

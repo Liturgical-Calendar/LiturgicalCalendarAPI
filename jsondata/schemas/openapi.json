@@ -5145,11 +5145,26 @@
         ],
         "responses": {
           "200": {
-            "description": "OK: the decree with the given decree_id",
+            "description": "OK: the decree with the given decree_id, enriched with the full set of translations (`i18n`) and lectionary readings (`readings`) across all locales, so admin editors can prefill every defined translation. These maps mirror the PUT/PATCH request body shape.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree"
+                  "allOf": [
+                    {
+                      "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "i18n": {
+                          "$ref": "./LitCalDecreeWritePayload.json#/properties/i18n"
+                        },
+                        "readings": {
+                          "$ref": "./LitCalDecreeWritePayload.json#/properties/readings"
+                        }
+                      }
+                    }
+                  ]
                 }
               }
             }

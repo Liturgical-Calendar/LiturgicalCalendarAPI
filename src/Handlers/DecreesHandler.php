@@ -257,8 +257,86 @@ final class DecreesHandler extends AbstractHandler
                     . ', valid values are found in the `decree_id` properties of the `litcal_decrees` collection: ' . implode(', ', $decreeIDs);
                 throw new NotFoundException($error);
             }
-            return $this->encodeResponseBody($response, $decree);
+
+            // Single-decree GET is enriched with the full translation and readings
+            // sets (every locale, not just the request locale) so the admin editor
+            // can prefill all defined translations. Shape mirrors the PUT/PATCH body.
+            $eventKey = $decree->liturgical_event->event_key;
+            $encoded  = json_encode($decree);
+            if ($encoded === false) {
+                throw new ServiceUnavailableException('Could not serialize decree');
+            }
+            $out = json_decode($encoded);
+            if (!$out instanceof \stdClass) {
+                throw new ServiceUnavailableException('Could not build decree response');
+            }
+            $out->i18n     = $this->aggregateI18nForEvent($eventKey);
+            $out->readings = $this->aggregateReadingsForEvent($eventKey);
+            return $this->encodeResponseBody($response, $out);
         }
+    }
+
+    /**
+     * Aggregate the non-empty translated names for an event across every decree
+     * i18n locale file, keyed by locale. Returned on the single-decree GET so
+     * the admin editor sees all defined translations, GRC-supported or not.
+     *
+     * @return \stdClass locale => translated name
+     */
+    private function aggregateI18nForEvent(string $eventKey): \stdClass
+    {
+        $out    = new \stdClass();
+        $folder = JsonData::DECREES_I18N_FOLDER->path();
+        $files  = glob($folder . '/*.json');
+        if ($files === false) {
+            return $out;
+        }
+        sort($files);
+        foreach ($files as $file) {
+            $locale = basename($file, '.json');
+            $arr    = Utilities::jsonFileToArray($file);
+            if (isset($arr[$eventKey]) && is_string($arr[$eventKey]) && $arr[$eventKey] !== '') {
+                $out->{$locale} = $arr[$eventKey];
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * Aggregate the readings for an event across every lectionary locale file,
+     * keyed by locale, including only locales whose readings have at least one
+     * non-empty field. Returned on the single-decree GET for editor prefill.
+     *
+     * @return \stdClass locale => readings object
+     */
+    private function aggregateReadingsForEvent(string $eventKey): \stdClass
+    {
+        $out    = new \stdClass();
+        $folder = JsonData::LECTIONARY_DECREES_FOLDER->path();
+        $files  = glob($folder . '/*.json');
+        if ($files === false) {
+            return $out;
+        }
+        sort($files);
+        foreach ($files as $file) {
+            $locale = basename($file, '.json');
+            $obj    = Utilities::jsonFileToObject($file);
+            if (false === property_exists($obj, $eventKey) || false === ( $obj->{$eventKey} instanceof \stdClass )) {
+                continue;
+            }
+            $readings   = $obj->{$eventKey};
+            $hasContent = false;
+            foreach (get_object_vars($readings) as $value) {
+                if (is_string($value) && $value !== '') {
+                    $hasContent = true;
+                    break;
+                }
+            }
+            if ($hasContent) {
+                $out->{$locale} = $readings;
+            }
+        }
+        return $out;
     }
 
     private function handlePutRequest(ResponseInterface $response): ResponseInterface
