@@ -21,15 +21,32 @@ final class DecreesHandlerWriteTest extends AbstractHandlerTestCase
         parent::setUp();
         $this->backupDir = sys_get_temp_dir() . '/decrees-backup-' . uniqid();
         mkdir($this->backupDir, 0755, true);
-        $src = dirname(JsonData::DECREES_FILE->path());
-        exec(sprintf('cp -r %s %s', escapeshellarg($src), escapeshellarg($this->backupDir)));
+        $src      = dirname(JsonData::DECREES_FILE->path());
+        $exitCode = 1;
+        exec(sprintf('cp -r %s %s', escapeshellarg($src), escapeshellarg($this->backupDir)), result_code: $exitCode);
+        if ($exitCode !== 0 || !is_dir($this->backupDir . '/decrees')) {
+            self::fail('Failed to back up the decrees source data directory; aborting before any test can mutate it.');
+        }
     }
 
     protected function tearDown(): void
     {
-        $src = dirname(JsonData::DECREES_FILE->path());
-        exec(sprintf('rm -rf %s && cp -r %s %s', escapeshellarg($src), escapeshellarg($this->backupDir . '/decrees'), escapeshellarg($src)));
-        exec(sprintf('rm -rf %s', escapeshellarg($this->backupDir)));
+        $src       = dirname(JsonData::DECREES_FILE->path());
+        $backupSrc = $this->backupDir . '/decrees';
+        // Only wipe the live directory when a non-empty backup exists to restore from;
+        // otherwise we would destroy the real decrees data with nothing to put back.
+        if (is_dir($backupSrc) && count(glob($backupSrc . '/*') ?: []) > 0) {
+            $exitCode = 1;
+            exec(sprintf('rm -rf %s && cp -r %s %s', escapeshellarg($src), escapeshellarg($backupSrc), escapeshellarg($src)), result_code: $exitCode);
+            if ($exitCode !== 0) {
+                // Keep the backup dir around for manual recovery and fail loudly.
+                parent::tearDown();
+                self::fail(sprintf('Failed to restore the decrees source data directory from backup %s; backup left in place for manual recovery.', $backupSrc));
+            }
+            exec(sprintf('rm -rf %s', escapeshellarg($this->backupDir)));
+        } else {
+            trigger_error('DecreesHandlerWriteTest::tearDown: backup directory missing or empty, skipping restore.', E_USER_WARNING);
+        }
         parent::tearDown();
     }
 

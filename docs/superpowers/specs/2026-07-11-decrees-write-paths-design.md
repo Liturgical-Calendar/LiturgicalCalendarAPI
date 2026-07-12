@@ -102,9 +102,11 @@ All writes touch files under `jsondata/sourcedata/decrees/`, using `JsonFormatte
 - **`decrees.json`** (single database, deliberate single-file design to minimize disk I/O):
   PUT appends; PATCH replaces the matching entry in place; DELETE removes it.
 - **`i18n/{locale}.json`**: for name-bearing actions, provided translations are written under the
-  `event_key`; every existing locale file receives the key, with an empty-string placeholder where no
-  translation was provided (Weblate fills these later).
-- **`lectionary/{locale}.json`**: the `readings` sidecar is distributed the same way.
+  `event_key`. Locales supplied in the `i18n` map receive the provided string; locale files NOT in the
+  map keep their existing translation when the key already exists, and receive an empty-string
+  placeholder only when the key is new to that file (Weblate fills placeholders later).
+- **`lectionary/{locale}.json`**: the `readings` sidecar is distributed ONLY to the locales supplied
+  in the `readings` map; other locale files are not touched, and no placeholders are created.
 
 **DELETE garbage collection**: the decree's `event_key` is removed from `i18n/*.json` and
 `lectionary/*.json` **only when no surviving decree still references that key** (keys are shared across

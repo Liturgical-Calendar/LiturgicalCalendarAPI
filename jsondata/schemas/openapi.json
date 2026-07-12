@@ -5138,7 +5138,7 @@
             "name": "decree_id",
             "schema": {
               "type": "string",
-              "pattern": "[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)"
+              "pattern": "^[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)$"
             },
             "required": true
           }
@@ -5180,7 +5180,7 @@
             "name": "decree_id",
             "schema": {
               "type": "string",
-              "pattern": "[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)"
+              "pattern": "^[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)$"
             },
             "required": true
           }
@@ -5232,6 +5232,9 @@
           },
           "409": {
             "$ref": "#/components/responses/Conflict409"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
           }
         }
       },
@@ -5256,7 +5259,7 @@
             "name": "decree_id",
             "schema": {
               "type": "string",
-              "pattern": "[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)"
+              "pattern": "^[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)$"
             },
             "required": true
           }
@@ -5308,6 +5311,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
           }
         }
       },
@@ -5332,7 +5338,7 @@
             "name": "decree_id",
             "schema": {
               "type": "string",
-              "pattern": "[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)"
+              "pattern": "^[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)$"
             },
             "required": true
           }
@@ -5349,6 +5355,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
           }
         }
       }

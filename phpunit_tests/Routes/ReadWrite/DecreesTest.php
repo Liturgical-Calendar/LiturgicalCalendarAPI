@@ -193,8 +193,9 @@ final class DecreesTest extends ApiTestCase
     /**
      * Full lifecycle: PUT (201) → PATCH (200) → DELETE (200) for a synthetic decree_id.
      *
-     * Steps 2 and 3 are wrapped in try/finally so the cleanup DELETE always runs and
-     * the data files are returned to their original state even if an assertion fails.
+     * The mutating steps (PUT and PATCH) are wrapped in try/finally so the cleanup DELETE
+     * always runs and the data files are returned to their original state even if an
+     * assertion fails after a partial creation.
      */
     public function testFullLifecycleCreatePatchDelete(): void
     {
@@ -210,22 +211,23 @@ final class DecreesTest extends ApiTestCase
             ['Content-Type' => 'application/json', 'Accept-Language' => 'en']
         );
 
-        // Step 1: PUT — create the new decree (expect 201 Created)
-        $createPayload = self::createNewPayload($decreeId);
-        $putResponse   = self::$http->request('PUT', "/decrees/{$decreeId}", [
-            'headers'     => $authHeaders,
-            'body'        => json_encode($createPayload),
-            'http_errors' => false,
-        ]);
-        $this->skipIfStaleServer($putResponse);
-        $this->assertSame(
-            201,
-            $putResponse->getStatusCode(),
-            "PUT /decrees/{$decreeId} should return 201 Created"
-        );
-
-        // Steps 2 and 3 are inside try/finally to guarantee cleanup.
+        // Steps 1 and 2 are inside try/finally so that the cleanup DELETE runs even when
+        // the PUT assertion fails after a partial creation.
         try {
+            // Step 1: PUT — create the new decree (expect 201 Created)
+            $createPayload = self::createNewPayload($decreeId);
+            $putResponse   = self::$http->request('PUT', "/decrees/{$decreeId}", [
+                'headers'     => $authHeaders,
+                'body'        => json_encode($createPayload),
+                'http_errors' => false,
+            ]);
+            $this->skipIfStaleServer($putResponse);
+            $this->assertSame(
+                201,
+                $putResponse->getStatusCode(),
+                "PUT /decrees/{$decreeId} should return 201 Created"
+            );
+
             // Step 2: PATCH — amend the description (expect 200 OK)
             $patchPayload                = self::createNewPayload($decreeId);
             $patchPayload['description'] = 'Amended description for integration test.';
@@ -250,11 +252,16 @@ final class DecreesTest extends ApiTestCase
                 'headers'     => self::authHeaders($token),
                 'http_errors' => false,
             ]);
-            $this->assertContains(
-                $deleteResponse->getStatusCode(),
-                [200, 404],
-                "Cleanup DELETE /decrees/{$decreeId} should return 200 OK or 404 Not Found"
-            );
+            $deleteStatus   = $deleteResponse->getStatusCode();
+            // Mirror skipIfStaleServer(): on a stale local build the PUT above raised a skip,
+            // and the cleanup DELETE also gets a 405 — don't let that turn the skip into a failure.
+            if ($deleteStatus !== 405 || getenv('CI') !== false) {
+                $this->assertContains(
+                    $deleteStatus,
+                    [200, 404],
+                    "Cleanup DELETE /decrees/{$decreeId} should return 200 OK or 404 Not Found"
+                );
+            }
         }
     }
 }

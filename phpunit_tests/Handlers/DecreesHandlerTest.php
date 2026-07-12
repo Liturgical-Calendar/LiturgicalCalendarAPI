@@ -100,7 +100,9 @@ final class DecreesHandlerTest extends AbstractHandlerTestCase
 
     public function testGetDecreeReadingsFallBackToBaseLocale(): void
     {
-        // A regional Accept-Language tag (en-US) must resolve readings via the base locale (en).
+        // Validates params-level normalization of regional Accept-Language tags:
+        // DecreesParams normalizes `en-US` to the primary language `en`, so the handler
+        // finds the `en` lectionary file directly, without any base-locale fallback logic.
         $resp = ( new DecreesHandler(['MaryMotherChurch_Create']) )->handle(
             $this->requestFor('GET', '/decrees/MaryMotherChurch_Create', ['Accept-Language' => 'en-US'])
         );

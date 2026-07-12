@@ -225,12 +225,10 @@ final class DecreesHandler extends AbstractHandler
 
         self::$decreesIndex = DecreeItemCollection::fromObject($decrees);
 
+        // DecreesParams normalizes Locale to the primary language (e.g. `en_US` -> `en`),
+        // so the lectionary file lookup never needs a base-locale fallback here.
         $locale         = $this->params->Locale ?? LitLocale::LATIN_PRIMARY_LANGUAGE;
         $lectionaryFile = strtr(JsonData::LECTIONARY_DECREES_FILE->path(), ['{locale}' => $locale]);
-        if (!file_exists($lectionaryFile)) {
-            $baseLocale     = explode('_', $locale)[0];
-            $lectionaryFile = strtr(JsonData::LECTIONARY_DECREES_FILE->path(), ['{locale}' => $baseLocale]);
-        }
         if (file_exists($lectionaryFile)) {
             $readings = Utilities::jsonFileToObject($lectionaryFile);
             foreach (self::$decreesIndex as $decree) {
@@ -268,26 +266,97 @@ final class DecreesHandler extends AbstractHandler
         $decreeId = $this->requireSinglePathParam();
         $payload  = $this->requireValidatedPayload($decreeId, isCreate: true);
 
-        $decrees = $this->loadDecreesDatabase();
-        if (null !== array_find($decrees, fn ($d) => $d->decree_id === $decreeId)) {
-            throw new ConflictException("Decree `{$decreeId}` already exists. Use PATCH to update it.");
-        }
+        return $this->withDecreesLock(function () use ($decreeId, $payload, $response): ResponseInterface {
+            $prior = $this->loadDecreesDatabase();
+            if (null !== array_find($prior, fn ($d) => $d->decree_id === $decreeId)) {
+                throw new ConflictException("Decree `{$decreeId}` already exists. Use PATCH to update it.");
+            }
 
-        $decrees[] = $this->stripSidecars($payload);
-        $this->saveDecreesDatabase($decrees);
-        $this->applySidecars($payload);
-        // FINDING 7: include touched files in audit context.
-        $auditFiles   = [JsonData::DECREES_FILE->path()];
-        $auditFiles[] = JsonData::DECREES_I18N_FOLDER->path();
-        if (property_exists($payload, 'readings') && $payload->readings instanceof \stdClass) {
-            $auditFiles[] = JsonData::LECTIONARY_DECREES_FOLDER->path();
-        }
-        $this->auditLog('CREATE', $decreeId, $auditFiles);
+            $decrees   = $prior;
+            $decrees[] = $this->stripSidecars($payload);
+            $this->saveDecreesDatabase($decrees);
+            $this->applySidecarsWithRollback($payload, $prior, $decreeId);
+            // FINDING 7: include touched files in audit context.
+            $auditFiles   = [JsonData::DECREES_FILE->path()];
+            $auditFiles[] = JsonData::DECREES_I18N_FOLDER->path();
+            if (property_exists($payload, 'readings') && $payload->readings instanceof \stdClass) {
+                $auditFiles[] = JsonData::LECTIONARY_DECREES_FOLDER->path();
+            }
+            $this->auditLog('CREATE', $decreeId, $auditFiles);
 
-        $result          = new \stdClass();
-        $result->success = "Decree `{$decreeId}` created";
-        $result->decree  = $this->stripSidecars($payload);
-        return $this->encodeResponseBody($response, $result, StatusCode::CREATED);
+            $result          = new \stdClass();
+            $result->success = "Decree `{$decreeId}` created";
+            $result->decree  = $this->stripSidecars($payload);
+            return $this->encodeResponseBody($response, $result, StatusCode::CREATED);
+        });
+    }
+
+    /**
+     * Execute a callable while holding an exclusive advisory lock on the decrees lockfile,
+     * serializing concurrent load->mutate->save sequences on decrees.json.
+     *
+     * A separate `.lock` file is used (not decrees.json itself) because saveDecreesDatabase()
+     * takes LOCK_EX on decrees.json via file_put_contents from this same process, and nesting
+     * flock on the same file would conflict.
+     *
+     * @template T
+     * @param callable(): T $fn
+     * @return T
+     */
+    private function withDecreesLock(callable $fn): mixed
+    {
+        $lockPath = JsonData::DECREES_FILE->path() . '.lock';
+        $fh       = fopen($lockPath, 'c');
+        if ($fh === false) {
+            throw new ServiceUnavailableException('Could not open decrees lock file');
+        }
+        try {
+            if (!flock($fh, LOCK_EX)) {
+                throw new ServiceUnavailableException('Could not acquire exclusive lock on decrees database');
+            }
+            return $fn();
+        } finally {
+            flock($fh, LOCK_UN);
+            fclose($fh);
+        }
+    }
+
+    /**
+     * Apply the i18n/readings sidecars; if sidecar distribution fails after the decrees
+     * database was already persisted, roll the database back to its prior state so that
+     * decrees.json (the source of truth) never diverges silently. Partial sidecar files
+     * may remain, which is acceptable.
+     *
+     * @param \stdClass[] $prior The decrees array as it was before the mutation.
+     */
+    private function applySidecarsWithRollback(\stdClass $payload, array $prior, string $decreeId): void
+    {
+        try {
+            $this->applySidecars($payload);
+        } catch (ServiceUnavailableException $e) {
+            $this->rollbackDecreesDatabase($prior, $decreeId);
+            throw $e;
+        }
+    }
+
+    /**
+     * Best-effort restore of the decrees database to its prior state; a rollback failure
+     * is logged but never masks the original exception being propagated by the caller.
+     *
+     * @param \stdClass[] $prior The decrees array as it was before the mutation.
+     */
+    private function rollbackDecreesDatabase(array $prior, string $decreeId): void
+    {
+        try {
+            $this->saveDecreesDatabase($prior);
+        } catch (\Throwable $rollbackEx) {
+            $this->auditLogger->error('Decree database rollback failed after sidecar write error', [
+                'operation'      => 'ROLLBACK',
+                'resource'       => 'decrees',
+                'decree_id'      => $decreeId,
+                'rollback_error' => $rollbackEx->getMessage(),
+            ]);
+        }
     }
 
     private function requireSinglePathParam(): string
@@ -467,95 +536,106 @@ final class DecreesHandler extends AbstractHandler
         $decreeId = $this->requireSinglePathParam();
         $payload  = $this->requireValidatedPayload($decreeId, isCreate: false);
 
-        $decrees = $this->loadDecreesDatabase();
-        $idx     = null;
-        foreach ($decrees as $i => $decree) {
-            if ($decree->decree_id === $decreeId) {
-                $idx = $i;
-                break;
+        return $this->withDecreesLock(function () use ($decreeId, $payload, $response): ResponseInterface {
+            $prior = $this->loadDecreesDatabase();
+            $idx   = null;
+            foreach ($prior as $i => $decree) {
+                if ($decree->decree_id === $decreeId) {
+                    $idx = $i;
+                    break;
+                }
             }
-        }
-        if (null === $idx) {
-            throw new NotFoundException("No decree found with decree_id `{$decreeId}`; use PUT to create it.");
-        }
+            if (null === $idx) {
+                throw new NotFoundException("No decree found with decree_id `{$decreeId}`; use PUT to create it.");
+            }
 
-        // FINDING 3: reject event_key changes — orphans i18n/lectionary entries permanently.
-        $storedLitEvent  = property_exists($decrees[$idx], 'liturgical_event') && $decrees[$idx]->liturgical_event instanceof \stdClass
-            ? $decrees[$idx]->liturgical_event
-            : null;
-        $storedEventKey  = $storedLitEvent !== null && property_exists($storedLitEvent, 'event_key') && is_string($storedLitEvent->event_key)
-            ? $storedLitEvent->event_key
-            : '';
-        $payloadLitEvent = property_exists($payload, 'liturgical_event') && $payload->liturgical_event instanceof \stdClass
-            ? $payload->liturgical_event
-            : null;
-        $payloadEventKey = $payloadLitEvent !== null && property_exists($payloadLitEvent, 'event_key') && is_string($payloadLitEvent->event_key)
-            ? $payloadLitEvent->event_key
-            : '';
-        if ($storedEventKey !== '' && $payloadEventKey !== '' && $payloadEventKey !== $storedEventKey) {
-            throw new ValidationException(
-                "Changing `liturgical_event.event_key` via PATCH is not allowed (stored: `{$storedEventKey}`, payload: `{$payloadEventKey}`). "
-                . 'To change the event_key, DELETE the decree and re-create it with PUT.'
-            );
-        }
+            // FINDING 3: reject event_key changes — orphans i18n/lectionary entries permanently.
+            $storedLitEvent  = property_exists($prior[$idx], 'liturgical_event') && $prior[$idx]->liturgical_event instanceof \stdClass
+                ? $prior[$idx]->liturgical_event
+                : null;
+            $storedEventKey  = $storedLitEvent !== null && property_exists($storedLitEvent, 'event_key') && is_string($storedLitEvent->event_key)
+                ? $storedLitEvent->event_key
+                : '';
+            $payloadLitEvent = property_exists($payload, 'liturgical_event') && $payload->liturgical_event instanceof \stdClass
+                ? $payload->liturgical_event
+                : null;
+            $payloadEventKey = $payloadLitEvent !== null && property_exists($payloadLitEvent, 'event_key') && is_string($payloadLitEvent->event_key)
+                ? $payloadLitEvent->event_key
+                : '';
+            if ($storedEventKey !== '' && $payloadEventKey !== '' && $payloadEventKey !== $storedEventKey) {
+                throw new ValidationException(
+                    "Changing `liturgical_event.event_key` via PATCH is not allowed (stored: `{$storedEventKey}`, payload: `{$payloadEventKey}`). "
+                    . 'To change the event_key, DELETE the decree and re-create it with PUT.'
+                );
+            }
 
-        $decrees[$idx] = $this->stripSidecars($payload);
-        $this->saveDecreesDatabase($decrees);
-        $this->applySidecars($payload);
-        // FINDING 7: include touched files in audit context.
-        $auditFiles   = [JsonData::DECREES_FILE->path()];
-        $auditFiles[] = JsonData::DECREES_I18N_FOLDER->path();
-        if (property_exists($payload, 'readings') && $payload->readings instanceof \stdClass) {
-            $auditFiles[] = JsonData::LECTIONARY_DECREES_FOLDER->path();
-        }
-        $this->auditLog('UPDATE', $decreeId, $auditFiles);
+            $decrees       = $prior;
+            $decrees[$idx] = $this->stripSidecars($payload);
+            $this->saveDecreesDatabase($decrees);
+            $this->applySidecarsWithRollback($payload, $prior, $decreeId);
+            // FINDING 7: include touched files in audit context.
+            $auditFiles   = [JsonData::DECREES_FILE->path()];
+            $auditFiles[] = JsonData::DECREES_I18N_FOLDER->path();
+            if (property_exists($payload, 'readings') && $payload->readings instanceof \stdClass) {
+                $auditFiles[] = JsonData::LECTIONARY_DECREES_FOLDER->path();
+            }
+            $this->auditLog('UPDATE', $decreeId, $auditFiles);
 
-        $result          = new \stdClass();
-        $result->success = "Decree `{$decreeId}` updated";
-        $result->decree  = $this->stripSidecars($payload);
-        return $this->encodeResponseBody($response, $result);
+            $result          = new \stdClass();
+            $result->success = "Decree `{$decreeId}` updated";
+            $result->decree  = $this->stripSidecars($payload);
+            return $this->encodeResponseBody($response, $result);
+        });
     }
 
     private function handleDeleteRequest(ResponseInterface $response): ResponseInterface
     {
         $decreeId = $this->requireSinglePathParam();
 
-        $decrees = $this->loadDecreesDatabase();
-        $target  = array_find($decrees, fn ($d) => $d->decree_id === $decreeId);
-        if (null === $target) {
-            throw new NotFoundException("No decree found with decree_id `{$decreeId}`");
-        }
-
-        $surviving = array_values(array_filter($decrees, fn ($d) => $d->decree_id !== $decreeId));
-        $this->saveDecreesDatabase($surviving);
-
-        $litEvent = property_exists($target, 'liturgical_event') && $target->liturgical_event instanceof \stdClass
-            ? $target->liturgical_event
-            : null;
-        $eventKey = $litEvent !== null && property_exists($litEvent, 'event_key') && is_string($litEvent->event_key)
-            ? $litEvent->event_key
-            : '';
-        // FINDING 7: track which folders are GC'd for the audit entry.
-        $gcFolders = [];
-        if ($eventKey !== '') {
-            $stillReferenced = null !== array_find(
-                $surviving,
-                fn ($d) => property_exists($d, 'liturgical_event')
-                    && $d->liturgical_event instanceof \stdClass
-                    && property_exists($d->liturgical_event, 'event_key')
-                    && $d->liturgical_event->event_key === $eventKey
-            );
-            if (false === $stillReferenced) {
-                $this->removeKeyFromLocaleFiles($eventKey, JsonData::DECREES_I18N_FOLDER->path());
-                $this->removeKeyFromLocaleFiles($eventKey, JsonData::LECTIONARY_DECREES_FOLDER->path());
-                $gcFolders = [JsonData::DECREES_I18N_FOLDER->path(), JsonData::LECTIONARY_DECREES_FOLDER->path()];
+        return $this->withDecreesLock(function () use ($decreeId, $response): ResponseInterface {
+            $prior  = $this->loadDecreesDatabase();
+            $target = array_find($prior, fn ($d) => $d->decree_id === $decreeId);
+            if (null === $target) {
+                throw new NotFoundException("No decree found with decree_id `{$decreeId}`");
             }
-        }
-        $this->auditLog('DELETE', $decreeId, array_merge([JsonData::DECREES_FILE->path()], $gcFolders));
 
-        $result          = new \stdClass();
-        $result->success = "Decree `{$decreeId}` deleted";
-        return $this->encodeResponseBody($response, $result);
+            $surviving = array_values(array_filter($prior, fn ($d) => $d->decree_id !== $decreeId));
+            $this->saveDecreesDatabase($surviving);
+
+            $litEvent = property_exists($target, 'liturgical_event') && $target->liturgical_event instanceof \stdClass
+                ? $target->liturgical_event
+                : null;
+            $eventKey = $litEvent !== null && property_exists($litEvent, 'event_key') && is_string($litEvent->event_key)
+                ? $litEvent->event_key
+                : '';
+            // FINDING 7: track which folders are GC'd for the audit entry.
+            $gcFolders = [];
+            if ($eventKey !== '') {
+                $stillReferenced = null !== array_find(
+                    $surviving,
+                    fn ($d) => property_exists($d, 'liturgical_event')
+                        && $d->liturgical_event instanceof \stdClass
+                        && property_exists($d->liturgical_event, 'event_key')
+                        && $d->liturgical_event->event_key === $eventKey
+                );
+                if (false === $stillReferenced) {
+                    try {
+                        $this->removeKeyFromLocaleFiles($eventKey, JsonData::DECREES_I18N_FOLDER->path());
+                        $this->removeKeyFromLocaleFiles($eventKey, JsonData::LECTIONARY_DECREES_FOLDER->path());
+                    } catch (ServiceUnavailableException $e) {
+                        // Restore the decrees database so it never diverges from the sidecars silently.
+                        $this->rollbackDecreesDatabase($prior, $decreeId);
+                        throw $e;
+                    }
+                    $gcFolders = [JsonData::DECREES_I18N_FOLDER->path(), JsonData::LECTIONARY_DECREES_FOLDER->path()];
+                }
+            }
+            $this->auditLog('DELETE', $decreeId, array_merge([JsonData::DECREES_FILE->path()], $gcFolders));
+
+            $result          = new \stdClass();
+            $result->success = "Decree `{$decreeId}` deleted";
+            return $this->encodeResponseBody($response, $result);
+        });
     }
 
     private function removeKeyFromLocaleFiles(string $eventKey, string $folder): void

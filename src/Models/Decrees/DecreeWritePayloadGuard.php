@@ -50,8 +50,10 @@ final class DecreeWritePayloadGuard
                 );
             }
         } elseif ($hasI18n) {
+            $actionStr   = is_string($action) ? $action : 'unknown';
+            $propertyStr = is_string($property) ? " and property `{$property}`" : '';
             throw new ValidationException(
-                'Decrees with metadata.action `setProperty` and property `grade` do not affect the event name: the `i18n` object is not allowed'
+                "Decrees with metadata.action `{$actionStr}`{$propertyStr} do not affect the event name: the `i18n` object is not allowed"
             );
         }
 
