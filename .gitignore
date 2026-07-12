@@ -40,6 +40,9 @@ infrastructure/*.env
 # Local git worktrees
 .worktrees/
 
+# Advisory lockfile used to serialize decrees write operations
+jsondata/sourcedata/decrees/*.lock
+
 # Coverage and test-result artifacts produced by composer test:coverage
 coverage.xml
 coverage.merged.xml

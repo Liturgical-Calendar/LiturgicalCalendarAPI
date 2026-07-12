@@ -3501,57 +3501,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
-                },
-                "example": {
-                  "litcal_events": {
-                    "StsBasilGreg": {
-                      "month": 1,
-                      "day": 2,
-                      "event_key": "StsBasilGreg",
-                      "grade": 3,
-                      "common": [
-                        "Proper"
-                      ],
-                      "calendar": "GENERAL ROMAN",
-                      "color": [
-                        "white"
-                      ],
-                      "readings": {
-                        "first_reading": "Efesini 4, 1-7.11-13",
-                        "responsorial_psalm": "Salmo 23",
-                        "gospel_acclamation": "Matteo 23, 9b.10b",
-                        "gospel": "Matteo 23, 8-12"
-                      },
-                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesi\u00e6 doctorum",
-                      "missal": "VATICAN_1970"
-                    },
-                    "StRayPenyafort": {
-                      "month": 1,
-                      "day": 7,
-                      "event_key": "StRayPenyafort",
-                      "grade": 2,
-                      "common": [
-                        "Pastors:For One Pastor"
-                      ],
-                      "calendar": "GENERAL ROMAN",
-                      "color": [
-                        "white"
-                      ],
-                      "readings": {
-                        "first_reading": "2 Corinzi 5, 14-20",
-                        "responsorial_psalm": "Salmo 103",
-                        "gospel_acclamation": "Matteo 24, 42a.44",
-                        "gospel": "Luca 12, 35-40"
-                      },
-                      "name": "Sancti Raimundi de Penyafort, presbyteri",
-                      "missal": "VATICAN_1970"
-                    }
-                  },
-                  "settings": {
-                    "locale": "en",
-                    "national_calendar": "US",
-                    "diocesan_calendar": "boston_us"
-                  }
                 }
               }
             }
@@ -3588,59 +3537,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
-                },
-                "example": {
-                  "litcal_events": {
-                    "StsBasilGreg": {
-                      "month": 1,
-                      "day": 2,
-                      "event_key": "StsBasilGreg",
-                      "grade": 3,
-                      "common": [
-                        "Proper"
-                      ],
-                      "calendar": "GENERAL ROMAN",
-                      "color": [
-                        "white"
-                      ],
-                      "readings": {
-                        "first_reading": "Ef 4, 1-7.11-13",
-                        "responsorial_psalm": "Salmo 23",
-                        "second_reading": "",
-                        "gospel_acclamation": "Mt 23, 9b.10b",
-                        "gospel": "Mt 23, 8-12"
-                      },
-                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesi\u00e6 doctorum",
-                      "missal": "VATICAN_1970"
-                    },
-                    "StRayPenyafort": {
-                      "month": 1,
-                      "day": 7,
-                      "event_key": "StRayPenyafort",
-                      "grade": 2,
-                      "common": [
-                        "Pastors:For One Pastor"
-                      ],
-                      "calendar": "GENERAL ROMAN",
-                      "color": [
-                        "white"
-                      ],
-                      "readings": {
-                        "first_reading": "2 Cor 5, 14-20",
-                        "responsorial_psalm": "Salmo 103",
-                        "second_reading": "",
-                        "gospel_acclamation": "Mt 24, 42a.44",
-                        "gospel": "Lc 12, 35-40"
-                      },
-                      "name": "Sancti Raimundi de Penyafort, presbyteri",
-                      "missal": "VATICAN_1970"
-                    }
-                  },
-                  "settings": {
-                    "locale": "la",
-                    "national_calendar": null,
-                    "diocesan_calendar": null
-                  }
                 }
               }
             }
@@ -3695,59 +3591,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
-                },
-                "example": {
-                  "litcal_events": {
-                    "StsBasilGreg": {
-                      "month": 1,
-                      "day": 2,
-                      "event_key": "StsBasilGreg",
-                      "grade": 3,
-                      "common": [
-                        "Proper"
-                      ],
-                      "calendar": "GENERAL ROMAN",
-                      "color": [
-                        "white"
-                      ],
-                      "readings": {
-                        "first_reading": "Ef 4, 1-7.11-13",
-                        "responsorial_psalm": "Salmo 23",
-                        "second_reading": "",
-                        "gospel_acclamation": "Mt 23, 9b.10b",
-                        "gospel": "Mt 23, 8-12"
-                      },
-                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesi\u00e6 doctorum",
-                      "missal": "VATICAN_1970"
-                    },
-                    "StRayPenyafort": {
-                      "month": 1,
-                      "day": 7,
-                      "event_key": "StRayPenyafort",
-                      "grade": 2,
-                      "common": [
-                        "Pastors:For One Pastor"
-                      ],
-                      "calendar": "GENERAL ROMAN",
-                      "color": [
-                        "white"
-                      ],
-                      "readings": {
-                        "first_reading": "2 Cor 5, 14-20",
-                        "responsorial_psalm": "Salmo 103",
-                        "second_reading": "",
-                        "gospel_acclamation": "Mt 24, 42a.44",
-                        "gospel": "Lc 12, 35-40"
-                      },
-                      "name": "Sancti Raimundi de Penyafort, presbyteri",
-                      "missal": "VATICAN_1970"
-                    }
-                  },
-                  "settings": {
-                    "locale": "en",
-                    "national_calendar": "US",
-                    "diocesan_calendar": "boston_us"
-                  }
                 }
               }
             }
@@ -3800,59 +3643,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
-                },
-                "example": {
-                  "litcal_events": {
-                    "StsBasilGreg": {
-                      "month": 1,
-                      "day": 2,
-                      "event_key": "StsBasilGreg",
-                      "grade": 3,
-                      "common": [
-                        "Proper"
-                      ],
-                      "calendar": "GENERAL ROMAN",
-                      "color": [
-                        "white"
-                      ],
-                      "readings": {
-                        "first_reading": "Ef 4, 1-7.11-13",
-                        "responsorial_psalm": "Salmo 23",
-                        "second_reading": "",
-                        "gospel_acclamation": "Mt 23, 9b.10b",
-                        "gospel": "Mt 23, 8-12"
-                      },
-                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesi\u00e6 doctorum",
-                      "missal": "VATICAN_1970"
-                    },
-                    "StRayPenyafort": {
-                      "month": 1,
-                      "day": 7,
-                      "event_key": "StRayPenyafort",
-                      "grade": 2,
-                      "common": [
-                        "Pastors:For One Pastor"
-                      ],
-                      "calendar": "GENERAL ROMAN",
-                      "color": [
-                        "white"
-                      ],
-                      "readings": {
-                        "first_reading": "2 Cor 5, 14-20",
-                        "responsorial_psalm": "Salmo 103",
-                        "second_reading": "",
-                        "gospel_acclamation": "Mt 24, 42a.44",
-                        "gospel": "Lc 12, 35-40"
-                      },
-                      "name": "Sancti Raimundi de Penyafort, presbyteri",
-                      "missal": "VATICAN_1970"
-                    }
-                  },
-                  "settings": {
-                    "locale": "la",
-                    "national_calendar": null,
-                    "diocesan_calendar": null
-                  }
                 }
               }
             }
@@ -3899,59 +3689,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
-                },
-                "example": {
-                  "litcal_events": {
-                    "StsBasilGreg": {
-                      "month": 1,
-                      "day": 2,
-                      "event_key": "StsBasilGreg",
-                      "grade": 3,
-                      "common": [
-                        "Proper"
-                      ],
-                      "calendar": "GENERAL ROMAN",
-                      "color": [
-                        "white"
-                      ],
-                      "readings": {
-                        "first_reading": "Efesini 4, 1-7.11-13",
-                        "responsorial_psalm": "Salmo 23",
-                        "second_reading": "",
-                        "gospel_acclamation": "Matteo 23, 9b.10b",
-                        "gospel": "Matteo 23, 8-12"
-                      },
-                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesi\u00e6 doctorum",
-                      "missal": "VATICAN_1970"
-                    },
-                    "StRayPenyafort": {
-                      "month": 1,
-                      "day": 7,
-                      "event_key": "StRayPenyafort",
-                      "grade": 2,
-                      "common": [
-                        "Pastors:For One Pastor"
-                      ],
-                      "calendar": "GENERAL ROMAN",
-                      "color": [
-                        "white"
-                      ],
-                      "readings": {
-                        "first_reading": "2 Corinzi 5, 14-20",
-                        "responsorial_psalm": "Salmo 103",
-                        "second_reading": "",
-                        "gospel_acclamation": "Matteo 24, 42a.44",
-                        "gospel": "Luca 12, 35-40"
-                      },
-                      "name": "Sancti Raimundi de Penyafort, presbyteri",
-                      "missal": "VATICAN_1970"
-                    }
-                  },
-                  "settings": {
-                    "locale": "en",
-                    "national_calendar": "US",
-                    "diocesan_calendar": "boston_us"
-                  }
                 }
               }
             }
@@ -3996,59 +3733,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
-                },
-                "example": {
-                  "litcal_events": {
-                    "StsBasilGreg": {
-                      "month": 1,
-                      "day": 2,
-                      "event_key": "StsBasilGreg",
-                      "grade": 3,
-                      "common": [
-                        "Proper"
-                      ],
-                      "calendar": "GENERAL ROMAN",
-                      "color": [
-                        "white"
-                      ],
-                      "readings": {
-                        "first_reading": "Ef 4, 1-7.11-13",
-                        "responsorial_psalm": "Salmo 23",
-                        "second_reading": "",
-                        "gospel_acclamation": "Mt 23, 9b.10b",
-                        "gospel": "Mt 23, 8-12"
-                      },
-                      "name": "Sancti Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesi\u00e6 doctorum",
-                      "missal": "VATICAN_1970"
-                    },
-                    "StRayPenyafort": {
-                      "month": 1,
-                      "day": 7,
-                      "event_key": "StRayPenyafort",
-                      "grade": 2,
-                      "common": [
-                        "Pastors:For One Pastor"
-                      ],
-                      "calendar": "GENERAL ROMAN",
-                      "color": [
-                        "white"
-                      ],
-                      "readings": {
-                        "first_reading": "2 Cor 5, 14-20",
-                        "responsorial_psalm": "Salmo 103",
-                        "second_reading": "",
-                        "gospel_acclamation": "Mt 24, 42a.44",
-                        "gospel": "Lc 12, 35-40"
-                      },
-                      "name": "Sancti Raimundi de Penyafort, presbyteri",
-                      "missal": "VATICAN_1970"
-                    }
-                  },
-                  "settings": {
-                    "locale": "la",
-                    "national_calendar": null,
-                    "diocesan_calendar": null
-                  }
                 }
               }
             }
@@ -5102,16 +4786,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "litcal_decrees": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree"
-                      }
-                    }
-                  }
+                  "$ref": "./LitCalDecreesPath.json"
                 }
               }
             }
@@ -5138,24 +4813,241 @@
             "name": "decree_id",
             "schema": {
               "type": "string",
-              "pattern": "[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)"
+              "pattern": "^[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)$"
             },
             "required": true
           }
         ],
         "responses": {
           "200": {
-            "description": "OK: an index of defined Decrees",
+            "description": "OK: the decree with the given decree_id, enriched with the full set of translations (`i18n`) and lectionary readings (`readings`) across all locales, so admin editors can prefill every defined translation. These maps mirror the PUT/PATCH request body shape.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree"
+                  "allOf": [
+                    {
+                      "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "i18n": {
+                          "$ref": "./LitCalDecreeWritePayload.json#/properties/i18n"
+                        },
+                        "readings": {
+                          "$ref": "./LitCalDecreeWritePayload.json#/properties/readings"
+                        }
+                      }
+                    }
+                  ]
                 }
               }
             }
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Decrees"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Create a new decree (requires editor permission on general_roman_calendar:decrees)",
+        "description": "Creates a new decree resource identified by `decree_id`. The `decree_id` in the URL must match the `decree_id` field in the request body. Returns 409 if a decree with the given `decree_id` already exists (use PATCH to update). The `i18n` sidecar is required for `createNew`, `makeDoctor`, and `setProperty:name` actions. The `readings` sidecar is required for `createNew` and rejected for `makeDoctor`/`setProperty:name`. Requires the `editor` relation on `general_roman_calendar:decrees`; Zitadel admin role bypasses FGA checks.",
+        "operationId": "decreeByIdPUT",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "decree_id",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)$"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecreeWritePayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created: the decree was created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "description": "A message confirming the decree was created",
+                      "example": "Decree `MaryMotherChurch_Create` created"
+                    },
+                    "decree": {
+                      "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "decree"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict409"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Decrees"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Update an existing decree (requires editor permission on general_roman_calendar:decrees)",
+        "description": "Updates an existing decree resource identified by `decree_id`. The `decree_id` in the URL must match the `decree_id` field in the request body. Returns 404 if no decree with the given `decree_id` exists (use PUT to create). The `i18n` sidecar is required for `createNew`, `makeDoctor`, and `setProperty:name` actions and rejected for `setProperty:grade`. The `readings` sidecar is optional on PATCH for all actions. Requires the `editor` relation on `general_roman_calendar:decrees`; Zitadel admin role bypasses FGA checks.",
+        "operationId": "decreeByIdPATCH",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "decree_id",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)$"
+            },
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecreeWritePayload"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "200 OK: the decree was updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "description": "A message confirming the decree was updated",
+                      "example": "Decree `MaryMotherChurch_Create` updated"
+                    },
+                    "decree": {
+                      "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "decree"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Decrees"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Delete a decree (requires admin permission on general_roman_calendar:decrees)",
+        "description": "Deletes the decree resource identified by `decree_id`. If the deleted decree's `liturgical_event.event_key` is no longer referenced by any remaining decree, the corresponding i18n and lectionary sidecar entries are also removed. Requires the `admin` relation on `general_roman_calendar:decrees`; Zitadel admin role bypasses FGA checks.",
+        "operationId": "decreeByIdDELETE",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "decree_id",
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)$"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DeleteSuccess200"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
           }
         }
       }
@@ -6068,6 +5960,9 @@
           "color",
           "readings"
         ]
+      },
+      "DecreeWritePayload": {
+        "$ref": "./LitCalDecreeWritePayload.json"
       },
       "LitCalXML": {
         "type": "object",
@@ -7030,224 +6925,7 @@
         ]
       },
       "LitCalAllFestivitiesResponse": {
-        "type": "object",
-        "properties": {
-          "litcal_events": {
-            "type": "object",
-            "patternProperties": {
-              "^(?:[a-z]+_[a-z]+_)?[A-Z][a-zA-Z0-9]+(?:_\\d+)?(?:_vigil)?$": {
-                "type": "object",
-                "properties": {
-                  "month": {
-                    "type": "integer",
-                    "format": "int32",
-                    "minimum": 1,
-                    "maximum": 12
-                  },
-                  "day": {
-                    "type": "integer",
-                    "format": "int32",
-                    "minimum": 1,
-                    "maximum": 31
-                  },
-                  "event_key": {
-                    "type": "string",
-                    "pattern": "^(?:[a-z]+_[a-z]+_)?[A-Z][a-zA-Z0-9]+(?:_\\d+)?(?:_vigil)?$",
-                    "description": "corresponds to the `event_key` property of liturgical events in the output of the LitCal API and similar endpoints"
-                  },
-                  "grade": {
-                    "type": "integer",
-                    "format": "int32",
-                    "minimum": 1,
-                    "maximum": 7
-                  },
-                  "common": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  },
-                  "calendar": {
-                    "type": "string",
-                    "const": "GENERAL ROMAN"
-                  },
-                  "color": {
-                    "type": "array",
-                    "items": {
-                      "type": "string",
-                      "enum": [
-                        "white",
-                        "red",
-                        "green",
-                        "rose",
-                        "purple"
-                      ]
-                    }
-                  },
-                  "readings": {
-                    "type": "object",
-                    "properties": {
-                      "first_reading": {
-                        "type": "string"
-                      },
-                      "responsorial_psalm": {
-                        "type": "string"
-                      },
-                      "second_reading": {
-                        "type": "string"
-                      },
-                      "responsorial_psalm_2": {
-                        "type": "string"
-                      },
-                      "third_reading": {
-                        "type": "string"
-                      },
-                      "responsorial_psalm_3": {
-                        "type": "string"
-                      },
-                      "fourth_reading": {
-                        "type": "string"
-                      },
-                      "responsorial_psalm_4": {
-                        "type": "string"
-                      },
-                      "fifth_reading": {
-                        "type": "string"
-                      },
-                      "responsorial_psalm_5": {
-                        "type": "string"
-                      },
-                      "sixth_reading": {
-                        "type": "string"
-                      },
-                      "responsorial_psalm_6": {
-                        "type": "string"
-                      },
-                      "seventh_reading": {
-                        "type": "string"
-                      },
-                      "responsorial_psalm_7": {
-                        "type": "string"
-                      },
-                      "epistle": {
-                        "type": "string"
-                      },
-                      "responsorial_psalm_epistle": {
-                        "type": "string"
-                      },
-                      "gospel_acclamation": {
-                        "type": "string"
-                      },
-                      "gospel": {
-                        "type": "string"
-                      }
-                    },
-                    "additionalProperties": false
-                  },
-                  "name": {
-                    "type": "string",
-                    "description": "The actual name of the liturgical event as defined in the latest edition of the source Roman Missal indicated in the key `MISSAL` (i.e. if the Missal is the Latin edition of the Roman Missal, the name should be from the latest edition of the Latin Roman Missal)"
-                  },
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "mobile",
-                      "fixed"
-                    ]
-                  },
-                  "missal": {
-                    "type": "string",
-                    "enum": [
-                      "VATICAN_1970",
-                      "VATICAN_2002",
-                      "VATICAN_2008"
-                    ],
-                    "description": "When a liturgical event is defined in a Roman Missal, this property will be present with an indication of the Roman Missal in question"
-                  },
-                  "decree": {
-                    "type": "string",
-                    "description": "When a liturgical event is defined ex-novo by a decree of the Dicastery for Divine Worship rather than by a Roman Missal, this property will be present with a reference to the decree"
-                  }
-                },
-                "additionalProperties": false,
-                "required": [
-                  "month",
-                  "day",
-                  "event_key",
-                  "grade",
-                  "common",
-                  "calendar",
-                  "color",
-                  "readings",
-                  "name"
-                ]
-              }
-            }
-          },
-          "settings": {
-            "type": "object",
-            "oneOf": [
-              {
-                "title": "Diocesan Calendar requested",
-                "properties": {
-                  "locale": {
-                    "type": "string",
-                    "pattern": "^[a-z][a-z]$",
-                    "description": "indicates the locale used to produce localized data in litcal_events"
-                  },
-                  "national_calendar": {
-                    "type": "string",
-                    "pattern": "^[A-Z]{2}$",
-                    "description": "indicates the National Calendar used to produce the data in litcal_events"
-                  },
-                  "diocesan_calendar": {
-                    "type": "string",
-                    "pattern": "^[a-z]{6}_[a-z]{2}$",
-                    "description": "indicates the Diocesan Calendar used to produce the data in litcal_events"
-                  }
-                },
-                "additionalProperties": false
-              },
-              {
-                "title": "National Calendar requested",
-                "properties": {
-                  "locale": {
-                    "type": "string",
-                    "pattern": "^[a-z][a-z]$",
-                    "description": "indicates the locale used to produce localized data in litcal_events"
-                  },
-                  "national_calendar": {
-                    "type": "string",
-                    "pattern": "^[A-Z]{2}$",
-                    "description": "indicates the National Calendar used to produce the data in litcal_events"
-                  },
-                  "diocesan_calendar": {
-                    "type": "null"
-                  }
-                },
-                "additionalProperties": false
-              },
-              {
-                "title": "Universal Roman Calendar requested",
-                "properties": {
-                  "locale": {
-                    "type": "string",
-                    "pattern": "^[a-z][a-z]$",
-                    "description": "indicates the locale used to produce localized data in litcal_events"
-                  },
-                  "national_calendar": {
-                    "type": "null"
-                  },
-                  "diocesan_calendar": {
-                    "type": "null"
-                  }
-                },
-                "additionalProperties": false
-              }
-            ]
-          }
-        },
-        "additionalProperties": false
+        "$ref": "./LitCalEventsPath.json"
       },
       "EventExistsAndHasExpectedDateAssertion": {
         "title": "Event exists and has expected date value",

@@ -1,0 +1,28 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "title": "LitCalDecreeWritePayload",
+    "description": "Single-decree write payload for PUT/PATCH /decrees/{decree_id}. Method- and action-dependent sidecar requirements (i18n, readings) are enforced by the API handler, not by this schema.",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "decree_id": { "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree/properties/decree_id" },
+        "decree_date": { "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree/properties/decree_date" },
+        "decree_protocol": { "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree/properties/decree_protocol" },
+        "description": { "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree/properties/description" },
+        "liturgical_event": { "$ref": "./LitCalDecreesSource.json#/definitions/LiturgicalEvent" },
+        "metadata": { "$ref": "./LitCalDecreesSource.json#/definitions/Metadata" },
+        "i18n": {
+            "type": "object",
+            "minProperties": 1,
+            "propertyNames": { "pattern": "^[a-z]{2,3}$" },
+            "additionalProperties": { "type": "string", "minLength": 1 }
+        },
+        "readings": {
+            "type": "object",
+            "minProperties": 1,
+            "propertyNames": { "pattern": "^[a-z]{2,3}$" },
+            "additionalProperties": { "$ref": "./CommonDef.json#/definitions/Readings" }
+        }
+    },
+    "required": ["decree_id", "decree_date", "decree_protocol", "description", "liturgical_event", "metadata"]
+}
