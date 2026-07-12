@@ -22,6 +22,7 @@ use LiturgicalCalendar\Api\Models\EventsPath\LiturgicalEventAbstract;
 use LiturgicalCalendar\Api\Models\EventsPath\LiturgicalEventFixed;
 use LiturgicalCalendar\Api\Models\EventsPath\LiturgicalEventMap;
 use LiturgicalCalendar\Api\Models\EventsPath\LiturgicalEventMobile;
+use LiturgicalCalendar\Api\Models\EventsPath\LiturgicalEventTemporale;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile;
@@ -46,6 +47,15 @@ final class EventsHandler extends AbstractHandler
 {
     /** @var LiturgicalEventMap */
     private static LiturgicalEventMap $liturgicalEvents;
+
+    /**
+     * Temporale (Proprium de Tempore) catalog entries. Kept separate from the LiturgicalEventMap (which is
+     * typed for dated Fixed/Mobile events) and merged into the response, since temporale events carry no
+     * stored date.
+     *
+     * @var LiturgicalEventTemporale[]
+     */
+    private static array $temporaleEvents            = [];
     private static ?DiocesanData $DiocesanData       = null;
     private static ?NationalData $NationalData       = null;
     private static ?WiderRegionData $WiderRegionData = null;
@@ -64,6 +74,7 @@ final class EventsHandler extends AbstractHandler
         parent::__construct($requestPathParams);
 
         self::$liturgicalEvents = new LiturgicalEventMap();
+        self::$temporaleEvents  = [];
     }
 
 
@@ -320,6 +331,35 @@ final class EventsHandler extends AbstractHandler
         }
     }
 
+
+    /**
+     * Processes the Temporale (Proprium de Tempore) events and adds them to the catalog.
+     *
+     * Temporale events (Advent Sundays, Easter, Pentecost, Corpus Christi, …) are computed from Easter and
+     * carry no stored date, so they are represented as date-less {@see LiturgicalEventTemporale} catalog
+     * entries and merged into the response. They matter to the catalog because they are the anchors a
+     * decree's relative `strtotime` references (e.g. "Monday after Pentecost"). Reads the source list and
+     * the localized names for the request's base locale.
+     */
+    private function processTemporaleEvents(): void
+    {
+        $dataFile = JsonData::TEMPORALE_FILE->path();
+        $i18nFile = strtr(JsonData::TEMPORALE_I18N_FILE->path(), ['{locale}' => $this->EventsParams->baseLocale]);
+        if (false === file_exists($dataFile) || false === file_exists($i18nFile)) {
+            return;
+        }
+        $temporaleData = Utilities::jsonFileToArray($dataFile);
+        $names         = Utilities::jsonFileToArray($i18nFile);
+        /** @var array{event_key:string,grade:int,type:string,color:string[]} $event */
+        foreach ($temporaleData as $event) {
+            $key = $event['event_key'];
+            if (false === array_key_exists($key, $names) || false === is_string($names[$key]) || $names[$key] === '') {
+                continue;
+            }
+            $event['name']           = $names[$key];
+            self::$temporaleEvents[] = LiturgicalEventTemporale::fromArray($event);
+        }
+    }
 
     /**
      * Processes the Memorials from Decrees data and populates the LiturgicalEventCollection.
@@ -632,13 +672,15 @@ final class EventsHandler extends AbstractHandler
         $this->loadNationalAndWiderRegionData();
         $this->loadDiocesanData();
         $this->setLocale();
+        $this->processTemporaleEvents();
         $this->processSanctoraleEvents();
         $this->processMemorialsFromDecreesData();
         $this->processNationalCalendarData();
         $this->processDiocesanCalendarData();
 
         $responseObj  = [
-            'litcal_events' => self::$liturgicalEvents->toCollection(),
+            // Temporale entries are date-less and live outside the (Fixed/Mobile) event map, so merge them in.
+            'litcal_events' => array_merge(self::$temporaleEvents, self::$liturgicalEvents->toCollection()),
             'settings'      => [
                 'locale'            => $this->EventsParams->Locale,
                 'national_calendar' => $this->EventsParams->NationalCalendar,

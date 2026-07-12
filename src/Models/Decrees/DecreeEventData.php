@@ -5,7 +5,7 @@ namespace LiturgicalCalendar\Api\Models\Decrees;
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewMobile;
 
-abstract class DecreeEventData extends AbstractJsonSrcData
+abstract class DecreeEventData extends AbstractJsonSrcData implements \JsonSerializable
 {
     public readonly string $event_key;
 
@@ -13,10 +13,46 @@ abstract class DecreeEventData extends AbstractJsonSrcData
 
     public string $calendar = 'GENERAL ROMAN';
 
+    public ?\stdClass $readings = null;
+
     protected function __construct(string $event_key, string $calendar)
     {
         $this->event_key = $event_key;
         $this->calendar  = $calendar;
+    }
+
+    /**
+     * Attach lectionary readings to this liturgical event.
+     *
+     * The object is temporarily unlocked to set the readings property, then re-locked.
+     *
+     * @param \stdClass $readings The readings object for this event (e.g. first_reading, gospel, etc.).
+     */
+    public function setReadings(\stdClass $readings): void
+    {
+        $this->unlock();
+        $this->readings = $readings;
+        $this->lock();
+    }
+
+    /**
+     * Serialize this event for JSON encoding.
+     *
+     * The `readings` property is omitted when it is null (no lectionary entry for this event).
+     * All other properties are included as-is so that legitimately absent properties
+     * (e.g. an uninitialised `name` on a SetPropertyGrade decree) continue to behave exactly
+     * as they do today.
+     *
+     * @return array<string, mixed>
+     */
+    public function jsonSerialize(): mixed
+    {
+        /** @var array<string, mixed> $vars */
+        $vars = get_object_vars($this);
+        if (array_key_exists('readings', $vars) && null === $vars['readings']) {
+            unset($vars['readings']);
+        }
+        return $vars;
     }
 
     /**

@@ -490,4 +490,25 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $response = $middleware->process($request, $this->nextHandler);
         $this->assertEquals(200, $response->getStatusCode());
     }
+
+    public function testForGeneralRomanCalendarAcceptsCustomRelationMap(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:someone', 'editor', 'general_roman_calendar:decrees')
+            ->willReturn(true);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forGeneralRomanCalendar(
+            $client,
+            'decrees',
+            ['PUT' => 'editor', 'PATCH' => 'editor', 'DELETE' => 'admin']
+        );
+
+        $request = ( new ServerRequest('PUT', '/decrees/some-decree') )
+            ->withAttribute('oidc_user', ['sub' => 'someone', 'roles' => []]);
+
+        $response = $middleware->process($request, $this->nextHandler);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
 }

@@ -45,6 +45,33 @@ final class EventsHandlerTest extends AbstractHandlerTestCase
         self::assertArrayHasKey('event_key', $body['litcal_events'][0]);
     }
 
+    public function testGetIncludesTemporaleEventsWithLocalizedNames(): void
+    {
+        // The catalog must include temporale (Proprium de Tempore) anchors — e.g. Pentecost — so a decree's
+        // relative strtotime can reference them. These are absent from the sanctorale-only Missal data.
+        $response = ( new EventsHandler() )->handle(
+            $this->requestFor('GET', '/events', ['Accept-Language' => 'en'])
+        );
+        self::assertSame(200, $response->getStatusCode());
+        $events = $this->decodeJsonBody($response)['litcal_events'];
+
+        $byKey = [];
+        foreach ($events as $e) {
+            $byKey[$e['event_key']] = $e;
+        }
+
+        self::assertArrayHasKey('Pentecost', $byKey, 'temporale anchor Pentecost must be in the events catalog');
+        self::assertArrayHasKey('Easter', $byKey);
+        self::assertSame('Pentecost', $byKey['Pentecost']['name']);
+        self::assertSame('mobile', $byKey['Pentecost']['type']);
+        // Temporale entries are date-less: no month/day/strtotime, but carry the required localized fields.
+        self::assertArrayNotHasKey('month', $byKey['Pentecost']);
+        self::assertArrayNotHasKey('day', $byKey['Pentecost']);
+        self::assertArrayNotHasKey('strtotime', $byKey['Pentecost']);
+        self::assertArrayHasKey('grade_lcl', $byKey['Pentecost']);
+        self::assertArrayHasKey('name', $byKey['Pentecost']);
+    }
+
     public function testGetForNationalCalendarReturnsThatCalendar(): void
     {
         $handler  = new EventsHandler(['nation', 'IT']);

@@ -721,6 +721,19 @@ final class PermissionAdminHandler extends AbstractHandler
      *   - object_type: string (required)
      *   - object_id: string (required)
      *   - relation: string (required)
+     *
+     * Authorization:
+     *   - Global admins (Zitadel role) may check any user's permission.
+     *   - Resource admins (OpenFGA "admin" relation on the resource) may check
+     *     any user's permission on that resource.
+     *   - **Self-check exemption:** any authenticated caller may check their own
+     *     permission without resource-admin rights. The exemption applies when
+     *     the normalized ?user value identifies the caller (i.e.
+     *     `normalizeUser($user) === "user:{$userId}"`). This allows viewers and
+     *     editors to discover their own capabilities — e.g. the admin-decrees
+     *     frontend detecting whether the current user has `editor` on
+     *     `general_roman_calendar:decrees` — without requiring them to hold the
+     *     `admin` relation on that resource.
      */
     private function checkPermission(
         ServerRequestInterface $request,
@@ -735,7 +748,15 @@ final class PermissionAdminHandler extends AbstractHandler
         $relation   = is_string($params['relation'] ?? null) ? $params['relation'] : '';
 
         $this->validateTupleParams($user, $objectType, $objectId, $relation);
-        $this->requireResourceAdmin($userId, $isGlobalAdmin, $objectType, $objectId);
+
+        // Self-check exemption: skip the resource-admin gate when the requested
+        // ?user identifies the caller themselves. Both the bare Zitadel ID and
+        // the "user:" prefixed form are accepted — normalizeUser() canonicalises
+        // both to "user:<id>" before comparison.
+        $isSelfCheck = $this->normalizeUser($user) === "user:{$userId}";
+        if (!$isSelfCheck) {
+            $this->requireResourceAdmin($userId, $isGlobalAdmin, $objectType, $objectId);
+        }
 
         $fgaUser   = $this->normalizeUser($user);
         $fgaObject = "{$objectType}:{$objectId}";

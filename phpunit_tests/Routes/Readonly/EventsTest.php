@@ -189,18 +189,22 @@ final class EventsTest extends ApiTestCase
                 $this->assertObjectHasProperty('day', $event, 'event object should have a day property');
                 $this->assertIsInt($event->day, 'day should be an int');
             } elseif ($event->type === 'mobile') {
-                $this->assertObjectHasProperty('strtotime', $event, 'event object should have a strtotime property');
-                $this->assertThat($event->strtotime, $this->logicalOr(
-                    $this->isString(),
-                    $this->isObject()
-                ));
-                if (is_object($event->strtotime)) {
-                    $this->assertObjectHasProperty('day_of_the_week', $event->strtotime, 'strtotime object should have a day_of_the_week property');
-                    $this->assertIsString($event->strtotime->day_of_the_week, 'day_of_the_week should be a string');
-                    $this->assertObjectHasProperty('relative_time', $event->strtotime, 'strtotime object should have a relative_time property');
-                    $this->assertContainsEquals($event->strtotime->relative_time, ['before', 'after'], 'relative_time should be either "before" or "after"');
-                    $this->assertObjectHasProperty('event_key', $event->strtotime, 'strtotime object should have a event_key property');
-                    $this->assertIsString($event->strtotime->event_key, 'event_key should be a string');
+                // A mobile event is either relative (a `strtotime` string or object) or temporale
+                // (Proprium de Tempore — computed from Easter, so no stored date). Temporale catalog
+                // entries are date-less, so validate `strtotime` only when it is present.
+                if (property_exists($event, 'strtotime')) {
+                    $this->assertThat($event->strtotime, $this->logicalOr(
+                        $this->isString(),
+                        $this->isObject()
+                    ));
+                    if (is_object($event->strtotime)) {
+                        $this->assertObjectHasProperty('day_of_the_week', $event->strtotime, 'strtotime object should have a day_of_the_week property');
+                        $this->assertIsString($event->strtotime->day_of_the_week, 'day_of_the_week should be a string');
+                        $this->assertObjectHasProperty('relative_time', $event->strtotime, 'strtotime object should have a relative_time property');
+                        $this->assertContainsEquals($event->strtotime->relative_time, ['before', 'after'], 'relative_time should be either "before" or "after"');
+                        $this->assertObjectHasProperty('event_key', $event->strtotime, 'strtotime object should have a event_key property');
+                        $this->assertIsString($event->strtotime->event_key, 'event_key should be a string');
+                    }
                 }
             }
         }
