@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Handlers\DecreesHandler;
 use LiturgicalCalendar\Api\Http\Exception\ConflictException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use PHPUnit\Framework\Attributes\CoversClass;
 
@@ -299,5 +300,310 @@ final class DecreesHandlerWriteTest extends AbstractHandlerTestCase
         ( new DecreesHandler(['Nonexistent_Create']) )->handle(
             $this->requestFor('DELETE', '/decrees/Nonexistent_Create', ['Accept-Language' => 'en'])
         );
+    }
+
+    // -----------------------------------------------------------------------
+    // requireSinglePathParam violations on PATCH and DELETE
+    // -----------------------------------------------------------------------
+
+    public function testPatchWithNoPathParamsIsRejected(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessageMatches('/require exactly one path parameter/');
+        // No path params supplied → requireSinglePathParam() throws.
+        ( new DecreesHandler([]) )->handle(
+            $this->requestFor('PATCH', '/decrees', ['Accept-Language' => 'en'], self::createNewPayload('StTest_Create'))
+        );
+    }
+
+    public function testPatchWithMultiplePathParamsIsRejected(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessageMatches('/require exactly one path parameter/');
+        ( new DecreesHandler(['StTest_Create', 'extra']) )->handle(
+            $this->requestFor('PATCH', '/decrees/StTest_Create/extra', ['Accept-Language' => 'en'], self::createNewPayload('StTest_Create'))
+        );
+    }
+
+    public function testDeleteWithNoPathParamsIsRejected(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessageMatches('/require exactly one path parameter/');
+        ( new DecreesHandler([]) )->handle(
+            $this->requestFor('DELETE', '/decrees', ['Accept-Language' => 'en'])
+        );
+    }
+
+    public function testDeleteWithMultiplePathParamsIsRejected(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessageMatches('/require exactly one path parameter/');
+        ( new DecreesHandler(['StTest_Create', 'extra']) )->handle(
+            $this->requestFor('DELETE', '/decrees/StTest_Create/extra', ['Accept-Language' => 'en'])
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // 503 sidecar write failure → rollback of decrees.json (applySidecarsWithRollback)
+    // -----------------------------------------------------------------------
+
+    /**
+     * When the i18n sidecar write fails (because the i18n folder is unwritable),
+     * `applySidecarsWithRollback` must:
+     *   1. Re-throw the ServiceUnavailableException.
+     *   2. Roll the decrees.json back to its pre-PUT state (StTest_Create must NOT
+     *      appear in the database after the 503).
+     *
+     * Skipped when running as root (chmod is ineffective for root).
+     */
+    public function testPutRollsBackDecreesDbWhenI18nSidecarWriteFails(): void
+    {
+        if (function_exists('posix_geteuid') && posix_geteuid() === 0) {
+            $this->markTestSkipped('chmod is ineffective as root; skipping filesystem permission test.');
+        }
+
+        $i18nFolder = JsonData::DECREES_I18N_FOLDER->path();
+        // Make each i18n locale file unwritable.
+        $files = glob($i18nFolder . '/*.json') ?: [];
+        if (empty($files)) {
+            $this->markTestSkipped('No i18n locale files found; cannot test write-failure path.');
+        }
+
+        foreach ($files as $file) {
+            chmod($file, 0444);
+        }
+        // Suppress the expected PHP warning emitted by file_put_contents when denied.
+        set_error_handler(static fn () => true, E_WARNING);
+        try {
+            $this->expectException(ServiceUnavailableException::class);
+            try {
+                ( new DecreesHandler(['StTest_Create']) )->handle(
+                    $this->requestFor('PUT', '/decrees/StTest_Create', ['Accept-Language' => 'en'], self::createNewPayload())
+                );
+            } finally {
+                restore_error_handler();
+                // Always restore write permissions before the outer tearDown restores the folder.
+                foreach ($files as $file) {
+                    chmod($file, 0644);
+                }
+            }
+        } catch (ServiceUnavailableException $e) {
+            // Verify rollback: StTest_Create must NOT be in decrees.json.
+            $db = json_decode((string) file_get_contents(JsonData::DECREES_FILE->path()), true);
+            self::assertNotContains('StTest_Create', array_column($db, 'decree_id'), 'decrees.json must be rolled back after sidecar write failure');
+            throw $e;
+        }
+    }
+
+    /**
+     * When the lectionary sidecar write fails after the decrees.json was already saved,
+     * the handler must roll back decrees.json and re-throw 503.
+     *
+     * Skipped when running as root.
+     */
+    public function testPutRollsBackDecreesDbWhenLectionarySidecarWriteFails(): void
+    {
+        if (function_exists('posix_geteuid') && posix_geteuid() === 0) {
+            $this->markTestSkipped('chmod is ineffective as root; skipping filesystem permission test.');
+        }
+
+        $lectFolder = JsonData::LECTIONARY_DECREES_FOLDER->path();
+        $files      = glob($lectFolder . '/*.json') ?: [];
+        if (empty($files)) {
+            $this->markTestSkipped('No lectionary locale files found; cannot test write-failure path.');
+        }
+
+        // Make lectionary files unwritable.
+        foreach ($files as $file) {
+            chmod($file, 0444);
+        }
+        // Suppress the expected PHP warning emitted by file_put_contents when denied.
+        set_error_handler(static fn () => true, E_WARNING);
+        try {
+            $this->expectException(ServiceUnavailableException::class);
+            try {
+                ( new DecreesHandler(['StTest_Create']) )->handle(
+                    $this->requestFor('PUT', '/decrees/StTest_Create', ['Accept-Language' => 'en'], self::createNewPayload())
+                );
+            } finally {
+                restore_error_handler();
+                foreach ($files as $file) {
+                    chmod($file, 0644);
+                }
+            }
+        } catch (ServiceUnavailableException $e) {
+            $db = json_decode((string) file_get_contents(JsonData::DECREES_FILE->path()), true);
+            self::assertNotContains('StTest_Create', array_column($db, 'decree_id'), 'decrees.json must be rolled back after lectionary write failure');
+            throw $e;
+        }
+    }
+
+    /**
+     * When an i18n sidecar write fails during DELETE's GC phase (removeKeyFromLocaleFiles),
+     * the handler must roll back decrees.json (i.e., restore the deleted entry) and re-throw 503.
+     *
+     * Skipped when running as root.
+     */
+    public function testDeleteRollsBackDecreesDbWhenSidecarGcFails(): void
+    {
+        if (function_exists('posix_geteuid') && posix_geteuid() === 0) {
+            $this->markTestSkipped('chmod is ineffective as root; skipping filesystem permission test.');
+        }
+
+        // Create a decree with a unique event_key so GC runs during DELETE.
+        ( new DecreesHandler(['StTest_Create']) )->handle(
+            $this->requestFor('PUT', '/decrees/StTest_Create', ['Accept-Language' => 'en'], self::createNewPayload())
+        );
+
+        // Confirm StTest_Create is in the database.
+        $dbBefore = json_decode((string) file_get_contents(JsonData::DECREES_FILE->path()), true);
+        self::assertContains('StTest_Create', array_column($dbBefore, 'decree_id'));
+
+        $i18nFolder = JsonData::DECREES_I18N_FOLDER->path();
+        $files      = glob($i18nFolder . '/*.json') ?: [];
+        if (empty($files)) {
+            $this->markTestSkipped('No i18n locale files found; cannot test write-failure path.');
+        }
+
+        foreach ($files as $file) {
+            chmod($file, 0444);
+        }
+        // Suppress the expected PHP warning emitted by file_put_contents when denied.
+        set_error_handler(static fn () => true, E_WARNING);
+        try {
+            $this->expectException(ServiceUnavailableException::class);
+            try {
+                ( new DecreesHandler(['StTest_Create']) )->handle(
+                    $this->requestFor('DELETE', '/decrees/StTest_Create', ['Accept-Language' => 'en'])
+                );
+            } finally {
+                restore_error_handler();
+                foreach ($files as $file) {
+                    chmod($file, 0644);
+                }
+            }
+        } catch (ServiceUnavailableException $e) {
+            // After rollback, StTest_Create must be restored in decrees.json.
+            $dbAfter = json_decode((string) file_get_contents(JsonData::DECREES_FILE->path()), true);
+            self::assertContains('StTest_Create', array_column($dbAfter, 'decree_id'), 'decrees.json must be restored after DELETE sidecar GC failure');
+            throw $e;
+        }
+    }
+
+    // -----------------------------------------------------------------------
+    // PATCH with readings (covers the $auditFiles[] lectionary branch on PATCH)
+    // -----------------------------------------------------------------------
+
+    public function testPatchWithReadingsUpdatesLectionaryFile(): void
+    {
+        // Create the decree first.
+        ( new DecreesHandler(['StTest_Create']) )->handle(
+            $this->requestFor('PUT', '/decrees/StTest_Create', ['Accept-Language' => 'en'], self::createNewPayload())
+        );
+
+        // Patch with updated readings.
+        $patch             = self::createNewPayload();
+        $patch['i18n']     = ['en' => 'Saint Test, Updated'];
+        $patch['readings'] = [
+            'en' => [
+                'first_reading'      => 'Exodus 1:1',
+                'responsorial_psalm' => 'Psalm 23',
+                'gospel_acclamation' => 'Matt 5:3',
+                'gospel'             => 'Matt 5:1-12',
+            ],
+        ];
+
+        $resp = ( new DecreesHandler(['StTest_Create']) )->handle(
+            $this->requestFor('PATCH', '/decrees/StTest_Create', ['Accept-Language' => 'en'], $patch)
+        );
+        self::assertSame(200, $resp->getStatusCode());
+
+        $lectEn = json_decode((string) file_get_contents(strtr(JsonData::LECTIONARY_DECREES_FILE->path(), ['{locale}' => 'en'])), true);
+        self::assertSame('Exodus 1:1', $lectEn['StTest']['first_reading'], 'Lectionary readings must be updated after PATCH');
+    }
+
+    // -----------------------------------------------------------------------
+    // PATCH / PUT with schema-invalid payload (covers requireValidatedPayload schema branch)
+    // -----------------------------------------------------------------------
+
+    public function testPutWithSchemaInvalidPayloadIsRejected(): void
+    {
+        // decree_id valid, but missing required fields like decree_date, liturgical_event, metadata
+        $invalidPayload = ['decree_id' => 'StTest_Create'];
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessageMatches('/schema validation/i');
+        ( new DecreesHandler(['StTest_Create']) )->handle(
+            $this->requestFor('PUT', '/decrees/StTest_Create', ['Accept-Language' => 'en'], $invalidPayload)
+        );
+    }
+
+    // -----------------------------------------------------------------------
+    // PATCH of a decree whose stored entry lacks liturgical_event (null storedLitEvent path)
+    // -----------------------------------------------------------------------
+
+    /**
+     * When a stored decree lacks a `liturgical_event` property (malformed source data),
+     * `storedLitEvent` is null (line 555) and `storedEventKey` is '' (line 558).
+     * The PATCH must proceed without throwing because storedEventKey === '' means no
+     * event_key-change check fires. The updated record is saved successfully.
+     */
+    public function testPatchDecreeWithStoredEntryMissingLiturgicalEventSucceeds(): void
+    {
+        $decreesFile = JsonData::DECREES_FILE->path();
+        $db          = json_decode((string) file_get_contents($decreesFile), true);
+
+        // Inject a stored decree without liturgical_event (uses a valid decree_id pattern).
+        $syntheticEntry                = [];
+        $syntheticEntry['decree_id']   = 'StTest_Create';
+        $syntheticEntry['decree_date'] = '2025-01-01';
+        $syntheticEntry['description'] = 'No liturgical event stored.';
+        $db[]                          = $syntheticEntry;
+        file_put_contents($decreesFile, json_encode($db, JSON_PRETTY_PRINT) . PHP_EOL);
+
+        // Build a valid PATCH payload that matches the schema.
+        $patch = self::createNewPayload('StTest_Create');
+        unset($patch['readings']);
+
+        $resp = ( new DecreesHandler(['StTest_Create']) )->handle(
+            $this->requestFor('PATCH', '/decrees/StTest_Create', ['Accept-Language' => 'en'], $patch)
+        );
+        self::assertSame(200, $resp->getStatusCode());
+
+        $dbAfter = json_decode((string) file_get_contents($decreesFile), true);
+        $updated = array_values(array_filter($dbAfter, fn ($d) => $d['decree_id'] === 'StTest_Create'))[0];
+        self::assertSame('Test decree creating a new liturgical event.', $updated['description']);
+    }
+
+    // -----------------------------------------------------------------------
+    // DELETE of decree that has no liturgical_event (null event_key path)
+    // -----------------------------------------------------------------------
+
+    /**
+     * When a stored decree has no `liturgical_event` property (malformed source data),
+     * event_key is '' and GC is skipped. The decree must still be deleted successfully.
+     *
+     * We inject a synthetic entry directly into decrees.json to exercise the null/empty
+     * event_key branch in handleDeleteRequest (lines 607-610).
+     */
+    public function testDeleteDecreeWithoutLiturgicalEventSucceeds(): void
+    {
+        $decreesFile = JsonData::DECREES_FILE->path();
+        $db          = json_decode((string) file_get_contents($decreesFile), true);
+
+        // Inject a minimal decree without a liturgical_event (uses a different slot to not
+        // conflict with other injected entries; tearDown restores the whole folder anyway).
+        $syntheticEntry                = [];
+        $syntheticEntry['decree_id']   = 'StTest_Doctor'; // valid decree_id pattern
+        $syntheticEntry['decree_date'] = '2025-01-01';
+        $db[]                          = $syntheticEntry;
+        file_put_contents($decreesFile, json_encode($db, JSON_PRETTY_PRINT) . PHP_EOL);
+
+        $resp = ( new DecreesHandler(['StTest_Doctor']) )->handle(
+            $this->requestFor('DELETE', '/decrees/StTest_Doctor', ['Accept-Language' => 'en'])
+        );
+        self::assertSame(200, $resp->getStatusCode());
+
+        $dbAfter = json_decode((string) file_get_contents($decreesFile), true);
+        self::assertNotContains('StTest_Doctor', array_column($dbAfter, 'decree_id'));
     }
 }
