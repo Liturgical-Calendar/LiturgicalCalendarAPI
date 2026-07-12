@@ -1,9 +1,17 @@
 # Decrees Write Paths (PUT/PATCH/DELETE) — Design
 
-**Date:** 2026-07-11
-**Status:** Approved design, pending implementation
+**Date:** 2026-07-11 (revised 2026-07-12)
+**Status:** Implemented (API #708, Frontend #400 in review)
 **Repos:** LiturgicalCalendarAPI (primary), LiturgicalCalendarFrontend (coordinated)
 **Related issues:** [#706](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/706) (path-shape alignment)
+**Companion spec:** `LiturgicalCalendarFrontend/docs/superpowers/specs/2026-07-12-admin-decrees-interface-design.md`
+(the admin-decrees interface behaviours, refined from all Frontend #400 commits)
+
+> **Revision note (2026-07-12).** Beyond the original write-path design, implementation added two API-contract
+> refinements captured below: the `url_lang_map` schema was loosened to any ISO 639-1 language
+> (see *Metadata: source URL and `url_lang_map`*), and the single-decree GET was enriched to return the full
+> per-locale translation and readings sets (see *GET enrichment*). These let the frontend editor prefill every
+> defined translation in one request.
 
 ## Motivation
 
@@ -94,6 +102,24 @@ PATCH replaces the stored entry and its i18n distribution):
 3. **Handler checks**: URL/body `decree_id` match; PUT conflict (409) / PATCH-DELETE existence (404);
    Accept-Language locale present in `i18n` when required; per-action sidecar matrix.
 
+## Metadata: source URL and `url_lang_map`
+
+A decree's `metadata.url` is the link to the published Vatican document. Vatican URLs are often language-specific
+and do **not** follow ISO/BCP-47 conventions (e.g. `ge` for German, `po`/`portD`/`portoghese` for Portuguese),
+so the metadata supports:
+
+- **`url`** — the source URL. It may contain a single `%s` placeholder where the Vatican language token appears.
+- **`url_lang_map`** — an object mapping ISO 639-1 language code → Vatican URL token
+  (e.g. `{"de":"ge","pt":"po"}`). At read time, `%s` is substituted with the token for the requested locale
+  (`DecreeEventMetadata::getUrl()`); the raw `%s` form is preserved in the JSON body so an edit round-trips.
+- **`urls_langs`** — a derived/computed field (per-language expanded URLs); not authored directly.
+
+**Schema (`DecreeLangs`) is intentionally open.** The original schema hard-coded eight languages, each with an
+enum of the Vatican tokens seen in existing decrees — a snapshot, not a rule. Because new decrees may be in any
+language with unpredictable tokens, `DecreeLangs` was loosened to `propertyNames: ^[a-z]{2}$` (any ISO 639-1
+key) mapping to any non-empty string token. Existing data still validates. Enumerating known tokens is a
+*frontend suggestion* concern (see the companion spec), never a server constraint.
+
 ## File mutations
 
 All writes touch files under `jsondata/sourcedata/decrees/`, using `JsonFormatter::encode()` + `LOCK_EX`
@@ -118,9 +144,22 @@ files touched), following `RegionalDataHandler`'s pattern.
 
 ## GET enrichment
 
-`GET /decrees` and `GET /decrees/{decree_id}` gain a `readings` property per decree, resolved from
-`lectionary/{locale}.json` for the request locale with base-locale fallback (temporale's resolution
-ladder). The localized event `name` already works; no other read-path changes.
+**Both list and single GET** resolve, for the request locale (base-locale fallback), the localized event
+`name` and a per-decree `liturgical_event.readings` object from `lectionary/{locale}.json`.
+
+**The single-decree GET additionally aggregates the full translation and readings sets** so the admin editor
+can prefill every defined translation in one request. `GET /decrees/{decree_id}` returns, alongside the
+localized decree:
+
+- **`i18n`** — object mapping locale → translated name, gathered from every `i18n/{locale}.json` file,
+  **excluding empty strings** (a locale with no translation is omitted).
+- **`readings`** — object mapping locale → readings object, gathered from every `lectionary/{locale}.json`
+  file, **including only locales whose readings have at least one non-empty field**.
+
+These two maps mirror the PUT/PATCH write-body shape exactly, so the single-decree GET response is the same
+shape one would submit back — a deliberate read/write symmetry. The list GET stays lean (request-locale only)
+to avoid bloating a multi-decree response. Documented in `openapi.json` via `allOf` (LitCalDecree + the two
+maps).
 
 ## Error handling
 
@@ -151,30 +190,23 @@ PATCH and DELETE (RFC 9110 §9.3.5).
 
 ## Frontend (LiturgicalCalendarFrontend)
 
-**Page migration.** `decrees.php` is migrated to `admin-decrees.php` and removed; navigation updates
-accordingly. Public consumption of decree data continues via the API.
+The admin-decrees interface (`admin-decrees.php` + `assets/js/admin-decrees.js`) replaces the public
+`decrees.php`. Its objectives and behaviours — capability gating, the enriched read-only cards, and the
+action-driven editor modal with the derived decree_id, the multilingual source-URL editor, and the
+all-locales translation/readings prefill — are specified in full in the companion document so the interface
+is reproducible from scratch:
 
-**Visibility and capability gating.**
+**→ `LiturgicalCalendarFrontend/docs/superpowers/specs/2026-07-12-admin-decrees-interface-design.md`**
 
-- Dashboard card and page access: `isAdmin || (hasRole('calendar_editor') && FGA viewer-or-above on
-  general_roman_calendar:decrees)`. Without this, the card does not render on `admin-dashboard.php`.
-- Capability detection on page load via existing `GET /admin/permissions/check`:
-  viewers get the read-only enriched view; editors get create/edit; resource admins additionally get
-  delete and a "manage permissions" link deep-linking into `admin-permissions.php` filtered to this
-  resource. No new permission UI is built.
+Key API-contract dependencies the interface relies on (summarised here, detailed there):
 
-**Enriched viewing** (gaps in the old `decrees.php`): localized event name plus expandable list of all
-`i18n` translations; lectionary readings (from the new `readings` property); full liturgical-event
-details — `month`/`day` for fixed events or human-rendered `strtotime` for mobile ones, `grade`,
-`color`, `type`, `common`; decree metadata (date, protocol, per-locale source URL).
-
-**Editor.** Modal-based CRUD cloned from the `admin-tests.js` pattern: shared `fetchJson` with
-`credentials: 'include'`, 15-second abort, modal alerts. The form is action-driven — selecting
-`createNew` / `setProperty→grade` / `setProperty→name` / `makeDoctor` reveals exactly the fields the
-payload matrix allows (fixed-vs-mobile toggle, grade/color/common selectors, i18n name inputs with the
-current locale required, readings inputs per the matrix, decree metadata fields). Client-side checks
-mirror the server matrix for fast feedback; the server remains authoritative. Page strings use the
-standard gettext-into-`window.Config` i18n pattern.
+- `GET /decrees` list fetched with `Accept-Language` = the page UI locale, so card names and locale labels agree.
+- `GET /decrees/{decree_id}` returns the aggregated `i18n` + `readings` maps (above); the editor prefills from
+  them in one request, with a per-locale probing fallback for older API deployments.
+- Public reads use `credentials: 'omit'` (the endpoint serves a wildcard `Access-Control-Allow-Origin`,
+  which browsers reject on credentialed requests); write requests use `credentials: 'include'` (cookie JWT).
+- Capability detection via `GET /admin/permissions/check` (self-check exemption); the FGA relation tiers
+  (`viewer`/`editor`/`admin`) map to view / create-edit / delete + grant.
 
 ## Out of scope
 
@@ -195,3 +227,6 @@ standard gettext-into-`window.Config` i18n pattern.
 | `GET /decrees` access                 | Public (viewer relation gates only frontend visibility)       |
 | Granting                              | Existing `PermissionAdminHandler`; no new surface             |
 | decrees.php                           | Migrated to gated `admin-decrees.php`, public page removed    |
+| `DecreeLangs` schema (`url_lang_map`) | Loosened to any ISO 639-1 key → any token (was closed enum)   |
+| Single-decree GET                     | Returns full `i18n` + `readings` maps (write-body symmetry)   |
+| List GET                              | Stays lean (request-locale only) to avoid response bloat      |
