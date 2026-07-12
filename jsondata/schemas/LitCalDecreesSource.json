@@ -156,84 +156,15 @@
         },
         "DecreeLangs": {
             "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "de": {
-                    "type": "string",
-                    "description": "German",
-                    "enum": [
-                        "de",
-                        "ge",
-                        "tedeD",
-                        "tedesca"
-                    ]
-                },
-                "en": {
-                    "type": "string",
-                    "description": "English",
-                    "enum": [
-                        "en",
-                        "ingD",
-                        "inglese"
-                    ]
-                },
-                "es": {
-                    "type": "string",
-                    "description": "Spanish",
-                    "enum": [
-                        "es",
-                        "sp",
-                        "spagnD",
-                        "spagnola"
-                    ]
-                },
-                "fr": {
-                    "type": "string",
-                    "description": "French",
-                    "enum": [
-                        "fr",
-                        "francD",
-                        "francese"
-                    ]
-                },
-                "it": {
-                    "type": "string",
-                    "description": "Italian",
-                    "enum": [
-                        "it",
-                        "italD",
-                        "italiana"
-                    ]
-                },
-                "la": {
-                    "type": "string",
-                    "description": "Latin",
-                    "enum": [
-                        "la",
-                        "lat",
-                        "latina"
-                    ]
-                },
-                "pl": {
-                    "type": "string",
-                    "description": "Polish",
-                    "enum": [
-                        "pl",
-                        "polacca"
-                    ]
-                },
-                "pt": {
-                    "type": "string",
-                    "description": "Portuguese",
-                    "enum": [
-                        "po",
-                        "pt",
-                        "portD",
-                        "portoghese"
-                    ]
-                }
+            "minProperties": 1,
+            "propertyNames": {
+                "pattern": "^[a-z]{2}$"
             },
-            "description": "mapping between two-letter ISO code for a language, and the actual language token used in Vatican Decree URLs",
+            "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+            },
+            "description": "mapping between a two-letter ISO 639-1 language code and the language token used in that language's Vatican Decree URL (an arbitrary Vatican-specific string, e.g. 'ge' for German or 'po' for Portuguese)",
             "title": "DecreeLangs"
         }
     }

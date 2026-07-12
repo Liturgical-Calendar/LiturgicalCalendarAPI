@@ -90,4 +90,23 @@ final class DecreeWritePayloadSchemaTest extends TestCase
         $this->expectException(\Swaggest\JsonSchema\Exception::class);
         self::schema()->in($payload);
     }
+
+    public function testUrlLangMapAcceptsAnyIso6391KeyAndArbitraryVaticanCode(): void
+    {
+        // DecreeLangs is no longer a closed 8-language enum: source URLs may be
+        // in any language, so any ISO 639-1 key maps to an arbitrary Vatican code.
+        $payload                         = self::validCreateNewPayload();
+        $payload->metadata->url          = 'https://www.vatican.va/content/john-paul-ii/%s/apost_letters/1997/documents/test.html';
+        $payload->metadata->url_lang_map = (object) ['ru' => 'russian', 'zh' => 'zh', 'de' => 'ge'];
+        self::schema()->in($payload);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testUrlLangMapRejectsNonIso6391Key(): void
+    {
+        $payload                         = self::validCreateNewPayload();
+        $payload->metadata->url_lang_map = (object) ['eng' => 'en']; // 3-letter key not allowed
+        $this->expectException(\Swaggest\JsonSchema\Exception::class);
+        self::schema()->in($payload);
+    }
 }
