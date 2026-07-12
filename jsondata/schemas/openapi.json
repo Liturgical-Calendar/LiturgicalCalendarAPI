@@ -5971,71 +5971,7 @@
         ]
       },
       "DecreeWritePayload": {
-        "type": "object",
-        "title": "DecreeWritePayload",
-        "description": "Single-decree write payload for PUT/PATCH /decrees/{decree_id}. Mirrors the LitCalDecreeWritePayload.json schema. Method- and action-dependent sidecar requirements (i18n, readings) are enforced by the handler, not by this schema.",
-        "additionalProperties": false,
-        "properties": {
-          "decree_id": {
-            "type": "string",
-            "pattern": "^[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)$",
-            "description": "Unique identifier for the decree. Must match the decree_id path parameter."
-          },
-          "decree_date": {
-            "type": "string",
-            "format": "date",
-            "description": "The date on which the decree was issued, in YYYY-MM-DD format."
-          },
-          "decree_protocol": {
-            "type": "string",
-            "description": "The official protocol or reference number of the decree."
-          },
-          "description": {
-            "type": "string",
-            "description": "A human-readable description of what the decree does."
-          },
-          "liturgical_event": {
-            "$ref": "./LitCalDecreesSource.json#/definitions/LiturgicalEvent"
-          },
-          "metadata": {
-            "$ref": "./LitCalDecreesSource.json#/definitions/Metadata"
-          },
-          "i18n": {
-            "type": "object",
-            "description": "Write-only sidecar: translations of the liturgical event name, keyed by base locale code (e.g. 'en', 'it', 'la'). Required for createNew, makeDoctor, and setProperty:name actions; rejected for setProperty:grade. On PUT for createNew at least one entry is required.",
-            "minProperties": 1,
-            "propertyNames": {
-              "pattern": "^[a-z]{2,3}$"
-            },
-            "additionalProperties": {
-              "type": "string",
-              "minLength": 1
-            },
-            "example": {
-              "en": "The Blessed Virgin Mary, Mother of the Church",
-              "la": "Beatae Mariae Virginis, Matris Ecclesiae"
-            }
-          },
-          "readings": {
-            "type": "object",
-            "description": "Write-only sidecar: lectionary readings for the liturgical event, keyed by base locale code (e.g. 'en', 'la'). Required on PUT for createNew; rejected on PUT for makeDoctor and setProperty:name; optional on PATCH for all actions.",
-            "minProperties": 1,
-            "propertyNames": {
-              "pattern": "^[a-z]{2,3}$"
-            },
-            "additionalProperties": {
-              "$ref": "./CommonDef.json#/definitions/Readings"
-            }
-          }
-        },
-        "required": [
-          "decree_id",
-          "decree_date",
-          "decree_protocol",
-          "description",
-          "liturgical_event",
-          "metadata"
-        ]
+        "$ref": "./LitCalDecreeWritePayload.json"
       },
       "LitCalXML": {
         "type": "object",
