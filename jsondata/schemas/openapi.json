@@ -4786,16 +4786,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "litcal_decrees": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree"
-                      }
-                    }
-                  }
+                  "$ref": "./LitCalDecreesPath.json"
                 }
               }
             }
