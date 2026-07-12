@@ -32,11 +32,11 @@ Access is gated in two layers, both already implemented platform-wide:
 
 **Relation map** (deviates from the platform default; matches the tests-endpoint map, per approved decision):
 
-| Method | Required FGA relation           |
-|--------|---------------------------------|
-| PUT    | `editor`                        |
-| PATCH  | `editor`                        |
-| DELETE | `admin`                         |
+| Method | Required FGA relation |
+| ------ | --------------------- |
+| PUT    | `editor`              |
+| PATCH  | `editor`              |
+| DELETE | `admin`               |
 
 - Global admins (Zitadel `admin` role) bypass FGA checks entirely (existing middleware behavior).
 - The FGA model's union semantics mean `admin` holders satisfy `editor` checks; no model changes needed.
@@ -52,11 +52,11 @@ Access is gated in two layers, both already implemented platform-wide:
 
 The Router's `decrees` case is extended (write methods move from the collection root to per-item paths):
 
-| Route                        | Methods            | Auth      |
-|------------------------------|--------------------|-----------|
-| `/decrees`                   | GET                | public    |
-| `/decrees/{decree_id}`       | GET                | public    |
-| `/decrees/{decree_id}`       | PUT, PATCH, DELETE | JWT + FGA |
+| Route                  | Methods            | Auth      |
+| ---------------------- | ------------------ | --------- |
+| `/decrees`             | GET                | public    |
+| `/decrees/{decree_id}` | GET                | public    |
+| `/decrees/{decree_id}` | PUT, PATCH, DELETE | JWT + FGA |
 
 - The `decree_id` in the URL is authoritative. If the body carries `decree_id`, it must match the URL
   or the request fails with 400.
@@ -78,12 +78,12 @@ PUT and PATCH accept a single decree object matching the `LitCalDecree` definiti
 **Per-action requirement matrix** (approved; the `i18n` column applies equally to PUT and PATCH, since
 PATCH replaces the stored entry and its i18n distribution):
 
-| `metadata.action`           | `i18n`               | `readings`                            |
-|-----------------------------|----------------------|---------------------------------------|
-| `createNew`                 | required (≥1 entry)  | required on PUT, optional on PATCH    |
-| `makeDoctor`                | required (≥1 entry)  | rejected on PUT (400), optional PATCH |
-| `setProperty` (`name`)      | required (≥1 entry)  | rejected on PUT (400), optional PATCH |
-| `setProperty` (`grade`)     | rejected (400)       | rejected on PUT (400), optional PATCH |
+| `metadata.action`       | `i18n`              | `readings`                            |
+| ----------------------- | ------------------- | ------------------------------------- |
+| `createNew`             | required (≥1 entry) | required on PUT, optional on PATCH    |
+| `makeDoctor`            | required (≥1 entry) | rejected on PUT (400), optional PATCH |
+| `setProperty` (`name`)  | required (≥1 entry) | rejected on PUT (400), optional PATCH |
+| `setProperty` (`grade`) | rejected (400)      | rejected on PUT (400), optional PATCH |
 
 - When `i18n` is required, it must include the **Accept-Language base locale** entry
   (temporale parity: the creating client immediately sees what it created in its own locale).
@@ -133,6 +133,11 @@ All writes touch files under `jsondata/sourcedata/decrees/`, using `JsonFormatte
   placeholder only when the key is new to that file (Weblate fills placeholders later).
 - **`lectionary/{locale}.json`**: the `readings` sidecar is distributed ONLY to the locales supplied
   in the `readings` map; other locale files are not touched, and no placeholders are created.
+- **Missing sidecar files are created, not skipped.** A payload may translate into any ICU-valid locale
+  (the frontend editor offers any ISO 639-1 language). If a supplied `i18n`/`readings` locale has no file
+  yet, that locale's sidecar file is **created** rather than the entry being silently dropped. Locale keys
+  are validated by `DecreeWritePayloadGuard` (`^[a-z]{2,3}$`, `LitLocale`) before any path is derived, so
+  the created filenames are safe from traversal.
 
 **DELETE garbage collection**: the decree's `event_key` is removed from `i18n/*.json` and
 `lectionary/*.json` **only when no surviving decree still references that key** (keys are shared across
@@ -161,10 +166,25 @@ shape one would submit back — a deliberate read/write symmetry. The list GET s
 to avoid bloating a multi-decree response. Documented in `openapi.json` via `allOf` (LitCalDecree + the two
 maps).
 
+## Events catalog: Temporale anchors
+
+A `createNew` decree may position a **mobile** event with a relative `strtotime`
+(`{ day_of_the_week, relative_time, event_key }`, e.g. "Monday after Pentecost"). The anchor `event_key` is
+normally a **temporale** (Proprium de Tempore) event — Easter, Pentecost, Corpus Christi, … The `/events`
+catalog was built only from the Roman Missal sanctorale plus decrees, so it lacked these anchors, leaving the
+editor's anchor picker unable to suggest them.
+
+`EventsHandler` now also loads the Proprium de Tempore. Temporale events are computed from Easter, so they
+carry **no stored date** (neither `month`/`day` nor `strtotime`); they are represented by a date-less
+`LiturgicalEventTemporale` catalog model and merged into the `litcal_events` response. The response schema
+(`LitCalEventsPath.json`) already makes `month`/`day`/`strtotime` optional, so date-less entries validate. The
+result is the complete GRC event catalog `/events` is documented to be, benefiting every consumer — not just
+the decree editor.
+
 ## Error handling
 
 | Case                                                                    | Status  |
-|-------------------------------------------------------------------------|---------|
+| ----------------------------------------------------------------------- | ------- |
 | Missing/invalid JWT                                                     | 401     |
 | Missing `calendar_editor` role, or FGA check fails                      | 403     |
 | Schema violation, id mismatch, sidecar matrix violation, invalid locale | 400     |
@@ -218,15 +238,17 @@ Key API-contract dependencies the interface relies on (summarised here, detailed
 
 ## Decisions log
 
-| Decision                              | Choice                                                        |
-|---------------------------------------|---------------------------------------------------------------|
-| Relation map                          | PUT/PATCH → `editor`, DELETE → `admin` (tests-endpoint map)   |
-| Path shape                            | Per-item `PUT/PATCH/DELETE /decrees/{decree_id}`              |
-| i18n in payload                       | Per-action matrix; Accept-Language base locale entry required |
-| readings in payload                   | Required on `createNew` PUT; optional on PATCH                |
-| `GET /decrees` access                 | Public (viewer relation gates only frontend visibility)       |
-| Granting                              | Existing `PermissionAdminHandler`; no new surface             |
-| decrees.php                           | Migrated to gated `admin-decrees.php`, public page removed    |
-| `DecreeLangs` schema (`url_lang_map`) | Loosened to any ISO 639-1 key → any token (was closed enum)   |
-| Single-decree GET                     | Returns full `i18n` + `readings` maps (write-body symmetry)   |
-| List GET                              | Stays lean (request-locale only) to avoid response bloat      |
+| Decision                              | Choice                                                          |
+| ------------------------------------- | --------------------------------------------------------------- |
+| Relation map                          | PUT/PATCH → `editor`, DELETE → `admin` (tests-endpoint map)     |
+| Path shape                            | Per-item `PUT/PATCH/DELETE /decrees/{decree_id}`                |
+| i18n in payload                       | Per-action matrix; Accept-Language base locale entry required   |
+| readings in payload                   | Required on `createNew` PUT; optional on PATCH                  |
+| `GET /decrees` access                 | Public (viewer relation gates only frontend visibility)         |
+| Granting                              | Existing `PermissionAdminHandler`; no new surface               |
+| decrees.php                           | Migrated to gated `admin-decrees.php`, public page removed      |
+| `DecreeLangs` schema (`url_lang_map`) | Loosened to any ISO 639-1 key → any token (was closed enum)     |
+| Single-decree GET                     | Returns full `i18n` + `readings` maps (write-body symmetry)     |
+| List GET                              | Stays lean (request-locale only) to avoid response bloat        |
+| Missing sidecar locale files          | Created on write (any ICU-valid locale), never silently dropped |
+| `/events` catalog                     | Includes date-less Temporale entries (relative-date anchors)    |

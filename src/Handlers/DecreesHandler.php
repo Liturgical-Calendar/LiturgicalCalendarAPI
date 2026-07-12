@@ -539,17 +539,32 @@ final class DecreesHandler extends AbstractHandler
         return $clone;
     }
 
+    /**
+     * Locales that must receive this event's sidecar entry: every existing locale file in $folder unioned
+     * with every locale the payload provides. Including the payload's locales means a translation/readings
+     * set in a locale that has no file yet creates that file rather than being silently dropped (the frontend
+     * lets editors add any ISO 639-1 language). Locale keys are already validated by DecreeWritePayloadGuard
+     * (`^[a-z]{2,3}$`, LitLocale), so the derived file paths are safe from traversal.
+     *
+     * @param string   $folder
+     * @param string[] $payloadLocales
+     * @return string[] locales, deduplicated
+     */
+    private function sidecarLocales(string $folder, array $payloadLocales): array
+    {
+        $files           = glob($folder . '/*.json');
+        $existingLocales = $files === false ? [] : array_map(static fn ($f) => basename($f, '.json'), $files);
+        return array_values(array_unique(array_merge($existingLocales, $payloadLocales)));
+    }
+
     private function distributeI18n(string $eventKey, \stdClass $i18n): void
     {
-        $folder = JsonData::DECREES_I18N_FOLDER->path();
-        $files  = glob($folder . '/*.json');
-        if ($files === false) {
-            return;
-        }
-        foreach ($files as $file) {
-            $locale = basename($file, '.json');
-            $arr    = Utilities::jsonFileToArray($file);
+        $folder  = JsonData::DECREES_I18N_FOLDER->path();
+        $locales = $this->sidecarLocales($folder, array_keys(get_object_vars($i18n)));
+        foreach ($locales as $locale) {
+            $file = $folder . '/' . $locale . '.json';
             /** @var array<string,string> $arr */
+            $arr = file_exists($file) ? Utilities::jsonFileToArray($file) : [];
             // FINDING 2: preserve existing translation when the payload doesn't provide this locale.
             $arr[$eventKey] = property_exists($i18n, $locale) && is_string($i18n->{$locale})
                 ? $i18n->{$locale}
@@ -567,17 +582,12 @@ final class DecreesHandler extends AbstractHandler
     private function distributeReadings(string $eventKey, \stdClass $readings): void
     {
         $folder = JsonData::LECTIONARY_DECREES_FOLDER->path();
-        $files  = glob($folder . '/*.json');
-        if ($files === false) {
-            return;
-        }
-        foreach ($files as $file) {
-            $locale = basename($file, '.json');
-            if (!property_exists($readings, $locale)) {
-                continue;
-            }
-            $arr = Utilities::jsonFileToArray($file);
+        // Only the locales explicitly present in the readings payload are written; a locale without a file
+        // yet has one created rather than dropping the readings.
+        foreach (array_keys(get_object_vars($readings)) as $locale) {
+            $file = $folder . '/' . $locale . '.json';
             /** @var array<string,mixed> $arr */
+            $arr            = file_exists($file) ? Utilities::jsonFileToArray($file) : [];
             $arr[$eventKey] = $readings->{$locale};
             ksort($arr);
             // FINDING 5: check write result to avoid silent partial writes.

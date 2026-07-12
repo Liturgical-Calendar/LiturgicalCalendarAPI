@@ -49,6 +49,13 @@ final class DecreeEventDataTest extends TestCase
         $event->setReadings($readings);
 
         self::assertSame($readings, $event->readings);
+
+        // setReadings() must leave the object re-locked. The lock is enforced by
+        // AbstractJsonSrcData::__set, which fires for inaccessible properties, so a
+        // write to an undeclared property is rejected with a LogicException while locked.
+        $this->expectException(\LogicException::class);
+        /** @phpstan-ignore property.notFound */
+        $event->__unlisted_probe = 'x';
     }
 
     /**

@@ -66,6 +66,7 @@ final class EventsHandlerTest extends AbstractHandlerTestCase
         self::assertSame('mobile', $byKey['Pentecost']['type']);
         // Temporale entries are date-less: no month/day/strtotime, but carry the required localized fields.
         self::assertArrayNotHasKey('month', $byKey['Pentecost']);
+        self::assertArrayNotHasKey('day', $byKey['Pentecost']);
         self::assertArrayNotHasKey('strtotime', $byKey['Pentecost']);
         self::assertArrayHasKey('grade_lcl', $byKey['Pentecost']);
         self::assertArrayHasKey('name', $byKey['Pentecost']);
