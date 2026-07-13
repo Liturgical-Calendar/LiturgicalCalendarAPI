@@ -1121,6 +1121,48 @@
         }
       }
     },
+    "/auth/dashboard-scopes": {
+      "get": {
+        "tags": [
+          "Authentication"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Get the caller's batched dashboard capability scopes",
+        "operationId": "authDashboardScopes",
+        "description": "Batched capability report for the frontend admin dashboard: global-admin flag, resource-admin scopes (as /auth/admin-scopes), and viewer-or-above object IDs keyed by object type across general_roman_calendar and the *_test types. Response is not cacheable (`Cache-Control: no-store`).",
+        "responses": {
+          "200": {
+            "description": "OK: Dashboard scope information",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "example": "no-store"
+                },
+                "description": "Always set to `no-store` to prevent caching of auth state."
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardScopesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          }
+        }
+      }
+    },
     "/auth/test-scopes": {
       "get": {
         "tags": [
@@ -8676,6 +8718,71 @@
           "is_global_admin",
           "is_resource_admin",
           "admin_scopes"
+        ],
+        "additionalProperties": false
+      },
+      "DashboardScopesResponse": {
+        "type": "object",
+        "properties": {
+          "is_global_admin": {
+            "type": "boolean",
+            "description": "True when the caller holds the global `admin` Zitadel role."
+          },
+          "is_resource_admin": {
+            "type": "boolean",
+            "description": "True when the caller holds an OpenFGA `admin` relation on at least one resource."
+          },
+          "admin_scopes": {
+            "type": "array",
+            "description": "Resources the caller administers via OpenFGA. Empty when `is_resource_admin` is false.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "object_type": {
+                  "type": "string",
+                  "example": "national_calendar",
+                  "description": "The OpenFGA object type."
+                },
+                "object_id": {
+                  "type": "string",
+                  "example": "IT",
+                  "description": "The OpenFGA object ID."
+                }
+              },
+              "required": [
+                "object_type",
+                "object_id"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "viewer_scopes": {
+            "type": "object",
+            "description": "Object IDs the caller can view (viewer-or-above), keyed by OpenFGA object type. Keys cover general_roman_calendar, national_calendar_test, diocesan_calendar_test and general_roman_calendar_test.",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "example": {
+              "general_roman_calendar": [
+                "temporale",
+                "decrees"
+              ],
+              "national_calendar_test": [
+                "IT"
+              ],
+              "diocesan_calendar_test": [],
+              "general_roman_calendar_test": []
+            }
+          }
+        },
+        "required": [
+          "is_global_admin",
+          "is_resource_admin",
+          "admin_scopes",
+          "viewer_scopes"
         ],
         "additionalProperties": false
       },
