@@ -12,6 +12,7 @@ use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use LiturgicalCalendar\Api\JsonFormatter;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
+use LiturgicalCalendar\Api\Http\Exception\ConflictException;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
@@ -242,19 +243,24 @@ final class TestsHandler extends AbstractHandler
     }
 
     /**
-     * Handles PUT requests for creating or updating a specific test.
+     * Handles PUT requests for creating a specific test at /tests/{test_name}.
      *
-     * This method expects no path parameters. The request body is expected to contain a JSON object
-     * which is validated against the LitCalTest JSON schema. If the validation fails, it returns a 422
-     * Unprocessable Content error response. If the validation succeeds, it attempts to write the JSON
-     * object to disk as a file in the tests directory. If the write fails, it returns a 503 Service Unavailable
-     * error response. If the write succeeds, it returns a 201 Created response with a JSON object indicating
-     * the resource has been created or updated.
+     * The test name in the request path is authoritative; the payload's `name`
+     * must match it. The payload is validated against the LitCalTest JSON schema
+     * (422 on failure). If a test with the same name already exists a 409 Conflict
+     * is returned. On success the test is written to disk and a 201 Created
+     * response is returned.
      */
     private function handlePutRequest(ResponseInterface $response): ResponseInterface
     {
-        if (count($this->requestPathParams)) {
-            $description = 'Expected no path params for PUT requests, received ' . count($this->requestPathParams) . '. Please use the base /tests endpoint for PUT requests.';
+        if (count($this->requestPathParams) !== 1) {
+            $description = 'Expected one and only one path param for PUT requests, received ' . count($this->requestPathParams) . '.';
+            throw new ValidationException($description);
+        }
+
+        $testName = $this->requestPathParams[0];
+        if (false === TestScopeResolver::isSafeName($testName)) {
+            $description = 'The Unit Test name in the request path may only contain letters, digits, hyphens and underscores.';
             throw new ValidationException($description);
         }
 
@@ -266,10 +272,16 @@ final class TestsHandler extends AbstractHandler
             throw new UnprocessableContentException($description);
         }
 
-        $testFilePath = JsonData::TESTS_FOLDER->path() . '/' . $this->payload->name . '.json';
-        if (file_exists($testFilePath)) {
-            $description = 'A Unit Test with the name ' . $this->payload->name . ' already exists. Did you perhaps mean to use a PATCH request?';
+        if ($this->payload->name !== $testName) {
+            $description = 'You are attempting to create the Unit Test at /tests/' . $testName . ' with a Unit Test that has the name '
+                . $this->payload->name . ' in the request body. This is not allowed.';
             throw new UnprocessableContentException($description);
+        }
+
+        $testFilePath = JsonData::TESTS_FOLDER->path() . '/' . $testName . '.json';
+        if (file_exists($testFilePath)) {
+            $description = 'A Unit Test with the name ' . $testName . ' already exists. Did you perhaps mean to use a PATCH request?';
+            throw new ConflictException($description);
         }
 
         $jsonEncodedTest = JsonFormatter::encode($this->payload, false);
@@ -279,12 +291,12 @@ final class TestsHandler extends AbstractHandler
             throw new ServiceUnavailableException($description);
         }
 
-        $responseBody = (object) ['response' => 'Unit Test ' . $this->payload->name . ' created successfully.'];
+        $responseBody = (object) ['response' => 'Unit Test ' . $testName . ' created successfully.'];
         return $this->encodeResponseBody($response, $responseBody, StatusCode::CREATED);
     }
 
     /**
-     * Handles PUT requests for creating or updating a specific test.
+     * Handles PATCH requests for updating a specific test at /tests/{test_name}.
      *
      * This method expects no path parameters. The request body is expected to contain a JSON object
      * which is validated against the LitCalTest JSON schema. If the validation fails, it returns a 422

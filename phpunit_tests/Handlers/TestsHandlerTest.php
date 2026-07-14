@@ -6,7 +6,9 @@ namespace LiturgicalCalendar\Tests\Handlers;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Handlers\TestsHandler;
+use LiturgicalCalendar\Api\Http\Exception\ConflictException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
+use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -77,9 +79,73 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         // surfaces this as a ValidationException at the AbstractHandler layer before
         // TestsHandler's own object check fires.
         $this->expectException(ValidationException::class);
-        $req = $this->requestFor('PUT', '/tests', [], '[1, 2, 3]')
+        $req = $this->requestFor('PUT', '/tests/SomeTest', [], '[1, 2, 3]')
             ->withHeader('Content-Type', 'application/json');
-        ( new TestsHandler() )->handle($req);
+        ( new TestsHandler(['SomeTest']) )->handle($req);
+    }
+
+    public function testPutCreatesTestAtPathName(): void
+    {
+        /** @var array<string,mixed> $payload */
+        $payload         = json_decode(
+            (string) file_get_contents(JsonData::TESTS_FOLDER->path() . '/MaryMotherChurchTest.json'),
+            true
+        );
+        $payload['name'] = 'ZzzPutCreatedTest';
+
+        $this->testFixturePath = JsonData::TESTS_FOLDER->path() . '/ZzzPutCreatedTest.json';
+
+        $response = ( new TestsHandler(['ZzzPutCreatedTest']) )->handle(
+            $this->requestFor('PUT', '/tests/ZzzPutCreatedTest', [], $payload)
+        );
+
+        $this->assertSame(201, $response->getStatusCode());
+        $this->assertFileExists($this->testFixturePath);
+    }
+
+    public function testPutWithNoPathParamsIsValidationError(): void
+    {
+        $this->expectException(ValidationException::class);
+        ( new TestsHandler() )->handle(
+            $this->requestFor('PUT', '/tests', [], ['name' => 'SomeTest'])
+        );
+    }
+
+    public function testPutExistingTestConflicts(): void
+    {
+        /** @var array<string,mixed> $payload */
+        $payload = json_decode(
+            (string) file_get_contents(JsonData::TESTS_FOLDER->path() . '/MaryMotherChurchTest.json'),
+            true
+        );
+
+        $this->expectException(ConflictException::class);
+        ( new TestsHandler(['MaryMotherChurchTest']) )->handle(
+            $this->requestFor('PUT', '/tests/MaryMotherChurchTest', [], $payload)
+        );
+    }
+
+    public function testPutBodyNameMismatchIsRejected(): void
+    {
+        /** @var array<string,mixed> $payload */
+        $payload = json_decode(
+            (string) file_get_contents(JsonData::TESTS_FOLDER->path() . '/MaryMotherChurchTest.json'),
+            true
+        );
+        // Body says MaryMotherChurchTest, path says ZzzOtherTest.
+
+        $this->expectException(UnprocessableContentException::class);
+        ( new TestsHandler(['ZzzOtherTest']) )->handle(
+            $this->requestFor('PUT', '/tests/ZzzOtherTest', [], $payload)
+        );
+    }
+
+    public function testPutUnsafePathNameIsRejected(): void
+    {
+        $this->expectException(ValidationException::class);
+        ( new TestsHandler(['..']) )->handle(
+            $this->requestFor('PUT', '/tests/..', [], ['name' => '..'])
+        );
     }
 
     public function testDeleteRejectsWrongPathParamCount(): void
