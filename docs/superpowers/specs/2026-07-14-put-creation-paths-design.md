@@ -33,9 +33,13 @@ request attribute from the path), leaving creates gated by role only.
 | Endpoint     | New create shape                              | Old shape fate                |
 |--------------|-----------------------------------------------|-------------------------------|
 | `/tests`     | `PUT /tests/{test_name}`                      | `PUT /tests` → 405            |
-| `/data`      | `PUT /data/{category}/{key}`                  | `PUT /data/{category}` → 405  |
+| `/data`      | `PUT /data/{category}/{key}`                  | `PUT /data/{category}` → 400* |
 | `/missals`   | `PUT /missals/{missal_id}` (405 stub for now) | `PUT /missals` → 405          |
 | `/temporale` | unchanged (singleton bulk payload)            | —                             |
+
+\* `RegionalDataHandler` validates the request path before the request method, so the legacy `/data` create shape yields a
+400 `ValidationException` ("Expected two path params…") rather than a 405. Reordering the handler's validation to force a
+405 would change its documented GET/POST arity errors, so the 400 is accepted as the legacy-shape response for `/data`.
 
 ## API changes
 
@@ -89,7 +93,7 @@ pending possible adoption of the `QUERY` method when it becomes standard.
 - Update `phpunit_tests/Handlers/TestsHandlerTest.php`, `RegionalDataHandlerTest.php`, and
   `phpunit_tests/Routes/ReadWrite/RegionalDataTest.php` to the new shapes, using
   `DecreesHandlerWriteTest.php` as the pattern.
-- Explicit assertions: old collection-level PUT yields 405; path/body id mismatch yields 422;
+- Explicit assertions: old collection-level PUT yields 405 (tests/missals) or 400 (data — see Target shapes note); path/body id mismatch yields 422;
   duplicate create yields 409; FGA-on-create behavior (grant present → allowed, absent → 403,
   admin bypass); missals route shape (PUT `/missals/{id}` → 405 stub, PUT `/missals` → 405
   method-not-allowed).
