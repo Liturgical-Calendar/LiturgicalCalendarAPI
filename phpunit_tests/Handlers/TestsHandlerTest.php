@@ -148,6 +148,71 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         );
     }
 
+    public function testPatchUpdatesExistingTest(): void
+    {
+        /** @var array<string,mixed> $payload */
+        $payload         = json_decode(
+            (string) file_get_contents(JsonData::TESTS_FOLDER->path() . '/MaryMotherChurchTest.json'),
+            true
+        );
+        $payload['name'] = 'ZzzPatchTargetTest';
+
+        // Seed the fixture on disk, then PATCH it with an updated description.
+        $this->testFixturePath = JsonData::TESTS_FOLDER->path() . '/ZzzPatchTargetTest.json';
+        file_put_contents($this->testFixturePath, json_encode($payload, JSON_THROW_ON_ERROR));
+
+        $payload['description'] = 'Updated description via PATCH';
+
+        $response = ( new TestsHandler(['ZzzPatchTargetTest']) )->handle(
+            $this->requestFor('PATCH', '/tests/ZzzPatchTargetTest', [], $payload)
+        );
+
+        $this->assertSame(200, $response->getStatusCode());
+        /** @var array<string,mixed> $written */
+        $written = json_decode((string) file_get_contents($this->testFixturePath), true);
+        $this->assertSame('Updated description via PATCH', $written['description']);
+    }
+
+    public function testPatchWithNoPathParamsIsValidationError(): void
+    {
+        $this->expectException(ValidationException::class);
+        ( new TestsHandler() )->handle(
+            $this->requestFor('PATCH', '/tests', [], ['name' => 'SomeTest'])
+        );
+    }
+
+    public function testPatchNonexistentTestIsUnprocessable(): void
+    {
+        /** @var array<string,mixed> $payload */
+        $payload         = json_decode(
+            (string) file_get_contents(JsonData::TESTS_FOLDER->path() . '/MaryMotherChurchTest.json'),
+            true
+        );
+        $payload['name'] = 'ZzzNoSuchTest';
+
+        $this->expectException(UnprocessableContentException::class);
+        $this->expectExceptionMessage('does not exist');
+        ( new TestsHandler(['ZzzNoSuchTest']) )->handle(
+            $this->requestFor('PATCH', '/tests/ZzzNoSuchTest', [], $payload)
+        );
+    }
+
+    public function testPatchBodyNameMismatchIsRejected(): void
+    {
+        /** @var array<string,mixed> $payload */
+        $payload = json_decode(
+            (string) file_get_contents(JsonData::TESTS_FOLDER->path() . '/MaryMotherChurchTest.json'),
+            true
+        );
+        // Body names an existing test, but the path addresses a different one.
+
+        $this->expectException(UnprocessableContentException::class);
+        $this->expectExceptionMessage('This is not allowed');
+        ( new TestsHandler(['ZzzOtherTest']) )->handle(
+            $this->requestFor('PATCH', '/tests/ZzzOtherTest', [], $payload)
+        );
+    }
+
     public function testDeleteRejectsWrongPathParamCount(): void
     {
         $this->expectException(ValidationException::class);
