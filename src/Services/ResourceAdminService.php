@@ -36,6 +36,19 @@ final class ResourceAdminService
         'general_roman_calendar_test',
     ];
 
+    /**
+     * Object types whose `viewer` relation the frontend admin dashboard consults
+     * for card visibility (issue LiturgicalCalendarFrontend#399). In the FGA model
+     * `viewer` is a union including `editor` and `admin`, so a single `viewer`
+     * query means "viewer or above".
+     */
+    public const VIEWER_OBJECT_TYPES = [
+        'general_roman_calendar',
+        'national_calendar_test',
+        'diocesan_calendar_test',
+        'general_roman_calendar_test',
+    ];
+
     public function __construct(private readonly OpenFgaClient $fgaClient)
     {
     }
@@ -101,6 +114,31 @@ final class ResourceAdminService
         }
 
         return ['editor' => $editor, 'admin' => $admin];
+    }
+
+    /**
+     * Object IDs the caller can view (viewer-or-above), keyed by object type,
+     * across VIEWER_OBJECT_TYPES. Every key is always present.
+     *
+     * Fails closed: any OpenFGA transport error yields all-empty lists.
+     *
+     * @param string $sub Zitadel user ID (without "user:" prefix)
+     * @return array<string, array<int, string>>
+     */
+    public function resolveViewerScopes(string $sub): array
+    {
+        $fgaUser = "user:{$sub}";
+        $scopes  = array_fill_keys(self::VIEWER_OBJECT_TYPES, []);
+
+        try {
+            foreach (self::VIEWER_OBJECT_TYPES as $type) {
+                $scopes[$type] = $this->fgaClient->listObjects($fgaUser, 'viewer', $type);
+            }
+        } catch (\RuntimeException) {
+            return array_fill_keys(self::VIEWER_OBJECT_TYPES, []);
+        }
+
+        return $scopes;
     }
 
     /**
