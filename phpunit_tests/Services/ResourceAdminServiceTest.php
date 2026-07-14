@@ -185,4 +185,43 @@ final class ResourceAdminServiceTest extends TestCase
 
         self::assertSame(['editor' => [], 'admin' => []], $service->resolveTestScopes('x'));
     }
+
+    public function testResolveViewerScopesReturnsIdsKeyedByType(): void
+    {
+        // One list-objects response per VIEWER_OBJECT_TYPES entry, in order:
+        // general_roman_calendar, national_calendar_test, diocesan_calendar_test, general_roman_calendar_test
+        $service = $this->serviceWith([
+            new GuzzleResponse(200, [], '{"objects":["general_roman_calendar:temporale","general_roman_calendar:decrees"]}'),
+            new GuzzleResponse(200, [], '{"objects":["national_calendar_test:IT"]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+        ]);
+
+        self::assertSame(
+            [
+                'general_roman_calendar'      => ['temporale', 'decrees'],
+                'national_calendar_test'      => ['IT'],
+                'diocesan_calendar_test'      => [],
+                'general_roman_calendar_test' => [],
+            ],
+            $service->resolveViewerScopes('grc-editor')
+        );
+    }
+
+    public function testResolveViewerScopesFailsClosedOnOpenFgaError(): void
+    {
+        $service = $this->serviceWith([
+            new GuzzleResponse(500, [], 'boom'),
+        ]);
+
+        self::assertSame(
+            [
+                'general_roman_calendar'      => [],
+                'national_calendar_test'      => [],
+                'diocesan_calendar_test'      => [],
+                'general_roman_calendar_test' => [],
+            ],
+            $service->resolveViewerScopes('grc-editor')
+        );
+    }
 }
