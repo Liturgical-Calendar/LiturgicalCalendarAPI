@@ -342,13 +342,13 @@ final class RouterPipelineTest extends TestCase
         }
     }
 
-    public function testMissalsWithoutIdRequiresAdminAndSkipsFga(): void
+    public function testMissalsWithoutIdUsesCalendarEditorAndSkipsFga(): void
     {
         $router   = $this->routerWithoutConstructor();
         $pipeline = $this->emptyPipeline();
 
-        // A collection-level write (no missal id) cannot be resource-authorized, so it must
-        // fail closed to admin rather than fall back to calendar_editor + no FGA check.
+        // Collection-level writes are no longer routed (PUT moved to /missals/{missal_id});
+        // an id-less write is still role-gated but only ever reaches the handler's 405.
         $this->callConfigurePipeline($router, $pipeline, 'missals', []);
 
         $queue = $this->getQueue($pipeline);
@@ -361,7 +361,7 @@ final class RouterPipelineTest extends TestCase
             }
         }
         self::assertNotNull($authMw, 'Expected an AuthorizationMiddleware for an id-less missals write');
-        self::assertSame('admin', $this->getPrivateProp($authMw, 'requiredRole'));
+        self::assertSame('calendar_editor', $this->getPrivateProp($authMw, 'requiredRole'));
 
         foreach ($queue as $mw) {
             self::assertNotInstanceOf(
