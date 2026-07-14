@@ -329,7 +329,7 @@ JSON;
             'body'    => self::$existingBody
         ]);
         $this->assertSame(400, $putResponse->getStatusCode(), 'Expected HTTP 400 Bad Request for PUT without path params');
-        $this->validatePutNoPathParametersErrorResponse($putResponse);
+        $this->validateWriteNoPathParametersErrorResponse($putResponse);
 
         // PATCH without path params should return 400 (expects two path params)
         $patchResponse = self::$http->patch('/data', [
@@ -340,14 +340,14 @@ JSON;
             'body'    => self::$existingBody
         ]);
         $this->assertSame(400, $patchResponse->getStatusCode(), 'Expected HTTP 400 Bad Request for PATCH without path params');
-        $this->validatePatchDeleteNoPathParametersErrorResponse($patchResponse);
+        $this->validateWriteNoPathParametersErrorResponse($patchResponse);
 
         // DELETE without path params should return 400 (expects two path params)
         $deleteResponse = self::$http->delete('/data', [
             'headers' => self::authHeaders($token)
         ]);
         $this->assertSame(400, $deleteResponse->getStatusCode(), 'Expected HTTP 400 Bad Request for DELETE without path params');
-        $this->validatePatchDeleteNoPathParametersErrorResponse($deleteResponse);
+        $this->validateWriteNoPathParametersErrorResponse($deleteResponse);
     }
 
     public function deleteCalendarDataNationStillHeldByDiocesanCalendarsReturnsError(\Psr\Http\Message\ResponseInterface $response): void
@@ -390,13 +390,7 @@ JSON;
         $this->assertSame('Expected at least two and at most three path params for GET and POST requests, received 1', $description);
     }
 
-    private function validatePutNoPathParametersErrorResponse(\Psr\Http\Message\ResponseInterface $response, string $content_type = 'application/problem+json'): void
-    {
-        $description = $this->validateRequestNoPathParametersErrorResponse($response, $content_type);
-        $this->assertSame('Expected two path params for PUT, PATCH and DELETE requests, received 0', $description);
-    }
-
-    private function validatePatchDeleteNoPathParametersErrorResponse(\Psr\Http\Message\ResponseInterface $response, string $content_type = 'application/problem+json'): void
+    private function validateWriteNoPathParametersErrorResponse(\Psr\Http\Message\ResponseInterface $response, string $content_type = 'application/problem+json'): void
     {
         $description = $this->validateRequestNoPathParametersErrorResponse($response, $content_type);
         $this->assertSame('Expected two path params for PUT, PATCH and DELETE requests, received 0', $description);

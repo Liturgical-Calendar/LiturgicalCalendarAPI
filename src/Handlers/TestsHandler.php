@@ -284,15 +284,25 @@ final class TestsHandler extends AbstractHandler
             throw new ConflictException($description);
         }
 
+        $this->writeTestToDisk($testFilePath);
+
+        $responseBody = (object) ['response' => 'Unit Test ' . $testName . ' created successfully.'];
+        return $this->encodeResponseBody($response, $responseBody, StatusCode::CREATED);
+    }
+
+    /**
+     * Writes the current payload to disk as a Unit Test JSON file.
+     *
+     * @throws ServiceUnavailableException When the write to disk fails
+     */
+    private function writeTestToDisk(string $testFilePath): void
+    {
         $jsonEncodedTest = JsonFormatter::encode($this->payload, false);
         $bytesWritten    = file_put_contents($testFilePath, $jsonEncodedTest);
         if (false === $bytesWritten) {
             $description = 'The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.';
             throw new ServiceUnavailableException($description);
         }
-
-        $responseBody = (object) ['response' => 'Unit Test ' . $testName . ' created successfully.'];
-        return $this->encodeResponseBody($response, $responseBody, StatusCode::CREATED);
     }
 
     /**
@@ -322,25 +332,22 @@ final class TestsHandler extends AbstractHandler
             throw new UnprocessableContentException($description);
         }
 
-        $testFilePath = JsonData::TESTS_FOLDER->path() . '/' . $this->payload->name . '.json';
+        $testName = $this->payload->name;
+
+        $testFilePath = JsonData::TESTS_FOLDER->path() . '/' . $testName . '.json';
         if (false === file_exists($testFilePath)) {
-            $description = 'A Unit Test with the name ' . $this->payload->name . ' does not exist. Did you perhaps mean to use a PUT request?';
+            $description = 'A Unit Test with the name ' . $testName . ' does not exist. Did you perhaps mean to use a PUT request?';
             throw new UnprocessableContentException($description);
         }
 
-        if ($this->payload->name !== $this->requestPathParams[0]) {
-            $description = 'You are attempting to update the Unit Test at /tests/' . $this->requestPathParams[0] . ' with a Unit Test that has the name ' . $this->payload->name . ' in the request body. This is not allowed.';
+        if ($testName !== $this->requestPathParams[0]) {
+            $description = 'You are attempting to update the Unit Test at /tests/' . $this->requestPathParams[0] . ' with a Unit Test that has the name ' . $testName . ' in the request body. This is not allowed.';
             throw new UnprocessableContentException($description);
         }
 
-        $jsonEncodedTest = JsonFormatter::encode($this->payload, false);
-        $bytesWritten    = file_put_contents($testFilePath, $jsonEncodedTest);
-        if (false === $bytesWritten) {
-            $description = 'The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.';
-            throw new ServiceUnavailableException($description);
-        }
+        $this->writeTestToDisk($testFilePath);
 
-        $responseBody = (object) ['response' => 'Unit Test ' . $this->payload->name . ' updated successfully.'];
+        $responseBody = (object) ['response' => 'Unit Test ' . $testName . ' updated successfully.'];
         return $this->encodeResponseBody($response, $responseBody);
     }
 

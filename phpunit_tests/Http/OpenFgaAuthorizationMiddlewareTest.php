@@ -528,13 +528,16 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
         $middleware = OpenFgaAuthorizationMiddleware::forTestScopes($client, $scopeResolver);
 
-        $body    = (string) json_encode(['applies_to' => ['national_calendar' => 'NL']]);
+        $payload = ['applies_to' => ['national_calendar' => 'NL']];
+        $body    = (string) json_encode($payload);
         $request = ( new ServerRequest('PUT', '/tests/BrandNewTest', [], $body) )
+            ->withParsedBody($payload)
             ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
             ->withAttribute('test_id', 'BrandNewTest');
 
-        // The middleware reads and rewinds the request body to resolve the FGA scope.
-        // Pin that the downstream handler can still read the same body afterwards.
+        // The middleware resolves the FGA scope from getParsedBody() (populated by
+        // JsonBodyParserMiddleware in production) and must not consume the stream.
+        // Pin that the downstream handler can still read the raw body afterwards.
         $downstreamHandler = new class ($body) implements RequestHandlerInterface {
             public function __construct(private string $expectedBody)
             {
@@ -543,8 +546,8 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
             public function handle(ServerRequestInterface $request): ResponseInterface
             {
                 // Use getContents() (like AbstractHandler::parseBodyPayload), NOT (string) casting:
-                // StreamTrait::__toString() rewinds unconditionally, which would mask a missing
-                // rewind() in the middleware and make this assertion tautological.
+                // StreamTrait::__toString() rewinds unconditionally, which would mask any
+                // stream consumption in the middleware and make this assertion tautological.
                 $received = $request->getBody()->getContents();
                 if ($received === '') {
                     throw new \RuntimeException('Downstream handler received an empty body.');
@@ -576,6 +579,8 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
         $middleware = OpenFgaAuthorizationMiddleware::forTestScopes($client, $scopeResolver);
 
+        // No withParsedBody(): an unparseable body means JsonBodyParserMiddleware
+        // leaves getParsedBody() null, so the scope fallback fails closed.
         $request = ( new ServerRequest('PUT', '/tests/BrandNewTest', [], 'not-json') )
             ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
             ->withAttribute('test_id', 'BrandNewTest');

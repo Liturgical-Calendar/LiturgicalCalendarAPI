@@ -257,12 +257,11 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
                 // Create flow: the test file does not exist yet, so derive the scope
                 // from the payload's `applies_to` — the same value the handler will
                 // persist, so the scope that authorizes the create is the scope the
-                // created resource will carry.
-                $body = (string) $request->getBody();
-                if ($request->getBody()->isSeekable()) {
-                    $request->getBody()->rewind();
-                }
-                $resolved = $resolver->resolveFromPayload(json_decode($body, true));
+                // created resource will carry. The payload comes from getParsedBody()
+                // (populated by JsonBodyParserMiddleware earlier in the pipeline)
+                // rather than the raw stream, so the body is never consumed here;
+                // a missing/unparseable body yields null and fails closed.
+                $resolved = $resolver->resolveFromPayload($request->getParsedBody());
             }
             return $resolved;
         };
