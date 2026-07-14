@@ -29,6 +29,46 @@ final class TestScopeResolver
     }
 
     /**
+     * True when the given name is safe to use as a bare file-stem.
+     *
+     * Only letters, digits, hyphens, and underscores are allowed. This rejects
+     * '..', '/', '\', null bytes, spaces, and every other special character.
+     */
+    public static function isSafeName(string $testName): bool
+    {
+        return (bool) preg_match('/\A[A-Za-z0-9_-]+\z/', $testName);
+    }
+
+    /**
+     * Resolve the FGA scope pair for a test that does not yet exist on disk,
+     * using the decoded request payload's `applies_to` key (create flow).
+     *
+     * Mirrors the mapping applied by resolve() to the stored file, so the scope
+     * that authorizes the create is the same scope the created file will have.
+     *
+     * @param mixed $decoded The json_decode'd (assoc mode) request body
+     * @return array{0: string, 1: string}|null
+     */
+    public function resolveFromPayload(mixed $decoded): ?array
+    {
+        if (!is_array($decoded)) {
+            return null;
+        }
+
+        $appliesTo = $decoded['applies_to'] ?? null;
+
+        if (is_array($appliesTo) && isset($appliesTo['diocesan_calendar']) && is_string($appliesTo['diocesan_calendar'])) {
+            return ['diocesan_calendar_test', $appliesTo['diocesan_calendar']];
+        }
+
+        if (is_array($appliesTo) && isset($appliesTo['national_calendar']) && is_string($appliesTo['national_calendar'])) {
+            return ['national_calendar_test', $appliesTo['national_calendar']];
+        }
+
+        return ['general_roman_calendar_test', 'general_roman_calendar'];
+    }
+
+    /**
      * @return array{0: string, 1: string}|null
      */
     public function resolve(string $testName): ?array
@@ -37,7 +77,7 @@ final class TestScopeResolver
         // Only allow characters that are safe for use as a bare file-stem: letters,
         // digits, hyphens, and underscores. This rejects '..', '/', '\', null bytes,
         // spaces, and every other special character before touching the filesystem.
-        if (!preg_match('/\A[A-Za-z0-9_-]+\z/', $testName)) {
+        if (!self::isSafeName($testName)) {
             return null;
         }
 

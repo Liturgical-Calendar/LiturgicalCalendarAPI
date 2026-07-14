@@ -233,8 +233,9 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
      *
      * The `test_id` request attribute is passed to `$resolver->resolve()` to
      * derive the FGA [objectType, objectId] pair at request time. If the
-     * attribute is absent or the resolver returns null the request is denied
-     * (fail-closed).
+     * attribute is absent or the scope cannot be resolved the request is denied
+     * (fail-closed). For PUT (create), when no file exists yet, the scope is
+     * resolved from the request payload's `applies_to`.
      *
      * @param OpenFgaClient     $client   The OpenFGA client
      * @param TestScopeResolver $resolver Scope resolver for the test
@@ -247,7 +248,22 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
             if (!is_string($testId) || trim($testId) === '') {
                 return null;
             }
-            return $resolver->resolve($testId);
+            $resolved = $resolver->resolve($testId);
+            if (
+                $resolved === null
+                && strtoupper($request->getMethod()) === 'PUT'
+                && TestScopeResolver::isSafeName($testId)
+            ) {
+                // Create flow: the test file does not exist yet, so derive the scope
+                // from the payload's `applies_to` — the same value the handler will
+                // persist, so the scope that authorizes the create is the scope the
+                // created resource will carry. The payload comes from getParsedBody()
+                // (populated by JsonBodyParserMiddleware earlier in the pipeline)
+                // rather than the raw stream, so the body is never consumed here;
+                // a missing/unparseable body yields null and fails closed.
+                $resolved = $resolver->resolveFromPayload($request->getParsedBody());
+            }
+            return $resolved;
         };
 
         // objectType and resourceIdAttribute are unused when objectResolver is set:

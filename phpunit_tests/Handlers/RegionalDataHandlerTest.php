@@ -174,12 +174,12 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
 
     public function testPutWithoutPayloadIsValidationError(): void
     {
-        // PUT requires exactly 1 path param (the category). Passing the
+        // PUT requires exactly 2 path params (category + key). Passing the
         // request without a body trips the empty-payload check in
         // parseBodyPayload → ValidationException.
         $this->expectException(ValidationException::class);
-        ( new RegionalDataHandler(['nation']) )
-            ->handle($this->requestFor('PUT', '/data/nation', ['Content-Type' => 'application/json'], ''));
+        ( new RegionalDataHandler(['nation', 'ZZ']) )
+            ->handle($this->requestFor('PUT', '/data/nation/ZZ', ['Content-Type' => 'application/json'], ''));
     }
 
     /**
@@ -229,7 +229,64 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         ];
 
         $this->expectException(UnprocessableContentException::class);
-        ( new RegionalDataHandler(['nation']) )->handle($this->requestFor('PUT', '/data/nation', [], $payload));
+        ( new RegionalDataHandler(['nation', 'ZZ']) )->handle($this->requestFor('PUT', '/data/nation/ZZ', [], $payload));
+    }
+
+    public function testPutWithSinglePathParamIsValidationError(): void
+    {
+        $this->expectException(ValidationException::class);
+        ( new RegionalDataHandler(['nation']) )
+            ->handle($this->requestFor('PUT', '/data/nation', ['Content-Type' => 'application/json'], ''));
+    }
+
+    public function testPutPathBodyKeyMismatchIsUnprocessable(): void
+    {
+        // Unlike testCreateNationalCalendarRejectsNonIsoNationCode's 'ZZ' payload (which
+        // is missing `wider_region` and uses a non-ISO nation code, both of which trip
+        // schema validation before the key is ever extracted), this payload must be
+        // schema-valid so that the mismatch check — not an unrelated schema error — is
+        // what fires. PUT to /data/nation/XK with metadata.nation = 'IT': path/body key
+        // mismatch must be rejected before any create-condition checks (including the
+        // "already exists" / ISO-region gate in checkNationalCalendarConditions).
+        $payload = [
+            'litcal'   => [
+                [
+                    'liturgical_event' => ['event_key' => 'StGeorgeMartyr', 'grade' => 4],
+                    'metadata'         => ['action' => 'makePatron', 'since_year' => 1868, 'url' => 'https://www.vatican.va/'],
+                ],
+            ],
+            'settings' => [
+                'epiphany'               => 'JAN6',
+                'ascension'              => 'SUNDAY',
+                'corpus_christi'         => 'SUNDAY',
+                'eternal_high_priest'    => false,
+                'holydays_of_obligation' => [
+                    'Christmas'            => true,
+                    'Epiphany'             => false,
+                    'Ascension'            => false,
+                    'CorpusChristi'        => false,
+                    'MaryMotherOfGod'      => true,
+                    'ImmaculateConception' => true,
+                    'Assumption'           => true,
+                    'StJoseph'             => false,
+                    'StsPeterPaulAp'       => false,
+                    'AllSaints'            => false,
+                ],
+            ],
+            'metadata' => [
+                'nation'       => 'IT',
+                'wider_region' => 'Europe',
+                'missals'      => ['IT_1983'],
+                'locales'      => ['it_IT'],
+            ],
+            'i18n'     => [
+                'it_IT' => ['StGeorgeMartyr' => 'San Giorgio, Martire'],
+            ],
+        ];
+
+        $this->expectException(UnprocessableContentException::class);
+        $this->expectExceptionMessage('The key in the request path does not match the key in the payload');
+        ( new RegionalDataHandler(['nation', 'XK']) )->handle($this->requestFor('PUT', '/data/nation/XK', [], $payload));
     }
 
     public function testDeletePurgeFailureDoesNotFailDeletion(): void
@@ -343,9 +400,9 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         }
 
         // --- Build handler with injected mock OutboxRepository ----------------
-        // PUT requests expect exactly ONE path param (the category); the nation
-        // key is derived from the payload body, not the URL.
-        $handler = new RegionalDataHandler(['nation']);
+        // PUT requests expect exactly TWO path params (category + key); the key
+        // in the path must match the nation key in the payload body.
+        $handler = new RegionalDataHandler(['nation', 'MT']);
 
         $repo = $this->createMock(OutboxBatchInsertInterface::class);
         $repo->expects($this->atLeastOnce())
@@ -425,7 +482,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
 
         try {
             // --- Act: issue PUT (bypasses JWT middleware — in-process) -------
-            $response = $handler->handle($this->requestFor('PUT', '/data/nation', [], $payload));
+            $response = $handler->handle($this->requestFor('PUT', '/data/nation/MT', [], $payload));
             self::assertContains($response->getStatusCode(), [200, 201]);
             // insertBatch assertion is enforced by the mock expectation above
         } finally {

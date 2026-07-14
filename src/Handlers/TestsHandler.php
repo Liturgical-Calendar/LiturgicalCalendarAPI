@@ -12,6 +12,7 @@ use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use LiturgicalCalendar\Api\JsonFormatter;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
+use LiturgicalCalendar\Api\Http\Exception\ConflictException;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
@@ -242,19 +243,24 @@ final class TestsHandler extends AbstractHandler
     }
 
     /**
-     * Handles PUT requests for creating or updating a specific test.
+     * Handles PUT requests for creating a specific test at /tests/{test_name}.
      *
-     * This method expects no path parameters. The request body is expected to contain a JSON object
-     * which is validated against the LitCalTest JSON schema. If the validation fails, it returns a 422
-     * Unprocessable Content error response. If the validation succeeds, it attempts to write the JSON
-     * object to disk as a file in the tests directory. If the write fails, it returns a 503 Service Unavailable
-     * error response. If the write succeeds, it returns a 201 Created response with a JSON object indicating
-     * the resource has been created or updated.
+     * The test name in the request path is authoritative; the payload's `name`
+     * must match it. The payload is validated against the LitCalTest JSON schema
+     * (422 on failure). If a test with the same name already exists a 409 Conflict
+     * is returned. On success the test is written to disk and a 201 Created
+     * response is returned.
      */
     private function handlePutRequest(ResponseInterface $response): ResponseInterface
     {
-        if (count($this->requestPathParams)) {
-            $description = 'Expected no path params for PUT requests, received ' . count($this->requestPathParams) . '. Please use the base /tests endpoint for PUT requests.';
+        if (count($this->requestPathParams) !== 1) {
+            $description = 'Expected one and only one path param for PUT requests, received ' . count($this->requestPathParams) . '.';
+            throw new ValidationException($description);
+        }
+
+        $testName = $this->requestPathParams[0];
+        if (false === TestScopeResolver::isSafeName($testName)) {
+            $description = 'The Unit Test name in the request path may only contain letters, digits, hyphens and underscores.';
             throw new ValidationException($description);
         }
 
@@ -266,32 +272,50 @@ final class TestsHandler extends AbstractHandler
             throw new UnprocessableContentException($description);
         }
 
-        $testFilePath = JsonData::TESTS_FOLDER->path() . '/' . $this->payload->name . '.json';
-        if (file_exists($testFilePath)) {
-            $description = 'A Unit Test with the name ' . $this->payload->name . ' already exists. Did you perhaps mean to use a PATCH request?';
+        if ($this->payload->name !== $testName) {
+            $description = 'You are attempting to create the Unit Test at /tests/' . $testName . ' with a Unit Test that has the name '
+                . $this->payload->name . ' in the request body. This is not allowed.';
             throw new UnprocessableContentException($description);
         }
 
+        $testFilePath = JsonData::TESTS_FOLDER->path() . '/' . $testName . '.json';
+        if (file_exists($testFilePath)) {
+            $description = 'A Unit Test with the name ' . $testName . ' already exists. Did you perhaps mean to use a PATCH request?';
+            throw new ConflictException($description);
+        }
+
+        $this->writeTestToDisk($testFilePath);
+
+        $responseBody = (object) ['response' => 'Unit Test ' . $testName . ' created successfully.'];
+        return $this->encodeResponseBody($response, $responseBody, StatusCode::CREATED);
+    }
+
+    /**
+     * Writes the current payload to disk as a Unit Test JSON file.
+     *
+     * @throws ServiceUnavailableException When the write to disk fails
+     */
+    private function writeTestToDisk(string $testFilePath): void
+    {
         $jsonEncodedTest = JsonFormatter::encode($this->payload, false);
         $bytesWritten    = file_put_contents($testFilePath, $jsonEncodedTest);
         if (false === $bytesWritten) {
             $description = 'The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.';
             throw new ServiceUnavailableException($description);
         }
-
-        $responseBody = (object) ['response' => 'Unit Test ' . $this->payload->name . ' created successfully.'];
-        return $this->encodeResponseBody($response, $responseBody, StatusCode::CREATED);
     }
 
     /**
-     * Handles PUT requests for creating or updating a specific test.
+     * Handles PATCH requests for updating a specific test at /tests/{test_name}.
      *
-     * This method expects no path parameters. The request body is expected to contain a JSON object
-     * which is validated against the LitCalTest JSON schema. If the validation fails, it returns a 422
-     * Unprocessable Content error response. If the validation succeeds, it attempts to write the JSON
-     * object to disk as a file in the tests directory. If the write fails, it returns a 503 Service Unavailable
-     * error response. If the write succeeds, it returns a 201 Created response with a JSON object indicating
-     * the resource has been created or updated.
+     * This method expects exactly one path parameter: the name of the test to update. The request body
+     * is expected to contain a JSON object which is validated against the LitCalTest JSON schema; if the
+     * validation fails, it returns a 422 Unprocessable Content error response. It also returns a 422 error
+     * if a Unit Test with the given name does not already exist, or if the `name` in the request body does
+     * not match the `test_name` path parameter. If validation succeeds, it attempts to write the JSON object
+     * to disk as a file in the tests directory; if the write fails, it returns a 503 Service Unavailable
+     * error response. If the write succeeds, it returns a 200 response with a JSON object indicating the
+     * resource has been updated.
      */
     private function handlePatchRequest(ResponseInterface $response): ResponseInterface
     {
@@ -308,25 +332,22 @@ final class TestsHandler extends AbstractHandler
             throw new UnprocessableContentException($description);
         }
 
-        $testFilePath = JsonData::TESTS_FOLDER->path() . '/' . $this->payload->name . '.json';
+        $testName = $this->payload->name;
+
+        $testFilePath = JsonData::TESTS_FOLDER->path() . '/' . $testName . '.json';
         if (false === file_exists($testFilePath)) {
-            $description = 'A Unit Test with the name ' . $this->payload->name . ' does not exist. Did you perhaps mean to use a PUT request?';
+            $description = 'A Unit Test with the name ' . $testName . ' does not exist. Did you perhaps mean to use a PUT request?';
             throw new UnprocessableContentException($description);
         }
 
-        if ($this->payload->name !== $this->requestPathParams[0]) {
-            $description = 'You are attempting to update the Unit Test at /tests/' . $this->requestPathParams[0] . ' with a Unit Test that has the name ' . $this->payload->name . ' in the request body. This is not allowed.';
+        if ($testName !== $this->requestPathParams[0]) {
+            $description = 'You are attempting to update the Unit Test at /tests/' . $this->requestPathParams[0] . ' with a Unit Test that has the name ' . $testName . ' in the request body. This is not allowed.';
             throw new UnprocessableContentException($description);
         }
 
-        $jsonEncodedTest = JsonFormatter::encode($this->payload, false);
-        $bytesWritten    = file_put_contents($testFilePath, $jsonEncodedTest);
-        if (false === $bytesWritten) {
-            $description = 'The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.';
-            throw new ServiceUnavailableException($description);
-        }
+        $this->writeTestToDisk($testFilePath);
 
-        $responseBody = (object) ['response' => 'Unit Test ' . $this->payload->name . ' updated successfully.'];
+        $responseBody = (object) ['response' => 'Unit Test ' . $testName . ' updated successfully.'];
         return $this->encodeResponseBody($response, $responseBody);
     }
 
