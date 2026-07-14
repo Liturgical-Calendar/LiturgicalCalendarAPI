@@ -5400,17 +5400,14 @@
                   "type": "object",
                   "additionalProperties": false,
                   "properties": {
-                    "status": {
-                      "type": "string",
-                      "const": "OK"
-                    },
                     "response": {
                       "type": "string",
-                      "const": "Resource Created"
+                      "examples": [
+                        "Unit Test MaryMotherChurchTest created successfully."
+                      ]
                     }
                   },
                   "required": [
-                    "status",
                     "response"
                   ]
                 }

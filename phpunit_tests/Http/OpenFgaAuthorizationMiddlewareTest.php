@@ -533,7 +533,34 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
             ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
             ->withAttribute('test_id', 'BrandNewTest');
 
-        $response = $middleware->process($request, $this->nextHandler);
+        // The middleware reads and rewinds the request body to resolve the FGA scope.
+        // Pin that the downstream handler can still read the same body afterwards.
+        $downstreamHandler = new class ($body) implements RequestHandlerInterface {
+            public function __construct(private string $expectedBody)
+            {
+            }
+
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                // Use getContents() (like AbstractHandler::parseBodyPayload), NOT (string) casting:
+                // StreamTrait::__toString() rewinds unconditionally, which would mask a missing
+                // rewind() in the middleware and make this assertion tautological.
+                $received = $request->getBody()->getContents();
+                if ($received === '') {
+                    throw new \RuntimeException('Downstream handler received an empty body.');
+                }
+
+                $decoded         = json_decode($received, true);
+                $expectedDecoded = json_decode($this->expectedBody, true);
+                if ($decoded !== $expectedDecoded) {
+                    throw new \RuntimeException('Downstream handler received a different body than expected.');
+                }
+
+                return new Response(200);
+            }
+        };
+
+        $response = $middleware->process($request, $downstreamHandler);
         $this->assertEquals(200, $response->getStatusCode());
     }
 

@@ -298,12 +298,14 @@ final class TestsHandler extends AbstractHandler
     /**
      * Handles PATCH requests for updating a specific test at /tests/{test_name}.
      *
-     * This method expects no path parameters. The request body is expected to contain a JSON object
-     * which is validated against the LitCalTest JSON schema. If the validation fails, it returns a 422
-     * Unprocessable Content error response. If the validation succeeds, it attempts to write the JSON
-     * object to disk as a file in the tests directory. If the write fails, it returns a 503 Service Unavailable
-     * error response. If the write succeeds, it returns a 201 Created response with a JSON object indicating
-     * the resource has been created or updated.
+     * This method expects exactly one path parameter: the name of the test to update. The request body
+     * is expected to contain a JSON object which is validated against the LitCalTest JSON schema; if the
+     * validation fails, it returns a 422 Unprocessable Content error response. It also returns a 422 error
+     * if a Unit Test with the given name does not already exist, or if the `name` in the request body does
+     * not match the `test_name` path parameter. If validation succeeds, it attempts to write the JSON object
+     * to disk as a file in the tests directory; if the write fails, it returns a 503 Service Unavailable
+     * error response. If the write succeeds, it returns a 200 response with a JSON object indicating the
+     * resource has been updated.
      */
     private function handlePatchRequest(ResponseInterface $response): ResponseInterface
     {

@@ -81,7 +81,6 @@ Some characteristics of this API:
   and not as it would be today (obviously future years will reflect the calendar as it is generated in the current year;
   as new decrees are issued by the Dicastery for Divine Worship and the Discipline of the Sacraments or new editions of the Roman Missal are published,
   the script will need to be updated to account for any new criteria)
-
 * **HTTP method semantics follow [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110)**:
   `PUT` is create-or-replace at the resource's own URI (idempotent, returning `409 Conflict` when attempting to create a resource that already exists),
   and `PATCH`/`DELETE` likewise address resources by path (e.g. `PUT /data/nation/IT`, `PATCH /tests/MaryMotherChurchTest`).
