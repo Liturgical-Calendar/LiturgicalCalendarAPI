@@ -59,6 +59,28 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
         $this->handlerWith([])->handle($this->requestFor('GET', '/auth/dashboard-scopes'));
     }
 
+    public function testEmptySubIsUnauthorized(): void
+    {
+        $this->expectException(UnauthorizedException::class);
+        $this->expectExceptionMessage('Invalid authentication token');
+
+        $request = $this->requestFor('GET', '/auth/dashboard-scopes')
+            ->withAttribute('oidc_user', ['sub' => '   ', 'roles' => ['calendar_editor']]);
+
+        $this->handlerWith([])->handle($request);
+    }
+
+    public function testNonStringSubIsUnauthorized(): void
+    {
+        $this->expectException(UnauthorizedException::class);
+        $this->expectExceptionMessage('Invalid authentication token');
+
+        $request = $this->requestFor('GET', '/auth/dashboard-scopes')
+            ->withAttribute('oidc_user', ['sub' => 42, 'roles' => ['calendar_editor']]);
+
+        $this->handlerWith([])->handle($request);
+    }
+
     public function testViewerScopesAreKeyedByType(): void
     {
         $handler = $this->handlerWith(self::emptyAdminThenViewer([
