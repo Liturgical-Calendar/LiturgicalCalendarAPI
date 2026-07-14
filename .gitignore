@@ -43,6 +43,9 @@ infrastructure/*.env
 # Advisory lockfile used to serialize decrees write operations
 jsondata/sourcedata/decrees/*.lock
 
+# Claude Code session-local runtime state (commands/*.md remain tracked)
+.claude/*.lock
+
 # Coverage and test-result artifacts produced by composer test:coverage
 coverage.xml
 coverage.merged.xml
