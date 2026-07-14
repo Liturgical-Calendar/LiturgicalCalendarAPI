@@ -511,4 +511,71 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $response = $middleware->process($request, $this->nextHandler);
         $this->assertEquals(200, $response->getStatusCode());
     }
+
+    public function testForTestScopesPutCreateResolvesScopeFromPayload(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:user-123', 'editor', 'national_calendar_test:NL')
+            ->willReturn(true);
+
+        // Empty temp dir: the test file does NOT exist (create flow).
+        $tempDir = sys_get_temp_dir() . '/fga_test_' . uniqid();
+        mkdir($tempDir);
+        $this->tempPaths[] = $tempDir;
+        $scopeResolver     = new TestScopeResolver($tempDir);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forTestScopes($client, $scopeResolver);
+
+        $body    = (string) json_encode(['applies_to' => ['national_calendar' => 'NL']]);
+        $request = ( new ServerRequest('PUT', '/tests/BrandNewTest', [], $body) )
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'BrandNewTest');
+
+        $response = $middleware->process($request, $this->nextHandler);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testForTestScopesPutCreateUnparseableBodyIsForbidden(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->never())->method('check');
+
+        $tempDir = sys_get_temp_dir() . '/fga_test_' . uniqid();
+        mkdir($tempDir);
+        $this->tempPaths[] = $tempDir;
+        $scopeResolver     = new TestScopeResolver($tempDir);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forTestScopes($client, $scopeResolver);
+
+        $request = ( new ServerRequest('PUT', '/tests/BrandNewTest', [], 'not-json') )
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'BrandNewTest');
+
+        $this->expectException(ForbiddenException::class);
+        $middleware->process($request, $this->nextHandler);
+    }
+
+    public function testForTestScopesPatchMissingFileStillFailsClosed(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->never())->method('check');
+
+        $tempDir = sys_get_temp_dir() . '/fga_test_' . uniqid();
+        mkdir($tempDir);
+        $this->tempPaths[] = $tempDir;
+        $scopeResolver     = new TestScopeResolver($tempDir);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forTestScopes($client, $scopeResolver);
+
+        // PATCH must NOT fall back to the payload: the resource must already exist.
+        $body    = (string) json_encode(['applies_to' => ['national_calendar' => 'NL']]);
+        $request = ( new ServerRequest('PATCH', '/tests/BrandNewTest', [], $body) )
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'BrandNewTest');
+
+        $this->expectException(ForbiddenException::class);
+        $middleware->process($request, $this->nextHandler);
+    }
 }
