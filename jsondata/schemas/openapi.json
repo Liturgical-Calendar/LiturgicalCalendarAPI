@@ -3791,7 +3791,45 @@
         }
       }
     },
-    "/data/nation": {
+    "/data/nation/{key}": {
+      "get": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve a national calendar data resource",
+        "operationId": "nationalDataGET",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/Nation"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: National calendar data resource retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./NationalCalendar.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      },
       "put": {
         "tags": [
           "Calendar Source Data"
@@ -3805,8 +3843,18 @@
           }
         ],
         "summary": "Create a national calendar data resource",
-        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`.",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it.",
         "operationId": "nationalCalendarDataPUT",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/Nation"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -3862,196 +3910,6 @@
           },
           "422": {
             "$ref": "#/components/responses/UnprocessableEntity422"
-          }
-        }
-      }
-    },
-    "/data/widerregion": {
-      "put": {
-        "tags": [
-          "Calendar Source Data"
-        ],
-        "security": [
-          {
-            "BearerAuth": []
-          },
-          {
-            "CookieAuth": []
-          }
-        ],
-        "summary": "Create a wider region data resource",
-        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`.",
-        "operationId": "widerregionDataPUT",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "./WiderRegionCalendar.json"
-              },
-              "examples": {
-                "EuropeWiderRegion": {
-                  "$ref": "#/components/examples/WiderRegionCalendarRequestBody"
-                },
-                "AsiaWiderRegion": {
-                  "$ref": "#/components/examples/WiderRegionCalendarAsiaRequestBody"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "201 Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "success": {
-                      "type": "string",
-                      "examples": [
-                        "Wider region calendar created or updated for region {REGION}"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "success"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest400"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized401"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden403"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict409"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity422"
-          }
-        }
-      }
-    },
-    "/data/diocese": {
-      "put": {
-        "tags": [
-          "Calendar Source Data"
-        ],
-        "security": [
-          {
-            "BearerAuth": []
-          },
-          {
-            "CookieAuth": []
-          }
-        ],
-        "summary": "Create a diocesan calendar data resource",
-        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`.",
-        "operationId": "diocesanDataPUT",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "./DiocesanCalendar.json"
-              },
-              "examples": {
-                "BostonDiocesan": {
-                  "$ref": "#/components/examples/DiocesanCalendarRequestBody"
-                },
-                "RomeDiocesan": {
-                  "$ref": "#/components/examples/DiocesanCalendarRomeRequestBody"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "201 Created",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "success": {
-                      "type": "string",
-                      "examples": [
-                        "Diocesan calendar created or updated for diocese {DIOCESE}"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "success"
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest400"
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized401"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden403"
-          },
-          "409": {
-            "$ref": "#/components/responses/Conflict409"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity422"
-          }
-        }
-      }
-    },
-    "/data/nation/{key}": {
-      "get": {
-        "tags": [
-          "Calendar Source Data"
-        ],
-        "security": [
-          {}
-        ],
-        "summary": "Retrieve a national calendar data resource",
-        "operationId": "nationalDataGET",
-        "parameters": [
-          {
-            "name": "key",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "./CommonDef.json#/definitions/Nation"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK: National calendar data resource retrieved successfully",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "./NationalCalendar.json"
-                }
-              }
-            }
-          },
-          "400": {
-            "$ref": "#/components/responses/BadRequest400"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound404"
           }
         }
       },
@@ -4256,6 +4114,89 @@
           }
         }
       },
+      "put": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Create a diocesan calendar data resource",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it.",
+        "operationId": "diocesanDataPUT",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./DiocesanCalendar.json"
+              },
+              "examples": {
+                "BostonDiocesan": {
+                  "$ref": "#/components/examples/DiocesanCalendarRequestBody"
+                },
+                "RomeDiocesan": {
+                  "$ref": "#/components/examples/DiocesanCalendarRomeRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "examples": [
+                        "Diocesan calendar created or updated for diocese {DIOCESE}"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict409"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
       "post": {
         "tags": [
           "Calendar Source Data"
@@ -4452,6 +4393,89 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Create a wider region data resource",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it.",
+        "operationId": "widerregionDataPUT",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./WiderRegionCalendar.json"
+              },
+              "examples": {
+                "EuropeWiderRegion": {
+                  "$ref": "#/components/examples/WiderRegionCalendarRequestBody"
+                },
+                "AsiaWiderRegion": {
+                  "$ref": "#/components/examples/WiderRegionCalendarAsiaRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "examples": [
+                        "Wider region calendar created or updated for region {REGION}"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict409"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       },
@@ -5245,84 +5269,6 @@
             "$ref": "#/components/responses/NotFound404"
           }
         }
-      },
-      "put": {
-        "tags": [
-          "Unit Tests"
-        ],
-        "security": [
-          {
-            "BearerAuth": []
-          },
-          {
-            "CookieAuth": []
-          }
-        ],
-        "summary": "Create a new unit test in the API `tests` folder",
-        "description": "Create (`PUT`) requires the `editor` relation.",
-        "operationId": "testsIndexPUT",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/ExactCorrespondenceUnitTest"
-                  },
-                  {
-                    "$ref": "#/components/schemas/ExactCorrespondenceSinceUnitTest"
-                  },
-                  {
-                    "$ref": "#/components/schemas/ExactCorrespondenceUntilUnitTest"
-                  }
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "201 Created. Even when updating an existing resource, we will still get the same 201 Created because we are basically overwriting the previous resource",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": false,
-                  "properties": {
-                    "status": {
-                      "type": "string",
-                      "const": "OK"
-                    },
-                    "response": {
-                      "type": "string",
-                      "const": "Resource Created"
-                    }
-                  },
-                  "required": [
-                    "status",
-                    "response"
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "$ref": "#/components/responses/Unauthorized401"
-          },
-          "403": {
-            "$ref": "#/components/responses/Forbidden403"
-          },
-          "415": {
-            "$ref": "#/components/responses/UnsupportedMediaType415"
-          },
-          "422": {
-            "$ref": "#/components/responses/UnprocessableEntity422"
-          },
-          "503": {
-            "$ref": "#/components/responses/ServiceUnavailable503"
-          }
-        }
       }
     },
     "/tests/{test_name}": {
@@ -5396,6 +5342,98 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Unit Tests"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Create a new unit test at its own URI in the API `tests` folder",
+        "description": "Create (`PUT`) requires the `editor` relation.",
+        "operationId": "createTestByNamePUT",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "test_name",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^(?:[a-z]+_[a-z]+_)?[A-Z][a-zA-Z0-9]+(?:_\\d+)?(?:_vigil)?Test$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ExactCorrespondenceUnitTest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ExactCorrespondenceSinceUnitTest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ExactCorrespondenceUntilUnitTest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created. The unit test did not previously exist and was created at the request URI.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "const": "OK"
+                    },
+                    "response": {
+                      "type": "string",
+                      "const": "Resource Created"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "response"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict409"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
           }
         }
       },
