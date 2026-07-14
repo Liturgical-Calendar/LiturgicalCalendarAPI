@@ -82,4 +82,46 @@ final class TestScopeResolverTest extends TestCase
         // Non-existent file: no traversal, just a missing file → null
         $this->assertNull($r->resolve('Valid-Test_Name-123'));
     }
+
+    public function testResolveFromPayloadNational(): void
+    {
+        $r = new TestScopeResolver($this->fixturesDir);
+        $this->assertSame(
+            ['national_calendar_test', 'NL'],
+            $r->resolveFromPayload(['applies_to' => ['national_calendar' => 'NL']])
+        );
+    }
+
+    public function testResolveFromPayloadDiocesan(): void
+    {
+        $r = new TestScopeResolver($this->fixturesDir);
+        $this->assertSame(
+            ['diocesan_calendar_test', 'romamo_it'],
+            $r->resolveFromPayload(['applies_to' => ['diocesan_calendar' => 'romamo_it']])
+        );
+    }
+
+    public function testResolveFromPayloadDefaultsToGeneralRoman(): void
+    {
+        $r = new TestScopeResolver($this->fixturesDir);
+        $this->assertSame(
+            ['general_roman_calendar_test', 'general_roman_calendar'],
+            $r->resolveFromPayload(['name' => 'SomeTest'])
+        );
+    }
+
+    public function testResolveFromPayloadReturnsNullForNonArray(): void
+    {
+        $r = new TestScopeResolver($this->fixturesDir);
+        $this->assertNull($r->resolveFromPayload(null));
+        $this->assertNull($r->resolveFromPayload('not-json'));
+    }
+
+    public function testIsSafeName(): void
+    {
+        $this->assertTrue(TestScopeResolver::isSafeName('Foo_Test-1'));
+        $this->assertFalse(TestScopeResolver::isSafeName('..'));
+        $this->assertFalse(TestScopeResolver::isSafeName('a/b'));
+        $this->assertFalse(TestScopeResolver::isSafeName(''));
+    }
 }

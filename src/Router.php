@@ -203,13 +203,13 @@ class Router
                 if (count($requestPathParts) === 0) {
                     $missalsHandler->setAllowedRequestMethods([
                         RequestMethod::GET,
-                        RequestMethod::POST,
-                        RequestMethod::PUT
+                        RequestMethod::POST
                     ]);
                 } elseif (count($requestPathParts) === 1) {
                     $missalsHandler->setAllowedRequestMethods([
                         RequestMethod::GET,
                         RequestMethod::POST,
+                        RequestMethod::PUT,
                         RequestMethod::PATCH,
                         RequestMethod::DELETE
                     ]);
@@ -461,12 +461,10 @@ class Router
                 $pathCount           = count($requestPathParts);
                 $firstInCategory     = $pathCount > 0 && in_array($requestPathParts[0], PathCategory::values(), true);
                 $allowedMethods      = match (true) {
-                    $pathCount === 0 => [],
-                    $pathCount === 1 && !$firstInCategory => [],
-                    $pathCount === 1 && $firstInCategory => [RequestMethod::PUT],
                     $pathCount === 2 && $firstInCategory => [
                         RequestMethod::GET,
                         RequestMethod::POST,
+                        RequestMethod::PUT,
                         RequestMethod::PATCH,
                         RequestMethod::DELETE
                     ],
@@ -498,13 +496,13 @@ class Router
                 if (count($requestPathParts) === 0) {
                     $testsHandler->setAllowedRequestMethods([
                         RequestMethod::GET,
-                        RequestMethod::POST,
-                        RequestMethod::PUT
+                        RequestMethod::POST
                     ]);
                 } elseif (count($requestPathParts) === 1) {
                     $testsHandler->setAllowedRequestMethods([
                         RequestMethod::GET,
                         RequestMethod::POST,
+                        RequestMethod::PUT,
                         RequestMethod::PATCH,
                         RequestMethod::DELETE
                     ]);
@@ -728,18 +726,13 @@ class Router
                 ));
             }
         } elseif ($route === 'missals') {
-            // The missal id identifies the resource being authorized. With an id, gate by
-            // calendar_editor + fine-grained FGA (Editio Typica -> general_roman_calendar,
-            // national missal -> national_calendar). Without an id (a collection-level write,
-            // e.g. creating a new missal) no resource-level check is possible, so fail closed
-            // to admin rather than falling back to role-only authorization.
-            if (count($requestPathParts) >= 1) {
-                $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
-                if ($oidcAvailable && $fgaClient !== null) {
-                    $pipeline->pipe(OpenFgaAuthorizationMiddleware::forMissals($fgaClient, $requestPathParts[0]));
-                }
-            } else {
-                $pipeline->pipe(AuthorizationMiddleware::forAdmin());
+            // Writes are authorized per-missal: calendar_editor role plus fine-grained FGA
+            // (Editio Typica -> general_roman_calendar, national missal -> national_calendar).
+            // Collection-level writes are no longer routed (PUT moved to /missals/{missal_id}),
+            // so an id-less write only ever reaches the handler's 405 Method Not Allowed.
+            $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
+            if ($oidcAvailable && $fgaClient !== null && count($requestPathParts) >= 1) {
+                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forMissals($fgaClient, $requestPathParts[0]));
             }
         }
     }

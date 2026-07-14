@@ -1324,16 +1324,12 @@ final class RegionalDataHandler extends AbstractHandler
                 }
                 break;
             case RequestMethod::PUT:
-                if (count($this->requestPathParams) !== 1) {
-                    $description = 'Expected one path param for PUT requests, received ' . count($this->requestPathParams);
-                    throw new ValidationException($description);
-                }
-                break;
+                // no break (intentional fallthrough)
             case RequestMethod::PATCH:
                 // no break (intentional fallthrough)
             case RequestMethod::DELETE:
                 if (count($this->requestPathParams) !== 2) {
-                    $description = 'Expected two path params for PATCH and DELETE requests, received ' . count($this->requestPathParams);
+                    $description = 'Expected two path params for PUT, PATCH and DELETE requests, received ' . count($this->requestPathParams);
                     throw new ValidationException($description);
                 }
                 break;
@@ -1602,11 +1598,11 @@ final class RegionalDataHandler extends AbstractHandler
         $params = [];
 
         // We always expect the category to be set in the request path
-        // We expect the key to be set in the request path for GET, POST, PATCH and DELETE requests
+        // We expect the key to be set in the request path for all request methods
         $this->validateRequestPath($request);
 
         $params['category'] = PathCategory::from($this->requestPathParams[0]);
-        if (in_array($method, [RequestMethod::GET, RequestMethod::POST, RequestMethod::PATCH, RequestMethod::DELETE], true)) {
+        if (in_array($method, [RequestMethod::GET, RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE], true)) {
             $params['key'] = $this->requestPathParams[1];
         }
 
@@ -1685,12 +1681,8 @@ final class RegionalDataHandler extends AbstractHandler
             if (false === isset($key)) {
                 throw new ValidationException('Invalid payload, could not extract diocese_id, nation or wider_region accordingly');
             }
-            if ($method === RequestMethod::PUT) {
-                $params['key'] = $key;
-            } else {
-                if ($params['key'] !== $key) {
-                    throw new UnprocessableContentException('The key in the request path does not match the key in the payload');
-                }
+            if ($params['key'] !== $key) {
+                throw new UnprocessableContentException('The key in the request path does not match the key in the payload');
             }
             /** @var array{category:PathCategory,key:string,i18n?:string,locale:string,payload:DiocesanData|NationalData|WiderRegionData,rawPayload:\stdClass} $params */
         }
