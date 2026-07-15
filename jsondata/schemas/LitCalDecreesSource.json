@@ -38,6 +38,7 @@
         },
         "DecreeDescription": {
             "type": "string",
+            "minLength": 1,
             "title": "DecreeDescription"
         },
         "DecreeCreateNewFixed": {
