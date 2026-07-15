@@ -15,7 +15,7 @@ The PHP models already discriminate five shapes (`src/Models/Decrees/`):
 
 | Model class                 | Discriminator                          | Decrees in data |
 |-----------------------------|----------------------------------------|-----------------|
-| `DecreeItemCreateNewFixed`  | `createNew` + `day`/`month`            | 8               |
+| `DecreeItemCreateNewFixed`  | `createNew` + `day`/`month`            | 9               |
 | `DecreeItemCreateNewMobile` | `createNew` + `strtotime`              | 1               |
 | `DecreeItemSetPropertyGrade`| `setProperty` + `property: grade`      | 1               |
 | `DecreeItemSetPropertyName` | `setProperty` + `property: name`       | 1               |
@@ -79,6 +79,8 @@ Common to all five variants:
   requirement of `day`+`month` vs `strtotime`, matching `DecreeItem`'s dispatch logic.
 - Scalar sub-schemas keep their existing `$ref`s to `CommonDef.json` (`EventKey`, `LitGrade`,
   `LitCommon`, `LitColor`, `Calendar`, `Month`, `Day`, `RelativeDateObject`).
+- The schema keeps a definition named `LitCalDecree` (now the `oneOf` of the five variants) so that
+  the three existing `$ref`s to it in `openapi.json` keep resolving.
 
 Removed from the source schema:
 
@@ -103,6 +105,10 @@ Becomes a `oneOf` over five payload variants. Each variant:
 - repeats the shared top-level properties via property-level `$ref`s (as today);
 - adds the optional `i18n` and `readings` sidecar properties (shapes unchanged);
 - is `additionalProperties: false`.
+- The `setProperty`/`grade` payload variant omits the `i18n` property entirely (the sidecar guard
+  rejects i18n for grade decrees in every method, so the schema encodes it structurally); the two
+  `openapi.json` pointers to the payload's sidecars move from `#/properties/*` to
+  `#/definitions/I18n` and `#/definitions/Readings`.
 
 The PUT/PATCH sidecar matrix remains enforced by `DecreeWritePayloadGuard` (schema = structural,
 guard = semantic).
@@ -116,8 +122,9 @@ duplication; scalar `$ref`s still point to `CommonDef.json` and the source schem
 - `api_path` required at top level, with the per-action suffix in its pattern.
 - `name` required in `liturgical_event` for the name-bearing shapes (`createNew` ×2, `makeDoctor`,
   `setProperty`/`name`); absent for `setProperty`/`grade`.
-- `readings` required in `liturgical_event` for the two `createNew` variants (merged in from the
-  lectionary sidecar); absent elsewhere.
+- `readings` optional in `liturgical_event` on **all five** response variants: the handler merges
+  readings by `event_key` whenever a lectionary sidecar entry exists, and a PATCH may legitimately
+  add readings to any decree type.
 - Metadata: `urls_langs` not allowed (the models drop it); `url_lang_map` optional.
 
 ### 5. Validation and test impact
@@ -134,6 +141,9 @@ duplication; scalar `$ref`s still point to `CommonDef.json` and the source schem
   design).
 - `composer lint:openapi` — `openapi.json` references the decree schemas; verify the Redocly lint
   still passes and update any embedded copies of the decree shapes if present.
+- The two 409-conflict tests (handler-level and route-level) switch their fixture from
+  `StMaryMagdalene_Upgrade` to `MaryMotherChurch_Create`, because the write payload schema now
+  rejects a `createNew` payload addressed to an `_Upgrade` decree_id before the existence check runs.
 
 ## Out of scope
 
