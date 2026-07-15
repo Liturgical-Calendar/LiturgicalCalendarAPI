@@ -395,7 +395,7 @@ final class RegionalDataHandler extends AbstractHandler
         ]);
 
         $responseObj          = new \stdClass();
-        $responseObj->success = "Calendar data created or updated for Diocese \"{$diocese_name}\" (Nation: \"{$nation}\")";
+        $responseObj->success = "Calendar data created for Diocese \"{$diocese_name}\" (Nation: \"{$nation}\")";
         $responseObj->data    = $rawPayload;
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
@@ -527,7 +527,7 @@ final class RegionalDataHandler extends AbstractHandler
         ]);
 
         $responseObj          = new \stdClass();
-        $responseObj->success = "Calendar data created or updated for Nation \"{$nationEnglish}\" (\"{$nation}\")";
+        $responseObj->success = "Calendar data created for Nation \"{$nationEnglish}\" (\"{$nation}\")";
         $responseObj->data    = $rawPayload;
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
@@ -618,11 +618,11 @@ final class RegionalDataHandler extends AbstractHandler
     }
 
     /**
-     * Handle PUT requests to create or update a regional calendar data resource.
+     * Handle PUT requests to create a regional calendar data resource.
      *
      * This is a private method and should only be called from {@see \LiturgicalCalendar\Api\Handlers\RegionalDataHandler::handleRequestMethod()}.
      *
-     * The resource is created or updated in the `jsondata/sourcedata/calendars/` directory.
+     * The resource is created in the `jsondata/sourcedata/calendars/` directory; if it already exists, a 409 Conflict is returned.
      *
      * If the payload is invalid, the response will be a JSON error response with a 422 Unprocessable Content status code.
      *
@@ -734,7 +734,7 @@ final class RegionalDataHandler extends AbstractHandler
         ]);
 
         $responseObj          = new \stdClass();
-        $responseObj->success = "Calendar data created or updated for Nation \"{$this->params->key}\"";
+        $responseObj->success = "Calendar data updated for Nation \"{$this->params->key}\"";
         $responseObj->data    = $rawPayload;
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
@@ -823,7 +823,7 @@ final class RegionalDataHandler extends AbstractHandler
         ]);
 
         $responseObj          = new \stdClass();
-        $responseObj->success = "Calendar data created or updated for Wider Region \"{$this->params->key}\"";
+        $responseObj->success = "Calendar data updated for Wider Region \"{$this->params->key}\"";
         $responseObj->data    = $rawPayload;
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
@@ -916,7 +916,7 @@ final class RegionalDataHandler extends AbstractHandler
         ]);
 
         $responseObj          = new \stdClass();
-        $responseObj->success = "Calendar data created or updated for Diocese \"{$dioceseEntry->diocese}\" (Nation: \"{$dioceseEntry->nation}\")";
+        $responseObj->success = "Calendar data updated for Diocese \"{$dioceseEntry->diocese}\" (Nation: \"{$dioceseEntry->nation}\")";
         $responseObj->data    = $rawPayload;
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }

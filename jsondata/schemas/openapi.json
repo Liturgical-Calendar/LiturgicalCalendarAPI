@@ -3885,7 +3885,7 @@
                     "success": {
                       "type": "string",
                       "examples": [
-                        "National calendar created or updated for nation {NATION}"
+                        "National calendar created for nation {NATION}"
                       ]
                     }
                   },
@@ -4006,7 +4006,7 @@
                   "properties": {
                     "success": {
                       "type": "string",
-                      "example": "National calendar created or updated for nation {NATION}"
+                      "example": "National calendar updated for nation {NATION}"
                     }
                   },
                   "required": [
@@ -4169,7 +4169,7 @@
                     "success": {
                       "type": "string",
                       "examples": [
-                        "Diocesan calendar created or updated for diocese {DIOCESE}"
+                        "Diocesan calendar created for diocese {DIOCESE}"
                       ]
                     }
                   },
@@ -4289,7 +4289,7 @@
                   "properties": {
                     "success": {
                       "type": "string",
-                      "example": "Diocesan calendar created or updated for diocese {DIOCESE}"
+                      "example": "Diocesan calendar updated for diocese {DIOCESE}"
                     }
                   },
                   "required": [
@@ -4451,7 +4451,7 @@
                     "success": {
                       "type": "string",
                       "examples": [
-                        "Wider region calendar created or updated for region {REGION}"
+                        "Wider region calendar created for region {REGION}"
                       ]
                     }
                   },
@@ -4571,7 +4571,7 @@
                   "properties": {
                     "success": {
                       "type": "string",
-                      "example": "Wider region calendar created or updated for region {REGION}"
+                      "example": "Wider region calendar updated for region {REGION}"
                     }
                   },
                   "required": [
@@ -5358,7 +5358,7 @@
           }
         ],
         "summary": "Create a new unit test at its own URI in the API `tests` folder",
-        "description": "Create (`PUT`) requires the `editor` relation.",
+        "description": "Create (`PUT`) requires the `editor` relation. When fine-grained authorization (OpenFGA) is enabled, the request body must be JSON: the authorization scope is resolved from the parsed JSON payload's `applies_to`, so YAML or form-encoded bodies fail closed with a 403.",
         "operationId": "createTestByNamePUT",
         "parameters": [
           {
