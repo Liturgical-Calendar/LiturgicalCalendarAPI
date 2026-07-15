@@ -4898,10 +4898,10 @@
                       "type": "object",
                       "properties": {
                         "i18n": {
-                          "$ref": "./LitCalDecreeWritePayload.json#/properties/i18n"
+                          "$ref": "./LitCalDecreeWritePayload.json#/definitions/I18n"
                         },
                         "readings": {
-                          "$ref": "./LitCalDecreeWritePayload.json#/properties/readings"
+                          "$ref": "./LitCalDecreeWritePayload.json#/definitions/Readings"
                         }
                       }
                     }
