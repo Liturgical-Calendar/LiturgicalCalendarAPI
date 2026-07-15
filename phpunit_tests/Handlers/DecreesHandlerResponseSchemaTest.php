@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Tests\Handlers;
 
 use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Handlers\DecreesHandler;
+use LiturgicalCalendar\Api\Router;
 use Swaggest\JsonSchema\Schema;
 
 /**
@@ -14,6 +15,15 @@ use Swaggest\JsonSchema\Schema;
  */
 final class DecreesHandlerResponseSchemaTest extends AbstractHandlerTestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+        // The base class pins Router::$apiPath to '' for stable self-links;
+        // this test validates api_path against the response schema's strict
+        // absolute-URL pattern, so emit a production-like base URL instead.
+        Router::$apiPath = 'http://localhost:8000';
+    }
+
     private function decreesIndexBody(): \stdClass
     {
         $resp = ( new DecreesHandler() )->handle(

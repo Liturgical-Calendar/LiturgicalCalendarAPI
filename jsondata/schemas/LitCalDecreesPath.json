@@ -54,7 +54,7 @@
                 },
                 "api_path": {
                     "type": "string",
-                    "pattern": "^(?:(?:https?:\\/\\/)?(?:litcal\\.johnromanodorazio\\.com\\/api\\/(?:dev|v[4-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))?)?\\/decrees\\/[A-Z][A-Za-z]+_Create$"
+                    "pattern": "^https?:\\/\\/(?:litcal\\.johnromanodorazio\\.com\\/api\\/(?:dev|v[4-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))\\/decrees\\/[A-Z][A-Za-z]+_Create$"
                 },
                 "liturgical_event": {
                     "$ref": "#/definitions/LiturgicalEventResponseCreateNewFixed"
@@ -92,7 +92,7 @@
                 },
                 "api_path": {
                     "type": "string",
-                    "pattern": "^(?:(?:https?:\\/\\/)?(?:litcal\\.johnromanodorazio\\.com\\/api\\/(?:dev|v[4-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))?)?\\/decrees\\/[A-Z][A-Za-z]+_Create$"
+                    "pattern": "^https?:\\/\\/(?:litcal\\.johnromanodorazio\\.com\\/api\\/(?:dev|v[4-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))\\/decrees\\/[A-Z][A-Za-z]+_Create$"
                 },
                 "liturgical_event": {
                     "$ref": "#/definitions/LiturgicalEventResponseCreateNewMobile"
@@ -130,7 +130,7 @@
                 },
                 "api_path": {
                     "type": "string",
-                    "pattern": "^(?:(?:https?:\\/\\/)?(?:litcal\\.johnromanodorazio\\.com\\/api\\/(?:dev|v[4-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))?)?\\/decrees\\/[A-Z][A-Za-z]+_Upgrade$"
+                    "pattern": "^https?:\\/\\/(?:litcal\\.johnromanodorazio\\.com\\/api\\/(?:dev|v[4-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))\\/decrees\\/[A-Z][A-Za-z]+_Upgrade$"
                 },
                 "liturgical_event": {
                     "$ref": "#/definitions/LiturgicalEventResponseSetPropertyGrade"
@@ -168,7 +168,7 @@
                 },
                 "api_path": {
                     "type": "string",
-                    "pattern": "^(?:(?:https?:\\/\\/)?(?:litcal\\.johnromanodorazio\\.com\\/api\\/(?:dev|v[4-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))?)?\\/decrees\\/[A-Z][A-Za-z]+_NameChange$"
+                    "pattern": "^https?:\\/\\/(?:litcal\\.johnromanodorazio\\.com\\/api\\/(?:dev|v[4-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))\\/decrees\\/[A-Z][A-Za-z]+_NameChange$"
                 },
                 "liturgical_event": {
                     "$ref": "#/definitions/LiturgicalEventResponseSetPropertyName"
@@ -206,7 +206,7 @@
                 },
                 "api_path": {
                     "type": "string",
-                    "pattern": "^(?:(?:https?:\\/\\/)?(?:litcal\\.johnromanodorazio\\.com\\/api\\/(?:dev|v[4-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))?)?\\/decrees\\/[A-Z][A-Za-z]+_Doctor$"
+                    "pattern": "^https?:\\/\\/(?:litcal\\.johnromanodorazio\\.com\\/api\\/(?:dev|v[4-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))\\/decrees\\/[A-Z][A-Za-z]+_Doctor$"
                 },
                 "liturgical_event": {
                     "$ref": "#/definitions/LiturgicalEventResponseMakeDoctor"
