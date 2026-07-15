@@ -40,11 +40,32 @@ final class TestScopeResolver
     }
 
     /**
+     * Map an `applies_to` value to the FGA (object type, object id) scope pair.
+     *
+     * This is the single source of truth for the applies_to → scope mapping,
+     * shared by both the stored-file path (resolve()) and the create-payload
+     * path (resolveFromPayload()): the scope that authorizes a create must be
+     * the same scope the stored file resolves to afterwards.
+     *
+     * @param mixed $appliesTo The decoded `applies_to` value (assoc array or absent)
+     * @return array{0: string, 1: string}
+     */
+    private static function mapAppliesTo(mixed $appliesTo): array
+    {
+        if (is_array($appliesTo) && isset($appliesTo['diocesan_calendar']) && is_string($appliesTo['diocesan_calendar'])) {
+            return ['diocesan_calendar_test', $appliesTo['diocesan_calendar']];
+        }
+
+        if (is_array($appliesTo) && isset($appliesTo['national_calendar']) && is_string($appliesTo['national_calendar'])) {
+            return ['national_calendar_test', $appliesTo['national_calendar']];
+        }
+
+        return ['general_roman_calendar_test', 'general_roman_calendar'];
+    }
+
+    /**
      * Resolve the FGA scope pair for a test that does not yet exist on disk,
      * using the decoded request payload's `applies_to` key (create flow).
-     *
-     * Mirrors the mapping applied by resolve() to the stored file, so the scope
-     * that authorizes the create is the same scope the created file will have.
      *
      * @param mixed $decoded The json_decode'd (assoc mode) request body
      * @return array{0: string, 1: string}|null
@@ -55,17 +76,7 @@ final class TestScopeResolver
             return null;
         }
 
-        $appliesTo = $decoded['applies_to'] ?? null;
-
-        if (is_array($appliesTo) && isset($appliesTo['diocesan_calendar']) && is_string($appliesTo['diocesan_calendar'])) {
-            return ['diocesan_calendar_test', $appliesTo['diocesan_calendar']];
-        }
-
-        if (is_array($appliesTo) && isset($appliesTo['national_calendar']) && is_string($appliesTo['national_calendar'])) {
-            return ['national_calendar_test', $appliesTo['national_calendar']];
-        }
-
-        return ['general_roman_calendar_test', 'general_roman_calendar'];
+        return self::mapAppliesTo($decoded['applies_to'] ?? null);
     }
 
     /**
@@ -93,16 +104,6 @@ final class TestScopeResolver
             return null;
         }
 
-        $appliesTo = $data['applies_to'] ?? null;
-
-        if (is_array($appliesTo) && isset($appliesTo['diocesan_calendar']) && is_string($appliesTo['diocesan_calendar'])) {
-            return ['diocesan_calendar_test', $appliesTo['diocesan_calendar']];
-        }
-
-        if (is_array($appliesTo) && isset($appliesTo['national_calendar']) && is_string($appliesTo['national_calendar'])) {
-            return ['national_calendar_test', $appliesTo['national_calendar']];
-        }
-
-        return ['general_roman_calendar_test', 'general_roman_calendar'];
+        return self::mapAppliesTo($data['applies_to'] ?? null);
     }
 }
