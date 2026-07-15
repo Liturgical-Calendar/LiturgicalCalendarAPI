@@ -370,22 +370,11 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
     }
 
     /**
-     * When a national calendar whose payload declares a wider_region is created
-     * via PUT, the handler must enqueue a WRITE_TUPLE outbox row that links
-     * `national_calendar:<N>` to `wider_region:<R>` via the `member_nation`
-     * relation.
-     *
-     * Malta (MT) is used as the fixture nation because:
-     * - It is a valid European nation code recognised by PHP's ICU locales.
-     * - It has no existing national calendar in the bundled source data, so
-     *   the PUT does not trigger a ResourceConflictException.
-     *
-     * The new MT files written by the handler are deleted unconditionally in
-     * tearDown via {@see cleanupMtFixture()} to keep the working tree clean.
+     * Registers the MT fixture paths for {@see cleanupMtFixture()} and skips
+     * the calling test if an MT national calendar unexpectedly already exists.
      */
-    public function testCreateNationalCalendarEnqueuesMemberNationTuple(): void
+    private function armMtFixture(): void
     {
-        // --- Arrange: record paths so tearDown can delete the new files -------
         $base              = Router::$apiFilePath . 'jsondata/sourcedata/calendars/nations/MT';
         $this->mtNationDir = $base;
         $this->mtJsonPath  = $base . '/MT.json';
@@ -395,36 +384,20 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         // Defensive guard: if MT already exists (it shouldn't), skip.
         if (file_exists($this->mtJsonPath)) {
             $this->markTestSkipped(
-                'MT national-calendar file already exists; skipping enqueue test to avoid overwriting it.'
+                'MT national-calendar file already exists; skipping to avoid overwriting it.'
             );
         }
+    }
 
-        // --- Build handler with injected mock OutboxRepository ----------------
-        // PUT requests expect exactly TWO path params (category + key); the key
-        // in the path must match the nation key in the payload body.
-        $handler = new RegionalDataHandler(['nation', 'MT']);
-
-        $repo = $this->createMock(OutboxBatchInsertInterface::class);
-        $repo->expects($this->atLeastOnce())
-            ->method('insertBatch')
-            ->with($this->callback(function (array $rows): bool {
-                foreach ($rows as $r) {
-                    if (
-                        $r['fga_user'] === 'national_calendar:MT'
-                        && $r['fga_relation'] === 'member_nation'
-                        && $r['fga_object'] === 'wider_region:Europe'
-                    ) {
-                        return true;
-                    }
-                }
-                return false;
-            }))
-            ->willReturn([99]);
-        $handler->setOutboxRepository($repo);
-
-        // Build a valid PUT payload for Malta (MT) with wider_region=Europe.
-        // The i18n section is required by the PUT handler.
-        $payload = [
+    /**
+     * A schema-valid national-calendar PUT/PATCH payload for Malta (MT) with
+     * wider_region=Europe. The i18n section is required by the PUT/PATCH handlers.
+     *
+     * @return array<string,mixed>
+     */
+    private static function mtNationalCalendarPayload(): array
+    {
+        return [
             'litcal'   => [
                 [
                     'liturgical_event' => ['event_key' => 'StGeorgeMartyr', 'grade' => 4],
@@ -463,6 +436,79 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
                 'en_MT' => ['StGeorgeMartyr' => 'Saint George, Martyr, Patron of Malta'],
             ],
         ];
+    }
+
+    /**
+     * A successful PATCH on an existing national calendar must report the
+     * update with the nation's English name alongside the ISO code — the same
+     * format createNationalCalendar uses.
+     *
+     * Creates MT via PUT first (no OpenFGA env forced, so no outbox/DB needed),
+     * then updates it via PATCH. MT files are cleaned up in tearDown.
+     */
+    public function testUpdateNationalCalendarSucceeds(): void
+    {
+        $this->armMtFixture();
+
+        $payload = self::mtNationalCalendarPayload();
+
+        $createResponse = ( new RegionalDataHandler(['nation', 'MT']) )
+            ->handle($this->requestFor('PUT', '/data/nation/MT', [], $payload));
+        self::assertSame(201, $createResponse->getStatusCode());
+
+        // PATCH must send a locale the MT calendar supports (defaults to Latin otherwise).
+        $updateResponse = ( new RegionalDataHandler(['nation', 'MT']) )
+            ->handle($this->requestFor('PATCH', '/data/nation/MT', ['Accept-Language' => 'en-MT'], $payload));
+
+        self::assertSame(201, $updateResponse->getStatusCode());
+        $body = $this->decodeJsonBody($updateResponse);
+        self::assertSame('Calendar data updated for Nation "Malta" ("MT")', $body['success']);
+    }
+
+    /**
+     * When a national calendar whose payload declares a wider_region is created
+     * via PUT, the handler must enqueue a WRITE_TUPLE outbox row that links
+     * `national_calendar:<N>` to `wider_region:<R>` via the `member_nation`
+     * relation.
+     *
+     * Malta (MT) is used as the fixture nation because:
+     * - It is a valid European nation code recognised by PHP's ICU locales.
+     * - It has no existing national calendar in the bundled source data, so
+     *   the PUT does not trigger a ResourceConflictException.
+     *
+     * The new MT files written by the handler are deleted unconditionally in
+     * tearDown via {@see cleanupMtFixture()} to keep the working tree clean.
+     */
+    public function testCreateNationalCalendarEnqueuesMemberNationTuple(): void
+    {
+        // --- Arrange: record paths so tearDown can delete the new files -------
+        $this->armMtFixture();
+
+        // --- Build handler with injected mock OutboxRepository ----------------
+        // PUT requests expect exactly TWO path params (category + key); the key
+        // in the path must match the nation key in the payload body.
+        $handler = new RegionalDataHandler(['nation', 'MT']);
+
+        $repo = $this->createMock(OutboxBatchInsertInterface::class);
+        $repo->expects($this->atLeastOnce())
+            ->method('insertBatch')
+            ->with($this->callback(function (array $rows): bool {
+                foreach ($rows as $r) {
+                    if (
+                        $r['fga_user'] === 'national_calendar:MT'
+                        && $r['fga_relation'] === 'member_nation'
+                        && $r['fga_object'] === 'wider_region:Europe'
+                    ) {
+                        return true;
+                    }
+                }
+                return false;
+            }))
+            ->willReturn([99]);
+        $handler->setOutboxRepository($repo);
+
+        // Build a valid PUT payload for Malta (MT) with wider_region=Europe.
+        $payload = self::mtNationalCalendarPayload();
 
         // Force OpenFGA "configured" so the create-sync transaction + processSync
         // branches execute (CI does not configure OpenFGA, so they would otherwise

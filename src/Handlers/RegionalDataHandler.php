@@ -734,7 +734,7 @@ final class RegionalDataHandler extends AbstractHandler
         ]);
 
         $responseObj          = new \stdClass();
-        $responseObj->success = "Calendar data updated for Nation \"{$this->params->key}\"";
+        $responseObj->success = "Calendar data updated for Nation \"{$nationEnglish}\" (\"{$this->params->key}\")";
         $responseObj->data    = $rawPayload;
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
