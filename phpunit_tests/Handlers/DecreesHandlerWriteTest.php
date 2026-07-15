@@ -124,10 +124,13 @@ final class DecreesHandlerWriteTest extends AbstractHandlerTestCase
 
     public function testPutExistingDecreeIdConflicts(): void
     {
-        $payload = self::createNewPayload('StMaryMagdalene_Upgrade');
+        // MaryMotherChurch_Create ships with the API, so a PUT on it must conflict.
+        // (A _Create decree_id is required: the write payload schema binds the
+        // decree_id suffix to metadata.action, and the fixture payload is createNew.)
+        $payload = self::createNewPayload('MaryMotherChurch_Create');
         $this->expectException(ConflictException::class);
-        ( new DecreesHandler(['StMaryMagdalene_Upgrade']) )->handle(
-            $this->requestFor('PUT', '/decrees/StMaryMagdalene_Upgrade', ['Accept-Language' => 'en'], $payload)
+        ( new DecreesHandler(['MaryMotherChurch_Create']) )->handle(
+            $this->requestFor('PUT', '/decrees/MaryMotherChurch_Create', ['Accept-Language' => 'en'], $payload)
         );
     }
 
