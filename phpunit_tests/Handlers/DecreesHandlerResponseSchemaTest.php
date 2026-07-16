@@ -30,8 +30,8 @@ final class DecreesHandlerResponseSchemaTest extends AbstractHandlerTestCase
             $this->requestFor('GET', '/decrees', ['Accept-Language' => 'en'])
         );
         self::assertSame(200, $resp->getStatusCode());
-        $body = json_decode((string) $resp->getBody());
-        assert($body instanceof \stdClass);
+        $body = json_decode((string) $resp->getBody(), flags: JSON_THROW_ON_ERROR);
+        self::assertInstanceOf(\stdClass::class, $body);
         return $body;
     }
 
@@ -73,8 +73,8 @@ final class DecreesHandlerResponseSchemaTest extends AbstractHandlerTestCase
             $this->requestFor('GET', '/decrees/' . $decreeId, ['Accept-Language' => 'en'])
         );
         self::assertSame(200, $resp->getStatusCode());
-        $body = json_decode((string) $resp->getBody());
-        assert($body instanceof \stdClass);
+        $body = json_decode((string) $resp->getBody(), flags: JSON_THROW_ON_ERROR);
+        self::assertInstanceOf(\stdClass::class, $body);
         return $body;
     }
 
