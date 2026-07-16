@@ -499,7 +499,9 @@
                     "type": "string",
                     "pattern": "^https?:\\\/\\\/(www|press)\\.vatican\\.va\\\/((roman_curia\\\/congregations\\\/ccdds\\\/documents\\\/[-_%a-z0-9]+)|(content\\\/salastampa\\\/it\\\/bollettino\\\/pubblico\\\/[0-9\\\/]+)|(content\\\/[-_%\\\/a-z0-9]+))\\.(html|pdf)(#[%a-zD]+)?$"
                 }
-            }
+            },
+            "description": "precalculated per-language decree URLs; a commodity for consuming clients, derivable from url + url_lang_map",
+            "title": "DecreeURLS"
         },
         "DecreeLangs": {
             "type": "object",
