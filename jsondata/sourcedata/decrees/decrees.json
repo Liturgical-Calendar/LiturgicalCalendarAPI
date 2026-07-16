@@ -85,7 +85,6 @@
         "description": "The Supreme Pontiff Pope FRANCIS, considering the important evangelical witness offered by Martha, Mary and Lazarus in welcoming the Lord Jesus into their home, in listening to him attentively, in believing that he is the resurrection and the life, and accepting the proposal of this Dicastery, has decreed that 29 July be designated in the General Roman Calendar as the Memorial of Saints Martha, Mary and Lazarus.",
         "liturgical_event": {
             "event_key": "StMartha",
-            "grade": 3,
             "calendar":"GENERAL ROMAN"
         },
         "metadata": {

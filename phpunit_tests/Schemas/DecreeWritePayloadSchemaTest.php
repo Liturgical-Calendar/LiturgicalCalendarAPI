@@ -109,4 +109,168 @@ final class DecreeWritePayloadSchemaTest extends TestCase
         $this->expectException(\Swaggest\JsonSchema\Exception::class);
         self::schema()->in($payload);
     }
+
+    private static function decodePayload(string $json): \stdClass
+    {
+        $obj = json_decode($json);
+        assert($obj instanceof \stdClass);
+        return $obj;
+    }
+
+    private static function validMakeDoctorPayload(): \stdClass
+    {
+        return self::decodePayload(<<<'JSON'
+        {
+            "decree_id": "StTest_Doctor",
+            "decree_date": "2025-06-01",
+            "decree_protocol": "Prot. N. 2/25",
+            "description": "Test decree elevating a saint to Doctor of the Church.",
+            "liturgical_event": {
+                "event_key": "StTest",
+                "common": ["Proper"],
+                "calendar": "GENERAL ROMAN"
+            },
+            "metadata": {
+                "action": "makeDoctor",
+                "since_year": 2025,
+                "url": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/test-doctor.html"
+            },
+            "i18n": { "en": "Saint Test, Doctor of the Church" }
+        }
+        JSON);
+    }
+
+    private static function validSetPropertyGradePayload(): \stdClass
+    {
+        return self::decodePayload(<<<'JSON'
+        {
+            "decree_id": "StTest_Upgrade",
+            "decree_date": "2025-06-01",
+            "decree_protocol": "Prot. N. 3/25",
+            "description": "Test decree upgrading the grade of a liturgical event.",
+            "liturgical_event": {
+                "event_key": "StTest",
+                "grade": 4,
+                "calendar": "GENERAL ROMAN"
+            },
+            "metadata": {
+                "action": "setProperty",
+                "property": "grade",
+                "since_year": 2025,
+                "url": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/test-grade.html"
+            }
+        }
+        JSON);
+    }
+
+    private static function validSetPropertyNamePayload(): \stdClass
+    {
+        return self::decodePayload(<<<'JSON'
+        {
+            "decree_id": "StTest_NameChange",
+            "decree_date": "2025-06-01",
+            "decree_protocol": "Prot. N. 4/25",
+            "description": "Test decree changing the name of a liturgical event.",
+            "liturgical_event": {
+                "event_key": "StTest",
+                "calendar": "GENERAL ROMAN"
+            },
+            "metadata": {
+                "action": "setProperty",
+                "property": "name",
+                "since_year": 2025,
+                "url": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/test-name.html"
+            },
+            "i18n": { "en": "Saint Test, renamed" }
+        }
+        JSON);
+    }
+
+    private static function validCreateNewMobilePayload(): \stdClass
+    {
+        return self::decodePayload(<<<'JSON'
+        {
+            "decree_id": "StTestMobile_Create",
+            "decree_date": "2025-06-01",
+            "decree_protocol": "Prot. N. 5/25",
+            "description": "Test decree creating a new mobile liturgical event.",
+            "liturgical_event": {
+                "event_key": "StTestMobile",
+                "color": ["white"],
+                "grade": 2,
+                "common": ["Proper"],
+                "type": "mobile",
+                "calendar": "GENERAL ROMAN",
+                "strtotime": {
+                    "day_of_the_week": "Monday",
+                    "relative_time": "after",
+                    "event_key": "Pentecost"
+                }
+            },
+            "metadata": {
+                "action": "createNew",
+                "since_year": 2025,
+                "url": "https://www.vatican.va/roman_curia/congregations/ccdds/documents/test-mobile.html"
+            },
+            "i18n": { "en": "Saint Test Mobile" },
+            "readings": {
+                "en": {
+                    "first_reading": "Genesis 1:1",
+                    "responsorial_psalm": "Psalm 1",
+                    "gospel_acclamation": "John 1:1",
+                    "gospel": "John 1:1-14"
+                }
+            }
+        }
+        JSON);
+    }
+
+    public function testValidMakeDoctorPayloadPasses(): void
+    {
+        self::schema()->in(self::validMakeDoctorPayload());
+        $this->addToAssertionCount(1);
+    }
+
+    public function testValidSetPropertyGradePayloadPasses(): void
+    {
+        self::schema()->in(self::validSetPropertyGradePayload());
+        $this->addToAssertionCount(1);
+    }
+
+    public function testValidSetPropertyNamePayloadPasses(): void
+    {
+        self::schema()->in(self::validSetPropertyNamePayload());
+        $this->addToAssertionCount(1);
+    }
+
+    public function testValidCreateNewMobilePayloadPasses(): void
+    {
+        self::schema()->in(self::validCreateNewMobilePayload());
+        $this->addToAssertionCount(1);
+    }
+
+    public function testDecreeIdSuffixMismatchedWithActionFails(): void
+    {
+        // createNew payload with a _Doctor decree_id: no oneOf branch matches.
+        $payload            = self::validCreateNewPayload();
+        $payload->decree_id = 'StTest_Doctor';
+        $this->expectException(\Swaggest\JsonSchema\Exception::class);
+        self::schema()->in($payload);
+    }
+
+    public function testStrayGradeOnSetPropertyNamePayloadFails(): void
+    {
+        $payload                          = self::validSetPropertyNamePayload();
+        $payload->liturgical_event->grade = 3;
+        $this->expectException(\Swaggest\JsonSchema\Exception::class);
+        self::schema()->in($payload);
+    }
+
+    public function testMissingSinceYearFails(): void
+    {
+        $payload = self::validCreateNewPayload();
+        unset($payload->metadata->since_year);
+        $this->expectException(\Swaggest\JsonSchema\Exception::class);
+        self::schema()->in($payload);
+    }
 }
