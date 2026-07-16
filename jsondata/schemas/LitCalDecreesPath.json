@@ -518,6 +518,280 @@
                 "url"
             ],
             "title": "MetadataResponseMakeDoctor"
+        },
+        "SingleDecreeI18n": {
+            "type": "object",
+            "propertyNames": {
+                "pattern": "^[a-z]{2,3}$"
+            },
+            "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+            },
+            "description": "aggregated non-empty translated names for the decree liturgical event, keyed by locale across every i18n locale file; may be empty when no locale defines a translation",
+            "title": "SingleDecreeI18n"
+        },
+        "SingleDecreeReadings": {
+            "type": "object",
+            "propertyNames": {
+                "pattern": "^[a-z]{2,3}$"
+            },
+            "additionalProperties": {
+                "$ref": "./CommonDef.json#/definitions/Readings"
+            },
+            "description": "aggregated lectionary readings for the decree liturgical event, keyed by locale across every lectionary locale file; may be empty when no locale defines readings",
+            "title": "SingleDecreeReadings"
+        },
+        "SingleDecreeResponseCreateNewFixed": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "decree_id": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeCreateNewFixed/properties/decree_id"
+                },
+                "decree_date": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDate"
+                },
+                "decree_protocol": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeProtocol"
+                },
+                "description": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDescription"
+                },
+                "api_path": {
+                    "type": "string",
+                    "pattern": "^https?:\\/\\/(?:litcal\\.johnromanodorazio\\.com\\/api\\/(?:dev|v[4-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))\\/decrees\\/[A-Z][A-Za-z]+_Create$"
+                },
+                "liturgical_event": {
+                    "$ref": "#/definitions/LiturgicalEventResponseCreateNewFixed"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/MetadataResponseCreateNew"
+                },
+                "i18n": {
+                    "$ref": "#/definitions/SingleDecreeI18n"
+                },
+                "readings": {
+                    "$ref": "#/definitions/SingleDecreeReadings"
+                }
+            },
+            "required": [
+                "decree_id",
+                "decree_date",
+                "decree_protocol",
+                "description",
+                "api_path",
+                "liturgical_event",
+                "metadata",
+                "i18n",
+                "readings"
+            ],
+            "title": "SingleDecreeResponseCreateNewFixed"
+        },
+        "SingleDecreeResponseCreateNewMobile": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "decree_id": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeCreateNewMobile/properties/decree_id"
+                },
+                "decree_date": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDate"
+                },
+                "decree_protocol": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeProtocol"
+                },
+                "description": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDescription"
+                },
+                "api_path": {
+                    "type": "string",
+                    "pattern": "^https?:\\/\\/(?:litcal\\.johnromanodorazio\\.com\\/api\\/(?:dev|v[4-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))\\/decrees\\/[A-Z][A-Za-z]+_Create$"
+                },
+                "liturgical_event": {
+                    "$ref": "#/definitions/LiturgicalEventResponseCreateNewMobile"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/MetadataResponseCreateNew"
+                },
+                "i18n": {
+                    "$ref": "#/definitions/SingleDecreeI18n"
+                },
+                "readings": {
+                    "$ref": "#/definitions/SingleDecreeReadings"
+                }
+            },
+            "required": [
+                "decree_id",
+                "decree_date",
+                "decree_protocol",
+                "description",
+                "api_path",
+                "liturgical_event",
+                "metadata",
+                "i18n",
+                "readings"
+            ],
+            "title": "SingleDecreeResponseCreateNewMobile"
+        },
+        "SingleDecreeResponseSetPropertyGrade": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "decree_id": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeSetPropertyGrade/properties/decree_id"
+                },
+                "decree_date": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDate"
+                },
+                "decree_protocol": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeProtocol"
+                },
+                "description": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDescription"
+                },
+                "api_path": {
+                    "type": "string",
+                    "pattern": "^https?:\\/\\/(?:litcal\\.johnromanodorazio\\.com\\/api\\/(?:dev|v[4-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))\\/decrees\\/[A-Z][A-Za-z]+_Upgrade$"
+                },
+                "liturgical_event": {
+                    "$ref": "#/definitions/LiturgicalEventResponseSetPropertyGrade"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/MetadataResponseSetPropertyGrade"
+                },
+                "i18n": {
+                    "$ref": "#/definitions/SingleDecreeI18n"
+                },
+                "readings": {
+                    "$ref": "#/definitions/SingleDecreeReadings"
+                }
+            },
+            "required": [
+                "decree_id",
+                "decree_date",
+                "decree_protocol",
+                "description",
+                "api_path",
+                "liturgical_event",
+                "metadata",
+                "i18n",
+                "readings"
+            ],
+            "title": "SingleDecreeResponseSetPropertyGrade"
+        },
+        "SingleDecreeResponseSetPropertyName": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "decree_id": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeSetPropertyName/properties/decree_id"
+                },
+                "decree_date": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDate"
+                },
+                "decree_protocol": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeProtocol"
+                },
+                "description": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDescription"
+                },
+                "api_path": {
+                    "type": "string",
+                    "pattern": "^https?:\\/\\/(?:litcal\\.johnromanodorazio\\.com\\/api\\/(?:dev|v[4-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))\\/decrees\\/[A-Z][A-Za-z]+_NameChange$"
+                },
+                "liturgical_event": {
+                    "$ref": "#/definitions/LiturgicalEventResponseSetPropertyName"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/MetadataResponseSetPropertyName"
+                },
+                "i18n": {
+                    "$ref": "#/definitions/SingleDecreeI18n"
+                },
+                "readings": {
+                    "$ref": "#/definitions/SingleDecreeReadings"
+                }
+            },
+            "required": [
+                "decree_id",
+                "decree_date",
+                "decree_protocol",
+                "description",
+                "api_path",
+                "liturgical_event",
+                "metadata",
+                "i18n",
+                "readings"
+            ],
+            "title": "SingleDecreeResponseSetPropertyName"
+        },
+        "SingleDecreeResponseMakeDoctor": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "decree_id": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeMakeDoctor/properties/decree_id"
+                },
+                "decree_date": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDate"
+                },
+                "decree_protocol": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeProtocol"
+                },
+                "description": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDescription"
+                },
+                "api_path": {
+                    "type": "string",
+                    "pattern": "^https?:\\/\\/(?:litcal\\.johnromanodorazio\\.com\\/api\\/(?:dev|v[4-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))\\/decrees\\/[A-Z][A-Za-z]+_Doctor$"
+                },
+                "liturgical_event": {
+                    "$ref": "#/definitions/LiturgicalEventResponseMakeDoctor"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/MetadataResponseMakeDoctor"
+                },
+                "i18n": {
+                    "$ref": "#/definitions/SingleDecreeI18n"
+                },
+                "readings": {
+                    "$ref": "#/definitions/SingleDecreeReadings"
+                }
+            },
+            "required": [
+                "decree_id",
+                "decree_date",
+                "decree_protocol",
+                "description",
+                "api_path",
+                "liturgical_event",
+                "metadata",
+                "i18n",
+                "readings"
+            ],
+            "title": "SingleDecreeResponseMakeDoctor"
+        },
+        "SingleDecreeResponse": {
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/SingleDecreeResponseCreateNewFixed"
+                },
+                {
+                    "$ref": "#/definitions/SingleDecreeResponseCreateNewMobile"
+                },
+                {
+                    "$ref": "#/definitions/SingleDecreeResponseSetPropertyGrade"
+                },
+                {
+                    "$ref": "#/definitions/SingleDecreeResponseSetPropertyName"
+                },
+                {
+                    "$ref": "#/definitions/SingleDecreeResponseMakeDoctor"
+                }
+            ],
+            "description": "Response of GET /decrees/{decree_id}: the decree as it appears in the index (localized name, api_path, request-locale readings in liturgical_event), enriched with the full cross-locale i18n and readings maps for editor prefill",
+            "title": "SingleDecreeResponse"
         }
     }
 }

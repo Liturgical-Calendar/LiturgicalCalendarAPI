@@ -4890,22 +4890,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "allOf": [
-                    {
-                      "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree"
-                    },
-                    {
-                      "type": "object",
-                      "properties": {
-                        "i18n": {
-                          "$ref": "./LitCalDecreeWritePayload.json#/definitions/I18n"
-                        },
-                        "readings": {
-                          "$ref": "./LitCalDecreeWritePayload.json#/definitions/Readings"
-                        }
-                      }
-                    }
-                  ]
+                  "$ref": "./LitCalDecreesPath.json#/definitions/SingleDecreeResponse"
                 }
               }
             }

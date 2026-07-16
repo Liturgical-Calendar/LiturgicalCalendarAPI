@@ -66,4 +66,39 @@ final class DecreesHandlerResponseSchemaTest extends AbstractHandlerTestCase
         $this->expectException(\Swaggest\JsonSchema\Exception::class);
         Schema::import(LitSchema::DECREES->path())->in($body);
     }
+
+    private function singleDecreeBody(string $decreeId): \stdClass
+    {
+        $resp = ( new DecreesHandler([$decreeId]) )->handle(
+            $this->requestFor('GET', '/decrees/' . $decreeId, ['Accept-Language' => 'en'])
+        );
+        self::assertSame(200, $resp->getStatusCode());
+        $body = json_decode((string) $resp->getBody());
+        assert($body instanceof \stdClass);
+        return $body;
+    }
+
+    private static function singleDecreeSchema(): Schema
+    {
+        return Schema::import(LitSchema::DECREES->path() . '#/definitions/SingleDecreeResponse');
+    }
+
+    public function testSingleDecreeResponseValidatesAgainstSingleDecreeSchema(): void
+    {
+        // Rich case: name-bearing createNew decree with liturgical_event
+        // readings and non-empty cross-locale i18n/readings maps.
+        self::singleDecreeSchema()->in($this->singleDecreeBody('MaryMotherChurch_Create'));
+        $this->addToAssertionCount(1);
+    }
+
+    public function testSingleDecreeResponseAllowsEmptyAggregateMaps(): void
+    {
+        // StMaryMagdalene_Upgrade has no i18n entries (grade decrees bear no
+        // name) and no lectionary entries, so both aggregate maps are {}.
+        $body = $this->singleDecreeBody('StMaryMagdalene_Upgrade');
+        self::assertSame([], get_object_vars($body->i18n));
+        self::assertSame([], get_object_vars($body->readings));
+        self::singleDecreeSchema()->in($body);
+        $this->addToAssertionCount(1);
+    }
 }
