@@ -36,8 +36,8 @@ final class ReadonlyPathsResponseSchemaTest extends AbstractHandlerTestCase
     {
         $resp = $handler->handle($this->requestFor('GET', $route, ['Accept-Language' => 'en']));
         self::assertSame(200, $resp->getStatusCode());
-        $body = json_decode((string) $resp->getBody());
-        assert($body instanceof \stdClass);
+        $body = json_decode((string) $resp->getBody(), flags: JSON_THROW_ON_ERROR);
+        self::assertInstanceOf(\stdClass::class, $body);
         Schema::import($schema->path())->in($body);
         $this->addToAssertionCount(1);
     }
