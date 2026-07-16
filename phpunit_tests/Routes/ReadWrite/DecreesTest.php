@@ -117,10 +117,12 @@ final class DecreesTest extends ApiTestCase
         $token = self::getJwtToken();
         $this->assertNotNull($token, 'Failed to obtain JWT token for authenticated test');
 
-        // StMaryMagdalene_Upgrade ships with the API, so a PUT on it must conflict.
-        $payload = self::createNewPayload('StMaryMagdalene_Upgrade');
+        // MaryMotherChurch_Create ships with the API, so a PUT on it must conflict.
+        // (A _Create decree_id is required: the write payload schema binds the
+        // decree_id suffix to metadata.action, and the fixture payload is createNew.)
+        $payload = self::createNewPayload('MaryMotherChurch_Create');
 
-        $response = self::$http->request('PUT', '/decrees/StMaryMagdalene_Upgrade', [
+        $response = self::$http->request('PUT', '/decrees/MaryMotherChurch_Create', [
             'headers'     => array_merge(
                 self::authHeaders($token),
                 ['Content-Type' => 'application/json', 'Accept-Language' => 'en']

@@ -1,28 +1,239 @@
 {
     "$schema": "https://json-schema.org/draft-07/schema#",
     "title": "LitCalDecreeWritePayload",
-    "description": "Single-decree write payload for PUT/PATCH /decrees/{decree_id}. Method- and action-dependent sidecar requirements (i18n, readings) are enforced by the API handler, not by this schema.",
-    "type": "object",
-    "additionalProperties": false,
-    "properties": {
-        "decree_id": { "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree/properties/decree_id" },
-        "decree_date": { "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree/properties/decree_date" },
-        "decree_protocol": { "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree/properties/decree_protocol" },
-        "description": { "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree/properties/description" },
-        "liturgical_event": { "$ref": "./LitCalDecreesSource.json#/definitions/LiturgicalEvent" },
-        "metadata": { "$ref": "./LitCalDecreesSource.json#/definitions/Metadata" },
-        "i18n": {
-            "type": "object",
-            "minProperties": 1,
-            "propertyNames": { "pattern": "^[a-z]{2,3}$" },
-            "additionalProperties": { "type": "string", "minLength": 1 }
+    "description": "Single-decree write payload for PUT/PATCH /decrees/{decree_id}. The payload shape is discriminated by metadata.action (and metadata.property for setProperty). Method- and action-dependent sidecar requirements (i18n, readings) are enforced by the API handler (DecreeWritePayloadGuard), not by this schema.",
+    "oneOf": [
+        {
+            "$ref": "#/definitions/PayloadCreateNewFixed"
         },
-        "readings": {
+        {
+            "$ref": "#/definitions/PayloadCreateNewMobile"
+        },
+        {
+            "$ref": "#/definitions/PayloadSetPropertyGrade"
+        },
+        {
+            "$ref": "#/definitions/PayloadSetPropertyName"
+        },
+        {
+            "$ref": "#/definitions/PayloadMakeDoctor"
+        }
+    ],
+    "definitions": {
+        "I18n": {
             "type": "object",
             "minProperties": 1,
-            "propertyNames": { "pattern": "^[a-z]{2,3}$" },
-            "additionalProperties": { "$ref": "./CommonDef.json#/definitions/Readings" }
+            "propertyNames": {
+                "pattern": "^[a-z]{2,3}$"
+            },
+            "additionalProperties": {
+                "type": "string",
+                "minLength": 1
+            },
+            "title": "I18n"
+        },
+        "Readings": {
+            "type": "object",
+            "minProperties": 1,
+            "propertyNames": {
+                "pattern": "^[a-z]{2,3}$"
+            },
+            "additionalProperties": {
+                "$ref": "./CommonDef.json#/definitions/Readings"
+            },
+            "title": "Readings"
+        },
+        "PayloadCreateNewFixed": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "decree_id": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeCreateNewFixed/properties/decree_id"
+                },
+                "decree_date": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDate"
+                },
+                "decree_protocol": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeProtocol"
+                },
+                "description": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDescription"
+                },
+                "liturgical_event": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/LiturgicalEventCreateNewFixed"
+                },
+                "metadata": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/MetadataCreateNew"
+                },
+                "i18n": {
+                    "$ref": "#/definitions/I18n"
+                },
+                "readings": {
+                    "$ref": "#/definitions/Readings"
+                }
+            },
+            "required": [
+                "decree_id",
+                "decree_date",
+                "decree_protocol",
+                "description",
+                "liturgical_event",
+                "metadata"
+            ],
+            "title": "PayloadCreateNewFixed"
+        },
+        "PayloadCreateNewMobile": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "decree_id": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeCreateNewMobile/properties/decree_id"
+                },
+                "decree_date": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDate"
+                },
+                "decree_protocol": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeProtocol"
+                },
+                "description": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDescription"
+                },
+                "liturgical_event": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/LiturgicalEventCreateNewMobile"
+                },
+                "metadata": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/MetadataCreateNew"
+                },
+                "i18n": {
+                    "$ref": "#/definitions/I18n"
+                },
+                "readings": {
+                    "$ref": "#/definitions/Readings"
+                }
+            },
+            "required": [
+                "decree_id",
+                "decree_date",
+                "decree_protocol",
+                "description",
+                "liturgical_event",
+                "metadata"
+            ],
+            "title": "PayloadCreateNewMobile"
+        },
+        "PayloadSetPropertyGrade": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "decree_id": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeSetPropertyGrade/properties/decree_id"
+                },
+                "decree_date": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDate"
+                },
+                "decree_protocol": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeProtocol"
+                },
+                "description": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDescription"
+                },
+                "liturgical_event": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/LiturgicalEventSetPropertyGrade"
+                },
+                "metadata": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/MetadataSetPropertyGrade"
+                },
+                "readings": {
+                    "$ref": "#/definitions/Readings"
+                }
+            },
+            "required": [
+                "decree_id",
+                "decree_date",
+                "decree_protocol",
+                "description",
+                "liturgical_event",
+                "metadata"
+            ],
+            "title": "PayloadSetPropertyGrade"
+        },
+        "PayloadSetPropertyName": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "decree_id": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeSetPropertyName/properties/decree_id"
+                },
+                "decree_date": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDate"
+                },
+                "decree_protocol": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeProtocol"
+                },
+                "description": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDescription"
+                },
+                "liturgical_event": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/LiturgicalEventSetPropertyName"
+                },
+                "metadata": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/MetadataSetPropertyName"
+                },
+                "i18n": {
+                    "$ref": "#/definitions/I18n"
+                },
+                "readings": {
+                    "$ref": "#/definitions/Readings"
+                }
+            },
+            "required": [
+                "decree_id",
+                "decree_date",
+                "decree_protocol",
+                "description",
+                "liturgical_event",
+                "metadata"
+            ],
+            "title": "PayloadSetPropertyName"
+        },
+        "PayloadMakeDoctor": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "decree_id": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeMakeDoctor/properties/decree_id"
+                },
+                "decree_date": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDate"
+                },
+                "decree_protocol": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeProtocol"
+                },
+                "description": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/DecreeDescription"
+                },
+                "liturgical_event": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/LiturgicalEventMakeDoctor"
+                },
+                "metadata": {
+                    "$ref": "./LitCalDecreesSource.json#/definitions/MetadataMakeDoctor"
+                },
+                "i18n": {
+                    "$ref": "#/definitions/I18n"
+                },
+                "readings": {
+                    "$ref": "#/definitions/Readings"
+                }
+            },
+            "required": [
+                "decree_id",
+                "decree_date",
+                "decree_protocol",
+                "description",
+                "liturgical_event",
+                "metadata"
+            ],
+            "title": "PayloadMakeDoctor"
         }
-    },
-    "required": ["decree_id", "decree_date", "decree_protocol", "description", "liturgical_event", "metadata"]
+    }
 }

@@ -8,32 +8,62 @@
     },
     "definitions": {
         "LitCalDecree": {
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/DecreeCreateNewFixed"
+                },
+                {
+                    "$ref": "#/definitions/DecreeCreateNewMobile"
+                },
+                {
+                    "$ref": "#/definitions/DecreeSetPropertyGrade"
+                },
+                {
+                    "$ref": "#/definitions/DecreeSetPropertyName"
+                },
+                {
+                    "$ref": "#/definitions/DecreeMakeDoctor"
+                }
+            ],
+            "title": "LitCalDecree"
+        },
+        "DecreeDate": {
+            "type": "string",
+            "format": "date",
+            "title": "DecreeDate"
+        },
+        "DecreeProtocol": {
+            "type": "string",
+            "title": "DecreeProtocol"
+        },
+        "DecreeDescription": {
+            "type": "string",
+            "minLength": 1,
+            "title": "DecreeDescription"
+        },
+        "DecreeCreateNewFixed": {
             "type": "object",
             "additionalProperties": false,
+            "description": "A decree that creates a new fixed-date liturgical event (metadata.action = createNew, liturgical_event.type = fixed)",
             "properties": {
                 "decree_id": {
                     "type": "string",
-                    "pattern": "^[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)$"
+                    "pattern": "^[A-Z][A-Za-z]+_Create$"
                 },
                 "decree_date": {
-                    "type": "string",
-                    "format": "date"
+                    "$ref": "#/definitions/DecreeDate"
                 },
                 "decree_protocol": {
-                    "type": "string"
+                    "$ref": "#/definitions/DecreeProtocol"
                 },
                 "description": {
-                    "type": "string"
+                    "$ref": "#/definitions/DecreeDescription"
                 },
                 "liturgical_event": {
-                    "$ref": "#/definitions/LiturgicalEvent"
+                    "$ref": "#/definitions/LiturgicalEventCreateNewFixed"
                 },
                 "metadata": {
-                    "$ref": "#/definitions/Metadata"
-                },
-                "api_path": {
-                    "type": "string",
-                    "pattern": "^https?:\\\/\\\/(?:litcal\\.johnromanodorazio\\.com\\\/api\\\/(?:dev|v[4-9]|v[1-9]\\d+)|(?:localhost|127\\.0\\.0\\.1)(?:\\:\\d{4}))\\\/decrees\\\/[A-Z][A-Za-z]+_(Upgrade|Create|NameChange|Doctor)$"
+                    "$ref": "#/definitions/MetadataCreateNew"
                 }
             },
             "required": [
@@ -43,46 +73,219 @@
                 "description",
                 "liturgical_event",
                 "metadata"
-            ]
+            ],
+            "title": "DecreeCreateNewFixed"
         },
-        "LiturgicalEvent": {
+        "DecreeCreateNewMobile": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "A decree that creates a new mobile liturgical event (metadata.action = createNew, liturgical_event.type = mobile)",
+            "properties": {
+                "decree_id": {
+                    "type": "string",
+                    "pattern": "^[A-Z][A-Za-z]+_Create$"
+                },
+                "decree_date": {
+                    "$ref": "#/definitions/DecreeDate"
+                },
+                "decree_protocol": {
+                    "$ref": "#/definitions/DecreeProtocol"
+                },
+                "description": {
+                    "$ref": "#/definitions/DecreeDescription"
+                },
+                "liturgical_event": {
+                    "$ref": "#/definitions/LiturgicalEventCreateNewMobile"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/MetadataCreateNew"
+                }
+            },
+            "required": [
+                "decree_id",
+                "decree_date",
+                "decree_protocol",
+                "description",
+                "liturgical_event",
+                "metadata"
+            ],
+            "title": "DecreeCreateNewMobile"
+        },
+        "DecreeSetPropertyGrade": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "A decree that changes the liturgical grade of an existing liturgical event (metadata.action = setProperty, metadata.property = grade)",
+            "properties": {
+                "decree_id": {
+                    "type": "string",
+                    "pattern": "^[A-Z][A-Za-z]+_Upgrade$"
+                },
+                "decree_date": {
+                    "$ref": "#/definitions/DecreeDate"
+                },
+                "decree_protocol": {
+                    "$ref": "#/definitions/DecreeProtocol"
+                },
+                "description": {
+                    "$ref": "#/definitions/DecreeDescription"
+                },
+                "liturgical_event": {
+                    "$ref": "#/definitions/LiturgicalEventSetPropertyGrade"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/MetadataSetPropertyGrade"
+                }
+            },
+            "required": [
+                "decree_id",
+                "decree_date",
+                "decree_protocol",
+                "description",
+                "liturgical_event",
+                "metadata"
+            ],
+            "title": "DecreeSetPropertyGrade"
+        },
+        "DecreeSetPropertyName": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "A decree that changes the name of an existing liturgical event (metadata.action = setProperty, metadata.property = name); the new name lives in the i18n sidecar files",
+            "properties": {
+                "decree_id": {
+                    "type": "string",
+                    "pattern": "^[A-Z][A-Za-z]+_NameChange$"
+                },
+                "decree_date": {
+                    "$ref": "#/definitions/DecreeDate"
+                },
+                "decree_protocol": {
+                    "$ref": "#/definitions/DecreeProtocol"
+                },
+                "description": {
+                    "$ref": "#/definitions/DecreeDescription"
+                },
+                "liturgical_event": {
+                    "$ref": "#/definitions/LiturgicalEventSetPropertyName"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/MetadataSetPropertyName"
+                }
+            },
+            "required": [
+                "decree_id",
+                "decree_date",
+                "decree_protocol",
+                "description",
+                "liturgical_event",
+                "metadata"
+            ],
+            "title": "DecreeSetPropertyName"
+        },
+        "DecreeMakeDoctor": {
+            "type": "object",
+            "additionalProperties": false,
+            "description": "A decree that declares a saint with an existing liturgical event a Doctor of the Church (metadata.action = makeDoctor)",
+            "properties": {
+                "decree_id": {
+                    "type": "string",
+                    "pattern": "^[A-Z][A-Za-z]+_Doctor$"
+                },
+                "decree_date": {
+                    "$ref": "#/definitions/DecreeDate"
+                },
+                "decree_protocol": {
+                    "$ref": "#/definitions/DecreeProtocol"
+                },
+                "description": {
+                    "$ref": "#/definitions/DecreeDescription"
+                },
+                "liturgical_event": {
+                    "$ref": "#/definitions/LiturgicalEventMakeDoctor"
+                },
+                "metadata": {
+                    "$ref": "#/definitions/MetadataMakeDoctor"
+                }
+            },
+            "required": [
+                "decree_id",
+                "decree_date",
+                "decree_protocol",
+                "description",
+                "liturgical_event",
+                "metadata"
+            ],
+            "title": "DecreeMakeDoctor"
+        },
+        "LiturgicalEventCreateNewFixed": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
                 "event_key": {
                     "$ref": "./CommonDef.json#/definitions/EventKey"
                 },
-                "name": {
-                    "type": "string"
+                "calendar": {
+                    "$ref": "./CommonDef.json#/definitions/Calendar"
                 },
                 "grade": {
                     "$ref": "./CommonDef.json#/definitions/LitGrade"
                 },
-                "common": {
-                    "$ref": "./CommonDef.json#/definitions/LitCommon"
-                },
-                "calendar": {
-                    "$ref": "./CommonDef.json#/definitions/Calendar"
-                },
-                "color": {
-                    "$ref": "./CommonDef.json#/definitions/LitColor"
-                },
-                "type": {
-                    "$ref": "./CommonDef.json#/definitions/LitEventType"
-                },
-                "readings": {
-                    "$ref": "./CommonDef.json#/definitions/Readings"
+                "day": {
+                    "$ref": "./CommonDef.json#/definitions/Day"
                 },
                 "month": {
                     "$ref": "./CommonDef.json#/definitions/Month"
                 },
-                "day": {
-                    "$ref": "./CommonDef.json#/definitions/Day"
+                "color": {
+                    "$ref": "./CommonDef.json#/definitions/LitColor"
+                },
+                "common": {
+                    "$ref": "./CommonDef.json#/definitions/LitCommon"
+                },
+                "type": {
+                    "type": "string",
+                    "const": "fixed"
+                }
+            },
+            "required": [
+                "event_key",
+                "calendar",
+                "grade",
+                "day",
+                "month",
+                "color",
+                "common",
+                "type"
+            ],
+            "title": "LiturgicalEventCreateNewFixed"
+        },
+        "LiturgicalEventCreateNewMobile": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "event_key": {
+                    "$ref": "./CommonDef.json#/definitions/EventKey"
+                },
+                "calendar": {
+                    "$ref": "./CommonDef.json#/definitions/Calendar"
+                },
+                "grade": {
+                    "$ref": "./CommonDef.json#/definitions/LitGrade"
+                },
+                "color": {
+                    "$ref": "./CommonDef.json#/definitions/LitColor"
+                },
+                "common": {
+                    "$ref": "./CommonDef.json#/definitions/LitCommon"
+                },
+                "type": {
+                    "type": "string",
+                    "const": "mobile"
                 },
                 "strtotime": {
                     "oneOf": [
                         {
                             "type": "string",
+                            "minLength": 1,
                             "description": "supports PHP strtotime string format"
                         },
                         {
@@ -93,23 +296,84 @@
             },
             "required": [
                 "event_key",
+                "calendar",
+                "grade",
+                "color",
+                "common",
+                "type",
+                "strtotime"
+            ],
+            "title": "LiturgicalEventCreateNewMobile"
+        },
+        "LiturgicalEventSetPropertyGrade": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "event_key": {
+                    "$ref": "./CommonDef.json#/definitions/EventKey"
+                },
+                "calendar": {
+                    "$ref": "./CommonDef.json#/definitions/Calendar"
+                },
+                "grade": {
+                    "$ref": "./CommonDef.json#/definitions/LitGrade"
+                }
+            },
+            "required": [
+                "event_key",
+                "calendar",
+                "grade"
+            ],
+            "title": "LiturgicalEventSetPropertyGrade"
+        },
+        "LiturgicalEventSetPropertyName": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "event_key": {
+                    "$ref": "./CommonDef.json#/definitions/EventKey"
+                },
+                "calendar": {
+                    "$ref": "./CommonDef.json#/definitions/Calendar"
+                }
+            },
+            "required": [
+                "event_key",
                 "calendar"
             ],
-            "title": "LiturgicalEvent"
+            "title": "LiturgicalEventSetPropertyName"
         },
-        "Metadata": {
+        "LiturgicalEventMakeDoctor": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "event_key": {
+                    "$ref": "./CommonDef.json#/definitions/EventKey"
+                },
+                "calendar": {
+                    "$ref": "./CommonDef.json#/definitions/Calendar"
+                },
+                "common": {
+                    "$ref": "./CommonDef.json#/definitions/LitCommon"
+                }
+            },
+            "required": [
+                "event_key",
+                "calendar",
+                "common"
+            ],
+            "title": "LiturgicalEventMakeDoctor"
+        },
+        "MetadataCreateNew": {
             "type": "object",
             "additionalProperties": false,
             "properties": {
                 "action": {
-                    "$ref": "#/definitions/MemorialFromDecreesAction"
-                },
-                "property": {
                     "type": "string",
-                    "enum": [
-                        "name",
-                        "grade"
-                    ]
+                    "const": "createNew"
+                },
+                "since_year": {
+                    "type": "integer"
                 },
                 "url": {
                     "$ref": "#/definitions/DecreeURL"
@@ -119,25 +383,108 @@
                 },
                 "urls_langs": {
                     "$ref": "#/definitions/DecreeURLS"
-                },
-                "since_year": {
-                    "type": "integer"
                 }
             },
             "required": [
                 "action",
+                "since_year",
                 "url"
             ],
-            "title": "Metadata"
+            "title": "MetadataCreateNew"
         },
-        "MemorialFromDecreesAction": {
-            "type": "string",
-            "enum": [
-                "createNew",
-                "setProperty",
-                "makeDoctor"
+        "MetadataSetPropertyGrade": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "const": "setProperty"
+                },
+                "property": {
+                    "type": "string",
+                    "const": "grade"
+                },
+                "since_year": {
+                    "type": "integer"
+                },
+                "url": {
+                    "$ref": "#/definitions/DecreeURL"
+                },
+                "url_lang_map": {
+                    "$ref": "#/definitions/DecreeLangs"
+                },
+                "urls_langs": {
+                    "$ref": "#/definitions/DecreeURLS"
+                }
+            },
+            "required": [
+                "action",
+                "property",
+                "since_year",
+                "url"
             ],
-            "title": "MemorialFromDecreesAction"
+            "title": "MetadataSetPropertyGrade"
+        },
+        "MetadataSetPropertyName": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "const": "setProperty"
+                },
+                "property": {
+                    "type": "string",
+                    "const": "name"
+                },
+                "since_year": {
+                    "type": "integer"
+                },
+                "url": {
+                    "$ref": "#/definitions/DecreeURL"
+                },
+                "url_lang_map": {
+                    "$ref": "#/definitions/DecreeLangs"
+                },
+                "urls_langs": {
+                    "$ref": "#/definitions/DecreeURLS"
+                }
+            },
+            "required": [
+                "action",
+                "property",
+                "since_year",
+                "url"
+            ],
+            "title": "MetadataSetPropertyName"
+        },
+        "MetadataMakeDoctor": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "const": "makeDoctor"
+                },
+                "since_year": {
+                    "type": "integer"
+                },
+                "url": {
+                    "$ref": "#/definitions/DecreeURL"
+                },
+                "url_lang_map": {
+                    "$ref": "#/definitions/DecreeLangs"
+                },
+                "urls_langs": {
+                    "$ref": "#/definitions/DecreeURLS"
+                }
+            },
+            "required": [
+                "action",
+                "since_year",
+                "url"
+            ],
+            "title": "MetadataMakeDoctor"
         },
         "DecreeURL": {
             "type": "string",
@@ -152,7 +499,9 @@
                     "type": "string",
                     "pattern": "^https?:\\\/\\\/(www|press)\\.vatican\\.va\\\/((roman_curia\\\/congregations\\\/ccdds\\\/documents\\\/[-_%a-z0-9]+)|(content\\\/salastampa\\\/it\\\/bollettino\\\/pubblico\\\/[0-9\\\/]+)|(content\\\/[-_%\\\/a-z0-9]+))\\.(html|pdf)(#[%a-zD]+)?$"
                 }
-            }
+            },
+            "description": "precalculated per-language decree URLs; a commodity for consuming clients, derivable from url + url_lang_map",
+            "title": "DecreeURLS"
         },
         "DecreeLangs": {
             "type": "object",
