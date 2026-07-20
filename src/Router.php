@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\PathCategory;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\CalendarHandler;
 use LiturgicalCalendar\Api\Handlers\EasterHandler;
 use LiturgicalCalendar\Api\Handlers\EventsHandler;
@@ -119,6 +120,16 @@ class Router
         $requestPathParts = explode('/', $pathParams);
         $route            = array_shift($requestPathParts);
 
+        // An optional leading 'ambrosian' segment on the calendar route selects the
+        // Ambrosian rite; strip it so the existing 0/1/2/3-part shape parsing below
+        // runs unchanged on the remainder (e.g. /calendar/ambrosian/diocese/milano_it
+        // -> ['diocese', 'milano_it'], same shape as a Roman diocesan request).
+        $rite = Rite::default();
+        if (( $route === 'calendar' || $route === '' ) && ( $requestPathParts[0] ?? null ) === 'ambrosian') {
+            $rite = Rite::AMBROSIAN;
+            array_shift($requestPathParts);
+        }
+
         // Parse allowed origins from environment (comma-separated list, or '*' for all)
         // This is used for both handler-level CORS and error response CORS
         $allowedOriginsEnv = isset($_ENV['CORS_ALLOWED_ORIGINS']) && is_string($_ENV['CORS_ALLOWED_ORIGINS'])
@@ -135,7 +146,7 @@ class Router
             case '':
                 // no break (intentional fallthrough)
             case 'calendar':
-                $calendarHandler = new CalendarHandler($requestPathParts);
+                $calendarHandler = new CalendarHandler($requestPathParts, $rite);
                 if (count($requestPathParts) === 0) {
                     $calendarHandler->setAllowedRequestMethods([
                         RequestMethod::GET,
