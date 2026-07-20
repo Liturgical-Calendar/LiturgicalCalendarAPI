@@ -17,6 +17,7 @@ use LiturgicalCalendar\Api\Enum\LitCommon;
 use LiturgicalCalendar\Api\Enum\LitEventType;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Enum\YearType;
 use LiturgicalCalendar\Api\Enum\JsonData;
@@ -42,7 +43,7 @@ use LiturgicalCalendar\Api\Models\PropriumDeTemporeEvent;
 use LiturgicalCalendar\Api\Models\RelativeLiturgicalDate;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
-use LiturgicalCalendar\Api\Models\Calendar\Temporale\RomanTemporale;
+use LiturgicalCalendar\Api\Models\Calendar\Rite\RiteProfileFactory;
 use LiturgicalCalendar\Api\Models\Calendar\Temporale\TemporaleContext;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItem;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCollection;
@@ -3874,8 +3875,11 @@ final class CalendarHandler extends AbstractHandler
         //3. Solemnities of the Lord, of the Blessed Virgin Mary, and of saints listed in the General Calendar
         //
         // The contiguous Roman temporale block (Easter Triduum through the mobile
-        // Solemnities of the Lord) is delegated to the RomanTemporale engine,
-        // which mutates the shared calendar and message sink through the context.
+        // Solemnities of the Lord) is delegated to the rite's temporale engine,
+        // obtained via the RiteProfile seam, which mutates the shared calendar
+        // and message sink through the context. Until a later plan parses the
+        // rite from the request path, this always resolves to Rite::default().
+        $riteProfile      = RiteProfileFactory::forRite(Rite::default());
         $temporaleContext = new TemporaleContext(
             $this->Cal,
             $this->CalendarParams,
@@ -3883,7 +3887,7 @@ final class CalendarHandler extends AbstractHandler
             $this->localeDateFormatter,
             $this->Messages
         );
-        ( new RomanTemporale() )->buildTemporale($temporaleContext);
+        $riteProfile->temporaleEngine()->buildTemporale($temporaleContext);
 
         $this->loadPropriumDeSanctisData(RomanMissal::EDITIO_TYPICA_1970);
         $this->calculateFixedSolemnities(); //this will also handle All Souls Day
