@@ -106,13 +106,13 @@ final class RomanTemporale implements TemporaleEngine
                 $this->createPropriumDeTemporeLiturgicalEventByKey('Epiphany', $ctx);
 
                 // if a Sunday falls between Jan. 2 and Jan. 5, it is called the "Second Sunday of Christmas"
-                for ($i = 2; $i < 6; $i++) {
-                    $dateTime = DateTime::fromFormat($i . '-1-' . $ctx->params->Year);
-                    if (self::dateIsSunday($dateTime)) {
-                        $ctx->propriumDeTempore['Christmas2']->setDate($dateTime);
-                        $this->createPropriumDeTemporeLiturgicalEventByKey('Christmas2', $ctx);
-                        break;
-                    }
+                $christmas2Day = array_find(
+                    [2, 3, 4, 5],
+                    fn(int $day): bool => self::dateIsSunday(DateTime::fromFormat($day . '-1-' . $ctx->params->Year))
+                );
+                if (null !== $christmas2Day) {
+                    $ctx->propriumDeTempore['Christmas2']->setDate(DateTime::fromFormat($christmas2Day . '-1-' . $ctx->params->Year));
+                    $this->createPropriumDeTemporeLiturgicalEventByKey('Christmas2', $ctx);
                 }
                 break;
             case Epiphany::SUNDAY_JAN2_JAN8:
