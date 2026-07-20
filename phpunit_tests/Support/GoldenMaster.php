@@ -8,8 +8,10 @@ namespace LiturgicalCalendar\Tests\Support;
  * Shared helpers for the Roman-calendar golden-master regression suite.
  * The MATRIX exercises: missal-edition year gates (2002/2008), the two
  * national editions used by existing calendars, a diocesan overlay, and
- * both the default and the explicitly-requested liturgical year type
- * (the double-year clone/merge pass).
+ * the LITURGICAL year type — both implicitly (the API default) and via
+ * the explicit `year_type=LITURGICAL` query parameter — which drives the
+ * double-year clone/merge pass. There is no CIVIL-year case in this
+ * matrix.
  *
  * `CalendarParams::initParamsFromRequestPath()` reads path segments from
  * the handler's constructor argument, not from the request URI — so each
