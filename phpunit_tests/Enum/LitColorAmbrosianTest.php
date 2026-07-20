@@ -6,8 +6,10 @@ namespace LiturgicalCalendar\Tests\Enum;
 
 use LiturgicalCalendar\Api\Enum\LitColor;
 use LiturgicalCalendar\Api\Enum\LitLocale;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(LitColor::class)]
 final class LitColorAmbrosianTest extends TestCase
 {
     public function testMorelloAndBlackCasesExist(): void
@@ -26,7 +28,7 @@ final class LitColorAmbrosianTest extends TestCase
     {
         // No gettext catalog is loaded in unit tests; _() falls through to the
         // source string, so these assert the source strings, not real Italian.
-        $this->assertSame('violaceo', LitColor::MORELLO->i18n('it_IT'));
+        $this->assertSame('morello', LitColor::MORELLO->i18n('it_IT'));
         $this->assertSame('black', LitColor::BLACK->i18n('it_IT'));
     }
 

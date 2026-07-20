@@ -39,7 +39,7 @@ enum LitColor: string
             /**translators: context = liturgical color */
             LitColor::ROSE   => ( $isLatin ? 'rosea'   : _('rose') ),
             /**translators: context = liturgical color (Ambrosian "morello"/violet) */
-            LitColor::MORELLO => ( $isLatin ? 'violaceus' : _('violaceo') ),
+            LitColor::MORELLO => ( $isLatin ? 'violaceus' : _('morello') ),
             /**translators: context = liturgical color */
             LitColor::BLACK   => ( $isLatin ? 'niger'     : _('black') ),
         };
