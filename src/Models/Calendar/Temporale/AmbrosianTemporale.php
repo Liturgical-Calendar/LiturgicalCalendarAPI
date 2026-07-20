@@ -27,7 +27,8 @@ final class AmbrosianTemporale implements TemporaleEngine
         $this->calculateAdvent($ctx);
         $this->calculateChristmasEpiphany($ctx);
         $this->calculateLent($ctx);
-        // Tasks 7-8 append: calculateEasterCycle, calculateAfterPentecostAnchors.
+        $this->calculateEasterCycle($ctx);
+        // Task 8 appends: calculateAfterPentecostAnchors.
     }
 
     /**
@@ -123,5 +124,43 @@ final class AmbrosianTemporale implements TemporaleEngine
 
         $ctx->propriumDeTempore['SabatoTradSymb']->setDate(Utilities::calcGregEaster($year)->sub(new \DateInterval('P8D')));
         $this->createPropriumDeTemporeLiturgicalEventByKey('SabatoTradSymb', $ctx);
+    }
+
+    /**
+     * Easter cycle: Triduum (Easter − 3..−1), Easter, the octave "in albis"
+     * (Easter + 1..6), Easter Sundays II–VII (Easter + 1..6 weeks), Ascension
+     * (Easter + 39d, Thursday) and Pentecost (Easter + 49d). The Ambrosian rite
+     * keeps Ascension on Thursday; the Ascension request param has no effect.
+     */
+    private function calculateEasterCycle(TemporaleContext $ctx): void
+    {
+        $year = $ctx->params->Year;
+
+        $ctx->propriumDeTempore['HolyThurs']->setDate(Utilities::calcGregEaster($year)->sub(new \DateInterval('P3D')));
+        $ctx->propriumDeTempore['GoodFri']->setDate(Utilities::calcGregEaster($year)->sub(new \DateInterval('P2D')));
+        $ctx->propriumDeTempore['EasterVigil']->setDate(Utilities::calcGregEaster($year)->sub(new \DateInterval('P1D')));
+        $ctx->propriumDeTempore['Easter']->setDate(Utilities::calcGregEaster($year));
+        $this->createPropriumDeTemporeLiturgicalEventByKey('HolyThurs', $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('GoodFri', $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('EasterVigil', $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('Easter', $ctx);
+
+        $octaveKeys = ['MonOctaveEaster', 'TueOctaveEaster', 'WedOctaveEaster', 'ThuOctaveEaster', 'FriOctaveEaster', 'SatOctaveEaster'];
+        foreach ($octaveKeys as $offset => $key) {
+            $ctx->propriumDeTempore[$key]->setDate(Utilities::calcGregEaster($year)->add(new \DateInterval('P' . ( $offset + 1 ) . 'D')));
+            $this->createPropriumDeTemporeLiturgicalEventByKey($key, $ctx);
+        }
+
+        for ($i = 2; $i <= 7; $i++) {
+            $key = 'Easter' . $i;
+            $ctx->propriumDeTempore[$key]->setDate(Utilities::calcGregEaster($year)->add(new \DateInterval('P' . ( 7 * ( $i - 1 ) ) . 'D')));
+            $this->createPropriumDeTemporeLiturgicalEventByKey($key, $ctx);
+        }
+
+        $ctx->propriumDeTempore['Ascension']->setDate(Utilities::calcGregEaster($year)->add(new \DateInterval('P39D')));
+        $this->createPropriumDeTemporeLiturgicalEventByKey('Ascension', $ctx);
+
+        $ctx->propriumDeTempore['Pentecost']->setDate(Utilities::calcGregEaster($year)->add(new \DateInterval('P49D')));
+        $this->createPropriumDeTemporeLiturgicalEventByKey('Pentecost', $ctx);
     }
 }

@@ -149,4 +149,19 @@ final class AmbrosianTemporaleTest extends TestCase
         $this->assertSame('2024-02-19', $d['AshesMonday']);
         $this->assertSame('2024-03-23', $d['SabatoTradSymb']);
     }
+
+    public function testEasterCycle2025(): void
+    {
+        $d = $this->runEngine(2025);
+        $this->assertSame('2025-04-17', $d['HolyThurs']);
+        $this->assertSame('2025-04-18', $d['GoodFri']);
+        $this->assertSame('2025-04-19', $d['EasterVigil']);
+        $this->assertSame('2025-04-20', $d['Easter']);
+        $this->assertSame('2025-04-21', $d['MonOctaveEaster']);
+        $this->assertSame('2025-04-26', $d['SatOctaveEaster']);
+        $this->assertSame('2025-04-27', $d['Easter2']);
+        $this->assertSame('2025-06-01', $d['Easter7']);
+        $this->assertSame('2025-05-29', $d['Ascension']);
+        $this->assertSame('2025-06-08', $d['Pentecost']);
+    }
 }
