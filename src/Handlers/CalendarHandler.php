@@ -17,6 +17,7 @@ use LiturgicalCalendar\Api\Enum\LitCommon;
 use LiturgicalCalendar\Api\Enum\LitEventType;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Enum\YearType;
 use LiturgicalCalendar\Api\Enum\JsonData;
@@ -42,6 +43,8 @@ use LiturgicalCalendar\Api\Models\PropriumDeTemporeEvent;
 use LiturgicalCalendar\Api\Models\RelativeLiturgicalDate;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
+use LiturgicalCalendar\Api\Models\Calendar\Rite\RiteProfileFactory;
+use LiturgicalCalendar\Api\Models\Calendar\Temporale\TemporaleContext;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItem;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCollection;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewFixed;
@@ -958,77 +961,6 @@ final class CalendarHandler extends AbstractHandler
     }
 
     /**
-     * Calculates the dates for Holy Thursday, Good Friday, Easter Vigil and Easter Sunday
-     * and creates the corresponding LiturgicalEvents in the calendar
-     *
-     * **General Norms for the Liturgical Year and the Calendar**
-     *
-     * I.
-     * 1. ***Easter Triduum of the Lord's Passion and Resurrection***
-     * 2. Christmas, Epiphany, Ascension, and Pentecost
-     */
-    private function calculateEasterTriduum(): void
-    {
-        $this->PropriumDeTempore['HolyThurs']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P3D')));
-        $this->PropriumDeTempore['GoodFri']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P2D')));
-        $this->PropriumDeTempore['EasterVigil']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)->sub(new \DateInterval('P1D')));
-        $this->PropriumDeTempore['Easter']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('HolyThurs');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('GoodFri');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('EasterVigil');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Easter');
-    }
-
-
-    /**
-     * Calculates the dates for Christmas and Epiphany
-     * and creates the corresponding LiturgicalEvents in the calendar
-     *
-     * **General Norms for the Liturgical Year and the Calendar**
-     *
-     * I.
-     * 1. Easter Triduum of the Lord's Passion and Resurrection
-     * 2. ***Christmas, Epiphany, Ascension, and Pentecost***
-     */
-    private function calculateChristmasEpiphany(): void
-    {
-        // Calculate Christmas
-        $this->PropriumDeTempore['Christmas']->setDate(DateTime::fromFormat('25-12-' . $this->CalendarParams->Year));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Christmas');
-
-        // Calculate Epiphany (and the "Second Sunday of Christmas" if applicable)
-        switch ($this->CalendarParams->Epiphany) {
-            case Epiphany::JAN6:
-                $this->PropriumDeTempore['Epiphany']->setDate(DateTime::fromFormat('6-1-' . $this->CalendarParams->Year));
-                $this->createPropriumDeTemporeLiturgicalEventByKey('Epiphany');
-
-                // if a Sunday falls between Jan. 2 and Jan. 5, it is called the "Second Sunday of Christmas"
-                for ($i = 2; $i < 6; $i++) {
-                    $dateTime = DateTime::fromFormat($i . '-1-' . $this->CalendarParams->Year);
-                    if (self::dateIsSunday($dateTime)) {
-                        $this->PropriumDeTempore['Christmas2']->setDate($dateTime);
-                        $this->createPropriumDeTemporeLiturgicalEventByKey('Christmas2');
-                        break;
-                    }
-                }
-                break;
-            case Epiphany::SUNDAY_JAN2_JAN8:
-                //If January 2nd is a Sunday, then go with Jan 2nd
-                $dateTime = DateTime::fromFormat('2-1-' . $this->CalendarParams->Year);
-                if (self::dateIsSunday($dateTime)) {
-                    $this->PropriumDeTempore['Epiphany']->setDate($dateTime);
-                    $this->createPropriumDeTemporeLiturgicalEventByKey('Epiphany');
-                } else {
-                    //otherwise find the Sunday following Jan 2nd
-                    $SundayOfEpiphany = $dateTime->modify('next Sunday');
-                    $this->PropriumDeTempore['Epiphany']->setDate($SundayOfEpiphany);
-                    $this->createPropriumDeTemporeLiturgicalEventByKey('Epiphany');
-                }
-                break;
-        }
-    }
-
-    /**
      * Weekdays from Jan. 2 to the day before Epiphany are called "*day before Epiphany" (in which calendar? England?)
      * Actually in Latin they are "Feria II temporis Nativitatis",
      *  in English "Monday - Christmas Weekday",
@@ -1107,226 +1039,6 @@ final class CalendarHandler extends AbstractHandler
                 $this->Cal->addLiturgicalEvent($event_key, $litEvent);
             }
         }
-    }
-
-    /**
-     * Calculates the dates for Ascension and Pentecost and creates the corresponding LiturgicalEvents in the calendar
-     *
-     * Ascension can be either Thursday or Sunday, depending on the calendar settings,
-     * so call either calculateAscensionThursday or calculateAscensionSunday
-     *
-     * Pentecost is fixed date, so just create a LiturgicalEvent
-     *
-     * **General Norms for the Liturgical Year and the Calendar**
-     *
-     * I.
-     * 1. Easter Triduum of the Lord's Passion and Resurrection
-     * 2. ***Christmas, Epiphany, Ascension, and Pentecost***
-     *
-     * @return void
-     */
-    private function calculateAscensionPentecost(): void
-    {
-        if ($this->CalendarParams->Ascension === Ascension::THURSDAY) {
-            $this->PropriumDeTempore['Ascension']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)->add(new \DateInterval('P39D')));
-            $this->createPropriumDeTemporeLiturgicalEventByKey('Ascension');
-            $this->PropriumDeTempore['Easter7']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-                ->add(new \DateInterval('P' . ( 7 * 6 ) . 'D')));
-            $this->createPropriumDeTemporeLiturgicalEventByKey('Easter7');
-        } elseif ($this->CalendarParams->Ascension === Ascension::SUNDAY) {
-            $this->PropriumDeTempore['Ascension']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-                ->add(new \DateInterval('P' . ( 7 * 6 ) . 'D')));
-            $this->createPropriumDeTemporeLiturgicalEventByKey('Ascension');
-        }
-
-        $this->PropriumDeTempore['Pentecost']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->add(new \DateInterval('P' . ( 7 * 7 ) . 'D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Pentecost');
-    }
-
-    /**
-     * Calculates the dates for Sundays of Advent, Lent, Easter, Ordinary Time, and special Sundays like Palm Sunday, Corpus Christi, and Trinity Sunday
-     * and creates the corresponding LiturgicalEvents in the calendar
-     *
-     * **General Norms for the Liturgical Year and the Calendar**
-     *
-     * I.
-     * 1. Easter Triduum of the Lord's Passion and Resurrection
-     * 2. Christmas, Epiphany, Ascension, and Pentecost;
-     *    ***Sundays of Advent, Lent and Easter***
-     *
-     * @return void
-     */
-    private function calculateSundaysMajorSeasons(): void
-    {
-        //We calculate Sundays of Advent based on Christmas
-        $christmasDateStr = '25-12-' . $this->CalendarParams->Year;
-
-        $this->PropriumDeTempore['Advent1']->setDate(DateTime::fromFormat($christmasDateStr)
-            ->modify('last Sunday')->sub(new \DateInterval('P' . ( 3 * 7 ) . 'D')));
-        $this->PropriumDeTempore['Advent2']->setDate(DateTime::fromFormat($christmasDateStr)
-            ->modify('last Sunday')->sub(new \DateInterval('P' . ( 2 * 7 ) . 'D')));
-        $this->PropriumDeTempore['Advent3']->setDate(DateTime::fromFormat($christmasDateStr)
-            ->modify('last Sunday')->sub(new \DateInterval('P7D')));
-        $this->PropriumDeTempore['Advent4']->setDate(DateTime::fromFormat($christmasDateStr)
-            ->modify('last Sunday'));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Advent1');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Advent2');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Advent3');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Advent4');
-
-        //We calculate Sundays of Lent, Palm Sunday, Sundays of Easter, Trinity Sunday and Corpus Christi based on Easter
-        $this->PropriumDeTempore['Lent1']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->sub(new \DateInterval('P' . ( 6 * 7 ) . 'D')));
-        $this->PropriumDeTempore['Lent2']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->sub(new \DateInterval('P' . ( 5 * 7 ) . 'D')));
-        $this->PropriumDeTempore['Lent3']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->sub(new \DateInterval('P' . ( 4 * 7 ) . 'D')));
-        $this->PropriumDeTempore['Lent4']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->sub(new \DateInterval('P' . ( 3 * 7 ) . 'D')));
-        $this->PropriumDeTempore['Lent5']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->sub(new \DateInterval('P' . ( 2 * 7 ) . 'D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Lent1');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Lent2');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Lent3');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Lent4');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Lent5');
-        $this->PropriumDeTempore['PalmSun']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->sub(new \DateInterval('P7D')));
-        $this->PropriumDeTempore['Easter2']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->add(new \DateInterval('P7D')));
-        $this->PropriumDeTempore['Easter3']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->add(new \DateInterval('P' . ( 7 * 2 ) . 'D')));
-        $this->PropriumDeTempore['Easter4']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->add(new \DateInterval('P' . ( 7 * 3 ) . 'D')));
-        $this->PropriumDeTempore['Easter5']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->add(new \DateInterval('P' . ( 7 * 4 ) . 'D')));
-        $this->PropriumDeTempore['Easter6']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->add(new \DateInterval('P' . ( 7 * 5 ) . 'D')));
-        $this->PropriumDeTempore['Trinity']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->add(new \DateInterval('P' . ( 7 * 8 ) . 'D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('PalmSun');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Easter2');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Easter3');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Easter4');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Easter5');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Easter6');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Trinity');
-        if ($this->CalendarParams->CorpusChristi === CorpusChristi::THURSDAY) {
-            $this->PropriumDeTempore['CorpusChristi']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-                ->add(new \DateInterval('P' . ( 7 * 8 + 4 ) . 'D')));
-            $this->createPropriumDeTemporeLiturgicalEventByKey('CorpusChristi');
-            //Seeing the Sunday is not taken by Corpus Christi, it should be later taken by a Sunday of Ordinary Time
-            // (they are calculated back to Pentecost)
-        } elseif ($this->CalendarParams->CorpusChristi === CorpusChristi::SUNDAY) {
-            $this->PropriumDeTempore['CorpusChristi']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-                ->add(new \DateInterval('P' . ( 7 * 9 ) . 'D')));
-            $this->createPropriumDeTemporeLiturgicalEventByKey('CorpusChristi');
-        }
-
-        if ($this->CalendarParams->Year >= 2000) {
-            // Modify name of the second Sunday of Easter to include Divine Mercy Sunday
-            $easter2Name = $this->PropriumDeTempore['Easter2']->name;
-            if (LitLocale::$PRIMARY_LANGUAGE === LitLocale::LATIN_PRIMARY_LANGUAGE) {
-                $divineMercySunday = $easter2Name . ' vel Dominica Divinæ Misericordiæ';
-            } else {
-                /**translators: context alternate name for a liturgical event, e.g. Second Sunday of Easter `or` Divine Mercy Sunday*/
-                $or                = _('or');
-                $divineMercySunday = $easter2Name
-                    . " $or "
-                    /**translators: as instituted on the day of the canonization of St Faustina Kowalska by Pope John Paul II in the year 2000 */
-                    . _('Divine Mercy Sunday');
-            }
-            $this->Cal->setProperty('Easter2', 'name', $divineMercySunday);
-        }
-    }
-
-    /**
-     * Calculates the date for Ash Wednesday
-     * and creates the corresponding LiturgicalEvent in the calendar
-     *
-     * @return void
-     */
-    private function calculateAshWednesday(): void
-    {
-        $this->PropriumDeTempore['AshWednesday']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->sub(new \DateInterval('P46D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('AshWednesday');
-    }
-
-    /**
-     * Calculates the dates for Weekdays of Holy Week from Monday to Thursday inclusive
-     * and creates the corresponding LiturgicalEvents in the calendar
-     *
-     * @return void
-     */
-    private function calculateWeekdaysHolyWeek(): void
-    {
-        //Weekdays of Holy Week from Monday to Thursday inclusive
-        // ( that is, thursday morning chrism Mass... the In Coena Domini Mass begins the Easter Triduum )
-        $this->PropriumDeTempore['MonHolyWeek']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->sub(new \DateInterval('P6D')));
-        $this->PropriumDeTempore['TueHolyWeek']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->sub(new \DateInterval('P5D')));
-        $this->PropriumDeTempore['WedHolyWeek']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->sub(new \DateInterval('P4D')));
-        $this->PropriumDeTempore['HolyThursChrism']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->sub(new \DateInterval('P3D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('MonHolyWeek');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('TueHolyWeek');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('WedHolyWeek');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('HolyThursChrism');
-    }
-
-    /**
-     * Calculates the dates for Monday to Saturday of the Octave of Easter
-     * and creates the corresponding LiturgicalEvents in the calendar
-     *
-     * @return void
-     */
-    private function calculateEasterOctave(): void
-    {
-        $this->PropriumDeTempore['MonOctaveEaster']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->add(new \DateInterval('P1D')));
-        $this->PropriumDeTempore['TueOctaveEaster']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->add(new \DateInterval('P2D')));
-        $this->PropriumDeTempore['WedOctaveEaster']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->add(new \DateInterval('P3D')));
-        $this->PropriumDeTempore['ThuOctaveEaster']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->add(new \DateInterval('P4D')));
-        $this->PropriumDeTempore['FriOctaveEaster']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->add(new \DateInterval('P5D')));
-        $this->PropriumDeTempore['SatOctaveEaster']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->add(new \DateInterval('P6D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('MonOctaveEaster');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('TueOctaveEaster');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('WedOctaveEaster');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('ThuOctaveEaster');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('FriOctaveEaster');
-        $this->createPropriumDeTemporeLiturgicalEventByKey('SatOctaveEaster');
-    }
-
-    /**
-     * Calculates the dates for Sacred Heart and Christ the King and creates the corresponding LiturgicalEvents in the calendar
-     *
-     * **General Norms for the Liturgical Year and the Calendar**
-     *
-     * I.
-     * 1. Easter Triduum of the Lord's Passion and Resurrection
-     * 2. Christmas, Epiphany, Ascension, and Pentecost
-     * 3. ***Solemnities of the Lord, of the Blessed Virgin Mary, and of saints listed in the General Calendar***
-     *
-     * @return void
-     */
-    private function calculateMobileSolemnitiesOfTheLord(): void
-    {
-        $this->PropriumDeTempore['SacredHeart']->setDate(Utilities::calcGregEaster($this->CalendarParams->Year)
-            ->add(new \DateInterval('P' . ( 7 * 9 + 5 ) . 'D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('SacredHeart');
-
-        //Christ the King is calculated backwards from the first sunday of advent
-        $this->PropriumDeTempore['ChristKing']->setDate(DateTime::fromFormat('25-12-' . $this->CalendarParams->Year)->modify('last Sunday')->sub(new \DateInterval('P' . ( 4 * 7 ) . 'D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('ChristKing');
     }
 
     /**
@@ -4158,17 +3870,24 @@ final class CalendarHandler extends AbstractHandler
 
         //I.
         //1. Easter Triduum of the Lord's Passion and Resurrection
-        $this->calculateEasterTriduum();
         //2. Christmas, Epiphany, Ascension, and Pentecost
-        $this->calculateChristmasEpiphany();
-        $this->calculateAscensionPentecost();
-        //Sundays of Advent, Lent, and Easter Time
-        $this->calculateSundaysMajorSeasons();
-        $this->calculateAshWednesday();
-        $this->calculateWeekdaysHolyWeek();
-        $this->calculateEasterOctave();
+        //   Sundays of Advent, Lent, and Easter Time
         //3. Solemnities of the Lord, of the Blessed Virgin Mary, and of saints listed in the General Calendar
-        $this->calculateMobileSolemnitiesOfTheLord();
+        //
+        // The contiguous Roman temporale block (Easter Triduum through the mobile
+        // Solemnities of the Lord) is delegated to the rite's temporale engine,
+        // obtained via the RiteProfile seam, which mutates the shared calendar
+        // and message sink through the context. Until a later plan parses the
+        // rite from the request path, this always resolves to Rite::default().
+        $riteProfile      = RiteProfileFactory::forRite(Rite::default());
+        $temporaleContext = new TemporaleContext(
+            $this->Cal,
+            $this->CalendarParams,
+            $this->PropriumDeTempore,
+            $this->localeDateFormatter,
+            $this->Messages
+        );
+        $riteProfile->temporaleEngine()->buildTemporale($temporaleContext);
 
         $this->loadPropriumDeSanctisData(RomanMissal::EDITIO_TYPICA_1970);
         $this->calculateFixedSolemnities(); //this will also handle All Souls Day
