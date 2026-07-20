@@ -6,7 +6,9 @@ namespace LiturgicalCalendar\Tests\Support;
 
 /**
  * Shared helpers for the Roman-calendar golden-master regression suite.
- * The MATRIX exercises: missal-edition year gates (2002/2008), the two
+ * The MATRIX straddles the missal-edition year gates (years on either
+ * side of 2002 and 2008, though missal edition affects the sanctorale,
+ * not the temporale this gate primarily protects), covers the two
  * national editions used by existing calendars, a diocesan overlay, and
  * the LITURGICAL year type — both implicitly (the API default) and via
  * the explicit `year_type=LITURGICAL` query parameter — which drives the
