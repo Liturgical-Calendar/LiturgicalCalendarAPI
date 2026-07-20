@@ -28,7 +28,7 @@ final class AmbrosianTemporale implements TemporaleEngine
         $this->calculateChristmasEpiphany($ctx);
         $this->calculateLent($ctx);
         $this->calculateEasterCycle($ctx);
-        // Task 8 appends: calculateAfterPentecostAnchors.
+        $this->calculateAfterPentecostAnchors($ctx);
     }
 
     /**
@@ -47,11 +47,10 @@ final class AmbrosianTemporale implements TemporaleEngine
     }
 
     /**
-     * Not yet called within this task's scope (Advent's Sunday anchors are
-     * produced directly via `modify('next Sunday')`); Tasks 5–8 reuse this for
-     * the Christmas/Epiphany "Second Sunday" style lookups, mirroring RomanTemporale.
+     * True if the given date falls on a Sunday. Used by
+     * `calculateAfterPentecostAnchors()` to guard the 3rd-Sunday-of-October
+     * computation for the Dedication of the Duomo di Milano.
      */
-    // @phpstan-ignore method.unused
     private static function dateIsSunday(DateTime $dt): bool
     {
         return (int) $dt->format('N') === 7;
@@ -162,5 +161,31 @@ final class AmbrosianTemporale implements TemporaleEngine
 
         $ctx->propriumDeTempore['Pentecost']->setDate(Utilities::calcGregEaster($year)->add(new \DateInterval('P49D')));
         $this->createPropriumDeTemporeLiturgicalEventByKey('Pentecost', $ctx);
+    }
+
+    /**
+     * After-Pentecost anchors: Dedication of the Duomo di Milano (3rd Sunday of
+     * October) and Christ the King (the Sunday before Advent I = the last Sunday
+     * after the Dedication). The after-Pentecost Sunday-numbering / sub-block fill
+     * is handler-level and deferred (see plan Global Constraints).
+     */
+    private function calculateAfterPentecostAnchors(TemporaleContext $ctx): void
+    {
+        $year = $ctx->params->Year;
+
+        // 3rd Sunday of October = 1st Sunday on/after Oct 1, plus 2 weeks.
+        $firstSundayOct = DateTime::fromFormat('1-10-' . $year);
+        if (false === self::dateIsSunday($firstSundayOct)) {
+            $firstSundayOct = $firstSundayOct->modify('next Sunday');
+        }
+        $dedication = ( clone $firstSundayOct )->add(new \DateInterval('P14D'));
+        $ctx->propriumDeTempore['DedicationDuomo']->setDate($dedication);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('DedicationDuomo', $ctx);
+
+        // Christ the King = the Sunday before Advent I (Advent I = Sunday after Nov 11).
+        $advent1    = DateTime::fromFormat('11-11-' . $year)->modify('next Sunday');
+        $christKing = ( clone $advent1 )->sub(new \DateInterval('P7D'));
+        $ctx->propriumDeTempore['ChristKing']->setDate($christKing);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('ChristKing', $ctx);
     }
 }

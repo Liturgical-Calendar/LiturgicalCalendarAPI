@@ -164,4 +164,29 @@ final class AmbrosianTemporaleTest extends TestCase
         $this->assertSame('2025-05-29', $d['Ascension']);
         $this->assertSame('2025-06-08', $d['Pentecost']);
     }
+
+    public function testAfterPentecostAnchors2025(): void
+    {
+        $d = $this->runEngine(2025);
+        $this->assertSame('2025-10-19', $d['DedicationDuomo']);
+        $this->assertSame('2025-11-09', $d['ChristKing']);
+    }
+
+    public function testAfterPentecostAnchors2024(): void
+    {
+        $d = $this->runEngine(2024);
+        $this->assertSame('2024-10-20', $d['DedicationDuomo']);
+        $this->assertSame('2024-11-10', $d['ChristKing']);
+    }
+
+    public function testChristKingIsSundayBeforeAdvent1(): void
+    {
+        foreach ([2024, 2025] as $year) {
+            $d  = $this->runEngine($year);
+            $ck = new \DateTimeImmutable($d['ChristKing']);
+            $a1 = new \DateTimeImmutable($d['Advent1']);
+            $this->assertSame(7, (int) $ck->format('N'), "Christ the King must be a Sunday ($year)");
+            $this->assertSame($a1->modify('-7 days')->format('Y-m-d'), $d['ChristKing']);
+        }
+    }
 }
