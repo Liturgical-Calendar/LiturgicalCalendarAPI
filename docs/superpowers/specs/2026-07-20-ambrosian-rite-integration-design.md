@@ -150,6 +150,31 @@ A new **`AmbrosianMissal` enum** (`src/Enum/AmbrosianMissal.php`), sibling to `R
 enumerates the editions: **`EDITIO_1976`, `EDITIO_2024`**. (The 2008 reform is handled by
 year-gating + engine branch, not as a third edition — §6.)
 
+### Rite-conditional request parameters
+
+Several existing request parameters / settings are Roman-specific movable-feast toggles that
+have **no effect under the Ambrosian rite**, because the Ambrosian norms fix those days:
+
+- **`epiphany`** (`JAN6` vs `SUNDAY_JAN2_JAN8`) — Ambrosian fixes Epiphany to **Jan 6** (n. 34).
+- **`ascension`** (`THURSDAY` vs `SUNDAY`) — Ambrosian fixes Ascension to the **40th day /
+  Thursday** (n. 22).
+- **`corpus_christi`** (`THURSDAY` vs `SUNDAY`) — Ambrosian has its own rite-fixed placement.
+- **`eternal_high_priest`** and the **`holydays_of_obligation`** map — Roman-national settings;
+  Ambrosian has its own *solennità di precetto*, so these do not apply.
+
+**Behaviour under the Ambrosian rite (to implement when rite routing lands):** these
+parameters are **ignored** — the `AmbrosianRiteProfile` supplies the rite-fixed values, and the
+response `settings` echoes those fixed values regardless of what the client sent (rather than
+erroring, to keep clients that send Roman defaults working). The `return_type` parameter is
+unaffected (it is calendar-endpoint-wide, not rite-specific).
+
+**OpenAPI contract obligation:** `jsondata/schemas/openapi.json` currently documents
+`EpiphanyParam` / `AscensionParam` / `CorpusChristiParam` in purely Roman terms and has **no
+notion of rite**. When the rite routing + validation work lands, the contract must document that
+these parameters are inert under the Ambrosian rite (and that `settings` will reflect the
+rite-fixed values). This documentation is **owned by the rite-routing work, not this temporal
+engine design** — captured here so it is not lost.
+
 ## 4. The `AmbrosianTemporale` engine
 
 `AmbrosianTemporale implements TemporaleEngine`. It computes the temporal cycle from
