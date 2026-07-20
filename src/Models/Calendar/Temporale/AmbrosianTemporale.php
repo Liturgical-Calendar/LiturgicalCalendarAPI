@@ -24,7 +24,8 @@ final class AmbrosianTemporale implements TemporaleEngine
     public function buildTemporale(TemporaleContext $ctx): void
     {
         $this->calculateAdvent($ctx);
-        // Tasks 5-8 append: calculateChristmasEpiphany, calculateLent, calculateEasterCycle, calculateAfterPentecostAnchors.
+        $this->calculateChristmasEpiphany($ctx);
+        // Tasks 6-8 append: calculateLent, calculateEasterCycle, calculateAfterPentecostAnchors.
     }
 
     /**
@@ -68,5 +69,28 @@ final class AmbrosianTemporale implements TemporaleEngine
             $ctx->propriumDeTempore[$key]->setDate($date);
             $this->createPropriumDeTemporeLiturgicalEventByKey($key, $ctx);
         }
+    }
+
+    /**
+     * Christmas (Dec 25), Circoncisione (Jan 1, octave day), Epiphany (fixed Jan 6),
+     * and Baptism of the Lord (Sunday after Jan 6). Ambrosian Epiphany has no
+     * date-option logic; the Dec 26–28 vigil shift is deferred (spec §4).
+     */
+    private function calculateChristmasEpiphany(TemporaleContext $ctx): void
+    {
+        $year = $ctx->params->Year;
+
+        $ctx->propriumDeTempore['Christmas']->setDate(DateTime::fromFormat('25-12-' . $year));
+        $this->createPropriumDeTemporeLiturgicalEventByKey('Christmas', $ctx);
+
+        $ctx->propriumDeTempore['Circoncisione']->setDate(DateTime::fromFormat('1-1-' . $year));
+        $this->createPropriumDeTemporeLiturgicalEventByKey('Circoncisione', $ctx);
+
+        $epiphany = DateTime::fromFormat('6-1-' . $year);
+        $ctx->propriumDeTempore['Epiphany']->setDate($epiphany);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('Epiphany', $ctx);
+
+        $ctx->propriumDeTempore['BaptismLord']->setDate(( clone $epiphany )->modify('next Sunday'));
+        $this->createPropriumDeTemporeLiturgicalEventByKey('BaptismLord', $ctx);
     }
 }
