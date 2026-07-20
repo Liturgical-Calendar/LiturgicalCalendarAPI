@@ -8,9 +8,11 @@ use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\CorpusChristi;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Api\Models\Calendar\Rite\AmbrosianRiteProfile;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 use LiturgicalCalendar\Api\Utilities;
@@ -44,6 +46,7 @@ class CalendarParams implements ParamsInterface
     public ?ReturnTypeParam $ReturnType   = null;
     public ?string $NationalCalendar      = null;
     public ?string $DiocesanCalendar      = null;
+    public Rite $Rite                     = Rite::ROMAN;
     private ?MetadataCalendars $calendars = null;
 
     public Epiphany $Epiphany           = Epiphany::JAN6;
@@ -109,6 +112,9 @@ class CalendarParams implements ParamsInterface
     //  public const YEAR_LOWER_LIMIT          = 1583;
     // For now we'll just deal with the Liturgical Calendar from the Editio Typica 1970
     public const YEAR_LOWER_LIMIT = 1970;
+
+    // The Ambrosian rite is only available from 1976 onward (the first reformed Ambrosian Missal).
+    public const AMBROSIAN_YEAR_LOWER_LIMIT = 1976;
 
     //The upper limit is determined by the limit of PHP in dealing with DateTime objects
     public const YEAR_UPPER_LIMIT = 9999;
@@ -630,6 +636,55 @@ class CalendarParams implements ParamsInterface
             if (count($params)) {
                 $this->setParams($params);
             }
+        }
+    }
+
+    /**
+     * Sets the liturgical rite for which the calendar should be calculated.
+     *
+     * @param Rite $rite the liturgical rite (ROMAN or AMBROSIAN)
+     */
+    public function setRite(Rite $rite): void
+    {
+        $this->Rite = $rite;
+    }
+
+    /**
+     * Cross-field validation of the rite against the requested calendar and year.
+     * Roman accepts every calendar shape and the full year range. The Ambrosian
+     * rite has no national layer, is restricted to its whitelisted dioceses (plus
+     * the comune ambrosiano when no diocese is given), and starts at 1976 (the
+     * first reformed Ambrosian Missal). Throws ValidationException (HTTP 400) on
+     * mismatch. Must be called after the rite, calendar, and year are all set.
+     *
+     * @throws ValidationException
+     */
+    public function validateRiteCompatibility(): void
+    {
+        if ($this->Rite === Rite::ROMAN) {
+            return;
+        }
+
+        if ($this->NationalCalendar !== null) {
+            throw new ValidationException(
+                'The Ambrosian rite has no national calendars; request the comune ambrosiano (`/calendar/ambrosian`) or one of its dioceses.'
+            );
+        }
+
+        if ($this->DiocesanCalendar !== null && !in_array($this->DiocesanCalendar, AmbrosianRiteProfile::SUPPORTED_DIOCESES, true)) {
+            throw new ValidationException(sprintf(
+                'Diocesan calendar `%s` does not support the Ambrosian rite. Ambrosian dioceses are: %s',
+                $this->DiocesanCalendar,
+                implode(', ', AmbrosianRiteProfile::SUPPORTED_DIOCESES)
+            ));
+        }
+
+        if ($this->Year < self::AMBROSIAN_YEAR_LOWER_LIMIT) {
+            throw new ValidationException(sprintf(
+                'The Ambrosian rite is only available from %d onward (the first reformed Ambrosian Missal); requested year %d.',
+                self::AMBROSIAN_YEAR_LOWER_LIMIT,
+                $this->Year
+            ));
         }
     }
 }

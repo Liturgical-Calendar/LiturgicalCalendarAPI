@@ -12,7 +12,7 @@ final class RiteProfileFactory
     {
         return match ($rite) {
             Rite::ROMAN     => new RomanRiteProfile(),
-            Rite::AMBROSIAN => throw new \InvalidArgumentException('Ambrosian rite not yet wired'),
+            Rite::AMBROSIAN => new AmbrosianRiteProfile(),
         };
     }
 }

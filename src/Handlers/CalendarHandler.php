@@ -26,6 +26,7 @@ use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
+use LiturgicalCalendar\Api\Http\Exception\ImplementationException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Exception\YamlException;
@@ -108,6 +109,7 @@ final class CalendarHandler extends AbstractHandler
     private array $allowedReturnTypes = [];
     private static CatholicDiocesesMap $worldDiocesesLatinRite; // can only be set once, after which it will be read-only
     private CalendarParams $CalendarParams;
+    private Rite $rite = Rite::ROMAN;
     private \NumberFormatter $formatter;
     private \NumberFormatter $formatterFem;
     private \IntlDateFormatter $dayOfTheWeek;
@@ -311,9 +313,10 @@ final class CalendarHandler extends AbstractHandler
     /**
      * @param string[] $requestPathParams
      */
-    public function __construct(array $requestPathParams = [])
+    public function __construct(array $requestPathParams = [], Rite $rite = Rite::ROMAN)
     {
         parent::__construct($requestPathParams);
+        $this->rite      = $rite;
         $this->startTime = hrtime(true);
     }
 
@@ -3877,9 +3880,10 @@ final class CalendarHandler extends AbstractHandler
         // The contiguous Roman temporale block (Easter Triduum through the mobile
         // Solemnities of the Lord) is delegated to the rite's temporale engine,
         // obtained via the RiteProfile seam, which mutates the shared calendar
-        // and message sink through the context. Until a later plan parses the
-        // rite from the request path, this always resolves to Rite::default().
-        $riteProfile      = RiteProfileFactory::forRite(Rite::default());
+        // and message sink through the context. This is only ever reached for
+        // Rite::ROMAN today: an Ambrosian request short-circuits with a 501
+        // earlier in handle() (Plans 3-5 will implement the Ambrosian engine).
+        $riteProfile      = RiteProfileFactory::forRite($this->CalendarParams->Rite);
         $temporaleContext = new TemporaleContext(
             $this->Cal,
             $this->CalendarParams,
@@ -4995,6 +4999,7 @@ final class CalendarHandler extends AbstractHandler
 
         $this->CalendarParams = new CalendarParams();
         $this->CalendarParams->setAllowedReturnTypes($this->allowedReturnTypes);
+        $this->CalendarParams->setRite($this->rite);
         $this->CalendarParams->setParams($params);
         if ($this->CalendarParams->ReturnType !== null) {
             $responseContentType = $this->CalendarParams->ReturnType->toResponseContentType();
@@ -5007,8 +5012,15 @@ final class CalendarHandler extends AbstractHandler
         // If a national calendar or diocesan calendar is requested, these will override
         //   most of the other parameters (taken care of by the updateSettingsBasedOn[National|Diocesan]Calendar methods)
         $this->CalendarParams->initParamsFromRequestPath($this->requestPathParams);
+        $this->CalendarParams->validateRiteCompatibility();
 
         $this->validateRequestMethod($request);
+
+        if ($this->CalendarParams->Rite === Rite::AMBROSIAN) {
+            throw new ImplementationException(
+                'The Ambrosian rite is planned but not yet available; only the Roman rite is currently implemented.'
+            );
+        }
 
         $this->loadDiocesanCalendarData();
         $this->loadNationalCalendarData();

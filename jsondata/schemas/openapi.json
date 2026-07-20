@@ -11,7 +11,7 @@
     }
   ],
   "info": {
-    "description": "An API which allows to retrieve data about the **Roman Calendar** for any given year, between 1970 and 9999. The data strives for historical accuracy (memorials and feast days are only generated from the year in which they were effectively introduced). The data is based on original sources (Roman Missals, Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments, Mysterii Paschalis, etc.), not on data copied or retrieved from online sources which may not be accurate. The API offers multiple locales and multiple calendars, from the **General Roman Calendar** to national or diocesan calendars.",
+    "description": "An API which allows to retrieve data about the **Roman Calendar** for any given year, between 1970 and 9999. The data strives for historical accuracy (memorials and feast days are only generated from the year in which they were effectively introduced). The data is based on original sources (Roman Missals, Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments, Mysterii Paschalis, etc.), not on data copied or retrieved from online sources which may not be accurate. The API offers multiple locales and multiple calendars, from the **General Roman Calendar** to national or diocesan calendars. The Roman rite is the default and may also be requested explicitly with a `/calendar/roman` prefix (equivalent to no prefix); a `/calendar/ambrosian` prefix selects the Ambrosian rite (currently returns `501 Not Implemented` — see the `/calendar/ambrosian` paths).",
     "version": "5.7",
     "title": "Liturgical Calendar",
     "contact": {
@@ -909,6 +909,512 @@
           },
           "304": {
             "description": "Not Modified: client should use cached results seeing that the response has not changed"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        }
+      }
+    },
+    "/calendar/ambrosian": {
+      "get": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "[Planned] Retrieve liturgical events for the Ambrosian calendar for each day of the current year (currently returns 501 Not Implemented)",
+        "operationId": "retrieveAmbrosianCalendarGET",
+        "description": "Planned; currently returns 501 Not Implemented. Once implemented, this endpoint will retrieve liturgical events for the Ambrosian rite for each day of the current year. There is no national layer for the Ambrosian rite. The epiphany, ascension, and corpus_christi query parameters are accepted for consistency with the Roman rite endpoints but are IGNORED under the Ambrosian rite: Epiphany is fixed to January 6th, Ascension to the 40th day after Easter (Thursday), and Corpus Christi to its rite-fixed placement.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          },
+          {
+            "$ref": "#/components/parameters/YearTypeParam"
+          },
+          {
+            "$ref": "#/components/parameters/EpiphanyParam"
+          },
+          {
+            "$ref": "#/components/parameters/AscensionParam"
+          },
+          {
+            "$ref": "#/components/parameters/CorpusChristiParam"
+          },
+          {
+            "$ref": "#/components/parameters/EternalHighPriestParam"
+          }
+        ],
+        "responses": {
+          "501": {
+            "$ref": "#/components/responses/NotImplemented501"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "[Planned] Retrieve liturgical events for the Ambrosian calendar for each day of the current year (currently returns 501 Not Implemented)",
+        "operationId": "retrieveAmbrosianCalendarPOST",
+        "description": "Planned; currently returns 501 Not Implemented. Once implemented, this endpoint will retrieve liturgical events for the Ambrosian rite for each day of the current year. There is no national layer for the Ambrosian rite. The epiphany, ascension, and corpus_christi request body parameters are accepted for consistency with the Roman rite endpoints but are IGNORED under the Ambrosian rite: Epiphany is fixed to January 6th, Ascension to the 40th day after Easter (Thursday), and Corpus Christi to its rite-fixed placement.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "501": {
+            "$ref": "#/components/responses/NotImplemented501"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        }
+      }
+    },
+    "/calendar/ambrosian/{year}": {
+      "get": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "[Planned] Retrieve liturgical events from the Ambrosian calendar for each day of the given year (currently returns 501 Not Implemented)",
+        "operationId": "retrieveAmbrosianCalendarForYearGET",
+        "description": "Planned; currently returns 501 Not Implemented. Once implemented, this endpoint will retrieve liturgical events for the Ambrosian rite for each day of the given year. There is no national layer for the Ambrosian rite. The epiphany, ascension, and corpus_christi query parameters are accepted for consistency with the Roman rite endpoints but are IGNORED under the Ambrosian rite: Epiphany is fixed to January 6th, Ascension to the 40th day after Easter (Thursday), and Corpus Christi to its rite-fixed placement. The Ambrosian rite is available only from 1976 onward (the first reformed Ambrosian Missal); earlier years return 400 Bad Request.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          },
+          {
+            "$ref": "#/components/parameters/YearPathParam"
+          },
+          {
+            "$ref": "#/components/parameters/YearTypeParam"
+          },
+          {
+            "$ref": "#/components/parameters/EpiphanyParam"
+          },
+          {
+            "$ref": "#/components/parameters/AscensionParam"
+          },
+          {
+            "$ref": "#/components/parameters/CorpusChristiParam"
+          },
+          {
+            "$ref": "#/components/parameters/EternalHighPriestParam"
+          }
+        ],
+        "responses": {
+          "501": {
+            "$ref": "#/components/responses/NotImplemented501"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "[Planned] Retrieve liturgical events from the Ambrosian calendar for each day of the given year (currently returns 501 Not Implemented)",
+        "operationId": "retrieveAmbrosianCalendarForYearPOST",
+        "description": "Planned; currently returns 501 Not Implemented. Once implemented, this endpoint will retrieve liturgical events for the Ambrosian rite for each day of the given year. There is no national layer for the Ambrosian rite. The epiphany, ascension, and corpus_christi request body parameters are accepted for consistency with the Roman rite endpoints but are IGNORED under the Ambrosian rite: Epiphany is fixed to January 6th, Ascension to the 40th day after Easter (Thursday), and Corpus Christi to its rite-fixed placement. The Ambrosian rite is available only from 1976 onward (the first reformed Ambrosian Missal); earlier years return 400 Bad Request.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          },
+          {
+            "in": "path",
+            "name": "year",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1970,
+              "maximum": 9999
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "501": {
+            "$ref": "#/components/responses/NotImplemented501"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        }
+      }
+    },
+    "/calendar/ambrosian/diocese/{calendar_id}": {
+      "get": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "[Planned] Retrieve liturgical events from the Ambrosian calendar for a given diocese for each day of the current year (currently returns 501 Not Implemented)",
+        "operationId": "retrieveAmbrosianDiocesanCalendarGET",
+        "description": "Planned; currently returns 501 Not Implemented. Once implemented, this endpoint will retrieve liturgical events for a given diocese under the Ambrosian rite for each day of the current year. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          },
+          {
+            "$ref": "#/components/parameters/DiocesanCalendarIdPathParam"
+          },
+          {
+            "$ref": "#/components/parameters/YearTypeParam"
+          }
+        ],
+        "responses": {
+          "501": {
+            "$ref": "#/components/responses/NotImplemented501"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "[Planned] Retrieve liturgical events from the Ambrosian calendar for a given diocese for each day of the current year (currently returns 501 Not Implemented)",
+        "operationId": "retrieveAmbrosianDiocesanCalendarPOST",
+        "description": "Planned; currently returns 501 Not Implemented. Once implemented, this endpoint will retrieve liturgical events for a given diocese under the Ambrosian rite for each day of the current year. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          },
+          {
+            "in": "path",
+            "name": "calendar_id",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/CivilOrLiturgicalYear"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CivilOrLiturgicalYear"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "501": {
+            "$ref": "#/components/responses/NotImplemented501"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        }
+      }
+    },
+    "/calendar/ambrosian/diocese/{calendar_id}/{year}": {
+      "get": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "[Planned] Retrieve liturgical events from the Ambrosian calendar for a given diocese for each day of a given year (currently returns 501 Not Implemented)",
+        "operationId": "retrieveAmbrosianDiocesanCalendarForYearGET",
+        "description": "Planned; currently returns 501 Not Implemented. Once implemented, this endpoint will retrieve liturgical events for a given diocese under the Ambrosian rite for each day of a given year. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request. The Ambrosian rite is available only from 1976 onward (the first reformed Ambrosian Missal); earlier years return 400 Bad Request.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          },
+          {
+            "$ref": "#/components/parameters/DiocesanCalendarIdPathParam"
+          },
+          {
+            "$ref": "#/components/parameters/YearPathParam"
+          },
+          {
+            "$ref": "#/components/parameters/YearTypeParam"
+          }
+        ],
+        "responses": {
+          "501": {
+            "$ref": "#/components/responses/NotImplemented501"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "[Planned] Retrieve liturgical events from the Ambrosian calendar for a given diocese for each day of a given year (currently returns 501 Not Implemented)",
+        "operationId": "retrieveAmbrosianDiocesanCalendarForYearPOST",
+        "description": "Planned; currently returns 501 Not Implemented. Once implemented, this endpoint will retrieve liturgical events for a given diocese under the Ambrosian rite for each day of a given year. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request. The Ambrosian rite is available only from 1976 onward (the first reformed Ambrosian Missal); earlier years return 400 Bad Request.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          },
+          {
+            "in": "path",
+            "name": "calendar_id",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          },
+          {
+            "in": "path",
+            "name": "year",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1970,
+              "maximum": 9999
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/CivilOrLiturgicalYear"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CivilOrLiturgicalYear"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "501": {
+            "$ref": "#/components/responses/NotImplemented501"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
@@ -9497,6 +10003,22 @@
               "status": 429,
               "detail": "Too many login attempts. Please try again later.",
               "retryAfter": 847
+            }
+          }
+        }
+      },
+      "NotImplemented501": {
+        "description": "501 Not Implemented. The request was valid and routable, but the requested calendar computation has not yet been implemented on the server.",
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "./Problem.json"
+            },
+            "example": {
+              "type": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/501",
+              "title": "Not Implemented",
+              "status": 501,
+              "detail": "This calendar computation has not yet been implemented"
             }
           }
         }

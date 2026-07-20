@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Models\Calendar\Rite;
 
 use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Models\Calendar\Rite\AmbrosianRiteProfile;
 use LiturgicalCalendar\Api\Models\Calendar\Rite\RiteProfileFactory;
 use LiturgicalCalendar\Api\Models\Calendar\Rite\RomanRiteProfile;
 use LiturgicalCalendar\Api\Models\Calendar\Temporale\RomanTemporale;
@@ -20,9 +21,10 @@ final class RiteProfileFactoryTest extends TestCase
         self::assertInstanceOf(RomanTemporale::class, $profile->temporaleEngine());
     }
 
-    public function testAmbrosianNotYetWired(): void
+    public function testAmbrosianProfileIsReturned(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        RiteProfileFactory::forRite(Rite::AMBROSIAN);
+        $profile = RiteProfileFactory::forRite(Rite::AMBROSIAN);
+        self::assertInstanceOf(AmbrosianRiteProfile::class, $profile);
+        self::assertSame(Rite::AMBROSIAN, $profile->rite());
     }
 }
