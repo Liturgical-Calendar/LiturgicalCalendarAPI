@@ -318,6 +318,9 @@ proper (B. Manfredo Settala) live in their diocesan files.
   `AmbrosianTemporale` engine **branches its season logic at year 2008** (§4), and
   individual sanctorale events carry **`since_year` / `until_year`** (the historical-fidelity
   mechanism the Roman calendars already use). **Effective floor for the rite = 1976.**
+- **Below the floor:** a request for an Ambrosian calendar in a year `< 1976` returns an
+  **explicit error** (`400 Bad Request` with a clear message), never a clamp or fallback —
+  consistent with historical fidelity. The Roman 1970 floor is unaffected.
 
 ### Locales
 
@@ -356,12 +359,23 @@ Mapped to the repo's test layering (`ApiTestCase` / `AbstractHandlerTestCase` / 
      `/calendar/ambrosian` → 200, no segment → Roman.
 3. **Handler tests** (`AbstractHandlerTestCase`, in-process): `/calendar/ambrosian[...]`
    response shape, expected seasons present, `supported_rites` in `/calendars` metadata.
-4. **Ordo validation — the acceptance gate.** Generated Ambrosian calendars validated
-   against a **published authoritative Ambrosian ordo** (chiesadimilano.it / diocesan
-   liturgical calendar) for a span of years — recent plus a couple historical (post-1976,
-   post-2008). This is where every "deferred to ordo-validation" edge case from §4 and §5
-   gets pinned. Where no machine-readable ordo exists, spot-check specific known dates.
-   Multi-year iterations tagged `@group slow`.
+4. **Ordo validation — the acceptance gate (scoped to the 2024 edition).** No printed
+   Ambrosian ordo is available. Validation is done by **spot-checking against the
+   chiesadimilano.it daily-liturgy widget**, which covers only the **new (2024-edition)**
+   liturgy from Advent 2024 onward. The gate therefore validates the **2024-edition engine
+   output for the two liturgical years the site covers**: **Year C (2024–2025)** and
+   **Year A (2025–2026)**. Spot-check the deferred edge cases from §4 and §5 (season
+   boundaries, Advent I, Dedication of the Duomo, Christ the King, the after-Pentecost
+   sub-blocks, transfers) against known dates on the site. Reference examples:
+   - a daily entry: `chiesadimilano.it/almanacco/letture-rito-ambrosiano/anno-a-2025-2026-ra/…`
+     (e.g. "Lunedì della settimana della VIII domenica dopo Pentecoste");
+   - the earliest available day: I domenica di Avvento, Year C 2024–2025
+     (`…/anno-c-2024-2025-la/i-domenica-di-avvento-…`).
+
+   **The pre-2024 editions (1976 / 2008) are implemented for historical fidelity but are
+   NOT validated in this pass** — they have no spot-check source and are explicitly left as
+   **needing further quality checks** (a known limitation, tracked in §9). Multi-year
+   iterations tagged `@group slow`.
 5. **Schema validation** — new/extended schemas Health-wired; Ambrosian source data added
    to the `SchemaValidationTest` corpus (`@group slow`).
 6. **Integration/route tests** (`ApiTestCase`): a few end-to-end `/calendar/ambrosian/...`
@@ -398,15 +412,16 @@ Mapped to the repo's test layering (`ApiTestCase` / `AbstractHandlerTestCase` / 
 - **Extraction risk.** Refactoring the ~5,400-line `CalendarHandler` behind interfaces is
   the highest-risk change. Mitigated by the golden-master lock (§7.1) and the existing
   Roman suite.
-- **Ordo availability.** The acceptance gate depends on a published Ambrosian ordo to
-  validate against; if no machine-readable source exists, validation falls back to
-  date-by-date spot checks, which is slower and less exhaustive.
+- **Validation coverage is limited to the 2024 edition (decided).** No printed ordo exists;
+  the only spot-check source is the chiesadimilano.it daily widget, which carries only the
+  new (2024) liturgy from Advent 2024. So only Year C (2024–2025) and Year A (2025–2026) of
+  the **2024-edition** output are validated (§7.4). The **1976 / 2008 editions are
+  implemented but unvalidated** — a known limitation left as needing further quality checks.
 - **Data volume & correctness.** Hand-authoring the full comune ambrosiano sanctorale plus
   four diocesan propers across two editions is substantial and error-prone; proofing against
   the printed Missal calendar is required.
-- **1970–1975 requests.** Below the 1976 floor the Ambrosian rite has no reformed calendar.
-  Decision to confirm during data authoring: hard error vs. clamp/fallback. Recommended:
-  explicit error, consistent with historical fidelity.
+- **Below-1976 requests (decided).** An Ambrosian calendar requested for a year `< 1976`
+  returns an **explicit error** (§6), never a clamp/fallback.
 - **`EventsHandler` scope.** The `/events` catalogue is rite-sensitive (it lists a rite's
   possible events). Wiring it for Ambrosian is in scope structurally but its data depth
   follows the sanctorale authoring.
