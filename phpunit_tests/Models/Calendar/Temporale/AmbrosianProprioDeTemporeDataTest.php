@@ -45,10 +45,21 @@ final class AmbrosianProprioDeTemporeDataTest extends TestCase
         $raw = Utilities::jsonFileToObjectArray(JsonData::AMBROSIAN_TEMPORALE_FILE->path());
         $it  = $this->loadNames('it');
         $la  = $this->loadNames('la');
+
+        $dataKeys = [];
         foreach ($raw as $event) {
-            $key = $event->event_key;
+            $key        = $event->event_key;
+            $dataKeys[] = $key;
             $this->assertArrayHasKey($key, $it, "it.json missing name for $key");
             $this->assertArrayHasKey($key, $la, "la.json missing name for $key");
         }
+
+        // Reverse direction: an i18n key with no corresponding data-file entry
+        // is an orphan (e.g. a stale/renamed key) and must fail loudly rather
+        // than silently going unused.
+        $itOrphans = array_diff(array_keys($it), $dataKeys);
+        $laOrphans = array_diff(array_keys($la), $dataKeys);
+        $this->assertSame([], array_values($itOrphans), 'it.json has orphan keys not present in the data file: ' . implode(', ', $itOrphans));
+        $this->assertSame([], array_values($laOrphans), 'la.json has orphan keys not present in the data file: ' . implode(', ', $laOrphans));
     }
 }

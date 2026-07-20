@@ -57,6 +57,16 @@ final class AmbrosianTemporale implements TemporaleEngine
     }
 
     /**
+     * Advent I anchor: the Sunday strictly after Nov 11 (St Martin).
+     * Single source of truth so calculateAdvent() and the Christ-the-King
+     * anchor cannot drift when the deferred Nov-11-on-Sunday edge is implemented.
+     */
+    private function adventOne(int $year): DateTime
+    {
+        return DateTime::fromFormat('11-11-' . $year)->modify('next Sunday');
+    }
+
+    /**
      * Advent — 6 Sundays. Advent I = the Sunday strictly after Nov 11 (St Martin);
      * Advent II–VI follow at weekly intervals. Advent VI = "dell'Incarnazione /
      * della Divina Maternità". The Nov-11-on-Sunday edge is deferred (spec §4).
@@ -64,7 +74,7 @@ final class AmbrosianTemporale implements TemporaleEngine
     private function calculateAdvent(TemporaleContext $ctx): void
     {
         $year    = $ctx->params->Year;
-        $advent1 = DateTime::fromFormat('11-11-' . $year)->modify('next Sunday');
+        $advent1 = $this->adventOne($year);
         for ($i = 1; $i <= 6; $i++) {
             $key  = 'Advent' . $i;
             $date = ( clone $advent1 )->add(new \DateInterval('P' . ( ( $i - 1 ) * 7 ) . 'D'));
@@ -183,7 +193,7 @@ final class AmbrosianTemporale implements TemporaleEngine
         $this->createPropriumDeTemporeLiturgicalEventByKey('DedicationDuomo', $ctx);
 
         // Christ the King = the Sunday before Advent I (Advent I = Sunday after Nov 11).
-        $advent1    = DateTime::fromFormat('11-11-' . $year)->modify('next Sunday');
+        $advent1    = $this->adventOne($year);
         $christKing = ( clone $advent1 )->sub(new \DateInterval('P7D'));
         $ctx->propriumDeTempore['ChristKing']->setDate($christKing);
         $this->createPropriumDeTemporeLiturgicalEventByKey('ChristKing', $ctx);

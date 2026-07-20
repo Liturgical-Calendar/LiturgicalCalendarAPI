@@ -56,6 +56,11 @@ final class AmbrosianTemporaleOrdoValidationTest extends TestCase
             'Ascension'       => '2025-05-29',
             'Pentecost'       => '2025-06-08',
         ],
+        // REGRESSION PIN (engine-derived, not an external ordo cross-check):
+        // chiesadimilano.it does not cover Advent 2026, so these values were
+        // computed from the engine's own rules rather than spot-checked
+        // against a printed/published ordo like the 2024/2025 rows above.
+        // This guards against accidental drift, not against a wrong rule.
         2026 => [
             'Advent1'         => '2026-11-15',
             'DedicationDuomo' => '2026-10-18',
