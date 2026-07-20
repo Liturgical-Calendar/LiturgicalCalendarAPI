@@ -10,6 +10,11 @@
       <directory suffix="Test.php">phpunit_tests</directory>
     </testsuite>
   </testsuites>
+  <groups>
+    <exclude>
+      <group>golden-master-generate</group>
+    </exclude>
+  </groups>
   <source>
     <include>
       <directory>src</directory>

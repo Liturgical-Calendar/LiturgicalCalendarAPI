@@ -99,12 +99,26 @@ final class GoldenMaster
 
     /**
      * Strip fields that vary between otherwise-identical runs (timestamps,
-     * the running API version, the echoed request headers, and each
-     * event's process-lifetime `event_idx`, a static counter in
+     * the running API version, the echoed request headers, each event's
+     * process-lifetime `event_idx` — a static counter in
      * {@see \LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent} that
-     * increments across every calendar computed in the same PHP process —
-     * its value depends on test execution order, not on calendar content)
-     * so only deterministic calendar content remains.
+     * increments across every calendar computed in the same PHP process, so
+     * its value depends on test execution order, not on calendar content —
+     * and each event's `readings`) so only deterministic calendar content
+     * remains.
+     *
+     * `readings` is excluded because it derives from
+     * `LiturgicalEventCollection::$lectionary`, a STATIC property that
+     * accumulates across handler invocations within one PHP process: a
+     * weekday event's `readings` come out empty when this generator runs in
+     * isolation but populated when it runs after another test that already
+     * loaded the lectionary. That makes `readings` order-dependent, not
+     * calendar-dependent. The temporale/rite refactor this gate protects
+     * never touches reading-lookup logic, so dropping `readings` from the
+     * comparison keeps the gate deterministic without weakening its actual
+     * purpose. The gate still covers `event_key`, `date`, `grade`, `color`,
+     * `liturgical_season`, `psalter_week`, the precedence buckets in
+     * `metadata`, and `messages`.
      *
      * @param array<string,mixed> $decoded
      * @return array<string,mixed>
@@ -122,7 +136,7 @@ final class GoldenMaster
         if (isset($decoded['litcal']) && is_array($decoded['litcal'])) {
             foreach ($decoded['litcal'] as &$event) {
                 if (is_array($event)) {
-                    unset($event['event_idx']);
+                    unset($event['event_idx'], $event['readings']);
                 }
             }
             unset($event);
