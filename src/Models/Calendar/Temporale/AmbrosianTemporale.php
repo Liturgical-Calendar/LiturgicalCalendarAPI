@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Api\Models\Calendar\Temporale;
 use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
+use LiturgicalCalendar\Api\Utilities;
 
 /**
  * Ambrosian-rite temporale engine (2024 edition, major mobile-anchor block).
@@ -25,7 +26,8 @@ final class AmbrosianTemporale implements TemporaleEngine
     {
         $this->calculateAdvent($ctx);
         $this->calculateChristmasEpiphany($ctx);
-        // Tasks 6-8 append: calculateLent, calculateEasterCycle, calculateAfterPentecostAnchors.
+        $this->calculateLent($ctx);
+        // Tasks 7-8 append: calculateEasterCycle, calculateAfterPentecostAnchors.
     }
 
     /**
@@ -92,5 +94,34 @@ final class AmbrosianTemporale implements TemporaleEngine
 
         $ctx->propriumDeTempore['BaptismLord']->setDate(( clone $epiphany )->modify('next Sunday'));
         $this->createPropriumDeTemporeLiturgicalEventByKey('BaptismLord', $ctx);
+    }
+
+    /**
+     * Lent — begins on a Sunday (Lent I = Easter − 42d); NO Ash Wednesday. Ashes
+     * are imposed the Monday after Lent I. Lent II–V are the named Sundays
+     * (Samaritana / Abramo / Cieco / Lazzaro, naming from data). Palm Sunday =
+     * Easter − 7d; Sabato "in traditione symboli" = the Saturday before it
+     * (Easter − 8d). Aliturgical Lenten Fridays are weekday-fill (deferred).
+     */
+    private function calculateLent(TemporaleContext $ctx): void
+    {
+        $year = $ctx->params->Year;
+
+        $lent1 = Utilities::calcGregEaster($year)->sub(new \DateInterval('P' . ( 6 * 7 ) . 'D'));
+        for ($i = 1; $i <= 5; $i++) {
+            $key  = 'Lent' . $i;
+            $date = ( clone $lent1 )->add(new \DateInterval('P' . ( ( $i - 1 ) * 7 ) . 'D'));
+            $ctx->propriumDeTempore[$key]->setDate($date);
+            $this->createPropriumDeTemporeLiturgicalEventByKey($key, $ctx);
+        }
+
+        $ctx->propriumDeTempore['AshesMonday']->setDate(( clone $lent1 )->add(new \DateInterval('P1D')));
+        $this->createPropriumDeTemporeLiturgicalEventByKey('AshesMonday', $ctx);
+
+        $ctx->propriumDeTempore['PalmSun']->setDate(Utilities::calcGregEaster($year)->sub(new \DateInterval('P7D')));
+        $this->createPropriumDeTemporeLiturgicalEventByKey('PalmSun', $ctx);
+
+        $ctx->propriumDeTempore['SabatoTradSymb']->setDate(Utilities::calcGregEaster($year)->sub(new \DateInterval('P8D')));
+        $this->createPropriumDeTemporeLiturgicalEventByKey('SabatoTradSymb', $ctx);
     }
 }
