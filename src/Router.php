@@ -104,6 +104,34 @@ class Router
     }
 
     /**
+     * Determines the liturgical rite from an optional leading rite segment on the
+     * calendar route, stripping that segment from the request-path parts when present.
+     *
+     * Only the calendar route (`calendar`, or the empty root route) carries a rite
+     * segment. A leading segment whose value is a valid {@see Rite} case (`roman`,
+     * `ambrosian`) selects that rite and is removed from `$requestPathParts` so the
+     * remaining 0/1/2/3-part shape parsing runs identically to an un-prefixed request;
+     * `/calendar` and `/calendar/roman` are therefore equivalent, symmetric with
+     * `/calendar/ambrosian`. Absence of a rite segment defaults to Roman. No nation or
+     * diocese identifier collides with a rite value, so this is unambiguous.
+     *
+     * @param string       $route            the first path segment (the endpoint), already shifted off
+     * @param list<string> $requestPathParts the remaining path segments; the rite segment is removed in place when present
+     */
+    public static function extractRiteSegment(string $route, array &$requestPathParts): Rite
+    {
+        if ($route === 'calendar' || $route === '') {
+            $maybeRite = Rite::tryFrom((string) ( $requestPathParts[0] ?? '' ));
+            if ($maybeRite !== null) {
+                array_shift($requestPathParts);
+                return $maybeRite;
+            }
+        }
+
+        return Rite::default();
+    }
+
+    /**
      * Route the incoming HTTP request to the appropriate API endpoint, execute the configured middleware pipeline, and emit the HTTP response.
      *
      * The method selects and configures a per-endpoint request handler based on the request path, applies middlewares (including error handling, logging, and conditional JWT authentication for protected data modification routes), runs the pipeline, appends the X-Request-Id header to the final response, and terminates execution by emitting the response.
@@ -120,15 +148,10 @@ class Router
         $requestPathParts = explode('/', $pathParams);
         $route            = array_shift($requestPathParts);
 
-        // An optional leading 'ambrosian' segment on the calendar route selects the
-        // Ambrosian rite; strip it so the existing 0/1/2/3-part shape parsing below
-        // runs unchanged on the remainder (e.g. /calendar/ambrosian/diocese/milano_it
-        // -> ['diocese', 'milano_it'], same shape as a Roman diocesan request).
-        $rite = Rite::default();
-        if (( $route === 'calendar' || $route === '' ) && ( $requestPathParts[0] ?? null ) === 'ambrosian') {
-            $rite = Rite::AMBROSIAN;
-            array_shift($requestPathParts);
-        }
+        // An optional leading rite segment on the calendar route selects the rite;
+        // it is stripped so the existing 0/1/2/3-part shape parsing below runs
+        // unchanged on the remainder (see extractRiteSegment()).
+        $rite = self::extractRiteSegment($route, $requestPathParts);
 
         // Parse allowed origins from environment (comma-separated list, or '*' for all)
         // This is used for both handler-level CORS and error response CORS
