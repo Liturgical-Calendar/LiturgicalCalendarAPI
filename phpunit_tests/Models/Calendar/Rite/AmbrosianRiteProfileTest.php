@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Tests\Models\Calendar\Rite;
 
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Models\Calendar\Rite\AmbrosianRiteProfile;
+use LiturgicalCalendar\Api\Models\Calendar\Temporale\AmbrosianTemporale;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -25,9 +26,9 @@ final class AmbrosianRiteProfileTest extends TestCase
         );
     }
 
-    public function testTemporaleEngineIsNotYetImplemented(): void
+    public function testTemporaleEngineReturnsAmbrosianTemporale(): void
     {
-        $this->expectException(\LogicException::class);
-        ( new AmbrosianRiteProfile() )->temporaleEngine();
+        $profile = new AmbrosianRiteProfile();
+        $this->assertInstanceOf(AmbrosianTemporale::class, $profile->temporaleEngine());
     }
 }
