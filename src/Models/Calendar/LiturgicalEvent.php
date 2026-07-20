@@ -223,7 +223,7 @@ final class LiturgicalEvent implements \JsonSerializable
      *      event_idx: int,
      *      name: string,
      *      date: string,
-     *      color: array<'green'|'rose'|'purple'|'red'|'white'>,
+     *      color: array<'green'|'rose'|'purple'|'red'|'white'|'morello'|'black'>,
      *      color_lcl: string[],
      *      type: 'fixed'|'mobile',
      *      grade: -1|0|1|2|3|4|5|6|7,

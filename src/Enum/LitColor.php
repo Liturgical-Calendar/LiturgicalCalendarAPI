@@ -6,11 +6,13 @@ enum LitColor: string
 {
     use EnumToArrayTrait;
 
-    case GREEN  = 'green';
-    case PURPLE = 'purple';
-    case WHITE  = 'white';
-    case RED    = 'red';
-    case ROSE   = 'rose';
+    case GREEN   = 'green';
+    case PURPLE  = 'purple';
+    case WHITE   = 'white';
+    case RED     = 'red';
+    case ROSE    = 'rose';
+    case MORELLO = 'morello';
+    case BLACK   = 'black';
 
     /**
      * Translates a liturgical color to the specified locale.
@@ -35,7 +37,11 @@ enum LitColor: string
             /**translators: context = liturgical color */
             LitColor::RED    => ( $isLatin ? 'ruber'   : _('red') ),
             /**translators: context = liturgical color */
-            LitColor::ROSE   => ( $isLatin ? 'rosea'   : _('rose') )
+            LitColor::ROSE   => ( $isLatin ? 'rosea'   : _('rose') ),
+            /**translators: context = liturgical color (Ambrosian "morello"/violet) */
+            LitColor::MORELLO => ( $isLatin ? 'violaceus' : _('violaceo') ),
+            /**translators: context = liturgical color */
+            LitColor::BLACK   => ( $isLatin ? 'niger'     : _('black') ),
         };
     }
 }
