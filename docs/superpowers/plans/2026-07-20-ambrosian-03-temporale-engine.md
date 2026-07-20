@@ -1471,3 +1471,47 @@ are consistent between the skeleton (Task 4) and the tasks that add them. Event 
 exactly match the keys each engine task dates. Test helper (`buildContext`/`runEngine`) defined once and
 reused. Collection accessor names flagged for implementer verification (`addLiturgicalEvent` confirmed from
 `RomanTemporale`; read-side accessors to confirm). ✓
+
+## Ordo-validation findings (Task 10)
+
+Automated gate: `AmbrosianTemporaleOrdoValidationTest::testAnchorsAcrossValidatedYears` (`@group slow`) pins
+the engine's anchor block for civil years 2024, 2025, and 2026, and is green. The harness (`buildContext()` /
+`runEngine()`) was extracted from `AmbrosianTemporaleTest` into `AmbrosianTemporaleHarnessTrait` and is now
+`use`d by both test classes; the full 11-test `AmbrosianTemporaleTest` suite still passes unchanged after the
+extraction.
+
+2026 anchors were not given by the brief as pre-verified and were re-derived independently (native-PHP
+`DateTimeImmutable`, mirroring the engine's own rules) before being committed: `Advent1` `2026-11-15`,
+`DedicationDuomo` `2026-10-18`, `ChristKing` `2026-11-08` — all three matched the brief's stated values
+exactly, so no correction was needed.
+
+Manual spot-check against chiesadimilano.it (best-effort, web access was available this run):
+
+- **I Domenica di Avvento, Year C 2024-25 (civil 2024):** site = 17 Novembre 2024; engine `Advent1` =
+  2024-11-17. Match.
+- **I Domenica di Avvento, Year A 2025-26 (civil 2025):** site = 16 Novembre 2025; engine `Advent1` =
+  2025-11-16. Match.
+- **Dedicazione del Duomo, Year C 2024-25 (civil 2025):** site = 19 Ottobre 2025; engine `DedicationDuomo` =
+  2025-10-19. Match.
+- **Cristo Re, Year C 2024-25 (civil 2025):** site = 9 Novembre 2025; engine `ChristKing` = 2025-11-09. Match.
+- **After-Pentecost bound check, Year A 2025-26 (civil 2026):** site's "Lunedì della settimana della VIII
+  Domenica dopo Pentecoste" = 20 Luglio 2026; engine `Pentecost` 2026-05-24 through `DedicationDuomo`
+  2026-10-18 brackets that date correctly (exact numbering fill itself is deferred, not asserted).
+
+Pages checked via site search (`chiesadimilano.it/almanacco/letture-rito-ambrosiano/...`); URLs recorded in
+the Task 10 report. All four exact-date spot-checks matched the engine with no discrepancy. The bound check
+confirms the after-Pentecost sub-block sits between `Pentecost` and `DedicationDuomo` as expected, without
+asserting exact Sunday numbering (deferred, per Global Constraints).
+
+Not spot-checked: `DedicationDuomo`/`ChristKing` for civil year 2024 (Oct/Nov 2024) fall in liturgical Year B
+2023-2024, which predates the chiesadimilano.it 2024-edition widget's Advent-2024 start — outside this task's
+validation basis (spec §7.4). Those two civil-2024 anchors remain covered only by the deterministic
+per-season unit tests from Task 8, which already assert them.
+
+**Follow-ups logged (deferred areas only, no anchor-block discrepancies found):**
+
+- After-Pentecost / after-Epiphany exact Sunday numbering and weekday fill — still deferred per Global
+  Constraints; the site's "VIII Domenica dopo Pentecoste" naming for 2026-07-20 was used only as a bound
+  check, not asserted as an exact ordinal.
+- Dec 26–28 vigil shifts and the Nov-11-on-Sunday Advent edge — not exercised by 2024/2025/2026 (Nov 11 never
+  fell on a Sunday in those years), remain deferred as before.
