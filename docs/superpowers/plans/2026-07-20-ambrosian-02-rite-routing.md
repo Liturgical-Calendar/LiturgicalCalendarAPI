@@ -23,8 +23,12 @@ lint:openapi`), phpcs (PSR-12 + custom ruleset), PHPStan level 10, CaptainHook g
   on branch `feature/ambrosian-rite-routing` (based on `development`, which already contains Plan 1). **Verify with
   `git rev-parse --show-toplevel` before each task's first command** — it MUST print that worktree path, never
   `/home/johnrdorazio/development/LiturgicalCalendar/LiturgicalCalendarAPI` (the shared main checkout is off-limits).
-- **`vendor/` is a symlink in the worktree** (already created + git-excluded). `vendor/bin/phpunit`,
-  `vendor/bin/phpcs`, `composer analyse` work. Never `git add` the `vendor` symlink; always stage explicit paths.
+- **`vendor/` is a real, worktree-local install** (git-excluded via the worktree's `.git/info/exclude`).
+  `vendor/bin/phpunit`, `vendor/bin/phpcs`, `composer analyse` operate on the worktree's own `src/`. Do NOT
+  replace it with a symlink to the main checkout's `vendor/` — a symlinked vendor makes Composer's autoload
+  `$baseDir` resolve (through the symlink) to the MAIN checkout's `src/`, so `vendor/bin/phpunit` silently tests
+  the wrong code (worktree-only classes come back "not found"). If `vendor/` is missing or a symlink, fix it with
+  `rm -f vendor && composer install --no-interaction` from the worktree. Never `git add` vendor; stage explicit paths.
 - **`.env.local` must exist** for in-process handler tests to run rather than skip: if `vendor/bin/phpunit
   phpunit_tests/Handlers/...` reports the target as skipped, run `cp .env.example .env.local` (gitignored) once, then
   re-run. A "Skipped" target is NOT a pass — report real tallies.
