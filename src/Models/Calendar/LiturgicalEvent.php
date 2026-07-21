@@ -49,6 +49,7 @@ final class LiturgicalEvent implements \JsonSerializable
     public ?bool $is_vigil_mass          = null;
     public ?bool $has_vigil_mass         = null;
     public ?bool $is_dominical           = null;
+    public ?bool $is_proper              = null;
     public ?bool $has_vesper_i           = null;
     public ?bool $has_vesper_ii          = null;
     public ?string $is_vigil_for         = null;
@@ -211,6 +212,8 @@ final class LiturgicalEvent implements \JsonSerializable
      * - liturgical_year: the liturgical year of the liturgical event, if applicable
      * - is_vigil_mass: a boolean indicating whether the liturgical event is a vigil mass, if applicable
      * - is_dominical: a boolean indicating whether the liturgical event is "of the Lord" (dominical), if applicable
+     * - is_proper: a boolean indicating whether the liturgical event is proper to a particular calendar
+     *   (as opposed to "comune", i.e. taken from the General Calendar), if applicable
      * - is_vigil_for: the liturgical event that the current liturgical event is a vigil for, if applicable
      * - has_vigil_mass: a boolean indicating whether the liturgical event has a vigil mass, if applicable
      * - has_vesper_i: a boolean indicating whether the liturgical event has a first vespers, if applicable
@@ -245,6 +248,7 @@ final class LiturgicalEvent implements \JsonSerializable
      *      liturgical_year?: ?string,
      *      is_vigil_mass?: ?bool,
      *      is_dominical?: ?bool,
+     *      is_proper?: ?bool,
      *      is_vigil_for?: ?string,
      *      has_vigil_mass?: ?bool,
      *      has_vesper_i?: ?bool,
@@ -307,6 +311,10 @@ final class LiturgicalEvent implements \JsonSerializable
 
         if ($this->is_dominical !== null) {
             $returnArr['is_dominical'] = $this->is_dominical;
+        }
+
+        if ($this->is_proper !== null) {
+            $returnArr['is_proper'] = $this->is_proper;
         }
 
         if ($this->is_vigil_for !== null) {
