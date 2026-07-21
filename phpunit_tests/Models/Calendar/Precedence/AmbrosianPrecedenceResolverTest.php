@@ -346,4 +346,299 @@ final class AmbrosianPrecedenceResolverTest extends TestCase
         self::assertStringContainsString('SomeLordFeast', $messages[0]);
         self::assertStringContainsString('omitted', $messages[0]);
     }
+
+    /**
+     * Baseline/regression check (no new logic exercised): a Lenten ferie
+     * (rank 7) contested by an ordinary comune memorial (rank 10) already
+     * wins the rank comparison in `resolve()`'s sort, so the ferie is the
+     * WINNER here, not the loser -- the memorial is suppressed via the plain
+     * fallback. Included because the task brief's Step 1 explicitly calls
+     * for this assertion alongside the two new-logic scenarios below.
+     */
+    public function testLentenFerieContestedByOrdinaryMemorialIsNotSuppressed(): void
+    {
+        $messages = [];
+        $ctx      = $this->buildContext(2025, $messages);
+
+        $ferie = $this->makeEvent([
+            'key'    => 'LentFerieDay',
+            'date'   => '2025-03-11',
+            'grade'  => LitGrade::WEEKDAY,
+            'season' => LitSeason::LENT,
+        ]);
+
+        $memorial = $this->makeEvent([
+            'key'    => 'SomeSaintMemorial',
+            'date'   => '2025-03-11',
+            'grade'  => LitGrade::MEMORIAL,
+            'proper' => false,
+        ]);
+
+        $ctx->cal->addLiturgicalEvent('LentFerieDay', $ferie);
+        $ctx->cal->addLiturgicalEvent('SomeSaintMemorial', $memorial);
+
+        ( new AmbrosianPrecedenceResolver() )->resolve($ctx);
+
+        self::assertFalse($ctx->cal->isSuppressed('LentFerieDay'));
+        self::assertNotNull($ctx->cal->getLiturgicalEvent('LentFerieDay'));
+
+        self::assertTrue($ctx->cal->isSuppressed('SomeSaintMemorial'));
+        self::assertNull($ctx->cal->getLiturgicalEvent('SomeSaintMemorial'));
+    }
+
+    /**
+     * The actual new behaviour (norm 4): a Lenten ferie contested by a
+     * comune saint Solemnity (rank 5, NOT the Annunciation or St Joseph)
+     * naturally loses the rank comparison in `resolve()`'s sort (5 < 7), so
+     * the ferie is handed to `resolveLoser()` as the LOSER. Per norm 4, a
+     * Lenten ferie yields only to the Annunciation/St Joseph, so it must
+     * NOT be suppressed here.
+     */
+    public function testLentenFerieIsProtectedAgainstNonPrivilegedSolemnity(): void
+    {
+        $messages = [];
+        $ctx      = $this->buildContext(2025, $messages);
+
+        $ferie = $this->makeEvent([
+            'key'    => 'LentFerieDay',
+            'date'   => '2025-03-11',
+            'grade'  => LitGrade::WEEKDAY,
+            'season' => LitSeason::LENT,
+        ]);
+
+        $solemnity = $this->makeEvent([
+            'key'       => 'SomeSaintSolemnity',
+            'date'      => '2025-03-11',
+            'grade'     => LitGrade::SOLEMNITY,
+            'dominical' => false,
+            'proper'    => false,
+        ]);
+
+        $ctx->cal->addLiturgicalEvent('LentFerieDay', $ferie);
+        $ctx->cal->addLiturgicalEvent('SomeSaintSolemnity', $solemnity);
+
+        ( new AmbrosianPrecedenceResolver() )->resolve($ctx);
+
+        // The ferie is NOT suppressed: it retains its precedence (norm 4 protection).
+        self::assertFalse($ctx->cal->isSuppressed('LentFerieDay'));
+        $ferieAfter = $ctx->cal->getLiturgicalEvent('LentFerieDay');
+        self::assertNotNull($ferieAfter);
+        self::assertSame('2025-03-11', $ferieAfter->date->format('Y-m-d'));
+
+        // The solemnity is untouched (this resolver makes no claim about
+        // repositioning the winner in this artificial coincidence).
+        self::assertNotNull($ctx->cal->getLiturgicalEvent('SomeSaintSolemnity'));
+
+        self::assertCount(1, $messages);
+        self::assertStringContainsString('LentFerieDay', $messages[0]);
+    }
+
+    /**
+     * The other half of norm 4: a Lenten ferie DOES yield when the winner is
+     * specifically the Annunciation (or St Joseph) solemnity.
+     */
+    public function testLentenFerieYieldsToAnnunciationSolemnity(): void
+    {
+        $messages = [];
+        $ctx      = $this->buildContext(2025, $messages);
+
+        $ferie = $this->makeEvent([
+            'key'    => 'LentFerieDay',
+            'date'   => '2025-03-11',
+            'grade'  => LitGrade::WEEKDAY,
+            'season' => LitSeason::LENT,
+        ]);
+
+        $annunciation = $this->makeEvent([
+            'key'       => 'Annunciation',
+            'date'      => '2025-03-11',
+            'grade'     => LitGrade::SOLEMNITY,
+            'dominical' => false,
+            'proper'    => false,
+        ]);
+
+        $ctx->cal->addLiturgicalEvent('LentFerieDay', $ferie);
+        $ctx->cal->addLiturgicalEvent('Annunciation', $annunciation);
+
+        ( new AmbrosianPrecedenceResolver() )->resolve($ctx);
+
+        // This date (2025-03-11) is outside the settimana autentica/Sabato in
+        // traditione symboli window, so the Annunciation itself is untouched...
+        $winner = $ctx->cal->getLiturgicalEvent('Annunciation');
+        self::assertNotNull($winner);
+        self::assertSame('2025-03-11', $winner->date->format('Y-m-d'));
+
+        // ...but the ferie yields (per norm 4) and is suppressed.
+        self::assertTrue($ctx->cal->isSuppressed('LentFerieDay'));
+        self::assertNull($ctx->cal->getLiturgicalEvent('LentFerieDay'));
+    }
+
+    /**
+     * Verified anchor dates (see task report for the PHP snippet that
+     * confirmed these): Easter 2025 = 2025-04-20; settimana autentica
+     * (Holy Week Mon-Thu) = 2025-04-14 .. 2025-04-17; SatOctaveEaster =
+     * 2025-04-26; Monday after the octave (Easter+8) = 2025-04-28.
+     *
+     * The Annunciation, placed on 2025-04-15 (Tuesday of Holy Week,
+     * contested by the 'TueHolyWeek' settimana-autentica ferie, rank 2),
+     * must transfer to the Monday after the Easter octave, 2025-04-28.
+     */
+    public function testAnnunciationInSettimanaAutenticaTransfersToMondayAfterOctave(): void
+    {
+        $messages = [];
+        $ctx      = $this->buildContext(2025, $messages);
+
+        $holyWeekTuesday = $this->makeEvent([
+            'key'       => 'TueHolyWeek',
+            'date'      => '2025-04-15',
+            'grade'     => LitGrade::WEEKDAY,
+            'season'    => LitSeason::LENT,
+            'dominical' => false,
+        ]);
+
+        $annunciation = $this->makeEvent([
+            'key'       => 'Annunciation',
+            'date'      => '2025-04-15',
+            'grade'     => LitGrade::SOLEMNITY,
+            'dominical' => false,
+            'proper'    => false,
+        ]);
+
+        $ctx->cal->addLiturgicalEvent('TueHolyWeek', $holyWeekTuesday);
+        $ctx->cal->addLiturgicalEvent('Annunciation', $annunciation);
+
+        ( new AmbrosianPrecedenceResolver() )->resolve($ctx);
+
+        // The Holy Week ferie wins and stays put.
+        $winner = $ctx->cal->getLiturgicalEvent('TueHolyWeek');
+        self::assertNotNull($winner);
+        self::assertSame('2025-04-15', $winner->date->format('Y-m-d'));
+
+        // The Annunciation is NOT suppressed: it survives, transferred to the
+        // Monday after the Easter octave.
+        self::assertFalse($ctx->cal->isSuppressed('Annunciation'));
+        $moved = $ctx->cal->getLiturgicalEvent('Annunciation');
+        self::assertNotNull($moved);
+        self::assertSame('2025-04-28', $moved->date->format('Y-m-d'));
+
+        self::assertCount(1, $messages);
+        self::assertStringContainsString('Annunciation', $messages[0]);
+        self::assertStringContainsString('2025-04-28', $messages[0]);
+    }
+
+    /**
+     * Same window, but St Joseph transfers to the TUESDAY after the octave
+     * (Easter+9 = 2025-04-29), not the Monday.
+     */
+    public function testStJosephInSettimanaAutenticaTransfersToTuesdayAfterOctave(): void
+    {
+        $messages = [];
+        $ctx      = $this->buildContext(2025, $messages);
+
+        $holyWeekWednesday = $this->makeEvent([
+            'key'       => 'WedHolyWeek',
+            'date'      => '2025-04-16',
+            'grade'     => LitGrade::WEEKDAY,
+            'season'    => LitSeason::LENT,
+            'dominical' => false,
+        ]);
+
+        $stJoseph = $this->makeEvent([
+            'key'       => 'StJoseph',
+            'date'      => '2025-04-16',
+            'grade'     => LitGrade::SOLEMNITY,
+            'dominical' => false,
+            'proper'    => false,
+        ]);
+
+        $ctx->cal->addLiturgicalEvent('WedHolyWeek', $holyWeekWednesday);
+        $ctx->cal->addLiturgicalEvent('StJoseph', $stJoseph);
+
+        ( new AmbrosianPrecedenceResolver() )->resolve($ctx);
+
+        self::assertFalse($ctx->cal->isSuppressed('StJoseph'));
+        $moved = $ctx->cal->getLiturgicalEvent('StJoseph');
+        self::assertNotNull($moved);
+        self::assertSame('2025-04-29', $moved->date->format('Y-m-d'));
+
+        self::assertCount(1, $messages);
+        self::assertStringContainsString('StJoseph', $messages[0]);
+        self::assertStringContainsString('2025-04-29', $messages[0]);
+    }
+
+    /**
+     * Generic n.56: a solemnity impeded by a higher-ranked day, with no
+     * specific rule above (not a privileged-Sunday case, not the
+     * Annunciation/St Joseph, not a Lenten ferie), transfers to the first
+     * subsequent day free of ranks 1-10. This constructs a short occupied
+     * run (day+1 and day+2 both occupied by rank <= 10 events) so the
+     * landing day is day+3.
+     */
+    public function testGenericSolemnityImpededTransfersToFirstFreeDay(): void
+    {
+        $messages = [];
+        $ctx      = $this->buildContext(2026, $messages);
+
+        // Rank 3: comune dominical solemnity/feast-of-the-Lord, outranks the rank-5 solemnity below.
+        $higherRankingDay = $this->makeEvent([
+            'key'       => 'SomeLordFeast',
+            'date'      => '2026-07-20',
+            'grade'     => LitGrade::HIGHER_SOLEMNITY,
+            'season'    => LitSeason::ORDINARY_TIME,
+            'dominical' => true,
+        ]);
+
+        // Rank 5: comune, non-dominical saint solemnity -- the impeded event.
+        $impededSolemnity = $this->makeEvent([
+            'key'       => 'SomeOtherSaintSolemnity',
+            'date'      => '2026-07-20',
+            'grade'     => LitGrade::SOLEMNITY,
+            'dominical' => false,
+            'proper'    => false,
+        ]);
+
+        // day+1: occupied by a rank <= 10 event (comune memorial, rank 10).
+        $occupant1 = $this->makeEvent([
+            'key'    => 'Occupant1',
+            'date'   => '2026-07-21',
+            'grade'  => LitGrade::MEMORIAL,
+            'proper' => false,
+        ]);
+
+        // day+2: occupied by a rank <= 10 event (comune feast, rank 8).
+        $occupant2 = $this->makeEvent([
+            'key'    => 'Occupant2',
+            'date'   => '2026-07-22',
+            'grade'  => LitGrade::FEAST,
+            'proper' => false,
+        ]);
+
+        // day+3 (2026-07-23) is left free -- no event added.
+
+        $ctx->cal->addLiturgicalEvent('SomeLordFeast', $higherRankingDay);
+        $ctx->cal->addLiturgicalEvent('SomeOtherSaintSolemnity', $impededSolemnity);
+        $ctx->cal->addLiturgicalEvent('Occupant1', $occupant1);
+        $ctx->cal->addLiturgicalEvent('Occupant2', $occupant2);
+
+        ( new AmbrosianPrecedenceResolver() )->resolve($ctx);
+
+        // The higher-ranking day wins and stays put.
+        $winner = $ctx->cal->getLiturgicalEvent('SomeLordFeast');
+        self::assertNotNull($winner);
+        self::assertSame('2026-07-20', $winner->date->format('Y-m-d'));
+
+        // The impeded solemnity is NOT suppressed: it lands on the first free day.
+        self::assertFalse($ctx->cal->isSuppressed('SomeOtherSaintSolemnity'));
+        $moved = $ctx->cal->getLiturgicalEvent('SomeOtherSaintSolemnity');
+        self::assertNotNull($moved);
+        self::assertSame('2026-07-23', $moved->date->format('Y-m-d'));
+
+        // The two occupying events are untouched.
+        self::assertNotNull($ctx->cal->getLiturgicalEvent('Occupant1'));
+        self::assertNotNull($ctx->cal->getLiturgicalEvent('Occupant2'));
+
+        self::assertCount(1, $messages);
+        self::assertStringContainsString('SomeOtherSaintSolemnity', $messages[0]);
+        self::assertStringContainsString('2026-07-23', $messages[0]);
+    }
 }
