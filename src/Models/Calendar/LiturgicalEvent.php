@@ -48,6 +48,8 @@ final class LiturgicalEvent implements \JsonSerializable
     public ?int $psalter_week            = null;
     public ?bool $is_vigil_mass          = null;
     public ?bool $has_vigil_mass         = null;
+    public ?bool $is_dominical           = null;
+    public ?bool $is_proper              = null;
     public ?bool $has_vesper_i           = null;
     public ?bool $has_vesper_ii          = null;
     public ?string $is_vigil_for         = null;
@@ -209,6 +211,9 @@ final class LiturgicalEvent implements \JsonSerializable
      * - readings: the lectionary readings associated with the liturgical event
      * - liturgical_year: the liturgical year of the liturgical event, if applicable
      * - is_vigil_mass: a boolean indicating whether the liturgical event is a vigil mass, if applicable
+     * - is_dominical: a boolean indicating whether the liturgical event is "of the Lord" (dominical), if applicable
+     * - is_proper: a boolean indicating whether the liturgical event is proper to a particular calendar
+     *   (as opposed to "comune", i.e. taken from the General Calendar), if applicable
      * - is_vigil_for: the liturgical event that the current liturgical event is a vigil for, if applicable
      * - has_vigil_mass: a boolean indicating whether the liturgical event has a vigil mass, if applicable
      * - has_vesper_i: a boolean indicating whether the liturgical event has a first vespers, if applicable
@@ -242,6 +247,8 @@ final class LiturgicalEvent implements \JsonSerializable
      *      day_of_the_week_long: string|false,
      *      liturgical_year?: ?string,
      *      is_vigil_mass?: ?bool,
+     *      is_dominical?: ?bool,
+     *      is_proper?: ?bool,
      *      is_vigil_for?: ?string,
      *      has_vigil_mass?: ?bool,
      *      has_vesper_i?: ?bool,
@@ -300,6 +307,14 @@ final class LiturgicalEvent implements \JsonSerializable
 
         if ($this->is_vigil_mass !== null) {
             $returnArr['is_vigil_mass'] = $this->is_vigil_mass;
+        }
+
+        if ($this->is_dominical !== null) {
+            $returnArr['is_dominical'] = $this->is_dominical;
+        }
+
+        if ($this->is_proper !== null) {
+            $returnArr['is_proper'] = $this->is_proper;
         }
 
         if ($this->is_vigil_for !== null) {
@@ -382,6 +397,8 @@ final class LiturgicalEvent implements \JsonSerializable
      * - type: The type of the liturgical event, as a LitEventType object or as a string.
      *   If not provided, defaults to LitEventType::FIXED.
      * - grade_display: The grade display of the liturgical event, as a string. If not provided, defaults to null.
+     * - is_dominical: whether the liturgical event is "of the Lord" (dominical), as a boolean, if the source object
+     *   declares the property (e.g. PropriumDeTemporeEvent). If not provided (property absent) or null, defaults to null.
      *
      * @param \stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile|DecreeItemCreateNewFixed|DecreeItemCreateNewMobile|PropriumDeTemporeEvent|PropriumDeSanctisEvent $obj
      * @return LiturgicalEvent A new LiturgicalEvent object.
@@ -531,7 +548,7 @@ final class LiturgicalEvent implements \JsonSerializable
             $grade_display = $obj->grade_display;
         }
 
-        return new self(
+        $litEvent = new self(
             $obj->name,
             $obj->date,
             $color,
@@ -540,6 +557,17 @@ final class LiturgicalEvent implements \JsonSerializable
             $commons,
             $grade_display
         );
+
+        // Carry over `is_dominical` from source data (e.g. PropriumDeTemporeEvent) when present and non-null.
+        // Most source types do not declare this property at all, so we guard with property_exists() first.
+        if (property_exists($obj, 'is_dominical') && null !== $obj->is_dominical) {
+            if (false === is_bool($obj->is_dominical)) {
+                throw new \Exception('Invalid object provided to create LiturgicalEvent: is_dominical is not a boolean or null');
+            }
+            $litEvent->is_dominical = $obj->is_dominical;
+        }
+
+        return $litEvent;
     }
 
 
