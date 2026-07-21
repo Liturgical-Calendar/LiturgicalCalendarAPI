@@ -19,7 +19,7 @@
     { "month": 1, "day": 28, "event_key": "StThomasAquinas", "grade": 3, "common": [ "Pastors:For One Pastor", "Doctors" ], "calendar": "AMBROSIAN", "color": [ "white" ] },
     { "month": 1, "day": 31, "event_key": "StJohnBosco", "grade": 3, "common": [ "Pastors:For One Pastor" ], "calendar": "AMBROSIAN", "color": [ "white" ] },
     { "month": 2, "day": 1, "event_key": "BlAndreaCarloFerrari", "grade": 3, "common": [ "Pastors:For a Bishop" ], "calendar": "AMBROSIAN", "color": [ "white" ] },
-    { "month": 2, "day": 2, "event_key": "PresentationOfTheLord", "grade": 4, "common": [ "Proper" ], "calendar": "AMBROSIAN", "color": [ "white" ], "is_dominical": true },
+    { "month": 2, "day": 2, "event_key": "PresentationOfTheLord", "grade": 5, "common": [ "Proper" ], "calendar": "AMBROSIAN", "color": [ "white" ], "is_dominical": true },
     { "month": 2, "day": 3, "event_key": "StBlaise", "grade": 2, "common": [ "Martyrs:For One Martyr", "Pastors:For a Bishop" ], "calendar": "AMBROSIAN", "color": [ "white", "red" ] },
     { "month": 2, "day": 3, "event_key": "StOscar", "grade": 2, "common": [ "Pastors:For a Bishop" ], "calendar": "AMBROSIAN", "color": [ "white" ] },
     { "month": 2, "day": 5, "event_key": "StAgatha", "grade": 3, "common": [ "Martyrs:For a Virgin Martyr", "Virgins:For One Virgin" ], "calendar": "AMBROSIAN", "color": [ "white", "red" ] },
@@ -85,7 +85,7 @@
     { "month": 5, "day": 27, "event_key": "StAugustineOfCanterbury", "grade": 2, "common": [ "Pastors:For a Bishop" ], "calendar": "AMBROSIAN", "color": [ "white" ] },
     { "month": 5, "day": 29, "event_key": "StsSisiniusMartiriusAlexanderVigilius", "grade": 3, "common": [ "Martyrs:For Several Martyrs", "Pastors:For a Bishop" ], "calendar": "AMBROSIAN", "color": [ "red" ] },
     { "month": 5, "day": 30, "event_key": "StPaulVIPope", "grade": 3, "common": [ "Pastors:For a Pope" ], "calendar": "AMBROSIAN", "color": [ "white" ] },
-    { "month": 5, "day": 31, "event_key": "VisitationBVM", "grade": 4, "common": [ "Blessed Virgin Mary" ], "calendar": "AMBROSIAN", "color": [ "white" ], "is_dominical": true },
+    { "month": 5, "day": 31, "event_key": "VisitationBVM", "grade": 5, "common": [ "Blessed Virgin Mary" ], "calendar": "AMBROSIAN", "color": [ "white" ], "is_dominical": true },
     { "month": 6, "day": 1, "event_key": "StJustinMartyr", "grade": 3, "common": [ "Martyrs:For One Martyr" ], "calendar": "AMBROSIAN", "color": [ "red" ] },
     { "month": 6, "day": 2, "event_key": "StsMarcellinusPeter", "grade": 2, "common": [ "Martyrs:For Several Martyrs" ], "calendar": "AMBROSIAN", "color": [ "red" ] },
     { "month": 6, "day": 3, "event_key": "StCharlesLwangaCompanions", "grade": 3, "common": [ "Martyrs:For Several Martyrs" ], "calendar": "AMBROSIAN", "color": [ "red" ] },
@@ -253,5 +253,4 @@
     { "month": 12, "day": 28, "event_key": "HolyInnocents", "grade": 4, "common": [ "Martyrs:For Several Martyrs" ], "calendar": "AMBROSIAN", "color": [ "red" ] },
     { "month": 12, "day": 29, "event_key": "StThomasBecket", "grade": 2, "common": [ "Martyrs:For One Martyr", "Pastors:For a Bishop" ], "calendar": "AMBROSIAN", "color": [ "white", "red" ] },
     { "month": 12, "day": 31, "event_key": "StSylvesterI", "grade": 2, "common": [ "Pastors:For a Pope" ], "calendar": "AMBROSIAN", "color": [ "white" ] }
-
 ]

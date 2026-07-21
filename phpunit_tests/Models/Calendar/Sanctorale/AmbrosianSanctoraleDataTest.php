@@ -89,7 +89,7 @@ final class AmbrosianSanctoraleDataTest extends TestCase
     {
         return [
             'BlAndreaCarloFerrari'                  => [3, null],
-            'PresentationOfTheLord'                 => [4, true],
+            'PresentationOfTheLord'                 => [5, true],
             'StBlaise'                              => [2, null],
             'StOscar'                               => [2, null],
             'StAgatha'                              => [3, null],
@@ -155,7 +155,7 @@ final class AmbrosianSanctoraleDataTest extends TestCase
             'StAugustineOfCanterbury'               => [2, null],
             'StsSisiniusMartiriusAlexanderVigilius' => [3, null],
             'StPaulVIPope'                          => [3, null],
-            'VisitationBVM'                         => [4, true],
+            'VisitationBVM'                         => [5, true],
             'StJustinMartyr'                        => [3, null],
             'StsMarcellinusPeter'                   => [2, null],
             'StCharlesLwangaCompanions'             => [3, null],
