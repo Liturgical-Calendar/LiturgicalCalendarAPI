@@ -446,6 +446,66 @@ final class AmbrosianPrecedenceResolverTest extends TestCase
     }
 
     /**
+     * The guard on the Lenten-ferie branch: `protectLentenFerie()` (which
+     * TRANSFERS the impeding winner off the protected day) must fire ONLY
+     * when the impeding winner is a solemnity. A NON-solemnity winner that
+     * outranks a Lenten ferie -- the shape a privileged Sunday of Lent or a
+     * fixed rank-2 day like SabatoTradSymb would take -- must NEVER be
+     * transferred (those days do not move); the ferie falls through to plain
+     * suppression instead, exactly as it did before Task 8.
+     *
+     * Constructed with a dominical Feast of the Lord (grade `FEAST_LORD`,
+     * rank 3) as the winner: it outranks the rank-7 Lenten ferie, but
+     * `isSolemnity()` is false for a `FEAST_LORD` grade, so the guard
+     * correctly excludes it from `protectLentenFerie()` and the ferie is
+     * suppressed rather than the winner transferred.
+     */
+    public function testLentenFerieAgainstNonSolemnityWinnerDoesNotTransferTheWinner(): void
+    {
+        $messages = [];
+        $ctx      = $this->buildContext(2025, $messages);
+
+        $ferie = $this->makeEvent([
+            'key'    => 'LentFerieDay',
+            'date'   => '2025-03-11',
+            'grade'  => LitGrade::WEEKDAY,
+            'season' => LitSeason::LENT,
+        ]);
+
+        // A dominical Feast of the Lord (rank 3): outranks the rank-7 ferie,
+        // but is NOT a solemnity -- so the `isSolemnity($winner)` guard keeps
+        // it out of protectLentenFerie(). It must not move.
+        $lordFeast = $this->makeEvent([
+            'key'       => 'SomeLordFeast',
+            'date'      => '2025-03-11',
+            'grade'     => LitGrade::FEAST_LORD,
+            'season'    => LitSeason::ORDINARY_TIME,
+            'dominical' => true,
+        ]);
+
+        $ctx->cal->addLiturgicalEvent('LentFerieDay', $ferie);
+        $ctx->cal->addLiturgicalEvent('SomeLordFeast', $lordFeast);
+
+        ( new AmbrosianPrecedenceResolver() )->resolve($ctx);
+
+        // The winner is a non-solemnity: it is NOT transferred, it stays put.
+        self::assertFalse($ctx->cal->isSuppressed('SomeLordFeast'));
+        $winnerAfter = $ctx->cal->getLiturgicalEvent('SomeLordFeast');
+        self::assertNotNull($winnerAfter);
+        self::assertSame('2025-03-11', $winnerAfter->date->format('Y-m-d'));
+
+        // The ferie falls through to plain suppression (pre-Task-8 behaviour
+        // for this sub-case) -- it is NOT protected here, because protection
+        // only applies against an impeding solemnity.
+        self::assertTrue($ctx->cal->isSuppressed('LentFerieDay'));
+        self::assertNull($ctx->cal->getLiturgicalEvent('LentFerieDay'));
+
+        self::assertCount(1, $messages);
+        self::assertStringContainsString('LentFerieDay', $messages[0]);
+        self::assertStringContainsString('suppressed', $messages[0]);
+    }
+
+    /**
      * The other half of norm 4: a Lenten ferie DOES yield when the winner is
      * specifically the Annunciation (or St Joseph) solemnity.
      */

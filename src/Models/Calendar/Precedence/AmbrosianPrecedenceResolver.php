@@ -180,12 +180,17 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
      *
      * Task 7 adds three more branches, evaluated in this order:
      *
-     * 1. A Lenten ferie loser is protected UNLESS the winner is specifically
-     *    the Annunciation or St Joseph (norm 4) -- checked first because it
-     *    is the most restrictive predicate (`$loser`'s grade/season) and
-     *    must win over the generic solemnity fallback below. Since Task 8,
-     *    "protected" means the IMPEDING WINNER is transferred away (the
-     *    ferie itself never moves) -- see {@see self::protectLentenFerie()}.
+     * 1. A Lenten ferie loser is protected when impeded by a SOLEMNITY that
+     *    is NOT the Annunciation or St Joseph (norm 4) -- checked first
+     *    because it is the most restrictive predicate (`$loser`'s
+     *    grade/season) and must win over the generic solemnity fallback
+     *    below. Since Task 8, "protected" means the IMPEDING WINNER is
+     *    transferred away (the ferie itself never moves) -- see
+     *    {@see self::protectLentenFerie()}. The `isSolemnity($winner)` guard
+     *    is deliberate: a non-solemnity winner (e.g. a privileged Sunday of
+     *    Lent, or a fixed rank-2 day like SabatoTradSymb) must never be
+     *    transferred, so it falls through to plain suppression of the ferie
+     *    instead.
      * 2. The Annunciation/St Joseph loser, when superseded specifically
      *    within the Sabato in traditione symboli/settimana autentica window,
      *    transfers to the fixed Monday/Tuesday-after-the-octave target. This
@@ -222,7 +227,23 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
             }
         }
 
-        if (self::isLentenFerie($loser) && false === self::isAnnunciationOrStJoseph($winner)) {
+        // The `isSolemnity($winner)` guard is load-bearing, NOT redundant: it
+        // ensures only an impeding SOLEMNITY is ever handed to
+        // protectLentenFerie() (which transfers the winner off the protected
+        // Lenten day via the n.56 walk). Without it, ANY non-Annunciation/St
+        // Joseph winner outranking a Lenten ferie -- including a privileged
+        // Sunday of Lent (rank 2/3) or a fixed rank-2 day like SabatoTradSymb
+        // -- would be transferred, and those must NEVER move. A non-solemnity
+        // winner that outranks a Lenten ferie instead falls through to plain
+        // suppression of the ferie below (the pre-Task-8 behaviour for that
+        // sub-case; unreachable today since the temporale emits no generic
+        // Lenten-ferie WEEKDAY events yet, but a landmine once Lenten ferial
+        // fill is wired in a later plan).
+        if (
+            self::isLentenFerie($loser)
+            && self::isSolemnity($winner)
+            && false === self::isAnnunciationOrStJoseph($winner)
+        ) {
             return $this->protectLentenFerie($winner, $loser, $ctx);
         }
 
