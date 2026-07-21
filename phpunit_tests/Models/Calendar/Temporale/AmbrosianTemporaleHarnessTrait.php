@@ -27,10 +27,26 @@ use LiturgicalCalendar\Api\Utilities;
  */
 trait AmbrosianTemporaleHarnessTrait
 {
+    private static string $originalPrimaryLanguage = '';
+    private static string $originalRuntimeLocale   = '';
+
     public static function setUpBeforeClass(): void
     {
         // JsonData::path() concatenates Router::$apiFilePath; populate it.
         Router::getApiPaths();
+
+        // Capture the global locale statics before buildContext() forces Italian,
+        // so tearDownAfterClass() can restore them and the mutation does not leak
+        // into other suites sharing the same process.
+        self::$originalPrimaryLanguage = LitLocale::$PRIMARY_LANGUAGE;
+        self::$originalRuntimeLocale   = LitLocale::$RUNTIME_LOCALE;
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        // Restore the global locale statics (runs even when a test fails).
+        LitLocale::$PRIMARY_LANGUAGE = self::$originalPrimaryLanguage;
+        LitLocale::$RUNTIME_LOCALE   = self::$originalRuntimeLocale;
     }
 
     /**
