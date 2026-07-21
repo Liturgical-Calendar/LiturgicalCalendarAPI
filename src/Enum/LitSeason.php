@@ -14,6 +14,19 @@ enum LitSeason: string
     case ORDINARY_TIME  = 'ORDINARY_TIME';
 
     /**
+     * Ambrosian rite only: Sundays and ferias between the Baptism of the Lord and the start of Lent.
+     * Distinguishes rank-4 "after Epiphany" Sundays from the rank-2 Advent/Lent/Easter Sundays.
+     */
+    case AFTER_EPIPHANY = 'AFTER_EPIPHANY';
+
+    /**
+     * Ambrosian rite only: Sundays and ferias between Pentecost and the start of Advent.
+     * Distinguishes rank-4 "after Pentecost" Sundays from the rank-2 Advent/Lent/Easter Sundays.
+     * Also covers dominical events proper to this period, e.g. `DedicationDuomo`.
+     */
+    case AFTER_PENTECOST = 'AFTER_PENTECOST';
+
+    /**
      * Patterns for detecting ADVENT events.
      */
     private const array ADVENT_PATTERNS = [
@@ -67,6 +80,23 @@ enum LitSeason: string
     ];
 
     /**
+     * Patterns for detecting AFTER_EPIPHANY events (Ambrosian rite only).
+     * These keys are distinct from the Roman `Epiphany`/`DayAfterEpiphany*` keys,
+     * which remain classified as CHRISTMAS.
+     */
+    private const array AFTER_EPIPHANY_PATTERNS = ['/^AfterEpiphany/'];
+
+    /**
+     * Patterns for detecting AFTER_PENTECOST events (Ambrosian rite only).
+     * `DedicationDuomo` (Dedication of the Cathedral of Milan) falls within this
+     * period even though it is a dominical solemnity in its own right.
+     */
+    private const array AFTER_PENTECOST_PATTERNS = [
+        '/^DedicationDuomo$/',
+        '/^AfterPentecost/',
+    ];
+
+    /**
      * Determine the liturgical season for a given temporale event key.
      *
      * @param string $eventKey The temporale event key.
@@ -99,6 +129,16 @@ enum LitSeason: string
                 return self::EASTER;
             }
         }
+        foreach (self::AFTER_EPIPHANY_PATTERNS as $pattern) {
+            if (preg_match($pattern, $eventKey)) {
+                return self::AFTER_EPIPHANY;
+            }
+        }
+        foreach (self::AFTER_PENTECOST_PATTERNS as $pattern) {
+            if (preg_match($pattern, $eventKey)) {
+                return self::AFTER_PENTECOST;
+            }
+        }
 
         // Default: Ordinary Time (includes OrdSunday*, OrdWeekday*, solemnities like Trinity, CorpusChristi, etc.)
         return self::ORDINARY_TIME;
@@ -125,7 +165,11 @@ enum LitSeason: string
             /**translators: context = liturgical season */
             LitSeason::EASTER         => $isLatin ? 'Tempus Paschale'     : _('Easter'),
             /**translators: context = liturgical season */
-            LitSeason::ORDINARY_TIME  => $isLatin ? 'Tempus per annum'    : _('Ordinary Time')
+            LitSeason::ORDINARY_TIME  => $isLatin ? 'Tempus per annum'    : _('Ordinary Time'),
+            /**translators: context = liturgical season (Ambrosian rite) */
+            LitSeason::AFTER_EPIPHANY  => $isLatin ? 'Tempus post Epiphaniam'  : _('After Epiphany'),
+            /**translators: context = liturgical season (Ambrosian rite) */
+            LitSeason::AFTER_PENTECOST => $isLatin ? 'Tempus post Pentecosten' : _('After Pentecost')
         };
     }
 }
