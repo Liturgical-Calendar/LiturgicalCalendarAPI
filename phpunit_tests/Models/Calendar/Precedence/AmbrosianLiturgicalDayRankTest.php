@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Models\Calendar\Precedence;
 
-use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitSeason;
-use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Models\Calendar\Precedence\AmbrosianLiturgicalDayRank;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -22,31 +20,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(AmbrosianLiturgicalDayRank::class)]
 final class AmbrosianLiturgicalDayRankTest extends TestCase
 {
-    /**
-     * @param array{
-     *     key?: string,
-     *     date?: string,
-     *     grade?: LitGrade,
-     *     season?: ?LitSeason,
-     *     dominical?: ?bool,
-     *     proper?: ?bool,
-     * } $opts
-     */
-    private function makeEvent(array $opts = []): LiturgicalEvent
-    {
-        $event = new LiturgicalEvent(
-            'Test Event',
-            new DateTime(( $opts['date'] ?? '2026-07-20' ) . 'T00:00:00+00:00'),
-            grade: $opts['grade'] ?? LitGrade::WEEKDAY
-        );
-
-        $event->event_key         = $opts['key'] ?? 'TestEvent';
-        $event->liturgical_season = array_key_exists('season', $opts) ? $opts['season'] : null;
-        $event->is_dominical      = array_key_exists('dominical', $opts) ? $opts['dominical'] : null;
-        $event->is_proper         = array_key_exists('proper', $opts) ? $opts['proper'] : null;
-
-        return $event;
-    }
+    use AmbrosianEventFactoryTrait;
 
     public function testRank1TriduumKey(): void
     {
