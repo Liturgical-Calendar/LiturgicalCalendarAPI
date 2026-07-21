@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Models\Calendar\Rite;
 
 use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Models\Calendar\Temporale\AmbrosianTemporale;
 use LiturgicalCalendar\Api\Models\Calendar\Temporale\TemporaleEngine;
 
 /**
- * Ambrosian rite profile. Plan 2 wires only the diocese whitelist and rite
- * identity; the temporale engine, precedence resolver, missal resolver, and
- * vocabularies arrive in later plans.
+ * Ambrosian rite profile. Plan 2 wired the diocese whitelist and rite
+ * identity; Plan 3 adds the temporale engine. The precedence resolver,
+ * missal resolver, and vocabularies arrive in later plans.
  */
 final class AmbrosianRiteProfile implements RiteProfile
 {
@@ -31,9 +32,6 @@ final class AmbrosianRiteProfile implements RiteProfile
 
     public function temporaleEngine(): TemporaleEngine
     {
-        // Unreachable in normal flow: CalendarHandler returns 501 for the
-        // Ambrosian rite before any temporale computation. Replaced by the
-        // real AmbrosianTemporale in Plan 3.
-        throw new \LogicException('The Ambrosian temporale engine is not yet implemented (Plan 3).');
+        return new AmbrosianTemporale();
     }
 }
