@@ -390,11 +390,17 @@ final class AmbrosianPrecedenceResolverTest extends TestCase
      * The actual new behaviour (norm 4): a Lenten ferie contested by a
      * comune saint Solemnity (rank 5, NOT the Annunciation or St Joseph)
      * naturally loses the rank comparison in `resolve()`'s sort (5 < 7), so
-     * the ferie is handed to `resolveLoser()` as the LOSER. Per norm 4, a
-     * Lenten ferie yields only to the Annunciation/St Joseph, so it must
-     * NOT be suppressed here.
+     * the ferie is handed to `resolveLoser()` as the LOSER (and the
+     * solemnity is `resolveLoser()`'s `$winner` argument). Per norm 4, a
+     * Lenten ferie yields only to the Annunciation/St Joseph -- Task 8
+     * (issue #727 item 1) closes what used to be a no-op here: the ferie
+     * itself is NOT suppressed and NOT moved, but the impeding solemnity
+     * (the `$winner`) is itself impeded by the protected ferie and is
+     * transferred away via the generic n.56 "first free day" walk, landing
+     * on the very next day since nothing else occupies this minimal
+     * fixture.
      */
-    public function testLentenFerieIsProtectedAgainstNonPrivilegedSolemnity(): void
+    public function testLentenFerieIsProtectedByTransferringImpedingSolemnityAway(): void
     {
         $messages = [];
         $ctx      = $this->buildContext(2025, $messages);
@@ -419,18 +425,24 @@ final class AmbrosianPrecedenceResolverTest extends TestCase
 
         ( new AmbrosianPrecedenceResolver() )->resolve($ctx);
 
-        // The ferie is NOT suppressed: it retains its precedence (norm 4 protection).
+        // The ferie is NOT suppressed and NOT moved: it retains its precedence
+        // and its date (norm 4 protection).
         self::assertFalse($ctx->cal->isSuppressed('LentFerieDay'));
         $ferieAfter = $ctx->cal->getLiturgicalEvent('LentFerieDay');
         self::assertNotNull($ferieAfter);
         self::assertSame('2025-03-11', $ferieAfter->date->format('Y-m-d'));
 
-        // The solemnity is untouched (this resolver makes no claim about
-        // repositioning the winner in this artificial coincidence).
-        self::assertNotNull($ctx->cal->getLiturgicalEvent('SomeSaintSolemnity'));
+        // The solemnity is NOT suppressed either: it survives, transferred off
+        // the protected Lenten day to the first subsequent free day.
+        self::assertFalse($ctx->cal->isSuppressed('SomeSaintSolemnity'));
+        $solemnityAfter = $ctx->cal->getLiturgicalEvent('SomeSaintSolemnity');
+        self::assertNotNull($solemnityAfter);
+        self::assertSame('2025-03-12', $solemnityAfter->date->format('Y-m-d'));
 
         self::assertCount(1, $messages);
         self::assertStringContainsString('LentFerieDay', $messages[0]);
+        self::assertStringContainsString('SomeSaintSolemnity', $messages[0]);
+        self::assertStringContainsString('2025-03-12', $messages[0]);
     }
 
     /**
@@ -640,5 +652,101 @@ final class AmbrosianPrecedenceResolverTest extends TestCase
         self::assertCount(1, $messages);
         self::assertStringContainsString('SomeOtherSaintSolemnity', $messages[0]);
         self::assertStringContainsString('2026-07-23', $messages[0]);
+    }
+
+    /**
+     * The iterative re-resolution pass (Task 8, issue #727 item 3): a
+     * transfer can land an event on a date that ALREADY holds another
+     * event that was uncontested (a single-event "group") when
+     * `resolveOnePass()` took its snapshot for this pass, so it was never
+     * revisited within that same pass. Only a second pass -- which
+     * rebuilds the date-group snapshot from scratch, reflecting the first
+     * pass's moves -- catches the fresh coincidence.
+     *
+     * Deliberately NOT built with a resident *solemnity* on the transfer's
+     * destination day: both existing single-pass checks already avoid
+     * landing on a solemnity in real time --
+     * `transferSaintSolemnity()`'s own `inSolemnities()` check, and this
+     * generic n.56 walk's `isFreeOfRanksOneThroughTen()` check (a
+     * solemnity is rank 5/6, which is NOT free of ranks 1-10, so the walk
+     * would already skip past it within a single pass). The genuine gap
+     * only appears when the destination's resident is BELOW the rank-10
+     * threshold (comune/proper memorial-tier or weekday) -- such a
+     * resident does not block the walk (rank > 10 is "free of ranks
+     * 1-10"), so the impeded solemnity lands right on top of it, and nobody
+     * revisits that now-contested date until the next pass. This is
+     * exactly the shape of the real cascade found in the 2025 assembled
+     * Ambrosian year (see `AmbrosianRealYearPrecedenceTest`): St Ambrose
+     * (Dec 7) impeded by Advent IV walks through the occupied Dec 8
+     * (Immaculate Conception, a solemnity -- skipped) onto Dec 9, which
+     * already held St Juan Diego (an optional memorial) -- unresolved
+     * after a single pass, resolved after the second.
+     */
+    public function testGenericTransferOntoOccupiedDayIsReResolvedByIterativePass(): void
+    {
+        $messages = [];
+        $ctx      = $this->buildContext(2026, $messages);
+
+        // Rank 3: comune dominical solemnity/feast-of-the-Lord, outranks the rank-5 solemnity below.
+        $higherRankingDay = $this->makeEvent([
+            'key'       => 'SomeLordFeast',
+            'date'      => '2026-07-20',
+            'grade'     => LitGrade::HIGHER_SOLEMNITY,
+            'season'    => LitSeason::ORDINARY_TIME,
+            'dominical' => true,
+        ]);
+
+        // Rank 5: comune, non-dominical saint solemnity -- the impeded event.
+        $impededSolemnity = $this->makeEvent([
+            'key'       => 'ImpededSolemnity',
+            'date'      => '2026-07-20',
+            'grade'     => LitGrade::SOLEMNITY,
+            'dominical' => false,
+            'proper'    => false,
+        ]);
+
+        // day+1 (2026-07-21): pre-existing, UNCONTESTED (single-event group)
+        // comune optional memorial -- rank 12, "free of ranks 1-10", so the
+        // n.56 walk does not skip past it and the impeded solemnity lands
+        // directly on top of it.
+        $mondayResident = $this->makeEvent([
+            'key'    => 'MondayResident',
+            'date'   => '2026-07-21',
+            'grade'  => LitGrade::MEMORIAL_OPT,
+            'proper' => false,
+        ]);
+
+        $ctx->cal->addLiturgicalEvent('SomeLordFeast', $higherRankingDay);
+        $ctx->cal->addLiturgicalEvent('ImpededSolemnity', $impededSolemnity);
+        $ctx->cal->addLiturgicalEvent('MondayResident', $mondayResident);
+
+        ( new AmbrosianPrecedenceResolver() )->resolve($ctx);
+
+        // The higher-ranking day wins and stays put.
+        $winner = $ctx->cal->getLiturgicalEvent('SomeLordFeast');
+        self::assertNotNull($winner);
+        self::assertSame('2026-07-20', $winner->date->format('Y-m-d'));
+
+        // The impeded solemnity is NOT suppressed: it lands on 2026-07-21 (the
+        // first day free of ranks 1-10 -- the resident memorial there does not
+        // block the walk).
+        self::assertFalse($ctx->cal->isSuppressed('ImpededSolemnity'));
+        $moved = $ctx->cal->getLiturgicalEvent('ImpededSolemnity');
+        self::assertNotNull($moved);
+        self::assertSame('2026-07-21', $moved->date->format('Y-m-d'));
+
+        // The second pass re-resolves the fresh coincidence this transfer
+        // created: the lower-ranking resident memorial is suppressed by the
+        // now-co-located, higher-ranking solemnity.
+        self::assertTrue($ctx->cal->isSuppressed('MondayResident'));
+        self::assertNull($ctx->cal->getLiturgicalEvent('MondayResident'));
+
+        // Two distinct outcomes -> two messages: the n.56 transfer (pass 1)
+        // and the pass-2 suppression of the displaced resident.
+        self::assertCount(2, $messages);
+        self::assertStringContainsString('ImpededSolemnity', $messages[0]);
+        self::assertStringContainsString('2026-07-21', $messages[0]);
+        self::assertStringContainsString('MondayResident', $messages[1]);
+        self::assertStringContainsString('ImpededSolemnity', $messages[1]);
     }
 }
