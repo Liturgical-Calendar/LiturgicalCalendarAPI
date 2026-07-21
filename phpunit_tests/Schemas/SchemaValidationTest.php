@@ -307,6 +307,34 @@ class SchemaValidationTest extends TestCase
     }
 
     /**
+     * Test loading the real Ambrosian comune sanctorale source file (2024 edition,
+     * Plan 5) against the PropriumDeSanctis schema.
+     *
+     * @group slow
+     */
+    public function testRealAmbrosianPropriumDeSanctisValidation(): void
+    {
+        $schemaPath = LitSchema::PROPRIUMDESANCTIS->path();
+        $schema     = Schema::import($schemaPath);
+
+        $ambrosianSanctisPath = JsonData::AMBROSIAN_SANCTORALE_FILE->path();
+
+        if (!file_exists($ambrosianSanctisPath)) {
+            $this->markTestSkipped('Ambrosian comune sanctorale file not found');
+        }
+
+        $content = file_get_contents($ambrosianSanctisPath);
+        $this->assertIsString($content);
+
+        $data = json_decode($content);
+        $this->assertNotNull($data, 'JSON decode should succeed');
+
+        // This should not throw
+        $schema->in($data);
+        $this->assertTrue(true, 'Real Ambrosian comune sanctorale should pass validation');
+    }
+
+    /**
      * Test loading a real proprium de tempore source file against its schema.
      *
      * @group slow

@@ -35,4 +35,16 @@ final class RomanRiteProfileTest extends TestCase
 
         $profile->precedenceResolver();
     }
+
+    public function testMissalResolverThrowsLogicException(): void
+    {
+        $profile = new RomanRiteProfile();
+
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage(
+            'Roman missals are resolved inline in CalendarHandler; no resolver is extracted.'
+        );
+
+        $profile->missalResolver();
+    }
 }

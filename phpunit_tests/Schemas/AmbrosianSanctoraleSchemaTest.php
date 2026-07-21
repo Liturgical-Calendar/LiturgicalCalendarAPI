@@ -125,4 +125,24 @@ final class AmbrosianSanctoraleSchemaTest extends TestCase
         $row->is_dominical = 'false';
         $this->assertInvalidRow($row);
     }
+
+    /**
+     * `morello` and `black` are Ambrosian-specific liturgical colors (Plan 3 added them to the
+     * PHP `LitColor` enum + i18n, but CommonDef.json's `LitColor` enum lagged behind). This
+     * additive schema fix (Plan 5 / Task 6) makes the temporale's `morello` rows, and any
+     * sanctorale row that legitimately needs `morello`/`black`, schema-valid.
+     */
+    public function testMorelloColorIsAccepted(): void
+    {
+        $row        = self::minimalAmbrosianRow();
+        $row->color = ['morello'];
+        $this->assertValidRow($row);
+    }
+
+    public function testBlackColorIsAccepted(): void
+    {
+        $row        = self::minimalAmbrosianRow();
+        $row->color = ['black'];
+        $this->assertValidRow($row);
+    }
 }
