@@ -14,10 +14,9 @@ use Swaggest\JsonSchema\Schema;
 
 /**
  * Data test for the comune ambrosiano sanctorale (Plan 5: Task 4 authored January as the worked
- * template; Task 5a extends it with February-June).
+ * template; Task 5a extended it with February-June; Task 5b completes the year with July-December).
  *
- * This test grows with each subsequent month (Task 5b still has to add Jul-Dec rows/keys): it
- * asserts that the data file loads into a PropriumDeSanctisMap, that every event_key present in the
+ * It asserts that the data file loads into a PropriumDeSanctisMap, that every event_key present in the
  * data file has BOTH an Italian and a Latin name (and vice versa: no orphan i18n keys), and that
  * every row in the data file validates against the PropriumDeSanctis.json schema.
  */
@@ -179,14 +178,179 @@ final class AmbrosianSanctoraleDataTest extends TestCase
     }
 
     /**
-     * Combined sentinel list for all months authored so far (January + February-June). Task 5b will
-     * extend this further with a `julyToDecemberSentinels()` counterpart.
+     * July-December sentinel keys (Task 5b), same (grade, is_dominical) shape as {@see januarySentinels()}.
+     * `is_dominical` is `true` only for the fixed-date "Festa/Solennità dS" entries in this range
+     * (the Transfiguration, the Exaltation of the Holy Cross, the Dedication of the Lateran Basilica,
+     * and Christmas); the mobile "Solennità dS" entries (the Dedication of the Duomo di Milano on the
+     * 3rd Sunday of October, and Christ the King on the last Sunday of the liturgical year) are
+     * intentionally NOT authored here since they are temporale, not fixed-date sanctorale (Plan 3).
+     *
+     * @return array<string,array{0:int,1:?bool}>
+     */
+    private static function julyToDecemberSentinels(): array
+    {
+        return [
+            'StThomasApostle'                             => [4, null],
+            'StElizabethOfPortugal'                       => [2, null],
+            'StAnthonyMaryZaccaria'                       => [3, null],
+            'StMariaGoretti'                              => [2, null],
+            'StsAugustineZhaoRongCompanions'              => [2, null],
+            'StBenedict'                                  => [4, null],
+            'StsNaborFelix'                               => [3, null],
+            'StHenry'                                     => [2, null],
+            'StCamillusDeLellis'                          => [2, null],
+            'StBonaventure'                               => [3, null],
+            'OurLadyOfMountCarmel'                        => [2, null],
+            'StMarcellina'                                => [3, null],
+            'StApollinare'                                => [2, null],
+            'StLawrenceOfBrindisi'                        => [2, null],
+            'StMaryMagdalene'                             => [4, null],
+            'StBridgetOfSweden'                           => [4, null],
+            'StCharbelMakhlouf'                           => [2, null],
+            'StJamesApostle'                              => [4, null],
+            'StsJoachimAnne'                              => [3, null],
+            'StsNazariusCelsus'                           => [3, null],
+            'StsMarthaMaryLazarus'                        => [3, null],
+            'StPeterChrysologus'                          => [2, null],
+            'StIgnatiusOfLoyola'                          => [3, null],
+            'StAlphonsusMariaDeLiguori'                   => [3, null],
+            'StEusebiusOfVercelli'                        => [3, null],
+            'StPeterJulianEymard'                         => [2, null],
+            'StJohnVianney'                               => [3, null],
+            'DedicationStMaryMajor'                       => [2, null],
+            'Transfiguration'                             => [5, true],
+            'StSixtusIIPopeCompanions'                    => [2, null],
+            'StCajetan'                                   => [2, null],
+            'StDominic'                                   => [3, null],
+            'StTeresaBenedictaOfTheCross'                 => [4, null],
+            'StLawrence'                                  => [4, null],
+            'StClare'                                     => [3, null],
+            'StJaneFrancesDeChantal'                      => [2, null],
+            'StsPontianHippolytus'                        => [2, null],
+            'StSimplicianOfMilan'                         => [3, null],
+            'Assumption'                                  => [6, null],
+            'StStephenOfHungary'                          => [2, null],
+            'StRoch'                                      => [2, null],
+            'StMaximilianKolbe'                           => [3, null],
+            'StJohnEudes'                                 => [2, null],
+            'StBernardOfClairvaux'                        => [3, null],
+            'StPiusX'                                     => [3, null],
+            'QueenshipBVM'                                => [3, null],
+            'StRoseOfLima'                                => [2, null],
+            'StBartholomewApostle'                        => [4, null],
+            'StLouisIX'                                   => [2, null],
+            'StJosephCalasanz'                            => [2, null],
+            'StAlexanderMartyr'                           => [2, null],
+            'StMonica'                                    => [3, null],
+            'StAugustineOfHippo'                          => [3, null],
+            'BeheadingStJohnBaptist'                      => [4, null],
+            'BlIldefonsoSchuster'                         => [3, null],
+            'StsFelixAbundius'                            => [2, null],
+            'StGregoryTheGreat'                           => [3, null],
+            'NativityBVM'                                 => [4, null],
+            'StPeterClaver'                               => [2, null],
+            'HolyNameBVM'                                 => [3, null],
+            'StJohnChrysostom'                            => [3, null],
+            'ExaltationHolyCross'                         => [5, true],
+            'OurLadyOfSorrows'                            => [3, null],
+            'StsCorneliusCyprian'                         => [3, null],
+            'StSatyrus'                                   => [3, null],
+            'StEustorgiusI'                               => [3, null],
+            'StJanuarius'                                 => [2, null],
+            'StHildegardOfBingen'                         => [2, null],
+            'StRobertBellarmine'                          => [2, null],
+            'StsAndrewKimTaegonPaulChongHasangCompanions' => [3, null],
+            'StMatthewApostleEvangelist'                  => [4, null],
+            'StsMauriceCompanions'                        => [2, null],
+            'StPioOfPietrelcina'                          => [3, null],
+            'StAnatalusAllMilaneseBishops'                => [4, null],
+            'StsCosmasDamian'                             => [2, null],
+            'StVincentDePaul'                             => [3, null],
+            'StWenceslaus'                                => [2, null],
+            'StsLorenzoRuizCompanions'                    => [2, null],
+            'StsMichaelGabrielRaphaelArchangels'          => [4, null],
+            'StJerome'                                    => [3, null],
+            'StThereseOfLisieux'                          => [3, null],
+            'HolyGuardianAngels'                          => [3, null],
+            'StFrancisOfAssisi'                           => [4, null],
+            'StFaustinaKowalska'                          => [2, null],
+            'StBruno'                                     => [2, null],
+            'OurLadyOfTheRosary'                          => [3, null],
+            'StAnselmOfLucca'                             => [2, null],
+            'StJohnCalabria'                              => [2, null],
+            'StsDenisCompanions'                          => [2, null],
+            'StJohnLeonardi'                              => [2, null],
+            'StCasimir'                                   => [2, null],
+            'StAlexanderSauli'                            => [2, null],
+            'StHedwig'                                    => [2, null],
+            'StMargaretMaryAlacoque'                      => [2, null],
+            'StCallistusI'                                => [2, null],
+            'StTeresaOfAvila'                             => [3, null],
+            'BlContardoFerrini'                           => [3, null],
+            'StIgnatiusOfAntioch'                         => [3, null],
+            'StLukeEvangelist'                            => [4, null],
+            'StsJeanDeBrebeufIsaacJoguesCompanions'       => [2, null],
+            'StPaulOfTheCross'                            => [2, null],
+            'StJohnPaulII'                                => [2, null],
+            'StJohnOfCapistrano'                          => [2, null],
+            'StAnthonyMaryClaret'                         => [2, null],
+            'StsSimonJudeApostles'                        => [4, null],
+            'StHonoratusOfVercelli'                       => [2, null],
+            'AllSaints'                                   => [6, null],
+            'AllSouls'                                    => [6, null],
+            'StMartinDePorres'                            => [2, null],
+            'StCharlesBorromeo'                           => [6, null],
+            'DedicationLateran'                           => [5, true],
+            'StLeoTheGreat'                               => [3, null],
+            'StMartinOfTours'                             => [4, null],
+            'StJosaphat'                                  => [3, null],
+            'StHomobonus'                                 => [2, null],
+            'StFrancesXavierCabrini'                      => [2, null],
+            'StAlbertTheGreat'                            => [2, null],
+            'StMargaretOfScotland'                        => [2, null],
+            'StGertrudeTheGreat'                          => [2, null],
+            'StElizabethOfHungary'                        => [3, null],
+            'DedicationBasilicasPeterPaul'                => [2, null],
+            'PresentationBVM'                             => [3, null],
+            'StCecilia'                                   => [3, null],
+            'StClementI'                                  => [2, null],
+            'StColumban'                                  => [2, null],
+            'StsAndrewDungLacCompanions'                  => [3, null],
+            'StCatherineOfAlexandria'                     => [2, null],
+            'StJohnOfGod'                                 => [2, null],
+            'StAndrewApostle'                             => [4, null],
+            'StFrancisXavier'                             => [3, null],
+            'StJohnDamascene'                             => [2, null],
+            'StNicholas'                                  => [3, null],
+            'StAmbrose'                                   => [6, null],
+            'ImmaculateConception'                        => [6, null],
+            'StJuanDiego'                                 => [2, null],
+            'OurLadyOfLoreto'                             => [2, null],
+            'StDamasusI'                                  => [2, null],
+            'OurLadyOfGuadalupe'                          => [2, null],
+            'StLucy'                                      => [3, null],
+            'StJohnOfTheCross'                            => [3, null],
+            'StJohnOfKety'                                => [2, null],
+            'StPeterCanisius'                             => [2, null],
+            'AnnouncementToStJoseph'                      => [2, null],
+            'Christmas'                                   => [6, true],
+            'StStephenFirstMartyr'                        => [4, null],
+            'StJohnApostleEvangelist'                     => [4, null],
+            'HolyInnocents'                               => [4, null],
+            'StThomasBecket'                              => [2, null],
+            'StSylvesterI'                                => [2, null],
+        ];
+    }
+
+    /**
+     * Combined sentinel list for all months authored so far (January through December — Task 5b
+     * completes the full year).
      *
      * @return array<string,array{0:int,1:?bool}>
      */
     private static function allSentinels(): array
     {
-        return array_merge(self::januarySentinels(), self::februaryToJuneSentinels());
+        return array_merge(self::januarySentinels(), self::februaryToJuneSentinels(), self::julyToDecemberSentinels());
     }
 
     public function testDataFileLoadsIntoMapWithItalianNames(): void
