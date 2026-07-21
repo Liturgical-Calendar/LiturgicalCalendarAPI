@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-21 06:27+0000\n"
+"POT-Creation-Date: 2026-07-21 18:46+0000\n"
 "PO-Revision-Date: 2026-06-19 19:52+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Italian <https://translate.johnromanodorazio.com/projects/"
@@ -598,34 +598,46 @@ msgid "Masses and Prayers for Various Needs and Occasions"
 msgstr "Messe e Orazioni per varie necessità"
 
 #. translators: context = liturgical season
-#: src/Enum/LitSeason.php:118
+#: src/Enum/LitSeason.php:158
 msgid "Advent"
 msgstr "Avvento"
 
 #. translators: context = liturgical season
-#: src/Enum/LitSeason.php:120
+#: src/Enum/LitSeason.php:160
 msgid "Christmas"
 msgstr "Natale"
 
 #. translators: context = liturgical season
-#: src/Enum/LitSeason.php:122
+#: src/Enum/LitSeason.php:162
 msgid "Lent"
 msgstr "Quaresima"
 
 #. translators: context = liturgical season
-#: src/Enum/LitSeason.php:124
+#: src/Enum/LitSeason.php:164
 msgid "Easter Triduum"
 msgstr "Triduo Pasquale"
 
 #. translators: context = liturgical season
-#: src/Enum/LitSeason.php:126
+#: src/Enum/LitSeason.php:166
 msgid "Easter"
 msgstr "Pasqua"
 
 #. translators: context = liturgical season
-#: src/Enum/LitSeason.php:128
+#: src/Enum/LitSeason.php:168
 msgid "Ordinary Time"
 msgstr "Tempo Ordinario"
+
+#. translators: context = liturgical season (Ambrosian rite)
+#: src/Enum/LitSeason.php:170
+#, fuzzy
+msgid "After Epiphany"
+msgstr "%s giorno dopo l'Epifania"
+
+#. translators: context = liturgical season (Ambrosian rite)
+#: src/Enum/LitSeason.php:172
+#, fuzzy
+msgid "After Pentecost"
+msgstr "il lunedì dopo la Pentecoste"
 
 #. translators: %s is a day number (17, 18, etc.) - for Advent weekdays Dec 17-24
 #: src/FerialEventNameGenerator.php:366
@@ -1522,7 +1534,7 @@ msgstr "Dal Comune"
 #. translators: context alternate name for a liturgical event, e.g. Second Sunday of Easter `or` Divine Mercy Sunday
 #. translators: when there are multiple possible commons, this will be the glue "[; or] From the Common of..."
 #: src/Models/Calendar/LitCommons.php:228
-#: src/Models/Calendar/LiturgicalEvent.php:140
+#: src/Models/Calendar/LiturgicalEvent.php:142
 #: src/Models/Calendar/Temporale/RomanTemporale.php:256
 #: src/Models/EventsPath/LiturgicalEventAbstract.php:104 src/Utilities.php:450
 #: src/Utilities.php:456
@@ -1727,9 +1739,6 @@ msgstr "Domenica della Divina Misericordia"
 
 #~ msgid "%s day before Epiphany"
 #~ msgstr "%s giorno prima dell'Epifania"
-
-#~ msgid "the Monday after Pentecost"
-#~ msgstr "il lunedì dopo la Pentecoste"
 
 #~ msgctxt "Male singular"
 #~ msgid "patron of Europe"

@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-21 06:27+0000\n"
+"POT-Creation-Date: 2026-07-21 18:46+0000\n"
 "PO-Revision-Date: 2026-01-18 04:05+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: German <https://translate.johnromanodorazio.com/projects/"
@@ -599,34 +599,45 @@ msgid "Masses and Prayers for Various Needs and Occasions"
 msgstr "Messen und Gebete für verschiedene Anliegen und Anlässe"
 
 #. translators: context = liturgical season
-#: src/Enum/LitSeason.php:118
+#: src/Enum/LitSeason.php:158
 msgid "Advent"
 msgstr "Advent"
 
 #. translators: context = liturgical season
-#: src/Enum/LitSeason.php:120
+#: src/Enum/LitSeason.php:160
 msgid "Christmas"
 msgstr "Weihnachten"
 
 #. translators: context = liturgical season
-#: src/Enum/LitSeason.php:122
+#: src/Enum/LitSeason.php:162
 msgid "Lent"
 msgstr "Fastenzeit"
 
 #. translators: context = liturgical season
-#: src/Enum/LitSeason.php:124
+#: src/Enum/LitSeason.php:164
 msgid "Easter Triduum"
 msgstr "Österliches Triduum"
 
 #. translators: context = liturgical season
-#: src/Enum/LitSeason.php:126
+#: src/Enum/LitSeason.php:166
 msgid "Easter"
 msgstr "Osterzeit"
 
 #. translators: context = liturgical season
-#: src/Enum/LitSeason.php:128
+#: src/Enum/LitSeason.php:168
 msgid "Ordinary Time"
 msgstr "Zeit im Jahreskreis"
+
+#. translators: context = liturgical season (Ambrosian rite)
+#: src/Enum/LitSeason.php:170
+msgid "After Epiphany"
+msgstr ""
+
+#. translators: context = liturgical season (Ambrosian rite)
+#: src/Enum/LitSeason.php:172
+#, fuzzy
+msgid "After Pentecost"
+msgstr "Nach der Ernte"
 
 #. translators: %s is a day number (17, 18, etc.) - for Advent weekdays Dec 17-24
 #: src/FerialEventNameGenerator.php:366
@@ -1530,7 +1541,7 @@ msgstr "Aus dem Gemeinsamen"
 #. translators: context alternate name for a liturgical event, e.g. Second Sunday of Easter `or` Divine Mercy Sunday
 #. translators: when there are multiple possible commons, this will be the glue "[; or] From the Common of..."
 #: src/Models/Calendar/LitCommons.php:228
-#: src/Models/Calendar/LiturgicalEvent.php:140
+#: src/Models/Calendar/LiturgicalEvent.php:142
 #: src/Models/Calendar/Temporale/RomanTemporale.php:256
 #: src/Models/EventsPath/LiturgicalEventAbstract.php:104 src/Utilities.php:450
 #: src/Utilities.php:456
