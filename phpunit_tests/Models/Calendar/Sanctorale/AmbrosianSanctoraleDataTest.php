@@ -13,9 +13,10 @@ use PHPUnit\Framework\TestCase;
 use Swaggest\JsonSchema\Schema;
 
 /**
- * Data test for the comune ambrosiano sanctorale (Plan 5, Task 4: January — the worked template).
+ * Data test for the comune ambrosiano sanctorale (Plan 5: Task 4 authored January as the worked
+ * template; Task 5a extends it with February-June).
  *
- * This test grows with each subsequent month (Tasks 5a/5b add Feb-Jun and Jul-Dec rows/keys): it
+ * This test grows with each subsequent month (Task 5b still has to add Jul-Dec rows/keys): it
  * asserts that the data file loads into a PropriumDeSanctisMap, that every event_key present in the
  * data file has BOTH an Italian and a Latin name (and vice versa: no orphan i18n keys), and that
  * every row in the data file validates against the PropriumDeSanctis.json schema.
@@ -75,6 +76,119 @@ final class AmbrosianSanctoraleDataTest extends TestCase
         ];
     }
 
+    /**
+     * February-June sentinel keys (Task 5a), same (grade, is_dominical) shape as {@see januarySentinels()}.
+     * `is_dominical` is `true` only for the fixed-date "Festa/Solennità dS" entries (the Presentation of
+     * the Lord, the Annunciation, and the Visitation); the several mobile "dS" entries in this range
+     * (Sunday/Thursday-after-Pentecost feasts, Monday-after-Pentecost, the Sacred/Immaculate Hearts) are
+     * intentionally NOT authored as sanctorale rows since they are computed from the temporale, not fixed
+     * dates.
+     *
+     * @return array<string,array{0:int,1:?bool}>
+     */
+    private static function februaryToJuneSentinels(): array
+    {
+        return [
+            'BlAndreaCarloFerrari'                  => [3, null],
+            'PresentationOfTheLord'                 => [4, true],
+            'StBlaise'                              => [2, null],
+            'StOscar'                               => [2, null],
+            'StAgatha'                              => [3, null],
+            'StPaulMikiCompanions'                  => [3, null],
+            'StsPerpetuaFelicity'                   => [3, null],
+            'StJeromeEmiliani'                      => [3, null],
+            'StJosephineBakhita'                    => [2, null],
+            'StScholastica'                         => [3, null],
+            'OurLadyOfLourdes'                      => [2, null],
+            'StsCyrilMethodius'                     => [4, null],
+            'SevenHolyFoundersServites'             => [2, null],
+            'StPatritius'                           => [2, null],
+            'StTuribiusMogrovejo'                   => [2, null],
+            'StPeterDamian'                         => [2, null],
+            'StPolycarp'                            => [3, null],
+            'StGregoryOfNarek'                      => [2, null],
+            'StJosephSpouseBVM'                     => [6, null],
+            'Annunciation'                          => [6, true],
+            'StFrancisOfPaola'                      => [2, null],
+            'StIsidoreOfSeville'                    => [2, null],
+            'StVincentFerrer'                       => [2, null],
+            'StJohnBaptistDeLaSalle'                => [3, null],
+            'StFrancesOfRome'                       => [2, null],
+            'StCyrilOfJerusalem'                    => [2, null],
+            'StStanislaus'                          => [3, null],
+            'StZenoOfVerona'                        => [2, null],
+            'StMartinIPope'                         => [2, null],
+            'StGaldino'                             => [3, null],
+            'StAnselm'                              => [2, null],
+            'StGeorge'                              => [2, null],
+            'StAdalbert'                            => [2, null],
+            'StFidelisOfSigmaringen'                => [2, null],
+            'StMarkEvangelist'                      => [4, null],
+            'StLouisMarieDeMontfort'                => [2, null],
+            'StPeterChanel'                         => [2, null],
+            'BlsCaterinaGiulianaVarese'             => [3, null],
+            'StGiannaBerettaMolla'                  => [3, null],
+            'StCatherineOfSiena'                    => [4, null],
+            'StPiusV'                               => [2, null],
+            'StJosephCottolengo'                    => [2, null],
+            'StRichardPampuri'                      => [2, null],
+            'StJosephTheWorker'                     => [3, null],
+            'StAthanasius'                          => [3, null],
+            'StsPhilipJames'                        => [4, null],
+            'StVictorMartyr'                        => [3, null],
+            'StMaddalenaOfCanossa'                  => [2, null],
+            'StJohnOfAvila'                         => [2, null],
+            'StsNereusAchilleus'                    => [2, null],
+            'StPancras'                             => [2, null],
+            'OurLadyOfFatima'                       => [2, null],
+            'StMatthiasApostle'                     => [4, null],
+            'StLuigiOrione'                         => [2, null],
+            'StJohnIPope'                           => [2, null],
+            'StsBartolomeaVincenza'                 => [2, null],
+            'StBernardineOfSiena'                   => [2, null],
+            'StsCristoforoMagallanesCompanions'     => [2, null],
+            'StRitaOfCascia'                        => [2, null],
+            'StBedeVenerabilis'                     => [2, null],
+            'StMariaMaddalenaDePazzi'               => [2, null],
+            'StGregoryVIIPope'                      => [2, null],
+            'StDionysius'                           => [3, null],
+            'StPhilipNeri'                          => [3, null],
+            'StAugustineOfCanterbury'               => [2, null],
+            'StsSisiniusMartiriusAlexanderVigilius' => [3, null],
+            'StPaulVIPope'                          => [3, null],
+            'VisitationBVM'                         => [4, true],
+            'StJustinMartyr'                        => [3, null],
+            'StsMarcellinusPeter'                   => [2, null],
+            'StCharlesLwangaCompanions'             => [3, null],
+            'StBonifaceMartyr'                      => [3, null],
+            'StNorbert'                             => [2, null],
+            'StEphremDeacon'                        => [2, null],
+            'StBarnabasApostle'                     => [4, null],
+            'StAnthonyOfPadua'                      => [3, null],
+            'StRomualdAbbot'                        => [2, null],
+            'StsProtaseGervase'                     => [4, null],
+            'StAloysiusGonzaga'                     => [3, null],
+            'StPaulinusOfNola'                      => [2, null],
+            'StsJohnFisherThomasMore'               => [2, null],
+            'NativityStJohnBaptist'                 => [6, null],
+            'StCyrilOfAlexandria'                   => [2, null],
+            'StIrenaeus'                            => [3, null],
+            'StsPeterPaulApostles'                  => [6, null],
+            'FirstMartyrsRomanChurch'               => [2, null],
+        ];
+    }
+
+    /**
+     * Combined sentinel list for all months authored so far (January + February-June). Task 5b will
+     * extend this further with a `julyToDecemberSentinels()` counterpart.
+     *
+     * @return array<string,array{0:int,1:?bool}>
+     */
+    private static function allSentinels(): array
+    {
+        return array_merge(self::januarySentinels(), self::februaryToJuneSentinels());
+    }
+
     public function testDataFileLoadsIntoMapWithItalianNames(): void
     {
         $raw   = $this->loadRawRows();
@@ -82,20 +196,20 @@ final class AmbrosianSanctoraleDataTest extends TestCase
         $map   = PropriumDeSanctisMap::fromObject($raw);
         $map->setNames($names);
 
-        foreach (self::januarySentinels() as $key => $_expected) {
-            $this->assertTrue($map->offsetExists($key), "Missing January sanctorale key: $key");
+        foreach (array_keys(self::allSentinels()) as $key) {
+            $this->assertTrue($map->offsetExists($key), "Missing sanctorale key: $key");
         }
     }
 
-    public function testJanuarySentinelsHaveExpectedGradeAndIsDominical(): void
+    public function testSentinelsHaveExpectedGradeAndIsDominical(): void
     {
         $raw   = $this->loadRawRows();
         $names = $this->loadNames('it');
         $map   = PropriumDeSanctisMap::fromObject($raw);
         $map->setNames($names);
 
-        foreach (self::januarySentinels() as $key => [$expectedGrade, $expectedIsDominical]) {
-            $this->assertTrue($map->offsetExists($key), "Missing January sanctorale key: $key");
+        foreach (self::allSentinels() as $key => [$expectedGrade, $expectedIsDominical]) {
+            $this->assertTrue($map->offsetExists($key), "Missing sanctorale key: $key");
             $event = $map[$key];
             $this->assertSame($expectedGrade, $event->grade->value, "Unexpected grade for $key");
             if ($expectedIsDominical === true) {
@@ -144,7 +258,7 @@ final class AmbrosianSanctoraleDataTest extends TestCase
     {
         $raw          = $this->loadRawRows();
         $dataKeys     = array_map(fn (\stdClass $event): string => $event->event_key, $raw);
-        $sentinelKeys = array_keys(self::januarySentinels());
+        $sentinelKeys = array_keys(self::allSentinels());
 
         $missingFromData     = array_diff($sentinelKeys, $dataKeys);
         $missingFromSentinel = array_diff($dataKeys, $sentinelKeys);
