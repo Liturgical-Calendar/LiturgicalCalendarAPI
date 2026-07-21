@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-20 19:56+0000\n"
+"POT-Creation-Date: 2026-07-21 06:27+0000\n"
 "PO-Revision-Date: 2025-10-18 13:19+0000\n"
 "Last-Translator: Mai Lê Bảo Khang <baokhang48812002@gmail.com>\n"
 "Language-Team: Vietnamese <https://translate.johnromanodorazio.com/projects/"
@@ -22,29 +22,39 @@ msgstr ""
 "X-Generator: Weblate 5.13.3\n"
 
 #. translators: context = liturgical color
-#: src/Enum/LitColor.php:30
+#: src/Enum/LitColor.php:32
 msgid "green"
 msgstr "xanh"
 
 #. translators: context = liturgical color
-#: src/Enum/LitColor.php:32
+#: src/Enum/LitColor.php:34
 msgid "purple"
 msgstr "tím"
 
 #. translators: context = liturgical color
-#: src/Enum/LitColor.php:34
+#: src/Enum/LitColor.php:36
 msgid "white"
 msgstr "trắng"
 
 #. translators: context = liturgical color
-#: src/Enum/LitColor.php:36
+#: src/Enum/LitColor.php:38
 msgid "red"
 msgstr "đỏ"
 
 #. translators: context = liturgical color
-#: src/Enum/LitColor.php:38
+#: src/Enum/LitColor.php:40
 msgid "rose"
 msgstr "hồng"
+
+#. translators: context = liturgical color (Ambrosian "morello"/violet)
+#: src/Enum/LitColor.php:42
+msgid "morello"
+msgstr ""
+
+#. translators: context = liturgical color
+#: src/Enum/LitColor.php:44
+msgid "black"
+msgstr ""
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
