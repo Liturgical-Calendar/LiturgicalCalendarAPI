@@ -5,13 +5,15 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Models\Calendar\Rite;
 
 use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Models\Calendar\Precedence\AmbrosianPrecedenceResolver;
+use LiturgicalCalendar\Api\Models\Calendar\Precedence\PrecedenceResolver;
 use LiturgicalCalendar\Api\Models\Calendar\Temporale\AmbrosianTemporale;
 use LiturgicalCalendar\Api\Models\Calendar\Temporale\TemporaleEngine;
 
 /**
  * Ambrosian rite profile. Plan 2 wired the diocese whitelist and rite
- * identity; Plan 3 adds the temporale engine. The precedence resolver,
- * missal resolver, and vocabularies arrive in later plans.
+ * identity; Plan 3 added the temporale engine; Plan 4 adds the precedence
+ * resolver. The missal resolver and vocabularies arrive in later plans.
  */
 final class AmbrosianRiteProfile implements RiteProfile
 {
@@ -33,5 +35,10 @@ final class AmbrosianRiteProfile implements RiteProfile
     public function temporaleEngine(): TemporaleEngine
     {
         return new AmbrosianTemporale();
+    }
+
+    public function precedenceResolver(): PrecedenceResolver
+    {
+        return new AmbrosianPrecedenceResolver();
     }
 }
