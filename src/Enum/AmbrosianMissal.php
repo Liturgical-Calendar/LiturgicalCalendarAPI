@@ -1,0 +1,167 @@
+<?php
+
+namespace LiturgicalCalendar\Api\Enum;
+
+use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+
+/**
+ * Enum class for the different Ambrosian Missals that are used in the Liturgical Calendar API.
+ * This class provides methods to check if a given missal_id is valid, get the name of an Ambrosian Missal,
+ * get the path to the JSON file containing the sanctorale data for an Ambrosian Missal,
+ * get the path to the i18n directory for the sanctorale of an Ambrosian Missal,
+ * and get the year limits for an Ambrosian Missal.
+ *
+ * Mirrors the shape of {@see \LiturgicalCalendar\Api\Enum\RomanMissal}. Only the 2024 edition is defined for
+ * now; the 1976 edition (with its own `since_year`/`until_year` historical gating) is deferred to a later plan.
+ *
+ * @phpstan-type AmbrosianMissalMetadata array{
+ *     missal_id:string,
+ *     name:string,
+ *     year_limits:array{since_year:int,until_year?:int}
+ * }
+ */
+class AmbrosianMissal
+{
+    public const EDITIO_2024 = 'EDITIO_2024';
+
+    /**
+     * The values of the Ambrosian Missal enumeration constants.
+     * This array is used to check if a given missal_id is a valid Ambrosian Missal enumeration constant.
+     * @static
+     * @var string[]
+     * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::isValid()
+     */
+    private static array $values = [ 'EDITIO_2024' ];
+
+    /**
+     * An associative array of the Ambrosian Missal names, where the key is the value of an Ambrosian Missal constant.
+     * This array is used to get the name of an Ambrosian Missal given its id.
+     * @static
+     * @var array<string,string>
+     * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getName()
+     */
+    private static array $names = [
+        self::EDITIO_2024 => 'Messale Ambrosiano, Editio 2024'
+    ];
+
+    /**
+     * An associative array of the JSON file paths, where the key is the value of an Ambrosian Missal constant.
+     * This array is used to get the path to the JSON file containing the sanctorale data for an Ambrosian Missal.
+     * @static
+     * @var array<string,string|false>
+     * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getSanctoraleFileName()
+     */
+    private static array $jsonFiles = [
+        self::EDITIO_2024 => '/ambrosian/propriumdesanctis_2024/propriumdesanctis.json'
+    ];
+
+    /**
+     * An associative array of the i18n file paths, where the key is the value of an Ambrosian Missal constant.
+     * This array is used to get the path to the i18n directory for the sanctorale of an Ambrosian Missal.
+     * @static
+     * @var array<string,string|false>
+     * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getSanctoraleI18nFilePath()
+     */
+    private static array $i18nPath = [
+        self::EDITIO_2024 => '/ambrosian/propriumdesanctis_2024/i18n/'
+    ];
+
+    /**
+     * An associative array of the year limits, where the key is the value of an Ambrosian Missal constant
+     * and the value is an associative array with the properties 'since_year' and optionally 'until_year'.
+     * This array is used to get the year limits for an Ambrosian Missal.
+     * @static
+     * @var array<string,array{since_year:int,until_year?:int}>
+     * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getYearLimits()
+     */
+    private static array $yearLimits = [
+        self::EDITIO_2024 => [ 'since_year' => 2024 ]
+    ];
+
+    /**
+     * Check if a given missal_id is a valid Ambrosian Missal enumeration constant.
+     *
+     * @param string $missal_id the missal_id to check
+     * @return bool true if the missal_id is a valid Ambrosian Missal enumeration constant, false otherwise
+     */
+    public static function isValid(string $missal_id): bool
+    {
+        return in_array($missal_id, self::$values);
+    }
+
+    /**
+     * Gets the name of the Ambrosian Missal corresponding to the given Missal id.
+     *
+     * @param string $missal_id the id of the Ambrosian Missal
+     * @return string the name of the Ambrosian Missal
+     * @throws ValidationException if missal_id is not valid
+     */
+    public static function getName(string $missal_id): string
+    {
+        if (false === self::isValid($missal_id)) {
+            throw new ValidationException('Invalid missal_id: ' . $missal_id);
+        }
+        return self::$names[$missal_id];
+    }
+
+    /**
+     * Gets the path to the JSON file containing the sanctorale data for the given Ambrosian Missal.
+     *
+     * @param string $missal_id the id of the Ambrosian Missal
+     * @return string|false the path to the JSON file, or false if the Ambrosian Missal does not have any JSON data
+     * @throws ValidationException if missal_id is not valid
+     */
+    public static function getSanctoraleFileName(string $missal_id): string|false
+    {
+        if (false === self::isValid($missal_id)) {
+            throw new ValidationException('Invalid missal_id: ' . $missal_id);
+        }
+        return is_string(self::$jsonFiles[$missal_id])
+            ? JsonData::MISSALS_FOLDER->path() . self::$jsonFiles[$missal_id]
+            : false;
+    }
+
+    /**
+     * Gets the path to the i18n directory for the sanctorale of the given Ambrosian Missal.
+     *
+     * @param string $missal_id the id of the Ambrosian Missal
+     * @return string|false the path to the i18n directory, or false if the Ambrosian Missal does not have any i18n data
+     * @throws ValidationException if missal_id is not valid
+     */
+    public static function getSanctoraleI18nFilePath(string $missal_id): string|false
+    {
+        if (false === self::isValid($missal_id)) {
+            throw new ValidationException('Invalid missal_id: ' . $missal_id);
+        }
+        return is_string(self::$i18nPath[$missal_id])
+            ? JsonData::MISSALS_FOLDER->path() . self::$i18nPath[$missal_id]
+            : false;
+    }
+
+    /**
+     * Gets the year limits for the given Ambrosian Missal.
+     *
+     * @param string $missal_id the id of the Ambrosian Missal
+     * @return array{since_year:int,until_year?:int} an associative array of the year limits
+     *   for the given Ambrosian Missal, with properties named 'since_year' and optionally 'until_year'
+     * @throws ValidationException if missal_id is not valid
+     */
+    public static function getYearLimits(string $missal_id): array
+    {
+        if (false === self::isValid($missal_id)) {
+            throw new ValidationException('Invalid missal_id: ' . $missal_id);
+        }
+        return self::$yearLimits[$missal_id];
+    }
+
+    /**
+     * Gets an array of all the valid Ambrosian Missal enumeration constants.
+     *
+     * @return string[] an array of all the valid Ambrosian Missal enumeration constants
+     */
+    public static function getMissalIds(): array
+    {
+        return self::$values;
+    }
+}
