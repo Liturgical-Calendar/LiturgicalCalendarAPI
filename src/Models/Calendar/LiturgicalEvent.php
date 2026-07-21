@@ -397,6 +397,8 @@ final class LiturgicalEvent implements \JsonSerializable
      * - type: The type of the liturgical event, as a LitEventType object or as a string.
      *   If not provided, defaults to LitEventType::FIXED.
      * - grade_display: The grade display of the liturgical event, as a string. If not provided, defaults to null.
+     * - is_dominical: whether the liturgical event is "of the Lord" (dominical), as a boolean, if the source object
+     *   declares the property (e.g. PropriumDeTemporeEvent). If not provided (property absent) or null, defaults to null.
      *
      * @param \stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile|DecreeItemCreateNewFixed|DecreeItemCreateNewMobile|PropriumDeTemporeEvent|PropriumDeSanctisEvent $obj
      * @return LiturgicalEvent A new LiturgicalEvent object.
@@ -546,7 +548,7 @@ final class LiturgicalEvent implements \JsonSerializable
             $grade_display = $obj->grade_display;
         }
 
-        return new self(
+        $litEvent = new self(
             $obj->name,
             $obj->date,
             $color,
@@ -555,6 +557,17 @@ final class LiturgicalEvent implements \JsonSerializable
             $commons,
             $grade_display
         );
+
+        // Carry over `is_dominical` from source data (e.g. PropriumDeTemporeEvent) when present and non-null.
+        // Most source types do not declare this property at all, so we guard with property_exists() first.
+        if (property_exists($obj, 'is_dominical') && null !== $obj->is_dominical) {
+            if (false === is_bool($obj->is_dominical)) {
+                throw new \Exception('Invalid object provided to create LiturgicalEvent: is_dominical is not a boolean or null');
+            }
+            $litEvent->is_dominical = $obj->is_dominical;
+        }
+
+        return $litEvent;
     }
 
 

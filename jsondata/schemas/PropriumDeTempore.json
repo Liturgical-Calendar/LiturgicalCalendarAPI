@@ -21,6 +21,10 @@
                 },
                 "color": {
                     "$ref": "./CommonDef.json#/definitions/LitColor"
+                },
+                "is_dominical": {
+                    "type": "boolean",
+                    "description": "Whether the event is \"of the Lord\" (dominical). Optional; used by the Ambrosian proprium to distinguish Sundays and solemnities/feasts of the Lord from weekday ferie."
                 }
             },
             "required": [
