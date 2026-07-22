@@ -1560,7 +1560,8 @@ final class LiturgicalEventCollection
         }
 
         // `Easter` and `Easter2` are themselves anchored temporale events (Easter Sunday is
-        // preceded by its own `EasterVigil`; Easter II opens with the octave), so they must
+        // preceded by its own `EasterVigil`; Easter II is the octave day of Easter — its eve is
+        // itself the Saturday within the Easter octave, not a vigil), so they must
         // not receive a synthesized replacement vigil. The strict-inequality window checks
         // below exclude the days *inside* the octave but not these two boundary dates, so
         // exclude them explicitly by key.

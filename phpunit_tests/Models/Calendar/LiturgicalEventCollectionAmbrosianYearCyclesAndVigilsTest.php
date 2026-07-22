@@ -182,7 +182,8 @@ final class LiturgicalEventCollectionAmbrosianYearCyclesAndVigilsTest extends Te
 
     /**
      * `Easter` and `Easter2` are anchored temporale events (Easter Sunday is preceded by its own
-     * `EasterVigil`; Easter II opens the octave), so `ambrosianEventCanHaveVigil()` excludes them
+     * `EasterVigil`; Easter II is the octave day of Easter, whose eve is itself the Saturday within
+     * the Easter octave), so `ambrosianEventCanHaveVigil()` excludes them
      * by key — no synthesized `Easter_vigil`/`Easter2_vigil` may be created even though both are
      * Sundays of grade HIGHER_SOLEMNITY that would otherwise pass the eligibility predicate.
      */
