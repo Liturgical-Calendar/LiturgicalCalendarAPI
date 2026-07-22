@@ -178,4 +178,24 @@ final class AmbrosianTemporaleTest extends TestCase
         self::assertSame(LitSeason::AFTER_PENTECOST, $events['AfterPentecostMartyrdom1']->liturgical_season);
         self::assertSame(LitSeason::AFTER_PENTECOST, $events['AfterPentecostDedication1']->liturgical_season);
     }
+
+    /**
+     * `martyrdomAnchor()` (n. 42a) postpones the Martyrdom of St John the
+     * Baptist from Aug 29 to Sep 1 whenever Aug 29 falls on a Sunday, so the
+     * "dopo il Martirio" block never overlaps a privileged Sunday. 2027 is
+     * the nearest civil year in which Aug 29 is a Sunday (verified via
+     * `date -d '2027-08-29' +%u` => 7), so the block's first Sunday
+     * (`AfterPentecostMartyrdom1`) must be measured from the postponed Sep 1
+     * anchor, not from Aug 29 itself: Sep 1, 2027 is a Wednesday, and the
+     * first Sunday on/after it is Sep 5, 2027.
+     */
+    public function testMartyrdomPostponedWhenAug29IsSunday(): void
+    {
+        $d = $this->runEngine(2027);
+
+        // Sanity: Aug 29, 2027 really is a Sunday -- the edge this test targets.
+        self::assertSame('7', ( new \DateTime('2027-08-29') )->format('N'), 'Expected Aug 29, 2027 to be a Sunday');
+
+        self::assertSame('2027-09-05', $d['AfterPentecostMartyrdom1']);
+    }
 }

@@ -77,7 +77,9 @@ final class AmbrosianTemporale implements TemporaleEngine
     /**
      * True if the given date falls on a Sunday. Used by
      * `calculateAfterPentecostAnchors()` to guard the 3rd-Sunday-of-October
-     * computation for the Dedication of the Duomo di Milano.
+     * computation for the Dedication of the Duomo di Milano, and by
+     * `martyrdomAnchor()` to guard the Aug 29 -> Sep 1 postponement of the
+     * Martyrdom of St John the Baptist when Aug 29 falls on a Sunday.
      */
     private static function dateIsSunday(DateTime $dt): bool
     {
