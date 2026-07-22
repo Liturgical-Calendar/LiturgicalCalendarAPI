@@ -7,6 +7,7 @@ use LiturgicalCalendar\Api\LatinUtils;
 use LiturgicalCalendar\Api\LocaleDateFormatter;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
+use LiturgicalCalendar\Api\Enum\AmbrosianMissal;
 use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\CalEventAction;
 use LiturgicalCalendar\Api\Enum\CorpusChristi;
@@ -44,7 +45,9 @@ use LiturgicalCalendar\Api\Models\PropriumDeTemporeEvent;
 use LiturgicalCalendar\Api\Models\RelativeLiturgicalDate;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
+use LiturgicalCalendar\Api\Models\Calendar\Missal\AmbrosianMissalResolver;
 use LiturgicalCalendar\Api\Models\Calendar\Rite\RiteProfileFactory;
+use LiturgicalCalendar\Api\Models\Calendar\Sanctorale\AmbrosianSanctoraleLoader;
 use LiturgicalCalendar\Api\Models\Calendar\Temporale\TemporaleContext;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItem;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCollection;
@@ -56,6 +59,7 @@ use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyGrade;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyGradeMetadata;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyName;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyNameMetadata;
+use LiturgicalCalendar\Api\Models\Lectionary\AmbrosianReadings;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarSettings;
 use LiturgicalCalendar\Api\Models\ConditionalRule;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
@@ -897,6 +901,72 @@ final class CalendarHandler extends AbstractHandler
         $PropriumDeTemporeI18n   = $this->loadAmbrosianPropriumDeTemporeI18nData($locale);
         $this->PropriumDeTempore = PropriumDeTemporeMap::fromObject($PropriumDeTempore);
         $this->PropriumDeTempore->setNames($PropriumDeTemporeI18n);
+    }
+
+    /**
+     * Adds every comune Ambrosian sanctorale event to `$this->Cal`.
+     *
+     * Unlike the Roman check-before-add convention (`inSolemnities()` / `handleCoincidence()`),
+     * the Ambrosian assembly model adds every sanctorale row unconditionally and defers
+     * coincidence resolution to a later precedence-resolution pass (Plan 7, Task 5). The only
+     * thing guarded here is an `event_key` collision against an event already present in
+     * `$this->Cal` — i.e. one added by the Proprium de Tempore load/engine that runs earlier in
+     * the pipeline — because `LiturgicalEventCollection::addLiturgicalEvent()` is keyed by
+     * `event_key` and would otherwise silently overwrite the earlier (temporale) definition.
+     *
+     * Audit finding (Plan 7 Task 4, Step 1): three keys are declared in BOTH
+     * `propriumdesanctis_2024/propriumdesanctis.json` and `propriumdetempore/propriumdetempore.json`
+     * — `Christmas`, `Circoncisione`, `Epiphany` — and all three remain present in
+     * `$this->Cal` after `AmbrosianTemporale::buildTemporale()` runs (verified: none of them are
+     * later removed/renamed by the temporale engine). So the skip branch below is not merely
+     * defensive: for a real Ambrosian request it is expected to trigger on exactly these three
+     * keys, with the temporale definition (added earlier in the pipeline) winning each time.
+     *
+     * Every added event is given the Task 2 empty-readings placeholder
+     * ({@see AmbrosianReadings::empty()}), since there is currently no Ambrosian lectionary data
+     * source in this codebase and the response schema requires every `LiturgicalEvent` to carry
+     * a `readings` property.
+     *
+     * Not yet called from `calculateUniversalCalendar()` (that method is Roman-only and Task 4
+     * must not touch it) — Plan 7 Task 9's `calculateAmbrosianCalendar()` orchestrator is the
+     * method that will call this by name, assembling it together with Tasks 3, 5-8. Until then
+     * it is exercised only by `CalendarHandlerAmbrosianSanctoraleLoadTest` via reflection.
+     */
+    // @phpstan-ignore method.unused (call site lands in Task 9's calculateAmbrosianCalendar() orchestrator)
+    private function addAmbrosianSanctoraleToCalendar(): void
+    {
+        $year    = $this->CalendarParams->Year;
+        $edition = ( new AmbrosianMissalResolver() )->resolve($year)[0];
+
+        $locale = LitLocale::$PRIMARY_LANGUAGE;
+        if (false === in_array($locale, ['it', 'la'], true)) {
+            $locale = 'it';
+        }
+
+        $sanctoraleMap = ( new AmbrosianSanctoraleLoader() )->load($edition, $locale);
+
+        foreach ($sanctoraleMap as $key => $propriumDeSanctisEvent) {
+            if (null !== $this->Cal->getLiturgicalEvent($key)) {
+                /**translators:
+                 * 1. Event key of the Ambrosian comune sanctorale event that was skipped
+                 * 2. Name of the Ambrosian Missal edition the sanctorale event was read from
+                 */
+                $this->Messages[] = sprintf(
+                    _('The Ambrosian comune sanctorale event `%1$s` from the %2$s was skipped because a liturgical event with the same key was already defined by the Proprium de Tempore, which takes precedence.'),
+                    $key,
+                    AmbrosianMissal::getName($edition)
+                );
+                continue;
+            }
+
+            $propriumDeSanctisEvent->setDate(
+                DateTime::fromFormat($propriumDeSanctisEvent->day . '-' . $propriumDeSanctisEvent->month . '-' . $year)
+            );
+
+            $litEvent = LiturgicalEvent::fromObject($propriumDeSanctisEvent);
+            $litEvent->setReadings(AmbrosianReadings::empty());
+            $this->Cal->addLiturgicalEvent($key, $litEvent);
+        }
     }
 
     /**
