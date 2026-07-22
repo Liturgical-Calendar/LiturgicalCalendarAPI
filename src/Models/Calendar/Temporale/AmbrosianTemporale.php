@@ -36,6 +36,7 @@ final class AmbrosianTemporale implements TemporaleEngine
         $this->calculateEasterCycle($ctx);
         $this->calculateAfterPentecostAnchors($ctx);
         $this->calculateAfterEpiphanySundays($ctx);
+        $this->calculateAfterEpiphanyWeekdays($ctx);
         $this->calculateAfterPentecostSundays($ctx);
     }
 
@@ -350,6 +351,104 @@ final class AmbrosianTemporale implements TemporaleEngine
         }
         $ordinalStr = Utilities::getOrdinal($ordinal, $ctx->localeDateFormatter->getLocale(), $this->ordinalFormatter($ctx), LatinUtils::LATIN_ORDINAL);
         return sprintf("%s domenica dopo l'Epifania", $ordinalStr);
+    }
+
+    /**
+     * Fill ferial weekdays over [$from, $to), skipping Sundays and any date already
+     * occupied (Sundays, anchors). Each free ferial day becomes a WEEKDAY event,
+     * season-stamped from its key. $keyBuilder(DateTime $date): string produces the
+     * event key; $nameBuilder(DateTime $date): string the display name. On Lenten
+     * Fridays, when $lentenAliturgicalFridays is true, is_aliturgical is set.
+     *
+     * @param callable(DateTime):string $keyBuilder
+     * @param callable(DateTime):string $nameBuilder
+     */
+    private function fillFerialWeekdays(TemporaleContext $ctx, DateTime $from, DateTime $to, LitColor $color, callable $keyBuilder, callable $nameBuilder, bool $lentenAliturgicalFridays = false): void
+    {
+        $day = clone $from;
+        while ($day < $to) {
+            $isSunday = (int) $day->format('N') === 7;
+            if (false === $isSunday && false === $ctx->cal->inCalendar($day)) {
+                $key   = $keyBuilder($day);
+                $name  = $nameBuilder($day);
+                $event = new LiturgicalEvent($name, clone $day, $color, LitEventType::MOBILE, LitGrade::WEEKDAY);
+                if ($lentenAliturgicalFridays && (int) $day->format('N') === 5) {
+                    $event->is_aliturgical = true;
+                }
+                $ctx->cal->addLiturgicalEvent($key, $event);
+                $this->stampSeason($event);
+            }
+            $day = ( clone $day )->add(new \DateInterval('P1D'));
+        }
+    }
+
+    /** English weekday name (Monday…Saturday) for locale-independent keys. */
+    private function englishWeekday(DateTime $date): string
+    {
+        return match ((int) $date->format('N')) {
+            1       => 'Monday',
+            2       => 'Tuesday',
+            3       => 'Wednesday',
+            4       => 'Thursday',
+            5       => 'Friday',
+            6       => 'Saturday',
+            default => 'Sunday',
+        };
+    }
+
+    /**
+     * Localized ferial name, e.g. (it) "Lunedì della II settimana dopo Pentecoste",
+     * (la) "Feria II hebdomadæ II post Pentecosten". When $weekNumber is null the
+     * week clause is omitted (e.g. de Exceptáto ferie named by date in Task 6).
+     */
+    private function weekdayName(DateTime $date, string $seasonPhraseIt, string $seasonPhraseLa, ?int $weekNumber, TemporaleContext $ctx): string
+    {
+        if (LitLocale::LATIN_PRIMARY_LANGUAGE === LitLocale::$PRIMARY_LANGUAGE) {
+            $feria = LatinUtils::LATIN_DAYOFTHEWEEK[$date->format('w')]; // e.g. "Feria II"
+            if (null === $weekNumber) {
+                return sprintf('%s %s', $feria, $seasonPhraseLa);
+            }
+            return sprintf('%s hebdomadæ %s %s', $feria, LatinUtils::LATIN_ORDINAL[$weekNumber], $seasonPhraseLa);
+        }
+        $weekday = $ctx->localeDateFormatter->getDayOfTheWeekFormatter()->format($date->format('U'));
+        $weekday = Utilities::ucfirst($weekday);
+        if (null === $weekNumber) {
+            return sprintf('%s %s', $weekday, $seasonPhraseIt);
+        }
+        $ordinalStr = Utilities::getOrdinal($weekNumber, $ctx->localeDateFormatter->getLocale(), $this->ordinalFormatter($ctx), LatinUtils::LATIN_ORDINAL);
+        return sprintf('%s della %s settimana %s', $weekday, $ordinalStr, $seasonPhraseIt);
+    }
+
+    /**
+     * After-Epiphany ferie: Monday after Baptism … Saturday before Lent I. First
+     * caller of `fillFerialWeekdays()`; keys as `AfterEpiphanyWeekday{N}{EnglishDay}`
+     * where N matches the after-Epiphany Sunday numbering (BaptismLord = week 1).
+     */
+    private function calculateAfterEpiphanyWeekdays(TemporaleContext $ctx): void
+    {
+        $year    = $ctx->params->Year;
+        $baptism = DateTime::fromFormat('6-1-' . $year)->modify('next Sunday');
+        $lent1   = Utilities::calcGregEaster($year)->sub(new \DateInterval('P' . ( 6 * 7 ) . 'D'));
+        $from    = ( clone $baptism )->add(new \DateInterval('P1D')); // Monday after Baptism
+        $this->fillFerialWeekdays(
+            $ctx,
+            $from,
+            $lent1,
+            LitColor::GREEN,
+            fn (DateTime $d): string => 'AfterEpiphanyWeekday' . $this->afterEpiphanyWeekNumber($d, $baptism) . $this->englishWeekday($d),
+            fn (DateTime $d): string => $this->weekdayName($d, "dopo l'Epifania", 'post Epiphaniam', $this->afterEpiphanyWeekNumber($d, $baptism), $ctx)
+        );
+    }
+
+    /**
+     * Week number of a ferial day in the after-Epiphany block: the ordinal of the
+     * Sunday that closes its week, matching the Sunday numbering (BaptismLord = week 1,
+     * so the first Monday after Baptism is week 2).
+     */
+    private function afterEpiphanyWeekNumber(DateTime $date, DateTime $baptism): int
+    {
+        $daysSinceBaptism = (int) $baptism->diff($date)->format('%a');
+        return (int) floor(( $daysSinceBaptism - 1 ) / 7) + 2;
     }
 
     /**

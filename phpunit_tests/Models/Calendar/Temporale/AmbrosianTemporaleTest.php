@@ -198,4 +198,17 @@ final class AmbrosianTemporaleTest extends TestCase
 
         self::assertSame('2027-09-05', $d['AfterPentecostMartyrdom1']);
     }
+
+    public function testAfterEpiphanyWeekdaysFillGaps2025(): void
+    {
+        $d = $this->runEngine(2025);
+        // After-Epiphany block: Mon after Baptism (2025-01-13) .. Sat before Lent1 (2025-03-08).
+        // Mondays are weekdays; assert a representative weekday exists and Sundays are NOT overwritten.
+        self::assertArrayHasKey('AfterEpiphanyWeekday2Monday', $d);   // week 2 Monday = 2025-01-13
+        self::assertSame('2025-01-13', $d['AfterEpiphanyWeekday2Monday']);
+        self::assertArrayHasKey('AfterEpiphanyWeekday3Saturday', $d); // 2025-01-25
+        self::assertSame('2025-01-25', $d['AfterEpiphanyWeekday3Saturday']);
+        // The Sunday 2025-01-19 remains AfterEpiphany2 (a weekday fill must never take a Sunday)
+        self::assertSame('2025-01-19', $d['AfterEpiphany2']);
+    }
 }

@@ -37,10 +37,18 @@ final class AmbrosianRealYearAssemblyTest extends TestCase
      * Three event keys (`Christmas`, `Circoncisione`, `Epiphany`) are listed in
      * both the temporale anchor block and the comune sanctorale source; adding
      * the sanctorale row for one of these keys overwrites the already-added
-     * temporale entry rather than creating a duplicate, so the final distinct
-     * key count is 65 + 254 - 3 = 316, not the plain sum of 319.
+     * temporale entry rather than creating a duplicate, so the anchor/Sunday
+     * distinct key count is 65 + 254 - 3 = 316, not the plain sum of 319.
+     *
+     * Plan 6 / Task 5 adds the after-Epiphany ferial-weekday fill
+     * (`fillFerialWeekdays()`, wired via `calculateAfterEpiphanyWeekdays()`),
+     * which for civil year 2025 emits 48 `AfterEpiphanyWeekday{N}{EnglishDay}`
+     * keys (Mon after Baptism 2025-01-13 .. Sat before Lent1 2025-03-08, 6
+     * ferial days/week x 8 weeks = 48; none of these dates collide with an
+     * existing temporale or sanctorale key, so all 48 are additive). New total:
+     * 316 + 48 = 364.
      */
-    private const int EXPECTED_TOTAL_2025 = 316;
+    private const int EXPECTED_TOTAL_2025 = 364;
 
     public function testAssembleAmbrosianYear2025IncludesTemporaleAnchor(): void
     {
