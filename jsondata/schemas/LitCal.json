@@ -570,14 +570,16 @@
                 "liturgical_season": {
                     "type": "string",
                     "title": "Liturgical Season",
-                    "description": "an enumeration value of the liturgical season in which the event falls, one of: ADVENT, CHRISTMAS, LENT, EASTER_TRIDUUM, EASTER, ORDINARY_TIME",
+                    "description": "an enumeration value of the liturgical season in which the event falls, one of: ADVENT, CHRISTMAS, LENT, EASTER_TRIDUUM, EASTER, ORDINARY_TIME, AFTER_EPIPHANY, AFTER_PENTECOST",
                     "enum": [
                         "ADVENT",
                         "CHRISTMAS",
                         "LENT",
                         "EASTER_TRIDUUM",
                         "EASTER",
-                        "ORDINARY_TIME"
+                        "ORDINARY_TIME",
+                        "AFTER_EPIPHANY",
+                        "AFTER_PENTECOST"
                     ]
                 },
                 "liturgical_season_lcl": {
@@ -599,6 +601,14 @@
                     "const": true,
                     "title": "Is Holy Day of Obligation",
                     "description": "the property will only exist and will be true if the celebration is a Holy Day of Obligation, according to the calendar requested; otherwise the property will be absent"
+                },
+                "is_dominical": {
+                    "type": "boolean",
+                    "description": "True if the event is 'of the Lord' (dominical). Present only for rites that classify dominical events (Ambrosian)."
+                },
+                "is_aliturgical": {
+                    "type": "boolean",
+                    "description": "True if the event is aliturgical (no Mass celebrated), e.g. the aliturgical Fridays of Ambrosian Lent."
                 }
             },
             "required": [
@@ -760,14 +770,16 @@
                 "liturgical_season": {
                     "type": "string",
                     "title": "Liturgical Season",
-                    "description": "an enumeration value of the liturgical season in which the event falls, one of: ADVENT, CHRISTMAS, LENT, EASTER_TRIDUUM, EASTER, ORDINARY_TIME",
+                    "description": "an enumeration value of the liturgical season in which the event falls, one of: ADVENT, CHRISTMAS, LENT, EASTER_TRIDUUM, EASTER, ORDINARY_TIME, AFTER_EPIPHANY, AFTER_PENTECOST",
                     "enum": [
                         "ADVENT",
                         "CHRISTMAS",
                         "LENT",
                         "EASTER_TRIDUUM",
                         "EASTER",
-                        "ORDINARY_TIME"
+                        "ORDINARY_TIME",
+                        "AFTER_EPIPHANY",
+                        "AFTER_PENTECOST"
                     ]
                 },
                 "liturgical_season_lcl": {
@@ -804,6 +816,14 @@
                     "const": true,
                     "title": "Is Holy Day of Obligation",
                     "description": "the property will only exist and will be true if the celebration is a Holy Day of Obligation, according to the calendar requested; otherwise the property will be absent"
+                },
+                "is_dominical": {
+                    "type": "boolean",
+                    "description": "True if the event is 'of the Lord' (dominical). Present only for rites that classify dominical events (Ambrosian)."
+                },
+                "is_aliturgical": {
+                    "type": "boolean",
+                    "description": "True if the event is aliturgical (no Mass celebrated), e.g. the aliturgical Fridays of Ambrosian Lent."
                 }
             },
             "required": [

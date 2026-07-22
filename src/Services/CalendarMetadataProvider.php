@@ -7,8 +7,10 @@ namespace LiturgicalCalendar\Api\Services;
 use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataAmbrosianCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarItem;
@@ -62,6 +64,7 @@ final class CalendarMetadataProvider
         self::buildDiocesanCalendarData($metadata);
         self::buildWiderRegionData($metadata);
         self::buildLocales($metadata);
+        self::buildAmbrosianCalendarData($metadata);
         return $metadata;
     }
 
@@ -272,5 +275,38 @@ final class CalendarMetadataProvider
             array_merge(['en'], array_map('basename', $folderGlob)),
             self::FULLY_TRANSLATED_LOCALES
         )));
+    }
+
+    /**
+     * Announces the comune `/calendar/ambrosian` calendar.
+     *
+     * Unlike the General Roman Calendar as used in the Vatican (which is
+     * added to the National calendars as a special case, since it is still
+     * Roman rite), the Ambrosian comune has no representation as a nation,
+     * diocese, or wider region: it is a distinct liturgical rite reachable
+     * only via the `ambrosian` rite segment on the calendar route (see
+     * {@see \LiturgicalCalendar\Api\Router::extractRiteSegment()}). This
+     * builds the `ambrosian_calendars` surface so that `/calendars`
+     * discovery clients can find it, alongside the locales it supports
+     * (derived from the Ambrosian Proprium de Tempore's `i18n` folder, the
+     * same source used at request time by {@see \LiturgicalCalendar\Api\Handlers\CalendarHandler}).
+     *
+     * @return void
+     */
+    private static function buildAmbrosianCalendarData(MetadataCalendars $metadata): void
+    {
+        $folderGlob = self::globOrThrow(JsonData::AMBROSIAN_TEMPORALE_I18N_FOLDER->path() . '/*.json', 0, 'CalendarMetadataProvider::buildAmbrosianCalendarData');
+
+        $locales = array_map(
+            fn (string $filename) => pathinfo($filename, PATHINFO_FILENAME),
+            $folderGlob
+        );
+
+        $metadataAmbrosianCalendarItem = MetadataAmbrosianCalendarItem::fromArray([
+            'calendar_id' => Rite::AMBROSIAN->value,
+            'rite'        => Rite::AMBROSIAN->value,
+            'locales'     => $locales
+        ]);
+        $metadata->pushAmbrosianCalendarMetadata($metadataAmbrosianCalendarItem);
     }
 }

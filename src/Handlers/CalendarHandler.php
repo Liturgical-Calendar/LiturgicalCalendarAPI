@@ -7,6 +7,7 @@ use LiturgicalCalendar\Api\LatinUtils;
 use LiturgicalCalendar\Api\LocaleDateFormatter;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
+use LiturgicalCalendar\Api\Enum\AmbrosianMissal;
 use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\CalEventAction;
 use LiturgicalCalendar\Api\Enum\CorpusChristi;
@@ -26,7 +27,6 @@ use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
-use LiturgicalCalendar\Api\Http\Exception\ImplementationException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Exception\YamlException;
@@ -44,7 +44,11 @@ use LiturgicalCalendar\Api\Models\PropriumDeTemporeEvent;
 use LiturgicalCalendar\Api\Models\RelativeLiturgicalDate;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
+use LiturgicalCalendar\Api\Models\Calendar\Missal\AmbrosianMissalResolver;
+use LiturgicalCalendar\Api\Models\Calendar\Precedence\AmbrosianPrecedenceResolver;
+use LiturgicalCalendar\Api\Models\Calendar\Precedence\PrecedenceContext;
 use LiturgicalCalendar\Api\Models\Calendar\Rite\RiteProfileFactory;
+use LiturgicalCalendar\Api\Models\Calendar\Sanctorale\AmbrosianSanctoraleLoader;
 use LiturgicalCalendar\Api\Models\Calendar\Temporale\TemporaleContext;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItem;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCollection;
@@ -56,6 +60,7 @@ use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyGrade;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyGradeMetadata;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyName;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyNameMetadata;
+use LiturgicalCalendar\Api\Models\Lectionary\AmbrosianReadings;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarSettings;
 use LiturgicalCalendar\Api\Models\ConditionalRule;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
@@ -828,6 +833,11 @@ final class CalendarHandler extends AbstractHandler
      */
     private function loadPropriumDeTemporeData(): void
     {
+        if ($this->CalendarParams->Rite === Rite::AMBROSIAN) {
+            $this->loadAmbrosianPropriumDeTemporeData();
+            return;
+        }
+
         $propriumDeTemporeFile = strtr(
             JsonData::MISSAL_FILE->path(),
             ['{missal_folder}' => 'propriumdetempore']
@@ -837,6 +847,269 @@ final class CalendarHandler extends AbstractHandler
         $PropriumDeTemporeI18n   = $this->loadPropriumDeTemporeI18nData();
         $this->PropriumDeTempore = PropriumDeTemporeMap::fromObject($PropriumDeTempore);
         $this->PropriumDeTempore->setNames($PropriumDeTemporeI18n);
+    }
+
+    /**
+     * Loads localization data stored in JSON format from a file in the
+     * `{JsonData::AMBROSIAN_TEMPORALE_I18N_FOLDER}` directory, named according to
+     * the given locale.
+     *
+     * If the file does not exist, or if there is an error decoding the
+     * JSON data, a 503 Service Unavailable error is thrown.
+     *
+     * @param string $locale The locale to load the i18n data for (must be one of the
+     *                       locales the Ambrosian Proprium de Tempore i18n data ships with).
+     * @return array<string,string> The loaded data.
+     */
+    private function loadAmbrosianPropriumDeTemporeI18nData(string $locale): array
+    {
+        $ambrosianPropriumDeTemporeI18nFile = strtr(
+            JsonData::AMBROSIAN_TEMPORALE_I18N_FILE->path(),
+            ['{locale}' => $locale]
+        );
+
+        $ambrosianPropriumDeTemporeI18nArr = Utilities::jsonFileToArray($ambrosianPropriumDeTemporeI18nFile);
+        if (array_filter(array_keys($ambrosianPropriumDeTemporeI18nArr), 'is_string') !== array_keys($ambrosianPropriumDeTemporeI18nArr)) {
+            throw new \Exception('We expected all the keys of the array to be strings.');
+        }
+        if (array_filter($ambrosianPropriumDeTemporeI18nArr, 'is_string') !== $ambrosianPropriumDeTemporeI18nArr) {
+            throw new \Exception('We expected all the values of the array to be strings.');
+        }
+        /** @var array<string,string> $ambrosianPropriumDeTemporeI18nArr */
+        return $ambrosianPropriumDeTemporeI18nArr;
+    }
+
+    /**
+     * Retrieve the Ambrosian Proprium de Tempore data, along with its i18n data.
+     *
+     * The Ambrosian Proprium de Tempore i18n data only ships `it` and `la` locales
+     * (see `jsondata/sourcedata/missals/ambrosian/propriumdetempore/i18n`). If the
+     * requested primary language isn't one of those, we fall back to Italian (`it`)
+     * rather than failing the request, mirroring how the Vatican/General Roman
+     * Calendar distinction elsewhere in this handler defaults to a sensible locale
+     * instead of forcing an unavailable one.
+     */
+    private function loadAmbrosianPropriumDeTemporeData(): void
+    {
+        $ambrosianPropriumDeTemporeFile = JsonData::AMBROSIAN_TEMPORALE_FILE->path();
+
+        $locale = LitLocale::$PRIMARY_LANGUAGE;
+        if (false === in_array($locale, ['it', 'la'], true)) {
+            $locale = 'it';
+        }
+
+        $PropriumDeTempore       = Utilities::jsonFileToObjectArray($ambrosianPropriumDeTemporeFile);
+        $PropriumDeTemporeI18n   = $this->loadAmbrosianPropriumDeTemporeI18nData($locale);
+        $this->PropriumDeTempore = PropriumDeTemporeMap::fromObject($PropriumDeTempore);
+        $this->PropriumDeTempore->setNames($PropriumDeTemporeI18n);
+    }
+
+    /**
+     * Adds every comune Ambrosian sanctorale event to `$this->Cal`.
+     *
+     * Unlike the Roman check-before-add convention (`inSolemnities()` / `handleCoincidence()`),
+     * the Ambrosian assembly model adds every sanctorale row unconditionally and defers
+     * coincidence resolution to a later precedence-resolution pass (Plan 7, Task 5). The only
+     * thing guarded here is an `event_key` collision against an event already present in
+     * `$this->Cal` — i.e. one added by the Proprium de Tempore load/engine that runs earlier in
+     * the pipeline — because `LiturgicalEventCollection::addLiturgicalEvent()` is keyed by
+     * `event_key` and would otherwise silently overwrite the earlier (temporale) definition.
+     *
+     * Audit finding (Plan 7 Task 4, Step 1): three keys are declared in BOTH
+     * `propriumdesanctis_2024/propriumdesanctis.json` and `propriumdetempore/propriumdetempore.json`
+     * — `Christmas`, `Circoncisione`, `Epiphany` — and all three remain present in
+     * `$this->Cal` after `AmbrosianTemporale::buildTemporale()` runs (verified: none of them are
+     * later removed/renamed by the temporale engine). So the skip branch below is not merely
+     * defensive: for a real Ambrosian request it is expected to trigger on exactly these three
+     * keys, with the temporale definition (added earlier in the pipeline) winning each time.
+     *
+     * Every added event is given the Task 2 empty-readings placeholder
+     * ({@see AmbrosianReadings::empty()}), since there is currently no Ambrosian lectionary data
+     * source in this codebase and the response schema requires every `LiturgicalEvent` to carry
+     * a `readings` property.
+     *
+     * Not called from `calculateUniversalCalendar()` (that method is Roman-only and Task 4 must
+     * not touch it) — called from Plan 7 Task 9's `calculateAmbrosianCalendar()` orchestrator,
+     * assembled together with Tasks 3, 5-8. Also exercised directly (via reflection) by
+     * `CalendarHandlerAmbrosianSanctoraleLoadTest`.
+     */
+    private function addAmbrosianSanctoraleToCalendar(): void
+    {
+        $year    = $this->CalendarParams->Year;
+        $edition = ( new AmbrosianMissalResolver() )->resolve($year)[0];
+
+        $locale = LitLocale::$PRIMARY_LANGUAGE;
+        if (false === in_array($locale, ['it', 'la'], true)) {
+            $locale = 'it';
+        }
+
+        $sanctoraleMap = ( new AmbrosianSanctoraleLoader() )->load($edition, $locale);
+
+        foreach ($sanctoraleMap as $key => $propriumDeSanctisEvent) {
+            if (null !== $this->Cal->getLiturgicalEvent($key)) {
+                /**translators:
+                 * 1. Event key of the Ambrosian comune sanctorale event that was skipped
+                 * 2. Name of the Ambrosian Missal edition the sanctorale event was read from
+                 */
+                $this->Messages[] = sprintf(
+                    _('The Ambrosian comune sanctorale event `%1$s` from the %2$s was skipped because a liturgical event with the same key was already defined by the Proprium de Tempore, which takes precedence.'),
+                    $key,
+                    AmbrosianMissal::getName($edition)
+                );
+                continue;
+            }
+
+            $propriumDeSanctisEvent->setDate(
+                DateTime::fromFormat($propriumDeSanctisEvent->day . '-' . $propriumDeSanctisEvent->month . '-' . $year)
+            );
+
+            $litEvent = LiturgicalEvent::fromObject($propriumDeSanctisEvent);
+            $litEvent->setReadings(AmbrosianReadings::empty());
+            $this->Cal->addLiturgicalEvent($key, $litEvent);
+        }
+    }
+
+    /**
+     * Runs Ambrosian same-day precedence resolution (coincidence ranking, suppression, and the
+     * Tabella dei giorni liturgici transfer rules) over `$this->Cal`.
+     *
+     * Builds a `PrecedenceContext` wrapping `$this->Cal`, `$this->CalendarParams`,
+     * `$this->localeDateFormatter`, and the by-ref `$this->Messages` sink, and hands it to
+     * `AmbrosianPrecedenceResolver::resolve()` (Plan 4).
+     *
+     * **Ordering:** this MUST run AFTER `LiturgicalEventCollection::stampAmbrosianSeasonOnSanctorale()`
+     * (Plan 7 Task 6) — the resolver's season-gated transfer rules (e.g. the privileged-Sunday
+     * checks that gate the Advent/Lent/Easter Solemnity transfer branches) read `liturgical_season`,
+     * which is `null` on every comune sanctorale event until that pass stamps it from a co-located
+     * temporale event.
+     *
+     * Not called from `calculateUniversalCalendar()` (that method is Roman-only) — called from
+     * Plan 7 Task 9's `calculateAmbrosianCalendar()` orchestrator, sequenced after Tasks 3/4/6
+     * (Proprium de Tempore load, temporale engine, comune sanctorale, season stamping). Also
+     * exercised directly (via reflection) by `CalendarHandlerAmbrosianPrecedenceResolverTest`.
+     */
+    private function resolveAmbrosianPrecedence(): void
+    {
+        $ctx = new PrecedenceContext(
+            $this->Cal,
+            $this->CalendarParams,
+            $this->localeDateFormatter,
+            $this->Messages
+        );
+
+        ( new AmbrosianPrecedenceResolver() )->resolve($ctx);
+    }
+
+    /**
+     * Ambrosian rite only: orchestrates the full Ambrosian calendar calculation for
+     * `$this->CalendarParams->Year`, assembling the passes built by Plan 7 Tasks 3-8 into the
+     * single call `handle()` will eventually make once the `/calendar/ambrosian` 501 is lifted
+     * (Task 10).
+     *
+     * Call order (load-bearing — do not reorder):
+     *
+     * 1. {@see self::loadPropriumDeTemporeData()} (Task 3, rite-aware): loads the Ambrosian
+     *    Proprium de Tempore into `$this->PropriumDeTempore` because `$this->CalendarParams->Rite`
+     *    is {@see Rite::AMBROSIAN}.
+     * 2. Builds a {@see TemporaleContext} over `$this->Cal` and runs
+     *    `RiteProfileFactory::forRite(AMBROSIAN)->temporaleEngine()->buildTemporale()` (mirrors the
+     *    Roman temporale seam in {@see self::calculateUniversalCalendar()}), which self-stamps
+     *    `liturgical_season` on every temporale event it produces.
+     * 3. {@see self::addAmbrosianSanctoraleToCalendar()} (Task 4): adds every comune Ambrosian
+     *    sanctorale event, skipping any `event_key` already added by the temporale engine.
+     * 3a. {@see self::backfillAmbrosianReadingsPlaceholder()}: a gap discovered while wiring this
+     *    orchestrator (not one of the originally scoped Task 3-8 passes) — see that method's
+     *    docblock for why it is load-bearing here.
+     * 4. {@see LiturgicalEventCollection::stampAmbrosianSeasonOnSanctorale()} (Task 6): copies
+     *    `liturgical_season` onto sanctorale events from a co-located temporale event. MUST run
+     *    before resolution — the resolver's season-gated transfer rules read `liturgical_season`.
+     * 5. {@see self::resolveAmbrosianPrecedence()} (Task 5): same-day coincidence ranking,
+     *    suppression, and transfer per the Tabella dei giorni liturgici.
+     * 6. {@see LiturgicalEventCollection::setAmbrosianHolyDaysOfObligation()} (Task 6).
+     * 7. {@see LiturgicalEventCollection::setAmbrosianYearCyclesAndVigils()} (Task 7): festive
+     *    (A/B/C) and ferial (I/II) cycles, plus first-vespers vigil Masses.
+     * 8. {@see LiturgicalEventCollection::calculatePsalterWeek()} (rite-agnostic gap-filler,
+     *    validated against the assembled Ambrosian collection in Task 8).
+     * 9. {@see LiturgicalEventCollection::sortLiturgicalEvents()}.
+     *
+     * Does NOT call {@see self::calculateUniversalCalendar()} (the Roman pipeline) and does not
+     * modify any Roman method. `$this->Cal` must already be initialized by the caller (mirroring
+     * how `calculateUniversalCalendar()` is only ever called after `$this->Cal = new
+     * LiturgicalEventCollection(...)` in `handle()`).
+     *
+     * Called from `handle()` (Plan 7 Task 10) as the per-run generator for the Ambrosian branch,
+     * once for the requested year, and — when `YearType::LITURGICAL` — once more for the
+     * previous year, exactly mirroring the Roman branch's two-run + splice structure. Also
+     * exercised directly (via reflection) by `CalendarHandlerAmbrosianOrchestratorTest`.
+     *
+     * @return void
+     */
+    private function calculateAmbrosianCalendar(): void
+    {
+        $this->loadPropriumDeTemporeData();
+
+        $riteProfile      = RiteProfileFactory::forRite($this->CalendarParams->Rite);
+        $temporaleContext = new TemporaleContext(
+            $this->Cal,
+            $this->CalendarParams,
+            $this->PropriumDeTempore,
+            $this->localeDateFormatter,
+            $this->Messages
+        );
+        $riteProfile->temporaleEngine()->buildTemporale($temporaleContext);
+
+        $this->addAmbrosianSanctoraleToCalendar();
+
+        $this->backfillAmbrosianReadingsPlaceholder();
+
+        $this->Cal->stampAmbrosianSeasonOnSanctorale();
+
+        $this->resolveAmbrosianPrecedence();
+
+        $this->Cal->setAmbrosianHolyDaysOfObligation();
+
+        $this->Cal->setAmbrosianYearCyclesAndVigils();
+
+        $this->Cal->calculatePsalterWeek();
+
+        $this->Cal->sortLiturgicalEvents();
+    }
+
+    /**
+     * Ambrosian rite only: backfills the Task 2/4 empty-readings placeholder
+     * ({@see AmbrosianReadings::empty()}) onto every temporale-origin event in `$this->Cal` that
+     * does not yet carry a `readings` property.
+     *
+     * `addAmbrosianSanctoraleToCalendar()` (Task 4) already stamps this placeholder onto every
+     * comune sanctorale event it adds, but the Ambrosian temporale engine
+     * (`AmbrosianTemporale::buildTemporale()`, Plan 3) does not — there is currently no Ambrosian
+     * lectionary data source for the temporale either. `LiturgicalEvent::$readings` is a typed
+     * property with no default, so any read of it before `setReadings()` is called throws a fatal
+     * `Error`. `LiturgicalEventCollection::createVigilMassFor()` (reused verbatim by
+     * `calculateAmbrosianVigilMass()`, Task 7, itself called from
+     * `setAmbrosianYearCyclesAndVigils()`) reads `->readings` unconditionally for any
+     * Sunday/Solemnity-grade event eligible for a vigil — which includes temporale-origin Sundays
+     * and fixed solemnities (Advent Sundays, Easter, Christmas, ...). This backfill MUST therefore
+     * run before `setAmbrosianYearCyclesAndVigils()`, and is placed immediately after
+     * `addAmbrosianSanctoraleToCalendar()` so every event already in `$this->Cal` — temporale and
+     * sanctorale alike — carries a `readings` property from this point onward (the response schema
+     * also requires every `LiturgicalEvent` to carry one).
+     *
+     * This gap was not caught by the per-task tests (Task 5/6/7/8) because each of those tests
+     * hand-assembles only the events it needs and/or (Task 8) applies its own
+     * `withReadingsPlaceholder()` test-only helper before calling
+     * `setAmbrosianYearCyclesAndVigils()`. Running the real, single `calculateAmbrosianCalendar()`
+     * orchestrator surfaced it.
+     *
+     * @return void
+     */
+    private function backfillAmbrosianReadingsPlaceholder(): void
+    {
+        foreach ($this->Cal->getLiturgicalEvents() as $event) {
+            if (false === isset($event->readings)) {
+                $event->setReadings(AmbrosianReadings::empty());
+            }
+        }
     }
 
     /**
@@ -5016,12 +5289,6 @@ final class CalendarHandler extends AbstractHandler
 
         $this->validateRequestMethod($request);
 
-        if ($this->CalendarParams->Rite === Rite::AMBROSIAN) {
-            throw new ImplementationException(
-                'The Ambrosian rite is planned but not yet available; only the Roman rite is currently implemented.'
-            );
-        }
-
         $this->loadDiocesanCalendarData();
         $this->loadNationalCalendarData();
         $this->updateSettingsBasedOnNationalCalendar();
@@ -5067,43 +5334,54 @@ final class CalendarHandler extends AbstractHandler
 
             $this->prepareL10N();
 
-            $this->Cal = new LiturgicalEventCollection($this->CalendarParams);
+            if ($this->CalendarParams->Rite === Rite::AMBROSIAN) {
+                // Ambrosian rite: no national/diocesan layer yet (comune only; dioceses are Plan 8),
+                // so calculateAmbrosianCalendar() is the entire per-run generator. It already runs
+                // setAmbrosianHolyDaysOfObligation(), setAmbrosianYearCyclesAndVigils(),
+                // calculatePsalterWeek(), and sortLiturgicalEvents() internally (see its docblock),
+                // so none of those Roman-branch calls are repeated here.
+                $this->Cal = new LiturgicalEventCollection($this->CalendarParams);
 
-            $this->calculateUniversalCalendar();
+                $this->calculateAmbrosianCalendar();
 
-            // Prepare the localization data for national and diocesan calendars, if applicable
-            $this->applyCalendarI18nData();
+                if ($this->CalendarParams->YearType === YearType::LITURGICAL) {
+                    // Save the state of the current Calendar calculation
+                    $CalBackup      = clone( $this->Cal );
+                    $Messages       = $this->Messages;
+                    $this->Messages = [];
 
-            if ($this->CalendarParams->NationalCalendar !== null && $this->NationalData !== null) {
-                $this->applyNationalCalendar();
-            }
+                    // Calculate the calendar for the previous year
+                    $this->CalendarParams->Year--;
+                    $this->Cal = new LiturgicalEventCollection($this->CalendarParams);
 
-            // :SATURDAY_MEMORIAL_BVM
-            $this->calculateSaturdayMemorialBVM();
+                    $this->calculateAmbrosianCalendar();
 
-            if ($this->CalendarParams->DiocesanCalendar !== null && $this->DiocesanData !== null) {
-                $this->applyDiocesanCalendar();
-            }
+                    $this->Cal->purgeDataBeforeAdvent();
+                    $CalBackup->purgeDataAdventChristmas();
 
-            $this->Cal->setSeasonsAndHolyDaysOfObligation();
+                    // Now we have to combine the two.
+                    // The backup (which represents the main portion) should be appended to the calendar that was just generated
+                    $this->Cal->merge($CalBackup);
 
-            $this->Cal->setYearCyclesAndVigils();
+                    // Reset the year back to the original request before outputting results
+                    $this->CalendarParams->Year++;
 
-            // For any celebrations that do not yet have a psalter_week property, make an attempt to calculate the value if applicable
-            $this->Cal->calculatePsalterWeek();
+                    // Append the messages from the backup calendar (current year) to the current messages (previous year)
+                    // Unfortunately, we don't have a way of purging messages that regard events from the civil year calculations
+                    //   that fall outside of the range of the current liturgical year.
+                    array_push($this->Messages, ...$Messages);
 
-            if ($this->CalendarParams->YearType === YearType::LITURGICAL) {
-                // Save the state of the current Calendar calculation
-                $this->Cal->sortLiturgicalEvents();
-                $CalBackup      = clone( $this->Cal );
-                $Messages       = $this->Messages;
-                $this->Messages = [];
-
-                // Calculate the calendar for the previous year
-                $this->CalendarParams->Year--;
+                    $response = $this->prepareResponseBody($request, $response);
+                } else {
+                    $response = $this->prepareResponseBody($request, $response);
+                }
+            } else {
                 $this->Cal = new LiturgicalEventCollection($this->CalendarParams);
 
                 $this->calculateUniversalCalendar();
+
+                // Prepare the localization data for national and diocesan calendars, if applicable
+                $this->applyCalendarI18nData();
 
                 if ($this->CalendarParams->NationalCalendar !== null && $this->NationalData !== null) {
                     $this->applyNationalCalendar();
@@ -5117,29 +5395,61 @@ final class CalendarHandler extends AbstractHandler
                 }
 
                 $this->Cal->setSeasonsAndHolyDaysOfObligation();
+
                 $this->Cal->setYearCyclesAndVigils();
+
+                // For any celebrations that do not yet have a psalter_week property, make an attempt to calculate the value if applicable
                 $this->Cal->calculatePsalterWeek();
-                $this->Cal->sortLiturgicalEvents();
 
-                $this->Cal->purgeDataBeforeAdvent();
-                $CalBackup->purgeDataAdventChristmas();
+                if ($this->CalendarParams->YearType === YearType::LITURGICAL) {
+                    // Save the state of the current Calendar calculation
+                    $this->Cal->sortLiturgicalEvents();
+                    $CalBackup      = clone( $this->Cal );
+                    $Messages       = $this->Messages;
+                    $this->Messages = [];
 
-                // Now we have to combine the two.
-                // The backup (which represents the main portion) should be appended to the calendar that was just generated
-                $this->Cal->merge($CalBackup);
+                    // Calculate the calendar for the previous year
+                    $this->CalendarParams->Year--;
+                    $this->Cal = new LiturgicalEventCollection($this->CalendarParams);
 
-                // Reset the year back to the original request before outputting results
-                $this->CalendarParams->Year++;
+                    $this->calculateUniversalCalendar();
 
-                // Append the messages from the backup calendar (current year) to the current messages (previous year)
-                // Unfortunately, we don't have a way of purging messages that regard events from the civil year calculations
-                //   that fall outside of the range of the current liturgical year.
-                array_push($this->Messages, ...$Messages);
+                    if ($this->CalendarParams->NationalCalendar !== null && $this->NationalData !== null) {
+                        $this->applyNationalCalendar();
+                    }
 
-                $response = $this->prepareResponseBody($request, $response);
-            } else {
-                $this->Cal->sortLiturgicalEvents();
-                $response = $this->prepareResponseBody($request, $response);
+                    // :SATURDAY_MEMORIAL_BVM
+                    $this->calculateSaturdayMemorialBVM();
+
+                    if ($this->CalendarParams->DiocesanCalendar !== null && $this->DiocesanData !== null) {
+                        $this->applyDiocesanCalendar();
+                    }
+
+                    $this->Cal->setSeasonsAndHolyDaysOfObligation();
+                    $this->Cal->setYearCyclesAndVigils();
+                    $this->Cal->calculatePsalterWeek();
+                    $this->Cal->sortLiturgicalEvents();
+
+                    $this->Cal->purgeDataBeforeAdvent();
+                    $CalBackup->purgeDataAdventChristmas();
+
+                    // Now we have to combine the two.
+                    // The backup (which represents the main portion) should be appended to the calendar that was just generated
+                    $this->Cal->merge($CalBackup);
+
+                    // Reset the year back to the original request before outputting results
+                    $this->CalendarParams->Year++;
+
+                    // Append the messages from the backup calendar (current year) to the current messages (previous year)
+                    // Unfortunately, we don't have a way of purging messages that regard events from the civil year calculations
+                    //   that fall outside of the range of the current liturgical year.
+                    array_push($this->Messages, ...$Messages);
+
+                    $response = $this->prepareResponseBody($request, $response);
+                } else {
+                    $this->Cal->sortLiturgicalEvents();
+                    $response = $this->prepareResponseBody($request, $response);
+                }
             }
         }
 

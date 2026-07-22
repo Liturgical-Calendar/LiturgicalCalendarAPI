@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Tests\Models\Metadata;
 use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\CorpusChristi;
 use LiturgicalCalendar\Api\Enum\Epiphany;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataAmbrosianCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanGroupItem;
@@ -16,6 +17,7 @@ use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(MetadataAmbrosianCalendarItem::class)]
 #[CoversClass(MetadataCalendars::class)]
 #[CoversClass(MetadataDiocesanCalendarItem::class)]
 #[CoversClass(MetadataDiocesanGroupItem::class)]
@@ -117,6 +119,29 @@ final class MetadataCalendarsTest extends TestCase
         self::assertSame('LatinAmerica', $wrObj->name);
     }
 
+    public function testAmbrosianCalendarItemRoundTrip(): void
+    {
+        $ac = MetadataAmbrosianCalendarItem::fromArray([
+            'calendar_id' => 'ambrosian',
+            'rite'        => 'ambrosian',
+            'locales'     => ['it', 'la'],
+        ]);
+        self::assertSame('ambrosian', $ac->calendar_id);
+        self::assertSame('ambrosian', $ac->rite);
+        self::assertSame(['it', 'la'], $ac->locales);
+        self::assertSame(
+            ['calendar_id' => 'ambrosian', 'rite' => 'ambrosian', 'locales' => ['it', 'la']],
+            $ac->jsonSerialize()
+        );
+
+        $acObj = MetadataAmbrosianCalendarItem::fromObject((object) [
+            'calendar_id' => 'ambrosian',
+            'rite'        => 'ambrosian',
+            'locales'     => ['it', 'la'],
+        ]);
+        self::assertSame('ambrosian', $acObj->calendar_id);
+    }
+
     public function testDiocesanCalendarItemRoundTrip(): void
     {
         $dc = MetadataDiocesanCalendarItem::fromArray([
@@ -170,9 +195,13 @@ final class MetadataCalendarsTest extends TestCase
         $mc = new MetadataCalendars();
         self::assertSame([], $mc->national_calendars);
         self::assertSame([], $mc->locales);
+        self::assertSame([], $mc->ambrosian_calendars);
+        self::assertSame([], $mc->ambrosian_calendars_keys);
         $arr = $mc->jsonSerialize();
         self::assertSame([], $arr['national_calendars']);
         self::assertSame([], $arr['locales']);
+        self::assertSame([], $arr['ambrosian_calendars']);
+        self::assertSame([], $arr['ambrosian_calendars_keys']);
     }
 
     public function testMetadataCalendarsPushAndSerialize(): void
@@ -226,5 +255,27 @@ final class MetadataCalendarsTest extends TestCase
         $wr = MetadataWiderRegionItem::fromArray(['name' => 'EU', 'locales' => ['it'], 'api_path' => 'p']);
         $mc->pushWiderRegionMetadata($wr);
         self::assertSame(['EU'], $mc->wider_regions_keys);
+
+        // Ambrosian comune calendar push.
+        $ac = MetadataAmbrosianCalendarItem::fromArray([
+            'calendar_id' => 'ambrosian',
+            'rite'        => 'ambrosian',
+            'locales'     => ['it', 'la'],
+        ]);
+        $mc->pushAmbrosianCalendarMetadata($ac);
+        self::assertSame(['ambrosian'], $mc->ambrosian_calendars_keys);
+
+        // Round-trip the whole container through fromArray/fromObject so the
+        // ambrosian_calendars deserialization paths are exercised (not just the item).
+        $arr = $mc->jsonSerialize();
+
+        $fromArr = MetadataCalendars::fromArray($arr);
+        self::assertSame(['ambrosian'], $fromArr->ambrosian_calendars_keys);
+        self::assertSame('ambrosian', $fromArr->ambrosian_calendars[0]->calendar_id);
+        self::assertSame(['it', 'la'], $fromArr->ambrosian_calendars[0]->locales);
+
+        $fromObj = MetadataCalendars::fromObject(json_decode(json_encode($arr, JSON_THROW_ON_ERROR), false, 512, JSON_THROW_ON_ERROR));
+        self::assertSame(['ambrosian'], $fromObj->ambrosian_calendars_keys);
+        self::assertSame('ambrosian', $fromObj->ambrosian_calendars[0]->rite);
     }
 }
