@@ -63,7 +63,7 @@ final class MissalsTest extends ApiTestCase
     public function testSingleMissalReturnsPropriumDeSanctis(): void
     {
         // Editio Typica 1970 is the canonical missal; its propriumdesanctis is
-        // committed under jsondata/sourcedata/missals/propriumdesanctis_1970/.
+        // committed under jsondata/sourcedata/rite/roman/missals/propriumdesanctis_1970/.
         $response = self::$http->get('/missals/EDITIO_TYPICA_1970', []);
         $this->assertSame(200, $response->getStatusCode());
 

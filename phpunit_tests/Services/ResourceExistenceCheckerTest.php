@@ -41,21 +41,21 @@ final class ResourceExistenceCheckerTest extends TestCase
     public function testMissingNationalCalendarDoesNotExist(): void
     {
         $checker = new ResourceExistenceChecker();
-        // 'ZZ' has no folder under jsondata/sourcedata/calendars/nations
+        // 'ZZ' has no folder under jsondata/sourcedata/rite/roman/calendars/nations
         $this->assertFalse($checker->exists('national_calendar', 'ZZ'));
     }
 
     public function testExistingNationalCalendarExists(): void
     {
         $checker = new ResourceExistenceChecker();
-        // IT has jsondata/sourcedata/calendars/nations/IT/IT.json
+        // IT has jsondata/sourcedata/rite/roman/calendars/nations/IT/IT.json
         $this->assertTrue($checker->exists('national_calendar', 'IT'));
     }
 
     public function testExistingWiderRegionExists(): void
     {
         $checker = new ResourceExistenceChecker();
-        // Europe has jsondata/sourcedata/calendars/wider_regions/Europe/
+        // Europe has jsondata/sourcedata/rite/roman/calendars/wider_regions/Europe/
         $this->assertTrue($checker->exists('wider_region', 'Europe'));
     }
 
