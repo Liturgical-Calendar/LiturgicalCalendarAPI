@@ -46,6 +46,8 @@ use LiturgicalCalendar\Api\Models\RelativeLiturgicalDate;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
 use LiturgicalCalendar\Api\Models\Calendar\Missal\AmbrosianMissalResolver;
+use LiturgicalCalendar\Api\Models\Calendar\Precedence\AmbrosianPrecedenceResolver;
+use LiturgicalCalendar\Api\Models\Calendar\Precedence\PrecedenceContext;
 use LiturgicalCalendar\Api\Models\Calendar\Rite\RiteProfileFactory;
 use LiturgicalCalendar\Api\Models\Calendar\Sanctorale\AmbrosianSanctoraleLoader;
 use LiturgicalCalendar\Api\Models\Calendar\Temporale\TemporaleContext;
@@ -967,6 +969,39 @@ final class CalendarHandler extends AbstractHandler
             $litEvent->setReadings(AmbrosianReadings::empty());
             $this->Cal->addLiturgicalEvent($key, $litEvent);
         }
+    }
+
+    /**
+     * Runs Ambrosian same-day precedence resolution (coincidence ranking, suppression, and the
+     * Tabella dei giorni liturgici transfer rules) over `$this->Cal`.
+     *
+     * Builds a `PrecedenceContext` wrapping `$this->Cal`, `$this->CalendarParams`,
+     * `$this->localeDateFormatter`, and the by-ref `$this->Messages` sink, and hands it to
+     * `AmbrosianPrecedenceResolver::resolve()` (Plan 4).
+     *
+     * **Ordering:** this MUST run AFTER `LiturgicalEventCollection::stampAmbrosianSeasonOnSanctorale()`
+     * (Plan 7 Task 6) — the resolver's season-gated transfer rules (e.g. the privileged-Sunday
+     * checks that gate the Advent/Lent/Easter Solemnity transfer branches) read `liturgical_season`,
+     * which is `null` on every comune sanctorale event until that pass stamps it from a co-located
+     * temporale event.
+     *
+     * Not yet called from `calculateUniversalCalendar()` (that method is Roman-only) — Plan 7
+     * Task 9's `calculateAmbrosianCalendar()` orchestrator is the method that will call this by
+     * name, sequencing it after Tasks 3/4/6 (Proprium de Tempore load, temporale engine, comune
+     * sanctorale, season stamping). Until then it is exercised only by
+     * `CalendarHandlerAmbrosianPrecedenceResolverTest` via reflection.
+     */
+    // @phpstan-ignore method.unused (call site lands in Task 9's calculateAmbrosianCalendar() orchestrator)
+    private function resolveAmbrosianPrecedence(): void
+    {
+        $ctx = new PrecedenceContext(
+            $this->Cal,
+            $this->CalendarParams,
+            $this->localeDateFormatter,
+            $this->Messages
+        );
+
+        ( new AmbrosianPrecedenceResolver() )->resolve($ctx);
     }
 
     /**
