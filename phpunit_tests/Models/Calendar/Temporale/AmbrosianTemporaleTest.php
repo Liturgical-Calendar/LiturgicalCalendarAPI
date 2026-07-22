@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Models\Calendar\Temporale;
 
+use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Models\Calendar\Temporale\AmbrosianTemporale;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -115,5 +116,23 @@ final class AmbrosianTemporaleTest extends TestCase
             $this->assertSame(7, (int) $ck->format('N'), "Christ the King must be a Sunday ($year)");
             $this->assertSame($a1->modify('-7 days')->format('Y-m-d'), $d['ChristKing']);
         }
+    }
+
+    public function testAnchorBlockSeasonsStamped2025(): void
+    {
+        $events = $this->runEngineEvents(2025);
+        self::assertSame(LitSeason::ADVENT, $events['Advent1']->liturgical_season);
+        self::assertSame(LitSeason::CHRISTMAS, $events['Christmas']->liturgical_season);
+        self::assertSame(LitSeason::CHRISTMAS, $events['Circoncisione']->liturgical_season);
+        self::assertSame(LitSeason::CHRISTMAS, $events['Epiphany']->liturgical_season);
+        self::assertSame(LitSeason::CHRISTMAS, $events['BaptismLord']->liturgical_season);
+        self::assertSame(LitSeason::LENT, $events['Lent1']->liturgical_season);
+        self::assertSame(LitSeason::LENT, $events['AshesMonday']->liturgical_season);
+        self::assertSame(LitSeason::LENT, $events['SabatoTradSymb']->liturgical_season);
+        self::assertSame(LitSeason::EASTER_TRIDUUM, $events['HolyThurs']->liturgical_season);
+        self::assertSame(LitSeason::EASTER, $events['Easter']->liturgical_season);
+        self::assertSame(LitSeason::EASTER, $events['Pentecost']->liturgical_season);
+        self::assertSame(LitSeason::AFTER_PENTECOST, $events['DedicationDuomo']->liturgical_season);
+        self::assertSame(LitSeason::AFTER_PENTECOST, $events['ChristKing']->liturgical_season);
     }
 }

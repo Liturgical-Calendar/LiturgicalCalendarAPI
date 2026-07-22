@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Models\Calendar\Temporale;
 
 use LiturgicalCalendar\Api\DateTime;
+use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Utilities;
@@ -43,7 +44,20 @@ final class AmbrosianTemporale implements TemporaleEngine
         }
         $event = LiturgicalEvent::fromObject($ctx->propriumDeTempore[$key]);
         $ctx->cal->addLiturgicalEvent($key, $event);
+        $this->stampSeason($event);
         return $event;
+    }
+
+    /**
+     * Stamp the Ambrosian liturgical season onto an event from its key. Called on
+     * every event the engine creates, because the Roman
+     * `LiturgicalEventCollection::setSeasonsAndHolyDaysOfObligation()` cannot run
+     * for the Ambrosian rite (it requires an AshWednesday event and knows only the
+     * six Roman seasons).
+     */
+    private function stampSeason(LiturgicalEvent $event): void
+    {
+        $event->liturgical_season = LitSeason::forEventKey($event->event_key);
     }
 
     /**

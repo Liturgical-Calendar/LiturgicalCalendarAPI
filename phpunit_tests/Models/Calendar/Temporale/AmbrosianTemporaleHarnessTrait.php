@@ -107,4 +107,20 @@ trait AmbrosianTemporaleHarnessTrait
         }
         return $dates;
     }
+
+    /** @return array<string,\LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent> map of event_key => event after buildTemporale */
+    private function runEngineEvents(int $year): array
+    {
+        $messages = [];
+        $ctx      = $this->buildContext($year, $messages);
+        ( new AmbrosianTemporale() )->buildTemporale($ctx);
+
+        $events = [];
+        foreach ($ctx->cal->getLiturgicalEvents()->getKeys() as $key) {
+            $event = $ctx->cal->getLiturgicalEvent($key);
+            self::assertNotNull($event, "Expected a LiturgicalEvent for key $key");
+            $events[$key] = $event;
+        }
+        return $events;
+    }
 }
