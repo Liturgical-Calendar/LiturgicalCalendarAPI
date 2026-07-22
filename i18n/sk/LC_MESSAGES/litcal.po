@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-21 18:46+0000\n"
+"POT-Creation-Date: 2026-07-22 12:01+0000\n"
 "PO-Revision-Date: 2026-06-19 20:58+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Slovak <https://translate.johnromanodorazio.com/projects/"
@@ -595,43 +595,43 @@ msgid "Masses and Prayers for Various Needs and Occasions"
 msgstr "Omše a modlitby za rôzne potreby a príležitosti"
 
 #. translators: context = liturgical season
-#: src/Enum/LitSeason.php:158
+#: src/Enum/LitSeason.php:161
 msgid "Advent"
 msgstr "Advent"
 
 #. translators: context = liturgical season
-#: src/Enum/LitSeason.php:160
+#: src/Enum/LitSeason.php:163
 msgid "Christmas"
 msgstr "Vianoce"
 
 #. translators: context = liturgical season
-#: src/Enum/LitSeason.php:162
+#: src/Enum/LitSeason.php:165
 msgid "Lent"
 msgstr "Pôst"
 
 #. translators: context = liturgical season
-#: src/Enum/LitSeason.php:164
+#: src/Enum/LitSeason.php:167
 msgid "Easter Triduum"
 msgstr "Veľkonočné trojdnie"
 
 #. translators: context = liturgical season
-#: src/Enum/LitSeason.php:166
+#: src/Enum/LitSeason.php:169
 msgid "Easter"
 msgstr "Veľká noc"
 
 #. translators: context = liturgical season
-#: src/Enum/LitSeason.php:168
+#: src/Enum/LitSeason.php:171
 msgid "Ordinary Time"
 msgstr "Obdobie cez rok"
 
 #. translators: context = liturgical season (Ambrosian rite)
-#: src/Enum/LitSeason.php:170
+#: src/Enum/LitSeason.php:173
 #, fuzzy
 msgid "After Epiphany"
 msgstr "%s po Zjavení Pána"
 
 #. translators: context = liturgical season (Ambrosian rite)
-#: src/Enum/LitSeason.php:172
+#: src/Enum/LitSeason.php:175
 #, fuzzy
 msgid "After Pentecost"
 msgstr "Po žatve"
@@ -1514,7 +1514,7 @@ msgstr "Z bežného"
 #. translators: context alternate name for a liturgical event, e.g. Second Sunday of Easter `or` Divine Mercy Sunday
 #. translators: when there are multiple possible commons, this will be the glue "[; or] From the Common of..."
 #: src/Models/Calendar/LitCommons.php:228
-#: src/Models/Calendar/LiturgicalEvent.php:142
+#: src/Models/Calendar/LiturgicalEvent.php:143
 #: src/Models/Calendar/Temporale/RomanTemporale.php:256
 #: src/Models/EventsPath/LiturgicalEventAbstract.php:104 src/Utilities.php:450
 #: src/Utilities.php:456
