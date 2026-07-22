@@ -2,9 +2,11 @@
 
 namespace LiturgicalCalendar\Api\Handlers;
 
+use LiturgicalCalendar\Api\Enum\AmbrosianMissal;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
@@ -18,6 +20,7 @@ use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewMobile;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemMakeDoctor;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyGrade;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyName;
+use LiturgicalCalendar\Api\Models\Calendar\Missal\AmbrosianMissalResolver;
 use LiturgicalCalendar\Api\Models\EventsPath\LiturgicalEventAbstract;
 use LiturgicalCalendar\Api\Models\EventsPath\LiturgicalEventFixed;
 use LiturgicalCalendar\Api\Models\EventsPath\LiturgicalEventMap;
@@ -60,6 +63,7 @@ final class EventsHandler extends AbstractHandler
     private static ?NationalData $NationalData       = null;
     private static ?WiderRegionData $WiderRegionData = null;
     private EventsParams $EventsParams;
+    private Rite $rite = Rite::ROMAN;
 
     /**
      * Initializes the EventsHandler.
@@ -68,10 +72,13 @@ final class EventsHandler extends AbstractHandler
      * to hold the liturgical events that will be populated during request handling.
      *
      * @param string[] $requestPathParams The path parameters from the request.
+     * @param Rite     $rite              The liturgical rite for which the events catalog should be
+     *                                    built (ROMAN or AMBROSIAN). Mirrors {@see CalendarHandler::__construct()}.
      */
-    public function __construct(array $requestPathParams = [])
+    public function __construct(array $requestPathParams = [], Rite $rite = Rite::ROMAN)
     {
         parent::__construct($requestPathParams);
+        $this->rite = $rite;
 
         self::$liturgicalEvents = new LiturgicalEventMap();
         self::$temporaleEvents  = [];
@@ -303,6 +310,11 @@ final class EventsHandler extends AbstractHandler
      */
     private function processSanctoraleEvents(): void
     {
+        if ($this->EventsParams->Rite === Rite::AMBROSIAN) {
+            $this->processAmbrosianSanctoraleEvents();
+            return;
+        }
+
         foreach (RomanMissal::getLatinMissalIds() as $LatinMissalId) {
             $MissalDataFile = RomanMissal::getSanctoraleFileName($LatinMissalId);
             $i18nPath       = RomanMissal::getSanctoraleI18nFilePath($LatinMissalId);
@@ -331,6 +343,62 @@ final class EventsHandler extends AbstractHandler
         }
     }
 
+    /**
+     * Ambrosian rite only: processes the comune Ambrosian Proprium de Sanctis (sanctorale) data
+     * and adds it to the catalog.
+     *
+     * Rite-scoped mirror of the Roman branch of {@see self::processSanctoraleEvents()} above: same
+     * raw-array read-and-name-lookup shape, but reading the single comune Ambrosian sanctorale
+     * (`{@see JsonData::AMBROSIAN_SANCTORALE_FILE}` / `_I18N_FILE`) resolved for the request year via
+     * {@see AmbrosianMissalResolver}, instead of looping {@see RomanMissal::getLatinMissalIds()}.
+     * There is no per-key skip-on-collision here (unlike
+     * `CalendarHandler::addAmbrosianSanctoraleToCalendar()`): temporale and sanctorale catalog
+     * entries are kept in separate buckets (`self::$temporaleEvents` vs. `self::$liturgicalEvents`),
+     * so the three keys shared between the two source files (`Christmas`, `Circoncisione`,
+     * `Epiphany`) never collide here the way they would in a single dated collection.
+     *
+     * Only called for {@see Rite::AMBROSIAN} requests, which `EventsParams::validateRiteCompatibility()`
+     * has already confirmed carry no national/diocesan calendar.
+     */
+    private function processAmbrosianSanctoraleEvents(): void
+    {
+        $edition = ( new AmbrosianMissalResolver() )->resolve($this->EventsParams->Year)[0];
+
+        $MissalDataFile = JsonData::AMBROSIAN_SANCTORALE_FILE->path();
+        $i18nFile       = strtr(JsonData::AMBROSIAN_SANCTORALE_I18N_FILE->path(), ['{locale}' => $this->resolveAmbrosianLocale()]);
+
+        $names      = Utilities::jsonFileToArray($i18nFile);
+        $MissalData = Utilities::jsonFileToArray($MissalDataFile);
+
+        /** @var array{event_key:string,month:integer,day:integer,grade:integer,color:string[],type:string,common?:string[],grade_display?:string} $liturgicalEvent */
+        foreach ($MissalData as $liturgicalEvent) {
+            $key = $liturgicalEvent['event_key'];
+            if (array_key_exists($key, $names)) {
+                $liturgicalEvent['name'] = $names[$key];
+            }
+            if (false === isset($liturgicalEvent['name'])) {
+                throw new \RuntimeException('Could not find name for liturgical event ' . $key . ' in the ' . AmbrosianMissal::getName($edition) . '.');
+            }
+            /** @var array{event_key:string,name:string,month:integer,day:integer,grade:integer,color:string[],type:string,common?:string[],grade_display?:string} $liturgicalEvent */
+            self::$liturgicalEvents->addEvent(LiturgicalEventFixed::fromArray($liturgicalEvent));
+        }
+    }
+
+    /**
+     * Ambrosian rite only: resolves the locale to use for the Ambrosian source data i18n files.
+     *
+     * The Ambrosian temporale and sanctorale i18n data only ship `it` and `la` locale files (see
+     * `jsondata/sourcedata/missals/ambrosian/propriumdetempore/i18n` and
+     * `jsondata/sourcedata/missals/ambrosian/propriumdesanctis_2024/i18n`). If the request's base
+     * locale isn't one of those, fall back to Italian (`it`), mirroring
+     * `CalendarHandler::loadAmbrosianPropriumDeTemporeData()` / `addAmbrosianSanctoraleToCalendar()`.
+     */
+    private function resolveAmbrosianLocale(): string
+    {
+        return in_array($this->EventsParams->baseLocale, ['it', 'la'], true)
+            ? $this->EventsParams->baseLocale
+            : 'it';
+    }
 
     /**
      * Processes the Temporale (Proprium de Tempore) events and adds them to the catalog.
@@ -340,11 +408,22 @@ final class EventsHandler extends AbstractHandler
      * entries and merged into the response. They matter to the catalog because they are the anchors a
      * decree's relative `strtotime` references (e.g. "Monday after Pentecost"). Reads the source list and
      * the localized names for the request's base locale.
+     *
+     * Ambrosian requests read the Ambrosian Proprium de Tempore source
+     * ({@see JsonData::AMBROSIAN_TEMPORALE_FILE} / `_I18N_FILE`) instead, with the same `it`/`la`
+     * (fallback `it`) locale resolution as
+     * `CalendarHandler::loadAmbrosianPropriumDeTemporeData()`. There is no per-edition resolution
+     * for the temporale (it is rite-wide, not Missal-edition-specific), mirroring that handler.
      */
     private function processTemporaleEvents(): void
     {
-        $dataFile = JsonData::TEMPORALE_FILE->path();
-        $i18nFile = strtr(JsonData::TEMPORALE_I18N_FILE->path(), ['{locale}' => $this->EventsParams->baseLocale]);
+        if ($this->EventsParams->Rite === Rite::AMBROSIAN) {
+            $dataFile = JsonData::AMBROSIAN_TEMPORALE_FILE->path();
+            $i18nFile = strtr(JsonData::AMBROSIAN_TEMPORALE_I18N_FILE->path(), ['{locale}' => $this->resolveAmbrosianLocale()]);
+        } else {
+            $dataFile = JsonData::TEMPORALE_FILE->path();
+            $i18nFile = strtr(JsonData::TEMPORALE_I18N_FILE->path(), ['{locale}' => $this->EventsParams->baseLocale]);
+        }
         if (false === file_exists($dataFile) || false === file_exists($i18nFile)) {
             return;
         }
@@ -663,9 +742,11 @@ final class EventsHandler extends AbstractHandler
         }
 
         $this->EventsParams = new EventsParams($params);
+        $this->EventsParams->setRite($this->rite);
         if (count($this->requestPathParams)) {
             $this->validateRequestPathParams();
         }
+        $this->EventsParams->validateRiteCompatibility();
 
         $this->validateRequestMethod($request);
 
@@ -674,9 +755,15 @@ final class EventsHandler extends AbstractHandler
         $this->setLocale();
         $this->processTemporaleEvents();
         $this->processSanctoraleEvents();
-        $this->processMemorialsFromDecreesData();
-        $this->processNationalCalendarData();
-        $this->processDiocesanCalendarData();
+        if ($this->EventsParams->Rite === Rite::ROMAN) {
+            // The Ambrosian rite has no national/diocesan layer or decrees data yet
+            // (comune ambrosiano only, for now); EventsParams::validateRiteCompatibility()
+            // above has already rejected any Ambrosian request carrying a national or
+            // diocesan calendar, so these three processors are Roman-only.
+            $this->processMemorialsFromDecreesData();
+            $this->processNationalCalendarData();
+            $this->processDiocesanCalendarData();
+        }
 
         $responseObj  = [
             // Temporale entries are date-less and live outside the (Fixed/Mobile) event map, so merge them in.

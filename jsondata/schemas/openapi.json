@@ -4105,6 +4105,88 @@
         }
       }
     },
+    "/events/ambrosian": {
+      "get": {
+        "tags": [
+          "Liturgical events"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve all possible liturgical events from the Ambrosian comune calendar (Proprium de Tempore and comune sanctorale) even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
+        "description": "The Ambrosian rite has no national calendars, and diocesan Ambrosian event catalogs are not yet supported; this endpoint serves only the comune ambrosiano (Proprium de Tempore + comune sanctorale) catalog. A `national_calendar` or `diocesan_calendar` parameter combined with this endpoint returns 400 Bad Request.",
+        "operationId": "retrieveAmbrosianEventsGET",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: A collection of all possible liturgical events that can be found in the Ambrosian comune calendar produced by the LitCal API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "304 Not Modified"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Liturgical events"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve all possible liturgical events from the Ambrosian comune calendar (Proprium de Tempore and comune sanctorale) even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
+        "description": "The Ambrosian rite has no national calendars, and diocesan Ambrosian event catalogs are not yet supported; this endpoint serves only the comune ambrosiano (Proprium de Tempore + comune sanctorale) catalog. A `national_calendar` or `diocesan_calendar` parameter combined with this endpoint returns 400 Bad Request.",
+        "operationId": "retrieveAmbrosianEventsPOST",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: A collection of all possible liturgical events that can be found in the Ambrosian comune calendar produced by the LitCal API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "304 Not Modified"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      }
+    },
     "/events/nation/{calendar_id}": {
       "get": {
         "tags": [

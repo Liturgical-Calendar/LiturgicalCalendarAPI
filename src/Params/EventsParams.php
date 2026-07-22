@@ -3,6 +3,7 @@
 namespace LiturgicalCalendar\Api\Params;
 
 use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
@@ -28,6 +29,7 @@ class EventsParams implements ParamsInterface
     public bool $EternalHighPriest   = false;
     public ?string $NationalCalendar = null;
     public ?string $DiocesanCalendar = null;
+    public Rite $Rite                = Rite::ROMAN;
 
     public readonly MetadataCalendars $calendarsMetadata;
 
@@ -220,5 +222,45 @@ class EventsParams implements ParamsInterface
     private function isValidDiocesanCalendar(string $calendar): bool
     {
         return in_array($calendar, $this->calendarsMetadata->diocesan_calendars_keys);
+    }
+
+    /**
+     * Sets the liturgical rite for which the events catalog should be built.
+     *
+     * @param Rite $rite the liturgical rite (ROMAN or AMBROSIAN)
+     */
+    public function setRite(Rite $rite): void
+    {
+        $this->Rite = $rite;
+    }
+
+    /**
+     * Cross-field validation of the rite against the requested calendar. Roman accepts
+     * every calendar shape. The Ambrosian rite has no national layer and, for the events
+     * catalog, no diocesan layer either (comune ambrosiano only, for now) — a national or
+     * diocesan calendar request combined with the Ambrosian rite is rejected. Mirrors
+     * {@see \LiturgicalCalendar\Api\Params\CalendarParams::validateRiteCompatibility()}, minus the
+     * year-floor check (the events catalog is year-agnostic). Must be called after the rite
+     * and any `national_calendar`/`diocesan_calendar` parameters have been set.
+     *
+     * @throws ValidationException
+     */
+    public function validateRiteCompatibility(): void
+    {
+        if ($this->Rite === Rite::ROMAN) {
+            return;
+        }
+
+        if ($this->NationalCalendar !== null) {
+            throw new ValidationException(
+                'The Ambrosian rite has no national calendars; request the comune ambrosiano events catalog (`/events/ambrosian`).'
+            );
+        }
+
+        if ($this->DiocesanCalendar !== null) {
+            throw new ValidationException(
+                'The Ambrosian rite does not yet support diocesan event catalogs; request the comune ambrosiano events catalog (`/events/ambrosian`).'
+            );
+        }
     }
 }

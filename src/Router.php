@@ -105,22 +105,24 @@ class Router
 
     /**
      * Determines the liturgical rite from an optional leading rite segment on the
-     * calendar route, stripping that segment from the request-path parts when present.
+     * calendar or events route, stripping that segment from the request-path parts
+     * when present.
      *
-     * Only the calendar route (`calendar`, or the empty root route) carries a rite
-     * segment. A leading segment whose value is a valid {@see Rite} case (`roman`,
-     * `ambrosian`) selects that rite and is removed from `$requestPathParts` so the
-     * remaining 0/1/2/3-part shape parsing runs identically to an un-prefixed request;
-     * `/calendar` and `/calendar/roman` are therefore equivalent, symmetric with
-     * `/calendar/ambrosian`. Absence of a rite segment defaults to Roman. No nation or
-     * diocese identifier collides with a rite value, so this is unambiguous.
+     * Only the calendar route (`calendar`, or the empty root route) and the events
+     * route (`events`) carry a rite segment. A leading segment whose value is a valid
+     * {@see Rite} case (`roman`, `ambrosian`) selects that rite and is removed from
+     * `$requestPathParts` so the remaining 0/1/2/3-part shape parsing runs identically
+     * to an un-prefixed request; `/calendar` and `/calendar/roman` are therefore
+     * equivalent, symmetric with `/calendar/ambrosian` (and likewise for `/events`).
+     * Absence of a rite segment defaults to Roman. No nation or diocese identifier
+     * collides with a rite value, so this is unambiguous.
      *
      * @param string       $route            the first path segment (the endpoint), already shifted off
      * @param list<string> $requestPathParts the remaining path segments; the rite segment is removed in place when present
      */
     public static function extractRiteSegment(string $route, array &$requestPathParts): Rite
     {
-        if ($route === 'calendar' || $route === '') {
+        if ($route === 'calendar' || $route === '' || $route === 'events') {
             $maybeRite = Rite::tryFrom((string) ( $requestPathParts[0] ?? '' ));
             if ($maybeRite !== null) {
                 array_shift($requestPathParts);
@@ -321,7 +323,7 @@ class Router
                 $this->handler = $easterHandler;
                 break;
             case 'events':
-                $eventsHandler = new EventsHandler($requestPathParts);
+                $eventsHandler = new EventsHandler($requestPathParts, $rite);
                 if (count($requestPathParts) === 0) {
                     $eventsHandler->setAllowedRequestMethods([
                         RequestMethod::GET,

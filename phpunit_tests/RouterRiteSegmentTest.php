@@ -10,10 +10,11 @@ use PHPUnit\Framework\Attributes\CoversMethod;
 use PHPUnit\Framework\TestCase;
 
 /**
- * The Router recognises an optional leading rite segment on the calendar route.
- * `/calendar` and `/calendar/roman` are equivalent (both Roman); `/calendar/ambrosian`
- * selects the Ambrosian rite. Any other leading segment (a year, `nation`, `diocese`)
- * is left untouched for the existing shape parsing.
+ * The Router recognises an optional leading rite segment on the calendar and events
+ * routes. `/calendar` and `/calendar/roman` are equivalent (both Roman); `/calendar/ambrosian`
+ * selects the Ambrosian rite — and likewise `/events/ambrosian` for the events route
+ * (Plan 7 Task 12). Any other leading segment (a year, `nation`, `diocese`) is left
+ * untouched for the existing shape parsing.
  */
 #[CoversMethod(Router::class, 'extractRiteSegment')]
 final class RouterRiteSegmentTest extends TestCase
@@ -60,11 +61,28 @@ final class RouterRiteSegmentTest extends TestCase
         self::assertSame(['nation', 'US'], $parts);
     }
 
-    public function testRiteSegmentOnlyAppliesToTheCalendarRoute(): void
+    public function testRiteSegmentOnlyAppliesToTheCalendarAndEventsRoutes(): void
     {
-        // A non-calendar route must never treat a leading 'ambrosian'/'roman' as a rite.
+        // A route that is neither calendar nor events must never treat a leading
+        // 'ambrosian'/'roman' as a rite.
         $parts = ['ambrosian'];
         self::assertSame(Rite::ROMAN, Router::extractRiteSegment('metadata', $parts));
         self::assertSame(['ambrosian'], $parts);
+    }
+
+    public function testEventsRouteAlsoSupportsAnAmbrosianRiteSegment(): void
+    {
+        // Plan 7 Task 12: the events route gained the same optional leading rite
+        // segment the calendar route already had.
+        $parts = ['ambrosian'];
+        self::assertSame(Rite::AMBROSIAN, Router::extractRiteSegment('events', $parts));
+        self::assertSame([], $parts);
+    }
+
+    public function testEventsRouteWithNoRiteSegmentDefaultsToRoman(): void
+    {
+        $parts = ['nation', 'US'];
+        self::assertSame(Rite::ROMAN, Router::extractRiteSegment('events', $parts));
+        self::assertSame(['nation', 'US'], $parts);
     }
 }
