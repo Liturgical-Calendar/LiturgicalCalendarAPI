@@ -144,6 +144,31 @@ enum JsonData: string
     case AMBROSIAN_TEMPORALE_I18N_FILE = JsonDataConstants::AMBROSIAN_TEMPORALE_I18N_FILE;
 
     /**
+     * The folder containing Ambrosian Proprium de Sanctis (sanctorale) data, 2024 edition.
+     * Evaluates to 'jsondata/sourcedata/missals/ambrosian/propriumdesanctis_2024'.
+     */
+    case AMBROSIAN_SANCTORALE_FOLDER = JsonDataConstants::AMBROSIAN_SANCTORALE_FOLDER;
+
+    /**
+     * The file containing the Ambrosian Proprium de Sanctis (sanctorale) data, 2024 edition.
+     * Evaluates to 'jsondata/sourcedata/missals/ambrosian/propriumdesanctis_2024/propriumdesanctis.json'.
+     */
+    case AMBROSIAN_SANCTORALE_FILE = JsonDataConstants::AMBROSIAN_SANCTORALE_FILE;
+
+    /**
+     * The folder containing i18n files for the Ambrosian Proprium de Sanctis (sanctorale), 2024 edition.
+     * Evaluates to 'jsondata/sourcedata/missals/ambrosian/propriumdesanctis_2024/i18n'.
+     */
+    case AMBROSIAN_SANCTORALE_I18N_FOLDER = JsonDataConstants::AMBROSIAN_SANCTORALE_I18N_FOLDER;
+
+    /**
+     * The file containing the i18n data for the Ambrosian Proprium de Sanctis (sanctorale), 2024 edition,
+     * with a placeholder for the locale.
+     * Evaluates to 'jsondata/sourcedata/missals/ambrosian/propriumdesanctis_2024/i18n/{locale}.json'.
+     */
+    case AMBROSIAN_SANCTORALE_I18N_FILE = JsonDataConstants::AMBROSIAN_SANCTORALE_I18N_FILE;
+
+    /**
      * The folder containing readings from the lectionary for every possible liturgical event in the General Roman Calendar.
      * Evaluates to 'jsondata/sourcedata/lectionarium'.
      */

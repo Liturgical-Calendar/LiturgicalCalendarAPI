@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Models\Calendar\Precedence;
 
+use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
@@ -58,16 +59,88 @@ use LiturgicalCalendar\Api\Utilities;
  * {@see self::suppress()}, exactly mirroring the ordered-predicate style
  * already used by `AmbrosianLiturgicalDayRank::rankOf()`. Any loser not
  * matched by an earlier branch falls through to the suppression fallback.
+ *
+ * Plan 5, Task 8 (this revision) hardens the above against REAL
+ * coincidences found by running the resolver on assembled real-year data
+ * (issue #727):
+ *
+ * - `resolve()` no longer resolves a single up-front date-group snapshot.
+ *   A TRANSFER can land an event on a date that already holds another
+ *   event -- a brand new coincidence the old single pass never
+ *   re-examined (suppression, by contrast, only ever REMOVES an event, so
+ *   it can never create a new coincidence). `resolve()` now repeats the
+ *   full "rebuild groups from current dates, resolve every contested
+ *   date once" pass until a pass performs zero moves (a fixpoint), capped
+ *   at {@see self::MAX_RE_RESOLUTION_PASSES} passes as a defensive guard
+ *   ({@see self::resolveOnePass()}).
+ * - {@see self::protectLentenFerie()} no longer leaves both the Lenten
+ *   ferie and the impeding solemnity on the same date (issue #727 item
+ *   1): per norm 4/56 a Lenten ferie yields ONLY to the Annunciation/St
+ *   Joseph, so any OTHER impeding solemnity is itself impeded and must
+ *   move -- via the same generic n.56 walk `transferSolemnityToNextFreeDay()`
+ *   already used elsewhere, just applied to the WINNER instead of the
+ *   loser. The walk itself is factored out into
+ *   {@see self::findNextFreeDay()} so both call sites share it.
  */
 final class AmbrosianPrecedenceResolver implements PrecedenceResolver
 {
+    /**
+     * Safety cap on {@see self::resolve()}'s re-resolution loop. A real
+     * Ambrosian calendar is expected to reach a fixpoint (a pass with zero
+     * moves) in at most a couple of passes -- transfer cascades are local
+     * (a handful of days deep at most) -- so hitting this cap signals a
+     * genuine anomaly (e.g. a pathological cycle of transfers) rather than
+     * a normal outcome, and is reported via `addMessage()` rather than
+     * looped on indefinitely.
+     */
+    private const int MAX_RE_RESOLUTION_PASSES = 12;
+
+    /**
+     * Safety cap, in days, on {@see self::findNextFreeDay()}'s forward walk.
+     * Shared by the generic n.56 transfer and the Lenten-ferie-protection
+     * transfer -- see {@see self::findNextFreeDay()} for why 366 is a safe
+     * defensive bound rather than a normally-reachable limit.
+     */
+    private const int MAX_FREE_DAY_WALK_DAYS = 366;
+
     public function resolve(PrecedenceContext $ctx): void
+    {
+        for ($pass = 1; $pass <= self::MAX_RE_RESOLUTION_PASSES; $pass++) {
+            if (false === $this->resolveOnePass($ctx)) {
+                // Fixpoint reached: the last pass moved nothing, so no
+                // coincidence remains that this resolver's rules can act on.
+                return;
+            }
+        }
+
+        $ctx->addMessage(sprintf(
+            'AmbrosianPrecedenceResolver: reached the %d-pass re-resolution cap without reaching a fixpoint; the '
+                . 'calendar may still contain an unresolved coincidence (this signals an anomaly and should not '
+                . 'happen for a real calendar).',
+            self::MAX_RE_RESOLUTION_PASSES
+        ));
+    }
+
+    /**
+     * One full resolution pass: rebuilds the date-group snapshot from the
+     * collection's CURRENT event dates (reflecting any moves made by
+     * earlier passes), resolves every contested date exactly once (same
+     * per-group logic as before Task 8: sort by `rankOf()`, keep the
+     * winner, hand every other event to {@see self::resolveLoser()}), and
+     * reports whether any call to `resolveLoser()` performed a MOVE (a
+     * transfer that could have created a new coincidence at its
+     * destination) -- the signal {@see self::resolve()} uses to decide
+     * whether another pass is needed.
+     */
+    private function resolveOnePass(PrecedenceContext $ctx): bool
     {
         /** @var array<string,array<string,LiturgicalEvent>> $eventsByDate keyed by 'Y-m-d', then by event_key */
         $eventsByDate = [];
         foreach ($ctx->cal->getLiturgicalEvents()->getEvents() as $key => $event) {
             $eventsByDate[$event->date->format('Y-m-d')][$key] = $event;
         }
+
+        $movedAny = false;
 
         foreach ($eventsByDate as $group) {
             if (count($group) < 2) {
@@ -85,9 +158,13 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
             $losers = $group;
 
             foreach ($losers as $loser) {
-                $this->resolveLoser($winner, $loser, $ctx);
+                if ($this->resolveLoser($winner, $loser, $ctx)) {
+                    $movedAny = true;
+                }
             }
         }
+
+        return $movedAny;
     }
 
     /**
@@ -103,10 +180,17 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
      *
      * Task 7 adds three more branches, evaluated in this order:
      *
-     * 1. A Lenten ferie loser is protected UNLESS the winner is specifically
-     *    the Annunciation or St Joseph (norm 4) -- checked first because it
-     *    is the most restrictive predicate (`$loser`'s grade/season) and
-     *    must win over the generic solemnity fallback below.
+     * 1. A Lenten ferie loser is protected when impeded by a SOLEMNITY that
+     *    is NOT the Annunciation or St Joseph (norm 4) -- checked first
+     *    because it is the most restrictive predicate (`$loser`'s
+     *    grade/season) and must win over the generic solemnity fallback
+     *    below. Since Task 8, "protected" means the IMPEDING WINNER is
+     *    transferred away (the ferie itself never moves) -- see
+     *    {@see self::protectLentenFerie()}. The `isSolemnity($winner)` guard
+     *    is deliberate: a non-solemnity winner (e.g. a privileged Sunday of
+     *    Lent, or a fixed rank-2 day like SabatoTradSymb) must never be
+     *    transferred, so it falls through to plain suppression of the ferie
+     *    instead.
      * 2. The Annunciation/St Joseph loser, when superseded specifically
      *    within the Sabato in traditione symboli/settimana autentica window,
      *    transfers to the fixed Monday/Tuesday-after-the-octave target. This
@@ -119,45 +203,62 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
      *    generic n.56 "first free day" transfer.
      *
      * Anything still unmatched falls through to plain suppression.
+     *
+     * @return bool `true` if this call MOVED an event (winner or loser) to
+     *     a new date -- the signal {@see self::resolveOnePass()} uses to
+     *     decide whether a transfer created a fresh coincidence that needs
+     *     another pass. Plain suppression/omission never creates a new
+     *     coincidence (it only removes an event), so those branches return
+     *     `false`.
      */
-    private function resolveLoser(LiturgicalEvent $winner, LiturgicalEvent $loser, PrecedenceContext $ctx): void
+    private function resolveLoser(LiturgicalEvent $winner, LiturgicalEvent $loser, PrecedenceContext $ctx): bool
     {
         if (self::isAdventLentEasterSunday($winner)) {
             if (self::isLordSolemnity($loser)) {
-                $this->transferLordSolemnityToMonday($winner, $loser, $ctx);
-                return;
+                return $this->transferLordSolemnityToMonday($winner, $loser, $ctx);
             }
 
             if (self::isLordFeast($loser)) {
-                $this->omitImpededLordFeast($winner, $loser, $ctx);
-                return;
+                return $this->omitImpededLordFeast($winner, $loser, $ctx);
             }
 
             if (self::isSaintSolemnity($loser)) {
-                $this->transferSaintSolemnity($winner, $loser, $ctx);
-                return;
+                return $this->transferSaintSolemnity($winner, $loser, $ctx);
             }
         }
 
-        if (self::isLentenFerie($loser) && false === self::isAnnunciationOrStJoseph($winner)) {
-            $this->protectLentenFerie($winner, $loser, $ctx);
-            return;
+        // The `isSolemnity($winner)` guard is load-bearing, NOT redundant: it
+        // ensures only an impeding SOLEMNITY is ever handed to
+        // protectLentenFerie() (which transfers the winner off the protected
+        // Lenten day via the n.56 walk). Without it, ANY non-Annunciation/St
+        // Joseph winner outranking a Lenten ferie -- including a privileged
+        // Sunday of Lent (rank 2/3) or a fixed rank-2 day like SabatoTradSymb
+        // -- would be transferred, and those must NEVER move. A non-solemnity
+        // winner that outranks a Lenten ferie instead falls through to plain
+        // suppression of the ferie below (the pre-Task-8 behaviour for that
+        // sub-case; unreachable today since the temporale emits no generic
+        // Lenten-ferie WEEKDAY events yet, but a landmine once Lenten ferial
+        // fill is wired in a later plan).
+        if (
+            self::isLentenFerie($loser)
+            && self::isSolemnity($winner)
+            && false === self::isAnnunciationOrStJoseph($winner)
+        ) {
+            return $this->protectLentenFerie($winner, $loser, $ctx);
         }
 
         if (
             self::isAnnunciationOrStJoseph($loser)
             && self::isInAnnunciationStJosephTransferWindow($loser->date, $ctx->params->Year)
         ) {
-            $this->transferAnnunciationOrStJoseph($winner, $loser, $ctx);
-            return;
+            return $this->transferAnnunciationOrStJoseph($winner, $loser, $ctx);
         }
 
         if (self::isSolemnity($loser)) {
-            $this->transferSolemnityToNextFreeDay($winner, $loser, $ctx);
-            return;
+            return $this->transferSolemnityToNextFreeDay($winner, $loser, $ctx);
         }
 
-        $this->suppress($winner, $loser, $ctx);
+        return $this->suppress($winner, $loser, $ctx);
     }
 
     /**
@@ -273,11 +374,18 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
     /**
      * Transfers a superseded Solemnity of the Lord to the Monday immediately
      * following the privileged Sunday that impeded it.
+     *
+     * @return bool always `true`: this branch always moves `$loser`.
      */
-    private function transferLordSolemnityToMonday(LiturgicalEvent $winner, LiturgicalEvent $loser, PrecedenceContext $ctx): void
+    private function transferLordSolemnityToMonday(LiturgicalEvent $winner, LiturgicalEvent $loser, PrecedenceContext $ctx): bool
     {
         $loserKey = $loser->event_key;
-        $monday   = ( clone $loser->date )->add(new \DateInterval('P1D'));
+        // Captured BEFORE the move: moveLiturgicalEventDate() mutates $loser's
+        // ->date property in place (same object reference), so reading it
+        // AFTER the move would report the new date twice instead of "impeded
+        // on X, transferred to Y".
+        $originalDate = $loser->date->format('Y-m-d');
+        $monday       = ( clone $loser->date )->add(new \DateInterval('P1D'));
 
         $ctx->cal->moveLiturgicalEventDate($loserKey, $monday);
 
@@ -287,9 +395,11 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
             $loserKey,
             $winner->name,
             $winner->event_key,
-            $loser->date->format('Y-m-d'),
+            $originalDate,
             $monday->format('Y-m-d')
         ));
+
+        return true;
     }
 
     /**
@@ -297,8 +407,11 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
      * impeded by a privileged Sunday. Mechanically identical to
      * {@see self::suppress()} but carries a message specific to this outcome,
      * since the brief requires each outcome to explain itself distinctly.
+     *
+     * @return bool always `false`: omission removes `$loser`, it never
+     *     moves it, so it can never create a new coincidence.
      */
-    private function omitImpededLordFeast(LiturgicalEvent $winner, LiturgicalEvent $loser, PrecedenceContext $ctx): void
+    private function omitImpededLordFeast(LiturgicalEvent $winner, LiturgicalEvent $loser, PrecedenceContext $ctx): bool
     {
         $loserKey = $loser->event_key;
 
@@ -313,6 +426,8 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
             $winner->event_key,
             $loser->date->format('Y-m-d')
         ));
+
+        return false;
     }
 
     /**
@@ -321,11 +436,17 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
      * impeded it -- unless that Monday is itself already occupied by a
      * solemnity, in which case the Tabella instead anticipates the
      * celebration to the Saturday immediately preceding the Sunday.
+     *
+     * @return bool always `true`: both outcomes (Monday or Saturday) move
+     *     `$loser`.
      */
-    private function transferSaintSolemnity(LiturgicalEvent $winner, LiturgicalEvent $loser, PrecedenceContext $ctx): void
+    private function transferSaintSolemnity(LiturgicalEvent $winner, LiturgicalEvent $loser, PrecedenceContext $ctx): bool
     {
         $loserKey = $loser->event_key;
-        $monday   = ( clone $loser->date )->add(new \DateInterval('P1D'));
+        // Captured BEFORE either move below, for the same reason documented
+        // in transferLordSolemnityToMonday().
+        $originalDate = $loser->date->format('Y-m-d');
+        $monday       = ( clone $loser->date )->add(new \DateInterval('P1D'));
 
         if ($ctx->cal->inSolemnities($monday)) {
             $saturday = ( clone $loser->date )->sub(new \DateInterval('P1D'));
@@ -338,11 +459,11 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
                 $loserKey,
                 $winner->name,
                 $winner->event_key,
-                $loser->date->format('Y-m-d'),
+                $originalDate,
                 $monday->format('Y-m-d'),
                 $saturday->format('Y-m-d')
             ));
-            return;
+            return true;
         }
 
         $ctx->cal->moveLiturgicalEventDate($loserKey, $monday);
@@ -353,31 +474,80 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
             $loserKey,
             $winner->name,
             $winner->event_key,
-            $loser->date->format('Y-m-d'),
+            $originalDate,
             $monday->format('Y-m-d')
         ));
+
+        return true;
     }
 
     /**
-     * Protects a superseded ferie of Lent (norm 4): leaves it untouched in
-     * the active collection -- NOT suppressed, NOT transferred -- because a
-     * Lenten ferie yields only to the Annunciation or St Joseph (handled by
-     * the dispatch guard in `resolveLoser()`, not here). Every other
-     * higher-ranked winner that reaches this branch does not displace the
-     * ferie's own liturgical precedence for the day.
+     * Protects a superseded ferie of Lent (norm 4): the ferie ITSELF is
+     * never suppressed and never moves, because a Lenten ferie yields only
+     * to the Annunciation or St Joseph (already excluded by the dispatch
+     * guard in `resolveLoser()`, not here). Task 8 (issue #727 item 1)
+     * closes what was previously a no-op that left both events on the
+     * date: `$winner` here is the IMPEDING solemnity (it won the rank
+     * comparison in `resolveOnePass()`'s sort), and per norm 4 that
+     * solemnity is itself impeded by the protected ferie, so it is
+     * `$winner` -- not `$loser` -- that is transferred away, via the same
+     * generic n.56 "first day free of ranks 1-10" walk used by
+     * {@see self::transferSolemnityToNextFreeDay()} (factored out into
+     * {@see self::findNextFreeDay()} so both share it). The ferie's own
+     * date is never touched.
+     *
+     * @return bool `true` if the winner was moved; `false` only in the
+     *     defensive guard case where no free day was found within
+     *     {@see self::MAX_FREE_DAY_WALK_DAYS} and the winner is suppressed
+     *     instead (should not happen for a real calendar).
      */
-    private function protectLentenFerie(LiturgicalEvent $winner, LiturgicalEvent $loser, PrecedenceContext $ctx): void
+    private function protectLentenFerie(LiturgicalEvent $winner, LiturgicalEvent $loser, PrecedenceContext $ctx): bool
     {
+        $winnerKey = $winner->event_key;
+        $target    = $this->findNextFreeDay($winner->date, $ctx);
+
+        if (null === $target) {
+            $ctx->cal->removeLiturgicalEvent($winnerKey);
+            $ctx->cal->addSuppressedEvent($winner);
+
+            $ctx->addMessage(sprintf(
+                '%s (%s) impedes the ferie of Lent %s (%s) on %s, but per norm 4 a Lenten ferie yields only to the '
+                    . 'Annunciation or St Joseph, so %s is itself impeded; no day free of ranks 1-10 was found '
+                    . 'within %d days to transfer it to, so it is suppressed as a guard (this should not happen '
+                    . 'for a real calendar).',
+                $winner->name,
+                $winnerKey,
+                $loser->name,
+                $loser->event_key,
+                $winner->date->format('Y-m-d'),
+                $winner->name,
+                self::MAX_FREE_DAY_WALK_DAYS
+            ));
+
+            return false;
+        }
+
+        // Captured BEFORE the move, for the same reason documented in
+        // transferLordSolemnityToMonday(): moveLiturgicalEventDate() mutates
+        // $winner's ->date property in place.
+        $originalDate = $winner->date->format('Y-m-d');
+
+        $ctx->cal->moveLiturgicalEventDate($winnerKey, $target);
+
         $ctx->addMessage(sprintf(
-            '%s (%s), a ferie of Lent, is contested by the higher-ranking %s (%s) on %s but is protected per norm 4 '
-                . '(a Lenten ferie yields only to the Annunciation or St Joseph); it retains its liturgical '
-                . 'precedence and is not suppressed.',
+            '%s (%s) impedes the ferie of Lent %s (%s) on %s, but per norm 4 a Lenten ferie yields only to the '
+                . 'Annunciation or St Joseph; the ferie retains its liturgical precedence and %s is instead '
+                . 'transferred, per n.56, to the first subsequent day free of ranks 1-10, %s.',
+            $winner->name,
+            $winnerKey,
             $loser->name,
             $loser->event_key,
+            $originalDate,
             $winner->name,
-            $winner->event_key,
-            $loser->date->format('Y-m-d')
+            $target->format('Y-m-d')
         ));
+
+        return true;
     }
 
     /**
@@ -389,14 +559,19 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
      * symboli/settimana autentica window that norm 4 anchors this transfer
      * to -- SatOctaveEaster (Easter + 6) is the last day of the Easter
      * octave, so +8/+9 are literally "the Monday/Tuesday after the octave".
+     *
+     * @return bool always `true`: this branch always moves `$loser`.
      */
-    private function transferAnnunciationOrStJoseph(LiturgicalEvent $winner, LiturgicalEvent $loser, PrecedenceContext $ctx): void
+    private function transferAnnunciationOrStJoseph(LiturgicalEvent $winner, LiturgicalEvent $loser, PrecedenceContext $ctx): bool
     {
         $loserKey   = $loser->event_key;
         $isStJoseph = $loserKey === 'StJoseph';
         $offset     = $isStJoseph ? 9 : 8;
         $easter     = Utilities::calcGregEaster($ctx->params->Year);
         $newDate    = ( clone $easter )->add(new \DateInterval("P{$offset}D"));
+        // Captured BEFORE the move, for the same reason documented in
+        // transferLordSolemnityToMonday().
+        $originalDate = $loser->date->format('Y-m-d');
 
         $ctx->cal->moveLiturgicalEventDate($loserKey, $newDate);
 
@@ -408,32 +583,90 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
             $loserKey,
             $winner->name,
             $winner->event_key,
-            $loser->date->format('Y-m-d'),
+            $originalDate,
             $isStJoseph ? 'Tuesday' : 'Monday',
             $newDate->format('Y-m-d')
         ));
+
+        return true;
     }
 
     /**
      * The generic "n.56" transfer: a superseded solemnity with no more
      * specific rule above it moves to the first subsequent day that is free
-     * of ranks 1-10 ({@see AmbrosianLiturgicalDayRank::isFreeOfRanksOneThroughTen()}),
-     * walking forward one day at a time from the impeded date.
+     * of ranks 1-10, via {@see self::findNextFreeDay()}. If no free day is
+     * found within the walk's cap, the event is suppressed outright with a
+     * distinct warning message rather than transferred nowhere.
      *
-     * The walk is capped at 366 iterations as a defensive guard -- a free
-     * day (a day with no occupant ranked 1-10) is expected well within a
-     * single year for any real Ambrosian calendar, so hitting the cap
-     * signals a genuine anomaly rather than a normal outcome. If the cap is
-     * reached, the event is suppressed outright with a warning message
-     * rather than transferred nowhere or looping indefinitely.
+     * @return bool `true` if `$loser` was moved; `false` only in the
+     *     defensive guard case where it is suppressed instead.
      */
-    private function transferSolemnityToNextFreeDay(LiturgicalEvent $winner, LiturgicalEvent $loser, PrecedenceContext $ctx): void
+    private function transferSolemnityToNextFreeDay(LiturgicalEvent $winner, LiturgicalEvent $loser, PrecedenceContext $ctx): bool
     {
-        $loserKey      = $loser->event_key;
-        $maxIterations = 366;
-        $candidate     = clone $loser->date;
+        $loserKey = $loser->event_key;
+        $target   = $this->findNextFreeDay($loser->date, $ctx);
 
-        for ($i = 0; $i < $maxIterations; $i++) {
+        if (null === $target) {
+            // Guard: should not happen for any real calendar -- suppress with a
+            // distinct warning message rather than transferring nowhere.
+            $ctx->cal->removeLiturgicalEvent($loserKey);
+            $ctx->cal->addSuppressedEvent($loser);
+
+            $ctx->addMessage(sprintf(
+                '%s (%s) is impeded by the higher-ranking %s (%s) on %s and no day free of ranks 1-10 was found '
+                    . 'within %d days; suppressed as a guard (this should not happen for a real calendar).',
+                $loser->name,
+                $loserKey,
+                $winner->name,
+                $winner->event_key,
+                $loser->date->format('Y-m-d'),
+                self::MAX_FREE_DAY_WALK_DAYS
+            ));
+
+            return false;
+        }
+
+        // Captured BEFORE the move, for the same reason documented in
+        // transferLordSolemnityToMonday().
+        $originalDate = $loser->date->format('Y-m-d');
+
+        $ctx->cal->moveLiturgicalEventDate($loserKey, $target);
+
+        $ctx->addMessage(sprintf(
+            '%s (%s) is impeded by the higher-ranking %s (%s) on %s and, per n.56, is transferred to the '
+                . 'first subsequent day free of ranks 1-10, %s.',
+            $loser->name,
+            $loserKey,
+            $winner->name,
+            $winner->event_key,
+            $originalDate,
+            $target->format('Y-m-d')
+        ));
+
+        return true;
+    }
+
+    /**
+     * Shared forward walk used by both n.56-style transfers
+     * ({@see self::transferSolemnityToNextFreeDay()} and
+     * {@see self::protectLentenFerie()}'s winner-transfer): starting the day
+     * AFTER `$fromDate`, walks forward one day at a time looking for a date
+     * with no occupant ranked 1-10
+     * ({@see AmbrosianLiturgicalDayRank::isFreeOfRanksOneThroughTen()}), and
+     * returns the first such date found.
+     *
+     * The walk is capped at {@see self::MAX_FREE_DAY_WALK_DAYS} (366) days
+     * as a defensive guard -- a free day is expected well within a single
+     * year for any real Ambrosian calendar, so returning `null` (exhausting
+     * the cap) signals a genuine anomaly rather than a normal outcome; each
+     * caller decides how to handle that (both currently suppress the event
+     * they would otherwise have moved).
+     */
+    private function findNextFreeDay(DateTime $fromDate, PrecedenceContext $ctx): ?DateTime
+    {
+        $candidate = clone $fromDate;
+
+        for ($i = 0; $i < self::MAX_FREE_DAY_WALK_DAYS; $i++) {
             $candidate = ( clone $candidate )->add(new \DateInterval('P1D'));
 
             $isFree = true;
@@ -445,37 +678,11 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
             }
 
             if ($isFree) {
-                $ctx->cal->moveLiturgicalEventDate($loserKey, $candidate);
-
-                $ctx->addMessage(sprintf(
-                    '%s (%s) is impeded by the higher-ranking %s (%s) on %s and, per n.56, is transferred to the '
-                        . 'first subsequent day free of ranks 1-10, %s.',
-                    $loser->name,
-                    $loserKey,
-                    $winner->name,
-                    $winner->event_key,
-                    $loser->date->format('Y-m-d'),
-                    $candidate->format('Y-m-d')
-                ));
-                return;
+                return $candidate;
             }
         }
 
-        // Guard: should not happen for any real calendar -- suppress with a
-        // distinct warning message rather than transferring nowhere.
-        $ctx->cal->removeLiturgicalEvent($loserKey);
-        $ctx->cal->addSuppressedEvent($loser);
-
-        $ctx->addMessage(sprintf(
-            '%s (%s) is impeded by the higher-ranking %s (%s) on %s and no day free of ranks 1-10 was found within '
-                . '%d days; suppressed as a guard (this should not happen for a real calendar).',
-            $loser->name,
-            $loserKey,
-            $winner->name,
-            $winner->event_key,
-            $loser->date->format('Y-m-d'),
-            $maxIterations
-        ));
+        return null;
     }
 
     /**
@@ -488,8 +695,11 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
      * is a defensive no-op restating that guarantee at the call site, per the
      * task brief, so the ledger write is not solely an implementation detail
      * of `removeLiturgicalEvent()`.
+     *
+     * @return bool always `false`: suppression removes `$loser`, it never
+     *     moves it, so it can never create a new coincidence.
      */
-    private function suppress(LiturgicalEvent $winner, LiturgicalEvent $loser, PrecedenceContext $ctx): void
+    private function suppress(LiturgicalEvent $winner, LiturgicalEvent $loser, PrecedenceContext $ctx): bool
     {
         $loserKey = $loser->event_key;
 
@@ -504,5 +714,7 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
             $winner->event_key,
             $loser->date->format('Y-m-d')
         ));
+
+        return false;
     }
 }

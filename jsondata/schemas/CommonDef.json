@@ -32,7 +32,9 @@
                     "red",
                     "green",
                     "purple",
-                    "rose"
+                    "rose",
+                    "morello",
+                    "black"
                 ]
             }
         },
@@ -506,6 +508,7 @@
             "enum": [
                 "",
                 "GENERAL ROMAN",
+                "AMBROSIAN",
                 "IT",
                 "US",
                 "NL",
