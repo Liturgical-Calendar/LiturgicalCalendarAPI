@@ -36,6 +36,10 @@
                 },
                 "color": {
                     "$ref": "./CommonDef.json#/definitions/LitColor"
+                },
+                "is_dominical": {
+                    "type": "boolean",
+                    "description": "Marks a feast or solemnity of the Lord, used by the Ambrosian precedence classifier. Optional; omitted for events where the distinction does not apply."
                 }
             },
             "required": [

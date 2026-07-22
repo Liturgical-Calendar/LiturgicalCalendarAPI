@@ -35,6 +35,11 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
     public private(set) string $name;
     public private(set) string $decree;
     public private(set) int $since_year;
+    /**
+     * Whether the event is "of the Lord" (dominical), if applicable to the source data.
+     * Absent/null for source data that does not classify dominical events (e.g. the Roman proprium).
+     */
+    public readonly ?bool $is_dominical;
 
     /**
      * Constructor for the PropriumDeSanctisEvent class.
@@ -47,6 +52,7 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
      * @param LitGrade $grade The liturgical grade of the event.
      * @param LitEventType $type The type of the event, with a default value of LitEventType::FIXED.
      * @param string $calendar The calendar for the event, with a default value of 'GENERAL ROMAN'.
+     * @param bool|null $is_dominical Whether the event is "of the Lord" (dominical), if applicable.
      */
     public function __construct(
         string $event_key,
@@ -57,7 +63,8 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
         LitGrade $grade,
         ?string $grade_display,
         LitEventType $type = LitEventType::FIXED,
-        string $calendar = 'GENERAL ROMAN'
+        string $calendar = 'GENERAL ROMAN',
+        ?bool $is_dominical = null
     ) {
         $this->event_key     = $event_key;
         $this->day           = $day;
@@ -68,6 +75,7 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
         $this->grade_display = $grade_display;
         $this->type          = $type;
         $this->calendar      = $calendar;
+        $this->is_dominical  = $is_dominical;
     }
 
     /**
@@ -138,7 +146,7 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
      * - common (string[]): The liturgical common of the event, as an array of strings
      * - grade (int): The liturgical grade of the event
      *
-     * @param array{event_key:string,day:int,month:int,color:string[],common:string[],grade:int,grade_display:?string,type:?string,calendar:?string} $data
+     * @param array{event_key:string,day:int,month:int,color:string[],common:string[],grade:int,grade_display:?string,type:?string,calendar:?string,is_dominical?:bool|null} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -151,6 +159,11 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
             },
             $data['common']
         ));
+
+        $is_dominical = null;
+        if (array_key_exists('is_dominical', $data) && is_bool($data['is_dominical'])) {
+            $is_dominical = $data['is_dominical'];
+        }
 
         return new static(
             $data['event_key'],
@@ -166,7 +179,8 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
             LitGrade::from($data['grade']),
             isset($data['grade_display']) ? $data['grade_display'] : null,
             isset($data['type']) ? LitEventType::from($data['type']) : LitEventType::FIXED,
-            isset($data['calendar']) ? $data['calendar'] : 'GENERAL ROMAN'
+            isset($data['calendar']) ? $data['calendar'] : 'GENERAL ROMAN',
+            $is_dominical
         );
     }
 
@@ -182,7 +196,7 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
      * - grade (int): The liturgical grade of the event.
      * - grade_display (string): The liturgical grade display of the event.
      *
-     * @param \stdClass&object{event_key:string,day:int,month:int,color:string[],common:string[],grade:int,grade_display:?string,type:?string,calendar:?string} $data The stdClass object or array containing event data.
+     * @param \stdClass&object{event_key:string,day:int,month:int,color:string[],common:string[],grade:int,grade_display:?string,type:?string,calendar:?string,is_dominical?:bool|null} $data The stdClass object or array containing event data.
      * @return static The newly created instance(s).
      */
     protected static function fromObjectInternal(\stdClass $data): static
@@ -195,6 +209,11 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
             },
             $data->common
         ));
+
+        $is_dominical = null;
+        if (property_exists($data, 'is_dominical') && is_bool($data->is_dominical)) {
+            $is_dominical = $data->is_dominical;
+        }
 
         return new static(
             $data->event_key,
@@ -210,7 +229,8 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
             LitGrade::from($data->grade),
             isset($data->grade_display) ? $data->grade_display : null,
             isset($data->type) ? LitEventType::from($data->type) : LitEventType::FIXED,
-            isset($data->calendar) ? $data->calendar : 'GENERAL ROMAN'
+            isset($data->calendar) ? $data->calendar : 'GENERAL ROMAN',
+            $is_dominical
         );
     }
 }
