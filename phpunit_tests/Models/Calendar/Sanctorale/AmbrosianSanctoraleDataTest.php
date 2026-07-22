@@ -106,7 +106,7 @@ final class AmbrosianSanctoraleDataTest extends TestCase
             'StPeterDamian'                         => [2, null],
             'StPolycarp'                            => [3, null],
             'StGregoryOfNarek'                      => [2, null],
-            'StJosephSpouseBVM'                     => [6, null],
+            'StJoseph'                              => [6, null],
             'Annunciation'                          => [6, true],
             'StFrancisOfPaola'                      => [2, null],
             'StIsidoreOfSeville'                    => [2, null],
