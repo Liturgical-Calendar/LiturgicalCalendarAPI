@@ -29,10 +29,22 @@ class JsonDataConstants
     public const SOURCEDATA_FOLDER = JsonDataConstants::FOLDER . '/sourcedata';
 
     /**
+     * The base folder for Roman-rite source data.
+     * Evaluates to 'jsondata/sourcedata/rite/roman'.
+     */
+    public const ROMAN_RITE_FOLDER = JsonDataConstants::SOURCEDATA_FOLDER . '/rite/roman';
+
+    /**
+     * The base folder for Ambrosian-rite source data.
+     * Evaluates to 'jsondata/sourcedata/rite/ambrosian'.
+     */
+    public const AMBROSIAN_RITE_FOLDER = JsonDataConstants::SOURCEDATA_FOLDER . '/rite/ambrosian';
+
+    /**
      * The folder containing ecclesiastical decrees.
      * Evaluates to 'jsondata/sourcedata/decrees'.
      */
-    public const DECREES_FOLDER = JsonDataConstants::SOURCEDATA_FOLDER . '/decrees';
+    public const DECREES_FOLDER = JsonDataConstants::ROMAN_RITE_FOLDER . '/decrees';
 
     /**
      * The file containing the data with the Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments.
@@ -57,7 +69,7 @@ class JsonDataConstants
      * The folder containing missal resources.
      * Evaluates to 'jsondata/sourcedata/missals'.
      */
-    public const MISSALS_FOLDER = JsonDataConstants::SOURCEDATA_FOLDER . '/missals';
+    public const MISSALS_FOLDER = JsonDataConstants::ROMAN_RITE_FOLDER . '/missals';
 
     /**
      * The file containing the missal data, with a placeholder for the actual missal folder name.
@@ -120,7 +132,7 @@ class JsonDataConstants
      * The folder containing Ambrosian Proprium de Tempore (temporale) data.
      * Evaluates to 'jsondata/sourcedata/missals/ambrosian/propriumdetempore'.
      */
-    public const AMBROSIAN_TEMPORALE_FOLDER = JsonDataConstants::MISSALS_FOLDER . '/ambrosian/propriumdetempore';
+    public const AMBROSIAN_TEMPORALE_FOLDER = JsonDataConstants::AMBROSIAN_RITE_FOLDER . '/missals/propriumdetempore';
 
     /**
      * The file containing the Ambrosian Proprium de Tempore (temporale) data.
@@ -145,7 +157,7 @@ class JsonDataConstants
      * The folder containing Ambrosian Proprium de Sanctis (sanctorale) data, 2024 edition.
      * Evaluates to 'jsondata/sourcedata/missals/ambrosian/propriumdesanctis_2024'.
      */
-    public const AMBROSIAN_SANCTORALE_FOLDER = JsonDataConstants::MISSALS_FOLDER . '/ambrosian/propriumdesanctis_2024';
+    public const AMBROSIAN_SANCTORALE_FOLDER = JsonDataConstants::AMBROSIAN_RITE_FOLDER . '/missals/propriumdesanctis_2024';
 
     /**
      * The file containing the Ambrosian Proprium de Sanctis (sanctorale) data, 2024 edition.
@@ -170,7 +182,7 @@ class JsonDataConstants
      * The folder containing readings from the lectionary for every possible liturgical event in the General Roman Calendar.
      * Evaluates to 'jsondata/sourcedata/lectionarium'.
      */
-    public const LECTIONARY_FOLDER = JsonDataConstants::SOURCEDATA_FOLDER . '/lectionary';
+    public const LECTIONARY_FOLDER = JsonDataConstants::ROMAN_RITE_FOLDER . '/lectionary';
 
     /**
      * The folder containing readings from the lectionary for Sundays and Festivities - Year A (General Roman Calendar).
@@ -319,7 +331,7 @@ class JsonDataConstants
      * The folder containing calendar data.
      * Evaluates to 'jsondata/sourcedata/calendars'.
      */
-    public const CALENDARS_FOLDER = JsonDataConstants::SOURCEDATA_FOLDER . '/calendars';
+    public const CALENDARS_FOLDER = JsonDataConstants::ROMAN_RITE_FOLDER . '/calendars';
 
     /**
      * The folder containing wider regions calendar data, with a placeholder for the actual region name.
