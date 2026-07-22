@@ -211,4 +211,33 @@ final class AmbrosianTemporaleTest extends TestCase
         // The Sunday 2025-01-19 remains AfterEpiphany2 (a weekday fill must never take a Sunday)
         self::assertSame('2025-01-19', $d['AfterEpiphany2']);
     }
+
+    public function testAdventDeExceptatoFerie2025(): void
+    {
+        $d = $this->runEngine(2025);
+        // 2025: Dec 17 is Wednesday, so de Exceptáto = Dec 17..23 (Sundays excluded).
+        // Keys are month+day ('md'), not bare day-of-month: the Advent block spans
+        // Nov and Dec, and day-of-month alone collides (e.g. both Nov 17 and Dec 17
+        // fall inside the block) -- see calculateAdventWeekdays()'s doc comment.
+        self::assertArrayHasKey('AdventWeekday1217', $d);
+        self::assertSame('2025-12-17', $d['AdventWeekday1217']);
+        self::assertArrayHasKey('AdventWeekday1223', $d);
+        self::assertSame('2025-12-23', $d['AdventWeekday1223']);
+        // Sanity: the Nov 17/Dec 17 collision case does NOT silently drop the
+        // November occurrence (both are distinct 'md' keys).
+        self::assertArrayHasKey('AdventWeekday1117', $d);
+        self::assertSame('2025-11-17', $d['AdventWeekday1117']);
+    }
+
+    public function testChristmasFerieSkipAnchors2025(): void
+    {
+        $d = $this->runEngine(2025);
+        self::assertArrayHasKey('ChristmasWeekday1229', $d); // Dec 29 2025 (Mon)
+        self::assertSame('2025-12-29', $d['ChristmasWeekday1229']);
+        // Jan 1 (Circoncisione) and Jan 6 (Epiphany) stay anchors, never overwritten:
+        // the fill is bounded to Dec 31 of the same civil year and never reaches
+        // January at all -- see calculateChristmasWeekdays()'s doc comment.
+        self::assertArrayNotHasKey('ChristmasWeekday0101', $d);
+        self::assertArrayNotHasKey('ChristmasWeekday0106', $d);
+    }
 }

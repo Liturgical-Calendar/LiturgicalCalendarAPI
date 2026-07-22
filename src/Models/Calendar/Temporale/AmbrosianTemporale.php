@@ -38,6 +38,8 @@ final class AmbrosianTemporale implements TemporaleEngine
         $this->calculateAfterEpiphanySundays($ctx);
         $this->calculateAfterEpiphanyWeekdays($ctx);
         $this->calculateAfterPentecostSundays($ctx);
+        $this->calculateAdventWeekdays($ctx);
+        $this->calculateChristmasWeekdays($ctx);
     }
 
     /**
@@ -449,6 +451,79 @@ final class AmbrosianTemporale implements TemporaleEngine
     {
         $daysSinceBaptism = (int) $baptism->diff($date)->format('%a');
         return (int) floor(( $daysSinceBaptism - 1 ) / 7) + 2;
+    }
+
+    /** Advent ferie: Monday after Advent I … Saturday before Christmas; Dec 17(18)–23 are de Exceptáto (n. 39). */
+    private function calculateAdventWeekdays(TemporaleContext $ctx): void
+    {
+        $year = $ctx->params->Year;
+        $from = ( clone $this->adventOne($year) )->add(new \DateInterval('P1D'));
+        $to   = DateTime::fromFormat('25-12-' . $year); // Christmas (exclusive)
+        $this->fillFerialWeekdays(
+            $ctx,
+            $from,
+            $to,
+            LitColor::MORELLO,
+            // Advent runs Nov->Dec, so day-of-month alone collides (e.g. both Nov 17
+            // and Dec 17 fall inside the block); key on month+day ('md') instead so
+            // every ferial day gets a distinct key. Season classification only needs
+            // the 'AdventWeekday' prefix (LitSeason::ADVENT_PATTERNS), so the exact
+            // suffix shape is free.
+            fn (DateTime $d): string => 'AdventWeekday' . $d->format('md'),
+            fn (DateTime $d): string => $this->adventWeekdayName($d, $ctx)
+        );
+    }
+
+    /**
+     * Ferial name for an Advent weekday: the de Exceptáto phrase for Dec 17–23
+     * (n. 39), otherwise the generic Advent phrase. Named by phrase, not week
+     * number, so $weekNumber is null in both branches.
+     */
+    private function adventWeekdayName(DateTime $date, TemporaleContext $ctx): string
+    {
+        $md = (int) $date->format('nd'); // e.g. 1217 for Dec 17
+        if ($md >= 1217 && $md <= 1223) {
+            return $this->weekdayName($date, 'de Exceptáto', 'de Exceptato', null, $ctx);
+        }
+        return $this->weekdayName($date, "d'Avvento", 'Adventus', null, $ctx);
+    }
+
+    /**
+     * Christmas ferie: Dec 26 … Dec 31 of the same civil year.
+     *
+     * The norm's upper bound is "the Saturday before Baptism", but within a
+     * single-civil-year engine call Baptism/Circoncisione/Epiphany are always
+     * dated in *January of this same $year* (see `calculateChristmasEpiphany()`),
+     * i.e. structurally *before* Dec 26 of that same $year, not after it —
+     * RomanTemporale's `Epiphany`/`Christmas` follow the identical same-$year
+     * convention, and `CalendarHandler::calculateWeekdaysChristmasOctave()`
+     * mirrors this exact boundary by stopping its own Christmas-octave weekday
+     * fill at `31-12-$year` rather than reaching into January. So the true
+     * Dec 26->Baptism span only exists once a caller merges this engine's
+     * output for $year with the *next* call's output for $year+1 (whose
+     * Circoncisione/Epiphany/BaptismLord anchors land on the correct forward
+     * dates) — real cross-year continuity is out of scope here and deferred,
+     * like the rest of the handler-level year semantics, to Plan 7. Bounding
+     * at Dec 31 keeps this call's output correct and self-contained: it never
+     * touches (or spuriously duplicates) the Jan 1 / Jan 6 anchors already
+     * placed by `calculateChristmasEpiphany()` for this same $year.
+     */
+    private function calculateChristmasWeekdays(TemporaleContext $ctx): void
+    {
+        $year = $ctx->params->Year;
+        $from = DateTime::fromFormat('26-12-' . $year);
+        $to   = DateTime::fromFormat('1-1-' . ( $year + 1 )); // Dec 31 $year inclusive, exclusive bound
+        $this->fillFerialWeekdays(
+            $ctx,
+            $from,
+            $to,
+            LitColor::WHITE,
+            // Bounded to a single month (Dec), so day-of-month alone would not
+            // collide here, but 'md' matches the Advent fill's key shape for
+            // consistency and stays collision-safe if the bound ever changes.
+            fn (DateTime $d): string => 'ChristmasWeekday' . $d->format('md'),
+            fn (DateTime $d): string => $this->weekdayName($d, 'del tempo di Natale', 'Nativitatis', null, $ctx)
+        );
     }
 
     /**

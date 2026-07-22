@@ -47,8 +47,25 @@ final class AmbrosianRealYearAssemblyTest extends TestCase
      * ferial days/week x 8 weeks = 48; none of these dates collide with an
      * existing temporale or sanctorale key, so all 48 are additive). New total:
      * 316 + 48 = 364.
+     *
+     * Plan 6 / Task 6 adds the Advent (incl. de Exceptáto, n. 39) and Christmas
+     * ferial-weekday fills (`calculateAdventWeekdays()` / `calculateChristmasWeekdays()`,
+     * both via `fillFerialWeekdays()`). Their keys are `AdventWeekday{md}` /
+     * `ChristmasWeekday{md}` (month+day, not bare day-of-month -- the Advent
+     * block spans Nov and Dec, where day-of-month alone collides, e.g. both
+     * Nov 17 and Dec 17 fall inside the block; see `calculateAdventWeekdays()`'s
+     * doc comment). For civil year 2025:
+     *   - Advent: Mon after Advent I (2025-11-17) .. Sat before Christmas
+     *     (2025-12-24), skipping Sundays (Advent2..6 anchors) = 33 ferial days.
+     *   - Christmas: Dec 26 .. Dec 31 of the same civil year (bounded there,
+     *     not through Baptism -- Baptism/Circoncisione/Epiphany are always
+     *     dated in *January of this same $year*, i.e. structurally before
+     *     Dec 26 of that year, not after it; see `calculateChristmasWeekdays()`'s
+     *     doc comment), skipping the Dec 28 Sunday = 5 ferial days.
+     * None of these 38 dates collide with an existing temporale or sanctorale
+     * key, so all 38 are additive. New total: 364 + 38 = 402.
      */
-    private const int EXPECTED_TOTAL_2025 = 364;
+    private const int EXPECTED_TOTAL_2025 = 402;
 
     public function testAssembleAmbrosianYear2025IncludesTemporaleAnchor(): void
     {
