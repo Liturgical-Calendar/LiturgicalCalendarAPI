@@ -3,6 +3,7 @@
 namespace LiturgicalCalendar\Api\Models\Calendar;
 
 use LiturgicalCalendar\Api\DateTime;
+use LiturgicalCalendar\Api\Enum\AmbrosianHolyDaysOfObligation;
 use LiturgicalCalendar\Api\Enum\LitCommon;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitLocale;
@@ -1093,6 +1094,89 @@ final class LiturgicalEventCollection
             }
 
             if (in_array($litEvent->event_key, $HolyDaysofObligation)) {
+                $litEvent->holy_day_of_obligation = true;
+            }
+        }
+    }
+
+    /**
+     * Ambrosian rite only: stamps a `liturgical_season` on every liturgical event that doesn't
+     * already have one.
+     *
+     * Unlike the Roman rite, where `setSeasonsAndHolyDaysOfObligation()` derives the season
+     * purely from the date (relative to `AshWednesday`, `Pentecost`, etc. — none of which exist
+     * as such in the Ambrosian calendar), the Ambrosian `AmbrosianTemporale` engine (Plan 7 Task
+     * 3/5) already self-stamps `liturgical_season` on every temporale event it produces, via
+     * `LitSeason::forEventKey()`. That engine is gap-free: it produces a ferial or festive
+     * temporale event for essentially every date of the year. The Ambrosian comune sanctorale
+     * (Plan 7 Task 4, `CalendarHandler::addAmbrosianSanctoraleToCalendar()`), by contrast, carries
+     * no season information at all — sanctorale source data has no `liturgical_season` field.
+     *
+     * This method fills that gap: for every event with a null `liturgical_season`, it looks for
+     * another event already occupying the same date (via `getCalEventsFromDate()`) that DOES carry
+     * a season, and copies that season over. This works for the overwhelming majority of dates
+     * because the temporale engine already covers them.
+     *
+     * The one known exception is the Ambrosian n.32 rule (deferred, not yet implemented): when a
+     * Sunday falls within the Christmas octave (Dec 26-31), the Ambrosian temporale engine does
+     * not currently produce a Sunday event for that date (the rule that would replace the ferial
+     * `ChristmasWeekday*` entry with a proper Sunday-within-the-octave celebration hasn't been
+     * implemented yet), so no seasoned event exists on that date to copy from. For that narrow gap
+     * this method falls back to `LitSeason::CHRISTMAS`, since Dec 26-31 always falls within the
+     * Christmas octave regardless of which weekday Dec 25 lands on.
+     *
+     * Must run before any coincidence/precedence resolution that depends on `liturgical_season`
+     * being populated (e.g. a future `resolve()` step), and does not touch Holy-Day-of-Obligation
+     * markers (see `setAmbrosianHolyDaysOfObligation()`).
+     *
+     * @return void
+     */
+    public function stampAmbrosianSeasonOnSanctorale(): void
+    {
+        foreach ($this->liturgicalEvents as $litEvent) {
+            if (null !== $litEvent->liturgical_season) {
+                continue;
+            }
+
+            $season = null;
+            foreach ($this->getCalEventsFromDate($litEvent->date) as $coincidingEvent) {
+                if (null !== $coincidingEvent->liturgical_season) {
+                    $season = $coincidingEvent->liturgical_season;
+                    break;
+                }
+            }
+
+            // Fallback for the deferred n.32 Christmas-octave-Sunday gap (Dec 26-31): no
+            // seasoned temporale event exists on that date yet, but the date is still
+            // unambiguously within the Christmas season.
+            $litEvent->liturgical_season = $season ?? LitSeason::CHRISTMAS;
+        }
+    }
+
+    /**
+     * Ambrosian rite only: marks Holy Days of Obligation.
+     *
+     * Mirrors the rite-agnostic HDoO half of the Roman `setSeasonsAndHolyDaysOfObligation()`
+     * (`in_array($event_key, $HolyDaysOfObligation)`, plus marking every Sunday), but sources the
+     * `event_key` set from `AmbrosianHolyDaysOfObligation::DEFAULT` instead of the Roman
+     * `CalendarParams::$HolyDaysOfObligation` default, since the two calendars don't share event
+     * keys for their days of precept (see `AmbrosianHolyDaysOfObligation` for the provisional,
+     * ordo-validation-pending set and its rationale).
+     *
+     * As in the Roman rite, every Sunday is also a holy day of obligation regardless of
+     * `event_key`.
+     *
+     * @return void
+     */
+    public function setAmbrosianHolyDaysOfObligation(): void
+    {
+        // Unlike the Roman `CalendarParams::$HolyDaysOfObligation` (a mutable instance property
+        // that request params can toggle, hence the `array_filter()` there), the Ambrosian
+        // default is a fixed `const` with every value `true`, so its keys are exactly its HDoO set.
+        $holyDaysOfObligation = array_keys(AmbrosianHolyDaysOfObligation::DEFAULT);
+
+        foreach ($this->liturgicalEvents as $litEvent) {
+            if (in_array($litEvent->event_key, $holyDaysOfObligation, true) || (int) $litEvent->date->format('N') === 7) {
                 $litEvent->holy_day_of_obligation = true;
             }
         }
