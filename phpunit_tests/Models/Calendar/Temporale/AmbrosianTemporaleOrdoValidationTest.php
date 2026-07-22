@@ -122,4 +122,31 @@ final class AmbrosianTemporaleOrdoValidationTest extends TestCase
             }
         }
     }
+
+    /**
+     * Guards against a silently empty after-Epiphany or after-Pentecost block:
+     * asserts the engine emits at least one numbered Sunday of each family for
+     * 2025 (the block sizes themselves vary year to year with the date of
+     * Easter/Pentecost/Dedication and are covered by the engine-level
+     * sub-block tests in AmbrosianTemporaleTest, so only a non-zero count is
+     * asserted here).
+     */
+    public function testAfterEpiphanyAndAfterPentecostBlocksAreNonEmpty2025(): void
+    {
+        $d = $this->runEngine(2025);
+
+        $afterEpiphanyCount  = 0;
+        $afterPentecostCount = 0;
+        foreach (array_keys($d) as $key) {
+            if (preg_match('/^AfterEpiphany\d+$/', $key)) {
+                $afterEpiphanyCount++;
+            }
+            if (preg_match('/^AfterPentecost(Martyrdom|Dedication)?\d+$/', $key)) {
+                $afterPentecostCount++;
+            }
+        }
+
+        self::assertGreaterThan(0, $afterEpiphanyCount, 'Expected at least one AfterEpiphanyN Sunday for 2025');
+        self::assertGreaterThan(0, $afterPentecostCount, 'Expected at least one AfterPentecost(Martyrdom|Dedication)N Sunday for 2025');
+    }
 }
