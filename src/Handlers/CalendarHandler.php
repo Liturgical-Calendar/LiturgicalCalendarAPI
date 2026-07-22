@@ -27,7 +27,6 @@ use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
-use LiturgicalCalendar\Api\Http\Exception\ImplementationException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Exception\YamlException;
@@ -1038,13 +1037,13 @@ final class CalendarHandler extends AbstractHandler
      * how `calculateUniversalCalendar()` is only ever called after `$this->Cal = new
      * LiturgicalEventCollection(...)` in `handle()`).
      *
-     * Not yet called from `handle()` — the `/calendar/ambrosian` route still returns 501 there
-     * (Plan 7 Task 10 lifts that gate and wires this method in). Until then it is exercised only
-     * by `CalendarHandlerAmbrosianOrchestratorTest` via reflection.
+     * Called from `handle()` (Plan 7 Task 10) as the per-run generator for the Ambrosian branch,
+     * once for the requested year, and — when `YearType::LITURGICAL` — once more for the
+     * previous year, exactly mirroring the Roman branch's two-run + splice structure. Also
+     * exercised directly (via reflection) by `CalendarHandlerAmbrosianOrchestratorTest`.
      *
      * @return void
      */
-    // @phpstan-ignore method.unused (call site lands in Task 10, when the 501 gate is lifted)
     private function calculateAmbrosianCalendar(): void
     {
         $this->loadPropriumDeTemporeData();
@@ -5290,12 +5289,6 @@ final class CalendarHandler extends AbstractHandler
 
         $this->validateRequestMethod($request);
 
-        if ($this->CalendarParams->Rite === Rite::AMBROSIAN) {
-            throw new ImplementationException(
-                'The Ambrosian rite is planned but not yet available; only the Roman rite is currently implemented.'
-            );
-        }
-
         $this->loadDiocesanCalendarData();
         $this->loadNationalCalendarData();
         $this->updateSettingsBasedOnNationalCalendar();
@@ -5341,43 +5334,54 @@ final class CalendarHandler extends AbstractHandler
 
             $this->prepareL10N();
 
-            $this->Cal = new LiturgicalEventCollection($this->CalendarParams);
+            if ($this->CalendarParams->Rite === Rite::AMBROSIAN) {
+                // Ambrosian rite: no national/diocesan layer yet (comune only; dioceses are Plan 8),
+                // so calculateAmbrosianCalendar() is the entire per-run generator. It already runs
+                // setAmbrosianHolyDaysOfObligation(), setAmbrosianYearCyclesAndVigils(),
+                // calculatePsalterWeek(), and sortLiturgicalEvents() internally (see its docblock),
+                // so none of those Roman-branch calls are repeated here.
+                $this->Cal = new LiturgicalEventCollection($this->CalendarParams);
 
-            $this->calculateUniversalCalendar();
+                $this->calculateAmbrosianCalendar();
 
-            // Prepare the localization data for national and diocesan calendars, if applicable
-            $this->applyCalendarI18nData();
+                if ($this->CalendarParams->YearType === YearType::LITURGICAL) {
+                    // Save the state of the current Calendar calculation
+                    $CalBackup      = clone( $this->Cal );
+                    $Messages       = $this->Messages;
+                    $this->Messages = [];
 
-            if ($this->CalendarParams->NationalCalendar !== null && $this->NationalData !== null) {
-                $this->applyNationalCalendar();
-            }
+                    // Calculate the calendar for the previous year
+                    $this->CalendarParams->Year--;
+                    $this->Cal = new LiturgicalEventCollection($this->CalendarParams);
 
-            // :SATURDAY_MEMORIAL_BVM
-            $this->calculateSaturdayMemorialBVM();
+                    $this->calculateAmbrosianCalendar();
 
-            if ($this->CalendarParams->DiocesanCalendar !== null && $this->DiocesanData !== null) {
-                $this->applyDiocesanCalendar();
-            }
+                    $this->Cal->purgeDataBeforeAdvent();
+                    $CalBackup->purgeDataAdventChristmas();
 
-            $this->Cal->setSeasonsAndHolyDaysOfObligation();
+                    // Now we have to combine the two.
+                    // The backup (which represents the main portion) should be appended to the calendar that was just generated
+                    $this->Cal->merge($CalBackup);
 
-            $this->Cal->setYearCyclesAndVigils();
+                    // Reset the year back to the original request before outputting results
+                    $this->CalendarParams->Year++;
 
-            // For any celebrations that do not yet have a psalter_week property, make an attempt to calculate the value if applicable
-            $this->Cal->calculatePsalterWeek();
+                    // Append the messages from the backup calendar (current year) to the current messages (previous year)
+                    // Unfortunately, we don't have a way of purging messages that regard events from the civil year calculations
+                    //   that fall outside of the range of the current liturgical year.
+                    array_push($this->Messages, ...$Messages);
 
-            if ($this->CalendarParams->YearType === YearType::LITURGICAL) {
-                // Save the state of the current Calendar calculation
-                $this->Cal->sortLiturgicalEvents();
-                $CalBackup      = clone( $this->Cal );
-                $Messages       = $this->Messages;
-                $this->Messages = [];
-
-                // Calculate the calendar for the previous year
-                $this->CalendarParams->Year--;
+                    $response = $this->prepareResponseBody($request, $response);
+                } else {
+                    $response = $this->prepareResponseBody($request, $response);
+                }
+            } else {
                 $this->Cal = new LiturgicalEventCollection($this->CalendarParams);
 
                 $this->calculateUniversalCalendar();
+
+                // Prepare the localization data for national and diocesan calendars, if applicable
+                $this->applyCalendarI18nData();
 
                 if ($this->CalendarParams->NationalCalendar !== null && $this->NationalData !== null) {
                     $this->applyNationalCalendar();
@@ -5391,29 +5395,61 @@ final class CalendarHandler extends AbstractHandler
                 }
 
                 $this->Cal->setSeasonsAndHolyDaysOfObligation();
+
                 $this->Cal->setYearCyclesAndVigils();
+
+                // For any celebrations that do not yet have a psalter_week property, make an attempt to calculate the value if applicable
                 $this->Cal->calculatePsalterWeek();
-                $this->Cal->sortLiturgicalEvents();
 
-                $this->Cal->purgeDataBeforeAdvent();
-                $CalBackup->purgeDataAdventChristmas();
+                if ($this->CalendarParams->YearType === YearType::LITURGICAL) {
+                    // Save the state of the current Calendar calculation
+                    $this->Cal->sortLiturgicalEvents();
+                    $CalBackup      = clone( $this->Cal );
+                    $Messages       = $this->Messages;
+                    $this->Messages = [];
 
-                // Now we have to combine the two.
-                // The backup (which represents the main portion) should be appended to the calendar that was just generated
-                $this->Cal->merge($CalBackup);
+                    // Calculate the calendar for the previous year
+                    $this->CalendarParams->Year--;
+                    $this->Cal = new LiturgicalEventCollection($this->CalendarParams);
 
-                // Reset the year back to the original request before outputting results
-                $this->CalendarParams->Year++;
+                    $this->calculateUniversalCalendar();
 
-                // Append the messages from the backup calendar (current year) to the current messages (previous year)
-                // Unfortunately, we don't have a way of purging messages that regard events from the civil year calculations
-                //   that fall outside of the range of the current liturgical year.
-                array_push($this->Messages, ...$Messages);
+                    if ($this->CalendarParams->NationalCalendar !== null && $this->NationalData !== null) {
+                        $this->applyNationalCalendar();
+                    }
 
-                $response = $this->prepareResponseBody($request, $response);
-            } else {
-                $this->Cal->sortLiturgicalEvents();
-                $response = $this->prepareResponseBody($request, $response);
+                    // :SATURDAY_MEMORIAL_BVM
+                    $this->calculateSaturdayMemorialBVM();
+
+                    if ($this->CalendarParams->DiocesanCalendar !== null && $this->DiocesanData !== null) {
+                        $this->applyDiocesanCalendar();
+                    }
+
+                    $this->Cal->setSeasonsAndHolyDaysOfObligation();
+                    $this->Cal->setYearCyclesAndVigils();
+                    $this->Cal->calculatePsalterWeek();
+                    $this->Cal->sortLiturgicalEvents();
+
+                    $this->Cal->purgeDataBeforeAdvent();
+                    $CalBackup->purgeDataAdventChristmas();
+
+                    // Now we have to combine the two.
+                    // The backup (which represents the main portion) should be appended to the calendar that was just generated
+                    $this->Cal->merge($CalBackup);
+
+                    // Reset the year back to the original request before outputting results
+                    $this->CalendarParams->Year++;
+
+                    // Append the messages from the backup calendar (current year) to the current messages (previous year)
+                    // Unfortunately, we don't have a way of purging messages that regard events from the civil year calculations
+                    //   that fall outside of the range of the current liturgical year.
+                    array_push($this->Messages, ...$Messages);
+
+                    $response = $this->prepareResponseBody($request, $response);
+                } else {
+                    $this->Cal->sortLiturgicalEvents();
+                    $response = $this->prepareResponseBody($request, $response);
+                }
             }
         }
 

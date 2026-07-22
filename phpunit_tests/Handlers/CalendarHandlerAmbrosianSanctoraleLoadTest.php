@@ -28,9 +28,10 @@ use LiturgicalCalendar\Api\Utilities;
  * would otherwise silently overwrite the temporale definition.
  *
  * These tests drive `addAmbrosianSanctoraleToCalendar()` directly via reflection (rather than
- * through `handle()`) because the Ambrosian rite still 501s at the top of `handle()` — this task
- * only builds a piece of the future Ambrosian generation path; a later orchestrator task (Task 9)
- * wires it into the real request flow and Task 10 removes the 501 gate.
+ * through `handle()`) because at the time this task was written the Ambrosian rite still 501-ed
+ * at the top of `handle()` — this task only built a piece of the future Ambrosian generation
+ * path; the orchestrator task (Task 9) wires it into the real request flow and Task 10 removed
+ * the 501 gate.
  *
  * The engine-wiring here (building a `TemporaleContext` and running
  * `AmbrosianTemporale::buildTemporale()`) is deliberately inlined rather than reusing

@@ -42,14 +42,18 @@ final class CalendarRiteRoutingTest extends AbstractHandlerTestCase
         self::assertSame(200, $this->handle(['2025'], Rite::ROMAN, '/calendar/2025'));
     }
 
-    public function testAmbrosianComuneBaseReturns501(): void
+    /**
+     * Plan 7 Task 10 lifted the 501 gate: the comune ambrosiano now generates a real
+     * calendar via calculateAmbrosianCalendar() instead of throwing ImplementationException.
+     */
+    public function testAmbrosianComuneBaseReturns200(): void
     {
-        self::assertSame(StatusCode::NOT_IMPLEMENTED->value, $this->handle([], Rite::AMBROSIAN, '/calendar/ambrosian'));
+        self::assertSame(StatusCode::OK->value, $this->handle([], Rite::AMBROSIAN, '/calendar/ambrosian'));
     }
 
-    public function testAmbrosianComuneWithYearReturns501(): void
+    public function testAmbrosianComuneWithYearReturns200(): void
     {
-        self::assertSame(StatusCode::NOT_IMPLEMENTED->value, $this->handle(['2008'], Rite::AMBROSIAN, '/calendar/ambrosian/2008'));
+        self::assertSame(StatusCode::OK->value, $this->handle(['2008'], Rite::AMBROSIAN, '/calendar/ambrosian/2008'));
     }
 
     public function testAmbrosianRejectsNationalCalendarWith400(): void

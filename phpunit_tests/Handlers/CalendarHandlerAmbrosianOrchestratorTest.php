@@ -15,8 +15,8 @@ use LiturgicalCalendar\Api\Params\CalendarParams;
  * Plan 7 Task 9: `CalendarHandler::calculateAmbrosianCalendar()`, the single orchestrator that
  * assembles Tasks 3-8 (rite-aware Proprium de Tempore load, temporale engine, comune sanctorale,
  * season-stamping, precedence resolution, Holy Days of Obligation, year-cycles/vigils, psalter
- * week) into the exact call sequence the (still-501-gated) `/calendar/ambrosian` route will use
- * once Task 10 lifts the 501.
+ * week) into the exact call sequence the `/calendar/ambrosian` route now uses since Plan 7
+ * Task 10 lifted the 501 gate and wired this method into `handle()`.
  *
  * Unlike the per-task tests (`CalendarHandlerAmbrosianPrecedenceResolverTest`,
  * `LiturgicalEventCollectionAmbrosianPsalterWeekTest`, etc.), which manually chain the individual
@@ -26,9 +26,10 @@ use LiturgicalCalendar\Api\Params\CalendarParams;
  * `loadPropriumDeTemporeData()` + `TemporaleContext` + `RiteProfileFactory` construction) is
  * correct, not just that the individual passes work when chained by test code.
  *
- * The 501 gate in `handle()` is untouched: a real `/calendar/ambrosian` HTTP request still returns
- * 501. This test reaches the orchestrator only by reflection, exactly as the Task 5/6/7/8 tests
- * reach their respective methods.
+ * This test still reaches the orchestrator directly via reflection (rather than through
+ * `handle()`), exactly as the Task 5/6/7/8 tests reach their respective methods; the full
+ * `handle()` path (now live) is covered separately by `CalendarRiteRoutingTest`,
+ * `AmbrosianLitCalSchemaTest`, and `phpunit_tests/Routes/Readonly/AmbrosianCalendarTest`.
  */
 final class CalendarHandlerAmbrosianOrchestratorTest extends AbstractHandlerTestCase
 {

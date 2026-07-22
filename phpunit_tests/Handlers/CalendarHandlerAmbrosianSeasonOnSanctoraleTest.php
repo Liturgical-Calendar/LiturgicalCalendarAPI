@@ -35,8 +35,9 @@ use LiturgicalCalendar\Api\Utilities;
  *
  * This test builds the full 2025 Ambrosian temporale + comune sanctorale assembly exactly as
  * `CalendarHandlerAmbrosianSanctoraleLoadTest` does (temporale engine, then
- * `addAmbrosianSanctoraleToCalendar()` via reflection, since the Ambrosian rite still 501s before
- * `handle()` reaches this point in the real request flow — Task 9 wires the full pipeline).
+ * `addAmbrosianSanctoraleToCalendar()` via reflection) rather than through `handle()`, at the
+ * granularity of this single pass — the full pipeline is assembled by `calculateAmbrosianCalendar()`
+ * (Task 9) and wired into `handle()` by Task 10.
  */
 final class CalendarHandlerAmbrosianSeasonOnSanctoraleTest extends AbstractHandlerTestCase
 {

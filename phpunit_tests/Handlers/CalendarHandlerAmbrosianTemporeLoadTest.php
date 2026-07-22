@@ -17,9 +17,9 @@ use LiturgicalCalendar\Api\Params\CalendarParams;
  * Ambrosian request would have calculated against the Roman Proprium de Tempore.
  *
  * These tests drive `loadPropriumDeTemporeData()` directly via reflection (rather than through
- * `handle()`) because the Ambrosian rite still 501s at the top of `handle()` — this task only
- * makes the tempore-load step rite-aware in preparation for the later orchestrator task that
- * removes the 501 gate.
+ * `handle()`) because at the time this task was written the Ambrosian rite still 501-ed at the
+ * top of `handle()` — this task only made the tempore-load step rite-aware in preparation for
+ * the later orchestrator task (Plan 7 Task 10) that removed the 501 gate.
  */
 final class CalendarHandlerAmbrosianTemporeLoadTest extends AbstractHandlerTestCase
 {
