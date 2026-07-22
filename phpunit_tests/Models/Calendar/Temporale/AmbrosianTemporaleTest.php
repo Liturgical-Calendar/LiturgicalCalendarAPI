@@ -260,4 +260,15 @@ final class AmbrosianTemporaleTest extends TestCase
         self::assertNotNull($someThursday);
         self::assertNull($someThursday->is_aliturgical);
     }
+
+    public function testEasterFerieAfterOctave2025(): void
+    {
+        $d = $this->runEngine(2025);
+        self::assertArrayHasKey('EasterWeekday2Monday', $d);
+        self::assertSame('2025-04-28', $d['EasterWeekday2Monday']);
+        // Ascension (Thu 2025-05-29) stays its own anchor:
+        self::assertSame('2025-05-29', $d['Ascension']);
+        // Octave weekdays remain their own anchors, not re-emitted:
+        self::assertArrayHasKey('MonOctaveEaster', $d);
+    }
 }

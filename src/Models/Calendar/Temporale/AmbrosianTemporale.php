@@ -41,6 +41,7 @@ final class AmbrosianTemporale implements TemporaleEngine
         $this->calculateAdventWeekdays($ctx);
         $this->calculateChristmasWeekdays($ctx);
         $this->calculateLentWeekdays($ctx);
+        $this->calculateEasterWeekdays($ctx);
     }
 
     /**
@@ -591,6 +592,37 @@ final class AmbrosianTemporale implements TemporaleEngine
     {
         $daysSince = (int) $lent1->diff($date)->format('%a');
         return (int) floor(( $daysSince - 1 ) / 7) + 1;
+    }
+
+    /**
+     * Easter ferie after the octave (n. 21): the Easter octave weekdays
+     * (`Mon..SatOctaveEaster`) are already anchors placed by `calculateEasterCycle()`,
+     * so this fill starts strictly after Easter II — Monday after Easter II …
+     * Saturday before Pentecost. Ascension (Thursday, Easter + 39d) is an anchor
+     * and is skipped by `inCalendar()`.
+     */
+    private function calculateEasterWeekdays(TemporaleContext $ctx): void
+    {
+        $year      = $ctx->params->Year;
+        $easter    = Utilities::calcGregEaster($year);
+        $easter2   = ( clone $easter )->add(new \DateInterval('P7D'));   // Easter II
+        $pentecost = ( clone $easter )->add(new \DateInterval('P49D'));
+        $from      = ( clone $easter2 )->add(new \DateInterval('P1D'));  // Monday after Easter II
+        $this->fillFerialWeekdays(
+            $ctx,
+            $from,
+            clone $pentecost, // up to (not incl.) Pentecost Sunday
+            LitColor::WHITE,
+            fn (DateTime $d): string => 'EasterWeekday' . $this->easterWeekNumber($d, $easter) . $this->englishWeekday($d),
+            fn (DateTime $d): string => $this->weekdayName($d, 'di Pasqua', 'Paschæ', $this->easterWeekNumber($d, $easter), $ctx)
+        );
+    }
+
+    /** Easter week number: the octave is week 1; Easter II opens week 2. */
+    private function easterWeekNumber(DateTime $date, DateTime $easter): int
+    {
+        $daysSince = (int) $easter->diff($date)->format('%a');
+        return (int) floor($daysSince / 7) + 1;
     }
 
     /**

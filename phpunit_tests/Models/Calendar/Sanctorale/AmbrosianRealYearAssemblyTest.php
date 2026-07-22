@@ -77,8 +77,20 @@ final class AmbrosianRealYearAssemblyTest extends TestCase
      * including the 5 Lenten Fridays (Mar 14, 21, 28, Apr 4, 11). None of these 28
      * dates collide with an existing temporale or sanctorale key, so all 28 are
      * additive. New total: 402 + 28 = 430.
+     *
+     * Plan 6 / Task 8 adds the post-octave Easter ferial-weekday fill
+     * (`calculateEasterWeekdays()`, via `fillFerialWeekdays()`). The Easter
+     * octave weekdays (`Mon..SatOctaveEaster`) are already anchors placed by
+     * `calculateEasterCycle()`, so this fill runs from the Monday after Easter II
+     * (2025-04-28, exclusive of the octave/Easter II) through the Saturday before
+     * Pentecost (2025-06-07; Pentecost itself, 2025-06-08, is exclusive). Keys are
+     * `EasterWeekday{N}{EnglishDay}`. For civil year 2025 this spans weeks 2-7 (6
+     * full Mon-Sat weeks = 36 slots) minus 1 anchor date (Ascension, 2025-05-29,
+     * a Thursday) already in the calendar = 35 ferial days. None of these 35
+     * dates collide with an existing temporale or sanctorale key, so all 35 are
+     * additive. New total: 430 + 35 = 465.
      */
-    private const int EXPECTED_TOTAL_2025 = 430;
+    private const int EXPECTED_TOTAL_2025 = 465;
 
     public function testAssembleAmbrosianYear2025IncludesTemporaleAnchor(): void
     {
