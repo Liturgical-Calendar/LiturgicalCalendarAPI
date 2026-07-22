@@ -148,4 +148,34 @@ final class AmbrosianTemporaleTest extends TestCase
         self::assertSame(LitSeason::AFTER_PENTECOST, $events['DedicationDuomo']->liturgical_season);
         self::assertSame(LitSeason::AFTER_PENTECOST, $events['ChristKing']->liturgical_season);
     }
+
+    public function testAfterPentecostSubBlocks2025(): void
+    {
+        $d = $this->runEngine(2025);
+
+        // (a) dopo Pentecoste: 1st Sunday after Pentecost (Jun 15) .. Sat before Aug 31
+        self::assertSame('2025-06-15', $d['AfterPentecost1']);
+        self::assertSame('2025-08-24', $d['AfterPentecost11']); // last before the Martyrdom Sunday
+        self::assertArrayNotHasKey('AfterPentecost12', $d);
+
+        // (b) dopo il Martirio: Aug 31 .. Sat before Oct 19 (Dedication)
+        self::assertSame('2025-08-31', $d['AfterPentecostMartyrdom1']);
+        self::assertSame('2025-10-12', $d['AfterPentecostMartyrdom7']);
+        self::assertArrayNotHasKey('AfterPentecostMartyrdom8', $d);
+
+        // (c) dopo la Dedicazione: 1st Sunday after Dedication (Oct 26) .. Sat before Advent I;
+        // Christ the King (Nov 9) is the terminal anchor, not re-emitted as a numbered Sunday.
+        self::assertSame('2025-10-26', $d['AfterPentecostDedication1']);
+        self::assertSame('2025-11-02', $d['AfterPentecostDedication2']);
+        self::assertArrayNotHasKey('AfterPentecostDedication3', $d); // Nov 9 = ChristKing
+        self::assertSame('2025-11-09', $d['ChristKing']);
+    }
+
+    public function testAfterPentecostSundaysStamped2025(): void
+    {
+        $events = $this->runEngineEvents(2025);
+        self::assertSame(LitSeason::AFTER_PENTECOST, $events['AfterPentecost1']->liturgical_season);
+        self::assertSame(LitSeason::AFTER_PENTECOST, $events['AfterPentecostMartyrdom1']->liturgical_season);
+        self::assertSame(LitSeason::AFTER_PENTECOST, $events['AfterPentecostDedication1']->liturgical_season);
+    }
 }

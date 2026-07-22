@@ -28,15 +28,19 @@ final class AmbrosianRealYearAssemblyTest extends TestCase
 
     /**
      * The comune ambrosiano (2024 edition, `propriumdesanctis.json`) has 254
-     * rows. The temporale engine produces 38 anchor keys for civil year 2025
-     * (verified via `AmbrosianTemporaleTest`/`AmbrosianTemporaleOrdoValidationTest`).
+     * rows. The temporale engine produces 65 anchor/synthesized keys for civil
+     * year 2025 (verified via `AmbrosianTemporaleTest`/`AmbrosianTemporaleOrdoValidationTest`):
+     * 38 major-block anchors (Advent through Christ the King) + 7 after-Epiphany
+     * Sundays (`AfterEpiphany2`..`AfterEpiphany8`) + 20 after-Pentecost Sundays
+     * across the three n.42 sub-blocks (`AfterPentecost1`..`11`,
+     * `AfterPentecostMartyrdom1`..`7`, `AfterPentecostDedication1`..`2`).
      * Three event keys (`Christmas`, `Circoncisione`, `Epiphany`) are listed in
      * both the temporale anchor block and the comune sanctorale source; adding
      * the sanctorale row for one of these keys overwrites the already-added
      * temporale entry rather than creating a duplicate, so the final distinct
-     * key count is 38 + 254 - 3 = 289, not the plain sum of 292.
+     * key count is 65 + 254 - 3 = 316, not the plain sum of 319.
      */
-    private const int EXPECTED_TOTAL_2025 = 289;
+    private const int EXPECTED_TOTAL_2025 = 316;
 
     public function testAssembleAmbrosianYear2025IncludesTemporaleAnchor(): void
     {

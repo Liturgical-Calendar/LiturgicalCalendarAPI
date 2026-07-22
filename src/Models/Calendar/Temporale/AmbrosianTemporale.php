@@ -36,6 +36,7 @@ final class AmbrosianTemporale implements TemporaleEngine
         $this->calculateEasterCycle($ctx);
         $this->calculateAfterPentecostAnchors($ctx);
         $this->calculateAfterEpiphanySundays($ctx);
+        $this->calculateAfterPentecostSundays($ctx);
     }
 
     /**
@@ -227,6 +228,79 @@ final class AmbrosianTemporale implements TemporaleEngine
     }
 
     /**
+     * Martyrdom of St John the Baptist (n. 42a): Aug 29, postponed to Sep 1 when
+     * Aug 29 falls on a Sunday.
+     */
+    private function martyrdomAnchor(int $year): DateTime
+    {
+        $aug29 = DateTime::fromFormat('29-8-' . $year);
+        return self::dateIsSunday($aug29) ? DateTime::fromFormat('1-9-' . $year) : $aug29;
+    }
+
+    /**
+     * After-Pentecost Sundays (n. 42), in three sub-blocks with per-block numbering:
+     *   (a) dopo Pentecoste     — 1st Sunday after Pentecost … Sat before the 1st Sunday after the Martyrdom
+     *   (b) dopo il Martirio    — that Sunday … Sat before the Dedication (3rd Sunday of October)
+     *   (c) dopo la Dedicazione — 1st Sunday after the Dedication … Sat before Advent I (ends at Christ the King)
+     * DedicationDuomo and ChristKing are anchors already placed; Sundays already in
+     * the calendar are skipped, so those two are not re-emitted as numbered Sundays.
+     */
+    private function calculateAfterPentecostSundays(TemporaleContext $ctx): void
+    {
+        $year         = $ctx->params->Year;
+        $pentecost    = Utilities::calcGregEaster($year)->add(new \DateInterval('P49D'));
+        $martyrdomSun = ( clone $this->martyrdomAnchor($year) )->modify('next Sunday'); // 1st Sunday after the Martyrdom
+        $dedication   = $ctx->cal->getLiturgicalEvent('DedicationDuomo')->date
+            ?? throw new ServiceUnavailableException('DedicationDuomo anchor must be placed before after-Pentecost Sundays');
+        $advent1      = $this->adventOne($year);
+
+        // (a) dopo Pentecoste
+        $this->numberSundayBlock(
+            $ctx,
+            'AfterPentecost',
+            ( clone $pentecost )->modify('next Sunday'),
+            $martyrdomSun,
+            fn (int $ordinal): string => $this->afterPentecostSundayName($ordinal, $ctx)
+        );
+        // (b) dopo il Martirio
+        $this->numberSundayBlock(
+            $ctx,
+            'AfterPentecostMartyrdom',
+            clone $martyrdomSun,
+            $dedication,
+            fn (int $ordinal): string => $this->afterMartyrdomSundayName($ordinal, $ctx)
+        );
+        // (c) dopo la Dedicazione
+        $this->numberSundayBlock(
+            $ctx,
+            'AfterPentecostDedication',
+            ( clone $dedication )->modify('next Sunday'),
+            $advent1,
+            fn (int $ordinal): string => $this->afterDedicationSundayName($ordinal, $ctx)
+        );
+    }
+
+    /**
+     * Emit consecutive numbered Sundays [$firstSunday, $endExclusive) under $keyStem,
+     * numbering from 1, skipping Sundays already occupied by an anchor. $nameBuilder
+     * is the per-block localized name builder (see below), invoked with the ordinal.
+     *
+     * @param \Closure(int): string $nameBuilder
+     */
+    private function numberSundayBlock(TemporaleContext $ctx, string $keyStem, DateTime $firstSunday, DateTime $endExclusive, \Closure $nameBuilder): void
+    {
+        $ordinal = 1;
+        $sunday  = clone $firstSunday;
+        while ($sunday < $endExclusive) {
+            if (false === $ctx->cal->inCalendar($sunday)) {
+                $this->synthesizeSunday($ctx, $keyStem . $ordinal, clone $sunday, $nameBuilder($ordinal));
+            }
+            $ordinal++;
+            $sunday = ( clone $sunday )->modify('next Sunday');
+        }
+    }
+
+    /**
      * Create a synthesized numbered Sunday (not drawn from the Proprium de Tempore
      * data file): a dominical FEAST_LORD in green, season-stamped from its key.
      * Used for the after-Epiphany and after-Pentecost Sunday blocks whose exact
@@ -274,6 +348,47 @@ final class AmbrosianTemporale implements TemporaleEngine
         }
         $ordinalStr = Utilities::getOrdinal($ordinal, $ctx->localeDateFormatter->getLocale(), $this->ordinalFormatter($ctx), LatinUtils::LATIN_ORDINAL);
         return sprintf("%s domenica dopo l'Epifania", $ordinalStr);
+    }
+
+    /**
+     * Localized display name for an after-Pentecost Sunday in sub-block (a)
+     * "dopo Pentecoste", e.g. (it) "II domenica dopo Pentecoste", (la) "Dominica
+     * II post Pentecosten".
+     */
+    private function afterPentecostSundayName(int $ordinal, TemporaleContext $ctx): string
+    {
+        return $this->afterPentecostFamilyName($ordinal, $ctx, 'dopo Pentecoste', 'post Pentecosten');
+    }
+
+    /**
+     * Localized display name for an after-Pentecost Sunday in sub-block (b)
+     * "dopo il Martirio" (of St John the Baptist).
+     */
+    private function afterMartyrdomSundayName(int $ordinal, TemporaleContext $ctx): string
+    {
+        return $this->afterPentecostFamilyName($ordinal, $ctx, 'dopo il Martirio', 'post Martyrium');
+    }
+
+    /**
+     * Localized display name for an after-Pentecost Sunday in sub-block (c)
+     * "dopo la Dedicazione" (of the Duomo di Milano).
+     */
+    private function afterDedicationSundayName(int $ordinal, TemporaleContext $ctx): string
+    {
+        return $this->afterPentecostFamilyName($ordinal, $ctx, 'dopo la Dedicazione', 'post Dedicationem');
+    }
+
+    /**
+     * Shared name-building logic for the three after-Pentecost sub-block name
+     * builders above.
+     */
+    private function afterPentecostFamilyName(int $ordinal, TemporaleContext $ctx, string $phraseIt, string $phraseLa): string
+    {
+        if (LitLocale::LATIN_PRIMARY_LANGUAGE === LitLocale::$PRIMARY_LANGUAGE) {
+            return sprintf('Dominica %s %s', LatinUtils::LATIN_ORDINAL[$ordinal], $phraseLa);
+        }
+        $ordinalStr = Utilities::getOrdinal($ordinal, $ctx->localeDateFormatter->getLocale(), $this->ordinalFormatter($ctx), LatinUtils::LATIN_ORDINAL);
+        return sprintf('%s domenica %s', $ordinalStr, $phraseIt);
     }
 
     /**
