@@ -41,6 +41,8 @@ final class AmbrosianTemporale implements TemporaleEngine
         $this->calculateAfterPentecostWeekdays($ctx);
         $this->calculateAdventWeekdays($ctx);
         $this->calculateChristmasWeekdays($ctx);
+        $this->calculateChristmasSundayAfterOctave($ctx);
+        $this->calculateChristmasJanuaryWeekdays($ctx);
         $this->calculateLentWeekdays($ctx);
         $this->calculateEasterWeekdays($ctx);
     }
@@ -530,6 +532,65 @@ final class AmbrosianTemporale implements TemporaleEngine
     }
 
     /**
+     * The n.33 "Domenica dopo l'ottava di Natale" (ambrosian.txt L4749-4750):
+     * "L'eventuale domenica tra il 2 e il 5 gennaio è la domenica dopo l'ottava
+     * di Natale." Computes the Sunday, if any, in the inclusive window
+     * [Jan 2, Jan 5] of the civil year — it exists only when Jan 1 falls on
+     * Wed/Thu/Fri/Sat; when Jan 1 is Sun/Mon/Tue there is no such Sunday and no
+     * event is created ("eventuale" = possible, not guaranteed). Unlike the
+     * other synthesized numbered Sundays this one is WHITE, not GREEN, so it is
+     * built directly (like `synthesizeSunday()`) rather than through it. Must
+     * run before `calculateChristmasJanuaryWeekdays()` so that helper's
+     * `inCalendar()` guard skips this date when it exists.
+     */
+    private function calculateChristmasSundayAfterOctave(TemporaleContext $ctx): void
+    {
+        $year = $ctx->params->Year;
+        $jan2 = DateTime::fromFormat('2-1-' . $year);
+        $jan5 = DateTime::fromFormat('5-1-' . $year);
+        $sun  = self::dateIsSunday($jan2) ? $jan2 : ( clone $jan2 )->modify('next Sunday');
+        if ($sun > $jan5) {
+            // No Sunday falls within [Jan 2, Jan 5] this year -- "eventuale" not realized.
+            return;
+        }
+
+        $name = LitLocale::LATIN_PRIMARY_LANGUAGE === LitLocale::$PRIMARY_LANGUAGE
+            ? 'Dominica post octavam Nativitatis'
+            : 'Domenica dopo l\'ottava di Natale';
+
+        $event               = new LiturgicalEvent($name, clone $sun, LitColor::WHITE, LitEventType::MOBILE, LitGrade::FEAST_LORD);
+        $event->is_dominical = true;
+        $ctx->cal->addLiturgicalEvent('ChristmasSundayAfterOctave', $event);
+        $this->stampSeason($event);
+    }
+
+    /**
+     * January Christmas ferie: Jan 2 … Baptism of the Lord (Sunday after Jan 6),
+     * exclusive. `Circoncisione` (Jan 1, before this range), `Epiphany` (Jan 6),
+     * `BaptismLord`, and the n.33 `ChristmasSundayAfterOctave` Sunday (when it
+     * exists) are all anchors already placed and are skipped by
+     * `fillFerialWeekdays()`'s Sunday/`inCalendar()` guards. Must run after
+     * `calculateChristmasSundayAfterOctave()` for that skip to take effect.
+     */
+    private function calculateChristmasJanuaryWeekdays(TemporaleContext $ctx): void
+    {
+        $year    = $ctx->params->Year;
+        $from    = DateTime::fromFormat('2-1-' . $year);
+        $baptism = DateTime::fromFormat('6-1-' . $year)->modify('next Sunday');
+        $this->fillFerialWeekdays(
+            $ctx,
+            $from,
+            $baptism,
+            LitColor::WHITE,
+            // Bounded to January, so day-of-month alone would not collide here,
+            // but 'md' matches calculateChristmasWeekdays()'s (Dec) key shape for
+            // consistency, and the two never collide since the months differ.
+            fn (DateTime $d): string => 'ChristmasWeekday' . $d->format('md'),
+            fn (DateTime $d): string => $this->weekdayName($d, 'del tempo di Natale', 'Nativitatis', null, $ctx)
+        );
+    }
+
+    /**
      * Localized display name for an after-Pentecost Sunday in sub-block (a)
      * "dopo Pentecoste", e.g. (it) "II domenica dopo Pentecoste", (la) "Dominica
      * II post Pentecosten".
@@ -620,17 +681,26 @@ final class AmbrosianTemporale implements TemporaleEngine
         return (int) floor(( $daysSince - 1 ) / 7) + 1;
     }
 
-    /** Lenten ferie: Lent I (excl.) … Saturday before Palm Sunday; Fridays are aliturgical (nn. 24–27). */
+    /**
+     * Lenten ferie: Lent I (excl.) … Wednesday of Holy Week (excl.); Fridays are
+     * aliturgical (nn. 24–27). The upper bound reaches past Palm Sunday through
+     * the Holy Week Monday/Tuesday/Wednesday ("settimana autentica"), which are
+     * still Lent-season ferie: Palm Sunday itself is a Sunday (skipped by
+     * `fillFerialWeekdays()`'s Sunday guard) and `SabatoTradSymb` is an anchor
+     * already placed (skipped by `inCalendar()`). Holy Week Mon–Wed contains no
+     * Friday, so `lentenAliturgicalFridays` never fires for them; Holy Thursday
+     * itself opens the Triduum and is excluded as the upper bound.
+     */
     private function calculateLentWeekdays(TemporaleContext $ctx): void
     {
-        $year    = $ctx->params->Year;
-        $lent1   = Utilities::calcGregEaster($year)->sub(new \DateInterval('P' . ( 6 * 7 ) . 'D'));
-        $palmSun = Utilities::calcGregEaster($year)->sub(new \DateInterval('P7D'));
-        $from    = ( clone $lent1 )->add(new \DateInterval('P1D'));
+        $year      = $ctx->params->Year;
+        $lent1     = Utilities::calcGregEaster($year)->sub(new \DateInterval('P' . ( 6 * 7 ) . 'D'));
+        $holyThurs = Utilities::calcGregEaster($year)->sub(new \DateInterval('P3D'));
+        $from      = ( clone $lent1 )->add(new \DateInterval('P1D'));
         $this->fillFerialWeekdays(
             $ctx,
             $from,
-            clone $palmSun, // up to (not incl.) Palm Sunday; SabatoTradSymb anchor is skipped by inCalendar()
+            clone $holyThurs, // up to (not incl.) Holy Thursday; PalmSun (Sunday) and SabatoTradSymb anchor are skipped
             LitColor::MORELLO,
             fn (DateTime $d): string => 'LentWeekday' . $this->lentWeekNumber($d, $lent1) . $this->englishWeekday($d),
             fn (DateTime $d): string => $this->weekdayName($d, 'di Quaresima', 'Quadragesimæ', $this->lentWeekNumber($d, $lent1), $ctx),

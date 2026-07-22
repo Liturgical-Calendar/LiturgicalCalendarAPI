@@ -109,8 +109,27 @@ final class AmbrosianRealYearAssemblyTest extends TestCase
      * sanctorale key (each block's Sundays are already-placed anchors, skipped
      * by the fill's own Sunday check), so all 138 are additive. New total:
      * 465 + 138 = 603.
+     *
+     * Plan 6 / Task 10 closes the three remaining coverage gaps found by
+     * walking the engine's 2025/2026 output (the n.32 "domenica nell'ottava
+     * del Natale" Dec 27/28 Sunday is spec-deferred and NOT modeled here):
+     *   - `calculateLentWeekdays()`'s upper bound is extended from Palm Sunday
+     *     to Holy Thursday (exclusive), adding the Holy Week Mon/Tue/Wed ferie
+     *     (2025: Apr 14/15/16 = `LentWeekday6Monday/Tuesday/Wednesday`) = 3
+     *     additive keys (Palm Sunday is a Sunday, skipped; `SabatoTradSymb` is
+     *     an anchor, skipped).
+     *   - `calculateChristmasSundayAfterOctave()` (n. 33) adds the "eventuale"
+     *     Sunday in [Jan 2, Jan 5] -- for 2025, Jan 5 -- as
+     *     `ChristmasSundayAfterOctave` = 1 additive key.
+     *   - `calculateChristmasJanuaryWeekdays()` fills Jan 2 .. Baptism of the
+     *     Lord (exclusive). For 2025 that range is Jan 2-11, minus the Jan 5
+     *     Sunday (now the n.33 anchor above) and the Jan 6 Epiphany anchor =
+     *     8 additive keys (`ChristmasWeekday0102`, `0103`, `0104`, `0107`,
+     *     `0108`, `0109`, `0110`, `0111`).
+     * None of these 3+1+8 = 12 dates collide with an existing temporale or
+     * sanctorale key. New total: 603 + 12 = 615.
      */
-    private const int EXPECTED_TOTAL_2025 = 603;
+    private const int EXPECTED_TOTAL_2025 = 615;
 
     public function testAssembleAmbrosianYear2025IncludesTemporaleAnchor(): void
     {

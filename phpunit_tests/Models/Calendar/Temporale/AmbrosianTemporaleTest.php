@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Models\Calendar\Temporale;
 
+use LiturgicalCalendar\Api\Enum\LitColor;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Models\Calendar\Temporale\AmbrosianTemporale;
@@ -284,5 +285,58 @@ final class AmbrosianTemporaleTest extends TestCase
         // (c) Monday after the Dedication (Sun 2025-10-19) = 2025-10-20
         self::assertArrayHasKey('AfterPentecostDedicationWeekday1Monday', $d);
         self::assertSame('2025-10-20', $d['AfterPentecostDedicationWeekday1Monday']);
+    }
+
+    public function testHolyWeekFerieCovered2025(): void
+    {
+        $events = $this->runEngineEvents(2025);
+        // 2025: Palm Sunday = Apr 13, Holy Thursday = Apr 17. Mon/Tue/Wed of Holy
+        // Week (Apr 14/15/16) were previously uncovered because
+        // calculateLentWeekdays() stopped at Palm Sunday; the fix extends the
+        // upper bound to Holy Thursday (exclusive).
+        self::assertArrayHasKey('LentWeekday6Monday', $events);
+        self::assertSame('2025-04-14', $events['LentWeekday6Monday']->date->format('Y-m-d'));
+        self::assertNull($events['LentWeekday6Monday']->is_aliturgical);
+
+        self::assertArrayHasKey('LentWeekday6Tuesday', $events);
+        self::assertSame('2025-04-15', $events['LentWeekday6Tuesday']->date->format('Y-m-d'));
+        self::assertNull($events['LentWeekday6Tuesday']->is_aliturgical);
+
+        self::assertArrayHasKey('LentWeekday6Wednesday', $events);
+        self::assertSame('2025-04-16', $events['LentWeekday6Wednesday']->date->format('Y-m-d'));
+        self::assertNull($events['LentWeekday6Wednesday']->is_aliturgical);
+    }
+
+    public function testJanuaryChristmasFerie2025(): void
+    {
+        $d = $this->runEngine(2025);
+        self::assertArrayHasKey('ChristmasWeekday0102', $d);
+        self::assertSame('2025-01-02', $d['ChristmasWeekday0102']);
+        self::assertArrayHasKey('ChristmasWeekday0111', $d);
+        self::assertSame('2025-01-11', $d['ChristmasWeekday0111']);
+        // Epiphany (Jan 6) and Circoncisione (Jan 1) must not be overwritten.
+        self::assertSame('2025-01-06', $d['Epiphany']);
+        self::assertSame('2025-01-01', $d['Circoncisione']);
+    }
+
+    public function testSundayAfterChristmasOctave2025And2026(): void
+    {
+        $events2025 = $this->runEngineEvents(2025);
+        self::assertArrayHasKey('ChristmasSundayAfterOctave', $events2025);
+        $event2025 = $events2025['ChristmasSundayAfterOctave'];
+        self::assertSame('2025-01-05', $event2025->date->format('Y-m-d'));
+        self::assertSame(LitSeason::CHRISTMAS, $event2025->liturgical_season);
+        self::assertTrue($event2025->is_dominical);
+        self::assertSame(LitGrade::FEAST_LORD, $event2025->grade);
+        self::assertContains(LitColor::WHITE, $event2025->color);
+
+        $d2026 = $this->runEngine(2026);
+        self::assertSame('2026-01-04', $d2026['ChristmasSundayAfterOctave']);
+
+        // 2023: Jan 1, 2023 is a Sunday, so [Jan 2, Jan 5] contains no Sunday --
+        // the n.33 Sunday does not exist that year ("eventuale").
+        self::assertSame('7', ( new \DateTime('2023-01-01') )->format('N'), 'Expected Jan 1, 2023 to be a Sunday');
+        $d2023 = $this->runEngine(2023);
+        self::assertArrayNotHasKey('ChristmasSundayAfterOctave', $d2023);
     }
 }
