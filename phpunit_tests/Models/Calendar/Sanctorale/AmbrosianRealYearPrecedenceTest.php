@@ -163,29 +163,41 @@ final class AmbrosianRealYearPrecedenceTest extends TestCase
     }
 
     /**
-     * A concrete real coincidence (task brief Step 1(ii)), documented in the
-     * Task 8 report: in the 2025 assembled year, `Advent4` (the temporale
-     * anchor for Advent IV, a dominical Higher Solemnity) and `StAmbrose`
-     * (the comune sanctorale Solemnity for the patron of Milan) both fall on
-     * 2025-12-07. `Advent4` outranks `StAmbrose` (rank 3 vs rank 5), so
-     * `StAmbrose` is impeded and transferred via the generic n.56 walk.
+     * A concrete real coincidence (task brief Step 1(ii)): in the 2025
+     * assembled year, `Advent4` (the temporale anchor for Advent IV, a
+     * dominical Higher Solemnity and privileged Advent Sunday) and
+     * `StAmbrose` (the comune sanctorale Solemnity for the patron of Milan)
+     * both fall on 2025-12-07.
      *
-     * The walk cannot land on 2025-12-08: the comune sanctorale also places
-     * `ImmaculateConception` (a Solemnity, rank 5 -- NOT free of ranks 1-10)
-     * there, so the walk skips it. It lands on 2025-12-09 instead, where the
-     * comune sanctorale independently places `StJuanDiego` (an optional
-     * memorial, rank 12 -- free of ranks 1-10, so the walk does not skip
-     * it). This creates a FRESH coincidence at the destination that only the
-     * Task 8 iterative pass resolves: `StJuanDiego` is suppressed by the
-     * now-co-located, higher-ranking `StAmbrose` in the second pass.
+     * Once Plan 6 Task 2 made `AmbrosianTemporale` populate
+     * `liturgical_season` on every event, the resolver's season-gated
+     * branches stopped being inert and now correctly recognize 2025-12-07 as
+     * a privileged Advent Sunday. That triggers the saint-Solemnity-on-a-
+     * privileged-Sunday rule (spec §5 / nn.4, 56) instead of the generic
+     * n.56 forward walk: `StAmbrose` is displaced to the following Monday,
+     * 2025-12-08 -- but that Monday is itself occupied by
+     * `ImmaculateConception` (also a Solemnity), so `StAmbrose` is
+     * ANTICIPATED to the preceding Saturday, 2025-12-06, instead.
      *
-     * This single real-year coincidence exercises: the generic n.56 walk
-     * skipping an occupied-by-a-solemnity day, landing on an
-     * occupied-by-a-memorial day, and the iterative pass cleaning up the
-     * resulting collision -- i.e. it is the real-data analogue of the
-     * constructed cascade in `AmbrosianPrecedenceResolverTest::testGenericTransferOntoOccupiedDayIsReResolvedByIterativePass()`.
+     * (Before `liturgical_season` was populated, the resolver could not see
+     * that Dec 7 was a privileged Sunday and fell through to the generic
+     * n.56 forward walk, which incorrectly landed `StAmbrose` on 2025-12-09
+     * -- suppressing `StJuanDiego` there. That was a bug; this test now
+     * documents and locks in the corrected anticipation-to-Saturday
+     * behavior.)
+     *
+     * The Dec-6 landing is confirmed correct by the authoritative Milan
+     * diocesan ordo:
+     * https://www.chiesadimilano.it/almanacco/letture-rito-ambrosiano/anno-a-2025-2026-ra/ordinazione-di-santambrogio-8-2851534.html
+     *
+     * The generic n.56 iterative-pass mechanism (a transfer landing on an
+     * already-occupied day, re-resolved by a second pass) is still covered
+     * on constructed fixture data by
+     * `AmbrosianPrecedenceResolverTest::testGenericTransferOntoOccupiedDayIsReResolvedByIterativePass()`;
+     * this real-year scenario no longer exercises that generic path, since
+     * the season-aware anticipation rule now applies instead.
      */
-    public function testStAmbroseCascadeThroughOccupiedImmaculateConceptionOntoStJuanDiego(): void
+    public function testStAmbroseOnAdventSundayAnticipatedToSaturdayPastOccupiedImmaculateConception(): void
     {
         $cal = $this->assembleAmbrosianYear(2025);
 
@@ -219,26 +231,36 @@ final class AmbrosianRealYearPrecedenceTest extends TestCase
 
         // ImmaculateConception is untouched: it was never contested (it wins
         // its own uncontested date and blocks -- but is not itself impeded by
-        // -- the n.56 walk).
+        // -- StAmbrose's displacement).
         $immaculateAfter = $cal->getLiturgicalEvent('ImmaculateConception');
         self::assertNotNull($immaculateAfter);
         self::assertSame('2025-12-08', $immaculateAfter->date->format('Y-m-d'));
         self::assertFalse($cal->isSuppressed('ImmaculateConception'));
 
-        // StAmbrose survives, transferred past the occupied Dec 8 onto Dec 9.
+        // StAmbrose survives: displaced from privileged Sunday Dec 7 to
+        // Monday Dec 8, which is occupied by ImmaculateConception, so it is
+        // anticipated to the preceding Saturday, Dec 6.
         self::assertFalse($cal->isSuppressed('StAmbrose'));
         $stAmbroseAfter = $cal->getLiturgicalEvent('StAmbrose');
         self::assertNotNull($stAmbroseAfter);
-        self::assertSame('2025-12-09', $stAmbroseAfter->date->format('Y-m-d'));
+        self::assertSame('2025-12-06', $stAmbroseAfter->date->format('Y-m-d'));
 
-        // StJuanDiego -- the fresh coincidence StAmbrose's transfer created at
-        // its destination -- is suppressed, but only by the SECOND pass.
-        self::assertTrue($cal->isSuppressed('StJuanDiego'));
-        self::assertNull($cal->getLiturgicalEvent('StJuanDiego'));
+        // StJuanDiego is untouched: with StAmbrose now anticipated to Dec 6
+        // instead of transferred to Dec 9, there is no fresh coincidence at
+        // StJuanDiego's date -- it remains active on its original 2025-12-09.
+        self::assertFalse($cal->isSuppressed('StJuanDiego'));
+        $stJuanDiegoAfter = $cal->getLiturgicalEvent('StJuanDiego');
+        self::assertNotNull($stJuanDiegoAfter);
+        self::assertSame('2025-12-09', $stJuanDiegoAfter->date->format('Y-m-d'));
 
-        // Dec 9 ends up holding exactly one active event: StAmbrose.
+        // Dec 6 ends up holding exactly one active event: StAmbrose.
+        $dec6Occupants = $cal->getCalEventsFromDate(\LiturgicalCalendar\Api\DateTime::fromFormat('6-12-2025'));
+        self::assertCount(1, $dec6Occupants);
+        self::assertArrayHasKey('StAmbrose', $dec6Occupants);
+
+        // Dec 9 ends up holding exactly one active event: StJuanDiego.
         $dec9Occupants = $cal->getCalEventsFromDate(\LiturgicalCalendar\Api\DateTime::fromFormat('9-12-2025'));
         self::assertCount(1, $dec9Occupants);
-        self::assertArrayHasKey('StAmbrose', $dec9Occupants);
+        self::assertArrayHasKey('StJuanDiego', $dec9Occupants);
     }
 }

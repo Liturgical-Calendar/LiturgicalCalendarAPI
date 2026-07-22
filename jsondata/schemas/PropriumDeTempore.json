@@ -25,6 +25,10 @@
                 "is_dominical": {
                     "type": "boolean",
                     "description": "Whether the event is \"of the Lord\" (dominical). Optional; used by the Ambrosian proprium to distinguish Sundays and solemnities/feasts of the Lord from weekday ferie."
+                },
+                "is_aliturgical": {
+                    "type": "boolean",
+                    "description": "Whether the event is aliturgical (no Mass is celebrated). Used by the Ambrosian proprium for the aliturgical Fridays of Lent."
                 }
             },
             "required": [

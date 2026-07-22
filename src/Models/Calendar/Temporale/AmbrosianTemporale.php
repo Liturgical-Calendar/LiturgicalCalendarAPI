@@ -5,7 +5,13 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Models\Calendar\Temporale;
 
 use LiturgicalCalendar\Api\DateTime;
+use LiturgicalCalendar\Api\Enum\LitColor;
+use LiturgicalCalendar\Api\Enum\LitEventType;
+use LiturgicalCalendar\Api\Enum\LitGrade;
+use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\LatinUtils;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Utilities;
 
@@ -29,6 +35,16 @@ final class AmbrosianTemporale implements TemporaleEngine
         $this->calculateLent($ctx);
         $this->calculateEasterCycle($ctx);
         $this->calculateAfterPentecostAnchors($ctx);
+        $this->calculateAfterEpiphanySundays($ctx);
+        $this->calculateAfterEpiphanyWeekdays($ctx);
+        $this->calculateAfterPentecostSundays($ctx);
+        $this->calculateAfterPentecostWeekdays($ctx);
+        $this->calculateAdventWeekdays($ctx);
+        $this->calculateChristmasWeekdays($ctx);
+        $this->calculateChristmasSundayAfterOctave($ctx);
+        $this->calculateChristmasJanuaryWeekdays($ctx);
+        $this->calculateLentWeekdays($ctx);
+        $this->calculateEasterWeekdays($ctx);
     }
 
     /**
@@ -43,13 +59,35 @@ final class AmbrosianTemporale implements TemporaleEngine
         }
         $event = LiturgicalEvent::fromObject($ctx->propriumDeTempore[$key]);
         $ctx->cal->addLiturgicalEvent($key, $event);
+        $this->stampSeason($event);
         return $event;
+    }
+
+    /**
+     * Stamp the Ambrosian liturgical season onto an event from its key. Called on
+     * every event the engine creates, because the Roman
+     * `LiturgicalEventCollection::setSeasonsAndHolyDaysOfObligation()` cannot run
+     * for the Ambrosian rite (it requires an AshWednesday event and knows only the
+     * six Roman seasons).
+     */
+    private function stampSeason(LiturgicalEvent $event): void
+    {
+        // `ChristKing` is a shared temporale key: in the Ambrosian rite it is the
+        // last Sunday after the Dedication (AFTER_PENTECOST), but in the Roman rite
+        // it is the last Sunday of Ordinary Time. `LitSeason::forEventKey()` is
+        // rite-agnostic and is also consumed by the Roman /temporale endpoint, so we
+        // must NOT globally reclassify `ChristKing` there — override it locally here.
+        $event->liturgical_season = 'ChristKing' === $event->event_key
+            ? LitSeason::AFTER_PENTECOST
+            : LitSeason::forEventKey($event->event_key);
     }
 
     /**
      * True if the given date falls on a Sunday. Used by
      * `calculateAfterPentecostAnchors()` to guard the 3rd-Sunday-of-October
-     * computation for the Dedication of the Duomo di Milano.
+     * computation for the Dedication of the Duomo di Milano, and by
+     * `martyrdomAnchor()` to guard the Aug 29 -> Sep 1 postponement of the
+     * Martyrdom of St John the Baptist when Aug 29 falls on a Sunday.
      */
     private static function dateIsSunday(DateTime $dt): bool
     {
@@ -197,5 +235,542 @@ final class AmbrosianTemporale implements TemporaleEngine
         $christKing = ( clone $advent1 )->sub(new \DateInterval('P7D'));
         $ctx->propriumDeTempore['ChristKing']->setDate($christKing);
         $this->createPropriumDeTemporeLiturgicalEventByKey('ChristKing', $ctx);
+    }
+
+    /**
+     * Martyrdom of St John the Baptist (n. 42a): Aug 29, postponed to Sep 1 when
+     * Aug 29 falls on a Sunday.
+     */
+    private function martyrdomAnchor(int $year): DateTime
+    {
+        $aug29 = DateTime::fromFormat('29-8-' . $year);
+        return self::dateIsSunday($aug29) ? DateTime::fromFormat('1-9-' . $year) : $aug29;
+    }
+
+    /**
+     * Shared boundary anchors for the three after-Pentecost sub-blocks (n. 42),
+     * consumed by both the Sunday numbering and the ferial fill so their block
+     * boundaries stay aligned: Pentecost (Easter + 49d), the 1st Sunday after the
+     * Martyrdom (Aug 29, postponed to Sep 1 when Aug 29 is a Sunday), the Dedication
+     * of the Duomo (must already be placed), and Advent I. Each call returns fresh
+     * DateTime objects.
+     *
+     * @return array{pentecost: DateTime, martyrdomSun: DateTime, dedication: DateTime, advent1: DateTime}
+     */
+    private function afterPentecostSubBlockBoundaries(TemporaleContext $ctx): array
+    {
+        $year = $ctx->params->Year;
+        return [
+            'pentecost'    => Utilities::calcGregEaster($year)->add(new \DateInterval('P49D')),
+            'martyrdomSun' => ( clone $this->martyrdomAnchor($year) )->modify('next Sunday'),
+            'dedication'   => $ctx->cal->getLiturgicalEvent('DedicationDuomo')->date
+                ?? throw new ServiceUnavailableException('DedicationDuomo anchor must be placed before the after-Pentecost sub-blocks'),
+            'advent1'      => $this->adventOne($year),
+        ];
+    }
+
+    /**
+     * After-Pentecost Sundays (n. 42), in three sub-blocks with per-block numbering:
+     *   (a) dopo Pentecoste     — 1st Sunday after Pentecost … Sat before the 1st Sunday after the Martyrdom
+     *   (b) dopo il Martirio    — that Sunday … Sat before the Dedication (3rd Sunday of October)
+     *   (c) dopo la Dedicazione — 1st Sunday after the Dedication … Sat before Advent I (ends at Christ the King)
+     * DedicationDuomo and ChristKing are anchors already placed; Sundays already in
+     * the calendar are skipped, so those two are not re-emitted as numbered Sundays.
+     */
+    private function calculateAfterPentecostSundays(TemporaleContext $ctx): void
+    {
+        ['pentecost' => $pentecost, 'martyrdomSun' => $martyrdomSun, 'dedication' => $dedication, 'advent1' => $advent1]
+            = $this->afterPentecostSubBlockBoundaries($ctx);
+
+        // (a) dopo Pentecoste
+        $this->numberSundayBlock(
+            $ctx,
+            'AfterPentecost',
+            ( clone $pentecost )->modify('next Sunday'),
+            $martyrdomSun,
+            fn (int $ordinal): string => $this->afterPentecostSundayName($ordinal, $ctx)
+        );
+        // (b) dopo il Martirio
+        $this->numberSundayBlock(
+            $ctx,
+            'AfterPentecostMartyrdom',
+            clone $martyrdomSun,
+            $dedication,
+            fn (int $ordinal): string => $this->afterMartyrdomSundayName($ordinal, $ctx)
+        );
+        // (c) dopo la Dedicazione
+        $this->numberSundayBlock(
+            $ctx,
+            'AfterPentecostDedication',
+            ( clone $dedication )->modify('next Sunday'),
+            $advent1,
+            fn (int $ordinal): string => $this->afterDedicationSundayName($ordinal, $ctx)
+        );
+    }
+
+    /**
+     * Emit consecutive numbered Sundays [$firstSunday, $endExclusive) under $keyStem,
+     * numbering from 1, skipping Sundays already occupied by an anchor. $nameBuilder
+     * is the per-block localized name builder (see below), invoked with the ordinal.
+     *
+     * @param \Closure(int): string $nameBuilder
+     */
+    private function numberSundayBlock(TemporaleContext $ctx, string $keyStem, DateTime $firstSunday, DateTime $endExclusive, \Closure $nameBuilder): void
+    {
+        $ordinal = 1;
+        $sunday  = clone $firstSunday;
+        while ($sunday < $endExclusive) {
+            if (false === $ctx->cal->inCalendar($sunday)) {
+                $this->synthesizeSunday($ctx, $keyStem . $ordinal, clone $sunday, $nameBuilder($ordinal));
+            }
+            $ordinal++;
+            $sunday = ( clone $sunday )->modify('next Sunday');
+        }
+    }
+
+    /**
+     * Create a synthesized numbered Sunday (not drawn from the Proprium de Tempore
+     * data file): a dominical FEAST_LORD in green, season-stamped from its key.
+     * Used for the after-Epiphany and after-Pentecost Sunday blocks whose exact
+     * names/numbering are validated against a published ordo in a later plan.
+     */
+    private function synthesizeSunday(TemporaleContext $ctx, string $key, DateTime $date, string $name): LiturgicalEvent
+    {
+        $event               = new LiturgicalEvent($name, $date, LitColor::GREEN, LitEventType::MOBILE, LitGrade::FEAST_LORD);
+        $event->is_dominical = true;
+        $ctx->cal->addLiturgicalEvent($key, $event);
+        $this->stampSeason($event);
+        return $event;
+    }
+
+    /**
+     * After-Epiphany Sundays (n. 40): every Sunday strictly after BaptismLord
+     * (the Sunday after Jan 6) and strictly before Lent I (Easter − 42d).
+     * Numbered from 2 — BaptismLord is the block's 1st Sunday.
+     */
+    private function calculateAfterEpiphanySundays(TemporaleContext $ctx): void
+    {
+        $year    = $ctx->params->Year;
+        $baptism = DateTime::fromFormat('6-1-' . $year)->modify('next Sunday');
+        $lent1   = Utilities::calcGregEaster($year)->sub(new \DateInterval('P' . ( 6 * 7 ) . 'D'));
+
+        $ordinal = 2;
+        $sunday  = ( clone $baptism )->modify('next Sunday');
+        while ($sunday < $lent1) {
+            $key = 'AfterEpiphany' . $ordinal;
+            $this->synthesizeSunday($ctx, $key, clone $sunday, $this->afterEpiphanySundayName($ordinal, $ctx));
+            $ordinal++;
+            $sunday = ( clone $sunday )->modify('next Sunday');
+        }
+    }
+
+    /**
+     * Localized display name for an after-Epiphany Sunday, e.g. (it) "II domenica
+     * dopo l'Epifania", (la) "Dominica II post Epiphaniam". Exact ordo wording is
+     * validated in a later plan.
+     */
+    private function afterEpiphanySundayName(int $ordinal, TemporaleContext $ctx): string
+    {
+        if (LitLocale::LATIN_PRIMARY_LANGUAGE === LitLocale::$PRIMARY_LANGUAGE) {
+            return sprintf('Dominica %s post Epiphaniam', LatinUtils::LATIN_ORDINAL[$ordinal]);
+        }
+        $ordinalStr = Utilities::getOrdinal($ordinal, $ctx->localeDateFormatter->getLocale(), $this->ordinalFormatter($ctx), LatinUtils::LATIN_ORDINAL);
+        return sprintf("%s domenica dopo l'Epifania", $ordinalStr);
+    }
+
+    /**
+     * Fill ferial weekdays over [$from, $to), skipping Sundays and any date already
+     * occupied (Sundays, anchors). Each free ferial day becomes a WEEKDAY event,
+     * season-stamped from its key. $keyBuilder(DateTime $date): string produces the
+     * event key; $nameBuilder(DateTime $date): string the display name. On Lenten
+     * Fridays, when $lentenAliturgicalFridays is true, is_aliturgical is set.
+     *
+     * @param callable(DateTime):string $keyBuilder
+     * @param callable(DateTime):string $nameBuilder
+     */
+    private function fillFerialWeekdays(TemporaleContext $ctx, DateTime $from, DateTime $to, LitColor $color, callable $keyBuilder, callable $nameBuilder, bool $lentenAliturgicalFridays = false): void
+    {
+        $day = clone $from;
+        while ($day < $to) {
+            $isSunday = (int) $day->format('N') === 7;
+            if (false === $isSunday && false === $ctx->cal->inCalendar($day)) {
+                $key   = $keyBuilder($day);
+                $name  = $nameBuilder($day);
+                $event = new LiturgicalEvent($name, clone $day, $color, LitEventType::MOBILE, LitGrade::WEEKDAY);
+                if ($lentenAliturgicalFridays && (int) $day->format('N') === 5) {
+                    $event->is_aliturgical = true;
+                }
+                $ctx->cal->addLiturgicalEvent($key, $event);
+                $this->stampSeason($event);
+            }
+            $day = ( clone $day )->add(new \DateInterval('P1D'));
+        }
+    }
+
+    /** English weekday name (Monday…Saturday) for locale-independent keys. */
+    private function englishWeekday(DateTime $date): string
+    {
+        return match ((int) $date->format('N')) {
+            1       => 'Monday',
+            2       => 'Tuesday',
+            3       => 'Wednesday',
+            4       => 'Thursday',
+            5       => 'Friday',
+            6       => 'Saturday',
+            default => 'Sunday',
+        };
+    }
+
+    /**
+     * Localized ferial name, e.g. (it) "Lunedì della II settimana dopo Pentecoste",
+     * (la) "Feria II hebdomadæ II post Pentecosten". When $weekNumber is null the
+     * week clause is omitted (e.g. de Exceptáto ferie named by date in Task 6).
+     */
+    private function weekdayName(DateTime $date, string $seasonPhraseIt, string $seasonPhraseLa, ?int $weekNumber, TemporaleContext $ctx): string
+    {
+        if (LitLocale::LATIN_PRIMARY_LANGUAGE === LitLocale::$PRIMARY_LANGUAGE) {
+            $feria = LatinUtils::LATIN_DAYOFTHEWEEK[$date->format('w')]; // e.g. "Feria II"
+            if (null === $weekNumber) {
+                return sprintf('%s %s', $feria, $seasonPhraseLa);
+            }
+            return sprintf('%s hebdomadæ %s %s', $feria, LatinUtils::LATIN_ORDINAL[$weekNumber], $seasonPhraseLa);
+        }
+        $weekday = $ctx->localeDateFormatter->getDayOfTheWeekFormatter()->format($date->format('U'));
+        $weekday = Utilities::ucfirst($weekday);
+        if (null === $weekNumber) {
+            return sprintf('%s %s', $weekday, $seasonPhraseIt);
+        }
+        $ordinalStr = Utilities::getOrdinal($weekNumber, $ctx->localeDateFormatter->getLocale(), $this->ordinalFormatter($ctx), LatinUtils::LATIN_ORDINAL);
+        return sprintf('%s della %s settimana %s', $weekday, $ordinalStr, $seasonPhraseIt);
+    }
+
+    /**
+     * After-Epiphany ferie: Monday after Baptism … Saturday before Lent I. First
+     * caller of `fillFerialWeekdays()`; keys as `AfterEpiphanyWeekday{N}{EnglishDay}`
+     * where N matches the after-Epiphany Sunday numbering (BaptismLord = week 1).
+     */
+    private function calculateAfterEpiphanyWeekdays(TemporaleContext $ctx): void
+    {
+        $year    = $ctx->params->Year;
+        $baptism = DateTime::fromFormat('6-1-' . $year)->modify('next Sunday');
+        $lent1   = Utilities::calcGregEaster($year)->sub(new \DateInterval('P' . ( 6 * 7 ) . 'D'));
+        $from    = ( clone $baptism )->add(new \DateInterval('P1D')); // Monday after Baptism
+        $this->fillFerialWeekdays(
+            $ctx,
+            $from,
+            $lent1,
+            LitColor::GREEN,
+            fn (DateTime $d): string => 'AfterEpiphanyWeekday' . $this->afterEpiphanyWeekNumber($d, $baptism) . $this->englishWeekday($d),
+            fn (DateTime $d): string => $this->weekdayName($d, "dopo l'Epifania", 'post Epiphaniam', $this->afterEpiphanyWeekNumber($d, $baptism), $ctx)
+        );
+    }
+
+    /**
+     * Week number of a ferial day in the after-Epiphany block: the ordinal of the
+     * Sunday that closes its week, matching the Sunday numbering (BaptismLord = week 1,
+     * so the first Monday after Baptism is week 2).
+     */
+    private function afterEpiphanyWeekNumber(DateTime $date, DateTime $baptism): int
+    {
+        $daysSinceBaptism = (int) $baptism->diff($date)->format('%a');
+        return (int) floor(( $daysSinceBaptism - 1 ) / 7) + 2;
+    }
+
+    /** Advent ferie: Monday after Advent I … Saturday before Christmas; Dec 17(18)–23 are de Exceptáto (n. 39). */
+    private function calculateAdventWeekdays(TemporaleContext $ctx): void
+    {
+        $year = $ctx->params->Year;
+        $from = ( clone $this->adventOne($year) )->add(new \DateInterval('P1D'));
+        $to   = DateTime::fromFormat('25-12-' . $year); // Christmas (exclusive)
+        $this->fillFerialWeekdays(
+            $ctx,
+            $from,
+            $to,
+            LitColor::MORELLO,
+            // Advent runs Nov->Dec, so day-of-month alone collides (e.g. both Nov 17
+            // and Dec 17 fall inside the block); key on month+day ('md') instead so
+            // every ferial day gets a distinct key. Season classification only needs
+            // the 'AdventWeekday' prefix (LitSeason::ADVENT_PATTERNS), so the exact
+            // suffix shape is free.
+            fn (DateTime $d): string => 'AdventWeekday' . $d->format('md'),
+            fn (DateTime $d): string => $this->adventWeekdayName($d, $ctx)
+        );
+    }
+
+    /**
+     * Ferial name for an Advent weekday: the de Exceptáto phrase for Dec 17–23
+     * (n. 39), otherwise the generic Advent phrase. Named by phrase, not week
+     * number, so $weekNumber is null in both branches.
+     */
+    private function adventWeekdayName(DateTime $date, TemporaleContext $ctx): string
+    {
+        $md = (int) $date->format('nd'); // e.g. 1217 for Dec 17
+        if ($md >= 1217 && $md <= 1223) {
+            return $this->weekdayName($date, 'de Exceptáto', 'de Exceptato', null, $ctx);
+        }
+        return $this->weekdayName($date, "d'Avvento", 'Adventus', null, $ctx);
+    }
+
+    /**
+     * Christmas ferie: Dec 26 … Dec 31 of the same civil year.
+     *
+     * The norm's upper bound is "the Saturday before Baptism", but within a
+     * single-civil-year engine call Baptism/Circoncisione/Epiphany are always
+     * dated in *January of this same $year* (see `calculateChristmasEpiphany()`),
+     * i.e. structurally *before* Dec 26 of that same $year, not after it —
+     * RomanTemporale's `Epiphany`/`Christmas` follow the identical same-$year
+     * convention, and `CalendarHandler::calculateWeekdaysChristmasOctave()`
+     * mirrors this exact boundary by stopping its own Christmas-octave weekday
+     * fill at `31-12-$year` rather than reaching into January. So the true
+     * Dec 26->Baptism span only exists once a caller merges this engine's
+     * output for $year with the *next* call's output for $year+1 (whose
+     * Circoncisione/Epiphany/BaptismLord anchors land on the correct forward
+     * dates) — real cross-year continuity is out of scope here and deferred,
+     * like the rest of the handler-level year semantics, to Plan 7. Bounding
+     * at Dec 31 keeps this call's output correct and self-contained: it never
+     * touches (or spuriously duplicates) the Jan 1 / Jan 6 anchors already
+     * placed by `calculateChristmasEpiphany()` for this same $year.
+     */
+    private function calculateChristmasWeekdays(TemporaleContext $ctx): void
+    {
+        $year = $ctx->params->Year;
+        $from = DateTime::fromFormat('26-12-' . $year);
+        $to   = DateTime::fromFormat('1-1-' . ( $year + 1 )); // Dec 31 $year inclusive, exclusive bound
+        $this->fillFerialWeekdays(
+            $ctx,
+            $from,
+            $to,
+            LitColor::WHITE,
+            // Bounded to a single month (Dec), so day-of-month alone would not
+            // collide here, but 'md' matches the Advent fill's key shape for
+            // consistency and stays collision-safe if the bound ever changes.
+            fn (DateTime $d): string => 'ChristmasWeekday' . $d->format('md'),
+            fn (DateTime $d): string => $this->weekdayName($d, 'del tempo di Natale', 'Nativitatis', null, $ctx)
+        );
+    }
+
+    /**
+     * The n.33 "Domenica dopo l'ottava di Natale" (ambrosian.txt L4749-4750):
+     * "L'eventuale domenica tra il 2 e il 5 gennaio è la domenica dopo l'ottava
+     * di Natale." Computes the Sunday, if any, in the inclusive window
+     * [Jan 2, Jan 5] of the civil year — it exists only when Jan 1 falls on
+     * Wed/Thu/Fri/Sat; when Jan 1 is Sun/Mon/Tue there is no such Sunday and no
+     * event is created ("eventuale" = possible, not guaranteed). Unlike the
+     * other synthesized numbered Sundays this one is WHITE, not GREEN, so it is
+     * built directly (like `synthesizeSunday()`) rather than through it. Must
+     * run before `calculateChristmasJanuaryWeekdays()` so that helper's
+     * `inCalendar()` guard skips this date when it exists.
+     */
+    private function calculateChristmasSundayAfterOctave(TemporaleContext $ctx): void
+    {
+        $year = $ctx->params->Year;
+        $jan2 = DateTime::fromFormat('2-1-' . $year);
+        $jan5 = DateTime::fromFormat('5-1-' . $year);
+        $sun  = self::dateIsSunday($jan2) ? $jan2 : ( clone $jan2 )->modify('next Sunday');
+        if ($sun > $jan5) {
+            // No Sunday falls within [Jan 2, Jan 5] this year -- "eventuale" not realized.
+            return;
+        }
+
+        $name = LitLocale::LATIN_PRIMARY_LANGUAGE === LitLocale::$PRIMARY_LANGUAGE
+            ? 'Dominica post octavam Nativitatis'
+            : 'Domenica dopo l\'ottava di Natale';
+
+        $event               = new LiturgicalEvent($name, clone $sun, LitColor::WHITE, LitEventType::MOBILE, LitGrade::FEAST_LORD);
+        $event->is_dominical = true;
+        $ctx->cal->addLiturgicalEvent('ChristmasSundayAfterOctave', $event);
+        $this->stampSeason($event);
+    }
+
+    /**
+     * January Christmas ferie: Jan 2 … Baptism of the Lord (Sunday after Jan 6),
+     * exclusive. `Circoncisione` (Jan 1, before this range), `Epiphany` (Jan 6),
+     * `BaptismLord`, and the n.33 `ChristmasSundayAfterOctave` Sunday (when it
+     * exists) are all anchors already placed and are skipped by
+     * `fillFerialWeekdays()`'s Sunday/`inCalendar()` guards. Must run after
+     * `calculateChristmasSundayAfterOctave()` for that skip to take effect.
+     */
+    private function calculateChristmasJanuaryWeekdays(TemporaleContext $ctx): void
+    {
+        $year    = $ctx->params->Year;
+        $from    = DateTime::fromFormat('2-1-' . $year);
+        $baptism = DateTime::fromFormat('6-1-' . $year)->modify('next Sunday');
+        $this->fillFerialWeekdays(
+            $ctx,
+            $from,
+            $baptism,
+            LitColor::WHITE,
+            // Bounded to January, so day-of-month alone would not collide here,
+            // but 'md' matches calculateChristmasWeekdays()'s (Dec) key shape for
+            // consistency, and the two never collide since the months differ.
+            fn (DateTime $d): string => 'ChristmasWeekday' . $d->format('md'),
+            fn (DateTime $d): string => $this->weekdayName($d, 'del tempo di Natale', 'Nativitatis', null, $ctx)
+        );
+    }
+
+    /**
+     * Localized display name for an after-Pentecost Sunday in sub-block (a)
+     * "dopo Pentecoste", e.g. (it) "II domenica dopo Pentecoste", (la) "Dominica
+     * II post Pentecosten".
+     */
+    private function afterPentecostSundayName(int $ordinal, TemporaleContext $ctx): string
+    {
+        return $this->afterPentecostFamilyName($ordinal, $ctx, 'dopo Pentecoste', 'post Pentecosten');
+    }
+
+    /**
+     * Localized display name for an after-Pentecost Sunday in sub-block (b)
+     * "dopo il Martirio" (of St John the Baptist).
+     */
+    private function afterMartyrdomSundayName(int $ordinal, TemporaleContext $ctx): string
+    {
+        return $this->afterPentecostFamilyName($ordinal, $ctx, 'dopo il Martirio', 'post Martyrium');
+    }
+
+    /**
+     * Localized display name for an after-Pentecost Sunday in sub-block (c)
+     * "dopo la Dedicazione" (of the Duomo di Milano).
+     */
+    private function afterDedicationSundayName(int $ordinal, TemporaleContext $ctx): string
+    {
+        return $this->afterPentecostFamilyName($ordinal, $ctx, 'dopo la Dedicazione', 'post Dedicationem');
+    }
+
+    /**
+     * Shared name-building logic for the three after-Pentecost sub-block name
+     * builders above.
+     */
+    private function afterPentecostFamilyName(int $ordinal, TemporaleContext $ctx, string $phraseIt, string $phraseLa): string
+    {
+        if (LitLocale::LATIN_PRIMARY_LANGUAGE === LitLocale::$PRIMARY_LANGUAGE) {
+            return sprintf('Dominica %s %s', LatinUtils::LATIN_ORDINAL[$ordinal], $phraseLa);
+        }
+        $ordinalStr = Utilities::getOrdinal($ordinal, $ctx->localeDateFormatter->getLocale(), $this->ordinalFormatter($ctx), LatinUtils::LATIN_ORDINAL);
+        return sprintf('%s domenica %s', $ordinalStr, $phraseIt);
+    }
+
+    /**
+     * After-Pentecost ferie (n. 42), across the same three sub-blocks as
+     * `calculateAfterPentecostSundays()`, green (`LitColor::GREEN`), from the
+     * Monday after Pentecost to the Saturday before Advent I:
+     *   (a) dopo Pentecoste     — Monday after Pentecost … Sat before the 1st Sunday after the Martyrdom
+     *   (b) dopo il Martirio    — that Sunday's Monday … Sat before the Dedication
+     *   (c) dopo la Dedicazione — Monday after the Dedication … Sat before Advent I
+     * `DedicationDuomo`, `ChristKing`, and the after-Pentecost Sundays are all
+     * anchors already placed and are skipped by `inCalendar()`.
+     */
+    private function calculateAfterPentecostWeekdays(TemporaleContext $ctx): void
+    {
+        ['pentecost' => $pentecost, 'martyrdomSun' => $martyrdomSun, 'dedication' => $dedication, 'advent1' => $advent1]
+            = $this->afterPentecostSubBlockBoundaries($ctx);
+
+        // (a) dopo Pentecoste — anchored on Pentecost
+        $this->fillFerialBlock($ctx, ( clone $pentecost )->add(new \DateInterval('P1D')), $martyrdomSun, $pentecost, 'AfterPentecostWeekday', 'dopo Pentecoste', 'post Pentecosten');
+        // (b) dopo il Martirio — anchored on the 1st Sunday after the Martyrdom
+        $this->fillFerialBlock($ctx, ( clone $martyrdomSun )->add(new \DateInterval('P1D')), $dedication, $martyrdomSun, 'AfterPentecostMartyrdomWeekday', 'dopo il Martirio', 'post Martyrium');
+        // (c) dopo la Dedicazione — anchored on the Dedication Sunday
+        $this->fillFerialBlock($ctx, ( clone $dedication )->add(new \DateInterval('P1D')), $advent1, $dedication, 'AfterPentecostDedicationWeekday', 'dopo la Dedicazione', 'post Dedicationem');
+    }
+
+    /**
+     * Fill one after-Pentecost sub-block [$from, $to) with green ferie whose week
+     * number is measured from $blockAnchorSunday (block week 1 = the anchor's week).
+     */
+    private function fillFerialBlock(TemporaleContext $ctx, DateTime $from, DateTime $to, DateTime $blockAnchorSunday, string $keyStem, string $phraseIt, string $phraseLa): void
+    {
+        $this->fillFerialWeekdays(
+            $ctx,
+            $from,
+            $to,
+            LitColor::GREEN,
+            fn (DateTime $d): string => $keyStem . $this->blockWeekNumber($d, $blockAnchorSunday) . $this->englishWeekday($d),
+            fn (DateTime $d): string => $this->weekdayName($d, $phraseIt, $phraseLa, $this->blockWeekNumber($d, $blockAnchorSunday), $ctx)
+        );
+    }
+
+    /** Week number within an after-Pentecost sub-block: week 1 opens the Monday after $anchorSunday. */
+    private function blockWeekNumber(DateTime $date, DateTime $anchorSunday): int
+    {
+        $daysSince = (int) $anchorSunday->diff($date)->format('%a');
+        return (int) floor(( $daysSince - 1 ) / 7) + 1;
+    }
+
+    /**
+     * Lenten ferie: Lent I (excl.) … Wednesday of Holy Week (excl.); Fridays are
+     * aliturgical (nn. 24–27). The upper bound reaches past Palm Sunday through
+     * the Holy Week Monday/Tuesday/Wednesday ("settimana autentica"), which are
+     * still Lent-season ferie: Palm Sunday itself is a Sunday (skipped by
+     * `fillFerialWeekdays()`'s Sunday guard) and `SabatoTradSymb` is an anchor
+     * already placed (skipped by `inCalendar()`). Holy Week Mon–Wed contains no
+     * Friday, so `lentenAliturgicalFridays` never fires for them; Holy Thursday
+     * itself opens the Triduum and is excluded as the upper bound.
+     */
+    private function calculateLentWeekdays(TemporaleContext $ctx): void
+    {
+        $year      = $ctx->params->Year;
+        $lent1     = Utilities::calcGregEaster($year)->sub(new \DateInterval('P' . ( 6 * 7 ) . 'D'));
+        $holyThurs = Utilities::calcGregEaster($year)->sub(new \DateInterval('P3D'));
+        $from      = ( clone $lent1 )->add(new \DateInterval('P1D'));
+        $this->fillFerialWeekdays(
+            $ctx,
+            $from,
+            clone $holyThurs, // up to (not incl.) Holy Thursday; PalmSun (Sunday) and SabatoTradSymb anchor are skipped
+            LitColor::MORELLO,
+            fn (DateTime $d): string => 'LentWeekday' . $this->lentWeekNumber($d, $lent1) . $this->englishWeekday($d),
+            fn (DateTime $d): string => $this->weekdayName($d, 'di Quaresima', 'Quadragesimæ', $this->lentWeekNumber($d, $lent1), $ctx),
+            true
+        );
+    }
+
+    /** Lenten week number: Lent I is week 1; the following Monday begins week 1's ferie. */
+    private function lentWeekNumber(DateTime $date, DateTime $lent1): int
+    {
+        $daysSince = (int) $lent1->diff($date)->format('%a');
+        return (int) floor(( $daysSince - 1 ) / 7) + 1;
+    }
+
+    /**
+     * Easter ferie after the octave (n. 21): the Easter octave weekdays
+     * (`Mon..SatOctaveEaster`) are already anchors placed by `calculateEasterCycle()`,
+     * so this fill starts strictly after Easter II — Monday after Easter II …
+     * Saturday before Pentecost. Ascension (Thursday, Easter + 39d) is an anchor
+     * and is skipped by `inCalendar()`.
+     */
+    private function calculateEasterWeekdays(TemporaleContext $ctx): void
+    {
+        $year      = $ctx->params->Year;
+        $easter    = Utilities::calcGregEaster($year);
+        $easter2   = ( clone $easter )->add(new \DateInterval('P7D'));   // Easter II
+        $pentecost = ( clone $easter )->add(new \DateInterval('P49D'));
+        $from      = ( clone $easter2 )->add(new \DateInterval('P1D'));  // Monday after Easter II
+        $this->fillFerialWeekdays(
+            $ctx,
+            $from,
+            clone $pentecost, // up to (not incl.) Pentecost Sunday
+            LitColor::WHITE,
+            fn (DateTime $d): string => 'EasterWeekday' . $this->easterWeekNumber($d, $easter) . $this->englishWeekday($d),
+            fn (DateTime $d): string => $this->weekdayName($d, 'di Pasqua', 'Paschæ', $this->easterWeekNumber($d, $easter), $ctx)
+        );
+    }
+
+    /** Easter week number: the octave is week 1; Easter II opens week 2. */
+    private function easterWeekNumber(DateTime $date, DateTime $easter): int
+    {
+        $daysSince = (int) $easter->diff($date)->format('%a');
+        return (int) floor($daysSince / 7) + 1;
+    }
+
+    /**
+     * Feminine \NumberFormatter for ordinal rendering, cached per engine call.
+     */
+    private ?\NumberFormatter $ordinalFormatterCache = null;
+
+    private function ordinalFormatter(TemporaleContext $ctx): \NumberFormatter
+    {
+        if (null === $this->ordinalFormatterCache) {
+            $this->ordinalFormatterCache = new \NumberFormatter($ctx->localeDateFormatter->getLocale(), \NumberFormatter::SPELLOUT);
+            $this->ordinalFormatterCache->setTextAttribute(\NumberFormatter::DEFAULT_RULESET, '%spellout-ordinal-feminine');
+        }
+        return $this->ordinalFormatterCache;
     }
 }
