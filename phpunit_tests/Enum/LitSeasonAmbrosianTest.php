@@ -66,6 +66,6 @@ final class LitSeasonAmbrosianTest extends TestCase
         self::assertSame(LitSeason::CHRISTMAS, LitSeason::forEventKey('Circoncisione'));
         self::assertSame(LitSeason::LENT, LitSeason::forEventKey('AshesMonday'));
         self::assertSame(LitSeason::LENT, LitSeason::forEventKey('SabatoTradSymb'));
-        self::assertSame(LitSeason::AFTER_PENTECOST, LitSeason::forEventKey('ChristKing'));
+        self::assertSame(LitSeason::ORDINARY_TIME, LitSeason::forEventKey('ChristKing')); // shared Roman key — must NOT become Ambrosian-only AFTER_PENTECOST (regression guard for TemporaleHandler)
     }
 }

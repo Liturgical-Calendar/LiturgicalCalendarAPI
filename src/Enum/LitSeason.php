@@ -97,7 +97,6 @@ enum LitSeason: string
     private const array AFTER_PENTECOST_PATTERNS = [
         '/^DedicationDuomo$/',
         '/^AfterPentecost/',
-        '/^ChristKing$/',
     ];
 
     /**

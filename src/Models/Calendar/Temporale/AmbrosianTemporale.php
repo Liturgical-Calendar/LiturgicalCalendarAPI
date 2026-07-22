@@ -57,7 +57,14 @@ final class AmbrosianTemporale implements TemporaleEngine
      */
     private function stampSeason(LiturgicalEvent $event): void
     {
-        $event->liturgical_season = LitSeason::forEventKey($event->event_key);
+        // `ChristKing` is a shared temporale key: in the Ambrosian rite it is the
+        // last Sunday after the Dedication (AFTER_PENTECOST), but in the Roman rite
+        // it is the last Sunday of Ordinary Time. `LitSeason::forEventKey()` is
+        // rite-agnostic and is also consumed by the Roman /temporale endpoint, so we
+        // must NOT globally reclassify `ChristKing` there — override it locally here.
+        $event->liturgical_season = 'ChristKing' === $event->event_key
+            ? LitSeason::AFTER_PENTECOST
+            : LitSeason::forEventKey($event->event_key);
     }
 
     /**
