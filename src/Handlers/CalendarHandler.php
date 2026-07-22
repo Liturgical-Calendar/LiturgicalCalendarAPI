@@ -929,12 +929,11 @@ final class CalendarHandler extends AbstractHandler
      * source in this codebase and the response schema requires every `LiturgicalEvent` to carry
      * a `readings` property.
      *
-     * Not yet called from `calculateUniversalCalendar()` (that method is Roman-only and Task 4
-     * must not touch it) — Plan 7 Task 9's `calculateAmbrosianCalendar()` orchestrator is the
-     * method that will call this by name, assembling it together with Tasks 3, 5-8. Until then
-     * it is exercised only by `CalendarHandlerAmbrosianSanctoraleLoadTest` via reflection.
+     * Not called from `calculateUniversalCalendar()` (that method is Roman-only and Task 4 must
+     * not touch it) — called from Plan 7 Task 9's `calculateAmbrosianCalendar()` orchestrator,
+     * assembled together with Tasks 3, 5-8. Also exercised directly (via reflection) by
+     * `CalendarHandlerAmbrosianSanctoraleLoadTest`.
      */
-    // @phpstan-ignore method.unused (call site lands in Task 9's calculateAmbrosianCalendar() orchestrator)
     private function addAmbrosianSanctoraleToCalendar(): void
     {
         $year    = $this->CalendarParams->Year;
@@ -985,13 +984,11 @@ final class CalendarHandler extends AbstractHandler
      * which is `null` on every comune sanctorale event until that pass stamps it from a co-located
      * temporale event.
      *
-     * Not yet called from `calculateUniversalCalendar()` (that method is Roman-only) — Plan 7
-     * Task 9's `calculateAmbrosianCalendar()` orchestrator is the method that will call this by
-     * name, sequencing it after Tasks 3/4/6 (Proprium de Tempore load, temporale engine, comune
-     * sanctorale, season stamping). Until then it is exercised only by
-     * `CalendarHandlerAmbrosianPrecedenceResolverTest` via reflection.
+     * Not called from `calculateUniversalCalendar()` (that method is Roman-only) — called from
+     * Plan 7 Task 9's `calculateAmbrosianCalendar()` orchestrator, sequenced after Tasks 3/4/6
+     * (Proprium de Tempore load, temporale engine, comune sanctorale, season stamping). Also
+     * exercised directly (via reflection) by `CalendarHandlerAmbrosianPrecedenceResolverTest`.
      */
-    // @phpstan-ignore method.unused (call site lands in Task 9's calculateAmbrosianCalendar() orchestrator)
     private function resolveAmbrosianPrecedence(): void
     {
         $ctx = new PrecedenceContext(
@@ -1002,6 +999,118 @@ final class CalendarHandler extends AbstractHandler
         );
 
         ( new AmbrosianPrecedenceResolver() )->resolve($ctx);
+    }
+
+    /**
+     * Ambrosian rite only: orchestrates the full Ambrosian calendar calculation for
+     * `$this->CalendarParams->Year`, assembling the passes built by Plan 7 Tasks 3-8 into the
+     * single call `handle()` will eventually make once the `/calendar/ambrosian` 501 is lifted
+     * (Task 10).
+     *
+     * Call order (load-bearing — do not reorder):
+     *
+     * 1. {@see self::loadPropriumDeTemporeData()} (Task 3, rite-aware): loads the Ambrosian
+     *    Proprium de Tempore into `$this->PropriumDeTempore` because `$this->CalendarParams->Rite`
+     *    is {@see Rite::AMBROSIAN}.
+     * 2. Builds a {@see TemporaleContext} over `$this->Cal` and runs
+     *    `RiteProfileFactory::forRite(AMBROSIAN)->temporaleEngine()->buildTemporale()` (mirrors the
+     *    Roman temporale seam in {@see self::calculateUniversalCalendar()}), which self-stamps
+     *    `liturgical_season` on every temporale event it produces.
+     * 3. {@see self::addAmbrosianSanctoraleToCalendar()} (Task 4): adds every comune Ambrosian
+     *    sanctorale event, skipping any `event_key` already added by the temporale engine.
+     * 3a. {@see self::backfillAmbrosianReadingsPlaceholder()}: a gap discovered while wiring this
+     *    orchestrator (not one of the originally scoped Task 3-8 passes) — see that method's
+     *    docblock for why it is load-bearing here.
+     * 4. {@see LiturgicalEventCollection::stampAmbrosianSeasonOnSanctorale()} (Task 6): copies
+     *    `liturgical_season` onto sanctorale events from a co-located temporale event. MUST run
+     *    before resolution — the resolver's season-gated transfer rules read `liturgical_season`.
+     * 5. {@see self::resolveAmbrosianPrecedence()} (Task 5): same-day coincidence ranking,
+     *    suppression, and transfer per the Tabella dei giorni liturgici.
+     * 6. {@see LiturgicalEventCollection::setAmbrosianHolyDaysOfObligation()} (Task 6).
+     * 7. {@see LiturgicalEventCollection::setAmbrosianYearCyclesAndVigils()} (Task 7): festive
+     *    (A/B/C) and ferial (I/II) cycles, plus first-vespers vigil Masses.
+     * 8. {@see LiturgicalEventCollection::calculatePsalterWeek()} (rite-agnostic gap-filler,
+     *    validated against the assembled Ambrosian collection in Task 8).
+     * 9. {@see LiturgicalEventCollection::sortLiturgicalEvents()}.
+     *
+     * Does NOT call {@see self::calculateUniversalCalendar()} (the Roman pipeline) and does not
+     * modify any Roman method. `$this->Cal` must already be initialized by the caller (mirroring
+     * how `calculateUniversalCalendar()` is only ever called after `$this->Cal = new
+     * LiturgicalEventCollection(...)` in `handle()`).
+     *
+     * Not yet called from `handle()` — the `/calendar/ambrosian` route still returns 501 there
+     * (Plan 7 Task 10 lifts that gate and wires this method in). Until then it is exercised only
+     * by `CalendarHandlerAmbrosianOrchestratorTest` via reflection.
+     *
+     * @return void
+     */
+    // @phpstan-ignore method.unused (call site lands in Task 10, when the 501 gate is lifted)
+    private function calculateAmbrosianCalendar(): void
+    {
+        $this->loadPropriumDeTemporeData();
+
+        $riteProfile      = RiteProfileFactory::forRite($this->CalendarParams->Rite);
+        $temporaleContext = new TemporaleContext(
+            $this->Cal,
+            $this->CalendarParams,
+            $this->PropriumDeTempore,
+            $this->localeDateFormatter,
+            $this->Messages
+        );
+        $riteProfile->temporaleEngine()->buildTemporale($temporaleContext);
+
+        $this->addAmbrosianSanctoraleToCalendar();
+
+        $this->backfillAmbrosianReadingsPlaceholder();
+
+        $this->Cal->stampAmbrosianSeasonOnSanctorale();
+
+        $this->resolveAmbrosianPrecedence();
+
+        $this->Cal->setAmbrosianHolyDaysOfObligation();
+
+        $this->Cal->setAmbrosianYearCyclesAndVigils();
+
+        $this->Cal->calculatePsalterWeek();
+
+        $this->Cal->sortLiturgicalEvents();
+    }
+
+    /**
+     * Ambrosian rite only: backfills the Task 2/4 empty-readings placeholder
+     * ({@see AmbrosianReadings::empty()}) onto every temporale-origin event in `$this->Cal` that
+     * does not yet carry a `readings` property.
+     *
+     * `addAmbrosianSanctoraleToCalendar()` (Task 4) already stamps this placeholder onto every
+     * comune sanctorale event it adds, but the Ambrosian temporale engine
+     * (`AmbrosianTemporale::buildTemporale()`, Plan 3) does not — there is currently no Ambrosian
+     * lectionary data source for the temporale either. `LiturgicalEvent::$readings` is a typed
+     * property with no default, so any read of it before `setReadings()` is called throws a fatal
+     * `Error`. `LiturgicalEventCollection::createVigilMassFor()` (reused verbatim by
+     * `calculateAmbrosianVigilMass()`, Task 7, itself called from
+     * `setAmbrosianYearCyclesAndVigils()`) reads `->readings` unconditionally for any
+     * Sunday/Solemnity-grade event eligible for a vigil — which includes temporale-origin Sundays
+     * and fixed solemnities (Advent Sundays, Easter, Christmas, ...). This backfill MUST therefore
+     * run before `setAmbrosianYearCyclesAndVigils()`, and is placed immediately after
+     * `addAmbrosianSanctoraleToCalendar()` so every event already in `$this->Cal` — temporale and
+     * sanctorale alike — carries a `readings` property from this point onward (the response schema
+     * also requires every `LiturgicalEvent` to carry one).
+     *
+     * This gap was not caught by the per-task tests (Task 5/6/7/8) because each of those tests
+     * hand-assembles only the events it needs and/or (Task 8) applies its own
+     * `withReadingsPlaceholder()` test-only helper before calling
+     * `setAmbrosianYearCyclesAndVigils()`. Running the real, single `calculateAmbrosianCalendar()`
+     * orchestrator surfaced it.
+     *
+     * @return void
+     */
+    private function backfillAmbrosianReadingsPlaceholder(): void
+    {
+        foreach ($this->Cal->getLiturgicalEvents() as $event) {
+            if (false === isset($event->readings)) {
+                $event->setReadings(AmbrosianReadings::empty());
+            }
+        }
     }
 
     /**
