@@ -49,6 +49,7 @@ final class LiturgicalEvent implements \JsonSerializable
     public ?bool $is_vigil_mass          = null;
     public ?bool $has_vigil_mass         = null;
     public ?bool $is_dominical           = null;
+    public ?bool $is_aliturgical         = null;
     public ?bool $is_proper              = null;
     public ?bool $has_vesper_i           = null;
     public ?bool $has_vesper_ii          = null;
@@ -212,6 +213,7 @@ final class LiturgicalEvent implements \JsonSerializable
      * - liturgical_year: the liturgical year of the liturgical event, if applicable
      * - is_vigil_mass: a boolean indicating whether the liturgical event is a vigil mass, if applicable
      * - is_dominical: a boolean indicating whether the liturgical event is "of the Lord" (dominical), if applicable
+     * - is_aliturgical: a boolean indicating whether the liturgical event is aliturgical (no Mass celebrated), if applicable
      * - is_proper: a boolean indicating whether the liturgical event is proper to a particular calendar
      *   (as opposed to "comune", i.e. taken from the General Calendar), if applicable
      * - is_vigil_for: the liturgical event that the current liturgical event is a vigil for, if applicable
@@ -248,6 +250,7 @@ final class LiturgicalEvent implements \JsonSerializable
      *      liturgical_year?: ?string,
      *      is_vigil_mass?: ?bool,
      *      is_dominical?: ?bool,
+     *      is_aliturgical?: ?bool,
      *      is_proper?: ?bool,
      *      is_vigil_for?: ?string,
      *      has_vigil_mass?: ?bool,
@@ -311,6 +314,10 @@ final class LiturgicalEvent implements \JsonSerializable
 
         if ($this->is_dominical !== null) {
             $returnArr['is_dominical'] = $this->is_dominical;
+        }
+
+        if ($this->is_aliturgical !== null) {
+            $returnArr['is_aliturgical'] = $this->is_aliturgical;
         }
 
         if ($this->is_proper !== null) {
@@ -398,6 +405,8 @@ final class LiturgicalEvent implements \JsonSerializable
      *   If not provided, defaults to LitEventType::FIXED.
      * - grade_display: The grade display of the liturgical event, as a string. If not provided, defaults to null.
      * - is_dominical: whether the liturgical event is "of the Lord" (dominical), as a boolean, if the source object
+     *   declares the property (e.g. PropriumDeTemporeEvent). If not provided (property absent) or null, defaults to null.
+     * - is_aliturgical: whether the liturgical event is aliturgical (no Mass celebrated), as a boolean, if the source object
      *   declares the property (e.g. PropriumDeTemporeEvent). If not provided (property absent) or null, defaults to null.
      *
      * @param \stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile|DecreeItemCreateNewFixed|DecreeItemCreateNewMobile|PropriumDeTemporeEvent|PropriumDeSanctisEvent $obj
@@ -565,6 +574,14 @@ final class LiturgicalEvent implements \JsonSerializable
                 throw new \Exception('Invalid object provided to create LiturgicalEvent: is_dominical is not a boolean or null');
             }
             $litEvent->is_dominical = $obj->is_dominical;
+        }
+
+        // Carry over `is_aliturgical` from source data (e.g. PropriumDeTemporeEvent) when present and non-null.
+        if (property_exists($obj, 'is_aliturgical') && null !== $obj->is_aliturgical) {
+            if (false === is_bool($obj->is_aliturgical)) {
+                throw new \Exception('Invalid object provided to create LiturgicalEvent: is_aliturgical is not a boolean or null');
+            }
+            $litEvent->is_aliturgical = $obj->is_aliturgical;
         }
 
         return $litEvent;

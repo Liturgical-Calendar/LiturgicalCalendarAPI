@@ -44,6 +44,7 @@ enum LitSeason: string
         '/^BaptismLord$/',
         '/^MaryMotherOfGod$/',
         '/^DayAfterEpiphany/',
+        '/^Circoncisione$/',
     ];
 
     /**
@@ -57,6 +58,8 @@ enum LitSeason: string
         '/^PalmSun$/',
         '/^(Mon|Tue|Wed)HolyWeek$/',
         '/^HolyThursChrism$/',
+        '/^AshesMonday$/',
+        '/^SabatoTradSymb$/',
     ];
 
     /**

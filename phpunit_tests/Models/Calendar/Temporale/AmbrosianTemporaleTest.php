@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Models\Calendar\Temporale;
 
+use LiturgicalCalendar\Api\Enum\LitColor;
+use LiturgicalCalendar\Api\Enum\LitGrade;
+use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Models\Calendar\Temporale\AmbrosianTemporale;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -115,5 +118,225 @@ final class AmbrosianTemporaleTest extends TestCase
             $this->assertSame(7, (int) $ck->format('N'), "Christ the King must be a Sunday ($year)");
             $this->assertSame($a1->modify('-7 days')->format('Y-m-d'), $d['ChristKing']);
         }
+    }
+
+    public function testAfterEpiphanySundays2025(): void
+    {
+        $d = $this->runEngine(2025);
+        self::assertSame('2025-01-19', $d['AfterEpiphany2']);
+        self::assertSame('2025-01-26', $d['AfterEpiphany3']);
+        self::assertSame('2025-02-02', $d['AfterEpiphany4']);
+        self::assertSame('2025-02-09', $d['AfterEpiphany5']);
+        self::assertSame('2025-02-16', $d['AfterEpiphany6']);
+        self::assertSame('2025-02-23', $d['AfterEpiphany7']);
+        self::assertSame('2025-03-02', $d['AfterEpiphany8']);
+        self::assertArrayNotHasKey('AfterEpiphany9', $d); // Mar 9 is Lent1
+    }
+
+    public function testAnchorBlockSeasonsStamped2025(): void
+    {
+        $events = $this->runEngineEvents(2025);
+        self::assertSame(LitSeason::ADVENT, $events['Advent1']->liturgical_season);
+        self::assertSame(LitSeason::CHRISTMAS, $events['Christmas']->liturgical_season);
+        self::assertSame(LitSeason::CHRISTMAS, $events['Circoncisione']->liturgical_season);
+        self::assertSame(LitSeason::CHRISTMAS, $events['Epiphany']->liturgical_season);
+        self::assertSame(LitSeason::CHRISTMAS, $events['BaptismLord']->liturgical_season);
+        self::assertSame(LitSeason::LENT, $events['Lent1']->liturgical_season);
+        self::assertSame(LitSeason::LENT, $events['AshesMonday']->liturgical_season);
+        self::assertSame(LitSeason::LENT, $events['SabatoTradSymb']->liturgical_season);
+        self::assertSame(LitSeason::EASTER_TRIDUUM, $events['HolyThurs']->liturgical_season);
+        self::assertSame(LitSeason::EASTER, $events['Easter']->liturgical_season);
+        self::assertSame(LitSeason::EASTER, $events['Pentecost']->liturgical_season);
+        self::assertSame(LitSeason::AFTER_PENTECOST, $events['DedicationDuomo']->liturgical_season);
+        self::assertSame(LitSeason::AFTER_PENTECOST, $events['ChristKing']->liturgical_season);
+    }
+
+    public function testAfterPentecostSubBlocks2025(): void
+    {
+        $d = $this->runEngine(2025);
+
+        // (a) dopo Pentecoste: 1st Sunday after Pentecost (Jun 15) .. Sat before Aug 31
+        self::assertSame('2025-06-15', $d['AfterPentecost1']);
+        self::assertSame('2025-08-24', $d['AfterPentecost11']); // last before the Martyrdom Sunday
+        self::assertArrayNotHasKey('AfterPentecost12', $d);
+
+        // (b) dopo il Martirio: Aug 31 .. Sat before Oct 19 (Dedication)
+        self::assertSame('2025-08-31', $d['AfterPentecostMartyrdom1']);
+        self::assertSame('2025-10-12', $d['AfterPentecostMartyrdom7']);
+        self::assertArrayNotHasKey('AfterPentecostMartyrdom8', $d);
+
+        // (c) dopo la Dedicazione: 1st Sunday after Dedication (Oct 26) .. Sat before Advent I;
+        // Christ the King (Nov 9) is the terminal anchor, not re-emitted as a numbered Sunday.
+        self::assertSame('2025-10-26', $d['AfterPentecostDedication1']);
+        self::assertSame('2025-11-02', $d['AfterPentecostDedication2']);
+        self::assertArrayNotHasKey('AfterPentecostDedication3', $d); // Nov 9 = ChristKing
+        self::assertSame('2025-11-09', $d['ChristKing']);
+    }
+
+    public function testAfterPentecostSundaysStamped2025(): void
+    {
+        $events = $this->runEngineEvents(2025);
+        self::assertSame(LitSeason::AFTER_PENTECOST, $events['AfterPentecost1']->liturgical_season);
+        self::assertSame(LitSeason::AFTER_PENTECOST, $events['AfterPentecostMartyrdom1']->liturgical_season);
+        self::assertSame(LitSeason::AFTER_PENTECOST, $events['AfterPentecostDedication1']->liturgical_season);
+    }
+
+    /**
+     * `martyrdomAnchor()` (n. 42a) postpones the Martyrdom of St John the
+     * Baptist from Aug 29 to Sep 1 whenever Aug 29 falls on a Sunday, so the
+     * "dopo il Martirio" block never overlaps a privileged Sunday. 2027 is
+     * the nearest civil year in which Aug 29 is a Sunday (verified via
+     * `date -d '2027-08-29' +%u` => 7), so the block's first Sunday
+     * (`AfterPentecostMartyrdom1`) must be measured from the postponed Sep 1
+     * anchor, not from Aug 29 itself: Sep 1, 2027 is a Wednesday, and the
+     * first Sunday on/after it is Sep 5, 2027.
+     */
+    public function testMartyrdomPostponedWhenAug29IsSunday(): void
+    {
+        $d = $this->runEngine(2027);
+
+        // Sanity: Aug 29, 2027 really is a Sunday -- the edge this test targets.
+        self::assertSame('7', ( new \DateTime('2027-08-29') )->format('N'), 'Expected Aug 29, 2027 to be a Sunday');
+
+        self::assertSame('2027-09-05', $d['AfterPentecostMartyrdom1']);
+    }
+
+    public function testAfterEpiphanyWeekdaysFillGaps2025(): void
+    {
+        $d = $this->runEngine(2025);
+        // After-Epiphany block: Mon after Baptism (2025-01-13) .. Sat before Lent1 (2025-03-08).
+        // Mondays are weekdays; assert a representative weekday exists and Sundays are NOT overwritten.
+        self::assertArrayHasKey('AfterEpiphanyWeekday2Monday', $d);   // week 2 Monday = 2025-01-13
+        self::assertSame('2025-01-13', $d['AfterEpiphanyWeekday2Monday']);
+        self::assertArrayHasKey('AfterEpiphanyWeekday3Saturday', $d); // 2025-01-25
+        self::assertSame('2025-01-25', $d['AfterEpiphanyWeekday3Saturday']);
+        // The Sunday 2025-01-19 remains AfterEpiphany2 (a weekday fill must never take a Sunday)
+        self::assertSame('2025-01-19', $d['AfterEpiphany2']);
+    }
+
+    public function testAdventDeExceptatoFerie2025(): void
+    {
+        $d = $this->runEngine(2025);
+        // 2025: Dec 17 is Wednesday, so de Exceptáto = Dec 17..23 (Sundays excluded).
+        // Keys are month+day ('md'), not bare day-of-month: the Advent block spans
+        // Nov and Dec, and day-of-month alone collides (e.g. both Nov 17 and Dec 17
+        // fall inside the block) -- see calculateAdventWeekdays()'s doc comment.
+        self::assertArrayHasKey('AdventWeekday1217', $d);
+        self::assertSame('2025-12-17', $d['AdventWeekday1217']);
+        self::assertArrayHasKey('AdventWeekday1223', $d);
+        self::assertSame('2025-12-23', $d['AdventWeekday1223']);
+        // Sanity: the Nov 17/Dec 17 collision case does NOT silently drop the
+        // November occurrence (both are distinct 'md' keys).
+        self::assertArrayHasKey('AdventWeekday1117', $d);
+        self::assertSame('2025-11-17', $d['AdventWeekday1117']);
+    }
+
+    public function testChristmasFerieSkipAnchors2025(): void
+    {
+        $d = $this->runEngine(2025);
+        self::assertArrayHasKey('ChristmasWeekday1229', $d); // Dec 29 2025 (Mon)
+        self::assertSame('2025-12-29', $d['ChristmasWeekday1229']);
+        // Jan 1 (Circoncisione) and Jan 6 (Epiphany) stay anchors, never overwritten:
+        // the fill is bounded to Dec 31 of the same civil year and never reaches
+        // January at all -- see calculateChristmasWeekdays()'s doc comment.
+        self::assertArrayNotHasKey('ChristmasWeekday0101', $d);
+        self::assertArrayNotHasKey('ChristmasWeekday0106', $d);
+    }
+
+    public function testLentenFridaysAreAliturgical2025(): void
+    {
+        $events  = $this->runEngineEvents(2025);
+        $fridays = array_filter(
+            $events,
+            fn ($e) => $e->liturgical_season === LitSeason::LENT
+                && (int) $e->date->format('N') === 5
+                && $e->grade === LitGrade::WEEKDAY
+        );
+        self::assertNotEmpty($fridays);
+        foreach ($fridays as $key => $e) {
+            self::assertTrue($e->is_aliturgical, "$key should be aliturgical");
+        }
+        // A Lenten non-Friday ferial is not aliturgical:
+        $someThursday = $events['LentWeekday1Thursday'] ?? null;
+        self::assertNotNull($someThursday);
+        self::assertNull($someThursday->is_aliturgical);
+    }
+
+    public function testEasterFerieAfterOctave2025(): void
+    {
+        $d = $this->runEngine(2025);
+        self::assertArrayHasKey('EasterWeekday2Monday', $d);
+        self::assertSame('2025-04-28', $d['EasterWeekday2Monday']);
+        // Ascension (Thu 2025-05-29) stays its own anchor:
+        self::assertSame('2025-05-29', $d['Ascension']);
+        // Octave weekdays remain their own anchors, not re-emitted:
+        self::assertArrayHasKey('MonOctaveEaster', $d);
+    }
+
+    public function testAfterPentecostWeekdaysFill2025(): void
+    {
+        $d = $this->runEngine(2025);
+        // (a) first ferial Monday after Pentecost (2025-06-08) = 2025-06-09, week 1
+        self::assertArrayHasKey('AfterPentecostWeekday1Monday', $d);
+        self::assertSame('2025-06-09', $d['AfterPentecostWeekday1Monday']);
+        // (b) Monday after the 1st Sunday after the Martyrdom (Sun 2025-08-31) = 2025-09-01
+        self::assertArrayHasKey('AfterPentecostMartyrdomWeekday1Monday', $d);
+        self::assertSame('2025-09-01', $d['AfterPentecostMartyrdomWeekday1Monday']);
+        // (c) Monday after the Dedication (Sun 2025-10-19) = 2025-10-20
+        self::assertArrayHasKey('AfterPentecostDedicationWeekday1Monday', $d);
+        self::assertSame('2025-10-20', $d['AfterPentecostDedicationWeekday1Monday']);
+    }
+
+    public function testHolyWeekFerieCovered2025(): void
+    {
+        $events = $this->runEngineEvents(2025);
+        // 2025: Palm Sunday = Apr 13, Holy Thursday = Apr 17. Mon/Tue/Wed of Holy
+        // Week (Apr 14/15/16) were previously uncovered because
+        // calculateLentWeekdays() stopped at Palm Sunday; the fix extends the
+        // upper bound to Holy Thursday (exclusive).
+        self::assertArrayHasKey('LentWeekday6Monday', $events);
+        self::assertSame('2025-04-14', $events['LentWeekday6Monday']->date->format('Y-m-d'));
+        self::assertNull($events['LentWeekday6Monday']->is_aliturgical);
+
+        self::assertArrayHasKey('LentWeekday6Tuesday', $events);
+        self::assertSame('2025-04-15', $events['LentWeekday6Tuesday']->date->format('Y-m-d'));
+        self::assertNull($events['LentWeekday6Tuesday']->is_aliturgical);
+
+        self::assertArrayHasKey('LentWeekday6Wednesday', $events);
+        self::assertSame('2025-04-16', $events['LentWeekday6Wednesday']->date->format('Y-m-d'));
+        self::assertNull($events['LentWeekday6Wednesday']->is_aliturgical);
+    }
+
+    public function testJanuaryChristmasFerie2025(): void
+    {
+        $d = $this->runEngine(2025);
+        self::assertArrayHasKey('ChristmasWeekday0102', $d);
+        self::assertSame('2025-01-02', $d['ChristmasWeekday0102']);
+        self::assertArrayHasKey('ChristmasWeekday0111', $d);
+        self::assertSame('2025-01-11', $d['ChristmasWeekday0111']);
+        // Epiphany (Jan 6) and Circoncisione (Jan 1) must not be overwritten.
+        self::assertSame('2025-01-06', $d['Epiphany']);
+        self::assertSame('2025-01-01', $d['Circoncisione']);
+    }
+
+    public function testSundayAfterChristmasOctave2025And2026(): void
+    {
+        $events2025 = $this->runEngineEvents(2025);
+        self::assertArrayHasKey('ChristmasSundayAfterOctave', $events2025);
+        $event2025 = $events2025['ChristmasSundayAfterOctave'];
+        self::assertSame('2025-01-05', $event2025->date->format('Y-m-d'));
+        self::assertSame(LitSeason::CHRISTMAS, $event2025->liturgical_season);
+        self::assertTrue($event2025->is_dominical);
+        self::assertSame(LitGrade::FEAST_LORD, $event2025->grade);
+        self::assertContains(LitColor::WHITE, $event2025->color);
+
+        $d2026 = $this->runEngine(2026);
+        self::assertSame('2026-01-04', $d2026['ChristmasSundayAfterOctave']);
+
+        // 2023: Jan 1, 2023 is a Sunday, so [Jan 2, Jan 5] contains no Sunday --
+        // the n.33 Sunday does not exist that year ("eventuale").
+        self::assertSame('7', ( new \DateTime('2023-01-01') )->format('N'), 'Expected Jan 1, 2023 to be a Sunday');
+        $d2023 = $this->runEngine(2023);
+        self::assertArrayNotHasKey('ChristmasSundayAfterOctave', $d2023);
     }
 }

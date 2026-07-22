@@ -28,6 +28,11 @@ final class PropriumDeTemporeEvent extends AbstractJsonSrcData
      * Absent/null for source data that does not classify dominical events (e.g. the Roman proprium).
      */
     public readonly ?bool $is_dominical;
+    /**
+     * Whether the event is aliturgical (no Mass celebrated), if applicable to the source data.
+     * Absent/null for source data that does not classify aliturgical days (e.g. the Roman proprium).
+     */
+    public readonly ?bool $is_aliturgical;
 
     /**
      * Constructor for the PropriumDeTemporeEvent class.
@@ -37,25 +42,28 @@ final class PropriumDeTemporeEvent extends AbstractJsonSrcData
      * @param LitEventType $type The type of the event.
      * @param LitColor[] $color The color of the event.
      * @param bool|null $is_dominical Whether the event is "of the Lord" (dominical), if applicable.
+     * @param bool|null $is_aliturgical Whether the event is aliturgical (no Mass celebrated), if applicable.
      */
     public function __construct(
         string $event_key,
         LitGrade $grade,
         LitEventType $type,
         array $color,
-        ?bool $is_dominical = null
+        ?bool $is_dominical = null,
+        ?bool $is_aliturgical = null
     ) {
-        $this->event_key    = $event_key;
-        $this->grade        = $grade;
-        $this->type         = $type;
-        $this->color        = $color;
-        $this->is_dominical = $is_dominical;
+        $this->event_key      = $event_key;
+        $this->grade          = $grade;
+        $this->type           = $type;
+        $this->color          = $color;
+        $this->is_dominical   = $is_dominical;
+        $this->is_aliturgical = $is_aliturgical;
     }
 
     /**
      * Creates an instance of PropriumDeTemporeEvent from an associative array.
      *
-     * @param array{event_key:string,grade:int,type:int,color:string[],is_dominical?:bool|null} $data
+     * @param array{event_key:string,grade:int,type:int,color:string[],is_dominical?:bool|null,is_aliturgical?:bool|null} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -67,7 +75,8 @@ final class PropriumDeTemporeEvent extends AbstractJsonSrcData
             LitGrade::from($data['grade']),
             LitEventType::from($data['type']),
             array_map(fn (string $color): LitColor => LitColor::from($color), $data['color']),
-            $data['is_dominical'] ?? null
+            $data['is_dominical'] ?? null,
+            $data['is_aliturgical'] ?? null
         );
     }
 
@@ -80,7 +89,7 @@ final class PropriumDeTemporeEvent extends AbstractJsonSrcData
      * - grade (int): The liturgical grade of the event.
      * - color (array): The liturgical colors for the event.
      *
-     * @param \stdClass&object{event_key:string,grade:int,type:int,color:string[],is_dominical?:bool|null} $data The stdClass object or array containing event data.
+     * @param \stdClass&object{event_key:string,grade:int,type:int,color:string[],is_dominical?:bool|null,is_aliturgical?:bool|null} $data The stdClass object or array containing event data.
      * @return static The newly created instance(s).
      */
     protected static function fromObjectInternal(\stdClass $data): static
@@ -92,12 +101,18 @@ final class PropriumDeTemporeEvent extends AbstractJsonSrcData
             $is_dominical = $data->is_dominical;
         }
 
+        $is_aliturgical = null;
+        if (property_exists($data, 'is_aliturgical') && is_bool($data->is_aliturgical)) {
+            $is_aliturgical = $data->is_aliturgical;
+        }
+
         return new static(
             $data->event_key,
             LitGrade::from($data->grade),
             LitEventType::from($data->type),
             array_map(fn (string $color): LitColor => LitColor::from($color), $data->color),
-            $is_dominical
+            $is_dominical,
+            $is_aliturgical
         );
     }
 
