@@ -86,6 +86,13 @@ Some characteristics of this API:
   and `PATCH`/`DELETE` likewise address resources by path (e.g. `PUT /data/nation/IT`, `PATCH /tests/MaryMotherChurchTest`).
   One deliberate exception: on read endpoints this API uses `POST` as a body-parameterized synonym of `GET` (not as collection-create),
   pending possible adoption of the [`QUERY` method](https://datatracker.ietf.org/doc/draft-ietf-httpbis-safe-method-w-body/) when it becomes standard.
+* **Ambrosian rite support (comune ambrosiano) is live**: `GET/POST /calendar/ambrosian` and `/calendar/ambrosian/{year}` calculate the calendar for the
+  Ambrosian rite as celebrated in common (no diocesan overlay yet — the Ambrosian dioceses of Milano, Bergamo, Novara, and Lugano are planned for a future
+  release), `/events/ambrosian` returns its event catalog, and the `/calendars` discovery endpoint announces it under `ambrosian_calendars`. A few notes on
+  the current state of this data:
+  * **Readings are a placeholder**: the Ambrosian rite does not yet have its own lectionary wired up, so `readings` is always empty for Ambrosian events.
+  * **Year cycles, first-vespers vigils, and psalter-week numbering are provisional**, pending validation against the official Ambrosian ordo.
+  * The Ambrosian rite is only available from **1976 onward** (the first reformed Ambrosian Missal); earlier years return `400 Bad Request`.
 
 # Example applications
 

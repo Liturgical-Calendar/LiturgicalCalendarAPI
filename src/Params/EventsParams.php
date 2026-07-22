@@ -3,6 +3,7 @@
 namespace LiturgicalCalendar\Api\Params;
 
 use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
@@ -28,6 +29,16 @@ class EventsParams implements ParamsInterface
     public bool $EternalHighPriest   = false;
     public ?string $NationalCalendar = null;
     public ?string $DiocesanCalendar = null;
+    public Rite $Rite                = Rite::ROMAN;
+
+    /**
+     * True when a `national_calendar=VA` filter was supplied on this request.
+     * VA normalizes `$NationalCalendar` back to null (it selects the General Roman
+     * Calendar, which has no national override), so this marker preserves the fact
+     * that a national filter WAS requested — needed to reject an Ambrosian request
+     * that (nonsensically) also asks for the VA national calendar.
+     */
+    private bool $vaNationalRequested = false;
 
     public readonly MetadataCalendars $calendarsMetadata;
 
@@ -153,7 +164,8 @@ class EventsParams implements ParamsInterface
                             throw new ValidationException($description);
                         }
                         if ($value === 'VA') {
-                            $forceVaInvariants = true;
+                            $forceVaInvariants         = true;
+                            $this->vaNationalRequested = true;
                         } else {
                             $this->NationalCalendar = strtoupper($value);
                         }
@@ -220,5 +232,45 @@ class EventsParams implements ParamsInterface
     private function isValidDiocesanCalendar(string $calendar): bool
     {
         return in_array($calendar, $this->calendarsMetadata->diocesan_calendars_keys);
+    }
+
+    /**
+     * Sets the liturgical rite for which the events catalog should be built.
+     *
+     * @param Rite $rite the liturgical rite (ROMAN or AMBROSIAN)
+     */
+    public function setRite(Rite $rite): void
+    {
+        $this->Rite = $rite;
+    }
+
+    /**
+     * Cross-field validation of the rite against the requested calendar. Roman accepts
+     * every calendar shape. The Ambrosian rite has no national layer and, for the events
+     * catalog, no diocesan layer either (comune ambrosiano only, for now) — a national or
+     * diocesan calendar request combined with the Ambrosian rite is rejected. Mirrors
+     * {@see \LiturgicalCalendar\Api\Params\CalendarParams::validateRiteCompatibility()}, minus the
+     * year-floor check (the events catalog is year-agnostic). Must be called after the rite
+     * and any `national_calendar`/`diocesan_calendar` parameters have been set.
+     *
+     * @throws ValidationException
+     */
+    public function validateRiteCompatibility(): void
+    {
+        if ($this->Rite === Rite::ROMAN) {
+            return;
+        }
+
+        if ($this->NationalCalendar !== null || $this->vaNationalRequested) {
+            throw new ValidationException(
+                'The Ambrosian rite has no national calendars; request the comune ambrosiano events catalog (`/events/ambrosian`).'
+            );
+        }
+
+        if ($this->DiocesanCalendar !== null) {
+            throw new ValidationException(
+                'The Ambrosian rite does not yet support diocesan event catalogs; request the comune ambrosiano events catalog (`/events/ambrosian`).'
+            );
+        }
     }
 }

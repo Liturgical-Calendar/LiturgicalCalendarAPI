@@ -145,6 +145,20 @@
                     "items": {
                         "$ref": "./CommonDef.json#/definitions/Locale"
                     }
+                },
+                "ambrosian_calendars": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/AmbrosianCalendarDef"
+                    }
+                },
+                "ambrosian_calendars_keys": {
+                    "type": "array",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string",
+                        "enum": ["ambrosian"]
+                    }
                 }
             },
             "required": [
@@ -155,9 +169,34 @@
                 "diocesan_groups",
                 "wider_regions",
                 "wider_regions_keys",
-                "locales"
+                "locales",
+                "ambrosian_calendars",
+                "ambrosian_calendars_keys"
             ],
             "additionalProperties": false
+        },
+        "AmbrosianCalendarDef": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "calendar_id": {
+                    "type": "string",
+                    "description": "the path segment identifying the comune calendar, used as /calendar/{calendar_id}",
+                    "enum": ["ambrosian"]
+                },
+                "rite": {
+                    "type": "string",
+                    "description": "the liturgical rite this comune calendar is computed under",
+                    "enum": ["ambrosian"]
+                },
+                "locales": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "./CommonDef.json#/definitions/Locale"
+                    }
+                }
+            },
+            "required": ["calendar_id", "rite", "locales"]
         },
         "WiderRegionDef": {
             "type": "object",

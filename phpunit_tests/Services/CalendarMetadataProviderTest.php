@@ -47,6 +47,27 @@ final class CalendarMetadataProviderTest extends TestCase
         self::assertCount(count($metadata->national_calendars), $metadata->national_calendars_keys);
         self::assertCount(count($metadata->diocesan_calendars), $metadata->diocesan_calendars_keys);
         self::assertCount(count($metadata->wider_regions), $metadata->wider_regions_keys);
+        self::assertCount(count($metadata->ambrosian_calendars), $metadata->ambrosian_calendars_keys);
+    }
+
+    /**
+     * The comune `/calendar/ambrosian` has no representation as a nation,
+     * diocese, or wider region — it's announced through its own
+     * `ambrosian_calendars` surface so clients can discover it.
+     */
+    public function testCreateAnnouncesTheAmbrosianComuneCalendar(): void
+    {
+        $metadata = CalendarMetadataProvider::create();
+
+        self::assertContains('ambrosian', $metadata->ambrosian_calendars_keys);
+        $ambrosian = current(array_filter(
+            $metadata->ambrosian_calendars,
+            fn ($item) => $item->calendar_id === 'ambrosian'
+        ));
+        self::assertNotFalse($ambrosian);
+        self::assertSame('ambrosian', $ambrosian->rite);
+        self::assertContains('it', $ambrosian->locales);
+        self::assertContains('la', $ambrosian->locales);
     }
 
     /**
