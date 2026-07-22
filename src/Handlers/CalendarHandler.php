@@ -828,6 +828,11 @@ final class CalendarHandler extends AbstractHandler
      */
     private function loadPropriumDeTemporeData(): void
     {
+        if ($this->CalendarParams->Rite === Rite::AMBROSIAN) {
+            $this->loadAmbrosianPropriumDeTemporeData();
+            return;
+        }
+
         $propriumDeTemporeFile = strtr(
             JsonData::MISSAL_FILE->path(),
             ['{missal_folder}' => 'propriumdetempore']
@@ -835,6 +840,61 @@ final class CalendarHandler extends AbstractHandler
 
         $PropriumDeTempore       = Utilities::jsonFileToObjectArray($propriumDeTemporeFile);
         $PropriumDeTemporeI18n   = $this->loadPropriumDeTemporeI18nData();
+        $this->PropriumDeTempore = PropriumDeTemporeMap::fromObject($PropriumDeTempore);
+        $this->PropriumDeTempore->setNames($PropriumDeTemporeI18n);
+    }
+
+    /**
+     * Loads localization data stored in JSON format from a file in the
+     * `{JsonData::AMBROSIAN_TEMPORALE_I18N_FOLDER}` directory, named according to
+     * the given locale.
+     *
+     * If the file does not exist, or if there is an error decoding the
+     * JSON data, a 503 Service Unavailable error is thrown.
+     *
+     * @param string $locale The locale to load the i18n data for (must be one of the
+     *                       locales the Ambrosian Proprium de Tempore i18n data ships with).
+     * @return array<string,string> The loaded data.
+     */
+    private function loadAmbrosianPropriumDeTemporeI18nData(string $locale): array
+    {
+        $ambrosianPropriumDeTemporeI18nFile = strtr(
+            JsonData::AMBROSIAN_TEMPORALE_I18N_FILE->path(),
+            ['{locale}' => $locale]
+        );
+
+        $ambrosianPropriumDeTemporeI18nArr = Utilities::jsonFileToArray($ambrosianPropriumDeTemporeI18nFile);
+        if (array_filter(array_keys($ambrosianPropriumDeTemporeI18nArr), 'is_string') !== array_keys($ambrosianPropriumDeTemporeI18nArr)) {
+            throw new \Exception('We expected all the keys of the array to be strings.');
+        }
+        if (array_filter($ambrosianPropriumDeTemporeI18nArr, 'is_string') !== $ambrosianPropriumDeTemporeI18nArr) {
+            throw new \Exception('We expected all the values of the array to be strings.');
+        }
+        /** @var array<string,string> $ambrosianPropriumDeTemporeI18nArr */
+        return $ambrosianPropriumDeTemporeI18nArr;
+    }
+
+    /**
+     * Retrieve the Ambrosian Proprium de Tempore data, along with its i18n data.
+     *
+     * The Ambrosian Proprium de Tempore i18n data only ships `it` and `la` locales
+     * (see `jsondata/sourcedata/missals/ambrosian/propriumdetempore/i18n`). If the
+     * requested primary language isn't one of those, we fall back to Italian (`it`)
+     * rather than failing the request, mirroring how the Vatican/General Roman
+     * Calendar distinction elsewhere in this handler defaults to a sensible locale
+     * instead of forcing an unavailable one.
+     */
+    private function loadAmbrosianPropriumDeTemporeData(): void
+    {
+        $ambrosianPropriumDeTemporeFile = JsonData::AMBROSIAN_TEMPORALE_FILE->path();
+
+        $locale = LitLocale::$PRIMARY_LANGUAGE;
+        if (false === in_array($locale, ['it', 'la'], true)) {
+            $locale = 'it';
+        }
+
+        $PropriumDeTempore       = Utilities::jsonFileToObjectArray($ambrosianPropriumDeTemporeFile);
+        $PropriumDeTemporeI18n   = $this->loadAmbrosianPropriumDeTemporeI18nData($locale);
         $this->PropriumDeTempore = PropriumDeTemporeMap::fromObject($PropriumDeTempore);
         $this->PropriumDeTempore->setNames($PropriumDeTemporeI18n);
     }
