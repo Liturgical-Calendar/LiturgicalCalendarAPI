@@ -40,6 +40,7 @@ final class AmbrosianTemporale implements TemporaleEngine
         $this->calculateAfterPentecostSundays($ctx);
         $this->calculateAdventWeekdays($ctx);
         $this->calculateChristmasWeekdays($ctx);
+        $this->calculateLentWeekdays($ctx);
     }
 
     /**
@@ -565,6 +566,31 @@ final class AmbrosianTemporale implements TemporaleEngine
         }
         $ordinalStr = Utilities::getOrdinal($ordinal, $ctx->localeDateFormatter->getLocale(), $this->ordinalFormatter($ctx), LatinUtils::LATIN_ORDINAL);
         return sprintf('%s domenica %s', $ordinalStr, $phraseIt);
+    }
+
+    /** Lenten ferie: Lent I (excl.) … Saturday before Palm Sunday; Fridays are aliturgical (nn. 24–27). */
+    private function calculateLentWeekdays(TemporaleContext $ctx): void
+    {
+        $year    = $ctx->params->Year;
+        $lent1   = Utilities::calcGregEaster($year)->sub(new \DateInterval('P' . ( 6 * 7 ) . 'D'));
+        $palmSun = Utilities::calcGregEaster($year)->sub(new \DateInterval('P7D'));
+        $from    = ( clone $lent1 )->add(new \DateInterval('P1D'));
+        $this->fillFerialWeekdays(
+            $ctx,
+            $from,
+            clone $palmSun, // up to (not incl.) Palm Sunday; SabatoTradSymb anchor is skipped by inCalendar()
+            LitColor::MORELLO,
+            fn (DateTime $d): string => 'LentWeekday' . $this->lentWeekNumber($d, $lent1) . $this->englishWeekday($d),
+            fn (DateTime $d): string => $this->weekdayName($d, 'di Quaresima', 'Quadragesimæ', $this->lentWeekNumber($d, $lent1), $ctx),
+            true
+        );
+    }
+
+    /** Lenten week number: Lent I is week 1; the following Monday begins week 1's ferie. */
+    private function lentWeekNumber(DateTime $date, DateTime $lent1): int
+    {
+        $daysSince = (int) $lent1->diff($date)->format('%a');
+        return (int) floor(( $daysSince - 1 ) / 7) + 1;
     }
 
     /**

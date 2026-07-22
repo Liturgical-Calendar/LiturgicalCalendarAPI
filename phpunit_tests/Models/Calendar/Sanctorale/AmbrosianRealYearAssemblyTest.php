@@ -64,8 +64,21 @@ final class AmbrosianRealYearAssemblyTest extends TestCase
      *     doc comment), skipping the Dec 28 Sunday = 5 ferial days.
      * None of these 38 dates collide with an existing temporale or sanctorale
      * key, so all 38 are additive. New total: 364 + 38 = 402.
+     *
+     * Plan 6 / Task 7 adds the Lenten ferial-weekday fill (`calculateLentWeekdays()`,
+     * via `fillFerialWeekdays(..., lentenAliturgicalFridays: true)`), which flags
+     * every Lenten Friday `is_aliturgical = true` (nn. 24-27). Keys are
+     * `LentWeekday{N}{EnglishDay}`, run from the day after Lent I (2025-03-10,
+     * exclusive of Lent I itself, but AshesMonday already occupies that date as an
+     * anchor) through the Saturday before Palm Sunday (2025-04-12, where
+     * SabatoTradSymb already occupies that date as an anchor). For civil year 2025
+     * this produces 5 full weeks of Mon-Sat ferie (30 slots) minus the 2 anchor
+     * dates (AshesMonday, SabatoTradSymb) already in the calendar = 28 ferial days,
+     * including the 5 Lenten Fridays (Mar 14, 21, 28, Apr 4, 11). None of these 28
+     * dates collide with an existing temporale or sanctorale key, so all 28 are
+     * additive. New total: 402 + 28 = 430.
      */
-    private const int EXPECTED_TOTAL_2025 = 402;
+    private const int EXPECTED_TOTAL_2025 = 430;
 
     public function testAssembleAmbrosianYear2025IncludesTemporaleAnchor(): void
     {

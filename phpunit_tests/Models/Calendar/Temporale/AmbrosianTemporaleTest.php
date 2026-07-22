@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Models\Calendar\Temporale;
 
+use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Models\Calendar\Temporale\AmbrosianTemporale;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -239,5 +240,24 @@ final class AmbrosianTemporaleTest extends TestCase
         // January at all -- see calculateChristmasWeekdays()'s doc comment.
         self::assertArrayNotHasKey('ChristmasWeekday0101', $d);
         self::assertArrayNotHasKey('ChristmasWeekday0106', $d);
+    }
+
+    public function testLentenFridaysAreAliturgical2025(): void
+    {
+        $events  = $this->runEngineEvents(2025);
+        $fridays = array_filter(
+            $events,
+            fn ($e) => $e->liturgical_season === LitSeason::LENT
+                && (int) $e->date->format('N') === 5
+                && $e->grade === LitGrade::WEEKDAY
+        );
+        self::assertNotEmpty($fridays);
+        foreach ($fridays as $key => $e) {
+            self::assertTrue($e->is_aliturgical, "$key should be aliturgical");
+        }
+        // A Lenten non-Friday ferial is not aliturgical:
+        $someThursday = $events['LentWeekday1Thursday'] ?? null;
+        self::assertNotNull($someThursday);
+        self::assertNull($someThursday->is_aliturgical);
     }
 }
