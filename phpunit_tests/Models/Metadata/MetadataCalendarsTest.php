@@ -264,5 +264,18 @@ final class MetadataCalendarsTest extends TestCase
         ]);
         $mc->pushAmbrosianCalendarMetadata($ac);
         self::assertSame(['ambrosian'], $mc->ambrosian_calendars_keys);
+
+        // Round-trip the whole container through fromArray/fromObject so the
+        // ambrosian_calendars deserialization paths are exercised (not just the item).
+        $arr = $mc->jsonSerialize();
+
+        $fromArr = MetadataCalendars::fromArray($arr);
+        self::assertSame(['ambrosian'], $fromArr->ambrosian_calendars_keys);
+        self::assertSame('ambrosian', $fromArr->ambrosian_calendars[0]->calendar_id);
+        self::assertSame(['it', 'la'], $fromArr->ambrosian_calendars[0]->locales);
+
+        $fromObj = MetadataCalendars::fromObject(json_decode(json_encode($arr, JSON_THROW_ON_ERROR), false, 512, JSON_THROW_ON_ERROR));
+        self::assertSame(['ambrosian'], $fromObj->ambrosian_calendars_keys);
+        self::assertSame('ambrosian', $fromObj->ambrosian_calendars[0]->rite);
     }
 }

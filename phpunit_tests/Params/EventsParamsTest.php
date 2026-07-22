@@ -149,6 +149,17 @@ final class EventsParamsTest extends TestCase
         $this->addToAssertionCount(1); // reached only if no exception was thrown
     }
 
+    public function testAmbrosianRejectsDiocesanCalendar(): void
+    {
+        // The Ambrosian rite serves only the comune catalog; a diocesan_calendar filter
+        // (from ?diocesan_calendar=… or /events/ambrosian/diocese/…) must be rejected.
+        $params = new EventsParams(['diocesan_calendar' => 'agrige_it']);
+        $params->setRite(Rite::AMBROSIAN);
+
+        $this->expectException(ValidationException::class);
+        $params->validateRiteCompatibility();
+    }
+
     /**
      * Regression for #576: when national_calendar=VA appears anywhere in the
      * input, its locale=la_VA / eternal_high_priest=false invariants must win
