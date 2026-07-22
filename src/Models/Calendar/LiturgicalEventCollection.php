@@ -1413,6 +1413,68 @@ final class LiturgicalEventCollection
     }
 
     /**
+     * Ambrosian rite only: sets the festive (A/B/C) and ferial (I/II) year cycles, and computes
+     * first-vespers vigil Masses, for each liturgical event in the collection.
+     *
+     * Mirrors the rite-agnostic arithmetic half of the Roman `setYearCyclesAndVigils()`:
+     *
+     * - The A/B/C festive cycle and I/II ferial cycle formulas (keyed off `Advent1`'s date and
+     *   `$this->CalendarParams->Year`, using the same {@see self::SUNDAY_CYCLE} /
+     *   {@see self::WEEKDAY_CYCLE} constants) are rite-agnostic and are reused verbatim.
+     * - The weekday-cycle guard, however, cannot reuse `inOrdinaryTime()`: that method requires an
+     *   `AshWednesday` event, which does not exist in the Ambrosian temporale. Instead, this method
+     *   only assigns a weekday cycle to events whose `liturgical_season` is
+     *   {@see LitSeason::AFTER_EPIPHANY} or {@see LitSeason::AFTER_PENTECOST} — the Ambrosian
+     *   analogue of Roman "Ordinary Time" (see `stampAmbrosianSeasonOnSanctorale()` for how
+     *   `liturgical_season` is populated).
+     * - The ~150 lines of Roman lectionary-readings retrieval (`ReadingsGeneralRoman`,
+     *   `getSanctoraleReadings()`, `getCycle()`, etc.) are deliberately OMITTED: there is no
+     *   Ambrosian lectionary source yet, and every Ambrosian event already carries the
+     *   empty-readings placeholder set by `AmbrosianReadings::empty()` (Plan 7 Task 2/4).
+     * - As in the Roman method, the fixed-date temporale events that share their readings/cycle
+     *   every year do not get a `liturgical_year` string: the Roman exclusion list
+     *   (`Christmas`, `MaryMotherOfGod`, `Christmas2`, `Epiphany`, `AshWednesday`) is adapted to
+     *   its Ambrosian equivalents (`Christmas`, `Circoncisione`, `Epiphany`).
+     * - Vigil Mass computation ({@see self::calculateAmbrosianVigilMass()}) is attempted for every
+     *   Sunday/solemnity/feast-of-the-Lord-grade event, exactly mirroring where the Roman method
+     *   calls `calculateVigilMass()`.
+     *
+     * Must run after `stampAmbrosianSeasonOnSanctorale()` (which this method depends on for the
+     * weekday-cycle guard) and `setAmbrosianHolyDaysOfObligation()`.
+     *
+     * @return void
+     */
+    public function setAmbrosianYearCyclesAndVigils(): void
+    {
+        $Advent1 = $this->liturgicalEvents->getEvent('Advent1');
+        if (null === $Advent1) {
+            throw new \InvalidArgumentException('Missing liturgical event: Advent1.');
+        }
+
+        foreach ($this->liturgicalEvents as $litEvent) {
+            if (self::dateIsNotSunday($litEvent->date) && $litEvent->grade === LitGrade::WEEKDAY) {
+                // Ambrosian "Ordinary Time" analogue: only weekdays after Epiphany or after
+                // Pentecost follow a ferial (I/II) cycle; weekdays of Advent, Christmas, Lent
+                // and Easter (and the various de Exceptato / Martyrdom / Dedication sub-blocks,
+                // which are NOT after-Epiphany/after-Pentecost) do not.
+                if ($litEvent->liturgical_season === LitSeason::AFTER_EPIPHANY || $litEvent->liturgical_season === LitSeason::AFTER_PENTECOST) {
+                    $weekdayCycle              = self::WEEKDAY_CYCLE[( $this->CalendarParams->Year - 1 ) % 2];
+                    $litEvent->liturgical_year = $this->T['YEAR'] . ' ' . $weekdayCycle;
+                }
+            } elseif (self::dateIsSunday($litEvent->date) || $litEvent->grade->value > LitGrade::FEAST->value) {
+                if (false === in_array($litEvent->event_key, ['Christmas', 'Circoncisione', 'Epiphany'], true)) {
+                    $festiveCycle              = $litEvent->date < $Advent1->date
+                        ? self::SUNDAY_CYCLE[( $this->CalendarParams->Year - 1 ) % 3]
+                        : self::SUNDAY_CYCLE[$this->CalendarParams->Year % 3];
+                    $litEvent->liturgical_year = $this->T['YEAR'] . ' ' . $festiveCycle;
+                }
+
+                $this->calculateAmbrosianVigilMass($litEvent);
+            }
+        }
+    }
+
+    /**
      * Determines if a given liturgical event can have a vigil mass.
      *
      * This function evaluates whether a liturgical event, identified by its key and date, is eligible for a vigil mass.
@@ -1446,6 +1508,62 @@ final class LiturgicalEventCollection
                 && false === ( $litEvent->event->date > $Easter->date && $litEvent->event->date < $Easter2->date )
             );
         }
+    }
+
+    /**
+     * Ambrosian rite only: determines if a given liturgical event should have a first-vespers
+     * vigil Mass.
+     *
+     * **PROVISIONAL — flagged for Plan 9 ordo validation.** This is a deliberately simplified
+     * adaptation of the Roman `liturgicalEventCanHaveVigil()`, not a faithful transcription of the
+     * actual Ambrosian rubrics governing First/Second Vespers, which have not yet been reviewed
+     * against a real Ambrosian ordo:
+     *
+     * - Eligibility is `dateIsSunday() || grade >= LitGrade::SOLEMNITY`, i.e. every Sunday plus
+     *   every Solemnity (comune or proper), regardless of `is_dominical`. The Roman
+     *   `SOLEMNITIES_LORD_BVM` precedence list and the one-off `Year === 2022` decree special case
+     *   (both used only to resolve *coincidences* between a vigil and another Solemnity landing on
+     *   the same date) are intentionally NOT ported: this method (and
+     *   {@see self::calculateAmbrosianVigilMass()}) does not attempt coincidence resolution at all
+     *   — it unconditionally creates the vigil event once eligibility is established. `is_dominical`
+     *   is available on `LiturgicalEvent` (see `AmbrosianLiturgicalDayRank::isDominicalSunday()`)
+     *   should a future Plan 9 pass need to distinguish "of the Lord" solemnities from others when
+     *   resolving such coincidences.
+     * - The Roman `AllSouls` and `AshWednesday` key exclusions do not apply: the Ambrosian
+     *   calendar has no `AshWednesday`, and `AllSouls` is not itself excluded from a vigil in the
+     *   Ambrosian rite (unlike Roman, where it is excluded because it is not, in the Roman rite, a
+     *   day that has Vespers I).
+     * - The Triduum exclusion window is adapted to the Ambrosian anchors `PalmSun`/`Easter`/
+     *   `Easter2` (which, unlike Roman's `AshWednesday`, DO exist in the Ambrosian temporale), but
+     *   only excludes dates *strictly inside* `PalmSun`..`Easter` and *strictly inside*
+     *   `Easter`..`Easter2` — exactly mirroring the Roman method's own boundary semantics. Unlike
+     *   Roman, this method is not additionally guarded by a caller-side split on `HolyThurs`..
+     *   `Easter2` (Roman's `setYearCyclesAndVigils()` only calls `calculateVigilMass()` for events
+     *   strictly before `HolyThurs` or at/after `Easter2`), so `Easter` and `Easter2` themselves
+     *   remain nominally "eligible" here (they are Sundays with grade `HIGHER_SOLEMNITY`, and
+     *   `date > X->date` is false when the date IS `X->date`). This could generate a redundant
+     *   `Easter_vigil`/`Easter2_vigil` event alongside the already-anchored `EasterVigil` temporale
+     *   event. Left as-is pending Plan 9 ordo validation rather than silently guessing at an
+     *   additional exclusion rule not specified by the task brief.
+     *
+     * @param LiturgicalEvent $litEvent The liturgical event object to test for vigil eligibility.
+     * @return bool True if the liturgical event should have a vigil mass, false otherwise.
+     */
+    private function ambrosianEventCanHaveVigil(LiturgicalEvent $litEvent): bool
+    {
+        $PalmSun = $this->liturgicalEvents->getEvent('PalmSun');
+        $Easter  = $this->liturgicalEvents->getEvent('Easter');
+        $Easter2 = $this->liturgicalEvents->getEvent('Easter2');
+
+        if (null === $PalmSun || null === $Easter || null === $Easter2) {
+            throw new \InvalidArgumentException('Missing liturgical events: PalmSun, Easter, or Easter2.');
+        }
+
+        return (
+            ( self::dateIsSunday($litEvent->date) || $litEvent->grade->value >= LitGrade::SOLEMNITY->value )
+            && false === ( $litEvent->date > $PalmSun->date && $litEvent->date < $Easter->date )
+            && false === ( $litEvent->date > $Easter->date && $litEvent->date < $Easter2->date )
+        );
     }
 
     /**
@@ -1681,6 +1799,37 @@ final class LiturgicalEventCollection
                 $litEvent->has_vesper_i   = false;
             }
         }
+    }
+
+    /**
+     * Ambrosian rite only: given a liturgical event, determines whether it should have a
+     * first-vespers vigil Mass and, if so, creates it.
+     *
+     * Unlike the Roman `calculateVigilMass()`, this method does NOT attempt to resolve a
+     * coincidence between the newly-created vigil and another Solemnity that might already occupy
+     * the vigil date (no `SOLEMNITIES_LORD_BVM` precedence list, no `Year === 2022` decree special
+     * case — see {@see self::ambrosianEventCanHaveVigil()}'s docblock for the full rationale).
+     * It reuses the Roman `createVigilMassFor()` verbatim for the actual event creation and
+     * field-stamping (new `{key}_vigil` event, `is_vigil_mass`/`is_vigil_for` on the vigil,
+     * `has_vigil_mass`/`has_vesper_i`/`has_vesper_ii` on the parent, and the readings placeholder
+     * copied across), keeping this a thin day-granularity wrapper around the shared mechanism.
+     *
+     * **PROVISIONAL — flagged for Plan 9 ordo validation**, per
+     * {@see self::ambrosianEventCanHaveVigil()}.
+     *
+     * @param LiturgicalEvent $litEvent The liturgical event object to (potentially) create a vigil for.
+     * @return void
+     */
+    private function calculateAmbrosianVigilMass(LiturgicalEvent $litEvent): void
+    {
+        if (false === $this->ambrosianEventCanHaveVigil($litEvent)) {
+            return;
+        }
+
+        $VigilDate = clone( $litEvent->date );
+        $VigilDate->sub(new \DateInterval('P1D'));
+
+        $this->createVigilMassFor($litEvent, $VigilDate);
     }
 
     /**
