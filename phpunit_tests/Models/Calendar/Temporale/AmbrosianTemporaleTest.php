@@ -271,4 +271,18 @@ final class AmbrosianTemporaleTest extends TestCase
         // Octave weekdays remain their own anchors, not re-emitted:
         self::assertArrayHasKey('MonOctaveEaster', $d);
     }
+
+    public function testAfterPentecostWeekdaysFill2025(): void
+    {
+        $d = $this->runEngine(2025);
+        // (a) first ferial Monday after Pentecost (2025-06-08) = 2025-06-09, week 1
+        self::assertArrayHasKey('AfterPentecostWeekday1Monday', $d);
+        self::assertSame('2025-06-09', $d['AfterPentecostWeekday1Monday']);
+        // (b) Monday after the 1st Sunday after the Martyrdom (Sun 2025-08-31) = 2025-09-01
+        self::assertArrayHasKey('AfterPentecostMartyrdomWeekday1Monday', $d);
+        self::assertSame('2025-09-01', $d['AfterPentecostMartyrdomWeekday1Monday']);
+        // (c) Monday after the Dedication (Sun 2025-10-19) = 2025-10-20
+        self::assertArrayHasKey('AfterPentecostDedicationWeekday1Monday', $d);
+        self::assertSame('2025-10-20', $d['AfterPentecostDedicationWeekday1Monday']);
+    }
 }

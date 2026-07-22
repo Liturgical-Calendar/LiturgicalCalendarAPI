@@ -89,8 +89,28 @@ final class AmbrosianRealYearAssemblyTest extends TestCase
      * a Thursday) already in the calendar = 35 ferial days. None of these 35
      * dates collide with an existing temporale or sanctorale key, so all 35 are
      * additive. New total: 430 + 35 = 465.
+     *
+     * Plan 6 / Task 9 adds the after-Pentecost ferial-weekday fill
+     * (`calculateAfterPentecostWeekdays()`, via `fillFerialWeekdays()`), the
+     * largest of the seven fills (Jun-mid-Nov), across the same three n.42
+     * sub-blocks as the after-Pentecost Sundays. Keys are
+     * `AfterPentecost{,Martyrdom,Dedication}Weekday{N}{EnglishDay}`. For civil
+     * year 2025:
+     *   - (a) dopo Pentecoste: Mon after Pentecost (2025-06-09) .. Sat before the
+     *     1st Sunday after the Martyrdom (2025-08-31 is exclusive) = 83 days,
+     *     minus 11 Sundays = 72 ferial days.
+     *   - (b) dopo il Martirio: Mon after that Sunday (2025-09-01) .. Sat before
+     *     the Dedication (2025-10-19 is exclusive) = 48 days, minus 6 Sundays
+     *     = 42 ferial days.
+     *   - (c) dopo la Dedicazione: Mon after the Dedication (2025-10-20) .. Sat
+     *     before Advent I (2025-11-16 is exclusive) = 27 days, minus 3 Sundays
+     *     = 24 ferial days.
+     * None of these 72+42+24 = 138 dates collide with an existing temporale or
+     * sanctorale key (each block's Sundays are already-placed anchors, skipped
+     * by the fill's own Sunday check), so all 138 are additive. New total:
+     * 465 + 138 = 603.
      */
-    private const int EXPECTED_TOTAL_2025 = 465;
+    private const int EXPECTED_TOTAL_2025 = 603;
 
     public function testAssembleAmbrosianYear2025IncludesTemporaleAnchor(): void
     {

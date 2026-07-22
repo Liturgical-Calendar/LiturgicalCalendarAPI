@@ -38,6 +38,7 @@ final class AmbrosianTemporale implements TemporaleEngine
         $this->calculateAfterEpiphanySundays($ctx);
         $this->calculateAfterEpiphanyWeekdays($ctx);
         $this->calculateAfterPentecostSundays($ctx);
+        $this->calculateAfterPentecostWeekdays($ctx);
         $this->calculateAdventWeekdays($ctx);
         $this->calculateChristmasWeekdays($ctx);
         $this->calculateLentWeekdays($ctx);
@@ -567,6 +568,56 @@ final class AmbrosianTemporale implements TemporaleEngine
         }
         $ordinalStr = Utilities::getOrdinal($ordinal, $ctx->localeDateFormatter->getLocale(), $this->ordinalFormatter($ctx), LatinUtils::LATIN_ORDINAL);
         return sprintf('%s domenica %s', $ordinalStr, $phraseIt);
+    }
+
+    /**
+     * After-Pentecost ferie (n. 42), across the same three sub-blocks as
+     * `calculateAfterPentecostSundays()`, green (`LitColor::GREEN`), from the
+     * Monday after Pentecost to the Saturday before Advent I:
+     *   (a) dopo Pentecoste     — Monday after Pentecost … Sat before the 1st Sunday after the Martyrdom
+     *   (b) dopo il Martirio    — that Sunday's Monday … Sat before the Dedication
+     *   (c) dopo la Dedicazione — Monday after the Dedication … Sat before Advent I
+     * `DedicationDuomo`, `ChristKing`, and the after-Pentecost Sundays are all
+     * anchors already placed and are skipped by `inCalendar()`.
+     */
+    private function calculateAfterPentecostWeekdays(TemporaleContext $ctx): void
+    {
+        $year         = $ctx->params->Year;
+        $pentecost    = Utilities::calcGregEaster($year)->add(new \DateInterval('P49D'));
+        $martyrdomSun = ( clone $this->martyrdomAnchor($year) )->modify('next Sunday');
+        $dedication   = $ctx->cal->getLiturgicalEvent('DedicationDuomo')->date
+            ?? throw new ServiceUnavailableException('DedicationDuomo anchor must be placed before after-Pentecost ferie');
+        $advent1      = $this->adventOne($year);
+
+        // (a) dopo Pentecoste — anchored on Pentecost
+        $this->fillFerialBlock($ctx, ( clone $pentecost )->add(new \DateInterval('P1D')), $martyrdomSun, $pentecost, 'AfterPentecostWeekday', 'dopo Pentecoste', 'post Pentecosten');
+        // (b) dopo il Martirio — anchored on the 1st Sunday after the Martyrdom
+        $this->fillFerialBlock($ctx, ( clone $martyrdomSun )->add(new \DateInterval('P1D')), $dedication, $martyrdomSun, 'AfterPentecostMartyrdomWeekday', 'dopo il Martirio', 'post Martyrium');
+        // (c) dopo la Dedicazione — anchored on the Dedication Sunday
+        $this->fillFerialBlock($ctx, ( clone $dedication )->add(new \DateInterval('P1D')), $advent1, $dedication, 'AfterPentecostDedicationWeekday', 'dopo la Dedicazione', 'post Dedicationem');
+    }
+
+    /**
+     * Fill one after-Pentecost sub-block [$from, $to) with green ferie whose week
+     * number is measured from $blockAnchorSunday (block week 1 = the anchor's week).
+     */
+    private function fillFerialBlock(TemporaleContext $ctx, DateTime $from, DateTime $to, DateTime $blockAnchorSunday, string $keyStem, string $phraseIt, string $phraseLa): void
+    {
+        $this->fillFerialWeekdays(
+            $ctx,
+            $from,
+            $to,
+            LitColor::GREEN,
+            fn (DateTime $d): string => $keyStem . $this->blockWeekNumber($d, $blockAnchorSunday) . $this->englishWeekday($d),
+            fn (DateTime $d): string => $this->weekdayName($d, $phraseIt, $phraseLa, $this->blockWeekNumber($d, $blockAnchorSunday), $ctx)
+        );
+    }
+
+    /** Week number within an after-Pentecost sub-block: week 1 opens the Monday after $anchorSunday. */
+    private function blockWeekNumber(DateTime $date, DateTime $anchorSunday): int
+    {
+        $daysSince = (int) $anchorSunday->diff($date)->format('%a');
+        return (int) floor(( $daysSince - 1 ) / 7) + 1;
     }
 
     /** Lenten ferie: Lent I (excl.) … Saturday before Palm Sunday; Fridays are aliturgical (nn. 24–27). */
