@@ -5,8 +5,13 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Models\Calendar\Temporale;
 
 use LiturgicalCalendar\Api\DateTime;
+use LiturgicalCalendar\Api\Enum\LitColor;
+use LiturgicalCalendar\Api\Enum\LitEventType;
+use LiturgicalCalendar\Api\Enum\LitGrade;
+use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\LatinUtils;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Utilities;
 
@@ -30,6 +35,7 @@ final class AmbrosianTemporale implements TemporaleEngine
         $this->calculateLent($ctx);
         $this->calculateEasterCycle($ctx);
         $this->calculateAfterPentecostAnchors($ctx);
+        $this->calculateAfterEpiphanySundays($ctx);
     }
 
     /**
@@ -218,5 +224,69 @@ final class AmbrosianTemporale implements TemporaleEngine
         $christKing = ( clone $advent1 )->sub(new \DateInterval('P7D'));
         $ctx->propriumDeTempore['ChristKing']->setDate($christKing);
         $this->createPropriumDeTemporeLiturgicalEventByKey('ChristKing', $ctx);
+    }
+
+    /**
+     * Create a synthesized numbered Sunday (not drawn from the Proprium de Tempore
+     * data file): a dominical FEAST_LORD in green, season-stamped from its key.
+     * Used for the after-Epiphany and after-Pentecost Sunday blocks whose exact
+     * names/numbering are validated against a published ordo in a later plan.
+     */
+    private function synthesizeSunday(TemporaleContext $ctx, string $key, DateTime $date, string $name): LiturgicalEvent
+    {
+        $event               = new LiturgicalEvent($name, $date, LitColor::GREEN, LitEventType::MOBILE, LitGrade::FEAST_LORD);
+        $event->is_dominical = true;
+        $ctx->cal->addLiturgicalEvent($key, $event);
+        $this->stampSeason($event);
+        return $event;
+    }
+
+    /**
+     * After-Epiphany Sundays (n. 40): every Sunday strictly after BaptismLord
+     * (the Sunday after Jan 6) and strictly before Lent I (Easter − 42d).
+     * Numbered from 2 — BaptismLord is the block's 1st Sunday.
+     */
+    private function calculateAfterEpiphanySundays(TemporaleContext $ctx): void
+    {
+        $year    = $ctx->params->Year;
+        $baptism = DateTime::fromFormat('6-1-' . $year)->modify('next Sunday');
+        $lent1   = Utilities::calcGregEaster($year)->sub(new \DateInterval('P' . ( 6 * 7 ) . 'D'));
+
+        $ordinal = 2;
+        $sunday  = ( clone $baptism )->modify('next Sunday');
+        while ($sunday < $lent1) {
+            $key = 'AfterEpiphany' . $ordinal;
+            $this->synthesizeSunday($ctx, $key, clone $sunday, $this->afterEpiphanySundayName($ordinal, $ctx));
+            $ordinal++;
+            $sunday = ( clone $sunday )->modify('next Sunday');
+        }
+    }
+
+    /**
+     * Localized display name for an after-Epiphany Sunday, e.g. (it) "II domenica
+     * dopo l'Epifania", (la) "Dominica II post Epiphaniam". Exact ordo wording is
+     * validated in a later plan.
+     */
+    private function afterEpiphanySundayName(int $ordinal, TemporaleContext $ctx): string
+    {
+        if (LitLocale::LATIN_PRIMARY_LANGUAGE === LitLocale::$PRIMARY_LANGUAGE) {
+            return sprintf('Dominica %s post Epiphaniam', LatinUtils::LATIN_ORDINAL[$ordinal]);
+        }
+        $ordinalStr = Utilities::getOrdinal($ordinal, $ctx->localeDateFormatter->getLocale(), $this->ordinalFormatter($ctx), LatinUtils::LATIN_ORDINAL);
+        return sprintf("%s domenica dopo l'Epifania", $ordinalStr);
+    }
+
+    /**
+     * Feminine \NumberFormatter for ordinal rendering, cached per engine call.
+     */
+    private ?\NumberFormatter $ordinalFormatterCache = null;
+
+    private function ordinalFormatter(TemporaleContext $ctx): \NumberFormatter
+    {
+        if (null === $this->ordinalFormatterCache) {
+            $this->ordinalFormatterCache = new \NumberFormatter($ctx->localeDateFormatter->getLocale(), \NumberFormatter::SPELLOUT);
+            $this->ordinalFormatterCache->setTextAttribute(\NumberFormatter::DEFAULT_RULESET, '%spellout-ordinal-feminine');
+        }
+        return $this->ordinalFormatterCache;
     }
 }

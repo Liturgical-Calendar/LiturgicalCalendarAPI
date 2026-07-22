@@ -118,6 +118,19 @@ final class AmbrosianTemporaleTest extends TestCase
         }
     }
 
+    public function testAfterEpiphanySundays2025(): void
+    {
+        $d = $this->runEngine(2025);
+        self::assertSame('2025-01-19', $d['AfterEpiphany2']);
+        self::assertSame('2025-01-26', $d['AfterEpiphany3']);
+        self::assertSame('2025-02-02', $d['AfterEpiphany4']);
+        self::assertSame('2025-02-09', $d['AfterEpiphany5']);
+        self::assertSame('2025-02-16', $d['AfterEpiphany6']);
+        self::assertSame('2025-02-23', $d['AfterEpiphany7']);
+        self::assertSame('2025-03-02', $d['AfterEpiphany8']);
+        self::assertArrayNotHasKey('AfterEpiphany9', $d); // Mar 9 is Lent1
+    }
+
     public function testAnchorBlockSeasonsStamped2025(): void
     {
         $events = $this->runEngineEvents(2025);
