@@ -195,6 +195,14 @@ final class LiturgicalEventCollectionAmbrosianYearCyclesAndVigilsTest extends Te
         self::assertNotNull($easter, 'Expected a LiturgicalEvent for temporale key Easter');
         self::assertNotNull($easter2, 'Expected a LiturgicalEvent for temporale key Easter2');
 
+        // Precondition: both would otherwise SATISFY the eligibility predicate (a Sunday of grade
+        // HIGHER_SOLEMNITY), so the absence of a vigil below proves the exclusion is by KEY, not
+        // an incidental consequence of the date/grade conditions.
+        self::assertSame(7, (int) $easter->date->format('N'), 'Expected Easter 2025 to fall on a Sunday.');
+        self::assertSame(7, (int) $easter2->date->format('N'), 'Expected Easter II 2025 to fall on a Sunday.');
+        self::assertSame(LitGrade::HIGHER_SOLEMNITY, $easter->grade);
+        self::assertSame(LitGrade::HIGHER_SOLEMNITY, $easter2->grade);
+
         $cal->setAmbrosianYearCyclesAndVigils();
 
         self::assertNull($cal->getLiturgicalEvent('Easter_vigil'), 'Easter must not get a synthesized replacement vigil (EasterVigil already anchors it).');
