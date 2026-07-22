@@ -88,6 +88,14 @@ final class EventsHandlerRiteRoutingTest extends AbstractHandlerTestCase
         self::assertSame(StatusCode::BAD_REQUEST->value, $result['status']);
     }
 
+    public function testAmbrosianRejectsVANationalCalendarWith400(): void
+    {
+        // VA normalizes NationalCalendar to null in EventsParams, so this exercises the
+        // separate "VA was requested" marker rather than the plain non-null check.
+        $result = $this->handle(['nation', 'VA'], Rite::AMBROSIAN, '/events/ambrosian/nation/VA');
+        self::assertSame(StatusCode::BAD_REQUEST->value, $result['status']);
+    }
+
     public function testAmbrosianRejectsDiocesanCalendarWith400(): void
     {
         $result = $this->handle(['diocese', 'boston_us'], Rite::AMBROSIAN, '/events/ambrosian/diocese/boston_us');

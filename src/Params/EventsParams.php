@@ -31,6 +31,15 @@ class EventsParams implements ParamsInterface
     public ?string $DiocesanCalendar = null;
     public Rite $Rite                = Rite::ROMAN;
 
+    /**
+     * True when a `national_calendar=VA` filter was supplied on this request.
+     * VA normalizes `$NationalCalendar` back to null (it selects the General Roman
+     * Calendar, which has no national override), so this marker preserves the fact
+     * that a national filter WAS requested — needed to reject an Ambrosian request
+     * that (nonsensically) also asks for the VA national calendar.
+     */
+    private bool $vaNationalRequested = false;
+
     public readonly MetadataCalendars $calendarsMetadata;
 
     public const ALLOWED_PARAMS = [
@@ -155,7 +164,8 @@ class EventsParams implements ParamsInterface
                             throw new ValidationException($description);
                         }
                         if ($value === 'VA') {
-                            $forceVaInvariants = true;
+                            $forceVaInvariants         = true;
+                            $this->vaNationalRequested = true;
                         } else {
                             $this->NationalCalendar = strtoupper($value);
                         }
@@ -251,7 +261,7 @@ class EventsParams implements ParamsInterface
             return;
         }
 
-        if ($this->NationalCalendar !== null) {
+        if ($this->NationalCalendar !== null || $this->vaNationalRequested) {
             throw new ValidationException(
                 'The Ambrosian rite has no national calendars; request the comune ambrosiano events catalog (`/events/ambrosian`).'
             );

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Params;
 
 use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Params\EventsParams;
 use LiturgicalCalendar\Api\Router;
@@ -123,6 +124,29 @@ final class EventsParamsTest extends TestCase
         self::assertSame(LitLocale::LATIN_PRIMARY_LANGUAGE, $params->baseLocale);
         self::assertFalse($params->EternalHighPriest);
         self::assertNull($params->NationalCalendar);
+    }
+
+    public function testAmbrosianRejectsVaNationalCalendar(): void
+    {
+        // national_calendar=VA (from ?national_calendar=VA or /events/ambrosian/nation/VA)
+        // normalizes NationalCalendar back to null, but an Ambrosian request must still be
+        // rejected — the Ambrosian rite has no national layer. Guards against VA slipping
+        // past the plain "NationalCalendar !== null" check.
+        $params = new EventsParams(['national_calendar' => 'VA']);
+        $params->setRite(Rite::AMBROSIAN);
+
+        $this->expectException(ValidationException::class);
+        $params->validateRiteCompatibility();
+    }
+
+    public function testRomanAcceptsVaNationalCalendar(): void
+    {
+        // VA is valid for the Roman rite (it selects the General Roman Calendar).
+        $params = new EventsParams(['national_calendar' => 'VA']);
+        $params->setRite(Rite::ROMAN);
+
+        $params->validateRiteCompatibility();
+        $this->addToAssertionCount(1); // reached only if no exception was thrown
     }
 
     /**

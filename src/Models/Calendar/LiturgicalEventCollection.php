@@ -1540,11 +1540,11 @@ final class LiturgicalEventCollection
      *   Roman, this method is not additionally guarded by a caller-side split on `HolyThurs`..
      *   `Easter2` (Roman's `setYearCyclesAndVigils()` only calls `calculateVigilMass()` for events
      *   strictly before `HolyThurs` or at/after `Easter2`), so `Easter` and `Easter2` themselves
-     *   remain nominally "eligible" here (they are Sundays with grade `HIGHER_SOLEMNITY`, and
-     *   `date > X->date` is false when the date IS `X->date`). This could generate a redundant
-     *   `Easter_vigil`/`Easter2_vigil` event alongside the already-anchored `EasterVigil` temporale
-     *   event. Left as-is pending Plan 9 ordo validation rather than silently guessing at an
-     *   additional exclusion rule not specified by the task brief.
+     *   would otherwise remain nominally "eligible" here (they are Sundays with grade
+     *   `HIGHER_SOLEMNITY`, and `date > X->date` is false when the date IS `X->date`), generating a
+     *   redundant `Easter_vigil`/`Easter2_vigil` event alongside the already-anchored `EasterVigil`
+     *   temporale event. They are therefore excluded explicitly by key below; the remaining
+     *   eligibility rules stay provisional pending Plan 9 ordo validation.
      *
      * @param LiturgicalEvent $litEvent The liturgical event object to test for vigil eligibility.
      * @return bool True if the liturgical event should have a vigil mass, false otherwise.
@@ -1557,6 +1557,15 @@ final class LiturgicalEventCollection
 
         if (null === $PalmSun || null === $Easter || null === $Easter2) {
             throw new \InvalidArgumentException('Missing liturgical events: PalmSun, Easter, or Easter2.');
+        }
+
+        // `Easter` and `Easter2` are themselves anchored temporale events (Easter Sunday is
+        // preceded by its own `EasterVigil`; Easter II opens with the octave), so they must
+        // not receive a synthesized replacement vigil. The strict-inequality window checks
+        // below exclude the days *inside* the octave but not these two boundary dates, so
+        // exclude them explicitly by key.
+        if ('Easter' === $litEvent->event_key || 'Easter2' === $litEvent->event_key) {
+            return false;
         }
 
         return (

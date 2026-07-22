@@ -181,6 +181,29 @@ final class LiturgicalEventCollectionAmbrosianYearCyclesAndVigilsTest extends Te
     }
 
     /**
+     * `Easter` and `Easter2` are anchored temporale events (Easter Sunday is preceded by its own
+     * `EasterVigil`; Easter II opens the octave), so `ambrosianEventCanHaveVigil()` excludes them
+     * by key — no synthesized `Easter_vigil`/`Easter2_vigil` may be created even though both are
+     * Sundays of grade HIGHER_SOLEMNITY that would otherwise pass the eligibility predicate.
+     */
+    public function testEasterAndEaster2GetNoSynthesizedVigil2025(): void
+    {
+        $cal = $this->assembleAmbrosianYearWithReadingsPlaceholder(2025);
+
+        $easter  = $cal->getLiturgicalEvent('Easter');
+        $easter2 = $cal->getLiturgicalEvent('Easter2');
+        self::assertNotNull($easter, 'Expected a LiturgicalEvent for temporale key Easter');
+        self::assertNotNull($easter2, 'Expected a LiturgicalEvent for temporale key Easter2');
+
+        $cal->setAmbrosianYearCyclesAndVigils();
+
+        self::assertNull($cal->getLiturgicalEvent('Easter_vigil'), 'Easter must not get a synthesized replacement vigil (EasterVigil already anchors it).');
+        self::assertNull($cal->getLiturgicalEvent('Easter2_vigil'), 'Easter2 must not get a synthesized replacement vigil.');
+        self::assertNull($easter->has_vigil_mass, 'Easter must not be flagged as having a vigil mass.');
+        self::assertNull($easter2->has_vigil_mass, 'Easter2 must not be flagged as having a vigil mass.');
+    }
+
+    /**
      * A plain ferial weekday outside the Ambrosian "ordinary" seasons (e.g. an Advent weekday)
      * must NOT be eligible for a vigil: `ambrosianEventCanHaveVigil()` requires
      * `dateIsSunday() || grade >= SOLEMNITY`, and a ferial weekday satisfies neither.

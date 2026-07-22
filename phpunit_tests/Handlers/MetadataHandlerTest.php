@@ -43,9 +43,15 @@ final class MetadataHandlerTest extends AbstractHandlerTestCase
         self::assertContains('VA', $body['litcal_metadata']['national_calendars_keys']);
         // The Ambrosian comune calendar (/calendar/ambrosian) is always present.
         self::assertContains('ambrosian', $body['litcal_metadata']['ambrosian_calendars_keys']);
-        self::assertContains('it', $body['litcal_metadata']['ambrosian_calendars'][0]['locales']);
-        self::assertContains('la', $body['litcal_metadata']['ambrosian_calendars'][0]['locales']);
-        self::assertSame('ambrosian', $body['litcal_metadata']['ambrosian_calendars'][0]['rite']);
+        // Locate the comune entry by calendar_id rather than assuming a fixed array index.
+        $ambrosianEntries = array_values(array_filter(
+            $body['litcal_metadata']['ambrosian_calendars'],
+            static fn (array $c): bool => ( $c['calendar_id'] ?? null ) === 'ambrosian'
+        ));
+        self::assertCount(1, $ambrosianEntries, 'Expected exactly one Ambrosian comune calendar entry');
+        self::assertContains('it', $ambrosianEntries[0]['locales']);
+        self::assertContains('la', $ambrosianEntries[0]['locales']);
+        self::assertSame('ambrosian', $ambrosianEntries[0]['rite']);
     }
 
     public function testConditionalGetWithMatchingEtagReturns304(): void
