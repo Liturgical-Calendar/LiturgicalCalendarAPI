@@ -95,17 +95,10 @@ trait AmbrosianTemporaleHarnessTrait
     /** @return array<string,string> map of event_key => 'Y-m-d' after buildTemporale */
     private function runEngine(int $year): array
     {
-        $messages = [];
-        $ctx      = $this->buildContext($year, $messages);
-        ( new AmbrosianTemporale() )->buildTemporale($ctx);
-
-        $dates = [];
-        foreach ($ctx->cal->getLiturgicalEvents()->getKeys() as $key) {
-            $event = $ctx->cal->getLiturgicalEvent($key);
-            self::assertNotNull($event, "Expected a LiturgicalEvent for key $key");
-            $dates[$key] = $event->date->format('Y-m-d');
-        }
-        return $dates;
+        return array_map(
+            static fn (\LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent $event): string => $event->date->format('Y-m-d'),
+            $this->runEngineEvents($year)
+        );
     }
 
     /** @return array<string,\LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent> map of event_key => event after buildTemporale */

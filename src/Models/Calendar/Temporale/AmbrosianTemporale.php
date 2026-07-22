@@ -248,6 +248,28 @@ final class AmbrosianTemporale implements TemporaleEngine
     }
 
     /**
+     * Shared boundary anchors for the three after-Pentecost sub-blocks (n. 42),
+     * consumed by both the Sunday numbering and the ferial fill so their block
+     * boundaries stay aligned: Pentecost (Easter + 49d), the 1st Sunday after the
+     * Martyrdom (Aug 29, postponed to Sep 1 when Aug 29 is a Sunday), the Dedication
+     * of the Duomo (must already be placed), and Advent I. Each call returns fresh
+     * DateTime objects.
+     *
+     * @return array{pentecost: DateTime, martyrdomSun: DateTime, dedication: DateTime, advent1: DateTime}
+     */
+    private function afterPentecostSubBlockBoundaries(TemporaleContext $ctx): array
+    {
+        $year = $ctx->params->Year;
+        return [
+            'pentecost'    => Utilities::calcGregEaster($year)->add(new \DateInterval('P49D')),
+            'martyrdomSun' => ( clone $this->martyrdomAnchor($year) )->modify('next Sunday'),
+            'dedication'   => $ctx->cal->getLiturgicalEvent('DedicationDuomo')->date
+                ?? throw new ServiceUnavailableException('DedicationDuomo anchor must be placed before the after-Pentecost sub-blocks'),
+            'advent1'      => $this->adventOne($year),
+        ];
+    }
+
+    /**
      * After-Pentecost Sundays (n. 42), in three sub-blocks with per-block numbering:
      *   (a) dopo Pentecoste     — 1st Sunday after Pentecost … Sat before the 1st Sunday after the Martyrdom
      *   (b) dopo il Martirio    — that Sunday … Sat before the Dedication (3rd Sunday of October)
@@ -257,12 +279,8 @@ final class AmbrosianTemporale implements TemporaleEngine
      */
     private function calculateAfterPentecostSundays(TemporaleContext $ctx): void
     {
-        $year         = $ctx->params->Year;
-        $pentecost    = Utilities::calcGregEaster($year)->add(new \DateInterval('P49D'));
-        $martyrdomSun = ( clone $this->martyrdomAnchor($year) )->modify('next Sunday'); // 1st Sunday after the Martyrdom
-        $dedication   = $ctx->cal->getLiturgicalEvent('DedicationDuomo')->date
-            ?? throw new ServiceUnavailableException('DedicationDuomo anchor must be placed before after-Pentecost Sundays');
-        $advent1      = $this->adventOne($year);
+        ['pentecost' => $pentecost, 'martyrdomSun' => $martyrdomSun, 'dedication' => $dedication, 'advent1' => $advent1]
+            = $this->afterPentecostSubBlockBoundaries($ctx);
 
         // (a) dopo Pentecoste
         $this->numberSundayBlock(
@@ -643,12 +661,8 @@ final class AmbrosianTemporale implements TemporaleEngine
      */
     private function calculateAfterPentecostWeekdays(TemporaleContext $ctx): void
     {
-        $year         = $ctx->params->Year;
-        $pentecost    = Utilities::calcGregEaster($year)->add(new \DateInterval('P49D'));
-        $martyrdomSun = ( clone $this->martyrdomAnchor($year) )->modify('next Sunday');
-        $dedication   = $ctx->cal->getLiturgicalEvent('DedicationDuomo')->date
-            ?? throw new ServiceUnavailableException('DedicationDuomo anchor must be placed before after-Pentecost ferie');
-        $advent1      = $this->adventOne($year);
+        ['pentecost' => $pentecost, 'martyrdomSun' => $martyrdomSun, 'dedication' => $dedication, 'advent1' => $advent1]
+            = $this->afterPentecostSubBlockBoundaries($ctx);
 
         // (a) dopo Pentecoste — anchored on Pentecost
         $this->fillFerialBlock($ctx, ( clone $pentecost )->add(new \DateInterval('P1D')), $martyrdomSun, $pentecost, 'AfterPentecostWeekday', 'dopo Pentecoste', 'post Pentecosten');

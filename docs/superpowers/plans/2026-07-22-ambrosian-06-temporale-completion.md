@@ -61,8 +61,8 @@ unchanged. A single `is_aliturgical` boolean is added to the event models + sour
 
 | Block                     | Sunday keys                   | Ferial keys                                      | Season          | Colour  |
 | ------------------------- | ----------------------------- | ------------------------------------------------ | --------------- | ------- |
-| Advent (existing anchors) | `Advent1..6`                  | `AdventWeekday{DDD}` (see Task 6)                | ADVENT          | morello |
-| Christmas                 | anchors only                  | `ChristmasWeekday{DDD}`                          | CHRISTMAS       | white   |
+| Advent (existing anchors) | `Advent1..6`                  | `AdventWeekday{MMDD}` (see Task 6)               | ADVENT          | morello |
+| Christmas                 | anchors only                  | `ChristmasWeekday{MMDD}`                         | CHRISTMAS       | white   |
 | After-Epiphany            | `AfterEpiphany2..N`           | `AfterEpiphanyWeekday{N}{EnglishDay}`            | AFTER_EPIPHANY  | green   |
 | Lent (existing anchors)   | `Lent1..5`                    | `LentWeekday{N}{EnglishDay}`                     | LENT            | morello |
 | Easter (existing anchors) | `Easter2..7`                  | `EasterWeekday{N}{EnglishDay}`                   | EASTER          | white   |
@@ -70,7 +70,7 @@ unchanged. A single `is_aliturgical` boolean is added to the event models + sour
 | After-Pentecost (b)       | `AfterPentecostMartyrdom{N}`  | `AfterPentecostMartyrdomWeekday{N}{EnglishDay}`  | AFTER_PENTECOST | green   |
 | After-Pentecost (c)       | `AfterPentecostDedication{N}` | `AfterPentecostDedicationWeekday{N}{EnglishDay}` | AFTER_PENTECOST | green   |
 
-`{DDD}` = zero-padded day-of-month; `{N}` = week number within the block/season; `{EnglishDay}` = English weekday name (`Monday`…`Saturday`) — matching the Roman
+`{MMDD}` = zero-padded month+day; `{N}` = week number within the block/season; `{EnglishDay}` = English weekday name (`Monday`…`Saturday`) — matching the Roman
 `OrdWeekday{N}{EnglishDay}` key convention so keys are locale-independent.
 
 ---
@@ -871,9 +871,10 @@ git commit -m "feat(ambrosian): add ferial weekday-fill helper and after-Epiphan
 **Norms:** Advent ferie run from the Monday after Advent I to the Saturday before Christmas; the ferie *de Exceptáto* are **Dec 17–23** (Dec 18–23 when Dec 17 is a Sunday) (n. 39).
 Christmas ferie run from Dec 26 to the Saturday before Baptism, with `Circoncisione` (Jan 1) and `Epiphany` (Jan 6) already placed as anchors and skipped by `inCalendar()`.
 
-- Advent keys: `AdventWeekday{DDD}` (`{DDD}` = zero-padded day-of-month) — matches the Roman `AdventWeekdayDec{N}` family closely enough to classify under `/^AdventWeekday/`.
+- Advent keys: `AdventWeekday{MMDD}` (`{MMDD}` = zero-padded month+day, e.g. `AdventWeekday1217`) — Advent spans November **and** December, so bare day-of-month would
+  collide (Nov 17 vs Dec 17); month+day avoids it. Keys start with `AdventWeekday` → classify under `/^AdventWeekday/`.
   Colour morello. Names: the de Exceptáto days (Dec 17/18–23) get a distinct phrase; the rest use the week-of-Advent phrase.
-- Christmas keys: `ChristmasWeekday{DDD}`. Colour white.
+- Christmas keys: `ChristmasWeekday{MMDD}`. Colour white.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -882,20 +883,20 @@ Christmas ferie run from Dec 26 to the Saturday before Baptism, with `Circoncisi
     {
         $d = $this->runEngine(2025);
         // 2025: Dec 17 is Wednesday, so de Exceptáto = Dec 17..23 (Sundays excluded).
-        self::assertArrayHasKey('AdventWeekday017', $d);
-        self::assertSame('2025-12-17', $d['AdventWeekday017']);
-        self::assertArrayHasKey('AdventWeekday023', $d);
-        self::assertSame('2025-12-23', $d['AdventWeekday023']);
+        self::assertArrayHasKey('AdventWeekday1217', $d);
+        self::assertSame('2025-12-17', $d['AdventWeekday1217']);
+        self::assertArrayHasKey('AdventWeekday1223', $d);
+        self::assertSame('2025-12-23', $d['AdventWeekday1223']);
     }
 
     public function testChristmasFerieSkipAnchors2025(): void
     {
         $d = $this->runEngine(2025);
-        self::assertArrayHasKey('ChristmasWeekday029', $d); // Dec 29 2025 (Mon)
-        self::assertSame('2025-12-29', $d['ChristmasWeekday029']);
+        self::assertArrayHasKey('ChristmasWeekday1229', $d); // Dec 29 2025 (Mon)
+        self::assertSame('2025-12-29', $d['ChristmasWeekday1229']);
         // Jan 1 (Circoncisione) and Jan 6 (Epiphany) stay anchors, never overwritten:
-        self::assertArrayNotHasKey('ChristmasWeekday001', $d);
-        self::assertArrayNotHasKey('ChristmasWeekday006', $d);
+        self::assertArrayNotHasKey('ChristmasWeekday0101', $d);
+        self::assertArrayNotHasKey('ChristmasWeekday0106', $d);
     }
 ```
 
@@ -918,7 +919,7 @@ Expected: FAIL.
             $from,
             $to,
             LitColor::MORELLO,
-            fn (DateTime $d): string => 'AdventWeekday' . $d->format('d'),
+            fn (DateTime $d): string => 'AdventWeekday' . $d->format('md'),
             fn (DateTime $d): string => $this->adventWeekdayName($d, $ctx)
         );
     }
@@ -943,16 +944,16 @@ Expected: FAIL.
             $from,
             clone $baptism, // up to (not incl.) Baptism Sunday
             LitColor::WHITE,
-            fn (DateTime $d): string => 'ChristmasWeekday' . $d->format('d'),
+            fn (DateTime $d): string => 'ChristmasWeekday' . $d->format('md'),
             fn (DateTime $d): string => $this->weekdayName($d, 'del tempo di Natale', 'Nativitatis', null, $ctx)
         );
     }
 ```
 
-> **Implementer note on the Dec/Jan key collision:** `ChristmasWeekday{DDD}` uses day-of-month only, so Dec 27 → `ChristmasWeekday027` and Jan 3 → `ChristmasWeekday003`; no
-> collision within one civil year because the Christmas fill spans Dec 26–31 (`0DD` = 26–31) then Jan 2–5 (`00D`). If a future year needs both a Dec and Jan day with the same
-> day-number they still differ (`0DD` vs `00D` never overlap). The `fillFerialWeekdays` loop crosses the Dec→Jan boundary automatically because the same civil `$year` is used for
-> both anchors here (the harness builds a single civil year; the handler-level year semantics are Plan 7's concern).
+> **Implementer note on the Nov/Dec key collision:** the weekday key uses **month+day** (`$d->format('md')`, e.g. `AdventWeekday1117` vs `AdventWeekday1217`), NOT bare
+> day-of-month — Advent spans November **and** December, so day-of-month alone would collide (Nov 17 and Dec 17 both → `AdventWeekday17`) and silently drop the earlier ferie.
+> The Christmas fill likewise uses `ChristmasWeekday{md}` (Dec 26–31 → `1226`…`1231`). The de Exceptáto range check keeps `format('nd')`, which equals `md` for two-digit months
+> (11/12). The Christmas fill here is bounded to Dec 31; the January Christmas ferie (Jan 2 → Baptism) are added in Task 10, and handler-level liturgical-year merging is Plan 7's concern.
 
 - [ ] **Step 4: Wire into `buildTemporale()`**
 
