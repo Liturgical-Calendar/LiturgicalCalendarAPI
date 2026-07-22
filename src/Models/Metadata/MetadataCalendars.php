@@ -35,7 +35,13 @@ use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
  *         api_path:string
  *     }>,
  *     wider_regions_keys:string[],
- *     locales:string[]
+ *     locales:string[],
+ *     ambrosian_calendars:array<\stdClass&object{
+ *         calendar_id:string,
+ *         rite:string,
+ *         locales:string[]
+ *     }>,
+ *     ambrosian_calendars_keys:string[]
  * }
  *
  * @phpstan-type MetadataCalendarsArray array{
@@ -68,7 +74,13 @@ use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
  *         api_path:string
  *     }>,
  *     wider_regions_keys:string[],
- *     locales:string[]
+ *     locales:string[],
+ *     ambrosian_calendars:array<array{
+ *         calendar_id:string,
+ *         rite:string,
+ *         locales:string[]
+ *     }>,
+ *     ambrosian_calendars_keys:string[]
  * }
  */
 final class MetadataCalendars extends AbstractJsonRepresentation
@@ -97,6 +109,12 @@ final class MetadataCalendars extends AbstractJsonRepresentation
     /** @var string[] */
     public array $locales;
 
+    /** @var MetadataAmbrosianCalendarItem[] */
+    public array $ambrosian_calendars;
+
+    /** @var string[] */
+    public array $ambrosian_calendars_keys;
+
     /**
      * Constructs a MetadataCalendars object.
      *
@@ -108,6 +126,8 @@ final class MetadataCalendars extends AbstractJsonRepresentation
      * @param MetadataWiderRegionItem[] $wider_regions Wider regions, each serialized to an array.
      * @param string[] $wider_regions_keys The keys for the wider regions.
      * @param string[] $locales The locales supported by the national calendars.
+     * @param MetadataAmbrosianCalendarItem[] $ambrosian_calendars Non-Roman-rite comune calendars (e.g. the Ambrosian `/calendar/ambrosian` comune), each serialized to an array.
+     * @param string[] $ambrosian_calendars_keys The keys for the ambrosian calendars.
      */
     public function __construct(
         array $national_calendars      = [],
@@ -117,16 +137,20 @@ final class MetadataCalendars extends AbstractJsonRepresentation
         array $diocesan_groups         = [],
         array $wider_regions           = [],
         array $wider_regions_keys      = [],
-        array $locales                 = []
+        array $locales                 = [],
+        array $ambrosian_calendars      = [],
+        array $ambrosian_calendars_keys = []
     ) {
-        $this->national_calendars      = $national_calendars;
-        $this->national_calendars_keys = $national_calendars_keys;
-        $this->diocesan_calendars      = $diocesan_calendars;
-        $this->diocesan_calendars_keys = $diocesan_calendars_keys;
-        $this->diocesan_groups         = $diocesan_groups;
-        $this->wider_regions           = $wider_regions;
-        $this->wider_regions_keys      = $wider_regions_keys;
-        $this->locales                 = $locales;
+        $this->national_calendars       = $national_calendars;
+        $this->national_calendars_keys  = $national_calendars_keys;
+        $this->diocesan_calendars       = $diocesan_calendars;
+        $this->diocesan_calendars_keys  = $diocesan_calendars_keys;
+        $this->diocesan_groups          = $diocesan_groups;
+        $this->wider_regions            = $wider_regions;
+        $this->wider_regions_keys       = $wider_regions_keys;
+        $this->locales                  = $locales;
+        $this->ambrosian_calendars      = $ambrosian_calendars;
+        $this->ambrosian_calendars_keys = $ambrosian_calendars_keys;
     }
 
 
@@ -141,6 +165,8 @@ final class MetadataCalendars extends AbstractJsonRepresentation
      * - wider_regions: The wider regions, each serialized to an array.
      * - wider_regions_keys: The keys for the wider regions.
      * - locales: The locales supported by the national calendars.
+     * - ambrosian_calendars: The non-Roman-rite comune calendars, each serialized to an array.
+     * - ambrosian_calendars_keys: The keys for the ambrosian calendars.
      *
      * @return MetadataCalendarsArray The associative array containing the metadata or index of all available calendars (whether General Roman, national, or diocesan), diocesan groups, wider regions, and locales.
      *
@@ -148,38 +174,46 @@ final class MetadataCalendars extends AbstractJsonRepresentation
     public function jsonSerialize(): array
     {
         return [
-            'national_calendars'      => array_map(
+            'national_calendars'       => array_map(
                 /** @return array{calendar_id:string,locales:string[],missals:string[],settings:array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool},wider_region?:string,dioceses?:string[]} */
                 function (MetadataNationalCalendarItem $nc): array {
                     return $nc->jsonSerialize();
                 },
                 $this->national_calendars
             ),
-            'national_calendars_keys' => $this->national_calendars_keys,
-            'diocesan_calendars'      => array_map(
+            'national_calendars_keys'  => $this->national_calendars_keys,
+            'diocesan_calendars'       => array_map(
                 /** @return array{calendar_id:string,diocese:string,nation:string,locales:string[],timezone:string,group?:string,settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string,eternal_high_priest?:bool}} */
                 function (MetadataDiocesanCalendarItem $dc): array {
                     return $dc->jsonSerialize();
                 },
                 $this->diocesan_calendars
             ),
-            'diocesan_calendars_keys' => $this->diocesan_calendars_keys,
-            'diocesan_groups'         => array_map(
+            'diocesan_calendars_keys'  => $this->diocesan_calendars_keys,
+            'diocesan_groups'          => array_map(
                 /** @return array{group_name:string,dioceses:string[]} */
                 function (MetadataDiocesanGroupItem $dg): array {
                     return $dg->jsonSerialize();
                 },
                 $this->diocesan_groups
             ),
-            'wider_regions'           => array_map(
+            'wider_regions'            => array_map(
                 /** @return array{name:string,locales:string[],api_path:string} */
                 function (MetadataWiderRegionItem $wr): array {
                     return $wr->jsonSerialize();
                 },
                 $this->wider_regions
             ),
-            'wider_regions_keys'      => $this->wider_regions_keys,
-            'locales'                 => $this->locales
+            'wider_regions_keys'       => $this->wider_regions_keys,
+            'locales'                  => $this->locales,
+            'ambrosian_calendars'      => array_map(
+                /** @return array{calendar_id:string,rite:string,locales:string[]} */
+                function (MetadataAmbrosianCalendarItem $ac): array {
+                    return $ac->jsonSerialize();
+                },
+                $this->ambrosian_calendars
+            ),
+            'ambrosian_calendars_keys' => $this->ambrosian_calendars_keys
         ];
     }
 
@@ -195,6 +229,8 @@ final class MetadataCalendars extends AbstractJsonRepresentation
      * - wider_regions (array): An array of associative arrays that can be used to create MetadataWiderRegionItem objects.
      * - wider_regions_keys (string[]): An array of strings that are the keys of the wider regions.
      * - locales (string[]): An array of strings that are the locales supported by this set of calendars.
+     * - ambrosian_calendars (array): An array of associative arrays that can be used to create MetadataAmbrosianCalendarItem objects.
+     * - ambrosian_calendars_keys (string[]): An array of strings that are the keys of the ambrosian calendars.
      *
      * @param MetadataCalendarsArray $data The associative array containing the metadata or index of all available calendars (whether General Roman, national, or diocesan), diocesan groups, wider regions, and locales.
      * @return static
@@ -209,7 +245,9 @@ final class MetadataCalendars extends AbstractJsonRepresentation
             array_map([MetadataDiocesanGroupItem::class, 'fromArray'], $data['diocesan_groups']),
             array_map([MetadataWiderRegionItem::class, 'fromArray'], $data['wider_regions']),
             $data['wider_regions_keys'],
-            $data['locales']
+            $data['locales'],
+            array_map([MetadataAmbrosianCalendarItem::class, 'fromArray'], $data['ambrosian_calendars']),
+            $data['ambrosian_calendars_keys']
         );
     }
 
@@ -225,6 +263,8 @@ final class MetadataCalendars extends AbstractJsonRepresentation
      * - wider_regions: The wider regions, each serialized to an object.
      * - wider_regions_keys: The keys for the wider regions.
      * - locales: The locales supported by the national calendars.
+     * - ambrosian_calendars: The non-Roman-rite comune calendars, each serialized to an object.
+     * - ambrosian_calendars_keys: The keys for the ambrosian calendars.
      *
      * @param MetadataCalendarsObject $data The \stdClass object containing the metadata or index of all available calendars (whether General Roman, national, or diocesan), diocesan groups, wider regions, and locales.
      * @return static
@@ -239,7 +279,9 @@ final class MetadataCalendars extends AbstractJsonRepresentation
             array_map([MetadataDiocesanGroupItem::class, 'fromObject'], $data->diocesan_groups),
             array_map([MetadataWiderRegionItem::class, 'fromObject'], $data->wider_regions),
             $data->wider_regions_keys,
-            $data->locales
+            $data->locales,
+            array_map([MetadataAmbrosianCalendarItem::class, 'fromObject'], $data->ambrosian_calendars),
+            $data->ambrosian_calendars_keys
         );
     }
 
@@ -297,5 +339,18 @@ final class MetadataCalendars extends AbstractJsonRepresentation
     {
         $this->wider_regions[]      = $metadata;
         $this->wider_regions_keys[] = $metadata->name;
+    }
+
+    /**
+     * Adds a non-Roman-rite comune calendar metadata item to the collection
+     * (e.g. the Ambrosian `/calendar/ambrosian` comune).
+     *
+     * @param MetadataAmbrosianCalendarItem $metadata The ambrosian calendar
+     *                                                 metadata item to add.
+     */
+    public function pushAmbrosianCalendarMetadata(MetadataAmbrosianCalendarItem $metadata): void
+    {
+        $this->ambrosian_calendars[]      = $metadata;
+        $this->ambrosian_calendars_keys[] = $metadata->calendar_id;
     }
 }

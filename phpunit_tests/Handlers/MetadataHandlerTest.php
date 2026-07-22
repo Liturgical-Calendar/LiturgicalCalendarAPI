@@ -37,8 +37,15 @@ final class MetadataHandlerTest extends AbstractHandlerTestCase
         self::assertArrayHasKey('diocesan_calendars_keys', $body['litcal_metadata']);
         self::assertArrayHasKey('wider_regions', $body['litcal_metadata']);
         self::assertArrayHasKey('locales', $body['litcal_metadata']);
+        self::assertArrayHasKey('ambrosian_calendars', $body['litcal_metadata']);
+        self::assertArrayHasKey('ambrosian_calendars_keys', $body['litcal_metadata']);
         // The "VA" General Roman calendar is always present.
         self::assertContains('VA', $body['litcal_metadata']['national_calendars_keys']);
+        // The Ambrosian comune calendar (/calendar/ambrosian) is always present.
+        self::assertContains('ambrosian', $body['litcal_metadata']['ambrosian_calendars_keys']);
+        self::assertContains('it', $body['litcal_metadata']['ambrosian_calendars'][0]['locales']);
+        self::assertContains('la', $body['litcal_metadata']['ambrosian_calendars'][0]['locales']);
+        self::assertSame('ambrosian', $body['litcal_metadata']['ambrosian_calendars'][0]['rite']);
     }
 
     public function testConditionalGetWithMatchingEtagReturns304(): void
