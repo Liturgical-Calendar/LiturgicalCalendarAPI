@@ -1,0 +1,68 @@
+{
+    "litcal": [
+        {
+            "liturgical_event": {
+                "event_key": "BeatoManfredoSettala",
+                "color": [ "white" ],
+                "grade": 3,
+                "common": [ "Proper" ],
+                "day": 27,
+                "month": 1
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 0
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "StsProtaseGervase",
+                "color": [ "red" ],
+                "grade": 3,
+                "common": [ "Proper" ],
+                "day": 19,
+                "month": 6
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 1
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "StFrancisOfAssisi",
+                "color": [ "white" ],
+                "grade": 3,
+                "common": [ "Proper" ],
+                "day": 4,
+                "month": 10
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 2
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "SanLuigiGuanella",
+                "color": [ "white" ],
+                "grade": 6,
+                "common": [ "Proper" ],
+                "day": 24,
+                "month": 10
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 3
+            }
+        }
+    ],
+    "metadata": {
+        "nation": "CH",
+        "diocese_id": "lugano_ch",
+        "diocese_name": "Lugano",
+        "locales": [ "it_IT", "la_VA" ],
+        "timezone": "Europe/Rome",
+        "rite": "ambrosian"
+    }
+}
