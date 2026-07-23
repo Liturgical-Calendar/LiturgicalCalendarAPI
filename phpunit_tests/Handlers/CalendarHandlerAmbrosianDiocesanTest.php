@@ -8,6 +8,8 @@ use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\CalendarHandler;
+use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
+use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsFestive;
 use LiturgicalCalendar\Api\Params\CalendarParams;
@@ -255,5 +257,92 @@ final class CalendarHandlerAmbrosianDiocesanTest extends AbstractHandlerTestCase
         $calAfter = $calProp->getValue($handler);
         self::assertSame($calBefore, $calAfter, 'Expected the same LiturgicalEventCollection instance, untouched.');
         self::assertCount(0, $calAfter->getLiturgicalEvents()->getKeys(), 'Expected no events to have been added by a no-op overlay.');
+    }
+
+    /**
+     * Task 10 of Plan 8b: unlike the tests above (which reflection-invoke
+     * `loadDiocesanCalendarData()` / `applyAmbrosianDiocesanCalendar()` / `calculateAmbrosianCalendar()`
+     * directly), these drive the real, live `/calendar/ambrosian/diocese/{id}/{year}` route through the
+     * full public `CalendarHandler::handle()` entry point — the same one the router dispatches to —
+     * confirming `loadDiocesanCalendarData()` (called unconditionally in `handle()` before the
+     * Ambrosian/Roman branch) populates `$this->DiocesanData` in time for the Ambrosian branch's
+     * `calculateAmbrosianCalendar()` call to overlay it, exactly mirroring
+     * `CalendarHandlerAmbrosianResponseSchemaTest::handle()`'s pattern for the comune-only route.
+     */
+    private function handleFullRequest(array $pathParts, string $uri): \Psr\Http\Message\ResponseInterface
+    {
+        // See CalendarHandlerAmbrosianResponseSchemaTest::handle() docblock: LiturgicalEvent's
+        // process-lifetime internal_index counter must be reset so event_idx assertions don't
+        // depend on how many other tests ran earlier in the same PHPUnit process.
+        $prop = new \ReflectionProperty(LiturgicalEvent::class, 'internal_index');
+        $prop->setValue(null, 0);
+
+        $handler = new CalendarHandler($pathParts, Rite::AMBROSIAN);
+        $handler->setAllowedReturnTypes([ReturnTypeParam::JSON]);
+        return $handler->handle($this->requestFor('GET', $uri, ['Accept' => 'application/json']));
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function eventsByKey(array $body): array
+    {
+        $byKey = [];
+        foreach ($body['litcal'] as $event) {
+            $byKey[$event['event_key']] = $event;
+        }
+        return $byKey;
+    }
+
+    public function testMilanDioceseEndpointReturnsMilanProperAndComuneEvents(): void
+    {
+        $response = $this->handleFullRequest(
+            ['diocese', 'milano_it', '2025'],
+            '/calendar/ambrosian/diocese/milano_it/2025?year_type=CIVIL'
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+
+        $body  = $this->decodeJsonBody($response);
+        $byKey = $this->eventsByKey($body);
+
+        self::assertArrayHasKey(
+            'SanLuigiGuanella',
+            $byKey,
+            'Expected the Milan-proper diocesan event `SanLuigiGuanella` to be present in the live response.'
+        );
+        self::assertSame(6, $byKey['SanLuigiGuanella']['grade']);
+
+        self::assertArrayHasKey(
+            'AllSaints',
+            $byKey,
+            'Expected the comune Ambrosian sanctorale event `AllSaints` to still be present alongside the diocesan overlay.'
+        );
+    }
+
+    public function testLuganoDioceseEndpointReturns200WithNoCHNationError(): void
+    {
+        $response = $this->handleFullRequest(
+            ['diocese', 'lugano_ch', '2025'],
+            '/calendar/ambrosian/diocese/lugano_ch/2025?year_type=CIVIL'
+        );
+
+        self::assertSame(200, $response->getStatusCode());
+
+        $body  = $this->decodeJsonBody($response);
+        $byKey = $this->eventsByKey($body);
+
+        self::assertArrayHasKey('StFrancisOfAssisi', $byKey, 'Expected `StFrancisOfAssisi` to be present in the live response.');
+        self::assertSame(
+            3,
+            $byKey['StFrancisOfAssisi']['grade'],
+            'Expected the lugano_ch diocesan override (MEMORIAL, grade 3) to win over the comune FEAST definition.'
+        );
+
+        self::assertArrayHasKey(
+            'AllSaints',
+            $byKey,
+            'Expected the comune Ambrosian sanctorale event `AllSaints` to still be present alongside the diocesan overlay.'
+        );
     }
 }

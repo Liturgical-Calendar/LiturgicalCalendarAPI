@@ -5493,8 +5493,12 @@ final class CalendarHandler extends AbstractHandler
             $this->prepareL10N();
 
             if ($this->CalendarParams->Rite === Rite::AMBROSIAN) {
-                // Ambrosian rite: no national/diocesan layer yet (comune only; dioceses are Plan 8),
-                // so calculateAmbrosianCalendar() is the entire per-run generator. It already runs
+                // Ambrosian rite has no national calendar layer, but diocesan calendars are
+                // supported (Plan 8b): $this->DiocesanData is already populated above by
+                // loadDiocesanCalendarData() (called unconditionally before this branch), and
+                // calculateAmbrosianCalendar() overlays it internally via
+                // applyAmbrosianDiocesanCalendar() when a diocese was requested (no-op otherwise).
+                // calculateAmbrosianCalendar() is the entire per-run generator: it already runs
                 // setAmbrosianHolyDaysOfObligation(), setAmbrosianYearCyclesAndVigils(),
                 // calculatePsalterWeek(), and sortLiturgicalEvents() internally (see its docblock),
                 // so none of those Roman-branch calls are repeated here.
