@@ -443,14 +443,21 @@ final class CalendarHandler extends AbstractHandler
                 _('The name of the diocese could not be derived from the diocese ID "%s".'),
                 $this->CalendarParams->DiocesanCalendar
             );
-        } else {
-            ['diocese_name' => $dioceseName, 'country_iso' => $nation] = $idTransform;
-            $this->DioceseName                                         = $dioceseName;
-            $this->CalendarParams->NationalCalendar                    = strtoupper($nation);
-            $diocesanDataFile                                          = strtr(
-                JsonData::DIOCESAN_CALENDAR_FILE->path(),
+            return;
+        }
+
+        ['diocese_name' => $dioceseName, 'country_iso' => $nation] = $idTransform;
+        $this->DioceseName                                         = $dioceseName;
+
+        if ($this->CalendarParams->Rite === Rite::AMBROSIAN) {
+            // Ambrosian dioceses are not layered on top of a national calendar: the Ambrosian
+            // rite has no national calendars, and CalendarParams::validateRiteCompatibility()
+            // throws if NationalCalendar is set for the Ambrosian rite. Leave it null and load
+            // the diocese file from the Ambrosian tree instead of the Roman tree.
+            $diocesanDataFile = strtr(
+                JsonData::AMBROSIAN_DIOCESAN_CALENDAR_FILE->path(),
                 [
-                    '{nation}'       => $this->CalendarParams->NationalCalendar,
+                    '{nation}'       => strtoupper($nation),
                     '{diocese}'      => $this->CalendarParams->DiocesanCalendar,
                     '{diocese_name}' => $dioceseName
                 ]
@@ -458,7 +465,21 @@ final class CalendarHandler extends AbstractHandler
 
             $diocesanDataJson   = Utilities::jsonFileToObject($diocesanDataFile);
             $this->DiocesanData = DiocesanData::fromObject($diocesanDataJson);
+            return;
         }
+
+        $this->CalendarParams->NationalCalendar = strtoupper($nation);
+        $diocesanDataFile                       = strtr(
+            JsonData::DIOCESAN_CALENDAR_FILE->path(),
+            [
+                '{nation}'       => $this->CalendarParams->NationalCalendar,
+                '{diocese}'      => $this->CalendarParams->DiocesanCalendar,
+                '{diocese_name}' => $dioceseName
+            ]
+        );
+
+        $diocesanDataJson   = Utilities::jsonFileToObject($diocesanDataFile);
+        $this->DiocesanData = DiocesanData::fromObject($diocesanDataJson);
     }
 
     /**
