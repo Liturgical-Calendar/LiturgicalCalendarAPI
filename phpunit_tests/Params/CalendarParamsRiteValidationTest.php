@@ -35,22 +35,23 @@ final class CalendarParamsRiteValidationTest extends TestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testAmbrosianWhitelistedDioceseIsValid(): void
+    public function testAmbrosianDioceseDoesNotTripUpOnItsOwn(): void
     {
+        // validateRiteCompatibility() no longer enforces diocese/rite matching
+        // itself (that's rite-scoped in CalendarParams::validateDiocesanCalendarParam(),
+        // against each diocese's declared `rite` metadata, exercised in
+        // CalendarParamsTest). This reflection-based harness bypasses that
+        // method entirely, so validateRiteCompatibility() must accept any
+        // DiocesanCalendar value here, whitelisted or not.
         $this->params(Rite::AMBROSIAN, null, 'milano_it', 2025)->validateRiteCompatibility();
-        $this->addToAssertionCount(1);
+        $this->params(Rite::AMBROSIAN, null, 'romamo_it', 2025)->validateRiteCompatibility();
+        $this->addToAssertionCount(2);
     }
 
     public function testAmbrosianRejectsNationalCalendar(): void
     {
         $this->expectException(ValidationException::class);
         $this->params(Rite::AMBROSIAN, 'US', null, 2025)->validateRiteCompatibility();
-    }
-
-    public function testAmbrosianRejectsNonWhitelistedDiocese(): void
-    {
-        $this->expectException(ValidationException::class);
-        $this->params(Rite::AMBROSIAN, null, 'romamo_it', 2025)->validateRiteCompatibility();
     }
 
     public function testAmbrosianRejectsYearBelow1976(): void
