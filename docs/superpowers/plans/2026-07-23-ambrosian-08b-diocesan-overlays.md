@@ -225,7 +225,9 @@ comune grade). EXCLUDE `A Milano, nella basilica/chiesa di…` rows (→ 8c).
   event, reuse the comune's exact event_key (look it up in
   `rite/ambrosian/missals/propriumdesanctis_2024/propriumdesanctis.json`); milano_it has no overrides (those are
   non-Milan), so all milano_it rows are net-new diocesan keys.
-- `grade`: map `Memoria`→3 (MEMORIAL), `Memoria facoltativa`→2, `Festa`→5 (FEAST), `Solennità`→6 (SOLEMNITY) per `LitGrade`. `common`: `["Proper"]` unless the text names a common.
+- `grade`: map `Memoria`→3 (MEMORIAL), `Memoria facoltativa`→2, `Festa`→4 (FEAST — NOT 5; `LitGrade::FEAST_LORD`=5 is
+  reserved for feasts *of the Lord*, e.g. Presentation/Transfiguration, per the comune data — diocesan saints tagged
+  `Festa` are grade 4), `Solennità`→6 (SOLEMNITY) per `LitGrade`. `common`: `["Proper"]` unless the text names a common.
 - `color`: white for most saints; red for martyrs (`martire/martiri`).
 - `i18n/it_IT.json`: `{ event_key: "<Italian name>", … }`. `i18n/la_VA.json`: Latin names (use the Latin form where the
   Missal gives one; else a reasonable Latin rendering — flag any uncertain ones in the task report).

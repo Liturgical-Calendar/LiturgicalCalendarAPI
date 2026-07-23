@@ -46,7 +46,7 @@
             "liturgical_event": {
                 "event_key": "BeatoSerafinoMorazzone",
                 "color": [ "white" ],
-                "grade": 3,
+                "grade": 4,
                 "common": [ "Proper" ],
                 "day": 9,
                 "month": 5
@@ -312,7 +312,7 @@
             "liturgical_event": {
                 "event_key": "SanLuigiGuanella",
                 "color": [ "white" ],
-                "grade": 3,
+                "grade": 6,
                 "common": [ "Proper" ],
                 "day": 24,
                 "month": 10
