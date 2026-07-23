@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Models\Lectionary\AmbrosianReadings;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsFestive;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsFerial;
 use LiturgicalCalendar\Api\Router;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -96,5 +97,16 @@ final class AmbrosianReadingsTest extends TestCase
             ],
             $serialized['readings']
         );
+    }
+
+    public function testEmptyFestiveHasFiveEmptyFields(): void
+    {
+        $r = AmbrosianReadings::emptyFestive();
+        self::assertInstanceOf(ReadingsFestive::class, $r);
+        self::assertSame('', $r->first_reading);
+        self::assertSame('', $r->responsorial_psalm);
+        self::assertSame('', $r->second_reading);
+        self::assertSame('', $r->gospel_acclamation);
+        self::assertSame('', $r->gospel);
     }
 }
