@@ -2,6 +2,7 @@
 
 namespace LiturgicalCalendar\Api\Models\Metadata;
 
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
 
 /**
@@ -14,7 +15,8 @@ use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
  *      locales:string[],
  *      timezone:string,
  *      group?:string,
- *      settings?:DiocesanCalendarSettingsObject
+ *      settings?:DiocesanCalendarSettingsObject,
+ *      rite?:string
  * }
  *
  * @phpstan-type DiocesanCalendarMetadataArray array{
@@ -24,7 +26,8 @@ use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
  *      locales:string[],
  *      timezone:string,
  *      group?:string,
- *      settings?:DiocesanCalendarSettingsArray
+ *      settings?:DiocesanCalendarSettingsArray,
+ *      rite?:string
  * }
  */
 final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
@@ -44,6 +47,8 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
 
     public ?MetadataDiocesanCalendarSettings $settings;
 
+    public readonly Rite $rite;
+
     /**
      * Constructor for DiocesanCalendarMetadataItem.
      *
@@ -54,6 +59,7 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
      * @param string $timezone The timezone for the Diocesan Calendar.
      * @param string|null $group The group name for the Diocesan Calendar, or null if none.
      * @param MetadataDiocesanCalendarSettings|null $settings The settings for the Diocesan Calendar, or null if none.
+     * @param Rite $rite The liturgical rite of the Diocesan Calendar (defaults to Rite::ROMAN).
      */
     public function __construct(
         string $calendar_id,
@@ -62,7 +68,8 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
         array $locales,
         string $timezone,
         ?string $group = null,
-        ?MetadataDiocesanCalendarSettings $settings = null
+        ?MetadataDiocesanCalendarSettings $settings = null,
+        Rite $rite = Rite::ROMAN
     ) {
         $this->calendar_id = $calendar_id;
         $this->diocese     = $diocese;
@@ -71,6 +78,7 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
         $this->timezone    = $timezone;
         $this->group       = $group;
         $this->settings    = $settings;
+        $this->rite        = $rite;
     }
 
     /**
@@ -85,8 +93,9 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
      * - timezone: The timezone for the Diocesan Calendar.
      * - group: The group name for the Diocesan Calendar, if applicable.
      * - settings: The settings for the Diocesan Calendar, if applicable.
+     * - rite: The liturgical rite of the Diocesan Calendar.
      *
-     * @return array{calendar_id:string,diocese:string,nation:string,locales:string[],timezone:string,group?:string,settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string,eternal_high_priest?:bool}} The associative array containing the Diocesan Calendar's metadata.
+     * @return array{calendar_id:string,diocese:string,nation:string,locales:string[],timezone:string,group?:string,settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string,eternal_high_priest?:bool},rite:string} The associative array containing the Diocesan Calendar's metadata.
      */
     public function jsonSerialize(): array
     {
@@ -103,6 +112,7 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
         if (null !== $this->settings) {
             $retArr['settings'] = $this->settings->jsonSerialize();
         }
+        $retArr['rite'] = $this->rite->value;
         return $retArr;
     }
 
@@ -119,6 +129,7 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
      * The array may also have the following optional keys:
      * - group (string|null): The group name for the Diocesan Calendar, if applicable.
      * - settings (string[]|null): The settings for the Diocesan Calendar, if applicable.
+     * - rite (string, optional): The liturgical rite of the Diocesan Calendar ("roman"|"ambrosian"), defaults to "roman".
      *
      * @param DiocesanCalendarMetadataArray $data
      * @return static
@@ -134,6 +145,8 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
             $settings = MetadataDiocesanCalendarSettings::fromArray($data['settings']);
         }
 
+        $rite = isset($data['rite']) && is_string($data['rite']) ? Rite::from($data['rite']) : Rite::ROMAN;
+
         return new static(
             $data['calendar_id'],
             $data['diocese'],
@@ -141,7 +154,8 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
             $data['locales'],
             $data['timezone'],
             $data['group'] ?? null,
-            $settings
+            $settings,
+            $rite
         );
     }
 
@@ -158,6 +172,7 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
      * The object may also have the following optional properties:
      * - group (string|null): The group name for the Diocesan Calendar, if applicable.
      * - settings (string[]|null): The settings for the Diocesan Calendar, if applicable.
+     * - rite (string, optional): The liturgical rite of the Diocesan Calendar ("roman"|"ambrosian"), defaults to "roman".
      *
      * @param DiocesanCalendarMetadataObject $data
      * @return static
@@ -173,6 +188,8 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
             $settings = MetadataDiocesanCalendarSettings::fromObject($data->settings);
         }
 
+        $rite = isset($data->rite) && is_string($data->rite) ? Rite::from($data->rite) : Rite::ROMAN;
+
         return new static(
             $data->calendar_id,
             $data->diocese,
@@ -180,7 +197,8 @@ final class MetadataDiocesanCalendarItem extends AbstractJsonRepresentation
             $data->locales,
             $data->timezone,
             $data->group ?? null,
-            $settings
+            $settings,
+            $rite
         );
     }
 }
