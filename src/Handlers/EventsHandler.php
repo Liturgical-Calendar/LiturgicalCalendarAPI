@@ -388,8 +388,8 @@ final class EventsHandler extends AbstractHandler
      * Ambrosian rite only: resolves the locale to use for the Ambrosian source data i18n files.
      *
      * The Ambrosian temporale and sanctorale i18n data only ship `it` and `la` locale files (see
-     * `jsondata/sourcedata/missals/ambrosian/propriumdetempore/i18n` and
-     * `jsondata/sourcedata/missals/ambrosian/propriumdesanctis_2024/i18n`). If the request's base
+     * `jsondata/sourcedata/rite/ambrosian/missals/propriumdetempore/i18n` and
+     * `jsondata/sourcedata/rite/ambrosian/missals/propriumdesanctis_2024/i18n`). If the request's base
      * locale isn't one of those, fall back to Italian (`it`), mirroring
      * `CalendarHandler::loadAmbrosianPropriumDeTemporeData()` / `addAmbrosianSanctoraleToCalendar()`.
      */

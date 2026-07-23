@@ -12,7 +12,7 @@ use LiturgicalCalendar\Tests\ApiTestCase;
  * The Decrees endpoint serves Dicastery for Divine Worship rulings that
  * modify the liturgical calendar (e.g. adding Mary Mother of the Church
  * 2018, upgrading St Mary Magdalene 2016). DecreesHandler loads these from
- * jsondata/sourcedata/decrees/decrees.json + applies the requested locale's
+ * jsondata/sourcedata/rite/roman/decrees/decrees.json + applies the requested locale's
  * i18n strings.
  */
 final class DecreesTest extends ApiTestCase
