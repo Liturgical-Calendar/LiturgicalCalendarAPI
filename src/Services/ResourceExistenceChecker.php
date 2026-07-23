@@ -15,9 +15,9 @@ use LiturgicalCalendar\Api\Enum\JsonData;
  * Resource types and their backing-data locations:
  *   general_roman_calendar       — fixed; always exists
  *   general_roman_calendar_test  — fixed; always exists
- *   national_calendar            — jsondata/sourcedata/calendars/nations/{id}/{id}.json
- *   wider_region                 — jsondata/sourcedata/calendars/wider_regions/{id}/ (directory)
- *   diocesan_calendar            — jsondata/sourcedata/calendars/dioceses/{nation}/{id}/ (directory, glob)
+ *   national_calendar            — jsondata/sourcedata/rite/roman/calendars/nations/{id}/{id}.json
+ *   wider_region                 — jsondata/sourcedata/rite/roman/calendars/wider_regions/{id}/ (directory)
+ *   diocesan_calendar            — jsondata/sourcedata/rite/roman/calendars/dioceses/{nation}/{id}/ (directory, glob)
  *   national_calendar_test       — governance scope; always treated as existing
  *   diocesan_calendar_test       — governance scope; always treated as existing
  */

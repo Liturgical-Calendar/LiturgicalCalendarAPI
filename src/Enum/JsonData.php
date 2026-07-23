@@ -170,13 +170,13 @@ enum JsonData: string
 
     /**
      * The folder containing readings from the lectionary for every possible liturgical event in the General Roman Calendar.
-     * Evaluates to 'jsondata/sourcedata/lectionarium'.
+     * Evaluates to 'jsondata/sourcedata/rite/roman/lectionary'.
      */
     case LECTIONARY_FOLDER = JsonDataConstants::LECTIONARY_FOLDER;
 
     /**
      * The folder containing readings from the lectionary for Sundays and Festivities - Year A (General Roman Calendar).
-     * Evaluates to 'jsondata/sourcedata/lectionarium/dominicale_et_festivum_A'.
+     * Evaluates to 'jsondata/sourcedata/rite/roman/lectionary/dominicale_et_festivum_A'.
      */
     case LECTIONARY_SUNDAYS_SOLEMNITIES_A_FOLDER = JsonDataConstants::LECTIONARY_SUNDAYS_SOLEMNITIES_A_FOLDER;
 
@@ -306,7 +306,7 @@ enum JsonData: string
 
     /**
      * The folder containing readings for memorials created via Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments.
-     * Evalates to 'jsondata/sourcedata/decrees/lectionary';
+     * Evaluates to 'jsondata/sourcedata/rite/roman/decrees/lectionary';
      */
     case LECTIONARY_DECREES_FOLDER = JsonDataConstants::LECTIONARY_DECREES_FOLDER;
 

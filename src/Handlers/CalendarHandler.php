@@ -883,7 +883,7 @@ final class CalendarHandler extends AbstractHandler
      * Retrieve the Ambrosian Proprium de Tempore data, along with its i18n data.
      *
      * The Ambrosian Proprium de Tempore i18n data only ships `it` and `la` locales
-     * (see `jsondata/sourcedata/missals/ambrosian/propriumdetempore/i18n`). If the
+     * (see `jsondata/sourcedata/rite/ambrosian/missals/propriumdetempore/i18n`). If the
      * requested primary language isn't one of those, we fall back to Italian (`it`)
      * rather than failing the request, mirroring how the Vatican/General Roman
      * Calendar distinction elsewhere in this handler defaults to a sensible locale
@@ -1178,7 +1178,7 @@ final class CalendarHandler extends AbstractHandler
         /**
          * If the Roman Missal has lectionary data, we load that too.
          * Latin edition Roman Missals do not have lectionary data,
-         * because that is taken care already by the `jsondata/sourcedata/lectionary` folder,
+         * because that is taken care already by the `jsondata/sourcedata/rite/roman/lectionary` folder,
          * which corresponds to the most recent edition of the Lectionaries
          * (at least as published in Italy, which is kind of the main reference when it comes to Lectionaries?).
          * Therefore we can safely use the fully identified locale (primary language with country identifier)

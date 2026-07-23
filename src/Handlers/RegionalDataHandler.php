@@ -405,7 +405,7 @@ final class RegionalDataHandler extends AbstractHandler
      *
      * This is a private method and should only be called from {@see \LiturgicalCalendar\Api\Handlers\RegionalDataHandler::createCalendar()}.
      *
-     * The national calendar data resource is created in the `jsondata/sourcedata/calendars/nations/` directory.
+     * The national calendar data resource is created in the `jsondata/sourcedata/rite/roman/calendars/nations/` directory.
      *
      * This method ensures the necessary directories for storing national calendar data are created.
      * It processes the internationalization (i18n) data provided in the payload, saving it to the appropriate
@@ -537,7 +537,7 @@ final class RegionalDataHandler extends AbstractHandler
      *
      * This is a private method and should only be called from {@see \LiturgicalCalendar\Api\Handlers\RegionalDataHandler::createCalendar()}.
      *
-     * The resource is created in the `jsondata/sourcedata/calendars/wider_regions/` directory.
+     * The resource is created in the `jsondata/sourcedata/rite/roman/calendars/wider_regions/` directory.
      *
      * This method ensures the necessary directories for storing wider region calendar data are created.
      * It processes the internationalization (i18n) data provided in the payload, saving it to the appropriate
@@ -622,7 +622,7 @@ final class RegionalDataHandler extends AbstractHandler
      *
      * This is a private method and should only be called from {@see \LiturgicalCalendar\Api\Handlers\RegionalDataHandler::handleRequestMethod()}.
      *
-     * The resource is created in the `jsondata/sourcedata/calendars/` directory; if it already exists, a 409 Conflict is returned.
+     * The resource is created in the `jsondata/sourcedata/rite/roman/calendars/` directory; if it already exists, a 409 Conflict is returned.
      *
      * If the payload is invalid, the response will be a JSON error response with a 422 Unprocessable Content status code.
      *
@@ -651,7 +651,7 @@ final class RegionalDataHandler extends AbstractHandler
      *
      * It is private as it is called from {@see \LiturgicalCalendar\Api\Handlers\RegionalDataHandler::updateCalendar()}.
      *
-     * The resource is updated in the `jsondata/sourcedata/calendars/nations/` directory.
+     * The resource is updated in the `jsondata/sourcedata/rite/roman/calendars/nations/` directory.
      *
      * If the resource to update is not found in the national calendars index, the response will be a JSON error response with a status code of 404 Not Found.
      * If the resource to update is not writable or the write was not successful, the response will be a JSON error response with a status code of 503 Service Unavailable.
@@ -1044,7 +1044,7 @@ final class RegionalDataHandler extends AbstractHandler
      *
      * This is a private method and should only be called from {@see \LiturgicalCalendar\Api\Handlers\RegionalDataHandler::handleRequestMethod()}.
      *
-     * The resource is deleted from the `jsondata/sourcedata/calendars/` directory.
+     * The resource is deleted from the `jsondata/sourcedata/rite/roman/calendars/` directory.
      *
      * If the resource is successfully deleted, the response will be a JSON object
      * containing a success message.
