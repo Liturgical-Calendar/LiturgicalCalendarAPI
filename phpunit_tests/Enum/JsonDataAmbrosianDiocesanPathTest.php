@@ -48,4 +48,36 @@ final class JsonDataAmbrosianDiocesanPathTest extends TestCase
             JsonData::AMBROSIAN_DIOCESAN_CALENDAR_FILE->value
         );
     }
+
+    public function testAmbrosianDiocesanCalendarI18nFolderConstant(): void
+    {
+        $this->assertSame(
+            'jsondata/sourcedata/rite/ambrosian/calendars/dioceses/{nation}/{diocese}/i18n',
+            JsonDataConstants::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FOLDER
+        );
+    }
+
+    public function testAmbrosianDiocesanCalendarI18nFileConstant(): void
+    {
+        $this->assertSame(
+            'jsondata/sourcedata/rite/ambrosian/calendars/dioceses/{nation}/{diocese}/i18n/{locale}.json',
+            JsonDataConstants::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FILE
+        );
+    }
+
+    public function testAmbrosianDiocesanCalendarI18nFolderEnumValue(): void
+    {
+        $this->assertSame(
+            JsonDataConstants::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FOLDER,
+            JsonData::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FOLDER->value
+        );
+    }
+
+    public function testAmbrosianDiocesanCalendarI18nFileEnumValue(): void
+    {
+        $this->assertSame(
+            JsonDataConstants::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FILE,
+            JsonData::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FILE->value
+        );
+    }
 }

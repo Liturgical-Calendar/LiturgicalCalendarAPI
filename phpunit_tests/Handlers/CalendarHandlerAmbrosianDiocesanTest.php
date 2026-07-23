@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Handlers;
 
+use LiturgicalCalendar\Api\Enum\LitGrade;
+use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\CalendarHandler;
+use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsFestive;
 use LiturgicalCalendar\Api\Params\CalendarParams;
 
 /**
@@ -23,6 +27,23 @@ use LiturgicalCalendar\Api\Params\CalendarParams;
  */
 final class CalendarHandlerAmbrosianDiocesanTest extends AbstractHandlerTestCase
 {
+    private static string $originalPrimaryLanguage = '';
+    private static string $originalRuntimeLocale   = '';
+
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+        self::$originalPrimaryLanguage = LitLocale::$PRIMARY_LANGUAGE;
+        self::$originalRuntimeLocale   = LitLocale::$RUNTIME_LOCALE;
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        LitLocale::$PRIMARY_LANGUAGE = self::$originalPrimaryLanguage;
+        LitLocale::$RUNTIME_LOCALE   = self::$originalRuntimeLocale;
+        parent::tearDownAfterClass();
+    }
+
     /**
      * Builds a `CalendarHandler` with `CalendarParams` set to request the given diocese under the
      * given rite, then invokes the private `loadDiocesanCalendarData()` via reflection.
@@ -95,5 +116,144 @@ final class CalendarHandlerAmbrosianDiocesanTest extends AbstractHandlerTestCase
 
         self::assertNotNull($diocesanData);
         self::assertSame('agrige_it', $diocesanData->metadata->diocese_id);
+    }
+
+    /**
+     * Task 9 of Plan 8b: `CalendarHandler::applyAmbrosianDiocesanCalendar()` — the add-all-then-
+     * resolve, diocesan-wins overlay wired into `calculateAmbrosianCalendar()` between
+     * `addAmbrosianSanctoraleToCalendar()` and `backfillAmbrosianReadingsPlaceholder()`.
+     *
+     * Builds a fully-assembled `CalendarHandler` (real `CalendarParams`, an empty `Cal`, and a
+     * `localeDateFormatter`, exactly like `CalendarHandlerAmbrosianOrchestratorTest::assembleHandler()`),
+     * then also reflection-invokes `loadDiocesanCalendarData()` so `$this->DiocesanData` is
+     * populated from the real on-disk diocesan JSON before `calculateAmbrosianCalendar()` runs.
+     */
+    private function assembleHandlerForDiocese(string $dioceseId, int $year = 2025): CalendarHandler
+    {
+        LitLocale::$PRIMARY_LANGUAGE = 'it';
+        LitLocale::$RUNTIME_LOCALE   = 'it_IT';
+
+        $params = new CalendarParams();
+        $params->setRite(Rite::AMBROSIAN);
+        $params->setParams(['year' => $year, 'locale' => 'it']);
+        $params->DiocesanCalendar = $dioceseId;
+
+        $handler = new CalendarHandler([], Rite::AMBROSIAN);
+
+        $handlerRef = new \ReflectionClass($handler);
+
+        $paramsProp = $handlerRef->getProperty('CalendarParams');
+        $paramsProp->setAccessible(true);
+        $paramsProp->setValue($handler, $params);
+
+        $loadMethod = $handlerRef->getMethod('loadDiocesanCalendarData');
+        $loadMethod->setAccessible(true);
+        $loadMethod->invoke($handler);
+
+        $calProp = $handlerRef->getProperty('Cal');
+        $calProp->setAccessible(true);
+        $calProp->setValue($handler, new LiturgicalEventCollection($params));
+
+        $localeDateFormatterProp = $handlerRef->getProperty('localeDateFormatter');
+        $localeDateFormatterProp->setAccessible(true);
+        $localeDateFormatterProp->setValue($handler, new \LiturgicalCalendar\Api\LocaleDateFormatter(LitLocale::$RUNTIME_LOCALE));
+
+        return $handler;
+    }
+
+    private function runOrchestrator(CalendarHandler $handler): LiturgicalEventCollection
+    {
+        $handlerRef = new \ReflectionClass($handler);
+
+        $method = $handlerRef->getMethod('calculateAmbrosianCalendar');
+        $method->setAccessible(true);
+        $method->invoke($handler);
+
+        $calProp = $handlerRef->getProperty('Cal');
+        $calProp->setAccessible(true);
+        /** @var LiturgicalEventCollection $cal */
+        $cal = $calProp->getValue($handler);
+
+        return $cal;
+    }
+
+    /**
+     * Net-new diocesan key: `SanLuigiGuanella` (24 October, grade SOLEMNITY) is proper to the
+     * Archdiocese of Milan and does not exist in the comune Ambrosian sanctorale at all. After the
+     * full orchestrator runs for `milano_it` 2025, it must be present in `$this->Cal`, carry its
+     * diocesan i18n name (non-empty), and carry festive (5-field) readings.
+     */
+    public function testMilanProperEventIsAddedWithGradeNameAndFestiveReadings(): void
+    {
+        $handler = $this->assembleHandlerForDiocese('milano_it', 2025);
+        $cal     = $this->runOrchestrator($handler);
+
+        $event = $cal->getLiturgicalEvent('SanLuigiGuanella');
+        self::assertNotNull($event, 'Expected `SanLuigiGuanella` (Milan-proper) to be present after the diocesan overlay ran.');
+        self::assertSame(LitGrade::SOLEMNITY, $event->grade);
+        self::assertNotSame('', $event->name, 'Expected the diocesan i18n name to be applied (non-empty).');
+        self::assertInstanceOf(ReadingsFestive::class, $event->readings);
+    }
+
+    /**
+     * Diocesan-wins override: `StFrancisOfAssisi` (4 October) is FEAST (grade 4) in the comune
+     * Ambrosian sanctorale but MEMORIAL (grade 3) in the `lugano_ch` diocesan calendar. After the
+     * overlay runs, the diocesan grade must win (the comune definition is removed and replaced,
+     * not merely shadowed).
+     */
+    public function testLuganoOverrideDowngradesStFrancisGradeToMemorial(): void
+    {
+        $handler = $this->assembleHandlerForDiocese('lugano_ch', 2025);
+        $cal     = $this->runOrchestrator($handler);
+
+        $event = $cal->getLiturgicalEvent('StFrancisOfAssisi');
+        self::assertNotNull($event, 'Expected `StFrancisOfAssisi` to be present after the diocesan overlay ran.');
+        self::assertSame(
+            LitGrade::MEMORIAL,
+            $event->grade,
+            'Expected the diocesan override (MEMORIAL) to win over the comune definition (FEAST).'
+        );
+        self::assertInstanceOf(ReadingsFestive::class, $event->readings);
+    }
+
+    /**
+     * Comune-unchanged guarantee: when no diocese is requested (`$this->DiocesanData` stays null),
+     * `applyAmbrosianDiocesanCalendar()` must be a strict no-op — it must not add, remove, or
+     * otherwise touch any event already in `$this->Cal`.
+     */
+    public function testNoOpWhenDiocesanDataIsNull(): void
+    {
+        LitLocale::$PRIMARY_LANGUAGE = 'it';
+        LitLocale::$RUNTIME_LOCALE   = 'it_IT';
+
+        $params = new CalendarParams();
+        $params->setRite(Rite::AMBROSIAN);
+        $params->setParams(['year' => 2025, 'locale' => 'it']);
+
+        $handler = new CalendarHandler([], Rite::AMBROSIAN);
+
+        $handlerRef = new \ReflectionClass($handler);
+
+        $paramsProp = $handlerRef->getProperty('CalendarParams');
+        $paramsProp->setAccessible(true);
+        $paramsProp->setValue($handler, $params);
+
+        $calBefore = new LiturgicalEventCollection($params);
+        $calProp   = $handlerRef->getProperty('Cal');
+        $calProp->setAccessible(true);
+        $calProp->setValue($handler, $calBefore);
+
+        $dataProp = $handlerRef->getProperty('DiocesanData');
+        $dataProp->setAccessible(true);
+        self::assertNull($dataProp->getValue($handler), 'Precondition: DiocesanData must be null for a comune-only request.');
+
+        $method = $handlerRef->getMethod('applyAmbrosianDiocesanCalendar');
+        $method->setAccessible(true);
+        $method->invoke($handler);
+
+        /** @var LiturgicalEventCollection $calAfter */
+        $calAfter = $calProp->getValue($handler);
+        self::assertSame($calBefore, $calAfter, 'Expected the same LiturgicalEventCollection instance, untouched.');
+        self::assertCount(0, $calAfter->getLiturgicalEvents()->getKeys(), 'Expected no events to have been added by a no-op overlay.');
     }
 }

@@ -181,6 +181,19 @@ enum JsonData: string
     case AMBROSIAN_DIOCESAN_CALENDAR_FILE = JsonDataConstants::AMBROSIAN_DIOCESAN_CALENDAR_FILE;
 
     /**
+     * The folder containing i18n files for Ambrosian diocesan calendars, with placeholders for the actual nation and diocese names.
+     * Evaluates to 'jsondata/sourcedata/rite/ambrosian/calendars/dioceses/{nation}/{diocese}/i18n'.
+     */
+    case AMBROSIAN_DIOCESAN_CALENDAR_I18N_FOLDER = JsonDataConstants::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FOLDER;
+
+    /**
+     * The file containing the i18n data for the specified Ambrosian diocesan calendar,
+     * with placeholders for the actual nation name, diocese name, and locale.
+     * Evaluates to 'jsondata/sourcedata/rite/ambrosian/calendars/dioceses/{nation}/{diocese}/i18n/{locale}.json'.
+     */
+    case AMBROSIAN_DIOCESAN_CALENDAR_I18N_FILE = JsonDataConstants::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FILE;
+
+    /**
      * The folder containing readings from the lectionary for every possible liturgical event in the General Roman Calendar.
      * Evaluates to 'jsondata/sourcedata/rite/roman/lectionary'.
      */
