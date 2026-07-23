@@ -54,7 +54,7 @@ final class AmbrosianMissalTest extends TestCase
         $path = AmbrosianMissal::getSanctoraleFileName(AmbrosianMissal::EDITIO_2024);
         self::assertIsString($path);
         self::assertStringContainsString(
-            'ambrosian/propriumdesanctis_2024/propriumdesanctis.json',
+            'ambrosian/missals/propriumdesanctis_2024/propriumdesanctis.json',
             $path
         );
     }
@@ -69,7 +69,7 @@ final class AmbrosianMissalTest extends TestCase
     {
         $path = AmbrosianMissal::getSanctoraleI18nFilePath(AmbrosianMissal::EDITIO_2024);
         self::assertIsString($path);
-        self::assertStringContainsString('ambrosian/propriumdesanctis_2024/i18n/', $path);
+        self::assertStringContainsString('ambrosian/missals/propriumdesanctis_2024/i18n/', $path);
     }
 
     public function testGetSanctoraleI18nFilePathRejectsInvalidId(): void

@@ -116,7 +116,7 @@ final class CalendarHandlerAmbrosianSanctoraleLoadTest extends AbstractHandlerTe
      */
     public function testActualOverlapBetweenTemporaleAndSanctoraleKeysIsExactlyThreeKnownKeys(): void
     {
-        $sanctoraleFile = JsonData::MISSALS_FOLDER->path() . '/ambrosian/propriumdesanctis_2024/propriumdesanctis.json';
+        $sanctoraleFile = JsonData::AMBROSIAN_SANCTORALE_FILE->path();
         $sanctoraleKeys = array_column(
             json_decode((string) file_get_contents($sanctoraleFile), true, flags: JSON_THROW_ON_ERROR),
             'event_key'

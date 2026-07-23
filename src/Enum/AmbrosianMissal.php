@@ -53,7 +53,7 @@ class AmbrosianMissal
      * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getSanctoraleFileName()
      */
     private static array $jsonFiles = [
-        self::EDITIO_2024 => '/ambrosian/propriumdesanctis_2024/propriumdesanctis.json'
+        self::EDITIO_2024 => '/propriumdesanctis.json'
     ];
 
     /**
@@ -64,7 +64,7 @@ class AmbrosianMissal
      * @see \LiturgicalCalendar\Api\Enum\AmbrosianMissal::getSanctoraleI18nFilePath()
      */
     private static array $i18nPath = [
-        self::EDITIO_2024 => '/ambrosian/propriumdesanctis_2024/i18n/'
+        self::EDITIO_2024 => '/i18n/'
     ];
 
     /**
@@ -118,7 +118,7 @@ class AmbrosianMissal
             throw new ValidationException('Invalid missal_id: ' . $missal_id);
         }
         return is_string(self::$jsonFiles[$missal_id])
-            ? JsonData::MISSALS_FOLDER->path() . self::$jsonFiles[$missal_id]
+            ? JsonData::AMBROSIAN_SANCTORALE_FOLDER->path() . self::$jsonFiles[$missal_id]
             : false;
     }
 
@@ -135,7 +135,7 @@ class AmbrosianMissal
             throw new ValidationException('Invalid missal_id: ' . $missal_id);
         }
         return is_string(self::$i18nPath[$missal_id])
-            ? JsonData::MISSALS_FOLDER->path() . self::$i18nPath[$missal_id]
+            ? JsonData::AMBROSIAN_SANCTORALE_FOLDER->path() . self::$i18nPath[$missal_id]
             : false;
     }
 

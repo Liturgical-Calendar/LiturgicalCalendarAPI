@@ -293,7 +293,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
     {
         // Same HR fixture approach as testDeleteCalendarPurgesOperationalTuples;
         // tearDown restores the files from these saved contents.
-        $base              = Router::$apiFilePath . 'jsondata/sourcedata/calendars/nations/HR';
+        $base              = Router::$apiFilePath . 'jsondata/sourcedata/rite/roman/calendars/nations/HR';
         $this->hrNationDir = $base;
         $this->hrJsonPath  = $base . '/HR.json';
         $this->hrI18nDir   = $base . '/i18n';
@@ -333,7 +333,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
     public function testDeleteCalendarPurgesOperationalTuples(): void
     {
         // --- Arrange: save fixture files so tearDown can restore them --------
-        $base              = Router::$apiFilePath . 'jsondata/sourcedata/calendars/nations/HR';
+        $base              = Router::$apiFilePath . 'jsondata/sourcedata/rite/roman/calendars/nations/HR';
         $this->hrNationDir = $base;
         $this->hrJsonPath  = $base . '/HR.json';
         $this->hrI18nDir   = $base . '/i18n';
@@ -375,7 +375,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
      */
     private function armMtFixture(): void
     {
-        $base              = Router::$apiFilePath . 'jsondata/sourcedata/calendars/nations/MT';
+        $base              = Router::$apiFilePath . 'jsondata/sourcedata/rite/roman/calendars/nations/MT';
         $this->mtNationDir = $base;
         $this->mtJsonPath  = $base . '/MT.json';
         $this->mtI18nDir   = $base . '/i18n';

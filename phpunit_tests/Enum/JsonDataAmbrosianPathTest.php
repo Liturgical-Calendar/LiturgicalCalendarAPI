@@ -19,7 +19,7 @@ final class JsonDataAmbrosianPathTest extends TestCase
     public function testAmbrosianTemporaleFilePath(): void
     {
         $this->assertStringEndsWith(
-            'jsondata/sourcedata/missals/ambrosian/propriumdetempore/propriumdetempore.json',
+            'jsondata/sourcedata/rite/ambrosian/missals/propriumdetempore/propriumdetempore.json',
             JsonData::AMBROSIAN_TEMPORALE_FILE->path()
         );
     }
@@ -27,7 +27,7 @@ final class JsonDataAmbrosianPathTest extends TestCase
     public function testAmbrosianTemporaleI18nFilePath(): void
     {
         $this->assertStringEndsWith(
-            'jsondata/sourcedata/missals/ambrosian/propriumdetempore/i18n/{locale}.json',
+            'jsondata/sourcedata/rite/ambrosian/missals/propriumdetempore/i18n/{locale}.json',
             JsonData::AMBROSIAN_TEMPORALE_I18N_FILE->path()
         );
     }
