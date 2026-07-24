@@ -62,7 +62,7 @@
         "diocese_id": "lugano_ch",
         "diocese_name": "Lugano",
         "locales": [ "it_IT", "la_VA" ],
-        "timezone": "Europe/Rome",
+        "timezone": "Europe/Zurich",
         "rite": "ambrosian"
     }
 }
