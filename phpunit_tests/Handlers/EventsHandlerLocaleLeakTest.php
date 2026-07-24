@@ -68,9 +68,9 @@ final class EventsHandlerLocaleLeakTest extends AbstractHandlerTestCase
     public function testFrenchEventsKeepTheirLanguageAfterAnItalianRequest(): void
     {
         // Baseline: a French /events request with no prior pollution → French fields.
-        $frBaseline = $this->localizedFields(
-            ( new EventsHandler() )->handle($this->requestFor('GET', '/events', ['Accept-Language' => 'fr']))
-        );
+        $frBaselineResponse = ( new EventsHandler() )->handle($this->requestFor('GET', '/events', ['Accept-Language' => 'fr']));
+        self::assertSame(200, $frBaselineResponse->getStatusCode());
+        $frBaseline = $this->localizedFields($frBaselineResponse);
 
         // Pollute the worker: a translated (Italian) /calendar request leaves
         // LANGUAGE=it_IT:... via CalendarHandler::prepareL10N().
@@ -83,9 +83,9 @@ final class EventsHandlerLocaleLeakTest extends AbstractHandlerTestCase
 
         // The same French /events request, now in a polluted process, must still be
         // French — not the leaked Italian.
-        $frAfter = $this->localizedFields(
-            ( new EventsHandler() )->handle($this->requestFor('GET', '/events', ['Accept-Language' => 'fr']))
-        );
+        $frAfterResponse = ( new EventsHandler() )->handle($this->requestFor('GET', '/events', ['Accept-Language' => 'fr']));
+        self::assertSame(200, $frAfterResponse->getStatusCode());
+        $frAfter = $this->localizedFields($frAfterResponse);
 
         self::assertSame($frBaseline, $frAfter, '/events localized fields leaked the prior request language (#743).');
     }
@@ -97,9 +97,9 @@ final class EventsHandlerLocaleLeakTest extends AbstractHandlerTestCase
         // the very path where a leaked LANGUAGE (from a prior translated request) used
         // to bleed Italian into an English /events response. The fix must degrade to
         // the English msgid base regardless.
-        $enBaseline = $this->localizedFields(
-            ( new EventsHandler() )->handle($this->requestFor('GET', '/events', ['Accept-Language' => 'en']))
-        );
+        $enBaselineResponse = ( new EventsHandler() )->handle($this->requestFor('GET', '/events', ['Accept-Language' => 'en']));
+        self::assertSame(200, $enBaselineResponse->getStatusCode());
+        $enBaseline = $this->localizedFields($enBaselineResponse);
 
         // Pollute the worker with a translated (Italian) /calendar request.
         $itCalendar = new CalendarHandler(['nation', 'IT', '2024']);
@@ -108,9 +108,9 @@ final class EventsHandlerLocaleLeakTest extends AbstractHandlerTestCase
             $this->requestFor('GET', '/calendar/nation/IT/2024', ['Accept' => 'application/json', 'Accept-Language' => 'it'])
         );
 
-        $enAfter = $this->localizedFields(
-            ( new EventsHandler() )->handle($this->requestFor('GET', '/events', ['Accept-Language' => 'en']))
-        );
+        $enAfterResponse = ( new EventsHandler() )->handle($this->requestFor('GET', '/events', ['Accept-Language' => 'en']));
+        self::assertSame(200, $enAfterResponse->getStatusCode());
+        $enAfter = $this->localizedFields($enAfterResponse);
 
         self::assertSame($enBaseline, $enAfter, 'English /events localized fields leaked the prior request language (#743).');
     }
@@ -123,7 +123,12 @@ final class EventsHandlerLocaleLeakTest extends AbstractHandlerTestCase
         $itCalendar->handle(
             $this->requestFor('GET', '/calendar/nation/IT/2024', ['Accept' => 'application/json', 'Accept-Language' => 'it'])
         );
-        self::assertNotFalse(getenv('LANGUAGE'), 'Precondition: the Italian /calendar request should have set LANGUAGE.');
+        // On a host without the it_IT locale the Italian /calendar request can't set
+        // LANGUAGE (setlocale fails), so there's nothing to leak and nothing to assert.
+        // Skip rather than fail: the precondition for this leak scenario is unavailable.
+        if (false === getenv('LANGUAGE')) {
+            self::markTestSkipped('The Italian /calendar request did not set LANGUAGE (the it_IT locale is likely not installed on this host).');
+        }
 
         // A Latin /events request must reset the leaked LANGUAGE so gettext-backed
         // output deterministically falls through to the untranslated base.
