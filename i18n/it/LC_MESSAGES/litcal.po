@@ -50,12 +50,12 @@ msgstr "rosa"
 #. translators: context = liturgical color (Ambrosian "morello"/violet)
 #: src/Enum/LitColor.php:42
 msgid "morello"
-msgstr ""
+msgstr "morello"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:44
 msgid "black"
-msgstr ""
+msgstr "nero"
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
@@ -629,15 +629,13 @@ msgstr "Tempo Ordinario"
 
 #. translators: context = liturgical season (Ambrosian rite)
 #: src/Enum/LitSeason.php:173
-#, fuzzy
 msgid "After Epiphany"
-msgstr "%s giorno dopo l'Epifania"
+msgstr "Tempo dopo l'Epifania"
 
 #. translators: context = liturgical season (Ambrosian rite)
 #: src/Enum/LitSeason.php:175
-#, fuzzy
 msgid "After Pentecost"
-msgstr "il lunedì dopo la Pentecoste"
+msgstr "Tempo dopo Pentecoste"
 
 #. translators: %s is a day number (17, 18, etc.) - for Advent weekdays Dec 17-24
 #: src/FerialEventNameGenerator.php:366
@@ -788,9 +786,8 @@ msgid "the following Monday"
 msgstr "lunedì seguente"
 
 #: src/Handlers/CalendarHandler.php:1698
-#, fuzzy
 msgid "the following day"
-msgstr "lunedì seguente"
+msgstr "il giorno seguente"
 
 #: src/Handlers/CalendarHandler.php:1700
 msgid "General Norms for the Liturgical Year and the Calendar"
