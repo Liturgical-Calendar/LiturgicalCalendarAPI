@@ -5062,6 +5062,15 @@ final class CalendarHandler extends AbstractHandler
 
             LitLocale::$RUNTIME_LOCALE = $normalizedLocale;
         } else {
+            // Latin (or default): a prior translated request handled by this same
+            // (long-lived) worker process may have left the process-global locale set —
+            // setlocale(LC_MESSAGES) and the LANGUAGE env var, both of which gettext reads.
+            // Reset them so the Latin calendar's message templates fall through to the
+            // untranslated (English) base instead of leaking the previous request's
+            // language (#739). This mirrors, in reverse, the translated branch above.
+            setlocale(LC_ALL, 'C');
+            putenv('LANGUAGE');
+            \Locale::setDefault(LitLocale::LATIN_PRIMARY_LANGUAGE);
             LitLocale::$RUNTIME_LOCALE = LitLocale::LATIN_PRIMARY_LANGUAGE;
         }
 
