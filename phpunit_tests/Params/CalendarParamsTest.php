@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\CorpusChristi;
 use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\YearType;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
@@ -302,6 +303,48 @@ final class CalendarParamsTest extends TestCase
         $this->expectExceptionMessage('Diocesan calendar');
 
         $params->setParams(['diocesan_calendar' => 'nowhere']);
+    }
+
+    public function testAmbrosianRiteAcceptsMatchingAmbrosianDiocese(): void
+    {
+        $params = new CalendarParams();
+        $params->setRite(Rite::AMBROSIAN);
+        $params->setParams(['diocesan_calendar' => 'milano_it']);
+
+        self::assertSame('milano_it', $params->DiocesanCalendar);
+    }
+
+    public function testRomanRiteRejectsAmbrosianDiocese(): void
+    {
+        $params = new CalendarParams();
+        $params->setRite(Rite::ROMAN);
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('belongs to the ambrosian rite, not the requested roman rite');
+
+        $params->setParams(['diocesan_calendar' => 'milano_it']);
+    }
+
+    public function testAmbrosianRiteRejectsRomanDiocese(): void
+    {
+        $params = new CalendarParams();
+        $params->setRite(Rite::AMBROSIAN);
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('belongs to the roman rite, not the requested ambrosian rite');
+
+        $params->setParams(['diocesan_calendar' => 'agrige_it']);
+    }
+
+    public function testRomanRiteAcceptsRomanDioceseUnchanged(): void
+    {
+        // Guards against regressions to the pre-existing Roman diocese
+        // validation path while adding rite-scoped enforcement above.
+        $params = new CalendarParams();
+        $params->setRite(Rite::ROMAN);
+        $params->setParams(['diocesan_calendar' => 'agrige_it']);
+
+        self::assertSame('agrige_it', $params->DiocesanCalendar);
     }
 
     public function testHolyDaysOfObligationOverride(): void

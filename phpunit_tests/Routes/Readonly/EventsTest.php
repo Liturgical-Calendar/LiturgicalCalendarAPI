@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Routes\Readonly;
 
 use PHPUnit\Framework\Attributes\Group;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Tests\ApiTestCase;
 use GuzzleHttp\Promise\EachPromise;
 use Psr\Http\Message\ResponseInterface;
@@ -67,10 +68,16 @@ final class EventsTest extends ApiTestCase
                 return $item->calendar_id === $diocesan_calendar_key;
             });
 
+            // Ambrosian dioceses have no national layer and are requested via
+            // their rite-scoped path (`/events/ambrosian/diocese/...`).
+            $ritePrefix = ( $diocesan_calendar_metadata->rite ?? Rite::ROMAN->value ) === Rite::AMBROSIAN->value
+                ? 'ambrosian/'
+                : '';
+
             $locales = $diocesan_calendar_metadata->locales;
             foreach ($locales as $locale) {
                 $requests[] = [
-                    'uri'    => "/events/diocese/{$diocesan_calendar_key}",
+                    'uri'    => "/events/{$ritePrefix}diocese/{$diocesan_calendar_key}",
                     'type'   => 'diocesan_calendar',
                     'key'    => $diocesan_calendar_key,
                     'locale' => $locale
@@ -150,8 +157,14 @@ final class EventsTest extends ApiTestCase
                 return $item->calendar_id === $calendar_id;
             });
 
-            $national_calendar = $diocesan_calendar_metadata->nation;
-            $this->assertEquals($data->settings->national_calendar, $national_calendar, 'national_calendar should be ' . $national_calendar);
+            // Ambrosian dioceses are not layered on top of a national calendar,
+            // so national_calendar is null; Roman dioceses echo their nation.
+            if (( $diocesan_calendar_metadata->rite ?? Rite::ROMAN->value ) === Rite::AMBROSIAN->value) {
+                $this->assertNull($data->settings->national_calendar, 'national_calendar should be null for an Ambrosian diocese');
+            } else {
+                $national_calendar = $diocesan_calendar_metadata->nation;
+                $this->assertEquals($data->settings->national_calendar, $national_calendar, 'national_calendar should be ' . $national_calendar);
+            }
             $this->assertEquals($data->settings->diocesan_calendar, $calendar_id, 'diocesan_calendar should be ' . $calendar_id);
         }
         foreach ($data->litcal_events as $event) {

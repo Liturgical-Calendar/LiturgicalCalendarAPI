@@ -443,14 +443,21 @@ final class CalendarHandler extends AbstractHandler
                 _('The name of the diocese could not be derived from the diocese ID "%s".'),
                 $this->CalendarParams->DiocesanCalendar
             );
-        } else {
-            ['diocese_name' => $dioceseName, 'country_iso' => $nation] = $idTransform;
-            $this->DioceseName                                         = $dioceseName;
-            $this->CalendarParams->NationalCalendar                    = strtoupper($nation);
-            $diocesanDataFile                                          = strtr(
-                JsonData::DIOCESAN_CALENDAR_FILE->path(),
+            return;
+        }
+
+        ['diocese_name' => $dioceseName, 'country_iso' => $nation] = $idTransform;
+        $this->DioceseName                                         = $dioceseName;
+
+        if ($this->CalendarParams->Rite === Rite::AMBROSIAN) {
+            // Ambrosian dioceses are not layered on top of a national calendar: the Ambrosian
+            // rite has no national calendars, and CalendarParams::validateRiteCompatibility()
+            // throws if NationalCalendar is set for the Ambrosian rite. Leave it null and load
+            // the diocese file from the Ambrosian tree instead of the Roman tree.
+            $diocesanDataFile = strtr(
+                JsonData::AMBROSIAN_DIOCESAN_CALENDAR_FILE->path(),
                 [
-                    '{nation}'       => $this->CalendarParams->NationalCalendar,
+                    '{nation}'       => strtoupper($nation),
                     '{diocese}'      => $this->CalendarParams->DiocesanCalendar,
                     '{diocese_name}' => $dioceseName
                 ]
@@ -458,7 +465,21 @@ final class CalendarHandler extends AbstractHandler
 
             $diocesanDataJson   = Utilities::jsonFileToObject($diocesanDataFile);
             $this->DiocesanData = DiocesanData::fromObject($diocesanDataJson);
+            return;
         }
+
+        $this->CalendarParams->NationalCalendar = strtoupper($nation);
+        $diocesanDataFile                       = strtr(
+            JsonData::DIOCESAN_CALENDAR_FILE->path(),
+            [
+                '{nation}'       => $this->CalendarParams->NationalCalendar,
+                '{diocese}'      => $this->CalendarParams->DiocesanCalendar,
+                '{diocese_name}' => $dioceseName
+            ]
+        );
+
+        $diocesanDataJson   = Utilities::jsonFileToObject($diocesanDataFile);
+        $this->DiocesanData = DiocesanData::fromObject($diocesanDataJson);
     }
 
     /**
@@ -970,6 +991,139 @@ final class CalendarHandler extends AbstractHandler
     }
 
     /**
+     * Overlays a requested Ambrosian diocesan calendar onto `$this->Cal`.
+     *
+     * Unlike the Roman diocesan model (`applyDiocesanCalendar()`), which prefixes both the
+     * `event_key` and the `name` with the diocese so diocesan events coexist alongside the
+     * national/comune event of the same underlying feast, the Ambrosian assembly model is
+     * "add-all-then-resolve, diocesan-wins": every row in `$this->DiocesanData->litcal` (within
+     * its `since_year`/`until_year` window) is built into a `LiturgicalEvent` under its own plain
+     * `event_key`, and if that key is already occupied — by a comune sanctorale event added a few
+     * lines earlier by {@see self::addAmbrosianSanctoraleToCalendar()} — the comune definition is
+     * removed first and the diocesan one takes its place. This mirrors the precedence-resolution
+     * model the rest of the Ambrosian pipeline already uses (add everything, resolve/suppress
+     * later) rather than the Roman check-before-add convention.
+     *
+     * `removeLiturgicalEvent()` is called before `addLiturgicalEvent()` (rather than simply letting
+     * `addLiturgicalEvent()` overwrite the array entry) because `LiturgicalEventCollection`
+     * maintains secondary per-grade sub-collections; removing the old entry first prevents a stale
+     * grade bucket from lingering alongside the new one.
+     *
+     * **Names:** `handle()`'s Ambrosian branch does not call `applyCalendarI18nData()` (that method
+     * is wired only into the Roman branch), so diocesan event names would otherwise never be set —
+     * `LiturgicalEventData::$name` is a non-nullable typed property with no default, and
+     * `LiturgicalEvent::fromObject()` reads it unconditionally, so leaving it unset would be a
+     * fatal error, not merely a blank name. The Ambrosian diocesan source tree ships the same
+     * shape as the Roman one: a flat `event_key => name` translations file per locale under
+     * `.../{nation}/{diocese}/i18n/{locale}.json` (confirmed on disk for `milano_it`, `lugano_ch`,
+     * `bergam_it`, `novara_it` — no `i18n` block is embedded in the main calendar JSON itself, so
+     * `DiocesanData::applyTranslations()`, which reads from `DiocesanData->i18n`, is not usable
+     * here; `DiocesanData->i18n` is left uninitialized). This mirrors
+     * `applyCalendarI18nData()`'s Roman diocesan branch: load that file for the resolved locale and
+     * call `DiocesanData::setNames()`, which sets `->liturgical_event->name` on every item in the
+     * collection directly from the flat translations array.
+     *
+     * The locale is resolved the same way {@see self::addAmbrosianSanctoraleToCalendar()} resolves
+     * the sanctorale locale — from `LitLocale::$PRIMARY_LANGUAGE` (`it`/`la`) — but then mapped to
+     * the full locale string the diocesan i18n filenames actually use (`it` → `it_IT`, `la` →
+     * `la_VA`), since (unlike the sanctorale/temporale i18n files, which are named `it.json`/
+     * `la.json`) the diocesan i18n files reuse the Roman diocesan-calendar i18n naming convention.
+     * If the mapped locale isn't one of the diocese's declared `metadata->locales`, falls back to
+     * the first declared locale (mirroring `updateSettingsBasedOnDiocesanCalendar()`'s fallback).
+     *
+     * Every added/overridden event is given the Task 2 festive (5-field) empty-readings
+     * placeholder ({@see AmbrosianReadings::emptyFestive()}) rather than the ferial 4-field one
+     * {@see self::addAmbrosianSanctoraleToCalendar()} uses for comune sanctorale, per this task's
+     * brief.
+     *
+     * Early-returns when `$this->DiocesanData === null` (no diocese requested), so comune-only
+     * Ambrosian calendars are entirely unaffected — this is required for output stability on
+     * every existing comune-only Ambrosian test/response.
+     *
+     * Not called from `calculateUniversalCalendar()` (that method is Roman-only) — called from
+     * Plan 8b Task 9's `calculateAmbrosianCalendar()` orchestrator, sequenced immediately after
+     * `addAmbrosianSanctoraleToCalendar()` (so the comune definitions this overlay may replace are
+     * already in `$this->Cal`) and before `backfillAmbrosianReadingsPlaceholder()` (which only
+     * backfills events that don't yet carry a `readings` property — moot here since every event
+     * this method touches already gets one, but keeping the call before that backfill keeps the
+     * "every event has readings by the end of this block" invariant easy to reason about). Also
+     * exercised directly (via reflection) by `CalendarHandlerAmbrosianDiocesanTest`.
+     */
+    private function applyAmbrosianDiocesanCalendar(): void
+    {
+        if (null === $this->DiocesanData) {
+            return;
+        }
+
+        $locale = match (LitLocale::$PRIMARY_LANGUAGE) {
+            'la'    => 'la_VA',
+            default => 'it_IT',
+        };
+        if (false === in_array($locale, $this->DiocesanData->metadata->locales, true)) {
+            $locale = $this->DiocesanData->metadata->locales[0];
+        }
+
+        $i18nFile = strtr(
+            JsonData::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FILE->path(),
+            [
+                '{nation}'  => $this->DiocesanData->metadata->nation,
+                '{diocese}' => $this->DiocesanData->metadata->diocese_id,
+                '{locale}'  => $locale
+            ]
+        );
+
+        $i18nData = Utilities::jsonFileToArray($i18nFile);
+        if (array_filter(array_keys($i18nData), 'is_string') !== array_keys($i18nData)) {
+            throw new \Exception('We expected all the keys of the array to be strings.');
+        }
+        if (array_filter($i18nData, 'is_string') !== $i18nData) {
+            throw new \Exception('We expected all the values of the array to be strings.');
+        }
+        /** @var array<string,string> $i18nData */
+        $this->DiocesanData->setNames($i18nData);
+
+        $year = $this->CalendarParams->Year;
+
+        foreach ($this->DiocesanData->litcal as $litCalItem) {
+            $meta = $litCalItem->metadata;
+            if ($year < $meta->since_year || ( null !== $meta->until_year && $year > $meta->until_year )) {
+                continue;
+            }
+
+            $liturgicalEvent = $litCalItem->liturgical_event;
+
+            if ($liturgicalEvent->isMobile()) {
+                /** @var DiocesanLitCalItemCreateNewMobile $liturgicalEvent */
+                $currentLitEventDate = $this->interpretStrtotime($liturgicalEvent);
+            } else {
+                /** @var DiocesanLitCalItemCreateNewFixed $liturgicalEvent */
+                $currentLitEventDate = DateTime::fromFormat($liturgicalEvent->day . '-' . $liturgicalEvent->month . '-' . $year);
+            }
+
+            if (false === $currentLitEventDate) {
+                // interpretStrtotime() already pushed an explanatory message onto $this->Messages.
+                continue;
+            }
+
+            $liturgicalEvent->setDate($currentLitEventDate);
+
+            $key = $liturgicalEvent->event_key;
+
+            // Diocesan-wins: remove any comune event already occupying this key before re-adding,
+            // so no stale grade sub-collection entry lingers from the comune definition. The comune
+            // event is being *replaced* by the diocesan one (not liturgically suppressed), so it must
+            // not surface in the response's suppressed_events metadata.
+            if (null !== $this->Cal->getLiturgicalEvent($key)) {
+                $this->Cal->removeLiturgicalEventWithoutSuppression($key);
+            }
+
+            $litEvent = LiturgicalEvent::fromObject($liturgicalEvent);
+            $litEvent->setReadings(AmbrosianReadings::emptyFestive());
+            $this->Cal->addLiturgicalEvent($key, $litEvent);
+        }
+    }
+
+    /**
      * Runs Ambrosian same-day precedence resolution (coincidence ranking, suppression, and the
      * Tabella dei giorni liturgici transfer rules) over `$this->Cal`.
      *
@@ -1017,7 +1171,11 @@ final class CalendarHandler extends AbstractHandler
      *    `liturgical_season` on every temporale event it produces.
      * 3. {@see self::addAmbrosianSanctoraleToCalendar()} (Task 4): adds every comune Ambrosian
      *    sanctorale event, skipping any `event_key` already added by the temporale engine.
-     * 3a. {@see self::backfillAmbrosianReadingsPlaceholder()}: a gap discovered while wiring this
+     * 3a. {@see self::applyAmbrosianDiocesanCalendar()} (Plan 8b Task 9): overlays the requested
+     *    diocesan calendar, if any, onto `$this->Cal` — add-all-then-resolve, diocesan-wins, so any
+     *    comune event just added by step 3 sharing an `event_key` with a diocesan row is removed
+     *    and replaced. No-op when `$this->DiocesanData === null` (no diocese requested).
+     * 3b. {@see self::backfillAmbrosianReadingsPlaceholder()}: a gap discovered while wiring this
      *    orchestrator (not one of the originally scoped Task 3-8 passes) — see that method's
      *    docblock for why it is load-bearing here.
      * 4. {@see LiturgicalEventCollection::stampAmbrosianSeasonOnSanctorale()} (Task 6): copies
@@ -1059,6 +1217,8 @@ final class CalendarHandler extends AbstractHandler
         $riteProfile->temporaleEngine()->buildTemporale($temporaleContext);
 
         $this->addAmbrosianSanctoraleToCalendar();
+
+        $this->applyAmbrosianDiocesanCalendar();
 
         $this->backfillAmbrosianReadingsPlaceholder();
 
@@ -5335,8 +5495,12 @@ final class CalendarHandler extends AbstractHandler
             $this->prepareL10N();
 
             if ($this->CalendarParams->Rite === Rite::AMBROSIAN) {
-                // Ambrosian rite: no national/diocesan layer yet (comune only; dioceses are Plan 8),
-                // so calculateAmbrosianCalendar() is the entire per-run generator. It already runs
+                // Ambrosian rite has no national calendar layer, but diocesan calendars are
+                // supported (Plan 8b): $this->DiocesanData is already populated above by
+                // loadDiocesanCalendarData() (called unconditionally before this branch), and
+                // calculateAmbrosianCalendar() overlays it internally via
+                // applyAmbrosianDiocesanCalendar() when a diocese was requested (no-op otherwise).
+                // calculateAmbrosianCalendar() is the entire per-run generator: it already runs
                 // setAmbrosianHolyDaysOfObligation(), setAmbrosianYearCyclesAndVigils(),
                 // calculatePsalterWeek(), and sortLiturgicalEvents() internally (see its docblock),
                 // so none of those Roman-branch calls are repeated here.

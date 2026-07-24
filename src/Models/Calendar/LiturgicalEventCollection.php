@@ -905,6 +905,49 @@ final class LiturgicalEventCollection
     }
 
     /**
+     * Removes a liturgical event from the collection and all grade sub-collections
+     * WITHOUT recording it as a suppressed event.
+     *
+     * Unlike {@see self::removeLiturgicalEvent()}, this does not add the removed event
+     * to the suppressedEvents map. Use it when an event is being *replaced* in place —
+     * e.g. a diocesan override of a comune event sharing the same key — where the removal
+     * is not a liturgical suppression and should not surface in the response's
+     * suppressed_events metadata.
+     *
+     * @param string $key The key of the liturgical event to remove.
+     */
+    public function removeLiturgicalEventWithoutSuppression(string $key): void
+    {
+        // Mirror every grade index addLiturgicalEvent() may have populated for this key:
+        // a Lord/BVM solemnity also lands in solemnitiesLordBVM, and a Feast of the Lord
+        // lands in feastsLord (never in the plain feasts map) — clearing only
+        // solemnities/feasts/memorials would leave a stale reference behind.
+        if ($this->solemnitiesLordBVM->hasKey($key)) {
+            $this->solemnitiesLordBVM->removeEvent($key);
+        }
+
+        if ($this->solemnities->hasKey($key)) {
+            $this->solemnities->removeEvent($key);
+        }
+
+        if ($this->feastsLord->hasKey($key)) {
+            $this->feastsLord->removeEvent($key);
+        }
+
+        if ($this->feasts->hasKey($key)) {
+            $this->feasts->removeEvent($key);
+        }
+
+        if ($this->memorials->hasKey($key)) {
+            $this->memorials->removeEvent($key);
+        }
+
+        if ($this->liturgicalEvents->hasKey($key)) {
+            $this->liturgicalEvents->removeEvent($key);
+        }
+    }
+
+    /**
      * Adds a LiturgicalEvent to the collection of suppressed events.
      *
      * This method does not perform any checks and simply adds the liturgical event to the

@@ -25,7 +25,6 @@ use LiturgicalCalendar\Api\Router;
 class SchemaValidationTest extends TestCase
 {
     private static string $schemasPath;
-    private static string $sourceDataPath;
     private static bool $routerInitialized = false;
 
     public static function setUpBeforeClass(): void
@@ -34,8 +33,7 @@ class SchemaValidationTest extends TestCase
         Router::getApiPaths();
 
         // Get the paths
-        self::$schemasPath    = JsonData::SCHEMAS_FOLDER->path();
-        self::$sourceDataPath = JsonData::SOURCEDATA_FOLDER->path();
+        self::$schemasPath = JsonData::SCHEMAS_FOLDER->path();
     }
 
     /**
@@ -169,7 +167,7 @@ class SchemaValidationTest extends TestCase
         $schema     = Schema::import($schemaPath);
 
         // Load a real national calendar file (structure: nations/{NATION}/{NATION}.json)
-        $usaCalendarPath = self::$sourceDataPath . '/calendars/nations/US/US.json';
+        $usaCalendarPath = strtr(JsonData::NATIONAL_CALENDAR_FILE->path(), ['{nation}' => 'US']);
 
         if (!file_exists($usaCalendarPath)) {
             $this->markTestSkipped('USA national calendar file not found');
@@ -198,7 +196,7 @@ class SchemaValidationTest extends TestCase
 
         // Try to find any diocesan calendar file
         // Structure: dioceses/{NATION}/{diocese_id}/*.json
-        $dioceseBasePath = self::$sourceDataPath . '/calendars/dioceses';
+        $dioceseBasePath = JsonData::DIOCESAN_CALENDARS_FOLDER->path();
         $nationDirs      = glob($dioceseBasePath . '/*', GLOB_ONLYDIR);
 
         if (empty($nationDirs) || $nationDirs === false) {
@@ -247,7 +245,7 @@ class SchemaValidationTest extends TestCase
 
         // Try to find any wider region calendar file
         // Structure: wider_regions/{REGION}/{REGION}.json
-        $widerRegionPath = self::$sourceDataPath . '/calendars/wider_regions';
+        $widerRegionPath = JsonData::WIDER_REGIONS_FOLDER->path();
         $regionDirs      = glob($widerRegionPath . '/*', GLOB_ONLYDIR);
 
         if (empty($regionDirs) || $regionDirs === false) {
@@ -289,7 +287,7 @@ class SchemaValidationTest extends TestCase
         $schema     = Schema::import($schemaPath);
 
         // Try to find the 1970 proprium de sanctis file
-        $sanctisPath = self::$sourceDataPath . '/missals/propriumdesanctis_1970/propriumdesanctis_1970.json';
+        $sanctisPath = strtr(JsonData::MISSAL_FILE->path(), ['{missal_folder}' => 'propriumdesanctis_1970']);
 
         if (!file_exists($sanctisPath)) {
             $this->markTestSkipped('Proprium de Sanctis 1970 file not found');
@@ -335,6 +333,63 @@ class SchemaValidationTest extends TestCase
     }
 
     /**
+     * Test loading all 4 real Ambrosian diocesan calendar source files (Tasks 4/5: milano_it,
+     * bergam_it, novara_it, lugano_ch) against the DiocesanCalendar schema. This exercises the
+     * optional `metadata.rite` field added in Task 1.
+     *
+     * @group slow
+     */
+    public function testRealAmbrosianDiocesanCalendarValidation(): void
+    {
+        $schemaPath = LitSchema::DIOCESAN->path();
+        $schema     = Schema::import($schemaPath);
+
+        // Structure: dioceses/{NATION}/{diocese_id}/*.json
+        $dioceseBasePath = JsonData::AMBROSIAN_DIOCESAN_CALENDARS_FOLDER->path();
+        $nationDirs      = glob($dioceseBasePath . '/*', GLOB_ONLYDIR);
+
+        if (empty($nationDirs) || $nationDirs === false) {
+            $this->fail('No Ambrosian diocesan calendar directories found at: ' . $dioceseBasePath);
+        }
+
+        // Collect every diocesan calendar file (nested in diocese_id folders)
+        $diocesanFiles = [];
+        foreach ($nationDirs as $nationDir) {
+            $dioceseDirs = glob($nationDir . '/*', GLOB_ONLYDIR);
+            if (empty($dioceseDirs) || $dioceseDirs === false) {
+                continue;
+            }
+            foreach ($dioceseDirs as $dioceseDir) {
+                $files = glob($dioceseDir . '/*.json');
+                if (!empty($files) && $files !== false) {
+                    array_push($diocesanFiles, ...$files);
+                }
+            }
+        }
+
+        // Fail loudly (don't silently pass) if the glob came up empty or short of the expected 4 dioceses
+        $this->assertCount(
+            4,
+            $diocesanFiles,
+            'Expected exactly 4 Ambrosian diocesan calendar files (milano_it, bergam_it, novara_it, lugano_ch), found: '
+                . implode(', ', $diocesanFiles)
+        );
+
+        foreach ($diocesanFiles as $diocesanFile) {
+            $content = file_get_contents($diocesanFile);
+            $this->assertIsString($content);
+
+            $data = json_decode($content);
+            $this->assertNotNull($data, 'JSON decode should succeed for: ' . $diocesanFile);
+
+            // This should not throw
+            $schema->in($data);
+        }
+
+        $this->assertTrue(true, 'All 4 real Ambrosian diocesan calendars should pass validation');
+    }
+
+    /**
      * Test loading a real proprium de tempore source file against its schema.
      *
      * @group slow
@@ -345,7 +400,7 @@ class SchemaValidationTest extends TestCase
         $schema     = Schema::import($schemaPath);
 
         // Try to find the proprium de tempore file
-        $temporePath = self::$sourceDataPath . '/missals/propriumdetempore/propriumdetempore.json';
+        $temporePath = JsonData::TEMPORALE_FILE->path();
 
         if (!file_exists($temporePath)) {
             $this->markTestSkipped('Proprium de Tempore file not found');
@@ -373,7 +428,7 @@ class SchemaValidationTest extends TestCase
         $schema     = Schema::import($schemaPath);
 
         // Try to find the decrees source file
-        $decreesPath = self::$sourceDataPath . '/decrees/decrees.json';
+        $decreesPath = JsonData::DECREES_FILE->path();
 
         if (!file_exists($decreesPath)) {
             $this->markTestSkipped('Decrees source file not found');

@@ -39,4 +39,21 @@ final class AmbrosianReadings
             'gospel'             => '',
         ]);
     }
+
+    /**
+     * Builds a schema-valid, content-empty `ReadingsFestive` instance to serve as the Ambrosian
+     * readings placeholder for festive (5-field) events.
+     *
+     * @return ReadingsFestive A `ReadingsAbstract` instance with all required fields set to `""`.
+     */
+    public static function emptyFestive(): ReadingsFestive
+    {
+        return ReadingsFestive::fromArray([
+            'first_reading'      => '',
+            'responsorial_psalm' => '',
+            'second_reading'     => '',
+            'gospel_acclamation' => '',
+            'gospel'             => '',
+        ]);
+    }
 }

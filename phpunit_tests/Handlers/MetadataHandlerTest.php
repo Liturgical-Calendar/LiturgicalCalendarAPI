@@ -54,6 +54,43 @@ final class MetadataHandlerTest extends AbstractHandlerTestCase
         self::assertSame('ambrosian', $ambrosianEntries[0]['rite']);
     }
 
+    /**
+     * The `/calendars` discovery endpoint must announce all four Ambrosian
+     * dioceses (milano_it, bergam_it, novara_it, lugano_ch) with
+     * `rite: "ambrosian"`, alongside `diocesan_calendars_keys`, while Roman
+     * dioceses remain unaffected and still report `rite: "roman"`.
+     */
+    public function testGetAnnouncesAmbrosianDiocesesWithRite(): void
+    {
+        $response = ( new MetadataHandler() )->handle($this->requestFor('GET', '/calendars'));
+        self::assertSame(200, $response->getStatusCode());
+
+        $body            = $this->decodeJsonBody($response);
+        $diocesanKeys    = $body['litcal_metadata']['diocesan_calendars_keys'];
+        $diocesanEntries = $body['litcal_metadata']['diocesan_calendars'];
+        $entriesByCalId  = [];
+        foreach ($diocesanEntries as $entry) {
+            self::assertArrayHasKey('rite', $entry, "diocesan_calendars entry for `{$entry['calendar_id']}` is missing `rite`");
+            $entriesByCalId[$entry['calendar_id']] = $entry;
+        }
+
+        $ambrosianDioceses = ['milano_it', 'bergam_it', 'novara_it', 'lugano_ch'];
+        foreach ($ambrosianDioceses as $calendarId) {
+            self::assertContains($calendarId, $diocesanKeys, "Expected `{$calendarId}` in diocesan_calendars_keys");
+            self::assertArrayHasKey($calendarId, $entriesByCalId, "Expected `{$calendarId}` in diocesan_calendars");
+            self::assertSame(
+                'ambrosian',
+                $entriesByCalId[$calendarId]['rite'],
+                "Expected `{$calendarId}` to be tagged rite=ambrosian"
+            );
+        }
+
+        // A Roman diocese must remain present and unaffected, still tagged rite=roman.
+        self::assertContains('agrige_it', $diocesanKeys);
+        self::assertArrayHasKey('agrige_it', $entriesByCalId);
+        self::assertSame('roman', $entriesByCalId['agrige_it']['rite']);
+    }
+
     public function testConditionalGetWithMatchingEtagReturns304(): void
     {
         $first = ( new MetadataHandler() )->handle($this->requestFor('GET', '/calendars'));

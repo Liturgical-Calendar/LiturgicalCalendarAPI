@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Routes\Readonly;
 
 use GuzzleHttp\Promise\EachPromise;
+use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Params\CalendarParams;
 use LiturgicalCalendar\Tests\ApiTestCase;
 use PHPUnit\Framework\Attributes\Group;
 use Psr\Http\Message\ResponseInterface;
@@ -130,11 +132,26 @@ final class CalendarTest extends ApiTestCase
                     'type' => 'national',
                 ];
             }
-            foreach (self::$metadata->diocesan_calendars_keys as $key) {
-                $requests[] = [
-                    'uri'  => "/calendar/diocese/{$key}/{$year}",
-                    'type' => 'diocesan',
-                ];
+            foreach (self::$metadata->diocesan_calendars as $diocesanCalendar) {
+                $key = $diocesanCalendar->calendar_id;
+                // Ambrosian dioceses have no national layer and are requested via
+                // their rite-scoped path; they are also only available from 1976
+                // onward, so years the API rejects by design (< 1976 → 400) are
+                // skipped rather than asserted as 200.
+                if (( $diocesanCalendar->rite ?? Rite::ROMAN->value ) === Rite::AMBROSIAN->value) {
+                    if ($year < CalendarParams::AMBROSIAN_YEAR_LOWER_LIMIT) {
+                        continue;
+                    }
+                    $requests[] = [
+                        'uri'  => "/calendar/ambrosian/diocese/{$key}/{$year}",
+                        'type' => 'diocesan',
+                    ];
+                } else {
+                    $requests[] = [
+                        'uri'  => "/calendar/diocese/{$key}/{$year}",
+                        'type' => 'diocesan',
+                    ];
+                }
             }
         }
 

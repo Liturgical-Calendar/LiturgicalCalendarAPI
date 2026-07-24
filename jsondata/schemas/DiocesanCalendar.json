@@ -131,6 +131,10 @@
                 },
                 "group": {
                     "type": "string"
+                },
+                "rite": {
+                    "type": "string",
+                    "enum": ["roman", "ambrosian"]
                 }
             },
             "required": [

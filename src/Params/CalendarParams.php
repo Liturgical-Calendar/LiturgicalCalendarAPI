@@ -12,8 +12,8 @@ use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
-use LiturgicalCalendar\Api\Models\Calendar\Rite\AmbrosianRiteProfile;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 use LiturgicalCalendar\Api\Utilities;
 
@@ -445,7 +445,8 @@ class CalendarParams implements ParamsInterface
      *
      * @param string $value a valid diocesan calendar key as listed in {@see \LiturgicalCalendar\Api\Params\CalendarParams::$calendars}::$diocesan_calendars_keys
      *
-     * Produces a 400 Bad Request error if the value of the diocesan_calendar parameter is invalid
+     * Produces a 400 Bad Request error if the value of the diocesan_calendar parameter is invalid,
+     * or if the diocese's declared rite does not match the requested rite (see {@see CalendarParams::$Rite}).
      */
     private function validateDiocesanCalendarParam(string $value): void
     {
@@ -457,6 +458,18 @@ class CalendarParams implements ParamsInterface
             throw new ValidationException("Invalid Diocesan calendar `{$value}`, valid diocesan calendars are: "
                 . implode(', ', $this->calendars->diocesan_calendars_keys));
         }
+
+        $dioceseItem = array_find(
+            $this->calendars->diocesan_calendars,
+            fn (MetadataDiocesanCalendarItem $item): bool => $item->calendar_id === $value
+        );
+
+        if (null !== $dioceseItem && $dioceseItem->rite !== $this->Rite) {
+            throw new ValidationException(
+                "Diocesan calendar `{$value}` belongs to the {$dioceseItem->rite->value} rite, not the requested {$this->Rite->value} rite."
+            );
+        }
+
         $this->DiocesanCalendar = $value;
     }
 
@@ -652,9 +665,12 @@ class CalendarParams implements ParamsInterface
     /**
      * Cross-field validation of the rite against the requested calendar and year.
      * Roman accepts every calendar shape and the full year range. The Ambrosian
-     * rite has no national layer, is restricted to its whitelisted dioceses (plus
-     * the comune ambrosiano when no diocese is given), and starts at 1976 (the
-     * first reformed Ambrosian Missal). Throws ValidationException (HTTP 400) on
+     * rite has no national layer, and starts at 1976 (the first reformed
+     * Ambrosian Missal). Diocese/rite mismatches (e.g. requesting a Roman
+     * diocese under the Ambrosian rite, or vice versa) are rejected earlier,
+     * by {@see CalendarParams::validateDiocesanCalendarParam()}, which is
+     * rite-scoped against the diocese's declared `rite` metadata rather than
+     * a hardcoded whitelist. Throws ValidationException (HTTP 400) on
      * mismatch. Must be called after the rite, calendar, and year are all set.
      *
      * @throws ValidationException
@@ -669,14 +685,6 @@ class CalendarParams implements ParamsInterface
             throw new ValidationException(
                 'The Ambrosian rite has no national calendars; request the comune ambrosiano (`/calendar/ambrosian`) or one of its dioceses.'
             );
-        }
-
-        if ($this->DiocesanCalendar !== null && !in_array($this->DiocesanCalendar, AmbrosianRiteProfile::SUPPORTED_DIOCESES, true)) {
-            throw new ValidationException(sprintf(
-                'Diocesan calendar `%s` does not support the Ambrosian rite. Ambrosian dioceses are: %s',
-                $this->DiocesanCalendar,
-                implode(', ', AmbrosianRiteProfile::SUPPORTED_DIOCESES)
-            ));
         }
 
         if ($this->Year < self::AMBROSIAN_YEAR_LOWER_LIMIT) {

@@ -20,14 +20,6 @@ final class AmbrosianRiteProfileTest extends TestCase
         self::assertSame(Rite::AMBROSIAN, ( new AmbrosianRiteProfile() )->rite());
     }
 
-    public function testWhitelistIsTheFourDioceses(): void
-    {
-        self::assertSame(
-            ['milano_it', 'bergam_it', 'novara_it', 'lugano_ch'],
-            AmbrosianRiteProfile::SUPPORTED_DIOCESES
-        );
-    }
-
     public function testTemporaleEngineReturnsAmbrosianTemporale(): void
     {
         $profile = new AmbrosianRiteProfile();

@@ -3,11 +3,12 @@
 namespace LiturgicalCalendar\Api\Models\RegionalData\DiocesanData;
 
 use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 
 /**
- * @phpstan-type DiocesanMetadataObject \stdClass&object{nation:string,diocese_id:string,diocese_name:string,locales:string[],timezone:string}
- * @phpstan-type DiocesanMetadataArray array{nation:string,diocese_id:string,diocese_name:string,locales:string[],timezone:string}
+ * @phpstan-type DiocesanMetadataObject \stdClass&object{nation:string,diocese_id:string,diocese_name:string,locales:string[],timezone:string,rite?:string}
+ * @phpstan-type DiocesanMetadataArray array{nation:string,diocese_id:string,diocese_name:string,locales:string[],timezone:string,rite?:string}
  */
 final class DiocesanMetadata extends AbstractJsonSrcData
 {
@@ -22,20 +23,24 @@ final class DiocesanMetadata extends AbstractJsonSrcData
 
     public readonly string $timezone;
 
+    public readonly Rite $rite;
+
     /**
      * @param string $nation The nation that the diocese is located in.
      * @param string $diocese_id The unique identifier for the diocese.
      * @param string $diocese_name The name of the diocese.
      * @param string[] $locales The locales supported by the diocese.
      * @param string $timezone The timezone for the diocese.
+     * @param Rite $rite The liturgical rite of the diocese (defaults to Rite::ROMAN).
      */
-    private function __construct(string $nation, string $diocese_id, string $diocese_name, array $locales, string $timezone)
+    private function __construct(string $nation, string $diocese_id, string $diocese_name, array $locales, string $timezone, Rite $rite = Rite::ROMAN)
     {
         $this->nation       = $nation;
         $this->diocese_id   = $diocese_id;
         $this->diocese_name = $diocese_name;
         $this->timezone     = $timezone;
         $this->locales      = $locales;
+        $this->rite         = $rite;
     }
 
 
@@ -48,6 +53,7 @@ final class DiocesanMetadata extends AbstractJsonSrcData
      * - diocese_name (string): The name of the diocese.
      * - locales (string[]): The locales supported by the diocese.
      * - timezone (string): The timezone for the diocese.
+     * - rite (string, optional): The liturgical rite of the diocese ("roman"|"ambrosian"), defaults to "roman".
      *
      * @param DiocesanMetadataArray $data
      * @return static
@@ -82,12 +88,15 @@ final class DiocesanMetadata extends AbstractJsonSrcData
             throw new \TypeError('locales parameter must contain valid locale strings supported by the current server: ' . implode(', ', LitLocale::getSupportedLocales()));
         }
 
+        $rite = isset($data['rite']) && is_string($data['rite']) ? Rite::from($data['rite']) : Rite::ROMAN;
+
         return new static(
             $data['nation'],
             $data['diocese_id'],
             $data['diocese_name'],
             $data['locales'],
-            $data['timezone']
+            $data['timezone'],
+            $rite
         );
     }
 
@@ -100,6 +109,7 @@ final class DiocesanMetadata extends AbstractJsonSrcData
      * - diocese_name (string): The name of the diocese.
      * - locales (string[]): The locales supported by the diocese.
      * - timezone (string): The timezone for the diocese.
+     * - rite (string, optional): The liturgical rite of the diocese ("roman"|"ambrosian"), defaults to "roman".
      *
      * @param DiocesanMetadataObject $data The object containing the properties of the diocesan calendar.
      * @return static
@@ -134,12 +144,15 @@ final class DiocesanMetadata extends AbstractJsonSrcData
             throw new \TypeError('locales parameter must contain valid locale strings supported by the current server: ' . implode(', ', LitLocale::getSupportedLocales()));
         }
 
+        $rite = isset($data->rite) && is_string($data->rite) ? Rite::from($data->rite) : Rite::ROMAN;
+
         return new static(
             $data->nation,
             $data->diocese_id,
             $data->diocese_name,
             $data->locales,
-            $data->timezone
+            $data->timezone,
+            $rite
         );
     }
 }

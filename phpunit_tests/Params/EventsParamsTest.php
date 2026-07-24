@@ -149,15 +149,53 @@ final class EventsParamsTest extends TestCase
         $this->addToAssertionCount(1); // reached only if no exception was thrown
     }
 
-    public function testAmbrosianRejectsDiocesanCalendar(): void
+    public function testAmbrosianRiteAcceptsMatchingAmbrosianDiocese(): void
     {
-        // The Ambrosian rite serves only the comune catalog; a diocesan_calendar filter
-        // (from ?diocesan_calendar=… or /events/ambrosian/diocese/…) must be rejected.
+        // Task 12: the Ambrosian rite now serves its own diocesan event catalogs
+        // (/events/ambrosian/diocese/{diocese_id}) — milano_it is declared as an
+        // Ambrosian-rite diocese in the calendars metadata (see MetadataDiocesanCalendarItem).
+        $params = new EventsParams(['diocesan_calendar' => 'milano_it']);
+        $params->setRite(Rite::AMBROSIAN);
+
+        $params->validateRiteCompatibility();
+        $this->addToAssertionCount(1); // reached only if no exception was thrown
+    }
+
+    public function testAmbrosianRiteRejectsRomanDiocese(): void
+    {
+        // Rite-scoped mismatch: agrige_it is a Roman-rite diocese requested under the
+        // Ambrosian rite (from ?diocesan_calendar=agrige_it or /events/ambrosian/diocese/agrige_it).
         $params = new EventsParams(['diocesan_calendar' => 'agrige_it']);
         $params->setRite(Rite::AMBROSIAN);
 
         $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('belongs to the roman rite, not the requested ambrosian rite');
+
         $params->validateRiteCompatibility();
+    }
+
+    public function testRomanRiteRejectsAmbrosianDiocese(): void
+    {
+        // Rite-scoped mismatch in the other direction: milano_it is an Ambrosian-rite
+        // diocese requested under the (default) Roman rite.
+        $params = new EventsParams(['diocesan_calendar' => 'milano_it']);
+        $params->setRite(Rite::ROMAN);
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('belongs to the ambrosian rite, not the requested roman rite');
+
+        $params->validateRiteCompatibility();
+    }
+
+    public function testRomanRiteAcceptsRomanDioceseUnchanged(): void
+    {
+        // Guards against regressions to the pre-existing Roman diocese validation
+        // path while adding rite-scoped enforcement above.
+        $params = new EventsParams(['diocesan_calendar' => 'agrige_it']);
+        $params->setRite(Rite::ROMAN);
+
+        $params->validateRiteCompatibility();
+        $this->addToAssertionCount(1); // reached only if no exception was thrown
     }
 
     /**

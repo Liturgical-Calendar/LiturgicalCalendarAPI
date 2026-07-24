@@ -179,6 +179,31 @@ class JsonDataConstants
     public const AMBROSIAN_SANCTORALE_I18N_FILE = JsonDataConstants::AMBROSIAN_SANCTORALE_I18N_FOLDER . '/{locale}.json';
 
     /**
+     * The folder containing Ambrosian diocesan calendars.
+     * Evaluates to 'jsondata/sourcedata/rite/ambrosian/calendars/dioceses'.
+     */
+    public const AMBROSIAN_DIOCESAN_CALENDARS_FOLDER = JsonDataConstants::AMBROSIAN_RITE_FOLDER . '/calendars/dioceses';
+
+    /**
+     * The file containing the Ambrosian diocesan calendar data, with placeholders for the actual nation and diocese names.
+     * Evaluates to 'jsondata/sourcedata/rite/ambrosian/calendars/dioceses/{nation}/{diocese}/{diocese_name}.json'.
+     */
+    public const AMBROSIAN_DIOCESAN_CALENDAR_FILE = JsonDataConstants::AMBROSIAN_DIOCESAN_CALENDARS_FOLDER . '/{nation}/{diocese}/{diocese_name}.json';
+
+    /**
+     * The folder containing i18n files for Ambrosian diocesan calendars, with placeholders for the actual nation and diocese names.
+     * Evaluates to 'jsondata/sourcedata/rite/ambrosian/calendars/dioceses/{nation}/{diocese}/i18n'.
+     */
+    public const AMBROSIAN_DIOCESAN_CALENDAR_I18N_FOLDER = JsonDataConstants::AMBROSIAN_DIOCESAN_CALENDARS_FOLDER . '/{nation}/{diocese}/i18n';
+
+    /**
+     * The file containing the i18n data for the specified Ambrosian diocesan calendar,
+     * with placeholders for the actual nation name, diocese name, and locale.
+     * Evaluates to 'jsondata/sourcedata/rite/ambrosian/calendars/dioceses/{nation}/{diocese}/i18n/{locale}.json'.
+     */
+    public const AMBROSIAN_DIOCESAN_CALENDAR_I18N_FILE = JsonDataConstants::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FOLDER . '/{locale}.json';
+
+    /**
      * The folder containing readings from the lectionary for every possible liturgical event in the General Roman Calendar.
      * Evaluates to 'jsondata/sourcedata/rite/roman/lectionary'.
      */
