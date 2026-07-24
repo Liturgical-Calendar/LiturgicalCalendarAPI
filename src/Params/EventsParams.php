@@ -6,6 +6,7 @@ use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 
 /**
@@ -245,31 +246,43 @@ class EventsParams implements ParamsInterface
     }
 
     /**
-     * Cross-field validation of the rite against the requested calendar. Roman accepts
-     * every calendar shape. The Ambrosian rite has no national layer and, for the events
-     * catalog, no diocesan layer either (comune ambrosiano only, for now) — a national or
-     * diocesan calendar request combined with the Ambrosian rite is rejected. Mirrors
-     * {@see \LiturgicalCalendar\Api\Params\CalendarParams::validateRiteCompatibility()}, minus the
-     * year-floor check (the events catalog is year-agnostic). Must be called after the rite
-     * and any `national_calendar`/`diocesan_calendar` parameters have been set.
+     * Cross-field validation of the rite against the requested calendar. The Ambrosian
+     * rite has no national layer — a national calendar request combined with the
+     * Ambrosian rite is rejected. Diocese/rite mismatches (e.g. requesting a Roman
+     * diocese under the Ambrosian rite, or an Ambrosian diocese under the Roman rite)
+     * are rejected regardless of which rite was requested, rite-scoped against the
+     * diocese's declared `rite` metadata rather than a hardcoded whitelist — mirroring
+     * {@see \LiturgicalCalendar\Api\Params\CalendarParams::validateDiocesanCalendarParam()}.
+     * A diocese whose declared rite matches the requested rite (Roman-under-Roman, or
+     * Ambrosian-under-Ambrosian, e.g. `/events/ambrosian/diocese/milano_it`) is allowed.
+     * Mirrors {@see \LiturgicalCalendar\Api\Params\CalendarParams::validateRiteCompatibility()},
+     * minus the year-floor check (the events catalog is year-agnostic). Must be called
+     * after the rite and any `national_calendar`/`diocesan_calendar` parameters have been set.
      *
      * @throws ValidationException
      */
     public function validateRiteCompatibility(): void
     {
+        if ($this->DiocesanCalendar !== null) {
+            $dioceseItem = array_find(
+                $this->calendarsMetadata->diocesan_calendars,
+                fn (MetadataDiocesanCalendarItem $item): bool => $item->calendar_id === $this->DiocesanCalendar
+            );
+
+            if (null !== $dioceseItem && $dioceseItem->rite !== $this->Rite) {
+                throw new ValidationException(
+                    "Diocesan calendar `{$this->DiocesanCalendar}` belongs to the {$dioceseItem->rite->value} rite, not the requested {$this->Rite->value} rite."
+                );
+            }
+        }
+
         if ($this->Rite === Rite::ROMAN) {
             return;
         }
 
         if ($this->NationalCalendar !== null || $this->vaNationalRequested) {
             throw new ValidationException(
-                'The Ambrosian rite has no national calendars; request the comune ambrosiano events catalog (`/events/ambrosian`).'
-            );
-        }
-
-        if ($this->DiocesanCalendar !== null) {
-            throw new ValidationException(
-                'The Ambrosian rite does not yet support diocesan event catalogs; request the comune ambrosiano events catalog (`/events/ambrosian`).'
+                'The Ambrosian rite has no national calendars; request the comune ambrosiano events catalog (`/events/ambrosian`) or one of its dioceses.'
             );
         }
     }
