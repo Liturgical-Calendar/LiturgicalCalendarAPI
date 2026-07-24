@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Handlers;
 
+use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Handlers\CalendarHandler;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Tests\Support\GoldenMaster;
@@ -17,9 +18,30 @@ use LiturgicalCalendar\Tests\Support\GoldenMaster;
  */
 final class CalendarHandlerLocaleLeakTest extends AbstractHandlerTestCase
 {
+    private string $savedLocale;
+    private ?string $savedLanguageEnv;
+    private string $savedIcuDefault;
+    private string $savedPrimaryLanguage;
+    private string $savedRuntimeLocale;
+    private bool $hadServerName;
+    private ?string $savedServerName;
+
     protected function setUp(): void
     {
         parent::setUp();
+
+        // Snapshot every process-global bit of state this test (and the handlers it
+        // invokes) will mutate, so tearDown() can restore the world exactly as it was
+        // found rather than unconditionally clobbering values another test may rely on.
+        $this->savedLocale          = setlocale(LC_ALL, 0) ?: 'C';
+        $languageEnv                = getenv('LANGUAGE');
+        $this->savedLanguageEnv     = false === $languageEnv ? null : $languageEnv;
+        $this->savedIcuDefault      = \Locale::getDefault();
+        $this->savedPrimaryLanguage = LitLocale::$PRIMARY_LANGUAGE;
+        $this->savedRuntimeLocale   = LitLocale::$RUNTIME_LOCALE;
+        $this->hadServerName        = array_key_exists('SERVER_NAME', $_SERVER);
+        $this->savedServerName      = $this->hadServerName ? (string) $_SERVER['SERVER_NAME'] : null;
+
         // Force Router::isLocalhost() true so handle() bypasses the response cache and
         // actually runs prepareL10N() for every request (the leak is invisible when a
         // request is served from ServerCache).
@@ -28,10 +50,19 @@ final class CalendarHandlerLocaleLeakTest extends AbstractHandlerTestCase
 
     protected function tearDown(): void
     {
-        unset($_SERVER['SERVER_NAME']);
-        // Never let this test's deliberate locale pollution leak into later tests.
-        setlocale(LC_ALL, 'C');
-        putenv('LANGUAGE');
+        // Restore the snapshot taken in setUp() so this test's deliberate locale
+        // pollution can never leak into later tests.
+        if ($this->hadServerName) {
+            $_SERVER['SERVER_NAME'] = $this->savedServerName;
+        } else {
+            unset($_SERVER['SERVER_NAME']);
+        }
+        setlocale(LC_ALL, $this->savedLocale);
+        putenv(null === $this->savedLanguageEnv ? 'LANGUAGE' : 'LANGUAGE=' . $this->savedLanguageEnv);
+        \Locale::setDefault($this->savedIcuDefault);
+        LitLocale::$PRIMARY_LANGUAGE = $this->savedPrimaryLanguage;
+        LitLocale::$RUNTIME_LOCALE   = $this->savedRuntimeLocale;
+
         parent::tearDown();
     }
 
