@@ -22,6 +22,27 @@ use PHPUnit\Framework\Attributes\CoversClass;
 final class EventsHandlerRiteRoutingTest extends AbstractHandlerTestCase
 {
     /**
+     * The Milan diocesan catalog test below is the first test in this class whose
+     * request locale ends up forced to `it_IT` (milano_it only ships `it_IT`/`la_VA`
+     * translations — see {@see EventsHandler::loadAmbrosianDiocesanData()}). Unlike
+     * `CalendarHandler::prepareL10N()` (which explicitly skips the OS `setlocale()`
+     * call for Latin requests), `EventsHandler::setLocale()` always calls it — and
+     * that call is process-global (`LC_ALL`), so once it succeeds it persists for
+     * any later test in the same PHPUnit process. `CalendarGoldenMasterTest`'s
+     * default (no `Accept-Language`) requests resolve to Latin and implicitly rely
+     * on gettext falling through to the untranslated (Latin) msgid, which breaks the
+     * moment the process locale is left pinned on a real translated catalog like
+     * `it_IT` by an earlier test. Reset to `C` (no gettext catalog binds to it, so
+     * lookups pass through unchanged) after every test in this class so that
+     * assumption holds regardless of suite execution order.
+     */
+    protected function tearDown(): void
+    {
+        setlocale(LC_ALL, 'C');
+        parent::tearDown();
+    }
+
+    /**
      * @param string[] $pathParts
      * @return array{status:int,body:array<string,mixed>}
      */
@@ -96,9 +117,46 @@ final class EventsHandlerRiteRoutingTest extends AbstractHandlerTestCase
         self::assertSame(StatusCode::BAD_REQUEST->value, $result['status']);
     }
 
-    public function testAmbrosianRejectsDiocesanCalendarWith400(): void
+    public function testAmbrosianRejectsRomanDiocesanCalendarWith400(): void
     {
+        // boston_us is a Roman-rite diocese requested under the Ambrosian rite — a
+        // rite mismatch, not "the Ambrosian rite has no diocesan layer at all"
+        // (Task 12 gives the Ambrosian rite its own diocesan catalogs).
         $result = $this->handle(['diocese', 'boston_us'], Rite::AMBROSIAN, '/events/ambrosian/diocese/boston_us');
         self::assertSame(StatusCode::BAD_REQUEST->value, $result['status']);
+    }
+
+    public function testAmbrosianRejectsUnknownDiocesanCalendarWith400(): void
+    {
+        $result = $this->handle(['diocese', 'nowhere_zz'], Rite::AMBROSIAN, '/events/ambrosian/diocese/nowhere_zz');
+        self::assertSame(StatusCode::BAD_REQUEST->value, $result['status']);
+    }
+
+    public function testAmbrosianDiocesanCatalogContainsDiocesanEventsAndComune(): void
+    {
+        // Task 12: /events/ambrosian/diocese/{diocese_id} must merge the diocese's own
+        // sanctorale (event_key prefixed with the diocese id, per
+        // EventsHandler::processAmbrosianDiocesanCalendarData()) into the comune
+        // Ambrosian catalog (temporale + comune sanctorale) already served by
+        // /events/ambrosian.
+        $result = $this->handle(['diocese', 'milano_it'], Rite::AMBROSIAN, '/events/ambrosian/diocese/milano_it');
+        self::assertSame(200, $result['status']);
+
+        $byKey = self::byKey($result['body']['litcal_events']);
+
+        // Milan-diocese-only sanctorale events (see jsondata/sourcedata/rite/ambrosian/calendars/dioceses/IT/milano_it).
+        self::assertArrayHasKey('milano_it_SanLuigiGuanella', $byKey);
+        self::assertArrayHasKey('milano_it_BeatoCarloAcutis', $byKey);
+
+        // The comune Ambrosian catalog (temporale + comune sanctorale) must still be present.
+        self::assertArrayHasKey('DedicationDuomo', $byKey);
+        self::assertArrayHasKey('Circoncisione', $byKey);
+
+        // Roman-only temporale anchor must still be excluded.
+        self::assertArrayNotHasKey('AshWednesday', $byKey);
+
+        self::assertSame('milano_it', $result['body']['settings']['diocesan_calendar']);
+        // Ambrosian dioceses are not layered on top of a national calendar.
+        self::assertNull($result['body']['settings']['national_calendar']);
     }
 }

@@ -88,13 +88,18 @@
                             },
                             "settings": {
                                 "$ref": "./CommonDef.json#/definitions/CalendarSettings"
+                            },
+                            "rite": {
+                                "type": "string",
+                                "enum": ["roman", "ambrosian"]
                             }
                         },
                         "required": [
                             "calendar_id",
                             "locales",
                             "nation",
-                            "diocese"
+                            "diocese",
+                            "rite"
                         ]
                     }
                 },

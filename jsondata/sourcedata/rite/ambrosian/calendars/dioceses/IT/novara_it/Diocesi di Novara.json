@@ -1,0 +1,40 @@
+{
+    "litcal": [
+        {
+            "liturgical_event": {
+                "event_key": "StsProtaseGervase",
+                "color": [ "red" ],
+                "grade": 3,
+                "common": [ "Proper" ],
+                "day": 19,
+                "month": 6
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 0
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "SanArialdo",
+                "color": [ "red" ],
+                "grade": 3,
+                "common": [ "Proper" ],
+                "day": 27,
+                "month": 6
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 1
+            }
+        }
+    ],
+    "metadata": {
+        "nation": "IT",
+        "diocese_id": "novara_it",
+        "diocese_name": "Diocesi di Novara",
+        "locales": [ "it_IT", "la_VA" ],
+        "timezone": "Europe/Rome",
+        "rite": "ambrosian"
+    }
+}

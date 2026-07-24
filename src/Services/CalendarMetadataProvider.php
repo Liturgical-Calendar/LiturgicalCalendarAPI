@@ -168,17 +168,41 @@ final class CalendarMetadataProvider
     }
 
     /**
-     * Builds an index of all diocesan calendars.
+     * Builds an index of all diocesan calendars, scanning both the Roman
+     * dioceses tree and (if present) the Ambrosian dioceses tree, tagging
+     * each discovered diocese with the rite of the tree it was found in.
      *
      * @return void
      */
     private static function buildDiocesanCalendarData(MetadataCalendars $metadata): void
     {
-        $countryFolders = self::globOrThrow(JsonData::DIOCESAN_CALENDARS_FOLDER->path() . '/*', GLOB_ONLYDIR, 'CalendarMetadataProvider::buildDiocesanCalendarData');
+        self::scanDiocesanTree($metadata, JsonData::DIOCESAN_CALENDARS_FOLDER->path(), Rite::ROMAN);
+
+        // The Ambrosian dioceses tree is optional (defensive): an absent
+        // tree is a harmless no-op rather than a glob error.
+        $ambrosianDiocesanFolder = JsonData::AMBROSIAN_DIOCESAN_CALENDARS_FOLDER->path();
+        if (is_dir($ambrosianDiocesanFolder)) {
+            self::scanDiocesanTree($metadata, $ambrosianDiocesanFolder, Rite::AMBROSIAN);
+        }
+    }
+
+    /**
+     * Scans a single diocesan calendars root (Roman or Ambrosian) and pushes
+     * every discovered diocese, tagged with the given rite, onto the
+     * metadata index.
+     *
+     * @param MetadataCalendars $metadata The metadata index to populate.
+     * @param string $folderPath The root folder to scan (nation folders as immediate children, diocese folders beneath those).
+     * @param Rite $rite The liturgical rite this tree's dioceses are tagged with.
+     * @return void
+     */
+    private static function scanDiocesanTree(MetadataCalendars $metadata, string $folderPath, Rite $rite): void
+    {
+        $countryFolders = self::globOrThrow($folderPath . '/*', GLOB_ONLYDIR, 'CalendarMetadataProvider::scanDiocesanTree');
 
         foreach ($countryFolders as $countryFolder) {
             $nation         = basename($countryFolder);
-            $dioceseFolders = self::globOrThrow($countryFolder . '/*', GLOB_ONLYDIR, 'CalendarMetadataProvider::buildDiocesanCalendarData');
+            $dioceseFolders = self::globOrThrow($countryFolder . '/*', GLOB_ONLYDIR, 'CalendarMetadataProvider::scanDiocesanTree');
 
             /** @var string[] $dioceseIDs */
             $dioceseIDs = array_map('basename', $dioceseFolders);
@@ -189,10 +213,10 @@ final class CalendarMetadataProvider
                 // world_dioceses.json, so this guard only fires on inconsistent
                 // source data and is unreachable in unit tests.
                 if (null === $dioceseName) {
-                    throw new \RuntimeException("CalendarMetadataProvider::buildDiocesanCalendarData: diocese name not found for nation = `{$nation}` and calendar_id = `{$calendar_id}`");
+                    throw new \RuntimeException("CalendarMetadataProvider::scanDiocesanTree: diocese name not found for nation = `{$nation}` and calendar_id = `{$calendar_id}`");
                 }
                 // @codeCoverageIgnoreEnd
-                $diocesanCalendarFile = JsonData::DIOCESAN_CALENDARS_FOLDER->path() . "/$nation/$calendar_id/$dioceseName.json";
+                $diocesanCalendarFile = "$folderPath/$nation/$calendar_id/$dioceseName.json";
                 $diocesanCalendarData = Utilities::jsonFileToObject($diocesanCalendarFile);
                 /** @var DiocesanCalendarDataObject $diocesanCalendarData */
                 $diocesanCalendarData->metadata->diocese = $dioceseName;
@@ -201,7 +225,10 @@ final class CalendarMetadataProvider
                 }
                 $diocesanCalendarData->metadata->calendar_id = $diocesanCalendarData->metadata->diocese_id;
                 unset($diocesanCalendarData->metadata->diocese_id);
-                $metadataDiocesanCalendarItem = MetadataDiocesanCalendarItem::fromObject($diocesanCalendarData->metadata);
+                // The rite is authoritative by which tree was scanned, not by
+                // re-reading the source file's own `rite` field.
+                $diocesanCalendarData->metadata->rite = $rite->value;
+                $metadataDiocesanCalendarItem         = MetadataDiocesanCalendarItem::fromObject($diocesanCalendarData->metadata);
                 $metadata->pushDiocesanCalendarMetadata($metadataDiocesanCalendarItem);
             }
         }

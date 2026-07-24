@@ -2,6 +2,7 @@
 
 namespace LiturgicalCalendar\Api\Models\Metadata;
 
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
 
 /**
@@ -22,7 +23,8 @@ use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
  *         locales:string[],
  *         timezone:string,
  *         group?:string,
- *         settings?:\stdClass&object{epiphany?:string,ascension?:string,corpus_christi?:string,eternal_high_priest?:bool}
+ *         settings?:\stdClass&object{epiphany?:string,ascension?:string,corpus_christi?:string,eternal_high_priest?:bool},
+ *         rite:string
  *     }>,
  *     diocesan_calendars_keys:string[],
  *     diocesan_groups:array<\stdClass&object{
@@ -61,7 +63,8 @@ use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
  *         locales:string[],
  *         timezone:string,
  *         group?:string,
- *         settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string,eternal_high_priest?:bool}
+ *         settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string,eternal_high_priest?:bool},
+ *         rite:string
  *     }>,
  *     diocesan_calendars_keys:string[],
  *     diocesan_groups:array<array{
@@ -183,7 +186,7 @@ final class MetadataCalendars extends AbstractJsonRepresentation
             ),
             'national_calendars_keys'  => $this->national_calendars_keys,
             'diocesan_calendars'       => array_map(
-                /** @return array{calendar_id:string,diocese:string,nation:string,locales:string[],timezone:string,group?:string,settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string,eternal_high_priest?:bool}} */
+                /** @return array{calendar_id:string,diocese:string,nation:string,locales:string[],timezone:string,group?:string,settings?:array{epiphany?:string,ascension?:string,corpus_christi?:string,eternal_high_priest?:bool},rite:string} */
                 function (MetadataDiocesanCalendarItem $dc): array {
                     return $dc->jsonSerialize();
                 },
@@ -311,6 +314,10 @@ final class MetadataCalendars extends AbstractJsonRepresentation
      * If the MetadataDiocesanCalendarItem has a "group" property, it adds the
      * calendar_id to the group of dioceses that it belongs to.
      *
+     * Roman-rite dioceses are additionally pushed onto their national
+     * calendar's `dioceses` list. Ambrosian-rite dioceses are skipped for
+     * that step: the Ambrosian comune has no national parent.
+     *
      * @param MetadataDiocesanCalendarItem $metadata The diocesan calendar metadata
      *                                                item to add.
      */
@@ -326,11 +333,17 @@ final class MetadataCalendars extends AbstractJsonRepresentation
                 $diocesanGroup->dioceses[] = $metadata->calendar_id;
             }
         }
-        // Push the diocese to the nation that it belongs to
-        foreach ($this->national_calendars as $calendar) {
-            if ($calendar->calendar_id === $metadata->nation) {
-                $calendar->dioceses[] = $metadata->calendar_id;
-                break;
+        // Push the diocese to the nation that it belongs to. Ambrosian
+        // dioceses have no national parent (the Ambrosian comune is reached
+        // only via the `ambrosian` rite segment on the calendar route), so
+        // they are deliberately excluded from every national calendar's
+        // dioceses list.
+        if (Rite::AMBROSIAN !== $metadata->rite) {
+            foreach ($this->national_calendars as $calendar) {
+                if ($calendar->calendar_id === $metadata->nation) {
+                    $calendar->dioceses[] = $metadata->calendar_id;
+                    break;
+                }
             }
         }
     }

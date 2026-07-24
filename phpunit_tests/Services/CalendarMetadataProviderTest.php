@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Services;
 
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
@@ -103,5 +104,61 @@ final class CalendarMetadataProviderTest extends TestCase
         $second = json_encode(['litcal_metadata' => CalendarMetadataProvider::create()], JSON_THROW_ON_ERROR);
 
         self::assertSame($first, $second);
+    }
+
+    /**
+     * Diocesan discovery must be rite-aware: it scans both the Roman and
+     * Ambrosian dioceses trees, tags each discovered diocese with the rite
+     * of the tree it was found in, and does NOT attach Ambrosian dioceses
+     * under a national calendar (the Ambrosian comune has no national
+     * parent — see {@see self::testCreateAnnouncesTheAmbrosianComuneCalendar}).
+     */
+    public function testDiocesanDiscoveryIsRiteAwareAndAmbrosianDiocesesHaveNoNationalParent(): void
+    {
+        $metadata = CalendarMetadataProvider::create();
+
+        self::assertContains('milano_it', $metadata->diocesan_calendars_keys);
+        self::assertContains('agrige_it', $metadata->diocesan_calendars_keys);
+
+        $milano = current(array_filter(
+            $metadata->diocesan_calendars,
+            fn ($item) => $item->calendar_id === 'milano_it'
+        ));
+        self::assertNotFalse($milano);
+        self::assertSame(Rite::AMBROSIAN, $milano->rite);
+
+        $agrigento = current(array_filter(
+            $metadata->diocesan_calendars,
+            fn ($item) => $item->calendar_id === 'agrige_it'
+        ));
+        self::assertNotFalse($agrigento);
+        self::assertSame(Rite::ROMAN, $agrigento->rite);
+
+        // The other three Ambrosian dioceses are also discovered and tagged.
+        foreach (['bergam_it', 'novara_it', 'lugano_ch'] as $ambrosianDioceseId) {
+            self::assertContains($ambrosianDioceseId, $metadata->diocesan_calendars_keys);
+            $item = current(array_filter(
+                $metadata->diocesan_calendars,
+                fn ($el) => $el->calendar_id === $ambrosianDioceseId
+            ));
+            self::assertNotFalse($item);
+            self::assertSame(Rite::AMBROSIAN, $item->rite);
+        }
+
+        // No national calendar should list an Ambrosian diocese among its dioceses.
+        foreach ($metadata->national_calendars as $nationalCalendar) {
+            self::assertNotContains('milano_it', $nationalCalendar->dioceses ?? []);
+            self::assertNotContains('bergam_it', $nationalCalendar->dioceses ?? []);
+            self::assertNotContains('novara_it', $nationalCalendar->dioceses ?? []);
+            self::assertNotContains('lugano_ch', $nationalCalendar->dioceses ?? []);
+        }
+
+        // Roman dioceses are still attached under their national calendar.
+        $itNational = current(array_filter(
+            $metadata->national_calendars,
+            fn ($nc) => $nc->calendar_id === 'IT'
+        ));
+        self::assertNotFalse($itNational);
+        self::assertContains('agrige_it', $itNational->dioceses ?? []);
     }
 }

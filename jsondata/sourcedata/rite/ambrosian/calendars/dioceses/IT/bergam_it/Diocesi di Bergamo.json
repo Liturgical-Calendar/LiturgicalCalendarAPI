@@ -1,0 +1,54 @@
+{
+    "litcal": [
+        {
+            "liturgical_event": {
+                "event_key": "StsProtaseGervase",
+                "color": [ "red" ],
+                "grade": 3,
+                "common": [ "Proper" ],
+                "day": 19,
+                "month": 6
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 0
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "SanGiovanniXXIII",
+                "color": [ "white" ],
+                "grade": 3,
+                "common": [ "Proper" ],
+                "day": 11,
+                "month": 10
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 1
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "SanGaudenzioDiBrescia",
+                "color": [ "white" ],
+                "grade": 3,
+                "common": [ "Proper" ],
+                "day": 25,
+                "month": 10
+            },
+            "metadata": {
+                "since_year": 2024,
+                "form_rownum": 2
+            }
+        }
+    ],
+    "metadata": {
+        "nation": "IT",
+        "diocese_id": "bergam_it",
+        "diocese_name": "Diocesi di Bergamo",
+        "locales": [ "it_IT", "la_VA" ],
+        "timezone": "Europe/Rome",
+        "rite": "ambrosian"
+    }
+}

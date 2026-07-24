@@ -26,6 +26,7 @@ use LiturgicalCalendar\Api\Models\EventsPath\LiturgicalEventFixed;
 use LiturgicalCalendar\Api\Models\EventsPath\LiturgicalEventMap;
 use LiturgicalCalendar\Api\Models\EventsPath\LiturgicalEventMobile;
 use LiturgicalCalendar\Api\Models\EventsPath\LiturgicalEventTemporale;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile;
@@ -137,6 +138,11 @@ final class EventsHandler extends AbstractHandler
                 fn ($el) => $el->calendar_id === $this->EventsParams->DiocesanCalendar
             );
             if (null !== $DiocesanData) {
+                if ($this->EventsParams->Rite === Rite::AMBROSIAN) {
+                    $this->loadAmbrosianDiocesanData($DiocesanData);
+                    return;
+                }
+
                 $this->EventsParams->NationalCalendar = $DiocesanData->nation;
 
                 $diocesanDataFile = strtr(
@@ -170,6 +176,54 @@ final class EventsHandler extends AbstractHandler
                     . implode(',', $this->EventsParams->calendarsMetadata->diocesan_calendars_keys) . ']';
                 throw new ValidationException($description);
             }
+        }
+    }
+
+    /**
+     * Ambrosian rite only: loads the JSON data for the specified Ambrosian diocesan calendar.
+     *
+     * Rite-scoped mirror of the Roman branch above ({@see self::loadDiocesanData()}): reads from the
+     * Ambrosian diocesan tree ({@see JsonData::AMBROSIAN_DIOCESAN_CALENDAR_FILE}) instead of the
+     * Roman one, and mirrors
+     * {@see \LiturgicalCalendar\Api\Handlers\CalendarHandler::loadDiocesanCalendarData()}'s Ambrosian
+     * branch: Ambrosian dioceses are not layered on top of a national calendar (the Ambrosian rite
+     * has no national calendars, and `EventsParams::validateRiteCompatibility()` throws if
+     * `NationalCalendar` is set for the Ambrosian rite), so `EventsParams->NationalCalendar` is
+     * deliberately left null here rather than assigned from `$metadataItem->nation`.
+     *
+     * @param MetadataDiocesanCalendarItem $metadataItem The metadata entry for the requested diocese
+     *                                                    (already confirmed to exist and to belong
+     *                                                    to the Ambrosian rite by
+     *                                                    {@see \LiturgicalCalendar\Api\Params\EventsParams::validateRiteCompatibility()}).
+     */
+    private function loadAmbrosianDiocesanData(MetadataDiocesanCalendarItem $metadataItem): void
+    {
+        $nation = strtoupper($metadataItem->nation);
+
+        $diocesanDataFile = strtr(
+            JsonData::AMBROSIAN_DIOCESAN_CALENDAR_FILE->path(),
+            [
+                '{nation}'       => $nation,
+                '{diocese}'      => $this->EventsParams->DiocesanCalendar,
+                '{diocese_name}' => $metadataItem->diocese
+            ]
+        );
+
+        $diocesanDataJson   = Utilities::jsonFileToObject($diocesanDataFile);
+        self::$DiocesanData = DiocesanData::fromObject($diocesanDataJson);
+
+        if (false === in_array($this->EventsParams->Locale, self::$DiocesanData->metadata->locales, true)) {
+            $this->EventsParams->Locale = self::$DiocesanData->metadata->locales[0];
+            $baseLocale                 = \Locale::getPrimaryLanguage($this->EventsParams->Locale);
+            if (null === $baseLocale) {
+                throw new ValidationException(
+                    '"Names are not always the same among all men, but differ in each language;'
+                    . ' yet all are trying to express the nature of things."'
+                    . ' — Plato, Cratylus, 383a'
+                );
+            }
+
+            $this->EventsParams->baseLocale = $baseLocale;
         }
     }
 
@@ -358,7 +412,7 @@ final class EventsHandler extends AbstractHandler
      * `Epiphany`) never collide here the way they would in a single dated collection.
      *
      * Only called for {@see Rite::AMBROSIAN} requests, which `EventsParams::validateRiteCompatibility()`
-     * has already confirmed carry no national/diocesan calendar.
+     * has already confirmed carry no national calendar.
      */
     private function processAmbrosianSanctoraleEvents(): void
     {
@@ -672,6 +726,68 @@ final class EventsHandler extends AbstractHandler
         }
     }
 
+    /**
+     * Ambrosian rite only: processes the Ambrosian diocesan calendar data and merges it into the
+     * catalog.
+     *
+     * Rite-scoped mirror of {@see self::processDiocesanCalendarData()} above: same event-object
+     * construction and `[ {diocese_name} ] {name}` naming / `{diocese}_{key}` key-prefixing shape,
+     * but reading the localized names from the Ambrosian diocesan i18n tree
+     * ({@see JsonData::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FILE}) instead of the Roman one. Unlike the
+     * comune Ambrosian sanctorale/temporale i18n files (named `it.json`/`la.json`), the Ambrosian
+     * diocesan i18n files reuse the Roman diocesan-calendar naming convention and are named after
+     * the full locale (`it_IT.json`/`la_VA.json`); the locale is resolved the same way
+     * {@see \LiturgicalCalendar\Api\Handlers\CalendarHandler::applyAmbrosianDiocesanCalendar()}
+     * resolves it: {@see self::resolveAmbrosianLocale()}'s `it`/`la` mapped to `it_IT`/`la_VA`,
+     * falling back to the diocese's first declared locale if the mapped one isn't among
+     * `DiocesanData->metadata->locales`.
+     *
+     * Early-returns when no Ambrosian diocese was requested (or {@see self::loadAmbrosianDiocesanData()}
+     * was never called), so the comune-only Ambrosian catalog is unaffected.
+     *
+     * @return void
+     */
+    private function processAmbrosianDiocesanCalendarData(): void
+    {
+        if ($this->EventsParams->DiocesanCalendar === null || self::$DiocesanData === null) {
+            return;
+        }
+
+        $locale = match ($this->resolveAmbrosianLocale()) {
+            'la'    => 'la_VA',
+            default => 'it_IT',
+        };
+        if (false === in_array($locale, self::$DiocesanData->metadata->locales, true)) {
+            $locale = self::$DiocesanData->metadata->locales[0];
+        }
+
+        $DiocesanCalendarI18nFile = strtr(
+            JsonData::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FILE->path(),
+            [
+                '{nation}'  => self::$DiocesanData->metadata->nation,
+                '{diocese}' => self::$DiocesanData->metadata->diocese_id,
+                '{locale}'  => $locale
+            ]
+        );
+
+        /** @var array<string,string> $DiocesanCalendarI18nData */
+        $DiocesanCalendarI18nData = Utilities::jsonFileToArray($DiocesanCalendarI18nFile);
+
+        foreach (self::$DiocesanData->litcal as $diocesanLitCalItem) {
+            $key  = $diocesanLitCalItem->liturgical_event->event_key;
+            $name = $DiocesanCalendarI18nData[$key];
+            $diocesanLitCalItem->setName('[ ' . self::$DiocesanData->metadata->diocese_name . ' ] ' . $name);
+            $diocesanLitCalItem->liturgical_event->setKey($this->EventsParams->DiocesanCalendar . '_' . $key);
+            if ($diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemCreateNewFixed) {
+                self::$liturgicalEvents->addEvent(LiturgicalEventFixed::fromObject($diocesanLitCalItem->liturgical_event));
+            } elseif ($diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemCreateNewMobile) {
+                self::$liturgicalEvents->addEvent(LiturgicalEventMobile::fromObject($diocesanLitCalItem->liturgical_event));
+            } else {
+                throw new \ValueError('Unknown DiocesanLitCalItem->liturgical_event type: ' . get_class($diocesanLitCalItem->liturgical_event));
+            }
+        }
+    }
+
 
     /**
      * Initializes the Events class and processes the request.
@@ -756,13 +872,21 @@ final class EventsHandler extends AbstractHandler
         $this->processTemporaleEvents();
         $this->processSanctoraleEvents();
         if ($this->EventsParams->Rite === Rite::ROMAN) {
-            // The Ambrosian rite has no national/diocesan layer or decrees data yet
-            // (comune ambrosiano only, for now); EventsParams::validateRiteCompatibility()
-            // above has already rejected any Ambrosian request carrying a national or
-            // diocesan calendar, so these three processors are Roman-only.
+            // The Ambrosian rite has no national calendars or decrees data yet;
+            // EventsParams::validateRiteCompatibility() above has already rejected any
+            // Ambrosian request carrying a national calendar, so these two processors are
+            // Roman-only. The diocesan overlay is rite-scoped: processDiocesanCalendarData()
+            // (Roman) below, processAmbrosianDiocesanCalendarData() (Ambrosian) in the branch
+            // beneath.
             $this->processMemorialsFromDecreesData();
             $this->processNationalCalendarData();
             $this->processDiocesanCalendarData();
+        } else {
+            // Ambrosian: merge the diocesan overlay (if a diocese was requested via
+            // /events/ambrosian/diocese/{id}) into the comune catalog already built by
+            // processTemporaleEvents()/processSanctoraleEvents() above. No-ops when no
+            // diocese was requested (comune-only /events/ambrosian).
+            $this->processAmbrosianDiocesanCalendarData();
         }
 
         $responseObj  = [
