@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-22 22:29+0000\n"
+"POT-Creation-Date: 2026-07-24 15:45+0000\n"
 "PO-Revision-Date: 2026-06-19 18:50+0000\n"
 "Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Indonesian <https://translate.johnromanodorazio.com/projects/"
@@ -646,14 +646,14 @@ msgstr "Desember %s"
 
 #. translators: %s is an ordinal number (1st, 2nd, 3rd)
 #. translators: %s is an ordinal number (first, second...)
-#: src/FerialEventNameGenerator.php:382 src/Handlers/CalendarHandler.php:1931
+#: src/FerialEventNameGenerator.php:382 src/Handlers/CalendarHandler.php:2091
 #, php-format
 msgid "of the %s Week of Advent"
 msgstr "Pekan %s Adven"
 
 #. translators: %s is an ordinal number (2nd, 3rd, etc.) - Day of Christmas Octave
 #. translators: %s is an ordinal number (first, second...)
-#: src/FerialEventNameGenerator.php:401 src/Handlers/CalendarHandler.php:1991
+#: src/FerialEventNameGenerator.php:401 src/Handlers/CalendarHandler.php:2151
 #, php-format
 msgid "%s Day of the Octave of Christmas"
 msgstr "Hari %s pada Oktaf Natal"
@@ -672,13 +672,13 @@ msgid "%s after Epiphany"
 msgstr "%s setelah Epifani"
 
 #. translators: Day after Ash Wednesday pattern
-#: src/FerialEventNameGenerator.php:467 src/Handlers/CalendarHandler.php:2070
+#: src/FerialEventNameGenerator.php:467 src/Handlers/CalendarHandler.php:2230
 msgid "after Ash Wednesday"
 msgstr "setelah Rabu Abu"
 
 #. translators: %s is an ordinal number (1st, 2nd, 3rd)
 #. translators: %s is an ordinal number (first, second...)
-#: src/FerialEventNameGenerator.php:484 src/Handlers/CalendarHandler.php:2049
+#: src/FerialEventNameGenerator.php:484 src/Handlers/CalendarHandler.php:2209
 #, php-format
 msgid "of the %s Week of Lent"
 msgstr "Pekan %s Prapaskah"
@@ -690,14 +690,14 @@ msgid "%s within the Octave of Easter"
 msgstr "%s dalam Oktaf Paskah"
 
 #. translators: %s is an ordinal number (2nd, 3rd, etc.)
-#: src/FerialEventNameGenerator.php:517 src/Handlers/CalendarHandler.php:3059
+#: src/FerialEventNameGenerator.php:517 src/Handlers/CalendarHandler.php:3219
 #, php-format
 msgid "of the %s Week of Easter"
 msgstr "Pekan %s Paskah"
 
 #. translators: %s is an ordinal number (1st, 2nd, etc.)
-#: src/FerialEventNameGenerator.php:535 src/Handlers/CalendarHandler.php:3131
-#: src/Handlers/CalendarHandler.php:3179
+#: src/FerialEventNameGenerator.php:535 src/Handlers/CalendarHandler.php:3291
+#: src/Handlers/CalendarHandler.php:3339
 #, php-format
 msgid "of the %s Week of Ordinary Time"
 msgstr "Pekan Biasa %s"
@@ -714,7 +714,7 @@ msgid ""
 "The name of the diocese could not be derived from the diocese ID \"%s\"."
 msgstr "Nama keuskupan tidak dapat ditentukan dari ID keuskupan \"%s\"."
 
-#: src/Handlers/CalendarHandler.php:788
+#: src/Handlers/CalendarHandler.php:809
 #, php-format
 msgid ""
 "Only years from 1970 and after are supported. You tried requesting the year "
@@ -723,12 +723,12 @@ msgstr ""
 "Hanya mendukung dari tahun 1970 dan seterusnya. Anda mencoba meminta tahun "
 "%d."
 
-#: src/Handlers/CalendarHandler.php:795
+#: src/Handlers/CalendarHandler.php:816
 #, php-format
 msgid "Only years until 9999 are supported. You tried requesting the year %d."
 msgstr "Hanya tahun hingga 9999 yang didukung. Anda mencoba meminta tahun %d."
 
-#: src/Handlers/CalendarHandler.php:955
+#: src/Handlers/CalendarHandler.php:976
 #, php-format
 msgid ""
 "The Ambrosian comune sanctorale event `%1$s` from the %2$s was skipped "
@@ -747,8 +747,8 @@ msgstr ""
 #.  6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
 #.
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Explicatory string for the transferral, 5: actual date for the transferral, 6: Reference to the norm that governs the transferral
-#: src/Handlers/CalendarHandler.php:1411 src/Handlers/CalendarHandler.php:1431
-#: src/Handlers/CalendarHandler.php:1482 src/Handlers/CalendarHandler.php:1534
+#: src/Handlers/CalendarHandler.php:1571 src/Handlers/CalendarHandler.php:1591
+#: src/Handlers/CalendarHandler.php:1642 src/Handlers/CalendarHandler.php:1694
 #, php-format
 msgid ""
 "The Solemnity '%1$s' falls on %2$s in the year %3$d, the celebration has "
@@ -757,16 +757,16 @@ msgstr ""
 "Hari Raya '%1$s' jatuh pada %2$s di tahun %3$d, perayaannya dipindahkan ke "
 "%4$s (%5$s) sesuai dengan %6$s."
 
-#: src/Handlers/CalendarHandler.php:1415
+#: src/Handlers/CalendarHandler.php:1575
 msgid "the Saturday preceding Palm Sunday"
 msgstr "Sabtu sebelum Minggu Palma"
 
-#: src/Handlers/CalendarHandler.php:1418 src/Handlers/CalendarHandler.php:1438
-#: src/Handlers/CalendarHandler.php:1488 src/Handlers/CalendarHandler.php:1586
-#: src/Handlers/CalendarHandler.php:2168 src/Handlers/CalendarHandler.php:2462
-#: src/Handlers/CalendarHandler.php:2937 src/Handlers/CalendarHandler.php:2953
-#: src/Handlers/CalendarHandler.php:2971 src/Handlers/CalendarHandler.php:3010
-#: src/Models/Calendar/LiturgicalEventCollection.php:1691
+#: src/Handlers/CalendarHandler.php:1578 src/Handlers/CalendarHandler.php:1598
+#: src/Handlers/CalendarHandler.php:1648 src/Handlers/CalendarHandler.php:1746
+#: src/Handlers/CalendarHandler.php:2328 src/Handlers/CalendarHandler.php:2622
+#: src/Handlers/CalendarHandler.php:3097 src/Handlers/CalendarHandler.php:3113
+#: src/Handlers/CalendarHandler.php:3131 src/Handlers/CalendarHandler.php:3170
+#: src/Models/Calendar/LiturgicalEventCollection.php:1734
 #: src/Models/Decrees/DecreeEventMetadata.php:54
 #: src/Models/RegionalData/NationalData/LitCalItemMakePatronMetadata.php:49
 msgid ""
@@ -774,25 +774,25 @@ msgid ""
 "Sacraments"
 msgstr "Dekret dari Dikasteri untuk Ibadah Ilahi dan Tata Tertib Sakramen"
 
-#: src/Handlers/CalendarHandler.php:1435
+#: src/Handlers/CalendarHandler.php:1595
 msgid "the Monday following the Second Sunday of Easter"
 msgstr "Senin setelah Minggu Kedua Paskah"
 
-#: src/Handlers/CalendarHandler.php:1486
+#: src/Handlers/CalendarHandler.php:1646
 msgid "the following Monday"
 msgstr "Senin berikutnya"
 
-#: src/Handlers/CalendarHandler.php:1538
+#: src/Handlers/CalendarHandler.php:1698
 #, fuzzy
 msgid "the following day"
 msgstr "Senin berikutnya"
 
-#: src/Handlers/CalendarHandler.php:1540
+#: src/Handlers/CalendarHandler.php:1700
 msgid "General Norms for the Liturgical Year and the Calendar"
 msgstr ""
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year
-#: src/Handlers/CalendarHandler.php:1545 src/Handlers/CalendarHandler.php:1560
+#: src/Handlers/CalendarHandler.php:1705 src/Handlers/CalendarHandler.php:1720
 #, php-format
 msgid ""
 "The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year %3$d. "
@@ -809,7 +809,7 @@ msgstr ""
 #.  3: Requested calendar year,
 #.  4: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
 #.
-#: src/Handlers/CalendarHandler.php:1598
+#: src/Handlers/CalendarHandler.php:1758
 #, php-format
 msgid ""
 "Seeing that the Solemnity '%1$s' coincides with the Solemnity '%2$s' in the "
@@ -819,7 +819,7 @@ msgstr ""
 "%3$d, telah dimajukan satu hari sesuai %4$s."
 
 #. translators: 1: LiturgicalEvent name (Christmas), 2: Requested calendar year, 3: LiturgicalEvent name (Holy Family), 4: New date for Holy Family
-#: src/Handlers/CalendarHandler.php:1683
+#: src/Handlers/CalendarHandler.php:1843
 #, php-format
 msgid ""
 "'%1$s' falls on a Sunday in the year %2$d, therefore the Feast '%3$s' is "
@@ -829,12 +829,12 @@ msgstr ""
 "dirayakan pada %4$s daripada pada hari Minggu setelah Natal."
 
 #. translators: You can ignore this translation if the Feast has not been inserted by the Episcopal Conference
-#: src/Handlers/CalendarHandler.php:1709
+#: src/Handlers/CalendarHandler.php:1869
 msgid "Our Lord Jesus Christ, The Eternal High Priest"
 msgstr "Tuhan Kita Yesus Kristus, Imam Agung Abadi"
 
 #. translators: 1: National Calendar, 2: Requested calendar year, 3: source of the rule
-#: src/Handlers/CalendarHandler.php:1721
+#: src/Handlers/CalendarHandler.php:1881
 #, php-format
 msgid ""
 "In 2012, Pope Benedict XVI gave faculty to the Episcopal Conferences to "
@@ -848,7 +848,7 @@ msgstr ""
 "Pentakosta: berlaku untuk kalender '%1$s' di tahun '%2$d' (%3$s)."
 
 #. translators: 1: LiturgicalEvent name, 2: Superseding LiturgicalEvent grade, 3: Superseding LiturgicalEvent name, 4: Requested calendar year
-#: src/Handlers/CalendarHandler.php:1782 src/Handlers/CalendarHandler.php:1828
+#: src/Handlers/CalendarHandler.php:1942 src/Handlers/CalendarHandler.php:1988
 #, php-format
 msgid "'%1$s' is superseded by the %2$s '%3$s' in the year %4$d."
 msgstr "'%1$s' digantikan oleh %2$s '%3$s' di tahun %4$d."
@@ -877,8 +877,8 @@ msgstr "'%1$s' digantikan oleh %2$s '%3$s' di tahun %4$d."
 #.  5. Source of the information
 #.  6. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:2105 src/Handlers/CalendarHandler.php:2555
-#: src/Handlers/CalendarHandler.php:2780 src/Handlers/CalendarHandler.php:3644
+#: src/Handlers/CalendarHandler.php:2265 src/Handlers/CalendarHandler.php:2715
+#: src/Handlers/CalendarHandler.php:2940 src/Handlers/CalendarHandler.php:3804
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
@@ -887,14 +887,14 @@ msgstr ""
 "%1$s '%2$s' telah ditambahkan pada %3$s sejak tahun %4$d (%5$s), berlaku "
 "untuk tahun %6$d."
 
-#: src/Handlers/CalendarHandler.php:2150 src/Handlers/CalendarHandler.php:2340
+#: src/Handlers/CalendarHandler.php:2310 src/Handlers/CalendarHandler.php:2500
 msgid ""
 "Vatican Press conference: Presentation of the Editio Typica Tertia of the "
 "Roman Missal"
 msgstr ""
 "Konferensi Pers Vatikan: Presentasi Editio Typica Tertia dari Misale Romawi"
 
-#: src/Handlers/CalendarHandler.php:2215
+#: src/Handlers/CalendarHandler.php:2375
 #, php-format
 msgid ""
 "The %1$s '%2$s' either falls between 17 Dec. and 24 Dec., or during the "
@@ -912,12 +912,12 @@ msgstr ""
 #.  4. Name of the liturgical event that is superseding
 #.  5. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:2253 src/Handlers/CalendarHandler.php:2301
+#: src/Handlers/CalendarHandler.php:2413 src/Handlers/CalendarHandler.php:2461
 #, php-format
 msgid "The %1$s '%2$s' is superseded by the %3$s '%4$s' in the year %5$d."
 msgstr "%1$s '%2$s' digantikan oleh %3$s '%4$s' di tahun %5$d."
 
-#: src/Handlers/CalendarHandler.php:2334
+#: src/Handlers/CalendarHandler.php:2494
 msgid "Apostolic Constitution Missale Romanum"
 msgstr "Konstitusi Apostolik Missale Romanum"
 
@@ -932,7 +932,7 @@ msgstr "Konstitusi Apostolik Missale Romanum"
 #.  8. Name of the liturgical event that is superseding
 #.  9. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:2363
+#: src/Handlers/CalendarHandler.php:2523
 #, php-format
 msgid ""
 "The %1$s '%2$s', added in the %3$s of the Roman Missal since the year %4$d "
@@ -963,7 +963,7 @@ msgstr ""
 #.  7. Name of superseding liturgical event
 #.  8. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:2409 src/Handlers/CalendarHandler.php:2835
+#: src/Handlers/CalendarHandler.php:2569 src/Handlers/CalendarHandler.php:2995
 #, php-format
 msgid ""
 "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
@@ -978,7 +978,7 @@ msgstr ""
 #.  3. Requested calendar year
 #.  4. Source of the information
 #.
-#: src/Handlers/CalendarHandler.php:2457
+#: src/Handlers/CalendarHandler.php:2617
 #, php-format
 msgid ""
 "The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
@@ -988,7 +988,7 @@ msgstr ""
 "Keduanya diturunkan dalam peringkat menjadi peringatan opsional (%4$s)."
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
-#: src/Handlers/CalendarHandler.php:2506
+#: src/Handlers/CalendarHandler.php:2666
 #, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': can only be relative to "
@@ -998,7 +998,7 @@ msgstr ""
 "terhadap acara liturgi dengan kunci '%2$s' menggunakan kata kunci %3$s"
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
-#: src/Handlers/CalendarHandler.php:2520
+#: src/Handlers/CalendarHandler.php:2680
 #, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s' relative to liturgical event "
@@ -1015,7 +1015,7 @@ msgstr ""
 #.  5. Requested calendar year
 #.  6. Source of the information
 #.
-#: src/Handlers/CalendarHandler.php:2611
+#: src/Handlers/CalendarHandler.php:2771
 #, php-format
 msgid ""
 "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
@@ -1032,7 +1032,7 @@ msgstr ""
 #.  5. Requested calendar year
 #.  6. Source of the information
 #.
-#: src/Handlers/CalendarHandler.php:2633
+#: src/Handlers/CalendarHandler.php:2793
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been raised to the rank of %3$s since the year %4$d, "
@@ -1049,7 +1049,7 @@ msgstr ""
 #.  5. Requested calendar year
 #.  6. Source of the information
 #.
-#: src/Handlers/CalendarHandler.php:2643
+#: src/Handlers/CalendarHandler.php:2803
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been lowered to the rank of %3$s since the year %4$d, "
@@ -1064,7 +1064,7 @@ msgstr ""
 #.  3. Requested calendar year
 #.  4. Source of the information
 #.
-#: src/Handlers/CalendarHandler.php:2696
+#: src/Handlers/CalendarHandler.php:2856
 #, php-format
 msgid ""
 "'%1$s' has been declared a Doctor of the Church since the year %2$d, "
@@ -1083,7 +1083,7 @@ msgstr ""
 #.  7. Year from which the liturgical event has been added
 #.  8. Source of the information
 #.
-#: src/Handlers/CalendarHandler.php:2862
+#: src/Handlers/CalendarHandler.php:3022
 #, php-format
 msgid ""
 "In the year %1$d, the %2$s '%3$s' has been suppressed by the %4$s '%5$s', "
@@ -1093,7 +1093,7 @@ msgstr ""
 "pada %6$s sejak tahun %7$d (%8$s)."
 
 #. translators: 1: LiturgicalEvent name, 2: Source of the information, 3: Requested calendar year
-#: src/Handlers/CalendarHandler.php:2934
+#: src/Handlers/CalendarHandler.php:3094
 #, php-format
 msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
@@ -1103,7 +1103,7 @@ msgstr ""
 "sejak tahun 2002 (%2$s), berlaku untuk tahun %3$d."
 
 #. translators: 1: LiturgicalEvent name, 2: Source of the information, 3: Requested calendar year
-#: src/Handlers/CalendarHandler.php:2950
+#: src/Handlers/CalendarHandler.php:3110
 #, php-format
 msgid ""
 "The optional memorial '%1$s', which would have been superseded this year by "
@@ -1115,7 +1115,7 @@ msgstr ""
 "dipindahkan ke 12 Agustus sejak tahun 2002 (%2$s), berlaku untuk tahun %3$d."
 
 #. translators: 1: LiturgicalEvent name, 2: Source of the information, 3: Requested calendar year, 4: Coinciding LiturgicalEvent grade, 5: Coinciding LiturgicalEvent name
-#: src/Handlers/CalendarHandler.php:2968
+#: src/Handlers/CalendarHandler.php:3128
 #, php-format
 msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
@@ -1127,7 +1127,7 @@ msgstr ""
 "digantikan oleh %4$s '%5$s' pada tahun %3$d."
 
 #. translators: 1: LiturgicalEvent name, 2: Source of the information
-#: src/Handlers/CalendarHandler.php:3007
+#: src/Handlers/CalendarHandler.php:3167
 #, php-format
 msgid ""
 "The Feast '%1$s' would have been suppressed this year ( 2009 ) since it "
@@ -1140,12 +1140,12 @@ msgstr ""
 "oleh %2$s telah dipulihkan sehingga gereja-gereja lokal bisa secara opsional "
 "merayakan peringatan."
 
-#: src/Handlers/CalendarHandler.php:3222
+#: src/Handlers/CalendarHandler.php:3382
 msgid "Saturday Memorial of the Blessed Virgin Mary"
 msgstr "Peringatan Sabtu Santa Perawan Maria"
 
 #. translators: 1: wider_region, 2: metadata, 3: calendar_id
-#: src/Handlers/CalendarHandler.php:3297
+#: src/Handlers/CalendarHandler.php:3457
 #, php-format
 msgid ""
 "Could not find a %1$s property in the %2$s for the National Calendar %3$s."
@@ -1153,7 +1153,7 @@ msgstr ""
 "Tidak dapat menemukan properti %1$s dalam %2$s untuk Kalender Nasional %3$s."
 
 #. translators: 1: Event key, 2: Original date, 3: New date, 4: Requested calendar year
-#: src/Handlers/CalendarHandler.php:3327
+#: src/Handlers/CalendarHandler.php:3487
 #, php-format
 msgid ""
 "The liturgical event '%1$s' has been moved from %2$s to %3$s due to "
@@ -1171,7 +1171,7 @@ msgstr ""
 #.  6. Requested calendar year
 #.  7. National or wider region calendar
 #.
-#: src/Handlers/CalendarHandler.php:3390
+#: src/Handlers/CalendarHandler.php:3550
 #, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, was suppressed by the %4$s "
@@ -1191,7 +1191,7 @@ msgstr ""
 #.  6. Requested calendar year
 #.  7. National or wider region calendar
 #.
-#: src/Handlers/CalendarHandler.php:3410
+#: src/Handlers/CalendarHandler.php:3570
 #, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, was suppressed by the %4$s "
@@ -1208,7 +1208,7 @@ msgstr ""
 #.  3. Requested calendar year
 #.  4. Source of the information
 #.
-#: src/Handlers/CalendarHandler.php:3494
+#: src/Handlers/CalendarHandler.php:3654
 #, php-format
 msgid ""
 "The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
@@ -1218,7 +1218,7 @@ msgstr ""
 "Keduanya diturunkan peringkatnya menjadi peringatan opsional."
 
 #. translators: 1. LiturgicalEvent name, 2. LiturgicalEvent date, 3. Coinciding liturgical event name, 4. Requested calendar year
-#: src/Handlers/CalendarHandler.php:3517
+#: src/Handlers/CalendarHandler.php:3677
 #, php-format
 msgid ""
 "The Feast '%1$s', usually celebrated on %2$s, coincides with another Feast "
@@ -1228,7 +1228,7 @@ msgstr ""
 "'%3$s' pada tahun %4$d! Apakah ada yang perlu dilakukan tentang ini?"
 
 #. translators: 1. LiturgicalEvent name, 2. LiturgicalEvent date, 3. Coinciding liturgical event name, 4. Requested calendar year
-#: src/Handlers/CalendarHandler.php:3537
+#: src/Handlers/CalendarHandler.php:3697
 #, php-format
 msgid ""
 "The Solemnity '%1$s', usually celebrated on %2$s, coincides with the Sunday "
@@ -1239,7 +1239,7 @@ msgstr ""
 "atau Hari Raya '%3$s' pada tahun %4$d! Apakah ada yang perlu dilakukan "
 "tentang ini?"
 
-#: src/Handlers/CalendarHandler.php:3577
+#: src/Handlers/CalendarHandler.php:3737
 #, php-format
 msgid ""
 "Cannot create liturgical event with key \"%1$s\": the day (%2$d) of the "
@@ -1250,7 +1250,7 @@ msgstr ""
 "acara liturgi lebih besar dari jumlah hari (%3$d) di bulan (%4$d) tahun "
 "acara liturgi (%5$d)."
 
-#: src/Handlers/CalendarHandler.php:3602
+#: src/Handlers/CalendarHandler.php:3762
 msgid ""
 "We should be creating a new liturgical event, however we do not seem to have "
 "the correct date information in order to proceed"
@@ -1264,7 +1264,7 @@ msgstr ""
 #.  3. Date of the liturgical event (localized date for fixed events, or mobile date expression for some mobile events)
 #.  4. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3660
+#: src/Handlers/CalendarHandler.php:3820
 #, php-format
 msgid ""
 "The %1$s '%2$s' was not added to the calendar on %3$s because it conflicts "
@@ -1281,7 +1281,7 @@ msgstr ""
 #.  5. Year from which the name has been changed
 #.  6. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3729
+#: src/Handlers/CalendarHandler.php:3889
 #, php-format
 msgid ""
 "The name of the %1$s '%2$s' has been changed to '%3$s' in the national "
@@ -1297,7 +1297,7 @@ msgstr ""
 #.  4. Year from which the name has been changed
 #.  5. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3747
+#: src/Handlers/CalendarHandler.php:3907
 #, php-format
 msgid ""
 "The name of the celebration '%1$s' has been changed to '%2$s' in the "
@@ -1317,7 +1317,7 @@ msgstr ""
 #.  6. Source of the information
 #.  7. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3774
+#: src/Handlers/CalendarHandler.php:3934
 #, php-format
 msgid ""
 "The grade of the %1$s '%2$s' has been changed to '%3$s' in the national "
@@ -1333,7 +1333,7 @@ msgstr ""
 #.  4. Year from which the name has been changed
 #.  5. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3793
+#: src/Handlers/CalendarHandler.php:3953
 #, php-format
 msgid ""
 "The grade of the celebration '%1$s' has been changed to '%2$s' in the "
@@ -1353,7 +1353,7 @@ msgstr ""
 #.  6. ID of the national calendar
 #.  7. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3828
+#: src/Handlers/CalendarHandler.php:3988
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been moved from %3$s to %4$s since the year %5$d in the "
@@ -1369,7 +1369,7 @@ msgstr ""
 #.  4. ID of the national calendar
 #.  5. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3847
+#: src/Handlers/CalendarHandler.php:4007
 #, php-format
 msgid ""
 "The liturgical event '%1$s' has been moved to %2$s since the year %3$d in "
@@ -1387,7 +1387,7 @@ msgstr ""
 #.  4. ID of the national calendar
 #.  5. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3878
+#: src/Handlers/CalendarHandler.php:4038
 #, php-format
 msgid ""
 "The liturgical event '%1$s' has been moved to %2$s since the year %3$d in "
@@ -1401,13 +1401,13 @@ msgstr ""
 "dengan peringkat lebih tinggi."
 
 #. translators: 1. Country name, 2. List of missals
-#: src/Handlers/CalendarHandler.php:3917
+#: src/Handlers/CalendarHandler.php:4077
 #, php-format
 msgid "Found Missals for region %1$s: %2$s."
 msgstr "Ditemukan Misale untuk wilayah %1$s: %2$s."
 
 #. translators: Name of the Roman Missal
-#: src/Handlers/CalendarHandler.php:3941
+#: src/Handlers/CalendarHandler.php:4101
 #, php-format
 msgid "Found a sanctorale data file for %s"
 msgstr "Ditemukan file data sanctorale untuk %s"
@@ -1421,7 +1421,7 @@ msgstr "Ditemukan file data sanctorale untuk %s"
 #.  6. Superseding liturgical event name
 #.  7. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3977
+#: src/Handlers/CalendarHandler.php:4137
 #, php-format
 msgid ""
 "The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
@@ -1431,13 +1431,13 @@ msgstr ""
 "oleh %5$s '%6$s' pada tahun %7$d"
 
 #. translators: Name of the Roman Missal
-#: src/Handlers/CalendarHandler.php:3991
+#: src/Handlers/CalendarHandler.php:4151
 #, php-format
 msgid "Could not find a sanctorale data file for %s"
 msgstr "Tidak dapat menemukan file data sanctorale untuk %s"
 
 #. translators: 1. LiturgicalEvent grade, 2. LiturgicalEvent name, 3. New liturgical event name, 4: Requested calendar year, 5. Old date, 6. New date
-#: src/Handlers/CalendarHandler.php:4065
+#: src/Handlers/CalendarHandler.php:4225
 #, php-format
 msgid ""
 "The %1$s '%2$s' is transferred from %5$s to %6$s as per the %7$s, to make "
@@ -1447,7 +1447,7 @@ msgstr ""
 "ruang bagi '%3$s': berlaku untuk tahun %4$d."
 
 #. translators: 1. LiturgicalEvent grade, 2. LiturgicalEvent name, 3. Old date, 4. New date, 5. Source of the information, 6. New liturgical event name, 7. Superseding liturgical event grade, 8. Superseding liturgical event name, 9: Requested calendar year
-#: src/Handlers/CalendarHandler.php:4083
+#: src/Handlers/CalendarHandler.php:4243
 #, php-format
 msgid ""
 "The %1$s '%2$s' would have been transferred from %3$s to %4$s as per the "
@@ -1459,7 +1459,7 @@ msgstr ""
 "%9$d."
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
-#: src/Handlers/CalendarHandler.php:4280
+#: src/Handlers/CalendarHandler.php:4440
 #, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s' relative to liturgical event "
@@ -1469,7 +1469,7 @@ msgstr ""
 "liturgi dengan kunci '%2$s', acara liturgi tidak ada."
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. event_key of the liturgical event that it is relative to, 3. List of valid keywords
-#: src/Handlers/CalendarHandler.php:4296
+#: src/Handlers/CalendarHandler.php:4456
 #, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': the `strtotime.relative_time` "
@@ -1481,7 +1481,7 @@ msgstr ""
 "acara liturgi dengan kunci '%2$s' menggunakan kata kunci %3$s."
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile liturgical event being created
-#: src/Handlers/CalendarHandler.php:4374
+#: src/Handlers/CalendarHandler.php:4534
 #, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': 'strtotime' property must be "
@@ -1491,7 +1491,7 @@ msgstr ""
 "berupa objek atau string, namun saat ini bertipe '%2$s'."
 
 #. translators: 1: LiturgicalEvent name, 2: Name of the diocese, 3: LiturgicalEvent date, 4: Coinciding liturgical event name, 5: Requested calendar year
-#: src/Handlers/CalendarHandler.php:4454
+#: src/Handlers/CalendarHandler.php:4614
 #, php-format
 msgid ""
 "The Solemnity '%1$s', proper to the calendar of the %2$s and usually "
@@ -1503,7 +1503,7 @@ msgstr ""
 "Apakah ada yang perlu dilakukan tentang ini?"
 
 #. translators: 1: LiturgicalEvent grade, 2: LiturgicalEvent name, 3: Name of the diocese, 4: LiturgicalEvent date, 5: Coinciding liturgical event name, 6: Requested calendar year
-#: src/Handlers/CalendarHandler.php:4479
+#: src/Handlers/CalendarHandler.php:4639
 #, php-format
 msgid ""
 "The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
@@ -1512,11 +1512,11 @@ msgstr ""
 "%1$s '%2$s', yang sesuai dengan kalender %3$s dan biasanya dirayakan pada "
 "%4$s, dibatalkan oleh %5$s %6$s pada tahun %7$d."
 
-#: src/Handlers/CalendarHandler.php:4778
+#: src/Handlers/CalendarHandler.php:4938
 msgid "Error converting Liturgical Calendar to XML."
 msgstr "Kesalahan mengonversi Kalender Liturgi ke XML."
 
-#: src/Handlers/CalendarHandler.php:4809
+#: src/Handlers/CalendarHandler.php:4969
 msgid "Error serializing Liturgical Calendar."
 msgstr "Kesalahan saat melakukan serialisasi Kalender Liturgi."
 
@@ -1550,7 +1550,7 @@ msgstr "TAHUN"
 msgid "Vigil Mass"
 msgstr "Misa Vigili"
 
-#: src/Models/Calendar/LiturgicalEventCollection.php:1685
+#: src/Models/Calendar/LiturgicalEventCollection.php:1728
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -1561,7 +1561,7 @@ msgstr ""
 "Sesuai dengan %6$s, yang pertama memiliki prioritas, oleh karena itu Misa "
 "Vigili dikonfirmasi demikian juga Vesper I."
 
-#: src/Models/Calendar/LiturgicalEventCollection.php:1700
+#: src/Models/Calendar/LiturgicalEventCollection.php:1743
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -1574,7 +1574,7 @@ msgstr ""
 "Misa vigili, sementara Hari Raya terakhir tidak akan memiliki Vesper II atau "
 "Misa malam."
 
-#: src/Models/Calendar/LiturgicalEventCollection.php:1710
+#: src/Models/Calendar/LiturgicalEventCollection.php:1753
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
@@ -1587,7 +1587,7 @@ msgstr ""
 "mempertahankan Vesper II dan Misa malam, sementara Hari Raya pertama tidak "
 "akan memiliki Misa Vigili atau Vesper I."
 
-#: src/Models/Calendar/LiturgicalEventCollection.php:1795
+#: src/Models/Calendar/LiturgicalEventCollection.php:1838
 #, php-format
 msgid ""
 "The Vigil Mass for the %1$s '%2$s' coincides with the %3$s '%4$s' in the "
