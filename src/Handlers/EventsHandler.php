@@ -299,31 +299,85 @@ final class EventsHandler extends AbstractHandler
     }
 
     /**
-     * Sets the locale for the current instance, affecting date formatting
-     * and translations of liturgical texts.
+     * Set up the process-global locale for this request in a deterministic,
+     * leak-proof way.
      *
-     * This method retrieves the primary language from the current locale,
-     * constructs an array of potential locale strings, and sets the locale
-     * for PHP's internationalization functions. It also configures the domain
-     * for gettext translations and initializes LitGrade and LitCommon instances
-     * with the specified locale.
+     * For a translated locale whose system locale is installed, this pins the
+     * current request's gettext catalog via LANGUAGE (which glibc gettext reads
+     * above LC_MESSAGES) and updates ICU's default. If setlocale() fails (the
+     * locale isn't installed — e.g. bare 'en', the source language) or the request
+     * is Latin/default, it resets setlocale()/LANGUAGE/ICU so localized output
+     * falls through to the untranslated (English) base. Every branch overrides
+     * whatever a prior request in the same persistent worker left behind, then
+     * binds the gettext text domain and configures the LiturgicalEventAbstract
+     * locale. Mirrors CalendarHandler::prepareL10N() (#743).
      *
      * @return void
      */
     private function setLocale(): void
     {
-        $localeArray = [
-            $this->EventsParams->Locale . '.utf8',
-            $this->EventsParams->Locale . '.UTF-8',
-            $this->EventsParams->Locale,
-            $this->EventsParams->baseLocale . '_' . strtoupper($this->EventsParams->baseLocale) . '.utf8',
-            $this->EventsParams->baseLocale . '_' . strtoupper($this->EventsParams->baseLocale) . '.UTF-8',
-            $this->EventsParams->baseLocale . '_' . strtoupper($this->EventsParams->baseLocale),
-            $this->EventsParams->baseLocale . '.utf8',
-            $this->EventsParams->baseLocale . '.UTF-8',
-            $this->EventsParams->baseLocale
-        ];
-        setlocale(LC_ALL, $localeArray);
+        $baseLocale = $this->EventsParams->baseLocale;
+
+        if ($baseLocale !== LitLocale::LATIN_PRIMARY_LANGUAGE) {
+            $localeArray = [
+                $this->EventsParams->Locale . '.utf8',
+                $this->EventsParams->Locale . '.UTF-8',
+                $this->EventsParams->Locale,
+                $baseLocale . '_' . strtoupper($baseLocale) . '.utf8',
+                $baseLocale . '_' . strtoupper($baseLocale) . '.UTF-8',
+                $baseLocale . '_' . strtoupper($baseLocale),
+                $baseLocale . '.utf8',
+                $baseLocale . '.UTF-8',
+                $baseLocale
+            ];
+
+            $runtimeLocale = setlocale(LC_ALL, $localeArray);
+            if (false === $runtimeLocale) {
+                // The requested locale isn't installed on this host. glibc gettext()
+                // can't load a catalog without a non-C locale, so localized output
+                // falls through to the (English) msgid base — correct for an English
+                // request (English is the source language, with no catalog of its own),
+                // and graceful degradation for any other uninstalled locale. Still reset
+                // the leak vector so a LANGUAGE / locale left by a prior request in this
+                // persistent worker can't bleed into this response (#743).
+                setlocale(LC_ALL, 'C');
+                putenv('LANGUAGE');
+                \Locale::setDefault($baseLocale);
+            } else {
+                // Example: "it_IT.UTF-8" → "it_IT"
+                $normalizedLocale = strtok($runtimeLocale, '.') ?: $runtimeLocale;
+                if ($normalizedLocale === 'C' || $normalizedLocale === 'POSIX') {
+                    $normalizedLocale = $baseLocale;
+                }
+
+                // Pin gettext's catalog for THIS request. glibc gettext() reads LANGUAGE
+                // above LC_MESSAGES, so — in a persistent worker — a LANGUAGE value left by
+                // a prior request (e.g. CalendarHandler::prepareL10N() or an earlier /events
+                // request in another language) would otherwise win and leak into this
+                // response's localized fields (#743).
+                $languageEnv = implode(':', array_unique([
+                    $runtimeLocale,
+                    $normalizedLocale,
+                    $baseLocale,
+                    'en'
+                ]));
+                putenv("LANGUAGE={$languageEnv}");
+
+                // also update ICU’s default locale
+                \Locale::setDefault($normalizedLocale);
+            }
+        } else {
+            // Latin (or default): a prior translated request handled by this same
+            // (long-lived) worker process may have left the process-global locale set —
+            // setlocale(LC_MESSAGES) and the LANGUAGE env var, both of which gettext reads.
+            // Reset them so the Latin catalog's message templates fall through to the
+            // untranslated (English) base instead of leaking the previous request's
+            // language (#743). This mirrors, in reverse, the translated branch above.
+            setlocale(LC_ALL, 'C');
+            putenv('LANGUAGE');
+            \Locale::setDefault(LitLocale::LATIN_PRIMARY_LANGUAGE);
+        }
+
         bindtextdomain('litcal', Router::$apiFilePath . 'i18n');
         textdomain('litcal');
         LiturgicalEventAbstract::setLocale($this->EventsParams->Locale);
