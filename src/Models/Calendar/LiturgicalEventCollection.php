@@ -918,8 +918,20 @@ final class LiturgicalEventCollection
      */
     public function removeLiturgicalEventWithoutSuppression(string $key): void
     {
+        // Mirror every grade index addLiturgicalEvent() may have populated for this key:
+        // a Lord/BVM solemnity also lands in solemnitiesLordBVM, and a Feast of the Lord
+        // lands in feastsLord (never in the plain feasts map) — clearing only
+        // solemnities/feasts/memorials would leave a stale reference behind.
+        if ($this->solemnitiesLordBVM->hasKey($key)) {
+            $this->solemnitiesLordBVM->removeEvent($key);
+        }
+
         if ($this->solemnities->hasKey($key)) {
             $this->solemnities->removeEvent($key);
+        }
+
+        if ($this->feastsLord->hasKey($key)) {
+            $this->feastsLord->removeEvent($key);
         }
 
         if ($this->feasts->hasKey($key)) {
