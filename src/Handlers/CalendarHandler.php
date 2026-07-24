@@ -1110,9 +1110,11 @@ final class CalendarHandler extends AbstractHandler
             $key = $liturgicalEvent->event_key;
 
             // Diocesan-wins: remove any comune event already occupying this key before re-adding,
-            // so no stale grade sub-collection entry lingers from the comune definition.
+            // so no stale grade sub-collection entry lingers from the comune definition. The comune
+            // event is being *replaced* by the diocesan one (not liturgically suppressed), so it must
+            // not surface in the response's suppressed_events metadata.
             if (null !== $this->Cal->getLiturgicalEvent($key)) {
-                $this->Cal->removeLiturgicalEvent($key);
+                $this->Cal->removeLiturgicalEventWithoutSuppression($key);
             }
 
             $litEvent = LiturgicalEvent::fromObject($liturgicalEvent);

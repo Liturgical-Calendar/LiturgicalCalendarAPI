@@ -216,6 +216,10 @@ final class CalendarHandlerAmbrosianDiocesanTest extends AbstractHandlerTestCase
             'Expected the diocesan override (MEMORIAL) to win over the comune definition (FEAST).'
         );
         self::assertInstanceOf(ReadingsFestive::class, $event->readings);
+        self::assertFalse(
+            $cal->isSuppressed('StFrancisOfAssisi'),
+            'A diocesan override replaces the comune event in place; it must NOT be recorded as a suppressed celebration.'
+        );
     }
 
     /**
