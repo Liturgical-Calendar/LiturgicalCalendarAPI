@@ -25,6 +25,19 @@ final class JsonDataAmbrosianDiocesanPathTest extends TestCase
         );
     }
 
+    /**
+     * Exercises the runtime `->path()` contract (not just the raw constant):
+     * `path()` prefixes `Router::$apiFilePath` — populated in setUpBeforeClass —
+     * onto the folder value, so the resolved path must end with it.
+     */
+    public function testAmbrosianDiocesanCalendarsFolderPath(): void
+    {
+        $this->assertStringEndsWith(
+            JsonDataConstants::AMBROSIAN_DIOCESAN_CALENDARS_FOLDER,
+            JsonData::AMBROSIAN_DIOCESAN_CALENDARS_FOLDER->path()
+        );
+    }
+
     public function testAmbrosianDiocesanCalendarFileConstant(): void
     {
         $this->assertSame(
