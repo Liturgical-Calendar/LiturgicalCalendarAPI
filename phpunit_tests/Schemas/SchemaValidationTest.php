@@ -25,7 +25,6 @@ use LiturgicalCalendar\Api\Router;
 class SchemaValidationTest extends TestCase
 {
     private static string $schemasPath;
-    private static string $sourceDataPath;
     private static bool $routerInitialized = false;
 
     public static function setUpBeforeClass(): void
@@ -34,8 +33,7 @@ class SchemaValidationTest extends TestCase
         Router::getApiPaths();
 
         // Get the paths
-        self::$schemasPath    = JsonData::SCHEMAS_FOLDER->path();
-        self::$sourceDataPath = JsonData::SOURCEDATA_FOLDER->path();
+        self::$schemasPath = JsonData::SCHEMAS_FOLDER->path();
     }
 
     /**
