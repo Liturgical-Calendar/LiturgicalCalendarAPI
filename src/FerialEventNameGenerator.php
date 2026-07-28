@@ -2,8 +2,8 @@
 
 namespace LiturgicalCalendar\Api;
 
-use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Api\Services\LocaleConfigurator;
 
 /**
  * Generates localized names for ferial (weekday) liturgical events.
@@ -176,74 +176,20 @@ class FerialEventNameGenerator
     /**
      * Initialize gettext for the locale.
      *
-     * Uses the same initialization pattern as CalendarHandler for consistency.
+     * Delegates process-global locale/LANGUAGE/ICU setup to the shared
+     * LocaleConfigurator (#745) — which resets for Latin and pins the catalog for
+     * translated locales, overriding any state a prior request left in this worker —
+     * then binds the gettext text domain. Latin phrase templates fall through to the
+     * English msgid base (there is no installable Latin locale); Latin day names and
+     * ordinals are emitted from hardcoded tables elsewhere in this class.
      */
     private function initializeGettext(): void
     {
-        // Skip gettext initialization for Latin (no .mo file needed, hardcoded strings)
-        if ($this->primaryLanguage === 'la') {
-            return;
-        }
+        LocaleConfigurator::configure($this->locale);
 
-        // Build locale variants to try (same pattern as CalendarHandler)
-        $localeArray = [
-            $this->locale . '.utf8',
-            $this->locale . '.UTF-8',
-            $this->locale,
-            $this->primaryLanguage . '.utf8',
-            $this->primaryLanguage . '.UTF-8',
-            $this->primaryLanguage
-        ];
-
-        // Map primary language to region if not already included
-        $regionMap = [
-            'en' => 'US',
-            'it' => 'IT',
-            'es' => 'ES',
-            'de' => 'DE',
-            'fr' => 'FR',
-            'pt' => 'PT',
-            'nl' => 'NL',
-            'hu' => 'HU',
-            'pl' => 'PL',
-            'sk' => 'SK',
-            'vi' => 'VN',
-            'hr' => 'HR',
-            'id' => 'ID',
-        ];
-
-        if (isset($regionMap[$this->primaryLanguage])) {
-            $region = $regionMap[$this->primaryLanguage];
-            array_splice($localeArray, 3, 0, [
-                $this->primaryLanguage . '_' . $region . '.utf8',
-                $this->primaryLanguage . '_' . $region . '.UTF-8',
-                $this->primaryLanguage . '_' . $region
-            ]);
-        }
-
-        // Set locale for gettext
-        $runtimeLocale = setlocale(LC_ALL, $localeArray);
-
-        // Set LANGUAGE environment variable for gettext fallback
-        if ($runtimeLocale !== false) {
-            $normalizedLocale = strtok($runtimeLocale, '.') ?: $runtimeLocale;
-            if ($normalizedLocale === 'C' || $normalizedLocale === 'POSIX') {
-                $normalizedLocale = $this->primaryLanguage;
-            }
-
-            $languageEnv = implode(':', array_unique([
-                $runtimeLocale,
-                $normalizedLocale,
-                $this->primaryLanguage,
-                'en'
-            ]));
-            putenv("LANGUAGE={$languageEnv}");
-        }
-
-        // Bind textdomain using Router::$apiFilePath if available
+        // Bind textdomain using Router::$apiFilePath if available, else fall back.
         $i18nPath = Router::$apiFilePath . 'i18n';
         if (!is_dir($i18nPath)) {
-            // Fallback to relative path
             $i18nPath = dirname(__DIR__) . '/i18n';
         }
 
