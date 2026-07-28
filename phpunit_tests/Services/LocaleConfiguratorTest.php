@@ -17,12 +17,14 @@ final class LocaleConfiguratorTest extends TestCase
     private string $savedApiFilePath    = '';
     private string|false $savedLanguage = false;
     private string $savedIcuDefault     = 'en';
+    private string|false $savedLocale   = false;
 
     protected function setUp(): void
     {
         $this->savedApiFilePath = isset(Router::$apiFilePath) ? Router::$apiFilePath : '';
         $this->savedLanguage    = getenv('LANGUAGE');
         $this->savedIcuDefault  = \Locale::getDefault();
+        $this->savedLocale      = setlocale(LC_ALL, 0);
 
         // JsonData::FOLDER->path() prefixes Router::$apiFilePath; point it at the repo root.
         Router::$apiFilePath = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR;
@@ -35,7 +37,9 @@ final class LocaleConfiguratorTest extends TestCase
     protected function tearDown(): void
     {
         Router::$apiFilePath = $this->savedApiFilePath;
-        setlocale(LC_ALL, 'C');
+        if ($this->savedLocale !== false) {
+            setlocale(LC_ALL, $this->savedLocale);
+        }
         if ($this->savedLanguage === false) {
             putenv('LANGUAGE');
         } else {

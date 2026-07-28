@@ -316,7 +316,7 @@ final class LocaleConfigurator
 - [ ] **Step 5: Run the test to verify it passes**
 
 Run: `vendor/bin/phpunit phpunit_tests/Services/LocaleConfiguratorTest.php`
-Expected: PASS (7 tests).
+Expected: PASS (6 tests).
 
 - [ ] **Step 6: Static analysis + lint on the new files**
 

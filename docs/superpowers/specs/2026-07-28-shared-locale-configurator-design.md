@@ -209,8 +209,9 @@ missing-Latin-reset gap.
 
 - **New `LocaleConfiguratorTest`** (unit, no handler needed), each with locale-state
   reset in `setUp`/`tearDown`:
-  - region from likelySubtags: `en`→ runtime `en_US`, `pt`→ `pt_BR` (assert
-    `getenv('LANGUAGE')` and the returned `runtimeLocale`).
+  - region from likelySubtags: `en`→ runtime `en_US`, `fr`→ `fr_FR`; a
+    region-bearing locale (`it_IT`) is preserved (assert `getenv('LANGUAGE')`
+    and the returned `runtimeLocale`).
   - Latin: `configure('la')` / `configure('la_VA')` → `isLatin` true,
     `getenv('LANGUAGE') === false`, ICU default `la`.
   - leak override: pre-set `putenv('LANGUAGE=it_IT:it')`, `configure('fr')` →
