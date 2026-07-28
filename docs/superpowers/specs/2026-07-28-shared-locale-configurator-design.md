@@ -179,6 +179,15 @@ LiturgicalEventAbstract::setLocale($this->EventsParams->Locale);
 `is_dir` fallback path, `bindtextdomain`, `bind_textdomain_codeset`, `textdomain`.
 `initializeFormatters()` is unaffected.
 
+`FerialEventNameGenerator` is independent of the other two handlers: it is
+constructed only by `TemporaleHandler::generateFerialEvents()` (with the request
+locale), and `TemporaleHandler` performs no other `setlocale`/`LANGUAGE`/gettext
+setup — its main temporale names come from a per-locale i18n JSON file, and only
+the ferial sub-part uses gettext. Routes are mutually exclusive per request, so
+this is not a re-set layered on top of another handler's locale; it is the sole
+gettext gate for `/temporale`. Folding it in additionally closes its current
+missing-Latin-reset gap.
+
 ## Behavior changes and risks (intentional)
 
 - **`CalendarHandler`**: region resolution now happens inside the service and no
