@@ -2,7 +2,6 @@
 
 namespace LiturgicalCalendar\Api;
 
-use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\LocaleConfigurator;
 
