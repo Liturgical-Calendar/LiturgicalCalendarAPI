@@ -40,6 +40,7 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 use LiturgicalCalendar\Api\Params\EventsParams;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Api\Services\LocaleConfigurator;
 use LiturgicalCalendar\Api\Utilities;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -299,114 +300,16 @@ final class EventsHandler extends AbstractHandler
     }
 
     /**
-     * Set up the process-global locale for this request in a deterministic,
-     * leak-proof way.
-     *
-     * For a translated locale whose system locale is installed, this pins the
-     * current request's gettext catalog via LANGUAGE (which glibc gettext reads
-     * above LC_MESSAGES) and updates ICU's default. If setlocale() fails (the
-     * locale isn't installed — e.g. bare 'en', the source language) or the request
-     * is Latin/default, it resets setlocale()/LANGUAGE/ICU so localized output
-     * falls through to the untranslated (English) base. Every branch overrides
-     * whatever a prior request in the same persistent worker left behind, then
-     * binds the gettext text domain and configures the LiturgicalEventAbstract
-     * locale. Mirrors CalendarHandler::prepareL10N() (#743).
-     *
-     * @return void
+     * Set up the process-global locale for this request via the shared
+     * LocaleConfigurator (deterministic + leak-free, #745), then bind the gettext
+     * text domain and configure the LiturgicalEventAbstract locale.
      */
     private function setLocale(): void
     {
-        $baseLocale = $this->EventsParams->baseLocale;
-
-        if ($baseLocale !== LitLocale::LATIN_PRIMARY_LANGUAGE) {
-            $this->applyTranslatedLocale($baseLocale);
-        } else {
-            // Latin (or default): reset the process-global locale left by a prior
-            // request in this long-lived worker so gettext-backed output falls through
-            // to the untranslated (English) base rather than leaking it (#743).
-            $this->resetToUntranslatedLocale(LitLocale::LATIN_PRIMARY_LANGUAGE);
-        }
-
+        LocaleConfigurator::configure($this->EventsParams->Locale);
         bindtextdomain('litcal', Router::$apiFilePath . 'i18n');
         textdomain('litcal');
         LiturgicalEventAbstract::setLocale($this->EventsParams->Locale);
-    }
-
-    /**
-     * Resolve and pin the process-global locale + gettext catalog for a translated
-     * request. Builds the locale-candidate list from the request locale; on a
-     * successful setlocale() it pins the current request's gettext catalog via
-     * LANGUAGE (which glibc gettext reads above LC_MESSAGES) and updates ICU's
-     * default. If the requested locale isn't installed on this host — e.g. bare 'en',
-     * the source language — setlocale() fails and localized output degrades to the
-     * untranslated (English) msgid base. Either way the leak vector is reset (#743).
-     *
-     * @param string $baseLocale The primary language subtag of the request locale.
-     * @return void
-     */
-    private function applyTranslatedLocale(string $baseLocale): void
-    {
-        $localeArray = [
-            $this->EventsParams->Locale . '.utf8',
-            $this->EventsParams->Locale . '.UTF-8',
-            $this->EventsParams->Locale,
-            $baseLocale . '_' . strtoupper($baseLocale) . '.utf8',
-            $baseLocale . '_' . strtoupper($baseLocale) . '.UTF-8',
-            $baseLocale . '_' . strtoupper($baseLocale),
-            $baseLocale . '.utf8',
-            $baseLocale . '.UTF-8',
-            $baseLocale
-        ];
-
-        $runtimeLocale = setlocale(LC_ALL, $localeArray);
-        if (false === $runtimeLocale) {
-            // The requested locale isn't installed on this host. glibc gettext() can't
-            // load a catalog without a non-C locale, so localized output falls through
-            // to the (English) msgid base — correct for an English request (the source
-            // language, with no catalog of its own), and graceful degradation for any
-            // other uninstalled locale. Still reset the leak vector (#743).
-            $this->resetToUntranslatedLocale($baseLocale);
-            return;
-        }
-
-        // Example: "it_IT.UTF-8" → "it_IT"
-        $normalizedLocale = strtok($runtimeLocale, '.') ?: $runtimeLocale;
-        if ($normalizedLocale === 'C' || $normalizedLocale === 'POSIX') {
-            $normalizedLocale = $baseLocale;
-        }
-
-        // Pin gettext's catalog for THIS request. glibc gettext() reads LANGUAGE above
-        // LC_MESSAGES, so — in a persistent worker — a LANGUAGE value left by a prior
-        // request (e.g. CalendarHandler::prepareL10N() or an earlier /events request in
-        // another language) would otherwise win and leak into this response (#743).
-        $languageEnv = implode(':', array_unique([
-            $runtimeLocale,
-            $normalizedLocale,
-            $baseLocale,
-            'en'
-        ]));
-        putenv("LANGUAGE={$languageEnv}");
-
-        // also update ICU’s default locale
-        \Locale::setDefault($normalizedLocale);
-    }
-
-    /**
-     * Reset the process-global locale state — setlocale(LC_MESSAGES) and the LANGUAGE
-     * env var, both of which gettext reads — that a prior request in this long-lived
-     * worker may have left behind, so localized output falls through deterministically
-     * to the untranslated (English) base instead of leaking the previous request's
-     * language (#743). Mirrors, in reverse, applyTranslatedLocale()'s translated path.
-     *
-     * @param string $icuDefaultLocale Locale to set as ICU's default (the request's
-     *                                 primary language, or Latin for a Latin request).
-     * @return void
-     */
-    private function resetToUntranslatedLocale(string $icuDefaultLocale): void
-    {
-        setlocale(LC_ALL, 'C');
-        putenv('LANGUAGE');
-        \Locale::setDefault($icuDefaultLocale);
     }
 
     /**
