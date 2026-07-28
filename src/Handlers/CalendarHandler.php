@@ -81,6 +81,7 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropert
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
 use LiturgicalCalendar\Api\Params\CalendarParams;
+use LiturgicalCalendar\Api\Services\LocaleConfigurator;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -5007,72 +5008,21 @@ final class CalendarHandler extends AbstractHandler
     /**
      * Set up the locale for this API request.
      *
-     * Uses the passed-in locale to set the locale for PHP's built-in
-     * internationalization functions. Also sets up the formatters for the
-     * dates and ordinals, and loads the translation files for the
-     * requested locale.
+     * Delegates process-global locale/LANGUAGE/ICU setup to the shared
+     * LocaleConfigurator (deterministic + leak-free, #745), then sets the
+     * LitLocale statics, the LiturgicalEvent locale, the date/ordinal formatters,
+     * and binds the gettext text domain.
      */
     private function prepareL10N(): void
     {
-        $region     = \Locale::getRegion($this->CalendarParams->Locale);
         $baseLocale = \Locale::getPrimaryLanguage($this->CalendarParams->Locale);
         if (null === $baseLocale) {
             throw new ServiceUnavailableException('“Pride was the reason for the division of tongues, humility the reason they were reunited.” - St. Augustine, The City of God, Book XVI, Chapter 4');
         }
 
-        LitLocale::$PRIMARY_LANGUAGE = $baseLocale;
-        if ($baseLocale !== LitLocale::LATIN_PRIMARY_LANGUAGE) {
-            $localeArray = [
-                $this->CalendarParams->Locale . '.utf8',
-                $this->CalendarParams->Locale . '.UTF-8',
-                $this->CalendarParams->Locale,
-                $baseLocale . '.utf8',
-                $baseLocale . '.UTF-8',
-                $baseLocale
-            ];
-            if ($region !== null && $region !== '') {
-                array_splice($localeArray, 3, 0, [
-                    $baseLocale . '_' . $region . '.utf8',
-                    $baseLocale . '_' . $region . '.UTF-8',
-                    $baseLocale . '_' . $region
-                ]);
-            }
-
-            $runtimeLocale = setlocale(LC_ALL, $localeArray);
-            if (false === $runtimeLocale) {
-                throw new ServiceUnavailableException('Could not set locale to ' . $this->CalendarParams->Locale . '.');
-            }
-
-            // Example: "it_IT.UTF-8" → "it_IT"
-            $normalizedLocale = strtok($runtimeLocale, '.') ?: $runtimeLocale;
-            if ($normalizedLocale === 'C' || $normalizedLocale === 'POSIX') {
-                $normalizedLocale = $baseLocale;
-            }
-
-            $languageEnv = implode(':', array_unique([
-                $runtimeLocale,
-                $normalizedLocale,
-                $baseLocale,
-                'en'
-            ]));
-            putenv("LANGUAGE={$languageEnv}");
-
-            // also update ICU’s default locale
-            \Locale::setDefault($normalizedLocale);
-
-            LitLocale::$RUNTIME_LOCALE = $normalizedLocale;
-        } else {
-            // Latin (or default): a prior translated request handled by this same
-            // (long-lived) worker process may have left the process-global locale set —
-            // setlocale(LC_MESSAGES) and the LANGUAGE env var, both of which gettext reads.
-            // Reset them so the Latin calendar's message templates fall through to the
-            // untranslated (English) base instead of leaking the previous request's
-            // language (#739). This mirrors, in reverse, the translated branch above.
-            setlocale(LC_ALL, 'C');
-            putenv('LANGUAGE');
-            \Locale::setDefault(LitLocale::LATIN_PRIMARY_LANGUAGE);
-            LitLocale::$RUNTIME_LOCALE = LitLocale::LATIN_PRIMARY_LANGUAGE;
-        }
+        $configured                  = LocaleConfigurator::configure($this->CalendarParams->Locale);
+        LitLocale::$PRIMARY_LANGUAGE = $configured->primaryLanguage;
+        LitLocale::$RUNTIME_LOCALE   = $configured->runtimeLocale;
 
         LiturgicalEvent::setLocale(LitLocale::$RUNTIME_LOCALE);
 
