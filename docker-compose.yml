@@ -232,7 +232,7 @@ services:
   # HTTP API: http://localhost:3001 (Playground), http://localhost:8083 (API)
   # Pin to a specific version for reproducible deployments.
   openfga-migrate:
-    image: openfga/openfga:v1.8.12
+    image: openfga/openfga:v1.18.2
     command: migrate
     environment:
       OPENFGA_DATASTORE_ENGINE: postgres
@@ -245,7 +245,7 @@ services:
 
   openfga:
     restart: unless-stopped
-    image: openfga/openfga:v1.8.12
+    image: openfga/openfga:v1.18.2
     command: run
     environment:
       OPENFGA_DATASTORE_ENGINE: postgres
