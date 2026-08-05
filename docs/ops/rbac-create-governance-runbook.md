@@ -11,6 +11,12 @@ This runbook covers the no-downtime rollout of the RBAC create-governance featur
 
 **Admin bypass:** system admins bypass OpenFGA checks throughout. The migration window is therefore non-breaking for operators.
 
+> **Model ownership note (added after this rollout completed):** the OpenFGA model now lives in `cdcf-infra`
+> (`auth/models/LiturgicalCalendar.json`), and neither `scripts/openfga-model.json` nor
+> `scripts/openfga-model.additive.json` exists in this repo any more. Model changes go through a PR in
+> `cdcf-infra`, followed by an operator running `./setup-openfga.sh --target production --create-litcal-store`
+> in `/opt/cdcf-auth/auth` on the VPS. The steps below are retained unchanged as a record of how this specific rollout was performed.
+
 ---
 
 ## Governance chain
