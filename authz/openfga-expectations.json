@@ -1,0 +1,41 @@
+{
+  "consumer": "LiturgicalCalendarAPI",
+  "store": "LiturgicalCalendar",
+  "required_types": [
+    "user",
+    "wider_region",
+    "national_calendar",
+    "diocesan_calendar",
+    "general_roman_calendar",
+    "national_calendar_test",
+    "diocesan_calendar_test",
+    "general_roman_calendar_test"
+  ],
+  "forbidden_types": [
+    "test_definition"
+  ],
+  "forbidden_relations": {
+    "*": ["deleter"]
+  },
+  "required_relations": {
+    "wider_region": ["member_nation"]
+  },
+  "relation_includes": {
+    "national_calendar": {
+      "editor": ["admin"],
+      "viewer": ["admin"]
+    },
+    "diocesan_calendar": {
+      "editor": ["admin"],
+      "viewer": ["admin"]
+    },
+    "general_roman_calendar": {
+      "editor": ["admin"],
+      "viewer": ["admin"]
+    },
+    "wider_region": {
+      "editor": ["admin"],
+      "viewer": ["admin"]
+    }
+  }
+}
