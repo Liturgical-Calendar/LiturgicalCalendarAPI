@@ -919,6 +919,9 @@ class Router
         ) {
             throw new ServiceUnavailableException('Unable to determine entry file.');
         }
+        // Captured immediately after the is_string() narrowing above (and before any further
+        // static method calls) so PHPStan can keep tracking $_SERVER['SCRIPT_FILENAME'] as a string.
+        $indexPath = $_SERVER['SCRIPT_FILENAME'];
         if (false === Router::isLocalhost() && ( false === isset($_ENV['API_BASE_PATH']) || false === is_string($_ENV['API_BASE_PATH']) || empty($_ENV['API_BASE_PATH']) )) {
             throw new ServiceUnavailableException('The API_BASE_PATH environment variable must be set in production environments.');
         } else {
@@ -926,7 +929,6 @@ class Router
             $api_base_path = $_ENV['API_BASE_PATH'];
         }
 
-        $indexPath             = $_SERVER['SCRIPT_FILENAME'];
         $relIndexToParentOfSrc = self::relativePath(dirname($indexPath), dirname(__DIR__));
 
         /**
