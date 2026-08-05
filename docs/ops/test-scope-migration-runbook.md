@@ -43,16 +43,25 @@ non-destructive; existing tuples continue to be valid.
 
 Run against **each environment** in order: dev → staging → prod.
 
+The authorization model itself is owned by `cdcf-infra`, not this repo: to ship
+this model change, edit `cdcf-infra/auth/models/LiturgicalCalendar.json`, get
+that PR merged, then have the operator run
+`./setup-openfga.sh --target production --create-litcal-store` in
+`/opt/cdcf-auth/auth` on the VPS to upload the new model version.
+
+Once the new model is uploaded, read it back and re-pin `OPENFGA_MODEL_ID` from
+the new model ID:
+
 ```bash
 ./scripts/setup-openfga.sh --update-env
 ```
 
-What the script does:
+What `./scripts/setup-openfga.sh --update-env` (run from this repo) does:
 
 1. Waits for OpenFGA to be ready.
 2. Finds or creates the `LiturgicalCalendar` store.
-3. Compares `scripts/openfga-model.json` with the current model version; if they
-   differ, posts the file as a new model version.
+3. Reads back the latest authorization model already in that store — it no
+   longer creates or uploads a model.
 4. With `--update-env`, writes the resulting `OPENFGA_STORE_ID` and
    `OPENFGA_MODEL_ID` into the `.env.*` file(s) and Docker Compose `.env` files
    in the API and sibling repos.
@@ -212,9 +221,12 @@ re-run; already-migrated tuples are treated as no-ops.
 
 After **all** environments are migrated and verified:
 
-1. Remove the `test_definition` type from `scripts/openfga-model.json`.
-2. Apply the updated model via `./scripts/setup-openfga.sh --update-env` in each
-   environment.
+1. Remove the `test_definition` type from `cdcf-infra/auth/models/LiturgicalCalendar.json`,
+   get that change merged, then have the operator run
+   `./setup-openfga.sh --target production --create-litcal-store` in
+   `/opt/cdcf-auth/auth` on the VPS to upload the new model version.
+2. Re-pin `OPENFGA_MODEL_ID` in each environment from the new model ID (run
+   `./scripts/setup-openfga.sh --update-env` in this repo to pick it up).
 3. Remove the `test_definition` constant from any PHP enum or constant that
    still references it (see `src/Enum/JsonDataConstants.php`).
 

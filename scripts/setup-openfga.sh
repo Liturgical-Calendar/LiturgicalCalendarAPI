@@ -1,6 +1,10 @@
 #!/bin/bash
 # OpenFGA Setup Script for LiturgicalCalendar API
-# Creates an OpenFGA store and loads the authorization model.
+# Creates the OpenFGA store if it doesn't exist yet, then discovers the
+# authorization model already uploaded to it and wires the IDs into .env
+# files. The authorization model itself is owned by cdcf-infra and uploaded
+# by the `authz-seed` compose service (`docker compose up authz-seed`) — this
+# script no longer creates or updates the model.
 # Run this after `docker compose up -d` once the openfga service is healthy.
 #
 # Usage:
@@ -25,7 +29,6 @@ RETRY_INTERVAL=5
 # Directories
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="${SCRIPT_DIR}/.."
-MODEL_FILE="${SCRIPT_DIR}/openfga-model.json"
 
 # Parse command line arguments
 UPDATE_ENV="${UPDATE_ENV:-false}"
@@ -99,71 +102,23 @@ create_store() {
     fi
 }
 
-# Function to load the authorization model
-# Returns the model ID on stdout; all status messages go to stderr.
-load_model() {
-    local store_id="$1"
-    echo -e "${YELLOW}Loading authorization model...${NC}" >&2
-
-    if [ ! -f "$MODEL_FILE" ]; then
-        echo -e "${RED}Model file not found: $MODEL_FILE${NC}" >&2
-        exit 1
-    fi
-
-    # Check if a model already exists
-    local existing_models
-    existing_models=$(curl -sS --fail-with-body "${OPENFGA_URL}/stores/${store_id}/authorization-models") || {
-        echo -e "${RED}Failed to list authorization models: ${existing_models}${NC}" >&2
+# The authorization model is owned by cdcf-infra and uploaded by the
+# `authz-seed` compose service. This script no longer creates or updates it;
+# it reads back what is in the store and wires the IDs into .env files.
+get_latest_model_id() {
+    local store_id="$1" body
+    body=$(curl -sS --fail-with-body "${OPENFGA_URL}/stores/${store_id}/authorization-models?page_size=1") || {
+        echo -e "${RED}Failed to read authorization models for store ${store_id}: ${body}${NC}" >&2
         exit 1
     }
-
-    local existing_model_id
-    existing_model_id=$(echo "$existing_models" | jq -r '.authorization_models[0]?.id // empty')
-
-    if [ -n "$existing_model_id" ]; then
-        echo -e "${GREEN}Authorization model already exists with ID: $existing_model_id${NC}" >&2
-        echo -e "${YELLOW}To update the model, a new version will be created.${NC}" >&2
-
-        # Compare model structures by normalizing both sides.
-        # The API response includes extra default fields (condition, module, source_info,
-        # empty relations objects) that aren't in the model file, so we strip them.
-        local normalize_filter='walk(if type == "object" then with_entries(select(.value != "" and .value != null and .value != {})) else . end)'
-        local existing_model
-        existing_model=$(echo "$existing_models" | jq -cS ".authorization_models[0].type_definitions | ${normalize_filter}")
-        local file_model
-        file_model=$(jq -cS ".type_definitions | ${normalize_filter}" "$MODEL_FILE")
-
-        if [ "$existing_model" = "$file_model" ]; then
-            echo -e "${GREEN}Model is up to date — using existing model${NC}" >&2
-            echo "$existing_model_id"
-            return 0
-        fi
-
-        echo -e "${YELLOW}Model has changed — creating new version...${NC}" >&2
-    fi
-
-    # Load the model
-    local model_payload
-    model_payload=$(jq -c '.' "$MODEL_FILE")
-
-    local result
-    result=$(curl -sS --fail-with-body -X POST "${OPENFGA_URL}/stores/${store_id}/authorization-models" \
-        -H "Content-Type: application/json" \
-        -d "$model_payload") || {
-        echo -e "${RED}Failed to load authorization model: ${result}${NC}" >&2
-        exit 1
-    }
-
     local model_id
-    model_id=$(echo "$result" | jq -r '.authorization_model_id // empty')
-
-    if [ -n "$model_id" ]; then
-        echo -e "${GREEN}Authorization model loaded with ID: $model_id${NC}" >&2
-        echo "$model_id"
-    else
-        echo -e "${RED}Failed to load authorization model: $result${NC}" >&2
+    model_id=$(echo "$body" | jq -r '.authorization_models[0].id // empty')
+    if [[ -z "$model_id" ]]; then
+        echo -e "${RED}Store ${store_id} has no authorization model.${NC}" >&2
+        echo -e "${YELLOW}Run 'docker compose up authz-seed' to seed it from cdcf-infra.${NC}" >&2
         exit 1
     fi
+    echo "$model_id"
 }
 
 # Portable in-place sed (works on both GNU/Linux and macOS/BSD)
@@ -216,7 +171,7 @@ update_env_file() {
 wait_for_openfga
 
 STORE_ID=$(create_store)
-MODEL_ID=$(load_model "$STORE_ID")
+MODEL_ID=$(get_latest_model_id "$STORE_ID")
 
 echo
 echo -e "${BLUE}========================================${NC}"

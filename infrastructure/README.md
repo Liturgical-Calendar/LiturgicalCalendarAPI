@@ -51,10 +51,17 @@ Open [http://localhost:8080/ui/console](http://localhost:8080/ui/console) in you
 ### 3. Configure OpenFGA
 
 ```bash
+docker compose up authz-seed                  # Seeds the store + model from cdcf-infra
 ./scripts/setup-openfga.sh --update-env
 ```
 
-This creates the OpenFGA store, loads the authorization model, and updates your `.env.local` with the store and model IDs.
+`authz-seed` clones `cdcf-infra`, which owns every authorization model on the shared
+OpenFGA instance, and uploads the model into the local store. `setup-openfga.sh` then
+creates the store if needed, reads back the model ID the seed uploaded, and updates
+your `.env.local` with the store and model IDs. To ship a model change, edit
+`cdcf-infra/auth/models/LiturgicalCalendar.json`, get it merged, then have the operator
+run `./setup-openfga.sh --target production --create-litcal-store` in
+`/opt/cdcf-auth/auth` on the VPS and re-pin `OPENFGA_MODEL_ID` from the new model ID.
 
 Access the OpenFGA Playground at [http://localhost:3001](http://localhost:3001) to explore the model interactively.
 
