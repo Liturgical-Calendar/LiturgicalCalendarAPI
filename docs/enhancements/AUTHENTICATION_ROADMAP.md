@@ -346,13 +346,15 @@ OpenFGA has been added to the Docker Compose stack:
 - **openfga** container — HTTP API on port 8083, gRPC on port 8084, Playground on port 3001
 - **openfga-migrate** — one-shot container that runs database migrations before OpenFGA starts
 - **PostgreSQL** backend — dedicated `openfga` database sharing the existing PostgreSQL instance
-- **`scripts/setup-openfga.sh`** — creates the OpenFGA store and loads the authorization model
+- **`scripts/setup-openfga.sh`** — creates the OpenFGA store and discovers the authorization model uploaded to it
+- **`docker compose up authz-seed`** — clones `cdcf-infra`, which owns the model, and uploads it into the store
 
 **Setup commands:**
 
 ```bash
 docker compose up -d                          # Start all services (including OpenFGA)
-./scripts/setup-openfga.sh --update-env       # Create store, load model, update .env
+docker compose up authz-seed                  # Seed store + model from cdcf-infra
+./scripts/setup-openfga.sh --update-env       # Discover store/model IDs, update .env
 ```
 
 **Configuration** (added to `.env.example`):
@@ -364,7 +366,11 @@ docker compose up -d                          # Start all services (including Op
 - `OPENFGA_GRPC_PORT` — Docker host port for gRPC (default: 8084)
 - `OPENFGA_PLAYGROUND_PORT` — Docker host port for Playground UI (default: 3001)
 
-**Authorization model file:** `scripts/openfga-model.json`
+**Authorization model:** owned by `cdcf-infra` (`auth/models/LiturgicalCalendar.json`) and
+uploaded by the `authz-seed` compose service; this repo keeps no model copy. To
+ship a model change, edit that file in cdcf-infra, get it merged, then have
+the operator run `./setup-openfga.sh --target production --create-litcal-store`
+on the VPS and re-pin `OPENFGA_MODEL_ID` from the new model ID.
 
 ### Migration Path
 
