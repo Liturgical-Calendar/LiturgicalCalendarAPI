@@ -190,7 +190,7 @@ final class Negotiator
 
         foreach ($items as $raw) {
             /**
-             * @var array<string,string|null> $params
+             * @var array<lowercase-string,string|null> $params
              * @var lowercase-string $type
              */
             [$type, $params] = self::splitParameters($raw);
@@ -315,7 +315,7 @@ final class Negotiator
 
         foreach ($items as $raw) {
             /**
-             * @var array<string,string|null> $params
+             * @var array<lowercase-string,string|null> $params
              * @var lowercase-string $tag
              */
             [$tag, $params] = self::splitParameters($raw);
@@ -451,7 +451,7 @@ final class Negotiator
 
         foreach ($items as $raw) {
             /**
-             * @var array<string,string|null> $params
+             * @var array<lowercase-string,string|null> $params
              * @var lowercase-string $token
              */
             [$token, $params] = self::splitParameters($raw);
@@ -581,7 +581,7 @@ final class Negotiator
 
         foreach ($items as $raw) {
             /**
-             * @var array<string,string|null> $params
+             * @var array<lowercase-string,string|null> $params
              * @var lowercase-string $token
              */
             [$token, $params] = self::splitParameters($raw);
