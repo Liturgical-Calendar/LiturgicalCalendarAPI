@@ -108,17 +108,28 @@ class OpenFgaModelTest extends TestCase
 
     /**
      * Keys the live API decorates every authorization-model response with
-     * that the source model file never carried: an empty `object` field on
-     * every userset reference, an empty `condition` on every
-     * directly-related user type, and `module` / `source_info` on every
-     * relation and type. Unlike those, `this: {}` (an empty object/array) IS
-     * meaningful — it is how the model itself expresses "the direct
-     * relation" — so normalization must remove specific extraneous keys
-     * rather than collapse empty structures generically. Mirrors the
-     * normalization `scripts/setup-openfga.sh` used to perform before this
-     * repo stopped owning the model file.
+     * that the source model file never carried: `module` / `source_info` on
+     * every relation and type are always API-added, so they are stripped
+     * unconditionally. `object` and `condition`, by contrast, are meaningful
+     * when non-empty — `condition` names a condition on a directly-related
+     * user type, and a non-empty `object` is data the model intends — so
+     * those two are stripped only when the API leaves them at its empty
+     * default (`''`, `[]`, or `null`, matching what the API actually emits).
+     * Unlike those, `this: {}` (an empty object/array) IS meaningful — it is
+     * how the model itself expresses "the direct relation" — so
+     * normalization must remove specific extraneous keys rather than
+     * collapse empty structures generically. Mirrors the normalization
+     * `scripts/setup-openfga.sh` used to perform before this repo stopped
+     * owning the model file.
      */
-    private const API_ONLY_KEYS = ['object', 'condition', 'module', 'source_info'];
+    private const ALWAYS_STRIPPED_KEYS = ['module', 'source_info'];
+
+    /**
+     * Stripped only when the value is empty (`''`, `[]`, or `null`); a
+     * non-empty value is meaningful model data and must survive
+     * normalization intact. See ALWAYS_STRIPPED_KEYS docblock above.
+     */
+    private const STRIPPED_WHEN_EMPTY_KEYS = ['object', 'condition'];
 
     /**
      * @param mixed $value
@@ -131,7 +142,10 @@ class OpenFgaModelTest extends TestCase
         }
         $result = [];
         foreach ($value as $key => $v) {
-            if (in_array($key, self::API_ONLY_KEYS, true)) {
+            if (in_array($key, self::ALWAYS_STRIPPED_KEYS, true)) {
+                continue;
+            }
+            if (in_array($key, self::STRIPPED_WHEN_EMPTY_KEYS, true) && ( $v === '' || $v === [] || $v === null )) {
                 continue;
             }
             $result[$key] = self::stripApiDefaults($v);

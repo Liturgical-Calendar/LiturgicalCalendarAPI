@@ -43,16 +43,18 @@ non-destructive; existing tuples continue to be valid.
 
 Run against **each environment** in order: dev → staging → prod.
 
-```bash
-./scripts/setup-openfga.sh --update-env
-```
-
 The authorization model itself is owned by `cdcf-infra`, not this repo: to ship
 this model change, edit `cdcf-infra/auth/models/LiturgicalCalendar.json`, get
 that PR merged, then have the operator run
-`./setup-openfga.sh --target production --create-litcal-store` on the VPS from
-a checkout of cdcf-infra to upload the new model version, and re-pin
-`OPENFGA_MODEL_ID` from the new model ID it prints.
+`./setup-openfga.sh --target production --create-litcal-store` in
+`/opt/cdcf-auth/auth` on the VPS to upload the new model version.
+
+Once the new model is uploaded, read it back and re-pin `OPENFGA_MODEL_ID` from
+the new model ID:
+
+```bash
+./scripts/setup-openfga.sh --update-env
+```
 
 What `./scripts/setup-openfga.sh --update-env` (run from this repo) does:
 
@@ -221,8 +223,8 @@ After **all** environments are migrated and verified:
 
 1. Remove the `test_definition` type from `cdcf-infra/auth/models/LiturgicalCalendar.json`,
    get that change merged, then have the operator run
-   `./setup-openfga.sh --target production --create-litcal-store` on the VPS to
-   upload the new model version.
+   `./setup-openfga.sh --target production --create-litcal-store` in
+   `/opt/cdcf-auth/auth` on the VPS to upload the new model version.
 2. Re-pin `OPENFGA_MODEL_ID` in each environment from the new model ID (run
    `./scripts/setup-openfga.sh --update-env` in this repo to pick it up).
 3. Remove the `test_definition` constant from any PHP enum or constant that

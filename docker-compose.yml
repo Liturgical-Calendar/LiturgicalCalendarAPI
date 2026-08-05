@@ -285,8 +285,11 @@ services:
       CDCF_INFRA_REF: "${CDCF_INFRA_REF:-main}"
       # cdcf-infra's setup-openfga.sh requires a non-empty preshared key in the
       # .env.local it sources regardless of target — it's only ever used as a
-      # Bearer token, and this stack's default OPENFGA_AUTHN_METHOD=none makes
-      # OpenFGA ignore it entirely, so a placeholder is fine for local dev.
+      # single Bearer token, while OPENFGA_AUTHN_PRESHARED_KEYS is OpenFGA's own
+      # comma-separated list (<key1>[,<key2>]); the entrypoint below trims to
+      # the first key before writing .env.local. This stack's default
+      # OPENFGA_AUTHN_METHOD=none makes OpenFGA ignore the token entirely, so a
+      # placeholder is fine for local dev.
       OPENFGA_PRESHARED_KEY: "${OPENFGA_AUTHN_PRESHARED_KEYS:-local-dev-preshared-key}"
     entrypoint:
       - /bin/sh
@@ -298,6 +301,7 @@ services:
         git clone --depth 1 --branch "$$CDCF_INFRA_REF" \
           https://github.com/CatholicOS/cdcf-infra.git /tmp/cdcf-infra
         cd /tmp/cdcf-infra/auth
+        OPENFGA_PRESHARED_KEY="$${OPENFGA_PRESHARED_KEY%%,*}"
         cat > .env.local <<EOF
         OPENFGA_API_URL=http://openfga:8080
         OPENFGA_INTERNAL_URL=http://openfga:8080

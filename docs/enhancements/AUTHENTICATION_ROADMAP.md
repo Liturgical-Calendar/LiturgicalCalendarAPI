@@ -370,7 +370,7 @@ docker compose up authz-seed                  # Seed store + model from cdcf-inf
 uploaded by the `authz-seed` compose service; this repo keeps no model copy. To
 ship a model change, edit that file in cdcf-infra, get it merged, then have
 the operator run `./setup-openfga.sh --target production --create-litcal-store`
-on the VPS and re-pin `OPENFGA_MODEL_ID` from the new model ID.
+in `/opt/cdcf-auth/auth` on the VPS and re-pin `OPENFGA_MODEL_ID` from the new model ID.
 
 ### Migration Path
 

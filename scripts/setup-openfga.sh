@@ -108,7 +108,7 @@ create_store() {
 get_latest_model_id() {
     local store_id="$1" body
     body=$(curl -sS --fail-with-body "${OPENFGA_URL}/stores/${store_id}/authorization-models?page_size=1") || {
-        echo -e "${RED}Failed to read authorization models for store ${store_id}${NC}" >&2
+        echo -e "${RED}Failed to read authorization models for store ${store_id}: ${body}${NC}" >&2
         exit 1
     }
     local model_id

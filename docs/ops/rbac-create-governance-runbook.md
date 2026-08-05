@@ -15,7 +15,7 @@ This runbook covers the no-downtime rollout of the RBAC create-governance featur
 > (`auth/models/LiturgicalCalendar.json`), and neither `scripts/openfga-model.json` nor
 > `scripts/openfga-model.additive.json` exists in this repo any more. Model changes go through a PR in
 > `cdcf-infra`, followed by an operator running `./setup-openfga.sh --target production --create-litcal-store`
-> there. The steps below are retained unchanged as a record of how this specific rollout was performed.
+> in `/opt/cdcf-auth/auth` on the VPS. The steps below are retained unchanged as a record of how this specific rollout was performed.
 
 ---
 
