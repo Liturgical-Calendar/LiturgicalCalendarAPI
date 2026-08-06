@@ -11,7 +11,7 @@
     }
   ],
   "info": {
-    "description": "An API which allows to retrieve data about the **Roman Calendar** for any given year, between 1970 and 9999. The data strives for historical accuracy (memorials and feast days are only generated from the year in which they were effectively introduced). The data is based on original sources (Roman Missals, Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments, Mysterii Paschalis, etc.), not on data copied or retrieved from online sources which may not be accurate. The API offers multiple locales and multiple calendars, from the **General Roman Calendar** to national or diocesan calendars. The Roman rite is the default and may also be requested explicitly with a `/calendar/roman` prefix (equivalent to no prefix); a `/calendar/ambrosian` prefix selects the Ambrosian rite (currently returns `501 Not Implemented` — see the `/calendar/ambrosian` paths).",
+    "description": "An API which allows to retrieve data about the **Roman Calendar** for any given year, between 1970 and 9999. The data strives for historical accuracy (memorials and feast days are only generated from the year in which they were effectively introduced). The data is based on original sources (Roman Missals, Decrees of the Dicastery for Divine Worship and the Discipline of the Sacraments, Mysterii Paschalis, etc.), not on data copied or retrieved from online sources which may not be accurate. The API offers multiple locales and multiple calendars, from the **General Roman Calendar** to national or diocesan calendars. The Roman rite is the default and may also be requested explicitly with a `/calendar/roman` prefix (equivalent to no prefix); a `/calendar/ambrosian` prefix selects the Ambrosian rite, available from 1976 onward. The Ambrosian rite has no national calendars: its dioceses (Milano, Bergamo, Novara, Lugano) are layered directly on the comune ambrosiano.",
     "version": "5.7",
     "title": "Liturgical Calendar",
     "contact": {
@@ -1199,9 +1199,9 @@
         "security": [
           {}
         ],
-        "summary": "[Planned] Retrieve liturgical events from the Ambrosian calendar for a given diocese for each day of the current year (currently returns 501 Not Implemented)",
+        "summary": "Retrieve liturgical events from the Ambrosian calendar for a given diocese for each day of the current year",
         "operationId": "retrieveAmbrosianDiocesanCalendarGET",
-        "description": "Planned; currently returns 501 Not Implemented. Once implemented, this endpoint will retrieve liturgical events for a given diocese under the Ambrosian rite for each day of the current year. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request.",
+        "description": "Retrieve liturgical events for a given diocese under the Ambrosian rite for each day of the current year. Ambrosian dioceses are not layered on a national calendar: the diocesan proper is applied directly over the comune ambrosiano. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -1217,8 +1217,11 @@
           }
         ],
         "responses": {
-          "501": {
-            "$ref": "#/components/responses/NotImplemented501"
+          "200": {
+            "$ref": "#/components/responses/LitCal200"
+          },
+          "304": {
+            "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
@@ -1241,9 +1244,9 @@
         "security": [
           {}
         ],
-        "summary": "[Planned] Retrieve liturgical events from the Ambrosian calendar for a given diocese for each day of the current year (currently returns 501 Not Implemented)",
+        "summary": "Retrieve liturgical events from the Ambrosian calendar for a given diocese for each day of the current year",
         "operationId": "retrieveAmbrosianDiocesanCalendarPOST",
-        "description": "Planned; currently returns 501 Not Implemented. Once implemented, this endpoint will retrieve liturgical events for a given diocese under the Ambrosian rite for each day of the current year. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request.",
+        "description": "Retrieve liturgical events for a given diocese under the Ambrosian rite for each day of the current year. Ambrosian dioceses are not layered on a national calendar: the diocesan proper is applied directly over the comune ambrosiano. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -1292,8 +1295,11 @@
           }
         },
         "responses": {
-          "501": {
-            "$ref": "#/components/responses/NotImplemented501"
+          "200": {
+            "$ref": "#/components/responses/LitCal200"
+          },
+          "304": {
+            "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
@@ -1318,9 +1324,9 @@
         "security": [
           {}
         ],
-        "summary": "[Planned] Retrieve liturgical events from the Ambrosian calendar for a given diocese for each day of a given year (currently returns 501 Not Implemented)",
+        "summary": "Retrieve liturgical events from the Ambrosian calendar for a given diocese for each day of a given year",
         "operationId": "retrieveAmbrosianDiocesanCalendarForYearGET",
-        "description": "Planned; currently returns 501 Not Implemented. Once implemented, this endpoint will retrieve liturgical events for a given diocese under the Ambrosian rite for each day of a given year. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request. The Ambrosian rite is available only from 1976 onward (the first reformed Ambrosian Missal); earlier years return 400 Bad Request.",
+        "description": "Retrieve liturgical events for a given diocese under the Ambrosian rite for each day of a given year. Ambrosian dioceses are not layered on a national calendar: the diocesan proper is applied directly over the comune ambrosiano. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request. The Ambrosian rite is available only from 1976 onward (the first reformed Ambrosian Missal); earlier years return 400 Bad Request.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -1339,8 +1345,11 @@
           }
         ],
         "responses": {
-          "501": {
-            "$ref": "#/components/responses/NotImplemented501"
+          "200": {
+            "$ref": "#/components/responses/LitCal200"
+          },
+          "304": {
+            "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
@@ -1363,9 +1372,9 @@
         "security": [
           {}
         ],
-        "summary": "[Planned] Retrieve liturgical events from the Ambrosian calendar for a given diocese for each day of a given year (currently returns 501 Not Implemented)",
+        "summary": "Retrieve liturgical events from the Ambrosian calendar for a given diocese for each day of a given year",
         "operationId": "retrieveAmbrosianDiocesanCalendarForYearPOST",
-        "description": "Planned; currently returns 501 Not Implemented. Once implemented, this endpoint will retrieve liturgical events for a given diocese under the Ambrosian rite for each day of a given year. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request. The Ambrosian rite is available only from 1976 onward (the first reformed Ambrosian Missal); earlier years return 400 Bad Request.",
+        "description": "Retrieve liturgical events for a given diocese under the Ambrosian rite for each day of a given year. Ambrosian dioceses are not layered on a national calendar: the diocesan proper is applied directly over the comune ambrosiano. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request. The Ambrosian rite is available only from 1976 onward (the first reformed Ambrosian Missal); earlier years return 400 Bad Request.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -1425,8 +1434,11 @@
           }
         },
         "responses": {
-          "501": {
-            "$ref": "#/components/responses/NotImplemented501"
+          "200": {
+            "$ref": "#/components/responses/LitCal200"
+          },
+          "304": {
+            "description": "Not Modified: client should use cached results seeing that the response has not changed"
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
@@ -4126,7 +4138,7 @@
           {}
         ],
         "summary": "Retrieve all possible liturgical events from the Ambrosian comune calendar (Proprium de Tempore and comune sanctorale) even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
-        "description": "The Ambrosian rite has no national calendars, and diocesan Ambrosian event catalogs are not yet supported; this endpoint serves only the comune ambrosiano (Proprium de Tempore + comune sanctorale) catalog. A `national_calendar` or `diocesan_calendar` parameter combined with this endpoint returns 400 Bad Request.",
+        "description": "The Ambrosian rite has no national calendars; this endpoint serves the comune ambrosiano (Proprium de Tempore + comune sanctorale) catalog. For a diocesan Ambrosian catalog, use `/events/ambrosian/diocese/{calendar_id}`. A `national_calendar` parameter combined with this endpoint returns 400 Bad Request, as does any diocese belonging to a different rite than the one requested.",
         "operationId": "retrieveAmbrosianEventsGET",
         "parameters": [
           {
@@ -4166,7 +4178,7 @@
           {}
         ],
         "summary": "Retrieve all possible liturgical events from the Ambrosian comune calendar (Proprium de Tempore and comune sanctorale) even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
-        "description": "The Ambrosian rite has no national calendars, and diocesan Ambrosian event catalogs are not yet supported; this endpoint serves only the comune ambrosiano (Proprium de Tempore + comune sanctorale) catalog. A `national_calendar` or `diocesan_calendar` parameter combined with this endpoint returns 400 Bad Request.",
+        "description": "The Ambrosian rite has no national calendars; this endpoint serves the comune ambrosiano (Proprium de Tempore + comune sanctorale) catalog. For a diocesan Ambrosian catalog, use `/events/ambrosian/diocese/{calendar_id}`. A `national_calendar` parameter combined with this endpoint returns 400 Bad Request, as does any diocese belonging to a different rite than the one requested.",
         "operationId": "retrieveAmbrosianEventsPOST",
         "parameters": [
           {
@@ -4176,6 +4188,104 @@
         "responses": {
           "200": {
             "description": "OK: A collection of all possible liturgical events that can be found in the Ambrosian comune calendar produced by the LitCal API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "304 Not Modified"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      }
+    },
+    "/events/ambrosian/diocese/{calendar_id}": {
+      "get": {
+        "tags": [
+          "Liturgical events"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve all possible liturgical events from the given Ambrosian diocesan calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
+        "description": "The diocesan proper is layered directly over the comune ambrosiano; the Ambrosian rite has no national calendars. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request.",
+        "operationId": "retrieveAmbrosianEventsForDiocesanCalendarGET",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "in": "path",
+            "name": "calendar_id",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: A collection of all possible liturgical events that can be found in the given Ambrosian diocesan calendar produced by the LitCal API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "304 Not Modified"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Liturgical events"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve all possible liturgical events from the given Ambrosian diocesan calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
+        "description": "The diocesan proper is layered directly over the comune ambrosiano; the Ambrosian rite has no national calendars. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request.",
+        "operationId": "retrieveAmbrosianEventsForDiocesanCalendarPOST",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "in": "path",
+            "name": "calendar_id",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: A collection of all possible liturgical events that can be found in the given Ambrosian diocesan calendar produced by the LitCal API",
             "content": {
               "application/json": {
                 "schema": {
@@ -10097,22 +10207,6 @@
               "status": 429,
               "detail": "Too many login attempts. Please try again later.",
               "retryAfter": 847
-            }
-          }
-        }
-      },
-      "NotImplemented501": {
-        "description": "501 Not Implemented. The request was valid and routable, but the requested calendar computation has not yet been implemented on the server.",
-        "content": {
-          "application/problem+json": {
-            "schema": {
-              "$ref": "./Problem.json"
-            },
-            "example": {
-              "type": "https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/501",
-              "title": "Not Implemented",
-              "status": 501,
-              "detail": "This calendar computation has not yet been implemented"
             }
           }
         }
