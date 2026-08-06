@@ -1158,8 +1158,8 @@ final class CalendarHandler extends AbstractHandler
     /**
      * Ambrosian rite only: orchestrates the full Ambrosian calendar calculation for
      * `$this->CalendarParams->Year`, assembling the passes built by Plan 7 Tasks 3-8 into the
-     * single call `handle()` will eventually make once the `/calendar/ambrosian` 501 is lifted
-     * (Task 10).
+     * single call `handle()` makes for an Ambrosian request (see the {@see Rite::AMBROSIAN}
+     * branch in `handle()`).
      *
      * Call order (load-bearing — do not reorder):
      *
@@ -4315,8 +4315,9 @@ final class CalendarHandler extends AbstractHandler
         // Solemnities of the Lord) is delegated to the rite's temporale engine,
         // obtained via the RiteProfile seam, which mutates the shared calendar
         // and message sink through the context. This is only ever reached for
-        // Rite::ROMAN today: an Ambrosian request short-circuits with a 501
-        // earlier in handle() (Plans 3-5 will implement the Ambrosian engine).
+        // Rite::ROMAN: handle() routes an Ambrosian request to
+        // calculateAmbrosianCalendar() instead, which drives AmbrosianTemporale
+        // through this same RiteProfile seam.
         $riteProfile      = RiteProfileFactory::forRite($this->CalendarParams->Rite);
         $temporaleContext = new TemporaleContext(
             $this->Cal,
