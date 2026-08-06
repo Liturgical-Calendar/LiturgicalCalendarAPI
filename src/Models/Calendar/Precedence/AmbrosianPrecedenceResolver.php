@@ -12,7 +12,9 @@ use LiturgicalCalendar\Api\Utilities;
 
 /**
  * Resolves same-day coincidences between Ambrosian liturgical events against
- * the 13-rank Tabella dei giorni liturgici ({@see AmbrosianLiturgicalDayRank}).
+ * the Tabella dei giorni liturgici ({@see AmbrosianLiturgicalDayRank}, whose
+ * docblock tabulates the ladder and the one place it refines the Tabella's own
+ * 13 ranks).
  *
  * ## Algorithm
  *
@@ -651,8 +653,8 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
      * ({@see self::transferSolemnityToNextFreeDay()} and
      * {@see self::protectLentenFerie()}'s winner-transfer): starting the day
      * AFTER `$fromDate`, walks forward one day at a time looking for a date
-     * with no occupant ranked 1-10
-     * ({@see AmbrosianLiturgicalDayRank::isFreeOfRanksOneThroughTen()}), and
+     * with no occupant in Tabella ranks 1-10
+     * ({@see AmbrosianLiturgicalDayRank::isFreeOfOccupiedRanks()}), and
      * returns the first such date found.
      *
      * The walk is capped at {@see self::MAX_FREE_DAY_WALK_DAYS} (366) days
@@ -671,7 +673,7 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
 
             $isFree = true;
             foreach ($ctx->cal->getCalEventsFromDate($candidate) as $occupant) {
-                if (false === AmbrosianLiturgicalDayRank::isFreeOfRanksOneThroughTen(AmbrosianLiturgicalDayRank::rankOf($occupant))) {
+                if (false === AmbrosianLiturgicalDayRank::isFreeOfOccupiedRanks(AmbrosianLiturgicalDayRank::rankOf($occupant))) {
                     $isFree = false;
                     break;
                 }

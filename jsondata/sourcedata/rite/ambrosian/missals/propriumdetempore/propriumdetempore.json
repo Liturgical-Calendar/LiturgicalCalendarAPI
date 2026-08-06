@@ -35,11 +35,11 @@
     { "event_key": "Easter7", "grade": 7, "type": "mobile", "color": [ "white" ], "is_dominical": true },
     { "event_key": "Ascension", "grade": 7, "type": "mobile", "color": [ "white" ], "is_dominical": true },
     { "event_key": "Pentecost", "grade": 7, "type": "mobile", "color": [ "red" ], "is_dominical": true },
-    { "event_key": "MaryMotherChurch", "grade": 3, "type": "mobile", "color": [ "white" ], "is_dominical": false, "since_year": 2018 },
+    { "event_key": "MaryMotherChurch", "grade": 3, "type": "mobile", "color": [ "white" ], "is_dominical": false, "is_bvm": true, "since_year": 2018 },
     { "event_key": "Trinity", "grade": 6, "type": "mobile", "color": [ "white" ], "is_dominical": true },
     { "event_key": "CorpusChristi", "grade": 6, "type": "mobile", "color": [ "white" ], "is_dominical": true },
     { "event_key": "SacredHeart", "grade": 6, "type": "mobile", "color": [ "white" ], "is_dominical": true },
-    { "event_key": "ImmaculateHeart", "grade": 3, "type": "mobile", "color": [ "white" ], "is_dominical": false },
+    { "event_key": "ImmaculateHeart", "grade": 3, "type": "mobile", "color": [ "white" ], "is_dominical": false, "is_bvm": true },
     { "event_key": "DedicationDuomo", "grade": 7, "type": "mobile", "color": [ "white" ], "is_dominical": true },
     { "event_key": "ChristKing", "grade": 6, "type": "mobile", "color": [ "white" ], "is_dominical": true }
 ]

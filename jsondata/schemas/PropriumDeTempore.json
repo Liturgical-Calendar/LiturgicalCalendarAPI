@@ -30,6 +30,10 @@
                     "type": "boolean",
                     "description": "Whether the event is aliturgical (no Mass is celebrated). Used by the Ambrosian proprium for the aliturgical Fridays of Lent."
                 },
+                "is_bvm": {
+                    "type": "boolean",
+                    "description": "Whether the event is a celebration of the Blessed Virgin Mary. Optional; used by the Ambrosian precedence classifier to rank a memorial of the BVM above a memorial of a saint within the comune memorial tier. Not serialized in API responses."
+                },
                 "since_year": {
                     "type": "integer",
                     "description": "First year in which the event is celebrated. Optional; when absent the event is not year-gated."

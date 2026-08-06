@@ -161,7 +161,20 @@ final class AmbrosianLiturgicalDayRankTest extends TestCase
         self::assertSame(9, AmbrosianLiturgicalDayRank::rankOf($event));
     }
 
-    public function testRank10ComuneMemorial(): void
+    public function testRank10ComuneBvmMemorial(): void
+    {
+        $event = $this->makeEvent([
+            'key'    => 'SomeBvmMemorial',
+            'date'   => '2026-07-20',
+            'grade'  => LitGrade::MEMORIAL,
+            'proper' => false,
+            'bvm'    => true,
+        ]);
+
+        self::assertSame(10, AmbrosianLiturgicalDayRank::rankOf($event));
+    }
+
+    public function testRank11ComuneSaintMemorial(): void
     {
         $event = $this->makeEvent([
             'key'    => 'SomeSaintMemorial',
@@ -170,22 +183,88 @@ final class AmbrosianLiturgicalDayRankTest extends TestCase
             'proper' => false,
         ]);
 
-        self::assertSame(10, AmbrosianLiturgicalDayRank::rankOf($event));
+        self::assertSame(11, AmbrosianLiturgicalDayRank::rankOf($event));
     }
 
-    public function testRank11ProperMemorial(): void
+    /**
+     * The rule this whole rank-10 split exists to state: a memorial of the Blessed
+     * Virgin Mary ranks STRICTLY above a memorial of a saint. Praenotanda n. 53's
+     * "medesimo grado" coexistence rule governs saints among themselves; it does not
+     * put a BVM memorial on a level with a saint's.
+     *
+     * Before the split, `rankOf()` returned a flat 10 for both, so on the real days
+     * where the two coincide the correct winner fell out of `uasort` stability rather
+     * than out of any stated rule -- see
+     * `AmbrosianRealYearBvmMemorialPrecedenceTest` for the assembled-calendar lock on
+     * those days.
+     */
+    public function testComuneBvmMemorialOutranksComuneSaintMemorial(): void
     {
-        $event = $this->makeEvent([
+        $bvmMemorial = $this->makeEvent([
+            'key'    => 'ImmaculateHeart',
+            'date'   => '2025-06-28',
+            'grade'  => LitGrade::MEMORIAL,
+            'proper' => false,
+            'bvm'    => true,
+        ]);
+
+        $saintMemorial = $this->makeEvent([
+            'key'    => 'StIrenaeus',
+            'date'   => '2025-06-28',
+            'grade'  => LitGrade::MEMORIAL,
+            'proper' => false,
+        ]);
+
+        self::assertLessThan(
+            AmbrosianLiturgicalDayRank::rankOf($saintMemorial),
+            AmbrosianLiturgicalDayRank::rankOf($bvmMemorial),
+            'A comune memorial of the BVM must rank strictly above a comune memorial of a saint'
+        );
+    }
+
+    /**
+     * `is_bvm` is an ADDITIVE, optional flag: absent (null) must behave exactly as
+     * before the split -- the saint's tier -- so that every Roman-rite event and every
+     * unflagged Ambrosian event keeps its previous classification.
+     */
+    public function testComuneMemorialWithoutBvmFlagFallsToTheSaintTier(): void
+    {
+        $unflagged = $this->makeEvent([
+            'key'   => 'SomeUnflaggedMemorial',
+            'date'  => '2026-07-20',
+            'grade' => LitGrade::MEMORIAL,
+        ]);
+
+        self::assertNull($unflagged->is_bvm);
+        self::assertSame(11, AmbrosianLiturgicalDayRank::rankOf($unflagged));
+    }
+
+    /**
+     * The split is deliberately confined to the COMUNE memorial tier: a PROPER
+     * memorial stays at a single rank whether or not it is flagged as BVM.
+     */
+    public function testProperMemorialTierIsNotSplitByTheBvmFlag(): void
+    {
+        $properSaint = $this->makeEvent([
             'key'    => 'DiocesanMemorial',
             'date'   => '2026-07-20',
             'grade'  => LitGrade::MEMORIAL,
             'proper' => true,
         ]);
 
-        self::assertSame(11, AmbrosianLiturgicalDayRank::rankOf($event));
+        $properBvm = $this->makeEvent([
+            'key'    => 'DiocesanBvmMemorial',
+            'date'   => '2026-07-20',
+            'grade'  => LitGrade::MEMORIAL,
+            'proper' => true,
+            'bvm'    => true,
+        ]);
+
+        self::assertSame(12, AmbrosianLiturgicalDayRank::rankOf($properSaint));
+        self::assertSame(12, AmbrosianLiturgicalDayRank::rankOf($properBvm));
     }
 
-    public function testRank12OptionalMemorial(): void
+    public function testRank13OptionalMemorial(): void
     {
         $event = $this->makeEvent([
             'key'   => 'SomeOptionalMemorial',
@@ -193,10 +272,10 @@ final class AmbrosianLiturgicalDayRankTest extends TestCase
             'grade' => LitGrade::MEMORIAL_OPT,
         ]);
 
-        self::assertSame(12, AmbrosianLiturgicalDayRank::rankOf($event));
+        self::assertSame(13, AmbrosianLiturgicalDayRank::rankOf($event));
     }
 
-    public function testRank13PlainWeekday(): void
+    public function testRank14PlainWeekday(): void
     {
         $event = $this->makeEvent([
             'key'    => 'OrdWeekday17_3',
@@ -205,7 +284,7 @@ final class AmbrosianLiturgicalDayRankTest extends TestCase
             'season' => LitSeason::ORDINARY_TIME,
         ]);
 
-        self::assertSame(13, AmbrosianLiturgicalDayRank::rankOf($event));
+        self::assertSame(14, AmbrosianLiturgicalDayRank::rankOf($event));
     }
 
     /**
@@ -242,6 +321,37 @@ final class AmbrosianLiturgicalDayRankTest extends TestCase
         self::assertSame(4, AmbrosianLiturgicalDayRank::rankOf($event));
     }
 
+    /**
+     * The unit-level fixture deferred from the Task 4 review of the "fix round 1" bug.
+     *
+     * A NON-Sunday Solemnity of the Lord that nonetheless falls inside `AFTER_PENTECOST`
+     * (the real shape of `CorpusChristi`, always a Thursday, and `SacredHeart`, always a
+     * Friday) must be rank 3. Rank 3's exclusion clause is conditioned on
+     * `isDominicalSunday() && season ∈ RANK_4_SUNDAY_SEASONS`; an earlier version excluded
+     * by season ALONE, which dropped these events to the rank-14 floor.
+     *
+     * The two existing "of-the-Lord asymmetry" fixtures both use `ORDINARY_TIME`, so
+     * neither exercises this branch; before this test the only coverage was indirect, via
+     * `AmbrosianRealYearPrecedenceTest`'s assembled-calendar CorpusChristi/SacredHeart
+     * gates. 2025-06-19 is a Thursday.
+     */
+    public function testNonSundayDominicalSolemnityAfterPentecostIsRank3(): void
+    {
+        $event = $this->makeEvent([
+            'key'       => 'CorpusChristi',
+            'date'      => '2025-06-19',
+            'grade'     => LitGrade::SOLEMNITY,
+            'season'    => LitSeason::AFTER_PENTECOST,
+            'dominical' => true,
+            'proper'    => false,
+        ]);
+
+        // Guard the fixture's own premise: a Sunday here would legitimately be rank 4.
+        self::assertNotSame(7, (int) $event->date->format('N'), 'Fixture date must not be a Sunday');
+
+        self::assertSame(3, AmbrosianLiturgicalDayRank::rankOf($event));
+    }
+
     public function testOfTheLordAsymmetryNonDominicalComuneSolemnityIsRank5(): void
     {
         $event = $this->makeEvent([
@@ -263,10 +373,17 @@ final class AmbrosianLiturgicalDayRankTest extends TestCase
         self::assertFalse(AmbrosianLiturgicalDayRank::isSolemnityRank(7));
     }
 
-    public function testIsFreeOfRanksOneThroughTen(): void
+    /**
+     * The n.56 "day free of ranks 1-10 (of the Tabella)" boundary. After the `is_bvm`
+     * split of Tabella rank 10, the comune memorial tier spans internal ranks 10 (BVM)
+     * and 11 (saint), so BOTH still occupy the day; the first free rank is 12 (proper
+     * memorial).
+     */
+    public function testIsFreeOfOccupiedRanks(): void
     {
-        self::assertFalse(AmbrosianLiturgicalDayRank::isFreeOfRanksOneThroughTen(10));
-        self::assertTrue(AmbrosianLiturgicalDayRank::isFreeOfRanksOneThroughTen(11));
-        self::assertTrue(AmbrosianLiturgicalDayRank::isFreeOfRanksOneThroughTen(13));
+        self::assertFalse(AmbrosianLiturgicalDayRank::isFreeOfOccupiedRanks(10));
+        self::assertFalse(AmbrosianLiturgicalDayRank::isFreeOfOccupiedRanks(11));
+        self::assertTrue(AmbrosianLiturgicalDayRank::isFreeOfOccupiedRanks(12));
+        self::assertTrue(AmbrosianLiturgicalDayRank::isFreeOfOccupiedRanks(14));
     }
 }

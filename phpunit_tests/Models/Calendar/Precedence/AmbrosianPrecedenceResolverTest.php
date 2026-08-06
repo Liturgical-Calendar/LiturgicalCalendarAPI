@@ -727,13 +727,13 @@ final class AmbrosianPrecedenceResolverTest extends TestCase
      * destination day: both existing single-pass checks already avoid
      * landing on a solemnity in real time --
      * `transferSaintSolemnity()`'s own `inSolemnities()` check, and this
-     * generic n.56 walk's `isFreeOfRanksOneThroughTen()` check (a
-     * solemnity is rank 5/6, which is NOT free of ranks 1-10, so the walk
-     * would already skip past it within a single pass). The genuine gap
-     * only appears when the destination's resident is BELOW the rank-10
-     * threshold (comune/proper memorial-tier or weekday) -- such a
-     * resident does not block the walk (rank > 10 is "free of ranks
-     * 1-10"), so the impeded solemnity lands right on top of it, and nobody
+     * generic n.56 walk's `isFreeOfOccupiedRanks()` check (a
+     * solemnity is rank 5/6, which is NOT free of the occupied ranks, so
+     * the walk would already skip past it within a single pass). The genuine
+     * gap only appears when the destination's resident is BELOW the
+     * comune-memorial threshold (proper memorial-tier or weekday) -- such a
+     * resident does not block the walk (rank > `OCCUPIED_RANK_CEILING` is
+     * "free"), so the impeded solemnity lands right on top of it, and nobody
      * revisits that now-contested date until the next pass. This is
      * exactly the shape of the real cascade found in the 2025 assembled
      * Ambrosian year (see `AmbrosianRealYearPrecedenceTest`): St Ambrose
@@ -766,7 +766,7 @@ final class AmbrosianPrecedenceResolverTest extends TestCase
         ]);
 
         // day+1 (2026-07-21): pre-existing, UNCONTESTED (single-event group)
-        // comune optional memorial -- rank 12, "free of ranks 1-10", so the
+        // comune optional memorial -- rank 13, "free of ranks 1-10", so the
         // n.56 walk does not skip past it and the impeded solemnity lands
         // directly on top of it.
         $mondayResident = $this->makeEvent([

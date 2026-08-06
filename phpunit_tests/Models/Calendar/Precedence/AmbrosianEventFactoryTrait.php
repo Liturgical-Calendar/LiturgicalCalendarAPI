@@ -25,6 +25,7 @@ trait AmbrosianEventFactoryTrait
      *     season?: ?LitSeason,
      *     dominical?: ?bool,
      *     proper?: ?bool,
+     *     bvm?: ?bool,
      * } $opts
      */
     private function makeEvent(array $opts = []): LiturgicalEvent
@@ -39,6 +40,7 @@ trait AmbrosianEventFactoryTrait
         $event->liturgical_season = array_key_exists('season', $opts) ? $opts['season'] : null;
         $event->is_dominical      = array_key_exists('dominical', $opts) ? $opts['dominical'] : null;
         $event->is_proper         = array_key_exists('proper', $opts) ? $opts['proper'] : null;
+        $event->is_bvm            = array_key_exists('bvm', $opts) ? $opts['bvm'] : null;
 
         return $event;
     }
