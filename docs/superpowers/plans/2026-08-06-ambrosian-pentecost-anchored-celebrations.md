@@ -620,7 +620,11 @@ Run: `vendor/bin/phpunit phpunit_tests/Models/Calendar/Temporale/ phpunit_tests/
 Expected: PASS. In particular `AmbrosianTemporaleTest` and `AmbrosianAnnualTableTest` must still pass — the entries exist but are not placed, so no
 date changes. If `setNames()` throws here, an i18n key is missing.
 
-Run: `vendor/bin/phpunit --group slow phpunit_tests/Schemas/`
+Run: `vendor/bin/phpunit phpunit_tests/Schemas/`
+
+Do NOT use `--group slow` to select these: `phpunit_tests/Schemas/SchemaValidationTest.php` marks its slow tests with legacy `@group slow`
+DOCBLOCKS, and PHPUnit 12 in this repo honours only the `#[Group('slow')]` ATTRIBUTE — so `--group slow phpunit_tests/Schemas/` selects
+zero tests and silently reports success. Select by path instead.
 
 Expected: PASS — the data file still validates against the updated schema.
 
@@ -958,12 +962,13 @@ Run: `vendor/bin/phpunit phpunit_tests/Handlers/CalendarGoldenMasterTest.php`
 If Ambrosian fixtures are covered, this fails with a diff. Inspect it: the only changes may be the five new celebrations per year, plus the ferie and
 the `AfterPentecost1` Sunday they displace. If anything else moved, stop and investigate.
 
-Regenerate deliberately once the diff is confirmed correct:
+Regenerate deliberately once the diff is confirmed correct — note the generator lives in a SEPARATE file from the checker:
 
-Run: `vendor/bin/phpunit --group golden-master-generate phpunit_tests/Handlers/CalendarGoldenMasterTest.php`
+Run: `vendor/bin/phpunit --group golden-master-generate phpunit_tests/Handlers/CalendarGoldenMasterGenerateTest.php`
 
-Note the generator is fenced behind the `golden-master-generate` group and excluded from both composer scripts and `phpunit.xml.dist`, so a bare run
-cannot clobber fixtures. It also requires `.env.local`.
+The generator is fenced behind `#[Group('golden-master-generate')]` — an attribute, so unlike the `@group` docblocks noted in Task 3 this fence is
+genuinely honoured by PHPUnit 12 — and is excluded from both composer scripts and `phpunit.xml.dist`, so a bare run cannot clobber fixtures. It also
+requires `.env.local`.
 
 - [ ] **Step 3: Update the README**
 
