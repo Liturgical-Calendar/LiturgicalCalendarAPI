@@ -927,16 +927,137 @@ Run: `vendor/bin/phpunit phpunit_tests/Models/Calendar/Temporale/AmbrosianAnnual
 
 Expected: PASS, 96 tests. (Had this been written before Task 4 it would have failed on the missing `CorpusChristi` key.)
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 3: Assert Corpus Domini at the ASSEMBLED-CALENDAR layer too**
+
+The assertion above runs against the temporale engine only. That layer cannot see precedence resolution — which is exactly how Task 4's Critical
+(Corpus Domini being transferred off its Missal Thursday by a lower-graded sanctorale event) survived a fully green temporale suite. A temporale-only
+oracle is therefore not enough.
+
+Extend the coverage so the 32 tabulated Corpus Domini dates are also asserted on the ASSEMBLED calendar (temporale + sanctorale + precedence
+resolution), proving the date survives resolution rather than merely being computed. Use the existing assembled-calendar harness —
+`phpunit_tests/Models/Calendar/Sanctorale/AmbrosianRealYearHarnessTrait.php` (`assembleAmbrosianYear()`) together with
+`AmbrosianPrecedenceResolver::resolve()` — as already used by `AmbrosianRealYearPrecedenceTest`. Do not invent a second harness.
+
+Assembling 32 full years is materially slower than running the engine alone, so mark the assembled-calendar sweep `#[Group('slow')]` (the ATTRIBUTE,
+never a `@group` docblock — see Task 3). If the full 32-year sweep proves too slow to be useful, cover the tabulated years that actually contain a
+collision plus a representative sample, and state in the report exactly which years were covered and which were dropped, so the reduced coverage is
+visible rather than silent.
+
+- [ ] **Step 4: Commit**
 
 ```bash
-git add phpunit_tests/Models/Calendar/Temporale/AmbrosianAnnualTableTest.php
-git commit -m "test(ambrosian): assert Corpus Domini against all 32 tabulated years"
+git add phpunit_tests/Models/Calendar/Temporale/AmbrosianAnnualTableTest.php phpunit_tests/Models/Calendar/Sanctorale/
+git commit -m "test(ambrosian): assert Corpus Domini across all 32 tabulated years"
 ```
 
 ---
 
-### Task 6: Full-suite verification, golden master, and docs
+### Task 6: `is_bvm` property and the rank-10 split
+
+Added after Task 4's review. Placing the two BVM memorials into the temporale made them collide with sanctorale memorials on five days across the
+sampled years:
+
+| Date       | Sanctorale event      | New temporale event | Both at |
+|------------|-----------------------|---------------------|---------|
+| 2024-05-20 | `StBernardineOfSiena` | `MaryMotherChurch`  | rank 10 |
+| 2025-06-09 | `StEphremDeacon`      | `MaryMotherChurch`  | rank 10 |
+| 2025-06-28 | `StIrenaeus`          | `ImmaculateHeart`   | rank 10 |
+| 2026-05-25 | `StDionysius`         | `MaryMotherChurch`  | rank 10 |
+| 2026-06-13 | `StAnthonyOfPadua`    | `ImmaculateHeart`   | rank 10 |
+
+**The outcomes are already correct.** A memorial of the Blessed Virgin Mary ranks above a memorial of a saint, so the BVM celebration winning each of
+these days is right. Praenotanda n. 53's "medesimo grado" coexistence rule governs saints among themselves; it does not put a BVM memorial on a level
+with a saint's.
+
+The defect is that the rank ladder does not say so. `rankOf()` returns a flat rank 10 for every comune memorial, so the correct winner is currently
+decided by `uasort` stability rather than by a stated rule — and the suppression message reads "higher-ranking" when the ranks are numerically equal.
+A future data or ordering change could silently flip any of these five days with no test to catch it.
+
+Encode the rule as an explicit `is_bvm` property, mirroring the existing `is_dominical` property. `is_dominical` is already carried by BOTH the
+Proprium de Tempore schema and the Ambrosian sanctorale schema, so `is_bvm` must be too — otherwise a BVM celebration coming from the sanctorale
+(e.g. `OurLadyOfLourdes`) would not be recognised.
+
+**Files:**
+
+- Modify: `jsondata/schemas/PropriumDeTempore.json` — optional `is_bvm` boolean
+- Modify: the Ambrosian sanctorale schema — the same optional `is_bvm` boolean
+- Modify: `src/Models/PropriumDeTemporeEvent.php` — parse and expose it (follow the `is_dominical` pattern exactly, as in Task 1)
+- Modify: the sanctorale event model and `src/Models/Calendar/LiturgicalEvent.php` — plumb it through so `rankOf()` can read it
+- Modify: `jsondata/sourcedata/rite/ambrosian/missals/propriumdetempore/propriumdetempore.json` — `is_bvm: true` on `MaryMotherChurch` and `ImmaculateHeart`
+- Modify: the Ambrosian sanctorale data — `is_bvm: true` on its BVM celebrations
+- Modify: `src/Models/Calendar/Precedence/AmbrosianLiturgicalDayRank.php` — split rank 10
+- Test: `phpunit_tests/Models/Calendar/Precedence/` and `phpunit_tests/Models/Calendar/Sanctorale/`
+
+**Interfaces:**
+
+- Consumes: `LiturgicalEvent`, as read by `AmbrosianLiturgicalDayRank::rankOf()`.
+- Produces: `is_bvm` on the event models, and a rank ladder in which a comune BVM memorial outranks a comune saint's memorial.
+
+- [ ] **Step 1: Write the failing tests**
+
+Two levels, both required:
+
+1. A unit test on `AmbrosianLiturgicalDayRank::rankOf()`: a comune BVM memorial must rank strictly above a comune saint's memorial. Follow the
+   existing fixture style in `phpunit_tests/Models/Calendar/Precedence/AmbrosianLiturgicalDayRankTest.php`.
+2. Assembled-calendar tests pinning all five rows of the table above: the BVM celebration is present on that date and the saint is the one suppressed.
+   These are the regression lock for the five real days. Use `AmbrosianRealYearHarnessTrait`.
+
+While here, also add the unit-level fixture test deferred from Task 4's review: a non-Sunday, `is_dominical: true`, `AFTER_PENTECOST`,
+`SOLEMNITY`-grade event must return rank 3. That branch is currently exercised only indirectly through `CorpusChristi`'s assembled test, and the
+existing "of-the-Lord asymmetry" tests use `ORDINARY_TIME`, so none of them would have caught the Task 4 Critical.
+
+- [ ] **Step 2: Run them to verify they fail**
+
+The rank unit test must fail with both memorials at rank 10. Record the output.
+
+- [ ] **Step 3: Add `is_bvm` to both schemas**
+
+Optional boolean, defaulting to absent/null, exactly like `is_dominical`. Both schemas set `additionalProperties: false`, so the schema change must
+land before the data change or validation fails.
+
+- [ ] **Step 4: Add `is_bvm` to the models and plumb it to `LiturgicalEvent`**
+
+Follow the `is_dominical` pattern precisely: nullable readonly property, constructor parameter defaulting to null, `property_exists(...) && is_bool(...)`
+guard in `fromObjectInternal()`, and position in the `new static(...)` call. Backward compatibility is mandatory — the Roman rite shares
+`PropriumDeTemporeEvent`, and no existing entry carries `is_bvm`.
+
+- [ ] **Step 5: Flag the BVM entries in the data**
+
+`is_bvm: true` on `MaryMotherChurch` and `ImmaculateHeart` in the Ambrosian temporale, and on the BVM celebrations in the Ambrosian sanctorale. Use the
+sanctorale's existing `common: ["Blessed Virgin Mary"]` marker to find the latter, but do NOT replace that field — `is_bvm` is an addition, not a
+migration.
+
+- [ ] **Step 6: Split rank 10**
+
+In `AmbrosianLiturgicalDayRank::rankOf()`, place a comune BVM memorial above a comune saint's memorial, and renumber the ranks below accordingly.
+Update the class docblock's rank table, which enumerates the ladder.
+
+Check every consumer of the rank numbers before renumbering — `SOLEMNITY_TIER_MAX_RANK` and anything else comparing against literal rank values must
+stay semantically correct. A silent off-by-one here would mis-rank a whole tier.
+
+- [ ] **Step 7: Fix the suppression message**
+
+Where the resolver reports an event "suppressed by the higher-ranking X", confirm the wording is accurate now that the ranks genuinely differ.
+
+- [ ] **Step 8: Run the tests and the full Ambrosian suites**
+
+Run: `vendor/bin/phpunit phpunit_tests/Models/Calendar/Precedence/ phpunit_tests/Models/Calendar/Sanctorale/ phpunit_tests/Models/Calendar/Temporale/`
+
+Expected: PASS. `AmbrosianAnnualTableTest` and `AmbrosianTemporaleCompletenessTest` must be unchanged and green. Any change to the assembled-calendar
+event counts must be explained, not accepted.
+
+Run: `composer analyse && vendor/bin/phpcs src/`
+
+- [ ] **Step 9: Commit**
+
+```bash
+git add jsondata/ src/ phpunit_tests/
+git commit -m "feat(ambrosian): rank BVM memorials above saints' memorials via is_bvm"
+```
+
+---
+
+### Task 7: Full-suite verification, golden master, and docs
 
 **Files:**
 
@@ -975,7 +1096,18 @@ requires `.env.local`.
 In `README.md`, under the Ambrosian bullet's "notes on the current state of this data" list, remove any note added about these celebrations being
 absent, and confirm the remaining caveats (placeholder readings, provisional year cycles/vigils/psalter weeks, 1976 floor) are still accurate.
 
-- [ ] **Step 4: Verify end-to-end against a running server**
+- [ ] **Step 4: Verify the assembled calendar, not just the engine**
+
+Run: `vendor/bin/phpunit phpunit_tests/Models/Calendar/Sanctorale/ phpunit_tests/Models/Calendar/Precedence/`
+
+Expected: PASS. These are the layers where Task 4's Critical actually lived — the temporale suite stayed fully green while Corpus Domini was being
+transferred off its Thursday. Treat a green temporale run as necessary but never sufficient.
+
+Then diff the assembled calendar against the pre-change branch for at least 2024, 2025 and 2026, and account for EVERY difference. The expected set is:
+the five new celebrations appearing, the ferie and the `AfterPentecost1` Sunday they replace disappearing, and the five saints correctly yielding to the
+two BVM memorials (see Task 6). Anything else is a regression to investigate before merge.
+
+- [ ] **Step 5: Verify end-to-end against a running server**
 
 Start the API on the free port and confirm the five celebrations now appear:
 
@@ -994,7 +1126,7 @@ for date, key in want.items():
 
 Expected: five `OK` lines. Before this work every line reported generic filler (`AfterPentecost1`, `AfterPentecostWeekday2Thursday`, …).
 
-- [ ] **Step 5: Commit and open the PR**
+- [ ] **Step 6: Commit and open the PR**
 
 ```bash
 git add README.md
