@@ -11,6 +11,7 @@ use LiturgicalCalendar\Api\Models\PropriumDeTemporeEvent;
 use LiturgicalCalendar\Api\Models\PropriumDeTemporeMap;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class AmbrosianProprioDeTemporeDataTest extends TestCase
@@ -28,6 +29,12 @@ final class AmbrosianProprioDeTemporeDataTest extends TestCase
         /** @var array<string,string> $names */
         $names = Utilities::jsonFileToArray($file);
         return $names;
+    }
+
+    private function loadPropriumDeTemporeMap(): PropriumDeTemporeMap
+    {
+        $raw = Utilities::jsonFileToObjectArray(JsonData::AMBROSIAN_TEMPORALE_FILE->path());
+        return PropriumDeTemporeMap::fromObject($raw);
     }
 
     public function testDataFileLoadsIntoMapWithItalianNames(): void
@@ -101,6 +108,9 @@ final class AmbrosianProprioDeTemporeDataTest extends TestCase
             'Easter7',
             'Ascension',
             'Pentecost',
+            'Trinity',
+            'CorpusChristi',
+            'SacredHeart',
             'DedicationDuomo',
             'ChristKing',
         ];
@@ -126,6 +136,8 @@ final class AmbrosianProprioDeTemporeDataTest extends TestCase
             'ThuOctaveEaster',
             'FriOctaveEaster',
             'SatOctaveEaster',
+            'MaryMotherChurch',
+            'ImmaculateHeart',
         ];
     }
 
@@ -212,5 +224,47 @@ final class AmbrosianProprioDeTemporeDataTest extends TestCase
 
         self::assertSame(2018, $event->since_year);
         self::assertSame(2030, $event->until_year);
+    }
+
+    /** @return array<string,array{0:string,1:int,2:bool,3:int|null}> */
+    public static function pentecostAnchoredCelebrations(): array
+    {
+        // key => [event_key, grade, is_dominical, since_year]
+        return [
+            'Mary Mother of the Church' => ['MaryMotherChurch', 3, false, 2018],
+            'Most Holy Trinity'         => ['Trinity', 6, true, null],
+            'Corpus Domini'             => ['CorpusChristi', 6, true, null],
+            'Sacred Heart'              => ['SacredHeart', 6, true, null],
+            'Immaculate Heart'          => ['ImmaculateHeart', 3, false, null],
+        ];
+    }
+
+    #[DataProvider('pentecostAnchoredCelebrations')]
+    public function testPentecostAnchoredCelebrationsArePresent(
+        string $eventKey,
+        int $grade,
+        bool $isDominical,
+        ?int $sinceYear
+    ): void {
+        $map = $this->loadPropriumDeTemporeMap();
+
+        self::assertTrue($map->offsetExists($eventKey), "Missing Proprium de Tempore entry: $eventKey");
+
+        $event = $map[$eventKey];
+        self::assertSame($grade, $event->grade->value, "$eventKey grade");
+        self::assertSame($isDominical, $event->is_dominical, "$eventKey is_dominical");
+        self::assertSame($sinceYear, $event->since_year, "$eventKey since_year");
+        self::assertSame('mobile', $event->type->value, "$eventKey type");
+        self::assertSame(['white'], array_map(static fn ($c): string => $c->value, $event->color), "$eventKey color");
+    }
+
+    #[DataProvider('pentecostAnchoredCelebrations')]
+    public function testPentecostAnchoredCelebrationsAreTranslatedInEveryShippedLocale(string $eventKey): void
+    {
+        foreach (['it', 'la'] as $locale) {
+            $names = $this->loadNames($locale);
+            self::assertArrayHasKey($eventKey, $names, "$eventKey missing from $locale.json");
+            self::assertNotSame('', trim($names[$eventKey]), "$eventKey is empty in $locale.json");
+        }
     }
 }
