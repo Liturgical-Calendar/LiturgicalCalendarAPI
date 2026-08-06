@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Tests\Models\Calendar\Temporale;
 use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
+use LiturgicalCalendar\Api\Models\PropriumDeTemporeEvent;
 use LiturgicalCalendar\Api\Models\PropriumDeTemporeMap;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Utilities;
@@ -183,5 +184,33 @@ final class AmbrosianProprioDeTemporeDataTest extends TestCase
 
         $overlap = array_intersect(self::dominicalKeys(), self::nonDominicalKeys());
         $this->assertSame([], array_values($overlap), 'Keys present in BOTH dominical and non-dominical lists: ' . implode(', ', $overlap));
+    }
+
+    public function testYearGatingFieldsDefaultToNull(): void
+    {
+        $event = PropriumDeTemporeEvent::fromObject((object) [
+            'event_key' => 'TestEvent',
+            'grade'     => 6,
+            'type'      => 'mobile',
+            'color'     => ['white'],
+        ]);
+
+        self::assertNull($event->since_year);
+        self::assertNull($event->until_year);
+    }
+
+    public function testYearGatingFieldsAreParsedWhenPresent(): void
+    {
+        $event = PropriumDeTemporeEvent::fromObject((object) [
+            'event_key'  => 'TestEvent',
+            'grade'      => 3,
+            'type'       => 'mobile',
+            'color'      => ['white'],
+            'since_year' => 2018,
+            'until_year' => 2030,
+        ]);
+
+        self::assertSame(2018, $event->since_year);
+        self::assertSame(2030, $event->until_year);
     }
 }

@@ -29,6 +29,14 @@
                 "is_aliturgical": {
                     "type": "boolean",
                     "description": "Whether the event is aliturgical (no Mass is celebrated). Used by the Ambrosian proprium for the aliturgical Fridays of Lent."
+                },
+                "since_year": {
+                    "type": "integer",
+                    "description": "First year in which the event is celebrated. Optional; when absent the event is not year-gated."
+                },
+                "until_year": {
+                    "type": "integer",
+                    "description": "Last year in which the event is celebrated. Optional; when absent the event is not year-gated."
                 }
             },
             "required": [
