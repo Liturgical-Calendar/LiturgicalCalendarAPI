@@ -71,4 +71,24 @@ final class AmbrosianAnnualTableTest extends TestCase
 
         self::assertSame($row['advent1'], $d['Advent1'], "Advent I opening liturgical year $year");
     }
+
+    /**
+     * Corpus Domini is the Thursday after Trinity Sunday, i.e. Pentecost + 11. The Missal
+     * tabulates it explicitly for every year from 2025 to 2056.
+     *
+     * @param array<string,string|int> $row
+     */
+    #[DataProvider('annualTableRows')]
+    public function testCorpusDominiMatchesTheMissalTable(array $row): void
+    {
+        $year = (int) $row['year'];
+        $d    = $this->runEngine($year);
+
+        self::assertSame($row['corpus_domini'], $d['CorpusChristi'], "Corpus Domini $year");
+
+        $pentecost = new \DateTimeImmutable((string) $row['pentecost']);
+        $corpus    = new \DateTimeImmutable((string) $row['corpus_domini']);
+        self::assertSame(11, (int) $pentecost->diff($corpus)->days, "Corpus Domini $year must be Pentecost + 11");
+        self::assertSame('Thu', $corpus->format('D'), "Corpus Domini $year must fall on a Thursday");
+    }
 }
