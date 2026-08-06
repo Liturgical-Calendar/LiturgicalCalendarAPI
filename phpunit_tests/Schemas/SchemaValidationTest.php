@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Tests\Schemas;
 
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Group;
 use Swaggest\JsonSchema\Schema;
 use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\JsonData;
@@ -415,6 +416,42 @@ class SchemaValidationTest extends TestCase
         // This should not throw
         $schema->in($data);
         $this->assertTrue(true, 'Real proprium de tempore should pass validation');
+    }
+
+    /**
+     * Test loading the real Ambrosian proprium de tempore source file against its schema.
+     *
+     * Uses the #[Group('slow')] attribute rather than a `@group slow` docblock: PHPUnit 12 in this
+     * repo only honours the attribute form for `--group` filtering, so a docblock annotation here
+     * would silently never be selected by `--group slow` (see the sibling Roman-temporale test above,
+     * which still uses the docblock form and is therefore also not selectable that way).
+     *
+     * This exercises the file that now carries the five Pentecost-anchored celebrations added for the
+     * Ambrosian rite (MaryMotherChurch, Trinity, CorpusChristi, SacredHeart, ImmaculateHeart), including
+     * MaryMotherChurch's `since_year` field, the first real use of that schema property.
+     */
+    #[Group('slow')]
+    public function testRealAmbrosianPropriumDeTemporeValidation(): void
+    {
+        $schemaPath = LitSchema::PROPRIUMDETEMPORE->path();
+        $schema     = Schema::import($schemaPath);
+
+        // Try to find the Ambrosian proprium de tempore file
+        $temporePath = JsonData::AMBROSIAN_TEMPORALE_FILE->path();
+
+        if (!file_exists($temporePath)) {
+            $this->markTestSkipped('Ambrosian Proprium de Tempore file not found');
+        }
+
+        $content = file_get_contents($temporePath);
+        $this->assertIsString($content);
+
+        $data = json_decode($content);
+        $this->assertNotNull($data, 'JSON decode should succeed');
+
+        // This should not throw
+        $schema->in($data);
+        $this->assertTrue(true, 'Real Ambrosian proprium de tempore should pass validation');
     }
 
     /**
