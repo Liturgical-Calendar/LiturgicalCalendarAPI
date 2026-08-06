@@ -86,10 +86,13 @@ Some characteristics of this API:
   and `PATCH`/`DELETE` likewise address resources by path (e.g. `PUT /data/nation/IT`, `PATCH /tests/MaryMotherChurchTest`).
   One deliberate exception: on read endpoints this API uses `POST` as a body-parameterized synonym of `GET` (not as collection-create),
   pending possible adoption of the [`QUERY` method](https://datatracker.ietf.org/doc/draft-ietf-httpbis-safe-method-w-body/) when it becomes standard.
-* **Ambrosian rite support (comune ambrosiano) is live**: `GET/POST /calendar/ambrosian` and `/calendar/ambrosian/{year}` calculate the calendar for the
-  Ambrosian rite as celebrated in common (no diocesan overlay yet — the Ambrosian dioceses of Milano, Bergamo, Novara, and Lugano are planned for a future
-  release), `/events/ambrosian` returns its event catalog, and the `/calendars` discovery endpoint announces it under `ambrosian_calendars`. A few notes on
-  the current state of this data:
+* **Ambrosian rite support is live**: `GET/POST /calendar/ambrosian` and `/calendar/ambrosian/{year}` calculate the calendar for the Ambrosian rite as
+  celebrated in common (the *comune ambrosiano*), while `/calendar/ambrosian/diocese/{calendar_id}` and `/calendar/ambrosian/diocese/{calendar_id}/{year}`
+  layer the proper of one of the four Ambrosian dioceses — Milano (`milano_it`), Bergamo (`bergam_it`), Novara (`novara_it`) and Lugano (`lugano_ch`) —
+  directly over it. `/events/ambrosian` and `/events/ambrosian/diocese/{calendar_id}` return the corresponding event catalogs, and the `/calendars`
+  discovery endpoint announces all of them under `ambrosian_calendars`. A few notes on the current state of this data:
+  * **The Ambrosian rite has no national calendar layer.** Its dioceses depend directly on the rite, so there is no `/calendar/ambrosian/nation/…` route:
+    combining the Ambrosian rite with a national calendar returns `400 Bad Request`, as does requesting a Roman diocese under the Ambrosian rite (or vice versa).
   * **Readings are a placeholder**: the Ambrosian rite does not yet have its own lectionary wired up, so `readings` is always empty for Ambrosian events.
   * **Year cycles, first-vespers vigils, and psalter-week numbering are provisional**, pending validation against the official Ambrosian ordo.
   * The Ambrosian rite is only available from **1976 onward** (the first reformed Ambrosian Missal); earlier years return `400 Bad Request`.
