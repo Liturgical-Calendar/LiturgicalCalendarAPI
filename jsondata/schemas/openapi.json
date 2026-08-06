@@ -4138,7 +4138,7 @@
           {}
         ],
         "summary": "Retrieve all possible liturgical events from the Ambrosian comune calendar (Proprium de Tempore and comune sanctorale) even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
-        "description": "The Ambrosian rite has no national calendars; this endpoint serves the comune ambrosiano (Proprium de Tempore + comune sanctorale) catalog. For a diocesan Ambrosian catalog, use `/events/ambrosian/diocese/{calendar_id}`. A `national_calendar` or `diocesan_calendar` parameter combined with this endpoint returns 400 Bad Request.",
+        "description": "The Ambrosian rite has no national calendars; this endpoint serves the comune ambrosiano (Proprium de Tempore + comune sanctorale) catalog. For a diocesan Ambrosian catalog, use `/events/ambrosian/diocese/{calendar_id}`. A `national_calendar` parameter combined with this endpoint returns 400 Bad Request, as does any diocese belonging to a different rite than the one requested.",
         "operationId": "retrieveAmbrosianEventsGET",
         "parameters": [
           {
@@ -4178,7 +4178,7 @@
           {}
         ],
         "summary": "Retrieve all possible liturgical events from the Ambrosian comune calendar (Proprium de Tempore and comune sanctorale) even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
-        "description": "The Ambrosian rite has no national calendars; this endpoint serves the comune ambrosiano (Proprium de Tempore + comune sanctorale) catalog. For a diocesan Ambrosian catalog, use `/events/ambrosian/diocese/{calendar_id}`. A `national_calendar` or `diocesan_calendar` parameter combined with this endpoint returns 400 Bad Request.",
+        "description": "The Ambrosian rite has no national calendars; this endpoint serves the comune ambrosiano (Proprium de Tempore + comune sanctorale) catalog. For a diocesan Ambrosian catalog, use `/events/ambrosian/diocese/{calendar_id}`. A `national_calendar` parameter combined with this endpoint returns 400 Bad Request, as does any diocese belonging to a different rite than the one requested.",
         "operationId": "retrieveAmbrosianEventsPOST",
         "parameters": [
           {
