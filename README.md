@@ -93,6 +93,9 @@ Some characteristics of this API:
   * **Readings are a placeholder**: the Ambrosian rite does not yet have its own lectionary wired up, so `readings` is always empty for Ambrosian events.
   * **Year cycles, first-vespers vigils, and psalter-week numbering are provisional**, pending validation against the official Ambrosian ordo.
   * The Ambrosian rite is only available from **1976 onward** (the first reformed Ambrosian Missal); earlier years return `400 Bad Request`.
+  * The temporale includes the five celebrations the Missal anchors to Pentecost: Mary Mother of the Church (Monday after Pentecost, from 2018 onward),
+    the Most Holy Trinity (I Sunday after Pentecost), Corpus Domini (the following Thursday), the Sacred Heart of Jesus (Friday after the II Sunday after
+    Pentecost), and the Immaculate Heart of Mary (the following Saturday).
 
 # Example applications
 
