@@ -66,10 +66,21 @@ use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
  * required test ("an after-Pentecost Sunday → rank 4"). The task brief
  * explicitly authorizes resolving this by choosing "the check that makes the
  * rank-2-vs-3-vs-4 distinction correct": rank 3's predicate therefore
- * excludes the two season values reserved for rank 4
- * (`AFTER_EPIPHANY`/`AFTER_PENTECOST`). Because rank 2 already fully absorbs
- * the Advent/Lent/Easter Sunday case earlier in the same ordered evaluation,
- * no equivalent exclusion is needed there.
+ * excludes only events that actually qualify for rank 4 --
+ * {@see self::isDominicalSunday()} true AND the season is one of the two
+ * reserved for rank 4 (`AFTER_EPIPHANY`/`AFTER_PENTECOST`) -- rather than
+ * excluding by season alone. Excluding by season alone was tried first and
+ * was wrong: it also caught non-Sunday Feasts/Solemnities of the Lord that
+ * merely fall within those seasons (e.g. `CorpusChristi` on a Thursday,
+ * `SacredHeart` on a Friday), pushing them all the way down to the rank-13
+ * floor instead of rank 3 -- discovered when the Ambrosian temporale engine
+ * started placing Pentecost-anchored celebrations that are `is_dominical`
+ * but not Sunday. Conditioning the exclusion on `isDominicalSunday()` fixes
+ * that without changing anything for plain numbered Sundays (still excluded,
+ * still rank 4) or for `ChristKing`/`Trinity` (both Sundays, still excluded,
+ * still rank 4). Because rank 2 already fully absorbs the Advent/Lent/Easter
+ * Sunday case earlier in the same ordered evaluation, no equivalent exclusion
+ * is needed there.
  *
  * ## Known gaps (documented, not implemented -- no requirement/test covers them)
  *
@@ -194,15 +205,16 @@ final class AmbrosianLiturgicalDayRank
             return 2;
         }
 
-        // rank 3: comune dominical solemnity/feast-of-the-Lord (excluding the rank-4
-        // ordinary-Sunday seasons, see class docblock), All Souls
+        // rank 3: comune dominical solemnity/feast-of-the-Lord (excluding events that
+        // actually qualify for rank 4 -- plain numbered Sundays after Epiphany/Pentecost,
+        // see class docblock), All Souls
         if (
             $e->event_key === self::ALL_SOULS_KEY
             || (
                 self::isComune($e)
                 && $e->is_dominical === true
                 && in_array($e->grade, self::RANK_3_GRADES, true)
-                && false === in_array($e->liturgical_season, self::RANK_4_SUNDAY_SEASONS, true)
+                && false === ( self::isDominicalSunday($e) && in_array($e->liturgical_season, self::RANK_4_SUNDAY_SEASONS, true) )
             )
         ) {
             return 3;

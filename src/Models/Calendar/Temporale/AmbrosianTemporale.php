@@ -233,9 +233,13 @@ final class AmbrosianTemporale implements TemporaleEngine
 
     /**
      * After-Pentecost anchors: Dedication of the Duomo di Milano (3rd Sunday of
-     * October) and Christ the King (the Sunday before Advent I = the last Sunday
-     * after the Dedication). The after-Pentecost Sunday-numbering / sub-block fill
-     * is handler-level and deferred (see plan Global Constraints).
+     * October), Christ the King (the Sunday before Advent I = the last Sunday
+     * after the Dedication), and the five Pentecost-anchored celebrations --
+     * Mary Mother of the Church, the Most Holy Trinity, Corpus Christi, the
+     * Sacred Heart, and the Immaculate Heart of Mary -- each placed as an
+     * Easter-offset anchor via {@see self::placeEasterOffsetAnchor()}. The
+     * after-Pentecost Sunday-numbering / sub-block fill is handler-level and
+     * deferred (see plan Global Constraints).
      */
     private function calculateAfterPentecostAnchors(TemporaleContext $ctx): void
     {

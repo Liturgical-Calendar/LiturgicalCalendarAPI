@@ -263,4 +263,92 @@ final class AmbrosianRealYearPrecedenceTest extends TestCase
         self::assertCount(1, $dec9Occupants);
         self::assertArrayHasKey('StJuanDiego', $dec9Occupants);
     }
+
+    /**
+     * Regression gate for the Task 4 "fix round 1" bug: `CorpusChristi` (Task 4, Easter+60,
+     * `is_dominical: true`, grade SOLEMNITY, never a Sunday) collided with `AmbrosianLiturgicalDayRank`
+     * rank 3's old exclusion, which tested `liturgical_season` alone rather than
+     * `isDominicalSunday() && season`. That excluded CorpusChristi from rank 3 (it IS
+     * AFTER_PENTECOST) without it ever qualifying for rank 4 (it is never a Sunday), so it fell
+     * through to the rank-13 floor and lost to any comune memorial/feast sharing its date.
+     *
+     * The Missal fixes Corpus Domini on this Thursday every year (Easter+60); it must never be
+     * impeded by a lower comune-tier event. This test exercises real collisions on both years the
+     * Task 7 harness covers: `StPaulVIPope` (fixed May 30, comune MEMORIAL) coincides with
+     * CorpusChristi in 2024 (2024-05-30), and `StsProtaseGervase` (fixed June 19, comune FEAST)
+     * coincides with CorpusChristi in 2025 (2025-06-19) -- confirmed via a real assembled-calendar
+     * run before this fix: both years transferred CorpusChristi off its Missal Thursday.
+     *
+     * Uses the assembled temporale+sanctorale+precedence layer (not the temporale-only tests in
+     * `AmbrosianTemporaleTest`), because the bug is entirely invisible at the temporale layer:
+     * `stampSeason()`/placement were already correct, and only precedence *resolution* against a
+     * colliding comune sanctorale event exposed the wrong rank.
+     */
+    public function testCorpusChristiLandsOnMissalThursdayUnimpeded(): void
+    {
+        $cases = [
+            2024 => ['2024-05-30', 'StPaulVIPope'],
+            2025 => ['2025-06-19', 'StsProtaseGervase'],
+        ];
+
+        foreach ($cases as $year => [$expectedDate, $colliderKey]) {
+            $cal = $this->assembleAmbrosianYear($year);
+
+            // Sanity: confirm the pre-resolution collision this test relies on.
+            $corpusChristi = $cal->getLiturgicalEvent('CorpusChristi');
+            $collider      = $cal->getLiturgicalEvent($colliderKey);
+            self::assertNotNull($corpusChristi, "Expected a LiturgicalEvent for CorpusChristi ($year)");
+            self::assertNotNull($collider, "Expected a LiturgicalEvent for $colliderKey ($year)");
+            self::assertSame($expectedDate, $corpusChristi->date->format('Y-m-d'), "CorpusChristi ($year)");
+            self::assertSame($expectedDate, $collider->date->format('Y-m-d'), "Expected $colliderKey to coincide with CorpusChristi on $expectedDate ($year)");
+
+            $messages = [];
+            $ctx      = $this->buildContextFor($cal, $year, $messages);
+            ( new AmbrosianPrecedenceResolver() )->resolve($ctx);
+
+            // CorpusChristi wins outright: stays active, on its Missal-fixed date, never suppressed.
+            self::assertFalse($cal->isSuppressed('CorpusChristi'), "CorpusChristi must not be suppressed ($year)");
+            $corpusChristiAfter = $cal->getLiturgicalEvent('CorpusChristi');
+            self::assertNotNull($corpusChristiAfter, "CorpusChristi must still be active ($year)");
+            self::assertSame($expectedDate, $corpusChristiAfter->date->format('Y-m-d'), "CorpusChristi must not be transferred off $expectedDate ($year)");
+
+            // The lower-ranking comune sanctorale collider loses (suppressed by CorpusChristi).
+            self::assertTrue($cal->isSuppressed($colliderKey), "$colliderKey must be suppressed by the higher-ranking CorpusChristi ($year)");
+        }
+    }
+
+    /**
+     * Same regression gate as {@see self::testCorpusChristiLandsOnMissalThursdayUnimpeded()} for
+     * `SacredHeart` (Task 4, Easter+68, `is_dominical: true`, grade SOLEMNITY, never a Sunday) --
+     * the second event newly exposed to the rank-3 bug. Unlike CorpusChristi, SacredHeart's Missal
+     * date (Easter+68, always a Friday) has no colliding comune sanctorale event in 2024 or 2025, so
+     * this test only asserts the positive half (SacredHeart lands on its Missal Friday, active,
+     * unsuppressed) rather than a collision-loser pair; it still would have failed pre-fix in a year
+     * with a same-date comune collider, and directly exercises the same rank-3 code path that was
+     * wrong.
+     */
+    public function testSacredHeartLandsOnMissalFridayUnimpeded(): void
+    {
+        $cases = [
+            2024 => '2024-06-07',
+            2025 => '2025-06-27',
+        ];
+
+        foreach ($cases as $year => $expectedDate) {
+            $cal = $this->assembleAmbrosianYear($year);
+
+            $sacredHeart = $cal->getLiturgicalEvent('SacredHeart');
+            self::assertNotNull($sacredHeart, "Expected a LiturgicalEvent for SacredHeart ($year)");
+            self::assertSame($expectedDate, $sacredHeart->date->format('Y-m-d'), "SacredHeart ($year)");
+
+            $messages = [];
+            $ctx      = $this->buildContextFor($cal, $year, $messages);
+            ( new AmbrosianPrecedenceResolver() )->resolve($ctx);
+
+            self::assertFalse($cal->isSuppressed('SacredHeart'), "SacredHeart must not be suppressed ($year)");
+            $sacredHeartAfter = $cal->getLiturgicalEvent('SacredHeart');
+            self::assertNotNull($sacredHeartAfter, "SacredHeart must still be active ($year)");
+            self::assertSame($expectedDate, $sacredHeartAfter->date->format('Y-m-d'), "SacredHeart must not be transferred off $expectedDate ($year)");
+        }
+    }
 }
