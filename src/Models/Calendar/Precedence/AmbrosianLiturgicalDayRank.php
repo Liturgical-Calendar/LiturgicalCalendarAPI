@@ -9,10 +9,10 @@ use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 
 /**
- * Classifies a `LiturgicalEvent` against the Ambrosian *Tabella dei giorni
- * liturgici* (the Ambrosian analog of the Roman `LitGrade` precedence ladder,
- * cf. `LitGrade`'s own Mysterii Paschalis docblock). Lower rank number means
- * higher precedence (rank 1 = Easter Triduum, the floor = plain weekday).
+ * Classifies a `LiturgicalEvent` against the 13-rank Ambrosian *Tabella dei
+ * giorni liturgici* (the Ambrosian analog of the Roman `LitGrade` precedence
+ * ladder, cf. `LitGrade`'s own Mysterii Paschalis docblock). Lower rank number
+ * means higher precedence (rank 1 = Easter Triduum, rank 13 = plain weekday).
  *
  * Implemented as an ORDERED LIST OF PREDICATES evaluated top to bottom inside
  * {@see self::rankOf()}, first match wins, one `if` block per rank in
@@ -20,61 +20,56 @@ use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
  * Tabella and inspected rank by rank, exactly mirroring the design already
  * used by `LitGrade`'s own docblock table.
  *
- * ## The rank ladder, and where it refines the Tabella
+ * ## Rank vs. tiebreak: the composite precedence key
  *
- * The Tabella itself has 13 ranks; this classifier returns 14, because the
- * Tabella's rank 10 ("comune memorial") is split in two -- see "The `is_bvm`
- * split" below. Everything above the split keeps the Tabella's own numbering;
- * everything below it is shifted down by one:
+ * `rankOf()` returns the Tabella's OWN numbering and nothing else. Refinements
+ * that order two days *within* a single Tabella rank do NOT get a rank number
+ * of their own -- inventing one would renumber every rank below it, silently
+ * invalidate every consumer comparing against a literal, and destroy the
+ * "readable side by side with the Tabella" property that is the whole point of
+ * this class. They are expressed instead as a SECONDARY SORT KEY:
  *
- * | Tabella | here | day                                                          |
- * |---------|------|--------------------------------------------------------------|
- * |       1 |    1 | Easter Triduum                                               |
- * |       2 |    2 | fixed Solemnities of the Lord; Sundays of Advent/Lent/Easter; |
- * |         |      | settimana autentica ferie; Easter and Christmas octaves       |
- * |       3 |    3 | comune dominical solemnity / Feast of the Lord; All Souls     |
- * |       4 |    4 | Sundays after Epiphany / after Pentecost                      |
- * |       5 |    5 | comune, non-dominical BVM/saint solemnity                     |
- * |       6 |    6 | proper solemnity                                              |
- * |       7 |    7 | ferie of Lent                                                 |
- * |       8 |    8 | comune feast                                                  |
- * |       9 |    9 | proper feast                                                  |
- * |      10 |   10 | comune memorial OF THE BLESSED VIRGIN MARY   <-- split        |
- * |      10 |   11 | comune memorial of a saint                   <-- split        |
- * |      11 |   12 | proper memorial                                              |
- * |      12 |   13 | optional memorial                                            |
- * |      13 |   14 | plain ferie/Saturday (the floor)                             |
+ * - {@see self::rankOf()}      -- the Tabella rank, 1..13. Primary key.
+ * - {@see self::tiebreakOf()}  -- ordering within that rank. Secondary key.
+ * - {@see self::precedenceKeyOf()} -- the pair, `[rank, tiebreak]`.
+ * - {@see self::compare()}     -- a `uasort`-ready comparator over the pair.
  *
- * Because the split lives at Tabella rank 10, every consumer that compares
- * against a rank number ABOVE 10 is unaffected ({@see self::SOLEMNITY_RANK_CEILING},
- * still 6). The one boundary that had to move is
- * {@see self::OCCUPIED_RANK_CEILING}: Praenotanda n. 56's "first day free of
- * ranks 1-10" means "free of everything through the comune memorial tier",
- * which is now internal rank 11. The n. 56 wording in
- * `AmbrosianPrecedenceResolver`'s user-facing messages deliberately keeps
- * citing the Tabella's own "1-10", which remains exactly true: a day held by
- * either half of the split is held at Tabella rank 10 either way.
+ * Callers that need "which of these two days wins?" must use `compare()` (or
+ * `precedenceKeyOf()`), never `rankOf()` alone. Callers that need "is this day
+ * a solemnity / is this day free?" use `rankOf()`, because those questions are
+ * about the Tabella tier and are unaffected by any within-rank refinement.
  *
- * ## The `is_bvm` split (Tabella rank 10)
+ * Tiebreak values are small ints, lower first, with
+ * {@see self::TIEBREAK_DEFAULT} (0) the baseline for "no refinement applies".
+ * A refinement that must PRECEDE the baseline takes a negative value; one that
+ * must FOLLOW it takes a positive value. Adding a refinement is therefore a
+ * local addition -- one constant and one clause in `tiebreakOf()` -- and never
+ * renumbers anything that already exists. Two such refinements are already
+ * foreseen (the own-church dedication within rank 3, and a BVM/saint split of
+ * the PROPER memorial tier at rank 11); both fit this shape without touching
+ * `rankOf()`.
+ *
+ * ## The `is_bvm` tiebreak (within Tabella rank 10)
  *
  * A memorial of the Blessed Virgin Mary ranks above a memorial of a saint.
  * Praenotanda n. 53's "medesimo grado" coexistence rule governs saints among
  * themselves; it does not put a BVM memorial on a level with a saint's. Before
- * this distinction was encoded, `rankOf()` returned a flat 10 for both, so on
- * the days where an Ambrosian BVM memorial coincides with a saint's memorial
+ * this rule was encoded, both were rank 10 with no further ordering, so on the
+ * days where an Ambrosian BVM memorial coincides with a saint's memorial
  * (`MaryMotherChurch` / `ImmaculateHeart` against the comune sanctorale) the
  * correct winner emerged only from `uasort`'s stability, not from any stated
  * rule -- and the resolver's "suppressed by the higher-ranking X" message was
- * describing a tie. The classifier now reads `$e->is_bvm`, an additive
+ * describing a tie. `tiebreakOf()` now reads `$e->is_bvm`, an additive
  * source-carried flag on `LiturgicalEvent` set from the Ambrosian proprium de
  * tempore and the Ambrosian comune sanctorale (whose BVM rows are marked by
  * `common: ["Blessed Virgin Mary"]`). `null`/absent -- the default, and the
- * value for ALL Roman-rite data -- means "not a BVM celebration", so the
- * saint's tier is the fallback exactly as before.
+ * value for ALL Roman-rite data -- means "not a BVM celebration", so an
+ * unflagged memorial keeps the baseline tiebreak and the previous ordering.
  *
- * Only the COMUNE memorial tier is split. The proper memorial tier is left
- * whole: no proper Ambrosian data exists yet (Plan 5+), so splitting it would
- * be an untested guess rather than an encoded rule.
+ * The tiebreak is scoped to the COMUNE memorial tier (rank 10). The proper
+ * memorial tier (rank 11) deliberately has no tiebreak yet: no proper
+ * Ambrosian data exists (Plan 5+), so encoding one would be an untested guess.
+ * When it is needed it is a two-line addition here, per the paragraph above.
  *
  * ## The `isProper` (comune vs. proper) distinction
  *
@@ -128,7 +123,7 @@ use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
  * excluding by season alone. Excluding by season alone was tried first and
  * was wrong: it also caught non-Sunday Feasts/Solemnities of the Lord that
  * merely fall within those seasons (e.g. `CorpusChristi` on a Thursday,
- * `SacredHeart` on a Friday), pushing them all the way down to the rank-14
+ * `SacredHeart` on a Friday), pushing them all the way down to the rank-13
  * floor instead of rank 3 -- discovered when the Ambrosian temporale engine
  * started placing Pentecost-anchored celebrations that are `is_dominical`
  * but not Sunday. Conditioning the exclusion on `isDominicalSunday()` fixes
@@ -151,7 +146,7 @@ use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
  *   needs FEAST grade without also being `is_proper`.
  * - `LitGrade::COMMEMORATION` (an API-internal refinement documented on
  *   `LitGrade` itself as "not in the original 13-point table") has no
- *   dedicated rank here and falls through to the rank-14 floor by default,
+ *   dedicated rank here and falls through to the rank-13 floor by default,
  *   consistent with it representing a demoted, collect-only memorial with no
  *   independent precedence of its own.
  */
@@ -219,14 +214,30 @@ final class AmbrosianLiturgicalDayRank
 
     /**
      * Highest rank number that still "occupies" a day tightly enough that
-     * nothing else may be added: everything through the comune memorial tier,
-     * i.e. Praenotanda n. 56's "ranks 1-10" of the Tabella, which after the
-     * `is_bvm` split of Tabella rank 10 is internal ranks 1-11 (see the class
-     * docblock's ladder table). Exposed so a resolver can ask "is this day
-     * free?" (i.e. is only a proper memorial, optional memorial, or plain
-     * weekday sitting on this date) without re-deriving the boundary.
+     * nothing else may be added (ranks 1-10: everything through the comune
+     * memorial tier, exactly Praenotanda n. 56's "ranks 1-10"). Exposed so a
+     * resolver can ask "is a day free of ranks 1-10?" (i.e. is only a proper
+     * memorial, optional memorial, or plain weekday sitting on this date)
+     * without re-deriving the boundary.
+     *
+     * Occupancy is a question about the Tabella TIER, so it reads
+     * {@see self::rankOf()} only; a within-rank tiebreak never changes whether
+     * a day is occupied.
      */
-    public const int OCCUPIED_RANK_CEILING = 11;
+    public const int OCCUPIED_RANK_CEILING = 10;
+
+    /**
+     * Baseline secondary sort key: "no within-rank refinement applies".
+     * See the class docblock's "Rank vs. tiebreak" section for why refinements
+     * that must precede the baseline take negative values.
+     */
+    public const int TIEBREAK_DEFAULT = 0;
+
+    /**
+     * Within Tabella rank 10 (comune memorial), a memorial of the Blessed
+     * Virgin Mary precedes a memorial of a saint.
+     */
+    public const int TIEBREAK_BVM_MEMORIAL = -1;
 
     /**
      * No instances: this is a pure static classifier.
@@ -236,13 +247,17 @@ final class AmbrosianLiturgicalDayRank
     }
 
     /**
-     * Classify a liturgical event against the Ambrosian Tabella.
+     * Classify a liturgical event against the 13-rank Ambrosian Tabella.
      * Ordered predicates, first match wins; see the class docblock for the
      * design rationale behind each deviation from a literal one-line-per-
      * rank reading of the Tabella.
      *
+     * This is the PRIMARY precedence key only. To decide which of two events
+     * on the same day wins, use {@see self::compare()} -- two events can share
+     * a rank and still be ordered by {@see self::tiebreakOf()}.
+     *
      * @param LiturgicalEvent $e
-     * @return int The rank, 1 (highest precedence) through 14 (lowest).
+     * @return int The rank, 1 (highest precedence) through 13 (lowest).
      */
     public static function rankOf(LiturgicalEvent $e): int
     {
@@ -312,30 +327,74 @@ final class AmbrosianLiturgicalDayRank
             return 9;
         }
 
-        // rank 10: comune memorial of the Blessed Virgin Mary (upper half of the
-        // Tabella's rank 10 -- see the class docblock's "`is_bvm` split" section)
-        if (self::isComune($e) && $e->grade === LitGrade::MEMORIAL && $e->is_bvm === true) {
+        // rank 10: comune memorial (a BVM memorial and a saint's memorial share this
+        // rank; they are ordered within it by self::tiebreakOf())
+        if (self::isComune($e) && $e->grade === LitGrade::MEMORIAL) {
             return 10;
         }
 
-        // rank 11: comune memorial of a saint (lower half of the Tabella's rank 10)
-        if (self::isComune($e) && $e->grade === LitGrade::MEMORIAL) {
+        // rank 11: proper memorial
+        if ($e->is_proper === true && $e->grade === LitGrade::MEMORIAL) {
             return 11;
         }
 
-        // rank 12: proper memorial
-        if ($e->is_proper === true && $e->grade === LitGrade::MEMORIAL) {
+        // rank 12: optional memorial
+        if ($e->grade === LitGrade::MEMORIAL_OPT) {
             return 12;
         }
 
-        // rank 13: optional memorial
-        if ($e->grade === LitGrade::MEMORIAL_OPT) {
-            return 13;
+        // rank 13: default floor (any remaining ferie/Saturday, including COMMEMORATION-grade
+        // events -- see class docblock)
+        return 13;
+    }
+
+    /**
+     * The SECONDARY precedence key: ordering between two events that share a
+     * Tabella rank. Ordered predicates, first match wins, exactly like
+     * {@see self::rankOf()}; {@see self::TIEBREAK_DEFAULT} when none applies.
+     *
+     * Lower sorts first (= higher precedence). See the class docblock's
+     * "Rank vs. tiebreak" section for how to add a refinement here without
+     * disturbing anything else.
+     *
+     * @param LiturgicalEvent $e
+     * @return int
+     */
+    public static function tiebreakOf(LiturgicalEvent $e): int
+    {
+        // Within rank 10 (comune memorial): a memorial of the Blessed Virgin Mary
+        // precedes a memorial of a saint.
+        if (self::isComune($e) && $e->grade === LitGrade::MEMORIAL && $e->is_bvm === true) {
+            return self::TIEBREAK_BVM_MEMORIAL;
         }
 
-        // rank 14: default floor (any remaining ferie/Saturday, including COMMEMORATION-grade
-        // events -- see class docblock)
-        return 14;
+        return self::TIEBREAK_DEFAULT;
+    }
+
+    /**
+     * The full composite precedence key, `[rank, tiebreak]`, ordered
+     * lexicographically: rank first, tiebreak only as far as the rank ties.
+     * Lower sorts first (= higher precedence).
+     *
+     * @param LiturgicalEvent $e
+     * @return array{int,int}
+     */
+    public static function precedenceKeyOf(LiturgicalEvent $e): array
+    {
+        return [self::rankOf($e), self::tiebreakOf($e)];
+    }
+
+    /**
+     * `uasort`-ready comparator over {@see self::precedenceKeyOf()}. THIS, not
+     * `rankOf()`, is the answer to "which of these two days takes precedence?".
+     *
+     * @param LiturgicalEvent $a
+     * @param LiturgicalEvent $b
+     * @return int negative when `$a` takes precedence over `$b`, positive when `$b` does, 0 when neither is ordered ahead of the other
+     */
+    public static function compare(LiturgicalEvent $a, LiturgicalEvent $b): int
+    {
+        return self::precedenceKeyOf($a) <=> self::precedenceKeyOf($b);
     }
 
     /**
@@ -356,8 +415,9 @@ final class AmbrosianLiturgicalDayRank
      * memorial, an optional memorial, or a plain weekday.
      *
      * Named without a rank literal on purpose: the previous name
-     * (`isFreeOfRanksOneThroughTen`) baked in a boundary that the `is_bvm`
-     * split of Tabella rank 10 has since moved.
+     * (`isFreeOfRanksOneThroughTen`) restated the boundary a second time, in a
+     * place that cannot be kept in sync with
+     * {@see self::OCCUPIED_RANK_CEILING} by the compiler.
      *
      * @param int $rank
      * @return bool

@@ -24,21 +24,23 @@ use PHPUnit\Framework\TestCase;
  * memorials (`MaryMotherChurch`, `ImmaculateHeart`) into the Ambrosian temporale made them
  * coincide with a comune sanctorale celebration of a saint.
  *
- * The OUTCOMES on these days were already correct before the `is_bvm` split -- a memorial of
+ * The OUTCOMES on these days were already correct before the `is_bvm` tiebreak -- a memorial of
  * the Blessed Virgin Mary ranks above a memorial of a saint, so the BVM celebration winning is
- * right. What was missing was the RULE. `rankOf()` returned a flat rank 10 for every comune
- * memorial, so on the three days where the collider is itself a comune MEMORIAL the winner was
- * decided by `uasort`'s stability rather than by anything stated, and the resolver's
- * "suppressed by the higher-ranking X" message was describing a numerical tie. A future data or
- * ordering change could have silently flipped any of them.
+ * right. What was missing was the RULE. Every comune memorial is Tabella rank 10 with nothing
+ * ordering them, so on the three days where the collider is itself a comune MEMORIAL the winner
+ * was decided by `uasort`'s stability rather than by anything stated, and the resolver's
+ * "suppressed by the higher-ranking X" message was describing a tie. A future data or ordering
+ * change could have silently flipped any of them.
  *
  * Each case therefore asserts BOTH halves:
  *
- * 1. the RULE -- `rankOf(BVM) < rankOf(saint)` strictly, before resolution;
+ * 1. the RULE -- `compare(BVM, saint) < 0` before resolution. Note this is the COMPOSITE key,
+ *    not `rankOf()`: the two share Tabella rank 10 by design, and the ordering lives in
+ *    `tiebreakOf()`.
  * 2. the OUTCOME -- after `resolve()`, the BVM celebration is active on the date and the saint
  *    is the one suppressed.
  *
- * Assertion (1) is what fails without the split. Assertion (2) is what must NEVER change.
+ * Assertion (1) is what fails without the tiebreak. Assertion (2) is what must NEVER change.
  *
  * Note on the third column below: two of the five colliders (`StBernardineOfSiena`,
  * `StEphremDeacon`) are OPTIONAL memorials, not memorials, so they already sat a full tier
@@ -106,12 +108,14 @@ final class AmbrosianRealYearBvmMemorialPrecedenceTest extends TestCase
         // The BVM celebration must be flagged as such all the way through to LiturgicalEvent.
         self::assertTrue($bvm->is_bvm, "$bvmKey must carry is_bvm === true");
 
-        // (1) THE RULE: the BVM celebration outranks the saint strictly, by rank number.
-        // This is the assertion that fails without the rank-10 split.
+        // (1) THE RULE: the BVM celebration takes precedence over the saint by the
+        // COMPOSITE key, not by chance. On the three days where both are comune
+        // memorials the Tabella rank is identical, so this ordering is expressible only
+        // through `compare()`. This is the assertion that fails without the tiebreak.
         self::assertLessThan(
-            AmbrosianLiturgicalDayRank::rankOf($saint),
-            AmbrosianLiturgicalDayRank::rankOf($bvm),
-            "$bvmKey must rank strictly above $saintKey on $date, not merely win a tie"
+            0,
+            AmbrosianLiturgicalDayRank::compare($bvm, $saint),
+            "$bvmKey must take precedence over $saintKey on $date, not merely win a tie"
         );
 
         $messages = [];
@@ -140,11 +144,11 @@ final class AmbrosianRealYearBvmMemorialPrecedenceTest extends TestCase
      * `PropriumDeSanctisEvent::$is_bvm -> LiturgicalEvent::$is_bvm` untested.
      *
      * `OurLadyOfTheRosary` (Oct 7) is a comune MEMORIAL flagged in the Ambrosian comune
-     * sanctorale by `common: ["Blessed Virgin Mary"]`; it must land in the BVM half of the
-     * split (rank 10), while a comune MEMORIAL of a saint from the same source lands in the
-     * saint half (rank 11).
+     * sanctorale by `common: ["Blessed Virgin Mary"]`; it must share Tabella rank 10 with
+     * a comune memorial of a saint from the same source (`StPolycarp`, Feb 23) and take
+     * precedence over it through the tiebreak.
      */
-    public function testSanctoraleBvmMemorialIsRankedInTheBvmHalfOfTheSplit(): void
+    public function testSanctoraleBvmMemorialTakesPrecedenceThroughTheTiebreak(): void
     {
         $cal = $this->assembleAmbrosianYear(2025);
 
@@ -152,11 +156,15 @@ final class AmbrosianRealYearBvmMemorialPrecedenceTest extends TestCase
         self::assertNotNull($rosary);
         self::assertTrue($rosary->is_bvm, 'OurLadyOfTheRosary must carry is_bvm === true from the sanctorale');
         self::assertSame(10, AmbrosianLiturgicalDayRank::rankOf($rosary));
+        self::assertSame(AmbrosianLiturgicalDayRank::TIEBREAK_BVM_MEMORIAL, AmbrosianLiturgicalDayRank::tiebreakOf($rosary));
 
         $saint = $cal->getLiturgicalEvent('StPolycarp');
         self::assertNotNull($saint);
         self::assertNull($saint->is_bvm, 'A saint\'s memorial must not carry is_bvm');
-        self::assertSame(11, AmbrosianLiturgicalDayRank::rankOf($saint));
+        self::assertSame(10, AmbrosianLiturgicalDayRank::rankOf($saint));
+        self::assertSame(AmbrosianLiturgicalDayRank::TIEBREAK_DEFAULT, AmbrosianLiturgicalDayRank::tiebreakOf($saint));
+
+        self::assertLessThan(0, AmbrosianLiturgicalDayRank::compare($rosary, $saint));
     }
 
     /**

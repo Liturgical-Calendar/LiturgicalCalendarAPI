@@ -258,7 +258,25 @@ final class AmbrosianProprioDeTemporeDataTest extends TestCase
         self::assertSame(['white'], array_map(static fn ($c): string => $c->value, $event->color), "$eventKey color");
     }
 
-    #[DataProvider('pentecostAnchoredCelebrations')]
+    /**
+     * The event keys alone, derived from {@see self::pentecostAnchoredCelebrations()} so the two
+     * providers cannot drift apart.
+     *
+     * PHPUnit warns ("has more arguments than the test method accepts") when a data set supplies
+     * more values than the test method's signature takes, so a test that only needs the key must
+     * be fed by its own provider rather than by the four-column one.
+     *
+     * @return array<string,array{0:string}>
+     */
+    public static function pentecostAnchoredCelebrationKeys(): array
+    {
+        return array_map(
+            static fn (array $case): array => [$case[0]],
+            self::pentecostAnchoredCelebrations()
+        );
+    }
+
+    #[DataProvider('pentecostAnchoredCelebrationKeys')]
     public function testPentecostAnchoredCelebrationsAreTranslatedInEveryShippedLocale(string $eventKey): void
     {
         foreach (['it', 'la'] as $locale) {

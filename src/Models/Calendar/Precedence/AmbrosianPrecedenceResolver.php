@@ -12,17 +12,16 @@ use LiturgicalCalendar\Api\Utilities;
 
 /**
  * Resolves same-day coincidences between Ambrosian liturgical events against
- * the Tabella dei giorni liturgici ({@see AmbrosianLiturgicalDayRank}, whose
- * docblock tabulates the ladder and the one place it refines the Tabella's own
- * 13 ranks).
+ * the 13-rank Tabella dei giorni liturgici ({@see AmbrosianLiturgicalDayRank}).
  *
  * ## Algorithm
  *
  * 1. Group the collection's events by calendar date (`Y-m-d`).
  * 2. For every date holding more than one event ("contested" dates), sort the
- *    group by {@see AmbrosianLiturgicalDayRank::rankOf()} ascending (lower
- *    rank number = higher precedence) and keep the first event as the day's
- *    winner.
+ *    group with {@see AmbrosianLiturgicalDayRank::compare()} ascending -- the
+ *    composite `[rank, tiebreak]` key, lower first -- and keep the first event
+ *    as the day's winner. Note `compare()`, not `rankOf()`: two events can
+ *    share a Tabella rank and still be strictly ordered within it.
  * 3. Every other event on that date ("losers") is handed to
  *    {@see self::resolveLoser()}, one at a time, paired with the winner.
  *
@@ -127,7 +126,7 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
      * One full resolution pass: rebuilds the date-group snapshot from the
      * collection's CURRENT event dates (reflecting any moves made by
      * earlier passes), resolves every contested date exactly once (same
-     * per-group logic as before Task 8: sort by `rankOf()`, keep the
+     * per-group logic as before Task 8: sort by the composite precedence key, keep the
      * winner, hand every other event to {@see self::resolveLoser()}), and
      * reports whether any call to `resolveLoser()` performed a MOVE (a
      * transfer that could have created a new coincidence at its
@@ -150,11 +149,11 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
                 continue;
             }
 
-            uasort(
-                $group,
-                static fn (LiturgicalEvent $a, LiturgicalEvent $b): int
-                    => AmbrosianLiturgicalDayRank::rankOf($a) <=> AmbrosianLiturgicalDayRank::rankOf($b)
-            );
+            // Sort on the full composite precedence key (Tabella rank first, then the
+            // within-rank tiebreak) rather than on `rankOf()` alone -- two events can
+            // share a rank and still be strictly ordered. See
+            // `AmbrosianLiturgicalDayRank`'s "Rank vs. tiebreak" docblock section.
+            uasort($group, AmbrosianLiturgicalDayRank::compare(...));
 
             $winner = array_shift($group);
             $losers = $group;
@@ -653,7 +652,7 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
      * ({@see self::transferSolemnityToNextFreeDay()} and
      * {@see self::protectLentenFerie()}'s winner-transfer): starting the day
      * AFTER `$fromDate`, walks forward one day at a time looking for a date
-     * with no occupant in Tabella ranks 1-10
+     * with no occupant ranked 1-10
      * ({@see AmbrosianLiturgicalDayRank::isFreeOfOccupiedRanks()}), and
      * returns the first such date found.
      *

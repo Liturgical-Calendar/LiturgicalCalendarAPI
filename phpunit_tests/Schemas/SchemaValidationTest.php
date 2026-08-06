@@ -158,6 +158,36 @@ class SchemaValidationTest extends TestCase
     }
 
     /**
+     * `is_bvm` is optional and boolean in PropriumDeTempore.json.
+     */
+    public function testPropriumDeTemporeAcceptsOptionalIsBvmBoolean(): void
+    {
+        $schema = Schema::import(LitSchema::PROPRIUMDETEMPORE->path());
+
+        $schema->in([
+            (object) ['event_key' => 'ImmaculateHeart', 'is_bvm' => true],
+            (object) ['event_key' => 'MaryMotherChurch', 'is_bvm' => false],
+            (object) ['event_key' => 'Christmas'],
+        ]);
+        $this->assertTrue(true, 'is_bvm must be optional and accept booleans');
+    }
+
+    /**
+     * The schema is the ONLY line of defence against a non-boolean `is_bvm`:
+     * `PropriumDeTemporeEvent::fromObjectInternal()` guards with
+     * `property_exists(...) && is_bool(...)`, which SILENTLY DROPS a non-boolean rather than
+     * throwing, so a row carrying `"is_bvm": "true"` would load with `is_bvm === null` and be
+     * ordered as a saint's memorial with nothing reporting the mistake.
+     */
+    public function testPropriumDeTemporeRejectsNonBooleanIsBvm(): void
+    {
+        $schema = Schema::import(LitSchema::PROPRIUMDETEMPORE->path());
+
+        $this->expectException(\Throwable::class);
+        $schema->in([(object) ['event_key' => 'ImmaculateHeart', 'is_bvm' => 'true']]);
+    }
+
+    /**
      * Test loading a real national calendar source file against its schema.
      *
      * @group slow
