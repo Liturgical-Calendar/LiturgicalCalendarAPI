@@ -80,19 +80,20 @@ final class LiturgicalEventCollectionAmbrosianYearCyclesAndVigilsTest extends Te
     }
 
     /**
-     * `AfterPentecostWeekday1Monday` (2025-06-09) is a ferial weekday whose `liturgical_season` is
+     * `AfterPentecostWeekday2Monday` (2025-06-16) is a ferial weekday whose `liturgical_season` is
      * `AFTER_PENTECOST` (stamped by the temporale engine itself), so it should receive the I/II
-     * weekday cycle: `WEEKDAY_CYCLE[(Year - 1) % 2]`.
+     * weekday cycle: `WEEKDAY_CYCLE[(Year - 1) % 2]`. (Week 1's Monday, 2025-06-09, is now
+     * `MaryMotherChurch` -- the Pentecost-anchored celebrations occupy it, so this test uses week 2.)
      */
     public function testAfterPentecostFerialWeekday2025HasCorrectWeekdayCycle(): void
     {
         $cal = $this->assembleAmbrosianYearWithReadingsPlaceholder(2025);
 
-        $weekday = $cal->getLiturgicalEvent('AfterPentecostWeekday1Monday');
-        self::assertNotNull($weekday, 'Expected a LiturgicalEvent for AfterPentecostWeekday1Monday');
+        $weekday = $cal->getLiturgicalEvent('AfterPentecostWeekday2Monday');
+        self::assertNotNull($weekday, 'Expected a LiturgicalEvent for AfterPentecostWeekday2Monday');
         self::assertSame(LitGrade::WEEKDAY, $weekday->grade);
         self::assertSame(LitSeason::AFTER_PENTECOST, $weekday->liturgical_season);
-        self::assertSame(1, (int) $weekday->date->format('N'), 'Expected AfterPentecostWeekday1Monday to fall on a Monday.');
+        self::assertSame(1, (int) $weekday->date->format('N'), 'Expected AfterPentecostWeekday2Monday to fall on a Monday.');
 
         $cal->setAmbrosianYearCyclesAndVigils();
 
@@ -221,12 +222,12 @@ final class LiturgicalEventCollectionAmbrosianYearCyclesAndVigilsTest extends Te
     {
         $cal = $this->assembleAmbrosianYearWithReadingsPlaceholder(2025);
 
-        $weekday = $cal->getLiturgicalEvent('AfterPentecostWeekday1Monday');
+        $weekday = $cal->getLiturgicalEvent('AfterPentecostWeekday2Monday');
         self::assertNotNull($weekday);
         self::assertSame(LitGrade::WEEKDAY, $weekday->grade);
 
         $cal->setAmbrosianYearCyclesAndVigils();
 
-        self::assertNull($cal->getLiturgicalEvent('AfterPentecostWeekday1Monday_vigil'));
+        self::assertNull($cal->getLiturgicalEvent('AfterPentecostWeekday2Monday_vigil'));
     }
 }

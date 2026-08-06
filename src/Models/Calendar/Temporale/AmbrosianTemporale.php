@@ -28,6 +28,26 @@ use LiturgicalCalendar\Api\Utilities;
  */
 final class AmbrosianTemporale implements TemporaleEngine
 {
+    /**
+     * Event keys whose Ambrosian season differs from the rite-agnostic
+     * {@see LitSeason::forEventKey()} classification and must be stamped
+     * AFTER_PENTECOST locally.
+     *
+     * `ChristKing` is the last Sunday after the Dedication in the Ambrosian rite but the
+     * last Sunday of Ordinary Time in the Roman. The five Pentecost-anchored celebrations
+     * fall in the Ambrosian tempo dopo Pentecoste, while `forEventKey()`'s default branch
+     * returns ORDINARY_TIME for them (correctly, for the Roman rite). `forEventKey()` is
+     * shared with the Roman /temporale endpoint and must not be changed.
+     */
+    private const array AFTER_PENTECOST_SEASON_OVERRIDES = [
+        'ChristKing',
+        'MaryMotherChurch',
+        'Trinity',
+        'CorpusChristi',
+        'SacredHeart',
+        'ImmaculateHeart',
+    ];
+
     public function buildTemporale(TemporaleContext $ctx): void
     {
         $this->calculateAdvent($ctx);
@@ -69,15 +89,15 @@ final class AmbrosianTemporale implements TemporaleEngine
      * `LiturgicalEventCollection::setSeasonsAndHolyDaysOfObligation()` cannot run
      * for the Ambrosian rite (it requires an AshWednesday event and knows only the
      * six Roman seasons).
+     *
+     * Event keys listed in {@see self::AFTER_PENTECOST_SEASON_OVERRIDES} are
+     * locally reclassified to AFTER_PENTECOST because their Ambrosian season
+     * differs from the rite-agnostic `LitSeason::forEventKey()` default (which is
+     * correct for the Roman rite and must not be changed there).
      */
     private function stampSeason(LiturgicalEvent $event): void
     {
-        // `ChristKing` is a shared temporale key: in the Ambrosian rite it is the
-        // last Sunday after the Dedication (AFTER_PENTECOST), but in the Roman rite
-        // it is the last Sunday of Ordinary Time. `LitSeason::forEventKey()` is
-        // rite-agnostic and is also consumed by the Roman /temporale endpoint, so we
-        // must NOT globally reclassify `ChristKing` there — override it locally here.
-        $event->liturgical_season = 'ChristKing' === $event->event_key
+        $event->liturgical_season = in_array($event->event_key, self::AFTER_PENTECOST_SEASON_OVERRIDES, true)
             ? LitSeason::AFTER_PENTECOST
             : LitSeason::forEventKey($event->event_key);
     }
@@ -235,6 +255,55 @@ final class AmbrosianTemporale implements TemporaleEngine
         $christKing = ( clone $advent1 )->sub(new \DateInterval('P7D'));
         $ctx->propriumDeTempore['ChristKing']->setDate($christKing);
         $this->createPropriumDeTemporeLiturgicalEventByKey('ChristKing', $ctx);
+
+        // Pentecost-anchored celebrations (calendario ambrosiano, praenotanda pp. LXXV, LXXVII).
+        // Placed here, before calculateAfterPentecostSundays() and calculateAfterPentecostWeekdays(),
+        // so both passes see these days as occupied: numberSundayBlock() skips an occupied Sunday
+        // while still incrementing its ordinal (Trinity therefore consumes the I domenica dopo
+        // Pentecoste and the later numbering is unaffected), and fillFerialWeekdays() skips
+        // occupied weekdays. Offsets are from Easter; Pentecost itself is Easter + 49.
+        $this->placeEasterOffsetAnchor('MaryMotherChurch', 50, $ctx); // Lunedì dopo Pentecoste
+        $this->placeEasterOffsetAnchor('Trinity', 56, $ctx);          // I domenica dopo Pentecoste
+        $this->placeEasterOffsetAnchor('CorpusChristi', 60, $ctx);    // Giovedì successivo
+        $this->placeEasterOffsetAnchor('SacredHeart', 68, $ctx);      // Venerdì dopo la II domenica
+        $this->placeEasterOffsetAnchor('ImmaculateHeart', 69, $ctx);  // Sabato dopo la II domenica
+    }
+
+    /**
+     * Place one Easter-anchored celebration `$easterOffset` days after Easter Sunday,
+     * unless the Proprium de Tempore entry's `since_year`/`until_year` gate excludes
+     * the requested year.
+     */
+    private function placeEasterOffsetAnchor(string $key, int $easterOffset, TemporaleContext $ctx): void
+    {
+        if (false === $this->isInForce($key, $ctx)) {
+            return;
+        }
+
+        $date = Utilities::calcGregEaster($ctx->params->Year)
+            ->add(new \DateInterval('P' . $easterOffset . 'D'));
+        $ctx->propriumDeTempore[$key]->setDate($date);
+        $this->createPropriumDeTemporeLiturgicalEventByKey($key, $ctx);
+    }
+
+    /**
+     * True when the Proprium de Tempore entry for `$key` is in force for the requested
+     * year, i.e. when its optional `since_year`/`until_year` limits admit it.
+     */
+    private function isInForce(string $key, TemporaleContext $ctx): bool
+    {
+        if (false === $ctx->propriumDeTempore->offsetExists($key)) {
+            throw new ServiceUnavailableException("isInForce requires a key from the Proprium de Tempore, instead got $key");
+        }
+
+        $event = $ctx->propriumDeTempore[$key];
+        $year  = $ctx->params->Year;
+
+        if (null !== $event->since_year && $year < $event->since_year) {
+            return false;
+        }
+
+        return null === $event->until_year || $year <= $event->until_year;
     }
 
     /**

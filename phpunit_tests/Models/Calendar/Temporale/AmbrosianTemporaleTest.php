@@ -155,8 +155,12 @@ final class AmbrosianTemporaleTest extends TestCase
     {
         $d = $this->runEngine(2025);
 
-        // (a) dopo Pentecoste: 1st Sunday after Pentecost (Jun 15) .. Sat before Aug 31
-        self::assertSame('2025-06-15', $d['AfterPentecost1']);
+        // (a) dopo Pentecoste: 1st Sunday after Pentecost (Jun 15) .. Sat before Aug 31.
+        // The I domenica dopo Pentecoste (Jun 15) is the Most Holy Trinity (Task 4), so
+        // AfterPentecost1 is not emitted -- but numberSundayBlock() still increments the
+        // ordinal for the skipped Sunday, so later Sundays in the block keep their numbering.
+        self::assertArrayNotHasKey('AfterPentecost1', $d);
+        self::assertSame('2025-06-15', $d['Trinity']);
         self::assertSame('2025-08-24', $d['AfterPentecost11']); // last before the Martyrdom Sunday
         self::assertArrayNotHasKey('AfterPentecost12', $d);
 
@@ -176,7 +180,10 @@ final class AmbrosianTemporaleTest extends TestCase
     public function testAfterPentecostSundaysStamped2025(): void
     {
         $events = $this->runEngineEvents(2025);
-        self::assertSame(LitSeason::AFTER_PENTECOST, $events['AfterPentecost1']->liturgical_season);
+        // AfterPentecost1 is not emitted for 2025: Trinity occupies the I domenica dopo
+        // Pentecoste (Task 4). AfterPentecost2 is the first still-synthesized Sunday in
+        // that sub-block.
+        self::assertSame(LitSeason::AFTER_PENTECOST, $events['AfterPentecost2']->liturgical_season);
         self::assertSame(LitSeason::AFTER_PENTECOST, $events['AfterPentecostMartyrdom1']->liturgical_season);
         self::assertSame(LitSeason::AFTER_PENTECOST, $events['AfterPentecostDedication1']->liturgical_season);
     }
@@ -276,9 +283,14 @@ final class AmbrosianTemporaleTest extends TestCase
     public function testAfterPentecostWeekdaysFill2025(): void
     {
         $d = $this->runEngine(2025);
-        // (a) first ferial Monday after Pentecost (2025-06-08) = 2025-06-09, week 1
-        self::assertArrayHasKey('AfterPentecostWeekday1Monday', $d);
-        self::assertSame('2025-06-09', $d['AfterPentecostWeekday1Monday']);
+        // (a) the first ferial Monday after Pentecost (2025-06-08) would be 2025-06-09, but
+        // that day is MaryMotherChurch (Lunedì dopo Pentecoste, Task 4), so
+        // AfterPentecostWeekday1Monday is not emitted; the next free ferial in week 1 is
+        // Tuesday.
+        self::assertArrayNotHasKey('AfterPentecostWeekday1Monday', $d);
+        self::assertSame('2025-06-09', $d['MaryMotherChurch']);
+        self::assertArrayHasKey('AfterPentecostWeekday1Tuesday', $d);
+        self::assertSame('2025-06-10', $d['AfterPentecostWeekday1Tuesday']);
         // (b) Monday after the 1st Sunday after the Martyrdom (Sun 2025-08-31) = 2025-09-01
         self::assertArrayHasKey('AfterPentecostMartyrdomWeekday1Monday', $d);
         self::assertSame('2025-09-01', $d['AfterPentecostMartyrdomWeekday1Monday']);
@@ -338,5 +350,57 @@ final class AmbrosianTemporaleTest extends TestCase
         self::assertSame('7', ( new \DateTime('2023-01-01') )->format('N'), 'Expected Jan 1, 2023 to be a Sunday');
         $d2023 = $this->runEngine(2023);
         self::assertArrayNotHasKey('ChristmasSundayAfterOctave', $d2023);
+    }
+
+    public function testPentecostAnchoredCelebrationsAreStampedAfterPentecost(): void
+    {
+        $events = $this->runEngineEvents(2026);
+
+        foreach (['Trinity', 'CorpusChristi', 'SacredHeart', 'ImmaculateHeart', 'MaryMotherChurch'] as $key) {
+            self::assertArrayHasKey($key, $events, "Expected $key in the 2026 temporale");
+            self::assertSame(
+                LitSeason::AFTER_PENTECOST,
+                $events[$key]->liturgical_season,
+                "$key must be stamped AFTER_PENTECOST, not the rite-agnostic Ordinary Time default"
+            );
+        }
+    }
+
+    public function testPentecostAnchoredCelebrations2026(): void
+    {
+        $d = $this->runEngine(2026);
+
+        // Pentecost 2026 = 24 May (Messale Ambrosiano, Tabella annuale).
+        self::assertSame('2026-05-24', $d['Pentecost']);
+        self::assertSame('2026-05-25', $d['MaryMotherChurch']);  // Lunedì dopo Pentecoste
+        self::assertSame('2026-05-31', $d['Trinity']);           // I domenica dopo Pentecoste
+        self::assertSame('2026-06-04', $d['CorpusChristi']);     // Giovedì successivo
+        self::assertSame('2026-06-12', $d['SacredHeart']);       // Venerdì dopo la II domenica
+        self::assertSame('2026-06-13', $d['ImmaculateHeart']);   // Sabato dopo la II domenica
+    }
+
+    public function testTrinityConsumesTheFirstSundayAfterPentecost(): void
+    {
+        $d = $this->runEngine(2026);
+
+        // Trinity occupies the I domenica dopo Pentecoste, so AfterPentecost1 is no longer
+        // emitted -- but the numbering of every later Sunday is unchanged, which is what
+        // lets the Missal anchor the Sacred Heart to "la II domenica dopo Pentecoste".
+        self::assertArrayNotHasKey('AfterPentecost1', $d);
+        self::assertSame('2026-06-07', $d['AfterPentecost2']);
+    }
+
+    public function testMaryMotherChurchIsGatedToItsInstitutionYear(): void
+    {
+        $before = $this->runEngine(2017);
+        self::assertArrayNotHasKey('MaryMotherChurch', $before);
+
+        $after = $this->runEngine(2018);
+        self::assertArrayHasKey('MaryMotherChurch', $after);
+
+        // The other four are ancient and present on both sides of the gate.
+        foreach (['Trinity', 'CorpusChristi', 'SacredHeart', 'ImmaculateHeart'] as $key) {
+            self::assertArrayHasKey($key, $before, "$key must not be year-gated");
+        }
     }
 }
