@@ -51,12 +51,19 @@ existing `Ascension` entry carries it despite falling on a Thursday.
 | Venerdì dopo la II domenica dopo Pentecoste        | SACRATISSIMO CUORE DI GESÙ              | Solennità dS (6) | `SacredHeart`      | +68           | yes            |
 | Sabato dopo la II domenica dopo Pentecoste         | Cuore Immacolato della b. Vergine Maria | Memoria (3)      | `ImmaculateHeart`  | +69           | no             |
 
-**Grade mapping.** `Solennità dS` maps to `LitGrade::SOLEMNITY` (6), consistent with the existing
-`ChristKing` entry; `LitGrade::HIGHER_SOLEMNITY` (7) is reserved in the current data for Easter,
-Ascension, Pentecost and the Dedication of the Duomo. `Memoria` maps to `LitGrade::MEMORIAL` (3).
+**Grade mapping.** Confirmed by the Missal's own *Tabella dei giorni liturgici disposta secondo
+l'ordine di precedenza* (pp. LXV–LXVI), which separates **rank 2** — Natale, Epifania, Ascensione,
+Pentecoste, Sundays of Advent/Lent/Easter, *Sabato in traditione symboli*, octave days and the
+Dedicazione del Duomo, i.e. exactly the keys the current data grades **7** — from **rank 3**,
+"Solennità e feste **del Signore**, elencate nel Calendario comune ambrosiano", where these
+celebrations sit alongside `ChristKing`, graded **6**. So `Solennità dS` → `LitGrade::SOLEMNITY` (6)
+and `Memoria` → `LitGrade::MEMORIAL` (3). Note this differs from the Roman temporale, which grades
+`Trinity` and `CorpusChristi` as 7; copying the Roman entries would be wrong. Rank 3 outranking
+**rank 4** ("domeniche… dopo Pentecoste") is also what lets Trinity displace the I domenica.
 
-**Colour.** White for all five. The *calendario* does not print colours; this follows universal usage
-and should be spot-checked against the propers when the Missal's Mass formularies are consulted.
+**Colour.** White for all five. The *calendario* does not print colours, but the Roman temporale
+entries for `Trinity`, `CorpusChristi`, `SacredHeart` and `ImmaculateHeart` are all `["white"]`, and
+`MaryMotherChurch` likewise. Worth a spot-check against the Ambrosian Mass formularies.
 
 **Keys.** All five exist in the Roman calendar under settled keys (`Trinity`, `CorpusChristi`,
 `SacredHeart`, `ImmaculateHeart`, `MaryMotherChurch`). Reusing them keeps cross-rite comparison cheap
@@ -88,6 +95,18 @@ Both downstream passes already refuse to overwrite an occupied day:
 
 So anchoring first is sufficient for Trinity (a Sunday), for the two weekday solemnities and for the two
 weekday memorials.
+
+### Season classification
+
+`AmbrosianTemporale::stampSeason()` classifies every event it creates via
+`LitSeason::forEventKey()`, whose default branch returns `ORDINARY_TIME` and names `Trinity` and
+`CorpusChristi` explicitly as examples. That is correct for the Roman rite and wrong for the
+Ambrosian, where all five belong to the *tempo dopo Pentecoste*. None of the five match
+`AFTER_PENTECOST_PATTERNS`, so without intervention all five would be stamped Ordinary Time.
+
+`forEventKey()` is rite-agnostic and is also consumed by the Roman `/temporale` endpoint, so it must
+not be changed. `stampSeason()` already local-overrides `ChristKing` for exactly this reason (the same
+key means a different season in each rite); extend that override to cover the five new keys.
 
 ### Why the Sunday numbering does not shift
 
