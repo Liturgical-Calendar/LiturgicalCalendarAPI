@@ -445,9 +445,27 @@ Other notable test infrastructure:
 **Test Groups:**
 
 - Regular tests: Fast validation tests.
-- `@group slow`: Reserved for tests with **measurable** runtime cost — e.g., multi-year calendar calculations (`Routes/Readonly/TemporaleTest`), rate-limit
+- `slow`: Reserved for tests with **measurable** runtime cost — e.g., multi-year calendar calculations (`Routes/Readonly/TemporaleTest`), rate-limit
   window waits (`Services/RateLimiterTest`), or full-schema-corpus validation (`Schemas/SchemaValidationTest`). Integration tests are NOT automatically slow:
-  most `Routes/*` tests run in < 200 ms and are excluded from `@group slow`.
+  most `Routes/*` tests run in < 200 ms and are excluded from the `slow` group.
+
+> **Always use the `#[Group('slow')]` ATTRIBUTE, never a legacy `@group slow` docblock.** PHPUnit 12 honours only the attribute. Several existing suites
+> (`Schemas/SchemaValidationTest`, `Routes/Readonly/TemporaleTest`) still use docblocks, with two consequences: `--exclude-group slow` does not exclude
+> them, so `composer test:quick` runs them anyway; and `--group slow <path>` on those files selects **zero tests and exits successfully** — a false green.
+> If you use `--group` for anything, confirm with `--list-tests` that it actually selected something. Migrating the remaining docblocks to attributes is
+> open work.
+
+**Engine cache (`engineCache/`) — a trap when comparing revisions:**
+
+`CalendarHandler` caches assembled calendars under `engineCache/v<API_VERSION>-<dataDigest>/`. Two properties make this dangerous during verification:
+
+- `computeEngineCacheDataVersion()` hashes **only** `jsondata/sourcedata` and `i18n/*.mo` — **never the PHP source**. A code-only change (e.g. a precedence
+  fix with no data change) does not invalidate the cache, so a deploy can keep serving stale calendars, and two revisions with identical data will serve
+  each other's cached output.
+- The cache path is relative to the **process working directory**, so running from a different cwd silently changes which cache is consulted.
+
+When bisecting or diffing calendar output across commits, clear `engineCache/` between runs (or use a fresh cwd per invocation) and stamp the provenance
+of each dump. Two separate agents have already reached confidently wrong conclusions by skipping this.
 
 **Integrity Checks:**
 External web interface at [Liturgical-Calendar/UnitTestInterface](https://github.com/Liturgical-Calendar/UnitTestInterface) provides comprehensive calendar
