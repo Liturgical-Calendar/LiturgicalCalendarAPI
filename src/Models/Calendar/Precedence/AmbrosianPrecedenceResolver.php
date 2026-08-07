@@ -708,7 +708,10 @@ final class AmbrosianPrecedenceResolver implements PrecedenceResolver
         $ctx->cal->addSuppressedEvent($loser);
 
         $ctx->addMessage(sprintf(
-            '%s (%s) is suppressed by the higher-ranking %s (%s) on %s.',
+            // "higher-precedence", not "higher-ranking": on a comune BVM-vs-saint day the two
+            // share Tabella rank 10 and the winner is decided by the composite key's tiebreak,
+            // so the ranks are equal even though the precedence is not.
+            '%s (%s) is suppressed by the higher-precedence %s (%s) on %s.',
             $loser->name,
             $loserKey,
             $winner->name,

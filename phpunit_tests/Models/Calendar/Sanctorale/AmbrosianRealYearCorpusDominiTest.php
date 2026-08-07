@@ -5,13 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Models\Calendar\Sanctorale;
 
 use LiturgicalCalendar\Api\DateTime;
-use LiturgicalCalendar\Api\Enum\LitLocale;
-use LiturgicalCalendar\Api\Enum\Rite;
-use LiturgicalCalendar\Api\LocaleDateFormatter;
-use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
 use LiturgicalCalendar\Api\Models\Calendar\Precedence\AmbrosianPrecedenceResolver;
-use LiturgicalCalendar\Api\Models\Calendar\Precedence\PrecedenceContext;
-use LiturgicalCalendar\Api\Params\CalendarParams;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Group;
@@ -81,20 +75,6 @@ final class AmbrosianRealYearCorpusDominiTest extends TestCase
         return array_map(
             static fn (array $row): array => [(int) $row['year'], (string) $row['corpus_domini']],
             $rows
-        );
-    }
-
-    private function buildContextFor(LiturgicalEventCollection $cal, int $year, array &$messages): PrecedenceContext
-    {
-        $params = new CalendarParams();
-        $params->setParams(['year' => $year]);
-        $params->setRite(Rite::AMBROSIAN);
-
-        return new PrecedenceContext(
-            $cal,
-            $params,
-            new LocaleDateFormatter(LitLocale::$RUNTIME_LOCALE),
-            $messages
         );
     }
 

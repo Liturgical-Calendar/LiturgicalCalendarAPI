@@ -4,12 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Models\Calendar\Sanctorale;
 
-use LiturgicalCalendar\Api\Enum\LitLocale;
-use LiturgicalCalendar\Api\Enum\Rite;
-use LiturgicalCalendar\Api\LocaleDateFormatter;
 use LiturgicalCalendar\Api\Models\Calendar\Precedence\AmbrosianPrecedenceResolver;
-use LiturgicalCalendar\Api\Models\Calendar\Precedence\PrecedenceContext;
-use LiturgicalCalendar\Api\Params\CalendarParams;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
@@ -34,28 +29,6 @@ use PHPUnit\Framework\TestCase;
 final class AmbrosianRealYearPrecedenceTest extends TestCase
 {
     use AmbrosianRealYearHarnessTrait;
-
-    /**
-     * Builds a PrecedenceContext wrapping the given real, already-assembled
-     * `LiturgicalEventCollection`, mirroring
-     * `AmbrosianPrecedenceResolverTest::buildContext()` but reusing an
-     * existing collection instead of constructing an empty one.
-     *
-     * @param array<string> $messages
-     */
-    private function buildContextFor(\LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection $cal, int $year, array &$messages): PrecedenceContext
-    {
-        $params = new CalendarParams();
-        $params->setParams(['year' => $year]);
-        $params->setRite(Rite::AMBROSIAN);
-
-        return new PrecedenceContext(
-            $cal,
-            $params,
-            new LocaleDateFormatter(LitLocale::$RUNTIME_LOCALE),
-            $messages
-        );
-    }
 
     /**
      * Builds a comparable signature of every event currently in the
@@ -313,7 +286,7 @@ final class AmbrosianRealYearPrecedenceTest extends TestCase
             self::assertSame($expectedDate, $corpusChristiAfter->date->format('Y-m-d'), "CorpusChristi must not be transferred off $expectedDate ($year)");
 
             // The lower-ranking comune sanctorale collider loses (suppressed by CorpusChristi).
-            self::assertTrue($cal->isSuppressed($colliderKey), "$colliderKey must be suppressed by the higher-ranking CorpusChristi ($year)");
+            self::assertTrue($cal->isSuppressed($colliderKey), "$colliderKey must be suppressed by the higher-precedence CorpusChristi ($year)");
         }
     }
 

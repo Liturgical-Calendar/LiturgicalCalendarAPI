@@ -58,8 +58,10 @@ use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
  * days where an Ambrosian BVM memorial coincides with a saint's memorial
  * (`MaryMotherChurch` / `ImmaculateHeart` against the comune sanctorale) the
  * correct winner emerged only from `uasort`'s stability, not from any stated
- * rule -- and the resolver's "suppressed by the higher-ranking X" message was
- * describing a tie. `tiebreakOf()` now reads `$e->is_bvm`, an additive
+ * rule -- and the resolver's suppression message was describing a tie (it now
+ * says "higher-precedence" rather than "higher-ranking", precisely because on
+ * these days the ranks are equal and only the composite key separates them).
+ * `tiebreakOf()` now reads `$e->is_bvm`, an additive
  * source-carried flag on `LiturgicalEvent` set from the Ambrosian proprium de
  * tempore and the Ambrosian comune sanctorale (whose BVM rows are marked by
  * `common: ["Blessed Virgin Mary"]`). `null`/absent -- the default, and the

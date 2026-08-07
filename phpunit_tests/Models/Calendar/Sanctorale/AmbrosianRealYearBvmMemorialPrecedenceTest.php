@@ -6,14 +6,8 @@ namespace LiturgicalCalendar\Tests\Models\Calendar\Sanctorale;
 
 use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\JsonData;
-use LiturgicalCalendar\Api\Enum\LitLocale;
-use LiturgicalCalendar\Api\Enum\Rite;
-use LiturgicalCalendar\Api\LocaleDateFormatter;
-use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
 use LiturgicalCalendar\Api\Models\Calendar\Precedence\AmbrosianLiturgicalDayRank;
 use LiturgicalCalendar\Api\Models\Calendar\Precedence\AmbrosianPrecedenceResolver;
-use LiturgicalCalendar\Api\Models\Calendar\Precedence\PrecedenceContext;
-use LiturgicalCalendar\Api\Params\CalendarParams;
 use LiturgicalCalendar\Api\Utilities;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -29,8 +23,10 @@ use PHPUnit\Framework\TestCase;
  * right. What was missing was the RULE. Every comune memorial is Tabella rank 10 with nothing
  * ordering them, so on the three days where the collider is itself a comune MEMORIAL the winner
  * was decided by `uasort`'s stability rather than by anything stated, and the resolver's
- * "suppressed by the higher-ranking X" message was describing a tie. A future data or ordering
- * change could have silently flipped any of them.
+ * suppression message was describing a tie. A future data or ordering change could have
+ * silently flipped any of them. (The message now reads "suppressed by the higher-precedence X"
+ * rather than "higher-ranking X", since on those three days the two ranks are genuinely equal
+ * and only the composite key's tiebreak separates them; the wording is pinned below.)
  *
  * Each case therefore asserts BOTH halves:
  *
@@ -72,26 +68,6 @@ final class AmbrosianRealYearBvmMemorialPrecedenceTest extends TestCase
         ];
     }
 
-    /**
-     * Builds a PrecedenceContext around an already-assembled collection, mirroring
-     * `AmbrosianRealYearPrecedenceTest::buildContextFor()`.
-     *
-     * @param array<string> $messages
-     */
-    private function buildContextFor(LiturgicalEventCollection $cal, int $year, array &$messages): PrecedenceContext
-    {
-        $params = new CalendarParams();
-        $params->setParams(['year' => $year]);
-        $params->setRite(Rite::AMBROSIAN);
-
-        return new PrecedenceContext(
-            $cal,
-            $params,
-            new LocaleDateFormatter(LitLocale::$RUNTIME_LOCALE),
-            $messages
-        );
-    }
-
     #[DataProvider('bvmCollisionDays')]
     public function testBvmMemorialOutranksAndSuppressesCoincidingSaint(int $year, string $date, string $saintKey, string $bvmKey): void
     {
@@ -130,6 +106,20 @@ final class AmbrosianRealYearBvmMemorialPrecedenceTest extends TestCase
         self::assertSame($date, $bvmAfter->date->format('Y-m-d'), "$bvmKey must not be moved off $date");
 
         self::assertTrue($cal->isSuppressed($saintKey), "$saintKey must be suppressed by $bvmKey on $date");
+
+        // (3) THE WORDING: the emitted `messages[]` entry must say "higher-precedence", not
+        // "higher-ranking" -- on the three comune-memorial days the two events share Tabella
+        // rank 10, so a message claiming a higher RANK would be factually wrong.
+        $suppressionMessages = array_values(array_filter(
+            $messages,
+            static fn (string $message): bool => str_contains($message, "($saintKey)") && str_contains($message, 'suppressed')
+        ));
+        self::assertCount(1, $suppressionMessages, "Expected exactly one suppression message naming $saintKey ($date)");
+        self::assertSame(
+            "$saint->name ($saintKey) is suppressed by the higher-precedence $bvm->name ($bvmKey) on $date.",
+            $suppressionMessages[0],
+            "The suppression message must attribute the outcome to higher PRECEDENCE, not a higher rank ($date)"
+        );
 
         // And the date ends up held by exactly the BVM celebration.
         $occupants = $cal->getCalEventsFromDate(DateTime::fromFormat(

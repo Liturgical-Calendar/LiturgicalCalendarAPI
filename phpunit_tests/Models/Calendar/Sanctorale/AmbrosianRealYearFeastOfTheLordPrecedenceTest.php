@@ -5,14 +5,8 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Models\Calendar\Sanctorale;
 
 use LiturgicalCalendar\Api\DateTime;
-use LiturgicalCalendar\Api\Enum\LitLocale;
-use LiturgicalCalendar\Api\Enum\Rite;
-use LiturgicalCalendar\Api\LocaleDateFormatter;
-use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
 use LiturgicalCalendar\Api\Models\Calendar\Precedence\AmbrosianLiturgicalDayRank;
 use LiturgicalCalendar\Api\Models\Calendar\Precedence\AmbrosianPrecedenceResolver;
-use LiturgicalCalendar\Api\Models\Calendar\Precedence\PrecedenceContext;
-use LiturgicalCalendar\Api\Params\CalendarParams;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -76,27 +70,24 @@ use PHPUnit\Framework\TestCase;
  * `AmbrosianRealYearBvmMemorialPrecedenceTest`'s reasoning for why a lock like this belongs
  * in `composer test:quick` rather than being excluded from it.
  *
- * ## Why this test calls `stampAmbrosianSeasonOnSanctorale()` itself
+ * ## Why the season stamp is load-bearing here
  *
- * `AmbrosianRealYearHarnessTrait::assembleAmbrosianYear()` builds the temporale anchor block
- * and the comune sanctorale, but does NOT call
+ * `AmbrosianRealYearHarnessTrait::assembleAmbrosianYear()` closes with
  * `LiturgicalEventCollection::stampAmbrosianSeasonOnSanctorale()` -- the pass the real
  * `CalendarHandler::calculateAmbrosianCalendar()` orchestrator runs (call-order step 4, see
  * that method's docblock) to copy `liturgical_season` from a co-located temporale event onto
  * a sanctorale event before resolution. Without it, every comune sanctorale event's
- * `liturgical_season` stays `null` in the harness-assembled collection, and the whole bug
- * this test targets is unreachable: `rankOf()`'s rank-3 clause tests
+ * `liturgical_season` would stay `null` in the harness-assembled collection, and the whole
+ * bug this test targets would be unreachable: `rankOf()`'s rank-3 clause tests
  * `in_array($e->liturgical_season, RANK_4_SUNDAY_SEASONS, true)`, which is trivially `false`
  * for a `null` season either way, so the pre-fix and post-fix predicates become
- * indistinguishable and a red/green check against this harness alone would pass unchanged in
- * BOTH states -- confirmed directly: reverting `rankOf()`'s rank-3 clause to its pre-fix,
- * season-alone exclusion left this test green until the explicit
- * `stampAmbrosianSeasonOnSanctorale()` call below was added, at which point it went red as
- * expected (see the Task 7 report's "Fix round 1" section for the full red/green transcript).
- * Each test method therefore calls it explicitly, immediately after assembly, exactly where
- * the real orchestrator calls it relative to `resolveAmbrosianPrecedence()` -- rather than
- * changing the shared trait (which other already-green tests in this directory depend on
- * exactly as it stands today, and which is out of scope for this task).
+ * indistinguishable and a red/green check against an unstamped harness would pass unchanged
+ * in BOTH states -- confirmed directly: reverting `rankOf()`'s rank-3 clause to its pre-fix,
+ * season-alone exclusion left this test green until the stamp was added, at which point it
+ * went red as expected (see the Task 7 report's "Fix round 1" section for the full red/green
+ * transcript). The call originally lived inline in this test class; it now lives in the
+ * shared trait, so every consumer of the harness resolves against the same season data
+ * production does.
  */
 #[CoversClass(AmbrosianLiturgicalDayRank::class)]
 final class AmbrosianRealYearFeastOfTheLordPrecedenceTest extends TestCase
@@ -122,36 +113,13 @@ final class AmbrosianRealYearFeastOfTheLordPrecedenceTest extends TestCase
         ];
     }
 
-    /**
-     * Builds a PrecedenceContext around an already-assembled collection, mirroring
-     * `AmbrosianRealYearPrecedenceTest::buildContextFor()`.
-     *
-     * @param array<string> $messages
-     */
-    private function buildContextFor(LiturgicalEventCollection $cal, int $year, array &$messages): PrecedenceContext
-    {
-        $params = new CalendarParams();
-        $params->setParams(['year' => $year]);
-        $params->setRite(Rite::AMBROSIAN);
-
-        return new PrecedenceContext(
-            $cal,
-            $params,
-            new LocaleDateFormatter(LitLocale::$RUNTIME_LOCALE),
-            $messages
-        );
-    }
-
     #[DataProvider('comuneFeastOfTheLordWeekdays')]
     public function testComuneFeastOfTheLordSurvivesItsMissalFixedWeekday(int $year, string $date, string $feastKey, string $ferialFillerKey): void
     {
+        // `assembleAmbrosianYear()` runs `stampAmbrosianSeasonOnSanctorale()` itself, mirroring
+        // the real orchestrator -- see the class docblock. Without that stamp `liturgical_season`
+        // would stay null on every sanctorale event and the bug this test targets is unreachable.
         $cal = $this->assembleAmbrosianYear($year);
-
-        // The real orchestrator's call-order step 4 (CalendarHandler::calculateAmbrosianCalendar()),
-        // which the test-only harness does not run -- see the class docblock's "Why this test
-        // calls stampAmbrosianSeasonOnSanctorale() itself" section. Without this, liturgical_season
-        // stays null on every sanctorale event and the bug this test targets is unreachable.
-        $cal->stampAmbrosianSeasonOnSanctorale();
 
         // Premise: before resolution, the feast really is a comune, dominical FEAST_LORD
         // whose date coincides with the generic ferial filler -- the exact shape of the bug.
