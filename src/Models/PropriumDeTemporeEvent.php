@@ -85,7 +85,7 @@ final class PropriumDeTemporeEvent extends AbstractJsonSrcData
     /**
      * Creates an instance of PropriumDeTemporeEvent from an associative array.
      *
-     * @param array{event_key:string,grade:int,type:int,color:string[],is_dominical?:bool|null,is_aliturgical?:bool|null,is_bvm?:bool|null} $data
+     * @param array{event_key:string,grade:int,type:int,color:string[],is_dominical?:bool|null,is_aliturgical?:bool|null,is_bvm?:bool|null,since_year?:int|null,until_year?:int|null} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -99,7 +99,9 @@ final class PropriumDeTemporeEvent extends AbstractJsonSrcData
             array_map(fn (string $color): LitColor => LitColor::from($color), $data['color']),
             $data['is_dominical'] ?? null,
             $data['is_aliturgical'] ?? null,
-            $data['is_bvm'] ?? null
+            $data['is_bvm'] ?? null,
+            $data['since_year'] ?? null,
+            $data['until_year'] ?? null
         );
     }
 
