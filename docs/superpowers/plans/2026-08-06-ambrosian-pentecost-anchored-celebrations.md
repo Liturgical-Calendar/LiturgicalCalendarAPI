@@ -952,26 +952,36 @@ git commit -m "test(ambrosian): assert Corpus Domini across all 32 tabulated yea
 
 ---
 
-### Task 6: `is_bvm` property and the rank-10 split
+### Task 6: `is_bvm` property and the rank-10 tiebreak
 
-Added after Task 4's review. Placing the two BVM memorials into the temporale made them collide with sanctorale memorials on five days across the
-sampled years:
+> **Design note (recorded after the fact).** This section originally prescribed *splitting rank 10* — inserting a new rank between the comune BVM
+> memorial and the comune saint's memorial and renumbering the tiers below. The project owner ruled against that during the task's review round: it
+> pushed `rankOf()` to 14 values against the Missal Tabella's 13, breaking the class's stated contract that its output reads side by side with the
+> Tabella. What SHIPPED is a **(rank, tiebreak) composite key**: `rankOf()` still returns the Tabella's 1–13, `OCCUPIED_RANK_CEILING` stays 10, and
+> BVM-over-saint is expressed as a *secondary* sort key. The section below describes the shipped design.
 
-| Date       | Sanctorale event      | New temporale event | Both at |
-|------------|-----------------------|---------------------|---------|
-| 2024-05-20 | `StBernardineOfSiena` | `MaryMotherChurch`  | rank 10 |
-| 2025-06-09 | `StEphremDeacon`      | `MaryMotherChurch`  | rank 10 |
-| 2025-06-28 | `StIrenaeus`          | `ImmaculateHeart`   | rank 10 |
-| 2026-05-25 | `StDionysius`         | `MaryMotherChurch`  | rank 10 |
-| 2026-06-13 | `StAnthonyOfPadua`    | `ImmaculateHeart`   | rank 10 |
+Added after Task 4's review. Placing the two BVM memorials into the temporale made them collide with sanctorale celebrations on five days across the
+sampled years. Only three of the five were genuine ties:
+
+| Date       | Sanctorale event      | Its grade      | Its rank | New temporale event | Tied? |
+|------------|-----------------------|----------------|----------|---------------------|-------|
+| 2024-05-20 | `StBernardineOfSiena` | `MEMORIAL_OPT` | 12       | `MaryMotherChurch`  | no    |
+| 2025-06-09 | `StEphremDeacon`      | `MEMORIAL_OPT` | 12       | `MaryMotherChurch`  | no    |
+| 2025-06-28 | `StIrenaeus`          | `MEMORIAL`     | 10       | `ImmaculateHeart`   | yes   |
+| 2026-05-25 | `StDionysius`         | `MEMORIAL`     | 10       | `MaryMotherChurch`  | yes   |
+| 2026-06-13 | `StAnthonyOfPadua`    | `MEMORIAL`     | 10       | `ImmaculateHeart`   | yes   |
+
+`StBernardineOfSiena` and `StEphremDeacon` are grade-2 optional memorials — rank 12, a full tier below the rank-10 BVM memorials — so their days were
+never ambiguous. (An earlier draft of this table listed all five as rank-10 ties; that was wrong.) All five days are pinned by the regression test
+anyway, so the fix is covered on the whole affected set rather than only on the contested subset.
 
 **The outcomes are already correct.** A memorial of the Blessed Virgin Mary ranks above a memorial of a saint, so the BVM celebration winning each of
 these days is right. Praenotanda n. 53's "medesimo grado" coexistence rule governs saints among themselves; it does not put a BVM memorial on a level
 with a saint's.
 
-The defect is that the rank ladder does not say so. `rankOf()` returns a flat rank 10 for every comune memorial, so the correct winner is currently
-decided by `uasort` stability rather than by a stated rule — and the suppression message reads "higher-ranking" when the ranks are numerically equal.
-A future data or ordering change could silently flip any of these five days with no test to catch it.
+The defect is that the ladder does not say so. `rankOf()` returns a flat rank 10 for every comune memorial, so on the three genuinely tied days the
+correct winner is decided by `uasort` stability rather than by a stated rule — and the suppression message claimed a "higher-ranking" winner when the
+ranks are numerically equal. A future data or ordering change could silently flip any of them with no test to catch it.
 
 Encode the rule as an explicit `is_bvm` property, mirroring the existing `is_dominical` property. `is_dominical` is already carried by BOTH the
 Proprium de Tempore schema and the Ambrosian sanctorale schema, so `is_bvm` must be too — otherwise a BVM celebration coming from the sanctorale
@@ -985,20 +995,23 @@ Proprium de Tempore schema and the Ambrosian sanctorale schema, so `is_bvm` must
 - Modify: the sanctorale event model and `src/Models/Calendar/LiturgicalEvent.php` — plumb it through so `rankOf()` can read it
 - Modify: `jsondata/sourcedata/rite/ambrosian/missals/propriumdetempore/propriumdetempore.json` — `is_bvm: true` on `MaryMotherChurch` and `ImmaculateHeart`
 - Modify: the Ambrosian sanctorale data — `is_bvm: true` on its BVM celebrations
-- Modify: `src/Models/Calendar/Precedence/AmbrosianLiturgicalDayRank.php` — split rank 10
+- Modify: `src/Models/Calendar/Precedence/AmbrosianLiturgicalDayRank.php` — add the tiebreak as a secondary key; do NOT renumber `rankOf()`
+- Modify: `src/Models/Calendar/Precedence/AmbrosianPrecedenceResolver.php` — sort on the composite key
 - Test: `phpunit_tests/Models/Calendar/Precedence/` and `phpunit_tests/Models/Calendar/Sanctorale/`
 
 **Interfaces:**
 
-- Consumes: `LiturgicalEvent`, as read by `AmbrosianLiturgicalDayRank::rankOf()`.
-- Produces: `is_bvm` on the event models, and a rank ladder in which a comune BVM memorial outranks a comune saint's memorial.
+- Consumes: `LiturgicalEvent`, as read by `AmbrosianLiturgicalDayRank::rankOf()` and `::tiebreakOf()`.
+- Produces: `is_bvm` on the event models, and a composite precedence key in which a comune BVM memorial precedes a comune saint's memorial *within*
+  Tabella rank 10.
 
 - [ ] **Step 1: Write the failing tests**
 
 Two levels, both required:
 
-1. A unit test on `AmbrosianLiturgicalDayRank::rankOf()`: a comune BVM memorial must rank strictly above a comune saint's memorial. Follow the
-   existing fixture style in `phpunit_tests/Models/Calendar/Precedence/AmbrosianLiturgicalDayRankTest.php`.
+1. A unit test on the COMPOSITE key: a comune BVM memorial and a comune saint's memorial must share `rankOf() === 10`, and
+   `compare(bvm, saint)` must be strictly negative. (Do NOT assert a strictly smaller `rankOf()` for the BVM memorial — that is the rejected split.)
+   Follow the existing fixture style in `phpunit_tests/Models/Calendar/Precedence/AmbrosianLiturgicalDayRankTest.php`.
 2. Assembled-calendar tests pinning all five rows of the table above: the BVM celebration is present on that date and the saint is the one suppressed.
    These are the regression lock for the five real days. Use `AmbrosianRealYearHarnessTrait`.
 
@@ -1008,7 +1021,7 @@ existing "of-the-Lord asymmetry" tests use `ORDINARY_TIME`, so none of them woul
 
 - [ ] **Step 2: Run them to verify they fail**
 
-The rank unit test must fail with both memorials at rank 10. Record the output.
+The composite-key unit test must fail on `compare()` returning 0 with both memorials at rank 10. Record the output.
 
 - [ ] **Step 3: Add `is_bvm` to both schemas**
 
@@ -1027,17 +1040,27 @@ guard in `fromObjectInternal()`, and position in the `new static(...)` call. Bac
 sanctorale's existing `common: ["Blessed Virgin Mary"]` marker to find the latter, but do NOT replace that field — `is_bvm` is an addition, not a
 migration.
 
-- [ ] **Step 6: Split rank 10**
+- [ ] **Step 6: Add the tiebreak as a secondary key — do NOT renumber `rankOf()`**
 
-In `AmbrosianLiturgicalDayRank::rankOf()`, place a comune BVM memorial above a comune saint's memorial, and renumber the ranks below accordingly.
-Update the class docblock's rank table, which enumerates the ladder.
+Leave `rankOf()` returning the Missal Tabella's 1–13 exactly as it does today, so the class keeps reading side by side with the Tabella. Add instead:
 
-Check every consumer of the rank numbers before renumbering — `SOLEMNITY_TIER_MAX_RANK` and anything else comparing against literal rank values must
-stay semantically correct. A silent off-by-one here would mis-rank a whole tier.
+- `tiebreakOf(LiturgicalEvent): int` — ordered predicates, first match wins, `TIEBREAK_DEFAULT = 0` as the baseline and negative values sorting first.
+  The only value this task needs is `TIEBREAK_BVM_MEMORIAL = -1`, scoped to comune memorials (rank 10).
+- `precedenceKeyOf(LiturgicalEvent): array{int,int}` — the composite `[rank, tiebreak]`.
+- `compare(LiturgicalEvent, LiturgicalEvent): int` — rank first, tiebreak second.
+
+Then switch the resolver's `uasort` from `rankOf()` to `compare()`. Update the class docblock's rank table and add a "Rank vs. tiebreak" section
+explaining which refinements belong on which axis.
+
+`OCCUPIED_RANK_CEILING` stays 10 and `SOLEMNITY_RANK_CEILING` stays 6 — no literal rank consumer changes, which is the point of choosing a composite
+key over a renumbering. Keep the tiebreak general rather than a BVM special case: the two refinements queued for later plans (own-church dedication at
+rank 3; splitting the proper-memorial tier) must each land as one more clause in `tiebreakOf()` without touching `rankOf()`.
 
 - [ ] **Step 7: Fix the suppression message**
 
-Where the resolver reports an event "suppressed by the higher-ranking X", confirm the wording is accurate now that the ranks genuinely differ.
+The resolver reports an event "suppressed by the higher-ranking X". Under the composite key that is inaccurate on exactly the days this task is about:
+the two events share Tabella rank 10 and only the tiebreak separates them. Reword it to "suppressed by the higher-precedence X" and pin the new
+wording in a test.
 
 - [ ] **Step 8: Run the tests and the full Ambrosian suites**
 
