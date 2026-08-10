@@ -4813,6 +4813,69 @@ final class CalendarHandler extends AbstractHandler
     }
 
     /**
+     * Blank out the generation stamps a representation embeds about itself, so that the ETag
+     * identifies the calendar rather than the moment it was serialized.
+     *
+     * `metadata.timestamp` / `metadata.date_time` (JSON, YML) and `DTSTAMP` (ICS) change on every
+     * generation while saying nothing about the calendar. Hashing the raw body therefore handed an
+     * unchanged calendar a fresh validator on every regeneration — every request where the server
+     * cache is bypassed, and every cache rebuild otherwise — so a conditional request re-sent the
+     * whole body for nothing. XML embeds no such stamp and is returned unchanged.
+     *
+     * Two bodies reduced to the same source may still differ in those stamps, which is exactly why
+     * the resulting validator is weak at the call sites (RFC 9110 §8.8.1).
+     */
+    private function validatorSource(string $responseBody): string
+    {
+        $substitutions = match ($this->CalendarParams->ReturnType) {
+            ReturnTypeParam::XML => [],
+            ReturnTypeParam::ICS => ['/DTSTAMP:\d{8}T\d{6}Z/' => 'DTSTAMP:'],
+            ReturnTypeParam::YAML => [
+                '/^(\s*)timestamp:\s*\d+$/m'     => '$1timestamp:',
+                "/^(\s*)date_time:\s*'[^']*'$/m" => '$1date_time:'
+            ],
+            default => [
+                '/"timestamp":\s*\d+/'     => '"timestamp":',
+                '/"date_time":\s*"[^"]*"/' => '"date_time":'
+            ]
+        };
+
+        if ([] === $substitutions) {
+            return $responseBody;
+        }
+
+        return preg_replace(array_keys($substitutions), array_values($substitutions), $responseBody) ?? $responseBody;
+    }
+
+    /**
+     * Whether an `If-None-Match` header selects the given validator.
+     *
+     * `If-None-Match` uses the weak comparison function (RFC 9110 §8.8.3.2), so a `W/` prefix on
+     * either side is ignored, and the field may carry `*` or a comma-separated list rather than a
+     * single entity-tag.
+     */
+    private static function ifNoneMatchSatisfiedBy(string $headerLine, string $validator): bool
+    {
+        if ('' === trim($headerLine)) {
+            return false;
+        }
+
+        foreach (explode(',', $headerLine) as $candidate) {
+            $candidate = trim($candidate);
+            if ('*' === $candidate) {
+                return true;
+            }
+
+            $candidate = preg_replace('/^W\//i', '', $candidate) ?? $candidate;
+            if (trim($candidate, " \t\"") === $validator) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Splices request_headers into a YAML body. Only the tiny request_headers map is
      * (re)dumped — cheap and byte-identical to Symfony's own scalar quoting — then indented
      * two spaces to sit under `metadata` and spliced over the existing entry. The pattern
@@ -4980,8 +5043,8 @@ final class CalendarHandler extends AbstractHandler
             }
         }
 
-        $responseHash  = md5($responseBody);
-        $etag          = '"' . $responseHash . '"';
+        $responseHash  = md5($this->validatorSource($responseBody));
+        $etag          = 'W/"' . $responseHash . '"';
         $this->endTime = hrtime(true);
         $executionTime = $this->endTime - $this->startTime;
         $response      = $response->withHeader('X-LitCal-Starttime', $this->startTime . '')
@@ -4990,10 +5053,7 @@ final class CalendarHandler extends AbstractHandler
                                   ->withHeader('Etag', $etag)
                                   ->withHeader('Vary', 'Accept, Accept-Language');
 
-        if (
-            $request->getHeaderLine('If-None-Match') !== ''
-            && trim($request->getHeaderLine('If-None-Match'), " \t\"") === $responseHash
-        ) {
+        if (self::ifNoneMatchSatisfiedBy($request->getHeaderLine('If-None-Match'), $responseHash)) {
             return $response->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
                                  ->withHeader('Content-Length', '0')
                                  ->withHeader('X-LitCal-Generated', 'ClientCache');
@@ -5425,8 +5485,8 @@ final class CalendarHandler extends AbstractHandler
             //   request headers), so re-inject THIS request's headers into
             //   metadata.request_headers before serving; see injectRequestHeaders() and #684.
             $responseBody  = $this->injectRequestHeaders(Utilities::rawContentsFromFile($this->CacheFile));
-            $responseHash  = md5($responseBody);
-            $etag          = '"' . $responseHash . '"';
+            $responseHash  = md5($this->validatorSource($responseBody));
+            $etag          = 'W/"' . $responseHash . '"';
             $this->endTime = hrtime(true);
             $executionTime = $this->endTime - $this->startTime;
             $response      = $response
@@ -5436,10 +5496,7 @@ final class CalendarHandler extends AbstractHandler
                 ->withHeader('Etag', $etag)
                 ->withHeader('Vary', 'Accept, Accept-Language');
 
-            if (
-                $request->getHeaderLine('If-None-Match') !== ''
-                && trim($request->getHeaderLine('If-None-Match'), " \t\"") === $responseHash
-            ) {
+            if (self::ifNoneMatchSatisfiedBy($request->getHeaderLine('If-None-Match'), $responseHash)) {
                 return $response
                     ->withStatus(StatusCode::NOT_MODIFIED->value, StatusCode::NOT_MODIFIED->reason())
                     ->withHeader('Content-Length', '0')

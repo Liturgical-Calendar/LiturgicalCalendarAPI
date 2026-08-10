@@ -96,6 +96,10 @@ Some characteristics of this API:
 * **Response headers are readable by cross-origin browser clients**: only the CORS-safelisted headers are visible to JavaScript by default, so the API names
   its own in `Access-Control-Expose-Headers` — always `X-Request-Id` (so a browser client can quote it in a bug report), plus `ETag` (so a client can echo it
   back as `If-None-Match`) and the canonical `Link`, each named only on the responses that actually carry them.
+* **The calendar `ETag` is a weak validator** (`W/"..."`): a calendar representation embeds its own generation stamp (`metadata.timestamp` / `metadata.date_time`,
+  or `DTSTAMP` in ICS), which changes on every regeneration while saying nothing about the calendar. The validator is computed with those stamps neutralised, so
+  an unchanged calendar keeps the same `ETag` across regenerations and a conditional request actually revalidates into a `304` instead of re-sending the whole
+  body. It is weak precisely because two bodies sharing a validator may still differ in those stamps ([RFC 9110 §8.8.1](https://www.rfc-editor.org/rfc/rfc9110#name-validator-fields)).
 * **Ambrosian rite support is live**: `GET/POST /calendar/ambrosian` and `/calendar/ambrosian/{year}` calculate the calendar for the Ambrosian rite as
   celebrated in common (the *comune ambrosiano*), while `/calendar/ambrosian/diocese/{calendar_id}` and `/calendar/ambrosian/diocese/{calendar_id}/{year}`
   layer the proper of one of the four Ambrosian dioceses — Milano (`milano_it`), Bergamo (`bergam_it`), Novara (`novara_it`) and Lugano (`lugano_ch`) —
