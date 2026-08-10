@@ -9,9 +9,9 @@ use LiturgicalCalendar\Tests\ApiTestCase;
 /**
  * Live HTTP integration test for the calendar route's ETag.
  *
- * A calendar representation embeds its own generation stamp — `metadata.timestamp` and
- * `metadata.date_time` in JSON/YML, `DTSTAMP` in ICS — which changes on every generation but
- * says nothing about the calendar itself. Hashing the raw body therefore produced a validator
+ * A calendar representation embeds its own generation stamp — `timestamp` / `date_time` in JSON
+ * and YML, `<Timestamp>` / `<DateTime>` in XML, `DTSTAMP` in ICS — which changes on every
+ * generation but says nothing about the calendar itself. Hashing the raw body therefore produced a validator
  * that changed whenever the response was regenerated: on every request where the server cache
  * is bypassed (localhost), and on every server-cache regeneration in production, even though
  * the calendar content was byte-for-byte the same. A conditional request then re-transferred
@@ -80,6 +80,49 @@ final class CalendarEtagStabilityTest extends ApiTestCase
 
         self::assertSame(200, $first->getStatusCode());
         self::assertSame($first->getHeaderLine('ETag'), $second->getHeaderLine('ETag'));
+    }
+
+    public function testTheXmlRepresentationAlsoHasAStableEtag(): void
+    {
+        // XML carries the same stamp as JSON but under PascalCase element names,
+        // `<Timestamp>` / `<DateTime>`.
+        $first = self::$http->get('/calendar/2026?return_type=XML', []);
+        usleep(self::GENERATION_STAMP_TICK_MICROSECONDS);
+        $second = self::$http->get('/calendar/2026?return_type=XML', []);
+
+        self::assertSame(200, $first->getStatusCode());
+        self::assertSame($first->getHeaderLine('ETag'), $second->getHeaderLine('ETag'));
+    }
+
+    public function testAnEntityTagWhoseOpaqueValueContainsACommaIsNotSplitIntoSeparateTags(): void
+    {
+        // An entity-tag's opaque value may itself contain a comma (RFC 9110 §8.8.3 permits any
+        // visible character except `"`), so splitting the field on commas can synthesise a
+        // fragment equal to our own validator and answer 304 to a client that holds nothing of
+        // the sort. This sends ONE tag that merely contains the validator, so it must not match.
+        $first     = self::$http->get('/calendar/2026', []);
+        $validator = trim(preg_replace('/^W\//', '', $first->getHeaderLine('ETag')) ?? '', '"');
+        self::assertNotSame('', $validator);
+
+        $response = self::$http->get('/calendar/2026', [
+            'headers' => ['If-None-Match' => '"unrelated,' . $validator . '"']
+        ]);
+
+        self::assertSame(200, $response->getStatusCode());
+    }
+
+    public function testAValidatorListedAmongSeveralEntityTagsStillMatches(): void
+    {
+        // The converse of the test above: a genuine comma-separated list must still match.
+        $first = self::$http->get('/calendar/2026', []);
+        $etag  = $first->getHeaderLine('ETag');
+        self::assertNotSame('', $etag);
+
+        $response = self::$http->get('/calendar/2026', [
+            'headers' => ['If-None-Match' => '"somethingelse", ' . $etag]
+        ]);
+
+        self::assertSame(304, $response->getStatusCode());
     }
 
     public function testDifferentCalendarsStillGetDifferentEtags(): void

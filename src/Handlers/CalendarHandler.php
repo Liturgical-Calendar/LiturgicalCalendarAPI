@@ -4816,11 +4816,12 @@ final class CalendarHandler extends AbstractHandler
      * Blank out the generation stamps a representation embeds about itself, so that the ETag
      * identifies the calendar rather than the moment it was serialized.
      *
-     * `metadata.timestamp` / `metadata.date_time` (JSON, YML) and `DTSTAMP` (ICS) change on every
-     * generation while saying nothing about the calendar. Hashing the raw body therefore handed an
-     * unchanged calendar a fresh validator on every regeneration — every request where the server
-     * cache is bypassed, and every cache rebuild otherwise — so a conditional request re-sent the
-     * whole body for nothing. XML embeds no such stamp and is returned unchanged.
+     * Every representation carries the same stamp under a different spelling: `timestamp` /
+     * `date_time` in JSON and YML, `<Timestamp>` / `<DateTime>` in XML, and `DTSTAMP` in ICS. All
+     * of them change on every generation while saying nothing about the calendar. Hashing the raw
+     * body therefore handed an unchanged calendar a fresh validator on every regeneration — every
+     * request where the server cache is bypassed, and every cache rebuild otherwise — so a
+     * conditional request re-sent the whole body for nothing.
      *
      * Two bodies reduced to the same source may still differ in those stamps, which is exactly why
      * the resulting validator is weak at the call sites (RFC 9110 §8.8.1).
@@ -4828,7 +4829,10 @@ final class CalendarHandler extends AbstractHandler
     private function validatorSource(string $responseBody): string
     {
         $substitutions = match ($this->CalendarParams->ReturnType) {
-            ReturnTypeParam::XML => [],
+            ReturnTypeParam::XML => [
+                '#<Timestamp>[^<]*</Timestamp>#' => '<Timestamp></Timestamp>',
+                '#<DateTime>[^<]*</DateTime>#'   => '<DateTime></DateTime>'
+            ],
             ReturnTypeParam::ICS => ['/DTSTAMP:\d{8}T\d{6}Z/' => 'DTSTAMP:'],
             ReturnTypeParam::YAML => [
                 '/^(\s*)timestamp:\s*\d+$/m'     => '$1timestamp:',
@@ -4840,10 +4844,6 @@ final class CalendarHandler extends AbstractHandler
             ]
         };
 
-        if ([] === $substitutions) {
-            return $responseBody;
-        }
-
         return preg_replace(array_keys($substitutions), array_values($substitutions), $responseBody) ?? $responseBody;
     }
 
@@ -4853,6 +4853,11 @@ final class CalendarHandler extends AbstractHandler
      * `If-None-Match` uses the weak comparison function (RFC 9110 §8.8.3.2), so a `W/` prefix on
      * either side is ignored, and the field may carry `*` or a comma-separated list rather than a
      * single entity-tag.
+     *
+     * The list is tokenised on the quotes rather than split on commas: an entity-tag's opaque
+     * value may itself contain a comma (`etagc` admits any visible character except `"`, RFC 9110
+     * §8.8.3), so splitting on commas can carve a fragment equal to `$validator` out of one
+     * unrelated tag and answer `304` to a client that does not hold the representation at all.
      */
     private static function ifNoneMatchSatisfiedBy(string $headerLine, string $validator): bool
     {
@@ -4860,19 +4865,15 @@ final class CalendarHandler extends AbstractHandler
             return false;
         }
 
-        foreach (explode(',', $headerLine) as $candidate) {
-            $candidate = trim($candidate);
-            if ('*' === $candidate) {
-                return true;
-            }
-
-            $candidate = preg_replace('/^W\//i', '', $candidate) ?? $candidate;
-            if (trim($candidate, " \t\"") === $validator) {
-                return true;
-            }
+        if ('*' === trim($headerLine)) {
+            return true;
         }
 
-        return false;
+        if (preg_match_all('/(?:W\/)?"([^"]*)"/i', $headerLine, $matches) < 1) {
+            return false;
+        }
+
+        return in_array($validator, $matches[1], true);
     }
 
     /**
