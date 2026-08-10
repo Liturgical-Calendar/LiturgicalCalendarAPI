@@ -754,7 +754,12 @@ class Router
                 $canonicalPathParts,
                 $this->request->getUri()->getQuery()
             );
-        if (null !== $canonicalUrl && $this->response->getStatusCode() >= 200 && $this->response->getStatusCode() < 300) {
+        // 304 is included alongside 2xx: a resolved conditional request stands in for the 200 it
+        // would otherwise have been and describes the same resource, so a client driving its own
+        // conditional requests should not lose the canonical URL merely because its cache was
+        // still fresh.
+        $status = $this->response->getStatusCode();
+        if (null !== $canonicalUrl && ( ( $status >= 200 && $status < 300 ) || $status === StatusCode::NOT_MODIFIED->value )) {
             $this->response = $this->response->withHeader('Link', '<' . $canonicalUrl . '>; rel="canonical"');
         }
 

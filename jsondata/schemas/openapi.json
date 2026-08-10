@@ -4927,7 +4927,7 @@
           }
         },
         "deprecated": true,
-        "description": "\n\n**Deprecated in favour of the explicit-rite form `/events/roman`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL."
+        "description": "**Deprecated in favour of the explicit-rite form `/events/roman`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL."
       },
       "post": {
         "tags": [
@@ -4965,7 +4965,7 @@
           }
         },
         "deprecated": true,
-        "description": "\n\n**Deprecated in favour of the explicit-rite form `/events/roman`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL."
+        "description": "**Deprecated in favour of the explicit-rite form `/events/roman`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL."
       }
     },
     "/events/roman": {
@@ -5004,7 +5004,7 @@
             "$ref": "#/components/responses/ServiceUnavailable503"
           }
         },
-        "description": "\n\nThis is the canonical form of this route: the rite is stated explicitly, symmetric with the `/events/ambrosian` variant. The equivalent bare path (`/events`) is retained for backwards compatibility and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header."
+        "description": "This is the canonical form of this route: the rite is stated explicitly, symmetric with the `/events/ambrosian` variant. The equivalent bare path (`/events`) is retained for backwards compatibility and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header."
       },
       "post": {
         "tags": [
@@ -5041,7 +5041,7 @@
             "$ref": "#/components/responses/ServiceUnavailable503"
           }
         },
-        "description": "\n\nThis is the canonical form of this route: the rite is stated explicitly, symmetric with the `/events/ambrosian` variant. The equivalent bare path (`/events`) is retained for backwards compatibility and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header."
+        "description": "This is the canonical form of this route: the rite is stated explicitly, symmetric with the `/events/ambrosian` variant. The equivalent bare path (`/events`) is retained for backwards compatibility and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header."
       }
     },
     "/events/ambrosian": {

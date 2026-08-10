@@ -103,6 +103,29 @@ final class CanonicalRiteLinkHeaderTest extends ApiTestCase
         self::assertSame('', $response->getHeaderLine('Link'));
     }
 
+    public function testAResolvedConditionalRequestStillCarriesTheCanonicalLink(): void
+    {
+        // A 304 stands in for the 200 it would otherwise have been, describing the same resource,
+        // so a client driving its own conditional requests should not lose the canonical URL
+        // merely because its cache was still fresh.
+        //
+        // `/events` rather than `/calendar/{year}` because only the former has a stable validator:
+        // a calendar response body embeds its own generation timestamp, so its ETag changes on
+        // every request and a conditional request against it only yields a 304 when both requests
+        // land in the same wall-clock second.
+        $first = self::$http->get('/events', []);
+        $etag  = $first->getHeaderLine('ETag');
+        self::assertNotSame('', $etag, 'precondition: the bare events route is ETag-bearing');
+
+        $second = self::$http->get('/events', ['headers' => ['If-None-Match' => $etag]]);
+
+        self::assertSame(304, $second->getStatusCode());
+        self::assertMatchesRegularExpression(
+            '#^<' . self::originPattern() . '/events/roman>; rel="canonical"$#',
+            $second->getHeaderLine('Link')
+        );
+    }
+
     public function testAPreflightResponseCarriesNoCanonicalLink(): void
     {
         // A CORS preflight is a control response, not a representation of the resource, so a
