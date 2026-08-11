@@ -128,7 +128,11 @@ final class PropriumDeSanctisMap extends AbstractJsonSrcDataArray implements \It
     /**
      * Creates an instance of PropriumDeSanctisMap from an array of associative arrays.
      *
-     * @param array<array{event_key:string,grade:int,type:?string,color:string[],readings:array{first_reading:string,responsorial_psalm:string,second_reading?:string,gospel_acclamation:string,gospel:string,palm_gospel?:string,responsorial_psalm_2?:string}}> $data
+     * Each element is handed to {@see PropriumDeSanctisEvent::fromArray()}, so this shape mirrors
+     * that method's: `day`, `month` and `common` are required alongside the rest, and `readings`
+     * is not among the keys it reads.
+     *
+     * @param array<array{event_key:string,day:int,month:int,color:string[],common:string[],grade:int,grade_display?:string|null,type?:string|null,calendar?:string|null,is_dominical?:bool|null,is_bvm?:bool|null}> $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static

@@ -154,7 +154,7 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
      * - common (string[]): The liturgical common of the event, as an array of strings
      * - grade (int): The liturgical grade of the event
      *
-     * @param array{event_key:string,day:int,month:int,color:string[],common:string[],grade:int,grade_display:?string,type:?string,calendar:?string,is_dominical?:bool|null,is_bvm?:bool|null} $data
+     * @param array{event_key:string,day:int,month:int,color:string[],common:string[],grade:int,grade_display?:string|null,type?:string|null,calendar?:string|null,is_dominical?:bool|null,is_bvm?:bool|null} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -209,6 +209,10 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
      * - common (array): The liturgical common for the event.
      * - grade (int): The liturgical grade of the event.
      * - grade_display (string): The liturgical grade display of the event.
+     *
+     * `grade_display`, `type` and `calendar` are read through `isset()` and so may be absent, but
+     * they are spelled required-nullable here rather than optional: PHPStan widens an optional
+     * property of an object shape to `mixed`, which would cost the value types at every use.
      *
      * @param \stdClass&object{event_key:string,day:int,month:int,color:string[],common:string[],grade:int,grade_display:?string,type:?string,calendar:?string,is_dominical?:bool|null,is_bvm?:bool|null} $data The stdClass object or array containing event data.
      * @return static The newly created instance(s).
