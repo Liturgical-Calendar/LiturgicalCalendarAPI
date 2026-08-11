@@ -120,11 +120,18 @@ jobs:
                    -o i18n/litcal.pot $(git ls-files '*.php')
           echo "POT_LINES_CHANGED=$(git diff -U0 | grep '^[+|-][^+|-]' | grep -Ev '^[+-]"POT-Creation-Date' | wc -l)" >> $GITHUB_OUTPUT
 
+      # Opened with WORKFLOW_AUTOMERGE_PAT rather than the default GITHUB_TOKEN.
+      # A PR opened by GITHUB_TOKEN does not trigger further workflows, so the
+      # `static_analysis` and `phpunit_tests` contexts that branch protection on
+      # development requires would never report on it, and the merge was refused
+      # forever with "the base branch policy prohibits the merge" (see #759).
+      # Opening it as a real identity makes both required checks run.
       - name: Create Pull Request
         id: cpr
         if: ${{ steps.update_pot.outputs.POT_LINES_CHANGED > 0 }}
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
+          token: ${{ secrets.WORKFLOW_AUTOMERGE_PAT }}
           commit-message: "chore: regenerate i18n/litcal.pot from source files"
           branch: automated/update-pot
           title: "chore: regenerate i18n/litcal.pot from source files"
@@ -136,34 +143,34 @@ jobs:
             behavioural code, so there is nothing for CI to validate.
           add-paths: i18n/litcal.pot
 
-      # The .pot PR is created with the default GITHUB_TOKEN, which by design
-      # does not trigger further workflows — so a separate pull_request-based
-      # auto-merge job (like the Dependabot one) would never fire. Instead we
-      # merge here, in the same push-triggered run that opened the PR.
+      # Hand the merge to GitHub rather than performing it inline. Branch
+      # protection on development requires the `static_analysis` and
+      # `phpunit_tests` contexts, and phpunit_tests alone runs for ~5 minutes, so
+      # the previous approach — `gh pr merge` with six 5-second retries in the
+      # same run that opened the PR — could never win that race. It failed every
+      # time with "the base branch policy prohibits the merge", leaving the .pot
+      # PR stranded and this job red (#759). `--auto` finishes immediately and
+      # lets GitHub merge once both contexts are green.
       #
-      # Branch protection on the base requires neither reviews nor status checks,
-      # so the PR is immediately mergeable ("clean"). We must NOT use
-      # `gh pr merge --auto` here: enabling auto-merge on an already-clean PR
-      # fails with "Pull request is in clean status (enablePullRequestAutoMerge)",
-      # which left every .pot PR stranded (see issue #684 follow-up). Merge
-      # directly instead, retrying to cover the brief window after creation while
-      # GitHub is still computing mergeability. --delete-branch removes the
-      # automated/update-pot head branch (explicit, not relying on the repo's
-      # delete_branch_on_merge setting). The github.ref guard pins the merge to
-      # development, so widening the push filter above can never cause an
-      # accidental merge into another branch (e.g. stable).
+      # The earlier comment here warned that --auto is rejected on an
+      # already-clean PR ("Pull request is in clean status"). That is still true,
+      # and is exactly what happens if branch protection ever stops requiring
+      # checks — so fall back to merging directly in that case, which keeps this
+      # working under either policy.
+      #
+      # --delete-branch removes the automated/update-pot head branch (explicit,
+      # not relying on the repo's delete_branch_on_merge setting). The github.ref
+      # guard pins the merge to development, so widening the push filter above can
+      # never cause an accidental merge into another branch (e.g. stable).
       - name: Auto-merge the POT update PR
         if: ${{ steps.cpr.outputs.pull-request-number && github.ref == 'refs/heads/development' }}
         run: |
-          for attempt in 1 2 3 4 5 6; do
-            if gh pr merge "$PR_NUMBER" --merge --delete-branch; then
-              exit 0
-            fi
-            echo "Merge attempt $attempt failed (PR not yet mergeable?); retrying in 5s…"
-            sleep 5
-          done
-          echo "::error::Failed to merge POT update PR #$PR_NUMBER after 6 attempts"
-          exit 1
+          if gh pr merge "$PR_NUMBER" --auto --merge --delete-branch; then
+            echo "Auto-merge enabled; GitHub will merge PR #$PR_NUMBER once the required checks pass."
+            exit 0
+          fi
+          echo "Could not enable auto-merge — the PR is likely already mergeable. Merging directly."
+          gh pr merge "$PR_NUMBER" --merge --delete-branch
         env:
           PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.WORKFLOW_AUTOMERGE_PAT }}
