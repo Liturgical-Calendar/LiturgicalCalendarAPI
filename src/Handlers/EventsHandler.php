@@ -827,7 +827,7 @@ final class EventsHandler extends AbstractHandler
         // preference degrades to Latin rather than tripping the rejection in
         // EventsParams::validateRiteCompatibility() — see the equivalent block in
         // CalendarHandler::handle() for why headers and explicit params differ (#761).
-        $locale = Negotiator::pickLanguage($request, CalendarMetadataProvider::localesForRite($this->rite), LitLocale::LATIN);
+        $locale = Negotiator::pickLanguage($request, CalendarMetadataProvider::negotiableLocalesForRite($this->rite), LitLocale::LATIN);
         if ($locale && LitLocale::isValid($locale)) {
             $params['locale'] = $locale;
         } else {

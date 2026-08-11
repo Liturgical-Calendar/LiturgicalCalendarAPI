@@ -5444,7 +5444,7 @@ final class CalendarHandler extends AbstractHandler
         // calendar param first); those are currently applied as a silent downgrade in
         // updateSettingsBasedOnDiocesanCalendar().
         if ($request->getHeaderLine('Accept-Language') !== '') {
-            $locale = Negotiator::pickLanguage($request, CalendarMetadataProvider::localesForRite($this->rite), null);
+            $locale = Negotiator::pickLanguage($request, CalendarMetadataProvider::negotiableLocalesForRite($this->rite), null);
             if ($locale && LitLocale::isValid($locale)) {
                 $params['locale'] = $locale;
             }

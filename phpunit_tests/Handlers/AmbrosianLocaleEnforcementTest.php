@@ -225,6 +225,69 @@ final class AmbrosianLocaleEnforcementTest extends AbstractHandlerTestCase
     }
 
     /**
+     * Narrowing negotiation to the rite's languages must not narrow the *shape* of the
+     * tag it returns. The rite-level metadata declares bare languages (`it`, `la`), but
+     * the diocesan layer matches the negotiated locale against its own full identifiers
+     * (`it_IT`, `la_VA`) with a strict `in_array()` — so a negotiator that answered `la`
+     * instead of `la_VA` would fail that membership test and get silently downgraded to
+     * the diocese's first locale, turning a request for Latin into Italian.
+     *
+     * These cases pin the exact `settings.locale` each header produced before locale
+     * enforcement existed; the only behavior this feature is allowed to change is what
+     * happens to a language the rite has no books for.
+     *
+     * @return array<string,array{0:string,1:string,2:string}> Accept-Language, expected /events locale, expected /calendar locale
+     */
+    public static function supportedAcceptLanguageHeaders(): array
+    {
+        return [
+            // /calendar collapses Latin to its runtime primary language, /events does not.
+            'Latin (underscore)' => ['la_VA', 'la_VA', 'la'],
+            'Latin (hyphen)'     => ['la-VA', 'la_VA', 'la'],
+            'Italian (Italy)'    => ['it_IT', 'it_IT', 'it_IT'],
+        ];
+    }
+
+    #[DataProvider('supportedAcceptLanguageHeaders')]
+    public function testEventsDiocesePreservesNegotiatedRegionalLocale(string $header, string $expectedEventsLocale, string $expectedCalendarLocale): void
+    {
+        $result = $this->events(
+            ['diocese', 'milano_it'],
+            Rite::AMBROSIAN,
+            '/events/ambrosian/diocese/milano_it',
+            [],
+            ['Accept-Language' => $header]
+        );
+
+        self::assertSame(StatusCode::OK->value, $result['status']);
+        self::assertSame($expectedEventsLocale, $result['locale']);
+    }
+
+    #[DataProvider('supportedAcceptLanguageHeaders')]
+    public function testEventsComunePreservesNegotiatedRegionalLocale(string $header, string $expectedEventsLocale, string $expectedCalendarLocale): void
+    {
+        $result = $this->events([], Rite::AMBROSIAN, '/events/ambrosian', [], ['Accept-Language' => $header]);
+
+        self::assertSame(StatusCode::OK->value, $result['status']);
+        self::assertSame($expectedEventsLocale, $result['locale']);
+    }
+
+    #[DataProvider('supportedAcceptLanguageHeaders')]
+    public function testCalendarDiocesePreservesNegotiatedRegionalLocale(string $header, string $expectedEventsLocale, string $expectedCalendarLocale): void
+    {
+        $result = $this->calendar(
+            ['diocese', 'milano_it', '2025'],
+            Rite::AMBROSIAN,
+            '/calendar/ambrosian/diocese/milano_it/2025',
+            [],
+            ['Accept-Language' => $header]
+        );
+
+        self::assertSame(StatusCode::OK->value, $result['status']);
+        self::assertSame($expectedCalendarLocale, $result['locale']);
+    }
+
+    /**
      * A browser's `Accept-Language` must never turn into a 400: it is negotiated against
      * the rite's locales, and when nothing matches the request falls through to the
      * API-wide Latin default.

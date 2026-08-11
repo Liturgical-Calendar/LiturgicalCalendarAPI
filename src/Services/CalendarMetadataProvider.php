@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Api\Services;
 use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
@@ -365,20 +366,73 @@ final class CalendarMetadataProvider
      */
     public static function riteSupportsLocale(Rite $rite, string $locale): bool
     {
-        $supported = self::localesForRite($rite);
-        if ([] === $supported) {
+        $riteLanguages = self::riteLanguages($rite);
+        if ([] === $riteLanguages) {
             return true;
         }
 
         $requestedLanguage = \Locale::getPrimaryLanguage($locale);
-        if (null === $requestedLanguage) {
-            return false;
+
+        return null !== $requestedLanguage && in_array($requestedLanguage, $riteLanguages, true);
+    }
+
+    /**
+     * The locale identifiers a rite's routes may negotiate an `Accept-Language` header
+     * down to — every locale the API would otherwise consider, minus those in a language
+     * the rite has no liturgical books for. Empty for an unrestricted rite, which is
+     * {@see \LiturgicalCalendar\Api\Http\Negotiator::pickLanguage()}'s own signal to use
+     * its full default list.
+     *
+     * This *filters* the negotiator's candidate list rather than replacing it with the
+     * bare languages {@see self::localesForRite()} returns, and that distinction is load-
+     * bearing. The rite-level metadata declares `it`/`la`, but the Ambrosian diocesan
+     * layer matches the negotiated locale against its own full identifiers
+     * (`it_IT`/`la_VA`) with a strict `in_array()`, falling back to its first locale on a
+     * miss. Handing the negotiator only bare languages made it answer `la` where it used
+     * to answer `la_VA`, which failed that membership test — so `Accept-Language: la-VA`
+     * on `/events/ambrosian/diocese/milano_it` silently came back in Italian. Narrowing
+     * the *set* of acceptable languages must not narrow the *shape* of the tag returned
+     * for one that is acceptable.
+     *
+     * @return string[]
+     */
+    public static function negotiableLocalesForRite(Rite $rite): array
+    {
+        $riteLanguages = self::riteLanguages($rite);
+        if ([] === $riteLanguages) {
+            return [];
         }
 
-        return null !== array_find(
-            $supported,
-            static fn (string $supportedLocale): bool => \Locale::getPrimaryLanguage($supportedLocale) === $requestedLanguage
-        );
+        LitLocale::init();
+
+        // The same candidate set Negotiator::pickLanguage() builds for itself when handed
+        // an empty $supported (manually-defined locales such as Latin, which ICU does not
+        // know, merged with the ICU-derived ones), narrowed to the rite's languages.
+        $allLocales = array_unique(array_merge(LitLocale::$values, LitLocale::$AllAvailableLocales));
+
+        return array_values(array_filter(
+            $allLocales,
+            static fn (string $locale): bool => in_array(\Locale::getPrimaryLanguage($locale), $riteLanguages, true)
+        ));
+    }
+
+    /**
+     * The primary languages of a rite's declared locales, e.g. `['it', 'la']`. Empty when
+     * the rite restricts nothing.
+     *
+     * @return string[]
+     */
+    private static function riteLanguages(Rite $rite): array
+    {
+        $languages = [];
+        foreach (self::localesForRite($rite) as $locale) {
+            $language = \Locale::getPrimaryLanguage($locale);
+            if (null !== $language) {
+                $languages[] = $language;
+            }
+        }
+
+        return array_values(array_unique($languages));
     }
 
     /**
