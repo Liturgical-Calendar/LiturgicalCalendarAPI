@@ -663,15 +663,16 @@ class CalendarParams implements ParamsInterface
     }
 
     /**
-     * Cross-field validation of the rite against the requested calendar and year.
-     * Roman accepts every calendar shape and the full year range. The Ambrosian
-     * rite has no national layer, and starts at 1976 (the first reformed
-     * Ambrosian Missal). Diocese/rite mismatches (e.g. requesting a Roman
-     * diocese under the Ambrosian rite, or vice versa) are rejected earlier,
-     * by {@see CalendarParams::validateDiocesanCalendarParam()}, which is
-     * rite-scoped against the diocese's declared `rite` metadata rather than
+     * Cross-field validation of the rite against the requested calendar, year, and
+     * locale. Roman accepts every calendar shape, the full year range, and every
+     * locale the API supports. The Ambrosian rite has no national layer, starts at
+     * 1976 (the first reformed Ambrosian Missal), and has liturgical books in only
+     * the locales its `/calendars` metadata declares. Diocese/rite mismatches (e.g.
+     * requesting a Roman diocese under the Ambrosian rite, or vice versa) are
+     * rejected earlier, by {@see CalendarParams::validateDiocesanCalendarParam()},
+     * which is rite-scoped against the diocese's declared `rite` metadata rather than
      * a hardcoded whitelist. Throws ValidationException (HTTP 400) on
-     * mismatch. Must be called after the rite, calendar, and year are all set.
+     * mismatch. Must be called after the rite, calendar, year, and locale are all set.
      *
      * @throws ValidationException
      */
@@ -694,5 +695,41 @@ class CalendarParams implements ParamsInterface
                 $this->Year
             ));
         }
+
+        $this->validateLocaleAgainstRite();
+    }
+
+    /**
+     * Rejects a `locale` the requested rite has no liturgical books for (issue #761).
+     *
+     * `validateLocaleParam()` above can only check the API-wide {@see LitLocale} set,
+     * since it runs before the calendar is known; this is the rite-scoped half, and it
+     * makes the endpoint honour what `/calendars` already declares. Applies equally to
+     * the comune (`/calendar/ambrosian`) and the diocesan routes
+     * (`/calendar/ambrosian/diocese/{id}`), which declare the same locales — the
+     * diocesan route previously downgraded an unsupported locale to the diocese's first
+     * declared locale in {@see \LiturgicalCalendar\Api\Handlers\CalendarHandler::updateSettingsBasedOnDiocesanCalendar()}
+     * rather than saying so.
+     *
+     * Only an explicit `locale` parameter reaches this check as a rejection: an
+     * `Accept-Language` header is negotiated against the same set in
+     * {@see \LiturgicalCalendar\Api\Handlers\CalendarHandler::handle()} before it is
+     * folded into the parameters, so a header that asks for an unsupported language
+     * degrades to the Latin default instead of failing the request.
+     *
+     * @throws ValidationException
+     */
+    private function validateLocaleAgainstRite(): void
+    {
+        if (CalendarMetadataProvider::riteSupportsLocale($this->Rite, $this->Locale)) {
+            return;
+        }
+
+        throw new ValidationException(sprintf(
+            'Invalid value `%s` for parameter `locale`: the `%s` rite has liturgical books only in: %s.',
+            $this->Locale,
+            $this->Rite->value,
+            implode(', ', CalendarMetadataProvider::localesForRite($this->Rite))
+        ));
     }
 }

@@ -81,6 +81,7 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropert
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
 use LiturgicalCalendar\Api\Params\CalendarParams;
+use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 use LiturgicalCalendar\Api\Services\LocaleConfigurator;
 use Nyholm\Psr7\Stream;
 use Psr\Http\Message\ServerRequestInterface;
@@ -5427,11 +5428,23 @@ final class CalendarHandler extends AbstractHandler
         $mimeWithoutCharset    = explode(';', $mime)[0];
         $params['return_type'] = AcceptHeader::from($mimeWithoutCharset)->toReturnTypeParam()->value;
 
-        // Second of all, we check if an Accept-Language header was set in the request
-        // TODO: Future enhancement - pass calendar-specific supported locales once calendar
-        // metadata is available (requires reordering to parse calendar param first)
+        // Second of all, we check if an Accept-Language header was set in the request.
+        // The header is negotiated against the locales the requested rite actually has
+        // liturgical books for (empty for the Roman rite, which restricts nothing), so a
+        // rite with a narrow locale set degrades gracefully here instead of tripping the
+        // rejection in CalendarParams::validateRiteCompatibility(): a header only states a
+        // preference, and a browser pointed at /calendar/ambrosian must not get a 400
+        // because its UI language happens to be Dutch (issue #761). When nothing in the
+        // header is acceptable, `locale` is left unset and the request falls through to
+        // the API-wide Latin default, exactly as if no header had been sent. An explicit
+        // `locale` parameter, merged in below, still overrides — and is still rejected
+        // when the rite has no books for it.
+        // TODO: Future enhancement - narrow this further to the requested national or
+        // diocesan calendar's own declared locales (requires reordering to parse the
+        // calendar param first); those are currently applied as a silent downgrade in
+        // updateSettingsBasedOnDiocesanCalendar().
         if ($request->getHeaderLine('Accept-Language') !== '') {
-            $locale = Negotiator::pickLanguage($request, [], null);
+            $locale = Negotiator::pickLanguage($request, CalendarMetadataProvider::negotiableLocalesForRite($this->rite), null);
             if ($locale && LitLocale::isValid($locale)) {
                 $params['locale'] = $locale;
             }

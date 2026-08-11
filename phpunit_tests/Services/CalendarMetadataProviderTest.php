@@ -72,6 +72,80 @@ final class CalendarMetadataProviderTest extends TestCase
     }
 
     /**
+     * The locale set the endpoints enforce (issue #761) must be the very set
+     * `/calendars` announces, not a parallel hardcoded copy that can drift from it.
+     */
+    public function testLocalesForRiteMatchesTheAnnouncedAmbrosianMetadata(): void
+    {
+        $metadata  = CalendarMetadataProvider::create();
+        $announced = current(array_filter(
+            $metadata->ambrosian_calendars,
+            fn ($item) => $item->calendar_id === 'ambrosian'
+        ));
+
+        self::assertNotFalse($announced);
+        self::assertSame($announced->locales, CalendarMetadataProvider::localesForRite(Rite::AMBROSIAN));
+    }
+
+    /**
+     * The Roman rite is translated into every locale the API ships, so it declares no
+     * rite-level restriction. The empty array is meaningful rather than incidental: it
+     * is what `Negotiator::pickLanguage()` reads as "use your own full default list".
+     */
+    public function testRomanRiteDeclaresNoLocaleRestriction(): void
+    {
+        self::assertSame([], CalendarMetadataProvider::localesForRite(Rite::ROMAN));
+        self::assertSame([], CalendarMetadataProvider::negotiableLocalesForRite(Rite::ROMAN));
+
+        // An unrestricted rite accepts anything, including locales the Ambrosian rite
+        // rejects. Asserted directly because the handlers reach the Roman path through
+        // earlier early-returns, leaving this guard otherwise unexercised.
+        self::assertTrue(CalendarMetadataProvider::riteSupportsLocale(Rite::ROMAN, 'nl_NL'));
+        self::assertTrue(CalendarMetadataProvider::riteSupportsLocale(Rite::ROMAN, 'la_VA'));
+    }
+
+    /**
+     * Matching is on primary language, so every regional variant of an Ambrosian
+     * liturgical language is accepted — `it_CH` in particular, the shape a client in
+     * Ticino would send for the Ambrosian parishes of the Diocese of Lugano.
+     */
+    public function testRiteSupportsLocaleMatchesOnPrimaryLanguage(): void
+    {
+        foreach (['it', 'it_IT', 'it_CH', 'la', 'la_VA'] as $locale) {
+            self::assertTrue(CalendarMetadataProvider::riteSupportsLocale(Rite::AMBROSIAN, $locale), $locale);
+        }
+
+        foreach (['nl', 'nl_NL', 'en_US', 'fr_FR', 'de_DE'] as $locale) {
+            self::assertFalse(CalendarMetadataProvider::riteSupportsLocale(Rite::AMBROSIAN, $locale), $locale);
+        }
+    }
+
+    /**
+     * The negotiable set narrows *which languages* are acceptable without narrowing the
+     * *shape* of the identifiers offered: it must still carry the region-qualified tags
+     * (`it_IT`, `la_VA`) that the Ambrosian diocesan layer matches against exactly. A set
+     * of bare languages alone would make `Accept-Language: la-VA` negotiate to `la`, miss
+     * that diocesan membership test, and silently come back in Italian.
+     */
+    public function testNegotiableLocalesKeepRegionQualifiedTagsForTheRitesLanguages(): void
+    {
+        $negotiable = CalendarMetadataProvider::negotiableLocalesForRite(Rite::AMBROSIAN);
+
+        self::assertContains('la_VA', $negotiable);
+        self::assertContains('it_IT', $negotiable);
+        self::assertContains('la', $negotiable);
+        self::assertContains('it', $negotiable);
+
+        foreach ($negotiable as $locale) {
+            self::assertContains(
+                \Locale::getPrimaryLanguage($locale),
+                ['it', 'la'],
+                "negotiable locale `{$locale}` is not one of the rite's languages"
+            );
+        }
+    }
+
+    /**
      * Single-source-of-truth guarantee.
      *
      * Consumers (RegionalDataHandler, EventsParams, CalendarParams) used to

@@ -1770,10 +1770,13 @@
         ],
         "summary": "Retrieve liturgical events for the Ambrosian calendar (comune ambrosiano) for each day of the current year",
         "operationId": "retrieveAmbrosianCalendarGET",
-        "description": "Retrieves liturgical events for the Ambrosian rite (comune ambrosiano only; no diocesan overlay) for each day of the current year. There is no national layer for the Ambrosian rite. The epiphany, ascension, and corpus_christi query parameters are accepted for consistency with the Roman rite endpoints but are IGNORED under the Ambrosian rite: Epiphany is fixed to January 6th, Ascension to the 40th day after Easter (Thursday), and Corpus Christi to its rite-fixed placement. Readings are currently an empty placeholder (no Ambrosian lectionary yet); year cycles, first-vespers vigils, and psalter-week numbering are provisional pending ordo validation.",
+        "description": "Retrieves liturgical events for the Ambrosian rite (comune ambrosiano only; no diocesan overlay) for each day of the current year. There is no national layer for the Ambrosian rite. The epiphany, ascension, and corpus_christi query parameters are accepted for consistency with the Roman rite endpoints but are IGNORED under the Ambrosian rite: Epiphany is fixed to January 6th, Ascension to the 40th day after Easter (Thursday), and Corpus Christi to its rite-fixed placement. Readings are currently an empty placeholder (no Ambrosian lectionary yet); year cycles, first-vespers vigils, and psalter-week numbering are provisional pending ordo validation. The Ambrosian rite has liturgical books only in Italian and Latin, as declared by `ambrosian_calendars[].locales` on `/calendars`: a `locale` parameter naming any other language returns 400 Bad Request, while an `Accept-Language` header asking for one is negotiated against that set (falling back to Latin) rather than rejected.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AmbrosianLocaleParam"
           },
           {
             "$ref": "#/components/parameters/AcceptHeader"
@@ -1824,7 +1827,7 @@
         ],
         "summary": "Retrieve liturgical events for the Ambrosian calendar (comune ambrosiano) for each day of the current year",
         "operationId": "retrieveAmbrosianCalendarPOST",
-        "description": "Retrieves liturgical events for the Ambrosian rite (comune ambrosiano only; no diocesan overlay) for each day of the current year. There is no national layer for the Ambrosian rite. The epiphany, ascension, and corpus_christi request body parameters are accepted for consistency with the Roman rite endpoints but are IGNORED under the Ambrosian rite: Epiphany is fixed to January 6th, Ascension to the 40th day after Easter (Thursday), and Corpus Christi to its rite-fixed placement. Readings are currently an empty placeholder (no Ambrosian lectionary yet); year cycles, first-vespers vigils, and psalter-week numbering are provisional pending ordo validation.",
+        "description": "Retrieves liturgical events for the Ambrosian rite (comune ambrosiano only; no diocesan overlay) for each day of the current year. There is no national layer for the Ambrosian rite. The epiphany, ascension, and corpus_christi request body parameters are accepted for consistency with the Roman rite endpoints but are IGNORED under the Ambrosian rite: Epiphany is fixed to January 6th, Ascension to the 40th day after Easter (Thursday), and Corpus Christi to its rite-fixed placement. Readings are currently an empty placeholder (no Ambrosian lectionary yet); year cycles, first-vespers vigils, and psalter-week numbering are provisional pending ordo validation. The Ambrosian rite has liturgical books only in Italian and Latin, as declared by `ambrosian_calendars[].locales` on `/calendars`: a `locale` parameter naming any other language returns 400 Bad Request, while an `Accept-Language` header asking for one is negotiated against that set (falling back to Latin) rather than rejected.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -1896,16 +1899,19 @@
         ],
         "summary": "Retrieve liturgical events from the Ambrosian calendar (comune ambrosiano) for each day of the given year",
         "operationId": "retrieveAmbrosianCalendarForYearGET",
-        "description": "Retrieves liturgical events for the Ambrosian rite (comune ambrosiano only; no diocesan overlay) for each day of the given year. There is no national layer for the Ambrosian rite. The epiphany, ascension, and corpus_christi query parameters are accepted for consistency with the Roman rite endpoints but are IGNORED under the Ambrosian rite: Epiphany is fixed to January 6th, Ascension to the 40th day after Easter (Thursday), and Corpus Christi to its rite-fixed placement. The Ambrosian rite is available only from 1976 onward (the first reformed Ambrosian Missal); earlier years return 400 Bad Request. Readings are currently an empty placeholder (no Ambrosian lectionary yet); year cycles, first-vespers vigils, and psalter-week numbering are provisional pending ordo validation.",
+        "description": "Retrieves liturgical events for the Ambrosian rite (comune ambrosiano only; no diocesan overlay) for each day of the given year. There is no national layer for the Ambrosian rite. The epiphany, ascension, and corpus_christi query parameters are accepted for consistency with the Roman rite endpoints but are IGNORED under the Ambrosian rite: Epiphany is fixed to January 6th, Ascension to the 40th day after Easter (Thursday), and Corpus Christi to its rite-fixed placement. The Ambrosian rite is available only from 1976 onward (the first reformed Ambrosian Missal); earlier years return 400 Bad Request. Readings are currently an empty placeholder (no Ambrosian lectionary yet); year cycles, first-vespers vigils, and psalter-week numbering are provisional pending ordo validation. The Ambrosian rite has liturgical books only in Italian and Latin, as declared by `ambrosian_calendars[].locales` on `/calendars`: a `locale` parameter naming any other language returns 400 Bad Request, while an `Accept-Language` header asking for one is negotiated against that set (falling back to Latin) rather than rejected.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
           },
           {
+            "$ref": "#/components/parameters/AmbrosianLocaleParam"
+          },
+          {
             "$ref": "#/components/parameters/AcceptHeader"
           },
           {
-            "$ref": "#/components/parameters/YearPathParam"
+            "$ref": "#/components/parameters/AmbrosianYearPathParam"
           },
           {
             "$ref": "#/components/parameters/YearTypeParam"
@@ -1953,7 +1959,7 @@
         ],
         "summary": "Retrieve liturgical events from the Ambrosian calendar (comune ambrosiano) for each day of the given year",
         "operationId": "retrieveAmbrosianCalendarForYearPOST",
-        "description": "Retrieves liturgical events for the Ambrosian rite (comune ambrosiano only; no diocesan overlay) for each day of the given year. There is no national layer for the Ambrosian rite. The epiphany, ascension, and corpus_christi request body parameters are accepted for consistency with the Roman rite endpoints but are IGNORED under the Ambrosian rite: Epiphany is fixed to January 6th, Ascension to the 40th day after Easter (Thursday), and Corpus Christi to its rite-fixed placement. The Ambrosian rite is available only from 1976 onward (the first reformed Ambrosian Missal); earlier years return 400 Bad Request. Readings are currently an empty placeholder (no Ambrosian lectionary yet); year cycles, first-vespers vigils, and psalter-week numbering are provisional pending ordo validation.",
+        "description": "Retrieves liturgical events for the Ambrosian rite (comune ambrosiano only; no diocesan overlay) for each day of the given year. There is no national layer for the Ambrosian rite. The epiphany, ascension, and corpus_christi request body parameters are accepted for consistency with the Roman rite endpoints but are IGNORED under the Ambrosian rite: Epiphany is fixed to January 6th, Ascension to the 40th day after Easter (Thursday), and Corpus Christi to its rite-fixed placement. The Ambrosian rite is available only from 1976 onward (the first reformed Ambrosian Missal); earlier years return 400 Bad Request. Readings are currently an empty placeholder (no Ambrosian lectionary yet); year cycles, first-vespers vigils, and psalter-week numbering are provisional pending ordo validation. The Ambrosian rite has liturgical books only in Italian and Latin, as declared by `ambrosian_calendars[].locales` on `/calendars`: a `locale` parameter naming any other language returns 400 Bad Request, while an `Accept-Language` header asking for one is negotiated against that set (falling back to Latin) rather than rejected.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -1962,15 +1968,7 @@
             "$ref": "#/components/parameters/AcceptHeader"
           },
           {
-            "in": "path",
-            "name": "year",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 1970,
-              "maximum": 9999
-            }
+            "$ref": "#/components/parameters/AmbrosianYearPathParam"
           }
         ],
         "requestBody": {
@@ -2036,10 +2034,13 @@
         ],
         "summary": "Retrieve liturgical events from the Ambrosian calendar for a given diocese for each day of the current year",
         "operationId": "retrieveAmbrosianDiocesanCalendarGET",
-        "description": "Retrieve liturgical events for a given diocese under the Ambrosian rite for each day of the current year. Ambrosian dioceses are not layered on a national calendar: the diocesan proper is applied directly over the comune ambrosiano. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request.",
+        "description": "Retrieve liturgical events for a given diocese under the Ambrosian rite for each day of the current year. Ambrosian dioceses are not layered on a national calendar: the diocesan proper is applied directly over the comune ambrosiano. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request. The Ambrosian rite has liturgical books only in Italian and Latin, as declared by `ambrosian_calendars[].locales` on `/calendars`: a `locale` parameter naming any other language returns 400 Bad Request, while an `Accept-Language` header asking for one is negotiated against that set (falling back to Latin) rather than rejected.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AmbrosianLocaleParam"
           },
           {
             "$ref": "#/components/parameters/AcceptHeader"
@@ -2081,7 +2082,7 @@
         ],
         "summary": "Retrieve liturgical events from the Ambrosian calendar for a given diocese for each day of the current year",
         "operationId": "retrieveAmbrosianDiocesanCalendarPOST",
-        "description": "Retrieve liturgical events for a given diocese under the Ambrosian rite for each day of the current year. Ambrosian dioceses are not layered on a national calendar: the diocesan proper is applied directly over the comune ambrosiano. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request.",
+        "description": "Retrieve liturgical events for a given diocese under the Ambrosian rite for each day of the current year. Ambrosian dioceses are not layered on a national calendar: the diocesan proper is applied directly over the comune ambrosiano. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request. The Ambrosian rite has liturgical books only in Italian and Latin, as declared by `ambrosian_calendars[].locales` on `/calendars`: a `locale` parameter naming any other language returns 400 Bad Request, while an `Accept-Language` header asking for one is negotiated against that set (falling back to Latin) rather than rejected.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -2161,10 +2162,13 @@
         ],
         "summary": "Retrieve liturgical events from the Ambrosian calendar for a given diocese for each day of a given year",
         "operationId": "retrieveAmbrosianDiocesanCalendarForYearGET",
-        "description": "Retrieve liturgical events for a given diocese under the Ambrosian rite for each day of a given year. Ambrosian dioceses are not layered on a national calendar: the diocesan proper is applied directly over the comune ambrosiano. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request. The Ambrosian rite is available only from 1976 onward (the first reformed Ambrosian Missal); earlier years return 400 Bad Request.",
+        "description": "Retrieve liturgical events for a given diocese under the Ambrosian rite for each day of a given year. Ambrosian dioceses are not layered on a national calendar: the diocesan proper is applied directly over the comune ambrosiano. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request. The Ambrosian rite is available only from 1976 onward (the first reformed Ambrosian Missal); earlier years return 400 Bad Request. The Ambrosian rite has liturgical books only in Italian and Latin, as declared by `ambrosian_calendars[].locales` on `/calendars`: a `locale` parameter naming any other language returns 400 Bad Request, while an `Accept-Language` header asking for one is negotiated against that set (falling back to Latin) rather than rejected.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AmbrosianLocaleParam"
           },
           {
             "$ref": "#/components/parameters/AcceptHeader"
@@ -2173,7 +2177,7 @@
             "$ref": "#/components/parameters/DiocesanCalendarIdPathParam"
           },
           {
-            "$ref": "#/components/parameters/YearPathParam"
+            "$ref": "#/components/parameters/AmbrosianYearPathParam"
           },
           {
             "$ref": "#/components/parameters/YearTypeParam"
@@ -2209,7 +2213,7 @@
         ],
         "summary": "Retrieve liturgical events from the Ambrosian calendar for a given diocese for each day of a given year",
         "operationId": "retrieveAmbrosianDiocesanCalendarForYearPOST",
-        "description": "Retrieve liturgical events for a given diocese under the Ambrosian rite for each day of a given year. Ambrosian dioceses are not layered on a national calendar: the diocesan proper is applied directly over the comune ambrosiano. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request. The Ambrosian rite is available only from 1976 onward (the first reformed Ambrosian Missal); earlier years return 400 Bad Request.",
+        "description": "Retrieve liturgical events for a given diocese under the Ambrosian rite for each day of a given year. Ambrosian dioceses are not layered on a national calendar: the diocesan proper is applied directly over the comune ambrosiano. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request. The Ambrosian rite is available only from 1976 onward (the first reformed Ambrosian Missal); earlier years return 400 Bad Request. The Ambrosian rite has liturgical books only in Italian and Latin, as declared by `ambrosian_calendars[].locales` on `/calendars`: a `locale` parameter naming any other language returns 400 Bad Request, while an `Accept-Language` header asking for one is negotiated against that set (falling back to Latin) rather than rejected.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -2226,15 +2230,7 @@
             }
           },
           {
-            "in": "path",
-            "name": "year",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 1970,
-              "maximum": 9999
-            }
+            "$ref": "#/components/parameters/AmbrosianYearPathParam"
           }
         ],
         "requestBody": {
@@ -5053,11 +5049,14 @@
           {}
         ],
         "summary": "Retrieve all possible liturgical events from the Ambrosian comune calendar (Proprium de Tempore and comune sanctorale) even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
-        "description": "The Ambrosian rite has no national calendars; this endpoint serves the comune ambrosiano (Proprium de Tempore + comune sanctorale) catalog. For a diocesan Ambrosian catalog, use `/events/ambrosian/diocese/{calendar_id}`. A `national_calendar` parameter combined with this endpoint returns 400 Bad Request, as does any diocese belonging to a different rite than the one requested.",
+        "description": "The Ambrosian rite has no national calendars; this endpoint serves the comune ambrosiano (Proprium de Tempore + comune sanctorale) catalog. For a diocesan Ambrosian catalog, use `/events/ambrosian/diocese/{calendar_id}`. A `national_calendar` parameter combined with this endpoint returns 400 Bad Request, as does any diocese belonging to a different rite than the one requested. The Ambrosian rite has liturgical books only in Italian and Latin, as declared by `ambrosian_calendars[].locales` on `/calendars`: a `locale` parameter naming any other language returns 400 Bad Request, while an `Accept-Language` header asking for one is negotiated against that set (falling back to Latin) rather than rejected.",
         "operationId": "retrieveAmbrosianEventsGET",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AmbrosianLocaleParam"
           }
         ],
         "responses": {
@@ -5093,13 +5092,28 @@
           {}
         ],
         "summary": "Retrieve all possible liturgical events from the Ambrosian comune calendar (Proprium de Tempore and comune sanctorale) even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
-        "description": "The Ambrosian rite has no national calendars; this endpoint serves the comune ambrosiano (Proprium de Tempore + comune sanctorale) catalog. For a diocesan Ambrosian catalog, use `/events/ambrosian/diocese/{calendar_id}`. A `national_calendar` parameter combined with this endpoint returns 400 Bad Request, as does any diocese belonging to a different rite than the one requested.",
+        "description": "The Ambrosian rite has no national calendars; this endpoint serves the comune ambrosiano (Proprium de Tempore + comune sanctorale) catalog. For a diocesan Ambrosian catalog, use `/events/ambrosian/diocese/{calendar_id}`. A `national_calendar` parameter combined with this endpoint returns 400 Bad Request, as does any diocese belonging to a different rite than the one requested. The Ambrosian rite has liturgical books only in Italian and Latin, as declared by `ambrosian_calendars[].locales` on `/calendars`: a `locale` parameter naming any other language returns 400 Bad Request, while an `Accept-Language` header asking for one is negotiated against that set (falling back to Latin) rather than rejected.",
         "operationId": "retrieveAmbrosianEventsPOST",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/AmbrosianEventsRequestBody"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AmbrosianEventsRequestBody"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK: A collection of all possible liturgical events that can be found in the Ambrosian comune calendar produced by the LitCal API",
@@ -5135,11 +5149,14 @@
           {}
         ],
         "summary": "Retrieve all possible liturgical events from the given Ambrosian diocesan calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
-        "description": "The diocesan proper is layered directly over the comune ambrosiano; the Ambrosian rite has no national calendars. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request.",
+        "description": "The diocesan proper is layered directly over the comune ambrosiano; the Ambrosian rite has no national calendars. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request. The Ambrosian rite has liturgical books only in Italian and Latin, as declared by `ambrosian_calendars[].locales` on `/calendars`: a `locale` parameter naming any other language returns 400 Bad Request, while an `Accept-Language` header asking for one is negotiated against that set (falling back to Latin) rather than rejected.",
         "operationId": "retrieveAmbrosianEventsForDiocesanCalendarGET",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AmbrosianLocaleParam"
           },
           {
             "in": "path",
@@ -5183,7 +5200,7 @@
           {}
         ],
         "summary": "Retrieve all possible liturgical events from the given Ambrosian diocesan calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
-        "description": "The diocesan proper is layered directly over the comune ambrosiano; the Ambrosian rite has no national calendars. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request.",
+        "description": "The diocesan proper is layered directly over the comune ambrosiano; the Ambrosian rite has no national calendars. Only the Ambrosian dioceses are valid for this path: Milano (milano_it), Bergamo (bergam_it), Novara (novara_it), and Lugano (lugano_ch); any other calendar_id combined with the ambrosian rite segment returns 400 Bad Request. The Ambrosian rite has liturgical books only in Italian and Latin, as declared by `ambrosian_calendars[].locales` on `/calendars`: a `locale` parameter naming any other language returns 400 Bad Request, while an `Accept-Language` header asking for one is negotiated against that set (falling back to Latin) rather than rejected.",
         "operationId": "retrieveAmbrosianEventsForDiocesanCalendarPOST",
         "parameters": [
           {
@@ -5198,6 +5215,21 @@
             }
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/AmbrosianEventsRequestBody"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AmbrosianEventsRequestBody"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK: A collection of all possible liturgical events that can be found in the given Ambrosian diocesan calendar produced by the LitCal API",
@@ -8254,6 +8286,29 @@
           }
         }
       },
+      "AmbrosianLocale": {
+        "type": "string",
+        "title": "Ambrosian liturgical language",
+        "description": "A locale the Ambrosian rite has approved liturgical books in: Italian (Messale Ambrosiano) or Latin (Missale Ambrosianum, the editio typica), as declared by `ambrosian_calendars[].locales` on `/calendars`. Any other language is rejected with 400 Bad Request. Shared by the `locale` query parameter of the Ambrosian GET operations and the `locale` body field of the Ambrosian events POST operations, so the two cannot document different sets.",
+        "default": "la_VA",
+        "enum": [
+          "it",
+          "it_CH",
+          "it_IT",
+          "la",
+          "la_VA"
+        ]
+      },
+      "AmbrosianEventsRequestBody": {
+        "type": "object",
+        "title": "Ambrosian events catalog request body",
+        "description": "The Ambrosian `/events` POST operations read their parameters from the request body rather than the query string.",
+        "properties": {
+          "locale": {
+            "$ref": "#/components/schemas/AmbrosianLocale"
+          }
+        }
+      },
       "CivilOrLiturgicalYear": {
         "type": "object",
         "title": "Liturgical or Civil year",
@@ -10443,6 +10498,27 @@
           "type": "integer",
           "format": "int32",
           "minimum": 1970,
+          "maximum": 9999
+        }
+      },
+      "AmbrosianLocaleParam": {
+        "in": "query",
+        "name": "locale",
+        "required": false,
+        "description": "Optional locale override; when provided it overrides the Accept-Language header. Unlike the Roman rite endpoints, which accept every locale the API ships, the Ambrosian rite has approved liturgical books only in Italian (Messale Ambrosiano) and Latin (Missale Ambrosianum, the editio typica) — as declared by `ambrosian_calendars[].locales` on `/calendars` — so any other language returns 400 Bad Request. An Accept-Language header asking for an unsupported language is negotiated against the same set and falls back to Latin rather than being rejected.",
+        "schema": {
+          "$ref": "#/components/schemas/AmbrosianLocale"
+        }
+      },
+      "AmbrosianYearPathParam": {
+        "in": "path",
+        "name": "year",
+        "required": true,
+        "description": "The calendar year for which to retrieve liturgical events. The Ambrosian rite starts at 1976, the year of the first reformed Messale Ambrosiano, rather than at the API-wide lower limit of 1970; earlier years return 400 Bad Request.",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 1976,
           "maximum": 9999
         }
       },

@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Api\Services;
 use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
@@ -322,18 +323,135 @@ final class CalendarMetadataProvider
      */
     private static function buildAmbrosianCalendarData(MetadataCalendars $metadata): void
     {
-        $folderGlob = self::globOrThrow(JsonData::AMBROSIAN_TEMPORALE_I18N_FOLDER->path() . '/*.json', 0, 'CalendarMetadataProvider::buildAmbrosianCalendarData');
-
-        $locales = array_map(
-            fn (string $filename) => pathinfo($filename, PATHINFO_FILENAME),
-            $folderGlob
-        );
-
         $metadataAmbrosianCalendarItem = MetadataAmbrosianCalendarItem::fromArray([
             'calendar_id' => Rite::AMBROSIAN->value,
             'rite'        => Rite::AMBROSIAN->value,
-            'locales'     => $locales
+            'locales'     => self::ambrosianLocales()
         ]);
         $metadata->pushAmbrosianCalendarMetadata($metadataAmbrosianCalendarItem);
+    }
+
+    /**
+     * The locales a rite has liturgical books for, i.e. the set announced for that rite
+     * on `/calendars`, or an empty array when the rite restricts nothing beyond the
+     * API-wide {@see \LiturgicalCalendar\Api\Enum\LitLocale} set.
+     *
+     * This is the enforcement side of what {@see self::buildAmbrosianCalendarData()}
+     * announces: both read the same glob, so the request-time check can never drift
+     * from the declared metadata (issue #761 — `/calendar/ambrosian?locale=nl` used to
+     * return 200 and echo `nl_NL` back for a rite with no Dutch liturgical books).
+     *
+     * The Roman rite returns `[]`: it is the API's universal calendar, translated into
+     * every locale the API ships, so it imposes no rite-level restriction. (Individual
+     * Roman national and diocesan calendars declare their own narrower `locales`, which
+     * the handlers apply as a graceful downgrade rather than a rejection; that behavior
+     * is untouched here.)
+     *
+     * @return string[] locale identifiers as declared in the metadata, e.g. `['it', 'la']`
+     */
+    public static function localesForRite(Rite $rite): array
+    {
+        return $rite === Rite::AMBROSIAN ? self::ambrosianLocales() : [];
+    }
+
+    /**
+     * Whether a requested locale is one the rite has liturgical books for.
+     *
+     * Matching is on primary language, not on the full identifier, for two reasons: the
+     * rite-level metadata declares bare languages (`it`, `la`) while the Ambrosian
+     * dioceses declare full identifiers (`it_IT`, `la_VA`), and a regional variant of a
+     * supported language is still that language — `it_CH`, the shape a Ticino client
+     * would send for the Ambrosian parishes of the Diocese of Lugano, is Italian and
+     * must be accepted.
+     */
+    public static function riteSupportsLocale(Rite $rite, string $locale): bool
+    {
+        $riteLanguages = self::riteLanguages($rite);
+        if ([] === $riteLanguages) {
+            return true;
+        }
+
+        $requestedLanguage = \Locale::getPrimaryLanguage($locale);
+
+        return null !== $requestedLanguage && in_array($requestedLanguage, $riteLanguages, true);
+    }
+
+    /**
+     * The locale identifiers a rite's routes may negotiate an `Accept-Language` header
+     * down to — every locale the API would otherwise consider, minus those in a language
+     * the rite has no liturgical books for. Empty for an unrestricted rite, which is
+     * {@see \LiturgicalCalendar\Api\Http\Negotiator::pickLanguage()}'s own signal to use
+     * its full default list.
+     *
+     * This *filters* the negotiator's candidate list rather than replacing it with the
+     * bare languages {@see self::localesForRite()} returns, and that distinction is load-
+     * bearing. The rite-level metadata declares `it`/`la`, but the Ambrosian diocesan
+     * layer matches the negotiated locale against its own full identifiers
+     * (`it_IT`/`la_VA`) with a strict `in_array()`, falling back to its first locale on a
+     * miss. Handing the negotiator only bare languages made it answer `la` where it used
+     * to answer `la_VA`, which failed that membership test — so `Accept-Language: la-VA`
+     * on `/events/ambrosian/diocese/milano_it` silently came back in Italian. Narrowing
+     * the *set* of acceptable languages must not narrow the *shape* of the tag returned
+     * for one that is acceptable.
+     *
+     * @return string[]
+     */
+    public static function negotiableLocalesForRite(Rite $rite): array
+    {
+        $riteLanguages = self::riteLanguages($rite);
+        if ([] === $riteLanguages) {
+            return [];
+        }
+
+        LitLocale::init();
+
+        // The same candidate set Negotiator::pickLanguage() builds for itself when handed
+        // an empty $supported (manually-defined locales such as Latin, which ICU does not
+        // know, merged with the ICU-derived ones), narrowed to the rite's languages.
+        $allLocales = array_unique(array_merge(LitLocale::$values, LitLocale::$AllAvailableLocales));
+
+        return array_values(array_filter(
+            $allLocales,
+            static fn (string $locale): bool => in_array(\Locale::getPrimaryLanguage($locale), $riteLanguages, true)
+        ));
+    }
+
+    /**
+     * The primary languages of a rite's declared locales, e.g. `['it', 'la']`. Empty when
+     * the rite restricts nothing.
+     *
+     * @return string[]
+     */
+    private static function riteLanguages(Rite $rite): array
+    {
+        $languages = [];
+        foreach (self::localesForRite($rite) as $locale) {
+            $language = \Locale::getPrimaryLanguage($locale);
+            if (null !== $language) {
+                $languages[] = $language;
+            }
+        }
+
+        return array_values(array_unique($languages));
+    }
+
+    /**
+     * The Ambrosian rite's locales, derived from the Ambrosian Proprium de Tempore's
+     * `i18n` folder — the same source the handlers read at request time when loading
+     * Ambrosian temporale and sanctorale names. Currently `['it', 'la']`: the *Messale
+     * Ambrosiano* (Italian) and the *Missale Ambrosianum* (Latin, the *editio typica*)
+     * are the rite's only approved liturgical books, and no episcopal conference outside
+     * Italy commissions an Ambrosian translation.
+     *
+     * @return string[]
+     */
+    private static function ambrosianLocales(): array
+    {
+        $folderGlob = self::globOrThrow(JsonData::AMBROSIAN_TEMPORALE_I18N_FOLDER->path() . '/*.json', 0, 'CalendarMetadataProvider::ambrosianLocales');
+
+        return array_map(
+            fn (string $filename) => pathinfo($filename, PATHINFO_FILENAME),
+            $folderGlob
+        );
     }
 }
