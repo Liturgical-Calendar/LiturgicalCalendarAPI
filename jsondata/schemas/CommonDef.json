@@ -407,6 +407,15 @@
                 "mobile"
             ]
         },
+        "Rite": {
+            "type": "string",
+            "title": "Rite",
+            "description": "the liturgical rite the calendar was computed under, as selected by the optional leading rite path segment (`roman` when the segment is absent)",
+            "enum": [
+                "roman",
+                "ambrosian"
+            ]
+        },
         "Epiphany": {
             "type": "string",
             "title": "Epiphany",

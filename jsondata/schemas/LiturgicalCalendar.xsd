@@ -222,6 +222,14 @@
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
+              <xs:element name="Rite">
+                <xs:simpleType>
+                  <xs:restriction base="xs:string">
+                    <xs:enumeration value="roman" />
+                    <xs:enumeration value="ambrosian" />
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
               <xs:element name="NationalCalendar" minOccurs="0" type="xs:string" />
               <xs:element name="DiocesanCalendar" minOccurs="0" type="xs:string" />
             </xs:sequence>

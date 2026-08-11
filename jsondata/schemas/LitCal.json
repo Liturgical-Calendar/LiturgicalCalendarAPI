@@ -196,7 +196,8 @@
                     "StJoseph": false,
                     "StsPeterPaulAp": false,
                     "AllSaints": true
-                }
+                },
+                "rite": "roman"
             },
             "metadata": {
                 "version": "5.3",
@@ -896,6 +897,9 @@
                 },
                 "holydays_of_obligation": {
                     "$ref": "./CommonDef.json#/definitions/HolyDaysOfObligation"
+                },
+                "rite": {
+                    "$ref": "./CommonDef.json#/definitions/Rite"
                 }
             },
             "required": [
@@ -907,7 +911,8 @@
                 "return_type",
                 "year_type",
                 "eternal_high_priest",
-                "holydays_of_obligation"
+                "holydays_of_obligation",
+                "rite"
             ]
         },
         "NationalCalendarSettings": {
@@ -953,6 +958,9 @@
                 "holydays_of_obligation": {
                     "$ref": "./CommonDef.json#/definitions/HolyDaysOfObligation"
                 },
+                "rite": {
+                    "$ref": "./CommonDef.json#/definitions/Rite"
+                },
                 "national_calendar": {
                     "$ref": "./CommonDef.json#/definitions/Nation"
                 }
@@ -967,7 +975,8 @@
                 "year_type",
                 "eternal_high_priest",
                 "national_calendar",
-                "holydays_of_obligation"
+                "holydays_of_obligation",
+                "rite"
             ]
         },
         "DiocesanCalendarSettings": {
@@ -1013,6 +1022,9 @@
                 "holydays_of_obligation": {
                     "$ref": "./CommonDef.json#/definitions/HolyDaysOfObligation"
                 },
+                "rite": {
+                    "$ref": "./CommonDef.json#/definitions/Rite"
+                },
                 "national_calendar": {
                     "$ref": "./CommonDef.json#/definitions/Nation"
                 },
@@ -1030,6 +1042,7 @@
                 "year_type",
                 "eternal_high_priest",
                 "holydays_of_obligation",
+                "rite",
                 "national_calendar",
                 "diocesan_calendar"
             ]
