@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-11 10:25+0000\n"
+"POT-Creation-Date: 2026-08-11 22:48+0000\n"
 "PO-Revision-Date: 2026-06-19 20:58+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Slovak <https://translate.johnromanodorazio.com/projects/"
@@ -644,14 +644,14 @@ msgstr "december %s"
 
 #. translators: %s is an ordinal number (1st, 2nd, 3rd)
 #. translators: %s is an ordinal number (first, second...)
-#: src/FerialEventNameGenerator.php:328 src/Handlers/CalendarHandler.php:2092
+#: src/FerialEventNameGenerator.php:328 src/Handlers/CalendarHandler.php:2093
 #, php-format
 msgid "of the %s Week of Advent"
 msgstr "týždňa adventu %s"
 
 #. translators: %s is an ordinal number (2nd, 3rd, etc.) - Day of Christmas Octave
 #. translators: %s is an ordinal number (first, second...)
-#: src/FerialEventNameGenerator.php:347 src/Handlers/CalendarHandler.php:2152
+#: src/FerialEventNameGenerator.php:347 src/Handlers/CalendarHandler.php:2153
 #, php-format
 msgid "%s Day of the Octave of Christmas"
 msgstr "%s deň oktávy Vianoc"
@@ -670,13 +670,13 @@ msgid "%s after Epiphany"
 msgstr "%s po Zjavení Pána"
 
 #. translators: Day after Ash Wednesday pattern
-#: src/FerialEventNameGenerator.php:413 src/Handlers/CalendarHandler.php:2231
+#: src/FerialEventNameGenerator.php:413 src/Handlers/CalendarHandler.php:2232
 msgid "after Ash Wednesday"
 msgstr "po Popolcovej strede"
 
 #. translators: %s is an ordinal number (1st, 2nd, 3rd)
 #. translators: %s is an ordinal number (first, second...)
-#: src/FerialEventNameGenerator.php:430 src/Handlers/CalendarHandler.php:2210
+#: src/FerialEventNameGenerator.php:430 src/Handlers/CalendarHandler.php:2211
 #, php-format
 msgid "of the %s Week of Lent"
 msgstr "týždňa pôstu %s"
@@ -688,14 +688,14 @@ msgid "%s within the Octave of Easter"
 msgstr "%s v oktáve Veľkej noci"
 
 #. translators: %s is an ordinal number (2nd, 3rd, etc.)
-#: src/FerialEventNameGenerator.php:463 src/Handlers/CalendarHandler.php:3220
+#: src/FerialEventNameGenerator.php:463 src/Handlers/CalendarHandler.php:3221
 #, php-format
 msgid "of the %s Week of Easter"
 msgstr "týždňa Veľkej noci %s"
 
 #. translators: %s is an ordinal number (1st, 2nd, etc.)
-#: src/FerialEventNameGenerator.php:481 src/Handlers/CalendarHandler.php:3292
-#: src/Handlers/CalendarHandler.php:3340
+#: src/FerialEventNameGenerator.php:481 src/Handlers/CalendarHandler.php:3293
+#: src/Handlers/CalendarHandler.php:3341
 #, php-format
 msgid "of the %s Week of Ordinary Time"
 msgstr "týždňa v období cez rok %s"
@@ -706,13 +706,13 @@ msgstr "týždňa v období cez rok %s"
 msgid "%s of Holy Week"
 msgstr "%s Veľkého týždňa"
 
-#: src/Handlers/CalendarHandler.php:444
+#: src/Handlers/CalendarHandler.php:445
 #, php-format
 msgid ""
 "The name of the diocese could not be derived from the diocese ID \"%s\"."
 msgstr "Názov diecézy sa nedal odvodiť z ID diecézy \"%s\"."
 
-#: src/Handlers/CalendarHandler.php:810
+#: src/Handlers/CalendarHandler.php:811
 #, php-format
 msgid ""
 "Only years from 1970 and after are supported. You tried requesting the year "
@@ -720,12 +720,12 @@ msgid ""
 msgstr ""
 "Podporované sú len roky od roku 1970 a neskôr. Skúsili ste požiadať o rok %d."
 
-#: src/Handlers/CalendarHandler.php:817
+#: src/Handlers/CalendarHandler.php:818
 #, php-format
 msgid "Only years until 9999 are supported. You tried requesting the year %d."
 msgstr "Podporované sú len roky do 9999. Skúsili ste zadať rok %d."
 
-#: src/Handlers/CalendarHandler.php:977
+#: src/Handlers/CalendarHandler.php:978
 #, php-format
 msgid ""
 "The Ambrosian comune sanctorale event `%1$s` from the %2$s was skipped "
@@ -744,8 +744,8 @@ msgstr ""
 #.  6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
 #.
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Explicatory string for the transferral, 5: actual date for the transferral, 6: Reference to the norm that governs the transferral
-#: src/Handlers/CalendarHandler.php:1572 src/Handlers/CalendarHandler.php:1592
-#: src/Handlers/CalendarHandler.php:1643 src/Handlers/CalendarHandler.php:1695
+#: src/Handlers/CalendarHandler.php:1573 src/Handlers/CalendarHandler.php:1593
+#: src/Handlers/CalendarHandler.php:1644 src/Handlers/CalendarHandler.php:1696
 #, php-format
 msgid ""
 "The Solemnity '%1$s' falls on %2$s in the year %3$d, the celebration has "
@@ -754,15 +754,15 @@ msgstr ""
 "Slávnosť '%1$s' pripadá na %2$s v roku %3$d, oslava bola presunutá na %4$s "
 "(%5$s) podľa %6$s."
 
-#: src/Handlers/CalendarHandler.php:1576
+#: src/Handlers/CalendarHandler.php:1577
 msgid "the Saturday preceding Palm Sunday"
 msgstr "sobota pred Kvetnou nedeľou"
 
-#: src/Handlers/CalendarHandler.php:1579 src/Handlers/CalendarHandler.php:1599
-#: src/Handlers/CalendarHandler.php:1649 src/Handlers/CalendarHandler.php:1747
-#: src/Handlers/CalendarHandler.php:2329 src/Handlers/CalendarHandler.php:2623
-#: src/Handlers/CalendarHandler.php:3098 src/Handlers/CalendarHandler.php:3114
-#: src/Handlers/CalendarHandler.php:3132 src/Handlers/CalendarHandler.php:3171
+#: src/Handlers/CalendarHandler.php:1580 src/Handlers/CalendarHandler.php:1600
+#: src/Handlers/CalendarHandler.php:1650 src/Handlers/CalendarHandler.php:1748
+#: src/Handlers/CalendarHandler.php:2330 src/Handlers/CalendarHandler.php:2624
+#: src/Handlers/CalendarHandler.php:3099 src/Handlers/CalendarHandler.php:3115
+#: src/Handlers/CalendarHandler.php:3133 src/Handlers/CalendarHandler.php:3172
 #: src/Models/Calendar/LiturgicalEventCollection.php:1734
 #: src/Models/Decrees/DecreeEventMetadata.php:54
 #: src/Models/RegionalData/NationalData/LitCalItemMakePatronMetadata.php:49
@@ -771,25 +771,25 @@ msgid ""
 "Sacraments"
 msgstr "Dekrét Dikastéria pre Boží kult a disciplínu sviatostí"
 
-#: src/Handlers/CalendarHandler.php:1596
+#: src/Handlers/CalendarHandler.php:1597
 msgid "the Monday following the Second Sunday of Easter"
 msgstr "pondelok po Druhej veľkonočnej nedeli"
 
-#: src/Handlers/CalendarHandler.php:1647
+#: src/Handlers/CalendarHandler.php:1648
 msgid "the following Monday"
 msgstr "nasledujúci pondelok"
 
-#: src/Handlers/CalendarHandler.php:1699
+#: src/Handlers/CalendarHandler.php:1700
 #, fuzzy
 msgid "the following day"
 msgstr "nasledujúci pondelok"
 
-#: src/Handlers/CalendarHandler.php:1701
+#: src/Handlers/CalendarHandler.php:1702
 msgid "General Norms for the Liturgical Year and the Calendar"
 msgstr ""
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year
-#: src/Handlers/CalendarHandler.php:1706 src/Handlers/CalendarHandler.php:1721
+#: src/Handlers/CalendarHandler.php:1707 src/Handlers/CalendarHandler.php:1722
 #, php-format
 msgid ""
 "The Solemnity '%1$s' coincides with the Solemnity '%2$s' in the year %3$d. "
@@ -805,7 +805,7 @@ msgstr ""
 #.  3: Requested calendar year,
 #.  4: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
 #.
-#: src/Handlers/CalendarHandler.php:1759
+#: src/Handlers/CalendarHandler.php:1760
 #, php-format
 msgid ""
 "Seeing that the Solemnity '%1$s' coincides with the Solemnity '%2$s' in the "
@@ -815,7 +815,7 @@ msgstr ""
 "podľa %4$s presunutá o jeden deň dopredu."
 
 #. translators: 1: LiturgicalEvent name (Christmas), 2: Requested calendar year, 3: LiturgicalEvent name (Holy Family), 4: New date for Holy Family
-#: src/Handlers/CalendarHandler.php:1844
+#: src/Handlers/CalendarHandler.php:1845
 #, php-format
 msgid ""
 "'%1$s' falls on a Sunday in the year %2$d, therefore the Feast '%3$s' is "
@@ -825,12 +825,12 @@ msgstr ""
 "%4$s namiesto nedele po Vianociach."
 
 #. translators: You can ignore this translation if the Feast has not been inserted by the Episcopal Conference
-#: src/Handlers/CalendarHandler.php:1870
+#: src/Handlers/CalendarHandler.php:1871
 msgid "Our Lord Jesus Christ, The Eternal High Priest"
 msgstr "Náš Pán Ježiš Kristus, Večný Veľkňaz"
 
 #. translators: 1: National Calendar, 2: Requested calendar year, 3: source of the rule
-#: src/Handlers/CalendarHandler.php:1882
+#: src/Handlers/CalendarHandler.php:1883
 #, php-format
 msgid ""
 "In 2012, Pope Benedict XVI gave faculty to the Episcopal Conferences to "
@@ -844,7 +844,7 @@ msgstr ""
 "(%3$s)."
 
 #. translators: 1: LiturgicalEvent name, 2: Superseding LiturgicalEvent grade, 3: Superseding LiturgicalEvent name, 4: Requested calendar year
-#: src/Handlers/CalendarHandler.php:1943 src/Handlers/CalendarHandler.php:1989
+#: src/Handlers/CalendarHandler.php:1944 src/Handlers/CalendarHandler.php:1990
 #, php-format
 msgid "'%1$s' is superseded by the %2$s '%3$s' in the year %4$d."
 msgstr "'%1$s' je nahradený %2$s '%3$s' v roku %4$d."
@@ -873,8 +873,8 @@ msgstr "'%1$s' je nahradený %2$s '%3$s' v roku %4$d."
 #.  5. Source of the information
 #.  6. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:2266 src/Handlers/CalendarHandler.php:2716
-#: src/Handlers/CalendarHandler.php:2941 src/Handlers/CalendarHandler.php:3805
+#: src/Handlers/CalendarHandler.php:2267 src/Handlers/CalendarHandler.php:2717
+#: src/Handlers/CalendarHandler.php:2942 src/Handlers/CalendarHandler.php:3806
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been added on %3$s since the year %4$d (%5$s), "
@@ -882,7 +882,7 @@ msgid ""
 msgstr ""
 "%1$s '%2$s' bol pridaný dňa %3$s od roku %4$d (%5$s), platný pre rok %6$d."
 
-#: src/Handlers/CalendarHandler.php:2311 src/Handlers/CalendarHandler.php:2501
+#: src/Handlers/CalendarHandler.php:2312 src/Handlers/CalendarHandler.php:2502
 msgid ""
 "Vatican Press conference: Presentation of the Editio Typica Tertia of the "
 "Roman Missal"
@@ -890,7 +890,7 @@ msgstr ""
 "Tlačová konferencia vo Vatikáne: Predstavenie Editio Typica Tertia Rímskeho "
 "misála"
 
-#: src/Handlers/CalendarHandler.php:2376
+#: src/Handlers/CalendarHandler.php:2377
 #, php-format
 msgid ""
 "The %1$s '%2$s' either falls between 17 Dec. and 24 Dec., or during the "
@@ -908,12 +908,12 @@ msgstr ""
 #.  4. Name of the liturgical event that is superseding
 #.  5. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:2414 src/Handlers/CalendarHandler.php:2462
+#: src/Handlers/CalendarHandler.php:2415 src/Handlers/CalendarHandler.php:2463
 #, php-format
 msgid "The %1$s '%2$s' is superseded by the %3$s '%4$s' in the year %5$d."
 msgstr "%1$s '%2$s' je nahradený %3$s '%4$s' v roku %5$d."
 
-#: src/Handlers/CalendarHandler.php:2495
+#: src/Handlers/CalendarHandler.php:2496
 msgid "Apostolic Constitution Missale Romanum"
 msgstr "Apoštolská konštitúcia Missale Romanum"
 
@@ -928,7 +928,7 @@ msgstr "Apoštolská konštitúcia Missale Romanum"
 #.  8. Name of the liturgical event that is superseding
 #.  9. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:2524
+#: src/Handlers/CalendarHandler.php:2525
 #, php-format
 msgid ""
 "The %1$s '%2$s', added in the %3$s of the Roman Missal since the year %4$d "
@@ -958,7 +958,7 @@ msgstr ""
 #.  7. Name of superseding liturgical event
 #.  8. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:2570 src/Handlers/CalendarHandler.php:2996
+#: src/Handlers/CalendarHandler.php:2571 src/Handlers/CalendarHandler.php:2997
 #, php-format
 msgid ""
 "The %1$s '%2$s', added on %3$s since the year %4$d (%5$s), is however "
@@ -973,7 +973,7 @@ msgstr ""
 #.  3. Requested calendar year
 #.  4. Source of the information
 #.
-#: src/Handlers/CalendarHandler.php:2618
+#: src/Handlers/CalendarHandler.php:2619
 #, php-format
 msgid ""
 "The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
@@ -983,7 +983,7 @@ msgstr ""
 "sú znížené na ľubovoľné spomienky (%4$s)."
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
-#: src/Handlers/CalendarHandler.php:2667
+#: src/Handlers/CalendarHandler.php:2668
 #, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': can only be relative to "
@@ -993,7 +993,7 @@ msgstr ""
 "vzťahu k liturgickej udalosti s kľúčom '%2$s' pomocou kľúčových slov %3$s."
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
-#: src/Handlers/CalendarHandler.php:2681
+#: src/Handlers/CalendarHandler.php:2682
 #, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s' relative to liturgical event "
@@ -1010,7 +1010,7 @@ msgstr ""
 #.  5. Requested calendar year
 #.  6. Source of the information
 #.
-#: src/Handlers/CalendarHandler.php:2772
+#: src/Handlers/CalendarHandler.php:2773
 #, php-format
 msgid ""
 "The name of the %1$s '%2$s' has been changed to %3$s since the year %4$d, "
@@ -1027,7 +1027,7 @@ msgstr ""
 #.  5. Requested calendar year
 #.  6. Source of the information
 #.
-#: src/Handlers/CalendarHandler.php:2794
+#: src/Handlers/CalendarHandler.php:2795
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been raised to the rank of %3$s since the year %4$d, "
@@ -1044,7 +1044,7 @@ msgstr ""
 #.  5. Requested calendar year
 #.  6. Source of the information
 #.
-#: src/Handlers/CalendarHandler.php:2804
+#: src/Handlers/CalendarHandler.php:2805
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been lowered to the rank of %3$s since the year %4$d, "
@@ -1059,7 +1059,7 @@ msgstr ""
 #.  3. Requested calendar year
 #.  4. Source of the information
 #.
-#: src/Handlers/CalendarHandler.php:2857
+#: src/Handlers/CalendarHandler.php:2858
 #, php-format
 msgid ""
 "'%1$s' has been declared a Doctor of the Church since the year %2$d, "
@@ -1078,7 +1078,7 @@ msgstr ""
 #.  7. Year from which the liturgical event has been added
 #.  8. Source of the information
 #.
-#: src/Handlers/CalendarHandler.php:3023
+#: src/Handlers/CalendarHandler.php:3024
 #, php-format
 msgid ""
 "In the year %1$d, the %2$s '%3$s' has been suppressed by the %4$s '%5$s', "
@@ -1088,7 +1088,7 @@ msgstr ""
 "%7$d (%8$s)."
 
 #. translators: 1: LiturgicalEvent name, 2: Source of the information, 3: Requested calendar year
-#: src/Handlers/CalendarHandler.php:3095
+#: src/Handlers/CalendarHandler.php:3096
 #, php-format
 msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
@@ -1098,7 +1098,7 @@ msgstr ""
 "roku 2002 (%2$s), platná pre rok %3$d."
 
 #. translators: 1: LiturgicalEvent name, 2: Source of the information, 3: Requested calendar year
-#: src/Handlers/CalendarHandler.php:3111
+#: src/Handlers/CalendarHandler.php:3112
 #, php-format
 msgid ""
 "The optional memorial '%1$s', which would have been superseded this year by "
@@ -1110,7 +1110,7 @@ msgstr ""
 "na 12. augusta, platná pre rok %3$d."
 
 #. translators: 1: LiturgicalEvent name, 2: Source of the information, 3: Requested calendar year, 4: Coinciding LiturgicalEvent grade, 5: Coinciding LiturgicalEvent name
-#: src/Handlers/CalendarHandler.php:3129
+#: src/Handlers/CalendarHandler.php:3130
 #, php-format
 msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
@@ -1122,7 +1122,7 @@ msgstr ""
 "%4$s '%5$s'."
 
 #. translators: 1: LiturgicalEvent name, 2: Source of the information
-#: src/Handlers/CalendarHandler.php:3168
+#: src/Handlers/CalendarHandler.php:3169
 #, php-format
 msgid ""
 "The Feast '%1$s' would have been suppressed this year ( 2009 ) since it "
@@ -1134,19 +1134,19 @@ msgstr ""
 "avšak keďže je Rok apoštola Pavla, podľa %2$s bol obnovený, aby miestne "
 "cirkvi mohli voliteľne sláviť pamätný deň."
 
-#: src/Handlers/CalendarHandler.php:3383
+#: src/Handlers/CalendarHandler.php:3384
 msgid "Saturday Memorial of the Blessed Virgin Mary"
 msgstr "Sobotná pamiatka Preblahoslavenej Panny Márie"
 
 #. translators: 1: wider_region, 2: metadata, 3: calendar_id
-#: src/Handlers/CalendarHandler.php:3458
+#: src/Handlers/CalendarHandler.php:3459
 #, php-format
 msgid ""
 "Could not find a %1$s property in the %2$s for the National Calendar %3$s."
 msgstr "Nepodarilo sa nájsť vlastnosť %1$s v %2$s pre národný kalendár %3$s."
 
 #. translators: 1: Event key, 2: Original date, 3: New date, 4: Requested calendar year
-#: src/Handlers/CalendarHandler.php:3488
+#: src/Handlers/CalendarHandler.php:3489
 #, php-format
 msgid ""
 "The liturgical event '%1$s' has been moved from %2$s to %3$s due to "
@@ -1164,7 +1164,7 @@ msgstr ""
 #.  6. Requested calendar year
 #.  7. National or wider region calendar
 #.
-#: src/Handlers/CalendarHandler.php:3551
+#: src/Handlers/CalendarHandler.php:3552
 #, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, was suppressed by the %4$s "
@@ -1183,7 +1183,7 @@ msgstr ""
 #.  6. Requested calendar year
 #.  7. National or wider region calendar
 #.
-#: src/Handlers/CalendarHandler.php:3571
+#: src/Handlers/CalendarHandler.php:3572
 #, php-format
 msgid ""
 "The %1$s '%2$s', usually celebrated on %3$s, was suppressed by the %4$s "
@@ -1200,7 +1200,7 @@ msgstr ""
 #.  3. Requested calendar year
 #.  4. Source of the information
 #.
-#: src/Handlers/CalendarHandler.php:3655
+#: src/Handlers/CalendarHandler.php:3656
 #, php-format
 msgid ""
 "The Memorial '%1$s' coincides with another Memorial '%2$s' in the year %3$d. "
@@ -1210,7 +1210,7 @@ msgstr ""
 "sú znížené na ľubovoľné spomienky."
 
 #. translators: 1. LiturgicalEvent name, 2. LiturgicalEvent date, 3. Coinciding liturgical event name, 4. Requested calendar year
-#: src/Handlers/CalendarHandler.php:3678
+#: src/Handlers/CalendarHandler.php:3679
 #, php-format
 msgid ""
 "The Feast '%1$s', usually celebrated on %2$s, coincides with another Feast "
@@ -1220,7 +1220,7 @@ msgstr ""
 "sviatkom '%3$s'! Treba s tým niečo urobiť?"
 
 #. translators: 1. LiturgicalEvent name, 2. LiturgicalEvent date, 3. Coinciding liturgical event name, 4. Requested calendar year
-#: src/Handlers/CalendarHandler.php:3698
+#: src/Handlers/CalendarHandler.php:3699
 #, php-format
 msgid ""
 "The Solemnity '%1$s', usually celebrated on %2$s, coincides with the Sunday "
@@ -1230,7 +1230,7 @@ msgstr ""
 "Slávnosť '%1$s', zvyčajne slávená %2$s, sa v roku %4$d zhoduje s nedeľou "
 "alebo slávnosťou '%3$s'! Treba s tým niečo urobiť?"
 
-#: src/Handlers/CalendarHandler.php:3738
+#: src/Handlers/CalendarHandler.php:3739
 #, php-format
 msgid ""
 "Cannot create liturgical event with key \"%1$s\": the day (%2$d) of the "
@@ -1241,7 +1241,7 @@ msgstr ""
 "liturgickej udalosti je väčší ako počet dní (%3$d) v mesiaci (%4$d) roka "
 "liturgickej udalosti (%5$d)."
 
-#: src/Handlers/CalendarHandler.php:3763
+#: src/Handlers/CalendarHandler.php:3764
 msgid ""
 "We should be creating a new liturgical event, however we do not seem to have "
 "the correct date information in order to proceed"
@@ -1255,7 +1255,7 @@ msgstr ""
 #.  3. Date of the liturgical event (localized date for fixed events, or mobile date expression for some mobile events)
 #.  4. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3821
+#: src/Handlers/CalendarHandler.php:3822
 #, php-format
 msgid ""
 "The %1$s '%2$s' was not added to the calendar on %3$s because it conflicts "
@@ -1272,7 +1272,7 @@ msgstr ""
 #.  5. Year from which the name has been changed
 #.  6. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3890
+#: src/Handlers/CalendarHandler.php:3891
 #, php-format
 msgid ""
 "The name of the %1$s '%2$s' has been changed to '%3$s' in the national "
@@ -1288,7 +1288,7 @@ msgstr ""
 #.  4. Year from which the name has been changed
 #.  5. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3908
+#: src/Handlers/CalendarHandler.php:3909
 #, php-format
 msgid ""
 "The name of the celebration '%1$s' has been changed to '%2$s' in the "
@@ -1308,7 +1308,7 @@ msgstr ""
 #.  6. Source of the information
 #.  7. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3935
+#: src/Handlers/CalendarHandler.php:3936
 #, php-format
 msgid ""
 "The grade of the %1$s '%2$s' has been changed to '%3$s' in the national "
@@ -1324,7 +1324,7 @@ msgstr ""
 #.  4. Year from which the name has been changed
 #.  5. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3954
+#: src/Handlers/CalendarHandler.php:3955
 #, php-format
 msgid ""
 "The grade of the celebration '%1$s' has been changed to '%2$s' in the "
@@ -1344,7 +1344,7 @@ msgstr ""
 #.  6. ID of the national calendar
 #.  7. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:3989
+#: src/Handlers/CalendarHandler.php:3990
 #, php-format
 msgid ""
 "The %1$s '%2$s' has been moved from %3$s to %4$s since the year %5$d in the "
@@ -1360,7 +1360,7 @@ msgstr ""
 #.  4. ID of the national calendar
 #.  5. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:4008
+#: src/Handlers/CalendarHandler.php:4009
 #, php-format
 msgid ""
 "The liturgical event '%1$s' has been moved to %2$s since the year %3$d in "
@@ -1378,7 +1378,7 @@ msgstr ""
 #.  4. ID of the national calendar
 #.  5. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:4039
+#: src/Handlers/CalendarHandler.php:4040
 #, php-format
 msgid ""
 "The liturgical event '%1$s' has been moved to %2$s since the year %3$d in "
@@ -1391,13 +1391,13 @@ msgstr ""
 "sa zdá byť nedeľou alebo liturgickou udalosťou vyššieho rangu."
 
 #. translators: 1. Country name, 2. List of missals
-#: src/Handlers/CalendarHandler.php:4078
+#: src/Handlers/CalendarHandler.php:4079
 #, php-format
 msgid "Found Missals for region %1$s: %2$s."
 msgstr "Nájdené misály pre región %1$s: %2$s."
 
 #. translators: Name of the Roman Missal
-#: src/Handlers/CalendarHandler.php:4102
+#: src/Handlers/CalendarHandler.php:4103
 #, php-format
 msgid "Found a sanctorale data file for %s"
 msgstr "Našiel som súbor sanctorale pre %s"
@@ -1411,7 +1411,7 @@ msgstr "Našiel som súbor sanctorale pre %s"
 #.  6. Superseding liturgical event name
 #.  7. Requested calendar year
 #.
-#: src/Handlers/CalendarHandler.php:4138
+#: src/Handlers/CalendarHandler.php:4139
 #, php-format
 msgid ""
 "The %1$s '%2$s' (%3$s), added to the national calendar in the %4$s, is "
@@ -1421,13 +1421,13 @@ msgstr ""
 "'%6$s' v roku %7$d"
 
 #. translators: Name of the Roman Missal
-#: src/Handlers/CalendarHandler.php:4152
+#: src/Handlers/CalendarHandler.php:4153
 #, php-format
 msgid "Could not find a sanctorale data file for %s"
 msgstr "Nepodarilo sa nájsť súbor sanctorale pre %s"
 
 #. translators: 1. LiturgicalEvent grade, 2. LiturgicalEvent name, 3. New liturgical event name, 4: Requested calendar year, 5. Old date, 6. New date
-#: src/Handlers/CalendarHandler.php:4226
+#: src/Handlers/CalendarHandler.php:4227
 #, php-format
 msgid ""
 "The %1$s '%2$s' is transferred from %5$s to %6$s as per the %7$s, to make "
@@ -1437,7 +1437,7 @@ msgstr ""
 "pre '%3$s': platné pre rok %4$d."
 
 #. translators: 1. LiturgicalEvent grade, 2. LiturgicalEvent name, 3. Old date, 4. New date, 5. Source of the information, 6. New liturgical event name, 7. Superseding liturgical event grade, 8. Superseding liturgical event name, 9: Requested calendar year
-#: src/Handlers/CalendarHandler.php:4244
+#: src/Handlers/CalendarHandler.php:4245
 #, php-format
 msgid ""
 "The %1$s '%2$s' would have been transferred from %3$s to %4$s as per the "
@@ -1448,7 +1448,7 @@ msgstr ""
 "miesto pre '%6$s', avšak je potlačený %7$s '%8$s' v roku %9$d."
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
-#: src/Handlers/CalendarHandler.php:4442
+#: src/Handlers/CalendarHandler.php:4443
 #, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s' relative to liturgical event "
@@ -1458,7 +1458,7 @@ msgstr ""
 "liturgickú udalosť s kľúčom '%2$s', liturgická udalosť neexistuje."
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. event_key of the liturgical event that it is relative to, 3. List of valid keywords
-#: src/Handlers/CalendarHandler.php:4458
+#: src/Handlers/CalendarHandler.php:4459
 #, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': the `strtotime.relative_time` "
@@ -1470,7 +1470,7 @@ msgstr ""
 "udalosti s kľúčom '%2$s' pomocou kľúčových slov %3$s."
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile liturgical event being created
-#: src/Handlers/CalendarHandler.php:4536
+#: src/Handlers/CalendarHandler.php:4537
 #, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': 'strtotime' property must be "
@@ -1480,7 +1480,7 @@ msgstr ""
 "musí byť buď objekt alebo reťazec, namiesto toho má typ '%2$s'."
 
 #. translators: 1: LiturgicalEvent name, 2: Name of the diocese, 3: LiturgicalEvent date, 4: Coinciding liturgical event name, 5: Requested calendar year
-#: src/Handlers/CalendarHandler.php:4616
+#: src/Handlers/CalendarHandler.php:4617
 #, php-format
 msgid ""
 "The Solemnity '%1$s', proper to the calendar of the %2$s and usually "
@@ -1491,7 +1491,7 @@ msgstr ""
 "%5$d zhoduje s nedeľou alebo slávnosťou '%4$s'! Treba s tým niečo urobiť?"
 
 #. translators: 1: LiturgicalEvent grade, 2: LiturgicalEvent name, 3: Name of the diocese, 4: LiturgicalEvent date, 5: Coinciding liturgical event name, 6: Requested calendar year
-#: src/Handlers/CalendarHandler.php:4641
+#: src/Handlers/CalendarHandler.php:4642
 #, php-format
 msgid ""
 "The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
@@ -1500,11 +1500,11 @@ msgstr ""
 "Slávnosť %1$s '%2$s', vlastná pre kalendár %3$s a obvykle slávená %4$s, je "
 "potlačená %5$s %6$s v roku %7$d."
 
-#: src/Handlers/CalendarHandler.php:5004
+#: src/Handlers/CalendarHandler.php:5005
 msgid "Error converting Liturgical Calendar to XML."
 msgstr "Chyba pri konverzii liturgického kalendára do XML."
 
-#: src/Handlers/CalendarHandler.php:5035
+#: src/Handlers/CalendarHandler.php:5036
 msgid "Error serializing Liturgical Calendar."
 msgstr "Chyba pri serializovaní liturgického kalendára."
 
