@@ -42,7 +42,10 @@ final class MissalsMap implements \IteratorAggregate, \ArrayAccess
     }
 
     /**
-     * Throws a BadMethodCallException, as PropriumDeTemporeCollection is immutable and cannot be modified.
+     * Sets the missal stored at the given offset.
+     *
+     * This map is mutable, unlike {@see PropriumDeTemporeMap} and {@see PropriumDeSanctisMap},
+     * whose offsetSet() throws.
      *
      * @param string $offset The offset to set the value at.
      * @param PropriumDeSanctisMap $value The value to set.
