@@ -117,6 +117,10 @@ class Router
      * Absence of a rite segment defaults to Roman. No nation or diocese identifier
      * collides with a rite value, so this is unambiguous.
      *
+     * Of the two equivalent forms, the explicit one is canonical: a request that omits the
+     * rite segment is answered with a `Link: rel="canonical"` header naming the explicit URL
+     * (see {@see self::canonicalRiteUrl()}).
+     *
      * @param string       $route            the first path segment (the endpoint), already shifted off
      * @param list<string> $requestPathParts the remaining path segments; the rite segment is removed in place when present
      */
@@ -131,6 +135,40 @@ class Router
         }
 
         return Rite::default();
+    }
+
+    /**
+     * Build the absolute canonical URL for a request that omitted the optional rite segment.
+     *
+     * The explicit rite form (`/calendar/roman/2026`, `/calendar/ambrosian/2026`) is canonical;
+     * the bare form (`/calendar/2026`) is retained for backwards compatibility and advertises the
+     * canonical form through an RFC 6596 `Link: rel="canonical"` header rather than a redirect.
+     *
+     * A redirect is deliberately not used: these routes accept POST, a 301/302 would downgrade
+     * POST to GET and silently drop the request body, and per the Fetch standard a browser treats
+     * any redirect response to a preflighted cross-origin request as a network error — which would
+     * break the browser clients that build the bare paths (liturgy-components-js `PathBuilder`).
+     *
+     * Returns null when no canonical form applies: the request already carried an explicit rite
+     * segment, or the route carries no rite segment at all.
+     *
+     * @param string       $route               the first path segment (the endpoint), already shifted off
+     * @param bool         $riteSegmentExplicit whether the request already carried a rite segment
+     * @param Rite         $rite                the rite resolved for this request
+     * @param list<string> $pathParts           the path segments following the route, rite segment already stripped
+     * @param string       $query               the raw request query string, preserved on the canonical URL
+     */
+    public static function canonicalRiteUrl(string $route, bool $riteSegmentExplicit, Rite $rite, array $pathParts, string $query = ''): ?string
+    {
+        // The root route resolves to the calendar handler, but canonicalising `/` to
+        // `/calendar/roman` would rename the endpoint rather than merely make the rite explicit.
+        if ($riteSegmentExplicit || false === in_array($route, ['calendar', 'events'], true)) {
+            return null;
+        }
+
+        $url = self::$apiPath . '/' . implode('/', array_merge([$route, $rite->value], $pathParts));
+
+        return '' === $query ? $url : $url . '?' . $query;
     }
 
     /**
@@ -153,7 +191,14 @@ class Router
         // An optional leading rite segment on the calendar route selects the rite;
         // it is stripped so the existing 0/1/2/3-part shape parsing below runs
         // unchanged on the remainder (see extractRiteSegment()).
-        $rite = self::extractRiteSegment($route, $requestPathParts);
+        $partCountBeforeRite = count($requestPathParts);
+        $rite                = self::extractRiteSegment($route, $requestPathParts);
+        $riteSegmentExplicit = count($requestPathParts) < $partCountBeforeRite;
+
+        // Snapshot the post-rite remainder for the canonical URL below: the handlers configured
+        // in the switch may consume $requestPathParts, and the canonical form has to mirror the
+        // request as it arrived.
+        $canonicalPathParts = $requestPathParts;
 
         // Parse allowed origins from environment (comma-separated list, or '*' for all)
         // This is used for both handler-level CORS and error response CORS
@@ -694,6 +739,43 @@ class Router
 
         $this->response = $pipeline->handle($this->request)
             ->withHeader('X-Request-Id', $this->requestId);
+
+        // A request that omitted the optional rite segment advertises the canonical explicit-rite
+        // form (RFC 6596). Only on success: pointing at a canonical URL for a request that did not
+        // resolve would just name an equally invalid URL. Never on a CORS preflight, which is a
+        // control response rather than a representation of the resource.
+        $isPreflight  = $this->request->getMethod() === RequestMethod::OPTIONS->value;
+        $canonicalUrl = $isPreflight
+            ? null
+            : self::canonicalRiteUrl(
+                $route,
+                $riteSegmentExplicit,
+                $rite,
+                $canonicalPathParts,
+                $this->request->getUri()->getQuery()
+            );
+        // 304 is included alongside 2xx: a resolved conditional request stands in for the 200 it
+        // would otherwise have been and describes the same resource, so a client driving its own
+        // conditional requests should not lose the canonical URL merely because its cache was
+        // still fresh.
+        $status = $this->response->getStatusCode();
+        if (null !== $canonicalUrl && ( ( $status >= 200 && $status < 300 ) || $status === StatusCode::NOT_MODIFIED->value )) {
+            $this->response = $this->response->withHeader('Link', '<' . $canonicalUrl . '>; rel="canonical"');
+        }
+
+        // A cross-origin browser client can only read the CORS-safelisted response headers, so
+        // every header this API sets itself is invisible to JavaScript unless named here (Fetch
+        // standard). Without this, a browser client cannot quote `X-Request-Id` in a bug report,
+        // nor echo an `ETag` back as `If-None-Match` when driving its own conditional requests.
+        // `ETag` and `Link` are only advertised on the responses that actually carry them.
+        $exposedHeaders = ['X-Request-Id'];
+        foreach (['ETag', 'Link'] as $conditionalHeader) {
+            if ($this->response->hasHeader($conditionalHeader)) {
+                $exposedHeaders[] = $conditionalHeader;
+            }
+        }
+        $this->response = $this->response->withHeader('Access-Control-Expose-Headers', implode(', ', $exposedHeaders));
+
         $this->emitResponse();
     }
 

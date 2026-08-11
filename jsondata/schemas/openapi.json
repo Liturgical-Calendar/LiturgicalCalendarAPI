@@ -112,7 +112,141 @@
         ],
         "summary": "Retrieve liturgical events for the General Roman Calendar for each day of the current year",
         "operationId": "retrieveGeneralRomanCalendarGET",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          },
+          {
+            "$ref": "#/components/parameters/YearTypeParam"
+          },
+          {
+            "$ref": "#/components/parameters/EpiphanyParam"
+          },
+          {
+            "$ref": "#/components/parameters/AscensionParam"
+          },
+          {
+            "$ref": "#/components/parameters/CorpusChristiParam"
+          },
+          {
+            "$ref": "#/components/parameters/EternalHighPriestParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/LitCal200"
+          },
+          "304": {
+            "description": "Not Modified: client should use cached results seeing that the response has not changed"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        },
+        "deprecated": true
+      },
+      "post": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve liturgical events for the General Roman Calendar for each day of the current year",
+        "operationId": "retrieveGeneralRomanCalendarPOST",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                },
+                "GeneralRomanCalendarTweaked": {
+                  "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                },
+                "GeneralRomanCalendarTweaked": {
+                  "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/LitCal200"
+          },
+          "304": {
+            "description": "Not Modified: client should use cached results seeing that the response has not changed"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/calendar/roman": {
+      "get": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve liturgical events for the General Roman Calendar for each day of the current year",
+        "operationId": "retrieveRomanRiteCalendarGET",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\nThis is the canonical form of this route: the rite is stated explicitly, symmetric with the `/calendar/ambrosian` variant. The equivalent bare path (`/calendar`) is retained for backwards compatibility and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -165,8 +299,8 @@
           {}
         ],
         "summary": "Retrieve liturgical events for the General Roman Calendar for each day of the current year",
-        "operationId": "retrieveGeneralRomanCalendarPOST",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
+        "operationId": "retrieveRomanRiteCalendarPOST",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\nThis is the canonical form of this route: the rite is stated explicitly, symmetric with the `/calendar/ambrosian` variant. The equivalent bare path (`/calendar`) is retained for backwards compatibility and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -244,7 +378,155 @@
         ],
         "summary": "Retrieve liturgical events from the General Roman Calendar for each day of the given year",
         "operationId": "retrieveGeneralRomanCalendarForYearGET",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/{year}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          },
+          {
+            "$ref": "#/components/parameters/YearPathParam"
+          },
+          {
+            "$ref": "#/components/parameters/YearTypeParam"
+          },
+          {
+            "$ref": "#/components/parameters/EpiphanyParam"
+          },
+          {
+            "$ref": "#/components/parameters/AscensionParam"
+          },
+          {
+            "$ref": "#/components/parameters/CorpusChristiParam"
+          },
+          {
+            "$ref": "#/components/parameters/EternalHighPriestParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/LitCal200"
+          },
+          "304": {
+            "description": "Not Modified: client should use cached results seeing that the response has not changed"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        },
+        "deprecated": true
+      },
+      "post": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve liturgical events from the General Roman Calendar for each day of the given year",
+        "operationId": "retrieveGeneralRomanCalendarForYearPOST",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/{year}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          },
+          {
+            "in": "path",
+            "name": "year",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1970,
+              "maximum": 9999
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                },
+                "GeneralRomanCalendarTweaked": {
+                  "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetrieveCalendarRequestBody"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                },
+                "GeneralRomanCalendarTweaked": {
+                  "$ref": "#/components/examples/GeneralRomanCalendarTweakedRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/LitCal200"
+          },
+          "304": {
+            "description": "Not Modified: client should use cached results seeing that the response has not changed"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/calendar/roman/{year}": {
+      "get": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve liturgical events from the General Roman Calendar for each day of the given year",
+        "operationId": "retrieveRomanRiteCalendarForYearGET",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\nThis is the canonical form of this route: the rite is stated explicitly, symmetric with the `/calendar/ambrosian/{year}` variant. The equivalent bare path (`/calendar/{year}`) is retained for backwards compatibility and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -300,8 +582,8 @@
           {}
         ],
         "summary": "Retrieve liturgical events from the General Roman Calendar for each day of the given year",
-        "operationId": "retrieveGeneralRomanCalendarForYearPOST",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
+        "operationId": "retrieveRomanRiteCalendarForYearPOST",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\nThis is the canonical form of this route: the rite is stated explicitly, symmetric with the `/calendar/ambrosian/{year}` variant. The equivalent bare path (`/calendar/{year}`) is retained for backwards compatibility and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -390,7 +672,143 @@
         ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given nation for each day of the current year",
         "operationId": "retrieveNationalCalendarGET",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/nation/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          },
+          {
+            "$ref": "#/components/parameters/NationalCalendarIdPathParam"
+          },
+          {
+            "$ref": "#/components/parameters/YearTypeParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/LitCal200"
+          },
+          "304": {
+            "description": "Not Modified: client should use cached results seeing that the response has not changed"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        },
+        "deprecated": true
+      },
+      "post": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve liturgical events from the liturgical calendar for a given nation for each day of the current year",
+        "operationId": "retrieveNationalCalendarPOST",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/nation/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          },
+          {
+            "in": "path",
+            "name": "calendar_id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "CA",
+                "HR",
+                "IT",
+                "NL",
+                "US",
+                "VA"
+              ],
+              "summary": "uppercase two letter ISO 3166 code of a nation for which the liturgical calendar has been defined"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/CivilOrLiturgicalYear"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CivilOrLiturgicalYear"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/LitCal200"
+          },
+          "304": {
+            "description": "Not Modified: client should use cached results seeing that the response has not changed"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/calendar/roman/nation/{calendar_id}": {
+      "get": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve liturgical events from the liturgical calendar for a given nation for each day of the current year",
+        "operationId": "retrieveRomanRiteNationalCalendarGET",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\nThis is the canonical form of this route: the rite is stated explicitly, symmetric with the `/calendar/ambrosian` variant. The equivalent bare path (`/calendar/nation/{calendar_id}`) is retained for backwards compatibility and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -434,8 +852,8 @@
           {}
         ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given nation for each day of the current year",
-        "operationId": "retrieveNationalCalendarPOST",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
+        "operationId": "retrieveRomanRiteNationalCalendarPOST",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\nThis is the canonical form of this route: the rite is stated explicitly, symmetric with the `/calendar/ambrosian` variant. The equivalent bare path (`/calendar/nation/{calendar_id}`) is retained for backwards compatibility and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -524,7 +942,156 @@
         ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given nation for each day of a given year",
         "operationId": "retrieveNationalCalendarForYearGET",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/nation/{calendar_id}/{year}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          },
+          {
+            "$ref": "#/components/parameters/NationalCalendarIdPathParam"
+          },
+          {
+            "$ref": "#/components/parameters/YearPathParam"
+          },
+          {
+            "$ref": "#/components/parameters/YearTypeParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/LitCal200"
+          },
+          "304": {
+            "description": "Not Modified: client should use cached results seeing that the response has not changed"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        },
+        "deprecated": true
+      },
+      "post": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve liturgical events from the liturgical calendar for a given nation for each day of a given year",
+        "operationId": "retrieveNationalCalendarForYearPOST",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/nation/{calendar_id}/{year}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          },
+          {
+            "in": "path",
+            "name": "calendar_id",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "CA",
+                "HR",
+                "IT",
+                "NL",
+                "US",
+                "VA"
+              ]
+            }
+          },
+          {
+            "in": "path",
+            "name": "year",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1970,
+              "maximum": 9999
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/CivilOrLiturgicalYear"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CivilOrLiturgicalYear"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/LitCal200"
+          },
+          "304": {
+            "description": "Not Modified: client should use cached results seeing that the response has not changed"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/calendar/roman/nation/{calendar_id}/{year}": {
+      "get": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve liturgical events from the liturgical calendar for a given nation for each day of a given year",
+        "operationId": "retrieveRomanRiteNationalCalendarForYearGET",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\nThis is the canonical form of this route: the rite is stated explicitly, symmetric with the `/calendar/ambrosian` variant. The equivalent bare path (`/calendar/nation/{calendar_id}/{year}`) is retained for backwards compatibility and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -571,8 +1138,8 @@
           {}
         ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given nation for each day of a given year",
-        "operationId": "retrieveNationalCalendarForYearPOST",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
+        "operationId": "retrieveRomanRiteNationalCalendarForYearPOST",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\nThis is the canonical form of this route: the rite is stated explicitly, symmetric with the `/calendar/ambrosian` variant. The equivalent bare path (`/calendar/nation/{calendar_id}/{year}`) is retained for backwards compatibility and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -671,7 +1238,134 @@
         ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given diocese for each day of the current year",
         "operationId": "retrieveDiocesanCalendarGET",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/diocese/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          },
+          {
+            "$ref": "#/components/parameters/DiocesanCalendarIdPathParam"
+          },
+          {
+            "$ref": "#/components/parameters/YearTypeParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/LitCal200"
+          },
+          "304": {
+            "description": "Not Modified: client should use cached results seeing that the response has not changed"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        },
+        "deprecated": true
+      },
+      "post": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve liturgical events from the liturgical calendar for a given diocese for each day of the current year",
+        "operationId": "retrieveDiocesanCalendarPOST",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/diocese/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          },
+          {
+            "in": "path",
+            "name": "calendar_id",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/CivilOrLiturgicalYear"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CivilOrLiturgicalYear"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/LitCal200"
+          },
+          "304": {
+            "description": "Not Modified: client should use cached results seeing that the response has not changed"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/calendar/roman/diocese/{calendar_id}": {
+      "get": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve liturgical events from the liturgical calendar for a given diocese for each day of the current year",
+        "operationId": "retrieveRomanRiteDiocesanCalendarGET",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\nThis is the canonical form of this route: the rite is stated explicitly, symmetric with the `/calendar/ambrosian/diocese/{calendar_id}` variant. The equivalent bare path (`/calendar/diocese/{calendar_id}`) is retained for backwards compatibility and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -715,8 +1409,8 @@
           {}
         ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given diocese for each day of the current year",
-        "operationId": "retrieveDiocesanCalendarPOST",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
+        "operationId": "retrieveRomanRiteDiocesanCalendarPOST",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\nThis is the canonical form of this route: the rite is stated explicitly, symmetric with the `/calendar/ambrosian/diocese/{calendar_id}` variant. The equivalent bare path (`/calendar/diocese/{calendar_id}`) is retained for backwards compatibility and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -796,7 +1490,148 @@
         ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given diocese for each day of a given year",
         "operationId": "retrieveDiocesanCalendarForYearGET",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/diocese/{calendar_id}/{year}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          },
+          {
+            "$ref": "#/components/parameters/DiocesanCalendarIdPathParam"
+          },
+          {
+            "$ref": "#/components/parameters/YearPathParam"
+          },
+          {
+            "$ref": "#/components/parameters/YearTypeParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/LitCal200"
+          },
+          "304": {
+            "description": "Not Modified: client should use cached results seeing that the response has not changed"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        },
+        "deprecated": true
+      },
+      "post": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve liturgical events from the liturgical calendar for a given diocese for each day of a given year",
+        "operationId": "retrieveDiocesanCalendarForYearPOST",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/diocese/{calendar_id}/{year}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptHeader"
+          },
+          {
+            "in": "path",
+            "name": "calendar_id",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          },
+          {
+            "in": "path",
+            "name": "year",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 1970,
+              "maximum": 9999
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/CivilOrLiturgicalYear"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CivilOrLiturgicalYear"
+              },
+              "examples": {
+                "LiturgicalYearCalendar": {
+                  "$ref": "#/components/examples/LiturgicalYearRequestBody"
+                },
+                "CivilYearCalendar": {
+                  "$ref": "#/components/examples/CivilYearRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/LitCal200"
+          },
+          "304": {
+            "description": "Not Modified: client should use cached results seeing that the response has not changed"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "406": {
+            "$ref": "#/components/responses/NotAcceptable406"
+          },
+          "415": {
+            "$ref": "#/components/responses/UnsupportedMediaType415"
+          },
+          "418": {
+            "$ref": "#/components/responses/IMATeapot418"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/calendar/roman/diocese/{calendar_id}/{year}": {
+      "get": {
+        "tags": [
+          "Main API endpoint"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve liturgical events from the liturgical calendar for a given diocese for each day of a given year",
+        "operationId": "retrieveRomanRiteDiocesanCalendarForYearGET",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\nThis is the canonical form of this route: the rite is stated explicitly, symmetric with the `/calendar/ambrosian/diocese/{calendar_id}/{year}` variant. The equivalent bare path (`/calendar/diocese/{calendar_id}/{year}`) is retained for backwards compatibility and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -843,8 +1678,8 @@
           {}
         ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given diocese for each day of a given year",
-        "operationId": "retrieveDiocesanCalendarForYearPOST",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year",
+        "operationId": "retrieveRomanRiteDiocesanCalendarForYearPOST",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\nThis is the canonical form of this route: the rite is stated explicitly, symmetric with the `/calendar/ambrosian/diocese/{calendar_id}/{year}` variant. The equivalent bare path (`/calendar/diocese/{calendar_id}/{year}`) is retained for backwards compatibility and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -4090,7 +4925,9 @@
           "503": {
             "$ref": "#/components/responses/ServiceUnavailable503"
           }
-        }
+        },
+        "deprecated": true,
+        "description": "**Deprecated in favour of the explicit-rite form `/events/roman`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL."
       },
       "post": {
         "tags": [
@@ -4126,7 +4963,85 @@
           "503": {
             "$ref": "#/components/responses/ServiceUnavailable503"
           }
-        }
+        },
+        "deprecated": true,
+        "description": "**Deprecated in favour of the explicit-rite form `/events/roman`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL."
+      }
+    },
+    "/events/roman": {
+      "get": {
+        "tags": [
+          "Liturgical events"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve all possible liturgical events from the General Roman Calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
+        "operationId": "retrieveRomanRiteEventsGET",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: A collection of all possible liturgical events that can be found in a liturgical calendar produced by the LitCal API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "304 Not Modified"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        },
+        "description": "This is the canonical form of this route: the rite is stated explicitly, symmetric with the `/events/ambrosian` variant. The equivalent bare path (`/events`) is retained for backwards compatibility and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header."
+      },
+      "post": {
+        "tags": [
+          "Liturgical events"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve all possible liturgical events from the General Roman Calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
+        "operationId": "retrieveRomanRiteEventsPOST",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: A collection of all possible liturgical events that can be found in a liturgical calendar produced by the LitCal API",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LitCalAllFestivitiesResponse"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "304 Not Modified"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "503": {
+            "$ref": "#/components/responses/ServiceUnavailable503"
+          }
+        },
+        "description": "This is the canonical form of this route: the rite is stated explicitly, symmetric with the `/events/ambrosian` variant. The equivalent bare path (`/events`) is retained for backwards compatibility and returns an identical response, advertising this URL through an RFC 6596 `Link: <...>; rel=\"canonical\"` response header."
       }
     },
     "/events/ambrosian": {
