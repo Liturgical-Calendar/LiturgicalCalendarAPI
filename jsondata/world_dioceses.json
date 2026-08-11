@@ -7085,10 +7085,6 @@
                     "diocese_id": "opmapa_it"
                 },
                 {
-                    "diocese_name": "Diocesi di Lanusei",
-                    "diocese_id": "opudei_it"
-                },
-                {
                     "diocese_name": "Ordinariato Militare per l'Italia",
                     "diocese_id": "ormpli_it"
                 },
@@ -13134,6 +13130,12 @@
                     "diocese_id": "mutare_zw"
                 }
             ]
+        }
+    ],
+    "personal_prelatures": [
+        {
+            "prelature_name": "Prelatura personale della Santa Croce e Opus Dei",
+            "prelature_id": "opudei_it"
         }
     ]
 }
