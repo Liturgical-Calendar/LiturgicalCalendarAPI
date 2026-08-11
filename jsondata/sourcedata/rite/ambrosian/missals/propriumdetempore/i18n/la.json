@@ -35,6 +35,11 @@
     "Easter7": "Dominica VII Paschae",
     "Ascension": "In Ascensione Domini",
     "Pentecost": "Dominica Pentecostes",
+    "MaryMotherChurch": "Beatæ Mariæ Virginis, Ecclesiæ Matris",
+    "Trinity": "Dominica post Pentecostem Sanctissimæ Trinitatis",
+    "CorpusChristi": "Ss.mi Corporis et Sanguinis Christi",
+    "SacredHeart": "Sacratissimi Cordis Iesu",
+    "ImmaculateHeart": "Immaculati Cordis Beatæ Mariæ Virginis",
     "DedicationDuomo": "In Dedicatione Ecclesiae Cathedralis Mediolanensis",
     "ChristKing": "Domini nostri Iesu Christi universorum Regis"
 }
