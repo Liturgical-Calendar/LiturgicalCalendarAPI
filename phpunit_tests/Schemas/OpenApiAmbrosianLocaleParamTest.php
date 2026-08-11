@@ -23,7 +23,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
  */
 final class OpenApiAmbrosianLocaleParamTest extends TestCase
 {
-    private const string PARAM_NAME = 'AmbrosianLocaleParam';
+    private const string PARAM_NAME  = 'AmbrosianLocaleParam';
+    private const string SCHEMA_NAME = 'AmbrosianLocale';
+    private const string BODY_NAME   = 'AmbrosianEventsRequestBody';
 
     /** @var array<string,mixed> */
     private static array $openapi;
@@ -42,17 +44,38 @@ final class OpenApiAmbrosianLocaleParamTest extends TestCase
         self::$openapi = $decoded;
     }
 
-    /** @return string[] */
+    /**
+     * The locale set the contract advertises, read from the shared schema that both the
+     * query parameter and the events request body reference — so a drift in either usage
+     * is a drift in the value asserted here.
+     *
+     * @return string[]
+     */
     private static function advertisedLocales(): array
+    {
+        /** @var array<string,array<string,mixed>> $schemas */
+        $schemas = self::$openapi['components']['schemas'];
+        self::assertArrayHasKey(self::SCHEMA_NAME, $schemas);
+
+        /** @var array{enum:string[]} $schema */
+        $schema = $schemas[self::SCHEMA_NAME];
+
+        return $schema['enum'];
+    }
+
+    /**
+     * The query parameter must not carry its own copy of the locale set; it has to point at
+     * the shared schema, otherwise the parameter and the request body can disagree.
+     */
+    public function testTheQueryParameterReferencesTheSharedLocaleSchema(): void
     {
         /** @var array<string,array<string,mixed>> $params */
         $params = self::$openapi['components']['parameters'];
         self::assertArrayHasKey(self::PARAM_NAME, $params);
 
-        /** @var array{schema:array{enum:string[]}} $param */
+        /** @var array{schema:array<string,string>} $param */
         $param = $params[self::PARAM_NAME];
-
-        return $param['schema']['enum'];
+        self::assertSame('#/components/schemas/' . self::SCHEMA_NAME, $param['schema']['$ref'] ?? null);
     }
 
     /**
@@ -87,9 +110,11 @@ final class OpenApiAmbrosianLocaleParamTest extends TestCase
 
     /**
      * The GET operations that read `locale` from the query string. POST is deliberately
-     * excluded: those handlers read parameters from the request body and ignore the query
-     * string entirely, so an `in: query` declaration there would document behavior that
-     * does not exist.
+     * excluded here: those handlers read parameters from the request body and ignore the
+     * query string entirely (verified: `POST …?locale=nl` returns 200 while the same value
+     * in the body returns 400), so an `in: query` declaration there would document behavior
+     * that does not exist. The events POST operations document it as a body field instead —
+     * see {@see self::testEventsPostOperationsDocumentTheLocaleRequestBody()}.
      *
      * @return array<string,array{0:string}>
      */
@@ -120,6 +145,58 @@ final class OpenApiAmbrosianLocaleParamTest extends TestCase
             '#/components/parameters/' . self::PARAM_NAME,
             $referenced,
             "GET {$path} documents the locale restriction in prose but does not declare the parameter"
+        );
+    }
+
+    /**
+     * The Ambrosian events POST operations accept the same restricted `locale`, but as a
+     * request body field rather than a query parameter, and they declared no request body at
+     * all. Assert every content type they document resolves to the shared body schema, so the
+     * 400 the description promises is expressed in the contract for POST too — and so a
+     * client generated from this document can find the field.
+     *
+     * @return array<string,array{0:string}>
+     */
+    public static function ambrosianEventsPostOperations(): array
+    {
+        return [
+            'comune events'   => ['/events/ambrosian'],
+            'diocesan events' => ['/events/ambrosian/diocese/{calendar_id}'],
+        ];
+    }
+
+    #[DataProvider('ambrosianEventsPostOperations')]
+    public function testEventsPostOperationsDocumentTheLocaleRequestBody(string $path): void
+    {
+        /** @var array<string,array<string,mixed>> $paths */
+        $paths = self::$openapi['paths'];
+        self::assertArrayHasKey($path, $paths);
+
+        /** @var array{requestBody?:array{content:array<string,array{schema:array<string,string>}>}} $operation */
+        $operation = $paths[$path]['post'];
+        self::assertArrayHasKey('requestBody', $operation, "POST {$path} must document its body parameters");
+
+        $content = $operation['requestBody']['content'];
+        self::assertNotEmpty($content);
+
+        foreach ($content as $mediaType => $definition) {
+            self::assertSame(
+                '#/components/schemas/' . self::BODY_NAME,
+                $definition['schema']['$ref'] ?? null,
+                "POST {$path} ({$mediaType}) must reference the documented Ambrosian events body"
+            );
+        }
+
+        /** @var array<string,array<string,mixed>> $schemas */
+        $schemas = self::$openapi['components']['schemas'];
+        self::assertArrayHasKey(self::BODY_NAME, $schemas);
+
+        /** @var array{properties:array<string,array<string,string>>} $body */
+        $body = $schemas[self::BODY_NAME];
+        self::assertSame(
+            '#/components/schemas/' . self::SCHEMA_NAME,
+            $body['properties']['locale']['$ref'] ?? null,
+            'the body locale field must reuse the shared locale set, not restate it'
         );
     }
 

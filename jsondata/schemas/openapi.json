@@ -5099,6 +5099,21 @@
             "$ref": "#/components/parameters/AcceptLanguageHeader"
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/AmbrosianEventsRequestBody"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AmbrosianEventsRequestBody"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK: A collection of all possible liturgical events that can be found in the Ambrosian comune calendar produced by the LitCal API",
@@ -5200,6 +5215,21 @@
             }
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/AmbrosianEventsRequestBody"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AmbrosianEventsRequestBody"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK: A collection of all possible liturgical events that can be found in the given Ambrosian diocesan calendar produced by the LitCal API",
@@ -8256,6 +8286,29 @@
           }
         }
       },
+      "AmbrosianLocale": {
+        "type": "string",
+        "title": "Ambrosian liturgical language",
+        "description": "A locale the Ambrosian rite has approved liturgical books in: Italian (Messale Ambrosiano) or Latin (Missale Ambrosianum, the editio typica), as declared by `ambrosian_calendars[].locales` on `/calendars`. Any other language is rejected with 400 Bad Request. Shared by the `locale` query parameter of the Ambrosian GET operations and the `locale` body field of the Ambrosian events POST operations, so the two cannot document different sets.",
+        "default": "la_VA",
+        "enum": [
+          "it",
+          "it_CH",
+          "it_IT",
+          "la",
+          "la_VA"
+        ]
+      },
+      "AmbrosianEventsRequestBody": {
+        "type": "object",
+        "title": "Ambrosian events catalog request body",
+        "description": "The Ambrosian `/events` POST operations read their parameters from the request body rather than the query string.",
+        "properties": {
+          "locale": {
+            "$ref": "#/components/schemas/AmbrosianLocale"
+          }
+        }
+      },
       "CivilOrLiturgicalYear": {
         "type": "object",
         "title": "Liturgical or Civil year",
@@ -10454,15 +10507,7 @@
         "required": false,
         "description": "Optional locale override; when provided it overrides the Accept-Language header. Unlike the Roman rite endpoints, which accept every locale the API ships, the Ambrosian rite has approved liturgical books only in Italian (Messale Ambrosiano) and Latin (Missale Ambrosianum, the editio typica) — as declared by `ambrosian_calendars[].locales` on `/calendars` — so any other language returns 400 Bad Request. An Accept-Language header asking for an unsupported language is negotiated against the same set and falls back to Latin rather than being rejected.",
         "schema": {
-          "type": "string",
-          "default": "la_VA",
-          "enum": [
-            "it",
-            "it_CH",
-            "it_IT",
-            "la",
-            "la_VA"
-          ]
+          "$ref": "#/components/schemas/AmbrosianLocale"
         }
       },
       "AmbrosianYearPathParam": {
