@@ -45,11 +45,28 @@ final class LiturgicalEvent implements \JsonSerializable
     public private(set) ReadingsAbstract|ReadingsMultipleSchemas|ReadingsChristmas|ReadingsWithEvening|ReadingsFestiveWithVigil|ReadingsCommons $readings;
 
     /** The following properties are set externally, but may be optional and therefore may remain null */
-    public ?int $psalter_week            = null;
-    public ?bool $is_vigil_mass          = null;
-    public ?bool $has_vigil_mass         = null;
-    public ?bool $is_dominical           = null;
-    public ?bool $is_aliturgical         = null;
+    public ?int $psalter_week    = null;
+    public ?bool $is_vigil_mass  = null;
+    public ?bool $has_vigil_mass = null;
+    public ?bool $is_dominical   = null;
+    public ?bool $is_aliturgical = null;
+    /**
+     * Whether the event is a celebration of the Blessed Virgin Mary.
+     *
+     * Carried over from source data that classifies it (the Ambrosian proprium de tempore and
+     * the Ambrosian comune sanctorale); `null` — meaning "the source does not classify this" —
+     * everywhere else, including all Roman-rite data.
+     *
+     * This is an INTERNAL precedence-classification input, read only by
+     * {@see \LiturgicalCalendar\Api\Models\Calendar\Precedence\AmbrosianLiturgicalDayRank::rankOf()}
+     * to rank a memorial of the BVM above a memorial of a saint within the comune memorial tier.
+     * It is deliberately NOT emitted by {@see self::jsonSerialize()} (and therefore absent from
+     * `LitCal.json`): the flag tracks the source data's `common: ["Blessed Virgin Mary"]` marker,
+     * which does not cover every Marian celebration (the Assumption and the Annunciation, for
+     * instance, carry `common: ["Proper"]`), so publishing it as an API property would advertise
+     * a "this is/is not a Marian celebration" claim the data does not actually support.
+     */
+    public ?bool $is_bvm                 = null;
     public ?bool $is_proper              = null;
     public ?bool $has_vesper_i           = null;
     public ?bool $has_vesper_ii          = null;
@@ -408,6 +425,9 @@ final class LiturgicalEvent implements \JsonSerializable
      *   declares the property (e.g. PropriumDeTemporeEvent). If not provided (property absent) or null, defaults to null.
      * - is_aliturgical: whether the liturgical event is aliturgical (no Mass celebrated), as a boolean, if the source object
      *   declares the property (e.g. PropriumDeTemporeEvent). If not provided (property absent) or null, defaults to null.
+     * - is_bvm: whether the liturgical event is a celebration of the Blessed Virgin Mary, as a boolean, if the source object
+     *   declares the property (e.g. PropriumDeTemporeEvent, PropriumDeSanctisEvent). If not provided (property absent) or null,
+     *   defaults to null. Internal precedence input only; never serialized.
      *
      * @param \stdClass|LitCalItemCreateNewFixed|LitCalItemCreateNewMobile|DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile|DecreeItemCreateNewFixed|DecreeItemCreateNewMobile|PropriumDeTemporeEvent|PropriumDeSanctisEvent $obj
      * @return LiturgicalEvent A new LiturgicalEvent object.
@@ -582,6 +602,15 @@ final class LiturgicalEvent implements \JsonSerializable
                 throw new \Exception('Invalid object provided to create LiturgicalEvent: is_aliturgical is not a boolean or null');
             }
             $litEvent->is_aliturgical = $obj->is_aliturgical;
+        }
+
+        // Carry over `is_bvm` from source data (PropriumDeTemporeEvent / PropriumDeSanctisEvent) when
+        // present and non-null. Internal only: never serialized -- see the property's docblock.
+        if (property_exists($obj, 'is_bvm') && null !== $obj->is_bvm) {
+            if (false === is_bool($obj->is_bvm)) {
+                throw new \Exception('Invalid object provided to create LiturgicalEvent: is_bvm is not a boolean or null');
+            }
+            $litEvent->is_bvm = $obj->is_bvm;
         }
 
         return $litEvent;

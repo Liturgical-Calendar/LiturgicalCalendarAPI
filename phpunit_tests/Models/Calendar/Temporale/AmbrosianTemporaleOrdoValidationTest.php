@@ -83,21 +83,27 @@ final class AmbrosianTemporaleOrdoValidationTest extends TestCase
      * Sunday, Dedication = 3rd Sunday of October) rather than spot-checked
      * against a printed/published ordo.
      *
+     * Since the Pentecost-anchored celebrations were placed (spec Task 4), the 1st
+     * Sunday after Pentecost is always the Most Holy Trinity, so `AfterPentecost1`
+     * is never emitted -- this sub-block's first-Sunday pin is keyed on `Trinity`
+     * instead (same dates as before; Trinity's Easter+56 offset is defined to equal
+     * Pentecost+7, i.e. the 1st Sunday after Pentecost, for every year).
+     *
      * @var array<int, array<string,string>>
      */
     private const EXPECTED_SUB_BLOCK_FIRST_SUNDAYS = [
         2024 => [
-            'AfterPentecost1'           => '2024-05-26',
+            'Trinity'                   => '2024-05-26',
             'AfterPentecostMartyrdom1'  => '2024-09-01',
             'AfterPentecostDedication1' => '2024-10-27',
         ],
         2025 => [
-            'AfterPentecost1'           => '2025-06-15',
+            'Trinity'                   => '2025-06-15',
             'AfterPentecostMartyrdom1'  => '2025-08-31',
             'AfterPentecostDedication1' => '2025-10-26',
         ],
         2026 => [
-            'AfterPentecost1'           => '2026-05-31',
+            'Trinity'                   => '2026-05-31',
             'AfterPentecostMartyrdom1'  => '2026-08-30',
             'AfterPentecostDedication1' => '2026-10-25',
         ],

@@ -29,6 +29,22 @@
                 "is_aliturgical": {
                     "type": "boolean",
                     "description": "Whether the event is aliturgical (no Mass is celebrated). Used by the Ambrosian proprium for the aliturgical Fridays of Lent."
+                },
+                "is_bvm": {
+                    "type": "boolean",
+                    "description": "Whether the event is a celebration of the Blessed Virgin Mary. Optional; used by the Ambrosian precedence classifier to rank a memorial of the BVM above a memorial of a saint within the comune memorial tier. Not serialized in API responses."
+                },
+                "since_year": {
+                    "type": "integer",
+                    "minimum": 1800,
+                    "maximum": 9999,
+                    "description": "First year in which the event is celebrated. Optional; when absent the event is not year-gated. NOTE: the gate is currently honoured ONLY by AmbrosianTemporale::placeEasterOffsetAnchor(), which consults it through isInForce() -- that is 5 of the 43 Ambrosian keys (the Pentecost-anchored celebrations MaryMotherChurch, Trinity, CorpusChristi, SacredHeart, ImmaculateHeart) and 0 Roman keys. Every other Proprium de Tempore event in either rite ignores it; a later plan generalises the mechanism. Bounds mirror the repo's existing same-named concept in LiturgicalEventMetadata, which rejects years before 1800."
+                },
+                "until_year": {
+                    "type": "integer",
+                    "minimum": 1800,
+                    "maximum": 9999,
+                    "description": "Last year in which the event is celebrated. Optional; when absent the event is not year-gated. NOTE: honoured on exactly the same narrow path as since_year -- AmbrosianTemporale::placeEasterOffsetAnchor() via isInForce(), 5 of 43 Ambrosian keys and 0 Roman keys -- and ignored by every other Proprium de Tempore event. Should be greater than or equal to since_year; that cross-property relationship is not expressed by this schema."
                 }
             },
             "required": [

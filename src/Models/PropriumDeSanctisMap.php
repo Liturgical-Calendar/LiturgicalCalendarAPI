@@ -66,28 +66,28 @@ final class PropriumDeSanctisMap extends AbstractJsonSrcDataArray implements \It
     }
 
     /**
-     * Throws a BadMethodCallException, as PropriumDeTemporeCollection is immutable and cannot be modified.
+     * Throws a BadMethodCallException, as PropriumDeSanctisMap is immutable and cannot be modified.
      *
      * @param string $offset The offset to set the value at.
      * @param PropriumDeSanctisEvent $value The value to set.
      *
-     * @throws \BadMethodCallException Always thrown, as PropriumDeTemporeCollection is immutable.
+     * @throws \BadMethodCallException Always thrown, as PropriumDeSanctisMap is immutable.
      */
     public function offsetSet($offset, $value): void
     {
-        throw new \BadMethodCallException('PropriumDeTemporeCollection is immutable');
+        throw new \BadMethodCallException('PropriumDeSanctisMap is immutable');
     }
 
     /**
-     * Throws a BadMethodCallException, as PropriumDeTemporeCollection is immutable and cannot be modified.
+     * Throws a BadMethodCallException, as PropriumDeSanctisMap is immutable and cannot be modified.
      *
      * @param string $offset The offset to unset.
      *
-     * @throws \BadMethodCallException Always thrown, as PropriumDeTemporeCollection is immutable.
+     * @throws \BadMethodCallException Always thrown, as PropriumDeSanctisMap is immutable.
      */
     public function offsetUnset($offset): void
     {
-        throw new \BadMethodCallException('PropriumDeTemporeCollection is immutable');
+        throw new \BadMethodCallException('PropriumDeSanctisMap is immutable');
     }
 
     /**
@@ -113,7 +113,7 @@ final class PropriumDeSanctisMap extends AbstractJsonSrcDataArray implements \It
     }
 
     /**
-     * Creates an instance of PropriumDeTemporeCollection from an array of stdClass objects.
+     * Creates an instance of PropriumDeSanctisMap from an array of stdClass objects.
      *
      * @param array<\stdClass> $data
      * @return static
@@ -126,9 +126,13 @@ final class PropriumDeSanctisMap extends AbstractJsonSrcDataArray implements \It
     }
 
     /**
-     * Creates an instance of PropriumDeTemporeCollection from an array of associative arrays.
+     * Creates an instance of PropriumDeSanctisMap from an array of associative arrays.
      *
-     * @param array<array{event_key:string,grade:int,type:int,color:string[],readings:array{first_reading:string,responsorial_psalm:string,second_reading?:string,gospel_acclamation:string,gospel:string,palm_gospel?:string,responsorial_psalm_2?:string}}> $data
+     * Each element is handed to {@see PropriumDeSanctisEvent::fromArray()}, so this shape mirrors
+     * that method's: `day`, `month` and `common` are required alongside the rest, and `readings`
+     * is not among the keys it reads.
+     *
+     * @param array<array{event_key:string,day:int,month:int,color:string[],common:string[],grade:int,grade_display?:string|null,type?:string|null,calendar?:string|null,is_dominical?:bool|null,is_bvm?:bool|null}> $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static

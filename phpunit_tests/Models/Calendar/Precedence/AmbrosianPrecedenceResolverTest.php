@@ -20,7 +20,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * Coincidence + suppression core of `AmbrosianPrecedenceResolver`: on a
  * contested date (more than one event), the event with the lowest
- * `AmbrosianLiturgicalDayRank::rankOf()` value wins and every other event on
+ * `AmbrosianLiturgicalDayRank::precedenceKeyOf()` value wins (Tabella rank
+ * first, then the within-rank tiebreak) and every other event on
  * that date is suppressed (removed from the active collection, recorded on
  * the suppressed-events ledger, and explained via a message). Task 5 only
  * implements the suppression fallback -- the transfer rules that the real
@@ -727,12 +728,12 @@ final class AmbrosianPrecedenceResolverTest extends TestCase
      * destination day: both existing single-pass checks already avoid
      * landing on a solemnity in real time --
      * `transferSaintSolemnity()`'s own `inSolemnities()` check, and this
-     * generic n.56 walk's `isFreeOfRanksOneThroughTen()` check (a
+     * generic n.56 walk's `isFreeOfOccupiedRanks()` check (a
      * solemnity is rank 5/6, which is NOT free of ranks 1-10, so the walk
      * would already skip past it within a single pass). The genuine gap
      * only appears when the destination's resident is BELOW the rank-10
-     * threshold (comune/proper memorial-tier or weekday) -- such a
-     * resident does not block the walk (rank > 10 is "free of ranks
+     * threshold (proper memorial-tier, optional memorial, or weekday) --
+     * such a resident does not block the walk (rank > 10 is "free of ranks
      * 1-10"), so the impeded solemnity lands right on top of it, and nobody
      * revisits that now-contested date until the next pass. This is
      * exactly the shape of the real cascade found in the 2025 assembled

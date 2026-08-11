@@ -12,12 +12,14 @@ use Swaggest\JsonSchema\Schema;
 /**
  * Unit tests for the Ambrosian comune sanctorale allowances in PropriumDeSanctis.json (Plan 5 / Task 2).
  *
- * The comune ambrosiano sanctorale data (authored in later tasks) needs two schema allowances:
+ * The comune ambrosiano sanctorale data (authored in later tasks) needs three schema allowances:
  * 1. an OPTIONAL `is_dominical` boolean property (marks feasts/solemnities of the Lord for the
  *    Ambrosian precedence classifier);
- * 2. `"AMBROSIAN"` as an allowed `calendar` value (Roman rows use e.g. `"GENERAL ROMAN"`).
+ * 2. `"AMBROSIAN"` as an allowed `calendar` value (Roman rows use e.g. `"GENERAL ROMAN"`);
+ * 3. an OPTIONAL `is_bvm` boolean property (marks celebrations of the Blessed Virgin Mary, the
+ *    within-rank tiebreak in the same classifier).
  *
- * Both changes must be additive: existing Roman data (which omits `is_dominical` and uses the
+ * All three must be additive: existing Roman data (which omits both flags and uses the
  * pre-existing `calendar` values) must keep validating, and `additionalProperties: false` must
  * still reject genuinely unknown properties.
  */
@@ -123,6 +125,48 @@ final class AmbrosianSanctoraleSchemaTest extends TestCase
     {
         $row               = self::minimalAmbrosianRow();
         $row->is_dominical = 'false';
+        $this->assertInvalidRow($row);
+    }
+
+    public function testAmbrosianRowWithIsBvmIsValid(): void
+    {
+        $row         = self::minimalAmbrosianRow();
+        $row->is_bvm = true;
+        $this->assertValidRow($row);
+    }
+
+    public function testRomanRowWithoutIsBvmIsStillValid(): void
+    {
+        $row = self::minimalRomanRow();
+        $this->assertObjectNotHasProperty('is_bvm', $row);
+        $this->assertValidRow($row);
+    }
+
+    public function testIsBvmFalseIsValid(): void
+    {
+        $row         = self::minimalAmbrosianRow();
+        $row->is_bvm = false;
+        $this->assertValidRow($row);
+    }
+
+    /**
+     * The schema is the ONLY line of defence against a non-boolean `is_bvm`:
+     * `PropriumDeSanctisEvent::fromObjectInternal()` guards with
+     * `property_exists(...) && is_bool(...)`, which SILENTLY DROPS a non-boolean rather than
+     * throwing. A row carrying `"is_bvm": "true"` would therefore load with `is_bvm === null`
+     * and be ranked as a saint's memorial, with nothing anywhere reporting the mistake.
+     */
+    public function testIsBvmMustBeBoolean(): void
+    {
+        $row         = self::minimalAmbrosianRow();
+        $row->is_bvm = 'true';
+        $this->assertInvalidRow($row);
+    }
+
+    public function testIsBvmNullIsRejected(): void
+    {
+        $row         = self::minimalAmbrosianRow();
+        $row->is_bvm = null;
         $this->assertInvalidRow($row);
     }
 

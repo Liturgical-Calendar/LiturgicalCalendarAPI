@@ -40,6 +40,10 @@
                 "is_dominical": {
                     "type": "boolean",
                     "description": "Marks a feast or solemnity of the Lord, used by the Ambrosian precedence classifier. Optional; omitted for events where the distinction does not apply."
+                },
+                "is_bvm": {
+                    "type": "boolean",
+                    "description": "Marks a celebration of the Blessed Virgin Mary, used by the Ambrosian precedence classifier to rank a memorial of the BVM above a memorial of a saint within the comune memorial tier. Optional; omitted for events where the distinction does not apply. Not serialized in API responses."
                 }
             },
             "required": [

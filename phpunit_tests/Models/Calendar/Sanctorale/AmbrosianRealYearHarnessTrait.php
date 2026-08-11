@@ -12,6 +12,7 @@ use LiturgicalCalendar\Api\LocaleDateFormatter;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
 use LiturgicalCalendar\Api\Models\Calendar\Missal\AmbrosianMissalResolver;
+use LiturgicalCalendar\Api\Models\Calendar\Precedence\PrecedenceContext;
 use LiturgicalCalendar\Api\Models\Calendar\Sanctorale\AmbrosianSanctoraleLoader;
 use LiturgicalCalendar\Api\Models\Calendar\Temporale\AmbrosianTemporale;
 use LiturgicalCalendar\Api\Models\Calendar\Temporale\TemporaleContext;
@@ -66,6 +67,14 @@ trait AmbrosianRealYearHarnessTrait
      * temporale anchor block (Plan 3) followed by the comune sanctorale
      * (Task 6), with each fixed-date sanctorale event dated for `$year`
      * before being added.
+     *
+     * After both engines have run, the harness reproduces the real orchestrator's
+     * next call-order step, `LiturgicalEventCollection::stampAmbrosianSeasonOnSanctorale()`
+     * (`CalendarHandler::calculateAmbrosianCalendar()`), whose own docblock states it MUST
+     * run before any precedence resolution that depends on `liturgical_season`. Without it
+     * every sanctorale event resolves with `liturgical_season === null`, which silently
+     * disables the resolver's and the rank classifier's season-gated branches -- making a
+     * genuine regression and its fix indistinguishable in any test built on this harness.
      *
      * Note on the resulting key count: the Ambrosian comune source lists a
      * handful of dominical solemnities (`Christmas`, `Circoncisione`,
@@ -138,6 +147,32 @@ trait AmbrosianRealYearHarnessTrait
             $cal->addLiturgicalEvent($key, LiturgicalEvent::fromObject($sanctisEvent));
         }
 
+        // 3. The real orchestrator's next step (CalendarHandler::calculateAmbrosianCalendar()):
+        // copy the temporale's `liturgical_season` onto every sanctorale event that lacks one.
+        // Mandatory before precedence resolution -- see the method docblock and this trait's.
+        $cal->stampAmbrosianSeasonOnSanctorale();
+
         return $cal;
+    }
+
+    /**
+     * Builds a `PrecedenceContext` around an already-assembled collection, so that each
+     * consumer of this harness can run `AmbrosianPrecedenceResolver::resolve()` against a
+     * real civil year without restating the wiring.
+     *
+     * @param array<string> $messages
+     */
+    private function buildContextFor(LiturgicalEventCollection $cal, int $year, array &$messages): PrecedenceContext
+    {
+        $params = new CalendarParams();
+        $params->setParams(['year' => $year]);
+        $params->setRite(Rite::AMBROSIAN);
+
+        return new PrecedenceContext(
+            $cal,
+            $params,
+            new LocaleDateFormatter(LitLocale::$RUNTIME_LOCALE),
+            $messages
+        );
     }
 }
