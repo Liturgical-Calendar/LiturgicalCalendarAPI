@@ -157,8 +157,10 @@ Because the Ambrosian temporale currently has no multi-year regression net, this
 building even though most of what it asserts is already correct — it pins the existing behaviour while
 the new celebrations are added.
 
-Mark the full 32-year sweep `@group slow` if its runtime warrants it, following
-`Routes/Readonly/TemporaleTest`.
+Mark the full 32-year sweep with the `#[Group('slow')]` attribute if its runtime warrants it, following
+`Routes/Readonly/TemporaleTest`. It must be the attribute and not a `@group slow` docblock: PHPUnit
+only honours the attribute, so `--group slow` against a docblock-marked suite selects zero tests and
+still exits 0.
 
 ### Targeted tests
 

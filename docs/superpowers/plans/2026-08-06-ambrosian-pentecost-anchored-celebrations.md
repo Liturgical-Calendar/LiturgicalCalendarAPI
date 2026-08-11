@@ -357,7 +357,9 @@ use PHPUnit\Framework\TestCase;
  * Unlike AmbrosianTemporaleOrdoValidationTest, which spot-checks three civil years
  * against the chiesadimilano.it daily widget, this is a published 32-year oracle.
  *
- * Marked @group slow per project convention for full-engine acceptance runs.
+ * Marked with the #[Group('slow')] attribute per project convention for full-engine acceptance
+ * runs. The attribute, not a `@group` docblock: PHPUnit only honours the attribute here, and
+ * `--group slow` against a docblock-marked suite selects zero tests and still exits 0.
  */
 #[CoversClass(AmbrosianTemporale::class)]
 #[Group('slow')]

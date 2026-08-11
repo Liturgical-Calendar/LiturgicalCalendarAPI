@@ -85,7 +85,7 @@ final class PropriumDeTemporeEvent extends AbstractJsonSrcData
     /**
      * Creates an instance of PropriumDeTemporeEvent from an associative array.
      *
-     * @param array{event_key:string,grade:int,type:int,color:string[],is_dominical?:bool|null,is_aliturgical?:bool|null,is_bvm?:bool|null,since_year?:int|null,until_year?:int|null} $data
+     * @param array{event_key:string,grade:int,type:string,color:string[],is_dominical?:bool|null,is_aliturgical?:bool|null,is_bvm?:bool|null,since_year?:int|null,until_year?:int|null} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -114,7 +114,7 @@ final class PropriumDeTemporeEvent extends AbstractJsonSrcData
      * - grade (int): The liturgical grade of the event.
      * - color (array): The liturgical colors for the event.
      *
-     * @param \stdClass&object{event_key:string,grade:int,type:int,color:string[],is_dominical?:bool|null,is_aliturgical?:bool|null,is_bvm?:bool|null,since_year?:int|null,until_year?:int|null} $data The stdClass object or array containing event data.
+     * @param \stdClass&object{event_key:string,grade:int,type:string,color:string[],is_dominical?:bool|null,is_aliturgical?:bool|null,is_bvm?:bool|null,since_year?:int|null,until_year?:int|null} $data The stdClass object or array containing event data.
      * @return static The newly created instance(s).
      */
     protected static function fromObjectInternal(\stdClass $data): static
