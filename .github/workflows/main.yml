@@ -155,8 +155,9 @@ jobs:
       # The earlier comment here warned that --auto is rejected on an
       # already-clean PR ("Pull request is in clean status"). That is still true,
       # and is exactly what happens if branch protection ever stops requiring
-      # checks — so fall back to merging directly in that case, which keeps this
-      # working under either policy.
+      # checks — so fall back to merging directly in that case, and only in that
+      # case, which keeps this working under either policy without swallowing
+      # genuine failures.
       #
       # --delete-branch removes the automated/update-pot head branch (explicit,
       # not relying on the repo's delete_branch_on_merge setting). The github.ref
@@ -169,7 +170,20 @@ jobs:
             echo "Auto-merge enabled; GitHub will merge PR #$PR_NUMBER once the required checks pass."
             exit 0
           fi
-          echo "Could not enable auto-merge — the PR is likely already mergeable. Merging directly."
+
+          # --auto failing is only benign in one case: the PR needs no checks and
+          # is therefore already CLEAN, which GitHub rejects with "Pull request is
+          # in clean status". Confirm that before merging directly, so a failure
+          # from a missing or under-scoped token, an API error, or auto-merge being
+          # disabled on the repo surfaces as itself instead of being masked by a
+          # second attempt that fails for an unrelated-looking reason.
+          MERGE_STATE=$(gh pr view "$PR_NUMBER" --json mergeStateStatus --jq .mergeStateStatus)
+          if [ "$MERGE_STATE" != "CLEAN" ]; then
+            echo "::error::Could not enable auto-merge on PR #$PR_NUMBER, and its merge state is ${MERGE_STATE:-unavailable} rather than CLEAN. Not attempting a direct merge; see the gh error above."
+            exit 1
+          fi
+
+          echo "PR #$PR_NUMBER requires no checks and is already CLEAN; merging directly."
           gh pr merge "$PR_NUMBER" --merge --delete-branch
         env:
           PR_NUMBER: ${{ steps.cpr.outputs.pull-request-number }}
