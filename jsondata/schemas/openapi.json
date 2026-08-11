@@ -1905,7 +1905,7 @@
             "$ref": "#/components/parameters/AcceptHeader"
           },
           {
-            "$ref": "#/components/parameters/YearPathParam"
+            "$ref": "#/components/parameters/AmbrosianYearPathParam"
           },
           {
             "$ref": "#/components/parameters/YearTypeParam"
@@ -1962,15 +1962,7 @@
             "$ref": "#/components/parameters/AcceptHeader"
           },
           {
-            "in": "path",
-            "name": "year",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 1970,
-              "maximum": 9999
-            }
+            "$ref": "#/components/parameters/AmbrosianYearPathParam"
           }
         ],
         "requestBody": {
@@ -2173,7 +2165,7 @@
             "$ref": "#/components/parameters/DiocesanCalendarIdPathParam"
           },
           {
-            "$ref": "#/components/parameters/YearPathParam"
+            "$ref": "#/components/parameters/AmbrosianYearPathParam"
           },
           {
             "$ref": "#/components/parameters/YearTypeParam"
@@ -2226,15 +2218,7 @@
             }
           },
           {
-            "in": "path",
-            "name": "year",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "minimum": 1970,
-              "maximum": 9999
-            }
+            "$ref": "#/components/parameters/AmbrosianYearPathParam"
           }
         ],
         "requestBody": {
@@ -10443,6 +10427,18 @@
           "type": "integer",
           "format": "int32",
           "minimum": 1970,
+          "maximum": 9999
+        }
+      },
+      "AmbrosianYearPathParam": {
+        "in": "path",
+        "name": "year",
+        "required": true,
+        "description": "The calendar year for which to retrieve liturgical events. The Ambrosian rite starts at 1976, the year of the first reformed Messale Ambrosiano, rather than at the API-wide lower limit of 1970; earlier years return 400 Bad Request.",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "minimum": 1976,
           "maximum": 9999
         }
       },
