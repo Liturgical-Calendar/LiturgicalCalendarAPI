@@ -40,6 +40,7 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 use LiturgicalCalendar\Api\Params\EventsParams;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 use LiturgicalCalendar\Api\Services\LocaleConfigurator;
 use LiturgicalCalendar\Api\Utilities;
 use Psr\Http\Message\ResponseInterface;
@@ -820,8 +821,13 @@ final class EventsHandler extends AbstractHandler
         /** @var array{locale?:string,national_calendar?:string,diocesan_calendar?:string,eternal_high_priest?:bool} $params */
         $params = [];
 
-        // Second of all, we check if an Accept-Language header was set in the request
-        $locale = Negotiator::pickLanguage($request, [], LitLocale::LATIN);
+        // Second of all, we check if an Accept-Language header was set in the request.
+        // Negotiated against the locales the requested rite has liturgical books for
+        // (empty for the Roman rite, which restricts nothing), so an unsupported
+        // preference degrades to Latin rather than tripping the rejection in
+        // EventsParams::validateRiteCompatibility() — see the equivalent block in
+        // CalendarHandler::handle() for why headers and explicit params differ (#761).
+        $locale = Negotiator::pickLanguage($request, CalendarMetadataProvider::negotiableLocalesForRite($this->rite), LitLocale::LATIN);
         if ($locale && LitLocale::isValid($locale)) {
             $params['locale'] = $locale;
         } else {

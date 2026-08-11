@@ -255,9 +255,11 @@ class EventsParams implements ParamsInterface
      * {@see \LiturgicalCalendar\Api\Params\CalendarParams::validateDiocesanCalendarParam()}.
      * A diocese whose declared rite matches the requested rite (Roman-under-Roman, or
      * Ambrosian-under-Ambrosian, e.g. `/events/ambrosian/diocese/milano_it`) is allowed.
+     * A `locale` the rite has no liturgical books for is likewise rejected (issue #761).
      * Mirrors {@see \LiturgicalCalendar\Api\Params\CalendarParams::validateRiteCompatibility()},
      * minus the year-floor check (the events catalog is year-agnostic). Must be called
-     * after the rite and any `national_calendar`/`diocesan_calendar` parameters have been set.
+     * after the rite, locale, and any `national_calendar`/`diocesan_calendar` parameters
+     * have been set.
      *
      * @throws ValidationException
      */
@@ -284,6 +286,21 @@ class EventsParams implements ParamsInterface
             throw new ValidationException(
                 'The Ambrosian rite has no national calendars; request the comune ambrosiano events catalog (`/events/ambrosian`) or one of its dioceses.'
             );
+        }
+
+        // Rite-scoped locale check: the loop in setParams() can only validate against the
+        // API-wide LitLocale set, since it runs before the rite is known. As on the
+        // calendar endpoint, only an explicit `locale` parameter is rejected here — an
+        // Accept-Language header is negotiated against the same set by
+        // EventsHandler::handle() before it becomes a parameter, so it degrades to Latin
+        // instead of failing the request.
+        if (false === CalendarMetadataProvider::riteSupportsLocale($this->Rite, $this->Locale)) {
+            throw new ValidationException(sprintf(
+                'Invalid value `%s` for param `locale`: the `%s` rite has liturgical books only in: %s.',
+                $this->Locale,
+                $this->Rite->value,
+                implode(', ', CalendarMetadataProvider::localesForRite($this->Rite))
+            ));
         }
     }
 }
