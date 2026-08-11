@@ -322,18 +322,82 @@ final class CalendarMetadataProvider
      */
     private static function buildAmbrosianCalendarData(MetadataCalendars $metadata): void
     {
-        $folderGlob = self::globOrThrow(JsonData::AMBROSIAN_TEMPORALE_I18N_FOLDER->path() . '/*.json', 0, 'CalendarMetadataProvider::buildAmbrosianCalendarData');
-
-        $locales = array_map(
-            fn (string $filename) => pathinfo($filename, PATHINFO_FILENAME),
-            $folderGlob
-        );
-
         $metadataAmbrosianCalendarItem = MetadataAmbrosianCalendarItem::fromArray([
             'calendar_id' => Rite::AMBROSIAN->value,
             'rite'        => Rite::AMBROSIAN->value,
-            'locales'     => $locales
+            'locales'     => self::ambrosianLocales()
         ]);
         $metadata->pushAmbrosianCalendarMetadata($metadataAmbrosianCalendarItem);
+    }
+
+    /**
+     * The locales a rite has liturgical books for, i.e. the set announced for that rite
+     * on `/calendars`, or an empty array when the rite restricts nothing beyond the
+     * API-wide {@see \LiturgicalCalendar\Api\Enum\LitLocale} set.
+     *
+     * This is the enforcement side of what {@see self::buildAmbrosianCalendarData()}
+     * announces: both read the same glob, so the request-time check can never drift
+     * from the declared metadata (issue #761 — `/calendar/ambrosian?locale=nl` used to
+     * return 200 and echo `nl_NL` back for a rite with no Dutch liturgical books).
+     *
+     * The Roman rite returns `[]`: it is the API's universal calendar, translated into
+     * every locale the API ships, so it imposes no rite-level restriction. (Individual
+     * Roman national and diocesan calendars declare their own narrower `locales`, which
+     * the handlers apply as a graceful downgrade rather than a rejection; that behavior
+     * is untouched here.)
+     *
+     * @return string[] locale identifiers as declared in the metadata, e.g. `['it', 'la']`
+     */
+    public static function localesForRite(Rite $rite): array
+    {
+        return $rite === Rite::AMBROSIAN ? self::ambrosianLocales() : [];
+    }
+
+    /**
+     * Whether a requested locale is one the rite has liturgical books for.
+     *
+     * Matching is on primary language, not on the full identifier, for two reasons: the
+     * rite-level metadata declares bare languages (`it`, `la`) while the Ambrosian
+     * dioceses declare full identifiers (`it_IT`, `la_VA`), and a regional variant of a
+     * supported language is still that language — `it_CH`, the shape a Ticino client
+     * would send for the Ambrosian parishes of the Diocese of Lugano, is Italian and
+     * must be accepted.
+     */
+    public static function riteSupportsLocale(Rite $rite, string $locale): bool
+    {
+        $supported = self::localesForRite($rite);
+        if ([] === $supported) {
+            return true;
+        }
+
+        $requestedLanguage = \Locale::getPrimaryLanguage($locale);
+        if (null === $requestedLanguage) {
+            return false;
+        }
+
+        return null !== array_find(
+            $supported,
+            static fn (string $supportedLocale): bool => \Locale::getPrimaryLanguage($supportedLocale) === $requestedLanguage
+        );
+    }
+
+    /**
+     * The Ambrosian rite's locales, derived from the Ambrosian Proprium de Tempore's
+     * `i18n` folder — the same source the handlers read at request time when loading
+     * Ambrosian temporale and sanctorale names. Currently `['it', 'la']`: the *Messale
+     * Ambrosiano* (Italian) and the *Missale Ambrosianum* (Latin, the *editio typica*)
+     * are the rite's only approved liturgical books, and no episcopal conference outside
+     * Italy commissions an Ambrosian translation.
+     *
+     * @return string[]
+     */
+    private static function ambrosianLocales(): array
+    {
+        $folderGlob = self::globOrThrow(JsonData::AMBROSIAN_TEMPORALE_I18N_FOLDER->path() . '/*.json', 0, 'CalendarMetadataProvider::ambrosianLocales');
+
+        return array_map(
+            fn (string $filename) => pathinfo($filename, PATHINFO_FILENAME),
+            $folderGlob
+        );
     }
 }
