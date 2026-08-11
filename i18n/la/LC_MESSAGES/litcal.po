@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-28 21:24+0000\n"
+"POT-Creation-Date: 2026-08-11 10:25+0000\n"
 "PO-Revision-Date: 2026-06-19 19:52+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Latin <https://translate.johnromanodorazio.com/projects/"
@@ -1469,7 +1469,7 @@ msgstr ""
 "%9$d."
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. Name of the liturgical event that it is relative to
-#: src/Handlers/CalendarHandler.php:4441
+#: src/Handlers/CalendarHandler.php:4442
 #, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s' relative to liturgical event "
@@ -1479,7 +1479,7 @@ msgstr ""
 "liturgici cum clave '%2$s', eventus liturgicus non existit."
 
 #. translators: 1. Name of the mobile liturgical event being created, 2. event_key of the liturgical event that it is relative to, 3. List of valid keywords
-#: src/Handlers/CalendarHandler.php:4457
+#: src/Handlers/CalendarHandler.php:4458
 #, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': the `strtotime.relative_time` "
@@ -1491,7 +1491,7 @@ msgstr ""
 "liturgicum cum clave '%2$s' utens vocabulis %3$s."
 
 #. translators: Do not translate 'strtotime'! 1. Name of the mobile liturgical event being created
-#: src/Handlers/CalendarHandler.php:4535
+#: src/Handlers/CalendarHandler.php:4536
 #, php-format
 msgid ""
 "Cannot create mobile liturgical event '%1$s': 'strtotime' property must be "
@@ -1501,7 +1501,7 @@ msgstr ""
 "debet esse vel obiectum vel catena, sed est generis '%2$s'."
 
 #. translators: 1: LiturgicalEvent name, 2: Name of the diocese, 3: LiturgicalEvent date, 4: Coinciding liturgical event name, 5: Requested calendar year
-#: src/Handlers/CalendarHandler.php:4615
+#: src/Handlers/CalendarHandler.php:4616
 #, php-format
 msgid ""
 "The Solemnity '%1$s', proper to the calendar of the %2$s and usually "
@@ -1513,7 +1513,7 @@ msgstr ""
 "de hoc agere?"
 
 #. translators: 1: LiturgicalEvent grade, 2: LiturgicalEvent name, 3: Name of the diocese, 4: LiturgicalEvent date, 5: Coinciding liturgical event name, 6: Requested calendar year
-#: src/Handlers/CalendarHandler.php:4640
+#: src/Handlers/CalendarHandler.php:4641
 #, php-format
 msgid ""
 "The %1$s '%2$s', proper to the calendar of the %3$s and usually celebrated "
@@ -1522,11 +1522,11 @@ msgstr ""
 "%1$s '%2$s', proprio calendario %3$s et plerumque celebratur die %4$s, "
 "supprimetur a %5$s %6$s anno %7$d."
 
-#: src/Handlers/CalendarHandler.php:4939
+#: src/Handlers/CalendarHandler.php:5004
 msgid "Error converting Liturgical Calendar to XML."
 msgstr "Error convertendi Calendarium Liturgicum ad XML."
 
-#: src/Handlers/CalendarHandler.php:4970
+#: src/Handlers/CalendarHandler.php:5035
 msgid "Error serializing Liturgical Calendar."
 msgstr "Error serializationis Calendarii Liturgici."
 
@@ -1544,7 +1544,7 @@ msgstr "De Commune"
 #. translators: context alternate name for a liturgical event, e.g. Second Sunday of Easter `or` Divine Mercy Sunday
 #. translators: when there are multiple possible commons, this will be the glue "[; or] From the Common of..."
 #: src/Models/Calendar/LitCommons.php:228
-#: src/Models/Calendar/LiturgicalEvent.php:143
+#: src/Models/Calendar/LiturgicalEvent.php:160
 #: src/Models/Calendar/Temporale/RomanTemporale.php:256
 #: src/Models/EventsPath/LiturgicalEventAbstract.php:104 src/Utilities.php:450
 #: src/Utilities.php:456
