@@ -4300,16 +4300,16 @@
         },
         {
             "name": "captainhook/hook-installer",
-            "version": "1.0.4",
+            "version": "1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/captainhook-git/hook-installer.git",
-                "reference": "fb3c45f6204b08baba999f4ffc4ae707bf684e8b"
+                "reference": "b184bebf8a76e78adb98c1953a82eed14232f0ae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/captainhook-git/hook-installer/zipball/fb3c45f6204b08baba999f4ffc4ae707bf684e8b",
-                "reference": "fb3c45f6204b08baba999f4ffc4ae707bf684e8b",
+                "url": "https://api.github.com/repos/captainhook-git/hook-installer/zipball/b184bebf8a76e78adb98c1953a82eed14232f0ae",
+                "reference": "b184bebf8a76e78adb98c1953a82eed14232f0ae",
                 "shasum": ""
             },
             "require": {
@@ -4341,9 +4341,9 @@
             "description": "Composer Plugin that makes everyone activate the CaptainHook git hooks locally",
             "support": {
                 "issues": "https://github.com/captainhook-git/hook-installer/issues",
-                "source": "https://github.com/captainhook-git/hook-installer/tree/1.0.4"
+                "source": "https://github.com/captainhook-git/hook-installer/tree/1.0.5"
             },
-            "time": "2025-04-08T07:12:26+00:00"
+            "time": "2026-08-02T20:10:37+00:00"
         },
         {
             "name": "myclabs/deep-copy",
