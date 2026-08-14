@@ -546,4 +546,105 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
             }
         }
     }
+
+    /**
+     * A schema-valid diocesan payload carrying a color licit only in the *other* rite must be
+     * rejected by the write path (issue #771).
+     *
+     * The JSON Schemas enumerate the union of both rites' colors, because JSON Schema cannot
+     * key a `color` facet off `metadata.rite` elsewhere in the document. The write path is the
+     * one place that holds both the payload and its declared rite, so it is where the
+     * rite-scoping is enforced — against the single authoritative palette in
+     * {@see \LiturgicalCalendar\Api\Models\Calendar\Rite\RiteProfile::colors()}.
+     *
+     * @return array<string,array{0:string,1:string,2:string,3:string}>
+     */
+    public static function illicitRiteColorProvider(): array
+    {
+        return [
+            // Exactly the defect #772 fixed in the shipped data, now caught at write time.
+            'roman purple in an ambrosian diocese' => ['ambrosian', 'purple', 'novara_it', 'Diocesi di Novara'],
+            'roman rose in an ambrosian diocese'   => ['ambrosian', 'rose', 'novara_it', 'Diocesi di Novara'],
+            'ambrosian morello in a roman diocese' => ['roman', 'morello', 'romamo_it', 'Diocesi di Roma'],
+            'ambrosian black in a roman diocese'   => ['roman', 'black', 'romamo_it', 'Diocesi di Roma'],
+        ];
+    }
+
+    #[\PHPUnit\Framework\Attributes\DataProvider('illicitRiteColorProvider')]
+    public function testPutDiocesanCalendarRejectsColorIllicitInDeclaredRite(
+        string $rite,
+        string $color,
+        string $dioceseId,
+        string $dioceseName
+    ): void {
+        $payload = self::diocesanPayloadWithColor($rite, $color, $dioceseId, $dioceseName);
+
+        $this->expectException(UnprocessableContentException::class);
+        // Assert on the message, not merely the type: several unrelated conditions on this
+        // path also raise UnprocessableContentException (unknown key, already exists, …), and
+        // a bare type assertion would pass for the wrong reason.
+        $this->expectExceptionMessage("not licit in the {$rite} rite");
+
+        ( new RegionalDataHandler(['diocese', $dioceseId]) )
+            ->handle($this->requestFor('PUT', "/data/diocese/{$dioceseId}", [], $payload));
+    }
+
+    /**
+     * Control: the same payload shape with a color the declared rite *does* admit must get
+     * past the color gate. It may still fail later (the diocese already exists), so this
+     * asserts only that the failure is not the color one.
+     */
+    public function testPutDiocesanCalendarAcceptsColorLicitInDeclaredRite(): void
+    {
+        $payload = self::diocesanPayloadWithColor('ambrosian', 'morello', 'novara_it', 'Diocesi di Novara');
+
+        try {
+            ( new RegionalDataHandler(['diocese', 'novara_it']) )
+                ->handle($this->requestFor('PUT', '/data/diocese/novara_it', [], $payload));
+            self::assertTrue(true, 'morello passed the rite color gate');
+        } catch (\Throwable $e) {
+            self::assertStringNotContainsString(
+                'not licit in the',
+                $e->getMessage(),
+                'morello is licit in the ambrosian rite and must not be rejected by the color gate'
+            );
+        }
+    }
+
+    /**
+     * @return array<string,mixed>
+     */
+    private static function diocesanPayloadWithColor(string $rite, string $color, string $dioceseId, string $dioceseName): array
+    {
+        return [
+            'litcal'   => [
+                [
+                    'liturgical_event' => [
+                        'event_key' => 'StsProtaseGervase',
+                        'color'     => [$color],
+                        'grade'     => 3,
+                        'common'    => ['Proper'],
+                        'day'       => 19,
+                        'month'     => 6,
+                    ],
+                    'metadata'         => ['since_year' => 2024, 'form_rownum' => 0],
+                ],
+            ],
+            'metadata' => [
+                // `diocese_name` is gated by an enum of real diocese names in CommonDef.json,
+                // so the fixture has to name an actual diocese for the payload to be
+                // schema-valid — otherwise it fails before ever reaching the color gate.
+                'nation'       => 'IT',
+                'diocese_id'   => $dioceseId,
+                'diocese_name' => $dioceseName,
+                'locales'      => ['it_IT'],
+                'timezone'     => 'Europe/Rome',
+                'rite'         => $rite,
+            ],
+            // PUT/PATCH require i18n covering every declared locale.
+            'i18n'     => [
+                'it_IT' => ['StsProtaseGervase' => 'Santi Protaso e Gervaso'],
+            ],
+        ];
+    }
 }

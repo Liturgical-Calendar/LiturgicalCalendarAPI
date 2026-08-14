@@ -10,6 +10,7 @@ use PHPUnit\Framework\Attributes\Group;
 use Swaggest\JsonSchema\Schema;
 use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Router;
 
 /**
@@ -35,6 +36,73 @@ class SchemaValidationTest extends TestCase
 
         // Get the paths
         self::$schemasPath = JsonData::SCHEMAS_FOLDER->path();
+    }
+
+    /**
+     * Assert that every liturgical color in a decoded source document is licit in the
+     * rite whose tree the document belongs to.
+     *
+     * The source-data schemas cannot express this themselves: `PropriumDeSanctis.json`
+     * (and `PropriumDeTempore.json`, and `DiocesanCalendar.json`) are shared by both
+     * rite-partitioned trees, and JSON Schema cannot key a `color` facet off the rite of
+     * the containing file — for the sanctorale and temporale files, the rite is not even
+     * recorded *in* the file, only in its path. Since this suite already has separate
+     * Roman and Ambrosian entry points per schema, the rite is known at the call site,
+     * and the rite-scoped subsets `CommonDef.json#/definitions/{Roman,Ambrosian}LitColor`
+     * can be applied there. Issue #771.
+     *
+     * @param mixed  $data    The decoded (stdClass/array) document.
+     * @param Rite   $rite    The rite whose tree the document was loaded from.
+     * @param string $context A human-readable identifier for the assertion message.
+     */
+    private function assertColorsLicitForRite(mixed $data, Rite $rite, string $context): void
+    {
+        $definition = match ($rite) {
+            Rite::ROMAN     => 'RomanLitColor',
+            Rite::AMBROSIAN => 'AmbrosianLitColor',
+        };
+
+        $commonDef = json_decode((string) file_get_contents(self::$schemasPath . '/CommonDef.json'));
+        $this->assertInstanceOf(\stdClass::class, $commonDef);
+        $this->assertObjectHasProperty($definition, $commonDef->definitions);
+
+        $subset = Schema::import($commonDef->definitions->{$definition});
+
+        $colorArrays = [];
+        self::collectColorArrays($data, $colorArrays);
+        $this->assertNotEmpty($colorArrays, "No color arrays found in $context — the assertion would be vacuous");
+
+        foreach ($colorArrays as $colors) {
+            // Throws InvalidValue if any entry is outside the rite's palette.
+            $subset->in($colors);
+        }
+
+        $this->assertTrue(true, "All colors in $context are licit in the {$rite->value} rite");
+    }
+
+    /**
+     * Collect every `color` array in an arbitrarily nested decoded document.
+     *
+     * @param mixed                $node
+     * @param array<int,list<mixed>> $found
+     */
+    private static function collectColorArrays(mixed $node, array &$found): void
+    {
+        if ($node instanceof \stdClass) {
+            $node = get_object_vars($node);
+        }
+
+        if (!is_array($node)) {
+            return;
+        }
+
+        foreach ($node as $key => $value) {
+            if ($key === 'color' && is_array($value)) {
+                $found[] = array_values($value);
+                continue;
+            }
+            self::collectColorArrays($value, $found);
+        }
     }
 
     /**
@@ -213,6 +281,9 @@ class SchemaValidationTest extends TestCase
         // This should not throw
         $schema->in($data);
         $this->assertTrue(true, 'Real USA national calendar should pass validation');
+
+        // National calendars have no `rite` field and exist only under the Roman tree.
+        $this->assertColorsLicitForRite($data, Rite::ROMAN, 'the USA national calendar');
     }
 
     /**
@@ -262,6 +333,10 @@ class SchemaValidationTest extends TestCase
         // This should not throw
         $schema->in($data);
         $this->assertTrue(true, "Real diocesan calendar should pass validation: $diocesanFile");
+
+        // DIOCESAN_CALENDARS_FOLDER is the Roman tree; the Ambrosian dioceses have their
+        // own folder enum and their own entry point below.
+        $this->assertColorsLicitForRite($data, Rite::ROMAN, $diocesanFile);
     }
 
     /**
@@ -305,6 +380,11 @@ class SchemaValidationTest extends TestCase
         // This should not throw
         $schema->in($data);
         $this->assertTrue(true, "Real wider region calendar should pass validation: $widerRegionFile");
+
+        // No rite-scoped color assertion here: wider-region calendars are a layer above
+        // the national calendars (Roman-only), and the shipped ones carry no `color` keys
+        // at all — their actions patch existing events rather than create new ones. The
+        // full-tree sweep in RiteSourceColorTest covers these files regardless.
     }
 
     /**
@@ -333,6 +413,11 @@ class SchemaValidationTest extends TestCase
         // This should not throw
         $schema->in($data);
         $this->assertTrue(true, 'Real proprium de sanctis 1970 should pass validation');
+
+        // PropriumDeSanctis.json is shared by both rite trees, so the rite-scoped
+        // subset is asserted here rather than in the schema (see the Ambrosian
+        // counterpart below).
+        $this->assertColorsLicitForRite($data, Rite::ROMAN, 'the 1970 proprium de sanctis');
     }
 
     /**
@@ -361,6 +446,10 @@ class SchemaValidationTest extends TestCase
         // This should not throw
         $schema->in($data);
         $this->assertTrue(true, 'Real Ambrosian comune sanctorale should pass validation');
+
+        // The stray `purple` AllSouls row of issue #772 lived in this very file and
+        // passed the shared schema; the Ambrosian subset is what rejects it.
+        $this->assertColorsLicitForRite($data, Rite::AMBROSIAN, 'the Ambrosian comune sanctorale');
     }
 
     /**
@@ -415,6 +504,8 @@ class SchemaValidationTest extends TestCase
 
             // This should not throw
             $schema->in($data);
+
+            $this->assertColorsLicitForRite($data, Rite::AMBROSIAN, $diocesanFile);
         }
 
         $this->assertTrue(true, 'All 4 real Ambrosian diocesan calendars should pass validation');
@@ -446,6 +537,8 @@ class SchemaValidationTest extends TestCase
         // This should not throw
         $schema->in($data);
         $this->assertTrue(true, 'Real proprium de tempore should pass validation');
+
+        $this->assertColorsLicitForRite($data, Rite::ROMAN, 'the Roman proprium de tempore');
     }
 
     /**
@@ -482,6 +575,8 @@ class SchemaValidationTest extends TestCase
         // This should not throw
         $schema->in($data);
         $this->assertTrue(true, 'Real Ambrosian proprium de tempore should pass validation');
+
+        $this->assertColorsLicitForRite($data, Rite::AMBROSIAN, 'the Ambrosian proprium de tempore');
     }
 
     /**

@@ -21,6 +21,7 @@ use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\PathCategory;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
@@ -33,6 +34,7 @@ use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarItem;
+use LiturgicalCalendar\Api\Models\Calendar\Rite\RiteProfileFactory;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
@@ -1303,6 +1305,79 @@ final class RegionalDataHandler extends AbstractHandler
         }
     }
 
+    /**
+     * Reject a write payload that carries a liturgical color illicit in the rite it declares.
+     *
+     * The JSON Schemas enumerate the *union* of the colors of both rites, because neither
+     * JSON Schema nor XML Schema can condition a `color` facet on the value of
+     * `metadata.rite` elsewhere in the document tree. The write path is the one place where
+     * both the payload and its rite are in hand at the same time, so this is where the
+     * rite-scoping is enforced (issue #771).
+     *
+     * The licit palette per rite is stated once, in {@see RiteProfile::colors()}; this method
+     * only compares against it. The payload has already passed schema validation by the time
+     * this runs, so every `color` entry found here is a valid {@see LitColor} value — what is
+     * being decided is whether it belongs to *this* rite.
+     *
+     * @param \stdClass $payload The raw (schema-valid) write payload.
+     * @param Rite      $rite    The rite the payload declares (or inherits by default).
+     *
+     * @throws UnprocessableContentException If any color is not licit in the given rite.
+     */
+    private static function validateColorsForRite(\stdClass $payload, Rite $rite): void
+    {
+        $licit = array_map(
+            static fn ($color): string => $color->value,
+            RiteProfileFactory::forRite($rite)->colors()
+        );
+
+        $offenders = [];
+        self::collectIllicitColors($payload, $licit, $offenders);
+
+        if ([] !== $offenders) {
+            $offenders = array_values(array_unique($offenders));
+            sort($offenders);
+            throw new UnprocessableContentException(
+                'The following liturgical color(s) are not licit in the ' . $rite->value . ' rite: '
+                . implode(', ', $offenders) . '. Licit colors for this rite are: ' . implode(', ', $licit) . '.'
+            );
+        }
+    }
+
+    /**
+     * Walk an arbitrarily nested payload and record every `color` entry outside the licit set.
+     *
+     * The `color` key sits at different depths across the three payload shapes (and across the
+     * several national-calendar action types), so the walk is structural rather than keyed to
+     * any one schema.
+     *
+     * @param mixed             $node      The node currently being visited.
+     * @param string[]          $licit     The licit color values for the rite.
+     * @param array<int,string> $offenders Accumulator for the offending color values.
+     */
+    private static function collectIllicitColors(mixed $node, array $licit, array &$offenders): void
+    {
+        if ($node instanceof \stdClass) {
+            $node = get_object_vars($node);
+        }
+
+        if (!is_array($node)) {
+            return;
+        }
+
+        foreach ($node as $key => $value) {
+            if ($key === 'color' && is_array($value)) {
+                foreach ($value as $color) {
+                    if (is_string($color) && !in_array($color, $licit, true)) {
+                        $offenders[] = $color;
+                    }
+                }
+                continue;
+            }
+            self::collectIllicitColors($value, $licit, $offenders);
+        }
+    }
+
 
 
     /**
@@ -1678,6 +1753,15 @@ final class RegionalDataHandler extends AbstractHandler
                 default:
                     throw new ValidationException("Invalid category: {$this->requestPathParams[0]}");
             }
+            // Rite-scoped color validation (issue #771). `metadata.rite` is carried only by
+            // diocesan calendars — national and wider-region calendars have no rite field and
+            // live exclusively under the Roman source tree, so they are Roman by construction.
+            // Diocesan payloads default to Roman when `rite` is absent, matching DiocesanMetadata.
+            $riteForPayload = ( $params['payload'] ?? null ) instanceof DiocesanData
+                ? $params['payload']->metadata->rite
+                : Rite::ROMAN;
+            self::validateColorsForRite($payload, $riteForPayload);
+
             if (false === isset($key)) {
                 throw new ValidationException('Invalid payload, could not extract diocese_id, nation or wider_region accordingly');
             }
