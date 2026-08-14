@@ -7703,14 +7703,18 @@
                           "red",
                           "white",
                           "purple",
-                          "rose"
+                          "rose",
+                          "morello",
+                          "black"
                         ],
                         "examples": [
                           "green",
                           "red",
                           "white",
                           "purple",
-                          "rose"
+                          "rose",
+                          "morello",
+                          "black"
                         ]
                       },
                       "idx": {
