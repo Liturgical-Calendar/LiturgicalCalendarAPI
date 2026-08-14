@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Repositories;
 
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Repositories\AccessRequestRepository;
+use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -407,7 +409,7 @@ final class AccessRequestRepositoryTest extends RepositoryTestCase
                 $code = $a . $b;
                 self::assertSame(
                     isset($enumSet[$code]),
-                    AccessRequestRepository::isValidObjectIdForType('national_calendar', $code),
+                    AccessRequestRepository::isValidObjectIdForType('national_calendar', RiteScopedObjectId::qualify(Rite::ROMAN, $code)),
                     "Validation of '{$code}' differs between CommonDef.json and the access-request validator"
                 );
             }
@@ -417,7 +419,26 @@ final class AccessRequestRepositoryTest extends RepositoryTestCase
     #[DataProvider('provideNationCodes')]
     public function testNationalCalendarObjectIdValidation(string $code, bool $expected): void
     {
-        self::assertSame($expected, AccessRequestRepository::isValidObjectIdForType('national_calendar', $code));
+        // The nation code is carried inside a rite-qualified id (issue #786).
+        self::assertSame(
+            $expected,
+            AccessRequestRepository::isValidObjectIdForType('national_calendar', RiteScopedObjectId::qualify(Rite::ROMAN, $code))
+        );
+    }
+
+    public function testNationalCalendarRequiresARiteQualifiedId(): void
+    {
+        // A bare nation code no longer identifies a calendar.
+        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('national_calendar', 'IT'));
+        self::assertTrue(AccessRequestRepository::isValidObjectIdForType('national_calendar', 'roman/IT'));
+    }
+
+    public function testOnlyTheDiocesanTierExistsUnderANonRomanRite(): void
+    {
+        self::assertTrue(AccessRequestRepository::isValidObjectIdForType('diocesan_calendar', 'ambrosian/lugano_ch'));
+        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('national_calendar', 'ambrosian/IT'));
+        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('wider_region', 'ambrosian/Europe'));
+        self::assertTrue(AccessRequestRepository::isValidObjectIdForType('wider_region', 'roman/Europe'));
     }
 
     /** @return array<string, array{0: string, 1: bool}> */

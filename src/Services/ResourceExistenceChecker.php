@@ -19,6 +19,12 @@ use LiturgicalCalendar\Api\Enum\Rite;
  *   rite_calendar_test           — fixed catalog; exists iff the id is a known Rite
  *   national_calendar            — jsondata/sourcedata/rite/roman/calendars/nations/{id}/{id}.json
  *   wider_region                 — jsondata/sourcedata/rite/roman/calendars/wider_regions/{id}/ (directory)
+ *
+ * Ids that name a calendar are rite-qualified as `<rite>/<calendarId>` (issue #786).
+ * The qualifier is stripped before the filesystem lookup rather than used to select a
+ * partition: this method decides what the reconciler PURGES, and unqualified legacy ids
+ * are still in the store for the whole migration window, so it answers "does a calendar
+ * of this id exist at all" and never destroys a grant over a format mismatch.
  *   diocesan_calendar            — jsondata/sourcedata/rite/{rite}/calendars/dioceses/{nation}/{id}/ (directory, glob across rites)
  *   national_calendar_test       — governance scope (id `<rite>/<calendarId>`); always treated as existing
  *   diocesan_calendar_test       — governance scope (id `<rite>/<calendarId>`); always treated as existing
@@ -55,13 +61,14 @@ final class ResourceExistenceChecker implements ResourceExistenceCheckerInterfac
                 return null !== Rite::tryFrom($objectId);
 
             case 'national_calendar':
+                $calendarId = RiteScopedObjectId::calendarId($objectId);
                 return is_file(
-                    JsonData::NATIONAL_CALENDARS_FOLDER->path() . "/{$objectId}/{$objectId}.json"
+                    JsonData::NATIONAL_CALENDARS_FOLDER->path() . "/{$calendarId}/{$calendarId}.json"
                 );
 
             case 'wider_region':
                 return is_dir(
-                    JsonData::WIDER_REGIONS_FOLDER->path() . "/{$objectId}"
+                    JsonData::WIDER_REGIONS_FOLDER->path() . '/' . RiteScopedObjectId::calendarId($objectId)
                 );
 
             case 'diocesan_calendar':
@@ -95,6 +102,8 @@ final class ResourceExistenceChecker implements ResourceExistenceCheckerInterfac
      */
     private static function diocesanCalendarExists(string $objectId): bool
     {
+        $objectId = RiteScopedObjectId::calendarId($objectId);
+
         // A glob pattern is being built from this value, so anything outside the
         // diocese-id character set is rejected rather than escaped. This also stops an
         // empty id from matching every nation directory and reporting as existing.

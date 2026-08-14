@@ -11,6 +11,7 @@ use LiturgicalCalendar\Api\Handlers\Auth\ClientIpTrait;
 use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesOutboxTooling;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxProcessor;
 use LiturgicalCalendar\Api\JsonFormatter;
@@ -495,9 +496,11 @@ final class RegionalDataHandler extends AbstractHandler
             $repo = $this->getOutboxRepository();
             $row  = [
                 'operation'       => OutboxOperation::WRITE_TUPLE,
-                'fga_user'        => "national_calendar:{$nation}",
+                // Both sides are rite-qualified: wider regions layer over national
+                // calendars, and both exist only in the Roman rite (issue #786).
+                'fga_user'        => 'national_calendar:' . RiteScopedObjectId::qualify(Rite::ROMAN, $nation),
                 'fga_relation'    => 'member_nation',
-                'fga_object'      => "wider_region:{$widerRegion}",
+                'fga_object'      => 'wider_region:' . RiteScopedObjectId::qualify(Rite::ROMAN, $widerRegion),
                 'idempotency_key' => "member_nation:wider_region:{$widerRegion}:national_calendar:{$nation}",
                 'metadata'        => ['member_nation_seed' => true],
             ];
@@ -980,6 +983,19 @@ final class RegionalDataHandler extends AbstractHandler
     }
 
     /**
+     * The full rite-qualified FGA object (`<type>:<rite>/<key>`) for this request.
+     *
+     * A bare calendar id does not identify a calendar — the source tree is partitioned
+     * by rite — so every object that names one carries its rite (issue #786).
+     */
+    private function fgaObjectForRequest(): string
+    {
+        return $this->fgaObjectTypeForCategory()
+            . ':'
+            . RiteScopedObjectId::qualify($this->params->rite, (string) $this->params->key);
+    }
+
+    /**
      * Get the paths for deleting a regional calendar data resource.
      *
      * The return value is an array with two elements:
@@ -1135,19 +1151,19 @@ final class RegionalDataHandler extends AbstractHandler
         // Purge operational (editor/viewer) FGA tuples orphaned by the file
         // deletion. The admin (governance) tuple is intentionally retained so
         // the resource can be recreated without losing ownership.
-        $objectType = $this->fgaObjectTypeForCategory();
-        $purge      = $this->getPurgeService();
+        $fgaObject = $this->fgaObjectForRequest();
+        $purge     = $this->getPurgeService();
         if ($purge !== null) {
             // Best-effort: the calendar files are already deleted, so an
             // OpenFGA/outbox error must NOT fail the completed deletion —
             // the reconciler sweep cleans up any stragglers.
             try {
-                $purge->purgeForObject("{$objectType}:{$this->params->key}");
+                $purge->purgeForObject($fgaObject);
             } catch (\Throwable $e) {
                 try {
                     $this->auditLogger->warning(
                         'Post-delete tuple purge failed; reconciler will retry',
-                        ['object' => "{$objectType}:{$this->params->key}", 'error' => $e->getMessage()]
+                        ['object' => $fgaObject, 'error' => $e->getMessage()]
                     );
                 } catch (\Throwable) {
                     // Logging is best-effort too; never fail a completed deletion.

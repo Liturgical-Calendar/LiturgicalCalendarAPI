@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Api\Repositories;
 
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
 use LiturgicalCalendar\Api\Services\TestScopeResolver;
 use PDO;
 
@@ -124,7 +125,9 @@ class AccessRequestRepository
             'rite_calendar_test'          => implode(', ', array_column(Rite::cases(), 'value')),
             'national_calendar_test'      => 'a rite-qualified nation code, e.g. ' . TestScopeResolver::qualify(Rite::ROMAN, 'US'),
             'diocesan_calendar_test'      => 'a rite-qualified diocese id, e.g. ' . TestScopeResolver::qualify(Rite::AMBROSIAN, 'lugano_ch'),
-            'national_calendar'           => 'a two-letter ISO nation code',
+            'national_calendar'           => 'a rite-qualified nation code, e.g. ' . RiteScopedObjectId::qualify(Rite::ROMAN, 'US'),
+            'diocesan_calendar'           => 'a rite-qualified diocese id, e.g. ' . RiteScopedObjectId::qualify(Rite::AMBROSIAN, 'lugano_ch'),
+            'wider_region'                => 'a rite-qualified wider region, e.g. ' . RiteScopedObjectId::qualify(Rite::ROMAN, 'Europe'),
             default                       => 'any non-empty id',
         };
     }
@@ -152,8 +155,25 @@ class AccessRequestRepository
             return $objectType !== 'national_calendar_test' || Rite::ROMAN === $parsed[0];
         }
 
-        if ($objectType === 'national_calendar') {
-            return self::isValidNationCode($objectId);
+        // Data resource types that name a calendar are rite-qualified for the same
+        // reason the scoped test types are: a bare calendar id does not identify a
+        // calendar, since the source tree is partitioned by rite (issue #786).
+        if (in_array($objectType, ['national_calendar', 'diocesan_calendar', 'wider_region'], true)) {
+            $parsed = RiteScopedObjectId::parse($objectId);
+            if (null === $parsed) {
+                return false;
+            }
+
+            [$rite, $calendarId] = $parsed;
+
+            // Only the diocesan tier exists under more than one rite.
+            if ($rite !== Rite::ROMAN && $objectType !== 'diocesan_calendar') {
+                return false;
+            }
+
+            return $objectType === 'national_calendar'
+                ? self::isValidNationCode($calendarId)
+                : $calendarId !== '';
         }
 
         return $objectId !== '';

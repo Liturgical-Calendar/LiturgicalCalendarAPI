@@ -739,7 +739,7 @@ class Router
 
             // Apply authorization middleware with role-based access control
             // (shared between OIDC and JWT paths)
-            $this->configureAuthorizationPipeline($pipeline, $route, $requestPathParts);
+            $this->configureAuthorizationPipeline($pipeline, $route, $requestPathParts, $rite);
         }
 
         $this->response = $pipeline->handle($this->request)
@@ -792,11 +792,14 @@ class Router
      * @param MiddlewarePipeline $pipeline The middleware pipeline to configure
      * @param string $route The current route being handled
      * @param array<int, string> $requestPathParts The parsed path parts after the route
+     * @param Rite $rite The rite selected by the route's optional rite segment; qualifies the
+     *                   calendar object ids the FGA middleware checks against (issue #786)
      */
     private function configureAuthorizationPipeline(
         MiddlewarePipeline $pipeline,
         string $route,
-        array $requestPathParts
+        array $requestPathParts,
+        Rite $rite = Rite::ROMAN
     ): void {
         // Cache a single OpenFGA client for the pipeline (avoid multiple fromEnv calls)
         $fgaClient = OpenFgaClient::isConfigured() ? OpenFgaClient::fromEnv() : null;
@@ -820,7 +823,8 @@ class Router
             if ($oidcAvailable && $fgaClient !== null && count($requestPathParts) >= 2) {
                 $fgaMiddleware = OpenFgaAuthorizationMiddleware::forCalendarData(
                     $fgaClient,
-                    $requestPathParts[0]
+                    $requestPathParts[0],
+                    $rite
                 );
                 if ($fgaMiddleware !== null) {
                     $pipeline->pipe($fgaMiddleware);

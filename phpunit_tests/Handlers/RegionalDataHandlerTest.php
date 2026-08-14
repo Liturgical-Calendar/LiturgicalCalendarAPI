@@ -357,7 +357,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         $purge = $this->createMock(ResourceTuplePurgeServiceInterface::class);
         $purge->expects($this->once())
             ->method('purgeForObject')
-            ->with('national_calendar:HR');
+            ->with('national_calendar:roman/HR');
         $handler->setPurgeService($purge);
 
         // --- Act: issue DELETE (bypasses JWT middleware — in-process) --------
@@ -495,9 +495,9 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
             ->with($this->callback(function (array $rows): bool {
                 foreach ($rows as $r) {
                     if (
-                        $r['fga_user'] === 'national_calendar:MT'
+                        $r['fga_user'] === 'national_calendar:roman/MT'
                         && $r['fga_relation'] === 'member_nation'
-                        && $r['fga_object'] === 'wider_region:Europe'
+                        && $r['fga_object'] === 'wider_region:roman/Europe'
                     ) {
                         return true;
                     }
