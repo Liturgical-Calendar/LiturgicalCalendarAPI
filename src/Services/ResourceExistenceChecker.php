@@ -31,6 +31,12 @@ use LiturgicalCalendar\Api\Enum\Rite;
  */
 final class ResourceExistenceChecker implements ResourceExistenceCheckerInterface
 {
+    /**
+     * The Vatican is announced as a national calendar but is still served by the
+     * General Roman Calendar, so it has no source folder of its own yet.
+     */
+    private const VATICAN_NATIONAL_CALENDAR_ID = 'VA';
+
     /** @var list<string> */
     private const RESOURCE_TYPES = [
         'national_calendar',
@@ -61,10 +67,7 @@ final class ResourceExistenceChecker implements ResourceExistenceCheckerInterfac
                 return null !== Rite::tryFrom($objectId);
 
             case 'national_calendar':
-                $calendarId = RiteScopedObjectId::calendarId($objectId);
-                return is_file(
-                    JsonData::NATIONAL_CALENDARS_FOLDER->path() . "/{$calendarId}/{$calendarId}.json"
-                );
+                return self::nationalCalendarExists(RiteScopedObjectId::calendarId($objectId));
 
             case 'wider_region':
                 return is_dir(
@@ -119,5 +122,28 @@ final class ResourceExistenceChecker implements ResourceExistenceCheckerInterfac
         }
 
         return false;
+    }
+
+    /**
+     * True when a national calendar of this id is announced by the API.
+     *
+     * Normally that means a source folder, but the Vatican is announced as a national
+     * calendar while still being served by the General Roman Calendar — it has no
+     * `nations/VA/VA.json` of its own yet. Without the special case a live
+     * `national_calendar:VA` grant reads as orphaned and the reconciler purges it, the
+     * same silent revocation the Ambrosian dioceses suffered (issue #786).
+     *
+     * Remove the special case once the Vatican gains its own folder; the `is_file()`
+     * check below will cover it from then on.
+     */
+    private static function nationalCalendarExists(string $calendarId): bool
+    {
+        if ($calendarId === self::VATICAN_NATIONAL_CALENDAR_ID) {
+            return true;
+        }
+
+        return is_file(
+            JsonData::NATIONAL_CALENDARS_FOLDER->path() . "/{$calendarId}/{$calendarId}.json"
+        );
     }
 }

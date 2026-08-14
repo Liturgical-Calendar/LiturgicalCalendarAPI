@@ -59,6 +59,40 @@ final class ResourceExistenceCheckerTest extends TestCase
         $this->assertFalse($checker->exists('diocesan_calendar', ''));
     }
 
+    /**
+     * The Vatican is announced as a national calendar but is still served by the
+     * General Roman Calendar, so it has no `nations/VA/VA.json` yet. Without the
+     * special case a live `national_calendar:VA` grant reads as orphaned and the
+     * reconciler purges it. Delete this test's VA assertions once the Vatican gains
+     * its own folder — the ordinary is_file() path will cover it then.
+     */
+    public function testVaticanNationalCalendarExistsWithoutItsOwnFolder(): void
+    {
+        $checker = new ResourceExistenceChecker();
+        $this->assertTrue($checker->exists('national_calendar', 'VA'));
+        $this->assertTrue($checker->exists('national_calendar', 'roman/VA'));
+    }
+
+    public function testNationalCalendarsWithFoldersExistAndUnknownOnesDoNot(): void
+    {
+        $checker = new ResourceExistenceChecker();
+        $this->assertTrue($checker->exists('national_calendar', 'roman/US'));
+        $this->assertTrue($checker->exists('national_calendar', 'roman/IT'));
+        $this->assertFalse($checker->exists('national_calendar', 'roman/ZZ'));
+        $this->assertFalse($checker->exists('national_calendar', 'ZZ'));
+    }
+
+    public function testQualifiedAndUnqualifiedIdsResolveAlike(): void
+    {
+        // Unqualified ids stay in the store for the whole migration window, and this
+        // predicate decides what gets purged, so both forms must resolve.
+        $checker = new ResourceExistenceChecker();
+        $this->assertTrue($checker->exists('diocesan_calendar', 'ambrosian/lugano_ch'));
+        $this->assertTrue($checker->exists('diocesan_calendar', 'lugano_ch'));
+        $this->assertTrue($checker->exists('wider_region', 'roman/Europe'));
+        $this->assertTrue($checker->exists('wider_region', 'Europe'));
+    }
+
     public function testNonResourceTypeIsNotAResourceType(): void
     {
         $checker = new ResourceExistenceChecker();
