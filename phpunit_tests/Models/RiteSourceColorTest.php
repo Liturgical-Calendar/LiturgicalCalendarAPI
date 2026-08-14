@@ -154,13 +154,18 @@ final class RiteSourceColorTest extends TestCase
         }
 
         foreach ($node as $key => $value) {
-            if ($key === 'color' && is_array($value)) {
-                foreach ($value as $color) {
+            if ($key === 'color') {
+                // `color` is an array on an event, but a bare string inside a
+                // `color_ad_libitum` entry (issue #781) — an ad libitum colour is just as
+                // rite-scoped as an unconditional one, so both shapes are checked.
+                foreach (is_array($value) ? $value : [$value] as $color) {
                     if (is_string($color) && !in_array($color, $licit, true)) {
                         $offenders[] = $color;
                     }
                 }
-                continue;
+                if (is_array($value)) {
+                    continue;
+                }
             }
             self::collectColors($value, $licit, $offenders);
         }

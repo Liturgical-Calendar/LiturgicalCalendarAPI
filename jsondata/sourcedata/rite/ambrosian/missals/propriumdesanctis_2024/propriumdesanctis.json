@@ -211,7 +211,7 @@
     { "month": 10, "day": 28, "event_key": "StsSimonJudeApostles", "grade": 4, "common": [ "Proper" ], "calendar": "AMBROSIAN", "color": [ "red" ] },
     { "month": 10, "day": 29, "event_key": "StHonoratusOfVercelli", "grade": 2, "common": [ "Pastors:For a Bishop" ], "calendar": "AMBROSIAN", "color": [ "white" ] },
     { "month": 11, "day": 1, "event_key": "AllSaints", "grade": 6, "common": [ "Proper" ], "calendar": "AMBROSIAN", "color": [ "white" ] },
-    { "month": 11, "day": 2, "event_key": "AllSouls", "grade": 6, "common": [ "Proper" ], "calendar": "AMBROSIAN", "color": [ "morello" ] },
+    { "month": 11, "day": 2, "event_key": "AllSouls", "grade": 6, "common": [ "Proper" ], "calendar": "AMBROSIAN", "color": [ "morello" ], "color_ad_libitum": [ { "color": "black", "when": "not_sunday_and_not_sunday_vigil" } ] },
     { "month": 11, "day": 3, "event_key": "StMartinDePorres", "grade": 2, "common": [ "Holy Men and Women:For Religious" ], "calendar": "AMBROSIAN", "color": [ "white" ] },
     { "month": 11, "day": 4, "event_key": "StCharlesBorromeo", "grade": 6, "common": [ "Pastors:For a Bishop" ], "calendar": "AMBROSIAN", "color": [ "white" ] },
     { "month": 11, "day": 9, "event_key": "DedicationLateran", "grade": 5, "common": [ "Proper" ], "calendar": "AMBROSIAN", "color": [ "white" ], "is_dominical": true },

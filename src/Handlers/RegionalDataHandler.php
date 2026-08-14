@@ -1366,13 +1366,18 @@ final class RegionalDataHandler extends AbstractHandler
         }
 
         foreach ($node as $key => $value) {
-            if ($key === 'color' && is_array($value)) {
-                foreach ($value as $color) {
+            if ($key === 'color') {
+                // On a liturgical event `color` is an array; inside a `color_ad_libitum`
+                // entry it is a bare string (issue #781). A colour admitted only ad libitum
+                // is still bound by the rite's palette, so both shapes are checked.
+                foreach (is_array($value) ? $value : [$value] as $color) {
                     if (is_string($color) && !in_array($color, $licit, true)) {
                         $offenders[] = $color;
                     }
                 }
-                continue;
+                if (is_array($value)) {
+                    continue;
+                }
             }
             self::collectIllicitColors($value, $licit, $offenders);
         }

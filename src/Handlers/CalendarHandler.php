@@ -1025,6 +1025,12 @@ final class CalendarHandler extends AbstractHandler
                 DateTime::fromFormat($propriumDeSanctisEvent->day . '-' . $propriumDeSanctisEvent->month . '-' . $year)
             );
 
+            // Must run after setDate() and before the LiturgicalEvent is built: the conditions
+            // are date-dependent, and LiturgicalEvent::__construct() derives `color_lcl` from
+            // whatever `color` it is handed (issue #781). A no-op for events with no ad libitum
+            // colours, which is every event but the Ambrosian AllSouls today.
+            $propriumDeSanctisEvent->resolveAdLibitumColors();
+
             $litEvent = LiturgicalEvent::fromObject($propriumDeSanctisEvent);
             $litEvent->setReadings(AmbrosianReadings::empty());
             $this->Cal->addLiturgicalEvent($key, $litEvent);
