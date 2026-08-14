@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Services\Outbox;
 
+use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\ResourceExistenceChecker;
 use LiturgicalCalendar\Api\Services\ResourceExistenceCheckerInterface;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
 use LiturgicalCalendar\Api\Services\Outbox\ResourceTuplePurgeReconciler;
@@ -45,6 +47,43 @@ final class ResourceTuplePurgeReconcilerTest extends TestCase
         $result     = $reconciler->sweep();
 
         $this->assertSame(1, $result['purgedObjects']);
+    }
+
+    /**
+     * Regression guard for issue #786, wired to the REAL ResourceExistenceChecker.
+     *
+     * Every other test here stubs the checker, so none of them could catch the bug:
+     * the checker globbed only the Roman partition, every Ambrosian diocese answered
+     * "deleted", and a sweep silently revoked live editor grants on all four of them.
+     * A Roman diocese and a genuinely absent one are swept alongside to show the
+     * predicate still discriminates.
+     */
+    public function testSweepDoesNotPurgeGrantsOnAmbrosianDiocesanCalendars(): void
+    {
+        Router::getApiPaths();
+
+        $client = $this->createStub(OpenFgaClient::class);
+        $client->method('readTuples')->willReturn([
+            'tuples'                  => [
+                ['user' => 'user:a', 'relation' => 'editor', 'object' => 'diocesan_calendar:milano_it'],
+                ['user' => 'user:b', 'relation' => 'editor', 'object' => 'diocesan_calendar:lugano_ch'],
+                ['user' => 'user:c', 'relation' => 'editor', 'object' => 'diocesan_calendar:rotter_nl'],
+                // genuinely absent under either rite -> this one SHOULD be purged
+                ['user' => 'user:d', 'relation' => 'editor', 'object' => 'diocesan_calendar:nowhere_zz'],
+            ],
+            'next_continuation_token' => '',
+        ]);
+
+        $purge = $this->createMock(ResourceTuplePurgeServiceInterface::class);
+        $purge->expects($this->once())
+            ->method('purgeForObject')
+            ->with('diocesan_calendar:nowhere_zz')
+            ->willReturn(1);
+
+        $reconciler = new ResourceTuplePurgeReconciler($client, new ResourceExistenceChecker(), $purge);
+        $result     = $reconciler->sweep();
+
+        $this->assertSame(1, $result['purgedObjects'], 'Only the absent diocese may be purged.');
     }
 
     public function testNoOperationalTuplesYieldsZeroPurgedObjects(): void

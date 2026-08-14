@@ -19,7 +19,7 @@ use LiturgicalCalendar\Api\Enum\Rite;
  *   rite_calendar_test           — fixed catalog; exists iff the id is a known Rite
  *   national_calendar            — jsondata/sourcedata/rite/roman/calendars/nations/{id}/{id}.json
  *   wider_region                 — jsondata/sourcedata/rite/roman/calendars/wider_regions/{id}/ (directory)
- *   diocesan_calendar            — jsondata/sourcedata/rite/roman/calendars/dioceses/{nation}/{id}/ (directory, glob)
+ *   diocesan_calendar            — jsondata/sourcedata/rite/{rite}/calendars/dioceses/{nation}/{id}/ (directory, glob across rites)
  *   national_calendar_test       — governance scope (id `<rite>/<calendarId>`); always treated as existing
  *   diocesan_calendar_test       — governance scope (id `<rite>/<calendarId>`); always treated as existing
  */
@@ -65,13 +65,7 @@ final class ResourceExistenceChecker implements ResourceExistenceCheckerInterfac
                 );
 
             case 'diocesan_calendar':
-                // Diocesan files live at dioceses/<NATION>/<dioceseId>/; check for the folder
-                // across all nation sub-directories via glob.
-                $matches = glob(
-                    JsonData::DIOCESAN_CALENDARS_FOLDER->path() . "/*/{$objectId}",
-                    GLOB_ONLYDIR
-                );
-                return $matches !== false && $matches !== [];
+                return self::diocesanCalendarExists($objectId);
 
             case 'national_calendar_test':
             case 'diocesan_calendar_test':
@@ -85,5 +79,36 @@ final class ResourceExistenceChecker implements ResourceExistenceCheckerInterfac
             default:
                 return false;
         }
+    }
+
+    /**
+     * True when a diocesan calendar of this id is defined under any rite.
+     *
+     * Diocesan files live at `dioceses/<NATION>/<dioceseId>/`, and the source tree is
+     * partitioned by rite. Globbing only the Roman partition reported every Ambrosian
+     * diocese as gone, and because the reconciler purges on this predicate that
+     * silently revoked live editor grants on the four Ambrosian dioceses (issue #786).
+     *
+     * Deliberately answers "under ANY rite" rather than a specific one: this decides
+     * what gets purged, so a false negative destroys a grant while a false positive
+     * merely keeps a stale tuple around for the next sweep.
+     */
+    private static function diocesanCalendarExists(string $objectId): bool
+    {
+        // A glob pattern is being built from this value, so anything outside the
+        // diocese-id character set is rejected rather than escaped. This also stops an
+        // empty id from matching every nation directory and reporting as existing.
+        if (1 !== preg_match('/\A[A-Za-z0-9_-]+\z/', $objectId)) {
+            return false;
+        }
+
+        foreach ([JsonData::DIOCESAN_CALENDARS_FOLDER, JsonData::AMBROSIAN_DIOCESAN_CALENDARS_FOLDER] as $folder) {
+            $matches = glob($folder->path() . "/*/{$objectId}", GLOB_ONLYDIR);
+            if ($matches !== false && $matches !== []) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

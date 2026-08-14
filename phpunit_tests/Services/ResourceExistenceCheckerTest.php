@@ -25,6 +25,40 @@ final class ResourceExistenceCheckerTest extends TestCase
         $this->assertTrue($checker->exists('general_roman_calendar_test', 'temporale'));
     }
 
+    /**
+     * Regression guard for issue #786.
+     *
+     * exists() used to glob only JsonData::DIOCESAN_CALENDARS_FOLDER, which derives
+     * from ROMAN_RITE_FOLDER, so every Ambrosian diocese reported as gone. Because
+     * ResourceTuplePurgeReconciler purges on exactly this predicate, a legitimate
+     * editor grant on an Ambrosian diocesan calendar was revoked on any sweep.
+     */
+    public function testAmbrosianDiocesanCalendarsExist(): void
+    {
+        $checker = new ResourceExistenceChecker();
+        foreach (['lugano_ch', 'milano_it', 'bergam_it', 'novara_it'] as $diocese) {
+            $this->assertTrue(
+                $checker->exists('diocesan_calendar', $diocese),
+                "Ambrosian diocese {$diocese} must not read as deleted — the reconciler purges on this."
+            );
+        }
+    }
+
+    public function testRomanDiocesanCalendarsStillExist(): void
+    {
+        $checker = new ResourceExistenceChecker();
+        foreach (['rotter_nl', 'romamo_it', 'boston_us'] as $diocese) {
+            $this->assertTrue($checker->exists('diocesan_calendar', $diocese));
+        }
+    }
+
+    public function testUnknownDiocesanCalendarDoesNotExistUnderEitherRite(): void
+    {
+        $checker = new ResourceExistenceChecker();
+        $this->assertFalse($checker->exists('diocesan_calendar', 'nowhere_zz'));
+        $this->assertFalse($checker->exists('diocesan_calendar', ''));
+    }
+
     public function testNonResourceTypeIsNotAResourceType(): void
     {
         $checker = new ResourceExistenceChecker();
