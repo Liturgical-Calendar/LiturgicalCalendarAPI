@@ -884,7 +884,11 @@ final class EventsHandler extends AbstractHandler
             'settings'      => [
                 'locale'            => $this->EventsParams->Locale,
                 'national_calendar' => $this->EventsParams->NationalCalendar,
-                'diocesan_calendar' => $this->EventsParams->DiocesanCalendar
+                'diocesan_calendar' => $this->EventsParams->DiocesanCalendar,
+                // Echoed for every rite, `roman` included, so consumers can branch on it without a
+                // presence check. A rite-level /events/ambrosian request sets neither national_calendar
+                // nor diocesan_calendar, so this is the only thing that distinguishes it from /events.
+                'rite'              => $this->EventsParams->Rite
             ]
         ];
         $responseBody = json_encode($responseObj, JSON_THROW_ON_ERROR);

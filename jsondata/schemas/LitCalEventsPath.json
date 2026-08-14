@@ -22,10 +22,13 @@
                   "diocesan_calendar": {
                     "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId",
                     "description": "indicates the Diocesan Calendar used to produce the data in `litcal_events`"
+                  },
+                  "rite": {
+                    "$ref": "./CommonDef.json#/definitions/Rite"
                   }
                 },
                 "additionalProperties": false,
-                "required": [ "locale", "national_calendar", "diocesan_calendar" ]
+                "required": [ "locale", "national_calendar", "diocesan_calendar", "rite" ]
               },
               {
                 "properties": {
@@ -39,10 +42,13 @@
                   },
                   "diocesan_calendar": {
                     "type": "null"
+                  },
+                  "rite": {
+                    "$ref": "./CommonDef.json#/definitions/Rite"
                   }
                 },
                 "additionalProperties": false,
-                "required": [ "locale", "national_calendar", "diocesan_calendar" ]
+                "required": [ "locale", "national_calendar", "diocesan_calendar", "rite" ]
               },
               {
                 "properties": {
@@ -54,10 +60,13 @@
                   },
                   "diocesan_calendar": {
                     "type": "null"
+                  },
+                  "rite": {
+                    "$ref": "./CommonDef.json#/definitions/Rite"
                   }
                 },
                 "additionalProperties": false,
-                "required": [ "locale", "national_calendar", "diocesan_calendar" ]
+                "required": [ "locale", "national_calendar", "diocesan_calendar", "rite" ]
               }
             ]
         }

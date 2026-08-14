@@ -4945,6 +4945,10 @@ final class CalendarHandler extends AbstractHandler
         $SerializeableLitCal->settings->year_type              = $this->CalendarParams->YearType;
         $SerializeableLitCal->settings->eternal_high_priest    = $this->CalendarParams->EternalHighPriest;
         $SerializeableLitCal->settings->holydays_of_obligation = $this->CalendarParams->HolyDaysOfObligation;
+        // Echoed for every rite, `roman` included, so consumers can branch on it without a presence check.
+        // A rite-level Ambrosian calendar sets neither national_calendar nor diocesan_calendar, so this is
+        // the only thing that tells it apart from the General Roman Calendar by payload alone.
+        $SerializeableLitCal->settings->rite = $this->CalendarParams->Rite;
         if ($this->CalendarParams->NationalCalendar !== null) {
             $SerializeableLitCal->settings->national_calendar = $this->CalendarParams->NationalCalendar;
         }
