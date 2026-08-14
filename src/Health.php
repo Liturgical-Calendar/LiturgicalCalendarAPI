@@ -19,6 +19,7 @@ use LiturgicalCalendar\Api\Enum\ICSErrorLevel;
 use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
@@ -46,8 +47,8 @@ use Psr\Http\Message\ResponseInterface;
  * @phpstan-type ExecuteValidationSourceFolder \stdClass&object{action:'executeValidation',category:'sourceDataCheck',validate:string,sourceFolder:string}
  * @phpstan-type ExecuteValidationSourceFile \stdClass&object{action:'executeValidation',category:'sourceDataCheck',validate:string,sourceFile:string}
  * @phpstan-type ExecuteValidationResource \stdClass&object{action:'executeValidation',category:'resourceDataCheck',validate:string,sourceFile:string}
- * @phpstan-type ValidateCalendar \stdClass&object{action:'validateCalendar',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar',responsetype:'JSON'|'XML'|'ICS'|'YML'}
- * @phpstan-type ExecuteUnitTest \stdClass&object{action:'executeUnitTest',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar',test:string}
+ * @phpstan-type ValidateCalendar \stdClass&object{action:'validateCalendar',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar'|'ritecalendar',responsetype:'JSON'|'XML'|'ICS'|'YML',rite?:string}
+ * @phpstan-type ExecuteUnitTest \stdClass&object{action:'executeUnitTest',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar'|'ritecalendar',test:string,rite?:string}
  *
  * @phpstan-import-type LiturgicalEvent from \LiturgicalCalendar\Api\Test\LitTestRunner
  */
@@ -374,7 +375,8 @@ class Health implements MessageComponentInterface
                         $messageReceived->year,
                         $messageReceived->category,
                         $messageReceived->responsetype,
-                        $from
+                        $from,
+                        self::readRiteHint($messageReceived)
                     );
                     break;
                 case 'executeUnitTest':
@@ -384,7 +386,8 @@ class Health implements MessageComponentInterface
                         $messageReceived->calendar,
                         $messageReceived->year,
                         $messageReceived->category,
-                        $from
+                        $from,
+                        self::readRiteHint($messageReceived)
                     );
                     break;
                 default:
@@ -973,21 +976,93 @@ class Health implements MessageComponentInterface
     }
 
     /**
-     * Build the calendar API request path based on calendar ID, year, and category.
+     * Read the optional `rite` property off an incoming WebSocket message.
+     *
+     * `rite` is optional — it is deliberately absent from `ACTION_PROPERTIES`,
+     * which lists only required properties — so clients that predate rite
+     * awareness keep working and get their rite resolved from metadata instead.
+     * A non-string value is treated as absent rather than as an error; the
+     * resolver validates the string against {@see Rite} in any case.
+     */
+    private static function readRiteHint(\stdClass $message): ?string
+    {
+        if (property_exists($message, 'rite') && is_string($message->rite)) {
+            return $message->rite;
+        }
+        return null;
+    }
+
+    /**
+     * Determine the rite a calendar request should be computed under.
+     *
+     * Resolution order:
+     *   1. an explicit `rite` on the WebSocket message, when it names a known {@see Rite};
+     *   2. for `diocesancalendar`, the rite `/calendars` announces for that diocese;
+     *   3. for `ritecalendar`, the calendar id itself read as a rite;
+     *   4. otherwise the default rite.
+     *
+     * Step 2 is what lets an existing, rite-unaware client keep working: the four
+     * Ambrosian dioceses need `/calendar/ambrosian/diocese/{id}` and 400 without
+     * the segment (issue #767). National calendars are Roman-only — `/calendars`
+     * announces no rite for them — so they fall through to step 4.
+     *
+     * @param string  $calendar The calendar identifier.
+     * @param string  $category The type of calendar ('nationalcalendar', 'diocesancalendar' or 'ritecalendar').
+     * @param ?string $riteHint The `rite` property of the incoming message, if any.
+     */
+    private function resolveRite(string $calendar, string $category, ?string $riteHint = null): Rite
+    {
+        if (null !== $riteHint) {
+            $rite = Rite::tryFrom($riteHint);
+            if (null !== $rite) {
+                return $rite;
+            }
+        }
+
+        if ($category === 'diocesancalendar') {
+            try {
+                return $this->findDioceseMetadata($calendar)->rite;
+            } catch (\RuntimeException | NotFoundException) {
+                // Metadata not loaded yet, or an unknown diocese: fall through to
+                // the default. The request itself will report the real problem.
+                return Rite::default();
+            }
+        }
+
+        if ($category === 'ritecalendar') {
+            return Rite::tryFrom($calendar) ?? Rite::default();
+        }
+
+        return Rite::default();
+    }
+
+    /**
+     * Build the calendar API request path based on calendar ID, year, category and rite.
+     *
+     * The rite segment is always emitted explicitly (`/roman/...`, `/ambrosian/...`),
+     * which is the canonical URL form {@see Rite} documents. It is required — not
+     * merely canonical — for Ambrosian diocesan calendars, which 400 without it.
      *
      * @param string $calendar The calendar identifier (e.g., 'VA' for Vatican, 'USA' for national).
      * @param int $year The year for the calendar request.
-     * @param string $category The type of calendar ('nationalcalendar' or 'diocesancalendar').
+     * @param string $category The type of calendar ('nationalcalendar', 'diocesancalendar' or 'ritecalendar').
+     * @param Rite $rite The rite the calendar is computed under.
      * @return string The constructed request path.
      */
-    private function buildCalendarRequestPath(string $calendar, int $year, string $category): string
+    private function buildCalendarRequestPath(string $calendar, int $year, string $category, Rite $rite): string
     {
-        if ($calendar === 'VA') {
-            return "/$year?year_type=CIVIL";
+        $ritePath = '/' . $rite->value;
+
+        // 'VA' is the historical marker for "the rite-level calendar", not a
+        // request for /nation/VA; it predates the `ritecalendar` category and
+        // resolves the same way.
+        if ($calendar === 'VA' || $category === 'ritecalendar') {
+            return "$ritePath/$year?year_type=CIVIL";
         }
+
         return match ($category) {
-            'nationalcalendar'  => "/nation/$calendar/$year?year_type=CIVIL",
-            'diocesancalendar'  => "/diocese/$calendar/$year?year_type=CIVIL",
+            'nationalcalendar'  => "$ritePath/nation/$calendar/$year?year_type=CIVIL",
+            'diocesancalendar'  => "$ritePath/diocese/$calendar/$year?year_type=CIVIL",
             default             => throw new \InvalidArgumentException("Unknown calendar category: {$category}")
         };
     }
@@ -998,15 +1073,16 @@ class Health implements MessageComponentInterface
      *
      * @param string $calendar The calendar identifier (e.g., 'VA' for Vatican).
      * @param int $year The year for which the calendar is to be validated.
-     * @param string $category The type of calendar (e.g., 'nationalcalendar', 'diocesancalendar').
+     * @param string $category The type of calendar (e.g., 'nationalcalendar', 'diocesancalendar', 'ritecalendar').
      * @param string $responseType The response format type (e.g., 'JSON', 'XML', 'ICS', 'YML').
      * @param ConnectionInterface $to The connection to which messages about the validation process are sent.
+     * @param ?string $riteHint The `rite` property of the incoming message, if any.
      *
      * This function retrieves the calendar data from a remote source based on the given parameters
      * and validates it against the appropriate schema. It supports multiple response types, including
      * XML, ICS, YML, and JSON. Validation results are sent as messages to the provided connection interface.
      */
-    private function validateCalendar(string $calendar, int $year, string $category, string $responseType, ConnectionInterface $to): void
+    private function validateCalendar(string $calendar, int $year, string $category, string $responseType, ConnectionInterface $to, ?string $riteHint = null): void
     {
         $runToken        = $this->resolveRunToken($to);
         $returnTypeParam = ReturnTypeParam::from($responseType);
@@ -1018,7 +1094,7 @@ class Health implements MessageComponentInterface
             'stream'  => true
         ];
 
-        $req     = $this->buildCalendarRequestPath($calendar, $year, $category);
+        $req     = $this->buildCalendarRequestPath($calendar, $year, $category, $this->resolveRite($calendar, $category, $riteHint));
         $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts, 300, $to);
         $promise->then(
             function (array $result) use ($to, $calendar, $year, $category, $req, $responseType, $runToken) {
@@ -1265,10 +1341,11 @@ class Health implements MessageComponentInterface
      * @param string $test The name of the unit test to be executed.
      * @param string $calendar The name of the calendar to be tested.
      * @param int $year The year for which the test should be executed.
-     * @param string $category The type of calendar to be tested: nationalcalendar or diocesancalendar.
+     * @param string $category The type of calendar to be tested: nationalcalendar, diocesancalendar or ritecalendar.
      * @param ConnectionInterface $to The connection to which the test result should be sent.
+     * @param ?string $riteHint The `rite` property of the incoming message, if any.
      */
-    private function executeUnitTest(string $test, string $calendar, int $year, string $category, ConnectionInterface $to): void
+    private function executeUnitTest(string $test, string $calendar, int $year, string $category, ConnectionInterface $to, ?string $riteHint = null): void
     {
         $runToken        = $this->resolveRunToken($to);
         $returnTypeParam = ReturnTypeParam::JSON;
@@ -1280,7 +1357,7 @@ class Health implements MessageComponentInterface
             'stream'  => true
         ];
 
-        $req     = $this->buildCalendarRequestPath($calendar, $year, $category);
+        $req     = $this->buildCalendarRequestPath($calendar, $year, $category, $this->resolveRite($calendar, $category, $riteHint));
         $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts, 300, $to);
         $promise->then(
             function (array $result) use ($to, $test, $year, $runToken) {

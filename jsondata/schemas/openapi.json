@@ -3113,7 +3113,7 @@
                           "permissions": [
                             {
                               "object_type": "national_calendar_test",
-                              "object_id": "IT",
+                              "object_id": "roman/IT",
                               "relation": "viewer"
                             }
                           ],
@@ -3538,7 +3538,8 @@
                 "wider_region",
                 "national_calendar_test",
                 "diocesan_calendar_test",
-                "general_roman_calendar_test"
+                "general_roman_calendar_test",
+                "rite_calendar_test"
               ]
             }
           },
@@ -3904,7 +3905,8 @@
                 "wider_region",
                 "national_calendar_test",
                 "diocesan_calendar_test",
-                "general_roman_calendar_test"
+                "general_roman_calendar_test",
+                "rite_calendar_test"
               ]
             }
           },
@@ -6741,6 +6743,9 @@
                       "description": "The memorial 'Mary Mother of the Church' was added in 2018 by Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments on the Monday after Pentecost",
                       "test_type": "exactCorrespondenceSince",
                       "year_since": 2018,
+                      "applies_to": {
+                        "rite": "roman"
+                      },
                       "assertions": [
                         {
                           "year": 2017,
@@ -6767,6 +6772,9 @@
                       "event_key": "NativityJohnBaptist",
                       "description": "When the Nativity of John the Baptist coincides with the Solemnity of the Sacred Heart, is it correctly moved to June 23?",
                       "test_type": "exactCorrespondence",
+                      "applies_to": {
+                        "rite": "roman"
+                      },
                       "assertions": [
                         {
                           "year": 2022,
@@ -6795,6 +6803,7 @@
                       "test_type": "exactCorrespondenceSince",
                       "year_since": 2011,
                       "applies_to": {
+                        "rite": "roman",
                         "national_calendar": "US"
                       },
                       "assertions": [
@@ -6831,6 +6840,9 @@
                       "event_key": "StJaneFrancesDeChantal",
                       "description": "Saint Jane Frances de Chantal was moved from December 12 to August 12 in the 2002 Latin Edition of the Roman Missal, to allow bishops conferences to insert Our Lady of Guadalupe as an optional memorial on December 12. DOES ST JANE FRANCES DE CHANTAL FALL ON THE RIGHT DAY BOTH BEFORE AND AFTER 2002, OR IT CORRECTLY OVERRIDEN BY GREATER FESTIVITIES?",
                       "test_type": "exactCorrespondence",
+                      "applies_to": {
+                        "rite": "roman"
+                      },
                       "assertions": [
                         {
                           "year": 2001,
@@ -6915,6 +6927,9 @@
                   "description": "The memorial 'Mary Mother of the Church' was added in 2018 by Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments on the Monday after Pentecost",
                   "test_type": "exactCorrespondenceSince",
                   "year_since": 2018,
+                  "applies_to": {
+                    "rite": "roman"
+                  },
                   "assertions": [
                     {
                       "year": 2017,
@@ -8371,10 +8386,10 @@
             }
           },
           "applies_to": {
-            "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
+            "$ref": "./LitCalTest.json#/definitions/AppliesToScope"
           },
           "excludes": {
-            "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
+            "$ref": "./LitCalTest.json#/definitions/ExcludesScope"
           }
         },
         "required": [
@@ -8382,6 +8397,7 @@
           "event_key",
           "description",
           "test_type",
+          "applies_to",
           "assertions"
         ]
       },
@@ -8431,10 +8447,10 @@
             }
           },
           "applies_to": {
-            "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
+            "$ref": "./LitCalTest.json#/definitions/AppliesToScope"
           },
           "excludes": {
-            "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
+            "$ref": "./LitCalTest.json#/definitions/ExcludesScope"
           }
         },
         "required": [
@@ -8442,6 +8458,7 @@
           "event_key",
           "description",
           "test_type",
+          "applies_to",
           "assertions",
           "year_since"
         ]
@@ -8492,10 +8509,10 @@
             }
           },
           "applies_to": {
-            "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
+            "$ref": "./LitCalTest.json#/definitions/AppliesToScope"
           },
           "excludes": {
-            "$ref": "./LitCalTest.json#/definitions/AppliesToOrExcludes"
+            "$ref": "./LitCalTest.json#/definitions/ExcludesScope"
           }
         },
         "required": [
@@ -8503,6 +8520,7 @@
           "event_key",
           "description",
           "test_type",
+          "applies_to",
           "assertions",
           "year_until"
         ]
@@ -8720,7 +8738,8 @@
               "wider_region",
               "national_calendar_test",
               "diocesan_calendar_test",
-              "general_roman_calendar_test"
+              "general_roman_calendar_test",
+              "rite_calendar_test"
             ],
             "description": "OpenFGA object type"
           },
@@ -9172,7 +9191,8 @@
               "wider_region",
               "national_calendar_test",
               "diocesan_calendar_test",
-              "general_roman_calendar_test"
+              "general_roman_calendar_test",
+              "rite_calendar_test"
             ]
           },
           "object_id": {
@@ -10299,7 +10319,7 @@
           },
           "viewer_scopes": {
             "type": "object",
-            "description": "Object IDs the caller can view (viewer-or-above), keyed by OpenFGA object type. Keys cover general_roman_calendar, national_calendar_test, diocesan_calendar_test and general_roman_calendar_test.",
+            "description": "Object IDs the caller can view (viewer-or-above), keyed by OpenFGA object type. Keys cover general_roman_calendar, national_calendar_test, diocesan_calendar_test, general_roman_calendar_test and rite_calendar_test. Scoped test ids are rite-qualified as `<rite>/<calendarId>` (e.g. `ambrosian/lugano_ch`), because a bare calendar id does not identify a calendar; `rite_calendar_test` ids are the rite itself.",
             "additionalProperties": {
               "type": "array",
               "items": {
@@ -10312,10 +10332,13 @@
                 "decrees"
               ],
               "national_calendar_test": [
-                "IT"
+                "roman/IT"
               ],
               "diocesan_calendar_test": [],
-              "general_roman_calendar_test": []
+              "general_roman_calendar_test": [],
+              "rite_calendar_test": [
+                "roman"
+              ]
             }
           }
         },
@@ -10345,7 +10368,8 @@
                   "enum": [
                     "national_calendar_test",
                     "diocesan_calendar_test",
-                    "general_roman_calendar_test"
+                    "general_roman_calendar_test",
+                    "rite_calendar_test"
                   ],
                   "example": "national_calendar_test",
                   "description": "The OpenFGA object type."
@@ -10374,7 +10398,8 @@
                   "enum": [
                     "national_calendar_test",
                     "diocesan_calendar_test",
-                    "general_roman_calendar_test"
+                    "general_roman_calendar_test",
+                    "rite_calendar_test"
                   ],
                   "example": "national_calendar_test",
                   "description": "The OpenFGA object type."

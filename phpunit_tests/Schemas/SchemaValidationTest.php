@@ -617,25 +617,27 @@ class SchemaValidationTest extends TestCase
     }
 
     /**
-     * Test loading a real test source file against its schema.
+     * Every real test source file must validate against its schema.
      *
-     * @group slow
+     * Deliberately data-driven over the whole `jsondata/tests/` corpus rather
+     * than a single `glob()[0]`: a requirement newly added to LitCalTest.json
+     * (e.g. `applies_to.rite`, issue #767) has to be satisfied by *all* the
+     * test files, and checking only the alphabetically-first one lets the rest
+     * drift unnoticed.
+     *
+     * Uses the #[Group('slow')] attribute rather than a `@group slow` docblock,
+     * which PHPUnit 12 does not honour — see the sibling Ambrosian temporale test
+     * above. CI runs the whole suite (`composer test:coverage`, no exclusions), so
+     * the corpus is still checked on every run.
      */
-    public function testRealTestSourceValidation(): void
+    #[Group('slow')]
+    #[DataProvider('realTestSourceFileProvider')]
+    public function testRealTestSourceValidation(string $testFile): void
     {
         $schemaPath = LitSchema::TEST_SRC->path();
         $schema     = Schema::import($schemaPath);
 
-        // Try to find any test source file (in jsondata/tests/, not sourcedata)
-        $testsPath = JsonData::TESTS_FOLDER->path();
-        $files     = glob($testsPath . '/*.json');
-
-        if (empty($files) || $files === false) {
-            $this->markTestSkipped('No test source files found');
-        }
-
-        $testFile = $files[0];
-        $content  = file_get_contents($testFile);
+        $content = file_get_contents($testFile);
         $this->assertIsString($content);
 
         $data = json_decode($content);
@@ -644,5 +646,25 @@ class SchemaValidationTest extends TestCase
         // This should not throw
         $schema->in($data);
         $this->assertTrue(true, "Real test source file should pass validation: $testFile");
+    }
+
+    /**
+     * @return array<string,array{string}>
+     */
+    public static function realTestSourceFileProvider(): array
+    {
+        // Test source files live in jsondata/tests/, not sourcedata. Resolved
+        // from the repo root rather than via JsonData::TESTS_FOLDER, because a
+        // data provider runs before any test can initialise Router::$apiFilePath.
+        $files = glob(dirname(__DIR__, 2) . '/jsondata/tests/*.json');
+        if (empty($files) || $files === false) {
+            return [];
+        }
+
+        $cases = [];
+        foreach ($files as $file) {
+            $cases[basename($file)] = [$file];
+        }
+        return $cases;
     }
 }

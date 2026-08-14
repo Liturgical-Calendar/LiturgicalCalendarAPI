@@ -5,6 +5,7 @@
     "test_type": "exactCorrespondenceSince",
     "year_since": 2011,
     "applies_to": {
+        "rite": "roman",
         "national_calendar": "US"
     },
     "assertions": [

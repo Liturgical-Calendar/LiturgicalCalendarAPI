@@ -285,10 +285,10 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:user-123', 'editor', 'national_calendar_test:US')
+            ->with('user:user-123', 'editor', 'national_calendar_test:roman/US')
             ->willReturn(true);
 
-        $resolver   = static fn () => ['national_calendar_test', 'US'];
+        $resolver   = static fn () => ['national_calendar_test', 'roman/US'];
         $middleware = new OpenFgaAuthorizationMiddleware(
             $client,
             'test_definition',
@@ -310,10 +310,10 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:user-123', 'editor', 'national_calendar_test:US')
+            ->with('user:user-123', 'editor', 'national_calendar_test:roman/US')
             ->willReturn(false);
 
-        $resolver   = static fn () => ['national_calendar_test', 'US'];
+        $resolver   = static fn () => ['national_calendar_test', 'roman/US'];
         $middleware = new OpenFgaAuthorizationMiddleware(
             $client,
             'test_definition',
@@ -327,7 +327,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
             ->withAttribute('test_id', 'some-test');
 
         $this->expectException(ForbiddenException::class);
-        $this->expectExceptionMessage('national_calendar_test:US');
+        $this->expectExceptionMessage('national_calendar_test:roman/US');
         $middleware->process($request, $this->nextHandler);
     }
 
@@ -385,7 +385,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:user-123', 'editor', 'national_calendar_test:US')
+            ->with('user:user-123', 'editor', 'national_calendar_test:roman/US')
             ->willReturn(true);
 
         // TestScopeResolver is final; use a real instance backed by a temp dir.
@@ -437,7 +437,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:user-123', 'editor', 'national_calendar_test:US')
+            ->with('user:user-123', 'editor', 'national_calendar_test:roman/US')
             ->willReturn(true);
 
         // TestScopeResolver is final; use a real instance backed by a temp dir.
@@ -470,10 +470,10 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:user-123', 'editor', 'national_calendar_test:US')
+            ->with('user:user-123', 'editor', 'national_calendar_test:roman/US')
             ->willReturn(true);
 
-        $resolver   = static fn () => ['national_calendar_test', 'US'];
+        $resolver   = static fn () => ['national_calendar_test', 'roman/US'];
         $middleware = new OpenFgaAuthorizationMiddleware(
             $client,
             'test_definition',
@@ -517,7 +517,7 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:user-123', 'editor', 'national_calendar_test:NL')
+            ->with('user:user-123', 'editor', 'national_calendar_test:roman/NL')
             ->willReturn(true);
 
         // Empty temp dir: the test file does NOT exist (create flow).

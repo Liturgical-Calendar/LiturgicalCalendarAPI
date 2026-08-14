@@ -4,6 +4,9 @@
     "description": "The memorial 'Mary Mother of the Church' was added in 2018 by Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments on the Monday after Pentecost",
     "test_type": "exactCorrespondenceSince",
     "year_since": 2018,
+    "applies_to": {
+        "rite": "roman"
+    },
     "assertions": [
         {
             "year": 2015,

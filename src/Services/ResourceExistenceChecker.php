@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Services;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\Rite;
 
 /**
  * Decides whether the backing data for an OpenFGA object still exists on disk.
@@ -15,11 +16,12 @@ use LiturgicalCalendar\Api\Enum\JsonData;
  * Resource types and their backing-data locations:
  *   general_roman_calendar       — fixed; always exists
  *   general_roman_calendar_test  — fixed; always exists
+ *   rite_calendar_test           — fixed catalog; exists iff the id is a known Rite
  *   national_calendar            — jsondata/sourcedata/rite/roman/calendars/nations/{id}/{id}.json
  *   wider_region                 — jsondata/sourcedata/rite/roman/calendars/wider_regions/{id}/ (directory)
  *   diocesan_calendar            — jsondata/sourcedata/rite/roman/calendars/dioceses/{nation}/{id}/ (directory, glob)
- *   national_calendar_test       — governance scope; always treated as existing
- *   diocesan_calendar_test       — governance scope; always treated as existing
+ *   national_calendar_test       — governance scope (id `<rite>/<calendarId>`); always treated as existing
+ *   diocesan_calendar_test       — governance scope (id `<rite>/<calendarId>`); always treated as existing
  */
 final class ResourceExistenceChecker implements ResourceExistenceCheckerInterface
 {
@@ -32,6 +34,7 @@ final class ResourceExistenceChecker implements ResourceExistenceCheckerInterfac
         'national_calendar_test',
         'diocesan_calendar_test',
         'general_roman_calendar_test',
+        'rite_calendar_test',
     ];
 
     public function isResourceType(string $objectType): bool
@@ -46,6 +49,10 @@ final class ResourceExistenceChecker implements ResourceExistenceCheckerInterfac
             case 'general_roman_calendar_test':
                 // Fixed catalog ids — always present.
                 return true;
+
+            case 'rite_calendar_test':
+                // Fixed catalog, one entry per rite the API can compute.
+                return null !== Rite::tryFrom($objectId);
 
             case 'national_calendar':
                 return is_file(
@@ -69,7 +76,10 @@ final class ResourceExistenceChecker implements ResourceExistenceCheckerInterfac
             case 'national_calendar_test':
             case 'diocesan_calendar_test':
                 // Scoped test objects are governance scopes, not file-backed resources.
-                // Treat as always existing to avoid false purges.
+                // Treat as always existing to avoid false purges. Deliberately not
+                // validating the `<rite>/<calendarId>` shape here: during the migration
+                // window legacy unqualified ids are still in the store, and this method
+                // decides what the reconciler *purges*.
                 return true;
 
             default:

@@ -38,6 +38,7 @@ final class TestsMapTest extends TestCase
             'event_key'   => 'evt',
             'description' => 'd',
             'test_type'   => 'exactCorrespondenceSince',
+            'applies_to'  => (object) ['rite' => 'roman'],
             'assertions'  => $assertions,
         ];
     }

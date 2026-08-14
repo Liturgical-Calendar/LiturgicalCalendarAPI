@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Services;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\Rite;
 
 /**
  * Maps a test file name to the OpenFGA (object type, object id) pair that
@@ -13,9 +14,26 @@ use LiturgicalCalendar\Api\Enum\JsonData;
  * Reads `{testsDir}/{testName}.json` and inspects the top-level `applies_to`
  * key:
  *
- *   - `{"diocesan_calendar": "<id>"}` → `['diocesan_calendar_test', '<id>']`
- *   - `{"national_calendar": "<id>"}` → `['national_calendar_test', '<id>']`
- *   - absent / empty / other          → `['general_roman_calendar_test', 'general_roman_calendar']`
+ *   - `{"rite": "<r>", "diocesan_calendar": "<id>"}` → `['diocesan_calendar_test', '<r>/<id>']`
+ *   - `{"rite": "<r>", "national_calendar": "<id>"}` → `['national_calendar_test', '<r>/<id>']`
+ *   - `{"rite": "<r>"}`                              → `['rite_calendar_test', '<r>']`
+ *   - absent / empty / other                         → `['rite_calendar_test', 'roman']`
+ *
+ * **Every scope carries its rite.** A calendar id alone does not identify a
+ * calendar: `lugano_ch` could name an Ambrosian calendar or a Roman one, and the
+ * source tree is already partitioned that way
+ * (`jsondata/sourcedata/rite/{rite}/calendars/...`), so nothing stops the same
+ * diocese from being defined under both. Granting `diocesan_calendar_test` on a
+ * bare `lugano_ch` would therefore be an ambiguous grant. National scopes are
+ * qualified too, for one uniform rule — even though only the Roman rite has a
+ * national tier today.
+ *
+ * `rite_calendar_test` generalises the older `general_roman_calendar_test`,
+ * whose single fixed id `general_roman_calendar` denoted exactly the Roman
+ * rite-level calendar; `rite_calendar_test:roman` is its successor and
+ * `rite_calendar_test:ambrosian` the scope this generalisation unlocks
+ * (issue #767). The old type is still accepted everywhere so pre-migration
+ * tuples keep authorizing — see `scripts/migrate-rite-test-tuples.php`.
  *
  * Returns `null` when the test file is missing or unreadable.
  */
@@ -26,6 +44,51 @@ final class TestScopeResolver
     public function __construct(?string $testsDir = null)
     {
         $this->testsDir = $testsDir ?? JsonData::TESTS_FOLDER->path();
+    }
+
+    /**
+     * Separates the rite from the calendar id inside a scoped-test object id.
+     *
+     * `/` is safe in an OpenFGA object id (only whitespace, `:`, `#` and `*` carry
+     * meaning) and reads as the hierarchy it is: rite over calendar.
+     */
+    public const RITE_SEPARATOR = '/';
+
+    /**
+     * Compose the rite-qualified object id for a national or diocesan test scope.
+     *
+     * The single definition of the qualified-id format; parseQualifiedId() is its
+     * inverse. Everything that writes or reads one of these ids goes through here
+     * rather than re-implementing the concatenation.
+     */
+    public static function qualify(Rite $rite, string $calendarId): string
+    {
+        return $rite->value . self::RITE_SEPARATOR . $calendarId;
+    }
+
+    /**
+     * Split a rite-qualified object id back into its rite and calendar id.
+     *
+     * Returns null when the id is not rite-qualified — an unmigrated legacy id
+     * such as a bare `rotter_nl`, or a prefix that names no known rite.
+     *
+     * @return array{0: Rite, 1: string}|null
+     */
+    public static function parseQualifiedId(string $objectId): ?array
+    {
+        $pos = strpos($objectId, self::RITE_SEPARATOR);
+        if (false === $pos) {
+            return null;
+        }
+
+        $rite       = Rite::tryFrom(substr($objectId, 0, $pos));
+        $calendarId = substr($objectId, $pos + strlen(self::RITE_SEPARATOR));
+
+        if (null === $rite || '' === $calendarId) {
+            return null;
+        }
+
+        return [$rite, $calendarId];
     }
 
     /**
@@ -52,15 +115,28 @@ final class TestScopeResolver
      */
     private static function mapAppliesTo(mixed $appliesTo): array
     {
+        // `applies_to.rite` is required by the schema, but resolve() also runs
+        // over files written before that requirement and resolveFromPayload()
+        // over payloads the handler has not yet validated, so an absent or
+        // unknown rite falls back to the default (Roman) rather than failing to
+        // resolve a scope at all.
+        $rite = null;
+        if (is_array($appliesTo) && isset($appliesTo['rite']) && is_string($appliesTo['rite'])) {
+            $rite = Rite::tryFrom($appliesTo['rite']);
+        }
+        $rite ??= Rite::default();
+
         if (is_array($appliesTo) && isset($appliesTo['diocesan_calendar']) && is_string($appliesTo['diocesan_calendar'])) {
-            return ['diocesan_calendar_test', $appliesTo['diocesan_calendar']];
+            return ['diocesan_calendar_test', self::qualify($rite, $appliesTo['diocesan_calendar'])];
         }
 
         if (is_array($appliesTo) && isset($appliesTo['national_calendar']) && is_string($appliesTo['national_calendar'])) {
-            return ['national_calendar_test', $appliesTo['national_calendar']];
+            return ['national_calendar_test', self::qualify($rite, $appliesTo['national_calendar'])];
         }
 
-        return ['general_roman_calendar_test', 'general_roman_calendar'];
+        // No national or diocesan calendar named: the test is scoped to the
+        // rite-level calendar, whose id is the rite itself.
+        return ['rite_calendar_test', $rite->value];
     }
 
     /**
