@@ -189,5 +189,20 @@ final class AmbrosianAdLibitumColorTest extends AbstractHandlerTestCase
         self::assertNotNull($vigil, "AllSouls_vigil not found in the {$year} Ambrosian calendar");
         self::assertSame('AllSouls', $vigil->is_vigil_for);
         self::assertSame($expectedColors, $vigil->color);
+
+        // Assert the inheritance itself, not merely that both happen to match a literal:
+        // compare the vigil's resolved colours against the celebration it opens. Without
+        // this, a regression that gave the vigil its own resolution would still pass as
+        // long as it landed on the same values.
+        $allSouls = array_find(
+            $payload->litcal,
+            static fn (\stdClass $event): bool => $event->event_key === 'AllSouls'
+        );
+        self::assertNotNull($allSouls, "AllSouls not found in the {$year} Ambrosian calendar");
+        self::assertSame(
+            $allSouls->color,
+            $vigil->color,
+            "AllSouls_vigil must carry the same resolved colours as the AllSouls celebration it opens ({$year})"
+        );
     }
 }
