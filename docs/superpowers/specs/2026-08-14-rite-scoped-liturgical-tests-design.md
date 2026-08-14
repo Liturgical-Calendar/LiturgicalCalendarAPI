@@ -177,7 +177,11 @@ assertions become `eventNotExists` / `expected_value: null`, matching the patter
   is a breaking change for that editor's PUT/PATCH payloads, so it needs a companion change in that
   repo. Tracked separately.
 - **Removing `general_roman_calendar_test`.** Additive now, removal once all deployments run merged code.
-- **Rite-qualifying diocesan/national calendar ids** in the resource model.
+- **Rite-qualifying the data resource types** (`national_calendar`, `diocesan_calendar`, `wider_region`) —
+  [#786](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/786). Same ambiguity, but the
+  blast radius is production calendar-editing grants plus `/data` rite-awareness. That issue also records a
+  live bug found while scoping it: `ResourceExistenceChecker` globs only the Roman partition, so all four
+  Ambrosian dioceses read as deleted and the reconciler would purge their grants.
 
 ## Testing
 
