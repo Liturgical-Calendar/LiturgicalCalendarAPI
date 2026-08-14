@@ -38,6 +38,40 @@
                 ]
             }
         },
+        "RomanLitColor": {
+            "type": "array",
+            "title": "Liturgical Color (Roman rite)",
+            "description": "the subset of `LitColor` licit in the Roman rite: green, red, white, purple and rose. `morello` and `black` are Ambrosian and must not appear in Roman source data. This definition is NOT referenced by the response schemas — those enumerate the union across rites, since neither JSON Schema nor XML Schema can key a color facet off the rite of the containing document. It is the source-data counterpart of `RomanRiteProfile::colors()`, which is the authoritative statement of the palette; see issue #771.",
+            "uniqueItems": true,
+            "minItems": 1,
+            "items": {
+                "type": "string",
+                "enum": [
+                    "white",
+                    "red",
+                    "green",
+                    "purple",
+                    "rose"
+                ]
+            }
+        },
+        "AmbrosianLitColor": {
+            "type": "array",
+            "title": "Liturgical Color (Ambrosian rite)",
+            "description": "the subset of `LitColor` licit in the Ambrosian rite: green, red, white, morello and black (praenotanda of the 2024 Ambrosian Missal, §350). `purple` and `rose` are Roman and must not appear in Ambrosian source data — the Ambrosian violet-family color is `morello`. `black` is admitted by the Ordinamento Generale del Messale Ambrosiano n. 320 as an optional alternative to `morello` on Lenten ferias (Saturday excluded) and in offices and Masses for the dead, Sundays excluded. This definition is NOT referenced by the response schemas — those enumerate the union across rites. It is the source-data counterpart of `AmbrosianRiteProfile::colors()`, which is the authoritative statement of the palette; see issue #771.",
+            "uniqueItems": true,
+            "minItems": 1,
+            "items": {
+                "type": "string",
+                "enum": [
+                    "white",
+                    "red",
+                    "green",
+                    "morello",
+                    "black"
+                ]
+            }
+        },
         "LitCommon": {
             "type": "array",
             "title": "Liturgical Common",
