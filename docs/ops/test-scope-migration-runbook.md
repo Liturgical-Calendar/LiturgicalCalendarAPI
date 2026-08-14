@@ -389,7 +389,9 @@ Editors should retain access. Spot-check a diocesan grant of each rite:
 # Mirrors what OpenFgaClient sends: the bearer token when OPENFGA_API_TOKEN is set,
 # and the pinned model id — omitting authorization_model_id checks against the store's
 # latest model rather than the one the API is running.
-curl -s "$OPENFGA_API_URL/stores/$OPENFGA_STORE_ID/check" \
+# -fsS so an HTTP 4xx/5xx fails the command: plain `curl -s` exits 0 on an error
+# response, which would read as a successful verification.
+curl -fsS "$OPENFGA_API_URL/stores/$OPENFGA_STORE_ID/check" \
   -H 'Content-Type: application/json' \
   ${OPENFGA_API_TOKEN:+-H "Authorization: Bearer $OPENFGA_API_TOKEN"} \
   -d '{
@@ -399,8 +401,11 @@ curl -s "$OPENFGA_API_URL/stores/$OPENFGA_STORE_ID/check" \
           "relation": "editor",
           "object": "diocesan_calendar:ambrosian/lugano_ch"
         }
-      }'
+      }' | jq -e '.allowed'
 ```
+
+`jq -e` exits non-zero when `allowed` is false or absent, so a denied check fails the
+command too rather than printing `{"allowed":false}` and exiting 0.
 
 ### Step 3 — prune (later)
 
