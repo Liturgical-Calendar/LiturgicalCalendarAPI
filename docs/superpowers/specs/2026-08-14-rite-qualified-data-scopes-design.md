@@ -54,6 +54,13 @@ of this id exist under any rite", and only returns false when none does.
 `national_calendar` and `wider_region` remain Roman-only lookups (no Ambrosian tier exists), tolerating an
 optional `roman/` prefix once step 3 lands.
 
+**A second false negative, found while writing the migration.** The Vatican is announced as a national
+calendar but is still served by the General Roman Calendar and has no `nations/VA/VA.json` of its own yet,
+so `exists('national_calendar', 'VA')` returned false and the reconciler would purge any
+`national_calendar:VA` grant — the same silent revocation, and the id is accepted as valid when the grant is
+requested. `exists()` special-cases VA, with a comment marking the case for removal once the Vatican gains
+its folder.
+
 ## 2. `/data` rite-awareness
 
 `Router::extractRiteSegment()` already strips a leading rite segment for `calendar`, `events` and the root
@@ -121,8 +128,13 @@ no new type to add and no model version to ship.
 `scripts/migrate-rite-data-tuples.php`, mirroring `migrate-rite-test-tuples.php`: copy-only by default,
 `--prune` gated behind full rollout, idempotent, already-qualified ids recognised and skipped.
 
-Each calendar's rite is inferred from the rite-partitioned source tree, which is the authority. An id defined
-under two rites, or under none, is reported and skipped — never guessed — and the run exits `2`.
+Only a **diocese's** rite is inferred from the source tree. National calendars and wider regions exist
+exclusively in the Roman rite, so their rite is a constant — and using the filesystem for them would have
+been fragile as well as redundant, since the Vatican has no folder yet and would have been skipped. A diocese
+id defined under two rites, or under none, is reported and skipped — never guessed — and the run exits `2`.
+
+`member_nation` tuples are rewritten on both sides: their user side is a `national_calendar:` object rather
+than a `user:`.
 
 These are **production calendar-editing grants**, not test-authoring scopes, so the rollback story matters
 more than it did in #785: the unqualified ids stay valid in every allow-list until the prune step.
