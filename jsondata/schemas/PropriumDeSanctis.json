@@ -26,7 +26,10 @@
                     "$ref": "./CommonDef.json#/definitions/LitGrade"
                 },
                 "grade_display": {
-                    "type": ["string", "null"]
+                    "type": [
+                        "string",
+                        "null"
+                    ]
                 },
                 "common": {
                     "$ref": "./CommonDef.json#/definitions/LitCommon"
@@ -44,6 +47,9 @@
                 "is_bvm": {
                     "type": "boolean",
                     "description": "Marks a celebration of the Blessed Virgin Mary, used by the Ambrosian precedence classifier to rank a memorial of the BVM above a memorial of a saint within the comune memorial tier. Optional; omitted for events where the distinction does not apply. Not serialized in API responses."
+                },
+                "color_ad_libitum": {
+                    "$ref": "CommonDef.json#/definitions/LitColorAdLibitum"
                 }
             },
             "required": [

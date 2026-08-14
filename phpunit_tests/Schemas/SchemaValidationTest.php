@@ -97,9 +97,18 @@ class SchemaValidationTest extends TestCase
         }
 
         foreach ($node as $key => $value) {
-            if ($key === 'color' && is_array($value)) {
-                $found[] = array_values($value);
-                continue;
+            if ($key === 'color') {
+                // An event's `color` is an array; a `color_ad_libitum` entry's `color` is a
+                // bare string (issue #781). Normalise both so the rite-scoped subset applies
+                // to conditional colours too.
+                if (is_array($value)) {
+                    $found[] = array_values($value);
+                    continue;
+                }
+                if (is_string($value)) {
+                    $found[] = [$value];
+                    continue;
+                }
             }
             self::collectColorArrays($value, $found);
         }

@@ -3,6 +3,7 @@
 namespace LiturgicalCalendar\Api\Models;
 
 use LiturgicalCalendar\Api\DateTime;
+use LiturgicalCalendar\Api\Enum\AdLibitumColorCondition;
 use LiturgicalCalendar\Api\Enum\LitColor;
 use LiturgicalCalendar\Api\Enum\LitEventType;
 use LiturgicalCalendar\Api\Enum\LitGrade;
@@ -23,8 +24,16 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
     public readonly string $event_key;
     public readonly int $day;
     public readonly int $month;
-    /** @var LitColor[] $color */
-    public readonly array $color;
+    /**
+     * The liturgical colours licit for this celebration.
+     *
+     * `private(set)` rather than `readonly` because {@see self::resolveAdLibitumColors()}
+     * may append an *ad libitum* colour once the date is known (issue #781). Every other
+     * writer is outside the class and unaffected.
+     *
+     * @var LitColor[] $color
+     */
+    public private(set) array $color;
     /** @var LitCommons|LitMassVariousNeeds[] $common */
     public readonly LitCommons|array $common;
     public private(set) LitGrade $grade;
@@ -45,6 +54,13 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
      * Absent/null for source data that does not classify BVM celebrations (e.g. the Roman propriums).
      */
     public readonly ?bool $is_bvm;
+    /**
+     * Colours admitted *ad libitum*, each gated by a named condition evaluated against the
+     * computed date (issue #781). Empty for every event whose colours are unconditional.
+     *
+     * @var AdLibitumColor[]
+     */
+    public readonly array $color_ad_libitum;
 
     /**
      * Constructor for the PropriumDeSanctisEvent class.
@@ -59,6 +75,7 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
      * @param string $calendar The calendar for the event, with a default value of 'GENERAL ROMAN'.
      * @param bool|null $is_dominical Whether the event is "of the Lord" (dominical), if applicable.
      * @param bool|null $is_bvm Whether the event is a celebration of the Blessed Virgin Mary, if applicable.
+     * @param AdLibitumColor[] $color_ad_libitum Colours admitted ad libitum, gated by a date-dependent condition.
      */
     public function __construct(
         string $event_key,
@@ -71,19 +88,43 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
         LitEventType $type = LitEventType::FIXED,
         string $calendar = 'GENERAL ROMAN',
         ?bool $is_dominical = null,
-        ?bool $is_bvm = null
+        ?bool $is_bvm = null,
+        array $color_ad_libitum = []
     ) {
-        $this->event_key     = $event_key;
-        $this->day           = $day;
-        $this->month         = $month;
-        $this->color         = $color;
-        $this->common        = $common;
-        $this->grade         = $grade;
-        $this->grade_display = $grade_display;
-        $this->type          = $type;
-        $this->calendar      = $calendar;
-        $this->is_dominical  = $is_dominical;
-        $this->is_bvm        = $is_bvm;
+        $this->event_key        = $event_key;
+        $this->day              = $day;
+        $this->month            = $month;
+        $this->color            = $color;
+        $this->common           = $common;
+        $this->grade            = $grade;
+        $this->grade_display    = $grade_display;
+        $this->type             = $type;
+        $this->calendar         = $calendar;
+        $this->is_dominical     = $is_dominical;
+        $this->is_bvm           = $is_bvm;
+        $this->color_ad_libitum = $color_ad_libitum;
+    }
+
+    /**
+     * Appends every *ad libitum* colour whose condition holds for this event's date.
+     *
+     * Must be called after {@see self::setDate()}: the conditions are date-dependent, which
+     * is the whole reason they cannot be expressed as extra entries in `color` in the source
+     * data. Idempotent — a colour already present is not appended twice.
+     *
+     * The proper colour(s) keep their leading position and the *ad libitum* one is appended,
+     * so `color[0]` remains the colour proper to the celebration.
+     */
+    public function resolveAdLibitumColors(): void
+    {
+        foreach ($this->color_ad_libitum as $adLibitumColor) {
+            if (
+                $adLibitumColor->when->isSatisfiedBy($this->date)
+                && false === in_array($adLibitumColor->color, $this->color, true)
+            ) {
+                $this->color = [...$this->color, $adLibitumColor->color];
+            }
+        }
     }
 
     /**
@@ -178,6 +219,19 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
             $is_bvm = $data['is_bvm'];
         }
 
+        $color_ad_libitum = [];
+        if (array_key_exists('color_ad_libitum', $data) && is_array($data['color_ad_libitum'])) {
+            foreach ($data['color_ad_libitum'] as $adLibitumColor) {
+                if (false === is_array($adLibitumColor) || false === is_string($adLibitumColor['color'] ?? null) || false === is_string($adLibitumColor['when'] ?? null)) {
+                    throw new \InvalidArgumentException('Each `color_ad_libitum` entry must be an object with string `color` and `when` properties.');
+                }
+                $color_ad_libitum[] = new AdLibitumColor(
+                    LitColor::from($adLibitumColor['color']),
+                    AdLibitumColorCondition::from($adLibitumColor['when'])
+                );
+            }
+        }
+
         return new static(
             $data['event_key'],
             $data['day'],
@@ -194,7 +248,8 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
             isset($data['type']) ? LitEventType::from($data['type']) : LitEventType::FIXED,
             isset($data['calendar']) ? $data['calendar'] : 'GENERAL ROMAN',
             $is_dominical,
-            $is_bvm
+            $is_bvm,
+            $color_ad_libitum
         );
     }
 
@@ -238,6 +293,19 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
             $is_bvm = $data->is_bvm;
         }
 
+        $color_ad_libitum = [];
+        if (property_exists($data, 'color_ad_libitum') && is_array($data->color_ad_libitum)) {
+            foreach ($data->color_ad_libitum as $adLibitumColor) {
+                if (false === $adLibitumColor instanceof \stdClass || false === is_string($adLibitumColor->color ?? null) || false === is_string($adLibitumColor->when ?? null)) {
+                    throw new \InvalidArgumentException('Each `color_ad_libitum` entry must be an object with string `color` and `when` properties.');
+                }
+                $color_ad_libitum[] = new AdLibitumColor(
+                    LitColor::from($adLibitumColor->color),
+                    AdLibitumColorCondition::from($adLibitumColor->when)
+                );
+            }
+        }
+
         return new static(
             $data->event_key,
             $data->day,
@@ -254,7 +322,8 @@ final class PropriumDeSanctisEvent extends AbstractJsonSrcData
             isset($data->type) ? LitEventType::from($data->type) : LitEventType::FIXED,
             isset($data->calendar) ? $data->calendar : 'GENERAL ROMAN',
             $is_dominical,
-            $is_bvm
+            $is_bvm,
+            $color_ad_libitum
         );
     }
 }
