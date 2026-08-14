@@ -3539,7 +3539,8 @@
                 "national_calendar_test",
                 "diocesan_calendar_test",
                 "general_roman_calendar_test",
-                "rite_calendar_test"
+                "rite_calendar_test",
+                "general_roman_calendar"
               ]
             }
           },
@@ -3906,7 +3907,8 @@
                 "national_calendar_test",
                 "diocesan_calendar_test",
                 "general_roman_calendar_test",
-                "rite_calendar_test"
+                "rite_calendar_test",
+                "general_roman_calendar"
               ]
             }
           },
@@ -8739,7 +8741,8 @@
               "national_calendar_test",
               "diocesan_calendar_test",
               "general_roman_calendar_test",
-              "rite_calendar_test"
+              "rite_calendar_test",
+              "general_roman_calendar"
             ],
             "description": "OpenFGA object type"
           },
@@ -9192,7 +9195,8 @@
               "national_calendar_test",
               "diocesan_calendar_test",
               "general_roman_calendar_test",
-              "rite_calendar_test"
+              "rite_calendar_test",
+              "general_roman_calendar"
             ]
           },
           "object_id": {

@@ -386,9 +386,20 @@ with status `2` so the anomaly is not lost in CI output.
 Editors should retain access. Spot-check a diocesan grant of each rite:
 
 ```bash
+# Mirrors what OpenFgaClient sends: the bearer token when OPENFGA_API_TOKEN is set,
+# and the pinned model id — omitting authorization_model_id checks against the store's
+# latest model rather than the one the API is running.
 curl -s "$OPENFGA_API_URL/stores/$OPENFGA_STORE_ID/check" \
   -H 'Content-Type: application/json' \
-  -d '{"tuple_key":{"user":"user:<sub>","relation":"editor","object":"diocesan_calendar:ambrosian/lugano_ch"}}'
+  ${OPENFGA_API_TOKEN:+-H "Authorization: Bearer $OPENFGA_API_TOKEN"} \
+  -d '{
+        "authorization_model_id": "'"$OPENFGA_MODEL_ID"'",
+        "tuple_key": {
+          "user": "user:<sub>",
+          "relation": "editor",
+          "object": "diocesan_calendar:ambrosian/lugano_ch"
+        }
+      }'
 ```
 
 ### Step 3 — prune (later)
