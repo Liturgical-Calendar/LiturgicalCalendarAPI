@@ -213,19 +213,26 @@
                 </xs:simpleType>
               </xs:element>
               <xs:element name="EternalHighPriest" type="xs:boolean" />
+              <!--
+                The child element names are liturgical `event_key`s, and the set is
+                rite-dependent: the Roman rite reports the Can. 1246 §1 days
+                (Christmas, Epiphany, Ascension, CorpusChristi, MaryMotherOfGod,
+                ImmaculateConception, Assumption, StJoseph, StsPeterPaulAp,
+                AllSaints), while the Ambrosian rite reports its own — Circoncisione
+                where the Roman has MaryMotherOfGod, plus StAmbrose and
+                DedicationDuomo, and no CorpusChristi/StJoseph/StsPeterPaulAp.
+
+                This was previously a fixed xs:sequence of the ten Roman keys, which
+                made `/calendar/ambrosian` as XML fail validation once the rite began
+                reporting its own days of precept (#776). The content model is
+                therefore open, mirroring `CommonDef.json`'s
+                `HolyDaysOfObligation`, which likewise constrains the values
+                (`{"const": true}`) rather than the key names.
+              -->
               <xs:element name="HolydaysOfObligation">
                 <xs:complexType>
                   <xs:sequence>
-                    <xs:element name="Christmas" type="xs:boolean" />
-                    <xs:element name="Epiphany" type="xs:boolean" />
-                    <xs:element name="Ascension" type="xs:boolean" />
-                    <xs:element name="CorpusChristi" type="xs:boolean" />
-                    <xs:element name="MaryMotherOfGod" type="xs:boolean" />
-                    <xs:element name="ImmaculateConception" type="xs:boolean" />
-                    <xs:element name="Assumption" type="xs:boolean" />
-                    <xs:element name="StJoseph" type="xs:boolean" />
-                    <xs:element name="StsPeterPaulAp" type="xs:boolean" />
-                    <xs:element name="AllSaints" type="xs:boolean" />
+                    <xs:any namespace="##targetNamespace" processContents="skip" minOccurs="0" maxOccurs="unbounded" />
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Schemas;
 
 use LiturgicalCalendar\Api\Enum\LitColor;
+use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Models\Calendar\Rite\RiteProfileFactory;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -21,11 +23,19 @@ use PHPUnit\Framework\TestCase;
  * set of colors. It deliberately compares sets, not order — the four files order
  * their entries differently and that is not a defect.
  *
- * Note the enumerations are the *union* across rites: `purple`/`rose` are Roman,
- * `morello`/`black` are Ambrosian. Neither JSON Schema nor XML Schema can key a
- * color facet off the rite of the containing document, so rite-scoped color
- * validation belongs in the validators rather than in these enums — tracked in
- * issue #771.
+ * Note the four enumerations are deliberately the *union* across rites:
+ * `purple`/`rose` are Roman, `morello`/`black` are Ambrosian. Neither JSON Schema
+ * nor XML Schema can key a color facet off the rite of the containing document, so
+ * rite-scoped color validation lives in the validators rather than in these enums
+ * (issue #771). Nothing about the union may change.
+ *
+ * Issue #771 added two further spellings that must agree with it from the other
+ * direction: the per-rite palettes on
+ * {@see \LiturgicalCalendar\Api\Models\Calendar\Rite\RiteProfile::colors()} and their
+ * `CommonDef.json` counterparts, `RomanLitColor` and `AmbrosianLitColor`. Those must
+ * partition the union exactly — so a color added to only one palette, or to the enum
+ * but to neither palette, is caught here rather than by whichever validator happens
+ * to run first.
  */
 final class ColorEnumParityTest extends TestCase
 {
@@ -52,18 +62,41 @@ final class ColorEnumParityTest extends TestCase
         return self::sorted(array_map(static fn (LitColor $c): string => $c->value, LitColor::cases()));
     }
 
-    public function testCommonDefJsonMatchesPhpEnum(): void
+    /**
+     * The `items.enum` array of one of CommonDef.json's color definitions.
+     *
+     * @return array<int,mixed>
+     */
+    private static function commonDefColorEnum(string $definition): array
     {
         $path    = self::schemasDir() . '/CommonDef.json';
         $decoded = json_decode((string) file_get_contents($path), true, 512, JSON_THROW_ON_ERROR);
         self::assertIsArray($decoded);
 
-        $enum = $decoded['definitions']['LitColor']['items']['enum'] ?? null;
-        self::assertIsArray($enum, 'CommonDef.json: could not locate definitions.LitColor.items.enum');
+        $enum = $decoded['definitions'][$definition]['items']['enum'] ?? null;
+        self::assertIsArray($enum, "CommonDef.json: could not locate definitions.$definition.items.enum");
 
+        return $enum;
+    }
+
+    /**
+     * The palette a rite profile declares, as sorted string values.
+     *
+     * @return array<int,string>
+     */
+    private static function riteProfileColors(Rite $rite): array
+    {
+        return self::sorted(array_map(
+            static fn (LitColor $c): string => $c->value,
+            RiteProfileFactory::forRite($rite)->colors()
+        ));
+    }
+
+    public function testCommonDefJsonMatchesPhpEnum(): void
+    {
         self::assertSame(
             self::phpEnumColors(),
-            self::sorted($enum),
+            self::sorted(self::commonDefColorEnum('LitColor')),
             'CommonDef.json LitColor enum has drifted from the PHP LitColor enum'
         );
     }
@@ -114,6 +147,86 @@ final class ColorEnumParityTest extends TestCase
                 'openapi.json Color option enum has drifted from the PHP LitColor enum'
             );
         }
+    }
+
+    /**
+     * The two rite palettes must partition the union exactly: every color in
+     * {@see LitColor} is licit in at least one rite, and neither palette invents a
+     * color the enum does not carry.
+     *
+     * This is the assertion that catches a colour added to only one palette (it
+     * would leave the union short, or overshoot it), and equally a colour added to
+     * `LitColor` and to neither palette — which would be a value no validator could
+     * ever admit.
+     */
+    public function testRiteProfilePalettesUnionToThePhpEnum(): void
+    {
+        $roman     = self::riteProfileColors(Rite::ROMAN);
+        $ambrosian = self::riteProfileColors(Rite::AMBROSIAN);
+
+        self::assertNotEmpty($roman, 'RomanRiteProfile::colors() must not be empty');
+        self::assertNotEmpty($ambrosian, 'AmbrosianRiteProfile::colors() must not be empty');
+
+        self::assertSame(
+            self::phpEnumColors(),
+            self::sorted(array_merge($roman, $ambrosian)),
+            'The union of the Roman and Ambrosian rite palettes must be exactly LitColor::cases()'
+        );
+    }
+
+    /**
+     * `green`, `red` and `white` are common to both Missals; the violet families and
+     * extremes are what separate them. Pinning the intersection keeps a future edit
+     * from quietly making, say, `rose` Ambrosian by adding it to both palettes —
+     * which the union assertion above would not notice.
+     */
+    public function testRiteProfilePalettesShareOnlyTheCommonColors(): void
+    {
+        self::assertSame(
+            ['green', 'red', 'white'],
+            self::sorted(array_intersect(
+                self::riteProfileColors(Rite::ROMAN),
+                self::riteProfileColors(Rite::AMBROSIAN)
+            )),
+            'Only green, red and white are common to the Roman and Ambrosian palettes'
+        );
+    }
+
+    /**
+     * The JSON Schema subsets used to validate rite-partitioned source data must
+     * restate the rite profiles exactly — the profiles are authoritative, the schema
+     * definitions are their source-data counterpart.
+     */
+    public function testCommonDefRiteSubsetsMatchTheRiteProfiles(): void
+    {
+        self::assertSame(
+            self::riteProfileColors(Rite::ROMAN),
+            self::sorted(self::commonDefColorEnum('RomanLitColor')),
+            'CommonDef.json RomanLitColor has drifted from RomanRiteProfile::colors()'
+        );
+
+        self::assertSame(
+            self::riteProfileColors(Rite::AMBROSIAN),
+            self::sorted(self::commonDefColorEnum('AmbrosianLitColor')),
+            'CommonDef.json AmbrosianLitColor has drifted from AmbrosianRiteProfile::colors()'
+        );
+    }
+
+    /**
+     * And, closing the loop, the two schema subsets must union to the schema union —
+     * so `LitColor` in CommonDef.json cannot drift away from its own subsets even if
+     * both of them still match the PHP profiles.
+     */
+    public function testCommonDefRiteSubsetsUnionToCommonDefLitColor(): void
+    {
+        self::assertSame(
+            self::sorted(self::commonDefColorEnum('LitColor')),
+            self::sorted(array_merge(
+                self::commonDefColorEnum('RomanLitColor'),
+                self::commonDefColorEnum('AmbrosianLitColor')
+            )),
+            'CommonDef.json: RomanLitColor ∪ AmbrosianLitColor must equal LitColor'
+        );
     }
 
     /**
