@@ -102,6 +102,13 @@
                     <xs:element name="HasVesperII" minOccurs="0" type="xs:boolean" />
                     <xs:element name="HasVigilMass" minOccurs="0" type="xs:boolean" />
                     <xs:element name="HolyDayOfObligation" minOccurs="0" type="xs:boolean" />
+                    <!--
+                      Ambrosian temporale flags, serialized only when non-null by
+                      LiturgicalEvent::jsonSerialize(); already declared (optional)
+                      in the LitCal.json response schema.
+                    -->
+                    <xs:element name="IsAliturgical" minOccurs="0" type="xs:boolean" />
+                    <xs:element name="IsDominical" minOccurs="0" type="xs:boolean" />
                     <xs:element name="IsVigilFor" minOccurs="0" type="xs:string" />
                     <xs:element name="IsVigilMass" minOccurs="0" type="xs:boolean" />
                     <xs:element name="LiturgicalSeason" minOccurs="0" type="xs:string" />
@@ -371,6 +378,14 @@
       </xs:sequence>
     </xs:complexType>
   </xs:element>
+  <!--
+    Union of the liturgical colors across every rite the API serves, mirroring
+    the `color` enumeration in CommonDef.json and the LitColor PHP enum.
+    `green`/`red`/`white`/`purple`/`rose` are Roman; `morello`/`black` are
+    Ambrosian. XML Schema has no way to key a facet off a sibling element, so
+    the enumeration is deliberately the union rather than rite-scoped; scoping
+    color validity per rite is tracked separately in issue #771.
+  -->
   <xs:simpleType name="ColorEnumType">
     <xs:restriction base="xs:string">
       <xs:enumeration value="green" />
@@ -378,6 +393,8 @@
       <xs:enumeration value="white" />
       <xs:enumeration value="purple" />
       <xs:enumeration value="rose" />
+      <xs:enumeration value="morello" />
+      <xs:enumeration value="black" />
     </xs:restriction>
   </xs:simpleType>
   <xs:complexType name="LitCalEventType">
