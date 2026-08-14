@@ -30,11 +30,13 @@ final class TestScopeResolverTest extends TestCase
         $this->assertSame(['national_calendar_test', 'US'], $r->resolve('BarTest'));
     }
 
-    public function testResolvesGeneralWhenAppliestoAbsent(): void
+    public function testResolvesRomanRiteWhenAppliestoAbsent(): void
     {
+        // Legacy files written before applies_to.rite became required still
+        // have to resolve to *something*; the default rite is Roman.
         $r = new TestScopeResolver($this->fixturesDir);
         $this->assertSame(
-            ['general_roman_calendar_test', 'general_roman_calendar'],
+            ['rite_calendar_test', 'roman'],
             $r->resolve('BazTest')
         );
     }
@@ -101,12 +103,51 @@ final class TestScopeResolverTest extends TestCase
         );
     }
 
-    public function testResolveFromPayloadDefaultsToGeneralRoman(): void
+    public function testResolveFromPayloadDefaultsToRomanRite(): void
     {
         $r = new TestScopeResolver($this->fixturesDir);
         $this->assertSame(
-            ['general_roman_calendar_test', 'general_roman_calendar'],
+            ['rite_calendar_test', 'roman'],
             $r->resolveFromPayload(['name' => 'SomeTest'])
+        );
+    }
+
+    public function testResolveFromPayloadRomanRite(): void
+    {
+        $r = new TestScopeResolver($this->fixturesDir);
+        $this->assertSame(
+            ['rite_calendar_test', 'roman'],
+            $r->resolveFromPayload(['applies_to' => ['rite' => 'roman']])
+        );
+    }
+
+    public function testResolveFromPayloadAmbrosianRite(): void
+    {
+        $r = new TestScopeResolver($this->fixturesDir);
+        $this->assertSame(
+            ['rite_calendar_test', 'ambrosian'],
+            $r->resolveFromPayload(['applies_to' => ['rite' => 'ambrosian']])
+        );
+    }
+
+    public function testResolveFromPayloadUnknownRiteFallsBackToDefault(): void
+    {
+        $r = new TestScopeResolver($this->fixturesDir);
+        $this->assertSame(
+            ['rite_calendar_test', 'roman'],
+            $r->resolveFromPayload(['applies_to' => ['rite' => 'byzantine']])
+        );
+    }
+
+    public function testCalendarScopeWinsOverRite(): void
+    {
+        // An Ambrosian diocesan test is scoped by its diocese, not its rite:
+        // diocesan and national calendar ids are unique across rites, and the
+        // matching data resource types are keyed the same way.
+        $r = new TestScopeResolver($this->fixturesDir);
+        $this->assertSame(
+            ['diocesan_calendar_test', 'lugano_ch'],
+            $r->resolveFromPayload(['applies_to' => ['rite' => 'ambrosian', 'diocesan_calendar' => 'lugano_ch']])
         );
     }
 

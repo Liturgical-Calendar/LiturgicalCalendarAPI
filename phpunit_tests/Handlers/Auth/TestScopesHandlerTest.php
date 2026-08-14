@@ -11,6 +11,7 @@ use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use LiturgicalCalendar\Api\Handlers\Auth\TestScopesHandler;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\ResourceAdminService;
 use LiturgicalCalendar\Tests\Handlers\AbstractHandlerTestCase;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -39,13 +40,14 @@ final class TestScopesHandlerTest extends AbstractHandlerTestCase
     }
 
     /**
-     * Six list-objects: editor x3 types, then admin x3 types.
+     * One empty list-objects response per (relation × TEST_OBJECT_TYPES) probe:
+     * editor for each type, then admin for each type.
      *
      * @return array<int, GuzzleResponse>
      */
-    private function sixEmpty(): array
+    private function allEmpty(): array
     {
-        return array_fill(0, 6, new GuzzleResponse(200, [], '{"objects":[]}'));
+        return array_fill(0, 2 * count(ResourceAdminService::TEST_OBJECT_TYPES), new GuzzleResponse(200, [], '{"objects":[]}'));
     }
 
     public function testMissingOidcUserIsUnauthorized(): void
@@ -67,11 +69,7 @@ final class TestScopesHandlerTest extends AbstractHandlerTestCase
     {
         $handler = $this->handlerWith([
             new GuzzleResponse(200, [], '{"objects":["national_calendar_test:USA"]}'),
-            new GuzzleResponse(200, [], '{"objects":[]}'),
-            new GuzzleResponse(200, [], '{"objects":[]}'),
-            new GuzzleResponse(200, [], '{"objects":[]}'),
-            new GuzzleResponse(200, [], '{"objects":[]}'),
-            new GuzzleResponse(200, [], '{"objects":[]}'),
+            ...$this->allEmpty(),
         ]);
 
         $request = $this->requestFor('GET', '/auth/test-scopes')
@@ -89,7 +87,7 @@ final class TestScopesHandlerTest extends AbstractHandlerTestCase
 
     public function testGlobalAdminFlaggedWithEmptyScopes(): void
     {
-        $handler = $this->handlerWith($this->sixEmpty());
+        $handler = $this->handlerWith($this->allEmpty());
 
         $request = $this->requestFor('GET', '/auth/test-scopes')
             ->withAttribute('oidc_user', ['sub' => 'root', 'roles' => ['admin']]);

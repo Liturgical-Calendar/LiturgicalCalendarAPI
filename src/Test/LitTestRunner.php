@@ -5,6 +5,7 @@ namespace LiturgicalCalendar\Api\Test;
 use Swaggest\JsonSchema\Schema;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitEventTestAssertion;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Test\TestsMap;
 
 /**
@@ -53,7 +54,7 @@ class LitTestRunner
     private bool $readyState = false;
 
     /**
-     * @var object{settings:object{year:int,national_calendar?:string,diocesan_calendar?:string},litcal:array<LiturgicalEvent>} The data to be tested
+     * @var object{settings:object{year:int,rite?:string,national_calendar?:string,diocesan_calendar?:string},litcal:array<LiturgicalEvent>} The data to be tested
      */
     private object $dataToTest;
 
@@ -82,7 +83,7 @@ class LitTestRunner
      * Updates the ready state based on successful initialization.
      *
      * @param string $Test The name of the test.
-     * @param \stdClass&object{settings:object{year:int,national_calendar?:string,diocesan_calendar?:string},litcal:LiturgicalEvent[]} $testData The test data object.
+     * @param \stdClass&object{settings:object{year:int,rite?:string,national_calendar?:string,diocesan_calendar?:string},litcal:LiturgicalEvent[]} $testData The test data object.
      */
     public function __construct(string $Test, \stdClass $testData)
     {
@@ -169,6 +170,12 @@ class LitTestRunner
                 $this->setError('Test name is not set');
                 return;
             }
+            $riteMismatch = $this->detectRiteMismatch();
+            if (null !== $riteMismatch) {
+                $this->setError($riteMismatch);
+                return;
+            }
+
             $assertion = self::$testCache->retrieveAssertionForYear($this->Test, $this->dataToTest->settings->year);
             if (is_null($assertion)) {
                 $this->setError("Out of bounds error: {$this->Test} only supports calendar years [ " . implode(', ', self::$testCache->getYearsSupported($this->Test)) . ' ]');
@@ -232,9 +239,65 @@ class LitTestRunner
      */
     private function getCalendarName(): string
     {
-        return property_exists($this->dataToTest->settings, 'diocesan_calendar') ? $this->dataToTest->settings->diocesan_calendar : (
-            property_exists($this->dataToTest->settings, 'national_calendar') ? $this->dataToTest->settings->national_calendar : 'the Universal Roman Calendar'
-        );
+        if (property_exists($this->dataToTest->settings, 'diocesan_calendar')) {
+            return $this->dataToTest->settings->diocesan_calendar;
+        }
+
+        if (property_exists($this->dataToTest->settings, 'national_calendar')) {
+            return $this->dataToTest->settings->national_calendar;
+        }
+
+        return match ($this->responseRite()) {
+            Rite::AMBROSIAN => 'the Ambrosian Calendar',
+            default         => 'the General Roman Calendar'
+        };
+    }
+
+    /**
+     * The rite the calendar under test was computed under, as echoed back in
+     * `settings.rite` (issue #760), or null when the response predates that
+     * field or carries an unknown value.
+     */
+    private function responseRite(): ?Rite
+    {
+        if (
+            false === property_exists($this->dataToTest->settings, 'rite')
+            || false === is_string($this->dataToTest->settings->rite)
+        ) {
+            return null;
+        }
+
+        return Rite::tryFrom($this->dataToTest->settings->rite);
+    }
+
+    /**
+     * Guard against a test being run against a calendar of the wrong rite.
+     *
+     * Without it, an Ambrosian test pointed at the General Roman Calendar fails
+     * every single assertion — the event key simply does not exist there — and
+     * reads as 32 broken assertions rather than one misrouted run. That is the
+     * failure mode that motivated issue #767.
+     *
+     * Returns the error text on mismatch, or null when the rites agree or the
+     * response does not state one.
+     */
+    private function detectRiteMismatch(): ?string
+    {
+        if (null === self::$testCache || null === $this->Test) {
+            return null;
+        }
+
+        $responseRite = $this->responseRite();
+        if (null === $responseRite) {
+            return null;
+        }
+
+        $declaredRite = self::$testCache->get($this->Test)->rite;
+        if ($declaredRite === $responseRite) {
+            return null;
+        }
+
+        return "{$this->Test} is scoped to the {$declaredRite->value} rite, but the calendar under test was computed under the {$responseRite->value} rite";
     }
 
     /**

@@ -34,6 +34,7 @@ final class TestsHandler extends AbstractHandler
         'applies_to',
         'excludes',
         'assertions',
+        'rite',
         'national_calendar',
         'diocesan_calendar',
         'national_calendars',

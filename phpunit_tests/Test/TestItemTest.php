@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Test;
 
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Test\TestItem;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -31,6 +32,7 @@ final class TestItemTest extends TestCase
             'event_key'   => 'sample_event',
             'description' => 'sample',
             'test_type'   => 'exactCorrespondenceSince',
+            'applies_to'  => (object) ['rite' => 'roman'],
             'assertions'  => [
                 (object) [
                     'year'           => 2020,
@@ -51,7 +53,9 @@ final class TestItemTest extends TestCase
         $this->assertSame('exactCorrespondenceSince', $item->test_type);
         $this->assertNull($item->year_since);
         $this->assertNull($item->year_until);
-        $this->assertNull($item->applies_to);
+        $this->assertSame(Rite::ROMAN, $item->rite);
+        $this->assertIsObject($item->applies_to);
+        $this->assertSame('roman', $item->applies_to->rite);
         $this->assertNull($item->excludes);
     }
 
@@ -70,7 +74,7 @@ final class TestItemTest extends TestCase
     public function testStoresAppliesToAndExcludesObjects(): void
     {
         $obj             = $this->baseObject();
-        $obj->applies_to = (object) ['national_calendar' => 'US'];
+        $obj->applies_to = (object) ['rite' => 'roman', 'national_calendar' => 'US'];
         $obj->excludes   = (object) ['diocesan_calendar' => 'rotter_nl'];
 
         $item = new TestItem($obj);
@@ -84,7 +88,7 @@ final class TestItemTest extends TestCase
     public function testAcceptsArrayFormNationalCalendars(): void
     {
         $obj             = $this->baseObject();
-        $obj->applies_to = (object) ['national_calendars' => ['US', 'IT']];
+        $obj->applies_to = (object) ['rite' => 'roman', 'national_calendars' => ['US', 'IT']];
 
         $item = new TestItem($obj);
 
@@ -95,7 +99,7 @@ final class TestItemTest extends TestCase
     public function testAcceptsArrayFormDiocesanCalendars(): void
     {
         $obj             = $this->baseObject();
-        $obj->applies_to = (object) ['diocesan_calendars' => ['rotter_nl', 'romamo_it']];
+        $obj->applies_to = (object) ['rite' => 'roman', 'diocesan_calendars' => ['rotter_nl', 'romamo_it']];
 
         $item = new TestItem($obj);
 
@@ -163,20 +167,84 @@ final class TestItemTest extends TestCase
         new TestItem($obj);
     }
 
-    public function testThrowsWhenAppliesToHasNoRecognisedKey(): void
+    public function testThrowsWhenAppliesToHasNoRite(): void
     {
         $obj             = $this->baseObject();
-        $obj->applies_to = (object) ['unrelated_key' => 'whatever'];
+        $obj->applies_to = (object) ['national_calendar' => 'US'];
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('`applies_to` must have at least one of the properties');
+        $this->expectExceptionMessage('`applies_to` must have a `rite` property');
+        new TestItem($obj);
+    }
+
+    public function testThrowsWhenAppliesToIsMissingEntirely(): void
+    {
+        $obj = $this->baseObject();
+        unset($obj->applies_to);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing required property: applies_to');
+        new TestItem($obj);
+    }
+
+    public function testThrowsWhenRiteIsNotAString(): void
+    {
+        $obj             = $this->baseObject();
+        $obj->applies_to = (object) ['rite' => 1];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('`rite` must have a string value');
+        new TestItem($obj);
+    }
+
+    public function testThrowsWhenRiteIsUnknown(): void
+    {
+        $obj             = $this->baseObject();
+        $obj->applies_to = (object) ['rite' => 'byzantine'];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('`rite` has an unknown value `byzantine`');
+        new TestItem($obj);
+    }
+
+    public function testStoresAmbrosianRite(): void
+    {
+        $obj             = $this->baseObject();
+        $obj->applies_to = (object) ['rite' => 'ambrosian', 'diocesan_calendar' => 'lugano_ch'];
+
+        $item = new TestItem($obj);
+
+        $this->assertSame(Rite::AMBROSIAN, $item->rite);
+        $this->assertIsObject($item->applies_to);
+        $this->assertSame('lugano_ch', $item->applies_to->diocesan_calendar);
+    }
+
+    public function testThrowsWhenExcludesCarriesARite(): void
+    {
+        // The rite is pinned by applies_to; excluding one is meaningless and
+        // would leave the test with nothing to run against.
+        $obj           = $this->baseObject();
+        $obj->excludes = (object) ['rite' => 'ambrosian'];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('`excludes` must not have a `rite` property');
+        new TestItem($obj);
+    }
+
+    public function testThrowsWhenExcludesHasNoRecognisedKey(): void
+    {
+        $obj           = $this->baseObject();
+        $obj->excludes = (object) ['unrelated_key' => 'whatever'];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('`excludes` must have at least one of the properties');
         new TestItem($obj);
     }
 
     public function testThrowsWhenNationalCalendarIsNotString(): void
     {
         $obj             = $this->baseObject();
-        $obj->applies_to = (object) ['national_calendar' => 123];
+        $obj->applies_to = (object) ['rite' => 'roman', 'national_calendar' => 123];
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('`national_calendar` must have a string value');
@@ -186,7 +254,7 @@ final class TestItemTest extends TestCase
     public function testThrowsWhenDiocesanCalendarIsNotString(): void
     {
         $obj             = $this->baseObject();
-        $obj->applies_to = (object) ['diocesan_calendar' => 123];
+        $obj->applies_to = (object) ['rite' => 'roman', 'diocesan_calendar' => 123];
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('`diocesan_calendar` must have a string value');
@@ -196,7 +264,7 @@ final class TestItemTest extends TestCase
     public function testThrowsWhenNationalCalendarsIsNotArray(): void
     {
         $obj             = $this->baseObject();
-        $obj->applies_to = (object) ['national_calendars' => 'US'];
+        $obj->applies_to = (object) ['rite' => 'roman', 'national_calendars' => 'US'];
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('`national_calendars` must have an array value');
@@ -206,7 +274,7 @@ final class TestItemTest extends TestCase
     public function testThrowsWhenNationalCalendarsContainsNonString(): void
     {
         $obj             = $this->baseObject();
-        $obj->applies_to = (object) ['national_calendars' => ['US', 123]];
+        $obj->applies_to = (object) ['rite' => 'roman', 'national_calendars' => ['US', 123]];
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('`national_calendars` must have an array of strings');
@@ -216,7 +284,7 @@ final class TestItemTest extends TestCase
     public function testThrowsWhenDiocesanCalendarsIsNotArray(): void
     {
         $obj             = $this->baseObject();
-        $obj->applies_to = (object) ['diocesan_calendars' => 'rotter_nl'];
+        $obj->applies_to = (object) ['rite' => 'roman', 'diocesan_calendars' => 'rotter_nl'];
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('`diocesan_calendars` must have an array value');
@@ -226,7 +294,7 @@ final class TestItemTest extends TestCase
     public function testThrowsWhenDiocesanCalendarsContainsNonString(): void
     {
         $obj             = $this->baseObject();
-        $obj->applies_to = (object) ['diocesan_calendars' => ['rotter_nl', 0]];
+        $obj->applies_to = (object) ['rite' => 'roman', 'diocesan_calendars' => ['rotter_nl', 0]];
 
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('`diocesan_calendars` must have an array of strings');

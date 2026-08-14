@@ -42,14 +42,23 @@ final class AccessRequestRepositoryConstantsTest extends TestCase
 
     public function testNewTestTypesAreValid(): void
     {
-        foreach (['national_calendar_test', 'diocesan_calendar_test', 'general_roman_calendar_test'] as $t) {
+        foreach (['national_calendar_test', 'diocesan_calendar_test', 'general_roman_calendar_test', 'rite_calendar_test'] as $t) {
             self::assertContains($t, AccessRequestRepository::VALID_OBJECT_TYPES);
         }
         self::assertNotContains('test_definition', AccessRequestRepository::VALID_OBJECT_TYPES);
         self::assertSame(
-            ['national_calendar_test', 'diocesan_calendar_test', 'general_roman_calendar_test'],
+            ['national_calendar_test', 'diocesan_calendar_test', 'general_roman_calendar_test', 'rite_calendar_test'],
             AccessRequestRepository::ROLE_OBJECT_TYPES['test_editor']
         );
+    }
+
+    public function testRiteCalendarTestObjectIdMustBeAKnownRite(): void
+    {
+        self::assertTrue(AccessRequestRepository::isValidObjectIdForType('rite_calendar_test', 'roman'));
+        self::assertTrue(AccessRequestRepository::isValidObjectIdForType('rite_calendar_test', 'ambrosian'));
+        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('rite_calendar_test', 'byzantine'));
+        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('rite_calendar_test', 'general_roman_calendar'));
+        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('rite_calendar_test', ''));
     }
 
     public function testGrcTestObjectIdMustBeFixed(): void

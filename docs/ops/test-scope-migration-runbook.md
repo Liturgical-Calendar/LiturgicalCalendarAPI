@@ -251,3 +251,66 @@ The migration writes the new tuple **before** deleting the old one, so:
   for this; manual OpenFGA tuple writes or a reverse migration script would be
   needed. Prefer rolling forward rather than rolling back once all environments
   are migrated.
+
+---
+
+## Follow-up migration — `general_roman_calendar_test` → `rite_calendar_test`
+
+Issue #767 made the rite a first-class scope for liturgical tests. The Ambrosian
+rite-level calendar (`GET /calendar/ambrosian`) is neither national nor diocesan,
+so `general_roman_calendar_test` — a type with exactly one id,
+`general_roman_calendar` — could not name it. `TestScopeResolver` now emits
+`rite_calendar_test:<rite>` for every rite-level test:
+
+| Type                          | Object id                                | Status                        |
+|-------------------------------|------------------------------------------|-------------------------------|
+| `general_roman_calendar_test` | Fixed id `general_roman_calendar`        | Deprecated; kept in the model |
+| `rite_calendar_test`          | A `Rite` value: `roman` / `ambrosian`    | Successor                     |
+
+The shape of this migration mirrors the one above, with one deliberate
+difference: it is **copy-only by default**. The legacy tuples are left in place
+so that rolling the API back to pre-#767 code keeps authorizing.
+
+### Step 1 — apply the model
+
+`rite_calendar_test` is added to `scripts/openfga-model.additive.json` alongside
+`general_roman_calendar_test`, with an identical relation set. As above, the
+authoritative model lives in `cdcf-infra`: land the equivalent change to
+`cdcf-infra/auth/models/LiturgicalCalendar.json`, then upload the new model
+version on the VPS.
+
+### Step 2 — copy the tuples
+
+```bash
+# Dry run first — prints every tuple that would be copied.
+php scripts/migrate-rite-test-tuples.php
+
+# Apply.
+php scripts/migrate-rite-test-tuples.php --apply
+```
+
+Each `general_roman_calendar_test:general_roman_calendar` tuple gains a
+counterpart on `rite_calendar_test:roman`, preserving user and relation.
+Re-running is a no-op. An id other than `general_roman_calendar` on the legacy
+type is reported and left untouched — the script never guesses a rite — and the
+run exits with status `2` so the anomaly is not lost in CI output.
+
+### Step 3 — prune (later)
+
+Only once **every** deployment runs post-#767 code:
+
+```bash
+php scripts/migrate-rite-test-tuples.php --apply --prune
+```
+
+Then drop `general_roman_calendar_test` from the model and from the PHP
+allow-lists that still name it:
+
+- `src/Services/TestScopeResolver.php` (docblock only — it no longer emits it)
+- `src/Services/ResourceExistenceChecker.php`
+- `src/Services/ResourceAdminService.php`
+- `src/Repositories/AccessRequestRepository.php`
+- `authz/openfga-expectations.json`
+- `jsondata/schemas/openapi.json`
+
+This step is **out of scope for the current change** and tracked as a follow-up.

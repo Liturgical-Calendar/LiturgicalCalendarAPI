@@ -40,9 +40,9 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
 
     /**
      * Response queue order: 4 admin list-objects (ADMIN_OBJECT_TYPES: national_calendar,
-     * diocesan_calendar, wider_region, general_roman_calendar), then 4 viewer list-objects
+     * diocesan_calendar, wider_region, general_roman_calendar), then 5 viewer list-objects
      * (VIEWER_OBJECT_TYPES: general_roman_calendar, national_calendar_test,
-     * diocesan_calendar_test, general_roman_calendar_test).
+     * diocesan_calendar_test, general_roman_calendar_test, rite_calendar_test).
      *
      * @param array<int, GuzzleResponse> $viewerResponses
      * @return array<int, GuzzleResponse>
@@ -88,6 +88,7 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
             new GuzzleResponse(200, [], '{"objects":["national_calendar_test:IT"]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":["rite_calendar_test:roman"]}'),
         ]));
 
         $request = $this->requestFor('GET', '/auth/dashboard-scopes')
@@ -104,6 +105,7 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
                 'national_calendar_test'      => ['IT'],
                 'diocesan_calendar_test'      => [],
                 'general_roman_calendar_test' => [],
+                'rite_calendar_test'          => ['roman'],
             ],
             $body['viewer_scopes']
         );
@@ -142,6 +144,7 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
         ]));
 
         $request = $this->requestFor('GET', '/auth/dashboard-scopes')
@@ -175,6 +178,7 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
                 'national_calendar_test'      => [],
                 'diocesan_calendar_test'      => [],
                 'general_roman_calendar_test' => [],
+                'rite_calendar_test'          => [],
             ],
             $body['viewer_scopes']
         );

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Repositories;
 
 use LiturgicalCalendar\Api\Database\Connection;
+use LiturgicalCalendar\Api\Enum\Rite;
 use PDO;
 
 /**
@@ -66,6 +67,7 @@ class AccessRequestRepository
         'national_calendar_test',
         'diocesan_calendar_test',
         'general_roman_calendar_test',
+        'rite_calendar_test',
         'general_roman_calendar',
     ];
 
@@ -84,10 +86,11 @@ class AccessRequestRepository
             'national_calendar_test',
             'diocesan_calendar_test',
             'general_roman_calendar_test',
+            'rite_calendar_test',
             'general_roman_calendar',
         ],
         'calendar_editor' => ['national_calendar', 'diocesan_calendar', 'wider_region', 'general_roman_calendar'],
-        'test_editor'     => ['national_calendar_test', 'diocesan_calendar_test', 'general_roman_calendar_test'],
+        'test_editor'     => ['national_calendar_test', 'diocesan_calendar_test', 'general_roman_calendar_test', 'rite_calendar_test'],
     ];
 
     public function __construct(?PDO $db = null)
@@ -99,8 +102,9 @@ class AccessRequestRepository
      * Validate an object_id for a given object_type.
      *
      * general_roman_calendar uses a fixed enumerated id set; general_roman_calendar_test
-     * accepts only the literal id 'general_roman_calendar'; all other types accept any
-     * non-empty id (the resource itself is validated downstream by the handler).
+     * accepts only the literal id 'general_roman_calendar'; rite_calendar_test accepts
+     * only a known Rite value; all other types accept any non-empty id (the resource
+     * itself is validated downstream by the handler).
      */
     public static function isValidObjectIdForType(string $objectType, string $objectId): bool
     {
@@ -110,6 +114,10 @@ class AccessRequestRepository
 
         if ($objectType === 'general_roman_calendar_test') {
             return $objectId === 'general_roman_calendar';
+        }
+
+        if ($objectType === 'rite_calendar_test') {
+            return null !== Rite::tryFrom($objectId);
         }
 
         if ($objectType === 'national_calendar') {

@@ -157,12 +157,14 @@ final class ResourceAdminServiceTest extends TestCase
 
     public function testResolveTestScopesGroupsEditorThenAdmin(): void
     {
-        // Order: editor for the 3 test types, then admin for the 3 test types.
+        // Order: editor for each TEST_OBJECT_TYPES entry, then admin for each.
         $service = $this->serviceWith([
             new GuzzleResponse(200, [], '{"objects":["national_calendar_test:USA"]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":["national_calendar_test:USA"]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
         ]);
@@ -189,12 +191,14 @@ final class ResourceAdminServiceTest extends TestCase
     public function testResolveViewerScopesReturnsIdsKeyedByType(): void
     {
         // One list-objects response per VIEWER_OBJECT_TYPES entry, in order:
-        // general_roman_calendar, national_calendar_test, diocesan_calendar_test, general_roman_calendar_test
+        // general_roman_calendar, national_calendar_test, diocesan_calendar_test,
+        // general_roman_calendar_test, rite_calendar_test
         $service = $this->serviceWith([
             new GuzzleResponse(200, [], '{"objects":["general_roman_calendar:temporale","general_roman_calendar:decrees"]}'),
             new GuzzleResponse(200, [], '{"objects":["national_calendar_test:IT"]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":["rite_calendar_test:ambrosian"]}'),
         ]);
 
         self::assertSame(
@@ -203,6 +207,7 @@ final class ResourceAdminServiceTest extends TestCase
                 'national_calendar_test'      => ['IT'],
                 'diocesan_calendar_test'      => [],
                 'general_roman_calendar_test' => [],
+                'rite_calendar_test'          => ['ambrosian'],
             ],
             $service->resolveViewerScopes('grc-editor')
         );
@@ -220,6 +225,7 @@ final class ResourceAdminServiceTest extends TestCase
                 'national_calendar_test'      => [],
                 'diocesan_calendar_test'      => [],
                 'general_roman_calendar_test' => [],
+                'rite_calendar_test'          => [],
             ],
             $service->resolveViewerScopes('grc-editor')
         );

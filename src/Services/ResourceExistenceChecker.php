@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Services;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\Rite;
 
 /**
  * Decides whether the backing data for an OpenFGA object still exists on disk.
@@ -15,6 +16,7 @@ use LiturgicalCalendar\Api\Enum\JsonData;
  * Resource types and their backing-data locations:
  *   general_roman_calendar       — fixed; always exists
  *   general_roman_calendar_test  — fixed; always exists
+ *   rite_calendar_test           — fixed catalog; exists iff the id is a known Rite
  *   national_calendar            — jsondata/sourcedata/rite/roman/calendars/nations/{id}/{id}.json
  *   wider_region                 — jsondata/sourcedata/rite/roman/calendars/wider_regions/{id}/ (directory)
  *   diocesan_calendar            — jsondata/sourcedata/rite/roman/calendars/dioceses/{nation}/{id}/ (directory, glob)
@@ -32,6 +34,7 @@ final class ResourceExistenceChecker implements ResourceExistenceCheckerInterfac
         'national_calendar_test',
         'diocesan_calendar_test',
         'general_roman_calendar_test',
+        'rite_calendar_test',
     ];
 
     public function isResourceType(string $objectType): bool
@@ -46,6 +49,10 @@ final class ResourceExistenceChecker implements ResourceExistenceCheckerInterfac
             case 'general_roman_calendar_test':
                 // Fixed catalog ids — always present.
                 return true;
+
+            case 'rite_calendar_test':
+                // Fixed catalog, one entry per rite the API can compute.
+                return null !== Rite::tryFrom($objectId);
 
             case 'national_calendar':
                 return is_file(
