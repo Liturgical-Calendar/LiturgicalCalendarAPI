@@ -61,9 +61,9 @@ final class RouterRiteSegmentTest extends TestCase
         self::assertSame(['nation', 'US'], $parts);
     }
 
-    public function testRiteSegmentOnlyAppliesToTheCalendarAndEventsRoutes(): void
+    public function testRiteSegmentOnlyAppliesToTheRiteCarryingRoutes(): void
     {
-        // A route that is neither calendar nor events must never treat a leading
+        // A route that carries no rite segment must never treat a leading
         // 'ambrosian'/'roman' as a rite.
         $parts = ['ambrosian'];
         self::assertSame(Rite::ROMAN, Router::extractRiteSegment('metadata', $parts));
@@ -84,5 +84,36 @@ final class RouterRiteSegmentTest extends TestCase
         $parts = ['nation', 'US'];
         self::assertSame(Rite::ROMAN, Router::extractRiteSegment('events', $parts));
         self::assertSame(['nation', 'US'], $parts);
+    }
+
+    /**
+     * Issue #786: `/data` gained the same optional leading rite segment, so the
+     * Ambrosian diocesan calendars became addressable — `/data/diocese/lugano_ch`
+     * was a 404 before, because the handler could only read the Roman partition.
+     */
+    public function testDataRouteSupportsAnAmbrosianRiteSegment(): void
+    {
+        $parts = ['ambrosian', 'diocese', 'lugano_ch'];
+        self::assertSame(Rite::AMBROSIAN, Router::extractRiteSegment('data', $parts));
+        self::assertSame(['diocese', 'lugano_ch'], $parts);
+    }
+
+    public function testDataRouteExplicitRomanIsEquivalentToBare(): void
+    {
+        $explicit = ['roman', 'diocese', 'rotter_nl'];
+        self::assertSame(Rite::ROMAN, Router::extractRiteSegment('data', $explicit));
+
+        $bare = ['diocese', 'rotter_nl'];
+        self::assertSame(Rite::ROMAN, Router::extractRiteSegment('data', $bare));
+
+        // Both forms leave the handler the same 2-part shape to parse.
+        self::assertSame($bare, $explicit);
+    }
+
+    public function testDataRouteWithNoRiteSegmentLeavesTheCategoryIntact(): void
+    {
+        $parts = ['widerregion', 'Europe'];
+        self::assertSame(Rite::ROMAN, Router::extractRiteSegment('data', $parts));
+        self::assertSame(['widerregion', 'Europe'], $parts);
     }
 }

@@ -66,14 +66,27 @@ final class RegionalDataHandler extends AbstractHandler
     use ResolvesOutboxTooling;
 
     private readonly MetadataCalendars $CalendarsMetadata;
+
+    /**
+     * The rite selected by the optional leading rite segment on `/data`.
+     *
+     * Only the diocesan tier exists under more than one rite; `RegionalDataParams::validateRiteCompatibility()`
+     * rejects a national or wider-region request under a non-Roman rite before any path is built.
+     */
+    private readonly Rite $rite;
     private RegionalDataParams $params;
     private Logger $auditLogger;
     private string $clientIp = 'unknown';
 
     /** @param string[] $requestPathParams */
-    public function __construct(array $requestPathParams = [])
+    /**
+     * @param string[] $requestPathParams
+     * @param Rite     $rite The rite selected by the optional leading `/data` rite segment.
+     */
+    public function __construct(array $requestPathParams = [], Rite $rite = Rite::ROMAN)
     {
         parent::__construct($requestPathParams);
+        $this->rite = $rite;
         // Allow credentials for cross-origin cookie requests (required for authenticated PUT/PATCH/DELETE)
         $this->allowCredentials = true;
         // Build the calendars metadata index in-process from local source data
@@ -142,7 +155,7 @@ final class RegionalDataHandler extends AbstractHandler
                     $description = "The requested resource {$this->params->key} was not found in the index";
                     throw new NotFoundException($description);
                 }
-                $i18nDataFile = strtr(JsonData::DIOCESAN_CALENDAR_I18N_FILE->path(), [
+                $i18nDataFile = strtr(JsonData::diocesanCalendarI18nFileFor($this->rite)->path(), [
                     '{nation}'  => $dioceseEntry->nation,
                     '{diocese}' => $this->params->key,
                     '{locale}'  => $this->params->i18nRequest
@@ -209,7 +222,7 @@ final class RegionalDataHandler extends AbstractHandler
                     throw new NotFoundException($description);
                 }
 
-                $calendarDataFile = strtr(JsonData::DIOCESAN_CALENDAR_FILE->path(), [
+                $calendarDataFile = strtr(JsonData::diocesanCalendarFileFor($this->rite)->path(), [
                     '{nation}'       => $dioceseEntry->nation,
                     '{diocese}'      => $this->params->key,
                     '{diocese_name}' => $dioceseEntry->diocese
@@ -245,7 +258,7 @@ final class RegionalDataHandler extends AbstractHandler
             switch ($this->params->category) {
                 case PathCategory::DIOCESE:
                     /** @var MetadataDiocesanCalendarItem $dioceseEntry */
-                    $CalendarDataI18nFile = strtr(JsonData::DIOCESAN_CALENDAR_I18N_FILE->path(), [
+                    $CalendarDataI18nFile = strtr(JsonData::diocesanCalendarI18nFileFor($this->rite)->path(), [
                         '{nation}'  => $dioceseEntry->nation,
                         '{diocese}' => $this->params->key,
                         '{locale}'  => $this->params->locale
@@ -297,7 +310,8 @@ final class RegionalDataHandler extends AbstractHandler
      *
      * This is a private method and should only be called from {@see \LiturgicalCalendar\Api\Handlers\RegionalDataHandler::createCalendar()}.
      *
-     * The diocesan calendar data resource is created in the `JsonData::DIOCESAN_CALENDARS_FOLDER` directory.
+     * The diocesan calendar data resource is created in the rite's diocesan tree
+     * ({@see \LiturgicalCalendar\Api\Enum\JsonData::diocesanCalendarsFolderFor()}).
      *
      * This method ensures the necessary directories for storing diocesan calendar data are created.
      * It processes the internationalization (i18n) data provided in the payload, saving it to the appropriate
@@ -343,7 +357,7 @@ final class RegionalDataHandler extends AbstractHandler
         // Ensure we have all the necessary folders in place
         // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
         // so we don't have to worry about manually checking and creating each one individually
-        $diocesanCalendarI18nFolder = strtr(JsonData::DIOCESAN_CALENDAR_I18N_FOLDER->path(), [
+        $diocesanCalendarI18nFolder = strtr(JsonData::diocesanCalendarI18nFolderFor($this->rite)->path(), [
             '{nation}'  => $nation,
             '{diocese}' => $diocese_id
         ]);
@@ -357,12 +371,12 @@ final class RegionalDataHandler extends AbstractHandler
         // Write i18n files and capture locales for audit logging
         $i18nLocales = $this->writeI18nFiles(
             $rawPayload,
-            JsonData::DIOCESAN_CALENDAR_I18N_FILE,
+            JsonData::diocesanCalendarI18nFileFor($this->rite),
             ['{nation}' => $nation, '{diocese}' => $diocese_id]
         );
 
         $diocesanCalendarFile = strtr(
-            JsonData::DIOCESAN_CALENDAR_FILE->path(),
+            JsonData::diocesanCalendarFileFor($this->rite)->path(),
             [
                 '{nation}'       => $nation,
                 '{diocese}'      => $diocese_id,
@@ -835,7 +849,8 @@ final class RegionalDataHandler extends AbstractHandler
      *
      * It is private as it is called from {@see \LiturgicalCalendar\Api\Handlers\RegionalDataHandler::updateCalendar()}.
      *
-     * The resource is updated in the {@see \LiturgicalCalendar\Api\Enum\JsonData::DIOCESAN_CALENDARS_FOLDER} folder.
+     * The resource is updated in the rite's diocesan tree
+     * ({@see \LiturgicalCalendar\Api\Enum\JsonData::diocesanCalendarsFolderFor()}).
      *
      * If the resource to update is not found in the diocesan calendars index, the response will be a JSON error response with a status code of 404 Not Found.
      * If the resource to update is not writable or the write was not successful, the response will be a JSON error response with a status code of 503 Service Unavailable.
@@ -865,15 +880,15 @@ final class RegionalDataHandler extends AbstractHandler
         $key         = $this->params->key;
         $i18nLocales = $this->updateI18nFiles(
             $rawPayload,
-            JsonData::DIOCESAN_CALENDAR_I18N_FILE,
-            JsonData::DIOCESAN_CALENDAR_I18N_FOLDER,
+            JsonData::diocesanCalendarI18nFileFor($this->rite),
+            JsonData::diocesanCalendarI18nFolderFor($this->rite),
             ['{nation}' => $dioceseEntry->nation, '{diocese}' => $key],
             $payload->metadata->locales,
             "diocesan calendar {$key}"
         );
 
         $DiocesanCalendarFile = strtr(
-            JsonData::DIOCESAN_CALENDAR_FILE->path(),
+            JsonData::diocesanCalendarFileFor($this->rite)->path(),
             [
                 '{nation}'       => $dioceseEntry->nation,
                 '{diocese}'      => $this->params->key,
@@ -991,7 +1006,7 @@ final class RegionalDataHandler extends AbstractHandler
                     throw new NotFoundException($description);
                 }
                 $calendarDataFile   = strtr(
-                    JsonData::DIOCESAN_CALENDAR_FILE->path(),
+                    JsonData::diocesanCalendarFileFor($this->rite)->path(),
                     [
                         '{nation}'       => $dioceseEntry->nation,
                         '{diocese}'      => $dioceseEntry->calendar_id,
@@ -999,7 +1014,7 @@ final class RegionalDataHandler extends AbstractHandler
                     ]
                 );
                 $calendarI18nFolder = strtr(
-                    JsonData::DIOCESAN_CALENDAR_I18N_FOLDER->path(),
+                    JsonData::diocesanCalendarI18nFolderFor($this->rite)->path(),
                     [
                         '{nation}'  => $dioceseEntry->nation,
                         '{diocese}' => $dioceseEntry->calendar_id
@@ -1526,6 +1541,15 @@ final class RegionalDataHandler extends AbstractHandler
                         . implode(', ', $this->CalendarsMetadata->diocesan_calendars_keys);
                     throw new UnprocessableContentException($description);
                 }
+
+                // The rite segment must agree with the rite the diocese is actually defined
+                // under, or the handler would read and write the wrong partition of the source
+                // tree. Mirrors EventsParams::validateRiteCompatibility(); done here rather than
+                // in the params object because it needs the /calendars metadata lookup above.
+                if ($currentDiocese->rite !== $params->rite) {
+                    $description = "Diocesan calendar `{$params->key}` belongs to the {$currentDiocese->rite->value} rite, not the requested {$params->rite->value} rite.";
+                    throw new UnprocessableContentException($description);
+                }
             }
         }
 
@@ -1682,6 +1706,7 @@ final class RegionalDataHandler extends AbstractHandler
         $this->validateRequestPath($request);
 
         $params['category'] = PathCategory::from($this->requestPathParams[0]);
+        $params['rite']     = $this->rite;
         if (in_array($method, [RequestMethod::GET, RequestMethod::POST, RequestMethod::PUT, RequestMethod::PATCH, RequestMethod::DELETE], true)) {
             $params['key'] = $this->requestPathParams[1];
         }

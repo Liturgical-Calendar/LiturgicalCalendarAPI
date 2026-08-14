@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Params;
 
 use LiturgicalCalendar\Api\Enum\PathCategory;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Params\RegionalDataParams;
@@ -27,6 +28,66 @@ final class RegionalDataParamsTest extends TestCase
         $this->expectException(ValidationException::class);
 
         new RegionalDataParams(['category' => PathCategory::NATION]); // @phpstan-ignore-line
+    }
+
+    public function testRiteDefaultsToRomanWhenAbsent(): void
+    {
+        $params = new RegionalDataParams([
+            'category' => PathCategory::NATION,
+            'key'      => 'IT',
+        ]);
+
+        self::assertSame(Rite::ROMAN, $params->rite);
+    }
+
+    public function testDiocesanCategoryAcceptsTheAmbrosianRite(): void
+    {
+        // The diocesan tier is the only one that exists under more than one rite.
+        $params = new RegionalDataParams([
+            'category' => PathCategory::DIOCESE,
+            'key'      => 'lugano_ch',
+            'rite'     => Rite::AMBROSIAN,
+        ]);
+
+        self::assertSame(Rite::AMBROSIAN, $params->rite);
+        self::assertSame(PathCategory::DIOCESE, $params->category);
+    }
+
+    public function testAmbrosianNationalCalendarIsRejected(): void
+    {
+        // There is no rite/ambrosian/calendars/nations tree to read or write.
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('has no national calendars');
+
+        new RegionalDataParams([
+            'category' => PathCategory::NATION,
+            'key'      => 'IT',
+            'rite'     => Rite::AMBROSIAN,
+        ]);
+    }
+
+    public function testAmbrosianWiderRegionIsRejected(): void
+    {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('has no wider regions');
+
+        new RegionalDataParams([
+            'category' => PathCategory::WIDERREGION,
+            'key'      => 'Europe',
+            'rite'     => Rite::AMBROSIAN,
+        ]);
+    }
+
+    public function testRomanRiteAcceptsEveryCategory(): void
+    {
+        foreach ([PathCategory::NATION, PathCategory::DIOCESE, PathCategory::WIDERREGION] as $category) {
+            $params = new RegionalDataParams([
+                'category' => $category,
+                'key'      => 'whatever',
+                'rite'     => Rite::ROMAN,
+            ]);
+            self::assertSame(Rite::ROMAN, $params->rite);
+        }
     }
 
     public function testCategoryAndKeyAreAssigned(): void
