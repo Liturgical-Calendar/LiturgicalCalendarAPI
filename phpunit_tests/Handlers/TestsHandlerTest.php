@@ -263,7 +263,7 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
      */
     public function testDeletePurgesScopedTestOperationalTuples(): void
     {
-        // --- Arrange: create a temp fixture that TestScopeResolver maps to national_calendar_test:US ---
+        // --- Arrange: create a temp fixture that TestScopeResolver maps to national_calendar_test:roman/US ---
         // Unique per-run name so the fixture cannot collide with a real or
         // shared test file (the handler reads from the real JsonData::TESTS_FOLDER,
         // so the fixture must live there). tearDown removes it via $testFixturePath.
@@ -283,7 +283,7 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         $purge = $this->createMock(ResourceTuplePurgeServiceInterface::class);
         $purge->expects($this->once())
             ->method('purgeForObject')
-            ->with('national_calendar_test:US');
+            ->with('national_calendar_test:roman/US');
         $handler->setPurgeService($purge);
 
         // --- Act: issue DELETE (bypasses JWT middleware — in-process) --------

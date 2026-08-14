@@ -9,7 +9,8 @@
     "general_roman_calendar",
     "national_calendar_test",
     "diocesan_calendar_test",
-    "general_roman_calendar_test"
+    "general_roman_calendar_test",
+    "rite_calendar_test"
   ],
   "forbidden_types": [
     "test_definition"

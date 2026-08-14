@@ -7,8 +7,57 @@
         { "$ref": "#/definitions/ExactCorrespondenceUntilType" }
     ],
     "definitions": {
-        "AppliesToOrExcludes": {
+        "AppliesToScope": {
             "type": "object",
+            "title": "AppliesToScope",
+            "description": "the calendar a test is scoped to. `rite` is required and names the rite the calendar is computed under: on its own it identifies the rite-level calendar (`/calendar/roman`, `/calendar/ambrosian`); paired with a calendar key it identifies a national or diocesan calendar within that rite (`/calendar/ambrosian/diocese/lugano_ch`). Without it a test would silently run against the General Roman Calendar and fail every assertion — see issue #767.",
+            "properties": {
+                "rite": {
+                    "$ref": "./CommonDef.json#/definitions/Rite"
+                },
+                "national_calendar": {
+                    "$ref": "./CommonDef.json#/definitions/NationalCalendarId"
+                },
+                "diocesan_calendar": {
+                    "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+                },
+                "national_calendars": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "./CommonDef.json#/definitions/NationalCalendarId"
+                    }
+                },
+                "diocesan_calendars": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+                    }
+                }
+            },
+            "required": [ "rite" ],
+            "allOf": [
+                {
+                    "description": "national calendars exist only in the Roman rite: the Ambrosian rite is proper to the Archdiocese of Milan and a handful of neighbouring dioceses, not to any nation, and `/calendar/ambrosian/nation/{id}` is a 400. Rejecting the combination here stops a test that could never run from passing corpus validation.",
+                    "if": {
+                        "required": [ "rite" ],
+                        "properties": {
+                            "rite": { "const": "ambrosian" }
+                        }
+                    },
+                    "then": {
+                        "properties": {
+                            "national_calendar": false,
+                            "national_calendars": false
+                        }
+                    }
+                }
+            ],
+            "additionalProperties": false
+        },
+        "ExcludesScope": {
+            "type": "object",
+            "title": "ExcludesScope",
+            "description": "calendars removed from the set a test applies to. `rite` is deliberately absent: the rite is already pinned by `applies_to`, so excluding one would be meaningless.",
             "minProperties": 1,
             "properties": {
                 "national_calendar": {
@@ -56,16 +105,16 @@
                     "const": "exactCorrespondence"
                 },
                 "applies_to": {
-                    "$ref": "#/definitions/AppliesToOrExcludes"
+                    "$ref": "#/definitions/AppliesToScope"
                 },
                 "excludes": {
-                    "$ref": "#/definitions/AppliesToOrExcludes"
+                    "$ref": "#/definitions/ExcludesScope"
                 },
                 "assertions": {
                     "$ref": "#/definitions/Assertions"
                 }
             },
-            "required": [ "name", "event_key", "description", "test_type", "assertions" ],
+            "required": [ "name", "event_key", "description", "test_type", "applies_to", "assertions" ],
             "additionalProperties": false
         },
         "ExactCorrespondenceSinceType": {
@@ -89,16 +138,16 @@
                     "$ref": "./CommonDef.json#/definitions/Year"
                 },
                 "applies_to": {
-                    "$ref": "#/definitions/AppliesToOrExcludes"
+                    "$ref": "#/definitions/AppliesToScope"
                 },
                 "excludes": {
-                    "$ref": "#/definitions/AppliesToOrExcludes"
+                    "$ref": "#/definitions/ExcludesScope"
                 },
                 "assertions": {
                     "$ref": "#/definitions/Assertions"
                 }
             },
-            "required": [ "name", "event_key", "description", "test_type", "assertions", "year_since" ],
+            "required": [ "name", "event_key", "description", "test_type", "applies_to", "assertions", "year_since" ],
             "additionalProperties": false
         },
         "ExactCorrespondenceUntilType": {
@@ -122,16 +171,16 @@
                     "$ref": "./CommonDef.json#/definitions/Year"
                 },
                 "applies_to": {
-                    "$ref": "#/definitions/AppliesToOrExcludes"
+                    "$ref": "#/definitions/AppliesToScope"
                 },
                 "excludes": {
-                    "$ref": "#/definitions/AppliesToOrExcludes"
+                    "$ref": "#/definitions/ExcludesScope"
                 },
                 "assertions": {
                     "$ref": "#/definitions/Assertions"
                 }
             },
-            "required": [ "name", "event_key", "description", "test_type", "assertions", "year_until" ],
+            "required": [ "name", "event_key", "description", "test_type", "applies_to", "assertions", "year_until" ],
             "additionalProperties": false
         },
         "Assertions": {

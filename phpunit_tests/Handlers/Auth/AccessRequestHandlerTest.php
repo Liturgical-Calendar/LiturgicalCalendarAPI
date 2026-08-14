@@ -177,7 +177,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
             [],
             [
                 'requested_role' => 'calendar_editor',
-                'permissions'    => [['object_type' => 'national_calendar_test', 'object_id' => 'IT', 'relation' => 'editor']],
+                'permissions'    => [['object_type' => 'national_calendar_test', 'object_id' => 'roman/IT', 'relation' => 'editor']],
             ]
         )->withAttribute('oidc_user', $this->oidcUser());
 
@@ -472,7 +472,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
             [],
             [
                 'requested_role' => 'test_editor',
-                'permissions'    => [['object_type' => 'national_calendar_test', 'object_id' => 'IT', 'relation' => 'editor']],
+                'permissions'    => [['object_type' => 'national_calendar_test', 'object_id' => 'roman/IT', 'relation' => 'editor']],
                 'justification'  => 'I help test the IT national calendar.',
             ]
         )->withAttribute('oidc_user', $this->oidcUser());

@@ -36,6 +36,16 @@ final class ResourceExistenceCheckerTest extends TestCase
         $this->assertTrue($checker->isResourceType('national_calendar_test'));
         $this->assertTrue($checker->isResourceType('diocesan_calendar_test'));
         $this->assertTrue($checker->isResourceType('general_roman_calendar_test'));
+        $this->assertTrue($checker->isResourceType('rite_calendar_test'));
+    }
+
+    public function testRiteCalendarTestExistsOnlyForKnownRites(): void
+    {
+        $checker = new ResourceExistenceChecker();
+        $this->assertTrue($checker->exists('rite_calendar_test', 'roman'));
+        $this->assertTrue($checker->exists('rite_calendar_test', 'ambrosian'));
+        $this->assertFalse($checker->exists('rite_calendar_test', 'byzantine'));
+        $this->assertFalse($checker->exists('rite_calendar_test', ''));
     }
 
     public function testMissingNationalCalendarDoesNotExist(): void

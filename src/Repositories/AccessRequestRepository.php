@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Repositories;
 
 use LiturgicalCalendar\Api\Database\Connection;
+use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Services\TestScopeResolver;
 use PDO;
 
 /**
@@ -66,6 +68,7 @@ class AccessRequestRepository
         'national_calendar_test',
         'diocesan_calendar_test',
         'general_roman_calendar_test',
+        'rite_calendar_test',
         'general_roman_calendar',
     ];
 
@@ -84,10 +87,11 @@ class AccessRequestRepository
             'national_calendar_test',
             'diocesan_calendar_test',
             'general_roman_calendar_test',
+            'rite_calendar_test',
             'general_roman_calendar',
         ],
         'calendar_editor' => ['national_calendar', 'diocesan_calendar', 'wider_region', 'general_roman_calendar'],
-        'test_editor'     => ['national_calendar_test', 'diocesan_calendar_test', 'general_roman_calendar_test'],
+        'test_editor'     => ['national_calendar_test', 'diocesan_calendar_test', 'general_roman_calendar_test', 'rite_calendar_test'],
     ];
 
     public function __construct(?PDO $db = null)
@@ -99,9 +103,32 @@ class AccessRequestRepository
      * Validate an object_id for a given object_type.
      *
      * general_roman_calendar uses a fixed enumerated id set; general_roman_calendar_test
-     * accepts only the literal id 'general_roman_calendar'; all other types accept any
-     * non-empty id (the resource itself is validated downstream by the handler).
+     * accepts only the literal id 'general_roman_calendar'; rite_calendar_test accepts
+     * only a known Rite value; the scoped test types require a rite-qualified
+     * `<rite>/<calendarId>` id, because a bare calendar id does not identify a
+     * calendar (see TestScopeResolver); all other types accept any non-empty id (the
+     * resource itself is validated downstream by the handler).
      */
+    /**
+     * Human-readable description of the ids `isValidObjectIdForType()` accepts.
+     *
+     * Kept next to the rule it describes so the two cannot drift: an error that
+     * lists the General Roman Calendar's ids while rejecting a diocesan test
+     * scope tells the caller nothing useful.
+     */
+    public static function validIdsLabelForType(string $objectType): string
+    {
+        return match ($objectType) {
+            'general_roman_calendar'      => implode(', ', self::GRC_OBJECT_IDS),
+            'general_roman_calendar_test' => 'general_roman_calendar',
+            'rite_calendar_test'          => implode(', ', array_column(Rite::cases(), 'value')),
+            'national_calendar_test'      => 'a rite-qualified nation code, e.g. ' . TestScopeResolver::qualify(Rite::ROMAN, 'US'),
+            'diocesan_calendar_test'      => 'a rite-qualified diocese id, e.g. ' . TestScopeResolver::qualify(Rite::AMBROSIAN, 'lugano_ch'),
+            'national_calendar'           => 'a two-letter ISO nation code',
+            default                       => 'any non-empty id',
+        };
+    }
+
     public static function isValidObjectIdForType(string $objectType, string $objectId): bool
     {
         if ($objectType === 'general_roman_calendar') {
@@ -110,6 +137,19 @@ class AccessRequestRepository
 
         if ($objectType === 'general_roman_calendar_test') {
             return $objectId === 'general_roman_calendar';
+        }
+
+        if ($objectType === 'rite_calendar_test') {
+            return null !== Rite::tryFrom($objectId);
+        }
+
+        if ($objectType === 'national_calendar_test' || $objectType === 'diocesan_calendar_test') {
+            $parsed = TestScopeResolver::parseQualifiedId($objectId);
+            if (null === $parsed) {
+                return false;
+            }
+            // Only the Roman rite has a national tier.
+            return $objectType !== 'national_calendar_test' || Rite::ROMAN === $parsed[0];
         }
 
         if ($objectType === 'national_calendar') {

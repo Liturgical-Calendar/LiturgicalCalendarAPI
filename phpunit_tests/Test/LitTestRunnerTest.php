@@ -51,9 +51,9 @@ final class LitTestRunnerTest extends TestCase
      * Build a minimal calendar response with the given litcal events and year.
      *
      * The LitTestRunner only reads `settings->year`, optional
-     * `settings->national_calendar` / `settings->diocesan_calendar`, and
-     * the `litcal` array. Anything else gets passed through into the
-     * `jsonData` attachment but isn't inspected.
+     * `settings->rite` / `settings->national_calendar` /
+     * `settings->diocesan_calendar`, and the `litcal` array. Anything else
+     * gets passed through into the `jsonData` attachment but isn't inspected.
      *
      * @param array<int,\stdClass> $litcal
      */
@@ -200,6 +200,66 @@ final class LitTestRunnerTest extends TestCase
         $msg = $runner->getMessage();
         $this->assertSame('success', $msg->type);
         $this->assertStringContainsString('Calendar US', $msg->text);
+    }
+
+    public function testRiteMismatchIsReportedAsASingleError(): void
+    {
+        // MaryMotherChurchTest is scoped to the Roman rite. Handing it an
+        // Ambrosian calendar must produce one clear diagnostic rather than a
+        // wall of failed assertions — the failure mode behind issue #767.
+        $data                 = $this->calendarPayload(2019, [
+            (object) ['event_key' => 'MaryMotherChurch', 'date' => '2019-06-10T00:00:00+00:00'],
+        ]);
+        $data->settings->rite = 'ambrosian';
+
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data);
+        $runner->runTest();
+
+        $msg = $runner->getMessage();
+        $this->assertSame('error', $msg->type);
+        $this->assertStringContainsString('is scoped to the roman rite', $msg->text);
+        $this->assertStringContainsString('computed under the ambrosian rite', $msg->text);
+    }
+
+    public function testMatchingRitePassesTheGuard(): void
+    {
+        $data                 = $this->calendarPayload(2019, [
+            (object) ['event_key' => 'MaryMotherChurch', 'date' => '2019-06-10T00:00:00+00:00'],
+        ]);
+        $data->settings->rite = 'roman';
+
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data);
+        $runner->runTest();
+
+        $this->assertSame('success', $runner->getMessage()->type);
+    }
+
+    public function testUnknownRiteInResponseIsIgnoredByTheGuard(): void
+    {
+        // A rite the API does not know is not a mismatch we can reason about;
+        // the assertions still run rather than being masked by a guard error.
+        $data                 = $this->calendarPayload(2019, [
+            (object) ['event_key' => 'MaryMotherChurch', 'date' => '2019-06-10T00:00:00+00:00'],
+        ]);
+        $data->settings->rite = 'byzantine';
+
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data);
+        $runner->runTest();
+
+        $this->assertSame('success', $runner->getMessage()->type);
+    }
+
+    public function testRiteLevelCalendarIsNamedByItsRite(): void
+    {
+        $data                 = $this->calendarPayload(2019, [
+            (object) ['event_key' => 'MaryMotherChurch', 'date' => '2019-06-10T00:00:00+00:00'],
+        ]);
+        $data->settings->rite = 'roman';
+
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data);
+        $runner->runTest();
+
+        $this->assertStringContainsString('the General Roman Calendar', $runner->getMessage()->text);
     }
 
     public function testDiocesanCalendarSettingsAppearInMessageText(): void

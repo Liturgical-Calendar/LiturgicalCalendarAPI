@@ -4,6 +4,7 @@
     "description": "The optional memorial of 'Saint Vincent, Deacon and Martyr' should fall on January 23, moved from January 22 to make way for the National Day of Prayer for the Unborn",
     "test_type": "exactCorrespondence",
     "applies_to": {
+        "rite": "roman",
         "national_calendar": "US"
     },
     "assertions": [

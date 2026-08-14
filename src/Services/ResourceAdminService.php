@@ -34,6 +34,7 @@ final class ResourceAdminService
         'national_calendar_test',
         'diocesan_calendar_test',
         'general_roman_calendar_test',
+        'rite_calendar_test',
     ];
 
     /**
@@ -47,6 +48,7 @@ final class ResourceAdminService
         'national_calendar_test',
         'diocesan_calendar_test',
         'general_roman_calendar_test',
+        'rite_calendar_test',
     ];
 
     public function __construct(private readonly OpenFgaClient $fgaClient)

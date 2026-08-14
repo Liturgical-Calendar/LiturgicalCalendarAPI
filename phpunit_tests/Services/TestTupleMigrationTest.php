@@ -20,7 +20,7 @@ final class TestTupleMigrationTest extends TestCase
     }
 
     /**
-     * A `test_definition:FooTest` tuple must remap to `diocesan_calendar_test:rotter_nl`
+     * A `test_definition:FooTest` tuple must remap to `diocesan_calendar_test:roman/rotter_nl`
      * when FooTest.json carries `applies_to.diocesan_calendar = "rotter_nl"`.
      */
     public function testMapsTupleToDiocesanScope(): void
@@ -40,7 +40,7 @@ final class TestTupleMigrationTest extends TestCase
             [
                 'user'     => 'user:1',
                 'relation' => 'editor',
-                'object'   => 'diocesan_calendar_test:rotter_nl',
+                'object'   => 'diocesan_calendar_test:roman/rotter_nl',
             ],
             $result
         );
