@@ -10,6 +10,7 @@ use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\Route;
+use LiturgicalCalendar\Api\Models\Calendar\Rite\RiteProfileFactory;
 use LiturgicalCalendar\Api\Models\CatholicDiocesesLatinRite\CatholicDiocesesMap;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataAmbrosianCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
@@ -319,14 +320,26 @@ final class CalendarMetadataProvider
      * (derived from the Ambrosian Proprium de Tempore's `i18n` folder, the
      * same source used at request time by {@see \LiturgicalCalendar\Api\Handlers\CalendarHandler}).
      *
+     * The announced `settings` come from {@see \LiturgicalCalendar\Api\Models\Calendar\Rite\RiteProfile::fixedCalendarSettings()}, the
+     * same authority {@see \LiturgicalCalendar\Api\Handlers\CalendarHandler::applyRiteFixedSettings()}
+     * applies before calculating, so what `/calendars` announces and what
+     * `/calendar/ambrosian` echoes cannot drift apart (issue #776).
+     *
      * @return void
      */
     private static function buildAmbrosianCalendarData(MetadataCalendars $metadata): void
     {
+        $fixedSettings = RiteProfileFactory::forRite(Rite::AMBROSIAN)->fixedCalendarSettings();
+
+        if (null === $fixedSettings) {
+            throw new \LogicException('The Ambrosian rite profile must declare the calendar settings the rite fixes.');
+        }
+
         $metadataAmbrosianCalendarItem = MetadataAmbrosianCalendarItem::fromArray([
             'calendar_id' => Rite::AMBROSIAN->value,
             'rite'        => Rite::AMBROSIAN->value,
-            'locales'     => self::ambrosianLocales()
+            'locales'     => self::ambrosianLocales(),
+            'settings'    => $fixedSettings->jsonSerialize()
         ]);
         $metadata->pushAmbrosianCalendarMetadata($metadataAmbrosianCalendarItem);
     }

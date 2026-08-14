@@ -9,12 +9,25 @@ use LiturgicalCalendar\Api\Models\Calendar\Missal\MissalResolver;
 use LiturgicalCalendar\Api\Models\Calendar\Precedence\PrecedenceResolver;
 use LiturgicalCalendar\Api\Models\Calendar\Temporale\RomanTemporale;
 use LiturgicalCalendar\Api\Models\Calendar\Temporale\TemporaleEngine;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataRiteCalendarSettings;
 
 final class RomanRiteProfile implements RiteProfile
 {
     public function rite(): Rite
     {
         return Rite::ROMAN;
+    }
+
+    /**
+     * The Roman rite fixes nothing at rite level: Epiphany, Ascension, Corpus Christi, the
+     * Eternal High Priest and the days of precept are all owned by its national and diocesan
+     * tiers (and, absent either, by the `CalendarParams` defaults, which a request may
+     * legitimately override). Announcing a block here would claim a constraint that the
+     * General Roman Calendar does not impose.
+     */
+    public function fixedCalendarSettings(): ?MetadataRiteCalendarSettings
+    {
+        return null;
     }
 
     public function temporaleEngine(): TemporaleEngine
