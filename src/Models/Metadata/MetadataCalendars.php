@@ -41,7 +41,14 @@ use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
  *     ambrosian_calendars:array<\stdClass&object{
  *         calendar_id:string,
  *         rite:string,
- *         locales:string[]
+ *         locales:string[],
+ *         settings:\stdClass&object{
+ *             epiphany:string,
+ *             ascension:string,
+ *             corpus_christi:string,
+ *             eternal_high_priest:bool,
+ *             holydays_of_obligation:\stdClass
+ *         }
  *     }>,
  *     ambrosian_calendars_keys:string[]
  * }
@@ -81,7 +88,14 @@ use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
  *     ambrosian_calendars:array<array{
  *         calendar_id:string,
  *         rite:string,
- *         locales:string[]
+ *         locales:string[],
+ *         settings:array{
+ *             epiphany:string,
+ *             ascension:string,
+ *             corpus_christi:string,
+ *             eternal_high_priest:bool,
+ *             holydays_of_obligation:array<string,bool>
+ *         }
  *     }>,
  *     ambrosian_calendars_keys:string[]
  * }
@@ -210,7 +224,7 @@ final class MetadataCalendars extends AbstractJsonRepresentation
             'wider_regions_keys'       => $this->wider_regions_keys,
             'locales'                  => $this->locales,
             'ambrosian_calendars'      => array_map(
-                /** @return array{calendar_id:string,rite:string,locales:string[]} */
+                /** @return array{calendar_id:string,rite:string,locales:string[],settings:array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool,holydays_of_obligation:array<string,bool>}} */
                 function (MetadataAmbrosianCalendarItem $ac): array {
                     return $ac->jsonSerialize();
                 },
