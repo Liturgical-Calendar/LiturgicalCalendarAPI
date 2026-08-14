@@ -376,6 +376,45 @@ final class CalendarHandler extends AbstractHandler
     }
 
     /**
+     * Overwrites the settings the requested rite fixes, after the national and diocesan
+     * layers have had their say (issue #776).
+     *
+     * The values come from {@see \LiturgicalCalendar\Api\Models\Calendar\Rite\RiteProfile::fixedCalendarSettings()} — the single authority
+     * that {@see \LiturgicalCalendar\Api\Services\CalendarMetadataProvider::buildAmbrosianCalendarData()}
+     * also reads to announce them on `/calendars`. Applying them here, before the params hash
+     * that keys the engine cache is computed and before the `settings` block is echoed, is
+     * what makes the announced values and the applied values the same values by construction.
+     *
+     * The Roman rite fixes nothing at rite level, so this is a no-op for it and the existing
+     * General Roman / national / diocesan precedence is untouched.
+     *
+     * For the Ambrosian rite this also *corrects* the echoed block: `epiphany`, `ascension`
+     * and `corpus_christi` are already documented in the OpenAPI schema as accepted but
+     * ignored under this rite (the Ambrosian temporale hardcodes all three), yet the response
+     * used to echo whatever had been requested — telling a client its parameter had been
+     * honoured when the calculation had ignored it. Likewise `holydays_of_obligation` used to
+     * echo the Roman Can. 1246 §1 keys, several of which (`CorpusChristi`, `MaryMotherOfGod`,
+     * `StJoseph`, `StsPeterPaulAp`) name days that do not exist in the Ambrosian calendar,
+     * while the days actually flagged on the events were the Ambrosian ones.
+     *
+     * @return void
+     */
+    private function applyRiteFixedSettings(): void
+    {
+        $fixedSettings = RiteProfileFactory::forRite($this->CalendarParams->Rite)->fixedCalendarSettings();
+
+        if (null === $fixedSettings) {
+            return;
+        }
+
+        $this->CalendarParams->Epiphany             = $fixedSettings->epiphany;
+        $this->CalendarParams->Ascension            = $fixedSettings->ascension;
+        $this->CalendarParams->CorpusChristi        = $fixedSettings->corpus_christi;
+        $this->CalendarParams->EternalHighPriest    = $fixedSettings->eternal_high_priest;
+        $this->CalendarParams->HolyDaysOfObligation = $fixedSettings->holydays_of_obligation;
+    }
+
+    /**
      * If a Diocesan calendar is specified, we need to check if any of the settings for Epiphany, Ascension, Corpus Christi
      * have been overridden. If so, we update the CalendarParams object with the new values.
      *
@@ -5491,6 +5530,7 @@ final class CalendarHandler extends AbstractHandler
         $this->loadNationalCalendarData();
         $this->updateSettingsBasedOnNationalCalendar();
         $this->updateSettingsBasedOnDiocesanCalendar();
+        $this->applyRiteFixedSettings();
         $this->CachePath = 'engineCache/v' . str_replace('.', '_', self::API_VERSION)
             . '-' . self::engineCacheDataVersion() . '/';
 

@@ -3,7 +3,6 @@
 namespace LiturgicalCalendar\Api\Models\Calendar;
 
 use LiturgicalCalendar\Api\DateTime;
-use LiturgicalCalendar\Api\Enum\AmbrosianHolyDaysOfObligation;
 use LiturgicalCalendar\Api\Enum\LitCommon;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitLocale;
@@ -1200,11 +1199,17 @@ final class LiturgicalEventCollection
      * Ambrosian rite only: marks Holy Days of Obligation.
      *
      * Mirrors the rite-agnostic HDoO half of the Roman `setSeasonsAndHolyDaysOfObligation()`
-     * (`in_array($event_key, $HolyDaysOfObligation)`, plus marking every Sunday), but sources the
-     * `event_key` set from `AmbrosianHolyDaysOfObligation::DEFAULT` instead of the Roman
-     * `CalendarParams::$HolyDaysOfObligation` default, since the two calendars don't share event
-     * keys for their days of precept (see `AmbrosianHolyDaysOfObligation` for the provisional,
-     * ordo-validation-pending set and its rationale).
+     * (`in_array($event_key, $HolyDaysOfObligation)`, plus marking every Sunday), reading the
+     * same `CalendarParams::$HolyDaysOfObligation` property the Roman path reads — which, for
+     * an Ambrosian request, `CalendarHandler::applyRiteFixedSettings()` has already replaced
+     * with the rite's own set (ultimately `AmbrosianHolyDaysOfObligation::DEFAULT`, declared by
+     * `AmbrosianRiteProfile::fixedCalendarSettings()`). The two rites do not share event keys
+     * for their days of precept; see `AmbrosianHolyDaysOfObligation` for the provisional,
+     * ordo-validation-pending set and its rationale.
+     *
+     * Going through `CalendarParams` rather than reading the enum directly is what keeps the
+     * flags on the events, the `settings` block echoed by `/calendar/ambrosian`, and the
+     * `settings` block announced by `/calendars` all sourced from one authority (issue #776).
      *
      * As in the Roman rite, every Sunday is also a holy day of obligation regardless of
      * `event_key`.
@@ -1213,10 +1218,7 @@ final class LiturgicalEventCollection
      */
     public function setAmbrosianHolyDaysOfObligation(): void
     {
-        // Unlike the Roman `CalendarParams::$HolyDaysOfObligation` (a mutable instance property
-        // that request params can toggle, hence the `array_filter()` there), the Ambrosian
-        // default is a fixed `const` with every value `true`, so its keys are exactly its HDoO set.
-        $holyDaysOfObligation = array_keys(AmbrosianHolyDaysOfObligation::DEFAULT);
+        $holyDaysOfObligation = array_keys(array_filter($this->CalendarParams->HolyDaysOfObligation));
 
         foreach ($this->liturgicalEvents as $litEvent) {
             if (in_array($litEvent->event_key, $holyDaysOfObligation, true) || (int) $litEvent->date->format('N') === 7) {

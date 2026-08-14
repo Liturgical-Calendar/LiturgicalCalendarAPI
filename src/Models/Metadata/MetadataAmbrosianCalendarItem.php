@@ -14,6 +14,8 @@ use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
  * they exist specifically to represent a non-Roman rite's calendar.
  *
  * @see \LiturgicalCalendar\Api\Enum\Rite
+ * @phpstan-import-type RiteCalendarSettingsArray from MetadataRiteCalendarSettings
+ * @phpstan-import-type RiteCalendarSettingsObject from MetadataRiteCalendarSettings
  */
 final class MetadataAmbrosianCalendarItem extends AbstractJsonRepresentation
 {
@@ -25,20 +27,32 @@ final class MetadataAmbrosianCalendarItem extends AbstractJsonRepresentation
     public array $locales;
 
     /**
+     * The settings the rite fixes for every calendar computed under it, announced so that a
+     * client can discover them without first issuing a calculation request (issue #776).
+     *
+     * Shaped exactly like `national_calendars[].settings` and `diocesan_calendars[].settings`
+     * so clients parse all three tiers with the same code.
+     */
+    public MetadataRiteCalendarSettings $settings;
+
+    /**
      * Initializes a MetadataAmbrosianCalendarItem object.
      *
      * @param string $calendar_id The path segment identifying the comune calendar (e.g. `ambrosian`, used as `/calendar/{$calendar_id}`).
      * @param string $rite The {@see \LiturgicalCalendar\Api\Enum\Rite} value this comune calendar is computed under.
      * @param string[] $locales The locales supported by the comune calendar.
+     * @param MetadataRiteCalendarSettings $settings The calendar settings the rite fixes.
      */
     public function __construct(
         string $calendar_id,
         string $rite,
-        array $locales
+        array $locales,
+        MetadataRiteCalendarSettings $settings
     ) {
         $this->calendar_id = $calendar_id;
         $this->rite        = $rite;
         $this->locales     = $locales;
+        $this->settings    = $settings;
     }
 
     /**
@@ -49,8 +63,9 @@ final class MetadataAmbrosianCalendarItem extends AbstractJsonRepresentation
      * - calendar_id: The path segment identifying the comune calendar.
      * - rite: The rite this comune calendar is computed under.
      * - locales: An array of locales supported by the comune calendar.
+     * - settings: The calendar settings the rite fixes.
      *
-     * @return array{calendar_id:string,rite:string,locales:string[]} The associative array representation of the object.
+     * @return array{calendar_id:string,rite:string,locales:string[],settings:RiteCalendarSettingsArray} The associative array representation of the object.
      */
     public function jsonSerialize(): array
     {
@@ -58,6 +73,7 @@ final class MetadataAmbrosianCalendarItem extends AbstractJsonRepresentation
             'calendar_id' => $this->calendar_id,
             'rite'        => $this->rite,
             'locales'     => $this->locales,
+            'settings'    => $this->settings->jsonSerialize(),
         ];
     }
 
@@ -68,8 +84,9 @@ final class MetadataAmbrosianCalendarItem extends AbstractJsonRepresentation
      * - calendar_id (string): The path segment identifying the comune calendar.
      * - rite (string): The rite this comune calendar is computed under.
      * - locales (string[]): The locales supported by the comune calendar.
+     * - settings (array): The calendar settings the rite fixes.
      *
-     * @param array{calendar_id:string,rite:string,locales:string[]} $data
+     * @param array{calendar_id:string,rite:string,locales:string[],settings:RiteCalendarSettingsArray} $data
      * @return static
      */
     protected static function fromArrayInternal(array $data): static
@@ -77,7 +94,8 @@ final class MetadataAmbrosianCalendarItem extends AbstractJsonRepresentation
         return new static(
             $data['calendar_id'],
             $data['rite'],
-            $data['locales']
+            $data['locales'],
+            MetadataRiteCalendarSettings::fromArray($data['settings'])
         );
     }
 
@@ -88,8 +106,9 @@ final class MetadataAmbrosianCalendarItem extends AbstractJsonRepresentation
      * - calendar_id (string): The path segment identifying the comune calendar.
      * - rite (string): The rite this comune calendar is computed under.
      * - locales (string[]): The locales supported by the comune calendar.
+     * - settings (object): The calendar settings the rite fixes.
      *
-     * @param \stdClass&object{calendar_id:string,rite:string,locales:string[]} $data
+     * @param \stdClass&object{calendar_id:string,rite:string,locales:string[],settings:RiteCalendarSettingsObject} $data
      * @return static
      */
     protected static function fromObjectInternal(\stdClass $data): static
@@ -97,7 +116,8 @@ final class MetadataAmbrosianCalendarItem extends AbstractJsonRepresentation
         return new static(
             $data->calendar_id,
             $data->rite,
-            $data->locales
+            $data->locales,
+            MetadataRiteCalendarSettings::fromObject($data->settings)
         );
     }
 }

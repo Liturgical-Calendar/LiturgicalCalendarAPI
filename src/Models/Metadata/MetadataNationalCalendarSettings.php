@@ -13,7 +13,7 @@ use LiturgicalCalendar\Api\Models\AbstractJsonRepresentation;
  *      ascension:string,
  *      corpus_christi:string,
  *      eternal_high_priest:bool,
- *      holydays_of_obligation:\stdClass&object<string,bool>
+ *      holydays_of_obligation:\stdClass
  * }
  * @phpstan-type NationalCalendarSettingsArray array{
  *      epiphany:string,
