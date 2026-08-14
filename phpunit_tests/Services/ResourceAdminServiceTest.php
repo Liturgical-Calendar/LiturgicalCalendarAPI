@@ -157,26 +157,35 @@ final class ResourceAdminServiceTest extends TestCase
 
     public function testResolveTestScopesGroupsEditorThenAdmin(): void
     {
-        // Order: editor for each TEST_OBJECT_TYPES entry, then admin for each.
+        // Order: editor for each TEST_OBJECT_TYPES entry, then admin for each —
+        // national_calendar_test, diocesan_calendar_test, general_roman_calendar_test,
+        // rite_calendar_test. The last of each group returns a rite object so the
+        // new probe is observable rather than silently empty.
         $service = $this->serviceWith([
             new GuzzleResponse(200, [], '{"objects":["national_calendar_test:USA"]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
-            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":["rite_calendar_test:ambrosian"]}'),
             new GuzzleResponse(200, [], '{"objects":["national_calendar_test:USA"]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
-            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":["rite_calendar_test:ambrosian"]}'),
         ]);
 
         $scopes = $service->resolveTestScopes('cei-admin');
 
         self::assertSame(
-            [['object_type' => 'national_calendar_test', 'object_id' => 'USA']],
+            [
+                ['object_type' => 'national_calendar_test', 'object_id' => 'USA'],
+                ['object_type' => 'rite_calendar_test', 'object_id' => 'ambrosian'],
+            ],
             $scopes['editor']
         );
         self::assertSame(
-            [['object_type' => 'national_calendar_test', 'object_id' => 'USA']],
+            [
+                ['object_type' => 'national_calendar_test', 'object_id' => 'USA'],
+                ['object_type' => 'rite_calendar_test', 'object_id' => 'ambrosian'],
+            ],
             $scopes['admin']
         );
     }

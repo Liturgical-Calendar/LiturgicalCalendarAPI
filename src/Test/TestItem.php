@@ -164,6 +164,20 @@ class TestItem
 
         self::checkCalendarScopeConditions($appliesToArr, 'applies_to');
 
+        // National calendars exist only in the Roman rite. The Ambrosian rite is
+        // proper to the Archdiocese of Milan and a handful of neighbouring
+        // dioceses rather than to any nation, and `/calendar/ambrosian/nation/{id}`
+        // is a 400 — so a test with that scope could pass validation and then fail
+        // only when the runner issues its request, which is exactly the
+        // expressible-but-unrunnable trap issue #767 set out to close.
+        if (Rite::ROMAN !== $rite) {
+            foreach (['national_calendar', 'national_calendars'] as $nationalKey) {
+                if (array_key_exists($nationalKey, $appliesToArr)) {
+                    throw new \InvalidArgumentException(__METHOD__ . ": Property `applies_to`.`{$nationalKey}` is not valid for the {$rite->value} rite; national calendars exist only in the " . Rite::ROMAN->value . ' rite');
+                }
+            }
+        }
+
         return $rite;
     }
 

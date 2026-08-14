@@ -133,7 +133,13 @@ final class HealthRiteRequestPathTest extends TestCase
 
     /**
      * Populate Health::$metadata with a two-diocese stand-in for the duration of
-     * $fn, then restore whatever was (or was not) there before.
+     * $fn, then put back what was there before.
+     *
+     * `Health::$metadata` is a typed static with no default, so PHP offers no way
+     * to return it to the genuinely uninitialised state. When it started out
+     * uninitialised we therefore leave an *empty* MetadataCalendars behind rather
+     * than the fixture, so a later test in the same process cannot resolve
+     * `lugano_ch` or `rotter_nl` from data this helper invented.
      */
     private static function withMetadata(callable $fn): void
     {
@@ -176,7 +182,25 @@ final class HealthRiteRequestPathTest extends TestCase
         } finally {
             if ($wasSet && $previous !== null) {
                 $property->setValue(null, $previous);
+            } else {
+                $property->setValue(null, self::emptyMetadata());
             }
         }
+    }
+
+    private static function emptyMetadata(): MetadataCalendars
+    {
+        return MetadataCalendars::fromObject((object) [
+            'national_calendars'       => [],
+            'national_calendars_keys'  => [],
+            'diocesan_calendars'       => [],
+            'diocesan_calendars_keys'  => [],
+            'diocesan_groups'          => [],
+            'wider_regions'            => [],
+            'wider_regions_keys'       => [],
+            'ambrosian_calendars'      => [],
+            'ambrosian_calendars_keys' => [],
+            'locales'                  => ['en'],
+        ]);
     }
 }

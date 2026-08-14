@@ -67,10 +67,11 @@ final class TestScopesHandlerTest extends AbstractHandlerTestCase
 
     public function testScopedEditorGetsEditorAndAdminLists(): void
     {
-        $handler = $this->handlerWith([
-            new GuzzleResponse(200, [], '{"objects":["national_calendar_test:USA"]}'),
-            ...$this->allEmpty(),
-        ]);
+        // Exactly one response per (relation x TEST_OBJECT_TYPES) probe: the first
+        // editor probe returns an object, the rest are empty.
+        $responses    = $this->allEmpty();
+        $responses[0] = new GuzzleResponse(200, [], '{"objects":["national_calendar_test:USA"]}');
+        $handler      = $this->handlerWith($responses);
 
         $request = $this->requestFor('GET', '/auth/test-scopes')
             ->withAttribute('oidc_user', ['sub' => 'usa-editor', 'roles' => ['test_editor']]);

@@ -625,8 +625,12 @@ class SchemaValidationTest extends TestCase
      * test files, and checking only the alphabetically-first one lets the rest
      * drift unnoticed.
      *
-     * @group slow
+     * Uses the #[Group('slow')] attribute rather than a `@group slow` docblock,
+     * which PHPUnit 12 does not honour — see the sibling Ambrosian temporale test
+     * above. CI runs the whole suite (`composer test:coverage`, no exclusions), so
+     * the corpus is still checked on every run.
      */
+    #[Group('slow')]
     #[DataProvider('realTestSourceFileProvider')]
     public function testRealTestSourceValidation(string $testFile): void
     {

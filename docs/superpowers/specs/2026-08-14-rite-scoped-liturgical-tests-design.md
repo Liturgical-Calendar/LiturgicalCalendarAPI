@@ -58,6 +58,12 @@ The issue posed three design questions; the maintainer answered all three in the
 { "applies_to": { "rite": "ambrosian", "diocesan_calendar": "lugano_ch" } }
 ```
 
+The Ambrosian rite is proper to the Archdiocese of Milan and a handful of neighbouring dioceses rather
+than to any nation, and `/calendar/ambrosian/nation/{id}` is a 400 — so `rite: ambrosian` combined with
+`national_calendar` / `national_calendars` is rejected, by a conditional in the schema and by the same
+rule in `TestItem`. Without that, a test could pass corpus validation and fail only when the runner
+issued its request: the same expressible-but-unrunnable trap as gap 2.
+
 `excludes` keeps its current shape and does **not** accept `rite`. `excludes` narrows the set of
 calendars a test applies to; the rite is already pinned by `applies_to`, so excluding a rite is
 meaningless. The two therefore stop sharing one schema definition: `AppliesToScope` (rite required) and
@@ -161,8 +167,8 @@ assertions become `eventNotExists` / `expected_value: null`, matching the patter
 
 ## Testing
 
-- `phpunit_tests/Test/TestItemTest.php` — rite required, invalid rite rejected, `excludes` still rejects
-  `rite`, typed `Rite` exposed.
+- `phpunit_tests/Test/TestItemTest.php` — rite required, invalid rite rejected, Ambrosian + national
+  calendar rejected, `excludes` still rejects `rite`, typed `Rite` exposed.
 - `phpunit_tests/Services/TestScopeResolverTest.php` — each mapping branch, including the legacy
   no-`applies_to` fallback to `rite_calendar_test:roman`.
 - New `phpunit_tests/Health/BuildCalendarRequestPathTest.php` — path construction per category × rite,

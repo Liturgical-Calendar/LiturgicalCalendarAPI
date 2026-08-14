@@ -35,6 +35,23 @@
                 }
             },
             "required": [ "rite" ],
+            "allOf": [
+                {
+                    "description": "national calendars exist only in the Roman rite: the Ambrosian rite is proper to the Archdiocese of Milan and a handful of neighbouring dioceses, not to any nation, and `/calendar/ambrosian/nation/{id}` is a 400. Rejecting the combination here stops a test that could never run from passing corpus validation.",
+                    "if": {
+                        "required": [ "rite" ],
+                        "properties": {
+                            "rite": { "const": "ambrosian" }
+                        }
+                    },
+                    "then": {
+                        "properties": {
+                            "national_calendar": false,
+                            "national_calendars": false
+                        }
+                    }
+                }
+            ],
             "additionalProperties": false
         },
         "ExcludesScope": {

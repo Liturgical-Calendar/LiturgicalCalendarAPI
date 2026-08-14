@@ -207,6 +207,29 @@ final class TestItemTest extends TestCase
         new TestItem($obj);
     }
 
+    public function testRejectsAmbrosianNationalCalendarScope(): void
+    {
+        // /calendar/ambrosian/nation/{id} is a 400 — the Ambrosian rite has no
+        // national calendars — so this scope must be rejected at validation time
+        // rather than at request time.
+        $obj             = $this->baseObject();
+        $obj->applies_to = (object) ['rite' => 'ambrosian', 'national_calendar' => 'IT'];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('`national_calendar` is not valid for the ambrosian rite');
+        new TestItem($obj);
+    }
+
+    public function testRejectsAmbrosianNationalCalendarsScope(): void
+    {
+        $obj             = $this->baseObject();
+        $obj->applies_to = (object) ['rite' => 'ambrosian', 'national_calendars' => ['IT']];
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('`national_calendars` is not valid for the ambrosian rite');
+        new TestItem($obj);
+    }
+
     public function testStoresAmbrosianRite(): void
     {
         $obj             = $this->baseObject();
