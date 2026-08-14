@@ -199,9 +199,13 @@
                     "items": {
                         "$ref": "./CommonDef.json#/definitions/Locale"
                     }
+                },
+                "settings": {
+                    "description": "the calendar settings this rite fixes for every calendar computed under it; announced so that clients can discover them without first issuing a calculation request. Same shape as national_calendars[].settings and diocesan_calendars[].settings. The holydays_of_obligation event_keys are the rite's own and do not overlap the Roman ones.",
+                    "$ref": "./CommonDef.json#/definitions/CalendarSettings"
                 }
             },
-            "required": ["calendar_id", "rite", "locales"]
+            "required": ["calendar_id", "rite", "locales", "settings"]
         },
         "WiderRegionDef": {
             "type": "object",

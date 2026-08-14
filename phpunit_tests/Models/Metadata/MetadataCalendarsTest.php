@@ -119,27 +119,55 @@ final class MetadataCalendarsTest extends TestCase
         self::assertSame('LatinAmerica', $wrObj->name);
     }
 
+    /**
+     * A deliberately synthetic settings block: this test exercises the model's serialization
+     * round-trip, not the Ambrosian rite's actual values. Those live in
+     * {@see \LiturgicalCalendar\Api\Models\Calendar\Rite\AmbrosianRiteProfile::fixedCalendarSettings()}
+     * and are asserted against the calculated calendar by
+     * {@see \LiturgicalCalendar\Tests\Handlers\AmbrosianCalendarSettingsMetadataTest}; repeating
+     * them here would be a second copy free to drift. Note in particular the holy day key that
+     * is `false` — the rite settings type must store the map verbatim rather than merging it
+     * onto the Roman Can. 1246 §1 seed the national settings type carries.
+     *
+     * @return array{epiphany:string,ascension:string,corpus_christi:string,eternal_high_priest:bool,holydays_of_obligation:array<string,bool>}
+     */
+    private static function syntheticRiteSettings(): array
+    {
+        return [
+            'epiphany'               => 'JAN6',
+            'ascension'              => 'THURSDAY',
+            'corpus_christi'         => 'THURSDAY',
+            'eternal_high_priest'    => false,
+            'holydays_of_obligation' => ['Christmas' => true, 'SomeRiteProperFeast' => true, 'StJoseph' => false],
+        ];
+    }
+
     public function testAmbrosianCalendarItemRoundTrip(): void
     {
+        $settings = self::syntheticRiteSettings();
+
         $ac = MetadataAmbrosianCalendarItem::fromArray([
             'calendar_id' => 'ambrosian',
             'rite'        => 'ambrosian',
             'locales'     => ['it', 'la'],
+            'settings'    => $settings,
         ]);
         self::assertSame('ambrosian', $ac->calendar_id);
         self::assertSame('ambrosian', $ac->rite);
         self::assertSame(['it', 'la'], $ac->locales);
         self::assertSame(
-            ['calendar_id' => 'ambrosian', 'rite' => 'ambrosian', 'locales' => ['it', 'la']],
+            ['calendar_id' => 'ambrosian', 'rite' => 'ambrosian', 'locales' => ['it', 'la'], 'settings' => $settings],
             $ac->jsonSerialize()
         );
 
-        $acObj = MetadataAmbrosianCalendarItem::fromObject((object) [
-            'calendar_id' => 'ambrosian',
-            'rite'        => 'ambrosian',
-            'locales'     => ['it', 'la'],
-        ]);
+        $acObj = MetadataAmbrosianCalendarItem::fromObject(json_decode(
+            json_encode($ac->jsonSerialize(), JSON_THROW_ON_ERROR),
+            false,
+            512,
+            JSON_THROW_ON_ERROR
+        ));
         self::assertSame('ambrosian', $acObj->calendar_id);
+        self::assertSame($settings, $acObj->jsonSerialize()['settings']);
     }
 
     public function testDiocesanCalendarItemRoundTrip(): void
@@ -261,6 +289,7 @@ final class MetadataCalendarsTest extends TestCase
             'calendar_id' => 'ambrosian',
             'rite'        => 'ambrosian',
             'locales'     => ['it', 'la'],
+            'settings'    => self::syntheticRiteSettings(),
         ]);
         $mc->pushAmbrosianCalendarMetadata($ac);
         self::assertSame(['ambrosian'], $mc->ambrosian_calendars_keys);
@@ -277,5 +306,6 @@ final class MetadataCalendarsTest extends TestCase
         $fromObj = MetadataCalendars::fromObject(json_decode(json_encode($arr, JSON_THROW_ON_ERROR), false, 512, JSON_THROW_ON_ERROR));
         self::assertSame(['ambrosian'], $fromObj->ambrosian_calendars_keys);
         self::assertSame('ambrosian', $fromObj->ambrosian_calendars[0]->rite);
+        self::assertSame(self::syntheticRiteSettings(), $fromObj->ambrosian_calendars[0]->jsonSerialize()['settings']);
     }
 }
