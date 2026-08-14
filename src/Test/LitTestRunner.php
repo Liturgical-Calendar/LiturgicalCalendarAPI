@@ -170,7 +170,7 @@ class LitTestRunner
                 $this->setError('Test name is not set');
                 return;
             }
-            $riteMismatch = $this->detectRiteMismatch();
+            $riteMismatch = $this->detectRiteMismatch(self::$testCache, $this->Test);
             if (null !== $riteMismatch) {
                 $this->setError($riteMismatch);
                 return;
@@ -278,26 +278,26 @@ class LitTestRunner
      * reads as 32 broken assertions rather than one misrouted run. That is the
      * failure mode that motivated issue #767.
      *
+     * The cache and test name are passed in already narrowed by runTest(), which
+     * has just checked both — re-checking here would add a branch no caller can
+     * reach.
+     *
      * Returns the error text on mismatch, or null when the rites agree or the
      * response does not state one.
      */
-    private function detectRiteMismatch(): ?string
+    private function detectRiteMismatch(TestsMap $testCache, string $testName): ?string
     {
-        if (null === self::$testCache || null === $this->Test) {
-            return null;
-        }
-
         $responseRite = $this->responseRite();
         if (null === $responseRite) {
             return null;
         }
 
-        $declaredRite = self::$testCache->get($this->Test)->rite;
+        $declaredRite = $testCache->get($testName)->rite;
         if ($declaredRite === $responseRite) {
             return null;
         }
 
-        return "{$this->Test} is scoped to the {$declaredRite->value} rite, but the calendar under test was computed under the {$responseRite->value} rite";
+        return "{$testName} is scoped to the {$declaredRite->value} rite, but the calendar under test was computed under the {$responseRite->value} rite";
     }
 
     /**

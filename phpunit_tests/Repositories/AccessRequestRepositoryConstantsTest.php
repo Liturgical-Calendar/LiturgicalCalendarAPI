@@ -91,12 +91,25 @@ final class AccessRequestRepositoryConstantsTest extends TestCase
         self::assertTrue(AccessRequestRepository::isValidObjectIdForType('diocesan_calendar_test', 'ambrosian/lugano_ch'));
     }
 
+    /**
+     * Every arm of the label map, because the label is the only thing a rejected
+     * caller sees: an arm that silently falls through to the General Roman
+     * Calendar's ids tells them nothing useful.
+     */
     public function testValidIdsLabelIsTypeAware(): void
     {
         self::assertStringContainsString('roman/US', AccessRequestRepository::validIdsLabelForType('national_calendar_test'));
         self::assertStringContainsString('ambrosian/lugano_ch', AccessRequestRepository::validIdsLabelForType('diocesan_calendar_test'));
         self::assertSame('roman, ambrosian', AccessRequestRepository::validIdsLabelForType('rite_calendar_test'));
         self::assertSame('general_roman_calendar', AccessRequestRepository::validIdsLabelForType('general_roman_calendar_test'));
+
+        self::assertSame(
+            implode(', ', AccessRequestRepository::GRC_OBJECT_IDS),
+            AccessRequestRepository::validIdsLabelForType('general_roman_calendar')
+        );
+        self::assertSame('a two-letter ISO nation code', AccessRequestRepository::validIdsLabelForType('national_calendar'));
+        self::assertSame('any non-empty id', AccessRequestRepository::validIdsLabelForType('wider_region'));
+        self::assertSame('any non-empty id', AccessRequestRepository::validIdsLabelForType('something_unknown'));
     }
 
     public function testValidRelationsHasNoDeleter(): void

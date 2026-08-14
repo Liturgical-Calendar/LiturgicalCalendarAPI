@@ -111,6 +111,109 @@ final class HealthRiteRequestPathTest extends TestCase
         self::assertSame('ambrosian', $method->invoke(null, (object) ['rite' => 'ambrosian']));
     }
 
+    /**
+     * The WebSocket dispatch has to hand the message's `rite` to the path builder,
+     * or a rite-aware client's selection is silently dropped and every Ambrosian
+     * diocesan request 400s (issue #767).
+     *
+     * Driven with a category the builder rejects, so the assertion lands on the
+     * synchronous path-building step and no HTTP request is ever queued — this
+     * needs neither the WS server nor the API to be running.
+     *
+     * @return array<string, array{0: array<string, mixed>}>
+     */
+    public static function dispatchedActionProvider(): array
+    {
+        return [
+            'executeUnitTest'  => [
+                [
+                    'action'   => 'executeUnitTest',
+                    'category' => 'widerregioncalendar',
+                    'calendar' => 'europe',
+                    'year'     => 2026,
+                    'test'     => 'SomeTest',
+                    'rite'     => 'ambrosian',
+                ]
+            ],
+            'validateCalendar' => [
+                [
+                    'action'       => 'validateCalendar',
+                    'category'     => 'widerregioncalendar',
+                    'calendar'     => 'europe',
+                    'year'         => 2026,
+                    'responsetype' => 'JSON',
+                    'rite'         => 'ambrosian',
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    #[DataProvider('dispatchedActionProvider')]
+    public function testWebSocketDispatchReachesTheRiteAwarePathBuilder(array $payload): void
+    {
+        $health = new Health();
+        $conn   = self::stubConnection();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown calendar category: widerregioncalendar');
+
+        // onMessage() echoes progress; swallow it so the assertion output stays clean.
+        ob_start();
+        try {
+            $health->onMessage($conn, (string) json_encode($payload));
+        } finally {
+            ob_end_clean();
+        }
+    }
+
+    public function testDispatchAcceptsAMessageWithNoRiteProperty(): void
+    {
+        // A client that predates rite awareness must still dispatch; its rite is
+        // resolved from metadata instead of the message.
+        $health = new Health();
+        $conn   = self::stubConnection();
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown calendar category: widerregioncalendar');
+
+        ob_start();
+        try {
+            $health->onMessage($conn, (string) json_encode([
+                'action'   => 'executeUnitTest',
+                'category' => 'widerregioncalendar',
+                'calendar' => 'europe',
+                'year'     => 2026,
+                'test'     => 'SomeTest',
+            ]));
+        } finally {
+            ob_end_clean();
+        }
+    }
+
+    /**
+     * A minimal Ratchet connection: onMessage() only needs somewhere to send.
+     */
+    private static function stubConnection(): \Ratchet\ConnectionInterface
+    {
+        return new class (1) implements \Ratchet\ConnectionInterface {
+            public function __construct(public int $resourceId)
+            {
+            }
+
+            public function send($data)
+            {
+                return $this;
+            }
+
+            public function close()
+            {
+            }
+        };
+    }
+
     private static function buildPath(string $calendar, int $year, string $category, Rite $rite): string
     {
         $health = ( new \ReflectionClass(Health::class) )->newInstanceWithoutConstructor();
