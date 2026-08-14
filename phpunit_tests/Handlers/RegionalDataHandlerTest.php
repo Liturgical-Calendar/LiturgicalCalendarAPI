@@ -612,6 +612,32 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
     }
 
     /**
+     * `color_ad_libitum` (issue #781) is a *sanctorale* property: it is declared on
+     * `PropriumDeSanctis.json` and resolved by the Ambrosian sanctorale assembly, and no
+     * `/data`-writable schema permits it. A diocesan payload carrying it is therefore
+     * rejected outright by schema validation, before the rite-scoped colour gate is reached.
+     *
+     * This pins that boundary deliberately. `collectIllicitColors()` does understand the
+     * `color_ad_libitum` shape — a bare `color` string rather than an array — so the gate is
+     * ready if the property is ever extended to diocesan or national calendars, but until
+     * both the schema and the engine support it there, admitting it here would promise
+     * behaviour the calculation does not implement.
+     */
+    public function testPutDiocesanCalendarRejectsAdLibitumColorAsUnknownProperty(): void
+    {
+        $payload                                                      = self::diocesanPayloadWithColor('ambrosian', 'morello', 'novara_it', 'Diocesi di Novara');
+        $payload['litcal'][0]['liturgical_event']['color_ad_libitum'] = [
+            ['color' => 'black', 'when' => 'not_sunday'],
+        ];
+
+        $this->expectException(UnprocessableContentException::class);
+        $this->expectExceptionMessage('Schema validation error');
+
+        ( new RegionalDataHandler(['diocese', 'novara_it']) )
+            ->handle($this->requestFor('PUT', '/data/diocese/novara_it', [], $payload));
+    }
+
+    /**
      * @return array<string,mixed>
      */
     private static function diocesanPayloadWithColor(string $rite, string $color, string $dioceseId, string $dioceseName): array

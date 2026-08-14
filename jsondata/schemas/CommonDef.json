@@ -72,6 +72,43 @@
                 ]
             }
         },
+        "LitColorAdLibitum": {
+            "type": "array",
+            "title": "Ad Libitum Liturgical Colour",
+            "description": "source-data only: liturgical colours admitted *ad libitum*, each gated by a named condition that the engine evaluates against the computed date. The engine appends the permitted colours to the event's `color` array, so the API response carries the outcome and never the condition. Used for colours whose admissibility depends on the day — e.g. the Ambrosian rite admits `black` in Masses for the dead only on days that are neither a Sunday nor the vigil opening one (Ordinamento Generale del Messale Ambrosiano n. 320). See issue #771 for the rite-scoped palettes these colours are also validated against.",
+            "uniqueItems": true,
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "properties": {
+                    "color": {
+                        "type": "string",
+                        "description": "the colour admitted ad libitum when the condition holds",
+                        "enum": [
+                            "white",
+                            "red",
+                            "green",
+                            "purple",
+                            "rose",
+                            "morello",
+                            "black"
+                        ]
+                    },
+                    "when": {
+                        "type": "string",
+                        "description": "the named predicate gating this colour; a closed vocabulary evaluated by the engine, mirroring the `AdLibitumColorCondition` PHP enum",
+                        "enum": [
+                            "not_sunday"
+                        ]
+                    }
+                },
+                "required": [
+                    "color",
+                    "when"
+                ],
+                "additionalProperties": false
+            }
+        },
         "LitCommon": {
             "type": "array",
             "title": "Liturgical Common",
@@ -8267,7 +8304,9 @@
                     "type": "object",
                     "oneOf": [
                         {
-                            "required": ["if_weekday"],
+                            "required": [
+                                "if_weekday"
+                            ],
                             "additionalProperties": false,
                             "properties": {
                                 "if_weekday": {
@@ -8285,7 +8324,9 @@
                             }
                         },
                         {
-                            "required": ["if_grade"],
+                            "required": [
+                                "if_grade"
+                            ],
                             "additionalProperties": false,
                             "properties": {
                                 "if_grade": {
@@ -8299,7 +8340,9 @@
                     "type": "object",
                     "oneOf": [
                         {
-                            "required": ["move"],
+                            "required": [
+                                "move"
+                            ],
                             "additionalProperties": false,
                             "properties": {
                                 "move": {
@@ -8309,7 +8352,9 @@
                             }
                         },
                         {
-                            "required": ["move_to"],
+                            "required": [
+                                "move_to"
+                            ],
                             "additionalProperties": false,
                             "properties": {
                                 "move_to": {
