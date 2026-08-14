@@ -162,11 +162,11 @@ final class ResourceAdminServiceTest extends TestCase
         // rite_calendar_test. The last of each group returns a rite object so the
         // new probe is observable rather than silently empty.
         $service = $this->serviceWith([
-            new GuzzleResponse(200, [], '{"objects":["national_calendar_test:USA"]}'),
+            new GuzzleResponse(200, [], '{"objects":["national_calendar_test:roman/USA"]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":["rite_calendar_test:ambrosian"]}'),
-            new GuzzleResponse(200, [], '{"objects":["national_calendar_test:USA"]}'),
+            new GuzzleResponse(200, [], '{"objects":["national_calendar_test:roman/USA"]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":["rite_calendar_test:ambrosian"]}'),
@@ -176,14 +176,14 @@ final class ResourceAdminServiceTest extends TestCase
 
         self::assertSame(
             [
-                ['object_type' => 'national_calendar_test', 'object_id' => 'USA'],
+                ['object_type' => 'national_calendar_test', 'object_id' => 'roman/USA'],
                 ['object_type' => 'rite_calendar_test', 'object_id' => 'ambrosian'],
             ],
             $scopes['editor']
         );
         self::assertSame(
             [
-                ['object_type' => 'national_calendar_test', 'object_id' => 'USA'],
+                ['object_type' => 'national_calendar_test', 'object_id' => 'roman/USA'],
                 ['object_type' => 'rite_calendar_test', 'object_id' => 'ambrosian'],
             ],
             $scopes['admin']
@@ -204,7 +204,7 @@ final class ResourceAdminServiceTest extends TestCase
         // general_roman_calendar_test, rite_calendar_test
         $service = $this->serviceWith([
             new GuzzleResponse(200, [], '{"objects":["general_roman_calendar:temporale","general_roman_calendar:decrees"]}'),
-            new GuzzleResponse(200, [], '{"objects":["national_calendar_test:IT"]}'),
+            new GuzzleResponse(200, [], '{"objects":["national_calendar_test:roman/IT"]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":["rite_calendar_test:ambrosian"]}'),
@@ -213,7 +213,7 @@ final class ResourceAdminServiceTest extends TestCase
         self::assertSame(
             [
                 'general_roman_calendar'      => ['temporale', 'decrees'],
-                'national_calendar_test'      => ['IT'],
+                'national_calendar_test'      => ['roman/IT'],
                 'diocesan_calendar_test'      => [],
                 'general_roman_calendar_test' => [],
                 'rite_calendar_test'          => ['ambrosian'],

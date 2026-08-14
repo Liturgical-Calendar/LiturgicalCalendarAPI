@@ -20,8 +20,8 @@ use LiturgicalCalendar\Api\Enum\Rite;
  *   national_calendar            — jsondata/sourcedata/rite/roman/calendars/nations/{id}/{id}.json
  *   wider_region                 — jsondata/sourcedata/rite/roman/calendars/wider_regions/{id}/ (directory)
  *   diocesan_calendar            — jsondata/sourcedata/rite/roman/calendars/dioceses/{nation}/{id}/ (directory, glob)
- *   national_calendar_test       — governance scope; always treated as existing
- *   diocesan_calendar_test       — governance scope; always treated as existing
+ *   national_calendar_test       — governance scope (id `<rite>/<calendarId>`); always treated as existing
+ *   diocesan_calendar_test       — governance scope (id `<rite>/<calendarId>`); always treated as existing
  */
 final class ResourceExistenceChecker implements ResourceExistenceCheckerInterface
 {
@@ -76,7 +76,10 @@ final class ResourceExistenceChecker implements ResourceExistenceCheckerInterfac
             case 'national_calendar_test':
             case 'diocesan_calendar_test':
                 // Scoped test objects are governance scopes, not file-backed resources.
-                // Treat as always existing to avoid false purges.
+                // Treat as always existing to avoid false purges. Deliberately not
+                // validating the `<rite>/<calendarId>` shape here: during the migration
+                // window legacy unqualified ids are still in the store, and this method
+                // decides what the reconciler *purges*.
                 return true;
 
             default:

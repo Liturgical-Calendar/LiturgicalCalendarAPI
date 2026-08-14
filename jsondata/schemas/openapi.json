@@ -3113,7 +3113,7 @@
                           "permissions": [
                             {
                               "object_type": "national_calendar_test",
-                              "object_id": "IT",
+                              "object_id": "roman/IT",
                               "relation": "viewer"
                             }
                           ],
@@ -10319,7 +10319,7 @@
           },
           "viewer_scopes": {
             "type": "object",
-            "description": "Object IDs the caller can view (viewer-or-above), keyed by OpenFGA object type. Keys cover general_roman_calendar, national_calendar_test, diocesan_calendar_test, general_roman_calendar_test and rite_calendar_test.",
+            "description": "Object IDs the caller can view (viewer-or-above), keyed by OpenFGA object type. Keys cover general_roman_calendar, national_calendar_test, diocesan_calendar_test, general_roman_calendar_test and rite_calendar_test. Scoped test ids are rite-qualified as `<rite>/<calendarId>` (e.g. `ambrosian/lugano_ch`), because a bare calendar id does not identify a calendar; `rite_calendar_test` ids are the rite itself.",
             "additionalProperties": {
               "type": "array",
               "items": {
@@ -10332,7 +10332,7 @@
                 "decrees"
               ],
               "national_calendar_test": [
-                "IT"
+                "roman/IT"
               ],
               "diocesan_calendar_test": [],
               "general_roman_calendar_test": [],

@@ -73,24 +73,37 @@ meaningless. The two therefore stop sharing one schema definition: `AppliesToSco
 
 `TestScopeResolver::mapAppliesTo()` becomes:
 
-| `applies_to`                           | FGA scope                     |
-|----------------------------------------|-------------------------------|
-| `{"diocesan_calendar": "<id>"}`        | `diocesan_calendar_test:<id>` |
-| `{"national_calendar": "<id>"}`        | `national_calendar_test:<id>` |
-| `{"rite": "<rite>"}` (no calendar key) | `rite_calendar_test:<rite>`   |
-| absent / unrecognised                  | `rite_calendar_test:roman`    |
+| `applies_to`                                   | FGA scope                         |
+|------------------------------------------------|-----------------------------------|
+| `{"rite": "<r>", "diocesan_calendar": "<id>"}` | `diocesan_calendar_test:<r>/<id>` |
+| `{"rite": "<r>", "national_calendar": "<id>"}` | `national_calendar_test:<r>/<id>` |
+| `{"rite": "<r>"}` (no calendar key)            | `rite_calendar_test:<r>`          |
+| absent / unrecognised                          | `rite_calendar_test:roman`        |
 
-The diocesan and national branches keep precedence and stay keyed by calendar id alone. Diocesan and
-national calendar ids are globally unique across rites today, and the *data* resource types
-(`diocesan_calendar`, `national_calendar`) are keyed the same way — rite-qualifying only the test scope
-would make the two halves of the model disagree. If a calendar id ever needs to be rite-qualified, that
-is a change to the whole resource model, not to tests, and is out of scope here.
+**Every scope carries its rite**, including the national and diocesan ones. A calendar id alone does not
+identify a calendar: the source tree is already partitioned as
+`jsondata/sourcedata/rite/{rite}/calendars/...`, so nothing stops the same diocese being defined under
+both rites, and `lugano_ch` only happens to be Ambrosian-only today. Granting `diocesan_calendar_test` on
+a bare `lugano_ch` would therefore be an ambiguous grant — it would silently cover a Roman `lugano_ch`
+calendar the moment one existed. National scopes are qualified too, for one uniform rule, even though only
+the Roman rite has a national tier; `national_calendar_test:ambrosian/*` is rejected rather than merely
+unused.
+
+`/` separates the two: it is safe in an OpenFGA object id (only whitespace, `:`, `#` and `*` carry meaning)
+and reads as the hierarchy it is. `TestScopeResolver::qualify()` / `::parseQualifiedId()` are the single
+definition of the format; `AccessRequestRepository` validates incoming ids through the parser.
+
+This applies to the *test* scopes only. The data resource types (`national_calendar`, `diocesan_calendar`)
+keep bare ids in this change — rite-qualifying those touches `/data` authorization and production calendar
+grants, and belongs in its own change.
 
 `general_roman_calendar_test` is **not removed**. It stays in the FGA model and in every PHP allow-list
 so existing tuples keep authorizing, following the additive-model pattern already used in this repo
-(`scripts/openfga-model.additive.json`, `docs/ops/test-scope-migration-runbook.md`). A migration script
-copies each `general_roman_calendar_test:general_roman_calendar` tuple onto `rite_calendar_test:roman`.
-Dropping the old type is a follow-up, once every deployment runs merged code.
+(`scripts/openfga-model.additive.json`, `docs/ops/test-scope-migration-runbook.md`). The unqualified
+`national_calendar_test` / `diocesan_calendar_test` ids stay valid for the same reason. A migration script
+copies every superseded tuple onto its successor, inferring each calendar's rite from the rite-partitioned
+source tree and skipping anything it cannot resolve unambiguously. Dropping the old type and pruning the
+unqualified ids is a follow-up, once every deployment runs merged code.
 
 Touched surfaces:
 
@@ -99,7 +112,8 @@ Touched surfaces:
 - `src/Services/TestScopeResolver.php` — the mapping
 - `src/Services/ResourceExistenceChecker.php` — resource type; always exists
 - `src/Repositories/AccessRequestRepository.php` — `OBJECT_TYPES`, `ROLE_OBJECT_TYPES`, id validation
-  (a `rite_calendar_test` id must be a valid `Rite` value)
+  (`rite_calendar_test` takes a `Rite` value; the scoped test types require `<rite>/<calendarId>`), and a
+  type-aware `validIdsLabelForType()` so a rejection says what the type actually accepts
 - `src/Services/ResourceAdminService.php` — `TEST_OBJECT_TYPES`, `VIEWER_OBJECT_TYPES`
 - `scripts/migrate-rite-test-tuples.php` + runbook section
 

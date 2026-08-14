@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Services;
 
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Services\TestScopeResolver;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -21,13 +22,13 @@ final class TestScopeResolverTest extends TestCase
     public function testResolvesDiocesan(): void
     {
         $r = new TestScopeResolver($this->fixturesDir);
-        $this->assertSame(['diocesan_calendar_test', 'rotter_nl'], $r->resolve('FooTest'));
+        $this->assertSame(['diocesan_calendar_test', 'roman/rotter_nl'], $r->resolve('FooTest'));
     }
 
     public function testResolvesNational(): void
     {
         $r = new TestScopeResolver($this->fixturesDir);
-        $this->assertSame(['national_calendar_test', 'US'], $r->resolve('BarTest'));
+        $this->assertSame(['national_calendar_test', 'roman/US'], $r->resolve('BarTest'));
     }
 
     public function testResolvesRomanRiteWhenAppliestoAbsent(): void
@@ -74,8 +75,9 @@ final class TestScopeResolverTest extends TestCase
     public function testAcceptsValidAlphanumericDashUnderscoreName(): void
     {
         $r = new TestScopeResolver($this->fixturesDir);
-        // FooTest is a known fixture — must still resolve
-        $this->assertSame(['diocesan_calendar_test', 'rotter_nl'], $r->resolve('FooTest'));
+        // FooTest is a known fixture — must still resolve. It predates the required
+        // `rite`, so it falls back to the default rite and is qualified with it.
+        $this->assertSame(['diocesan_calendar_test', 'roman/rotter_nl'], $r->resolve('FooTest'));
     }
 
     public function testAcceptsNameWithDashAndUnderscore(): void
@@ -85,12 +87,21 @@ final class TestScopeResolverTest extends TestCase
         $this->assertNull($r->resolve('Valid-Test_Name-123'));
     }
 
+    public function testResolvesRiteQualifiedDiocesanScopeFromFile(): void
+    {
+        $r = new TestScopeResolver($this->fixturesDir);
+        $this->assertSame(
+            ['diocesan_calendar_test', 'ambrosian/lugano_ch'],
+            $r->resolve('AmbrosianDioceseTest')
+        );
+    }
+
     public function testResolveFromPayloadNational(): void
     {
         $r = new TestScopeResolver($this->fixturesDir);
         $this->assertSame(
-            ['national_calendar_test', 'NL'],
-            $r->resolveFromPayload(['applies_to' => ['national_calendar' => 'NL']])
+            ['national_calendar_test', 'roman/NL'],
+            $r->resolveFromPayload(['applies_to' => ['rite' => 'roman', 'national_calendar' => 'NL']])
         );
     }
 
@@ -98,7 +109,18 @@ final class TestScopeResolverTest extends TestCase
     {
         $r = new TestScopeResolver($this->fixturesDir);
         $this->assertSame(
-            ['diocesan_calendar_test', 'romamo_it'],
+            ['diocesan_calendar_test', 'roman/romamo_it'],
+            $r->resolveFromPayload(['applies_to' => ['rite' => 'roman', 'diocesan_calendar' => 'romamo_it']])
+        );
+    }
+
+    public function testUnqualifiedLegacyPayloadFallsBackToTheDefaultRite(): void
+    {
+        // A payload written before `rite` was required still has to resolve to a
+        // scope; it is qualified with the default rite rather than left bare.
+        $r = new TestScopeResolver($this->fixturesDir);
+        $this->assertSame(
+            ['diocesan_calendar_test', 'roman/romamo_it'],
             $r->resolveFromPayload(['applies_to' => ['diocesan_calendar' => 'romamo_it']])
         );
     }
@@ -139,16 +161,41 @@ final class TestScopeResolverTest extends TestCase
         );
     }
 
-    public function testCalendarScopeWinsOverRite(): void
+    public function testCalendarScopeSelectsTheTypeAndTheRiteQualifiesTheId(): void
     {
-        // An Ambrosian diocesan test is scoped by its diocese, not its rite:
-        // diocesan and national calendar ids are unique across rites, and the
-        // matching data resource types are keyed the same way.
+        // An Ambrosian diocesan test lands on diocesan_calendar_test, but its id
+        // carries the rite: `lugano_ch` on its own would be an ambiguous grant,
+        // since the source tree admits the same diocese under either rite.
         $r = new TestScopeResolver($this->fixturesDir);
         $this->assertSame(
-            ['diocesan_calendar_test', 'lugano_ch'],
+            ['diocesan_calendar_test', 'ambrosian/lugano_ch'],
             $r->resolveFromPayload(['applies_to' => ['rite' => 'ambrosian', 'diocesan_calendar' => 'lugano_ch']])
         );
+    }
+
+    public function testTheSameDioceseUnderTwoRitesGetsTwoDistinctScopes(): void
+    {
+        $r     = new TestScopeResolver($this->fixturesDir);
+        $ambro = $r->resolveFromPayload(['applies_to' => ['rite' => 'ambrosian', 'diocesan_calendar' => 'lugano_ch']]);
+        $roman = $r->resolveFromPayload(['applies_to' => ['rite' => 'roman', 'diocesan_calendar' => 'lugano_ch']]);
+
+        $this->assertNotSame($ambro, $roman);
+        $this->assertSame(['diocesan_calendar_test', 'ambrosian/lugano_ch'], $ambro);
+        $this->assertSame(['diocesan_calendar_test', 'roman/lugano_ch'], $roman);
+    }
+
+    public function testQualifyAndParseRoundTrip(): void
+    {
+        $qualified = TestScopeResolver::qualify(Rite::AMBROSIAN, 'lugano_ch');
+        $this->assertSame('ambrosian/lugano_ch', $qualified);
+        $this->assertSame([Rite::AMBROSIAN, 'lugano_ch'], TestScopeResolver::parseQualifiedId($qualified));
+    }
+
+    public function testParseQualifiedIdRejectsUnqualifiedAndUnknownRites(): void
+    {
+        $this->assertNull(TestScopeResolver::parseQualifiedId('rotter_nl'));
+        $this->assertNull(TestScopeResolver::parseQualifiedId('byzantine/foo'));
+        $this->assertNull(TestScopeResolver::parseQualifiedId('roman/'));
     }
 
     public function testResolveFromPayloadReturnsNullForNonArray(): void

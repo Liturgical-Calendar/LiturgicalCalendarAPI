@@ -6,7 +6,7 @@ This branch (`feat/calendar-scoped-tests`) replaces the flat `test_definition`
 OpenFGA type with three calendar-scoped types:
 
 | New type                      | Scope                   | Object id                         |
-| ----------------------------- | ----------------------- | --------------------------------- |
+|-------------------------------|-------------------------|-----------------------------------|
 | `national_calendar_test`      | National-calendar tests | ISO nation code, e.g. `IT`        |
 | `diocesan_calendar_test`      | Diocesan-calendar tests | Diocese id, e.g. `ROMA`           |
 | `general_roman_calendar_test` | GRC / unscoped tests    | Fixed id `general_roman_calendar` |
@@ -254,22 +254,38 @@ The migration writes the new tuple **before** deleting the old one, so:
 
 ---
 
-## Follow-up migration — `general_roman_calendar_test` → `rite_calendar_test`
+## Follow-up migration — rite-qualified test scopes
 
-Issue #767 made the rite a first-class scope for liturgical tests. The Ambrosian
-rite-level calendar (`GET /calendar/ambrosian`) is neither national nor diocesan,
-so `general_roman_calendar_test` — a type with exactly one id,
-`general_roman_calendar` — could not name it. `TestScopeResolver` now emits
-`rite_calendar_test:<rite>` for every rite-level test:
+Issue #767 made the rite a first-class scope for liturgical tests. Two things
+follow, and one migration covers both.
 
-| Type                          | Object id                                | Status                        |
-|-------------------------------|------------------------------------------|-------------------------------|
-| `general_roman_calendar_test` | Fixed id `general_roman_calendar`        | Deprecated; kept in the model |
-| `rite_calendar_test`          | A `Rite` value: `roman` / `ambrosian`    | Successor                     |
+**The rite-level calendar needed a type.** The Ambrosian rite-level calendar
+(`GET /calendar/ambrosian`) is neither national nor diocesan, so
+`general_roman_calendar_test` — a type with exactly one id,
+`general_roman_calendar` — could not name it.
+
+**Scoped calendar ids needed a rite.** A bare calendar id does not identify a
+calendar: the source tree is partitioned as
+`jsondata/sourcedata/rite/{rite}/calendars/...`, so `lugano_ch` could name an
+Ambrosian calendar or a Roman one, and granting `diocesan_calendar_test` on a
+bare `lugano_ch` would be an ambiguous grant. National scopes are qualified too,
+for one uniform rule — even though only the Roman rite has a national tier.
+
+| Type                          | Object id before         | Object id after                       |
+|-------------------------------|--------------------------|---------------------------------------|
+| `general_roman_calendar_test` | `general_roman_calendar` | → `rite_calendar_test:roman`          |
+| `rite_calendar_test`          | *(new)*                  | A `Rite` value: `roman` / `ambrosian` |
+| `national_calendar_test`      | `US`                     | `roman/US`                            |
+| `diocesan_calendar_test`      | `lugano_ch`              | `ambrosian/lugano_ch`                 |
+
+The rite of an existing national or diocesan tuple is inferred from the
+rite-partitioned source tree, which is the authority on which rite a calendar is
+defined under. An id defined under two rites is reported and skipped — the script
+never guesses which grant was meant.
 
 The shape of this migration mirrors the one above, with one deliberate
-difference: it is **copy-only by default**. The legacy tuples are left in place
-so that rolling the API back to pre-#767 code keeps authorizing.
+difference: it is **copy-only by default**. The superseded tuples are left in
+place so that rolling the API back to pre-#767 code keeps authorizing.
 
 ### Step 1 — apply the model
 
@@ -289,11 +305,12 @@ php scripts/migrate-rite-test-tuples.php
 php scripts/migrate-rite-test-tuples.php --apply
 ```
 
-Each `general_roman_calendar_test:general_roman_calendar` tuple gains a
-counterpart on `rite_calendar_test:roman`, preserving user and relation.
-Re-running is a no-op. An id other than `general_roman_calendar` on the legacy
-type is reported and left untouched — the script never guesses a rite — and the
-run exits with status `2` so the anomaly is not lost in CI output.
+Each superseded tuple gains a counterpart on its rite-qualified successor,
+preserving user and relation. Re-running is a no-op: already-qualified ids are
+recognised and skipped. Anything the script cannot resolve — an unexpected id on
+the legacy type, or a calendar id defined under two rites or none — is reported
+and left untouched, and the run exits with status `2` so the anomaly is not lost
+in CI output.
 
 ### Step 3 — prune (later)
 
@@ -302,6 +319,9 @@ Only once **every** deployment runs post-#767 code:
 ```bash
 php scripts/migrate-rite-test-tuples.php --apply --prune
 ```
+
+This deletes both the legacy `general_roman_calendar_test` tuples and the
+unqualified `national_calendar_test` / `diocesan_calendar_test` ones.
 
 Then drop `general_roman_calendar_test` from the model and from the PHP
 allow-lists that still name it:

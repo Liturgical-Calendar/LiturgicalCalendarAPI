@@ -2,14 +2,27 @@
 <?php
 
 /**
- * Idempotent migration: copy every `general_roman_calendar_test` OpenFGA tuple
- * onto the generalised `rite_calendar_test:roman` object (issue #767).
+ * Idempotent migration: bring every scoped-test OpenFGA tuple onto its
+ * rite-qualified successor (issue #767).
  *
- * `general_roman_calendar_test` had exactly one id, `general_roman_calendar`,
- * denoting the Roman rite-level calendar. Once rites became a first-class scope
- * that type could no longer name the Ambrosian rite-level calendar, so
- * `TestScopeResolver` now emits `rite_calendar_test:<rite>` instead. Existing
- * grants have to follow, or every current test editor silently loses access.
+ * Three remappings, all of them because a scope has to name a rite:
+ *
+ *   general_roman_calendar_test:general_roman_calendar → rite_calendar_test:roman
+ *   national_calendar_test:<id>                        → national_calendar_test:<rite>/<id>
+ *   diocesan_calendar_test:<id>                        → diocesan_calendar_test:<rite>/<id>
+ *
+ * `general_roman_calendar_test` had exactly one id, denoting the Roman rite-level
+ * calendar; it cannot name the Ambrosian one, so `rite_calendar_test` replaces it.
+ * The national and diocesan types keep their names but gain a rite-qualified id,
+ * because a bare calendar id is ambiguous: the source tree is partitioned as
+ * `jsondata/sourcedata/rite/{rite}/calendars/...`, so `lugano_ch` could name an
+ * Ambrosian calendar or a Roman one. Existing grants have to follow, or every
+ * current test editor silently loses access.
+ *
+ * The rite of an existing national/diocesan tuple is inferred from that same
+ * source tree, which is the authority on which rite a calendar is defined under.
+ * A calendar id that is defined under two rites is reported and skipped — the
+ * script never guesses which grant was meant.
  *
  * Usage:
  *   php scripts/migrate-rite-test-tuples.php [--dry-run|--apply] [--prune]
@@ -17,11 +30,10 @@
  * Flags:
  *   --dry-run  (default) Print what WOULD be done without touching the store.
  *   --apply             Write the new tuples in OpenFGA.
- *   --prune             Additionally DELETE the old general_roman_calendar_test
- *                       tuples. Off by default: the old type stays in the model
- *                       and in every PHP allow-list so a rollback to pre-#767
- *                       code keeps authorizing. Only prune once every
- *                       deployment runs merged code.
+ *   --prune             Additionally DELETE the superseded tuples. Off by
+ *                       default: the legacy type and the unqualified ids stay
+ *                       valid so a rollback to pre-#767 code keeps authorizing.
+ *                       Only prune once every deployment runs merged code.
  *
  * Safety guarantees:
  *   - Copy-then-prune ordering: a tuple is never deleted before its replacement
@@ -30,6 +42,7 @@
  *     is caught and treated as a no-op).
  *   - Deleting a tuple that no longer exists is benign (TupleNotFoundException
  *     is caught and treated as a no-op).
+ *   - Already-migrated tuples are recognised and left alone.
  *   - The script is safe to re-run after a partial migration.
  *
  * Required environment variables (loaded from .env* files if present):
@@ -48,15 +61,19 @@ use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Services\Exception\TupleAlreadyExistsException;
 use LiturgicalCalendar\Api\Services\Exception\TupleNotFoundException;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\TestScopeResolver;
 
-const LEGACY_OBJECT = 'general_roman_calendar_test:general_roman_calendar';
-const LEGACY_PREFIX = 'general_roman_calendar_test:';
+const LEGACY_GRC_OBJECT = 'general_roman_calendar_test:general_roman_calendar';
+const LEGACY_GRC_PREFIX = 'general_roman_calendar_test:';
+const NATIONAL_PREFIX   = 'national_calendar_test:';
+const DIOCESAN_PREFIX   = 'diocesan_calendar_test:';
+
+$projectRoot = dirname(__DIR__);
 
 // ---------------------------------------------------------------------------
 // Bootstrap: load environment from .env* files if present
 // ---------------------------------------------------------------------------
-$projectRoot = dirname(__DIR__);
-$dotenv      = Dotenv::createImmutable(
+$dotenv = Dotenv::createImmutable(
     $projectRoot,
     ['.env', '.env.local', '.env.development', '.env.test', '.env.staging', '.env.production'],
     false
@@ -70,11 +87,58 @@ $apply  = in_array('--apply', $argv, true);
 $prune  = in_array('--prune', $argv, true);
 $dryRun = !$apply;
 
-$modeName = $dryRun ? 'DRY RUN' : 'APPLY';
-$modeHint = $dryRun ? ' (pass --apply to apply changes)' : '';
-echo "Mode: {$modeName}{$modeHint}" . PHP_EOL;
-echo 'Prune legacy tuples: ' . ( $prune ? 'YES' : 'no (copy only)' ) . PHP_EOL;
+echo 'Mode: ' . ( $dryRun ? 'DRY RUN (pass --apply to apply changes)' : 'APPLY' ) . PHP_EOL;
+echo 'Prune superseded tuples: ' . ( $prune ? 'YES' : 'no (copy only)' ) . PHP_EOL;
 echo PHP_EOL;
+
+/**
+ * Rites under which a diocesan calendar of the given id is defined on disk.
+ *
+ * Closures rather than named functions: this file is a script whose job is side
+ * effects, and PSR-1 asks a file to declare symbols or execute logic, not both.
+ *
+ * @var callable(string): list<Rite> $ritesDefiningDiocese
+ */
+$ritesDefiningDiocese = static function (string $calendarId) use ($projectRoot): array {
+    $found = [];
+    foreach (Rite::cases() as $rite) {
+        $matches = glob(
+            sprintf(
+                '%s/jsondata/sourcedata/rite/%s/calendars/dioceses/*/%s',
+                $projectRoot,
+                $rite->value,
+                $calendarId
+            ),
+            GLOB_ONLYDIR
+        );
+        if ($matches !== false && $matches !== []) {
+            $found[] = $rite;
+        }
+    }
+    return $found;
+};
+
+/**
+ * Rites under which a national calendar of the given id is defined on disk.
+ *
+ * @var callable(string): list<Rite> $ritesDefiningNation
+ */
+$ritesDefiningNation = static function (string $calendarId) use ($projectRoot): array {
+    $found = [];
+    foreach (Rite::cases() as $rite) {
+        $file = sprintf(
+            '%s/jsondata/sourcedata/rite/%s/calendars/nations/%s/%s.json',
+            $projectRoot,
+            $rite->value,
+            $calendarId,
+            $calendarId
+        );
+        if (is_file($file)) {
+            $found[] = $rite;
+        }
+    }
+    return $found;
+};
 
 // ---------------------------------------------------------------------------
 // Dependency setup
@@ -87,7 +151,7 @@ if (!OpenFgaClient::isConfigured()) {
 $client = OpenFgaClient::fromEnv();
 
 // ---------------------------------------------------------------------------
-// Enumerate all general_roman_calendar_test tuples (paginated)
+// Enumerate every tuple (paginated)
 //
 // Read ALL tuples (empty user + empty object = no filter) and filter in app
 // code, mirroring scripts/migrate-test-tuples.php: the type-only object filter
@@ -103,38 +167,70 @@ do {
     $continuationToken = $page['next_continuation_token'] !== '' ? $page['next_continuation_token'] : null;
 } while ($continuationToken !== null);
 
-$legacyTuples = array_values(
-    array_filter($allTuples, static fn (array $t): bool => str_starts_with($t['object'], LEGACY_PREFIX))
-);
+$candidates = array_values(array_filter($allTuples, static function (array $t): bool {
+    return str_starts_with($t['object'], LEGACY_GRC_PREFIX)
+        || str_starts_with($t['object'], NATIONAL_PREFIX)
+        || str_starts_with($t['object'], DIOCESAN_PREFIX);
+}));
 
-$totalCount   = count($legacyTuples);
 $copiedCount  = 0;
 $prunedCount  = 0;
 $skippedCount = 0;
+$alreadyCount = 0;
 
-/** @var list<string> $unexpectedObjects */
-$unexpectedObjects = [];
-
-$newObject = 'rite_calendar_test:' . Rite::ROMAN->value;
+/** @var list<string> $unresolved */
+$unresolved = [];
 
 // ---------------------------------------------------------------------------
 // Process each tuple
 // ---------------------------------------------------------------------------
-foreach ($legacyTuples as $tuple) {
-    // The legacy type only ever had one id. Anything else is unexpected data we
-    // must not guess a rite for, so report it and leave it alone.
-    if ($tuple['object'] !== LEGACY_OBJECT) {
-        ++$skippedCount;
-        $unexpectedObjects[] = $tuple['object'];
-        echo "[SKIPPED] {$tuple['object']} (unexpected id for the legacy type — leaving untouched)" . PHP_EOL;
-        continue;
+foreach ($candidates as $tuple) {
+    $object   = $tuple['object'];
+    $colonPos = (int) strpos($object, ':');
+    $type     = substr($object, 0, $colonPos);
+    $objectId = substr($object, $colonPos + 1);
+
+    $newObject = null;
+
+    if ($type === 'general_roman_calendar_test') {
+        // The legacy type only ever had one id. Anything else is unexpected data
+        // we must not guess a rite for.
+        if ($object !== LEGACY_GRC_OBJECT) {
+            ++$skippedCount;
+            $unresolved[] = "{$object} (unexpected id for the legacy type)";
+            echo "[SKIPPED] {$object} — unexpected id for the legacy type, leaving untouched" . PHP_EOL;
+            continue;
+        }
+        $newObject = 'rite_calendar_test:' . Rite::ROMAN->value;
+    } else {
+        if (null !== TestScopeResolver::parseQualifiedId($objectId)) {
+            ++$alreadyCount;
+            echo "[ALREADY QUALIFIED] {$object}" . PHP_EOL;
+            continue;
+        }
+
+        $rites = $type === 'diocesan_calendar_test'
+            ? $ritesDefiningDiocese($objectId)
+            : $ritesDefiningNation($objectId);
+
+        if (count($rites) !== 1) {
+            ++$skippedCount;
+            $reason       = $rites === []
+                ? 'no calendar of that id is defined under any rite'
+                : 'defined under more than one rite: ' . implode(', ', array_column($rites, 'value'));
+            $unresolved[] = "{$object} ({$reason})";
+            echo "[SKIPPED] {$object} — {$reason}, leaving untouched" . PHP_EOL;
+            continue;
+        }
+
+        $newObject = $type . ':' . TestScopeResolver::qualify($rites[0], $objectId);
     }
 
     if ($dryRun) {
         ++$copiedCount;
-        echo "[DRY RUN] {$tuple['user']} {$tuple['relation']} {$tuple['object']} → {$newObject}" . PHP_EOL;
+        echo "[DRY RUN] {$tuple['user']} {$tuple['relation']} {$object} → {$newObject}" . PHP_EOL;
         if ($prune) {
-            echo "[DRY RUN] would then delete {$tuple['user']} {$tuple['relation']} {$tuple['object']}" . PHP_EOL;
+            echo "[DRY RUN] would then delete {$tuple['user']} {$tuple['relation']} {$object}" . PHP_EOL;
         }
         continue;
     }
@@ -143,7 +239,7 @@ foreach ($legacyTuples as $tuple) {
 
     try {
         $client->writeTuple($tuple['user'], $tuple['relation'], $newObject);
-        echo "[COPIED] {$tuple['user']} {$tuple['relation']} {$tuple['object']} → {$newObject}" . PHP_EOL;
+        echo "[COPIED] {$tuple['user']} {$tuple['relation']} {$object} → {$newObject}" . PHP_EOL;
     } catch (TupleAlreadyExistsException) {
         echo "[ALREADY EXISTS] {$tuple['user']} {$tuple['relation']} {$newObject} — write skipped" . PHP_EOL;
     }
@@ -154,9 +250,9 @@ foreach ($legacyTuples as $tuple) {
     }
 
     try {
-        $client->deleteTuple($tuple['user'], $tuple['relation'], $tuple['object']);
+        $client->deleteTuple($tuple['user'], $tuple['relation'], $object);
         ++$prunedCount;
-        echo "[PRUNED] {$tuple['user']} {$tuple['relation']} {$tuple['object']}" . PHP_EOL;
+        echo "[PRUNED] {$tuple['user']} {$tuple['relation']} {$object}" . PHP_EOL;
     } catch (TupleNotFoundException) {
         // Old tuple was already removed in a previous run — benign.
     }
@@ -165,22 +261,21 @@ foreach ($legacyTuples as $tuple) {
 // ---------------------------------------------------------------------------
 // Summary
 // ---------------------------------------------------------------------------
-$copiedLabel = $dryRun ? 'Would copy' : 'Copied';
-
 echo PHP_EOL;
 echo 'Summary:' . PHP_EOL;
-echo sprintf("  Total legacy tuples : %d\n", $totalCount);
-echo sprintf("  %-20s: %d\n", $copiedLabel, $copiedCount);
+echo sprintf("  Candidate tuples    : %d\n", count($candidates));
+echo sprintf("  %-20s: %d\n", $dryRun ? 'Would copy' : 'Copied', $copiedCount);
 if ($prune) {
     echo sprintf("  %-20s: %d\n", $dryRun ? 'Would prune' : 'Pruned', $prunedCount);
 }
+echo sprintf("  %-20s: %d\n", 'Already qualified', $alreadyCount);
 echo sprintf("  %-20s: %d\n", 'Skipped', $skippedCount);
 
-if ($unexpectedObjects !== []) {
+if ($unresolved !== []) {
     echo PHP_EOL;
-    echo 'Unexpected legacy object ids (left untouched):' . PHP_EOL;
-    foreach (array_unique($unexpectedObjects) as $object) {
-        echo "  - {$object}" . PHP_EOL;
+    echo 'Left untouched (resolve by hand):' . PHP_EOL;
+    foreach (array_unique($unresolved) as $entry) {
+        echo "  - {$entry}" . PHP_EOL;
     }
 }
 

@@ -1,0 +1,9 @@
+{
+    "name": "AmbrosianDioceseTest",
+    "event_key": "AmbrosianDioceseEvent",
+    "applies_to": {
+        "rite": "ambrosian",
+        "diocesan_calendar": "lugano_ch"
+    },
+    "assertions": []
+}

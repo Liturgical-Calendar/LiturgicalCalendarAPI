@@ -68,12 +68,35 @@ final class AccessRequestRepositoryConstantsTest extends TestCase
         self::assertFalse(AccessRequestRepository::isValidObjectIdForType('general_roman_calendar_test', ''));
     }
 
-    public function testNewCalendarTestTypesAcceptNonEmptyIds(): void
+    public function testScopedCalendarTestTypesRequireRiteQualifiedIds(): void
     {
-        self::assertTrue(AccessRequestRepository::isValidObjectIdForType('national_calendar_test', 'IT'));
+        // A bare calendar id does not identify a calendar — `lugano_ch` could be
+        // Ambrosian or Roman — so a scoped test grant must name the rite.
+        self::assertTrue(AccessRequestRepository::isValidObjectIdForType('national_calendar_test', 'roman/IT'));
+        self::assertTrue(AccessRequestRepository::isValidObjectIdForType('diocesan_calendar_test', 'roman/romamo_it'));
+        self::assertTrue(AccessRequestRepository::isValidObjectIdForType('diocesan_calendar_test', 'ambrosian/lugano_ch'));
+
+        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('national_calendar_test', 'IT'));
+        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('diocesan_calendar_test', 'romamo_it'));
         self::assertFalse(AccessRequestRepository::isValidObjectIdForType('national_calendar_test', ''));
-        self::assertTrue(AccessRequestRepository::isValidObjectIdForType('diocesan_calendar_test', 'romamo_it'));
         self::assertFalse(AccessRequestRepository::isValidObjectIdForType('diocesan_calendar_test', ''));
+        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('diocesan_calendar_test', 'byzantine/foo'));
+    }
+
+    public function testOnlyTheRomanRiteHasANationalTier(): void
+    {
+        // /calendar/ambrosian/nation/{id} is a 400 — there is no Ambrosian
+        // national calendar to grant against.
+        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('national_calendar_test', 'ambrosian/IT'));
+        self::assertTrue(AccessRequestRepository::isValidObjectIdForType('diocesan_calendar_test', 'ambrosian/lugano_ch'));
+    }
+
+    public function testValidIdsLabelIsTypeAware(): void
+    {
+        self::assertStringContainsString('roman/US', AccessRequestRepository::validIdsLabelForType('national_calendar_test'));
+        self::assertStringContainsString('ambrosian/lugano_ch', AccessRequestRepository::validIdsLabelForType('diocesan_calendar_test'));
+        self::assertSame('roman, ambrosian', AccessRequestRepository::validIdsLabelForType('rite_calendar_test'));
+        self::assertSame('general_roman_calendar', AccessRequestRepository::validIdsLabelForType('general_roman_calendar_test'));
     }
 
     public function testValidRelationsHasNoDeleter(): void

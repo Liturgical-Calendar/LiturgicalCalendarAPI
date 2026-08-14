@@ -85,7 +85,7 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
     {
         $handler = $this->handlerWith(self::emptyAdminThenViewer([
             new GuzzleResponse(200, [], '{"objects":["general_roman_calendar:decrees"]}'),
-            new GuzzleResponse(200, [], '{"objects":["national_calendar_test:IT"]}'),
+            new GuzzleResponse(200, [], '{"objects":["national_calendar_test:roman/IT"]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":[]}'),
             new GuzzleResponse(200, [], '{"objects":["rite_calendar_test:roman"]}'),
@@ -102,7 +102,7 @@ final class DashboardScopesHandlerTest extends AbstractHandlerTestCase
         self::assertSame(
             [
                 'general_roman_calendar'      => ['decrees'],
-                'national_calendar_test'      => ['IT'],
+                'national_calendar_test'      => ['roman/IT'],
                 'diocesan_calendar_test'      => [],
                 'general_roman_calendar_test' => [],
                 'rite_calendar_test'          => ['roman'],

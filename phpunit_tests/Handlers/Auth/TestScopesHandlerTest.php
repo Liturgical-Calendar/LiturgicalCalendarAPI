@@ -70,7 +70,7 @@ final class TestScopesHandlerTest extends AbstractHandlerTestCase
         // Exactly one response per (relation x TEST_OBJECT_TYPES) probe: the first
         // editor probe returns an object, the rest are empty.
         $responses    = $this->allEmpty();
-        $responses[0] = new GuzzleResponse(200, [], '{"objects":["national_calendar_test:USA"]}');
+        $responses[0] = new GuzzleResponse(200, [], '{"objects":["national_calendar_test:roman/USA"]}');
         $handler      = $this->handlerWith($responses);
 
         $request = $this->requestFor('GET', '/auth/test-scopes')
@@ -80,7 +80,7 @@ final class TestScopesHandlerTest extends AbstractHandlerTestCase
 
         self::assertFalse($body['is_global_admin']);
         self::assertSame(
-            [['object_type' => 'national_calendar_test', 'object_id' => 'USA']],
+            [['object_type' => 'national_calendar_test', 'object_id' => 'roman/USA']],
             $body['editor']
         );
         self::assertSame([], $body['admin']);
