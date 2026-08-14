@@ -98,7 +98,7 @@
                         "type": "string",
                         "description": "the named predicate gating this colour; a closed vocabulary evaluated by the engine, mirroring the `AdLibitumColorCondition` PHP enum",
                         "enum": [
-                            "not_sunday_and_not_sunday_vigil"
+                            "not_sunday"
                         ]
                     }
                 },

@@ -25,22 +25,26 @@ enum AdLibitumColorCondition: string
     use EnumToArrayTrait;
 
     /**
-     * Admitted on any day that is neither a Sunday nor the day whose evening Mass opens one.
+     * Admitted on any day but Sunday.
      *
      * *Ordinamento Generale del Messale Ambrosiano* n. 320 admits black in offices and
-     * Masses for the dead **except on Sundays**. The Milan Curia extended the same exclusion
-     * to the vigil: for Saturday 2 November 2019 it specified that the evening Masses were of
-     * the Commemoration of All the Faithful Departed in `morello` and *not* black, since
-     * Vespers already opens the Sunday.
+     * Masses for the dead **except on Sundays**.
      *
-     * **Modelling note.** The API reports colours per *day*, not per Mass, so a Saturday is
-     * excluded outright. Strictly, n. 320 would still permit black at a Saturday *morning*
-     * Mass for the dead — only the evening Mass falls under the Sunday exclusion. Since a
-     * single day-level answer has to cover both, this takes the restrictive reading, which
-     * is the one the Curia published for the case it actually ruled on. Distinguishing them
-     * would require per-Mass colours, which the model does not have.
+     * The Sunday-vigil case needs no special handling here, because `color` is per
+     * *celebration* rather than per day, and a vigil is its own event that inherits the
+     * colours of the celebration it belongs to:
+     *
+     * - All Souls on a Sunday (e.g. 2025) is `morello` only, and `AllSouls_vigil` — the
+     *   Saturday-evening Mass that opens it — inherits `morello` with it.
+     * - All Souls on a Saturday (e.g. 2024) is `morello` + `black`; the Mass that opens the
+     *   *following* Sunday is a different event entirely (that Sunday's own vigil), and
+     *   carries that Sunday's colours, not these.
+     *
+     * So evaluating the condition against the celebration's own date is exactly right, and
+     * the restrictive "exclude Saturday too" reading would have wrongly denied the faculty
+     * at a Saturday Mass for the dead.
      */
-    case NOT_SUNDAY_AND_NOT_SUNDAY_VIGIL = 'not_sunday_and_not_sunday_vigil';
+    case NOT_SUNDAY = 'not_sunday';
 
     /**
      * Whether this condition holds for the given computed date.
@@ -50,8 +54,7 @@ enum AdLibitumColorCondition: string
         $isoDayOfWeek = (int) $date->format('N');
 
         return match ($this) {
-            // 6 = Saturday (its evening Mass opens the Sunday), 7 = Sunday.
-            self::NOT_SUNDAY_AND_NOT_SUNDAY_VIGIL => false === in_array($isoDayOfWeek, [6, 7], true),
+            self::NOT_SUNDAY => $isoDayOfWeek !== 7, // 7 = Sunday
         };
     }
 }

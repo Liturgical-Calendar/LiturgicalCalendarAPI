@@ -627,7 +627,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
     {
         $payload                                                      = self::diocesanPayloadWithColor('ambrosian', 'morello', 'novara_it', 'Diocesi di Novara');
         $payload['litcal'][0]['liturgical_event']['color_ad_libitum'] = [
-            ['color' => 'black', 'when' => 'not_sunday_and_not_sunday_vigil'],
+            ['color' => 'black', 'when' => 'not_sunday'],
         ];
 
         $this->expectException(UnprocessableContentException::class);

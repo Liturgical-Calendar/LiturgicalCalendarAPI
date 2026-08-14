@@ -14,16 +14,20 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * Issue #781: the Ambrosian Commemoration of All the Faithful Departed takes `morello`,
- * with `black` admitted only *ad libitum* and only on days that are neither a Sunday nor
- * the vigil opening one.
+ * with `black` admitted *ad libitum* on any day but Sunday (*Ordinamento Generale del
+ * Messale Ambrosiano* n. 320).
  *
- * Per *Ordinamento Generale del Messale Ambrosiano* n. 320, black may be used in offices
- * and Masses for the dead **except on Sundays**. The Milan Curia applied the same
- * exclusion to Saturday 2 November 2019: the evening vigil Masses were of All Souls in
- * `morello`, not black, since Vespers already opens the Sunday.
+ * `color` is per *celebration*, not per day, so the condition is evaluated against the
+ * celebration's own date and the Sunday-vigil case falls out for free: a vigil is its own
+ * event inheriting the colours of the celebration it belongs to. When All Souls is on a
+ * Sunday, `AllSouls_vigil` (the Saturday evening that opens it) inherits `morello` only;
+ * when All Souls is on a Saturday, the Mass opening the *following* Sunday is that
+ * Sunday's own vigil and carries that Sunday's colours instead.
  *
  * The resolved alternative is appended to the existing `color` array rather than carried
- * in a parallel field — `["rose", "purple"]` for Gaudete/Laetare is the same pattern.
+ * in a parallel field — the array already expresses alternatives within one celebration,
+ * whether from a choice of common (`["white", "red"]` for a martyr-bishop) or from an
+ * *ad libitum* option (`["rose", "purple"]` on Gaudete/Laetare).
  */
 #[CoversClass(CalendarHandler::class)]
 final class AmbrosianAdLibitumColorTest extends AbstractHandlerTestCase
@@ -62,24 +66,24 @@ final class AmbrosianAdLibitumColorTest extends AbstractHandlerTestCase
     }
 
     /**
-     * 2 November by weekday. The faculty applies Monday–Friday only.
+     * 2 November by weekday. The faculty applies on every day but Sunday.
      *
      * @return array<string,array{0:int,1:string[]}>
      */
     public static function allSoulsByYear(): array
     {
         return [
-            // Monday — an ordinary feria, black admitted ad libitum.
+            // Ordinary ferias — black admitted ad libitum.
             '2026 (Monday)'   => [2026, ['morello', 'black']],
             '2020 (Monday)'   => [2020, ['morello', 'black']],
             '2029 (Friday)'   => [2029, ['morello', 'black']],
-            // Sunday — n. 320 excludes black outright.
+            // Saturday is a feria like any other for this celebration: the Mass that opens
+            // the following Sunday is that Sunday's own vigil, a separate event.
+            '2019 (Saturday)' => [2019, ['morello', 'black']],
+            '2024 (Saturday)' => [2024, ['morello', 'black']],
+            // Sunday — n. 320 excludes black.
             '2025 (Sunday)'   => [2025, ['morello']],
             '2031 (Sunday)'   => [2031, ['morello']],
-            // Saturday — the evening Mass opens the Sunday, so black is excluded too.
-            // 2019 is the year the Milan Curia ruled on explicitly.
-            '2019 (Saturday)' => [2019, ['morello']],
-            '2024 (Saturday)' => [2024, ['morello']],
         ];
     }
 
@@ -151,5 +155,39 @@ final class AmbrosianAdLibitumColorTest extends AbstractHandlerTestCase
         self::assertNotNull($allSouls);
 
         self::assertSame(LitColor::MORELLO->value, $allSouls->color[0]);
+    }
+
+    /**
+     * A vigil is its own event and inherits the colours of the celebration it opens, so the
+     * Sunday exclusion propagates to `AllSouls_vigil` with no special-casing.
+     *
+     * @return array<string,array{0:int,1:string[]}>
+     */
+    public static function allSoulsVigilByYear(): array
+    {
+        return [
+            // All Souls on a Sunday: the Saturday-evening vigil opening it is morello only.
+            '2025 (vigil opens Sunday)'   => [2025, ['morello']],
+            // All Souls on a Saturday: its vigil is the Friday evening, and carries black too.
+            '2024 (vigil opens Saturday)' => [2024, ['morello', 'black']],
+        ];
+    }
+
+    /**
+     * @param string[] $expectedColors
+     */
+    #[DataProvider('allSoulsVigilByYear')]
+    public function testAllSoulsVigilInheritsResolvedColors(int $year, array $expectedColors): void
+    {
+        $payload = json_decode((string) $this->ambrosianCalendarFor($year)->getBody());
+        self::assertInstanceOf(\stdClass::class, $payload);
+
+        $vigil = array_find(
+            $payload->litcal,
+            static fn (\stdClass $event): bool => $event->event_key === 'AllSouls_vigil'
+        );
+        self::assertNotNull($vigil, "AllSouls_vigil not found in the {$year} Ambrosian calendar");
+        self::assertSame('AllSouls', $vigil->is_vigil_for);
+        self::assertSame($expectedColors, $vigil->color);
     }
 }
