@@ -49,46 +49,30 @@ final class TestScopeResolver
     /**
      * Separates the rite from the calendar id inside a scoped-test object id.
      *
-     * `/` is safe in an OpenFGA object id (only whitespace, `:`, `#` and `*` carry
-     * meaning) and reads as the hierarchy it is: rite over calendar.
+     * @deprecated Use {@see RiteScopedObjectId::SEPARATOR}. Retained so #767's public
+     *             surface keeps working now that the data resource types share the format.
      */
-    public const RITE_SEPARATOR = '/';
+    public const RITE_SEPARATOR = RiteScopedObjectId::SEPARATOR;
 
     /**
      * Compose the rite-qualified object id for a national or diocesan test scope.
      *
-     * The single definition of the qualified-id format; parseQualifiedId() is its
-     * inverse. Everything that writes or reads one of these ids goes through here
-     * rather than re-implementing the concatenation.
+     * Delegates to {@see RiteScopedObjectId::qualify()}, which is the single definition
+     * of the format now that the data resource types use it too (#786).
      */
     public static function qualify(Rite $rite, string $calendarId): string
     {
-        return $rite->value . self::RITE_SEPARATOR . $calendarId;
+        return RiteScopedObjectId::qualify($rite, $calendarId);
     }
 
     /**
      * Split a rite-qualified object id back into its rite and calendar id.
      *
-     * Returns null when the id is not rite-qualified — an unmigrated legacy id
-     * such as a bare `rotter_nl`, or a prefix that names no known rite.
-     *
      * @return array{0: Rite, 1: string}|null
      */
     public static function parseQualifiedId(string $objectId): ?array
     {
-        $pos = strpos($objectId, self::RITE_SEPARATOR);
-        if (false === $pos) {
-            return null;
-        }
-
-        $rite       = Rite::tryFrom(substr($objectId, 0, $pos));
-        $calendarId = substr($objectId, $pos + strlen(self::RITE_SEPARATOR));
-
-        if (null === $rite || '' === $calendarId) {
-            return null;
-        }
-
-        return [$rite, $calendarId];
+        return RiteScopedObjectId::parse($objectId);
     }
 
     /**

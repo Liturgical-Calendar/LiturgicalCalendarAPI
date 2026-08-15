@@ -472,4 +472,40 @@ enum JsonData: string
     {
         return Router::$apiFilePath . $this->value;
     }
+
+    /**
+     * The diocesan-calendar data file template for the given rite.
+     *
+     * The source tree is partitioned by rite, and only the diocesan tier exists under
+     * more than one: there are no `AMBROSIAN_NATIONAL_*` or `AMBROSIAN_WIDER_REGION_*`
+     * constants because the Ambrosian rite has neither tier. These resolvers let a call
+     * site ask for "the diocesan file for this rite" instead of repeating the branch.
+     */
+    public static function diocesanCalendarFileFor(Rite $rite): self
+    {
+        return $rite === Rite::AMBROSIAN
+            ? self::AMBROSIAN_DIOCESAN_CALENDAR_FILE
+            : self::DIOCESAN_CALENDAR_FILE;
+    }
+
+    public static function diocesanCalendarsFolderFor(Rite $rite): self
+    {
+        return $rite === Rite::AMBROSIAN
+            ? self::AMBROSIAN_DIOCESAN_CALENDARS_FOLDER
+            : self::DIOCESAN_CALENDARS_FOLDER;
+    }
+
+    public static function diocesanCalendarI18nFolderFor(Rite $rite): self
+    {
+        return $rite === Rite::AMBROSIAN
+            ? self::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FOLDER
+            : self::DIOCESAN_CALENDAR_I18N_FOLDER;
+    }
+
+    public static function diocesanCalendarI18nFileFor(Rite $rite): self
+    {
+        return $rite === Rite::AMBROSIAN
+            ? self::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FILE
+            : self::DIOCESAN_CALENDAR_I18N_FILE;
+    }
 }

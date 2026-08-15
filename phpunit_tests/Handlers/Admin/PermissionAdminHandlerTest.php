@@ -408,8 +408,8 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
             // readTuples: 3 tuples on national_calendar
             new Response(200, [], (string) json_encode([
                 'tuples'             => [
-                    ['key' => ['user' => 'user:alice', 'relation' => 'editor', 'object' => 'national_calendar:IT']],
-                    ['key' => ['user' => 'user:bob',   'relation' => 'viewer', 'object' => 'national_calendar:US']],
+                    ['key' => ['user' => 'user:alice', 'relation' => 'editor', 'object' => 'national_calendar:roman/IT']],
+                    ['key' => ['user' => 'user:bob',   'relation' => 'viewer', 'object' => 'national_calendar:roman/US']],
                     ['key' => ['user' => 'user:carol', 'relation' => 'editor', 'object' => 'national_calendar:FR']],
                 ],
                 'continuation_token' => '',
@@ -417,8 +417,8 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
             // listObjects: admin allowed on IT + US (NOT FR)
             new Response(200, [], (string) json_encode([
                 'objects' => [
-                    'national_calendar:IT',
-                    'national_calendar:US',
+                    'national_calendar:roman/IT',
+                    'national_calendar:roman/US',
                 ],
             ])),
         ]);
@@ -448,7 +448,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         self::assertCount(2, $body['permissions']);
         $allowedObjects = array_column($body['permissions'], 'object');
         sort($allowedObjects);
-        self::assertSame(['national_calendar:IT', 'national_calendar:US'], $allowedObjects);
+        self::assertSame(['national_calendar:roman/IT', 'national_calendar:roman/US'], $allowedObjects);
 
         // Exactly two HTTP calls: readTuples + listObjects. Never N+1.
         self::assertCount(2, $requestHistory);
@@ -491,7 +491,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
                         [
                             'user'        => 'user-alice',
                             'object_type' => 'national_calendar',
-                            'object_id'   => 'IT',
+                            'object_id'   => 'roman/IT',
                             'relation'    => 'editor',
                         ]
                     ))
@@ -524,7 +524,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         $requestBody = [
             'user'        => 'user-alice',
             'object_type' => 'national_calendar',
-            'object_id'   => 'IT',
+            'object_id'   => 'roman/IT',
             'relation'    => 'editor',
         ];
 
@@ -589,7 +589,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
                         [
                             'user'        => 'user-alice',
                             'object_type' => 'national_calendar',
-                            'object_id'   => 'IT',
+                            'object_id'   => 'roman/IT',
                             'relation'    => 'editor',
                         ]
                     ))
@@ -637,7 +637,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
                         [
                             'user'        => 'user-alice',
                             'object_type' => 'national_calendar',
-                            'object_id'   => 'IT',
+                            'object_id'   => 'roman/IT',
                             'relation'    => 'editor',
                         ]
                     ))
@@ -681,7 +681,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
                             [
                                 'user'        => 'user-alice',
                                 'object_type' => 'national_calendar',
-                                'object_id'   => 'IT',
+                                'object_id'   => 'roman/IT',
                                 'relation'    => 'editor',
                             ]
                         ))
@@ -735,7 +735,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
                             [
                                 'user'        => 'user-alice',
                                 'object_type' => 'national_calendar',
-                                'object_id'   => 'IT',
+                                'object_id'   => 'roman/IT',
                                 'relation'    => 'editor',
                             ]
                         ))
@@ -787,7 +787,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
                             [
                                 'user'        => 'user-alice',
                                 'object_type' => 'national_calendar',
-                                'object_id'   => 'IT',
+                                'object_id'   => 'roman/IT',
                                 'relation'    => 'editor',
                             ]
                         ))
@@ -815,7 +815,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
         $requestBody = [
             'user'        => 'user-alice',
             'object_type' => 'national_calendar',
-            'object_id'   => 'IT',
+            'object_id'   => 'roman/IT',
             'relation'    => 'editor',
         ];
 
@@ -877,7 +877,7 @@ final class PermissionAdminHandlerTest extends AbstractHandlerTestCase
             fn(OpenFgaClient $client) => $this->dispatchRevokePermission(
                 user: 'user:user-d9-12345',
                 objectType: 'national_calendar',
-                objectId: 'IT',
+                objectId: 'roman/IT',
                 relation: 'editor',
                 outboxRepo: $outboxRepo,
                 notifier: $notifier,

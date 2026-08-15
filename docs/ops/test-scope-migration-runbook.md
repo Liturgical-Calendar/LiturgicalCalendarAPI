@@ -334,3 +334,86 @@ allow-lists that still name it:
 - `jsondata/schemas/openapi.json`
 
 This step is **out of scope for the current change** and tracked as a follow-up.
+
+---
+
+## Follow-up migration — rite-qualified *data* resource scopes
+
+Issue #786 applied the same reasoning to the calendar **data** resource types that #767
+applied to the test scopes. A bare calendar id does not identify a calendar: the source
+tree is partitioned as `jsondata/sourcedata/rite/{rite}/calendars/...`, so `lugano_ch`
+could name an Ambrosian calendar or a Roman one, and a grant on the bare id would
+silently widen to cover whichever was added later.
+
+| Type                     | Object id before | Object id after       |
+|--------------------------|------------------|-----------------------|
+| `diocesan_calendar`      | `lugano_ch`      | `ambrosian/lugano_ch` |
+| `national_calendar`      | `US`             | `roman/US`            |
+| `wider_region`           | `Europe`         | `roman/Europe`        |
+| `general_roman_calendar` | `temporale`      | *(unchanged)*         |
+
+`general_roman_calendar` is untouched: its ids are `temporale`, `decrees` and missal
+editions, which are not calendars and are Roman by construction.
+
+**No model change is needed.** Unlike the test-scope migration above, the object *types*
+are unchanged — only their ids move — so there is no new type to add and no model version
+to upload.
+
+These are **production calendar-editing grants**, not test-authoring scopes. Treat the
+rollback story accordingly: the unqualified ids stay valid in every PHP allow-list until
+the prune step, so a rollback to pre-#786 code keeps authorizing.
+
+### Step 1 — copy the tuples
+
+```bash
+# Dry run first — prints every tuple that would be rewritten.
+php scripts/migrate-rite-data-tuples.php
+
+# Apply.
+php scripts/migrate-rite-data-tuples.php --apply
+```
+
+National calendars and wider regions exist only in the Roman rite, so their rite is a
+constant. A diocese's rite is inferred from the rite-partitioned source tree. A diocese id
+defined under two rites, or under none, is reported and left untouched, and the run exits
+with status `2` so the anomaly is not lost in CI output.
+
+`member_nation` tuples are rewritten on **both** sides: their user side is a
+`national_calendar:` object rather than a `user:`, so it needs qualifying too.
+
+### Step 2 — verify
+
+Editors should retain access. Spot-check a diocesan grant of each rite:
+
+```bash
+# Mirrors what OpenFgaClient sends: the bearer token when OPENFGA_API_TOKEN is set,
+# and the pinned model id — omitting authorization_model_id checks against the store's
+# latest model rather than the one the API is running.
+# -fsS so an HTTP 4xx/5xx fails the command: plain `curl -s` exits 0 on an error
+# response, which would read as a successful verification.
+curl -fsS "$OPENFGA_API_URL/stores/$OPENFGA_STORE_ID/check" \
+  -H 'Content-Type: application/json' \
+  ${OPENFGA_API_TOKEN:+-H "Authorization: Bearer $OPENFGA_API_TOKEN"} \
+  -d '{
+        "authorization_model_id": "'"$OPENFGA_MODEL_ID"'",
+        "tuple_key": {
+          "user": "user:<sub>",
+          "relation": "editor",
+          "object": "diocesan_calendar:ambrosian/lugano_ch"
+        }
+      }' | jq -e '.allowed'
+```
+
+`jq -e` exits non-zero when `allowed` is false or absent, so a denied check fails the
+command too rather than printing `{"allowed":false}` and exiting 0.
+
+### Step 3 — prune (later)
+
+Only once **every** deployment runs post-#786 code:
+
+```bash
+php scripts/migrate-rite-data-tuples.php --apply --prune
+```
+
+Then the unqualified ids can be rejected outright rather than merely superseded. The same
+step for the #785 test scopes is described above; the two can be pruned independently.

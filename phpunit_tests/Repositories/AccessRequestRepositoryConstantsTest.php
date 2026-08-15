@@ -35,8 +35,9 @@ final class AccessRequestRepositoryConstantsTest extends TestCase
         }
         self::assertFalse(AccessRequestRepository::isValidObjectIdForType('general_roman_calendar', 'EDITIO_TYPICA_1971'));
         self::assertFalse(AccessRequestRepository::isValidObjectIdForType('general_roman_calendar', ''));
-        // Other types keep free-form ids (non-empty)
-        self::assertTrue(AccessRequestRepository::isValidObjectIdForType('national_calendar', 'IT'));
+        // Calendar-naming types require a rite-qualified id (issue #786).
+        self::assertTrue(AccessRequestRepository::isValidObjectIdForType('national_calendar', 'roman/IT'));
+        self::assertFalse(AccessRequestRepository::isValidObjectIdForType('national_calendar', 'IT'));
         self::assertFalse(AccessRequestRepository::isValidObjectIdForType('national_calendar', ''));
     }
 
@@ -107,8 +108,9 @@ final class AccessRequestRepositoryConstantsTest extends TestCase
             implode(', ', AccessRequestRepository::GRC_OBJECT_IDS),
             AccessRequestRepository::validIdsLabelForType('general_roman_calendar')
         );
-        self::assertSame('a two-letter ISO nation code', AccessRequestRepository::validIdsLabelForType('national_calendar'));
-        self::assertSame('any non-empty id', AccessRequestRepository::validIdsLabelForType('wider_region'));
+        self::assertStringContainsString('roman/US', AccessRequestRepository::validIdsLabelForType('national_calendar'));
+        self::assertStringContainsString('ambrosian/lugano_ch', AccessRequestRepository::validIdsLabelForType('diocesan_calendar'));
+        self::assertStringContainsString('roman/Europe', AccessRequestRepository::validIdsLabelForType('wider_region'));
         self::assertSame('any non-empty id', AccessRequestRepository::validIdsLabelForType('something_unknown'));
     }
 

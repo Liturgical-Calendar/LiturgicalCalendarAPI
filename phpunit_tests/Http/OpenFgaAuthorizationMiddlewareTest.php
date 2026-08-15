@@ -4,6 +4,7 @@ namespace LiturgicalCalendar\Tests\Http;
 
 use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Middleware\OpenFgaAuthorizationMiddleware;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\TestScopeResolver;
@@ -260,12 +261,67 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
     }
 
+    /**
+     * Issue #786: the /data object id carries the route's rite, so a grant on an
+     * Ambrosian diocese cannot be satisfied by a Roman one of the same id.
+     */
+    public function testForCalendarDataQualifiesTheObjectIdWithTheRite(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:abc', 'editor', 'diocesan_calendar:ambrosian/lugano_ch')
+            ->willReturn(true);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forCalendarData($client, 'diocese', Rite::AMBROSIAN);
+        self::assertNotNull($middleware);
+
+        $request = ( new ServerRequest('PATCH', '/data/ambrosian/diocese/lugano_ch') )
+            ->withAttribute('oidc_user', ['sub' => 'abc', 'roles' => ['calendar_editor']])
+            ->withAttribute('calendar_id', 'lugano_ch');
+
+        $this->assertEquals(200, $middleware->process($request, $this->nextHandler)->getStatusCode());
+    }
+
+    public function testForCalendarDataDefaultsToTheRomanRite(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:abc', 'editor', 'diocesan_calendar:roman/rotter_nl')
+            ->willReturn(true);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forCalendarData($client, 'diocese');
+        self::assertNotNull($middleware);
+
+        $request = ( new ServerRequest('PATCH', '/data/diocese/rotter_nl') )
+            ->withAttribute('oidc_user', ['sub' => 'abc', 'roles' => ['calendar_editor']])
+            ->withAttribute('calendar_id', 'rotter_nl');
+
+        $this->assertEquals(200, $middleware->process($request, $this->nextHandler)->getStatusCode());
+    }
+
+    public function testForCalendarDataFailsClosedWithoutACalendarId(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->never())->method('check');
+
+        $middleware = OpenFgaAuthorizationMiddleware::forCalendarData($client, 'diocese', Rite::ROMAN);
+        self::assertNotNull($middleware);
+
+        $request = ( new ServerRequest('PATCH', '/data/diocese/') )
+            ->withAttribute('oidc_user', ['sub' => 'abc', 'roles' => ['calendar_editor']]);
+
+        $this->expectException(ForbiddenException::class);
+        $middleware->process($request, $this->nextHandler);
+    }
+
     public function testForMissalsNationalChecksNationalCalendarByPrefix(): void
     {
         $client = $this->createMock(OpenFgaClient::class);
         $client->expects($this->once())
             ->method('check')
-            ->with('user:abc', 'admin', 'national_calendar:IT')
+            ->with('user:abc', 'admin', 'national_calendar:roman/IT')
             ->willReturn(true);
 
         $middleware = OpenFgaAuthorizationMiddleware::forMissals($client, 'IT_1983');

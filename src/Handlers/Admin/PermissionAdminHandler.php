@@ -838,7 +838,7 @@ final class PermissionAdminHandler extends AbstractHandler
                     'Invalid object_id "%s" for object_type "%s". Valid ids: %s',
                     $objectId,
                     $objectType,
-                    implode(', ', AccessRequestRepository::GRC_OBJECT_IDS)
+                    AccessRequestRepository::validIdsLabelForType($objectType)
                 )
             );
         }

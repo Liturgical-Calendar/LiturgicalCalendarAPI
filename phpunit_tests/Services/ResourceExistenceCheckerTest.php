@@ -25,6 +25,74 @@ final class ResourceExistenceCheckerTest extends TestCase
         $this->assertTrue($checker->exists('general_roman_calendar_test', 'temporale'));
     }
 
+    /**
+     * Regression guard for issue #786.
+     *
+     * exists() used to glob only JsonData::DIOCESAN_CALENDARS_FOLDER, which derives
+     * from ROMAN_RITE_FOLDER, so every Ambrosian diocese reported as gone. Because
+     * ResourceTuplePurgeReconciler purges on exactly this predicate, a legitimate
+     * editor grant on an Ambrosian diocesan calendar was revoked on any sweep.
+     */
+    public function testAmbrosianDiocesanCalendarsExist(): void
+    {
+        $checker = new ResourceExistenceChecker();
+        foreach (['lugano_ch', 'milano_it', 'bergam_it', 'novara_it'] as $diocese) {
+            $this->assertTrue(
+                $checker->exists('diocesan_calendar', $diocese),
+                "Ambrosian diocese {$diocese} must not read as deleted — the reconciler purges on this."
+            );
+        }
+    }
+
+    public function testRomanDiocesanCalendarsStillExist(): void
+    {
+        $checker = new ResourceExistenceChecker();
+        foreach (['rotter_nl', 'romamo_it', 'boston_us'] as $diocese) {
+            $this->assertTrue($checker->exists('diocesan_calendar', $diocese));
+        }
+    }
+
+    public function testUnknownDiocesanCalendarDoesNotExistUnderEitherRite(): void
+    {
+        $checker = new ResourceExistenceChecker();
+        $this->assertFalse($checker->exists('diocesan_calendar', 'nowhere_zz'));
+        $this->assertFalse($checker->exists('diocesan_calendar', ''));
+    }
+
+    /**
+     * The Vatican is announced as a national calendar but is still served by the
+     * General Roman Calendar, so it has no `nations/VA/VA.json` yet. Without the
+     * special case a live `national_calendar:VA` grant reads as orphaned and the
+     * reconciler purges it. Delete this test's VA assertions once the Vatican gains
+     * its own folder — the ordinary is_file() path will cover it then.
+     */
+    public function testVaticanNationalCalendarExistsWithoutItsOwnFolder(): void
+    {
+        $checker = new ResourceExistenceChecker();
+        $this->assertTrue($checker->exists('national_calendar', 'VA'));
+        $this->assertTrue($checker->exists('national_calendar', 'roman/VA'));
+    }
+
+    public function testNationalCalendarsWithFoldersExistAndUnknownOnesDoNot(): void
+    {
+        $checker = new ResourceExistenceChecker();
+        $this->assertTrue($checker->exists('national_calendar', 'roman/US'));
+        $this->assertTrue($checker->exists('national_calendar', 'roman/IT'));
+        $this->assertFalse($checker->exists('national_calendar', 'roman/ZZ'));
+        $this->assertFalse($checker->exists('national_calendar', 'ZZ'));
+    }
+
+    public function testQualifiedAndUnqualifiedIdsResolveAlike(): void
+    {
+        // Unqualified ids stay in the store for the whole migration window, and this
+        // predicate decides what gets purged, so both forms must resolve.
+        $checker = new ResourceExistenceChecker();
+        $this->assertTrue($checker->exists('diocesan_calendar', 'ambrosian/lugano_ch'));
+        $this->assertTrue($checker->exists('diocesan_calendar', 'lugano_ch'));
+        $this->assertTrue($checker->exists('wider_region', 'roman/Europe'));
+        $this->assertTrue($checker->exists('wider_region', 'Europe'));
+    }
+
     public function testNonResourceTypeIsNotAResourceType(): void
     {
         $checker = new ResourceExistenceChecker();
