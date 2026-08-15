@@ -108,14 +108,19 @@ class Router
      * calendar or events route, stripping that segment from the request-path parts
      * when present.
      *
-     * Only the calendar route (`calendar`, or the empty root route) and the events
-     * route (`events`) carry a rite segment. A leading segment whose value is a valid
+     * The calendar route (`calendar`, or the empty root route), the events route
+     * (`events`) and the regional-data route (`data`) carry a rite segment. A leading
+     * segment whose value is a valid
      * {@see Rite} case (`roman`, `ambrosian`) selects that rite and is removed from
      * `$requestPathParts` so the remaining 0/1/2/3-part shape parsing runs identically
      * to an un-prefixed request; `/calendar` and `/calendar/roman` are therefore
      * equivalent, symmetric with `/calendar/ambrosian` (and likewise for `/events`).
-     * Absence of a rite segment defaults to Roman. No nation or diocese identifier
-     * collides with a rite value, so this is unambiguous.
+     * Absence of a rite segment defaults to Roman. No nation, diocese or path-category
+     * identifier collides with a rite value, so this is unambiguous.
+     *
+     * `data` takes the segment but is deliberately absent from {@see self::canonicalRiteUrl()}:
+     * that header advertises the explicit form for cacheable read routes, and `/data` is an
+     * admin write surface where a `Link: rel="canonical"` on a PUT is noise.
      *
      * Of the two equivalent forms, the explicit one is canonical: a request that omits the
      * rite segment is answered with a `Link: rel="canonical"` header naming the explicit URL
@@ -126,7 +131,7 @@ class Router
      */
     public static function extractRiteSegment(string $route, array &$requestPathParts): Rite
     {
-        if ($route === 'calendar' || $route === '' || $route === 'events') {
+        if ($route === 'calendar' || $route === '' || $route === 'events' || $route === 'data') {
             $maybeRite = Rite::tryFrom((string) ( $requestPathParts[0] ?? '' ));
             if ($maybeRite !== null) {
                 array_shift($requestPathParts);
@@ -538,7 +543,7 @@ class Router
                 $this->handler       = $applicationsHandler;
                 break;
             case 'data':
-                $regionalDataHandler = new RegionalDataHandler($requestPathParts);
+                $regionalDataHandler = new RegionalDataHandler($requestPathParts, $rite);
                 $pathCount           = count($requestPathParts);
                 $firstInCategory     = $pathCount > 0 && in_array($requestPathParts[0], PathCategory::values(), true);
                 $allowedMethods      = match (true) {
@@ -734,7 +739,7 @@ class Router
 
             // Apply authorization middleware with role-based access control
             // (shared between OIDC and JWT paths)
-            $this->configureAuthorizationPipeline($pipeline, $route, $requestPathParts);
+            $this->configureAuthorizationPipeline($pipeline, $route, $requestPathParts, $rite);
         }
 
         $this->response = $pipeline->handle($this->request)
@@ -787,11 +792,14 @@ class Router
      * @param MiddlewarePipeline $pipeline The middleware pipeline to configure
      * @param string $route The current route being handled
      * @param array<int, string> $requestPathParts The parsed path parts after the route
+     * @param Rite $rite The rite selected by the route's optional rite segment; qualifies the
+     *                   calendar object ids the FGA middleware checks against (issue #786)
      */
     private function configureAuthorizationPipeline(
         MiddlewarePipeline $pipeline,
         string $route,
-        array $requestPathParts
+        array $requestPathParts,
+        Rite $rite = Rite::ROMAN
     ): void {
         // Cache a single OpenFGA client for the pipeline (avoid multiple fromEnv calls)
         $fgaClient = OpenFgaClient::isConfigured() ? OpenFgaClient::fromEnv() : null;
@@ -815,7 +823,8 @@ class Router
             if ($oidcAvailable && $fgaClient !== null && count($requestPathParts) >= 2) {
                 $fgaMiddleware = OpenFgaAuthorizationMiddleware::forCalendarData(
                     $fgaClient,
-                    $requestPathParts[0]
+                    $requestPathParts[0],
+                    $rite
                 );
                 if ($fgaMiddleware !== null) {
                     $pipeline->pipe($fgaMiddleware);

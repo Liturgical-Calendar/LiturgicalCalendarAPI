@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Http\Middleware;
 
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
 use LiturgicalCalendar\Api\Services\TestScopeResolver;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -26,13 +28,17 @@ use Psr\Http\Server\RequestHandlerInterface;
  *   Calendar tests override PUT → "editor" (creating a test is an editing act).
  *
  * Object types:
- *   /data/nation/{id}       → national_calendar:{id}
- *   /data/diocese/{id}      → diocesan_calendar:{id}
- *   /data/widerregion/{id}  → wider_region:{id}
- *   /tests/{id}             → {national,diocesan,general_roman}_calendar_test:{scopeId} (via TestScopeResolver)
+ *   /data/nation/{id}       → national_calendar:{rite}/{id}
+ *   /data/diocese/{id}      → diocesan_calendar:{rite}/{id}
+ *   /data/widerregion/{id}  → wider_region:{rite}/{id}
+ *   /tests/{id}             → {national,diocesan}_calendar_test:{rite}/{id} | rite_calendar_test:{rite} (via TestScopeResolver)
  *   /temporale, /decrees    → general_roman_calendar:{fixedId}
  *   /missals/{editio_typica}→ general_roman_calendar:{missalId}
- *   /missals/{national}     → national_calendar:{nation}
+ *   /missals/{national}     → national_calendar:roman/{nation}
+ *
+ * Object ids that name a calendar are rite-qualified: a bare calendar id does not
+ * identify a calendar, since the source tree is partitioned by rite and the same
+ * diocese could be defined under both (issue #786). See {@see RiteScopedObjectId}.
  */
 final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
 {
@@ -214,18 +220,33 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
      * Maps the path category (nation/diocese/widerregion) to the OpenFGA
      * object type and creates the appropriate middleware instance.
      *
+     * The object id is rite-qualified from the route's rite segment, so a grant on an
+     * Ambrosian diocese cannot be satisfied by a Roman one of the same id, or vice
+     * versa (issue #786). Resolved per-request rather than fixed at construction so an
+     * absent or blank `calendar_id` attribute fails closed.
+     *
      * @param OpenFgaClient $client       The OpenFGA client
      * @param string        $pathCategory Path category from the URL (e.g., "nation")
+     * @param Rite          $rite         The rite selected by the route's rite segment
      * @return self|null Configured middleware, or null if the path category is unknown
      */
-    public static function forCalendarData(OpenFgaClient $client, string $pathCategory): ?self
+    public static function forCalendarData(OpenFgaClient $client, string $pathCategory, Rite $rite = Rite::ROMAN): ?self
     {
         $objectType = self::OBJECT_TYPE_MAP[$pathCategory] ?? null;
         if ($objectType === null) {
             return null;
         }
 
-        return new self($client, $objectType, 'calendar_id');
+        $objectResolver = static function (ServerRequestInterface $request) use ($objectType, $rite): ?array {
+            $calendarId = $request->getAttribute('calendar_id');
+            if (!is_string($calendarId) || trim($calendarId) === '') {
+                return null;
+            }
+
+            return [$objectType, RiteScopedObjectId::qualify($rite, $calendarId)];
+        };
+
+        return new self($client, $objectType, 'calendar_id', null, $objectResolver);
     }
 
     /**
@@ -309,7 +330,9 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
             return new self($client, 'general_roman_calendar', 'calendar_id', $missalId);
         }
 
+        // Missals live only under the Roman source tree, so the owning national
+        // calendar's grant is always the Roman-rite one.
         $nation = explode('_', $missalId)[0];
-        return new self($client, 'national_calendar', 'calendar_id', $nation);
+        return new self($client, 'national_calendar', 'calendar_id', RiteScopedObjectId::qualify(Rite::ROMAN, $nation));
     }
 }

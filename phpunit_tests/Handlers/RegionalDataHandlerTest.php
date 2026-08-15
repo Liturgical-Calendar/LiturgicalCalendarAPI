@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Handlers;
 
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\RegionalDataHandler;
 use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
@@ -135,6 +136,63 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         $this->mtJsonPath  = '';
         $this->mtI18nDir   = '';
         $this->mtI18nPath  = '';
+    }
+
+    /**
+     * Issue #786: /data reads the rite's own partition of the source tree. Before the
+     * rite segment existed, the Ambrosian diocesan calendars were unreachable — the
+     * handler could only resolve Roman-only JsonData constants, so this was a 404.
+     */
+    public function testGetAmbrosianDiocesanCalendarReadsTheAmbrosianTree(): void
+    {
+        $response = ( new RegionalDataHandler(['diocese', 'lugano_ch'], Rite::AMBROSIAN) )
+            ->handle($this->requestFor('GET', '/data/ambrosian/diocese/lugano_ch', ['Accept-Language' => 'it-IT']));
+
+        self::assertSame(200, $response->getStatusCode());
+
+        $body = $this->decodeJsonBody($response);
+        self::assertArrayHasKey('litcal', $body);
+        self::assertNotEmpty($body['litcal']);
+    }
+
+    public function testGetRomanDiocesanCalendarStillReadsTheRomanTree(): void
+    {
+        $response = ( new RegionalDataHandler(['diocese', 'rotter_nl'], Rite::ROMAN) )
+            ->handle($this->requestFor('GET', '/data/roman/diocese/rotter_nl', ['Accept-Language' => 'nl-NL']));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertArrayHasKey('litcal', $this->decodeJsonBody($response));
+    }
+
+    public function testGetAmbrosianDiocesanI18nReadsTheAmbrosianTree(): void
+    {
+        // The i18n file for an Ambrosian diocese lives beside its calendar, under
+        // rite/ambrosian/, not in the Roman tree.
+        $response = ( new RegionalDataHandler(['diocese', 'lugano_ch', 'it_IT'], Rite::AMBROSIAN) )
+            ->handle($this->requestFor('GET', '/data/ambrosian/diocese/lugano_ch/it_IT', ['Accept-Language' => 'it-IT']));
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertNotEmpty($this->decodeJsonBody($response));
+    }
+
+    public function testDiocesanCalendarOfAnotherRiteIsRejected(): void
+    {
+        // Requesting an Ambrosian diocese under the Roman rite would otherwise read
+        // and write the wrong partition of the source tree.
+        $this->expectException(UnprocessableContentException::class);
+        $this->expectExceptionMessage('belongs to the ambrosian rite, not the requested roman rite');
+
+        ( new RegionalDataHandler(['diocese', 'lugano_ch'], Rite::ROMAN) )
+            ->handle($this->requestFor('GET', '/data/diocese/lugano_ch', ['Accept-Language' => 'it-IT']));
+    }
+
+    public function testRomanDioceseUnderTheAmbrosianRiteIsRejected(): void
+    {
+        $this->expectException(UnprocessableContentException::class);
+        $this->expectExceptionMessage('belongs to the roman rite, not the requested ambrosian rite');
+
+        ( new RegionalDataHandler(['diocese', 'rotter_nl'], Rite::AMBROSIAN) )
+            ->handle($this->requestFor('GET', '/data/ambrosian/diocese/rotter_nl', ['Accept-Language' => 'nl-NL']));
     }
 
     public function testOptionsPreflightSucceeds(): void
@@ -357,7 +415,7 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         $purge = $this->createMock(ResourceTuplePurgeServiceInterface::class);
         $purge->expects($this->once())
             ->method('purgeForObject')
-            ->with('national_calendar:HR');
+            ->with('national_calendar:roman/HR');
         $handler->setPurgeService($purge);
 
         // --- Act: issue DELETE (bypasses JWT middleware — in-process) --------
@@ -495,9 +553,9 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
             ->with($this->callback(function (array $rows): bool {
                 foreach ($rows as $r) {
                     if (
-                        $r['fga_user'] === 'national_calendar:MT'
+                        $r['fga_user'] === 'national_calendar:roman/MT'
                         && $r['fga_relation'] === 'member_nation'
-                        && $r['fga_object'] === 'wider_region:Europe'
+                        && $r['fga_object'] === 'wider_region:roman/Europe'
                     ) {
                         return true;
                     }

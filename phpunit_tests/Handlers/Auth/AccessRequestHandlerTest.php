@@ -107,7 +107,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
             'POST',
             '/auth/access-requests',
             [],
-            ['permissions' => [['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor']]]
+            ['permissions' => [['object_type' => 'national_calendar', 'object_id' => 'roman/IT', 'relation' => 'editor']]]
         )->withAttribute('oidc_user', $this->oidcUser());
 
         $this->expectException(ValidationException::class);
@@ -124,7 +124,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
             [],
             [
                 'requested_role' => 'galactic_overlord',
-                'permissions'    => [['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor']],
+                'permissions'    => [['object_type' => 'national_calendar', 'object_id' => 'roman/IT', 'relation' => 'editor']],
             ]
         )->withAttribute('oidc_user', $this->oidcUser());
 
@@ -157,7 +157,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
             [],
             [
                 'requested_role' => 'developer',
-                'permissions'    => [['object_type' => 'not_a_type', 'object_id' => 'IT', 'relation' => 'editor']],
+                'permissions'    => [['object_type' => 'not_a_type', 'object_id' => 'roman/IT', 'relation' => 'editor']],
             ]
         )->withAttribute('oidc_user', $this->oidcUser());
 
@@ -195,7 +195,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
             [],
             [
                 'requested_role' => 'test_editor',
-                'permissions'    => [['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor']],
+                'permissions'    => [['object_type' => 'national_calendar', 'object_id' => 'roman/IT', 'relation' => 'editor']],
             ]
         )->withAttribute('oidc_user', $this->oidcUser());
 
@@ -214,7 +214,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
             [
                 'requested_role' => 'developer',
                 'permissions'    => [
-                    ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+                    ['object_type' => 'national_calendar', 'object_id' => 'roman/IT', 'relation' => 'editor'],
                 ],
                 'justification'  => 'I help maintain the IT calendar.',
             ]
@@ -240,7 +240,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
             [],
             [
                 'requested_role' => 'developer',
-                'permissions'    => [['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor']],
+                'permissions'    => [['object_type' => 'national_calendar', 'object_id' => 'roman/IT', 'relation' => 'editor']],
             ]
         )->withAttribute('oidc_user', $this->oidcUser());
 
@@ -252,7 +252,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
             [],
             [
                 'requested_role' => 'developer',
-                'permissions'    => [['object_type' => 'national_calendar', 'object_id' => 'US', 'relation' => 'editor']],
+                'permissions'    => [['object_type' => 'national_calendar', 'object_id' => 'roman/US', 'relation' => 'editor']],
             ]
         )->withAttribute('oidc_user', $this->oidcUser());
 
@@ -267,7 +267,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
             'POST',
             '/auth/access-requests/not-a-uuid/resubmit',
             [],
-            ['permissions' => [['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor']]]
+            ['permissions' => [['object_type' => 'national_calendar', 'object_id' => 'roman/IT', 'relation' => 'editor']]]
         )->withAttribute('oidc_user', $this->oidcUser());
 
         $this->expectException(ValidationException::class);
@@ -286,7 +286,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
             'POST',
             '/auth/access-requests/' . $reqId . '/resubmit',
             [],
-            ['permissions' => [['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor']]]
+            ['permissions' => [['object_type' => 'national_calendar', 'object_id' => 'roman/IT', 'relation' => 'editor']]]
         )->withAttribute('oidc_user', $this->oidcUser('user-alice'));
 
         $this->expectException(ForbiddenException::class);
@@ -305,7 +305,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
             [],
             [
                 'permissions' => [
-                    ['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor'],
+                    ['object_type' => 'national_calendar', 'object_id' => 'roman/IT', 'relation' => 'editor'],
                 ],
             ]
         )->withAttribute('oidc_user', $this->oidcUser());
@@ -490,7 +490,7 @@ final class AccessRequestHandlerTest extends AbstractHandlerTestCase
             [],
             [
                 'requested_role' => 'test_editor',
-                'permissions'    => [['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor']],
+                'permissions'    => [['object_type' => 'national_calendar', 'object_id' => 'roman/IT', 'relation' => 'editor']],
             ]
         )->withAttribute('oidc_user', $this->oidcUser());
 

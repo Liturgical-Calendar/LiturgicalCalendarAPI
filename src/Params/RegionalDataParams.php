@@ -4,6 +4,7 @@ namespace LiturgicalCalendar\Api\Params;
 
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\PathCategory;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
@@ -20,6 +21,12 @@ use LiturgicalCalendar\Api\Models\RegionalData\WiderRegionData\WiderRegionData;
 class RegionalDataParams implements ParamsInterface
 {
     public PathCategory $category;
+
+    /**
+     * The rite the addressed calendar belongs to, from the optional leading rite
+     * segment on `/data` (Roman when absent).
+     */
+    public Rite $rite           = Rite::ROMAN;
     public ?string $key         = null;
     public ?string $locale      = null;
     public ?string $i18nRequest = null;
@@ -46,7 +53,7 @@ class RegionalDataParams implements ParamsInterface
      * is set to null.
      *
      * Additionally, it initializes the list of available system locales.
-     * @param array{category:PathCategory,key:string,i18n?:string,i18nRequest?:string,locale?:string,payload?:DiocesanData|NationalData|WiderRegionData,rawPayload?:\stdClass} $params
+     * @param array{category:PathCategory,key:string,rite?:Rite,i18n?:string,i18nRequest?:string,locale?:string,payload?:DiocesanData|NationalData|WiderRegionData,rawPayload?:\stdClass} $params
      */
     public function __construct(array $params)
     {
@@ -94,6 +101,12 @@ class RegionalDataParams implements ParamsInterface
         $this->category = $params['category'];
         $this->key      = $params['key'];
 
+        if (array_key_exists('rite', $params) && $params['rite'] instanceof Rite) {
+            $this->rite = $params['rite'];
+        }
+
+        $this->validateRiteCompatibility();
+
         if (array_key_exists('payload', $params)) {
             $this->payload = $params['payload'];
 
@@ -116,6 +129,39 @@ class RegionalDataParams implements ParamsInterface
                 $description = "Invalid value {$params['locale']} for param `locale`, valid values are: la, la_VA, " . implode(', ', LitLocale::$AllAvailableLocales);
                 throw new ValidationException($description);
             }
+        }
+    }
+
+    /**
+     * Reject a category that the requested rite has no tier for.
+     *
+     * Mirrors {@see \LiturgicalCalendar\Api\Params\EventsParams::validateRiteCompatibility()}.
+     * Only the diocesan tier exists under more than one rite: the Ambrosian rite is proper
+     * to the Archdiocese of Milan and a handful of neighbouring dioceses rather than to any
+     * nation or region, and the source tree has no `rite/ambrosian/calendars/nations` or
+     * `.../wider_regions` to read or write.
+     *
+     * The diocese-belongs-to-this-rite check needs `/calendars` metadata and therefore lives
+     * in the handler, alongside the lookup it shares.
+     *
+     * @throws ValidationException
+     */
+    public function validateRiteCompatibility(): void
+    {
+        if ($this->rite === Rite::ROMAN) {
+            return;
+        }
+
+        if ($this->category === PathCategory::NATION) {
+            throw new ValidationException(
+                "The {$this->rite->value} rite has no national calendars; request a diocesan calendar of that rite instead."
+            );
+        }
+
+        if ($this->category === PathCategory::WIDERREGION) {
+            throw new ValidationException(
+                "The {$this->rite->value} rite has no wider regions; wider regions are a layer over national calendars, which exist only in the Roman rite."
+            );
         }
     }
 }

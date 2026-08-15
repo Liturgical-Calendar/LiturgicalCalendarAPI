@@ -2723,7 +2723,7 @@
                           "permissions": [
                             {
                               "object_type": "national_calendar",
-                              "object_id": "IT",
+                              "object_id": "roman/IT",
                               "relation": "editor"
                             }
                           ],
@@ -2764,7 +2764,7 @@
                           "permissions": [
                             {
                               "object_type": "national_calendar",
-                              "object_id": "IT",
+                              "object_id": "roman/IT",
                               "relation": "editor"
                             }
                           ],
@@ -3539,7 +3539,8 @@
                 "national_calendar_test",
                 "diocesan_calendar_test",
                 "general_roman_calendar_test",
-                "rite_calendar_test"
+                "rite_calendar_test",
+                "general_roman_calendar"
               ]
             }
           },
@@ -3906,7 +3907,8 @@
                 "national_calendar_test",
                 "diocesan_calendar_test",
                 "general_roman_calendar_test",
-                "rite_calendar_test"
+                "rite_calendar_test",
+                "general_roman_calendar"
               ]
             }
           },
@@ -8739,13 +8741,14 @@
               "national_calendar_test",
               "diocesan_calendar_test",
               "general_roman_calendar_test",
-              "rite_calendar_test"
+              "rite_calendar_test",
+              "general_roman_calendar"
             ],
             "description": "OpenFGA object type"
           },
           "object_id": {
             "type": "string",
-            "description": "Resource identifier (e.g., 'IT', 'BOSTON', 'Americas')"
+            "description": "Resource identifier. Ids that name a calendar are rite-qualified as `<rite>/<calendarId>` (e.g. `roman/IT`, `ambrosian/lugano_ch`, `roman/Americas`), because a bare calendar id does not identify a calendar; general_roman_calendar ids stay bare (e.g. `temporale`)."
           },
           "relation": {
             "type": "string",
@@ -9192,12 +9195,13 @@
               "national_calendar_test",
               "diocesan_calendar_test",
               "general_roman_calendar_test",
-              "rite_calendar_test"
+              "rite_calendar_test",
+              "general_roman_calendar"
             ]
           },
           "object_id": {
             "type": "string",
-            "description": "Resource identifier (e.g., 'IT', 'BOSTON')"
+            "description": "Resource identifier. Ids that name a calendar are rite-qualified as `<rite>/<calendarId>` (e.g. `roman/IT`, `ambrosian/lugano_ch`); general_roman_calendar ids stay bare (e.g. `temporale`)."
           },
           "relation": {
             "type": "string",
@@ -10263,8 +10267,8 @@
                 },
                 "object_id": {
                   "type": "string",
-                  "example": "IT",
-                  "description": "The OpenFGA object ID."
+                  "example": "roman/IT",
+                  "description": "The OpenFGA object ID. Ids that name a calendar are rite-qualified as `<rite>/<calendarId>`."
                 }
               },
               "required": [
@@ -10306,8 +10310,8 @@
                 },
                 "object_id": {
                   "type": "string",
-                  "example": "IT",
-                  "description": "The OpenFGA object ID."
+                  "example": "roman/IT",
+                  "description": "The OpenFGA object ID. Ids that name a calendar are rite-qualified as `<rite>/<calendarId>`."
                 }
               },
               "required": [
@@ -10376,8 +10380,8 @@
                 },
                 "object_id": {
                   "type": "string",
-                  "example": "IT",
-                  "description": "The OpenFGA object ID."
+                  "example": "roman/IT",
+                  "description": "The OpenFGA object ID. Ids that name a calendar are rite-qualified as `<rite>/<calendarId>`."
                 }
               },
               "required": [
@@ -10406,8 +10410,8 @@
                 },
                 "object_id": {
                   "type": "string",
-                  "example": "IT",
-                  "description": "The OpenFGA object ID."
+                  "example": "roman/IT",
+                  "description": "The OpenFGA object ID. Ids that name a calendar are rite-qualified as `<rite>/<calendarId>`."
                 }
               },
               "required": [
