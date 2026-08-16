@@ -124,9 +124,16 @@ validation.
 So `scope` becomes an **optional, documented property on the three types in `LitCalTest.json`**, server-computed
 and never present in a source file.
 
-`PUT` and `PATCH` **reject** a payload carrying `scope` with a 422, rather than silently dropping it. An ignored
-field that looks writable is precisely how `deriveScope()` drifted; a loud rejection keeps the field
-unambiguously read-only.
+`PUT` and `PATCH` accept a payload whose `scope` **matches** what the server resolves, and reject with a 422 only
+when the supplied `scope` **disagrees**. A bare-presence rejection was the first design here, on the reasoning that a
+field which looks writable but is silently ignored is precisely how `deriveScope()` drifted. Both client analyses
+(UnitTestInterface #39, LiturgicalCalendarFrontend #459) independently pushed back, and they are right: after this
+change no legitimate client ever *originates* a `scope` value, so the only realistic way one appears in a write body
+is a benign unedited echo of a `GET` response. Rejecting that punishes the ordinary load-edit-save cycle — UTI's
+`admin.js` demonstrably round-trips the whole object — while catching nothing a mismatch check does not.
+
+Matching-is-accepted keeps the drift signal that motivated the field: a client that hand-derives a scope and gets it
+wrong still gets a loud 422. It is the silent divergence that must be impossible, not the echo.
 
 ## 4. Consumers
 
@@ -167,6 +174,10 @@ itself.
   Because this is a hard break, both must ship alongside it or `admin-tests` and the test runner break the day
   it lands. Whether the API change waits on them is a release-sequencing decision, not a design one.
 - Pruning the superseded #785 and #786 tuples, which waits on every deployment running merged code.
+- **A calendar filter on the collection** (`GET /tests?national_calendar=US`, or "tests applicable to calendar X").
+  Both clients re-implement this selection logic client-side today, which is the same duplication argument that
+  motivated exposing `scope`. Raised by the UnitTestInterface #39 analysis; deliberately not bundled here, because the
+  rite dimension is what #787 exists to settle and a calendar filter is an independent ergonomics change.
 - The `applies_to` plural forms (`national_calendars`, `diocesan_calendars`). They are schema-legal, unused by
   the corpus, and ignored by `TestScopeResolver::mapAppliesTo()`, which resolves such a test to the rite-level
   scope. That pre-existing gap is untouched here.

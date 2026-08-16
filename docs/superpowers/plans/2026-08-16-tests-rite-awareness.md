@@ -991,7 +991,7 @@ Deletes the duplication that made `admin-tests`' `deriveScope()` drift twice in 
 **Files:**
 
 - Modify: `jsondata/schemas/LitCalTest.json` — `scope` on all three correspondence types (they are `additionalProperties: false`)
-- Modify: `src/Handlers/TestsHandler.php` — inject on read, reject on write
+- Modify: `src/Handlers/TestsHandler.php` — inject on read; on write accept a matching echo, 422 on disagreement
 - Test: `phpunit_tests/Handlers/TestsHandlerTest.php`
 
 **Interfaces:**
@@ -1028,19 +1028,47 @@ Append to `phpunit_tests/Handlers/TestsHandlerTest.php`:
         self::assertSame('roman/US', $body['scope']['object_id']);
     }
 
-    public function testWritePayloadCarryingScopeIsRejected(): void
+    public function testWritePayloadEchoingTheCorrectScopeIsAccepted(): void
     {
+        // The ordinary load-edit-save cycle: the client GETs a test, edits one field, and
+        // PUTs the whole object back with the server's own `scope` still attached. That
+        // must not 422 — no legitimate client originates a scope value, so an echo is benign.
         /** @var array<string,mixed> $payload */
         $payload          = json_decode(
             (string) file_get_contents(JsonData::testsFolderFor(Rite::ROMAN)->path() . '/MaryMotherChurchTest.json'),
             true
         );
-        $payload['name']  = 'ZzzScopeRejectedTest';
+        $payload['name']  = 'ZzzScopeEchoTest';
         $payload['scope'] = ['object_type' => 'rite_calendar_test', 'object_id' => 'roman'];
 
+        $this->testFixturePath = JsonData::testsFolderFor(Rite::ROMAN)->path() . '/ZzzScopeEchoTest.json';
+
+        $response = ( new TestsHandler(['ZzzScopeEchoTest'], Rite::ROMAN) )->handle(
+            $this->requestFor('PUT', '/tests/roman/ZzzScopeEchoTest', [], $payload)
+        );
+        self::assertSame(201, $response->getStatusCode());
+
+        // The echoed scope must NOT be persisted — it is derived, not stored.
+        /** @var array<string,mixed> $stored */
+        $stored = json_decode((string) file_get_contents($this->testFixturePath), true);
+        self::assertArrayNotHasKey('scope', $stored);
+    }
+
+    public function testWritePayloadWithAContradictoryScopeIsRejected(): void
+    {
+        // A client that hand-derived the scope and got it wrong still gets a loud 422 —
+        // silent divergence is what must be impossible, not the echo.
+        /** @var array<string,mixed> $payload */
+        $payload          = json_decode(
+            (string) file_get_contents(JsonData::testsFolderFor(Rite::ROMAN)->path() . '/MaryMotherChurchTest.json'),
+            true
+        );
+        $payload['name']  = 'ZzzScopeMismatchTest';
+        $payload['scope'] = ['object_type' => 'diocesan_calendar_test', 'object_id' => 'roman/rotter_nl'];
+
         $this->expectException(UnprocessableContentException::class);
-        ( new TestsHandler(['ZzzScopeRejectedTest'], Rite::ROMAN) )->handle(
-            $this->requestFor('PUT', '/tests/roman/ZzzScopeRejectedTest', [], $payload)
+        ( new TestsHandler(['ZzzScopeMismatchTest'], Rite::ROMAN) )->handle(
+            $this->requestFor('PUT', '/tests/roman/ZzzScopeMismatchTest', [], $payload)
         );
     }
 ```
@@ -1061,7 +1089,7 @@ In `jsondata/schemas/LitCalTest.json`, add to `definitions` a shared block:
         "ResolvedScope": {
             "type": "object",
             "title": "ResolvedScope",
-            "description": "the OpenFGA (object type, object id) pair that scopes this test in the authorization model, computed by the server from `applies_to`. Read-only: it never appears in a source file, and a write payload carrying it is rejected with a 422. Exposed so clients do not re-implement TestScopeResolver — see issue #787.",
+            "description": "the OpenFGA (object type, object id) pair that scopes this test in the authorization model, computed by the server from `applies_to`. Read-only: it never appears in a source file. A write payload may echo back the value the API returned, but a `scope` that disagrees with the resolved one is rejected with a 422, and an echoed value is never persisted. Exposed so clients do not re-implement TestScopeResolver — see issue #787.",
             "properties": {
                 "object_type": {
                     "type": "string",
@@ -1080,7 +1108,7 @@ In `jsondata/schemas/LitCalTest.json`, add to `definitions` a shared block:
 Then add `"scope": { "$ref": "#/definitions/ResolvedScope" }` to the `properties` of **all three** of `ExactCorrespondenceType`,
 `ExactCorrespondenceSinceType` and `ExactCorrespondenceUntilType`. Do **not** add it to any `required` array — source files never carry it.
 
-- [ ] **Step 4: Inject on read and reject on write**
+- [ ] **Step 4: Inject on read; accept a matching echo on write**
 
 In `src/Handlers/TestsHandler.php`, add a helper next to `collectTests()`:
 
@@ -1130,21 +1158,57 @@ that branch's body with:
             return $this->encodeResponseBody($response, $decodedContents);
 ```
 
-For the write rejection, add to `assertPayloadRiteMatchesPath()`'s caller path — a separate guard, called from the same two places,
-immediately before `assertPayloadRiteMatchesPath()`:
+For the write path, add a separate guard called from the same two places as `assertPayloadRiteMatchesPath()` (in `handlePutRequest()`
+and `handlePatchRequest()`), immediately AFTER it — it needs the validated `name`, and the rite check should fail first when both are wrong:
 
 ```php
     /**
-     * `scope` is server-computed and read-only. Rejecting it loudly, rather than silently
-     * dropping it, is deliberate: a field that looks writable but is ignored is exactly how
-     * the client-side copy of this logic drifted in the first place (#787).
+     * `scope` is server-computed and read-only, but an *echo* of the correct value is
+     * accepted rather than rejected.
+     *
+     * No legitimate client originates a scope: the field exists precisely so clients stop
+     * deriving it. So the only realistic way one reaches a write body is the ordinary
+     * load-edit-save cycle handing back what the GET returned. Rejecting that on presence
+     * alone would punish the common case while catching nothing that a mismatch check does
+     * not — and it is the silent divergence that must be impossible, not the echo (#787).
+     *
+     * The property is unset after validation so it is never persisted: the stored file is
+     * the source, and `scope` is derived from it.
      */
-    private function assertPayloadCarriesNoScope(): void
+    private function assertPayloadScopeAgrees(): void
     {
-        if (property_exists($this->payload, 'scope')) {
-            $description = 'The `scope` property is computed by the server from `applies_to` and is read-only. Remove it from the request body.';
+        if (false === property_exists($this->payload, 'scope')) {
+            return;
+        }
+
+        $resolved = $this->scopeObjectFor($this->rite ?? Rite::default(), $this->payload->name);
+        $supplied = $this->payload->scope;
+
+        // On create the test does not exist yet, so resolve the scope the stored file WILL
+        // have, from the payload's own applies_to — the same mapping resolve() would apply.
+        if ($resolved === null) {
+            $fromPayload = ( new TestScopeResolver() )->resolveFromPayload(
+                json_decode(json_encode($this->payload), true)
+            );
+            $resolved = $fromPayload === null
+                ? null
+                : (object) ['object_type' => $fromPayload[0], 'object_id' => $fromPayload[1]];
+        }
+
+        $agrees = $supplied instanceof \stdClass
+            && $resolved !== null
+            && property_exists($supplied, 'object_type')
+            && property_exists($supplied, 'object_id')
+            && $supplied->object_type === $resolved->object_type
+            && $supplied->object_id === $resolved->object_id;
+
+        if (false === $agrees) {
+            $description = 'The `scope` property is computed by the server from `applies_to` and is read-only. '
+                . 'The value supplied does not match the scope this test resolves to; omit it, or send back the value the API returned.';
             throw new UnprocessableContentException($description);
         }
+
+        unset($this->payload->scope);
     }
 ```
 
@@ -1268,7 +1332,8 @@ GET  /tests/ambrosian/StIgnatiusOfLoyolaTest 200 carries scope
 GET  /tests/MaryMotherChurchTest            400  rite segment required (the hard break)
 GET  /tests/roman/StIgnatiusOfLoyolaTest    404  Ambrosian test, not in the Roman partition
 PUT  /tests/ambrosian/X  (body rite: roman) 422  rite disagreement
-PUT  /tests/roman/X      (body has scope)   422  scope is read-only
+PUT  /tests/roman/X   (body echoes scope)  201  matching echo accepted, not persisted
+PUT  /tests/roman/X   (body wrong scope)   422  scope disagreement
 ```
 
 - [ ] PR targets `development`, never `stable`
