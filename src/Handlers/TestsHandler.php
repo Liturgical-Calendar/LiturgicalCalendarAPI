@@ -12,7 +12,6 @@ use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use LiturgicalCalendar\Api\JsonFormatter;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
-use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Exception\ConflictException;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
@@ -23,7 +22,6 @@ use LiturgicalCalendar\Api\Services\TestScopeResolver;
 use LiturgicalCalendar\Api\Utilities;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Nyholm\Psr7\Stream;
 
 final class TestsHandler extends AbstractHandler
 {
@@ -142,6 +140,22 @@ final class TestsHandler extends AbstractHandler
     }
 
     /**
+     * The FGA scope pair for a test, as a response-only object.
+     *
+     * @return (\stdClass&object{object_type:string,object_id:string})|null null when no such test exists under that rite
+     */
+    private function scopeObjectFor(Rite $rite, string $testName): ?\stdClass
+    {
+        $scope = ( new TestScopeResolver() )->resolve($rite, $testName);
+        if ($scope === null) {
+            return null;
+        }
+        /** @var \stdClass&object{object_type:string,object_id:string} $obj */
+        $obj = (object) ['object_type' => $scope[0], 'object_id' => $scope[1]];
+        return $obj;
+    }
+
+    /**
      * Every test in the requested rite, or across every rite when no rite segment was given.
      *
      * @return list<array<string,mixed>>
@@ -163,6 +177,11 @@ final class TestsHandler extends AbstractHandler
                 }
                 /** @var array<string,mixed> $decoded */
                 $decoded = json_decode($testContents, true, 512, JSON_THROW_ON_ERROR);
+                $name    = is_string($decoded['name'] ?? null) ? $decoded['name'] : basename($filePath, '.json');
+                $scope   = ( new TestScopeResolver() )->resolve($rite, $name);
+                if ($scope !== null) {
+                    $decoded['scope'] = ['object_type' => $scope[0], 'object_id' => $scope[1]];
+                }
                 $suite[] = $decoded;
             }
         }
@@ -195,17 +214,15 @@ final class TestsHandler extends AbstractHandler
                     $description = "Test {$testFile} was not readable";
                     throw new ServiceUnavailableException($description);
                 }
-                if ($response->getHeaderLine('Content-Type') === AcceptHeader::JSON->value) {
-                    return $response
-                        ->withStatus(StatusCode::OK->value, StatusCode::OK->reason())
-                        ->withBody(Stream::create($testContents));
-                } else {
-                    $decodedContents = json_decode($testContents, false, 512, JSON_THROW_ON_ERROR);
-                    if (false === ( $decodedContents instanceof \stdClass )) {
-                        throw new ServiceUnavailableException("Failed to decode test {$testFile} as JSON");
-                    }
-                    return $this->encodeResponseBody($response, $decodedContents);
+                $decodedContents = json_decode($testContents, false, 512, JSON_THROW_ON_ERROR);
+                if (false === ( $decodedContents instanceof \stdClass )) {
+                    throw new ServiceUnavailableException("Failed to decode test {$testFile} as JSON");
                 }
+                $scopeObject = $this->scopeObjectFor($this->rite ?? Rite::default(), $testFile);
+                if ($scopeObject !== null) {
+                    $decodedContents->scope = $scopeObject;
+                }
+                return $this->encodeResponseBody($response, $decodedContents);
             } else {
                 $description = "Test {$testFile} not found";
                 throw new NotFoundException($description);
@@ -294,6 +311,7 @@ final class TestsHandler extends AbstractHandler
         $this->validatePayloadAgainstTestSchema('create');
         self::sanitizeObjectValues($this->payload);
         $this->assertPayloadRiteMatchesPath();
+        $this->assertPayloadScopeAgrees();
 
         if (false === property_exists($this->payload, 'name') || false === is_string($this->payload->name)) {
             $description = 'The Unit Test you are attempting to create must have a valid name.';
@@ -349,6 +367,63 @@ final class TestsHandler extends AbstractHandler
     }
 
     /**
+     * `scope` is server-computed and read-only, but an *echo* of the correct value is
+     * accepted rather than rejected.
+     *
+     * No legitimate client originates a scope: the field exists precisely so clients stop
+     * deriving it. So the only realistic way one reaches a write body is the ordinary
+     * load-edit-save cycle handing back what the GET returned. Rejecting that on presence
+     * alone would punish the common case while catching nothing that a mismatch check does
+     * not — and it is the silent divergence that must be impossible, not the echo (#787).
+     *
+     * The property is unset after validation so it is never persisted: the stored file is
+     * the source, and `scope` is derived from it.
+     */
+    private function assertPayloadScopeAgrees(): void
+    {
+        if (false === property_exists($this->payload, 'scope')) {
+            return;
+        }
+
+        // `name` is required by the JSON schema, which has already validated this payload
+        // by the time this method runs (called right after assertPayloadRiteMatchesPath()).
+        // Narrowing it here (rather than trusting that) keeps this method sound on its own.
+        $name = property_exists($this->payload, 'name') && is_string($this->payload->name)
+            ? $this->payload->name
+            : null;
+
+        $resolved = $name === null ? null : $this->scopeObjectFor($this->rite ?? Rite::default(), $name);
+        $supplied = $this->payload->scope;
+
+        // On create the test does not exist yet, so resolve the scope the stored file WILL
+        // have, from the payload's own applies_to — the same mapping resolve() would apply.
+        if ($resolved === null) {
+            $encodedPayload = json_encode($this->payload);
+            $fromPayload    = $encodedPayload === false
+                ? null
+                : ( new TestScopeResolver() )->resolveFromPayload(json_decode($encodedPayload, true));
+            $resolved       = $fromPayload === null
+                ? null
+                : (object) ['object_type' => $fromPayload[0], 'object_id' => $fromPayload[1]];
+        }
+
+        $agrees = $supplied instanceof \stdClass
+            && $resolved !== null
+            && property_exists($supplied, 'object_type')
+            && property_exists($supplied, 'object_id')
+            && $supplied->object_type === $resolved->object_type
+            && $supplied->object_id === $resolved->object_id;
+
+        if (false === $agrees) {
+            $description = 'The `scope` property is computed by the server from `applies_to` and is read-only. '
+                . 'The value supplied does not match the scope this test resolves to; omit it, or send back the value the API returned.';
+            throw new UnprocessableContentException($description);
+        }
+
+        unset($this->payload->scope);
+    }
+
+    /**
      * Writes the current payload to disk as a Unit Test JSON file.
      *
      * @throws ServiceUnavailableException When the write to disk fails
@@ -385,6 +460,7 @@ final class TestsHandler extends AbstractHandler
         $this->validatePayloadAgainstTestSchema('update');
         self::sanitizeObjectValues($this->payload);
         $this->assertPayloadRiteMatchesPath();
+        $this->assertPayloadScopeAgrees();
 
         if (false === property_exists($this->payload, 'name') || false === is_string($this->payload->name)) {
             $description = 'The Unit Test you are attempting to update must have a valid name.';

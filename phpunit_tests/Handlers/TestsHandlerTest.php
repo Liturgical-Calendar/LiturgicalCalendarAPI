@@ -373,4 +373,72 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
             $this->requestFor('PATCH', '/tests/ambrosian/MaryMotherChurchTest', [], $payload)
         );
     }
+
+    public function testCollectionCarriesTheResolvedScope(): void
+    {
+        $response = ( new TestsHandler([], Rite::AMBROSIAN) )->handle($this->requestFor('GET', '/tests/ambrosian'));
+        $body     = $this->decodeJsonBody($response);
+
+        self::assertNotEmpty($body['litcal_tests']);
+        foreach ($body['litcal_tests'] as $test) {
+            self::assertArrayHasKey('scope', $test);
+            self::assertSame('rite_calendar_test', $test['scope']['object_type']);
+            self::assertSame('ambrosian', $test['scope']['object_id']);
+        }
+    }
+
+    public function testSingleTestCarriesTheResolvedScope(): void
+    {
+        $response = ( new TestsHandler(['PrayerUnbornTest'], Rite::ROMAN) )
+            ->handle($this->requestFor('GET', '/tests/roman/PrayerUnbornTest'));
+
+        /** @var array<string,mixed> $body */
+        $body = json_decode((string) $response->getBody(), true);
+        self::assertSame('national_calendar_test', $body['scope']['object_type']);
+        self::assertSame('roman/US', $body['scope']['object_id']);
+    }
+
+    public function testWritePayloadEchoingTheCorrectScopeIsAccepted(): void
+    {
+        // The ordinary load-edit-save cycle: the client GETs a test, edits one field, and
+        // PUTs the whole object back with the server's own `scope` still attached. That
+        // must not 422 — no legitimate client originates a scope value, so an echo is benign.
+        /** @var array<string,mixed> $payload */
+        $payload          = json_decode(
+            (string) file_get_contents(JsonData::testsFolderFor(Rite::ROMAN)->path() . '/MaryMotherChurchTest.json'),
+            true
+        );
+        $payload['name']  = 'ZzzScopeEchoTest';
+        $payload['scope'] = ['object_type' => 'rite_calendar_test', 'object_id' => 'roman'];
+
+        $this->testFixturePath = JsonData::testsFolderFor(Rite::ROMAN)->path() . '/ZzzScopeEchoTest.json';
+
+        $response = ( new TestsHandler(['ZzzScopeEchoTest'], Rite::ROMAN) )->handle(
+            $this->requestFor('PUT', '/tests/roman/ZzzScopeEchoTest', [], $payload)
+        );
+        self::assertSame(201, $response->getStatusCode());
+
+        // The echoed scope must NOT be persisted — it is derived, not stored.
+        /** @var array<string,mixed> $stored */
+        $stored = json_decode((string) file_get_contents($this->testFixturePath), true);
+        self::assertArrayNotHasKey('scope', $stored);
+    }
+
+    public function testWritePayloadWithAContradictoryScopeIsRejected(): void
+    {
+        // A client that hand-derived the scope and got it wrong still gets a loud 422 —
+        // silent divergence is what must be impossible, not the echo.
+        /** @var array<string,mixed> $payload */
+        $payload          = json_decode(
+            (string) file_get_contents(JsonData::testsFolderFor(Rite::ROMAN)->path() . '/MaryMotherChurchTest.json'),
+            true
+        );
+        $payload['name']  = 'ZzzScopeMismatchTest';
+        $payload['scope'] = ['object_type' => 'diocesan_calendar_test', 'object_id' => 'roman/rotter_nl'];
+
+        $this->expectException(UnprocessableContentException::class);
+        ( new TestsHandler(['ZzzScopeMismatchTest'], Rite::ROMAN) )->handle(
+            $this->requestFor('PUT', '/tests/roman/ZzzScopeMismatchTest', [], $payload)
+        );
+    }
 }

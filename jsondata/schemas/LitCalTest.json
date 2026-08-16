@@ -87,6 +87,23 @@
             ],
             "additionalProperties": false
         },
+        "ResolvedScope": {
+            "type": "object",
+            "title": "ResolvedScope",
+            "description": "the OpenFGA (object type, object id) pair that scopes this test in the authorization model, computed by the server from `applies_to`. Read-only: it never appears in a source file. A write payload may echo back the value the API returned, but a `scope` that disagrees with the resolved one is rejected with a 422, and an echoed value is never persisted. Exposed so clients do not re-implement TestScopeResolver — see issue #787.",
+            "properties": {
+                "object_type": {
+                    "type": "string",
+                    "enum": ["rite_calendar_test", "national_calendar_test", "diocesan_calendar_test"]
+                },
+                "object_id": {
+                    "type": "string",
+                    "minLength": 1
+                }
+            },
+            "required": ["object_type", "object_id"],
+            "additionalProperties": false
+        },
         "ExactCorrespondenceType": {
             "type": "object",
             "properties": {
@@ -112,6 +129,9 @@
                 },
                 "assertions": {
                     "$ref": "#/definitions/Assertions"
+                },
+                "scope": {
+                    "$ref": "#/definitions/ResolvedScope"
                 }
             },
             "required": [ "name", "event_key", "description", "test_type", "applies_to", "assertions" ],
@@ -145,6 +165,9 @@
                 },
                 "assertions": {
                     "$ref": "#/definitions/Assertions"
+                },
+                "scope": {
+                    "$ref": "#/definitions/ResolvedScope"
                 }
             },
             "required": [ "name", "event_key", "description", "test_type", "applies_to", "assertions", "year_since" ],
@@ -178,6 +201,9 @@
                 },
                 "assertions": {
                     "$ref": "#/definitions/Assertions"
+                },
+                "scope": {
+                    "$ref": "#/definitions/ResolvedScope"
                 }
             },
             "required": [ "name", "event_key", "description", "test_type", "applies_to", "assertions", "year_until" ],
