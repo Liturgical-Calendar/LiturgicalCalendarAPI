@@ -11,7 +11,7 @@ use LiturgicalCalendar\Api\Enum\Rite;
  * Maps a test file name to the OpenFGA (object type, object id) pair that
  * scopes the test within the authorization model.
  *
- * Reads `{testsDir}/{testName}.json` and inspects the top-level `applies_to`
+ * Reads `{testsRoot}/{rite}/{testName}.json` and inspects the top-level `applies_to`
  * key:
  *
  *   - `{"rite": "<r>", "diocesan_calendar": "<id>"}` → `['diocesan_calendar_test', '<r>/<id>']`
@@ -39,11 +39,12 @@ use LiturgicalCalendar\Api\Enum\Rite;
  */
 final class TestScopeResolver
 {
-    private string $testsDir;
+    /** Absolute path to the corpus ROOT (`jsondata/tests`), not to a rite partition. */
+    private string $testsRootDir;
 
-    public function __construct(?string $testsDir = null)
+    public function __construct(?string $testsRootDir = null)
     {
-        $this->testsDir = $testsDir ?? JsonData::TESTS_FOLDER->path();
+        $this->testsRootDir = $testsRootDir ?? JsonData::TESTS_FOLDER->path();
     }
 
     /**
@@ -140,9 +141,15 @@ final class TestScopeResolver
     }
 
     /**
-     * @return array{0: string, 1: string}|null
+     * Resolve the FGA scope pair for a stored test.
+     *
+     * The corpus is partitioned by rite (#787), so a name alone does not identify a test:
+     * `StIgnatiusOfLoyolaTest` exists — or may come to exist — under both rites, as two
+     * different tests with two different scopes.
+     *
+     * @return array{0: string, 1: string}|null null when the name is unsafe, or no such test exists under that rite
      */
-    public function resolve(string $testName): ?array
+    public function resolve(Rite $rite, string $testName): ?array
     {
         // Reject any name that could enable path traversal or filesystem injection.
         // Only allow characters that are safe for use as a bare file-stem: letters,
@@ -152,7 +159,7 @@ final class TestScopeResolver
             return null;
         }
 
-        $filePath = $this->testsDir . DIRECTORY_SEPARATOR . $testName . '.json';
+        $filePath = $this->testsRootDir . DIRECTORY_SEPARATOR . $rite->value . DIRECTORY_SEPARATOR . $testName . '.json';
 
         $raw = @file_get_contents($filePath);
         if (false === $raw) {

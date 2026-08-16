@@ -89,12 +89,12 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
     {
         /** @var array<string,mixed> $payload */
         $payload         = json_decode(
-            (string) file_get_contents(JsonData::TESTS_FOLDER->path() . '/MaryMotherChurchTest.json'),
+            (string) file_get_contents(JsonData::testsFolderFor(Rite::ROMAN)->path() . '/MaryMotherChurchTest.json'),
             true
         );
         $payload['name'] = 'ZzzPutCreatedTest';
 
-        $this->testFixturePath = JsonData::TESTS_FOLDER->path() . '/ZzzPutCreatedTest.json';
+        $this->testFixturePath = JsonData::testsFolderFor(Rite::ROMAN)->path() . '/ZzzPutCreatedTest.json';
 
         $response = ( new TestsHandler(['ZzzPutCreatedTest'], Rite::ROMAN) )->handle(
             $this->requestFor('PUT', '/tests/roman/ZzzPutCreatedTest', [], $payload)
@@ -116,7 +116,7 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
     {
         /** @var array<string,mixed> $payload */
         $payload = json_decode(
-            (string) file_get_contents(JsonData::TESTS_FOLDER->path() . '/MaryMotherChurchTest.json'),
+            (string) file_get_contents(JsonData::testsFolderFor(Rite::ROMAN)->path() . '/MaryMotherChurchTest.json'),
             true
         );
 
@@ -130,7 +130,7 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
     {
         /** @var array<string,mixed> $payload */
         $payload = json_decode(
-            (string) file_get_contents(JsonData::TESTS_FOLDER->path() . '/MaryMotherChurchTest.json'),
+            (string) file_get_contents(JsonData::testsFolderFor(Rite::ROMAN)->path() . '/MaryMotherChurchTest.json'),
             true
         );
         // Body says MaryMotherChurchTest, path says ZzzOtherTest.
@@ -153,13 +153,13 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
     {
         /** @var array<string,mixed> $payload */
         $payload         = json_decode(
-            (string) file_get_contents(JsonData::TESTS_FOLDER->path() . '/MaryMotherChurchTest.json'),
+            (string) file_get_contents(JsonData::testsFolderFor(Rite::ROMAN)->path() . '/MaryMotherChurchTest.json'),
             true
         );
         $payload['name'] = 'ZzzPatchTargetTest';
 
         // Seed the fixture on disk, then PATCH it with an updated description.
-        $this->testFixturePath = JsonData::TESTS_FOLDER->path() . '/ZzzPatchTargetTest.json';
+        $this->testFixturePath = JsonData::testsFolderFor(Rite::ROMAN)->path() . '/ZzzPatchTargetTest.json';
         file_put_contents($this->testFixturePath, json_encode($payload, JSON_THROW_ON_ERROR));
 
         $payload['description'] = 'Updated description via PATCH';
@@ -186,7 +186,7 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
     {
         /** @var array<string,mixed> $payload */
         $payload         = json_decode(
-            (string) file_get_contents(JsonData::TESTS_FOLDER->path() . '/MaryMotherChurchTest.json'),
+            (string) file_get_contents(JsonData::testsFolderFor(Rite::ROMAN)->path() . '/MaryMotherChurchTest.json'),
             true
         );
         $payload['name'] = 'ZzzNoSuchTest';
@@ -202,7 +202,7 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
     {
         /** @var array<string,mixed> $payload */
         $payload = json_decode(
-            (string) file_get_contents(JsonData::TESTS_FOLDER->path() . '/MaryMotherChurchTest.json'),
+            (string) file_get_contents(JsonData::testsFolderFor(Rite::ROMAN)->path() . '/MaryMotherChurchTest.json'),
             true
         );
         // Body names an existing test, but the path addresses a different one.
@@ -232,7 +232,7 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
     public function testDeletePurgeFailureDoesNotFailDeletion(): void
     {
         $testName              = 'PurgeFailFixture_' . bin2hex(random_bytes(6));
-        $fixturePath           = JsonData::TESTS_FOLDER->path() . DIRECTORY_SEPARATOR . $testName . '.json';
+        $fixturePath           = JsonData::testsFolderFor(Rite::ROMAN)->path() . DIRECTORY_SEPARATOR . $testName . '.json';
         $this->testFixturePath = $fixturePath;
         file_put_contents($fixturePath, json_encode(
             ['name' => $testName, 'applies_to' => ['national_calendar' => 'US']],
@@ -266,10 +266,10 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
     {
         // --- Arrange: create a temp fixture that TestScopeResolver maps to national_calendar_test:roman/US ---
         // Unique per-run name so the fixture cannot collide with a real or
-        // shared test file (the handler reads from the real JsonData::TESTS_FOLDER,
+        // shared test file (the handler reads from the real JsonData::testsFolderFor(Rite::ROMAN),
         // so the fixture must live there). tearDown removes it via $testFixturePath.
         $testName              = 'PurgeFixture_' . bin2hex(random_bytes(6));
-        $testsDir              = JsonData::TESTS_FOLDER->path();
+        $testsDir              = JsonData::testsFolderFor(Rite::ROMAN)->path();
         $fixturePath           = $testsDir . DIRECTORY_SEPARATOR . $testName . '.json';
         $this->testFixturePath = $fixturePath;
 

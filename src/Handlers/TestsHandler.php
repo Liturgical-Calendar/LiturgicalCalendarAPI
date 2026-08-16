@@ -131,6 +131,45 @@ final class TestsHandler extends AbstractHandler
     }
 
     /**
+     * Absolute path to the file backing a test, in the partition for this request's rite.
+     *
+     * Only ever called once the null-rite guard in handle() has passed, so $this->rite is
+     * non-null on every write and single-test read path.
+     */
+    private function testFilePath(string $testName): string
+    {
+        return JsonData::testsFolderFor($this->rite ?? Rite::default())->path() . '/' . $testName . '.json';
+    }
+
+    /**
+     * Every test in the requested rite, or across every rite when no rite segment was given.
+     *
+     * @return list<array<string,mixed>>
+     */
+    private function collectTests(): array
+    {
+        $rites = $this->rite === null ? Rite::cases() : [$this->rite];
+        $suite = [];
+        foreach ($rites as $rite) {
+            $folder = JsonData::testsFolderFor($rite)->path();
+            $files  = glob($folder . '/*Test.json');
+            if ($files === false) {
+                throw new ServiceUnavailableException("Tests folder {$folder} cannot be opened");
+            }
+            foreach ($files as $filePath) {
+                $testContents = file_get_contents($filePath);
+                if ($testContents === false) {
+                    throw new ServiceUnavailableException('Test ' . basename($filePath) . ' was not readable');
+                }
+                /** @var array<string,mixed> $decoded */
+                $decoded = json_decode($testContents, true, 512, JSON_THROW_ON_ERROR);
+                $suite[] = $decoded;
+            }
+        }
+        return $suite;
+    }
+
+    /**
      * Handles GET requests for tests.
      *
      * If no path parts are provided, this method returns an index of all tests.
@@ -141,34 +180,17 @@ final class TestsHandler extends AbstractHandler
     private function handleGetRequest(ResponseInterface $response): ResponseInterface
     {
         if (count($this->requestPathParams) === 0) {
-            try {
-                $responseBody = new \stdClass();
-                $testSuite    = [];
-                $testFiles    = new \DirectoryIterator('glob://' . JsonData::TESTS_FOLDER->path() . '/*Test.json');
-                foreach ($testFiles as $f) {
-                    $fileName     = $f->getFilename();
-                    $testContents = file_get_contents(JsonData::TESTS_FOLDER->path() . "/$fileName");
-                    if ($testContents === false) {
-                        $description = "Test {$fileName} was not readable";
-                        throw new ServiceUnavailableException($description);
-                    }
-                    $testSuite[] = json_decode($testContents, true, 512, JSON_THROW_ON_ERROR);
-                }
-                $responseBody->litcal_tests = $testSuite;
-                return $this->encodeResponseBody($response, $responseBody);
-            } catch (\UnexpectedValueException $e) {
-                throw new ServiceUnavailableException(
-                    $description = 'Tests folder path cannot be opened: ' . $e->getMessage(),
-                    $e
-                );
-            }
+            $responseBody               = new \stdClass();
+            $responseBody->litcal_tests = $this->collectTests();
+            return $this->encodeResponseBody($response, $responseBody);
         } elseif (count($this->requestPathParams) > 1) {
             $description = 'Expected one path param for GET requests, received ' . count($this->requestPathParams);
             throw new ValidationException($description);
         } else {
-            $testFile = array_shift($this->requestPathParams);
-            if (file_exists(JsonData::TESTS_FOLDER->path() . "/{$testFile}.json")) {
-                $testContents = file_get_contents(JsonData::TESTS_FOLDER->path() . "/{$testFile}.json");
+            $testFile     = array_shift($this->requestPathParams);
+            $testFilePath = $this->testFilePath($testFile);
+            if (file_exists($testFilePath)) {
+                $testContents = file_get_contents($testFilePath);
                 if ($testContents === false) {
                     $description = "Test {$testFile} was not readable";
                     throw new ServiceUnavailableException($description);
@@ -214,12 +236,12 @@ final class TestsHandler extends AbstractHandler
         // validation (path-traversal / unsafe characters) or the test file is
         // missing/unreadable — in every such case refuse to touch the filesystem,
         // so unsafe names like "../foo" can never reach unlink().
-        $scope = ( new TestScopeResolver() )->resolve($testName);
+        $scope = ( new TestScopeResolver() )->resolve($this->rite ?? Rite::default(), $testName);
         if ($scope === null) {
             throw new NotFoundException("Test {$testName} not found, cannot DELETE.");
         }
 
-        if (false === unlink(JsonData::TESTS_FOLDER->path() . "/{$testName}.json")) {
+        if (false === unlink($this->testFilePath($testName))) {
             throw new ServiceUnavailableException("Test {$testName} could not be deleted");
         }
 
@@ -283,7 +305,7 @@ final class TestsHandler extends AbstractHandler
             throw new UnprocessableContentException($description);
         }
 
-        $testFilePath = JsonData::TESTS_FOLDER->path() . '/' . $testName . '.json';
+        $testFilePath = $this->testFilePath($testName);
         if (file_exists($testFilePath)) {
             $description = 'A Unit Test with the name ' . $testName . ' already exists. Did you perhaps mean to use a PATCH request?';
             throw new ConflictException($description);
@@ -339,7 +361,7 @@ final class TestsHandler extends AbstractHandler
 
         $testName = $this->payload->name;
 
-        $testFilePath = JsonData::TESTS_FOLDER->path() . '/' . $testName . '.json';
+        $testFilePath = $this->testFilePath($testName);
         if (false === file_exists($testFilePath)) {
             $description = 'A Unit Test with the name ' . $testName . ' does not exist. Did you perhaps mean to use a PUT request?';
             throw new UnprocessableContentException($description);

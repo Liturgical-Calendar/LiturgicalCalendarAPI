@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Services;
 
+use LiturgicalCalendar\Api\Enum\Rite;
+
 /**
  * Pure mapper that remaps a `test_definition` OpenFGA tuple to the
  * appropriate scoped type (diocesan_calendar_test, national_calendar_test,
@@ -54,7 +56,16 @@ final class TestTupleMigration
             return null;
         }
 
-        $resolved = $resolver->resolve($testName);
+        // These legacy `test_definition:` tuples predate rite partitioning (#787)
+        // and carry no rite of their own, so the corpus is searched rite by rite
+        // and the first partition containing the file wins.
+        $resolved = null;
+        foreach (Rite::cases() as $rite) {
+            $resolved = $resolver->resolve($rite, $testName);
+            if ($resolved !== null) {
+                break;
+            }
+        }
 
         if ($resolved === null) {
             return null;

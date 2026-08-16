@@ -653,17 +653,22 @@ class SchemaValidationTest extends TestCase
      */
     public static function realTestSourceFileProvider(): array
     {
-        // Test source files live in jsondata/tests/, not sourcedata. Resolved
-        // from the repo root rather than via JsonData::TESTS_FOLDER, because a
-        // data provider runs before any test can initialise Router::$apiFilePath.
-        $files = glob(dirname(__DIR__, 2) . '/jsondata/tests/*.json');
+        // Test source files live in jsondata/tests/, partitioned by rite (#787:
+        // jsondata/tests/{rite}/*.json), not sourcedata. Resolved from the repo
+        // root rather than via JsonData::TESTS_FOLDER, because a data provider
+        // runs before any test can initialise Router::$apiFilePath.
+        $files = glob(dirname(__DIR__, 2) . '/jsondata/tests/*/*.json');
         if (empty($files) || $files === false) {
             return [];
         }
 
         $cases = [];
         foreach ($files as $file) {
-            $cases[basename($file)] = [$file];
+            // Key on {rite}/{name}.json rather than the bare basename: the corpus is
+            // partitioned by rite, so the same test name could exist under two rites,
+            // and a bare-basename key would silently drop one of them.
+            $key         = basename(dirname($file)) . '/' . basename($file);
+            $cases[$key] = [$file];
         }
         return $cases;
     }
