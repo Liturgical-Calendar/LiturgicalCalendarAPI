@@ -310,4 +310,55 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         $response = ( new TestsHandler([], null) )->handle($this->requestFor('GET', '/tests'));
         self::assertSame(200, $response->getStatusCode());
     }
+
+    public function testPutRejectsPayloadWhoseRiteContradictsThePath(): void
+    {
+        /** @var array<string,mixed> $payload */
+        $payload               = json_decode(
+            (string) file_get_contents(JsonData::testsFolderFor(Rite::ROMAN)->path() . '/MaryMotherChurchTest.json'),
+            true
+        );
+        $payload['name']       = 'ZzzRiteMismatchTest';
+        $payload['applies_to'] = ['rite' => 'roman'];
+
+        // Addressed under /tests/ambrosian/... but the body says roman.
+        $this->expectException(UnprocessableContentException::class);
+        ( new TestsHandler(['ZzzRiteMismatchTest'], Rite::AMBROSIAN) )->handle(
+            $this->requestFor('PUT', '/tests/ambrosian/ZzzRiteMismatchTest', [], $payload)
+        );
+    }
+
+    public function testPutAcceptsPayloadWhoseRiteMatchesThePath(): void
+    {
+        /** @var array<string,mixed> $payload */
+        $payload               = json_decode(
+            (string) file_get_contents(JsonData::testsFolderFor(Rite::ROMAN)->path() . '/MaryMotherChurchTest.json'),
+            true
+        );
+        $payload['name']       = 'ZzzRiteMatchTest';
+        $payload['applies_to'] = ['rite' => 'roman'];
+
+        $this->testFixturePath = JsonData::testsFolderFor(Rite::ROMAN)->path() . '/ZzzRiteMatchTest.json';
+
+        $response = ( new TestsHandler(['ZzzRiteMatchTest'], Rite::ROMAN) )->handle(
+            $this->requestFor('PUT', '/tests/roman/ZzzRiteMatchTest', [], $payload)
+        );
+        self::assertSame(201, $response->getStatusCode());
+    }
+
+    public function testPatchRejectsPayloadWhoseRiteContradictsThePath(): void
+    {
+        /** @var array<string,mixed> $payload */
+        $payload               = json_decode(
+            (string) file_get_contents(JsonData::testsFolderFor(Rite::ROMAN)->path() . '/MaryMotherChurchTest.json'),
+            true
+        );
+        $payload['applies_to'] = ['rite' => 'roman'];
+
+        // MaryMotherChurchTest exists under roman/, but is addressed here under ambrosian/.
+        $this->expectException(UnprocessableContentException::class);
+        ( new TestsHandler(['MaryMotherChurchTest'], Rite::AMBROSIAN) )->handle(
+            $this->requestFor('PATCH', '/tests/ambrosian/MaryMotherChurchTest', [], $payload)
+        );
+    }
 }

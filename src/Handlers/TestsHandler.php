@@ -293,6 +293,7 @@ final class TestsHandler extends AbstractHandler
 
         $this->validatePayloadAgainstTestSchema('create');
         self::sanitizeObjectValues($this->payload);
+        $this->assertPayloadRiteMatchesPath();
 
         if (false === property_exists($this->payload, 'name') || false === is_string($this->payload->name)) {
             $description = 'The Unit Test you are attempting to create must have a valid name.';
@@ -315,6 +316,36 @@ final class TestsHandler extends AbstractHandler
 
         $responseBody = (object) ['response' => 'Unit Test ' . $testName . ' created successfully.'];
         return $this->encodeResponseBody($response, $responseBody, StatusCode::CREATED);
+    }
+
+    /**
+     * The path segment and `applies_to.rite` must name the same rite.
+     *
+     * The directory is the address and `applies_to.rite` is the content. Letting them
+     * diverge would file a test under a rite it does not claim, and `TestScopeResolver`
+     * reads the content while the route reads the address — so they would authorize and
+     * store against different rites.
+     */
+    private function assertPayloadRiteMatchesPath(): void
+    {
+        $pathRite = $this->rite ?? Rite::default();
+
+        $payloadRite = null;
+        if (
+            property_exists($this->payload, 'applies_to')
+            && $this->payload->applies_to instanceof \stdClass
+            && property_exists($this->payload->applies_to, 'rite')
+            && is_string($this->payload->applies_to->rite)
+        ) {
+            $payloadRite = Rite::tryFrom($this->payload->applies_to->rite);
+        }
+
+        if ($payloadRite !== $pathRite) {
+            $described   = null === $payloadRite ? 'none' : $payloadRite->value;
+            $description = 'You are attempting to write a Unit Test at /tests/' . $pathRite->value
+                . '/ whose applies_to.rite is ' . $described . '. The rite in the path and the rite in the body must match.';
+            throw new UnprocessableContentException($description);
+        }
     }
 
     /**
@@ -353,6 +384,7 @@ final class TestsHandler extends AbstractHandler
 
         $this->validatePayloadAgainstTestSchema('update');
         self::sanitizeObjectValues($this->payload);
+        $this->assertPayloadRiteMatchesPath();
 
         if (false === property_exists($this->payload, 'name') || false === is_string($this->payload->name)) {
             $description = 'The Unit Test you are attempting to update must have a valid name.';
