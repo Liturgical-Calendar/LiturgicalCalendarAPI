@@ -24,6 +24,9 @@ enum JsonData: string
      */
     case TESTS_FOLDER = JsonDataConstants::TESTS_FOLDER;
 
+    case ROMAN_TESTS_FOLDER     = JsonDataConstants::ROMAN_TESTS_FOLDER;
+    case AMBROSIAN_TESTS_FOLDER = JsonDataConstants::AMBROSIAN_TESTS_FOLDER;
+
     /**
      * The folder containing source data.
      * Evaluates to 'jsondata/sourcedata'.
@@ -507,5 +510,19 @@ enum JsonData: string
         return $rite === Rite::AMBROSIAN
             ? self::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FILE
             : self::DIOCESAN_CALENDAR_I18N_FILE;
+    }
+
+    /**
+     * The test-corpus folder for the given rite.
+     *
+     * Unlike the diocesan resolvers, both partitions always exist: every rite has a test
+     * folder, because a rite-level test (`applies_to: {"rite": "ambrosian"}`) needs
+     * somewhere to live even where that rite has no national or diocesan tier.
+     */
+    public static function testsFolderFor(Rite $rite): self
+    {
+        return $rite === Rite::AMBROSIAN
+            ? self::AMBROSIAN_TESTS_FOLDER
+            : self::ROMAN_TESTS_FOLDER;
     }
 }
