@@ -280,12 +280,20 @@ final class LitTestRunnerTest extends TestCase
 
     public function testRunnerResolvesTestsFromTheRitePartition(): void
     {
+        // Minimal valid-shaped test data: the constructor only reads the file
+        // from disk and validates it against the schema — it never dereferences
+        // $testData — but the "not ready" path's setError() formats a message via
+        // settings->year, so a bare `new \stdClass()` would trip a PHP warning on
+        // undefined properties. A real settings->year avoids that noise for both
+        // the ready and not-ready runner below.
+        $data = (object) ['settings' => (object) ['year' => 2024]];
+
         // StIgnatiusOfLoyolaTest exists only under ambrosian/.
-        $ambrosian = new LitTestRunner('StIgnatiusOfLoyolaTest', new \stdClass(), Rite::AMBROSIAN);
+        $ambrosian = new LitTestRunner('StIgnatiusOfLoyolaTest', $data, Rite::AMBROSIAN);
         self::assertTrue($ambrosian->isReady());
 
         // The same name under roman/ does not exist, so the runner is not ready.
-        $roman = new LitTestRunner('StIgnatiusOfLoyolaTest', new \stdClass(), Rite::ROMAN);
+        $roman = new LitTestRunner('StIgnatiusOfLoyolaTest', $data, Rite::ROMAN);
         self::assertFalse($roman->isReady());
     }
 }

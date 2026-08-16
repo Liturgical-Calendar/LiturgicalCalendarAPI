@@ -493,6 +493,79 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $middleware->process($request, $this->nextHandler);
     }
 
+    /**
+     * Twin of testForTestScopesFactoryMissingTestIdThrowsForbidden(), for the
+     * rite guard added by #787: a valid test_id with a MISSING test_rite
+     * attribute must still fail closed. A fixture that would resolve happily
+     * once a rite is supplied is deliberately present, so a passing check()
+     * call can only mean the guard was bypassed and a partition was guessed.
+     */
+    public function testForTestScopesFactoryMissingTestRiteThrowsForbidden(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->never())->method('check');
+
+        $tempDir     = sys_get_temp_dir() . '/fga_test_' . uniqid();
+        $tempRiteDir = $tempDir . '/roman';
+        $tempFile    = $tempRiteDir . '/some-test.json';
+        mkdir($tempRiteDir, 0777, true);
+        $this->tempPaths[] = $tempDir;
+        $this->tempPaths[] = $tempRiteDir;
+        $this->tempPaths[] = $tempFile;
+        file_put_contents(
+            $tempFile,
+            (string) json_encode(['applies_to' => ['national_calendar' => 'US']])
+        );
+        $scopeResolver = new TestScopeResolver($tempDir);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forTestScopes($client, $scopeResolver);
+
+        $request = ( new ServerRequest('PATCH', '/tests/some-test') )
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'some-test');
+        // No test_rite attribute — the guard must return null before resolve() is
+        // ever called, regardless of whether the name would resolve under some rite.
+
+        $this->expectException(ForbiddenException::class);
+        $middleware->process($request, $this->nextHandler);
+    }
+
+    /**
+     * Same guard, exercised via an INVALID test_rite value (one Rite::tryFrom()
+     * cannot parse) rather than a missing attribute. Rite::tryFrom() returning
+     * null must be treated identically to the attribute being absent.
+     */
+    public function testForTestScopesFactoryInvalidTestRiteThrowsForbidden(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->never())->method('check');
+
+        $tempDir     = sys_get_temp_dir() . '/fga_test_' . uniqid();
+        $tempRiteDir = $tempDir . '/roman';
+        $tempFile    = $tempRiteDir . '/some-test.json';
+        mkdir($tempRiteDir, 0777, true);
+        $this->tempPaths[] = $tempDir;
+        $this->tempPaths[] = $tempRiteDir;
+        $this->tempPaths[] = $tempFile;
+        file_put_contents(
+            $tempFile,
+            (string) json_encode(['applies_to' => ['national_calendar' => 'US']])
+        );
+        $scopeResolver = new TestScopeResolver($tempDir);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forTestScopes($client, $scopeResolver);
+
+        $request = ( new ServerRequest('PATCH', '/tests/byzantine/some-test') )
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'some-test')
+            ->withAttribute('test_rite', 'byzantine');
+        // test_rite is present but not a value Rite::tryFrom() recognises —
+        // must fail closed exactly like the absent-attribute case.
+
+        $this->expectException(ForbiddenException::class);
+        $middleware->process($request, $this->nextHandler);
+    }
+
     public function testForTestScopesFactoryPutMapsToEditor(): void
     {
         $client = $this->createMock(OpenFgaClient::class);
