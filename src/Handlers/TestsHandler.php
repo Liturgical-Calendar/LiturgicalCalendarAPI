@@ -383,6 +383,15 @@ final class TestsHandler extends AbstractHandler
      * alone would punish the common case while catching nothing that a mismatch check does
      * not — and it is the silent divergence that must be impossible, not the echo (#787).
      *
+     * The accepted value is always the scope the payload's own `applies_to` resolves to —
+     * the scope the stored file WILL have after this write — never the scope the stored file
+     * has *before* it (on PATCH, that would be an already-obsolete value by the time the
+     * write completes). PUT and PATCH share this: on create there is no stored file yet, and
+     * on update the authorization layer (`OpenFgaAuthorizationMiddleware::
+     * forTestScopePayloadTarget()`, #790) has already required `editor` on this same
+     * payload-derived scope, so accepting anything else here would be incoherent with what
+     * was actually authorized.
+     *
      * The property is unset after validation so it is never persisted: the stored file is
      * the source, and `scope` is derived from it.
      */
@@ -392,27 +401,15 @@ final class TestsHandler extends AbstractHandler
             return;
         }
 
-        // `name` is required by the JSON schema, which has already validated this payload
-        // by the time this method runs (called right after assertPayloadRiteMatchesPath()).
-        // Narrowing it here (rather than trusting that) keeps this method sound on its own.
-        $name = property_exists($this->payload, 'name') && is_string($this->payload->name)
-            ? $this->payload->name
-            : null;
+        $encodedPayload = json_encode($this->payload);
+        $fromPayload    = $encodedPayload === false
+            ? null
+            : ( new TestScopeResolver() )->resolveFromPayload(json_decode($encodedPayload, true));
+        $resolved       = $fromPayload === null
+            ? null
+            : (object) ['object_type' => $fromPayload[0], 'object_id' => $fromPayload[1]];
 
-        $resolved = $name === null ? null : $this->scopeObjectFor($this->rite ?? Rite::default(), $name);
         $supplied = $this->payload->scope;
-
-        // On create the test does not exist yet, so resolve the scope the stored file WILL
-        // have, from the payload's own applies_to — the same mapping resolve() would apply.
-        if ($resolved === null) {
-            $encodedPayload = json_encode($this->payload);
-            $fromPayload    = $encodedPayload === false
-                ? null
-                : ( new TestScopeResolver() )->resolveFromPayload(json_decode($encodedPayload, true));
-            $resolved       = $fromPayload === null
-                ? null
-                : (object) ['object_type' => $fromPayload[0], 'object_id' => $fromPayload[1]];
-        }
 
         $agrees = $supplied instanceof \stdClass
             && $resolved !== null

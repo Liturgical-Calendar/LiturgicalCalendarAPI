@@ -880,6 +880,10 @@ class Router
                     ->withAttribute('test_id', $requestPathParts[0])
                     ->withAttribute('test_rite', $testsRite?->value);
                 $pipeline->pipe(OpenFgaAuthorizationMiddleware::forTestScopes($fgaClient, new TestScopeResolver()));
+                // Union check (#790): a PATCH that re-scopes a test also needs editor on the
+                // payload-derived target scope, not just the stored one above. Inert for
+                // PUT/DELETE — see forTestScopePayloadTarget()'s docblock.
+                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forTestScopePayloadTarget($fgaClient, new TestScopeResolver()));
             }
         } elseif ($route === 'temporale') {
             $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());

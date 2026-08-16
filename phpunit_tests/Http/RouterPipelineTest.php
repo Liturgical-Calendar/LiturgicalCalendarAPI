@@ -350,6 +350,39 @@ final class RouterPipelineTest extends TestCase
         self::assertSame('ambrosian', $request->getAttribute('test_rite'));
     }
 
+    /**
+     * Issue #790: a PATCH that re-scopes a test must be authorized against BOTH the
+     * stored scope (forTestScopes()) and the payload-derived target scope
+     * (forTestScopePayloadTarget()). Piping only the first leaves the union check inert —
+     * this test protects the wiring in configureAuthorizationPipeline() itself, which the
+     * factory-level unit tests in OpenFgaAuthorizationMiddlewareTest cannot see since they
+     * construct middleware instances directly rather than going through the Router.
+     */
+    public function testTestsRouteAddsBothFgaMiddlewareInstancesForTheUnionCheck(): void
+    {
+        $router   = $this->routerWithoutConstructor(new ServerRequest('PATCH', '/tests/roman/some-test'));
+        $pipeline = $this->emptyPipeline();
+
+        $this->callConfigurePipeline($router, $pipeline, 'tests', ['some-test']);
+
+        $queue  = $this->getQueue($pipeline);
+        $fgaMws = array_values(array_filter(
+            $queue,
+            static fn (object $mw): bool => $mw instanceof OpenFgaAuthorizationMiddleware
+        ));
+
+        self::assertCount(2, $fgaMws, 'Expected both forTestScopes() and forTestScopePayloadTarget() in the pipeline');
+
+        // forTestScopePayloadTarget()'s relation map only defines PATCH, distinguishing it
+        // from forTestScopes() (which also maps PUT and DELETE) — see each factory's
+        // relationMap argument.
+        self::assertSame(
+            ['PATCH' => 'editor'],
+            $this->getPrivateProp($fgaMws[1], 'relationMap'),
+            'Second FGA middleware in the pipeline must be forTestScopePayloadTarget()'
+        );
+    }
+
     public function testTestsRouteWithoutPathPartSkipsFga(): void
     {
         // Without a path part (no test id) the fine-grained FGA middleware must not
