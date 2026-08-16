@@ -23,6 +23,19 @@ class JsonDataConstants
     public const TESTS_FOLDER = JsonDataConstants::FOLDER . '/tests';
 
     /**
+     * The test corpus is partitioned by rite, so that a test name is unique within a
+     * rite rather than globally: a Roman `StIgnatiusOfLoyolaTest` can coexist with the
+     * Ambrosian one. Unlike the sourcedata partitions this lives under `jsondata/tests`
+     * rather than `sourcedata/rite`, because tests are not source data.
+     *
+     * Evaluates to 'jsondata/tests/roman'.
+     */
+    public const ROMAN_TESTS_FOLDER = JsonDataConstants::TESTS_FOLDER . '/roman';
+
+    /** Evaluates to 'jsondata/tests/ambrosian'. */
+    public const AMBROSIAN_TESTS_FOLDER = JsonDataConstants::TESTS_FOLDER . '/ambrosian';
+
+    /**
      * The folder containing source data.
      * Evaluates to 'jsondata/sourcedata'.
      */

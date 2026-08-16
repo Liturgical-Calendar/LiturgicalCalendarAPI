@@ -1357,16 +1357,17 @@ class Health implements MessageComponentInterface
             'stream'  => true
         ];
 
-        $req     = $this->buildCalendarRequestPath($calendar, $year, $category, $this->resolveRite($calendar, $category, $riteHint));
+        $rite    = $this->resolveRite($calendar, $category, $riteHint);
+        $req     = $this->buildCalendarRequestPath($calendar, $year, $category, $rite);
         $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts, 300, $to);
         $promise->then(
-            function (array $result) use ($to, $test, $year, $runToken) {
+            function (array $result) use ($to, $test, $year, $runToken, $rite) {
                 /** @var array{data: string, fromCache: bool} $result */
                 $data = $result['data'];
                 /** @var \stdClass&object{settings:object{year:int,national_calendar?:string,diocesan_calendar?:string},litcal:LiturgicalEvent[]} $jsonData */
                 $jsonData = json_decode($data);
                 if (json_last_error() === JSON_ERROR_NONE) {
-                    $UnitTest = new LitTestRunner($test, $jsonData);
+                    $UnitTest = new LitTestRunner($test, $jsonData, $rite);
                     if ($UnitTest->isReady()) {
                         $UnitTest->runTest();
                     }

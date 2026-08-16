@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Test;
 
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Test\LitTestRunner;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -32,7 +33,7 @@ final class LitTestRunnerTest extends TestCase
 
     public static function setUpBeforeClass(): void
     {
-        // LitTestRunner's constructor reads JsonData::TESTS_FOLDER->path(),
+        // LitTestRunner's constructor reads JsonData::testsFolderFor(Rite)->path(),
         // which composes Router::$apiFilePath as a prefix. The static is
         // typed and uninitialised when the production bootstrap hasn't
         // run, so we pin it to the project root here for the duration
@@ -71,7 +72,7 @@ final class LitTestRunnerTest extends TestCase
         $data   = $this->calendarPayload(2019, [
             (object) ['event_key' => 'MaryMotherChurch', 'date' => '2019-06-10T00:00:00+00:00'],
         ]);
-        $runner = new LitTestRunner('MaryMotherChurchTest', $data);
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
         $this->assertTrue($runner->isReady());
         $runner->runTest();
 
@@ -91,7 +92,7 @@ final class LitTestRunnerTest extends TestCase
         $data   = $this->calendarPayload(2019, [
             (object) ['event_key' => 'MaryMotherChurch', 'date' => '2019-06-11T00:00:00+00:00'],
         ]);
-        $runner = new LitTestRunner('MaryMotherChurchTest', $data);
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
         $runner->runTest();
 
         $msg = $runner->getMessage();
@@ -113,7 +114,7 @@ final class LitTestRunnerTest extends TestCase
         $data   = $this->calendarPayload(2019, [
             (object) ['event_key' => 'SomeOtherEvent', 'date' => '2019-06-10T00:00:00+00:00'],
         ]);
-        $runner = new LitTestRunner('MaryMotherChurchTest', $data);
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
         $runner->runTest();
 
         $msg = $runner->getMessage();
@@ -130,7 +131,7 @@ final class LitTestRunnerTest extends TestCase
         $data   = $this->calendarPayload(2017, [
             (object) ['event_key' => 'MaryMotherChurch', 'date' => '2017-06-05T00:00:00+00:00'],
         ]);
-        $runner = new LitTestRunner('MaryMotherChurchTest', $data);
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
         $runner->runTest();
 
         $msg = $runner->getMessage();
@@ -146,7 +147,7 @@ final class LitTestRunnerTest extends TestCase
         $data   = $this->calendarPayload(2099, [
             (object) ['event_key' => 'MaryMotherChurch', 'date' => '2099-05-25T00:00:00+00:00'],
         ]);
-        $runner = new LitTestRunner('MaryMotherChurchTest', $data);
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
         $runner->runTest();
 
         $msg = $runner->getMessage();
@@ -158,7 +159,7 @@ final class LitTestRunnerTest extends TestCase
     public function testUnknownTestNameProducesErrorWithoutJsonData(): void
     {
         $data   = $this->calendarPayload(2019, []);
-        $runner = new LitTestRunner('Definitely_No_Such_Test_Definition_Xyz', $data);
+        $runner = new LitTestRunner('Definitely_No_Such_Test_Definition_Xyz', $data, Rite::ROMAN);
         $this->assertFalse($runner->isReady());
 
         $msg = $runner->getMessage();
@@ -175,7 +176,7 @@ final class LitTestRunnerTest extends TestCase
         $data   = $this->calendarPayload(2019, [
             (object) ['event_key' => 'MaryMotherChurch', 'date' => '2019-06-10T00:00:00+00:00'],
         ]);
-        $runner = new LitTestRunner('MaryMotherChurchTest', $data);
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
         $this->assertTrue($runner->isReady());
 
         $msg = $runner->getMessage();
@@ -194,7 +195,7 @@ final class LitTestRunnerTest extends TestCase
         ]);
         $data->settings->national_calendar = 'US';
 
-        $runner = new LitTestRunner('MaryMotherChurchTest', $data);
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
         $runner->runTest();
 
         $msg = $runner->getMessage();
@@ -212,7 +213,7 @@ final class LitTestRunnerTest extends TestCase
         ]);
         $data->settings->rite = 'ambrosian';
 
-        $runner = new LitTestRunner('MaryMotherChurchTest', $data);
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
         $runner->runTest();
 
         $msg = $runner->getMessage();
@@ -228,7 +229,7 @@ final class LitTestRunnerTest extends TestCase
         ]);
         $data->settings->rite = 'roman';
 
-        $runner = new LitTestRunner('MaryMotherChurchTest', $data);
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
         $runner->runTest();
 
         $this->assertSame('success', $runner->getMessage()->type);
@@ -243,7 +244,7 @@ final class LitTestRunnerTest extends TestCase
         ]);
         $data->settings->rite = 'byzantine';
 
-        $runner = new LitTestRunner('MaryMotherChurchTest', $data);
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
         $runner->runTest();
 
         $this->assertSame('success', $runner->getMessage()->type);
@@ -256,7 +257,7 @@ final class LitTestRunnerTest extends TestCase
         ]);
         $data->settings->rite = 'roman';
 
-        $runner = new LitTestRunner('MaryMotherChurchTest', $data);
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
         $runner->runTest();
 
         $this->assertStringContainsString('the General Roman Calendar', $runner->getMessage()->text);
@@ -269,11 +270,30 @@ final class LitTestRunnerTest extends TestCase
         ]);
         $data->settings->diocesan_calendar = 'rotter_nl';
 
-        $runner = new LitTestRunner('MaryMotherChurchTest', $data);
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
         $runner->runTest();
 
         $msg = $runner->getMessage();
         $this->assertSame('success', $msg->type);
         $this->assertStringContainsString('Calendar rotter_nl', $msg->text);
+    }
+
+    public function testRunnerResolvesTestsFromTheRitePartition(): void
+    {
+        // Minimal valid-shaped test data: the constructor only reads the file
+        // from disk and validates it against the schema — it never dereferences
+        // $testData — but the "not ready" path's setError() formats a message via
+        // settings->year, so a bare `new \stdClass()` would trip a PHP warning on
+        // undefined properties. A real settings->year avoids that noise for both
+        // the ready and not-ready runner below.
+        $data = (object) ['settings' => (object) ['year' => 2024]];
+
+        // StIgnatiusOfLoyolaTest exists only under ambrosian/.
+        $ambrosian = new LitTestRunner('StIgnatiusOfLoyolaTest', $data, Rite::AMBROSIAN);
+        self::assertTrue($ambrosian->isReady());
+
+        // The same name under roman/ does not exist, so the runner is not ready.
+        $roman = new LitTestRunner('StIgnatiusOfLoyolaTest', $data, Rite::ROMAN);
+        self::assertFalse($roman->isReady());
     }
 }

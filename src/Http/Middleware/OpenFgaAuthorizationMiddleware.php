@@ -31,7 +31,7 @@ use Psr\Http\Server\RequestHandlerInterface;
  *   /data/nation/{id}       → national_calendar:{rite}/{id}
  *   /data/diocese/{id}      → diocesan_calendar:{rite}/{id}
  *   /data/widerregion/{id}  → wider_region:{rite}/{id}
- *   /tests/{id}             → {national,diocesan}_calendar_test:{rite}/{id} | rite_calendar_test:{rite} (via TestScopeResolver)
+ *   /tests/{rite}/{id}      → {national,diocesan}_calendar_test:{rite}/{id} | rite_calendar_test:{rite} (via TestScopeResolver)
  *   /temporale, /decrees    → general_roman_calendar:{fixedId}
  *   /missals/{editio_typica}→ general_roman_calendar:{missalId}
  *   /missals/{national}     → national_calendar:roman/{nation}
@@ -269,7 +269,16 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
             if (!is_string($testId) || trim($testId) === '') {
                 return null;
             }
-            $resolved = $resolver->resolve($testId);
+
+            // The rite is part of a test's identity (#787). Without it there is no single
+            // test to authorize against, so fail closed rather than guessing a partition.
+            $riteValue = $request->getAttribute('test_rite');
+            $rite      = is_string($riteValue) ? Rite::tryFrom($riteValue) : null;
+            if ($rite === null) {
+                return null;
+            }
+
+            $resolved = $resolver->resolve($rite, $testId);
             if (
                 $resolved === null
                 && strtoupper($request->getMethod()) === 'PUT'

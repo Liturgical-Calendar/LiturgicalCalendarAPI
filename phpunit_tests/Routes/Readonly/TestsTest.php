@@ -46,7 +46,7 @@ final class TestsTest extends ApiTestCase
     {
         // MaryMotherChurchTest is committed to jsondata/tests/ and is a stable
         // pick (added 2018 by decree, won't move).
-        $response = self::$http->get('/tests/MaryMotherChurchTest', []);
+        $response = self::$http->get('/tests/roman/MaryMotherChurchTest', []);
         $this->assertSame(200, $response->getStatusCode());
 
         $data = json_decode((string) $response->getBody());
@@ -65,8 +65,18 @@ final class TestsTest extends ApiTestCase
 
     public function testUnknownTestNameReturns404(): void
     {
-        $response = self::$http->get('/tests/NoSuchTestName_Xyz', []);
+        $response = self::$http->get('/tests/roman/NoSuchTestName_Xyz', []);
         $this->assertSame(404, $response->getStatusCode());
+    }
+
+    public function testBareTestNameWithoutRiteSegmentReturns400(): void
+    {
+        // The #787 hard break: /tests/{name} (no rite segment) no longer
+        // addresses a test — a name is only unique within a rite now. This is
+        // the only end-to-end coverage of that break; TestsHandlerTest only
+        // exercises it in-process.
+        $response = self::$http->get('/tests/MaryMotherChurchTest', []);
+        $this->assertSame(400, $response->getStatusCode());
     }
 
     public function testListRespectsYamlAcceptHeader(): void
