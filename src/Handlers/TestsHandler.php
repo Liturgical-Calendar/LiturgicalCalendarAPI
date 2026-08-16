@@ -177,8 +177,12 @@ final class TestsHandler extends AbstractHandler
                 }
                 /** @var array<string,mixed> $decoded */
                 $decoded = json_decode($testContents, true, 512, JSON_THROW_ON_ERROR);
-                $name    = is_string($decoded['name'] ?? null) ? $decoded['name'] : basename($filePath, '.json');
-                $scope   = ( new TestScopeResolver() )->resolve($rite, $name);
+                // resolve() is a file-stem lookup (like the single-test path at handleGetRequest()),
+                // so the scope must key off the filename, not the file's internal `name` — the two
+                // are enforced equal on write, but reading the content here would silently misattribute
+                // scope if they ever diverged.
+                $name  = basename($filePath, '.json');
+                $scope = ( new TestScopeResolver() )->resolve($rite, $name);
                 if ($scope !== null) {
                     $decoded['scope'] = ['object_type' => $scope[0], 'object_id' => $scope[1]];
                 }
