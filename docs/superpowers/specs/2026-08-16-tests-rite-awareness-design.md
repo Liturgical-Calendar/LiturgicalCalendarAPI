@@ -153,7 +153,20 @@ wrong still gets a loud 422. It is the silent divergence that must be impossible
 
 `git mv` of the 11 test files into `roman/` and `ambrosian/`. Content-identical, since every file already
 records the right `applies_to.rite`. There is no data transformation and nothing to roll back beyond the move
-itself.
+itself — **in this repository.**
+
+A deployed instance is not this repository, though. Any test created since #785 through `PUT /tests/{name}`
+(the pre-#787 bare-name endpoint) lives only on that host's `jsondata/tests/` volume, flat, outside git
+entirely — `git mv` cannot move what it never tracked, so such a file survives this deploy unmoved. Because
+`collectTests()` now globs `{rite}/*Test.json`, a flat file one level up becomes invisible to `GET /tests` and
+`GET /tests/{rite}`, unaddressable by `GET /tests/{rite}/{name}`, and undeletable through the API, while any
+OpenFGA tuple scoping it stays live and orphaned. This is a real gap in an otherwise trivial migration, not a
+hypothetical: nothing prevents a `PUT` from having landed on a deployed host between the #785 and #787
+deploys. See the ops runbook's "Deployed-instance hazard — flat test files predating #787" section for the
+detection command and manual remedy (move each such file into the partition matching its own
+`applies_to.rite`). No migration script is provided for this — it is expected to touch at most a handful of
+files per environment, and a script would need write access to a production volume for a one-time, easily
+hand-verified move.
 
 `phpunit_tests/Schemas/SchemaValidationTest.php:659` globs `jsondata/tests/*.json` and becomes recursive.
 

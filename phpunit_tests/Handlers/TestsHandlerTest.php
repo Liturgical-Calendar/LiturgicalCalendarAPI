@@ -50,6 +50,34 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         self::assertNotEmpty($body['litcal_tests']);
     }
 
+    /**
+     * The corpus-wide index must actually span every rite partition, not just be
+     * non-empty. `Rite::cases()` includes both `roman` and `ambrosian`; if the
+     * null-rite branch in `TestsHandler::collectTests()` ever regressed to a single
+     * hard-coded rite, the suite would still be non-empty (the Roman partition alone
+     * has dozens of files) and this would go unnoticed without an assertion that
+     * checks for partitions plural. `MaryMotherChurchTest` (roman) and
+     * `StIgnatiusOfLoyolaTest` (ambrosian) both resolve to a rite-level
+     * `rite_calendar_test` scope, so their `scope.object_id` doubles as a
+     * per-partition marker.
+     */
+    public function testGetIndexSpansAllRitePartitions(): void
+    {
+        $response = ( new TestsHandler() )->handle($this->requestFor('GET', '/tests'));
+
+        self::assertSame(200, $response->getStatusCode());
+        $body = $this->decodeJsonBody($response);
+        self::assertArrayHasKey('litcal_tests', $body);
+
+        $scopeIds = array_map(
+            static fn (array $test): string => $test['scope']['object_type'] . ':' . $test['scope']['object_id'],
+            $body['litcal_tests']
+        );
+
+        self::assertContains('rite_calendar_test:roman', $scopeIds);
+        self::assertContains('rite_calendar_test:ambrosian', $scopeIds);
+    }
+
     public function testGetSingleTestByNameReturnsThatTest(): void
     {
         // MaryMotherChurchTest ships with the repo per jsondata/tests/.
@@ -348,6 +376,37 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
             $this->requestFor('PUT', '/tests/roman/ZzzRiteMatchTest', [], $payload)
         );
         self::assertSame(201, $response->getStatusCode());
+    }
+
+    /**
+     * A PUT addressed under /tests/ambrosian/... must land in the Ambrosian
+     * partition (jsondata/tests/ambrosian/), not the Roman one. The sibling test
+     * above (testPutAcceptsPayloadWhoseRiteMatchesThePath) uses roman on both
+     * sides and only asserts the 201, so it would not catch a regression that
+     * always wrote to `Rite::default()`'s (roman's) folder regardless of the
+     * request's own rite.
+     */
+    public function testPutAmbrosianTestLandsInAmbrosianPartition(): void
+    {
+        /** @var array<string,mixed> $payload */
+        $payload               = json_decode(
+            (string) file_get_contents(JsonData::testsFolderFor(Rite::AMBROSIAN)->path() . '/StIgnatiusOfLoyolaTest.json'),
+            true
+        );
+        $payload['name']       = 'ZzzAmbrosianPutTest';
+        $payload['applies_to'] = ['rite' => 'ambrosian'];
+
+        $ambrosianFixturePath  = JsonData::testsFolderFor(Rite::AMBROSIAN)->path() . '/ZzzAmbrosianPutTest.json';
+        $romanFixturePath      = JsonData::testsFolderFor(Rite::ROMAN)->path() . '/ZzzAmbrosianPutTest.json';
+        $this->testFixturePath = $ambrosianFixturePath;
+
+        $response = ( new TestsHandler(['ZzzAmbrosianPutTest'], Rite::AMBROSIAN) )->handle(
+            $this->requestFor('PUT', '/tests/ambrosian/ZzzAmbrosianPutTest', [], $payload)
+        );
+
+        self::assertSame(201, $response->getStatusCode());
+        self::assertFileExists($ambrosianFixturePath);
+        self::assertFileDoesNotExist($romanFixturePath);
     }
 
     public function testPatchRejectsPayloadWhoseRiteContradictsThePath(): void

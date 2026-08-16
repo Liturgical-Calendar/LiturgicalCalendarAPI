@@ -6910,7 +6910,7 @@
           {}
         ],
         "summary": "Retrieve the unit tests defined for a single rite as an index useful for frontend processing",
-        "description": "Same response shape as `GET /tests`, restricted to the partition for the given rite. `/tests/ambrosian` behaves exactly like `/tests` scoped to the Ambrosian rite. This is also the path that a legacy bare `/tests/{test_name}` request now resolves to: since a bare test name is not itself a recognized rite, the request falls through to a `400 Bad Request` (the bare `/tests/{test_name}` form no longer identifies a resource, because test names are unique only within a rite, not globally — see #787). To read a single test, use `GET /tests/{rite}/{test_name}`.",
+        "description": "Same response shape as `GET /tests`, restricted to the partition for the given rite. `/tests/ambrosian` behaves exactly like `/tests` scoped to the Ambrosian rite. A legacy bare `/tests/{test_name}` request does not resolve to this operation: since a bare test name is not a recognized rite, it reaches the `/tests` handler with one unconsumed path segment and no rite context, which rejects it — for `GET`, or when fine-grained authorization (OpenFGA) is not configured, with a `400 Bad Request` (test names are unique only within a rite, not globally — see #787); with OpenFGA configured, `PUT`/`PATCH`/`DELETE` against that same bare path instead fail closed with a `403 Forbidden` in `OpenFgaAuthorizationMiddleware`, before the handler is ever reached, because no rite segment means no authorization scope can be resolved. A path with three or more segments under `/tests` is a `405 Method Not Allowed`, not a `400`, since the router recognizes no route of that shape. To read a single test, use `GET /tests/{rite}/{test_name}`.",
         "operationId": "retrieveTestIndexByRiteGET",
         "parameters": [
           {
@@ -6961,9 +6961,6 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest400"
-          },
-          "404": {
-            "$ref": "#/components/responses/NotFound404"
           }
         }
       }
@@ -7158,7 +7155,7 @@
           }
         ],
         "summary": "Update an existing unit test in the API `tests` folder",
-        "description": "The `{rite}` path segment and the body's `applies_to.rite` must name the same rite, or the request is rejected with a 422. The body may optionally echo the `scope` the API previously returned: a `scope` that matches the server-resolved value is accepted and silently stripped before persisting; a `scope` that disagrees is rejected with a 422. `scope` is never required, and is never present in a source file.",
+        "description": "The `{rite}` path segment and the body's `applies_to.rite` must name the same rite, or the request is rejected with a 422. The body may optionally echo the `scope` the API previously returned: a `scope` that matches the server-resolved value is accepted and silently stripped before persisting; a `scope` that disagrees is rejected with a 422. On `PATCH`, the server-resolved value is the scope of the test as it is currently stored on disk *before* this request is applied, not the scope implied by this request's own `applies_to` — so a `PATCH` that intentionally changes `applies_to` and echoes the newly-correct scope is rejected as a mismatch, while echoing the now-superseded stored scope is accepted. `scope` is never required, and is never present in a source file.",
         "operationId": "updateTestByNamePATCH",
         "parameters": [
           {

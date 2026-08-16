@@ -131,10 +131,25 @@ Unresolved test IDs (test JSON file not found):
 ```
 
 **Review the output before continuing.** An exit code of `2` means there are
-unresolved tuples (the JSON file for that test is missing). Unresolved tuples
-are **never deleted** — they stay as `test_definition:*` and are safe to
-investigate separately. Fix any unresolved tests before applying (or accept that
-they remain under the old type until cleaned up).
+unresolved tuples. Unresolved tuples are **never deleted** — they stay as
+`test_definition:*` and are safe to investigate separately. Fix any unresolved
+tests before applying (or accept that they remain under the old type until
+cleaned up).
+
+An `[UNRESOLVED]` line reports one of two reasons:
+
+- `no test file found` — the JSON file for that test id is missing under every
+  rite partition. Fix or remove the test, or leave the tuple under the legacy
+  type until it is.
+- `defined under two rites — cannot tell which one this grant meant` (labeled
+  `ambiguous` internally, #787) — a test with that name exists under **both**
+  `jsondata/tests/roman/{name}.json` and `jsondata/tests/ambrosian/{name}.json`,
+  so the script cannot tell which rite the old flat `test_definition:{name}`
+  tuple was meant to authorize and will not guess. Re-running the script
+  reports the same ambiguity every time — it does not resolve on its own. An
+  operator must inspect both files, decide by hand which rite the grant
+  belongs to, and write the resulting scoped tuple manually (via a direct
+  OpenFGA tuple write) rather than relying on the script for that one id.
 
 ### 3b. Apply
 
@@ -158,36 +173,58 @@ tuples kept).
 
 After migrating, confirm that the scoped authorization is enforced correctly.
 
+`ItalyPatronSaintsTest` below is a placeholder name — it must satisfy the `name`
+pattern in `jsondata/schemas/LitCalTest.json` (`IT_2024` never did, since the
+schema requires a leading capital letter and forbids underscores before it).
+Substitute the name of a real test file that exists at
+`jsondata/tests/roman/{Name}.json` with `applies_to.national_calendar: "IT"`,
+or create one first. If the file does not exist, `TestScopeResolver::resolve()`
+returns null and `OpenFgaAuthorizationMiddleware` fails closed with `403` for
+*every* user regardless of scope — which would make 4a "pass" without
+exercising the DE-vs-IT check either. Confirm the test file exists before
+relying on any of 4a/4b/4c.
+
 ### 4a. Out-of-scope user must receive 403
 
-An authenticated user who holds `national_calendar_test:DE#editor` (Germany
-scope) must **not** be allowed to PATCH an Italian national-calendar test.
+An authenticated user who holds `national_calendar_test:roman/DE#editor`
+(Germany scope) must **not** be allowed to PATCH an Italian national-calendar
+test.
 
 ```bash
-# TOKEN_OUT = a valid OIDC bearer token for a user scoped to DE, not IT
+# TOKEN_OUT = a valid OIDC bearer token for a user scoped to roman/DE, not roman/IT
 curl -s -o /dev/null -w "%{http_code}" \
   -X PATCH \
   -H "Authorization: Bearer ${TOKEN_OUT}" \
   -H "Content-Type: application/json" \
   -d '{"missal": "IT_1983"}' \
-  http://localhost:8000/tests/IT_2024
+  http://localhost:8000/tests/roman/ItalyPatronSaintsTest
 ```
 
 Expected: **`403`**
 
+**Caution — a vacuous 403 does not prove this test passed.** A malformed path
+(missing the `{rite}` segment, e.g. the pre-#787 bare `/tests/IT_2024` shape
+this step used to use) also fails closed with `403` at
+`OpenFgaAuthorizationMiddleware`, regardless of which user is authenticated —
+that would make this step "pass" without ever exercising the DE-vs-IT
+authorization check it exists to prove. Confirm the request path is exactly
+`/tests/roman/{test_name}` as shown above, and where possible inspect the
+response body or audit log to confirm the denial reason is the scope mismatch
+(`roman/DE` vs. `roman/IT`), not a routing/path error.
+
 ### 4b. In-scope user must receive 2xx
 
-An authenticated user who holds `national_calendar_test:IT#editor` must be
-allowed to PATCH the same test.
+An authenticated user who holds `national_calendar_test:roman/IT#editor` must
+be allowed to PATCH the same test.
 
 ```bash
-# TOKEN_IT = a valid OIDC bearer token for a user with national_calendar_test:IT#editor grant
+# TOKEN_IT = a valid OIDC bearer token for a user with national_calendar_test:roman/IT#editor grant
 curl -s -o /dev/null -w "%{http_code}" \
   -X PATCH \
   -H "Authorization: Bearer ${TOKEN_IT}" \
   -H "Content-Type: application/json" \
   -d '{"missal": "IT_1983"}' \
-  http://localhost:8000/tests/IT_2024
+  http://localhost:8000/tests/roman/ItalyPatronSaintsTest
 ```
 
 Expected: **`200`** or **`204`**
@@ -203,7 +240,7 @@ curl -s -o /dev/null -w "%{http_code}" \
   -H "Authorization: Bearer ${TOKEN_ADMIN}" \
   -H "Content-Type: application/json" \
   -d '{"missal": "IT_1983"}' \
-  http://localhost:8000/tests/IT_2024
+  http://localhost:8000/tests/roman/ItalyPatronSaintsTest
 ```
 
 Expected: **`200`** or **`204`**
@@ -417,3 +454,66 @@ php scripts/migrate-rite-data-tuples.php --apply --prune
 
 Then the unqualified ids can be rejected outright rather than merely superseded. The same
 step for the #785 test scopes is described above; the two can be pruned independently.
+
+---
+
+## Deployed-instance hazard — flat test files predating #787
+
+Issue #787 moved the test corpus from a flat `jsondata/tests/{name}.json` layout to
+rite-partitioned `jsondata/tests/{rite}/{name}.json`, and made `/tests/{rite}/{name}` the
+only way to address a test — a bare `/tests/{name}` is now a `400`. In this repository that
+move is a plain `git mv`: content-identical, nothing to roll back beyond the move itself.
+
+A deployed instance is not this repository, though. Any test created through the pre-#787
+`PUT /tests/{name}` endpoint since the #785 migration went live is a file that exists
+**only on that host's disk**, outside git entirely, sitting flat directly under
+`jsondata/tests/{name}.json` rather than under a rite partition. `git mv` cannot move what
+it never tracked, so such a file survives this deploy unmoved.
+
+After this deploy, `TestsHandler::collectTests()` globs `jsondata/tests/{rite}/*Test.json`
+— a flat file one level up matches nothing. Concretely, on the deployed host such a file
+becomes:
+
+- **invisible** to `GET /tests` and `GET /tests/{rite}` (absent from both indexes),
+- **unaddressable** by `GET /tests/{rite}/{name}` (no rite segment resolves to it), and
+- **undeletable** through the API (`DELETE /tests/{rite}/{name}` needs the same rite
+  segment to resolve the file, and none does),
+
+while any OpenFGA tuple scoping it (`national_calendar_test:...`, `diocesan_calendar_test:...`,
+`rite_calendar_test:...`) stays live and orphaned, since nothing ever calls the purge path for
+a file the API can no longer see.
+
+### Detect
+
+Run on the deployed host, from the API's `jsondata/tests/` directory:
+
+```bash
+find jsondata/tests -maxdepth 1 -name '*Test.json' -type f
+```
+
+Anything this prints is a flat file predating the partition move — the `roman/` and
+`ambrosian/` subdirectories are excluded by `-maxdepth 1`, so a populated result here is
+always a hazard, never a false positive from the new layout.
+
+### Handle
+
+For each file `find` reports:
+
+1. Read its `applies_to.rite` field: `jq -r .applies_to.rite jsondata/tests/{name}.json`.
+2. Move it into the matching partition on the host directly (or through whatever
+   deployment/config-management mechanism owns that volume) —
+   `mv jsondata/tests/{name}.json jsondata/tests/{rite}/{name}.json`. This is a plain
+   filesystem move, not a `git mv`: the file was never tracked, so there is nothing to
+   commit.
+3. Re-run the detection command — it should print nothing.
+4. Spot-check `GET /tests/{rite}/{name}` returns the moved test, and that its `scope` in
+   the response matches whatever OpenFGA tuple was already granted for it. No tuple
+   migration is needed here — the object type and id are unchanged by the file move, only
+   its filesystem location is.
+
+Do this **before** treating `GET /tests` as a complete inventory on that host, and before
+assuming a `DELETE` against a test name created before this deploy will succeed.
+
+No automated migration script is provided for this: it is expected to touch at most a
+handful of files per environment, and a script would need write access to a production
+volume for a one-time, easily hand-verified move.

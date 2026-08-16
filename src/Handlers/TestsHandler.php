@@ -291,7 +291,7 @@ final class TestsHandler extends AbstractHandler
     }
 
     /**
-     * Handles PUT requests for creating a specific test at /tests/{test_name}.
+     * Handles PUT requests for creating a specific test at /tests/{rite}/{test_name}.
      *
      * The test name in the request path is authoritative; the payload's `name`
      * must match it. The payload is validated against the LitCalTest JSON schema
@@ -323,7 +323,8 @@ final class TestsHandler extends AbstractHandler
         }
 
         if ($this->payload->name !== $testName) {
-            $description = 'You are attempting to create the Unit Test at /tests/' . $testName . ' with a Unit Test that has the name '
+            $rite        = $this->rite ?? Rite::default();
+            $description = 'You are attempting to create the Unit Test at /tests/' . $rite->value . '/' . $testName . ' with a Unit Test that has the name '
                 . $this->payload->name . ' in the request body. This is not allowed.';
             throw new UnprocessableContentException($description);
         }
@@ -443,7 +444,7 @@ final class TestsHandler extends AbstractHandler
     }
 
     /**
-     * Handles PATCH requests for updating a specific test at /tests/{test_name}.
+     * Handles PATCH requests for updating a specific test at /tests/{rite}/{test_name}.
      *
      * This method expects exactly one path parameter: the name of the test to update. The request body
      * is expected to contain a JSON object which is validated against the LitCalTest JSON schema; if the
@@ -480,7 +481,9 @@ final class TestsHandler extends AbstractHandler
         }
 
         if ($testName !== $this->requestPathParams[0]) {
-            $description = 'You are attempting to update the Unit Test at /tests/' . $this->requestPathParams[0] . ' with a Unit Test that has the name ' . $testName . ' in the request body. This is not allowed.';
+            $rite        = $this->rite ?? Rite::default();
+            $description = 'You are attempting to update the Unit Test at /tests/' . $rite->value . '/' . $this->requestPathParams[0]
+                . ' with a Unit Test that has the name ' . $testName . ' in the request body. This is not allowed.';
             throw new UnprocessableContentException($description);
         }
 
