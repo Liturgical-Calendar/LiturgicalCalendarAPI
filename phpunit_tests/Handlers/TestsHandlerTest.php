@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Handlers;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\TestsHandler;
 use LiturgicalCalendar\Api\Http\Exception\ConflictException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
@@ -52,8 +53,8 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
     public function testGetSingleTestByNameReturnsThatTest(): void
     {
         // MaryMotherChurchTest ships with the repo per jsondata/tests/.
-        $handler  = new TestsHandler(['MaryMotherChurchTest']);
-        $response = $handler->handle($this->requestFor('GET', '/tests/MaryMotherChurchTest'));
+        $handler  = new TestsHandler(['MaryMotherChurchTest'], Rite::ROMAN);
+        $response = $handler->handle($this->requestFor('GET', '/tests/roman/MaryMotherChurchTest'));
 
         self::assertSame(200, $response->getStatusCode());
         self::assertJson((string) $response->getBody());
@@ -62,15 +63,15 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
     public function testUnknownTestIsNotFound(): void
     {
         $this->expectException(NotFoundException::class);
-        ( new TestsHandler(['NotARealTest']) )
-            ->handle($this->requestFor('GET', '/tests/NotARealTest'));
+        ( new TestsHandler(['NotARealTest'], Rite::ROMAN) )
+            ->handle($this->requestFor('GET', '/tests/roman/NotARealTest'));
     }
 
     public function testTooManyPathParamsIsValidationError(): void
     {
         $this->expectException(ValidationException::class);
-        ( new TestsHandler(['a', 'b']) )
-            ->handle($this->requestFor('GET', '/tests/a/b'));
+        ( new TestsHandler(['a', 'b'], Rite::ROMAN) )
+            ->handle($this->requestFor('GET', '/tests/roman/a/b'));
     }
 
     public function testPutWithMalformedPayloadIsValidationError(): void
@@ -79,9 +80,9 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         // surfaces this as a ValidationException at the AbstractHandler layer before
         // TestsHandler's own object check fires.
         $this->expectException(ValidationException::class);
-        $req = $this->requestFor('PUT', '/tests/SomeTest', [], '[1, 2, 3]')
+        $req = $this->requestFor('PUT', '/tests/roman/SomeTest', [], '[1, 2, 3]')
             ->withHeader('Content-Type', 'application/json');
-        ( new TestsHandler(['SomeTest']) )->handle($req);
+        ( new TestsHandler(['SomeTest'], Rite::ROMAN) )->handle($req);
     }
 
     public function testPutCreatesTestAtPathName(): void
@@ -95,8 +96,8 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
 
         $this->testFixturePath = JsonData::TESTS_FOLDER->path() . '/ZzzPutCreatedTest.json';
 
-        $response = ( new TestsHandler(['ZzzPutCreatedTest']) )->handle(
-            $this->requestFor('PUT', '/tests/ZzzPutCreatedTest', [], $payload)
+        $response = ( new TestsHandler(['ZzzPutCreatedTest'], Rite::ROMAN) )->handle(
+            $this->requestFor('PUT', '/tests/roman/ZzzPutCreatedTest', [], $payload)
         );
 
         $this->assertSame(201, $response->getStatusCode());
@@ -120,8 +121,8 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         );
 
         $this->expectException(ConflictException::class);
-        ( new TestsHandler(['MaryMotherChurchTest']) )->handle(
-            $this->requestFor('PUT', '/tests/MaryMotherChurchTest', [], $payload)
+        ( new TestsHandler(['MaryMotherChurchTest'], Rite::ROMAN) )->handle(
+            $this->requestFor('PUT', '/tests/roman/MaryMotherChurchTest', [], $payload)
         );
     }
 
@@ -135,16 +136,16 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         // Body says MaryMotherChurchTest, path says ZzzOtherTest.
 
         $this->expectException(UnprocessableContentException::class);
-        ( new TestsHandler(['ZzzOtherTest']) )->handle(
-            $this->requestFor('PUT', '/tests/ZzzOtherTest', [], $payload)
+        ( new TestsHandler(['ZzzOtherTest'], Rite::ROMAN) )->handle(
+            $this->requestFor('PUT', '/tests/roman/ZzzOtherTest', [], $payload)
         );
     }
 
     public function testPutUnsafePathNameIsRejected(): void
     {
         $this->expectException(ValidationException::class);
-        ( new TestsHandler(['..']) )->handle(
-            $this->requestFor('PUT', '/tests/..', [], ['name' => '..'])
+        ( new TestsHandler(['..'], Rite::ROMAN) )->handle(
+            $this->requestFor('PUT', '/tests/roman/..', [], ['name' => '..'])
         );
     }
 
@@ -163,8 +164,8 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
 
         $payload['description'] = 'Updated description via PATCH';
 
-        $response = ( new TestsHandler(['ZzzPatchTargetTest']) )->handle(
-            $this->requestFor('PATCH', '/tests/ZzzPatchTargetTest', [], $payload)
+        $response = ( new TestsHandler(['ZzzPatchTargetTest'], Rite::ROMAN) )->handle(
+            $this->requestFor('PATCH', '/tests/roman/ZzzPatchTargetTest', [], $payload)
         );
 
         $this->assertSame(200, $response->getStatusCode());
@@ -192,8 +193,8 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
 
         $this->expectException(UnprocessableContentException::class);
         $this->expectExceptionMessage('does not exist');
-        ( new TestsHandler(['ZzzNoSuchTest']) )->handle(
-            $this->requestFor('PATCH', '/tests/ZzzNoSuchTest', [], $payload)
+        ( new TestsHandler(['ZzzNoSuchTest'], Rite::ROMAN) )->handle(
+            $this->requestFor('PATCH', '/tests/roman/ZzzNoSuchTest', [], $payload)
         );
     }
 
@@ -208,15 +209,15 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
 
         $this->expectException(UnprocessableContentException::class);
         $this->expectExceptionMessage('This is not allowed');
-        ( new TestsHandler(['ZzzOtherTest']) )->handle(
-            $this->requestFor('PATCH', '/tests/ZzzOtherTest', [], $payload)
+        ( new TestsHandler(['ZzzOtherTest'], Rite::ROMAN) )->handle(
+            $this->requestFor('PATCH', '/tests/roman/ZzzOtherTest', [], $payload)
         );
     }
 
     public function testDeleteRejectsWrongPathParamCount(): void
     {
         $this->expectException(ValidationException::class);
-        ( new TestsHandler(['a', 'b']) )->handle($this->requestFor('DELETE', '/tests/a/b'));
+        ( new TestsHandler(['a', 'b'], Rite::ROMAN) )->handle($this->requestFor('DELETE', '/tests/roman/a/b'));
     }
 
     public function testDeleteUnknownOrUnsafeNameReturnsNotFound(): void
@@ -225,7 +226,7 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         // path-traversal) name, so the handler must 404 and never reach unlink().
         $name = 'NoSuchTest_' . bin2hex(random_bytes(4));
         $this->expectException(NotFoundException::class);
-        ( new TestsHandler([$name]) )->handle($this->requestFor('DELETE', "/tests/{$name}"));
+        ( new TestsHandler([$name], Rite::ROMAN) )->handle($this->requestFor('DELETE', "/tests/roman/{$name}"));
     }
 
     public function testDeletePurgeFailureDoesNotFailDeletion(): void
@@ -243,10 +244,10 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         $purge = $this->createStub(ResourceTuplePurgeServiceInterface::class);
         $purge->method('purgeForObject')->willThrowException(new \RuntimeException('FGA unavailable'));
 
-        $handler = new TestsHandler([$testName]);
+        $handler = new TestsHandler([$testName], Rite::ROMAN);
         $handler->setPurgeService($purge);
 
-        $response = $handler->handle($this->requestFor('DELETE', "/tests/{$testName}"));
+        $response = $handler->handle($this->requestFor('DELETE', "/tests/roman/{$testName}"));
 
         self::assertSame(204, $response->getStatusCode());
         $this->testFixturePath = null; // handler already removed the file
@@ -278,7 +279,7 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         ));
 
         // --- Build handler with injected mock purge service ------------------
-        $handler = new TestsHandler([$testName]);
+        $handler = new TestsHandler([$testName], Rite::ROMAN);
 
         $purge = $this->createMock(ResourceTuplePurgeServiceInterface::class);
         $purge->expects($this->once())
@@ -287,12 +288,26 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         $handler->setPurgeService($purge);
 
         // --- Act: issue DELETE (bypasses JWT middleware — in-process) --------
-        $request  = $this->requestFor('DELETE', "/tests/{$testName}");
+        $request  = $this->requestFor('DELETE', "/tests/roman/{$testName}");
         $response = $handler->handle($request);
 
         // --- Assert ----------------------------------------------------------
         self::assertSame(204, $response->getStatusCode());
         $this->testFixturePath = null; // handler already removed the file
         // purgeForObject assertion enforced by mock expectation above
+    }
+
+    public function testBareTestNameWithoutRiteSegmentIsRejected(): void
+    {
+        // The #787 hard break: /tests/MaryMotherChurchTest no longer addresses a test.
+        $this->expectException(ValidationException::class);
+        ( new TestsHandler(['MaryMotherChurchTest'], null) )
+            ->handle($this->requestFor('GET', '/tests/MaryMotherChurchTest'));
+    }
+
+    public function testCollectionWithoutRiteSegmentIsStillAllowed(): void
+    {
+        $response = ( new TestsHandler([], null) )->handle($this->requestFor('GET', '/tests'));
+        self::assertSame(200, $response->getStatusCode());
     }
 }

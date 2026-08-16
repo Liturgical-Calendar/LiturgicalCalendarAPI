@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesOutboxTooling;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use LiturgicalCalendar\Api\JsonFormatter;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
@@ -45,10 +46,13 @@ final class TestsHandler extends AbstractHandler
 
     private \stdClass $payload;
 
+    private ?Rite $rite;
+
     /** @param string[] $requestPathParams */
-    public function __construct(array $requestPathParams = [])
+    public function __construct(array $requestPathParams = [], ?Rite $rite = null)
     {
         parent::__construct($requestPathParams);
+        $this->rite = $rite;
         // The frontend admin-tests page performs cookie-authenticated writes
         // (PUT / PATCH / DELETE) against /tests from the browser. On split-origin
         // deployments (e.g. the docker e2e stack: frontend :3000 → API :8000) a
@@ -376,6 +380,16 @@ final class TestsHandler extends AbstractHandler
 
         // For all other request methods, validate that they are supported by the endpoint
         $this->validateRequestMethod($request);
+
+        // A test is addressed as /tests/{rite}/{name}. The bare /tests/{name} form is
+        // gone: names are only unique within a rite now, so a bare name does not identify
+        // a test. Bare /tests (no path params) remains the corpus-wide index.
+        if ($this->rite === null && count($this->requestPathParams) > 0) {
+            $description = 'A Unit Test is addressed as /tests/{rite}/{name}, where {rite} is one of: '
+                . implode(', ', array_column(Rite::cases(), 'value'))
+                . '. Received /tests/' . implode('/', $this->requestPathParams) . ' with no rite segment.';
+            throw new ValidationException($description);
+        }
 
         // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint:
         //   if set we negotiate the best Content-Type, if not set we default to the first supported by the current handler

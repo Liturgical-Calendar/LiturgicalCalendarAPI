@@ -284,7 +284,7 @@ final class RouterPipelineTest extends TestCase
 
     public function testTestsRouteAddsTestEditorMiddleware(): void
     {
-        $router   = $this->routerWithoutConstructor(new ServerRequest('PATCH', '/tests/some-test'));
+        $router   = $this->routerWithoutConstructor(new ServerRequest('PATCH', '/tests/roman/some-test'));
         $pipeline = $this->emptyPipeline();
 
         $this->callConfigurePipeline($router, $pipeline, 'tests', ['some-test']);
@@ -297,7 +297,7 @@ final class RouterPipelineTest extends TestCase
 
     public function testTestsRouteAddsOpenFgaMiddlewareWithObjectResolver(): void
     {
-        $router   = $this->routerWithoutConstructor(new ServerRequest('PATCH', '/tests/some-test'));
+        $router   = $this->routerWithoutConstructor(new ServerRequest('PATCH', '/tests/roman/some-test'));
         $pipeline = $this->emptyPipeline();
 
         $this->callConfigurePipeline($router, $pipeline, 'tests', ['some-test']);
