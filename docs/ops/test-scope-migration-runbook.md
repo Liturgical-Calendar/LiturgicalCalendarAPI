@@ -289,11 +289,18 @@ place so that rolling the API back to pre-#767 code keeps authorizing.
 
 ### Step 1 — apply the model
 
-`rite_calendar_test` is added to `scripts/openfga-model.additive.json` alongside
-`general_roman_calendar_test`, with an identical relation set. As above, the
-authoritative model lives in `cdcf-infra`: land the equivalent change to
+`rite_calendar_test` is added alongside `general_roman_calendar_test`, with an
+identical relation set (`admin`, `editor`, `viewer`). As above, the model lives
+in `cdcf-infra` and **only** there: land the change to
 `cdcf-infra/auth/models/LiturgicalCalendar.json`, then upload the new model
 version on the VPS.
+
+> An earlier revision of this step also named `scripts/openfga-model.additive.json`
+> in this repo. That file was already dead when it was written — the model moved to
+> `cdcf-infra` on 2026-08-04 — and editing it instead of opening the `cdcf-infra` PR
+> is exactly how `rite_calendar_test` shipped in the API's allow-lists while missing
+> from every deployed model, collapsing dashboard gating for all users. The file has
+> since been deleted; `cdcf-infra` is the only place a model change counts.
 
 ### Step 2 — copy the tuples
 
