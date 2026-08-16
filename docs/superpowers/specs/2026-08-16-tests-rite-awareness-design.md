@@ -68,17 +68,21 @@ rite segment and the name unambiguous — see below.
 the default rite (Roman), and bare `GET /tests` must mean *all rites*. `/tests` therefore resolves its own
 tri-state `?Rite`, where `null` means "every rite".
 
-| Path                   | Parts after rite | Rite | Result                          |
-| ---------------------- | ---------------- | ---- | ------------------------------- |
-| `/tests`               | 0                | null | collection, all rites           |
-| `/tests/{rite}`        | 0                | set  | collection for that rite        |
-| `/tests/{rite}/{name}` | 1                | set  | single test                     |
-| `/tests/{name}`        | 1                | null | **400** — rite segment required |
-| 3 or more parts        | —                | —    | 400                             |
+| Path                   | Parts after rite | Rite | Result                                     |
+| ---------------------- | ---------------- | ---- | ------------------------------------------ |
+| `/tests`               | 0                | null | collection, all rites                      |
+| `/tests/{rite}`        | 0                | set  | collection for that rite                   |
+| `/tests/{rite}/{name}` | 1                | set  | single test                                |
+| `/tests/{name}`        | 1                | null | **400** — rite segment required            |
+| 3 or more parts        | —                | —    | 405 — no methods configured for that shape |
 
 Row 4 is the hard break, and it is cleanly detectable: `Rite::tryFrom()` fails on the leading segment. No test
 name can be mistaken for a rite, because the schema requires a `Test` suffix and the collection globs
 `*Test.json`, so neither `roman` nor `ambrosian` can name a test.
+
+Row 5 is not a 400: 3+ parts fall through `Router::route()`'s `case 'tests':` to
+`setAllowedRequestMethods([])`, so `AbstractHandler::validateRequestMethod()` throws
+`MethodNotAllowedException` (405) before the handler's own path-part count guard is ever reached.
 
 The count-based method wiring in `Router::route()` is untouched. After the segment is stripped, the remaining
 0/1-part shapes are exactly the ones the `case 'tests':` switch already configures.

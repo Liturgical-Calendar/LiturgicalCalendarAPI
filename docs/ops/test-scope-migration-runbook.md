@@ -126,7 +126,7 @@ Summary:
   Would migrate                : 3
   Would skip (unresolved)      : 1
 
-Unresolved test IDs (test JSON file not found):
+Unresolved test IDs (no test file found, or defined under two rites):
   - ORPHAN_TEST
 ```
 
@@ -217,13 +217,38 @@ response body or audit log to confirm the denial reason is the scope mismatch
 An authenticated user who holds `national_calendar_test:roman/IT#editor` must
 be allowed to PATCH the same test.
 
+The body below is a minimal payload that is valid under `LitCalTest.json`
+(`name`, `event_key`, `description`, `test_type`, `applies_to`, and
+`assertions` are all required, and unknown properties such as a bare
+`missal` key are rejected) — required so a 2xx here actually reflects the
+authorization check passing rather than the handler's own schema
+validation rejecting the request with a `400` (`validatePayloadAgainstTestSchema()`
+throws `ValidationException`, not the `422 UnprocessableContentException` used
+for the rite/scope-mismatch checks) before authorization is even relevant to
+the outcome. Adjust `event_key`/`assertions` to match whatever real test file
+you substituted for `ItalyPatronSaintsTest`.
+
 ```bash
 # TOKEN_IT = a valid OIDC bearer token for a user with national_calendar_test:roman/IT#editor grant
 curl -s -o /dev/null -w "%{http_code}" \
   -X PATCH \
   -H "Authorization: Bearer ${TOKEN_IT}" \
   -H "Content-Type: application/json" \
-  -d '{"missal": "IT_1983"}' \
+  -d '{
+    "name": "ItalyPatronSaintsTest",
+    "event_key": "ItalyPatronSaints",
+    "description": "Patron saints of Italy (Francis of Assisi and Catherine of Siena).",
+    "test_type": "exactCorrespondence",
+    "applies_to": { "rite": "roman", "national_calendar": "IT" },
+    "assertions": [
+      {
+        "year": 2020,
+        "expected_value": "2020-04-29T00:00:00+00:00",
+        "assert": "eventExists AND hasExpectedDate",
+        "assertion": "Patron saints of Italy should exist on the expected date"
+      }
+    ]
+  }' \
   http://localhost:8000/tests/roman/ItalyPatronSaintsTest
 ```
 
@@ -234,12 +259,30 @@ Expected: **`200`** or **`204`**
 A user with the `admin` role in the OIDC token passes all OpenFGA checks without
 a tuple lookup.
 
+Use the same schema-valid body as 4b (a bare `{"missal": "IT_1983"}` is not
+valid under `LitCalTest.json` and would return `400` regardless of who is
+authenticated, proving nothing about the admin bypass):
+
 ```bash
 curl -s -o /dev/null -w "%{http_code}" \
   -X PATCH \
   -H "Authorization: Bearer ${TOKEN_ADMIN}" \
   -H "Content-Type: application/json" \
-  -d '{"missal": "IT_1983"}' \
+  -d '{
+    "name": "ItalyPatronSaintsTest",
+    "event_key": "ItalyPatronSaints",
+    "description": "Patron saints of Italy (Francis of Assisi and Catherine of Siena).",
+    "test_type": "exactCorrespondence",
+    "applies_to": { "rite": "roman", "national_calendar": "IT" },
+    "assertions": [
+      {
+        "year": 2020,
+        "expected_value": "2020-04-29T00:00:00+00:00",
+        "assert": "eventExists AND hasExpectedDate",
+        "assertion": "Patron saints of Italy should exist on the expected date"
+      }
+    ]
+  }' \
   http://localhost:8000/tests/roman/ItalyPatronSaintsTest
 ```
 
@@ -485,7 +528,8 @@ a file the API can no longer see.
 
 ### Detect
 
-Run on the deployed host, from the API's `jsondata/tests/` directory:
+Run on the deployed host, from the API's repository root (the directory containing
+`jsondata/`, not `jsondata/tests/` itself — the command below is relative to it):
 
 ```bash
 find jsondata/tests -maxdepth 1 -name '*Test.json' -type f
@@ -493,7 +537,11 @@ find jsondata/tests -maxdepth 1 -name '*Test.json' -type f
 
 Anything this prints is a flat file predating the partition move — the `roman/` and
 `ambrosian/` subdirectories are excluded by `-maxdepth 1`, so a populated result here is
-always a hazard, never a false positive from the new layout.
+always a hazard, never a false positive from the new layout. An empty result is the
+no-hazard outcome only if the command actually ran against an existing `jsondata/tests`
+path — confirm you are in the repository root first, since `find` on a missing path also
+prints nothing to stdout (it errors to stderr) and would otherwise look identical to "no
+hazard found".
 
 ### Handle
 

@@ -164,7 +164,7 @@ echo sprintf("  %-29s: %d\n", $unresolvedLabel, $unresolvedCount);
 
 if ($unresolvedIds !== []) {
     echo PHP_EOL;
-    echo 'Unresolved test IDs (test JSON file not found):' . PHP_EOL;
+    echo 'Unresolved test IDs (no test file found, or defined under two rites):' . PHP_EOL;
     foreach ($unresolvedIds as $id) {
         echo "  - {$id}" . PHP_EOL;
     }
