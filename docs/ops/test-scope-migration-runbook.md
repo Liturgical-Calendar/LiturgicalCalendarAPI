@@ -116,18 +116,20 @@ what it would do:
 ```text
 Mode: DRY RUN (pass --apply to apply changes)
 
-[DRY RUN] test_definition:IT_2024 → national_calendar_test:IT
-[DRY RUN] test_definition:ROMA_DIOCESE_2024 → diocesan_calendar_test:ROMA
-[DRY RUN] test_definition:GRC_ADVENT_2024 → general_roman_calendar_test:general_roman_calendar
-[UNRESOLVED] test_definition:ORPHAN_TEST (no test file found — skipping)
+[DRY RUN] test_definition:ItalyPatronSaintsTest → national_calendar_test:roman/IT
+[DRY RUN] test_definition:romamo_it_PatronTest → diocesan_calendar_test:roman/romamo_it
+[DRY RUN] test_definition:MaryMotherChurchTest → rite_calendar_test:roman
+[UNRESOLVED] test_definition:OrphanTest (no test file found — skipping)
+[UNRESOLVED] test_definition:CollideTest (defined under two rites — cannot tell which one this grant meant — skipping)
 
 Summary:
-  Total test_definition tuples : 4
+  Total test_definition tuples : 5
   Would migrate                : 3
-  Would skip (unresolved)      : 1
+  Would skip (unresolved)      : 2
 
 Unresolved test IDs (no test file found, or defined under two rites):
-  - ORPHAN_TEST
+  - OrphanTest
+  - CollideTest
 ```
 
 **Review the output before continuing.** An exit code of `2` means there are
@@ -148,8 +150,29 @@ An `[UNRESOLVED]` line reports one of two reasons:
   tuple was meant to authorize and will not guess. Re-running the script
   reports the same ambiguity every time — it does not resolve on its own. An
   operator must inspect both files, decide by hand which rite the grant
-  belongs to, and write the resulting scoped tuple manually (via a direct
-  OpenFGA tuple write) rather than relying on the script for that one id.
+  belongs to, and migrate that one id manually, in the order below.
+
+  **Manual remediation — both steps are required, in this order.** The script's
+  own apply path does exactly this (`scripts/migrate-test-tuples.php:137-147`);
+  the manual path must mirror it:
+
+  1. **Write the scoped replacement first**, copying the **`user` and `relation`
+     verbatim** from the original tuple and changing only the object — e.g.
+     `test_definition:StIgnatiusOfLoyolaTest` becomes
+     `rite_calendar_test:ambrosian`, or `national_calendar_test:roman/IT` for a
+     national-scoped test. Only the object changes; a different `user` or
+     `relation` silently grants the wrong person, or the right person the wrong
+     level of access.
+  2. **Delete the legacy `test_definition:{name}` tuple only after that write
+     succeeds.** Never delete first: between the delete and the write the
+     grantee holds no grant at all, and if the write then fails you have
+     revoked real access with nothing recorded to restore it from.
+
+  Leaving step 2 undone is not immediately harmful — the `test_definition` type
+  is deliberately retained during the migration window (see the model note at
+  the top of this runbook) — but the migration is not complete until it is done,
+  and the stale tuple will stop authorizing the moment that type is pruned.
+  Leaving step 1 undone is worse: the grant simply disappears at prune time.
 
 ### 3b. Apply
 
@@ -159,8 +182,10 @@ php scripts/migrate-test-tuples.php --apply
 
 The script:
 
-1. Writes the new scoped tuple (e.g. `national_calendar_test:IT`).
-2. Deletes the old `test_definition:*` tuple.
+1. Writes the new scoped tuple, preserving the original `user` and `relation`
+   and changing only the object (e.g. `national_calendar_test:roman/IT` — the
+   ids are rite-qualified since #785).
+2. Deletes the old `test_definition:*` tuple, only after that write succeeded.
 3. If the new tuple already exists, write is silently skipped.
 4. If the old tuple is already gone, delete is silently skipped.
 
