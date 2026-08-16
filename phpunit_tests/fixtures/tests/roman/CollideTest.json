@@ -1,0 +1,9 @@
+{
+    "name": "CollideTest",
+    "event_key": "CollideEvent",
+    "applies_to": {
+        "rite": "roman",
+        "diocesan_calendar": "rotter_nl"
+    },
+    "assertions": []
+}

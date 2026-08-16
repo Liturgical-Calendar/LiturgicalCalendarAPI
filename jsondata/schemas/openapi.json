@@ -6728,6 +6728,7 @@
           {}
         ],
         "summary": "Retrieve all the unit tests defined in the API `tests` folder as an index useful for frontend processing",
+        "description": "The corpus-wide index, across every rite (`roman` and `ambrosian`). Each test object carries a server-computed, read-only `scope` (`object_type`/`object_id`) resolved from its `applies_to`. To retrieve only the tests defined for a single rite, use `GET /tests/{rite}`.",
         "operationId": "retrieveTestIndexGET",
         "responses": {
           "200": {
@@ -6747,6 +6748,10 @@
                       "year_since": 2018,
                       "applies_to": {
                         "rite": "roman"
+                      },
+                      "scope": {
+                        "object_type": "rite_calendar_test",
+                        "object_id": "roman"
                       },
                       "assertions": [
                         {
@@ -6776,6 +6781,10 @@
                       "test_type": "exactCorrespondence",
                       "applies_to": {
                         "rite": "roman"
+                      },
+                      "scope": {
+                        "object_type": "rite_calendar_test",
+                        "object_id": "roman"
                       },
                       "assertions": [
                         {
@@ -6807,6 +6816,10 @@
                       "applies_to": {
                         "rite": "roman",
                         "national_calendar": "US"
+                      },
+                      "scope": {
+                        "object_type": "national_calendar_test",
+                        "object_id": "roman/US"
                       },
                       "assertions": [
                         {
@@ -6844,6 +6857,10 @@
                       "test_type": "exactCorrespondence",
                       "applies_to": {
                         "rite": "roman"
+                      },
+                      "scope": {
+                        "object_type": "rite_calendar_test",
+                        "object_id": "roman"
                       },
                       "assertions": [
                         {
@@ -6884,7 +6901,7 @@
         }
       }
     },
-    "/tests/{test_name}": {
+    "/tests/{rite}": {
       "get": {
         "tags": [
           "Unit Tests"
@@ -6892,9 +6909,77 @@
         "security": [
           {}
         ],
-        "summary": "Retrieve a single unit test defined in the API `tests` by its name",
+        "summary": "Retrieve the unit tests defined for a single rite as an index useful for frontend processing",
+        "description": "Same response shape as `GET /tests`, restricted to the partition for the given rite. `/tests/ambrosian` behaves exactly like `/tests` scoped to the Ambrosian rite. A legacy bare `/tests/{test_name}` request does not resolve to this operation: since a bare test name is not a recognized rite, it reaches the `/tests` handler with one unconsumed path segment and no rite context, which rejects it — for `GET`, or when fine-grained authorization (OpenFGA) is not configured, with a `400 Bad Request` (test names are unique only within a rite, not globally — see #787); with OpenFGA configured, `PUT`/`PATCH`/`DELETE` against that same bare path instead fail closed with a `403 Forbidden` in `OpenFgaAuthorizationMiddleware`, before the handler is ever reached, because no rite segment means no authorization scope can be resolved. A path with three or more segments under `/tests` is a `405 Method Not Allowed`, not a `400`, since the router recognizes no route of that shape. To read a single test, use `GET /tests/{rite}/{test_name}`.",
+        "operationId": "retrieveTestIndexByRiteGET",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/TestsRitePathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: An index of the Unit Tests currently defined for the given rite",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./LitCalTestsPath.json"
+                },
+                "example": {
+                  "litcal_tests": [
+                    {
+                      "name": "StIgnatiusOfLoyolaTest",
+                      "event_key": "StIgnatiusOfLoyola",
+                      "description": "The Memorial of 'Saint Ignatius of Loyola' should fall on July 31 in the Ambrosian calendar, except when July 31 falls on a Sunday, when the memorial is suppressed",
+                      "test_type": "exactCorrespondence",
+                      "applies_to": {
+                        "rite": "ambrosian"
+                      },
+                      "scope": {
+                        "object_type": "rite_calendar_test",
+                        "object_id": "ambrosian"
+                      },
+                      "assertions": [
+                        {
+                          "year": 2005,
+                          "expected_value": null,
+                          "assert": "eventNotExists",
+                          "assertion": "The Memorial of 'Saint Ignatius of Loyola' should not exist when July 31 falls on a Sunday"
+                        },
+                        {
+                          "year": 2006,
+                          "expected_value": "2006-07-31T00:00:00+00:00",
+                          "assert": "eventExists AND hasExpectedDate",
+                          "assertion": "The Memorial of 'Saint Ignatius of Loyola' should fall on July 31"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          }
+        }
+      }
+    },
+    "/tests/{rite}/{test_name}": {
+      "get": {
+        "tags": [
+          "Unit Tests"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve a single unit test defined in the API `tests` by its rite and name",
+        "description": "A test is addressed as `/tests/{rite}/{test_name}`: names are unique within a rite, not globally, so the same name may exist as two different tests under two different rites.",
         "operationId": "retrieveTestByNameGET",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/TestsRitePathParam"
+          },
           {
             "in": "path",
             "name": "test_name",
@@ -6931,6 +7016,10 @@
                   "year_since": 2018,
                   "applies_to": {
                     "rite": "roman"
+                  },
+                  "scope": {
+                    "object_type": "rite_calendar_test",
+                    "object_id": "roman"
                   },
                   "assertions": [
                     {
@@ -6974,9 +7063,12 @@
           }
         ],
         "summary": "Create a new unit test at its own URI in the API `tests` folder",
-        "description": "Create (`PUT`) requires the `editor` relation. When fine-grained authorization (OpenFGA) is enabled, the request body must be JSON: the authorization scope is resolved from the parsed JSON payload's `applies_to`, so YAML or form-encoded bodies fail closed with a 403.",
+        "description": "Create (`PUT`) requires the `editor` relation. When fine-grained authorization (OpenFGA) is enabled, the request body must be JSON: the authorization scope is resolved from the parsed JSON payload's `applies_to`, so YAML or form-encoded bodies fail closed with a 403. The `{rite}` path segment and the body's `applies_to.rite` must name the same rite, or the request is rejected with a 422. The body may optionally echo the `scope` the API previously returned: a `scope` that matches the server-resolved value is accepted and silently stripped before persisting; a `scope` that disagrees is rejected with a 422. `scope` is never required, and is never present in a source file.",
         "operationId": "createTestByNamePUT",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/TestsRitePathParam"
+          },
           {
             "in": "path",
             "name": "test_name",
@@ -7030,6 +7122,9 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
           },
@@ -7063,8 +7158,12 @@
           }
         ],
         "summary": "Update an existing unit test in the API `tests` folder",
+        "description": "The `{rite}` path segment and the body's `applies_to.rite` must name the same rite, or the request is rejected with a 422. The body may optionally echo the `scope` the API previously returned: a `scope` that matches the server-resolved value is accepted and silently stripped before persisting; a `scope` that disagrees is rejected with a 422. On `PATCH`, the server-resolved value is the scope of the test as it is currently stored on disk *before* this request is applied, not the scope implied by this request's own `applies_to` — so a `PATCH` that intentionally changes `applies_to` and echoes the newly-correct scope is rejected as a mismatch, while echoing the now-superseded stored scope is accepted. `scope` is never required, and is never present in a source file.",
         "operationId": "updateTestByNamePATCH",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/TestsRitePathParam"
+          },
           {
             "in": "path",
             "name": "test_name",
@@ -7117,6 +7216,9 @@
               }
             }
           },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
           },
@@ -7149,6 +7251,9 @@
         "summary": "Delete a unit test from the API `tests` folder",
         "operationId": "deleteTestByNameDELETE",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/TestsRitePathParam"
+          },
           {
             "in": "path",
             "name": "test_name",
@@ -8392,6 +8497,9 @@
           },
           "excludes": {
             "$ref": "./LitCalTest.json#/definitions/ExcludesScope"
+          },
+          "scope": {
+            "$ref": "./LitCalTest.json#/definitions/ResolvedScope"
           }
         },
         "required": [
@@ -8453,6 +8561,9 @@
           },
           "excludes": {
             "$ref": "./LitCalTest.json#/definitions/ExcludesScope"
+          },
+          "scope": {
+            "$ref": "./LitCalTest.json#/definitions/ResolvedScope"
           }
         },
         "required": [
@@ -8515,6 +8626,9 @@
           },
           "excludes": {
             "$ref": "./LitCalTest.json#/definitions/ExcludesScope"
+          },
+          "scope": {
+            "$ref": "./LitCalTest.json#/definitions/ResolvedScope"
           }
         },
         "required": [
@@ -10431,6 +10545,19 @@
       }
     },
     "parameters": {
+      "TestsRitePathParam": {
+        "name": "rite",
+        "in": "path",
+        "required": true,
+        "description": "The liturgical rite the test is defined under. Part of a test's identity: names are unique within a rite, not globally.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "roman",
+            "ambrosian"
+          ]
+        }
+      },
       "AcceptLanguageHeader": {
         "in": "header",
         "name": "Accept-Language",

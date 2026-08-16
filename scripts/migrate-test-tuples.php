@@ -106,7 +106,8 @@ $unresolvedIds = [];
 // Process each tuple
 // ---------------------------------------------------------------------------
 foreach ($allTuples as $tuple) {
-    $mapped = $migration->mapTuple($tuple, $resolver);
+    $reason = null;
+    $mapped = $migration->mapTuple($tuple, $resolver, $reason);
 
     // Extract the test name from the old object for reporting
     $colonPos = strpos($tuple['object'], ':');
@@ -115,7 +116,14 @@ foreach ($allTuples as $tuple) {
     if ($mapped === null) {
         ++$unresolvedCount;
         $unresolvedIds[] = $testId;
-        echo "[UNRESOLVED] {$tuple['object']} (no test file found — skipping)" . PHP_EOL;
+        // 'ambiguous' means the name now resolves under two rite partitions (#787):
+        // migrating it would require guessing which grant was meant, so it is
+        // reported and skipped rather than silently reassigned to one of them.
+        $why = match ($reason) {
+            'ambiguous' => 'defined under two rites — cannot tell which one this grant meant',
+            default     => 'no test file found',
+        };
+        echo "[UNRESOLVED] {$tuple['object']} ({$why} — skipping)" . PHP_EOL;
         continue;
     }
 
@@ -156,7 +164,7 @@ echo sprintf("  %-29s: %d\n", $unresolvedLabel, $unresolvedCount);
 
 if ($unresolvedIds !== []) {
     echo PHP_EOL;
-    echo 'Unresolved test IDs (test JSON file not found):' . PHP_EOL;
+    echo 'Unresolved test IDs (no test file found, or defined under two rites):' . PHP_EOL;
     foreach ($unresolvedIds as $id) {
         echo "  - {$id}" . PHP_EOL;
     }

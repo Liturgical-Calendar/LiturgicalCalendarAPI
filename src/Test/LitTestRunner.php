@@ -69,6 +69,14 @@ class LitTestRunner
     private ?string $Test = null;
 
     /**
+     * @var string|null The cache key for this test: `{rite}/{Test}`.
+     * The corpus is partitioned by rite (#787), so the same test name under two
+     * rites is two different tests, and the static cache key must carry the rite
+     * to avoid a silent collision between them.
+     */
+    private ?string $cacheKey = null;
+
+    /**
      * @var TestsMap|null The cache for the test instructions and supported years
      * This is a static property that is shared across all instances of LitTestRunner.
      * It is used to avoid loading the same test instructions multiple times.
@@ -84,16 +92,21 @@ class LitTestRunner
      *
      * @param string $Test The name of the test.
      * @param \stdClass&object{settings:object{year:int,rite?:string,national_calendar?:string,diocesan_calendar?:string},litcal:LiturgicalEvent[]} $testData The test data object.
+     * @param Rite $rite The rite partition this test belongs to (#787).
      */
-    public function __construct(string $Test, \stdClass $testData)
+    public function __construct(string $Test, \stdClass $testData, Rite $rite)
     {
         $this->Test       = $Test;
         $this->dataToTest = $testData;
         if (self::$testCache === null) {
             self::$testCache = new TestsMap();
         }
-        if (false === self::$testCache->has($Test)) {
-            $testPath = rtrim(JsonData::TESTS_FOLDER->path(), '/\\') . DIRECTORY_SEPARATOR . basename($Test) . '.json';
+        // The cache key carries the rite: the corpus is partitioned, so the same name
+        // under two rites is two different tests (#787).
+        $cacheKey       = $rite->value . '/' . $Test;
+        $this->cacheKey = $cacheKey;
+        if (false === self::$testCache->has($cacheKey)) {
+            $testPath = rtrim(JsonData::testsFolderFor($rite)->path(), '/\\') . DIRECTORY_SEPARATOR . basename($Test) . '.json';
             if (file_exists($testPath)) {
                 $testInstructionsRaw = file_get_contents($testPath);
                 if ($testInstructionsRaw) {
@@ -105,7 +118,7 @@ class LitTestRunner
                             $schema = Schema::import($schemaFile);
                             $schema->in($testInstructions);
                             /** @var TestDataObject $testInstructions */
-                            self::$testCache->add($Test, $testInstructions);
+                            self::$testCache->add($cacheKey, $testInstructions);
                             $this->readyState = true;
                         } catch (\Throwable $e) {
                             $this->setError("Cannot proceed with {$Test}, the Test instructions were incorrectly validated against schema " . $schemaFile . ': ' . $e->getMessage());
@@ -120,7 +133,7 @@ class LitTestRunner
                 $this->setError("Test server could not read Test instructions for {$Test}");
             }
         } else {
-            $this->readyState = self::$testCache->isReady($Test);
+            $this->readyState = self::$testCache->isReady($cacheKey);
         }
     }
 
@@ -170,22 +183,26 @@ class LitTestRunner
                 $this->setError('Test name is not set');
                 return;
             }
-            $riteMismatch = $this->detectRiteMismatch(self::$testCache, $this->Test);
+            if (null === $this->cacheKey) {
+                $this->setError('Test cache key is not set');
+                return;
+            }
+            $riteMismatch = $this->detectRiteMismatch(self::$testCache, $this->cacheKey);
             if (null !== $riteMismatch) {
                 $this->setError($riteMismatch);
                 return;
             }
 
-            $assertion = self::$testCache->retrieveAssertionForYear($this->Test, $this->dataToTest->settings->year);
+            $assertion = self::$testCache->retrieveAssertionForYear($this->cacheKey, $this->dataToTest->settings->year);
             if (is_null($assertion)) {
-                $this->setError("Out of bounds error: {$this->Test} only supports calendar years [ " . implode(', ', self::$testCache->getYearsSupported($this->Test)) . ' ]');
+                $this->setError("Out of bounds error: {$this->Test} only supports calendar years [ " . implode(', ', self::$testCache->getYearsSupported($this->cacheKey)) . ' ]');
                 return;
             }
 
             $calendarType     = $this->getCalendarType();
             $calendarName     = $this->getCalendarName();
             $messageIfError   = "{$this->Test} Assertion '{$assertion->assertion}' failed for Year " . $this->dataToTest->settings->year . " in {$calendarType}{$calendarName}.";
-            $eventKey         = self::$testCache->get($this->Test)->event_key;
+            $eventKey         = self::$testCache->get($this->cacheKey)->event_key;
             $eventBeingTested = array_find($this->dataToTest->litcal, fn ($item) => $item->event_key === $eventKey);
 
             switch ($assertion->assert) {
@@ -278,26 +295,27 @@ class LitTestRunner
      * reads as 32 broken assertions rather than one misrouted run. That is the
      * failure mode that motivated issue #767.
      *
-     * The cache and test name are passed in already narrowed by runTest(), which
+     * The cache and cache key are passed in already narrowed by runTest(), which
      * has just checked both — re-checking here would add a branch no caller can
-     * reach.
+     * reach. The human-readable test name for the error message is read from
+     * `$this->Test` rather than the (rite-prefixed) cache key.
      *
      * Returns the error text on mismatch, or null when the rites agree or the
      * response does not state one.
      */
-    private function detectRiteMismatch(TestsMap $testCache, string $testName): ?string
+    private function detectRiteMismatch(TestsMap $testCache, string $cacheKey): ?string
     {
         $responseRite = $this->responseRite();
         if (null === $responseRite) {
             return null;
         }
 
-        $declaredRite = $testCache->get($testName)->rite;
+        $declaredRite = $testCache->get($cacheKey)->rite;
         if ($declaredRite === $responseRite) {
             return null;
         }
 
-        return "{$testName} is scoped to the {$declaredRite->value} rite, but the calendar under test was computed under the {$responseRite->value} rite";
+        return "{$this->Test} is scoped to the {$declaredRite->value} rite, but the calendar under test was computed under the {$responseRite->value} rite";
     }
 
     /**

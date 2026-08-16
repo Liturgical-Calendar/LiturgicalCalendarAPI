@@ -122,4 +122,55 @@ final class TestTupleMigrationTest extends TestCase
         // [A-Za-z0-9_-]) → resolve() returns null → mapTuple returns null.
         $this->assertNull($migration->mapTuple($tuple, $resolver));
     }
+
+    /**
+     * A legacy `test_definition:` tuple carries no rite. When the name resolves
+     * under BOTH rite partitions — `CollideTest.json` exists under both
+     * fixtures/tests/roman/ and fixtures/tests/ambrosian/, as two different
+     * tests with two different scopes — mapTuple() must refuse to guess which
+     * one the tuple meant, rather than silently picking the first rite tried.
+     * Guessing wrong would grant a scope the tuple's holder never had while
+     * revoking the one they actually held — a privilege shift in both
+     * directions once the caller deletes the old tuple.
+     */
+    public function testAmbiguousAcrossTwoRitesIsRefused(): void
+    {
+        $resolver  = new TestScopeResolver($this->fixturesDir);
+        $migration = new TestTupleMigration();
+
+        $tuple = [
+            'user'     => 'user:1',
+            'relation' => 'editor',
+            'object'   => 'test_definition:CollideTest',
+        ];
+
+        $reason = null;
+        $result = $migration->mapTuple($tuple, $resolver, $reason);
+
+        $this->assertNull($result);
+        $this->assertSame('ambiguous', $reason);
+    }
+
+    /**
+     * The companion case: a name resolving in NEITHER partition is reported as
+     * 'not_found' rather than 'ambiguous', so a CLI consumer can tell the two
+     * failure modes apart.
+     */
+    public function testNotFoundReasonIsDistinctFromAmbiguous(): void
+    {
+        $resolver  = new TestScopeResolver($this->fixturesDir);
+        $migration = new TestTupleMigration();
+
+        $tuple = [
+            'user'     => 'user:1',
+            'relation' => 'editor',
+            'object'   => 'test_definition:NonExistentTest',
+        ];
+
+        $reason = null;
+        $result = $migration->mapTuple($tuple, $resolver, $reason);
+
+        $this->assertNull($result);
+        $this->assertSame('not_found', $reason);
+    }
 }

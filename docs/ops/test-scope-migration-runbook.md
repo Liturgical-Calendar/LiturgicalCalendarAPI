@@ -116,25 +116,63 @@ what it would do:
 ```text
 Mode: DRY RUN (pass --apply to apply changes)
 
-[DRY RUN] test_definition:IT_2024 → national_calendar_test:IT
-[DRY RUN] test_definition:ROMA_DIOCESE_2024 → diocesan_calendar_test:ROMA
-[DRY RUN] test_definition:GRC_ADVENT_2024 → general_roman_calendar_test:general_roman_calendar
-[UNRESOLVED] test_definition:ORPHAN_TEST (no test file found — skipping)
+[DRY RUN] test_definition:ItalyPatronSaintsTest → national_calendar_test:roman/IT
+[DRY RUN] test_definition:romamo_it_PatronTest → diocesan_calendar_test:roman/romamo_it
+[DRY RUN] test_definition:MaryMotherChurchTest → rite_calendar_test:roman
+[UNRESOLVED] test_definition:OrphanTest (no test file found — skipping)
+[UNRESOLVED] test_definition:CollideTest (defined under two rites — cannot tell which one this grant meant — skipping)
 
 Summary:
-  Total test_definition tuples : 4
+  Total test_definition tuples : 5
   Would migrate                : 3
-  Would skip (unresolved)      : 1
+  Would skip (unresolved)      : 2
 
-Unresolved test IDs (test JSON file not found):
-  - ORPHAN_TEST
+Unresolved test IDs (no test file found, or defined under two rites):
+  - OrphanTest
+  - CollideTest
 ```
 
 **Review the output before continuing.** An exit code of `2` means there are
-unresolved tuples (the JSON file for that test is missing). Unresolved tuples
-are **never deleted** — they stay as `test_definition:*` and are safe to
-investigate separately. Fix any unresolved tests before applying (or accept that
-they remain under the old type until cleaned up).
+unresolved tuples. Unresolved tuples are **never deleted** — they stay as
+`test_definition:*` and are safe to investigate separately. Fix any unresolved
+tests before applying (or accept that they remain under the old type until
+cleaned up).
+
+An `[UNRESOLVED]` line reports one of two reasons:
+
+- `no test file found` — the JSON file for that test id is missing under every
+  rite partition. Fix or remove the test, or leave the tuple under the legacy
+  type until it is.
+- `defined under two rites — cannot tell which one this grant meant` (labeled
+  `ambiguous` internally, #787) — a test with that name exists under **both**
+  `jsondata/tests/roman/{name}.json` and `jsondata/tests/ambrosian/{name}.json`,
+  so the script cannot tell which rite the old flat `test_definition:{name}`
+  tuple was meant to authorize and will not guess. Re-running the script
+  reports the same ambiguity every time — it does not resolve on its own. An
+  operator must inspect both files, decide by hand which rite the grant
+  belongs to, and migrate that one id manually, in the order below.
+
+  **Manual remediation — both steps are required, in this order.** The script's
+  own apply path does exactly this (`scripts/migrate-test-tuples.php:137-147`);
+  the manual path must mirror it:
+
+  1. **Write the scoped replacement first**, copying the **`user` and `relation`
+     verbatim** from the original tuple and changing only the object — e.g.
+     `test_definition:StIgnatiusOfLoyolaTest` becomes
+     `rite_calendar_test:ambrosian`, or `national_calendar_test:roman/IT` for a
+     national-scoped test. Only the object changes; a different `user` or
+     `relation` silently grants the wrong person, or the right person the wrong
+     level of access.
+  2. **Delete the legacy `test_definition:{name}` tuple only after that write
+     succeeds.** Never delete first: between the delete and the write the
+     grantee holds no grant at all, and if the write then fails you have
+     revoked real access with nothing recorded to restore it from.
+
+  Leaving step 2 undone is not immediately harmful — the `test_definition` type
+  is deliberately retained during the migration window (see the model note at
+  the top of this runbook) — but the migration is not complete until it is done,
+  and the stale tuple will stop authorizing the moment that type is pruned.
+  Leaving step 1 undone is worse: the grant simply disappears at prune time.
 
 ### 3b. Apply
 
@@ -144,8 +182,10 @@ php scripts/migrate-test-tuples.php --apply
 
 The script:
 
-1. Writes the new scoped tuple (e.g. `national_calendar_test:IT`).
-2. Deletes the old `test_definition:*` tuple.
+1. Writes the new scoped tuple, preserving the original `user` and `relation`
+   and changing only the object (e.g. `national_calendar_test:roman/IT` — the
+   ids are rite-qualified since #785).
+2. Deletes the old `test_definition:*` tuple, only after that write succeeded.
 3. If the new tuple already exists, write is silently skipped.
 4. If the old tuple is already gone, delete is silently skipped.
 
@@ -158,36 +198,83 @@ tuples kept).
 
 After migrating, confirm that the scoped authorization is enforced correctly.
 
+`ItalyPatronSaintsTest` below is a placeholder name — it must satisfy the `name`
+pattern in `jsondata/schemas/LitCalTest.json` (`IT_2024` never did, since the
+schema requires a leading capital letter and forbids underscores before it).
+Substitute the name of a real test file that exists at
+`jsondata/tests/roman/{Name}.json` with `applies_to.national_calendar: "IT"`,
+or create one first. If the file does not exist, `TestScopeResolver::resolve()`
+returns null and `OpenFgaAuthorizationMiddleware` fails closed with `403` for
+*every* user regardless of scope — which would make 4a "pass" without
+exercising the DE-vs-IT check either. Confirm the test file exists before
+relying on any of 4a/4b/4c.
+
 ### 4a. Out-of-scope user must receive 403
 
-An authenticated user who holds `national_calendar_test:DE#editor` (Germany
-scope) must **not** be allowed to PATCH an Italian national-calendar test.
+An authenticated user who holds `national_calendar_test:roman/DE#editor`
+(Germany scope) must **not** be allowed to PATCH an Italian national-calendar
+test.
 
 ```bash
-# TOKEN_OUT = a valid OIDC bearer token for a user scoped to DE, not IT
+# TOKEN_OUT = a valid OIDC bearer token for a user scoped to roman/DE, not roman/IT
 curl -s -o /dev/null -w "%{http_code}" \
   -X PATCH \
   -H "Authorization: Bearer ${TOKEN_OUT}" \
   -H "Content-Type: application/json" \
   -d '{"missal": "IT_1983"}' \
-  http://localhost:8000/tests/IT_2024
+  http://localhost:8000/tests/roman/ItalyPatronSaintsTest
 ```
 
 Expected: **`403`**
 
+**Caution — a vacuous 403 does not prove this test passed.** A malformed path
+(missing the `{rite}` segment, e.g. the pre-#787 bare `/tests/IT_2024` shape
+this step used to use) also fails closed with `403` at
+`OpenFgaAuthorizationMiddleware`, regardless of which user is authenticated —
+that would make this step "pass" without ever exercising the DE-vs-IT
+authorization check it exists to prove. Confirm the request path is exactly
+`/tests/roman/{test_name}` as shown above, and where possible inspect the
+response body or audit log to confirm the denial reason is the scope mismatch
+(`roman/DE` vs. `roman/IT`), not a routing/path error.
+
 ### 4b. In-scope user must receive 2xx
 
-An authenticated user who holds `national_calendar_test:IT#editor` must be
-allowed to PATCH the same test.
+An authenticated user who holds `national_calendar_test:roman/IT#editor` must
+be allowed to PATCH the same test.
+
+The body below is a minimal payload that is valid under `LitCalTest.json`
+(`name`, `event_key`, `description`, `test_type`, `applies_to`, and
+`assertions` are all required, and unknown properties such as a bare
+`missal` key are rejected) — required so a 2xx here actually reflects the
+authorization check passing rather than the handler's own schema
+validation rejecting the request with a `400` (`validatePayloadAgainstTestSchema()`
+throws `ValidationException`, not the `422 UnprocessableContentException` used
+for the rite/scope-mismatch checks) before authorization is even relevant to
+the outcome. Adjust `event_key`/`assertions` to match whatever real test file
+you substituted for `ItalyPatronSaintsTest`.
 
 ```bash
-# TOKEN_IT = a valid OIDC bearer token for a user with national_calendar_test:IT#editor grant
+# TOKEN_IT = a valid OIDC bearer token for a user with national_calendar_test:roman/IT#editor grant
 curl -s -o /dev/null -w "%{http_code}" \
   -X PATCH \
   -H "Authorization: Bearer ${TOKEN_IT}" \
   -H "Content-Type: application/json" \
-  -d '{"missal": "IT_1983"}' \
-  http://localhost:8000/tests/IT_2024
+  -d '{
+    "name": "ItalyPatronSaintsTest",
+    "event_key": "ItalyPatronSaints",
+    "description": "Patron saints of Italy (Francis of Assisi and Catherine of Siena).",
+    "test_type": "exactCorrespondence",
+    "applies_to": { "rite": "roman", "national_calendar": "IT" },
+    "assertions": [
+      {
+        "year": 2020,
+        "expected_value": "2020-04-29T00:00:00+00:00",
+        "assert": "eventExists AND hasExpectedDate",
+        "assertion": "Patron saints of Italy should exist on the expected date"
+      }
+    ]
+  }' \
+  http://localhost:8000/tests/roman/ItalyPatronSaintsTest
 ```
 
 Expected: **`200`** or **`204`**
@@ -197,13 +284,31 @@ Expected: **`200`** or **`204`**
 A user with the `admin` role in the OIDC token passes all OpenFGA checks without
 a tuple lookup.
 
+Use the same schema-valid body as 4b (a bare `{"missal": "IT_1983"}` is not
+valid under `LitCalTest.json` and would return `400` regardless of who is
+authenticated, proving nothing about the admin bypass):
+
 ```bash
 curl -s -o /dev/null -w "%{http_code}" \
   -X PATCH \
   -H "Authorization: Bearer ${TOKEN_ADMIN}" \
   -H "Content-Type: application/json" \
-  -d '{"missal": "IT_1983"}' \
-  http://localhost:8000/tests/IT_2024
+  -d '{
+    "name": "ItalyPatronSaintsTest",
+    "event_key": "ItalyPatronSaints",
+    "description": "Patron saints of Italy (Francis of Assisi and Catherine of Siena).",
+    "test_type": "exactCorrespondence",
+    "applies_to": { "rite": "roman", "national_calendar": "IT" },
+    "assertions": [
+      {
+        "year": 2020,
+        "expected_value": "2020-04-29T00:00:00+00:00",
+        "assert": "eventExists AND hasExpectedDate",
+        "assertion": "Patron saints of Italy should exist on the expected date"
+      }
+    ]
+  }' \
+  http://localhost:8000/tests/roman/ItalyPatronSaintsTest
 ```
 
 Expected: **`200`** or **`204`**
@@ -424,3 +529,71 @@ php scripts/migrate-rite-data-tuples.php --apply --prune
 
 Then the unqualified ids can be rejected outright rather than merely superseded. The same
 step for the #785 test scopes is described above; the two can be pruned independently.
+
+---
+
+## Deployed-instance hazard — flat test files predating #787
+
+Issue #787 moved the test corpus from a flat `jsondata/tests/{name}.json` layout to
+rite-partitioned `jsondata/tests/{rite}/{name}.json`, and made `/tests/{rite}/{name}` the
+only way to address a test — a bare `/tests/{name}` is now a `400`. In this repository that
+move is a plain `git mv`: content-identical, nothing to roll back beyond the move itself.
+
+A deployed instance is not this repository, though. Any test created through the pre-#787
+`PUT /tests/{name}` endpoint since the #785 migration went live is a file that exists
+**only on that host's disk**, outside git entirely, sitting flat directly under
+`jsondata/tests/{name}.json` rather than under a rite partition. `git mv` cannot move what
+it never tracked, so such a file survives this deploy unmoved.
+
+After this deploy, `TestsHandler::collectTests()` globs `jsondata/tests/{rite}/*Test.json`
+— a flat file one level up matches nothing. Concretely, on the deployed host such a file
+becomes:
+
+- **invisible** to `GET /tests` and `GET /tests/{rite}` (absent from both indexes),
+- **unaddressable** by `GET /tests/{rite}/{name}` (no rite segment resolves to it), and
+- **undeletable** through the API (`DELETE /tests/{rite}/{name}` needs the same rite
+  segment to resolve the file, and none does),
+
+while any OpenFGA tuple scoping it (`national_calendar_test:...`, `diocesan_calendar_test:...`,
+`rite_calendar_test:...`) stays live and orphaned, since nothing ever calls the purge path for
+a file the API can no longer see.
+
+### Detect
+
+Run on the deployed host, from the API's repository root (the directory containing
+`jsondata/`, not `jsondata/tests/` itself — the command below is relative to it):
+
+```bash
+find jsondata/tests -maxdepth 1 -name '*Test.json' -type f
+```
+
+Anything this prints is a flat file predating the partition move — the `roman/` and
+`ambrosian/` subdirectories are excluded by `-maxdepth 1`, so a populated result here is
+always a hazard, never a false positive from the new layout. An empty result is the
+no-hazard outcome only if the command actually ran against an existing `jsondata/tests`
+path — confirm you are in the repository root first, since `find` on a missing path also
+prints nothing to stdout (it errors to stderr) and would otherwise look identical to "no
+hazard found".
+
+### Handle
+
+For each file `find` reports:
+
+1. Read its `applies_to.rite` field: `jq -r .applies_to.rite jsondata/tests/{name}.json`.
+2. Move it into the matching partition on the host directly (or through whatever
+   deployment/config-management mechanism owns that volume) —
+   `mv jsondata/tests/{name}.json jsondata/tests/{rite}/{name}.json`. This is a plain
+   filesystem move, not a `git mv`: the file was never tracked, so there is nothing to
+   commit.
+3. Re-run the detection command — it should print nothing.
+4. Spot-check `GET /tests/{rite}/{name}` returns the moved test, and that its `scope` in
+   the response matches whatever OpenFGA tuple was already granted for it. No tuple
+   migration is needed here — the object type and id are unchanged by the file move, only
+   its filesystem location is.
+
+Do this **before** treating `GET /tests` as a complete inventory on that host, and before
+assuming a `DELETE` against a test name created before this deploy will succeed.
+
+No automated migration script is provided for this: it is expected to touch at most a
+handful of files per environment, and a script would need write access to a production
+volume for a one-time, easily hand-verified move.

@@ -67,4 +67,24 @@ final class JsonDataRiteResolversTest extends TestCase
         self::assertStringContainsString('/rite/ambrosian/', JsonData::diocesanCalendarFileFor(Rite::AMBROSIAN)->value);
         self::assertStringContainsString('/rite/roman/', JsonData::diocesanCalendarFileFor(Rite::ROMAN)->value);
     }
+
+    public function testTestsFolderForRomanIsTheRomanPartition(): void
+    {
+        self::assertSame(JsonData::ROMAN_TESTS_FOLDER, JsonData::testsFolderFor(Rite::ROMAN));
+        self::assertStringEndsWith('jsondata/tests/roman', JsonData::ROMAN_TESTS_FOLDER->value);
+    }
+
+    public function testTestsFolderForAmbrosianIsTheAmbrosianPartition(): void
+    {
+        self::assertSame(JsonData::AMBROSIAN_TESTS_FOLDER, JsonData::testsFolderFor(Rite::AMBROSIAN));
+        self::assertStringEndsWith('jsondata/tests/ambrosian', JsonData::AMBROSIAN_TESTS_FOLDER->value);
+    }
+
+    public function testTestPartitionsAreDistinctAndSitUnderTheTestsFolder(): void
+    {
+        self::assertNotSame(JsonData::ROMAN_TESTS_FOLDER, JsonData::AMBROSIAN_TESTS_FOLDER);
+        foreach ([JsonData::ROMAN_TESTS_FOLDER, JsonData::AMBROSIAN_TESTS_FOLDER] as $partition) {
+            self::assertStringStartsWith(JsonData::TESTS_FOLDER->value . '/', $partition->value);
+        }
+    }
 }

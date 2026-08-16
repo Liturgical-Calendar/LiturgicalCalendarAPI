@@ -8,10 +8,10 @@ use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesOutboxTooling;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use LiturgicalCalendar\Api\JsonFormatter;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
-use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Exception\ConflictException;
 use LiturgicalCalendar\Api\Http\Exception\MethodNotAllowedException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
@@ -22,7 +22,6 @@ use LiturgicalCalendar\Api\Services\TestScopeResolver;
 use LiturgicalCalendar\Api\Utilities;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Nyholm\Psr7\Stream;
 
 final class TestsHandler extends AbstractHandler
 {
@@ -45,10 +44,13 @@ final class TestsHandler extends AbstractHandler
 
     private \stdClass $payload;
 
+    private ?Rite $rite;
+
     /** @param string[] $requestPathParams */
-    public function __construct(array $requestPathParams = [])
+    public function __construct(array $requestPathParams = [], ?Rite $rite = null)
     {
         parent::__construct($requestPathParams);
+        $this->rite = $rite;
         // The frontend admin-tests page performs cookie-authenticated writes
         // (PUT / PATCH / DELETE) against /tests from the browser. On split-origin
         // deployments (e.g. the docker e2e stack: frontend :3000 → API :8000) a
@@ -127,6 +129,70 @@ final class TestsHandler extends AbstractHandler
     }
 
     /**
+     * Absolute path to the file backing a test, in the partition for this request's rite.
+     *
+     * Only ever called once the null-rite guard in handle() has passed, so $this->rite is
+     * non-null on every write and single-test read path.
+     */
+    private function testFilePath(string $testName): string
+    {
+        return JsonData::testsFolderFor($this->rite ?? Rite::default())->path() . '/' . $testName . '.json';
+    }
+
+    /**
+     * The FGA scope pair for a test, as a response-only object.
+     *
+     * @return (\stdClass&object{object_type:string,object_id:string})|null null when no such test exists under that rite
+     */
+    private function scopeObjectFor(Rite $rite, string $testName): ?\stdClass
+    {
+        $scope = ( new TestScopeResolver() )->resolve($rite, $testName);
+        if ($scope === null) {
+            return null;
+        }
+        /** @var \stdClass&object{object_type:string,object_id:string} $obj */
+        $obj = (object) ['object_type' => $scope[0], 'object_id' => $scope[1]];
+        return $obj;
+    }
+
+    /**
+     * Every test in the requested rite, or across every rite when no rite segment was given.
+     *
+     * @return list<array<string,mixed>>
+     */
+    private function collectTests(): array
+    {
+        $rites = $this->rite === null ? Rite::cases() : [$this->rite];
+        $suite = [];
+        foreach ($rites as $rite) {
+            $folder = JsonData::testsFolderFor($rite)->path();
+            $files  = glob($folder . '/*Test.json');
+            if ($files === false) {
+                throw new ServiceUnavailableException("Tests folder {$folder} cannot be opened");
+            }
+            foreach ($files as $filePath) {
+                $testContents = file_get_contents($filePath);
+                if ($testContents === false) {
+                    throw new ServiceUnavailableException('Test ' . basename($filePath) . ' was not readable');
+                }
+                /** @var array<string,mixed> $decoded */
+                $decoded = json_decode($testContents, true, 512, JSON_THROW_ON_ERROR);
+                // resolve() is a file-stem lookup (like the single-test path at handleGetRequest()),
+                // so the scope must key off the filename, not the file's internal `name` — the two
+                // are enforced equal on write, but reading the content here would silently misattribute
+                // scope if they ever diverged.
+                $name  = basename($filePath, '.json');
+                $scope = ( new TestScopeResolver() )->resolve($rite, $name);
+                if ($scope !== null) {
+                    $decoded['scope'] = ['object_type' => $scope[0], 'object_id' => $scope[1]];
+                }
+                $suite[] = $decoded;
+            }
+        }
+        return $suite;
+    }
+
+    /**
      * Handles GET requests for tests.
      *
      * If no path parts are provided, this method returns an index of all tests.
@@ -137,49 +203,30 @@ final class TestsHandler extends AbstractHandler
     private function handleGetRequest(ResponseInterface $response): ResponseInterface
     {
         if (count($this->requestPathParams) === 0) {
-            try {
-                $responseBody = new \stdClass();
-                $testSuite    = [];
-                $testFiles    = new \DirectoryIterator('glob://' . JsonData::TESTS_FOLDER->path() . '/*Test.json');
-                foreach ($testFiles as $f) {
-                    $fileName     = $f->getFilename();
-                    $testContents = file_get_contents(JsonData::TESTS_FOLDER->path() . "/$fileName");
-                    if ($testContents === false) {
-                        $description = "Test {$fileName} was not readable";
-                        throw new ServiceUnavailableException($description);
-                    }
-                    $testSuite[] = json_decode($testContents, true, 512, JSON_THROW_ON_ERROR);
-                }
-                $responseBody->litcal_tests = $testSuite;
-                return $this->encodeResponseBody($response, $responseBody);
-            } catch (\UnexpectedValueException $e) {
-                throw new ServiceUnavailableException(
-                    $description = 'Tests folder path cannot be opened: ' . $e->getMessage(),
-                    $e
-                );
-            }
+            $responseBody               = new \stdClass();
+            $responseBody->litcal_tests = $this->collectTests();
+            return $this->encodeResponseBody($response, $responseBody);
         } elseif (count($this->requestPathParams) > 1) {
             $description = 'Expected one path param for GET requests, received ' . count($this->requestPathParams);
             throw new ValidationException($description);
         } else {
-            $testFile = array_shift($this->requestPathParams);
-            if (file_exists(JsonData::TESTS_FOLDER->path() . "/{$testFile}.json")) {
-                $testContents = file_get_contents(JsonData::TESTS_FOLDER->path() . "/{$testFile}.json");
+            $testFile     = array_shift($this->requestPathParams);
+            $testFilePath = $this->testFilePath($testFile);
+            if (file_exists($testFilePath)) {
+                $testContents = file_get_contents($testFilePath);
                 if ($testContents === false) {
                     $description = "Test {$testFile} was not readable";
                     throw new ServiceUnavailableException($description);
                 }
-                if ($response->getHeaderLine('Content-Type') === AcceptHeader::JSON->value) {
-                    return $response
-                        ->withStatus(StatusCode::OK->value, StatusCode::OK->reason())
-                        ->withBody(Stream::create($testContents));
-                } else {
-                    $decodedContents = json_decode($testContents, false, 512, JSON_THROW_ON_ERROR);
-                    if (false === ( $decodedContents instanceof \stdClass )) {
-                        throw new ServiceUnavailableException("Failed to decode test {$testFile} as JSON");
-                    }
-                    return $this->encodeResponseBody($response, $decodedContents);
+                $decodedContents = json_decode($testContents, false, 512, JSON_THROW_ON_ERROR);
+                if (false === ( $decodedContents instanceof \stdClass )) {
+                    throw new ServiceUnavailableException("Failed to decode test {$testFile} as JSON");
                 }
+                $scopeObject = $this->scopeObjectFor($this->rite ?? Rite::default(), $testFile);
+                if ($scopeObject !== null) {
+                    $decodedContents->scope = $scopeObject;
+                }
+                return $this->encodeResponseBody($response, $decodedContents);
             } else {
                 $description = "Test {$testFile} not found";
                 throw new NotFoundException($description);
@@ -210,12 +257,12 @@ final class TestsHandler extends AbstractHandler
         // validation (path-traversal / unsafe characters) or the test file is
         // missing/unreadable — in every such case refuse to touch the filesystem,
         // so unsafe names like "../foo" can never reach unlink().
-        $scope = ( new TestScopeResolver() )->resolve($testName);
+        $scope = ( new TestScopeResolver() )->resolve($this->rite ?? Rite::default(), $testName);
         if ($scope === null) {
             throw new NotFoundException("Test {$testName} not found, cannot DELETE.");
         }
 
-        if (false === unlink(JsonData::TESTS_FOLDER->path() . "/{$testName}.json")) {
+        if (false === unlink($this->testFilePath($testName))) {
             throw new ServiceUnavailableException("Test {$testName} could not be deleted");
         }
 
@@ -244,13 +291,15 @@ final class TestsHandler extends AbstractHandler
     }
 
     /**
-     * Handles PUT requests for creating a specific test at /tests/{test_name}.
+     * Handles PUT requests for creating a specific test at /tests/{rite}/{test_name}.
      *
      * The test name in the request path is authoritative; the payload's `name`
      * must match it. The payload is validated against the LitCalTest JSON schema
-     * (422 on failure). If a test with the same name already exists a 409 Conflict
-     * is returned. On success the test is written to disk and a 201 Created
-     * response is returned.
+     * (**400** on failure — {@see ValidationException}; the 422s on this path come
+     * from the semantic guards afterwards: name mismatch, rite disagreement, and a
+     * `scope` that contradicts the resolved one). If a test with the same name
+     * already exists a 409 Conflict is returned. On success the test is written to
+     * disk and a 201 Created response is returned.
      */
     private function handlePutRequest(ResponseInterface $response): ResponseInterface
     {
@@ -267,6 +316,8 @@ final class TestsHandler extends AbstractHandler
 
         $this->validatePayloadAgainstTestSchema('create');
         self::sanitizeObjectValues($this->payload);
+        $this->assertPayloadRiteMatchesPath();
+        $this->assertPayloadScopeAgrees();
 
         if (false === property_exists($this->payload, 'name') || false === is_string($this->payload->name)) {
             $description = 'The Unit Test you are attempting to create must have a valid name.';
@@ -274,12 +325,13 @@ final class TestsHandler extends AbstractHandler
         }
 
         if ($this->payload->name !== $testName) {
-            $description = 'You are attempting to create the Unit Test at /tests/' . $testName . ' with a Unit Test that has the name '
+            $rite        = $this->rite ?? Rite::default();
+            $description = 'You are attempting to create the Unit Test at /tests/' . $rite->value . '/' . $testName . ' with a Unit Test that has the name '
                 . $this->payload->name . ' in the request body. This is not allowed.';
             throw new UnprocessableContentException($description);
         }
 
-        $testFilePath = JsonData::TESTS_FOLDER->path() . '/' . $testName . '.json';
+        $testFilePath = $this->testFilePath($testName);
         if (file_exists($testFilePath)) {
             $description = 'A Unit Test with the name ' . $testName . ' already exists. Did you perhaps mean to use a PATCH request?';
             throw new ConflictException($description);
@@ -289,6 +341,93 @@ final class TestsHandler extends AbstractHandler
 
         $responseBody = (object) ['response' => 'Unit Test ' . $testName . ' created successfully.'];
         return $this->encodeResponseBody($response, $responseBody, StatusCode::CREATED);
+    }
+
+    /**
+     * The path segment and `applies_to.rite` must name the same rite.
+     *
+     * The directory is the address and `applies_to.rite` is the content. Letting them
+     * diverge would file a test under a rite it does not claim, and `TestScopeResolver`
+     * reads the content while the route reads the address — so they would authorize and
+     * store against different rites.
+     */
+    private function assertPayloadRiteMatchesPath(): void
+    {
+        $pathRite = $this->rite ?? Rite::default();
+
+        $payloadRite = null;
+        if (
+            property_exists($this->payload, 'applies_to')
+            && $this->payload->applies_to instanceof \stdClass
+            && property_exists($this->payload->applies_to, 'rite')
+            && is_string($this->payload->applies_to->rite)
+        ) {
+            $payloadRite = Rite::tryFrom($this->payload->applies_to->rite);
+        }
+
+        if ($payloadRite !== $pathRite) {
+            $described   = null === $payloadRite ? 'none' : $payloadRite->value;
+            $description = 'You are attempting to write a Unit Test at /tests/' . $pathRite->value
+                . '/ whose applies_to.rite is ' . $described . '. The rite in the path and the rite in the body must match.';
+            throw new UnprocessableContentException($description);
+        }
+    }
+
+    /**
+     * `scope` is server-computed and read-only, but an *echo* of the correct value is
+     * accepted rather than rejected.
+     *
+     * No legitimate client originates a scope: the field exists precisely so clients stop
+     * deriving it. So the only realistic way one reaches a write body is the ordinary
+     * load-edit-save cycle handing back what the GET returned. Rejecting that on presence
+     * alone would punish the common case while catching nothing that a mismatch check does
+     * not — and it is the silent divergence that must be impossible, not the echo (#787).
+     *
+     * The property is unset after validation so it is never persisted: the stored file is
+     * the source, and `scope` is derived from it.
+     */
+    private function assertPayloadScopeAgrees(): void
+    {
+        if (false === property_exists($this->payload, 'scope')) {
+            return;
+        }
+
+        // `name` is required by the JSON schema, which has already validated this payload
+        // by the time this method runs (called right after assertPayloadRiteMatchesPath()).
+        // Narrowing it here (rather than trusting that) keeps this method sound on its own.
+        $name = property_exists($this->payload, 'name') && is_string($this->payload->name)
+            ? $this->payload->name
+            : null;
+
+        $resolved = $name === null ? null : $this->scopeObjectFor($this->rite ?? Rite::default(), $name);
+        $supplied = $this->payload->scope;
+
+        // On create the test does not exist yet, so resolve the scope the stored file WILL
+        // have, from the payload's own applies_to — the same mapping resolve() would apply.
+        if ($resolved === null) {
+            $encodedPayload = json_encode($this->payload);
+            $fromPayload    = $encodedPayload === false
+                ? null
+                : ( new TestScopeResolver() )->resolveFromPayload(json_decode($encodedPayload, true));
+            $resolved       = $fromPayload === null
+                ? null
+                : (object) ['object_type' => $fromPayload[0], 'object_id' => $fromPayload[1]];
+        }
+
+        $agrees = $supplied instanceof \stdClass
+            && $resolved !== null
+            && property_exists($supplied, 'object_type')
+            && property_exists($supplied, 'object_id')
+            && $supplied->object_type === $resolved->object_type
+            && $supplied->object_id === $resolved->object_id;
+
+        if (false === $agrees) {
+            $description = 'The `scope` property is computed by the server from `applies_to` and is read-only. '
+                . 'The value supplied does not match the scope this test resolves to; omit it, or send back the value the API returned.';
+            throw new UnprocessableContentException($description);
+        }
+
+        unset($this->payload->scope);
     }
 
     /**
@@ -307,13 +446,15 @@ final class TestsHandler extends AbstractHandler
     }
 
     /**
-     * Handles PATCH requests for updating a specific test at /tests/{test_name}.
+     * Handles PATCH requests for updating a specific test at /tests/{rite}/{test_name}.
      *
      * This method expects exactly one path parameter: the name of the test to update. The request body
      * is expected to contain a JSON object which is validated against the LitCalTest JSON schema; if the
-     * validation fails, it returns a 422 Unprocessable Content error response. It also returns a 422 error
-     * if a Unit Test with the given name does not already exist, or if the `name` in the request body does
-     * not match the `test_name` path parameter. If validation succeeds, it attempts to write the JSON object
+     * validation fails, it returns a 400 Bad Request error response ({@see ValidationException}). It returns
+     * a 422 Unprocessable Content error instead when the payload is well-formed but semantically wrong: a
+     * Unit Test with the given name does not already exist, the `name` in the request body does not match
+     * the `test_name` path parameter, or the rite/`scope` guards reject it. If validation succeeds, it
+     * attempts to write the JSON object
      * to disk as a file in the tests directory; if the write fails, it returns a 503 Service Unavailable
      * error response. If the write succeeds, it returns a 200 response with a JSON object indicating the
      * resource has been updated.
@@ -327,6 +468,8 @@ final class TestsHandler extends AbstractHandler
 
         $this->validatePayloadAgainstTestSchema('update');
         self::sanitizeObjectValues($this->payload);
+        $this->assertPayloadRiteMatchesPath();
+        $this->assertPayloadScopeAgrees();
 
         if (false === property_exists($this->payload, 'name') || false === is_string($this->payload->name)) {
             $description = 'The Unit Test you are attempting to update must have a valid name.';
@@ -335,14 +478,16 @@ final class TestsHandler extends AbstractHandler
 
         $testName = $this->payload->name;
 
-        $testFilePath = JsonData::TESTS_FOLDER->path() . '/' . $testName . '.json';
+        $testFilePath = $this->testFilePath($testName);
         if (false === file_exists($testFilePath)) {
             $description = 'A Unit Test with the name ' . $testName . ' does not exist. Did you perhaps mean to use a PUT request?';
             throw new UnprocessableContentException($description);
         }
 
         if ($testName !== $this->requestPathParams[0]) {
-            $description = 'You are attempting to update the Unit Test at /tests/' . $this->requestPathParams[0] . ' with a Unit Test that has the name ' . $testName . ' in the request body. This is not allowed.';
+            $rite        = $this->rite ?? Rite::default();
+            $description = 'You are attempting to update the Unit Test at /tests/' . $rite->value . '/' . $this->requestPathParams[0]
+                . ' with a Unit Test that has the name ' . $testName . ' in the request body. This is not allowed.';
             throw new UnprocessableContentException($description);
         }
 
@@ -376,6 +521,16 @@ final class TestsHandler extends AbstractHandler
 
         // For all other request methods, validate that they are supported by the endpoint
         $this->validateRequestMethod($request);
+
+        // A test is addressed as /tests/{rite}/{name}. The bare /tests/{name} form is
+        // gone: names are only unique within a rite now, so a bare name does not identify
+        // a test. Bare /tests (no path params) remains the corpus-wide index.
+        if ($this->rite === null && count($this->requestPathParams) > 0) {
+            $description = 'A Unit Test is addressed as /tests/{rite}/{name}, where {rite} is one of: '
+                . implode(', ', array_column(Rite::cases(), 'value'))
+                . '. Received /tests/' . implode('/', $this->requestPathParams) . ' with no rite segment.';
+            throw new ValidationException($description);
+        }
 
         // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint:
         //   if set we negotiate the best Content-Type, if not set we default to the first supported by the current handler

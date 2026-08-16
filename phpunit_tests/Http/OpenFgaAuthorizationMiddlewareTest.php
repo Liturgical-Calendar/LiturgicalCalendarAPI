@@ -445,13 +445,17 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
             ->willReturn(true);
 
         // TestScopeResolver is final; use a real instance backed by a temp dir.
+        // The corpus is partitioned by rite (#787), so the fixture lives under the
+        // rite subdirectory the resolver will look in.
         // Track created paths so tearDown() cleans them up even on assertion failure.
-        $tempDir  = sys_get_temp_dir() . '/fga_test_' . uniqid();
-        $tempFile = $tempDir . '/some-test.json';
-        mkdir($tempDir);
+        $tempDir     = sys_get_temp_dir() . '/fga_test_' . uniqid();
+        $tempRiteDir = $tempDir . '/roman';
+        $tempFile    = $tempRiteDir . '/some-test.json';
+        mkdir($tempRiteDir, 0777, true);
         // Append dir before file so tearDown()'s array_reverse() removes the file first,
         // then the now-empty dir (rmdir fails on a non-empty dir).
         $this->tempPaths[] = $tempDir;
+        $this->tempPaths[] = $tempRiteDir;
         $this->tempPaths[] = $tempFile;
         file_put_contents(
             $tempFile,
@@ -461,9 +465,10 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
         $middleware = OpenFgaAuthorizationMiddleware::forTestScopes($client, $scopeResolver);
 
-        $request = ( new ServerRequest('PATCH', '/tests/some-test') )
+        $request = ( new ServerRequest('PATCH', '/tests/roman/some-test') )
             ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
-            ->withAttribute('test_id', 'some-test');
+            ->withAttribute('test_id', 'some-test')
+            ->withAttribute('test_rite', 'roman');
 
         $response = $middleware->process($request, $this->nextHandler);
         $this->assertEquals(200, $response->getStatusCode());
@@ -488,22 +493,24 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $middleware->process($request, $this->nextHandler);
     }
 
-    public function testForTestScopesFactoryPutMapsToEditor(): void
+    /**
+     * Twin of testForTestScopesFactoryMissingTestIdThrowsForbidden(), for the
+     * rite guard added by #787: a valid test_id with a MISSING test_rite
+     * attribute must still fail closed. A fixture that would resolve happily
+     * once a rite is supplied is deliberately present, so a passing check()
+     * call can only mean the guard was bypassed and a partition was guessed.
+     */
+    public function testForTestScopesFactoryMissingTestRiteThrowsForbidden(): void
     {
         $client = $this->createMock(OpenFgaClient::class);
-        $client->expects($this->once())
-            ->method('check')
-            ->with('user:user-123', 'editor', 'national_calendar_test:roman/US')
-            ->willReturn(true);
+        $client->expects($this->never())->method('check');
 
-        // TestScopeResolver is final; use a real instance backed by a temp dir.
-        // Track created paths so tearDown() cleans them up even on assertion failure.
-        $tempDir  = sys_get_temp_dir() . '/fga_test_' . uniqid();
-        $tempFile = $tempDir . '/some-test.json';
-        mkdir($tempDir);
-        // Append dir before file so tearDown()'s array_reverse() removes the file first,
-        // then the now-empty dir (rmdir fails on a non-empty dir).
+        $tempDir     = sys_get_temp_dir() . '/fga_test_' . uniqid();
+        $tempRiteDir = $tempDir . '/roman';
+        $tempFile    = $tempRiteDir . '/some-test.json';
+        mkdir($tempRiteDir, 0777, true);
         $this->tempPaths[] = $tempDir;
+        $this->tempPaths[] = $tempRiteDir;
         $this->tempPaths[] = $tempFile;
         file_put_contents(
             $tempFile,
@@ -513,9 +520,85 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
         $middleware = OpenFgaAuthorizationMiddleware::forTestScopes($client, $scopeResolver);
 
-        $request = ( new ServerRequest('PUT', '/tests/some-test') )
+        $request = ( new ServerRequest('PATCH', '/tests/some-test') )
             ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
             ->withAttribute('test_id', 'some-test');
+        // No test_rite attribute — the guard must return null before resolve() is
+        // ever called, regardless of whether the name would resolve under some rite.
+
+        $this->expectException(ForbiddenException::class);
+        $middleware->process($request, $this->nextHandler);
+    }
+
+    /**
+     * Same guard, exercised via an INVALID test_rite value (one Rite::tryFrom()
+     * cannot parse) rather than a missing attribute. Rite::tryFrom() returning
+     * null must be treated identically to the attribute being absent.
+     */
+    public function testForTestScopesFactoryInvalidTestRiteThrowsForbidden(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->never())->method('check');
+
+        $tempDir     = sys_get_temp_dir() . '/fga_test_' . uniqid();
+        $tempRiteDir = $tempDir . '/roman';
+        $tempFile    = $tempRiteDir . '/some-test.json';
+        mkdir($tempRiteDir, 0777, true);
+        $this->tempPaths[] = $tempDir;
+        $this->tempPaths[] = $tempRiteDir;
+        $this->tempPaths[] = $tempFile;
+        file_put_contents(
+            $tempFile,
+            (string) json_encode(['applies_to' => ['national_calendar' => 'US']])
+        );
+        $scopeResolver = new TestScopeResolver($tempDir);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forTestScopes($client, $scopeResolver);
+
+        $request = ( new ServerRequest('PATCH', '/tests/byzantine/some-test') )
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'some-test')
+            ->withAttribute('test_rite', 'byzantine');
+        // test_rite is present but not a value Rite::tryFrom() recognises —
+        // must fail closed exactly like the absent-attribute case.
+
+        $this->expectException(ForbiddenException::class);
+        $middleware->process($request, $this->nextHandler);
+    }
+
+    public function testForTestScopesFactoryPutMapsToEditor(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:user-123', 'editor', 'national_calendar_test:roman/US')
+            ->willReturn(true);
+
+        // TestScopeResolver is final; use a real instance backed by a temp dir.
+        // The corpus is partitioned by rite (#787), so the fixture lives under the
+        // rite subdirectory the resolver will look in.
+        // Track created paths so tearDown() cleans them up even on assertion failure.
+        $tempDir     = sys_get_temp_dir() . '/fga_test_' . uniqid();
+        $tempRiteDir = $tempDir . '/roman';
+        $tempFile    = $tempRiteDir . '/some-test.json';
+        mkdir($tempRiteDir, 0777, true);
+        // Append dir before file so tearDown()'s array_reverse() removes the file first,
+        // then the now-empty dir (rmdir fails on a non-empty dir).
+        $this->tempPaths[] = $tempDir;
+        $this->tempPaths[] = $tempRiteDir;
+        $this->tempPaths[] = $tempFile;
+        file_put_contents(
+            $tempFile,
+            (string) json_encode(['applies_to' => ['national_calendar' => 'US']])
+        );
+        $scopeResolver = new TestScopeResolver($tempDir);
+
+        $middleware = OpenFgaAuthorizationMiddleware::forTestScopes($client, $scopeResolver);
+
+        $request = ( new ServerRequest('PUT', '/tests/roman/some-test') )
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'some-test')
+            ->withAttribute('test_rite', 'roman');
 
         $response = $middleware->process($request, $this->nextHandler);
         $this->assertEquals(200, $response->getStatusCode());
@@ -586,10 +669,11 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
         $payload = ['applies_to' => ['national_calendar' => 'NL']];
         $body    = (string) json_encode($payload);
-        $request = ( new ServerRequest('PUT', '/tests/BrandNewTest', [], $body) )
+        $request = ( new ServerRequest('PUT', '/tests/roman/BrandNewTest', [], $body) )
             ->withParsedBody($payload)
             ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
-            ->withAttribute('test_id', 'BrandNewTest');
+            ->withAttribute('test_id', 'BrandNewTest')
+            ->withAttribute('test_rite', 'roman');
 
         // The middleware resolves the FGA scope from getParsedBody() (populated by
         // JsonBodyParserMiddleware in production) and must not consume the stream.
@@ -637,9 +721,10 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
         // No withParsedBody(): an unparseable body means JsonBodyParserMiddleware
         // leaves getParsedBody() null, so the scope fallback fails closed.
-        $request = ( new ServerRequest('PUT', '/tests/BrandNewTest', [], 'not-json') )
+        $request = ( new ServerRequest('PUT', '/tests/roman/BrandNewTest', [], 'not-json') )
             ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
-            ->withAttribute('test_id', 'BrandNewTest');
+            ->withAttribute('test_id', 'BrandNewTest')
+            ->withAttribute('test_rite', 'roman');
 
         $this->expectException(ForbiddenException::class);
         $middleware->process($request, $this->nextHandler);
@@ -659,9 +744,10 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
         // PATCH must NOT fall back to the payload: the resource must already exist.
         $body    = (string) json_encode(['applies_to' => ['national_calendar' => 'NL']]);
-        $request = ( new ServerRequest('PATCH', '/tests/BrandNewTest', [], $body) )
+        $request = ( new ServerRequest('PATCH', '/tests/roman/BrandNewTest', [], $body) )
             ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
-            ->withAttribute('test_id', 'BrandNewTest');
+            ->withAttribute('test_id', 'BrandNewTest')
+            ->withAttribute('test_rite', 'roman');
 
         $this->expectException(ForbiddenException::class);
         $middleware->process($request, $this->nextHandler);

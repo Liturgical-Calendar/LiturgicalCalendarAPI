@@ -143,6 +143,34 @@ class Router
     }
 
     /**
+     * Resolve the optional leading rite segment on the `/tests` route.
+     *
+     * `/tests` deliberately does not go through {@see self::extractRiteSegment()}. That
+     * helper resolves an absent segment to the default rite, which is right for `/calendar`,
+     * `/events` and `/data` — every one of those addresses a single calendar, so "no rite
+     * stated" can only sensibly mean "the default one". `/tests` has a *collection* whose
+     * historical meaning is "every test regardless of rite", so it needs a third state:
+     * null means all rites, and is distinct from an explicit `roman`.
+     *
+     * A test name can never be mistaken for a rite: `LitCalTest.json` requires names to end
+     * in `Test` and the collection globs `*Test.json`, so neither `roman` nor `ambrosian`
+     * can name a test.
+     *
+     * @param list<string> $requestPathParts the path segments following the route; the rite segment is removed in place when present
+     * @return Rite|null the rite named by the leading segment, or null when none is present
+     */
+    public static function extractTestsRite(array &$requestPathParts): ?Rite
+    {
+        $maybeRite = Rite::tryFrom((string) ( $requestPathParts[0] ?? '' ));
+        if ($maybeRite !== null) {
+            array_shift($requestPathParts);
+            return $maybeRite;
+        }
+
+        return null;
+    }
+
+    /**
      * Build the absolute canonical URL for a request that omitted the optional rite segment.
      *
      * The explicit rite form (`/calendar/roman/2026`, `/calendar/ambrosian/2026`) is canonical;
@@ -211,6 +239,12 @@ class Router
             ? $_ENV['CORS_ALLOWED_ORIGINS']
             : null;
         $allowedOrigins    = Utilities::parseCorsAllowedOrigins($allowedOriginsEnv);
+
+        // Tri-state rite resolved by the 'tests' case below (see extractTestsRite()):
+        // null means "all rites" until that case runs, and stays null for every other
+        // route. Declared here so configureAuthorizationPipeline() can be passed the
+        // resolved value further down.
+        $testsRite = null;
 
         // The very first response that will need to be submitted by the API,
         // is the response to pre-flight requests.
@@ -578,7 +612,11 @@ class Router
                 $this->handler = $regionalDataHandler;
                 break;
             case 'tests':
-                $testsHandler = new TestsHandler($requestPathParts);
+                // Strip the rite segment BEFORE the count-based method wiring below, so
+                // /tests/ambrosian behaves exactly like /tests (collection) and
+                // /tests/ambrosian/{name} exactly like a one-part item route.
+                $testsRite    = self::extractTestsRite($requestPathParts);
+                $testsHandler = new TestsHandler($requestPathParts, $testsRite);
                 if (count($requestPathParts) === 0) {
                     $testsHandler->setAllowedRequestMethods([
                         RequestMethod::GET,
@@ -739,7 +777,7 @@ class Router
 
             // Apply authorization middleware with role-based access control
             // (shared between OIDC and JWT paths)
-            $this->configureAuthorizationPipeline($pipeline, $route, $requestPathParts, $rite);
+            $this->configureAuthorizationPipeline($pipeline, $route, $requestPathParts, $rite, $testsRite);
         }
 
         $this->response = $pipeline->handle($this->request)
@@ -794,12 +832,15 @@ class Router
      * @param array<int, string> $requestPathParts The parsed path parts after the route
      * @param Rite $rite The rite selected by the route's optional rite segment; qualifies the
      *                   calendar object ids the FGA middleware checks against (issue #786)
+     * @param Rite|null $testsRite The rite resolved by {@see Router::extractTestsRite()} for the
+     *                             `tests` route only; null means "all rites" (or n/a for other routes)
      */
     private function configureAuthorizationPipeline(
         MiddlewarePipeline $pipeline,
         string $route,
         array $requestPathParts,
-        Rite $rite = Rite::ROMAN
+        Rite $rite = Rite::ROMAN,
+        ?Rite $testsRite = null
     ): void {
         // Cache a single OpenFGA client for the pipeline (avoid multiple fromEnv calls)
         $fgaClient = OpenFgaClient::isConfigured() ? OpenFgaClient::fromEnv() : null;
@@ -835,7 +876,9 @@ class Router
 
             // OpenFGA fine-grained authorization for test definitions
             if ($oidcAvailable && $fgaClient !== null && count($requestPathParts) >= 1) {
-                $this->request = $this->request->withAttribute('test_id', $requestPathParts[0]);
+                $this->request = $this->request
+                    ->withAttribute('test_id', $requestPathParts[0])
+                    ->withAttribute('test_rite', $testsRite?->value);
                 $pipeline->pipe(OpenFgaAuthorizationMiddleware::forTestScopes($fgaClient, new TestScopeResolver()));
             }
         } elseif ($route === 'temporale') {

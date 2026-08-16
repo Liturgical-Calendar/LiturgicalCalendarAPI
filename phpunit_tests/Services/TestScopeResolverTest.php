@@ -22,13 +22,13 @@ final class TestScopeResolverTest extends TestCase
     public function testResolvesDiocesan(): void
     {
         $r = new TestScopeResolver($this->fixturesDir);
-        $this->assertSame(['diocesan_calendar_test', 'roman/rotter_nl'], $r->resolve('FooTest'));
+        $this->assertSame(['diocesan_calendar_test', 'roman/rotter_nl'], $r->resolve(Rite::ROMAN, 'FooTest'));
     }
 
     public function testResolvesNational(): void
     {
         $r = new TestScopeResolver($this->fixturesDir);
-        $this->assertSame(['national_calendar_test', 'roman/US'], $r->resolve('BarTest'));
+        $this->assertSame(['national_calendar_test', 'roman/US'], $r->resolve(Rite::ROMAN, 'BarTest'));
     }
 
     public function testResolvesRomanRiteWhenAppliestoAbsent(): void
@@ -38,38 +38,38 @@ final class TestScopeResolverTest extends TestCase
         $r = new TestScopeResolver($this->fixturesDir);
         $this->assertSame(
             ['rite_calendar_test', 'roman'],
-            $r->resolve('BazTest')
+            $r->resolve(Rite::ROMAN, 'BazTest')
         );
     }
 
     public function testReturnsNullForNonexistentFile(): void
     {
         $r = new TestScopeResolver($this->fixturesDir);
-        $this->assertNull($r->resolve('NonExistentTest'));
+        $this->assertNull($r->resolve(Rite::ROMAN, 'NonExistentTest'));
     }
 
     public function testRejectsPathTraversalDotDot(): void
     {
         $r = new TestScopeResolver($this->fixturesDir);
-        $this->assertNull($r->resolve('../../etc/passwd'));
+        $this->assertNull($r->resolve(Rite::ROMAN, '../../etc/passwd'));
     }
 
     public function testRejectsPathWithDirectorySeparator(): void
     {
         $r = new TestScopeResolver($this->fixturesDir);
-        $this->assertNull($r->resolve('Foo/Bar'));
+        $this->assertNull($r->resolve(Rite::ROMAN, 'Foo/Bar'));
     }
 
     public function testRejectsNameWithNullByte(): void
     {
         $r = new TestScopeResolver($this->fixturesDir);
-        $this->assertNull($r->resolve("Foo\x00Bar"));
+        $this->assertNull($r->resolve(Rite::ROMAN, "Foo\x00Bar"));
     }
 
     public function testRejectsNameWithDisallowedCharacter(): void
     {
         $r = new TestScopeResolver($this->fixturesDir);
-        $this->assertNull($r->resolve('Foo Bar'));
+        $this->assertNull($r->resolve(Rite::ROMAN, 'Foo Bar'));
     }
 
     public function testAcceptsValidAlphanumericDashUnderscoreName(): void
@@ -77,14 +77,14 @@ final class TestScopeResolverTest extends TestCase
         $r = new TestScopeResolver($this->fixturesDir);
         // FooTest is a known fixture — must still resolve. It predates the required
         // `rite`, so it falls back to the default rite and is qualified with it.
-        $this->assertSame(['diocesan_calendar_test', 'roman/rotter_nl'], $r->resolve('FooTest'));
+        $this->assertSame(['diocesan_calendar_test', 'roman/rotter_nl'], $r->resolve(Rite::ROMAN, 'FooTest'));
     }
 
     public function testAcceptsNameWithDashAndUnderscore(): void
     {
         $r = new TestScopeResolver($this->fixturesDir);
         // Non-existent file: no traversal, just a missing file → null
-        $this->assertNull($r->resolve('Valid-Test_Name-123'));
+        $this->assertNull($r->resolve(Rite::ROMAN, 'Valid-Test_Name-123'));
     }
 
     public function testResolvesRiteQualifiedDiocesanScopeFromFile(): void
@@ -92,7 +92,7 @@ final class TestScopeResolverTest extends TestCase
         $r = new TestScopeResolver($this->fixturesDir);
         $this->assertSame(
             ['diocesan_calendar_test', 'ambrosian/lugano_ch'],
-            $r->resolve('AmbrosianDioceseTest')
+            $r->resolve(Rite::AMBROSIAN, 'AmbrosianDioceseTest')
         );
     }
 

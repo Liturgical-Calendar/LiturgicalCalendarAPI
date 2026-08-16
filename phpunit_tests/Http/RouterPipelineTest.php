@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Http;
 
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Middleware\AuthorizationMiddleware;
 use LiturgicalCalendar\Api\Http\Middleware\OpenFgaAuthorizationMiddleware;
 use LiturgicalCalendar\Api\Http\Server\MiddlewarePipeline;
@@ -137,16 +138,23 @@ final class RouterPipelineTest extends TestCase
     /**
      * Call the private configureAuthorizationPipeline method via reflection.
      *
+     * $rite and $testsRite mirror configureAuthorizationPipeline()'s own defaults
+     * (Rite::ROMAN / null) so every existing 4-argument call site is unaffected;
+     * only tests that care about the 'tests' route's tri-state rite need to pass
+     * $testsRite explicitly.
+     *
      * @param array<int, string> $pathParts
      */
     private function callConfigurePipeline(
         Router $router,
         MiddlewarePipeline $pipeline,
         string $route,
-        array $pathParts
+        array $pathParts,
+        Rite $rite = Rite::ROMAN,
+        ?Rite $testsRite = null
     ): void {
         $method = new ReflectionMethod(Router::class, 'configureAuthorizationPipeline');
-        $method->invoke($router, $pipeline, $route, $pathParts);
+        $method->invoke($router, $pipeline, $route, $pathParts, $rite, $testsRite);
     }
 
     /**
@@ -284,7 +292,7 @@ final class RouterPipelineTest extends TestCase
 
     public function testTestsRouteAddsTestEditorMiddleware(): void
     {
-        $router   = $this->routerWithoutConstructor(new ServerRequest('PATCH', '/tests/some-test'));
+        $router   = $this->routerWithoutConstructor(new ServerRequest('PATCH', '/tests/roman/some-test'));
         $pipeline = $this->emptyPipeline();
 
         $this->callConfigurePipeline($router, $pipeline, 'tests', ['some-test']);
@@ -297,7 +305,7 @@ final class RouterPipelineTest extends TestCase
 
     public function testTestsRouteAddsOpenFgaMiddlewareWithObjectResolver(): void
     {
-        $router   = $this->routerWithoutConstructor(new ServerRequest('PATCH', '/tests/some-test'));
+        $router   = $this->routerWithoutConstructor(new ServerRequest('PATCH', '/tests/roman/some-test'));
         $pipeline = $this->emptyPipeline();
 
         $this->callConfigurePipeline($router, $pipeline, 'tests', ['some-test']);
@@ -320,6 +328,26 @@ final class RouterPipelineTest extends TestCase
             $this->getPrivateProp($fgaMw, 'objectResolver'),
             'objectResolver must be set by forTestScopes()'
         );
+    }
+
+    /**
+     * The 'tests' branch sets both 'test_id' and 'test_rite' request attributes
+     * before piping the FGA middleware. Deleting either the withAttribute() call
+     * for 'test_rite' or dropping $testsRite at the route()-level call site would
+     * leave this assertion (and only this assertion) failing — it is the one test
+     * that observes the resulting request rather than just the pipeline queue.
+     */
+    public function testTestsRouteSetsTestRiteAttributeOnRequest(): void
+    {
+        $router   = $this->routerWithoutConstructor(new ServerRequest('PATCH', '/tests/ambrosian/some-test'));
+        $pipeline = $this->emptyPipeline();
+
+        $this->callConfigurePipeline($router, $pipeline, 'tests', ['some-test'], Rite::ROMAN, Rite::AMBROSIAN);
+
+        $request = $this->getPrivateProp($router, 'request');
+        self::assertInstanceOf(ServerRequestInterface::class, $request);
+        self::assertSame('some-test', $request->getAttribute('test_id'));
+        self::assertSame('ambrosian', $request->getAttribute('test_rite'));
     }
 
     public function testTestsRouteWithoutPathPartSkipsFga(): void

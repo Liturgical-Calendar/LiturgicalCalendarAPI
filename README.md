@@ -83,7 +83,7 @@ Some characteristics of this API:
   the script will need to be updated to account for any new criteria)
 * **HTTP method semantics follow [RFC 9110](https://www.rfc-editor.org/rfc/rfc9110)**:
   `PUT` is create-or-replace at the resource's own URI (idempotent, returning `409 Conflict` when attempting to create a resource that already exists),
-  and `PATCH`/`DELETE` likewise address resources by path (e.g. `PUT /data/nation/IT`, `PATCH /tests/MaryMotherChurchTest`).
+  and `PATCH`/`DELETE` likewise address resources by path (e.g. `PUT /data/nation/IT`, `PATCH /tests/roman/MaryMotherChurchTest`).
   One deliberate exception: on read endpoints this API uses `POST` as a body-parameterized synonym of `GET` (not as collection-create),
   pending possible adoption of the [`QUERY` method](https://datatracker.ietf.org/doc/draft-ietf-httpbis-safe-method-w-body/) when it becomes standard.
 * **The explicit rite segment is the canonical URL form**: `/calendar/roman/{year}` states the rite outright, symmetric with `/calendar/ambrosian/{year}`, and
