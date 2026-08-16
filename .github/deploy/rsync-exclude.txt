@@ -79,11 +79,13 @@ infrastructure/
 
 # --- Dev-only entries inside scripts/ ---
 # scripts/ itself MUST ship: the operational scripts (mint-official-key,
-# migrate-*-tuples, reconcile-resource-tuples, seed-wider-region-membership,
-# and the openfga-model*.json they apply) bootstrap from the deployed app
-# root's vendor/ + .env and are run ON the server per the RBAC runbook,
-# since production OpenFGA/Postgres are only reachable there. Exclude only
-# the local coverage tooling and the Docker-bootstrap SQL.
+# migrate-*-tuples, reconcile-resource-tuples, seed-wider-region-membership)
+# bootstrap from the deployed app root's vendor/ + .env and are run ON the
+# server per the RBAC runbook, since production OpenFGA/Postgres are only
+# reachable there. No openfga-model*.json ships any more — the authorization
+# model lives in cdcf-infra (auth/models/LiturgicalCalendar.json) and is
+# uploaded from /opt/cdcf-auth/auth, not from this vhost. Exclude only the
+# local coverage tooling and the Docker-bootstrap SQL.
 scripts/coverage-summary.php
 scripts/coverage-with-server.sh
 scripts/merge-pcov-coverage.php
