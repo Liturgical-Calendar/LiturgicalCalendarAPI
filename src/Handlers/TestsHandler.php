@@ -295,9 +295,11 @@ final class TestsHandler extends AbstractHandler
      *
      * The test name in the request path is authoritative; the payload's `name`
      * must match it. The payload is validated against the LitCalTest JSON schema
-     * (422 on failure). If a test with the same name already exists a 409 Conflict
-     * is returned. On success the test is written to disk and a 201 Created
-     * response is returned.
+     * (**400** on failure — {@see ValidationException}; the 422s on this path come
+     * from the semantic guards afterwards: name mismatch, rite disagreement, and a
+     * `scope` that contradicts the resolved one). If a test with the same name
+     * already exists a 409 Conflict is returned. On success the test is written to
+     * disk and a 201 Created response is returned.
      */
     private function handlePutRequest(ResponseInterface $response): ResponseInterface
     {
@@ -448,9 +450,11 @@ final class TestsHandler extends AbstractHandler
      *
      * This method expects exactly one path parameter: the name of the test to update. The request body
      * is expected to contain a JSON object which is validated against the LitCalTest JSON schema; if the
-     * validation fails, it returns a 422 Unprocessable Content error response. It also returns a 422 error
-     * if a Unit Test with the given name does not already exist, or if the `name` in the request body does
-     * not match the `test_name` path parameter. If validation succeeds, it attempts to write the JSON object
+     * validation fails, it returns a 400 Bad Request error response ({@see ValidationException}). It returns
+     * a 422 Unprocessable Content error instead when the payload is well-formed but semantically wrong: a
+     * Unit Test with the given name does not already exist, the `name` in the request body does not match
+     * the `test_name` path parameter, or the rite/`scope` guards reject it. If validation succeeds, it
+     * attempts to write the JSON object
      * to disk as a file in the tests directory; if the write fails, it returns a 503 Service Unavailable
      * error response. If the write succeeds, it returns a 200 response with a JSON object indicating the
      * resource has been updated.
