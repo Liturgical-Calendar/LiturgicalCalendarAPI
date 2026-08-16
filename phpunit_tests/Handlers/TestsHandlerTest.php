@@ -321,8 +321,12 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         $payload['name']       = 'ZzzRiteMismatchTest';
         $payload['applies_to'] = ['rite' => 'roman'];
 
+        // Guard against the guard silently not firing and the payload getting written anyway.
+        $this->testFixturePath = JsonData::testsFolderFor(Rite::AMBROSIAN)->path() . '/ZzzRiteMismatchTest.json';
+
         // Addressed under /tests/ambrosian/... but the body says roman.
         $this->expectException(UnprocessableContentException::class);
+        $this->expectExceptionMessage('The rite in the path and the rite in the body must match.');
         ( new TestsHandler(['ZzzRiteMismatchTest'], Rite::AMBROSIAN) )->handle(
             $this->requestFor('PUT', '/tests/ambrosian/ZzzRiteMismatchTest', [], $payload)
         );
@@ -355,8 +359,16 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         );
         $payload['applies_to'] = ['rite' => 'roman'];
 
-        // MaryMotherChurchTest exists under roman/, but is addressed here under ambrosian/.
+        // Guard against the guard silently not firing and the payload getting written anyway.
+        $this->testFixturePath = JsonData::testsFolderFor(Rite::AMBROSIAN)->path() . '/MaryMotherChurchTest.json';
+
+        // MaryMotherChurchTest exists under roman/, but is addressed here under ambrosian/. Without
+        // the rite guard, the pre-existing "does the file exist in this rite's partition?" check
+        // would ALSO throw UnprocessableContentException (for the unrelated reason that no such
+        // file exists under ambrosian/), so the exception message is asserted to make sure it is
+        // actually the rite guard that fires, not that unrelated check.
         $this->expectException(UnprocessableContentException::class);
+        $this->expectExceptionMessage('The rite in the path and the rite in the body must match.');
         ( new TestsHandler(['MaryMotherChurchTest'], Rite::AMBROSIAN) )->handle(
             $this->requestFor('PATCH', '/tests/ambrosian/MaryMotherChurchTest', [], $payload)
         );
