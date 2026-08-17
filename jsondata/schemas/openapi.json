@@ -7158,7 +7158,7 @@
           }
         ],
         "summary": "Update an existing unit test in the API `tests` folder",
-        "description": "The `{rite}` path segment and the body's `applies_to.rite` must name the same rite, or the request is rejected with a 422. The body may optionally echo the `scope` the API previously returned: a `scope` that matches the server-resolved value is accepted and silently stripped before persisting; a `scope` that disagrees is rejected with a 422. On `PATCH`, the server-resolved value is the scope of the test as it is currently stored on disk *before* this request is applied, not the scope implied by this request's own `applies_to` — so a `PATCH` that intentionally changes `applies_to` and echoes the newly-correct scope is rejected as a mismatch, while echoing the now-superseded stored scope is accepted. `scope` is never required, and is never present in a source file.",
+        "description": "The `{rite}` path segment and the body's `applies_to.rite` must name the same rite, or the request is rejected with a 422. The body may optionally echo the `scope` the API previously returned: a `scope` that matches the server-resolved value is accepted and silently stripped before persisting; a `scope` that disagrees is rejected with a 422. On `PATCH`, the server-resolved value is always the scope this request's own `applies_to` resolves to — the scope the test WILL have once this write is applied — never the scope it had beforehand; a `PATCH` that changes `applies_to` and echoes the newly-correct scope is accepted, while echoing the now-superseded stored scope is rejected as a mismatch. A `PATCH` that changes `applies_to` (re-scoping the test) additionally requires the `editor` relation on BOTH the scope the test is currently stored under and the scope named by the new `applies_to`; holding `editor` on only one of the two is rejected with a 403, even though the stored-scope check alone would otherwise pass. `scope` is never required, and is never present in a source file.",
         "operationId": "updateTestByNamePATCH",
         "parameters": [
           {
@@ -7222,6 +7222,9 @@
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
           },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
           "404": {
             "$ref": "#/components/responses/NotFound404"
           },
@@ -7271,6 +7274,9 @@
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"

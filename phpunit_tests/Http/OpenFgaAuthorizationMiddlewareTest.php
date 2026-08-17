@@ -752,4 +752,240 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
         $this->expectException(ForbiddenException::class);
         $middleware->process($request, $this->nextHandler);
     }
+
+    // -----------------------------------------------------------------
+    // forTestScopePayloadTarget() — issue #790 union check
+    // -----------------------------------------------------------------
+
+    public function testForTestScopePayloadTargetDeniesWhenNotAuthorizedForPayloadScope(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:user-123', 'editor', 'national_calendar_test:roman/US')
+            ->willReturn(false);
+
+        $scopeResolver = new TestScopeResolver(sys_get_temp_dir());
+        $middleware    = OpenFgaAuthorizationMiddleware::forTestScopePayloadTarget($client, $scopeResolver);
+
+        $payload = ['applies_to' => ['rite' => 'roman', 'national_calendar' => 'US']];
+        $request = ( new ServerRequest('PATCH', '/tests/roman/SomeItTest', [], (string) json_encode($payload)) )
+            ->withParsedBody($payload)
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'SomeItTest')
+            ->withAttribute('test_rite', 'roman');
+
+        $this->expectException(ForbiddenException::class);
+        $this->expectExceptionMessage('national_calendar_test:roman/US');
+        $middleware->process($request, $this->nextHandler);
+    }
+
+    public function testForTestScopePayloadTargetAllowsWhenAuthorizedForPayloadScope(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->once())
+            ->method('check')
+            ->with('user:user-123', 'editor', 'national_calendar_test:roman/US')
+            ->willReturn(true);
+
+        $scopeResolver = new TestScopeResolver(sys_get_temp_dir());
+        $middleware    = OpenFgaAuthorizationMiddleware::forTestScopePayloadTarget($client, $scopeResolver);
+
+        $payload = ['applies_to' => ['rite' => 'roman', 'national_calendar' => 'US']];
+        $request = ( new ServerRequest('PATCH', '/tests/roman/SomeItTest', [], (string) json_encode($payload)) )
+            ->withParsedBody($payload)
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'SomeItTest')
+            ->withAttribute('test_rite', 'roman');
+
+        $response = $middleware->process($request, $this->nextHandler);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testForTestScopePayloadTargetPassesThroughForPutWithoutCallingCheck(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->never())->method('check');
+
+        $scopeResolver = new TestScopeResolver(sys_get_temp_dir());
+        $middleware    = OpenFgaAuthorizationMiddleware::forTestScopePayloadTarget($client, $scopeResolver);
+
+        $payload = ['applies_to' => ['rite' => 'roman', 'national_calendar' => 'US']];
+        $request = ( new ServerRequest('PUT', '/tests/roman/SomeItTest', [], (string) json_encode($payload)) )
+            ->withParsedBody($payload)
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'SomeItTest')
+            ->withAttribute('test_rite', 'roman');
+
+        // The relation map only defines PATCH, so PUT resolves to a null relation and
+        // process() passes through before the resolver (and thus check()) is ever reached.
+        $response = $middleware->process($request, $this->nextHandler);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testForTestScopePayloadTargetPassesThroughForDeleteWithoutCallingCheck(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->never())->method('check');
+
+        $scopeResolver = new TestScopeResolver(sys_get_temp_dir());
+        $middleware    = OpenFgaAuthorizationMiddleware::forTestScopePayloadTarget($client, $scopeResolver);
+
+        $request = ( new ServerRequest('DELETE', '/tests/roman/SomeItTest') )
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'SomeItTest')
+            ->withAttribute('test_rite', 'roman');
+
+        $response = $middleware->process($request, $this->nextHandler);
+        $this->assertEquals(200, $response->getStatusCode());
+    }
+
+    public function testForTestScopePayloadTargetFailsClosedOnUnparseableBody(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->never())->method('check');
+
+        $scopeResolver = new TestScopeResolver(sys_get_temp_dir());
+        $middleware    = OpenFgaAuthorizationMiddleware::forTestScopePayloadTarget($client, $scopeResolver);
+
+        // No withParsedBody(): getParsedBody() is null, so resolveFromPayload() returns
+        // null and the resolver fails closed.
+        $request = ( new ServerRequest('PATCH', '/tests/roman/SomeItTest', [], 'not-json') )
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'SomeItTest')
+            ->withAttribute('test_rite', 'roman');
+
+        $this->expectException(ForbiddenException::class);
+        $middleware->process($request, $this->nextHandler);
+    }
+
+    /**
+     * Issue #790's actual exploit, reproduced at the middleware layer: a caller scoped
+     * to national_calendar_test:roman/IT holds `editor` on the STORED scope (satisfying
+     * forTestScopes()) but NOT on the payload-derived TARGET scope
+     * (national_calendar_test:roman/US). Piping both middleware instances — exactly as
+     * Router::configureAuthorizationPipeline() does — must deny the request.
+     */
+    public function testUnionDeniesWhenCallerHoldsStoredScopeButNotPayloadTarget(): void
+    {
+        $client = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->exactly(2))
+            ->method('check')
+            ->willReturnMap([
+                ['user:user-123', 'editor', 'national_calendar_test:roman/IT', true],
+                ['user:user-123', 'editor', 'national_calendar_test:roman/US', false],
+            ]);
+
+        // Stored file: scoped to IT (the caller's granted scope).
+        $tempDir     = sys_get_temp_dir() . '/fga_test_' . uniqid();
+        $tempRiteDir = $tempDir . '/roman';
+        $tempFile    = $tempRiteDir . '/SomeItTest.json';
+        mkdir($tempRiteDir, 0777, true);
+        $this->tempPaths[] = $tempDir;
+        $this->tempPaths[] = $tempRiteDir;
+        $this->tempPaths[] = $tempFile;
+        file_put_contents(
+            $tempFile,
+            (string) json_encode(['applies_to' => ['rite' => 'roman', 'national_calendar' => 'IT']])
+        );
+        $scopeResolver = new TestScopeResolver($tempDir);
+
+        $storedScopeMiddleware   = OpenFgaAuthorizationMiddleware::forTestScopes($client, $scopeResolver);
+        $payloadTargetMiddleware = OpenFgaAuthorizationMiddleware::forTestScopePayloadTarget($client, $scopeResolver);
+
+        // Payload's applies_to attempts to move the test to US.
+        $payload = ['applies_to' => ['rite' => 'roman', 'national_calendar' => 'US']];
+        $request = ( new ServerRequest('PATCH', '/tests/roman/SomeItTest', [], (string) json_encode($payload)) )
+            ->withParsedBody($payload)
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'SomeItTest')
+            ->withAttribute('test_rite', 'roman');
+
+        // Simulate the pipeline: forTestScopes() runs first (would pass), and its handler
+        // is forTestScopePayloadTarget() (which must deny) — mirroring Router's ordering.
+        $innerHandler = new class ($payloadTargetMiddleware, $this->nextHandler) implements RequestHandlerInterface {
+            public function __construct(
+                private OpenFgaAuthorizationMiddleware $middleware,
+                private RequestHandlerInterface $next
+            ) {
+            }
+
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                return $this->middleware->process($request, $this->next);
+            }
+        };
+
+        $this->expectException(ForbiddenException::class);
+        $this->expectExceptionMessage('national_calendar_test:roman/US');
+        $storedScopeMiddleware->process($request, $innerHandler);
+    }
+
+    /**
+     * Twin of the exploit test above: the caller holds `editor` on BOTH the stored scope
+     * and the payload-derived target scope, so the re-scoping PATCH is allowed through.
+     */
+    public function testUnionAllowsWhenCallerHoldsBothStoredAndPayloadTargetScopes(): void
+    {
+        // Record the actual objects check() was called with, not just the call count: a
+        // resolver-collapsing mutant (e.g. both middleware instances resolving to the
+        // SAME object) would still trigger exactly 2 calls here — one per middleware
+        // instance — and a bare exactly(2) assertion would not notice. Asserting the
+        // recorded objects afterwards makes that distinction observable.
+        $checkedObjects = [];
+        $client         = $this->createMock(OpenFgaClient::class);
+        $client->expects($this->exactly(2))
+            ->method('check')
+            ->willReturnCallback(function (string $user, string $relation, string $object) use (&$checkedObjects): bool {
+                $checkedObjects[] = $object;
+                return match ($object) {
+                    'national_calendar_test:roman/IT', 'national_calendar_test:roman/US' => true,
+                    default => false,
+                };
+            });
+
+        $tempDir     = sys_get_temp_dir() . '/fga_test_' . uniqid();
+        $tempRiteDir = $tempDir . '/roman';
+        $tempFile    = $tempRiteDir . '/SomeItTest.json';
+        mkdir($tempRiteDir, 0777, true);
+        $this->tempPaths[] = $tempDir;
+        $this->tempPaths[] = $tempRiteDir;
+        $this->tempPaths[] = $tempFile;
+        file_put_contents(
+            $tempFile,
+            (string) json_encode(['applies_to' => ['rite' => 'roman', 'national_calendar' => 'IT']])
+        );
+        $scopeResolver = new TestScopeResolver($tempDir);
+
+        $storedScopeMiddleware   = OpenFgaAuthorizationMiddleware::forTestScopes($client, $scopeResolver);
+        $payloadTargetMiddleware = OpenFgaAuthorizationMiddleware::forTestScopePayloadTarget($client, $scopeResolver);
+
+        $payload = ['applies_to' => ['rite' => 'roman', 'national_calendar' => 'US']];
+        $request = ( new ServerRequest('PATCH', '/tests/roman/SomeItTest', [], (string) json_encode($payload)) )
+            ->withParsedBody($payload)
+            ->withAttribute('oidc_user', ['sub' => 'user-123', 'roles' => ['test_editor']])
+            ->withAttribute('test_id', 'SomeItTest')
+            ->withAttribute('test_rite', 'roman');
+
+        $innerHandler = new class ($payloadTargetMiddleware, $this->nextHandler) implements RequestHandlerInterface {
+            public function __construct(
+                private OpenFgaAuthorizationMiddleware $middleware,
+                private RequestHandlerInterface $next
+            ) {
+            }
+
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                return $this->middleware->process($request, $this->next);
+            }
+        };
+
+        $response = $storedScopeMiddleware->process($request, $innerHandler);
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEqualsCanonicalizing(
+            ['national_calendar_test:roman/IT', 'national_calendar_test:roman/US'],
+            $checkedObjects,
+            'Expected one check() against the STORED scope and one against the payload-derived TARGET scope'
+        );
+    }
 }

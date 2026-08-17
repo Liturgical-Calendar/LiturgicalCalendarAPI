@@ -7,9 +7,11 @@ namespace LiturgicalCalendar\Tests\Handlers;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\TestsHandler;
+use LiturgicalCalendar\Api\Http\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Http\Exception\ConflictException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
+use LiturgicalCalendar\Api\Http\Exception\UnsupportedMediaTypeException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -223,6 +225,34 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         ( new TestsHandler() )->handle(
             $this->requestFor('PATCH', '/tests', [], ['name' => 'SomeTest'])
         );
+    }
+
+    /**
+     * Issue #790 follow-up: Router::route() restricts /tests writes to application/json
+     * only. OpenFgaAuthorizationMiddleware's scope resolvers (forTestScopes()'s PUT-create
+     * fallback, and forTestScopePayloadTarget()) only ever see getParsedBody(), which
+     * JsonBodyParserMiddleware never populates for a YAML body — so a YAML PUT/PATCH was
+     * never actually authorizable; it just failed unpredictably depending on whether
+     * OpenFGA was configured (403 when it was, an inconsistent "worked" when it wasn't).
+     * Mirroring the Router's restriction directly on the handler here (this test harness
+     * bypasses the middleware pipeline entirely) pins that a YAML body is now rejected
+     * with a clear, content-type-specific 415 rather than either of those — a
+     * UnsupportedMediaTypeException, never a ForbiddenException.
+     */
+    public function testPatchWithYamlContentTypeIsRejectedAsUnsupportedMediaType(): void
+    {
+        $handler = ( new TestsHandler(['SomeTest'], Rite::ROMAN) )
+            ->setAllowedRequestContentTypes([RequestContentType::JSON]);
+
+        $request = $this->requestFor(
+            'PATCH',
+            '/tests/roman/SomeTest',
+            ['Content-Type' => 'application/yaml'],
+            "name: SomeTest\n"
+        );
+
+        $this->expectException(UnsupportedMediaTypeException::class);
+        $handler->handle($request);
     }
 
     public function testPatchNonexistentTestIsUnprocessable(): void
@@ -536,28 +566,13 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         );
     }
 
-    public function testPatchPayloadEchoingTheCorrectScopeIsAcceptedAndStripped(): void
+    public function testPatchUnchangedScopeEchoIsAcceptedAndStripped(): void
     {
-        // PATCH counterpart of the PUT echo test above, designed to kill two mutants a
-        // plain "unchanged applies_to" PATCH echo would NOT catch:
-        //
-        //   1. Deleting the assertPayloadScopeAgrees() call from handlePatchRequest():
-        //      with nothing validating/stripping `scope`, it would simply be written
-        //      to disk verbatim.
-        //   2. Forcing `$resolved` to always take the create-time resolveFromPayload()
-        //      fallback (i.e. resolve() against the file already on disk is never
-        //      consulted): if the payload's own applies_to always agreed with what is
-        //      already on disk, that fallback would silently compute the SAME answer
-        //      and the mutant would be invisible.
-        //
-        // To make (2) observable, the fixture is seeded scoped to a national calendar
-        // (national_calendar_test:roman/US, PrayerUnbornTest's applies_to) and the PATCH
-        // re-scopes it back to the rite level (drops applies_to.national_calendar) while
-        // echoing the scope the ORIGINAL, on-disk resource resolves to -- exactly what a
-        // client's prior GET would have returned before this edit. The real resolve()
-        // path reads the file as it stands *before* the write and accepts the echo; the
-        // mutant recomputes from the NEW payload's applies_to (rite_calendar_test:roman)
-        // and rejects it as a mismatch, turning the 200 into a 422.
+        // PATCH counterpart of the PUT echo test above: the ordinary load-edit-save cycle
+        // where applies_to is untouched, so the payload-derived scope equals the stored
+        // scope. Designed to kill the mutant that deletes the assertPayloadScopeAgrees()
+        // call from handlePatchRequest(): with nothing validating/stripping `scope`, it
+        // would simply be written to disk verbatim.
         /** @var array<string,mixed> $onDisk */
         $onDisk         = json_decode(
             (string) file_get_contents(JsonData::testsFolderFor(Rite::ROMAN)->path() . '/PrayerUnbornTest.json'),
@@ -568,20 +583,90 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         $this->testFixturePath = JsonData::testsFolderFor(Rite::ROMAN)->path() . '/ZzzScopePatchEchoTest.json';
         file_put_contents($this->testFixturePath, json_encode($onDisk, JSON_THROW_ON_ERROR));
 
-        $payload               = $onDisk;
-        $payload['applies_to'] = ['rite' => 'roman']; // drops national_calendar => re-scopes to the rite level
-        $payload['scope']      = ['object_type' => 'national_calendar_test', 'object_id' => 'roman/US'];
+        // applies_to is unchanged, and `scope` echoes exactly what a prior GET would have
+        // returned for it (national_calendar_test:roman/US, from PrayerUnbornTest's applies_to).
+        $payload          = $onDisk;
+        $payload['scope'] = ['object_type' => 'national_calendar_test', 'object_id' => 'roman/US'];
 
         $response = ( new TestsHandler(['ZzzScopePatchEchoTest'], Rite::ROMAN) )->handle(
             $this->requestFor('PATCH', '/tests/roman/ZzzScopePatchEchoTest', [], $payload)
         );
         self::assertSame(200, $response->getStatusCode());
 
-        // The echoed scope must NOT be persisted on the PATCH path either, and the
-        // re-scoping itself must have taken effect.
+        // The echoed scope must NOT be persisted on the PATCH path either.
+        /** @var array<string,mixed> $stored */
+        $stored = json_decode((string) file_get_contents($this->testFixturePath), true);
+        self::assertArrayNotHasKey('scope', $stored);
+        self::assertSame($onDisk['applies_to'], $stored['applies_to']);
+    }
+
+    /**
+     * Issue #790: once PATCH is allowed to re-scope a test, the `scope` echo it accepts
+     * must be the scope the payload's `applies_to` resolves to (the NEW scope) — never the
+     * scope the stored file had before the write. Accepting the stale echo would be
+     * incoherent with what `OpenFgaAuthorizationMiddleware::forTestScopePayloadTarget()`
+     * actually authorized (the new scope), and would let a client keep proving it once knew
+     * the old scope rather than the one this write is landing in.
+     *
+     * The fixture is seeded scoped to a national calendar (national_calendar_test:roman/US,
+     * PrayerUnbornTest's applies_to) and the PATCH re-scopes it to the rite level (drops
+     * applies_to.national_calendar) while echoing the NEW scope the payload resolves to.
+     */
+    public function testPatchReScopingWithNewScopeEchoIsAcceptedAndStripped(): void
+    {
+        /** @var array<string,mixed> $onDisk */
+        $onDisk         = json_decode(
+            (string) file_get_contents(JsonData::testsFolderFor(Rite::ROMAN)->path() . '/PrayerUnbornTest.json'),
+            true
+        );
+        $onDisk['name'] = 'ZzzScopeReScopeNewEchoTest';
+
+        $this->testFixturePath = JsonData::testsFolderFor(Rite::ROMAN)->path() . '/ZzzScopeReScopeNewEchoTest.json';
+        file_put_contents($this->testFixturePath, json_encode($onDisk, JSON_THROW_ON_ERROR));
+
+        $payload               = $onDisk;
+        $payload['applies_to'] = ['rite' => 'roman']; // drops national_calendar => re-scopes to the rite level
+        $payload['scope']      = ['object_type' => 'rite_calendar_test', 'object_id' => 'roman']; // the NEW scope
+
+        $response = ( new TestsHandler(['ZzzScopeReScopeNewEchoTest'], Rite::ROMAN) )->handle(
+            $this->requestFor('PATCH', '/tests/roman/ZzzScopeReScopeNewEchoTest', [], $payload)
+        );
+        self::assertSame(200, $response->getStatusCode());
+
+        // The echoed scope must NOT be persisted, and the re-scoping itself took effect.
         /** @var array<string,mixed> $stored */
         $stored = json_decode((string) file_get_contents($this->testFixturePath), true);
         self::assertArrayNotHasKey('scope', $stored);
         self::assertSame(['rite' => 'roman'], $stored['applies_to']);
+    }
+
+    /**
+     * Twin of testPatchReScopingWithNewScopeEchoIsAcceptedAndStripped(): the same re-scoping
+     * PATCH, but echoing the STALE (pre-write, on-disk) scope instead of the new one. That
+     * must now be rejected — accepting it would be exactly the incoherence #790's fix closes.
+     */
+    public function testPatchReScopingWithStaleScopeEchoIsRejected(): void
+    {
+        /** @var array<string,mixed> $onDisk */
+        $onDisk         = json_decode(
+            (string) file_get_contents(JsonData::testsFolderFor(Rite::ROMAN)->path() . '/PrayerUnbornTest.json'),
+            true
+        );
+        $onDisk['name'] = 'ZzzScopeReScopeStaleEchoTest';
+
+        $this->testFixturePath = JsonData::testsFolderFor(Rite::ROMAN)->path() . '/ZzzScopeReScopeStaleEchoTest.json';
+        file_put_contents($this->testFixturePath, json_encode($onDisk, JSON_THROW_ON_ERROR));
+
+        $payload               = $onDisk;
+        $payload['applies_to'] = ['rite' => 'roman']; // drops national_calendar => re-scopes to the rite level
+        // Echoes the OLD, now-obsolete scope — what a client's prior GET (before this edit)
+        // would have returned.
+        $payload['scope'] = ['object_type' => 'national_calendar_test', 'object_id' => 'roman/US'];
+
+        $this->expectException(UnprocessableContentException::class);
+        $this->expectExceptionMessage('does not match the scope this test resolves to');
+        ( new TestsHandler(['ZzzScopeReScopeStaleEchoTest'], Rite::ROMAN) )->handle(
+            $this->requestFor('PATCH', '/tests/roman/ZzzScopeReScopeStaleEchoTest', [], $payload)
+        );
     }
 }

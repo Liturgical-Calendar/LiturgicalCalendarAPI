@@ -39,6 +39,11 @@ use Psr\Http\Server\RequestHandlerInterface;
  * Object ids that name a calendar are rite-qualified: a bare calendar id does not
  * identify a calendar, since the source tree is partitioned by rite and the same
  * diocese could be defined under both (issue #786). See {@see RiteScopedObjectId}.
+ *
+ * `PATCH /tests/{rite}/{id}` is authorized by two piped instances: {@see forTestScopes()}
+ * checks the stored scope, {@see forTestScopePayloadTarget()} checks the payload-derived
+ * scope. Both must pass, so re-scoping a test via PATCH requires `editor` on both the old
+ * and the new scope (issue #790).
  */
 final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
 {
@@ -305,6 +310,48 @@ final class OpenFgaAuthorizationMiddleware implements MiddlewareInterface
             null,
             $objectResolver,
             ['PUT' => 'editor', 'PATCH' => 'editor', 'DELETE' => 'admin']
+        );
+    }
+
+    /**
+     * Create middleware that authorizes a PATCH's payload-derived target scope, alongside
+     * {@see forTestScopes()}'s stored-scope check.
+     *
+     * `PATCH /tests/{rite}/{name}` authorizes against the scope resolved from the *stored*
+     * file (via `forTestScopes()`), but the handler writes the *payload's* `applies_to` —
+     * which may name a different scope. Piped right after `forTestScopes()`, this instance
+     * closes that gap by requiring `editor` on the payload-derived scope too, so a PATCH that
+     * re-scopes a test needs `editor` on both the old and the new scope (issue #790). This
+     * mirrors the PUT rule: you may write only where you may write.
+     *
+     * The relation map only defines `PATCH`; every other method resolves to a null relation in
+     * `process()`, which passes the request through without invoking the resolver — so this
+     * instance is inert for PUT/DELETE and the resolver never needs its own method guard.
+     *
+     * When the payload does not change the scope, this resolves to the same object
+     * `forTestScopes()` already checked — a redundant but harmless extra `check()` call.
+     *
+     * @param OpenFgaClient     $client   The OpenFGA client
+     * @param TestScopeResolver $resolver Scope resolver for the test
+     * @return self Configured middleware
+     */
+    public static function forTestScopePayloadTarget(OpenFgaClient $client, TestScopeResolver $resolver): self
+    {
+        $objectResolver = static function (ServerRequestInterface $request) use ($resolver): ?array {
+            // Same payload source as forTestScopes()'s PUT-create fallback: getParsedBody()
+            // (populated by JsonBodyParserMiddleware earlier in the pipeline), never the raw
+            // stream, so the body is never consumed here. A missing/unparseable body yields
+            // null and fails closed.
+            return $resolver->resolveFromPayload($request->getParsedBody());
+        };
+
+        return new self(
+            $client,
+            '',
+            '',
+            null,
+            $objectResolver,
+            ['PATCH' => 'editor']
         );
     }
 
