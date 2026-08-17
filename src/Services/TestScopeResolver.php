@@ -11,13 +11,17 @@ use LiturgicalCalendar\Api\Enum\Rite;
  * Maps a test file name to the OpenFGA (object type, object id) pair that
  * scopes the test within the authorization model.
  *
- * Reads `{testsRoot}/{rite}/{testName}.json` and inspects the top-level `applies_to`
- * key:
+ * {@see resolve()} reads `{testsRoot}/{rite}/{testName}.json` and inspects the top-level
+ * `applies_to` key, leniently:
  *
  *   - `{"rite": "<r>", "diocesan_calendar": "<id>"}` → `['diocesan_calendar_test', '<r>/<id>']`
  *   - `{"rite": "<r>", "national_calendar": "<id>"}` → `['national_calendar_test', '<r>/<id>']`
  *   - `{"rite": "<r>"}`                              → `['rite_calendar_test', '<r>']`
  *   - absent / empty / other                         → `['rite_calendar_test', 'roman']`
+ *
+ * {@see resolveFromPayload()} maps the same shapes, EXCEPT the last row: a payload with no
+ * (or non-array) `applies_to` returns `null` rather than the lenient rite-level default,
+ * since a payload authorizes a write and must name its own scope (#790 follow-up).
  *
  * **Every scope carries its rite.** A calendar id alone does not identify a
  * calendar: `lugano_ch` could name an Ambrosian calendar or a Roman one, and the
@@ -126,7 +130,16 @@ final class TestScopeResolver
 
     /**
      * Resolve the FGA scope pair for a test that does not yet exist on disk,
-     * using the decoded request payload's `applies_to` key (create flow).
+     * using the decoded request payload's `applies_to` key (create flow), or for a
+     * PATCH's re-scoping target (#790).
+     *
+     * Unlike {@see resolve()}, this path is strict: a payload authorizes a *write*, so it
+     * must name its own scope via `applies_to`, or authorization fails closed here rather
+     * than defaulting to the lenient `rite_calendar_test` scope and depending on a
+     * downstream semantic guard (`TestsHandler::assertPayloadRiteMatchesPath()`) to catch
+     * the omission. `resolve()` keeps the lenient default: it reads *stored* files,
+     * including legacy ones written before `applies_to.rite` was required, and making that
+     * path strict would break authorization for existing tests.
      *
      * @param mixed $decoded The json_decode'd (assoc mode) request body
      * @return array{0: string, 1: string}|null
@@ -137,7 +150,11 @@ final class TestScopeResolver
             return null;
         }
 
-        return self::mapAppliesTo($decoded['applies_to'] ?? null);
+        if (!isset($decoded['applies_to']) || !is_array($decoded['applies_to'])) {
+            return null;
+        }
+
+        return self::mapAppliesTo($decoded['applies_to']);
     }
 
     /**

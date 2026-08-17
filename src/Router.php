@@ -633,10 +633,16 @@ class Router
                 } else {
                     $testsHandler->setAllowedRequestMethods([]);
                 }
+                // Request bodies are JSON-only (issue #790 follow-up): OpenFgaAuthorizationMiddleware's
+                // scope resolvers read getParsedBody(), which JsonBodyParserMiddleware only populates
+                // for application/json — a YAML or form-urlencoded PUT/PATCH body was never actually
+                // authorizable, it just failed inconsistently (403 when OpenFGA is configured, silently
+                // "worked" when it is not) instead of failing predictably. openapi.json already declares
+                // only application/json for these request bodies, so this makes the handler match what
+                // was already the documented and only-working contract. Response content types are
+                // unaffected — YAML remains a supported Accept header below.
                 $testsHandler->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
-                    RequestContentType::YAML,
-                    RequestContentType::FORMDATA
                 ])->setAllowedAcceptHeaders([
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
@@ -880,6 +886,10 @@ class Router
                     ->withAttribute('test_id', $requestPathParts[0])
                     ->withAttribute('test_rite', $testsRite?->value);
                 $pipeline->pipe(OpenFgaAuthorizationMiddleware::forTestScopes($fgaClient, new TestScopeResolver()));
+                // Union check (#790): a PATCH that re-scopes a test also needs editor on the
+                // payload-derived target scope, not just the stored one above. Inert for
+                // PUT/DELETE — see forTestScopePayloadTarget()'s docblock.
+                $pipeline->pipe(OpenFgaAuthorizationMiddleware::forTestScopePayloadTarget($fgaClient, new TestScopeResolver()));
             }
         } elseif ($route === 'temporale') {
             $pipeline->pipe(AuthorizationMiddleware::forCalendarEditor());
