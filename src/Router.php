@@ -633,10 +633,16 @@ class Router
                 } else {
                     $testsHandler->setAllowedRequestMethods([]);
                 }
+                // Request bodies are JSON-only (issue #790 follow-up): OpenFgaAuthorizationMiddleware's
+                // scope resolvers read getParsedBody(), which JsonBodyParserMiddleware only populates
+                // for application/json — a YAML or form-urlencoded PUT/PATCH body was never actually
+                // authorizable, it just failed inconsistently (403 when OpenFGA is configured, silently
+                // "worked" when it is not) instead of failing predictably. openapi.json already declares
+                // only application/json for these request bodies, so this makes the handler match what
+                // was already the documented and only-working contract. Response content types are
+                // unaffected — YAML remains a supported Accept header below.
                 $testsHandler->setAllowedRequestContentTypes([
                     RequestContentType::JSON,
-                    RequestContentType::YAML,
-                    RequestContentType::FORMDATA
                 ])->setAllowedAcceptHeaders([
                     AcceptHeader::JSON,
                     AcceptHeader::YAML

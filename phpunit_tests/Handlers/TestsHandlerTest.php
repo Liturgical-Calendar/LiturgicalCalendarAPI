@@ -7,9 +7,11 @@ namespace LiturgicalCalendar\Tests\Handlers;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\TestsHandler;
+use LiturgicalCalendar\Api\Http\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Http\Exception\ConflictException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
+use LiturgicalCalendar\Api\Http\Exception\UnsupportedMediaTypeException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -223,6 +225,34 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         ( new TestsHandler() )->handle(
             $this->requestFor('PATCH', '/tests', [], ['name' => 'SomeTest'])
         );
+    }
+
+    /**
+     * Issue #790 follow-up: Router::route() restricts /tests writes to application/json
+     * only. OpenFgaAuthorizationMiddleware's scope resolvers (forTestScopes()'s PUT-create
+     * fallback, and forTestScopePayloadTarget()) only ever see getParsedBody(), which
+     * JsonBodyParserMiddleware never populates for a YAML body — so a YAML PUT/PATCH was
+     * never actually authorizable; it just failed unpredictably depending on whether
+     * OpenFGA was configured (403 when it was, an inconsistent "worked" when it wasn't).
+     * Mirroring the Router's restriction directly on the handler here (this test harness
+     * bypasses the middleware pipeline entirely) pins that a YAML body is now rejected
+     * with a clear, content-type-specific 415 rather than either of those — a
+     * UnsupportedMediaTypeException, never a ForbiddenException.
+     */
+    public function testPatchWithYamlContentTypeIsRejectedAsUnsupportedMediaType(): void
+    {
+        $handler = ( new TestsHandler(['SomeTest'], Rite::ROMAN) )
+            ->setAllowedRequestContentTypes([RequestContentType::JSON]);
+
+        $request = $this->requestFor(
+            'PATCH',
+            '/tests/roman/SomeTest',
+            ['Content-Type' => 'application/yaml'],
+            "name: SomeTest\n"
+        );
+
+        $this->expectException(UnsupportedMediaTypeException::class);
+        $handler->handle($request);
     }
 
     public function testPatchNonexistentTestIsUnprocessable(): void

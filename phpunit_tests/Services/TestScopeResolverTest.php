@@ -35,6 +35,12 @@ final class TestScopeResolverTest extends TestCase
     {
         // Legacy files written before applies_to.rite became required still
         // have to resolve to *something*; the default rite is Roman.
+        //
+        // This also pins the #790 follow-up constraint that resolve() — unlike the now-
+        // strict resolveFromPayload() (see TestScopeResolverTest::
+        // testResolveFromPayloadWithoutAppliesToFailsClosed()) — must KEEP this lenient
+        // default: it reads stored files, and making this path strict would break
+        // authorization for existing tests written before applies_to was required.
         $r = new TestScopeResolver($this->fixturesDir);
         $this->assertSame(
             ['rite_calendar_test', 'roman'],
@@ -125,13 +131,29 @@ final class TestScopeResolverTest extends TestCase
         );
     }
 
-    public function testResolveFromPayloadDefaultsToRomanRite(): void
+    /**
+     * Issue #790 follow-up: unlike resolve() (which must stay lenient for legacy stored
+     * files), resolveFromPayload() authorizes a *write* — a payload with no `applies_to`
+     * at all must fail closed rather than silently default to the rite-level scope. This
+     * pins the tightened contract; it replaces what was previously
+     * testResolveFromPayloadDefaultsToRomanRite(), which asserted the lenient default this
+     * change deliberately removes for the payload path only.
+     */
+    public function testResolveFromPayloadWithoutAppliesToFailsClosed(): void
     {
         $r = new TestScopeResolver($this->fixturesDir);
-        $this->assertSame(
-            ['rite_calendar_test', 'roman'],
-            $r->resolveFromPayload(['name' => 'SomeTest'])
-        );
+        $this->assertNull($r->resolveFromPayload(['name' => 'SomeTest']));
+    }
+
+    /**
+     * Twin of the above: `applies_to` present but not an array (e.g. a client sending a
+     * string or null) must also fail closed, not be coerced into the lenient default.
+     */
+    public function testResolveFromPayloadWithNonArrayAppliesToFailsClosed(): void
+    {
+        $r = new TestScopeResolver($this->fixturesDir);
+        $this->assertNull($r->resolveFromPayload(['applies_to' => 'roman']));
+        $this->assertNull($r->resolveFromPayload(['applies_to' => null]));
     }
 
     public function testResolveFromPayloadRomanRite(): void

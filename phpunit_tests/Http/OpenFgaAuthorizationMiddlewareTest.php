@@ -927,13 +927,22 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
      */
     public function testUnionAllowsWhenCallerHoldsBothStoredAndPayloadTargetScopes(): void
     {
-        $client = $this->createMock(OpenFgaClient::class);
+        // Record the actual objects check() was called with, not just the call count: a
+        // resolver-collapsing mutant (e.g. both middleware instances resolving to the
+        // SAME object) would still trigger exactly 2 calls here — one per middleware
+        // instance — and a bare exactly(2) assertion would not notice. Asserting the
+        // recorded objects afterwards makes that distinction observable.
+        $checkedObjects = [];
+        $client         = $this->createMock(OpenFgaClient::class);
         $client->expects($this->exactly(2))
             ->method('check')
-            ->willReturnMap([
-                ['user:user-123', 'editor', 'national_calendar_test:roman/IT', true],
-                ['user:user-123', 'editor', 'national_calendar_test:roman/US', true],
-            ]);
+            ->willReturnCallback(function (string $user, string $relation, string $object) use (&$checkedObjects): bool {
+                $checkedObjects[] = $object;
+                return match ($object) {
+                    'national_calendar_test:roman/IT', 'national_calendar_test:roman/US' => true,
+                    default => false,
+                };
+            });
 
         $tempDir     = sys_get_temp_dir() . '/fga_test_' . uniqid();
         $tempRiteDir = $tempDir . '/roman';
@@ -973,5 +982,10 @@ class OpenFgaAuthorizationMiddlewareTest extends TestCase
 
         $response = $storedScopeMiddleware->process($request, $innerHandler);
         $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEqualsCanonicalizing(
+            ['national_calendar_test:roman/IT', 'national_calendar_test:roman/US'],
+            $checkedObjects,
+            'Expected one check() against the STORED scope and one against the payload-derived TARGET scope'
+        );
     }
 }
