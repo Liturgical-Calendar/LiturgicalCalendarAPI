@@ -1314,6 +1314,27 @@ final class RegionalDataHandler extends AbstractHandler
     }
 
     /**
+     * Translate a payload \ValueError from the RegionalData model layer into a 422.
+     *
+     * The models validate invariants the JSON schema cannot express — chiefly that
+     * `i18n` keys exactly the locales `metadata.locales` announces — and signal a
+     * breach with a plain \ValueError. Uncaught that is a 500, which misreports a
+     * client-data problem as a server fault (issue #462).
+     *
+     * The translation lives here rather than in the models because the very same
+     * DTOs load calendars from disk. There, a mismatch is OUR bug in stored data,
+     * not the caller's, and must stay a server error — so only the request path may
+     * reinterpret it as unprocessable content.
+     *
+     * @param \ValueError $e The error raised while building the DTO
+     * @return UnprocessableContentException Ready to throw at the call site
+     */
+    private static function payloadValueError(\ValueError $e): UnprocessableContentException
+    {
+        return new UnprocessableContentException($e->getMessage());
+    }
+
+    /**
      * Validate payload data against a schema
      *
      * @param \stdClass $data Data to validate
@@ -1762,8 +1783,14 @@ final class RegionalDataHandler extends AbstractHandler
                             throw new UnprocessableContentException('The litcal array must contain at least one liturgical event');
                         }
                         $params['rawPayload'] = $payload;  // Store raw for writing to disk
-                        $params['payload']    = DiocesanData::fromObject($payload);  // DTO for property access
-                        $key                  = $params['payload']->metadata->diocese_id;
+                        // DTO for property access. See payloadValueError() for why the
+                        // model layer's \ValueError has to be translated here.
+                        try {
+                            $params['payload'] = DiocesanData::fromObject($payload);
+                        } catch (\ValueError $e) {
+                            throw self::payloadValueError($e);
+                        }
+                        $key = $params['payload']->metadata->diocese_id;
                     }
                     break;
                 case PathCategory::NATION:
@@ -1777,8 +1804,12 @@ final class RegionalDataHandler extends AbstractHandler
                             throw new UnprocessableContentException('The litcal array must contain at least one liturgical event');
                         }
                         $params['rawPayload'] = $payload;  // Store raw for writing to disk
-                        $params['payload']    = NationalData::fromObject($payload);  // DTO for property access
-                        $key                  = $params['payload']->metadata->nation;
+                        try {
+                            $params['payload'] = NationalData::fromObject($payload);
+                        } catch (\ValueError $e) {
+                            throw self::payloadValueError($e);
+                        }
+                        $key = $params['payload']->metadata->nation;
                     }
                     break;
                 case PathCategory::WIDERREGION:
@@ -1792,8 +1823,12 @@ final class RegionalDataHandler extends AbstractHandler
                             throw new UnprocessableContentException('The litcal array must contain at least one liturgical event');
                         }
                         $params['rawPayload'] = $payload;  // Store raw for writing to disk
-                        $params['payload']    = WiderRegionData::fromObject($payload);  // DTO for property access
-                        $key                  = $params['payload']->metadata->wider_region;
+                        try {
+                            $params['payload'] = WiderRegionData::fromObject($payload);
+                        } catch (\ValueError $e) {
+                            throw self::payloadValueError($e);
+                        }
+                        $key = $params['payload']->metadata->wider_region;
                     }
                     break;
                 default:

@@ -696,6 +696,52 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
     }
 
     /**
+     * A payload whose `i18n` covers fewer locales than `metadata.locales` announces must be
+     * rejected as unprocessable content, NOT crash with an uncaught \ValueError (issue #462).
+     *
+     * JSON Schema cannot express "the keys of this object equal the values of that array", so
+     * the invariant is enforced in the RegionalData model layer, which signals a breach with a
+     * plain \ValueError. Nothing on the write path caught it, so a client that submitted a
+     * short `i18n` — which the diocesan editor did whenever a save beat its secondary-locale
+     * translation fetch — got a 500 blaming the server for its own bad request.
+     *
+     * Covered here for the diocesan and national categories; wider-region reaches the same
+     * model check through the identical `fromObject()` write path.
+     */
+    public function testPutDiocesanCalendarRejectsI18nNarrowerThanDeclaredLocales(): void
+    {
+        $payload                        = self::diocesanPayloadWithColor('ambrosian', 'morello', 'novara_it', 'Diocesi di Novara');
+        $payload['metadata']['locales'] = ['it_IT', 'la_VA'];
+        // `i18n` still carries it_IT alone — exactly the mismatch the model rejects.
+
+        $this->expectException(UnprocessableContentException::class);
+        // Assert on the message, not merely the type: many unrelated conditions on this path
+        // also raise UnprocessableContentException, so a bare type assertion could pass for
+        // the wrong reason.
+        $this->expectExceptionMessage('keys of i18n parameter must be the same as the values of metadata.locales');
+
+        ( new RegionalDataHandler(['diocese', 'novara_it']) )
+            ->handle($this->requestFor('PUT', '/data/diocese/novara_it', [], $payload));
+    }
+
+    /**
+     * The national category has its own `fromObject()` call, so it needs its own guard — the
+     * defect was never diocese-specific.
+     */
+    public function testPutNationalCalendarRejectsI18nNarrowerThanDeclaredLocales(): void
+    {
+        $payload                        = self::mtNationalCalendarPayload();
+        $payload['metadata']['locales'] = ['en_MT', 'it_IT'];
+        // `i18n` still carries en_MT alone.
+
+        $this->expectException(UnprocessableContentException::class);
+        $this->expectExceptionMessage('keys of i18n parameter must be the same as the values of metadata.locales');
+
+        ( new RegionalDataHandler(['nation', 'MT']) )
+            ->handle($this->requestFor('PUT', '/data/nation/MT', [], $payload));
+    }
+
+    /**
      * @return array<string,mixed>
      */
     private static function diocesanPayloadWithColor(string $rite, string $color, string $dioceseId, string $dioceseName): array
