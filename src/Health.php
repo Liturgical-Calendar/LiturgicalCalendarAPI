@@ -1948,6 +1948,7 @@ class Health implements MessageComponentInterface
             JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_2008/propriumdesanctis_2008.json'       => LitSchema::PROPRIUMDESANCTIS->path(),
             JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json' => LitSchema::PROPRIUMDESANCTIS->path(),
             JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json' => LitSchema::PROPRIUMDESANCTIS->path(),
+            JsonData::AMBROSIAN_TEMPORALE_FILE->value                                                     => LitSchema::PROPRIUMDETEMPORE->path(),
             JsonData::AMBROSIAN_SANCTORALE_FILE->value                                                    => LitSchema::PROPRIUMDESANCTIS->path(),
             Route::CALENDARS->path()                                                                      => LitSchema::METADATA->path(),
             Route::DECREES->path()                                                                        => LitSchema::DECREES->path(),
