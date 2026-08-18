@@ -11,53 +11,53 @@
     "json.schemas": [
         {
             "fileMatch": [
-                "/sourcedata/missals/propriumdesanctis_*.json"
+                "/jsondata/sourcedata/rite/*/missals/propriumdesanctis_*/propriumdesanctis*.json"
             ],
             "url": "./jsondata/schemas/PropriumDeSanctis.json"
         },
         {
             "fileMatch": [
-                "/sourcedata/missals/propriumdetempore.json"
+                "/jsondata/sourcedata/rite/*/missals/propriumdetempore/propriumdetempore.json"
             ],
             "url": "./jsondata/schemas/PropriumDeTempore.json"
         },
         {
             "fileMatch": [
-                "/sourcedata/decrees/decrees.json"
+                "/jsondata/sourcedata/rite/*/decrees/decrees.json"
             ],
             "url": "./jsondata/schemas/LitCalDecreesSource.json"
         },
         {
             "fileMatch": [
-                "/sourcedata/calendars/wider_regions/*/*.json"
+                "/jsondata/sourcedata/rite/*/calendars/wider_regions/*/*.json"
             ],
             "url": "./jsondata/schemas/WiderRegionCalendar.json"
         },
         {
             "fileMatch": [
-                "/sourcedata/calendars/nations/*/*.json"
+                "/jsondata/sourcedata/rite/*/calendars/nations/*/*.json"
             ],
             "url": "./jsondata/schemas/NationalCalendar.json"
         },
         {
             "fileMatch": [
-                "/sourcedata/calendars/dioceses/*/*/*.json"
+                "/jsondata/sourcedata/rite/*/calendars/dioceses/*/*/*.json"
             ],
             "url": "./jsondata/schemas/DiocesanCalendar.json"
         },
         {
             "fileMatch": [
-                "/sourcedata/tests/*.json"
+                "/jsondata/tests/*/*.json"
             ],
             "url": "./jsondata/schemas/LitCalTest.json"
         },
         {
             "fileMatch": [
-                "/sourcedata/calendars/dioceses/*/*/i18n/*.json",
-                "/sourcedata/calendars/nations/*/i18n/*.json",
-                "/sourcedata/calendars/wider_regions/*/i18n/*.json",
-                "/sourcedata/decrees/i18n/*.json",
-                "/sourcedata/missals/*/i18n/*.json"
+                "/jsondata/sourcedata/rite/*/calendars/dioceses/*/*/i18n/*.json",
+                "/jsondata/sourcedata/rite/*/calendars/nations/*/i18n/*.json",
+                "/jsondata/sourcedata/rite/*/calendars/wider_regions/*/i18n/*.json",
+                "/jsondata/sourcedata/rite/*/decrees/i18n/*.json",
+                "/jsondata/sourcedata/rite/*/missals/*/i18n/*.json"
             ],
             "url": "./jsondata/schemas/LitCalTranslation.json"
         }
