@@ -31,6 +31,14 @@ final class SourceDataUrlSchemeTest extends TestCase
 {
     private const DANGEROUS_URL = 'javascript:alert(1)';
 
+    /**
+     * An `https://` URL that satisfies the `^https://` pattern but is not a well-formed URI —
+     * an unescaped backslash is not permitted in RFC 3986. Only `format: uri` can reject this,
+     * so it is the value that proves the two constraints are complementary rather than
+     * redundant, and that `format` assertion is still live on every pointer.
+     */
+    private const MALFORMED_URL = 'https://www.vatican.va/invalid\url';
+
     private const BENIGN_URL = 'https://www.vatican.va/content/paul-vi/%s/apost_letters/documents/hf_p-vi_apl_19641024_pacis-nuntius.html';
 
     private static bool $routerInitialized = false;
@@ -170,6 +178,27 @@ final class SourceDataUrlSchemeTest extends TestCase
 
         $this->expectException(\Swaggest\JsonSchema\Exception::class);
         $schema->in(self::DANGEROUS_URL);
+    }
+
+    /**
+     * `pattern` and `format` guard different things, and both must stay in place.
+     *
+     * `^https://` rejects the dangerous schemes but happily accepts a malformed URI, while
+     * `format: uri` rejects the malformed URI but happily accepts `javascript:`. Dropping
+     * either constraint on the theory that the other supersedes it would silently widen what
+     * the source data may carry, so this asserts the `format` half independently, per pointer.
+     */
+    #[DataProvider('urlSchemaPointerProvider')]
+    public function testSchemaRejectsMalformedHttpsUrl(LitSchema $litSchema, string $pointer): void
+    {
+        $schema = self::importSubSchema($litSchema, $pointer);
+
+        // Guard the premise: the pattern alone would let this through, so a failure below is
+        // attributable to `format: uri` and to nothing else.
+        self::assertMatchesRegularExpression('/^https:\/\//', self::MALFORMED_URL);
+
+        $this->expectException(\Swaggest\JsonSchema\Exception::class);
+        $schema->in(self::MALFORMED_URL);
     }
 
     #[DataProvider('urlSchemaPointerProvider')]
