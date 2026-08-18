@@ -3966,7 +3966,10 @@ final class CalendarHandler extends AbstractHandler
                                 /** @var LitCalItemSetPropertyGradeMetadata $metadata */
                                 $metadata                = $litEventItem->metadata;
                                 $existingLiturgicalEvent = $this->Cal->getLiturgicalEvent($liturgicalEvent->event_key);
-                                $url                     = $metadata->url !== null ? '<a href="' . $metadata->url . '" target="_blank">' . $metadata->url . '</a>' : 'source unknown #handleNationalCalendarEvents';
+                                // The URL is escaped again at the point of interpolation as defence in depth:
+                                // `double_encode: false` keeps the value idempotent with the escaping already applied when the model was hydrated.
+                                $escapedUrl = $metadata->url !== null ? htmlspecialchars($metadata->url, ENT_QUOTES, 'UTF-8', false) : null;
+                                $url        = $escapedUrl !== null ? '<a href="' . $escapedUrl . '" target="_blank">' . $escapedUrl . '</a>' : 'source unknown #handleNationalCalendarEvents';
                                 if (null !== $existingLiturgicalEvent) {
                                     $this->Messages[] = sprintf(
                                         /**translators:
