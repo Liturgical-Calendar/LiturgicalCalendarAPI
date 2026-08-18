@@ -85,6 +85,32 @@ final class ResourceAdminService
     }
 
     /**
+     * Report a fail-closed recovery, without ever letting the reporting itself fail.
+     *
+     * Both halves of `$this->logger()->error(...)` can throw in production:
+     * `LoggerFactory::create()` raises `\RuntimeException` when the logs directory
+     * cannot be created, and Monolog's stream handlers raise when the target stream
+     * cannot be opened (unwritable directory, full disk). Since `\RuntimeException`
+     * is precisely the type the surrounding catch blocks handle, an unguarded log
+     * call would propagate out of the recovery path and turn a degraded
+     * authorization lookup into an unhandled 500 — reinstating, by a different
+     * route, the global outage that issue #793 exists to prevent.
+     *
+     * Diagnostics are best-effort; the fail-closed return is not.
+     *
+     * @param array<string, mixed> $context
+     */
+    private function logFailure(string $message, array $context): void
+    {
+        try {
+            $this->logger()->error($message, $context);
+        } catch (\Throwable) {
+            // Deliberately swallowed: there is nowhere left to report a broken
+            // logger to, and the caller's fail-closed result matters more.
+        }
+    }
+
+    /**
      * List the object IDs of one type the user holds one relation on, failing
      * closed for that single (relation, type) pair.
      *
@@ -106,7 +132,7 @@ final class ResourceAdminService
         } catch (\RuntimeException $e) {
             // Fail closed for THIS object type only: zeroing every other type
             // turns one misconfigured type into a global authorization outage.
-            $this->logger()->error(
+            $this->logFailure(
                 sprintf(
                     'OpenFGA listObjects failed for object type "%s", relation "%s": %s',
                     $type,
@@ -233,7 +259,7 @@ final class ResourceAdminService
                 // Fail closed for THIS request only — a transient OpenFGA failure
                 // excludes the request rather than surfacing a 500. Mirrors the
                 // per-unit isolation of listObjectsIsolated().
-                $this->logger()->error(
+                $this->logFailure(
                     sprintf('OpenFGA check failed while filtering access requests by admin access: %s', $e->getMessage()),
                     [
                         'user'  => $fgaUser,

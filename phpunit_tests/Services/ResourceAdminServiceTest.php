@@ -11,6 +11,7 @@ use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\ResourceAdminService;
 use LiturgicalCalendar\Tests\Support\CollectingLogger;
+use LiturgicalCalendar\Tests\Support\ThrowingLogger;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -399,5 +400,67 @@ final class ResourceAdminServiceTest extends TestCase
         $errors = $logger->recordsAtLevel('error');
         self::assertCount(1, $errors);
         self::assertSame('user:cei-admin', $errors[0]['context']['user']);
+    }
+
+    /**
+     * A broken logging backend must not defeat the fail-closed guarantee.
+     *
+     * `LoggerFactory::create()` throws `\RuntimeException` when the logs directory
+     * cannot be created, and Monolog's stream handlers throw when the stream cannot
+     * be opened. Both are reachable in production, and `\RuntimeException` is the
+     * very type these catch blocks are handling — so an unguarded log call inside
+     * the recovery path would propagate straight out and turn a degraded lookup
+     * into an unhandled 500. That is the same amplification #793 exists to prevent.
+     */
+    public function testResolveScopesStillFailsClosedWhenTheLoggerItselfThrows(): void
+    {
+        $service = $this->serviceWith(self::serverErrors(count(ResourceAdminService::ADMIN_OBJECT_TYPES)), new ThrowingLogger());
+
+        self::assertSame([], $service->resolveScopes('cei-admin'));
+    }
+
+    public function testResolveTestScopesStillFailsClosedWhenTheLoggerItselfThrows(): void
+    {
+        // Two probes per type: the editor loop and the admin loop.
+        $service = $this->serviceWith(self::serverErrors(count(ResourceAdminService::TEST_OBJECT_TYPES) * 2), new ThrowingLogger());
+
+        self::assertSame(['editor' => [], 'admin' => []], $service->resolveTestScopes('cei-admin'));
+    }
+
+    public function testResolveViewerScopesStillReturnsEveryKeyWhenTheLoggerItselfThrows(): void
+    {
+        $service = $this->serviceWith(self::serverErrors(count(ResourceAdminService::VIEWER_OBJECT_TYPES)), new ThrowingLogger());
+
+        $scopes = $service->resolveViewerScopes('cei-admin');
+
+        self::assertSame(ResourceAdminService::VIEWER_OBJECT_TYPES, array_keys($scopes));
+        foreach ($scopes as $type => $objectIds) {
+            self::assertSame([], $objectIds, "expected an empty list for {$type}");
+        }
+    }
+
+    public function testFilterByAdminAccessStillFailsClosedWhenTheLoggerItselfThrows(): void
+    {
+        $service = $this->serviceWith([new GuzzleResponse(500, [], 'boom')], new ThrowingLogger());
+
+        $requests = [
+            ['id' => 'A', 'permissions' => [['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor']]],
+        ];
+
+        self::assertSame([], $service->filterByAdminAccess($requests, 'cei-admin'));
+    }
+
+    public function testAThrowingLoggerDoesNotMaskARealResult(): void
+    {
+        // Guard against "fixing" the above by swallowing everything: when OpenFGA
+        // succeeds, no logging happens, so a throwing logger is simply never reached
+        // and the real scopes must come back intact.
+        $responses = array_map(
+            static fn(string $type): GuzzleResponse => new GuzzleResponse(200, [], '{"objects":["' . $type . ':IT"]}'),
+            ResourceAdminService::ADMIN_OBJECT_TYPES
+        );
+        $service   = $this->serviceWith(array_values($responses), new ThrowingLogger());
+
+        self::assertCount(count(ResourceAdminService::ADMIN_OBJECT_TYPES), $service->resolveScopes('cei-admin'));
     }
 }
