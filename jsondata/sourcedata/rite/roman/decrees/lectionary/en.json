@@ -5,29 +5,11 @@
         "gospel_acclamation": "",
         "gospel": "John 19: 25-34"
     },
-    "StJohnXXIII": {
-        "first_reading": "Ezekiel 34: 11-16",
-        "responsorial_psalm": "Psalm 23: 1-3a, 4, 5, 6",
-        "gospel_acclamation": "John 10: 14",
-        "gospel": "John 21: 15-17"
-    },
-    "StJohnPaulII": {
-        "first_reading": "Isaiah 52: 7-10",
-        "responsorial_psalm": "Psalm 96: 1-2a, 2b-3, 7-8a, 10",
-        "gospel_acclamation": "John 10: 14",
-        "gospel": "John 21: 15-17"
-    },
     "OurLadyOfLoreto": {
         "first_reading": "Isaiah 7: 10-14; 8: 10",
         "responsorial_psalm": "Luke 1: 46-47, 48-49, 50-51, 52-53, 54-55",
         "gospel_acclamation": "Luke 1: 28",
         "gospel": "Luke 1: 26-38"
-    },
-    "StPaulVI": {
-        "first_reading": "1 Corinthians 9: 16-19, 22-23",
-        "responsorial_psalm": "Psalm 96: 1-2a, 2b-3, 7-8a, 10",
-        "gospel_acclamation": "Mark 1: 17",
-        "gospel": "Matthew 16: 13-19"
     },
     "StFaustinaKowalska": {
         "first_reading": "Ephesians 3: 14-19",
@@ -41,22 +23,40 @@
         "gospel_acclamation": "John 6: 63c, 68c",
         "gospel": "Matthew 7: 21-29"
     },
-    "StJohnAvila": {
-        "first_reading": "Acts 13: 46-49",
-        "responsorial_psalm": "Psalm 23: 1-3a, 4, 5, 6",
-        "gospel_acclamation": "Matthew 5: 16",
-        "gospel": "Matthew 5: 13-19"
-    },
     "StHildegardBingen": {
         "first_reading": "Song of Songs 8: 6-7",
         "responsorial_psalm": "Psalm 45: 11-12, 14-15, 16-17",
         "gospel_acclamation": "Matthew 5: 8",
         "gospel": "Matthew 25: 1-13"
     },
+    "StJohnAvila": {
+        "first_reading": "Acts 13: 46-49",
+        "responsorial_psalm": "Psalm 23: 1-3a, 4, 5, 6",
+        "gospel_acclamation": "Matthew 5: 16",
+        "gospel": "Matthew 5: 13-19"
+    },
+    "StJohnPaulII": {
+        "first_reading": "Isaiah 52: 7-10",
+        "responsorial_psalm": "Psalm 96: 1-2a, 2b-3, 7-8a, 10",
+        "gospel_acclamation": "John 10: 14",
+        "gospel": "John 21: 15-17"
+    },
+    "StJohnXXIII": {
+        "first_reading": "Ezekiel 34: 11-16",
+        "responsorial_psalm": "Psalm 23: 1-3a, 4, 5, 6",
+        "gospel_acclamation": "John 10: 14",
+        "gospel": "John 21: 15-17"
+    },
     "StMotherTeresa": {
         "first_reading": "Isaiah 58: 6-11",
         "responsorial_psalm": "Psalm 33: 2-3, 4-5, 6-7, 8-9, 10-11",
         "gospel_acclamation": "Matthew 11: 25",
         "gospel": "Matthew 25: 31-46|Matthew 25: 31-40"
+    },
+    "StPaulVI": {
+        "first_reading": "1 Corinthians 9: 16-19, 22-23",
+        "responsorial_psalm": "Psalm 96: 1-2a, 2b-3, 7-8a, 10",
+        "gospel_acclamation": "Mark 1: 17",
+        "gospel": "Matthew 16: 13-19"
     }
 }

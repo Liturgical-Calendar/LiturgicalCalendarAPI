@@ -1,15 +1,15 @@
 {
     "MaryMotherChurch": "Santa Virgen María, Madre de la Iglesia",
-    "StMartha": "Santa Marta, María y Lázaro",
-    "StJohnXXIII": "San Juan XXIII, Papa",
-    "StJohnPaulII": "San Juan Pablo II, Papa",
     "OurLadyOfLoreto": "Santa Virgen María de Loreto",
-    "StPaulVI": "San Pablo VI, Papa",
     "StFaustinaKowalska": "Santa Faustina Kowalska",
     "StGregoryNarek": "San Gregorio de Narek, Abad y Doctor de la Iglesia",
-    "StJohnAvila": "San Juan de Ávila, Sacerdote y Doctor de la Iglesia",
     "StHildegardBingen": "Santa Hildegarda de Bingen, Virgen y Doctora de la Iglesia",
-    "StThereseChildJesus": "Santa Teresa del Niño Jesús, Virgen y Doctora de la Iglesia",
     "StIrenaeus": "San Ireneo, Obispo, Mártir y Doctor de la Iglesia",
-    "StMotherTeresa": "Santa Teresa de Calcuta, Virgen"
+    "StJohnAvila": "San Juan de Ávila, Sacerdote y Doctor de la Iglesia",
+    "StJohnPaulII": "San Juan Pablo II, Papa",
+    "StJohnXXIII": "San Juan XXIII, Papa",
+    "StMartha": "Santa Marta, María y Lázaro",
+    "StMotherTeresa": "Santa Teresa de Calcuta, Virgen",
+    "StPaulVI": "San Pablo VI, Papa",
+    "StThereseChildJesus": "Santa Teresa del Niño Jesús, Virgen y Doctora de la Iglesia"
 }

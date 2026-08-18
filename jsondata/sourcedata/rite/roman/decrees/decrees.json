@@ -7,7 +7,7 @@
         "liturgical_event": {
             "event_key": "StMaryMagdalene",
             "grade": 4,
-            "calendar":"GENERAL ROMAN"
+            "calendar": "GENERAL ROMAN"
         },
         "metadata": {
             "action": "setProperty",
@@ -44,9 +44,9 @@
         "liturgical_event": {
             "event_key": "MaryMotherChurch",
             "grade": 3,
-            "common": ["Proper"],
+            "common": [ "Proper" ],
             "calendar": "GENERAL ROMAN",
-            "color": ["white"],
+            "color": [ "white" ],
             "type": "mobile",
             "strtotime": {
                 "day_of_the_week": "Monday",
@@ -85,7 +85,7 @@
         "description": "The Supreme Pontiff Pope FRANCIS, considering the important evangelical witness offered by Martha, Mary and Lazarus in welcoming the Lord Jesus into their home, in listening to him attentively, in believing that he is the resurrection and the life, and accepting the proposal of this Dicastery, has decreed that 29 July be designated in the General Roman Calendar as the Memorial of Saints Martha, Mary and Lazarus.",
         "liturgical_event": {
             "event_key": "StMartha",
-            "calendar":"GENERAL ROMAN"
+            "calendar": "GENERAL ROMAN"
         },
         "metadata": {
             "action": "setProperty",
@@ -122,9 +122,9 @@
             "grade": 2,
             "month": 10,
             "day": 11,
-            "common": ["Pastors:For a Pope"],
+            "common": [ "Pastors:For a Pope" ],
             "calendar": "GENERAL ROMAN",
-            "color": ["white"],
+            "color": [ "white" ],
             "type": "fixed"
         },
         "metadata": {
@@ -159,9 +159,9 @@
             "grade": 2,
             "month": 10,
             "day": 22,
-            "common": ["Pastors:For a Pope"],
+            "common": [ "Pastors:For a Pope" ],
             "calendar": "GENERAL ROMAN",
-            "color": ["white"],
+            "color": [ "white" ],
             "type": "fixed"
         },
         "metadata": {
@@ -196,9 +196,9 @@
             "grade": 2,
             "month": 12,
             "day": 10,
-            "common": ["Blessed Virgin Mary"],
+            "common": [ "Blessed Virgin Mary" ],
             "calendar": "GENERAL ROMAN",
-            "color": ["white"],
+            "color": [ "white" ],
             "type": "fixed"
         },
         "metadata": {
@@ -233,9 +233,9 @@
             "grade": 2,
             "month": 5,
             "day": 29,
-            "common": ["Pastors:For a Pope"],
+            "common": [ "Pastors:For a Pope" ],
             "calendar": "GENERAL ROMAN",
-            "color": ["white"],
+            "color": [ "white" ],
             "type": "fixed"
         },
         "metadata": {
@@ -272,9 +272,9 @@
             "grade": 2,
             "month": 10,
             "day": 5,
-            "common": ["Holy Men and Women:For Religious"],
+            "common": [ "Holy Men and Women:For Religious" ],
             "calendar": "GENERAL ROMAN",
-            "color": ["white"],
+            "color": [ "white" ],
             "type": "fixed"
         },
         "metadata": {
@@ -309,9 +309,9 @@
             "grade": 2,
             "month": 2,
             "day": 27,
-            "common": ["Holy Men and Women:For an Abbot", "Doctors"],
+            "common": [ "Holy Men and Women:For an Abbot", "Doctors" ],
             "calendar": "GENERAL ROMAN",
-            "color": ["white"],
+            "color": [ "white" ],
             "type": "fixed"
         },
         "metadata": {
@@ -348,9 +348,9 @@
             "grade": 2,
             "month": 5,
             "day": 10,
-            "common": ["Pastors:For One Pastor", "Doctors"],
+            "common": [ "Pastors:For One Pastor", "Doctors" ],
             "calendar": "GENERAL ROMAN",
-            "color": ["white"],
+            "color": [ "white" ],
             "type": "fixed"
         },
         "metadata": {
@@ -387,9 +387,9 @@
             "grade": 2,
             "month": 9,
             "day": 17,
-            "common": ["Virgins:For One Virgin", "Doctors"],
+            "common": [ "Virgins:For One Virgin", "Doctors" ],
             "calendar": "GENERAL ROMAN",
-            "color": ["white"],
+            "color": [ "white" ],
             "type": "fixed"
         },
         "metadata": {
@@ -423,7 +423,7 @@
         "description": "Fulfilling the wishes of many Brothers in the Episcopate and of a great number of the faithful throughout the world, after consulting the Dicastery for the Causes of Saints and hearing the opinion of the Dicastery for the Doctrine of the Faith regarding her eminent doctrine, with certain knowledge and after lengthy reflection, with the fullness of Our apostolic authority We declare Saint Thérèse of the Child Jesus and the Holy Face, virgin, to be a Doctor of the Universal Church.",
         "liturgical_event": {
             "event_key": "StThereseChildJesus",
-            "common": ["Proper"],
+            "common": [ "Proper" ],
             "calendar": "GENERAL ROMAN"
         },
         "metadata": {
@@ -457,7 +457,7 @@
         "description": "Dopo aver avuto il parere della Congregazione delle Cause dei Santi, con la mia Autorità Apostolica lo DICHIARO Sant'Ireneo di Lione Dottore della Chiesa con il titolo di Doctor unitatis.",
         "liturgical_event": {
             "event_key": "StIrenaeus",
-            "common": ["Proper"],
+            "common": [ "Proper" ],
             "calendar": "GENERAL ROMAN"
         },
         "metadata": {
@@ -476,9 +476,9 @@
             "grade": 2,
             "month": 9,
             "day": 5,
-            "common": ["Virgins:For One Virgin", "Holy Men and Women:For Those Who Practiced Works of Mercy"],
+            "common": [ "Virgins:For One Virgin", "Holy Men and Women:For Those Who Practiced Works of Mercy" ],
             "calendar": "GENERAL ROMAN",
-            "color": ["white"],
+            "color": [ "white" ],
             "type": "fixed"
         },
         "metadata": {
