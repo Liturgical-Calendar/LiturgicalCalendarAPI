@@ -56,6 +56,37 @@ final class HealthSchemaMappingTest extends TestCase
         $this->assertSame(LitSchema::PROPRIUMDESANCTIS->path(), $result);
     }
 
+    public function testAmbrosianTemporaleFileMapsToPropriumDeTemporeSchema(): void
+    {
+        // The sanctorale arm was registered on its own, leaving the Ambrosian temporale as the
+        // one shipped missal file no client could schema-validate (issue #800). Every Roman
+        // missal registers both halves; the Ambrosian rite must too.
+        $result = self::getPathToSchemaFile(JsonData::AMBROSIAN_TEMPORALE_FILE->value);
+
+        $this->assertSame(LitSchema::PROPRIUMDETEMPORE->path(), $result);
+    }
+
+    public function testRomanTemporaleFileStillMapsToPropriumDeTemporeSchema(): void
+    {
+        // Guards against the new Ambrosian temporale arm shadowing the pre-existing Roman one,
+        // which lives in the same match expression.
+        $result = self::getPathToSchemaFile(
+            JsonData::MISSALS_FOLDER->value . '/propriumdetempore/propriumdetempore.json'
+        );
+
+        $this->assertSame(LitSchema::PROPRIUMDETEMPORE->path(), $result);
+    }
+
+    public function testAmbrosianTemporaleAndSanctoraleMapToDistinctSchemas(): void
+    {
+        // The two Ambrosian files sit next to each other under the same missals folder and differ
+        // only by leaf name, so a copy-paste slip would silently point both at one schema.
+        $temporale  = self::getPathToSchemaFile(JsonData::AMBROSIAN_TEMPORALE_FILE->value);
+        $sanctorale = self::getPathToSchemaFile(JsonData::AMBROSIAN_SANCTORALE_FILE->value);
+
+        $this->assertNotSame($temporale, $sanctorale);
+    }
+
     public function testUnknownFileMapsToNull(): void
     {
         $result = self::getPathToSchemaFile('/some/unregistered/path.json');
