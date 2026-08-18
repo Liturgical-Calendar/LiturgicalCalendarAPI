@@ -223,7 +223,9 @@
                         },
                         "url": {
                             "type": "string",
-                            "format": "uri"
+                            "format": "uri",
+                            "pattern": "^https://",
+                            "description": "Must be an absolute https:// URL. Other URI schemes (javascript:, data:, ...) are rejected, since this value is interpolated into an href attribute in the calendar messages output. A %s sprintf placeholder may appear later in the URL."
                         }
                     },
                     "required": [
@@ -279,7 +281,9 @@
                         },
                         "url": {
                             "type": "string",
-                            "format": "uri"
+                            "format": "uri",
+                            "pattern": "^https://",
+                            "description": "Must be an absolute https:// URL. Other URI schemes (javascript:, data:, ...) are rejected, since this value is interpolated into an href attribute in the calendar messages output. A %s sprintf placeholder may appear later in the URL."
                         }
                     },
                     "required": [
@@ -397,7 +401,9 @@
                         },
                         "url": {
                             "type": "string",
-                            "format": "uri"
+                            "format": "uri",
+                            "pattern": "^https://",
+                            "description": "Must be an absolute https:// URL. Other URI schemes (javascript:, data:, ...) are rejected, since this value is interpolated into an href attribute in the calendar messages output. A %s sprintf placeholder may appear later in the URL."
                         }
                     },
                     "required": [
