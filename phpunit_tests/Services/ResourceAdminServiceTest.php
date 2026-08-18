@@ -10,17 +10,21 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\ResourceAdminService;
+use LiturgicalCalendar\Tests\Support\CollectingLogger;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 
 #[CoversClass(ResourceAdminService::class)]
 final class ResourceAdminServiceTest extends TestCase
 {
     /**
      * @param array<int, GuzzleResponse> $responses Queued, replayed in order.
+     * @param LoggerInterface|null $logger Optional PSR-3 spy; when null the service falls
+     *                                     back to its own lazily-created logger.
      */
-    private function serviceWith(array $responses): ResourceAdminService
+    private function serviceWith(array $responses, ?LoggerInterface $logger = null): ResourceAdminService
     {
         $stack  = HandlerStack::create(new MockHandler($responses));
         $guzzle = new GuzzleClient(['handler' => $stack]);
@@ -34,7 +38,33 @@ final class ResourceAdminServiceTest extends TestCase
             streamFactory: $psr17,
             apiToken: 'test-token'
         );
-        return new ResourceAdminService($client);
+        return new ResourceAdminService($client, $logger ?? new CollectingLogger());
+    }
+
+    /**
+     * $count distinct 500 responses — one per (relation, object type) probe.
+     *
+     * Distinct instances matter: a single GuzzleResponse reused across queue slots
+     * shares one body stream, which is exhausted after the first read.
+     *
+     * @return array<int, GuzzleResponse>
+     */
+    private static function serverErrors(int $count): array
+    {
+        return array_map(static fn(): GuzzleResponse => new GuzzleResponse(500, [], 'boom'), range(1, $count));
+    }
+
+    /**
+     * OpenFGA's response to a request naming an object type that is absent from the
+     * deployed authorization model — the exact failure that caused issue #793.
+     */
+    private static function typeNotFound(string $type): GuzzleResponse
+    {
+        return new GuzzleResponse(
+            400,
+            [],
+            sprintf('{"code":"type_not_found","message":"type \'%s\' not found"}', $type)
+        );
     }
 
     public function testResolveScopesUnionsAdminTuplesAcrossTypes(): void
@@ -56,11 +86,40 @@ final class ResourceAdminServiceTest extends TestCase
 
     public function testResolveScopesFailsClosedOnOpenFgaError(): void
     {
-        $service = $this->serviceWith([
-            new GuzzleResponse(500, [], 'boom'),
-        ]);
+        // Every type fails -> the union is empty. One 500 per ADMIN_OBJECT_TYPES entry:
+        // each type is probed independently, so each needs its own queued response.
+        $service = $this->serviceWith(self::serverErrors(count(ResourceAdminService::ADMIN_OBJECT_TYPES)));
 
         self::assertSame([], $service->resolveScopes('cei-admin'));
+    }
+
+    public function testResolveScopesIsolatesFailureToTheOffendingObjectType(): void
+    {
+        // Regression guard for issue #793: a single failing object type used to
+        // discard the scopes already collected for every other type. Here
+        // diocesan_calendar (the 2nd of ADMIN_OBJECT_TYPES) blows up; the
+        // national_calendar and general_roman_calendar scopes must survive.
+        $logger  = new CollectingLogger();
+        $service = $this->serviceWith([
+            new GuzzleResponse(200, [], '{"objects":["national_calendar:IT"]}'),
+            self::typeNotFound('diocesan_calendar'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":["general_roman_calendar:temporale"]}'),
+        ], $logger);
+
+        self::assertSame(
+            [
+                ['object_type' => 'national_calendar', 'object_id' => 'IT'],
+                ['object_type' => 'general_roman_calendar', 'object_id' => 'temporale'],
+            ],
+            $service->resolveScopes('cei-admin')
+        );
+
+        $errors = $logger->recordsAtLevel('error');
+        self::assertCount(1, $errors);
+        self::assertStringContainsString('diocesan_calendar', $errors[0]['message']);
+        self::assertSame('diocesan_calendar', $errors[0]['context']['object_type']);
+        self::assertSame('admin', $errors[0]['context']['relation']);
     }
 
     public function testFilterByAdminAccessKeepsOnlyFullyAdministeredRequests(): void
@@ -192,9 +251,54 @@ final class ResourceAdminServiceTest extends TestCase
 
     public function testResolveTestScopesFailsClosedOnError(): void
     {
-        $service = $this->serviceWith([new GuzzleResponse(500, [], 'boom')]);
+        // Two relations (editor, admin) probed per TEST_OBJECT_TYPES entry, each
+        // independently -> one queued 500 per (relation, type) pair.
+        $service = $this->serviceWith(self::serverErrors(count(ResourceAdminService::TEST_OBJECT_TYPES) * 2));
 
         self::assertSame(['editor' => [], 'admin' => []], $service->resolveTestScopes('x'));
+    }
+
+    public function testResolveTestScopesIsolatesFailurePerTypeAndPerRelation(): void
+    {
+        // rite_calendar_test — the type whose premature addition triggered #793 —
+        // is missing from the model, failing under BOTH relations. The other three
+        // test types must still resolve, and the two log lines must name the
+        // relation that failed so the offending probe is identifiable.
+        //
+        // Order: editor for each of the 4 TEST_OBJECT_TYPES, then admin for each.
+        $logger  = new CollectingLogger();
+        $service = $this->serviceWith([
+            new GuzzleResponse(200, [], '{"objects":["national_calendar_test:roman/USA"]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":["general_roman_calendar_test:temporale"]}'),
+            self::typeNotFound('rite_calendar_test'),
+            new GuzzleResponse(200, [], '{"objects":["national_calendar_test:roman/USA"]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            self::typeNotFound('rite_calendar_test'),
+        ], $logger);
+
+        $scopes = $service->resolveTestScopes('cei-admin');
+
+        self::assertSame(
+            [
+                ['object_type' => 'national_calendar_test', 'object_id' => 'roman/USA'],
+                ['object_type' => 'general_roman_calendar_test', 'object_id' => 'temporale'],
+            ],
+            $scopes['editor']
+        );
+        self::assertSame(
+            [['object_type' => 'national_calendar_test', 'object_id' => 'roman/USA']],
+            $scopes['admin']
+        );
+
+        $errors = $logger->recordsAtLevel('error');
+        self::assertCount(2, $errors);
+        self::assertSame(['rite_calendar_test', 'rite_calendar_test'], array_column(array_column($errors, 'context'), 'object_type'));
+        self::assertSame(['editor', 'admin'], array_column(array_column($errors, 'context'), 'relation'));
+        self::assertStringContainsString('rite_calendar_test', $errors[0]['message']);
+        self::assertStringContainsString('"editor"', $errors[0]['message']);
+        self::assertStringContainsString('"admin"', $errors[1]['message']);
     }
 
     public function testResolveViewerScopesReturnsIdsKeyedByType(): void
@@ -224,9 +328,9 @@ final class ResourceAdminServiceTest extends TestCase
 
     public function testResolveViewerScopesFailsClosedOnOpenFgaError(): void
     {
-        $service = $this->serviceWith([
-            new GuzzleResponse(500, [], 'boom'),
-        ]);
+        // One 500 per VIEWER_OBJECT_TYPES entry: every type fails, so every key is
+        // present but empty.
+        $service = $this->serviceWith(self::serverErrors(count(ResourceAdminService::VIEWER_OBJECT_TYPES)));
 
         self::assertSame(
             [
@@ -238,5 +342,62 @@ final class ResourceAdminServiceTest extends TestCase
             ],
             $service->resolveViewerScopes('grc-editor')
         );
+    }
+
+    public function testResolveViewerScopesIsolatesFailureAndKeepsEveryKey(): void
+    {
+        // The dashboard-card outage of issue #793 in miniature: rite_calendar_test
+        // (last of VIEWER_OBJECT_TYPES) is unknown to the deployed model. Only its
+        // list may be emptied — the four other cards keep their visibility — and
+        // its key must still be present, per the documented contract.
+        $logger  = new CollectingLogger();
+        $service = $this->serviceWith([
+            new GuzzleResponse(200, [], '{"objects":["general_roman_calendar:temporale","general_roman_calendar:decrees"]}'),
+            new GuzzleResponse(200, [], '{"objects":["national_calendar_test:roman/IT"]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":["general_roman_calendar_test:sanctorale"]}'),
+            self::typeNotFound('rite_calendar_test'),
+        ], $logger);
+
+        $scopes = $service->resolveViewerScopes('grc-editor');
+
+        self::assertSame(
+            [
+                'general_roman_calendar'      => ['temporale', 'decrees'],
+                'national_calendar_test'      => ['roman/IT'],
+                'diocesan_calendar_test'      => [],
+                'general_roman_calendar_test' => ['sanctorale'],
+                'rite_calendar_test'          => [],
+            ],
+            $scopes
+        );
+        self::assertArrayHasKey('rite_calendar_test', $scopes);
+
+        $errors = $logger->recordsAtLevel('error');
+        self::assertCount(1, $errors);
+        self::assertStringContainsString('rite_calendar_test', $errors[0]['message']);
+        self::assertSame('rite_calendar_test', $errors[0]['context']['object_type']);
+        self::assertSame('viewer', $errors[0]['context']['relation']);
+        self::assertSame('user:grc-editor', $errors[0]['context']['user']);
+    }
+
+    public function testFilterByAdminAccessLogsTheFailureItSwallows(): void
+    {
+        // filterByAdminAccess already failed closed per request; it did so silently.
+        // The exclusion must now leave a trace, for the same reason #793 was hard to
+        // diagnose: a fail-closed path that logs nothing is indistinguishable from a
+        // legitimately empty result.
+        $logger  = new CollectingLogger();
+        $service = $this->serviceWith([new GuzzleResponse(500, [], 'boom')], $logger);
+
+        $requests = [
+            ['id' => 'A', 'permissions' => [['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'editor']]],
+        ];
+
+        self::assertSame([], $service->filterByAdminAccess($requests, 'cei-admin'));
+
+        $errors = $logger->recordsAtLevel('error');
+        self::assertCount(1, $errors);
+        self::assertSame('user:cei-admin', $errors[0]['context']['user']);
     }
 }
