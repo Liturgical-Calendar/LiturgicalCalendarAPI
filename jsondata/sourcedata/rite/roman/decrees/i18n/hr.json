@@ -1,15 +1,15 @@
 {
     "MaryMotherChurch": "Blažena Djevica Marija Majka Crkve",
-    "StMartha": "Sveta Marta, Marija i Lazar",
-    "StJohnXXIII": "Sveti Ivan XXIII., papa",
-    "StJohnPaulII": "Sveti Ivan Pavao II., papa",
     "OurLadyOfLoreto": "Blažena Djevica Marija Loretska",
-    "StPaulVI": "Sveti Pavao VI., papa",
     "StFaustinaKowalska": "Sveta Faustina Kowalska, djevica",
     "StGregoryNarek": "Sveti Grgur iz Nareka, opat i crkveni naučitelj",
-    "StJohnAvila": "Sveti Ivan Avilski, prezbiter i crkveni naučitelj",
     "StHildegardBingen": "Sveta Hildegarda iz Bingena, djevica i crkvena naučiteljica",
-    "StThereseChildJesus": "Sveta Terezija od Djeteta Isusa, djevica i crkvena naučiteljica",
     "StIrenaeus": "Sveti Irenej, biskup i mučenik i crkveni naučitelj",
-    "StMotherTeresa": "Sveta Terezija od Calcuta, djevica"
+    "StJohnAvila": "Sveti Ivan Avilski, prezbiter i crkveni naučitelj",
+    "StJohnPaulII": "Sveti Ivan Pavao II., papa",
+    "StJohnXXIII": "Sveti Ivan XXIII., papa",
+    "StMartha": "Sveta Marta, Marija i Lazar",
+    "StMotherTeresa": "Sveta Terezija od Calcuta, djevica",
+    "StPaulVI": "Sveti Pavao VI., papa",
+    "StThereseChildJesus": "Sveta Terezija od Djeteta Isusa, djevica i crkvena naučiteljica"
 }
