@@ -106,7 +106,7 @@ class LitTestRunner
         $cacheKey       = $rite->value . '/' . $Test;
         $this->cacheKey = $cacheKey;
         if (false === self::$testCache->has($cacheKey)) {
-            $testPath = rtrim(JsonData::testsFolderFor($rite)->path(), '/\\') . DIRECTORY_SEPARATOR . basename($Test) . '.json';
+            $testPath = self::testPathFor($Test, $rite);
             if (file_exists($testPath)) {
                 $testInstructionsRaw = file_get_contents($testPath);
                 if ($testInstructionsRaw) {
@@ -130,11 +130,83 @@ class LitTestRunner
                     }
                 }
             } else {
-                $this->setError("Test server could not read Test instructions for {$Test}");
+                // The file is absent from the requested rite's partition. Before blaming
+                // the filesystem, look for the same test name under the other rites: if it
+                // lives there, the file is fine and the *request* is wrong, and the operator
+                // needs to hear about the rite rather than go hunting for a missing file.
+                // See issue #794 — after #787 partitioned the corpus by rite, Health resolves
+                // the rite from the calendar under test and passes it as the test's partition,
+                // so a mismatch lands here instead of in detectRiteMismatch().
+                $declaredRites = self::ritesDefiningTest($Test, $rite);
+                if ([] === $declaredRites) {
+                    $this->setError("Test server could not read Test instructions for {$Test}");
+                } else {
+                    $this->setError($this->riteMismatchMessage($declaredRites, $rite));
+                }
             }
         } else {
             $this->readyState = self::$testCache->isReady($cacheKey);
         }
+    }
+
+    /**
+     * The path the test instructions for `$Test` would occupy in `$rite`'s partition of the corpus.
+     */
+    private static function testPathFor(string $Test, Rite $rite): string
+    {
+        return rtrim(JsonData::testsFolderFor($rite)->path(), '/\\') . DIRECTORY_SEPARATOR . basename($Test) . '.json';
+    }
+
+    /**
+     * The rites — other than `$requested` — whose partition actually defines a test named `$Test`.
+     *
+     * Iterates {@see \LiturgicalCalendar\Api\Enum\Rite::cases()} rather than naming the two
+     * current rites, so a third rite is covered the day it is added. One `file_exists()` per
+     * rite; deliberately uncached, since this only runs on the error path where the requested
+     * partition has already come up empty.
+     *
+     * @return list<Rite>
+     */
+    private static function ritesDefiningTest(string $Test, Rite $requested): array
+    {
+        $found = [];
+        foreach (Rite::cases() as $candidate) {
+            if ($candidate === $requested) {
+                continue;
+            }
+            if (file_exists(self::testPathFor($Test, $candidate))) {
+                $found[] = $candidate;
+            }
+        }
+
+        return $found;
+    }
+
+    /**
+     * The single operator-facing sentence for "this test and this calendar are of different rites".
+     *
+     * Shared by the two paths that can detect the condition — the constructor, when the test
+     * is absent from the requested partition but present in another, and
+     * {@see \LiturgicalCalendar\Api\Test\LitTestRunner::detectRiteMismatch()}, when the response
+     * echoes back a rite that disagrees with the loaded test's. One condition, one phrasing.
+     *
+     * A test name can legitimately be defined under more than one other rite; all of them are
+     * named, since which one the operator meant is exactly what is in question.
+     *
+     * @param non-empty-list<Rite> $declaredRites The rite(s) the test is actually scoped to.
+     * @param Rite                 $responseRite  The rite the calendar under test was computed under.
+     */
+    private function riteMismatchMessage(array $declaredRites, Rite $responseRite): string
+    {
+        $names = array_map(static fn (Rite $rite): string => $rite->value, $declaredRites);
+        if (1 === count($names)) {
+            $scope = "the {$names[0]} rite";
+        } else {
+            $last  = array_pop($names);
+            $scope = 'the ' . implode(', ', $names) . " and {$last} rites";
+        }
+
+        return "{$this->Test} is scoped to {$scope}, but the calendar under test was computed under the {$responseRite->value} rite";
     }
 
     /**
@@ -315,7 +387,7 @@ class LitTestRunner
             return null;
         }
 
-        return "{$this->Test} is scoped to the {$declaredRite->value} rite, but the calendar under test was computed under the {$responseRite->value} rite";
+        return $this->riteMismatchMessage([$declaredRite], $responseRite);
     }
 
     /**

@@ -166,6 +166,10 @@ final class LitTestRunnerTest extends TestCase
         $this->assertSame('error', $msg->type);
         $this->assertStringContainsString('could not read Test instructions', $msg->text);
         $this->assertObjectNotHasProperty('jsonData', $msg);
+
+        // Regression guard for #794: a name that exists under NO rite must keep the
+        // missing-file message. The rite-mismatch branch added there must not swallow it.
+        $this->assertStringNotContainsString('is scoped to', $msg->text);
     }
 
     public function testGetMessageWithoutRunningProducesFallbackError(): void
@@ -295,5 +299,29 @@ final class LitTestRunnerTest extends TestCase
         // The same name under roman/ does not exist, so the runner is not ready.
         $roman = new LitTestRunner('StIgnatiusOfLoyolaTest', $data, Rite::ROMAN);
         self::assertFalse($roman->isReady());
+    }
+
+    public function testTestMissingFromRequestedRiteButPresentInAnotherReportsARiteMismatch(): void
+    {
+        // #794: after #787 partitioned the corpus by rite, Health resolves the rite from
+        // the calendar under test and hands it to LitTestRunner as the test's partition.
+        // An Ambrosian-scoped test run against a Roman calendar therefore misses the file
+        // and used to report "could not read Test instructions" — pointing the operator at
+        // the filesystem when the file is fine and the requested rite is wrong.
+        // StIgnatiusOfLoyolaTest exists only under jsondata/tests/ambrosian/.
+        $data   = $this->calendarPayload(2024, []);
+        $runner = new LitTestRunner('StIgnatiusOfLoyolaTest', $data, Rite::ROMAN);
+
+        $this->assertFalse($runner->isReady());
+
+        $msg = $runner->getMessage();
+        $this->assertSame('error', $msg->type);
+        $this->assertSame(
+            'StIgnatiusOfLoyolaTest is scoped to the ambrosian rite, but the calendar under test was computed under the roman rite',
+            $msg->text,
+            'The wording must match detectRiteMismatch() exactly: one condition, one phrasing.'
+        );
+        $this->assertStringNotContainsString('could not read Test instructions', $msg->text);
+        $this->assertObjectNotHasProperty('jsonData', $msg, 'Setup errors should not carry the full calendar payload');
     }
 }
