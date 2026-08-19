@@ -24,6 +24,7 @@ use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
+use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use Symfony\Component\Yaml\Yaml;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
@@ -2046,24 +2047,28 @@ class Health implements MessageComponentInterface
      */
     private static function getPathToSchemaFile(string $dataFile): ?string
     {
+        // Source-data files come from the one inventory (#806 step A); the arms below are API
+        // routes, which are a different kind of thing and stay here.
+        //
+        // CheckableInventory::byPath() already normalises between the two path representations
+        // in play: $dataFile here is the unprefixed repo-relative form (matching JsonData::*->value),
+        // while the inventory stores absolute paths prefixed with Router::$apiFilePath. No
+        // conversion is needed at this call site.
+        $item = CheckableInventory::byPath($dataFile);
+        if (null !== $item) {
+            return $item->schema->path();
+        }
+
         return match ($dataFile) {
-            JsonData::MISSALS_FOLDER->value . '/propriumdetempore/propriumdetempore.json'                 => LitSchema::PROPRIUMDETEMPORE->path(),
-            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_1970/propriumdesanctis_1970.json'       => LitSchema::PROPRIUMDESANCTIS->path(),
-            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_2002/propriumdesanctis_2002.json'       => LitSchema::PROPRIUMDESANCTIS->path(),
-            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_2008/propriumdesanctis_2008.json'       => LitSchema::PROPRIUMDESANCTIS->path(),
-            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_IT_1983/propriumdesanctis_IT_1983.json' => LitSchema::PROPRIUMDESANCTIS->path(),
-            JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json' => LitSchema::PROPRIUMDESANCTIS->path(),
-            JsonData::AMBROSIAN_TEMPORALE_FILE->value                                                     => LitSchema::PROPRIUMDETEMPORE->path(),
-            JsonData::AMBROSIAN_SANCTORALE_FILE->value                                                    => LitSchema::PROPRIUMDESANCTIS->path(),
-            Route::CALENDARS->path()                                                                      => LitSchema::METADATA->path(),
-            Route::DECREES->path()                                                                        => LitSchema::DECREES->path(),
-            Route::EVENTS->path()                                                                         => LitSchema::EVENTS->path(),
-            Route::TESTS->path()                                                                          => LitSchema::TESTS->path(),
-            Route::EASTER->path()                                                                         => LitSchema::EASTER->path(),
-            Route::MISSALS->path()                                                                        => LitSchema::MISSALS->path(),
-            Route::DATA->path()                                                                           => LitSchema::DATA->path(),
-            Route::SCHEMAS->path()                                                                        => LitSchema::SCHEMAS->path(),
-            default => null
+            Route::CALENDARS->path() => LitSchema::METADATA->path(),
+            Route::DECREES->path()   => LitSchema::DECREES->path(),
+            Route::EVENTS->path()    => LitSchema::EVENTS->path(),
+            Route::TESTS->path()     => LitSchema::TESTS->path(),
+            Route::EASTER->path()    => LitSchema::EASTER->path(),
+            Route::MISSALS->path()   => LitSchema::MISSALS->path(),
+            Route::DATA->path()      => LitSchema::DATA->path(),
+            Route::SCHEMAS->path()   => LitSchema::SCHEMAS->path(),
+            default                  => null
         };
     }
 
@@ -2175,6 +2180,20 @@ class Health implements MessageComponentInterface
                 }
                 return Health::getPathToSchemaFile($dataPath);
             case 'sourceDataCheck':
+                // Legacy slugs from the runner pages, mapped onto inventory ids. #806 step A gives
+                // every item an id; until the clients send those ids (UnitTestInterface#42), the
+                // old vocabulary keeps working through this table.
+                $legacySlugToId = [
+                    'memorials-from-decrees'      => 'decrees:roman',
+                    'memorials-from-decrees-i18n' => 'decrees:roman:i18n',
+                    'proprium-de-tempore'         => 'temporale:roman',
+                    'proprium-de-tempore-i18n'    => 'temporale:roman:i18n'
+                ];
+                $item           = CheckableInventory::byId($legacySlugToId[$dataPath] ?? $dataPath);
+                if (null !== $item) {
+                    return $item->schema->path();
+                }
+
                 if (preg_match('/-i18n$/', $dataPath)) {
                     return LitSchema::I18N->path();
                 }
