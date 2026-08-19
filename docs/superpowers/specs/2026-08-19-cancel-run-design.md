@@ -100,8 +100,8 @@ Its predicate keeps an entry when any of these holds:
 
 ```php
 null === $item['resourceId']                                   // untagged, e.g. the connect-time metadata fetch
-| null === $item['runToken']                                  // enqueued before any run token was set |
-|------------------------------------------------------------------------------------------------------|
+|| null === $item['runToken']                                  // enqueued before any run token was set
+|| ( $this->runTokens[$item['resourceId']] ?? null ) === $item['runToken']
 ```
 
 With the stored token unset, the third clause evaluates `null === 'run-a'` for the cancelled run's entries, so they are
