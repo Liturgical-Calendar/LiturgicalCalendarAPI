@@ -8,7 +8,9 @@ use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
+use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 
 /**
  * The source data this API can validate, in one place.
@@ -32,11 +34,32 @@ final class CheckableInventory
     /** @var list<CheckableItem>|null */
     private static ?array $items = null;
 
+    /** @var MetadataCalendars|null */
+    private static ?MetadataCalendars $metadata = null;
+
+    /**
+     * The calendar index, from the same builder that serves `/calendars`.
+     *
+     * Memoized for the lifetime of the request only. `CalendarMetadataProvider` deliberately re-reads
+     * source data on every call because the `/data` write endpoints can mutate calendar definitions at
+     * runtime; caching it here for one request keeps a single `/validations` response internally
+     * consistent without outliving the write that would invalidate it.
+     */
+    private static function metadata(): MetadataCalendars
+    {
+        return self::$metadata ??= CalendarMetadataProvider::create();
+    }
+
     /** @return list<CheckableItem> */
     public static function all(): array
     {
         if (null === self::$items) {
-            self::$items = array_merge(self::derivedRomanSanctorale(), self::explicitItems());
+            self::$items = array_merge(
+                self::derivedRomanSanctorale(),
+                self::explicitItems(),
+                self::nationalCalendarItems(),
+                self::widerRegionItems()
+            );
         }
 
         return self::$items;
@@ -201,5 +224,88 @@ final class CheckableInventory
                 JsonData::AMBROSIAN_SANCTORALE_I18N_FOLDER->path()
             )
         ];
+    }
+
+    /**
+     * National calendar definitions, enumerated from the calendar index rather than listed.
+     *
+     * A national calendar is specific to its own nation, so `region` is its calendar id — that is what
+     * lets a client scoping to one calendar keep it and drop the other nine.
+     *
+     * @return list<CheckableItem>
+     */
+    private static function nationalCalendarItems(): array
+    {
+        $items = [];
+        foreach (self::metadata()->national_calendars as $nation) {
+            $id   = $nation->calendar_id;
+            $file = strtr(JsonData::NATIONAL_CALENDAR_FILE->path(), ['{nation}' => $id]);
+
+            $items[] = new CheckableItem(
+                "nation:roman:{$id}",
+                'file',
+                Rite::ROMAN,
+                $id,
+                "National calendar: {$id}",
+                LitSchema::NATIONAL,
+                self::STEPS,
+                $file
+            );
+
+            $items[] = new CheckableItem(
+                "nation:roman:{$id}:i18n",
+                'folder',
+                Rite::ROMAN,
+                $id,
+                "National calendar translations: {$id}",
+                LitSchema::I18N,
+                self::STEPS,
+                rtrim(strtr(JsonData::NATIONAL_CALENDAR_I18N_FOLDER->path(), ['{nation}' => $id]), '/')
+            );
+        }
+
+        return $items;
+    }
+
+    /**
+     * Wider region definitions.
+     *
+     * `region` is null: a wider region spans several nations, which a scalar cannot express. Clients
+     * scoping to one calendar use the `wider_region` field `/calendars` already gives them, rather than
+     * this field. Widening `region` into a list would be a wire-contract change, not a fix here.
+     *
+     * @return list<CheckableItem>
+     */
+    private static function widerRegionItems(): array
+    {
+        $items = [];
+        foreach (self::metadata()->wider_regions as $region) {
+            $name = $region->name;
+            $file = strtr(JsonData::WIDER_REGION_FILE->path(), ['{wider_region}' => $name]);
+
+            $items[] = new CheckableItem(
+                "widerregion:roman:{$name}",
+                'file',
+                Rite::ROMAN,
+                null,
+                "Wider region: {$name}",
+                LitSchema::WIDERREGION,
+                self::STEPS,
+                $file
+            );
+
+            $items[] = new CheckableItem(
+                "widerregion:roman:{$name}:i18n",
+                'folder',
+                Rite::ROMAN,
+                null,
+                "Wider region translations: {$name}",
+                LitSchema::I18N,
+                self::STEPS,
+                rtrim(strtr(JsonData::WIDER_REGION_I18N_FOLDER->path(), ['{wider_region}' => $name]), '/')
+            );
+        }
+
+        return $items;
     }
 }

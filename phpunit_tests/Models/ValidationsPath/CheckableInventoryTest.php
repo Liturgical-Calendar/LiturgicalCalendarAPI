@@ -26,10 +26,23 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(CheckableItem::class)]
 final class CheckableInventoryTest extends TestCase
 {
+    private static string $savedApiPath = '';
+
     public static function setUpBeforeClass(): void
     {
         // JsonData cases build filesystem paths from this prefix.
         Router::$apiFilePath = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR;
+
+        // CalendarMetadataProvider::create() (pulled in via CheckableInventory::nationalCalendarItems()
+        // and ::widerRegionItems()) reads Router::$apiPath while building each wider region's api_path.
+        // isset() is false for typed-uninitialised properties.
+        self::$savedApiPath = isset(Router::$apiPath) ? Router::$apiPath : '';
+        Router::$apiPath    = '';
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        Router::$apiPath = self::$savedApiPath;
     }
 
     /**
@@ -76,15 +89,24 @@ final class CheckableInventoryTest extends TestCase
         self::assertSame(array_unique($ids), $ids, 'inventory ids must be unique');
     }
 
-    public function testItHoldsNineFilesAndNineFolders(): void
+    public function testEveryItemIsEitherAFileOrAFolderAndFoldersAreI18n(): void
     {
-        $kinds = array_count_values(array_map(
-            static fn (CheckableItem $i): string => $i->kind,
-            CheckableInventory::all()
-        ));
+        $files   = 0;
+        $folders = 0;
+        foreach (CheckableInventory::all() as $item) {
+            if ('folder' === $item->kind) {
+                ++$folders;
+                self::assertStringEndsWith(':i18n', $item->id, "folder item {$item->id} is not an i18n folder");
+                self::assertSame(LitSchema::I18N, $item->schema, "folder item {$item->id} must validate as i18n");
+            } else {
+                ++$files;
+                self::assertStringEndsNotWith(':i18n', $item->id, "file item {$item->id} looks like an i18n folder");
+            }
+        }
 
-        self::assertSame(9, $kinds['file']);
-        self::assertSame(9, $kinds['folder']);
+        // The static half alone contributes nine of each; enumeration only adds.
+        self::assertGreaterThanOrEqual(9, $files);
+        self::assertGreaterThanOrEqual(9, $folders);
     }
 
     public function testTheFiveMissalsWithASanctoraleArePresentAndTheOthersAbsent(): void
@@ -155,6 +177,51 @@ final class CheckableInventoryTest extends TestCase
             $encoded = json_encode($item, JSON_THROW_ON_ERROR);
             self::assertStringNotContainsString('jsondata', $encoded, "item {$item->id} leaked a path");
             self::assertArrayNotHasKey('path', (array) json_decode($encoded, true, 512, JSON_THROW_ON_ERROR));
+        }
+    }
+
+    public function testNationalCalendarsAreEnumeratedFromTheMetadataProvider(): void
+    {
+        $ids = array_map(static fn (CheckableItem $i): string => $i->id, CheckableInventory::all());
+
+        // Italy is a national calendar the repository ships; if it ever stops being one, this test
+        // should be updated deliberately rather than the assertion loosened.
+        self::assertContains('nation:roman:IT', $ids);
+        self::assertContains('nation:roman:IT:i18n', $ids);
+
+        $italy = CheckableInventory::byId('nation:roman:IT');
+        self::assertNotNull($italy);
+        self::assertSame('file', $italy->kind);
+        self::assertSame(Rite::ROMAN, $italy->rite);
+        self::assertSame('IT', $italy->region, 'a national calendar is specific to its own nation');
+        self::assertSame(LitSchema::NATIONAL, $italy->schema);
+        self::assertStringContainsString('/calendars/nations/IT/IT.json', $italy->path);
+
+        $italyI18n = CheckableInventory::byId('nation:roman:IT:i18n');
+        self::assertNotNull($italyI18n);
+        self::assertSame('folder', $italyI18n->kind);
+        self::assertSame(LitSchema::I18N, $italyI18n->schema);
+    }
+
+    public function testWiderRegionsAreEnumeratedAndAreNotNationScoped(): void
+    {
+        $europe = CheckableInventory::byId('widerregion:roman:Europe');
+        self::assertNotNull($europe);
+        self::assertSame('file', $europe->kind);
+        self::assertSame(LitSchema::WIDERREGION, $europe->schema);
+        self::assertNull(
+            $europe->region,
+            'a wider region spans several nations, which the scalar region cannot express; '
+                . 'clients scope it via the wider_region field on /calendars instead'
+        );
+
+        self::assertNotNull(CheckableInventory::byId('widerregion:roman:Europe:i18n'));
+    }
+
+    public function testEveryEnumeratedItemStillHidesItsPath(): void
+    {
+        foreach (CheckableInventory::all() as $item) {
+            self::assertStringNotContainsString('jsondata', json_encode($item, JSON_THROW_ON_ERROR));
         }
     }
 }
