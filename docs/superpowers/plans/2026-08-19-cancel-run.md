@@ -507,22 +507,28 @@ cd /home/johnrdorazio/development/LiturgicalCalendar/UnitTestInterface
 git checkout main && git pull && git checkout -b feat/43-cancel-run
 ```
 
-The spec stubs the WebSocket, so **no WebSocket server is needed**. Two things are:
+The spec stubs the WebSocket, so **no WebSocket server is needed**. Two things are: the API on `:8000`, whose
+`/calendars`, `/missals` and `/tests` responses gate the start button, and the UnitTestInterface pages on `:3003`.
+
+Both come from the docker stack in the frontend repo. Bringing up `litcal-tests` pulls in `litcal-api` as a dependency:
 
 ```bash
-# 1. The API on :8000 — the page's /calendars, /missals and /tests fetches gate the start button.
-#    Start it however this machine normally does (docker compose up -d in the API checkout, or
-#    `composer start` there). Verify:
+cd /home/johnrdorazio/development/LiturgicalCalendar/LiturgicalCalendarFrontend
+docker compose up -d litcal-tests
 curl -s -o /dev/null -w '%{http_code}\n' http://localhost:8000/calendars   # expect 200
-
-# 2. The UnitTestInterface pages on :3003, served from THIS checkout:
-cd /home/johnrdorazio/development/LiturgicalCalendar/UnitTestInterface
-php -S localhost:3003 &
 curl -s -o /dev/null -w '%{http_code}\n' http://localhost:3003/            # expect 200
 ```
 
-Serving from this checkout matters: `playwright.config.ts` has no `webServer` block, so the specs test whatever is
-already on `:3003`. Point it at the wrong directory and the run silently exercises unmodified files.
+`docker-compose.override.yml` bind-mounts `../UnitTestInterface/assets:ro` into the `litcal-tests` container, so the
+edits in Steps 5 and 6 are served live with no rebuild. It bind-mounts `../UnitTestInterface/index.php`,
+`resources.php` and friends as **single files**, which pin their inodes — if a git operation ever replaces one of those
+files the container keeps serving the old content until `docker compose up -d --force-recreate litcal-tests`. This task
+only edits `assets/`, a directory mount, so that trap does not apply here.
+
+**The `:8000` API container mounts the *main* API checkout's `src`, not the `feat/cancel-run` worktree.** The server-side
+`cancelRun` from Task 1 is therefore *not* running behind `:8000` or `:8082`. That is fine — this task stubs the
+WebSocket and never reaches a real server — but do not attempt a live end-to-end check here and do not read anything
+into `:8082`'s behaviour. Task 1's coverage is the in-process PHPUnit test.
 
 - [ ] **Step 2: Write the WebSocket stub**
 
