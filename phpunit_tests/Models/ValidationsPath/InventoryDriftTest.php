@@ -48,6 +48,7 @@ final class InventoryDriftTest extends TestCase
         $missalDirs = glob($root . '/rite/*/missals/*', GLOB_ONLYDIR);
         self::assertNotEmpty($missalDirs, 'no missal directories found — is the glob root right?');
 
+        $i18nDirsFound = 0;
         foreach ($missalDirs as $dir) {
             foreach (glob($dir . '/*.json') ?: [] as $file) {
                 self::assertContains(
@@ -57,6 +58,7 @@ final class InventoryDriftTest extends TestCase
                 );
             }
             if (is_dir($dir . '/i18n')) {
+                ++$i18nDirsFound;
                 self::assertContains(
                     $dir . '/i18n',
                     $covered,
@@ -64,6 +66,12 @@ final class InventoryDriftTest extends TestCase
                 );
             }
         }
+
+        self::assertGreaterThan(
+            0,
+            $i18nDirsFound,
+            'no i18n directories found under any missal; if the convention moved, this test has stopped checking translations'
+        );
     }
 
     public function testEveryDecreesDataFileAndI18nFolderIsCovered(): void
@@ -74,13 +82,21 @@ final class InventoryDriftTest extends TestCase
         $decreeDirs = glob($root . '/rite/*/decrees', GLOB_ONLYDIR);
         self::assertNotEmpty($decreeDirs, 'no decrees directories found — is the glob root right?');
 
+        $i18nDirsFound = 0;
         foreach ($decreeDirs as $dir) {
             foreach (glob($dir . '/*.json') ?: [] as $file) {
                 self::assertContains($file, $covered, "source data with no inventory entry: {$file}");
             }
             if (is_dir($dir . '/i18n')) {
+                ++$i18nDirsFound;
                 self::assertContains($dir . '/i18n', $covered, "i18n folder with no inventory entry: {$dir}/i18n");
             }
         }
+
+        self::assertGreaterThan(
+            0,
+            $i18nDirsFound,
+            'no i18n directories found under any decrees folder; if the convention moved, this test has stopped checking translations'
+        );
     }
 }
