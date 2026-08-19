@@ -14,11 +14,18 @@ Every incident #806 cites is that one fault:
 | Incident         | What broke                                                                                         |
 |------------------|----------------------------------------------------------------------------------------------------|
 | API#737 → UTI#38 | source data moved under `rite/roman/`; the client's copy of the layout had to follow "in lockstep" |
-| API#795          | all twelve `.vscode` schema globs matched nothing — a third copy of the layout, never chased       |
+| API#795          | all twelve `.vscode` schema globs matched nothing — a third copy of the layout, fixed by hand      |
 | API#800          | Ambrosian temporale unvalidatable by any client: the data existed, no client listed it             |
 
-Under this design the server advertises its inventory and the client sends an opaque id. No path crosses the wire, so
-the whole class of breakage disappears.
+Under this design the server advertises its inventory and the client sends an opaque id. For the API clients that adopt
+it, no path crosses the wire, so that class of breakage disappears for them.
+
+That does not reach #795. #799 fixed it by hand, by re-copying the current layout into `.vscode/settings.json` — the
+same lockstep edit this design exists to stop needing, not a cure for having to make it. `.vscode/settings.json` is
+editor tooling, not an API client, so it neither sends nor receives anything from `/validations`; the drift test walks
+the source tree against the inventory, not against `.vscode`. The globs are correct today, but nothing here would
+notice if they went stale again. The same inventory could plausibly back a test asserting the `.vscode` globs still
+match real paths, which would close that class too — worth noting, not this design's job to do.
 
 ## Scope
 
@@ -170,7 +177,7 @@ The house envelope is a `litcal_*` key — `/schemas` returns `litcal_schemas`, 
       "kind": "file",
       "rite": "roman",
       "region": "US",
-      "label": "Roman Missal, USA edition (2011)",
+      "label": "2011 Roman Missal issued by the USCCB",
       "schema": "PropriumDeSanctis.json",
       "steps": ["exists", "parses", "validates"]
     }
@@ -248,11 +255,14 @@ via direct `handle()`, no running server):
 
 1. `byPath()` returns the same schema for every path that today's `getPathToSchemaFile()` table maps — the table is
    pasted into the test as the oracle, so the refactor is proved equivalent rather than assumed.
-2. `byId()` resolves the slugs the `sourceDataCheck` branch handles for inventory-owned entries.
+2. That `byId()` resolves the legacy `sourceDataCheck` slugs to the schema each is supposed to resolve to is not
+   covered here — it lives in `phpunit_tests/HealthSchemaCategoryTest.php`'s `sourceDataCheckSlugProvider()`, which
+   exercises `$legacySlugToId` (in `Health.php`) end to end through `retrieveSchemaForCategory()`, rather than calling
+   `CheckableInventory::byId()` directly.
 3. The five Roman sanctorale editions are present and the six without a sanctorale file are absent.
 4. `region` is `null` for the *editiones typicae* and for both Ambrosian items, `'US'` for `US_2011`, `'IT'` for
    `IT_1983` — the mapping the client's scope predicate depends on.
-5. Applying that predicate to the inventory yields, for `('roman', 'USA')`, the universal Roman items plus `US_2011`
+5. Applying that predicate to the inventory yields, for `('roman', 'US')`, the universal Roman items plus `US_2011`
    and not `IT_1983`; and for `('ambrosian', null)`, exactly the four Ambrosian items.
 
 **The drift test** — the one that earns its keep:
