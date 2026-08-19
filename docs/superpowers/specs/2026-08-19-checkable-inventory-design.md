@@ -44,6 +44,34 @@ The runners check three different kinds of thing, and only one of them is the pr
 Only kind 1 caused #737/#38, #795 and #800. Advertising kinds 2 and 3 would add surface without removing duplication,
 so this endpoint covers kind 1 only.
 
+## Who consumes it, and how they differ
+
+The two UnitTestInterface pages check overlapping sets for different reasons, and the inventory has to serve both.
+
+**`resources.php` is exhaustive.** It checks every API path — `/calendars`, `/decrees`, `/tests`, `/events`,
+`/easter`, `/schemas`, `/missals`, `/data`, plus the per-nation and per-diocese combinations — and the calendar source
+files for *every* calendar the API supports. It cares about the whole surface, filtered only by the selected rite.
+
+**`index.php` is calendar-scoped.** It checks the source files for the *selected* calendar, and runs the liturgical
+accuracy tests. With no calendar selected it falls back to the General Roman Calendar, or to the Ambrosian calendar when
+the Ambrosian rite is selected with no specific calendar.
+
+Two consequences for this design:
+
+1. **`rite` alone is not enough.** Two of the nine files are national missal editions — `propriumdesanctis_US_2011` and
+   `propriumdesanctis_IT_1983` — and they are in scope for the USA and Italy calendars respectively, and nowhere else.
+   A flat, rite-tagged list cannot express that, so items carry a `region` as well.
+2. **Accuracy tests are filtered too**, by rite and by calendar: a test naming a calendar appears only for that calendar
+   and rite; a test naming no calendar appears for any calendar, still filtered by rite. Those tests are kind 2 (they
+   come from `/tests`), so they are outside this endpoint — but they are the reason the client's filtering predicate
+   has to exist regardless of what this endpoint returns.
+
+### A client-side prerequisite, not in this scope
+
+Neither page has a RiteSelect dropdown yet, so today nothing selects a rite to filter by. That control, and the
+filtering it drives, is client work belonging with UnitTestInterface#42 and the rite-awareness thread in #39. This
+endpoint supplies the data those filters need; it does not depend on them, and it ships useful without them.
+
 ## The inventory
 
 18 items: 9 files and their 9 `i18n` folders.
@@ -58,8 +86,8 @@ Half of them need not be written down at all.
 
 Those five are **exactly** the five Roman sanctorale arms in today's hand-written `Health::getPathToSchemaFile()` table.
 So the inventory derives them instead of restating them, together with their `i18n` folders via
-`getSanctoraleI18nFilePath()` and their labels via `getName()`. A new missal edition with a sanctorale file joins the
-inventory with no edit here.
+`getSanctoraleI18nFilePath()`, their labels via `getName()`, and their `region` the same way `produceMetadata()` already
+computes it. A new missal edition with a sanctorale file joins the inventory with no edit here.
 
 ### Explicit — four pairs (8 items)
 
@@ -84,7 +112,7 @@ is written down; this design stops *duplicating* it, it does not add a rival.
 Three units, each with one responsibility.
 
 **`src/Models/ValidationsPath/CheckableItem.php`** — one item. Readonly properties: `id`, `kind` (`file` or `folder`),
-`rite`, `label`, `schema`, `steps`, and `path`. Implements `JsonSerializable` and **omits `path`** from its serialized
+`rite`, `region`, `label`, `schema`, `steps`, and `path`. Implements `JsonSerializable` and **omits `path`** from its serialized
 form: the server needs it to resolve a check, and no client may ever see it. That omission is the whole point of the
 feature, so it belongs in the type rather than in the handler.
 
@@ -123,16 +151,18 @@ The house envelope is a `litcal_*` key — `/schemas` returns `litcal_schemas`, 
       "id": "temporale:roman",
       "kind": "file",
       "rite": "roman",
+      "region": null,
       "label": "Roman Proprium de Tempore",
       "schema": "PropriumDeTempore.json",
       "steps": ["exists", "parses", "validates"]
     },
     {
-      "id": "temporale:roman:i18n",
-      "kind": "folder",
+      "id": "sanctorale:roman:US_2011",
+      "kind": "file",
       "rite": "roman",
-      "label": "Roman Proprium de Tempore translations",
-      "schema": "LitCalTranslation.json",
+      "region": "US",
+      "label": "Roman Missal, USA edition (2011)",
+      "schema": "PropriumDeSanctis.json",
       "steps": ["exists", "parses", "validates"]
     }
   ]
@@ -145,6 +175,33 @@ another shared constant.
 
 **No `protocol` field.** #806's sketch has one, but versioning and capability negotiation are section F. Stamping a
 version on one endpoint before that contract is designed is a guess, and a wrong guess would have to be supported.
+
+### `region` semantics
+
+`null` means the item applies to its whole rite. A two-letter nation code means it applies only to that nation's
+calendar. So a client's scope test is one expression:
+
+```javascript
+const inScope = ( item, rite, nation ) =>
+    item.rite === rite && ( item.region === null || item.region === nation );
+```
+
+This deliberately diverges from `RomanMissal::produceMetadata()`, which reports `'VA'` rather than `null` for the
+*editiones typicae*. `'VA'` is a nation code, and using it as a scope marker only works because the General Roman
+Calendar happens to be served under nation `VA`; applied to the Ambrosian items it would be simply false. `null` says
+"not nation-specific" without borrowing a nation to say it.
+
+### No query parameters
+
+The endpoint takes none, and always returns the whole inventory. Both pages fetch it once at load and filter in the
+browser, so changing the rite or calendar selection re-filters an array rather than making another request. That keeps
+the two dropdowns instant and the response cacheable.
+
+The obvious objection is that "is this item in scope" is server knowledge, and two runners implementing it
+independently would recreate the drift #806 exists to end — in the two files that have already drifted apart from each
+other. The answer is not to move the rule to the server but to write it **once** on the client: the predicate above
+belongs in the shared `assets/js/wsProtocol.js` module, which both runners already import. One implementation, no extra
+request.
 
 ## Deliberately not doing
 
