@@ -18,6 +18,7 @@ use LiturgicalCalendar\Api\Handlers\RegionalDataHandler;
 use LiturgicalCalendar\Api\Handlers\MissalsHandler;
 use LiturgicalCalendar\Api\Handlers\DecreesHandler;
 use LiturgicalCalendar\Api\Handlers\SchemasHandler;
+use LiturgicalCalendar\Api\Handlers\ValidationsHandler;
 use LiturgicalCalendar\Api\Handlers\TemporaleHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\LoginHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\LogoutHandler;
@@ -450,6 +451,11 @@ class Router
                     AcceptHeader::YAML
                 ]);
                 $this->handler = $schemasHandler;
+                break;
+            case 'validations':
+                $validationsHandler = new ValidationsHandler($requestPathParts);
+                $validationsHandler->setAllowedRequestMethods([RequestMethod::GET]);
+                $this->handler = $validationsHandler;
                 break;
             case 'auth':
                 // Handle authentication routes

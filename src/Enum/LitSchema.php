@@ -25,6 +25,7 @@ enum LitSchema: string
     case EASTER            = '/LitCalEasterPath.json';
     case DATA              = '/LitCalDataPath.json';
     case SCHEMAS           = '/LitCalSchemasPath.json';
+    case VALIDATIONS       = '/LitCalValidationsPath.json';
 
     public function path(): string
     {
@@ -52,7 +53,8 @@ enum LitSchema: string
             LitSchema::MISSALS  => $ERRMSG . 'Missals path data not valid',
             LitSchema::EASTER   => $ERRMSG . 'Easter path data not valid',
             LitSchema::DATA     => $ERRMSG . 'Data path data not valid',
-            LitSchema::SCHEMAS  => $ERRMSG . 'Schemas path data not valid'
+            LitSchema::SCHEMAS  => $ERRMSG . 'Schemas path data not valid',
+            LitSchema::VALIDATIONS => $ERRMSG . 'Validations path data not valid'
         };
     }
 
@@ -77,6 +79,7 @@ enum LitSchema: string
             LitSchema::EASTER->path()            => LitSchema::EASTER,
             LitSchema::DATA->path()              => LitSchema::DATA,
             LitSchema::SCHEMAS->path()           => LitSchema::SCHEMAS,
+            LitSchema::VALIDATIONS->path()       => LitSchema::VALIDATIONS,
             default                              => throw new ValidationException('Invalid schema URL: ' . $url)
         };
     }

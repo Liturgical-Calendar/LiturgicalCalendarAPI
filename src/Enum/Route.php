@@ -22,6 +22,7 @@ enum Route: string
     case EASTER             = '/easter';
     case SCHEMAS            = '/schemas';
     case MISSALS            = '/missals';
+    case VALIDATIONS        = '/validations';
     case OPS_MIGRATE        = '/_ops/migrate';
     case OPS_MIGRATE_STATUS = '/_ops/migrate/status';
 
