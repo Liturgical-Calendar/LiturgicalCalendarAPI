@@ -100,8 +100,13 @@ Half of them need not be written down at all.
 
 Those five are **exactly** the five Roman sanctorale arms in today's hand-written `Health::getPathToSchemaFile()` table.
 So the inventory derives them instead of restating them, together with their `i18n` folders via
-`getSanctoraleI18nFilePath()`, their labels via `getName()`, and their `region` the same way `produceMetadata()` already
-computes it. A new missal edition with a sanctorale file joins the inventory with no edit here.
+`getSanctoraleI18nFilePath()` and their labels via `getName()`. A new missal edition with a sanctorale file joins the
+inventory with no edit here.
+
+`region` is derived by the same *rule* `produceMetadata()` uses — the id prefix for a national edition — but not to the
+same *value* for the universal ones: the **editiones typicae get `null` here, where `produceMetadata()` reports `'VA'`**.
+The reason is in "`region` semantics" below, and the distinction matters enough to state in both places rather than
+leave a reader to infer that "the same way" means identical output.
 
 ### Explicit — four pairs (8 items)
 
