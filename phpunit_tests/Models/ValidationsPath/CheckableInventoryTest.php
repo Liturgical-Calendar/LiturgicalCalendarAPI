@@ -10,6 +10,7 @@ use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableItem;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Api\Services\ResourceExistenceChecker;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -201,6 +202,19 @@ final class CheckableInventoryTest extends TestCase
         self::assertNotNull($italyI18n);
         self::assertSame('folder', $italyI18n->kind);
         self::assertSame(LitSchema::I18N, $italyI18n->schema);
+    }
+
+    public function testVaticanIsExcludedBecauseItHasNoSourceDataOfItsOwn(): void
+    {
+        // The Vatican is announced as a national calendar (CalendarMetadataProvider hardcodes it
+        // alongside the real per-nation entries) but is served by the General Roman Calendar and
+        // has no nations/VA/ source folder — nothing here is checkable, so it must not be listed.
+        self::assertNull(CheckableInventory::byId('nation:roman:' . ResourceExistenceChecker::VATICAN_NATIONAL_CALENDAR_ID));
+
+        $vaticanPrefix = 'nation:roman:' . ResourceExistenceChecker::VATICAN_NATIONAL_CALENDAR_ID;
+        foreach (CheckableInventory::all() as $item) {
+            self::assertStringStartsNotWith($vaticanPrefix, $item->id, "unexpected Vatican item {$item->id}");
+        }
     }
 
     public function testWiderRegionsAreEnumeratedAndAreNotNationScoped(): void

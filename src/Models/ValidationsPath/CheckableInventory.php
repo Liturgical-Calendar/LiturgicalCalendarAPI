@@ -11,6 +11,7 @@ use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
+use LiturgicalCalendar\Api\Services\ResourceExistenceChecker;
 
 /**
  * The source data this API can validate, in one place.
@@ -238,7 +239,16 @@ final class CheckableInventory
     {
         $items = [];
         foreach (self::metadata()->national_calendars as $nation) {
-            $id   = $nation->calendar_id;
+            $id = $nation->calendar_id;
+
+            // The Vatican is announced as a national calendar but is served by the General Roman
+            // Calendar and has no source folder of its own — see ResourceExistenceChecker, which
+            // special-cases the same id for the same reason. There is nothing here to check, so it
+            // is excluded rather than listed with a target that could never exist.
+            if (ResourceExistenceChecker::VATICAN_NATIONAL_CALENDAR_ID === $id) {
+                continue;
+            }
+
             $file = strtr(JsonData::NATIONAL_CALENDAR_FILE->path(), ['{nation}' => $id]);
 
             $items[] = new CheckableItem(
