@@ -65,6 +65,10 @@
       "description": "Retrieve the JSON schemas that define API request and response shapes and source data files"
     },
     {
+      "name": "Validations",
+      "description": "Retrieve the source data this API can be asked to validate"
+    },
+    {
       "name": "Temporale",
       "description": "Retrieve / create / update / delete Proprium de Tempore (temporale) events"
     },
@@ -7307,6 +7311,64 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      }
+    },
+    "/validations": {
+      "get": {
+        "tags": [
+          "Validations"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the source data this API can be asked to validate",
+        "description": "Clients iterate this list and send back an item's opaque id, so no filesystem path crosses the wire. Advertising is not verification: an item appearing here does not assert that the underlying data is present, only that it is checkable. Filtering by rite and region is done by the client.",
+        "operationId": "validationsGET",
+        "responses": {
+          "200": {
+            "description": "the source data this API can validate",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./LitCalValidationsPath.json"
+                },
+                "example": {
+                  "litcal_validations": [
+                    {
+                      "id": "temporale:roman",
+                      "kind": "file",
+                      "rite": "roman",
+                      "region": null,
+                      "label": "Roman Proprium de Tempore",
+                      "schema": "PropriumDeTempore.json",
+                      "steps": [
+                        "exists",
+                        "parses",
+                        "validates"
+                      ]
+                    },
+                    {
+                      "id": "sanctorale:roman:US_2011:i18n",
+                      "kind": "folder",
+                      "rite": "roman",
+                      "region": "US",
+                      "label": "2011 Roman Missal issued by the USCCB translations",
+                      "schema": "LitCalTranslation.json",
+                      "steps": [
+                        "exists",
+                        "parses",
+                        "validates"
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "the requested Accept header is not supported by this endpoint"
           }
         }
       }
