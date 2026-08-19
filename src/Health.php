@@ -65,6 +65,7 @@ use Psr\Http\Message\ResponseInterface;
  * @phpstan-type ExecuteValidationResource \stdClass&object{action:'executeValidation',category:'resourceDataCheck',validate:string,sourceFile:string,responsetype?:string}
  * @phpstan-type ValidateCalendar \stdClass&object{action:'validateCalendar',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar'|'ritecalendar',responsetype:'JSON'|'XML'|'ICS'|'YML',rite?:string}
  * @phpstan-type ExecuteUnitTest \stdClass&object{action:'executeUnitTest',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar'|'ritecalendar',test:string,rite?:string}
+ * @phpstan-type CancelRun \stdClass&object{action:'cancelRun',runToken:string}
  *
  * @phpstan-import-type LiturgicalEvent from \LiturgicalCalendar\Api\Test\LitTestRunner
  */
@@ -87,7 +88,8 @@ class Health implements MessageComponentInterface
     private const ACTION_PROPERTIES = [
         'executeValidation' => ['category', 'validate', 'sourceFile'],
         'validateCalendar'  => ['category', 'calendar', 'year', 'responsetype'],
-        'executeUnitTest'   => ['category', 'calendar', 'year', 'test']
+        'executeUnitTest'   => ['category', 'calendar', 'year', 'test'],
+        'cancelRun'         => ['runToken']
     ];
 
     private const RED    = "\033[0;31m";
@@ -362,11 +364,16 @@ class Health implements MessageComponentInterface
         // Reset per-connection cache hit counter for each new message (test run)
         $this->cacheHitCounters[$resourceId] = 0;
         echo sprintf('Receiving message from connection %d: %s', $resourceId, $msg . "\n");
-        /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest $messageReceived */
+        /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest|CancelRun $messageReceived */
         $messageReceived = json_decode($msg);
-        // Store optional run token for response correlation
+        // Store optional run token for response correlation. `cancelRun` is exempt: it names the run it
+        // wants abandoned rather than the run this connection is on, and storing it here would install
+        // the very token cancelRun() is about to clear — making even a stale cancel match, and dropping
+        // the queue of the run that replaced it.
         if (
             $messageReceived instanceof \stdClass
+            && property_exists($messageReceived, 'action')
+            && $messageReceived->action !== 'cancelRun'
             && property_exists($messageReceived, 'runToken')
             && is_string($messageReceived->runToken)
             && preg_match('/^[A-Za-z0-9_\-]{1,64}$/', $messageReceived->runToken)
@@ -405,6 +412,10 @@ class Health implements MessageComponentInterface
                         $from,
                         self::readRiteHint($messageReceived)
                     );
+                    break;
+                case 'cancelRun':
+                    /** @var CancelRun $messageReceived */
+                    $this->cancelRun($messageReceived->runToken, $from);
                     break;
                 default:
                     $message       = new \stdClass();
@@ -501,6 +512,45 @@ class Health implements MessageComponentInterface
     private function resolveRunToken(ConnectionInterface $conn): ?string
     {
         return is_int($conn->resourceId) ? ( $this->runTokens[$conn->resourceId] ?? null ) : null;
+    }
+
+    /**
+     * Abandon a run: forget its token, so its queued requests stop being work worth doing.
+     *
+     * Sent by the client when the user stops a run, so the server does not keep fetching calendars and
+     * validating files for a run nobody is watching. Only the queued backlog is dropped — requests
+     * already in flight are capped at maxConcurrency and their frames are discarded client-side, so
+     * chasing them would buy little for a great deal of plumbing.
+     *
+     * The token must match what this connection is currently running. A cancel naming a run the
+     * connection has already left — the user stopped and restarted faster than the frame travelled —
+     * is a no-op: acting on it would clear the token of the run that *replaced* it and drop that run's
+     * queue instead, which is a worse bug than the one this fixes.
+     *
+     * Nothing is sent back; see #806 section H.
+     *
+     * `validateMessageProperties()` only checks that `runToken` is *present*, not that it is a string —
+     * `{"action":"cancelRun","runToken":null}` (or an array, or an object) passes validation and reaches
+     * here. In weak mode PHP does not coerce those into a `string` parameter; it throws `TypeError`, and
+     * Ratchet's `IoServer::handleData` only catches `\Exception`, so an `\Error` escapes and kills the
+     * whole WebSocket process over one malformed cancel. A cancel the server cannot act on is already a
+     * documented no-op (see above), so a non-string token folds into that same no-op path instead.
+     *
+     * @param mixed $runToken The run the client wants abandoned. Expected to be a string, but the caller
+     *                        only guarantees the property exists, not its type — see above.
+     * @param ConnectionInterface $from The connection that asked.
+     */
+    private function cancelRun(mixed $runToken, ConnectionInterface $from): void
+    {
+        if (false === is_string($runToken)) {
+            return;
+        }
+        $resourceId = $from->resourceId;
+        if (false === is_int($resourceId) || ( $this->runTokens[$resourceId] ?? null ) !== $runToken) {
+            return;
+        }
+        unset($this->runTokens[$resourceId]);
+        $this->dropSupersededQueuedRequests();
     }
 
     /**
@@ -1877,12 +1927,13 @@ class Health implements MessageComponentInterface
     }
 
     /**
-     * Drop queued requests whose run has been superseded: the client stopped and started a new run,
-     * so the connection's stored token has advanced. Their responses would be discarded by the
-     * client anyway, so skipping the work lets a restarted run dispatch immediately instead of first
-     * draining the abandoned run's backlog. Untagged requests (e.g. the metadata fetch on connect)
-     * carry no token and are always kept. In-flight requests are not affected (they are few — capped
-     * at maxConcurrency — and their responses are discarded client-side).
+     * Drop queued requests whose run this connection is no longer on. Two things cause that: the client
+     * stopped and started a new run, so the connection's stored token advanced; or the client sent
+     * `cancelRun` and {@see Health::cancelRun()} cleared the stored token outright. Their responses would
+     * be discarded by the client anyway, so skipping the work lets a restarted run dispatch immediately
+     * instead of first draining the abandoned run's backlog. Untagged requests (e.g. the metadata fetch
+     * on connect) carry no token and are always kept. In-flight requests are not affected (they are few —
+     * capped at maxConcurrency — and their responses are discarded client-side).
      */
     private function dropSupersededQueuedRequests(): void
     {
@@ -2024,7 +2075,7 @@ class Health implements MessageComponentInterface
      * specified action. If any expected property is missing from the message
      * object, the function returns false, indicating the message is invalid.
      *
-     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest $message The message object to validate.
+     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest|CancelRun $message The message object to validate.
      * @return bool True if all required properties are present, false otherwise.
      */
     private static function validateMessageProperties(\stdClass $message): bool
