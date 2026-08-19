@@ -60,7 +60,8 @@ final class CheckableInventory
                 self::explicitItems(),
                 self::nationalCalendarItems(),
                 self::widerRegionItems(),
-                self::diocesanCalendarItems()
+                self::diocesanCalendarItems(),
+                self::testDefinitionItems()
             );
         }
 
@@ -363,6 +364,50 @@ final class CheckableInventory
                 self::STEPS,
                 rtrim(strtr($i18nTemplate, $replacements), '/')
             );
+        }
+
+        return $items;
+    }
+
+    /**
+     * Test definitions, one per JSON file in each rite's tests folder.
+     *
+     * This item is the *definition* — does the file validate against LitCalTest.json. Running the test
+     * against a computed calendar is a separate action with its own addressing, and the two must not be
+     * conflated: a definition can be valid while the test it describes fails, and vice versa.
+     *
+     * Unlike every other kind here, a test has no `i18n` sibling.
+     *
+     * Enumerated from the filesystem rather than from `CalendarMetadataProvider`, because test
+     * definitions are not calendars and the index does not carry them: `TestsHandler` itself
+     * discovers them the same way (see its own `glob(... . '/*Test.json')`), so here the glob
+     * *is* the registration lookup, not a stat gating an already-known item. The asymmetry this
+     * buys is real: unlike every calendar item above, a deleted test file here simply drops out of
+     * the inventory instead of staying listed and failing its `exists` step.
+     *
+     * @return list<CheckableItem>
+     */
+    private static function testDefinitionItems(): array
+    {
+        $items = [];
+
+        foreach (Rite::cases() as $rite) {
+            $folder = JsonData::testsFolderFor($rite)->path();
+            $files  = glob($folder . '/*Test.json') ?: [];
+
+            foreach ($files as $file) {
+                $name    = basename($file, '.json');
+                $items[] = new CheckableItem(
+                    "test:{$rite->value}:{$name}",
+                    'file',
+                    $rite,
+                    null,
+                    "Liturgical test: {$name}",
+                    LitSchema::TEST_SRC,
+                    self::STEPS,
+                    $file
+                );
+            }
         }
 
         return $items;

@@ -167,7 +167,15 @@ final class CheckableInventoryTest extends TestCase
         );
         sort($ambrosian);
         self::assertSame(
-            ['sanctorale:ambrosian', 'sanctorale:ambrosian:i18n', 'temporale:ambrosian', 'temporale:ambrosian:i18n'],
+            [
+                'sanctorale:ambrosian',
+                'sanctorale:ambrosian:i18n',
+                'temporale:ambrosian',
+                'temporale:ambrosian:i18n',
+                // Test definitions are rite-scoped, not nation-scoped (region is always null), so the
+                // repository's one Ambrosian test fixture is legitimately in scope here too.
+                'test:ambrosian:StIgnatiusOfLoyolaTest',
+            ],
             $ambrosian
         );
     }
@@ -271,6 +279,32 @@ final class CheckableInventoryTest extends TestCase
             self::assertSame(Rite::AMBROSIAN, $item->rite);
             self::assertStringContainsString('/rite/ambrosian/calendars/dioceses/', $item->path);
             self::assertFileExists($item->path, "{$item->id} points at a file that does not exist");
+        }
+    }
+
+    /**
+     * A test *definition* is a source artifact: does the JSON match LitCalTest.json. That is a different
+     * thing from running the test against a computed calendar, which stays a separate action.
+     */
+    public function testTestDefinitionsAreEnumeratedPerRite(): void
+    {
+        $ids     = array_map(static fn (CheckableItem $i): string => $i->id, CheckableInventory::all());
+        $testIds = array_values(array_filter($ids, static fn (string $id): bool => str_starts_with($id, 'test:')));
+
+        self::assertNotEmpty($testIds, 'the repository ships test definitions; none were enumerated');
+
+        foreach ($testIds as $id) {
+            self::assertMatchesRegularExpression('/^test:(roman|ambrosian):[A-Za-z0-9_]+$/', $id);
+            self::assertStringEndsNotWith(':i18n', $id, 'test definitions have no translations folder');
+        }
+
+        foreach (CheckableInventory::all() as $item) {
+            if (str_starts_with($item->id, 'test:')) {
+                self::assertSame('file', $item->kind);
+                self::assertSame(LitSchema::TEST_SRC, $item->schema);
+                self::assertNull($item->region, 'a test definition is not nation-scoped');
+                self::assertFileExists($item->path, "{$item->id} points at a file that does not exist");
+            }
         }
     }
 }
