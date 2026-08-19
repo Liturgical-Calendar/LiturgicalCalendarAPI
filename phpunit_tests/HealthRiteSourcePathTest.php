@@ -10,6 +10,7 @@ use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Router;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use PHPUnit\Framework\TestCase;
 use Ratchet\ConnectionInterface;
 
@@ -49,7 +50,7 @@ final class HealthRiteSourcePathTest extends TestCase
 
         self::assertStringContainsString(
             'Reading data from file ' . $expected,
-            self::captureSourceFileRead('milano_it')
+            self::captureSourceFileRead('diocesan-calendar-milano_it')
         );
     }
 
@@ -61,7 +62,7 @@ final class HealthRiteSourcePathTest extends TestCase
             '{diocese_name}' => 'Rotterdam'
         ]);
 
-        $output = self::captureSourceFileRead('rotter_nl');
+        $output = self::captureSourceFileRead('diocesan-calendar-rotter_nl');
 
         self::assertStringContainsString('Reading data from file ' . $expected, $output);
         self::assertStringNotContainsString(JsonData::AMBROSIAN_DIOCESAN_CALENDARS_FOLDER->value, $output);
@@ -73,9 +74,58 @@ final class HealthRiteSourcePathTest extends TestCase
      */
     public function testTheClientSuppliedSourceFileIsNotWhatIsRead(): void
     {
-        $output = self::captureSourceFileRead('milano_it');
+        $output = self::captureSourceFileRead('diocesan-calendar-milano_it');
 
         self::assertStringNotContainsString('client/supplied/nonsense.json', $output);
+    }
+
+    // ------------------------------------------------- slugs the trailing block cannot match
+
+    /**
+     * The `sourceFile` branch's own slug pattern was `([A-Z][a-z]+)`, which matches `Europe` but
+     * neither `IT` nor `milano_it` — so its national and diocesan arms never ran and `$dataPath`
+     * kept whatever the client sent. For the *canonical* id shapes that went unnoticed, because
+     * the block at the tail of `executeValidation()` re-derives the path for `[A-Z]{2}` nations
+     * and `[a-z]{6}_[a-z]{2}` dioceses anyway.
+     *
+     * These two exercise ids that the trailing block's stricter patterns cannot match, which is
+     * the only window in which the widened pattern is observable. They also show why the widened
+     * pattern and the rite-aware diocesan constant had to land together: the moment the pattern
+     * admits a diocesan id, that arm starts executing, and with the bare Roman constant it would
+     * have sent every Ambrosian diocese to a Roman path.
+     */
+    #[WithoutErrorHandler]
+    public function testANationalSlugTheTrailingBlockCannotMatchIsDerivedServerSide(): void
+    {
+        $expected = strtr(JsonData::NATIONAL_CALENDAR_FILE->path(), ['{nation}' => 'USA']);
+
+        $output = self::captureSourceFileRead('national-calendar-USA');
+
+        self::assertStringContainsString('Reading data from file ' . $expected, $output);
+        self::assertStringNotContainsString('client/supplied/nonsense.json', $output);
+    }
+
+    #[WithoutErrorHandler]
+    public function testADiocesanSlugTheTrailingBlockCannotMatchKeepsItsRite(): void
+    {
+        $ambrosian = strtr(JsonData::AMBROSIAN_DIOCESAN_CALENDAR_FILE->path(), [
+            '{nation}'       => 'ZZ',
+            '{diocese}'      => 'nowhere_zz',
+            '{diocese_name}' => 'Nowhere'
+        ]);
+        $roman     = strtr(JsonData::DIOCESAN_CALENDAR_FILE->path(), [
+            '{nation}'       => 'ZZ',
+            '{diocese}'      => 'nowhere_zz',
+            '{diocese_name}' => 'Nowhere'
+        ]);
+
+        $output = self::captureSourceFileRead(
+            'diocesan-calendar-nowhere_zz',
+            [self::diocese('nowhere_zz', 'Nowhere', 'ZZ', Rite::AMBROSIAN)]
+        );
+
+        self::assertStringContainsString('Reading data from file ' . $ambrosian, $output);
+        self::assertStringNotContainsString($roman, $output);
     }
 
     // ---------------------------------------------------------------- i18n folder
@@ -149,11 +199,13 @@ final class HealthRiteSourcePathTest extends TestCase
     // ---------------------------------------------------------------- helpers
 
     /**
-     * Run a diocesan `sourceFile` check and return everything `executeValidation()` echoed. The
-     * path is echoed before the read is handed to a promise that is never resolved, so this
-     * needs neither the event loop nor the file to exist.
+     * Run a `sourceFile` check and return everything `executeValidation()` echoed. The path is
+     * echoed before the read is handed off, so this needs neither the file to exist nor the
+     * validation to succeed.
+     *
+     * @param list<\stdClass>|null $dioceses metadata stand-in, or null for the two real fixtures
      */
-    private static function captureSourceFileRead(string $dioceseId): string
+    private static function captureSourceFileRead(string $validateSlug, ?array $dioceses = null): string
     {
         $conn   = self::createStubConnection(1);
         $health = self::healthWithRunToken($conn);
@@ -161,16 +213,16 @@ final class HealthRiteSourcePathTest extends TestCase
         ob_start();
         try {
             self::withMetadata(
-                [
+                $dioceses ?? [
                     self::diocese('milano_it', 'Arcidiocesi di Milano', 'IT', Rite::AMBROSIAN),
                     self::diocese('rotter_nl', 'Rotterdam', 'NL', Rite::ROMAN),
                 ],
-                static function () use ($health, $conn, $dioceseId): void {
+                static function () use ($health, $conn, $validateSlug): void {
                     $method = new \ReflectionMethod(Health::class, 'executeValidation');
                     $method->invoke($health, (object) [
                         'action'     => 'executeValidation',
                         'category'   => 'sourceDataCheck',
-                        'validate'   => "diocesan-calendar-$dioceseId",
+                        'validate'   => $validateSlug,
                         'sourceFile' => 'client/supplied/nonsense.json',
                     ], $conn);
                 }

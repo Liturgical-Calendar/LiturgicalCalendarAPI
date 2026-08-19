@@ -664,7 +664,12 @@ class Health implements MessageComponentInterface
                     /** @var ExecuteValidationSourceFile $validation */
                     $dataPath = (string) $validation->sourceFile;
                     $matches  = null;
-                    if (preg_match('/^(wider-region|national-calendar|diocesan-calendar)-([A-Z][a-z]+)$/', $validate, $matches)) {
+                    // `[A-Z][a-z]+` matched `Europe` but neither `IT` (no lowercase char) nor
+                    // `milano_it` (lowercase initial, and no `_` in the class), so the national
+                    // and diocesan arms below never ran and $dataPath silently kept the
+                    // client-supplied `sourceFile`. `[A-Za-z_]+` matches all three, the same way
+                    // the i18n branch above already does.
+                    if (preg_match('/^(wider-region|national-calendar|diocesan-calendar)-([A-Za-z_]+)$/', $validate, $matches)) {
                         switch ($matches[1]) {
                             case 'wider-region':
                                 $dataPath = strtr(
@@ -685,8 +690,13 @@ class Health implements MessageComponentInterface
                                     $this->handleDioceseMetadataError($e, $to, $validation, $matches[2], $runToken);
                                     return;
                                 }
+                                // Rite-partitioned, like every other diocesan path. This arm only
+                                // starts executing once the slug pattern above admits a diocesan
+                                // id, which is why the two changes belong together: widening the
+                                // pattern while leaving the bare Roman constant here would send
+                                // every Ambrosian diocese to a Roman path.
                                 $dataPath = strtr(
-                                    JsonData::DIOCESAN_CALENDAR_FILE->path(),
+                                    JsonData::diocesanCalendarFileFor($dioceseMetadata->rite)->path(),
                                     [
                                         '{diocese}'      => $matches[2],
                                         '{nation}'       => $dioceseMetadata->nation,
