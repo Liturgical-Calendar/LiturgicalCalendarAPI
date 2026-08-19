@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Tests;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitSchema;
+use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Router;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -28,10 +29,24 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Health::class)]
 final class HealthSchemaCategoryTest extends TestCase
 {
+    private static bool $routerInitialized = false;
+
+    /**
+     * `LitSchema::path()` and `Route::path()` both need `Router`'s static paths resolved.
+     * Data providers run *before* `setUpBeforeClass()`, so any provider that builds a
+     * `Route::path()` must initialise them itself; the flag keeps repeat calls cheap.
+     */
+    private static function initRouter(): void
+    {
+        if (false === self::$routerInitialized) {
+            Router::getApiPaths();
+            self::$routerInitialized = true;
+        }
+    }
+
     public static function setUpBeforeClass(): void
     {
-        // LitSchema::path()/JsonData::path() both depend on Router::$apiFilePath.
-        Router::getApiPaths();
+        self::initRouter();
     }
 
     private static function retrieveSchemaForCategory(string $category, string $dataPath): ?string
@@ -97,6 +112,45 @@ final class HealthSchemaCategoryTest extends TestCase
     public function testSourceDataCheckRejectsAnUnrecognisedSlug(): void
     {
         self::assertNull(self::retrieveSchemaForCategory('sourceDataCheck', 'not-a-known-slug'));
+    }
+
+    // ---------------------------------------------------------------- resourceDataCheck
+
+    /**
+     * `resourceDataCheck` resolves from the API endpoint URL, either by matching a route shape
+     * or — for the bare routes — by falling through to {@see Health::getPathToSchemaFile()}.
+     *
+     * @return array<string, array{string, LitSchema}>
+     */
+    public static function resourceDataCheckUrlProvider(): array
+    {
+        self::initRouter();
+
+        return [
+            'missal by id'      => [Route::MISSALS->path() . '/EDITIO_TYPICA_1970', LitSchema::PROPRIUMDESANCTIS],
+            'events for nation' => [Route::EVENTS->path() . '/nation/US', LitSchema::EVENTS],
+            'data for nation'   => [Route::DATA->path() . '/nation/US', LitSchema::NATIONAL],
+            'data for diocese'  => [Route::DATA->path() . '/diocese/romamo_it', LitSchema::DIOCESAN],
+            'data for region'   => [Route::DATA->path() . '/widerregion/Europe', LitSchema::WIDERREGION],
+            'bare route'        => [Route::CALENDARS->path(), LitSchema::METADATA],
+        ];
+    }
+
+    #[DataProvider('resourceDataCheckUrlProvider')]
+    public function testResourceDataCheckResolvesFromTheEndpointUrl(string $url, LitSchema $expected): void
+    {
+        self::assertSame($expected->path(), self::retrieveSchemaForCategory('resourceDataCheck', $url));
+    }
+
+    public function testResourceDataCheckRejectsAnUnrecognisedUrl(): void
+    {
+        self::assertNull(self::retrieveSchemaForCategory('resourceDataCheck', 'https://example.test/not/a/route'));
+    }
+
+    public function testResourceDataCheckDoesNotResolveASourceDataCheckSlug(): void
+    {
+        // Completes the mismatch matrix: each category rejects the others' input.
+        self::assertNull(self::retrieveSchemaForCategory('resourceDataCheck', 'national-calendar-US'));
     }
 
     // ---------------------------------------------------------------- the two are not interchangeable

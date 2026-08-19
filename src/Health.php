@@ -50,7 +50,10 @@ use Psr\Http\Message\ResponseInterface;
  *   - `universalcalendar`  — the schema is resolved from the `sourceFile` **path**, via {@see Health::getPathToSchemaFile()}.
  *                            `validate` is a display/CSS label only (PascalCase), never a schema key.
  *   - `sourceDataCheck`    — the schema is resolved from the `validate` **slug** (anchored lowercase patterns such as
- *                            `national-calendar-IT`), and `sourceFile`/`sourceFolder` carry a bare id the server expands into a path.
+ *                            `national-calendar-IT`). The data path is `sourceFile`/`sourceFolder` **as supplied**, except for the
+ *                            `wider-region-…`, `national-calendar-…`, `diocesan-calendar-…` and `proprium-de-sanctis-…-i18n` slugs,
+ *                            where the server reconstructs the path from the slug — which is why messages carrying those send a bare
+ *                            id (`IT`, `Europe`) while the rest send a real path (`jsondata/tests/roman/…`).
  *   - `resourceDataCheck`  — the schema is resolved from the `sourceFile` **URL** of an API endpoint.
  *
  * Do not confuse these with the *calendar type* named by `category` on `validateCalendar` and `executeUnitTest` below;
