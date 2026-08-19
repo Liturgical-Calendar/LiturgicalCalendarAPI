@@ -636,8 +636,12 @@ class Health implements MessageComponentInterface
                                 $this->handleDioceseMetadataError($e, $to, $validation, $matches[2], $runToken);
                                 return;
                             }
+                            // The diocesan tree is partitioned by rite, and it is the only tier
+                            // that is: an Ambrosian diocese keeps its i18n files under
+                            // `sourcedata/rite/ambrosian/...`, so the bare Roman constant would
+                            // send every one of them to a folder that does not exist.
                             $dataPath = strtr(
-                                JsonData::DIOCESAN_CALENDAR_I18N_FOLDER->path(),
+                                JsonData::diocesanCalendarI18nFolderFor($dioceseMetadata->rite)->path(),
                                 [
                                     '{diocese}' => $matches[2],
                                     '{nation}'  => $dioceseMetadata->nation
@@ -863,7 +867,10 @@ class Health implements MessageComponentInterface
                 }
                 $nation      = $dioceseMetadata->nation;
                 $dioceseName = $dioceseMetadata->diocese;
-                $dataPath    = strtr(JsonData::DIOCESAN_CALENDAR_FILE->path(), [
+                // Rite-partitioned, exactly as the i18n-folder branch above: this is the site
+                // that actually governs a diocesan source-file check, because it reassigns
+                // $dataPath after the earlier `sourceFile` branch has run.
+                $dataPath = strtr(JsonData::diocesanCalendarFileFor($dioceseMetadata->rite)->path(), [
                     '{nation}'       => $nation,
                     '{diocese}'      => $dioceseId,
                     '{diocese_name}' => $dioceseName
@@ -2143,11 +2150,13 @@ class Health implements MessageComponentInterface
                 ) {
                     return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS->path()) : LitSchema::PROPRIUMDESANCTIS->path();
                 } elseif (
-                    preg_match('/\/events\/(?:nation\/[A-Z]{2}|diocese\/[a-z]{6}_[a-z]{2})(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath)
+                    preg_match('/\/events\/(?:(?:roman|ambrosian)\/)?(?:nation\/[A-Z]{2}|diocese\/[a-z]{6}_[a-z]{2})(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath)
                 ) {
                     return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::EVENTS->path()) : LitSchema::EVENTS->path();
                 } elseif (
-                    preg_match('/\/data\/(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/[A-Z][a-z]+)(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath, $matches)
+                    // The rite segment is NON-capturing on purpose: the numbered groups below drive
+                    // the switch, so a capturing group here would shift them all by one.
+                    preg_match('/\/data\/(?:(?:roman|ambrosian)\/)?(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/[A-Z][a-z]+)(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath, $matches)
                 ) {
                     $schema = LitSchema::DATA->path();
                     foreach ($matches as $idx => $match) {
