@@ -69,15 +69,15 @@ Two consequences for this design:
 
 ### A client-side prerequisite, not in this scope
 
-Neither page has a RiteSelect dropdown yet, so today nothing selects a rite to filter by. That control, and the
-filtering it drives, is client work tracked as **UnitTestInterface#48**, alongside #42 and the rite-awareness
-thread in #39. This endpoint supplies the data those filters need; it does not depend on them, and it ships useful
-without them.
+Neither page has a RiteSelect dropdown yet, so today nothing selects a rite to filter by. UnitTestInterface#39
+brought the calendar dropdown's options as far as carrying `data-rite`; the control itself, and the filtering it
+drives, is client work tracked as **UnitTestInterface#48**, alongside #42. This endpoint supplies the data those
+filters need; it does not depend on them, and it ships useful without them.
 
-Worth knowing when reading #48: the control already exists as `RiteSelect` in `liturgy-components-php`, but
-UnitTestInterface pins `liturgical-calendar/components: ^3.1` (locked v3.3.1) and `RiteSelect` shipped in v4.0.0 — a
-major bump that also raises the package's PHP floor to 8.2. So the client half of rite filtering is gated on a
-dependency upgrade, not on this endpoint.
+Worth knowing when reading #48: the client half is gated on adopting `@liturgical-calendar/components-js`, whose
+`CalendarSelect` is rite-aware and whose `MetaComponents/CalendarControls` already wires a rite select to a calendar
+select. The PHP components UnitTestInterface currently depends on render server-side, so they can supply the control
+but not the wiring. Either way the gate is a client-side dependency decision, not this endpoint.
 
 ## The inventory
 
