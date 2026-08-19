@@ -1,11 +1,12 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://litcal.johnromanodorazio.com/api/dev/schemas/LitCalValidationsPath.json",
+    "$schema": "https://json-schema.org/draft-07/schema#",
     "title": "Liturgical Calendar Validations Path",
     "description": "The source data this API can be asked to validate. Clients iterate this list and send back an item's opaque id, so no filesystem path crosses the wire.",
     "type": "object",
     "additionalProperties": false,
-    "required": ["litcal_validations"],
+    "required": [
+        "litcal_validations"
+    ],
     "properties": {
         "litcal_validations": {
             "type": "array",
@@ -13,7 +14,15 @@
             "items": {
                 "type": "object",
                 "additionalProperties": false,
-                "required": ["id", "kind", "rite", "region", "label", "schema", "steps"],
+                "required": [
+                    "id",
+                    "kind",
+                    "rite",
+                    "region",
+                    "label",
+                    "schema",
+                    "steps"
+                ],
                 "properties": {
                     "id": {
                         "type": "string",
@@ -22,14 +31,23 @@
                     },
                     "kind": {
                         "type": "string",
-                        "enum": ["file", "folder"]
+                        "enum": [
+                            "file",
+                            "folder"
+                        ]
                     },
                     "rite": {
                         "type": "string",
-                        "enum": ["roman", "ambrosian"]
+                        "enum": [
+                            "roman",
+                            "ambrosian"
+                        ]
                     },
                     "region": {
-                        "type": ["string", "null"],
+                        "type": [
+                            "string",
+                            "null"
+                        ],
                         "pattern": "^[A-Z]{2}$",
                         "description": "Null when the item applies to its whole rite; an ISO nation code when it applies only to that nation's calendar."
                     },
@@ -47,7 +65,11 @@
                         "minItems": 1,
                         "items": {
                             "type": "string",
-                            "enum": ["exists", "parses", "validates"]
+                            "enum": [
+                                "exists",
+                                "parses",
+                                "validates"
+                            ]
                         }
                     }
                 }
