@@ -114,13 +114,19 @@ The stop branches of `assets/js/index.js` and `assets/js/resources.js` are ident
 immediately before `currentRunToken = null`:
 
 ```javascript
-if ( conn.readyState === WebSocket.OPEN ) {
-    conn.send( JSON.stringify( { action: 'cancelRun', runToken: currentRunToken } ) );
+if ( conn.readyState === WebSocket.OPEN && currentRunToken !== null ) {
+    sendMessage( { action: 'cancelRun' } );
 }
 ```
 
+Both runners already carry an identical `sendMessage()` helper that attaches `currentRunToken` to any outbound payload,
+so the cancel is guaranteed to name the same run its sibling frames named. That is also why the insert must precede
+`currentRunToken = null`.
+
 The `readyState` guard matters because the stop button is also reachable while the socket is reconnecting. A closed socket
 needs no cancel: `Health::onClose()` already unsets the connection's stored token, and the queue drains on the next pass.
+The explicit null test is the second half of the same care: `sendMessage()` omits the token when there is none, and a
+cancel carrying no token is a protocol error the server rejects.
 
 Nothing else in the stop branch changes, and no response handling is added.
 
