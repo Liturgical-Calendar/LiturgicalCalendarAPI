@@ -2183,6 +2183,13 @@ class Health implements MessageComponentInterface
                 // Legacy slugs from the runner pages, mapped onto inventory ids. #806 step A gives
                 // every item an id; until the clients send those ids (UnitTestInterface#42), the
                 // old vocabulary keeps working through this table.
+                //
+                // proprium-de-sanctis-* is deliberately absent: those slugs are hyphenated (e.g.
+                // proprium-de-sanctis-IT-1983) while the matching inventory ids are underscored
+                // (sanctorale:roman:IT_1983), so mapping them here would mean hand-listing the
+                // five editions again — exactly the restatement the derivation removed. They keep
+                // resolving through the surviving regex below instead, until clients send inventory
+                // ids.
                 $legacySlugToId = [
                     'memorials-from-decrees'      => 'decrees:roman',
                     'memorials-from-decrees-i18n' => 'decrees:roman:i18n',

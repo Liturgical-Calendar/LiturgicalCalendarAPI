@@ -33,8 +33,12 @@ final class ValidationsHandler extends AbstractHandler
     {
         parent::__construct($requestPathParams);
 
-        // Read-only, JSON-only: the same restriction Router applies, held here too
-        // so the handler is self-consistent when instantiated directly (as in tests).
+        // Read-only, JSON-only. Router's restriction here is about methods (GET only), not
+        // Accept — sibling read routes accept [JSON, YAML]. This endpoint deliberately narrows
+        // further: it's a machine-readable inventory for clients deciding what to validate, not
+        // a document meant for human viewing in alternate formats, so there's no reason to carry
+        // the YAML encoding cost. Held here too so the handler is self-consistent when
+        // instantiated directly (as in tests).
         $this->allowedRequestMethods = [RequestMethod::GET];
         $this->allowedAcceptHeaders  = [AcceptHeader::JSON];
     }

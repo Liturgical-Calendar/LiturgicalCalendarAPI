@@ -12,7 +12,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Source data that exists on disk but appears in no inventory entry.
+ * Source data that exists on disk but appears in no inventory entry — for the directories this
+ * test walks.
  *
  * This is the failure #800 was: the Ambrosian temporale was present and unvalidatable, because
  * nothing listed it. Divergence between the data and the list that describes it was silent, and
@@ -22,6 +23,12 @@ use PHPUnit\Framework\TestCase;
  * failure here: that is what the `exists` step reports at check time, and asserting it would stop
  * the inventory from advertising data a given deployment is missing — reintroducing the same
  * blindness from the other side.
+ *
+ * Coverage is not exhaustive. This test walks only the `missals` and `decrees` directories under
+ * each `rite`. The `calendars` tree under each rite, and the `lectionary` tree under `roman`, are
+ * outside `CheckableInventory`'s scope entirely and are never visited here. Within the directories
+ * that are walked, only top-level JSON files and an `i18n` subfolder are checked — a `lectionary`
+ * subfolder nested inside a missal or decrees directory is not covered either.
  */
 #[CoversClass(CheckableInventory::class)]
 final class InventoryDriftTest extends TestCase
