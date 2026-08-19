@@ -91,6 +91,12 @@ Four test methods cover the spec's six cases: case 1 (matching cancel drops the 
 emitted) are the first method; cases 2 and 3 (untagged and other-connection entries survive) are the second; case 4
 (stale cancel) is the third; case 5 (missing `runToken`) is the fourth.
 
+> **Landed with six, not four.** The final whole-branch review added two the plan did not foresee: one covering a
+> `runToken` that is present but not a string (which reaches the handler and must not throw), and one asserting that an
+> *ordinary* message still stores its token — that second one guards the exemption clause in Step 6, since inverting
+> its comparison would break response correlation for every normal run with a green suite. The spec's testing section
+> lists all eight cases; this step is left as it was planned.
+
 Create `phpunit_tests/HealthCancelRunTest.php`:
 
 ```php

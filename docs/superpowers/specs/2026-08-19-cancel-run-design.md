@@ -68,8 +68,11 @@ store is therefore gated on `$messageReceived->action !== 'cancelRun'`.
 ### 3. The handler
 
 ```php
-private function cancelRun(string $runToken, ConnectionInterface $from): void
+private function cancelRun(mixed $runToken, ConnectionInterface $from): void
 {
+    if (false === is_string($runToken)) {
+        return;
+    }
     $resourceId = $from->resourceId;
     if (false === is_int($resourceId) || ( $this->runTokens[$resourceId] ?? null ) !== $runToken) {
         return;
@@ -78,6 +81,12 @@ private function cancelRun(string $runToken, ConnectionInterface $from): void
     $this->dropSupersededQueuedRequests();
 }
 ```
+
+The parameter is `mixed`, not `string`, because `validateMessageProperties()` checks that a property *exists* and
+nothing more. A `runToken` of `null`, `[]` or `{}` therefore passes validation and reaches this handler, and none of
+those coerce in weak mode — they raise `TypeError`, which is an `\Error`, and Ratchet's `IoServer::handleData` catches
+only `\Exception`. An unguarded typed parameter here would let any client kill the WebSocket process with one frame.
+The three pre-existing actions carry the same exposure and are deliberately left alone; see the scope table.
 
 The match test is the load-bearing line. A cancel that names a run the connection is no longer on — the user stopped and
 restarted faster than the frame travelled — must be a no-op. Without the test it would clear the **new** run's token and
@@ -157,17 +166,25 @@ The stop button is the **only** trigger. Navigating away or closing the tab need
 
 ## Error handling
 
-| Condition                              | Behaviour                                                                                 |
-|----------------------------------------|-------------------------------------------------------------------------------------------|
-| `runToken` missing from the message    | Rejected by `validateMessageProperties()`; existing protocol-error path, no state touched |
-| `runToken` does not match stored token | No-op. No frame, no state change, no queue filtering                                      |
-| `resourceId` is not an int             | No-op, same as above                                                                      |
-| Socket not `OPEN` when stop is clicked | Client skips the send; `onClose()` handles the cleanup                                    |
-| Cancel arrives with no queued requests | `dropSupersededQueuedRequests()` returns early on an empty queue                          |
+| Condition                                                | Behaviour                                                                                 |
+|----------------------------------------------------------|-------------------------------------------------------------------------------------------|
+| `runToken` missing from the message                      | Rejected by `validateMessageProperties()`; existing protocol-error path, no state touched |
+| `runToken` present but not a string                      | No-op inside the handler. No frame, no state change, no queue filtering                   |
+| `runToken` a string that does not match the stored token | No-op, same as above                                                                      |
+| `resourceId` is not an int                               | No-op, same as above                                                                      |
+| Socket not `OPEN` when stop is clicked                   | Client skips the send; `onClose()` handles the cleanup                                    |
+| Cancel arrives with no queued requests                   | `dropSupersededQueuedRequests()` returns early on an empty queue                          |
 
-Only the first row produces anything visible. Since UnitTestInterface PR #46, the protocol-error frame is painted as a
-failure rather than silently consumed — which is the wanted behaviour for a client that sent a malformed cancel, and is
-the reason the success path stays silent.
+**Only the first row produces anything visible.** The asymmetry is deliberate, and worth stating because it can read as
+inconsistent: a *missing* `runToken` is caught by the generic presence validator every action shares, so it comes back
+as the standard protocol error — and since UnitTestInterface PR #46 that error is painted as a failed check, which is
+the right outcome for a client that sent a malformed frame. A `runToken` that is present but unusable instead reaches
+the handler, whose contract is already that a cancel it cannot act on changes nothing and says nothing. Making it
+shout would mean a stale cancel — an ordinary race, not a client bug — shouting too.
+
+The third row covers more than a stale token. Because `cancelRun` is exempt from the ambient token store, a token whose
+format could never have been stored in the first place (the store requires `^[A-Za-z0-9_\-]{1,64}$`) simply fails the
+match like any other non-matching string. There is no separate code path for it.
 
 ## Testing
 
@@ -186,6 +203,12 @@ Cases:
 4. A stale cancel — the connection has already moved to a new token — changes nothing.
 5. A cancel missing `runToken` is rejected and changes nothing.
 6. No frame is emitted in the success case.
+7. A cancel whose `runToken` is present but not a string is a silent no-op, and above all does not throw.
+8. An *ordinary* message still stores its `runToken`. This one guards the exemption clause rather than the cancel:
+   invert that comparison and every normal run loses response correlation silently, with a green suite.
+
+Cases 7 and 8 were added in response to the final whole-branch review, not foreseen when this document was first
+written.
 
 ### Client
 
