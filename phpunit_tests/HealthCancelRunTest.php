@@ -180,4 +180,57 @@ final class HealthCancelRunTest extends TestCase
         self::assertSame('echobot', $frame->type);
         self::assertSame('Invalid message properties', $frame->errorMsg);
     }
+
+    /**
+     * Regression test for the `$messageReceived->action !== 'cancelRun'` exemption on the ambient
+     * run-token store at the top of `onMessage()`. If that comparison were ever accidentally inverted
+     * to `===`, every *non*-cancelRun message would stop storing its token — `cancelRun` would keep
+     * working, but every ordinary run would silently lose response correlation, and a green suite
+     * would not notice, because all the other `runToken` coverage in this file seeds `$runTokens` by
+     * reflection and calls private handlers directly rather than driving them through `onMessage()`.
+     *
+     * `validateCalendar` is used as the "ordinary message" here because, sent with only `runToken`, it
+     * is missing every other required property (`category`, `calendar`, `year`, `responsetype`), so
+     * `validateMessageProperties()` rejects it and `onMessage()` falls straight to the protocol-error
+     * path — confirmed by the asserted echoed frame below — without dispatching an HTTP request or file
+     * read. That is what makes it safe to drive through the real entry point in a unit test.
+     */
+    public function testAnOrdinaryMessageStillStoresItsRunToken(): void
+    {
+        $health = new Health();
+        $conn   = self::createStubConnection(1);
+
+        $health->onMessage($conn, (string) json_encode(['action' => 'validateCalendar', 'runToken' => 'run-a']));
+
+        self::assertSame([1 => 'run-a'], self::getRunTokens($health), 'an ordinary message still stores its run token');
+
+        self::assertCount(1, $conn->sent, 'confirms the message short-circuited on the protocol-error path, not real work');
+        $frame = json_decode($conn->sent[0]);
+        self::assertSame('Invalid message properties', $frame->errorMsg, 'confirms it never reached the validateCalendar dispatch');
+    }
+
+    /**
+     * `validateMessageProperties()` checks only that `runToken` is *present*, not that it is a string —
+     * `{"action":"cancelRun","runToken":null}` (same for an array or object) passes validation and
+     * reaches `cancelRun()`. Before its `is_string()` guard, PHP's weak-mode parameter coercion throws
+     * `TypeError` for a non-string argument against a `string` parameter; Ratchet's `IoServer::handleData`
+     * only catches `\Exception`, so that `\Error` would escape uncaught and take the whole WebSocket
+     * process down over one malformed cancel. A cancel the server cannot act on is already a documented
+     * no-op for a stale token (see `cancelRun()`'s docblock); this asserts a non-string token folds into
+     * that same no-op instead of crashing.
+     */
+    public function testACancelWithANonStringRunTokenIsASilentNoOp(): void
+    {
+        $health = new Health();
+        $conn   = self::createStubConnection(1);
+
+        self::setRunTokens($health, [1 => 'run-a']);
+        self::setQueue($health, [self::queueEntry('https://example.test/a', 1, 'run-a')]);
+
+        $health->onMessage($conn, (string) json_encode(['action' => 'cancelRun', 'runToken' => null]));
+
+        self::assertCount(1, self::getQueue($health), 'the queued request survives an unusable cancel');
+        self::assertSame([1 => 'run-a'], self::getRunTokens($health), 'the stored token is untouched');
+        self::assertSame([], $conn->sent, 'a cancel the server cannot act on stays silent, same as a stale token');
+    }
 }

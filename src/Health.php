@@ -529,11 +529,22 @@ class Health implements MessageComponentInterface
      *
      * Nothing is sent back; see #806 section H.
      *
-     * @param string $runToken The run the client wants abandoned.
+     * `validateMessageProperties()` only checks that `runToken` is *present*, not that it is a string —
+     * `{"action":"cancelRun","runToken":null}` (or an array, or an object) passes validation and reaches
+     * here. In weak mode PHP does not coerce those into a `string` parameter; it throws `TypeError`, and
+     * Ratchet's `IoServer::handleData` only catches `\Exception`, so an `\Error` escapes and kills the
+     * whole WebSocket process over one malformed cancel. A cancel the server cannot act on is already a
+     * documented no-op (see above), so a non-string token folds into that same no-op path instead.
+     *
+     * @param mixed $runToken The run the client wants abandoned. Expected to be a string, but the caller
+     *                        only guarantees the property exists, not its type — see above.
      * @param ConnectionInterface $from The connection that asked.
      */
-    private function cancelRun(string $runToken, ConnectionInterface $from): void
+    private function cancelRun(mixed $runToken, ConnectionInterface $from): void
     {
+        if (false === is_string($runToken)) {
+            return;
+        }
         $resourceId = $from->resourceId;
         if (false === is_int($resourceId) || ( $this->runTokens[$resourceId] ?? null ) !== $runToken) {
             return;
