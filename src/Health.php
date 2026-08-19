@@ -44,9 +44,25 @@ use Psr\Http\Message\ResponseInterface;
  *      group?: string
  * }
  *
- * @phpstan-type ExecuteValidationSourceFolder \stdClass&object{action:'executeValidation',category:'sourceDataCheck',validate:string,sourceFolder:string}
- * @phpstan-type ExecuteValidationSourceFile \stdClass&object{action:'executeValidation',category:'sourceDataCheck',validate:string,sourceFile:string}
- * @phpstan-type ExecuteValidationResource \stdClass&object{action:'executeValidation',category:'resourceDataCheck',validate:string,sourceFile:string}
+ * `executeValidation` accepts exactly three categories, and they are NOT interchangeable — each names a different
+ * schema-resolution strategy, and the wrong one yields a null schema rather than a loud failure:
+ *
+ *   - `universalcalendar`  — the schema is resolved from the `sourceFile` **path**, via {@see Health::getPathToSchemaFile()}.
+ *                            `validate` is a display/CSS label only (PascalCase), never a schema key.
+ *   - `sourceDataCheck`    — the schema is resolved from the `validate` **slug** (anchored lowercase patterns such as
+ *                            `national-calendar-IT`). The data path is `sourceFile`/`sourceFolder` **as supplied**, except for the
+ *                            `wider-region-…`, `national-calendar-…`, `diocesan-calendar-…` and `proprium-de-sanctis-…-i18n` slugs,
+ *                            where the server reconstructs the path from the slug — which is why messages carrying those send a bare
+ *                            id (`IT`, `Europe`) while the rest send a real path (`jsondata/tests/roman/…`).
+ *   - `resourceDataCheck`  — the schema is resolved from the `sourceFile` **URL** of an API endpoint.
+ *
+ * Do not confuse these with the *calendar type* named by `category` on `validateCalendar` and `executeUnitTest` below;
+ * that is an unrelated vocabulary that merely shares the property name. See issue #806.
+ *
+ * @phpstan-type ExecuteValidationCategory 'universalcalendar'|'sourceDataCheck'|'resourceDataCheck'
+ * @phpstan-type ExecuteValidationSourceFolder \stdClass&object{action:'executeValidation',category:'sourceDataCheck',validate:string,sourceFolder:string,responsetype?:string}
+ * @phpstan-type ExecuteValidationSourceFile \stdClass&object{action:'executeValidation',category:'universalcalendar'|'sourceDataCheck',validate:string,sourceFile:string,responsetype?:string}
+ * @phpstan-type ExecuteValidationResource \stdClass&object{action:'executeValidation',category:'resourceDataCheck',validate:string,sourceFile:string,responsetype?:string}
  * @phpstan-type ValidateCalendar \stdClass&object{action:'validateCalendar',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar'|'ritecalendar',responsetype:'JSON'|'XML'|'ICS'|'YML',rite?:string}
  * @phpstan-type ExecuteUnitTest \stdClass&object{action:'executeUnitTest',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar'|'ritecalendar',test:string,rite?:string}
  *
@@ -1988,19 +2004,25 @@ class Health implements MessageComponentInterface
     }
 
     /**
-     * Returns the appropriate schema for the given category and dataPath.
-     * If dataPath is null, it will return the schema for the category.
-     * If dataPath is not null, it will return the schema for the dataPath.
-     * If the category is 'universalcalendar', it will return the schema from the DATA_PATH_TO_SCHEMA array.
-     * If the category is 'nationalcalendar', 'diocesancalendar', 'widerregioncalendar', or 'propriumdesanctis',
-     * it will return the corresponding schema constant.
-     * If the category is 'resourceDataCheck', it will return the schema for the dataPath if it matches one of the patterns,
-     * otherwise it will return the schema from the DATA_PATH_TO_SCHEMA array.
-     * If the category is not recognized, it will return null.
+     * Resolve the JSON Schema an `executeValidation` message should validate against.
      *
-     * @param string $category The category of the data.
-     * @param string $dataPath The path to the data.
-     * @return string|null The schema for the given category and dataPath, or null if the category is not recognized.
+     * Three categories are supported, each resolving from a different input — see the
+     * `ExecuteValidationCategory` note in the class docblock:
+     *
+     *   - `universalcalendar`: `$dataPath` is a source-data path or API URL, looked up in
+     *     {@see Health::getPathToSchemaFile()};
+     *   - `sourceDataCheck`: `$dataPath` is the `validate` slug, matched against anchored patterns;
+     *   - `resourceDataCheck`: `$dataPath` is an API endpoint URL.
+     *
+     * Any other category returns null, which surfaces to the client as
+     * "Unable to detect schema for dataPath …".
+     *
+     * Note the caller passes `$pathForSchema`, not the raw `sourceFile`: for `sourceDataCheck`
+     * that is the `validate` slug, and for the other two it is the `sourceFile` itself.
+     *
+     * @param string $category The schema-resolution strategy; one of ExecuteValidationCategory.
+     * @param string $dataPath The value to resolve from — a path, a URL, or a `validate` slug, per the category.
+     * @return string|null The schema path, or null when the category is not one of the three supported values.
      */
     private static function retrieveSchemaForCategory(string $category, string $dataPath): ?string
     {
@@ -2021,14 +2043,6 @@ class Health implements MessageComponentInterface
                     }
                 }
                 return Health::getPathToSchemaFile($dataPath);
-            case 'nationalcalendar':
-                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::NATIONAL->path()) : LitSchema::NATIONAL->path();
-            case 'diocesancalendar':
-                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::DIOCESAN->path()) : LitSchema::DIOCESAN->path();
-            case 'widerregioncalendar':
-                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::WIDERREGION->path()) : LitSchema::WIDERREGION->path();
-            case 'propriumdesanctis':
-                return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS->path()) : LitSchema::PROPRIUMDESANCTIS->path();
             case 'resourceDataCheck':
                 if (
                     preg_match('/\/missals\/[_A-Z0-9]+$/', $dataPath)
