@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests;
 
 use LiturgicalCalendar\Api\Health;
+use LiturgicalCalendar\Api\Router;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Ratchet\ConnectionInterface;
@@ -132,26 +133,37 @@ final class HealthFolderStepResultTest extends TestCase
      */
     public function testAMissingFolderStillReportsAllThreeSteps(): void
     {
-        $conn = self::createStubConnection(2);
+        // Driven through executeValidation() rather than the helper: the fix is in the `glob()`
+        // guard, and a test that called sendFolderStepResult() three times itself would pass
+        // whether or not that guard had been fixed. The path is synchronous — the guard returns
+        // before any promise is created — so no event loop is needed.
+        Router::getApiPaths();
 
-        $health   = new Health();
-        $validate = 'national-calendar-IT-i18n';
-        $missing  = ['/nowhere does not exist or contains no json files'];
+        $conn   = self::createStubConnection(3);
+        $health = new Health();
 
-        $method = new \ReflectionMethod(Health::class, 'sendFolderStepResult');
-        foreach (['file-exists', 'json-valid', 'schema-valid'] as $step) {
-            $method->invoke($health, $conn, "$validate.$step", $missing, '', 'Data folder could not be checked', 'run-token-1');
-        }
+        $tokens = new \ReflectionProperty(Health::class, 'runTokens');
+        $tokens->setValue($health, [$conn->resourceId => 'run-token-1']);
+
+        $validate = 'tests-NoSuchTest-i18n';
+        $method   = new \ReflectionMethod(Health::class, 'executeValidation');
+        $method->invoke($health, (object) [
+            'action'       => 'executeValidation',
+            'category'     => 'sourceDataCheck',
+            'validate'     => $validate,
+            'sourceFolder' => 'jsondata/definitely-not-a-real-folder',
+        ], $conn);
 
         $frames = array_map(static fn(string $raw): \stdClass => json_decode($raw), $conn->sent);
 
-        self::assertCount(3, $frames);
+        self::assertCount(3, $frames, 'a missing folder must still report every step');
         self::assertSame(
             [".$validate.file-exists", ".$validate.json-valid", ".$validate.schema-valid"],
             array_map(static fn(\stdClass $f): string => $f->classes, $frames)
         );
         foreach ($frames as $frame) {
             self::assertSame('error', $frame->type);
+            self::assertSame('run-token-1', $frame->runToken);
         }
     }
 }
