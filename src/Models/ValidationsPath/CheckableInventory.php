@@ -59,7 +59,8 @@ final class CheckableInventory
                 self::derivedRomanSanctorale(),
                 self::explicitItems(),
                 self::nationalCalendarItems(),
-                self::widerRegionItems()
+                self::widerRegionItems(),
+                self::diocesanCalendarItems()
             );
         }
 
@@ -313,6 +314,54 @@ final class CheckableInventory
                 LitSchema::I18N,
                 self::STEPS,
                 rtrim(strtr(JsonData::WIDER_REGION_I18N_FOLDER->path(), ['{wider_region}' => $name]), '/')
+            );
+        }
+
+        return $items;
+    }
+
+    /**
+     * Diocesan calendar definitions.
+     *
+     * The rite selects the path template, not just a label: an Ambrosian diocese lives under
+     * `rite/ambrosian/calendars/dioceses/`, and the file name is the diocese *name* rather than its id,
+     * which is why the template carries three placeholders.
+     *
+     * @return list<CheckableItem>
+     */
+    private static function diocesanCalendarItems(): array
+    {
+        $items = [];
+        foreach (self::metadata()->diocesan_calendars as $diocese) {
+            $fileTemplate = JsonData::diocesanCalendarFileFor($diocese->rite)->path();
+            $i18nTemplate = JsonData::diocesanCalendarI18nFolderFor($diocese->rite)->path();
+
+            $replacements = [
+                '{nation}'       => $diocese->nation,
+                '{diocese}'      => $diocese->calendar_id,
+                '{diocese_name}' => $diocese->diocese
+            ];
+
+            $items[] = new CheckableItem(
+                "diocese:{$diocese->rite->value}:{$diocese->calendar_id}",
+                'file',
+                $diocese->rite,
+                $diocese->nation,
+                "Diocesan calendar: {$diocese->diocese}",
+                LitSchema::DIOCESAN,
+                self::STEPS,
+                strtr($fileTemplate, $replacements)
+            );
+
+            $items[] = new CheckableItem(
+                "diocese:{$diocese->rite->value}:{$diocese->calendar_id}:i18n",
+                'folder',
+                $diocese->rite,
+                $diocese->nation,
+                "Diocesan calendar translations: {$diocese->diocese}",
+                LitSchema::I18N,
+                self::STEPS,
+                rtrim(strtr($i18nTemplate, $replacements), '/')
             );
         }
 

@@ -238,4 +238,39 @@ final class CheckableInventoryTest extends TestCase
             self::assertStringNotContainsString('jsondata', json_encode($item, JSON_THROW_ON_ERROR));
         }
     }
+
+    public function testDiocesanCalendarsAreEnumeratedUnderTheirOwnRite(): void
+    {
+        // The Diocese of Rome's registered calendar_id is `romamo_it` (the source folder basename
+        // under jsondata/sourcedata/rite/roman/calendars/dioceses/IT/), not the id sketched in the
+        // implementation plan this test is drawn from.
+        $roman = CheckableInventory::byId('diocese:roman:romamo_it');
+        self::assertNotNull($roman, 'the Diocese of Rome should be a checkable target');
+        self::assertSame(Rite::ROMAN, $roman->rite);
+        self::assertSame('IT', $roman->region, 'a diocesan calendar is scoped to its nation');
+        self::assertSame(LitSchema::DIOCESAN, $roman->schema);
+        self::assertNotNull(CheckableInventory::byId('diocese:roman:romamo_it:i18n'));
+    }
+
+    /**
+     * The rite is not cosmetic here: an Ambrosian diocese lives under a different path template
+     * entirely, so getting it wrong produces an item pointing at a file that does not exist — which
+     * the exists step would report as a failure of the data rather than of this class.
+     */
+    public function testAnAmbrosianDioceseResolvesToTheAmbrosianTree(): void
+    {
+        $ambrosian = array_values(array_filter(
+            CheckableInventory::all(),
+            static fn (CheckableItem $i): bool => str_starts_with($i->id, 'diocese:ambrosian:')
+                && false === str_ends_with($i->id, ':i18n')
+        ));
+
+        self::assertNotEmpty($ambrosian, 'the repository ships Ambrosian dioceses; none were enumerated');
+
+        foreach ($ambrosian as $item) {
+            self::assertSame(Rite::AMBROSIAN, $item->rite);
+            self::assertStringContainsString('/rite/ambrosian/calendars/dioceses/', $item->path);
+            self::assertFileExists($item->path, "{$item->id} points at a file that does not exist");
+        }
+    }
 }
