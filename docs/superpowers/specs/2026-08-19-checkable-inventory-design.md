@@ -136,7 +136,9 @@ Plus `Route::VALIDATIONS = '/validations'` and a `case 'validations'` in `Router
 
 `Health` gains nothing. It *sheds*:
 
-- `getPathToSchemaFile()` becomes `CheckableInventory::byPath($path)?->schema`.
+- `getPathToSchemaFile()` consults `CheckableInventory::byPath($path)` first. Only its *source-data* arms move; the
+  same `match` also maps API **route** paths (`Route::CALENDARS->path()` and friends), which are a different kind of
+  thing and stay where they are.
 - The `sourceDataCheck` slug branch — eight anchored `preg_match` calls — becomes `byId($id)?->schema` for the entries
   the inventory owns.
 
