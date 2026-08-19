@@ -46,12 +46,13 @@ Playwright 1.57 on the client.
 
 **UnitTestInterface (checkout `UnitTestInterface`):**
 
-| File                     | Responsibility                                                    |
-|--------------------------|-------------------------------------------------------------------|
-| `e2e/websocket-stub.ts`  | Reusable `window.WebSocket` recorder that opens and never replies |
-| `e2e/cancel-run.spec.ts` | Asserts both runners emit the cancel frame when a run is stopped  |
-| `assets/js/index.js`     | Sends the frame from the Calendars runner's stop branch           |
-| `assets/js/resources.js` | Sends the frame from the Resources runner's stop branch           |
+| File                      | Responsibility                                                    |
+|---------------------------|-------------------------------------------------------------------|
+| `assets/js/wsProtocol.js` | Shared protocol helpers; today just the cancel frame              |
+| `e2e/websocket-stub.ts`   | Reusable `window.WebSocket` recorder that opens and never replies |
+| `e2e/cancel-run.spec.ts`  | Asserts both runners emit the cancel frame when a run is stopped  |
+| `assets/js/index.js`      | Sends the frame from the Calendars runner's stop branch           |
+| `assets/js/resources.js`  | Sends the frame from the Resources runner's stop branch           |
 
 ---
 
@@ -489,16 +490,24 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 
 **Files:**
 
+- Create: `assets/js/wsProtocol.js`
 - Create: `e2e/websocket-stub.ts`
 - Create: `e2e/cancel-run.spec.ts`
-- Modify: `assets/js/index.js` (stop branch, ~line 1640-1644)
-- Modify: `assets/js/resources.js` (stop branch, ~line 1209-1213)
+- Modify: `assets/js/index.js` (import block at the top; stop branch ~line 1640-1644)
+- Modify: `assets/js/resources.js` (import block at the top; stop branch ~line 1209-1213)
 
 **Interfaces:**
 
 - Consumes: the wire action `{"action": "cancelRun", "runToken": "<token>"}` produced by Task 1.
-- Produces: `installWebSocketStub(page: Page): Promise<void>` from `e2e/websocket-stub.ts`, which sets
-  `window.__wsSent: string[]` in the page — reusable by later protocol work (#42).
+- Produces: `sendCancelRun(conn: WebSocket, runToken: string|null): boolean` from `assets/js/wsProtocol.js`, returning
+  `true` only when a frame was sent; `installWebSocketStub(page: Page): Promise<void>` and
+  `sentFrames(page: Page): Promise<string[]>` from `e2e/websocket-stub.ts`, which set and read `window.__wsSent`.
+
+Both runners are already ES modules importing from `./common.js` and `./testResults.js`, so a third shared module needs
+no change to how either page loads its script. `wsProtocol.js` is deliberately the seed of the shared protocol client
+that #42 will grow: `index.js` and `resources.js` are two independent implementations of the same protocol that have
+already drifted (they each carry their own identical `sendMessage()` today), so new protocol behaviour lands in one
+place rather than becoming a fourth thing to keep in lockstep.
 
 - [ ] **Step 1: Create the branch and start the servers this task needs**
 
@@ -603,7 +612,9 @@ export const sentFrames = (page: Page): Promise<string[]> =>
 
 - [ ] **Step 3: Write the failing spec**
 
-Create `e2e/cancel-run.spec.ts`:
+Create `e2e/cancel-run.spec.ts`. The first three tests call the shared helper directly in the page context — the same
+dynamic-import technique `e2e/result-painting.spec.ts` uses — because the guard branches (closed socket, absent token)
+are not reachable by clicking. The last two prove both runners are actually wired to it.
 
 ```typescript
 import { test, expect, Page } from '@playwright/test';
@@ -616,9 +627,58 @@ import { installWebSocketStub, sentFrames } from './websocket-stub';
  * fetching calendars for a run nobody was watching. Both runners must now send `cancelRun` naming the
  * run being abandoned.
  *
- * The WebSocket is stubbed, so these specs need no WebSocket server — only the API on :8000, whose
- * /calendars, /missals and /tests responses gate the start button.
+ * No WebSocket server is needed: the helper specs import the module directly, and the wiring specs stub
+ * `window.WebSocket`. Only the API on :8000 is required, whose responses gate the start button.
  */
+
+/**
+ * Call the real `sendCancelRun()` in the page context against a recording fake connection.
+ *
+ * The module specifier is held in a variable so TypeScript treats the `import()` as dynamic and does not
+ * try to resolve a browser-served path against the e2e tsconfig.
+ */
+const callHelper = async (page: Page, readyState: number, runToken: string | null) =>
+    page.evaluate(async ({ readyState, runToken }) => {
+        const specifier = '/assets/js/wsProtocol.js';
+        const { sendCancelRun } = (await import(specifier)) as {
+            sendCancelRun: (conn: unknown, token: string | null) => boolean;
+        };
+        const sent: string[] = [];
+        const conn = { readyState, send: (data: string) => sent.push(data) };
+        return { returned: sendCancelRun(conn, runToken), sent };
+    }, { readyState, runToken });
+
+test.describe('the sendCancelRun helper', () => {
+    test.beforeEach(async ({ page }) => {
+        await page.goto('/');
+    });
+
+    test('sends the cancel frame when the socket is open and the run has a token', async ({ page }) => {
+        const { returned, sent } = await callHelper(page, 1, 'run-a');
+
+        expect(returned).toBe(true);
+        expect(sent).toHaveLength(1);
+        expect(JSON.parse(sent[0])).toEqual({ action: 'cancelRun', runToken: 'run-a' });
+    });
+
+    test('sends nothing when the socket is not open', async ({ page }) => {
+        // Stop is also reachable while the socket is reconnecting. A closed socket needs no cancel:
+        // the server drops the run's queued work when the connection closes.
+        const { returned, sent } = await callHelper(page, 3, 'run-a');
+
+        expect(returned).toBe(false);
+        expect(sent).toEqual([]);
+    });
+
+    test('sends nothing when there is no run to cancel', async ({ page }) => {
+        // A cancel carrying no token is a protocol error the server rejects, which the UI would then
+        // paint as a failure. Better never to send one.
+        const { returned, sent } = await callHelper(page, 1, null);
+
+        expect(returned).toBe(false);
+        expect(sent).toEqual([]);
+    });
+});
 
 /** Start a run, then stop it, returning every frame the page sent. */
 const startThenStop = async (page: Page, path: string): Promise<string[]> => {
@@ -642,11 +702,9 @@ test('the Calendars runner tells the server when a run is stopped', async ({ pag
 
     const cancel = JSON.parse(frames[frames.length - 1]);
     expect(cancel.action).toBe('cancelRun');
-    expect(typeof cancel.runToken).toBe('string');
 
     // The cancel must name the run it is abandoning, not some fresh value.
-    const firstRequest = JSON.parse(frames[0]);
-    expect(cancel.runToken).toBe(firstRequest.runToken);
+    expect(cancel.runToken).toBe(JSON.parse(frames[0]).runToken);
 });
 
 test('the Resources runner tells the server when a run is stopped', async ({ page }) => {
@@ -654,10 +712,8 @@ test('the Resources runner tells the server when a run is stopped', async ({ pag
 
     const cancel = JSON.parse(frames[frames.length - 1]);
     expect(cancel.action).toBe('cancelRun');
-    expect(typeof cancel.runToken).toBe('string');
 
-    const firstRequest = JSON.parse(frames[0]);
-    expect(cancel.runToken).toBe(firstRequest.runToken);
+    expect(cancel.runToken).toBe(JSON.parse(frames[0]).runToken);
 });
 ```
 
@@ -671,66 +727,112 @@ npx playwright test e2e/cancel-run.spec.ts --project=chromium --no-deps
 `--no-deps` skips the `setup` project, which authenticates against Zitadel and is unrelated here; the stored
 `e2e/.auth/user.json` is reused.
 
-Expected: **2 failures**. The last recorded frame is still the run's final validation request, so
-`expect(cancel.action).toBe('cancelRun')` fails with the action of whatever the runner sent last
+Expected: **5 failures**. The three helper specs fail on the dynamic import — `/assets/js/wsProtocol.js` is served as a
+404 HTML page, so the `import()` rejects. The two wiring specs fail because the last recorded frame is still the run's
+final validation request, so `expect(cancel.action).toBe('cancelRun')` reports whatever the runner sent last
 (`executeValidation` or `validateCalendar`).
 
-- [ ] **Step 5: Send the cancel from the Calendars runner**
+- [ ] **Step 5: Write the shared helper**
 
-In `assets/js/index.js`, in the stop branch of the `#startTestRunnerBtn` click handler, insert immediately after
+Create `assets/js/wsProtocol.js`:
+
+```javascript
+/**
+ * Shared helpers for the Health WebSocket protocol.
+ *
+ * `index.js` and `resources.js` are two independent implementations of the same protocol and have already
+ * drifted apart in ways that cost debugging sessions — different state names, different runToken guards,
+ * two vocabularies for the same file (see #42). New protocol behaviour lands here so both runners share one
+ * definition rather than acquiring a fourth thing to keep in lockstep.
+ * @module wsProtocol
+ */
+
+/**
+ * Tell the server a run is abandoned, so it stops draining a backlog nobody is watching.
+ *
+ * Silent on the wire: the server acknowledges by dropping the run's queued requests and sends nothing back
+ * (LiturgicalCalendarAPI#806 section H).
+ *
+ * Call this *before* clearing the run token — the cancel has to name the run it is stopping, and the server
+ * ignores a cancel that names a run the connection is no longer on.
+ *
+ * @param {WebSocket} conn - The connection the run was started on.
+ * @param {?string} runToken - The run being abandoned; the same token its requests carried.
+ * @returns {boolean} true when a cancel was sent, false when there was nothing to send it on or about.
+ */
+export const sendCancelRun = ( conn, runToken ) => {
+    if ( !conn || conn.readyState !== WebSocket.OPEN ) {
+        return false;
+    }
+    if ( typeof runToken !== 'string' || runToken === '' ) {
+        return false;
+    }
+    conn.send( JSON.stringify( { action: 'cancelRun', runToken } ) );
+    return true;
+};
+```
+
+- [ ] **Step 6: Wire the Calendars runner**
+
+In `assets/js/index.js`, add to the imports at the top of the file, after the existing `./common.js` and
+`./testResults.js` import blocks:
+
+```javascript
+import { sendCancelRun } from './wsProtocol.js';
+```
+
+Then in the stop branch of the `#startTestRunnerBtn` click handler, insert immediately after
 `console.log( 'Stopping test run...' );` and before `currentState = TestState.Stopped;`:
 
 ```javascript
         // Tell the server the run is abandoned, so it stops draining a backlog nobody is watching.
-        // Must happen before currentRunToken is cleared: sendMessage() attaches the token, and the
-        // cancel has to name the run it is stopping. The explicit null test matters because
-        // sendMessage() omits the token when there is none, and a cancel without one is a protocol
-        // error the server rejects.
-        if ( conn.readyState === WebSocket.OPEN && currentRunToken !== null ) {
-            sendMessage( { action: 'cancelRun' } );
-        }
+        // Must precede clearing currentRunToken: the cancel has to name the run it is stopping.
+        sendCancelRun( conn, currentRunToken );
 ```
 
-- [ ] **Step 6: Send the cancel from the Resources runner**
+- [ ] **Step 7: Wire the Resources runner**
 
-In `assets/js/resources.js`, in the stop branch of the `#startTestRunnerBtn` click handler, insert immediately after
+In `assets/js/resources.js`, add to the imports at the top of the file, after the existing `./common.js` and
+`./testResults.js` import blocks:
+
+```javascript
+import { sendCancelRun } from './wsProtocol.js';
+```
+
+Then in the stop branch of the `#startTestRunnerBtn` click handler, insert immediately after
 `console.log( 'Stopping test run...' );` and before `currentState = TestState.Stopped;`:
 
 ```javascript
         // Tell the server the run is abandoned, so it stops draining a backlog nobody is watching.
-        // Must happen before currentRunToken is cleared: sendMessage() attaches the token, and the
-        // cancel has to name the run it is stopping. The explicit null test matters because
-        // sendMessage() omits the token when there is none, and a cancel without one is a protocol
-        // error the server rejects.
-        if ( conn.readyState === WebSocket.OPEN && currentRunToken !== null ) {
-            sendMessage( { action: 'cancelRun' } );
-        }
+        // Must precede clearing currentRunToken: the cancel has to name the run it is stopping.
+        sendCancelRun( conn, currentRunToken );
 ```
 
-- [ ] **Step 7: Run the spec to verify it passes**
+- [ ] **Step 8: Run the spec to verify it passes**
 
 ```bash
 cd /home/johnrdorazio/development/LiturgicalCalendar/UnitTestInterface
 npx playwright test e2e/cancel-run.spec.ts --project=chromium --no-deps
 ```
 
-Expected: `2 passed`.
+Expected: `5 passed`.
 
-If instead the start button never enables, the API on `:8000` is not up — fix that rather than relaxing the assertion.
-If the run does not park after its first frame, report it; do not replace the poll with a fixed `waitForTimeout`.
+If the start button never enables, the API on `:8000` is not up — fix that rather than relaxing the assertion. If the
+run does not park after its first frame, report it; do not replace the poll with a fixed `waitForTimeout`.
 
-- [ ] **Step 8: Typecheck and syntax-check**
+- [ ] **Step 9: Typecheck and syntax-check**
 
 ```bash
 cd /home/johnrdorazio/development/LiturgicalCalendar/UnitTestInterface
 npm run typecheck
+node --check assets/js/wsProtocol.js
 node --check assets/js/index.js
 node --check assets/js/resources.js
 ```
 
 Expected: all clean.
 
-- [ ] **Step 9: Check for regressions in the specs that share this surface**
+- [ ] **Step 10: Check for regressions in the specs that share this surface**
 
 ```bash
 cd /home/johnrdorazio/development/LiturgicalCalendar/UnitTestInterface
@@ -739,11 +841,11 @@ npx playwright test e2e/result-painting.spec.ts e2e/results-replay.spec.ts e2e/r
 
 Expected: all pass. These are the specs that touch the runners and the painter.
 
-- [ ] **Step 10: Commit**
+- [ ] **Step 11: Commit**
 
 ```bash
 cd /home/johnrdorazio/development/LiturgicalCalendar/UnitTestInterface
-git add e2e/websocket-stub.ts e2e/cancel-run.spec.ts assets/js/index.js assets/js/resources.js
+git add assets/js/wsProtocol.js e2e/websocket-stub.ts e2e/cancel-run.spec.ts assets/js/index.js assets/js/resources.js
 git commit -m "fix(runner): tell the server when a run is stopped
 
 Stopping a run was purely local: state was reset, incoming frames were
@@ -752,19 +854,26 @@ run nobody was watching. On a wide year range that is 81 calendar requests
 plus all their downstream validation, wasted on every stopped run.
 
 Both runners now send {action: 'cancelRun', runToken} before clearing the
-token — the cancel has to name the run it is abandoning. The readyState
-guard matters because stop is also reachable while the socket is
-reconnecting; a closed socket needs no cancel, since the server drops the
-run's queued work when the connection closes.
+token — the cancel has to name the run it is abandoning. It goes through a
+new shared wsProtocol.js rather than being pasted into both files: index.js
+and resources.js are already two independent implementations of the same
+protocol that have drifted apart in ways that cost debugging sessions, and
+this is the seed of the shared client #42 will grow.
 
-The server side is LiturgicalCalendarAPI#806 section H. It answers with
+The helper stays silent when the socket is not open — stop is reachable
+while reconnecting, and a closed connection already drops the run's queued
+work server-side — and when there is no token, since a tokenless cancel is
+a protocol error the UI would paint as a failure.
+
+The server side is LiturgicalCalendarAPI#806 section H, which answers with
 silence: PR #46 made an unrecognised response type paint a visible failure,
 so an ack frame would have needed handling here first.
 
-Verified with a new e2e spec that stubs window.WebSocket with a recorder
-that opens and never replies, parking the run after its first request. The
-stub needs no WebSocket server — playwright.config.ts starts none — and is
-written for reuse by the protocol work in #42.
+Verified with a new e2e spec: three cases call the helper directly for the
+guard branches, two drive each runner end to end against a stubbed
+window.WebSocket that opens and never replies, parking the run after its
+first request. Neither needs a WebSocket server — playwright.config.ts
+starts none.
 
 Closes #43
 

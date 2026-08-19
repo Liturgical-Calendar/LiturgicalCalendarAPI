@@ -110,23 +110,37 @@ docblock changes, to name the second trigger — it currently describes superses
 
 ## Client design — UnitTestInterface
 
-The stop branches of `assets/js/index.js` and `assets/js/resources.js` are identical in shape. Both gain the same insert,
-immediately before `currentRunToken = null`:
+The stop branches of `assets/js/index.js` and `assets/js/resources.js` are identical in shape. Rather than pasting the
+same block into both, the behaviour goes into a new shared module, `assets/js/wsProtocol.js`:
 
 ```javascript
-if ( conn.readyState === WebSocket.OPEN && currentRunToken !== null ) {
-    sendMessage( { action: 'cancelRun' } );
-}
+export const sendCancelRun = ( conn, runToken ) => {
+    if ( !conn || conn.readyState !== WebSocket.OPEN ) {
+        return false;
+    }
+    if ( typeof runToken !== 'string' || runToken === '' ) {
+        return false;
+    }
+    conn.send( JSON.stringify( { action: 'cancelRun', runToken } ) );
+    return true;
+};
 ```
 
-Both runners already carry an identical `sendMessage()` helper that attaches `currentRunToken` to any outbound payload,
-so the cancel is guaranteed to name the same run its sibling frames named. That is also why the insert must precede
-`currentRunToken = null`.
+Both runners import it and call `sendCancelRun( conn, currentRunToken )` immediately before `currentRunToken = null` —
+the cancel has to name the run it is stopping.
+
+The two runners are already independent implementations of the same protocol that have drifted apart in ways that cost
+debugging sessions — different state names, different `runToken` guards, two vocabularies for the same file. Adding a
+fourth thing to keep in lockstep would be the wrong direction, and both files are already ES modules importing from
+`./common.js`, so a shared module costs nothing in page wiring. `wsProtocol.js` is the seed of the shared protocol
+client #42 will grow.
 
 The `readyState` guard matters because the stop button is also reachable while the socket is reconnecting. A closed socket
 needs no cancel: `Health::onClose()` already unsets the connection's stored token, and the queue drains on the next pass.
-The explicit null test is the second half of the same care: `sendMessage()` omits the token when there is none, and a
-cancel carrying no token is a protocol error the server rejects.
+The token test is the second half of the same care — a cancel carrying no token is a protocol error the server rejects,
+and since PR #46 the UI would paint that rejection as a failed check.
+
+Returning a boolean is what makes the two guard branches testable at all: neither is reachable by clicking.
 
 Nothing else in the stop branch changes, and no response handling is added.
 
@@ -175,9 +189,11 @@ Cases:
 
 ### Client
 
-A Playwright spec using `page.addInitScript` to replace `window.WebSocket` with a recorder that reports itself open
-immediately and never replies. Start the run, stop it, and assert the last recorded outbound frame is the `cancelRun`
-carrying the token the run started with.
+A Playwright spec in two halves. Three cases import `wsProtocol.js` directly in the page context — the technique
+`e2e/result-painting.spec.ts` already uses — and call `sendCancelRun()` against a recording fake connection, covering
+the frame it emits and the two guard branches that no amount of clicking can reach. Two more cases stub
+`window.WebSocket` with a recorder that reports itself open and never replies, then start and stop a run on each page
+and assert the last recorded frame is the `cancelRun` carrying the token the run started with.
 
 The stub is written to be reusable: #42 will need exactly this to test protocol behaviour without a live server, and
 `playwright.config.ts` starts no WebSocket server today.
