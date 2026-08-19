@@ -9,6 +9,7 @@ use LiturgicalCalendar\Api\Handlers\EasterHandler;
 use LiturgicalCalendar\Api\Handlers\MetadataHandler;
 use LiturgicalCalendar\Api\Handlers\SchemasHandler;
 use LiturgicalCalendar\Api\Handlers\TestsHandler;
+use LiturgicalCalendar\Api\Handlers\ValidationsHandler;
 use LiturgicalCalendar\Api\Router;
 use Psr\Http\Server\RequestHandlerInterface;
 use Swaggest\JsonSchema\Schema;
@@ -60,5 +61,10 @@ final class ReadonlyPathsResponseSchemaTest extends AbstractHandlerTestCase
     public function testSchemasResponseValidatesAgainstSchemasPathSchema(): void
     {
         $this->validateHandlerResponse(new SchemasHandler(), '/schemas', LitSchema::SCHEMAS);
+    }
+
+    public function testValidationsResponseValidatesAgainstValidationsPathSchema(): void
+    {
+        $this->validateHandlerResponse(new ValidationsHandler(), '/validations', LitSchema::VALIDATIONS);
     }
 }

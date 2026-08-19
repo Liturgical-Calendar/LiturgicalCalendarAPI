@@ -100,6 +100,8 @@ final class HealthSchemaCategoryTest extends TestCase
             'decrees'              => ['memorials-from-decrees', LitSchema::DECREES_SRC],
             'test definition'      => ['tests-StIgnatiusOfLoyolaTest', LitSchema::TEST_SRC],
             'i18n folder suffix'   => ['national-calendar-US-i18n', LitSchema::I18N],
+            'decrees i18n'         => ['memorials-from-decrees-i18n', LitSchema::I18N],
+            'temporale i18n'       => ['proprium-de-tempore-i18n', LitSchema::I18N],
         ];
     }
 
