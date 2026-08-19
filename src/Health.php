@@ -679,17 +679,34 @@ class Health implements MessageComponentInterface
             }
             $files = glob($dataPath . '/*.json');
             if (false === $files || empty($files)) {
-                $message          = new \stdClass();
-                $message->type    = 'error';
-                $message->text    = "Data folder $sourceFolder ($dataPath) does not exist or does not contain any json files";
-                $message->classes = ".$validate.file-exists";
-                $this->sendMessage($to, $message);
+                // Report all three steps, not just file-exists. A client sizes the phase as three
+                // frames per check, so short-circuiting with a single frame under-delivers and the
+                // phase never completes — the same wedge, approached from the other side.
+                $missing = ["$dataPath does not exist or contains no json files"];
+                foreach (['file-exists', 'json-valid', 'schema-valid'] as $step) {
+                    $this->sendFolderStepResult(
+                        $to,
+                        "$validate.$step",
+                        $missing,
+                        '', // unreachable: $missing is non-empty, so the failure text is used
+                        "Data folder $sourceFolder could not be checked",
+                        $runToken
+                    );
+                }
                 return;
             }
 
-            $fileExistsAndIsReadable = true;
-            $jsonDecodable           = true;
-            $schemaValidated         = true;
+            // A folder check reports on the folder, not on each file in it: exactly one frame per
+            // step, whatever the outcome. Failures are therefore collected here and summarised
+            // once at the end, rather than emitted per file — sending one frame per failing file
+            // made the frame count depend on how many files happened to be broken, which no
+            // client can predict (see UnitTestInterface#43).
+            /** @var list<string> $fileExistsErrors */
+            $fileExistsErrors = [];
+            /** @var list<string> $jsonErrors */
+            $jsonErrors = [];
+            /** @var list<string> $schemaErrors */
+            $schemaErrors = [];
 
             /** @var list<PromiseInterface<string>> $promises */
             $promises = [];
@@ -700,57 +717,43 @@ class Health implements MessageComponentInterface
                 $matchI8nFile = preg_match('/(?:[a-z]{2,3}(?:_[A-Z][a-z]{3})?(?:_[A-Z]{2})?|(?:ar|en|eo)_001|(?:en_150|es_419))\.json$/', $filename);
 
                 if (false === $matchI8nFile || 0 === $matchI8nFile) {
-                    $fileExistsAndIsReadable = false;
-                    $message                 = new \stdClass();
-                    $message->type           = 'error';
-                    $message->text           = "Data folder $sourceFolder contains an invalid i18n json filename $filename";
-                    $message->classes        = ".$validate.file-exists";
-                    $this->sendMessage($to, $message);
+                    $fileExistsErrors[] = "invalid i18n json filename $filename";
                     continue;
                 }
 
                 /** @var PromiseInterface<array{data: string, fromCache: bool}> $promise */
                 $promise    = $this->cachedFileGetContents($file);
                 $promises[] = $promise->then(
-                    function (array $result) use ($to, $validation, $filename, $schema, $pathForSchema, $runToken, &$jsonDecodable, &$schemaValidated) {
+                    function (array $result) use ($validation, $filename, $schema, $pathForSchema, &$jsonErrors, &$schemaErrors) {
                         /** @var array{data: string, fromCache: bool} $result */
                         $fileData = $result['data'];
                         $validate = (string) $validation->validate;
                         $category = (string) $validation->category;
                         $jsonData = json_decode($fileData);
                         if (json_last_error() !== JSON_ERROR_NONE) {
-                            $jsonDecodable    = false;
-                            $message          = new \stdClass();
-                            $message->type    = 'error';
-                            $message->text    = "The i18n json file $filename was not successfully decoded as JSON: " . json_last_error_msg();
-                            $message->classes = ".$validate.json-valid";
-                            $this->sendMessage($to, $message, $runToken);
+                            $jsonErrors[] = "$filename: " . json_last_error_msg();
+                            // A file that would not decode was never schema-checked either, so the
+                            // schema step must not go on to claim it validated successfully.
+                            $schemaErrors[] = "$filename: not validated, the file could not be decoded as JSON";
                         } else {
                             if (null !== $schema) {
                                 $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
                                 if ($validationResult instanceof \stdClass) {
-                                    $schemaValidated           = false;
-                                    $validationResult->classes = ".$validate.schema-valid";
-                                    $this->sendMessage($to, $validationResult, $runToken);
+                                    /** @var string $validationText */
+                                    $validationText = $validationResult->text;
+                                    $schemaErrors[] = "$filename: " . $validationText;
                                 }
                             } else {
-                                $message          = new \stdClass();
-                                $message->type    = 'error';
-                                $message->text    = "executeValidation validation->sourceFolder: Unable to detect a schema for {$validate} and category {$category} (path for schema: $pathForSchema)";
-                                $message->classes = ".$validate.schema-valid";
-                                $this->sendMessage($to, $message, $runToken);
+                                $schemaErrors[] = "$filename: unable to detect a schema for {$validate} and category {$category} (path for schema: $pathForSchema)";
                             }
                         }
                     },
-                    function (\Throwable $reason) use ($to, $validation, $filename, $runToken, &$fileExistsAndIsReadable) {
-                        $fileExistsAndIsReadable = false;
-                        $validate                = (string) $validation->validate;
-                        $sourceFolder            = (string) $validation->sourceFolder;
-                        $message                 = new \stdClass();
-                        $message->type           = 'error';
-                        $message->text           = "Data folder $sourceFolder contains an unreadable i18n json file $filename: " . $reason->getMessage();
-                        $message->classes        = ".$validate.file-exists";
-                        $this->sendMessage($to, $message, $runToken);
+                    function (\Throwable $reason) use ($filename, &$fileExistsErrors, &$jsonErrors, &$schemaErrors) {
+                        $fileExistsErrors[] = "unreadable i18n json file $filename: " . $reason->getMessage();
+                        // An unread file was neither decoded nor validated; without these the
+                        // later steps would report success over a file nobody managed to open.
+                        $jsonErrors[]   = "$filename: not decoded, the file could not be read";
+                        $schemaErrors[] = "$filename: not validated, the file could not be read";
                     }
                 );
             }
@@ -758,35 +761,39 @@ class Health implements MessageComponentInterface
             $allPromises = Promise\all($promises);
 
             $allPromises->then(
-                function () use ($to, $validation, $schema, $fileExistsAndIsReadable, $jsonDecodable, $schemaValidated, $runToken) {
+                function () use ($to, $validation, $schema, &$fileExistsErrors, &$jsonErrors, &$schemaErrors, $runToken) {
                     $validate     = (string) $validation->validate;
                     $sourceFolder = (string) $validation->sourceFolder;
-                    if ($fileExistsAndIsReadable) {
-                        $message = (object) [
-                            'type'    => 'success',
-                            'text'    => "The Data folder $sourceFolder exists and contains valid i18n json files",
-                            'classes' => ".$validate.file-exists"
-                        ];
-                        $this->sendMessage($to, $message, $runToken);
-                    }
 
-                    if ($jsonDecodable) {
-                        $message = (object) [
-                            'type'    => 'success',
-                            'text'    => "The i18n json files in Data folder $sourceFolder were successfully decoded as JSON",
-                            'classes' => ".$validate.json-valid"
-                        ];
-                        $this->sendMessage($to, $message, $runToken);
-                    }
+                    // Exactly one frame per step, pass or fail. A folder check is a statement
+                    // about the folder, so a failure names the offending files inside a single
+                    // frame instead of emitting one frame each.
+                    $this->sendFolderStepResult(
+                        $to,
+                        "$validate.file-exists",
+                        $fileExistsErrors,
+                        "The Data folder $sourceFolder exists and contains valid i18n json files",
+                        "Data folder $sourceFolder",
+                        $runToken
+                    );
 
-                    if ($schemaValidated) {
-                        $message = (object) [
-                            'type'    => 'success',
-                            'text'    => "The i18n json files in Data folder $sourceFolder were successfully validated against the Schema $schema",
-                            'classes' => ".$validate.schema-valid"
-                        ];
-                        $this->sendMessage($to, $message, $runToken);
-                    }
+                    $this->sendFolderStepResult(
+                        $to,
+                        "$validate.json-valid",
+                        $jsonErrors,
+                        "The i18n json files in Data folder $sourceFolder were successfully decoded as JSON",
+                        "The i18n json files in Data folder $sourceFolder were not all decoded as JSON",
+                        $runToken
+                    );
+
+                    $this->sendFolderStepResult(
+                        $to,
+                        "$validate.schema-valid",
+                        $schemaErrors,
+                        "The i18n json files in Data folder $sourceFolder were successfully validated against the Schema $schema",
+                        "The i18n json files in Data folder $sourceFolder were not all valid against the Schema $schema",
+                        $runToken
+                    );
                 },
                 function (\Throwable $e) use ($validation) {
                     echo 'Error verifying i18n folder for validation ' . json_encode($validation) . ': ' . $e->getMessage() . "\n";
@@ -936,6 +943,37 @@ class Health implements MessageComponentInterface
         }
 
         $message->classes = ".$validate.diocese-metadata";
+        $this->sendMessage($to, $message, $runToken);
+    }
+
+    /**
+     * Emit the single result frame for one step of a `sourceFolder` check.
+     *
+     * A folder check reports on the folder as a whole, so each step yields exactly one frame
+     * whether it passed or failed. Emitting one frame per failing file instead would make the
+     * number of frames depend on how many files happened to be broken — unpredictable for a
+     * client that has to know when a phase is complete (UnitTestInterface#43).
+     *
+     * @param string       $classes      Response `classes` selector, without the leading dot.
+     * @param list<string> $errors       Per-file failures; empty means the step passed.
+     * @param string       $successText  Message for the passing case.
+     * @param string       $failurePrefix Lead-in for the failing case; the offending files follow.
+     * @param ?string      $runToken     Run token to echo back.
+     */
+    private function sendFolderStepResult(
+        ConnectionInterface $to,
+        string $classes,
+        array $errors,
+        string $successText,
+        string $failurePrefix,
+        ?string $runToken
+    ): void {
+        $message          = new \stdClass();
+        $message->type    = [] === $errors ? 'success' : 'error';
+        $message->text    = [] === $errors
+            ? $successText
+            : $failurePrefix . ' — ' . count($errors) . ' problem(s): ' . implode('; ', $errors);
+        $message->classes = '.' . $classes;
         $this->sendMessage($to, $message, $runToken);
     }
 
