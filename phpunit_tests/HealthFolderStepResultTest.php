@@ -122,4 +122,36 @@ final class HealthFolderStepResultTest extends TestCase
 
         self::assertSame('run-token-1', $frames[0]->runToken);
     }
+
+    /**
+     * The three-frames-per-check contract has to hold on the *short* paths too.
+     *
+     * A folder that does not exist used to emit a single `file-exists` error and return, which
+     * under-delivers by two frames. That is the same wedge as over-delivering, approached from
+     * the other side: a client counting toward `checks.length * 3` never reaches its target.
+     */
+    public function testAMissingFolderStillReportsAllThreeSteps(): void
+    {
+        $conn = self::createStubConnection(2);
+
+        $health   = new Health();
+        $validate = 'national-calendar-IT-i18n';
+        $missing  = ['/nowhere does not exist or contains no json files'];
+
+        $method = new \ReflectionMethod(Health::class, 'sendFolderStepResult');
+        foreach (['file-exists', 'json-valid', 'schema-valid'] as $step) {
+            $method->invoke($health, $conn, "$validate.$step", $missing, '', 'Data folder could not be checked', 'run-token-1');
+        }
+
+        $frames = array_map(static fn(string $raw): \stdClass => json_decode($raw), $conn->sent);
+
+        self::assertCount(3, $frames);
+        self::assertSame(
+            [".$validate.file-exists", ".$validate.json-valid", ".$validate.schema-valid"],
+            array_map(static fn(\stdClass $f): string => $f->classes, $frames)
+        );
+        foreach ($frames as $frame) {
+            self::assertSame('error', $frame->type);
+        }
+    }
 }

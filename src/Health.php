@@ -679,11 +679,20 @@ class Health implements MessageComponentInterface
             }
             $files = glob($dataPath . '/*.json');
             if (false === $files || empty($files)) {
-                $message          = new \stdClass();
-                $message->type    = 'error';
-                $message->text    = "Data folder $sourceFolder ($dataPath) does not exist or does not contain any json files";
-                $message->classes = ".$validate.file-exists";
-                $this->sendMessage($to, $message);
+                // Report all three steps, not just file-exists. A client sizes the phase as three
+                // frames per check, so short-circuiting with a single frame under-delivers and the
+                // phase never completes — the same wedge, approached from the other side.
+                $missing = ["$dataPath does not exist or contains no json files"];
+                foreach (['file-exists', 'json-valid', 'schema-valid'] as $step) {
+                    $this->sendFolderStepResult(
+                        $to,
+                        "$validate.$step",
+                        $missing,
+                        '', // unreachable: $missing is non-empty, so the failure text is used
+                        "Data folder $sourceFolder could not be checked",
+                        $runToken
+                    );
+                }
                 return;
             }
 
@@ -723,6 +732,9 @@ class Health implements MessageComponentInterface
                         $jsonData = json_decode($fileData);
                         if (json_last_error() !== JSON_ERROR_NONE) {
                             $jsonErrors[] = "$filename: " . json_last_error_msg();
+                            // A file that would not decode was never schema-checked either, so the
+                            // schema step must not go on to claim it validated successfully.
+                            $schemaErrors[] = "$filename: not validated, the file could not be decoded as JSON";
                         } else {
                             if (null !== $schema) {
                                 $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
@@ -736,8 +748,12 @@ class Health implements MessageComponentInterface
                             }
                         }
                     },
-                    function (\Throwable $reason) use ($filename, &$fileExistsErrors) {
+                    function (\Throwable $reason) use ($filename, &$fileExistsErrors, &$jsonErrors, &$schemaErrors) {
                         $fileExistsErrors[] = "unreadable i18n json file $filename: " . $reason->getMessage();
+                        // An unread file was neither decoded nor validated; without these the
+                        // later steps would report success over a file nobody managed to open.
+                        $jsonErrors[]   = "$filename: not decoded, the file could not be read";
+                        $schemaErrors[] = "$filename: not validated, the file could not be read";
                     }
                 );
             }
