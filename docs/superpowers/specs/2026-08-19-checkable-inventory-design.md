@@ -22,13 +22,14 @@ the whole class of breakage disappears.
 
 ## Scope
 
-| In scope                                                                   | Out of scope                                                 |
-|----------------------------------------------------------------------------|--------------------------------------------------------------|
-| A `GET /validations` endpoint advertising static source-data files/folders | Per-calendar items — wider regions, nations, dioceses, tests |
-| Collapsing the server's two schema-resolution vocabularies into one        | The API's own endpoints (`resourceDataChecks`)               |
-| A drift test that fails when data exists with no inventory entry           | Any change to the WebSocket protocol itself                  |
-| —                                                                          | The `hello` frame and `protocol` versioning (#806 section F) |
-| —                                                                          | Client adoption (UnitTestInterface#42)                       |
+| In scope                                                                   | Out of scope                                                                  |
+|----------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| A `GET /validations` endpoint advertising static source-data files/folders | Per-calendar items — wider regions, nations, dioceses, tests                  |
+| Collapsing the server's two schema-resolution vocabularies into one        | The API's own endpoints (`resourceDataChecks`)                                |
+| A drift test that fails when data exists with no inventory entry           | Any change to the WebSocket protocol itself                                   |
+| —                                                                          | The `hello` frame and `protocol` versioning (#806 section F)                  |
+| —                                                                          | Client adoption, and the client-side scope predicate (UnitTestInterface#42)   |
+| —                                                                          | A RiteSelect control on either page (client work; UnitTestInterface#42 / #39) |
 
 ### Why only static files
 
@@ -230,7 +231,7 @@ The endpoint has no failure mode of its own: it serves a static structure and ne
 via direct `handle()`, no running server):
 
 1. `GET` returns 200 with the `litcal_validations` envelope.
-2. Every item carries `id`, `kind`, `rite`, `label`, `schema`, `steps`.
+2. Every item carries `id`, `kind`, `rite`, `region`, `label`, `schema`, `steps`; `region` is `null` or a two-letter code.
 3. **No item exposes `path`** — the serialized payload must not contain a `jsondata/` substring anywhere.
 4. Ids are unique.
 5. A non-GET verb is 405; a path parameter is 400.
@@ -241,6 +242,10 @@ via direct `handle()`, no running server):
    pasted into the test as the oracle, so the refactor is proved equivalent rather than assumed.
 2. `byId()` resolves the slugs the `sourceDataCheck` branch handles for inventory-owned entries.
 3. The five Roman sanctorale editions are present and the six without a sanctorale file are absent.
+4. `region` is `null` for the *editiones typicae* and for both Ambrosian items, `'US'` for `US_2011`, `'IT'` for
+   `IT_1983` — the mapping the client's scope predicate depends on.
+5. Applying that predicate to the inventory yields, for `('roman', 'USA')`, the universal Roman items plus `US_2011`
+   and not `IT_1983`; and for `('ambrosian', null)`, exactly the four Ambrosian items.
 
 **The drift test** — the one that earns its keep:
 
