@@ -734,8 +734,13 @@ class Health implements MessageComponentInterface
         $schema = Health::retrieveSchemaForCategory($category, $pathForSchema);
 
         // A folder check is recognised exactly as the execution phase used to recognise it, so a
-        // message carrying a non-string `sourceFolder` keeps taking the file branch as before.
-        $isFolderCheck = property_exists($validation, 'sourceFolder') && is_string($validation->sourceFolder);
+        // message carrying a non-string `sourceFolder` keeps taking the file branch as before. The
+        // same predicate yields the folder string the frames quote: the one the client supplied,
+        // which for a reconstructed slug is not the folder the server ends up reading.
+        $sourceFolder  = property_exists($validation, 'sourceFolder') && is_string($validation->sourceFolder)
+            ? $validation->sourceFolder
+            : null;
+        $isFolderCheck = null !== $sourceFolder;
 
         // The slug re-derivation used to open the file branch of the execution phase, but it is
         // resolution work: the seam below must receive a path that is already final, and must
@@ -776,7 +781,9 @@ class Health implements MessageComponentInterface
             $validate,
             $to,
             $runToken,
-            $validation
+            $category,
+            $pathForSchema,
+            $sourceFolder
         );
     }
 
@@ -795,11 +802,16 @@ class Health implements MessageComponentInterface
      * @param string $label The human label and CSS-class fragment for the result frames (what a v1 message calls `validate`).
      * @param ConnectionInterface $to The connection to send the result frames to.
      * @param ?string $runToken The originating run token to echo back on responses, or null to use the per-connection fallback.
-     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|null $legacyMessage
-     *        The originating v1 message, when the caller has one. It takes no part in control flow: it only keeps the
-     *        diagnostic text byte-identical to the pre-extraction output, which quotes the `sourceFolder` the client
-     *        supplied and the `category` it named — neither of which is derivable from a resolved target. A caller
-     *        without a v1 message omits it.
+     * @param string $category The check's category, one of ExecuteValidationCategory. It never touches control flow — the
+     *        schema is already resolved by the time we are called — and appears only in the two "could not detect / verify
+     *        the schema" diagnostics. It is a parameter rather than something rebuilt here so that the rule that produces
+     *        it lives in exactly one place. The default is the right value for an inventory-driven source-data check; a
+     *        caller checking anything else passes its own.
+     * @param ?string $pathForSchema The value the schema was resolved from, quoted in the same two diagnostics; defaults to $label,
+     *        which is what a sourceDataCheck resolves from.
+     * @param ?string $sourceFolder For a folder check, the folder as the *caller* named it — what the result frames quote.
+     *        It is not always $dataPath: a v1 client sends a bare id (`IT`) for the reconstructed i18n slugs and the server
+     *        reads the folder it derived from it. Defaults to $dataPath, for a caller whose two are the same.
      */
     private function runValidationSteps(
         string $dataPath,
@@ -808,33 +820,17 @@ class Health implements MessageComponentInterface
         string $label,
         ConnectionInterface $to,
         ?string $runToken,
-        ?\stdClass $legacyMessage = null
+        string $category = 'sourceDataCheck',
+        ?string $pathForSchema = null,
+        ?string $sourceFolder = null
     ): void {
-        $category = null !== $legacyMessage ? (string) $legacyMessage->category : 'sourceDataCheck';
-
-        // The value the schema was resolved from: the `validate` slug for a sourceDataCheck, the
-        // `sourceFile` itself for the other two categories. It appears only in the "unable to
-        // detect a schema" diagnostic.
-        $pathForSchema = ( null !== $legacyMessage && $category !== 'sourceDataCheck' && property_exists($legacyMessage, 'sourceFile') && is_string($legacyMessage->sourceFile) )
-            ? $legacyMessage->sourceFile
-            : $label;
-
-        /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $validationForMessages */
-        $validationForMessages = $legacyMessage ?? (object) [
-            'action'     => 'executeValidation',
-            'category'   => $category,
-            'validate'   => $label,
-            'sourceFile' => $dataPath
-        ];
+        $pathForSchema ??= $label;
+        // Read before $dataPath is made absolute below, so the two stay distinguishable.
+        $sourceFolder ??= $dataPath;
 
         // Now that we have the correct schema to validate against,
         // we will perform the actual validation either for all files in a folder, or for a single file
         if ($kind === 'folder') {
-            // The folder as the client named it, which is what the messages quote; $dataPath is
-            // the folder the server resolved and actually reads.
-            $sourceFolder = ( null !== $legacyMessage && property_exists($legacyMessage, 'sourceFolder') && is_string($legacyMessage->sourceFolder) )
-                ? $legacyMessage->sourceFolder
-                : $dataPath;
             // Resolve relative paths against the project root
             if (!str_starts_with($dataPath, '/')) {
                 $dataPath = Router::$apiFilePath . $dataPath;
@@ -952,11 +948,25 @@ class Health implements MessageComponentInterface
                         $runToken
                     );
                 },
-                function (\Throwable $e) use ($validationForMessages) {
-                    echo 'Error verifying i18n folder for validation ' . json_encode($validationForMessages) . ': ' . $e->getMessage() . "\n";
+                function (\Throwable $e) use ($label, $dataPath) {
+                    echo 'Error verifying i18n folder for validation ' . $label . ' (' . $dataPath . '): ' . $e->getMessage() . "\n";
                 }
             );
         } else {
+            // {@see Health::processValidationData()} and {@see Health::handleValidationDataError()} take a
+            // whole v1 message and read exactly two properties off it: `validate` and `category`. Both are
+            // parameters here, so this is a pure adapter for their signatures — it carries no information
+            // the caller did not pass. The annotation asserts the *shape* those two require; the literal
+            // category cannot be proven, because an unrecognised category has to reach the diagnostic
+            // verbatim (telling a client that its category was wrong is the diagnostic's whole job).
+            /** @var ExecuteValidationSourceFile|ExecuteValidationResource $validationForMessages */
+            $validationForMessages = (object) [
+                'action'     => 'executeValidation',
+                'category'   => $category,
+                'validate'   => $label,
+                'sourceFile' => $dataPath
+            ];
+
             // If we are validating an API path, we check for a 200 OK HTTP response from the API
             // rather than checking for existence of the file in the filesystem
             if (str_starts_with($dataPath, 'http://') || str_starts_with($dataPath, 'https://')) {

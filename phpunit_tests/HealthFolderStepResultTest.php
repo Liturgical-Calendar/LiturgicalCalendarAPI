@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests;
 
+use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Router;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -164,6 +165,53 @@ final class HealthFolderStepResultTest extends TestCase
         foreach ($frames as $frame) {
             self::assertSame('error', $frame->type);
             self::assertSame('run-token-1', $frame->runToken);
+        }
+    }
+
+    /**
+     * The frames quote the folder the *client* named, while the server reads the folder it
+     * derived from the `validate` slug. The two are not the same string: for the reconstructed
+     * i18n slugs a client sends a bare id and the server rebuilds the real path from it, which is
+     * why `runValidationSteps()` takes the caller's folder string as a parameter instead of
+     * quoting the path it reads.
+     *
+     * Nothing pinned this before, so a refactor could have silently swapped one for the other in
+     * six message texts and every assertion would still have passed.
+     */
+    public function testTheFramesQuoteTheFolderTheClientNamedNotTheOneTheServerReads(): void
+    {
+        Router::getApiPaths();
+
+        $derived = strtr(JsonData::NATIONAL_CALENDAR_I18N_FOLDER->path(), ['{nation}' => 'ZZ']);
+
+        $conn   = self::createStubConnection(4);
+        $health = new Health();
+
+        $tokens = new \ReflectionProperty(Health::class, 'runTokens');
+        $tokens->setValue($health, [$conn->resourceId => 'run-token-1']);
+
+        $method = new \ReflectionMethod(Health::class, 'executeValidation');
+        $method->invoke($health, (object) [
+            'action'       => 'executeValidation',
+            'category'     => 'sourceDataCheck',
+            'validate'     => 'national-calendar-ZZ-i18n',
+            'sourceFolder' => 'client/supplied/nonsense',
+        ], $conn);
+
+        $frames = array_map(static fn(string $raw): \stdClass => json_decode($raw), $conn->sent);
+
+        self::assertCount(3, $frames);
+        foreach ($frames as $frame) {
+            self::assertStringContainsString(
+                'Data folder client/supplied/nonsense could not be checked',
+                (string) $frame->text,
+                'the frames must quote the folder the client named'
+            );
+            self::assertStringContainsString(
+                $derived,
+                (string) $frame->text,
+                'and must report on the folder the server derived from the slug and actually read'
+            );
         }
     }
 }
