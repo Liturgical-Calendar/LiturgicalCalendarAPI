@@ -254,4 +254,28 @@ final class HealthProtocolValidationTest extends TestCase
         $malformed = $this->frames((string) json_encode(['action' => 'cancelRun', 'runToken' => ['an', 'array']]));
         self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $malformed[0]->errorCode);
     }
+
+    /**
+     * A rejection must not tell an unauthenticated client where the server keeps its files.
+     *
+     * The validator quotes the schema library's own message, and that message embeds the absolute
+     * path of the schema it was validating against. Asserting on the project root rather than on
+     * one known path keeps the check honest if the wording changes.
+     */
+    public function testARejectionNeverLeaksTheServerFilesystemPath(): void
+    {
+        foreach (
+            [
+                ['action' => 'runTest', 'test' => 'X', 'calendar' => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'], 'year' => '2026'],
+                ['action' => 'validateCalendar', 'calendar' => 'IT', 'year' => 'nope', 'category' => 'nationalcalendar', 'responsetype' => 'JSON'],
+            ] as $message
+        ) {
+            $frames = $this->frames((string) json_encode($message));
+            self::assertStringNotContainsString(
+                rtrim(Router::$apiFilePath, '/'),
+                (string) $frames[0]->text,
+                'a rejection leaked the server filesystem path'
+            );
+        }
+    }
 }

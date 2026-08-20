@@ -23,13 +23,49 @@ use Swaggest\JsonSchema\Schema;
  * implements draft-07, where `additionalProperties` sees only the properties declared in the same
  * schema object — so the natural `if`/`then`/`unevaluatedProperties` spelling needs 2019-09. The
  * allowed *names* still come from the schema; only the gate is here. See issue #826.
+ *
+ * **Validation is scoped to the one arm a message claims to be**, not run against the whole
+ * top-level `oneOf`. `shapeOf()` already has to resolve that arm to check `requestId`-gated
+ * properties, and reusing it here does more than save work: `swaggest/json-schema`'s `oneOf`
+ * failure text lists every arm's failure, including ones that have nothing to do with the message
+ * — a `runTest` with a bad `year` was, before this, told it was missing `executeValidation`'s
+ * `sourceFolder`. Scoping the validated schema to the claimed arm means the failure text can only
+ * ever be about that arm.
  */
 final class WebSocketMessageValidator
 {
-    private static ?Schema $schema = null;
+    /**
+     * The definition names {@see self::warm()} pre-imports. Not the same list `shapeOf()` matches
+     * action names against: `validateCalendar` is one action but two shapes, so this has seven
+     * entries where that has five action names plus a special case.
+     *
+     * @var list<string>
+     */
+    private const KNOWN_SHAPES = [
+        'executeValidation',
+        'validateCalendarLegacy',
+        'validateCalendarTyped',
+        'executeUnitTest',
+        'runTest',
+        'cancelRun',
+        'validateSource'
+    ];
+
+    /**
+     * The whole-document schema, used only when a message's shape cannot be determined at all.
+     * Unreachable through {@see \LiturgicalCalendar\Api\Health::onMessage()}, which already refuses
+     * an unrecognised action with `UNKNOWN_ACTION` before `validate()` ever runs — kept so a direct
+     * caller still gets a sensible answer instead of a fatal on a null shape.
+     */
+    private static ?Schema $topLevelSchema = null;
+
+    /** @var array<string, Schema> One imported Schema per shape, built once and reused. */
+    private static array $shapeSchemas = [];
 
     /** @var array<string, list<string>>|null */
     private static ?array $propertyNames = null;
+
+    private static ?\stdClass $rawDocument = null;
 
     private string $schemaPath;
 
@@ -46,18 +82,19 @@ final class WebSocketMessageValidator
      */
     public function validate(\stdClass $message, array $deferToHandler = []): ?string
     {
-        try {
-            $this->schema()->in($message);
-        } catch (\Throwable $e) {
-            return $e->getMessage();
-        }
-
-        if (false === property_exists($message, 'requestId')) {
-            return null;
-        }
-
         $shape = self::shapeOf($message);
-        if (null === $shape) {
+
+        try {
+            if (null !== $shape) {
+                $this->schemaFor($shape)->in($message);
+            } else {
+                $this->schema()->in($message);
+            }
+        } catch (\Throwable $e) {
+            return $this->sanitize($e->getMessage());
+        }
+
+        if (null === $shape || false === property_exists($message, 'requestId')) {
             return null;
         }
 
@@ -109,12 +146,8 @@ final class WebSocketMessageValidator
     private function propertyNamesFor(string $shape): array
     {
         if (null === self::$propertyNames) {
-            $raw = json_decode((string) file_get_contents($this->schemaPath));
-            if (false === $raw instanceof \stdClass || false === isset($raw->definitions)) {
-                throw new \RuntimeException("WebSocket message schema at {$this->schemaPath} has no definitions.");
-            }
             $names = [];
-            foreach ((array) $raw->definitions as $name => $definition) {
+            foreach ((array) $this->raw()->definitions as $name => $definition) {
                 if ($definition instanceof \stdClass && isset($definition->properties)) {
                     $names[(string) $name] = array_map('strval', array_keys((array) $definition->properties));
                 }
@@ -125,17 +158,83 @@ final class WebSocketMessageValidator
         return self::$propertyNames[$shape] ?? [];
     }
 
+    /**
+     * The schema document, decoded once and reused by both {@see self::propertyNamesFor()} and
+     * {@see self::schemaFor()} — the latter needs `definitions` alongside the arm it wraps, so the
+     * two must agree on what "the schema" is.
+     */
+    private function raw(): \stdClass
+    {
+        if (null === self::$rawDocument) {
+            $decoded = json_decode((string) file_get_contents($this->schemaPath));
+            if (false === $decoded instanceof \stdClass || false === isset($decoded->definitions)) {
+                throw new \RuntimeException("WebSocket message schema at {$this->schemaPath} has no definitions.");
+            }
+            self::$rawDocument = $decoded;
+        }
+
+        return self::$rawDocument;
+    }
+
+    /**
+     * A schema scoped to exactly one published shape, imported once per shape and reused after
+     * that — {@see self::warm()} is what keeps importing off the per-message path.
+     *
+     * The arm is wrapped rather than validated as a bare `$ref`: several definitions `$ref` their
+     * siblings (`calendarIdentity`, `correlationId`), and a definition lifted out on its own takes
+     * its unresolvable pointers with it. Keeping `definitions` alongside preserves them. Same
+     * construction {@see \LiturgicalCalendar\Tests\Schemas\WebSocketMessageSchemaTest::testEachMessageMatchesExactlyOneArm()}
+     * uses to check the schema itself.
+     */
+    private function schemaFor(string $shape): Schema
+    {
+        if (false === isset(self::$shapeSchemas[$shape])) {
+            if (false === isset($this->raw()->definitions->{$shape})) {
+                throw new \RuntimeException("WebSocket message schema at {$this->schemaPath} has no definition for {$shape}.");
+            }
+
+            $armDocument = (object) [
+                '$schema'     => 'https://json-schema.org/draft-07/schema#',
+                'allOf'       => [(object) ['$ref' => '#/definitions/' . $shape]],
+                'definitions' => $this->raw()->definitions
+            ];
+
+            $imported = Schema::import($armDocument);
+            if (false === $imported instanceof Schema) {
+                throw new \RuntimeException("WebSocket message schema shape {$shape} could not be imported.");
+            }
+            self::$shapeSchemas[$shape] = $imported;
+        }
+
+        return self::$shapeSchemas[$shape];
+    }
+
     private function schema(): Schema
     {
-        if (null === self::$schema) {
+        if (null === self::$topLevelSchema) {
             $imported = Schema::import($this->schemaPath);
             if (false === $imported instanceof Schema) {
                 throw new \RuntimeException("WebSocket message schema at {$this->schemaPath} could not be imported.");
             }
-            self::$schema = $imported;
+            self::$topLevelSchema = $imported;
         }
 
-        return self::$schema;
+        return self::$topLevelSchema;
+    }
+
+    /**
+     * Strip the schema file's absolute filesystem path out of a validation-failure message before
+     * it reaches the client.
+     *
+     * `swaggest/json-schema` embeds the path a schema document was imported from inside `$ref[...]`
+     * trace segments of its own failure text. An unauthenticated WebSocket client — this validator
+     * runs ahead of any auth check, by design — has no business learning where on disk the server
+     * keeps its files. Scoping validation to one arm (see the class docblock) already removes most
+     * of the irrelevant trace text this could appear in; this removes what is left.
+     */
+    private function sanitize(string $message): string
+    {
+        return str_replace($this->schemaPath, basename($this->schemaPath), $message);
     }
 
     /**
@@ -144,18 +243,22 @@ final class WebSocketMessageValidator
      */
     public static function reset(): void
     {
-        self::$schema        = null;
-        self::$propertyNames = null;
+        self::$topLevelSchema = null;
+        self::$shapeSchemas   = [];
+        self::$propertyNames  = null;
+        self::$rawDocument    = null;
     }
 
     /**
-     * Import the schema now rather than on the first message. A server that cannot validate is
-     * misconfigured, and should fail where an operator sees it rather than answering every message
-     * with an internal error.
+     * Import every published shape now rather than on the first message that claims it. A server
+     * that cannot validate is misconfigured, and should fail where an operator sees it rather than
+     * answering every message with an internal error.
      */
     public function warm(): void
     {
-        $this->schema();
+        foreach (self::KNOWN_SHAPES as $shape) {
+            $this->schemaFor($shape);
+        }
         $this->propertyNamesFor('validateSource');
     }
 }
