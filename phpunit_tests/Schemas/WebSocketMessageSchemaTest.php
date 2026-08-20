@@ -60,13 +60,14 @@ final class WebSocketMessageSchemaTest extends TestCase
                     'runToken'     => 'abc123'
                 ]
             ],
-            // resources.js:1184 — the resource arm adds responsetype.
+            // resources.js:1184 wraps each entry of resourceDataChecks (resources.js:210-244) as
+            // `{ action, responsetype, ...check }`. The entries carry validate/sourceFile/category
+            // and nothing else — notably no `rite`, unlike the source-data checks above.
             'resource check with responsetype'       => [
                 [
                     'action'       => 'executeValidation',
                     'responsetype' => 'JSON',
-                    'rite'         => 'roman',
-                    'validate'     => 'calendars',
+                    'validate'     => 'calendars-path',
                     'sourceFile'   => 'http://localhost:8000/calendars',
                     'category'     => 'resourceDataCheck',
                     'runToken'     => 'abc123'
@@ -84,6 +85,7 @@ final class WebSocketMessageSchemaTest extends TestCase
                     'runToken'     => 'abc123'
                 ]
             ],
+            // index.js:724 — the spread always adds calendar, year, category and rite.
             'legacy executeUnitTest'                 => [
                 [
                     'action'   => 'executeUnitTest',
@@ -91,6 +93,7 @@ final class WebSocketMessageSchemaTest extends TestCase
                     'calendar' => 'IT',
                     'year'     => 2024,
                     'category' => 'nationalcalendar',
+                    'rite'     => 'roman',
                     'runToken' => 'abc123'
                 ]
             ],
@@ -101,6 +104,10 @@ final class WebSocketMessageSchemaTest extends TestCase
                     'runToken' => 'abc123'
                 ]
             ],
+            // Not sent by the shipped client: UnitTestInterface has no validateSource, runTest,
+            // responseFormat or requestId anywhere in assets/js/*.js at HEAD 9126ad9. This is the
+            // reshaped (v2) shape from issue #806 section D, which UnitTestInterface#42 has not
+            // shipped yet — there is no client source line to cite.
             'v2 validateSource'                      => [
                 [
                     'action'    => 'validateSource',
@@ -109,6 +116,8 @@ final class WebSocketMessageSchemaTest extends TestCase
                     'requestId' => 'req-1'
                 ]
             ],
+            // Not sent by the shipped client — see the note on 'v2 validateSource' above. Reshaped
+            // (v2) validateCalendar, issue #806 section D.
             'v2 typed validateCalendar'              => [
                 [
                     'action'         => 'validateCalendar',
@@ -118,6 +127,8 @@ final class WebSocketMessageSchemaTest extends TestCase
                     'requestId'      => 'req-2'
                 ]
             ],
+            // Not sent by the shipped client — see the note on 'v2 validateSource' above. Reshaped
+            // (v2) executeUnitTest, issue #806 section E.
             'v2 runTest'                             => [
                 [
                     'action'    => 'runTest',
