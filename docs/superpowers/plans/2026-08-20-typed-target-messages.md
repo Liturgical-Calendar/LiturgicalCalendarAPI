@@ -543,12 +543,36 @@ Whichever file, the reference must state: the three v2 shapes; how each is discr
 `calendar.kind` is one of `general`, `national`, `diocesan`, `rite`; that ids are opaque and come from `/validations`;
 and that v1 remains supported until UnitTestInterface#42 ships.
 
-- [ ] **Step 3: Amend the spec's status**
+- [ ] **Step 3: Record the `steps` caveat from issue #819**
+
+`GET /validations` publishes a `steps` array per item, and `Health` emits one frame per step — but the two use
+different words. `CheckableInventory::STEPS` is `['exists', 'parses', 'validates']`; the emitted frame classes are
+`file-exists`, `json-valid`, `schema-valid`. Nothing in the API relates them, so a client that takes `steps` literally
+waits for a `.<label>.exists` frame that never arrives. Present since #811; filed as
+[#819](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/819).
+
+**Do not change either vocabulary here.** The maintainer's decision is that section C dissolves this — once responses
+are structured and DOM-agnostic, the frame carries the step identity and the CSS class becomes a client-side rendering
+choice, leaving nothing to reconcile. Renaming the published values down to the frame classes now would bake
+presentation detail into the discovery endpoint, which is the coupling `/validations` exists to remove, and C would
+undo it immediately. Renaming the frames is not additive and would break the live UnitTestInterface runners, which
+match on those classes.
+
+What to write, wherever the `/validations` contract is documented: that **`steps` is authoritative for its length,
+not for its values** — a client sizes a phase by `count(steps)`, which is correct today and is what replaces
+UnitTestInterface#42's four hardcoded `* 3` constants — and that its values do not yet correspond to emitted frame
+classes, with a pointer to #819.
+
+This exists to prevent one specific failure: UnitTestInterface#42 shipping before section C, needing step names, and
+hardcoding a client-side mapping. That would reintroduce exactly the duplication #806 exists to end, and it would
+then be load-bearing.
+
+- [ ] **Step 4: Amend the spec's status**
 
 Add a short section recording what plan 2 shipped and what it deliberately did not: the legacy branch survives, and the
 `glob()` containment exposure survives with it until the legacy-removal follow-up.
 
-- [ ] **Step 4: Lint and commit**
+- [ ] **Step 5: Lint and commit**
 
 ```bash
 cd /home/johnrdorazio/development/LiturgicalCalendar/LiturgicalCalendarAPI-msg
