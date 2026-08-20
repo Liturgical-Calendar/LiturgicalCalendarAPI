@@ -190,14 +190,20 @@ final class InventoryDriftTest extends TestCase
      * wider pattern would match the same files today and pass unnoticed.
      *
      * Driving both sides through the live handler, rather than re-implementing its glob, pins them
-     * together directly: this test fails the moment what `/tests` actually serves diverges from what
-     * the inventory advertises, regardless of which side's pattern moved.
+     * together directly: this test set-compares the *resulting id sets* of the two enumerations, not
+     * either side's pattern, so it fails when either one drifts from the other — the inventory
+     * widening while the handler stays put, or the reverse. That symmetry is exactly why this is the
+     * live-handler form and not a basename-suffix check: it fails the moment what `/tests` actually
+     * serves diverges from what the inventory advertises, regardless of which side's pattern moved.
      */
     public function testTestDefinitionItemsMatchWhatTestsEndpointServes(): void
     {
         foreach (Rite::cases() as $rite) {
+            // The rite scoping comes from the constructor's $rite argument, not from the request URI —
+            // TestsHandler::handle() never parses the path for it. The URI below is a plain, unscoped
+            // /tests; it is only what a PSR-7 request needs to exist, not what selects the partition.
             $response = ( new TestsHandler([], $rite) )->handle(
-                new ServerRequest('GET', '/tests/' . $rite->value, ['Accept' => 'application/json'])
+                new ServerRequest('GET', '/tests', ['Accept' => 'application/json'])
             );
             self::assertSame(200, $response->getStatusCode());
 
