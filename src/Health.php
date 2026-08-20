@@ -155,9 +155,19 @@ class Health implements MessageComponentInterface
      * worse than either answer applied consistently, because the client cannot tell which it is
      * getting.
      *
-     * `runTest` retires only `category`: `ACTION_PROPERTIES['executeUnitTest']` is
+     * `runTest` retires `category` and `rite`: `ACTION_PROPERTIES['executeUnitTest']` is
      * `['category', 'calendar', 'year', 'test']`, so there was never a `responsetype` on it to
      * retire. `runToken` is retired by nothing — it is shared, current, and valid on all three.
+     *
+     * **The retired set is not derivable from `ACTION_PROPERTIES`**, and an audit that assumed it
+     * was is how `rite` came to be missed on both calendar actions: `ACTION_PROPERTIES` lists only
+     * *required* properties, so every optional v1 property — `rite` on `validateCalendar` and
+     * `executeUnitTest`, `responsetype` on `executeValidation` — was structurally invisible to it.
+     * When adding a shape here, read the v1 predecessor's `@phpstan-type` alias at the top of this
+     * file, where the optional properties are the ones marked `?`. (`responsetype` on
+     * `executeValidation` is the one optional property deliberately *not* retired: `validateSource`
+     * has no response representation to choose, `executeValidation()` never read it, and retiring it
+     * would answer a question no client is asking.)
      *
      * Keyed by action; `shape` completes the sentence "… is not part of a %s" and is why
      * `validateCalendar`'s reads "a validateCalendar message with an object calendar": on a *string*
@@ -189,13 +199,22 @@ class Health implements MessageComponentInterface
                 // seeing. Sent *instead of* `responseFormat` it never reaches here at all — the
                 // property list turns the message away for the missing required property, and that
                 // reading is unchanged.
-                'responsetype' => 'responseFormat replaces it.'
+                'responsetype' => 'responseFormat replaces it.',
+                // Optional on v1, and therefore invisible to an audit that read ACTION_PROPERTIES —
+                // which lists required properties only. It is the one retired property whose silent
+                // acceptance would be actively dangerous: a half-migrated client that objectified
+                // `calendar` but kept its old top-level `rite` gets a *rite disagreement* ignored,
+                // which is exactly what the typed identity went out of its way to make loud.
+                'rite'         => 'calendar.rite replaces it.'
             ]
         ],
         'runTest'          => [
             'shape'   => 'runTest message',
             'retired' => [
-                'category' => 'calendar.kind replaces it.'
+                'category' => 'calendar.kind replaces it.',
+                // Same optional property, same predecessor treatment: `executeUnitTest` read a
+                // top-level `rite` through readRiteHint(); `runTest` reads only `calendar.rite`.
+                'rite'     => 'calendar.rite replaces it.'
             ]
         ]
     ];
@@ -1829,11 +1848,13 @@ class Health implements MessageComponentInterface
      */
     private function validateTypedCalendar(\stdClass $message, ConnectionInterface $to): void
     {
-        // A leftover `category` or `responsetype` is a half-migrated client: the message happens to
-        // work, because `calendar.kind` and `responseFormat` supply what is actually read and the
-        // stale property never is, so the client keeps believing the old property still selects
-        // something and only finds out otherwise the day the two disagree. Say so now, while they
-        // still agree. See Health::RETIRED_PROPERTIES.
+        // A leftover `category`, `responsetype` or top-level `rite` is a half-migrated client: the
+        // message happens to work, because `calendar.kind`, `responseFormat` and `calendar.rite`
+        // supply what is actually read and the stale property never is, so the client keeps
+        // believing the old property still selects something and only finds out otherwise the day
+        // the two disagree. Say so now, while they still agree — most sharply for `rite`, where a
+        // disagreement is the very thing resolveCalendarIdentity() refuses to resolve silently.
+        // See Health::RETIRED_PROPERTIES.
         if ($this->rejectRetiredProperties($message, 'validateCalendar', $to)) {
             return;
         }

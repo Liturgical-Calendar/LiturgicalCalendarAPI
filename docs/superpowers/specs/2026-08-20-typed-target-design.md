@@ -233,12 +233,25 @@ ignored:
 | v2 action          | v1 predecessor      | rejects if present                                   |
 |--------------------|---------------------|------------------------------------------------------|
 | `validateSource`   | `executeValidation` | `category`, `validate`, `sourceFile`, `sourceFolder` |
-| `validateCalendar` | `validateCalendar`  | `category`, `responsetype`                           |
-| `runTest`          | `executeUnitTest`   | `category`                                           |
+| `validateCalendar` | `validateCalendar`  | `category`, `responsetype`, `rite`                   |
+| `runTest`          | `executeUnitTest`   | `category`, `rite`                                   |
 
-`runTest` retires only `category`, because `executeUnitTest` never had a `responsetype` to retire in the first place.
-`runToken` is retired by nothing on any of the three — it predates this design, is shared across all three actions, and
-stays current.
+`runTest` retires no `responsetype`, because `executeUnitTest` never had one to retire in the first place. `runToken`
+is retired by nothing on any of the three — it predates this design, is shared across all three actions, and stays
+current.
+
+**The retired set is not the required-property list.** `rite` was missed on both calendar actions on the first pass,
+and the cause is worth writing down because it will recur: the audit derived the retired set from
+`Health::ACTION_PROPERTIES`, which lists only the properties an action *requires*, so every **optional** v1 property was
+structurally invisible to it. `rite` was optional on both v1 `validateCalendar` and `executeUnitTest` — read by
+`readRiteHint()`, honoured by `resolveRite()` — and the v2 shapes moved it inside `calendar.rite` and stopped reading
+the top-level one. Silently ignoring it is the worst possible outcome for this particular property: what goes unsaid is
+a **rite disagreement**, the one thing the typed identity went out of its way to make loud. When reshaping a further
+message, read the predecessor's `@phpstan-type` alias, where the optional properties are the ones marked `?`.
+
+`responsetype` is the one optional v1 property deliberately **not** retired: `executeValidation` accepted it, but
+`executeValidation()` never read it and `validateSource` has no response representation to choose, so retiring it would
+answer a question no client is asking.
 
 This is not a breaking change: a v1 client sends a string `calendar` or an old action name and never reaches these
 checks, so nothing that worked yesterday stops working. What it catches is the client in between — one that has

@@ -985,8 +985,110 @@ final class HealthTypedCalendarTest extends TestCase
     }
 
     /**
-     * `runTest` retires `category` and nothing else, because there is nothing else to retire:
-     * `ACTION_PROPERTIES['executeUnitTest']` is `['category', 'calendar', 'year', 'test']`, so no
+     * A top-level `rite` is retired on both calendar actions, and it is the retired property whose
+     * silent acceptance would do real damage.
+     *
+     * `rite` was **optional** on v1 `validateCalendar` and on `executeUnitTest` — read by
+     * `readRiteHint()`, honoured by `resolveRite()` — and the v2 shapes moved it inside
+     * `calendar.rite` and stopped reading the top-level one. So a client that objectified `calendar`
+     * but kept its old `rite` gets a *rite disagreement* ignored, which is the one thing the typed
+     * identity went out of its way to make loud: `resolveCalendarIdentity()` refuses to pick a
+     * winner when `calendar.rite` contradicts the calendar's actual rite, and a stale top-level
+     * `rite` reintroduces exactly that ambiguity one level up.
+     *
+     * The payloads deliberately carry a `rite` that **agrees** with `calendar.rite`, so what is
+     * rejected is the retired property itself and not a disagreement — the message would otherwise
+     * be dispatched perfectly and say nothing.
+     *
+     * This property was missed by the original retired-property audit because that audit derived the
+     * retired set from `ACTION_PROPERTIES`, which lists only *required* properties. Optional v1
+     * properties were structurally invisible to it; see `Health::RETIRED_PROPERTIES`.
+     *
+     * @return array<string, array{0: array<string, mixed>, 1: string}>
+     */
+    public static function retiredRiteMessageProvider(): array
+    {
+        return [
+            'validateCalendar' => [
+                [
+                    'action'         => 'validateCalendar',
+                    'calendar'       => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'],
+                    'year'           => 2026,
+                    'responseFormat' => 'JSON',
+                    'rite'           => 'roman'
+                ],
+                'rite is not part of a validateCalendar message with an object calendar: calendar.rite replaces it.'
+            ],
+            'runTest'          => [
+                [
+                    'action'   => 'runTest',
+                    'test'     => 'StIgnatiusOfLoyolaTest',
+                    'calendar' => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'],
+                    'year'     => 2026,
+                    'rite'     => 'roman'
+                ],
+                'rite is not part of a runTest message: calendar.rite replaces it.'
+            ],
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    #[DataProvider('retiredRiteMessageProvider')]
+    public function testALeftoverTopLevelRiteIsRejected(array $payload, string $expectedText): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        self::send($health, $conn, $payload);
+
+        self::assertCount(1, $conn->sent, 'a half-migrated message is answered once and not dispatched');
+        $frame = json_decode($conn->sent[0]);
+        self::assertSame('echobot', $frame->type);
+        self::assertSame($expectedText, $frame->text);
+        self::assertSame([], self::queuedPaths($health), 'a rejected message must not have queued a request');
+    }
+
+    /**
+     * The rule must not reach the v1 actions it is named after: `rite` is a *current, supported*
+     * optional hint on the string form of `validateCalendar` and on `executeUnitTest`, and a rule
+     * that swept it up there would delete v1 rite awareness (issue #767) rather than guard the v2
+     * shapes. The queued path is what is asserted, because that is where the hint has its effect —
+     * an accepted-but-ignored `rite` would leave no trace in the frames.
+     *
+     * The hint deliberately *contradicts* what the metadata says, so the assertion distinguishes a
+     * hint that was honoured from a rite that was merely looked up: `rotter_nl` is Roman in the
+     * fixture, and only the top-level `rite` can put `/ambrosian/` in front of it.
+     */
+    public function testTheV1ShapeStillHonoursATopLevelRite(): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        self::withMetadata(static function () use ($health, $conn): void {
+            self::send($health, $conn, [
+                'action'       => 'validateCalendar',
+                'calendar'     => 'rotter_nl',
+                'category'     => 'diocesancalendar',
+                'year'         => 2026,
+                'responsetype' => 'JSON',
+                'rite'         => 'ambrosian'
+            ]);
+        });
+
+        self::assertSame([], $conn->sent, 'the legacy shape was refused a property it still supports');
+        self::assertSame(
+            '/ambrosian/diocese/rotter_nl/2026?year_type=CIVIL',
+            self::soleQueuedPath($health),
+            'the v1 rite hint stopped reaching the request path'
+        );
+    }
+
+    /**
+     * `runTest` retires `category` and `rite`, and no third property, because there is no third
+     * property to retire: `ACTION_PROPERTIES['executeUnitTest']` is
+     * `['category', 'calendar', 'year', 'test']` and its only optional property was `rite`, so no
      * `responsetype` ever named anything on it. A rule that invented one would reject a property no
      * client was ever told to send, for a reason that is not true.
      */
