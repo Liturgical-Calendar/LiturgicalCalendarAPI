@@ -46,13 +46,13 @@ business.
 
 ## Scope
 
-| In scope                                                        | Out of scope                                                         |
-|-----------------------------------------------------------------|----------------------------------------------------------------------|
-| Structured fields on every response, alongside the legacy three | Removing `type` / `text` / `classes` (gated on UnitTestInterface#42) |
-| `requestId` correlation, client-supplied and echoed             | The `protocol` field and the `hello` handshake (#806 section F)      |
-| `runId` as the published name for today's `runToken`            | Typed `protocolError` responses (#806 section G)                     |
-| A terminal `complete` frame per target                          | Renaming the `.test-valid` CSS class (see below)                     |
-| Retiring `FRAME_CLASS_FOR_STEP` from the test suite into `src`  | Strict request validation beyond what section B already rejects      |
+| In scope                                                                                                  | Out of scope                                                         |
+|-----------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------|
+| Structured fields on every response, alongside the legacy three                                           | Removing `type` / `text` / `classes` (gated on UnitTestInterface#42) |
+| `requestId` correlation, client-supplied and echoed                                                       | The `protocol` field and the `hello` handshake (#806 section F)      |
+| `runId` as the published name for today's `runToken`                                                      | Typed `protocolError` responses (#806 section G)                     |
+| A terminal `complete` frame per target                                                                    | Renaming the `.test-valid` CSS class (see below)                     |
+| Retiring the legacy class table from the test suite into `src` (shipped as `FrameFamily::CLASS_FOR_STEP`) | Strict request validation beyond what section B already rejects      |
 
 ## The envelope
 
@@ -166,43 +166,133 @@ removal, when `text` stops being a contract and `details` can be escaped, or not
 
 ## Emitters, and the legacy projection
 
-Three typed emitters replace frame construction spread across 27 sites. Each owns one kind:
+Frame construction spread across 27 sites collapses onto **one primitive**, `sendStepResult()`, plus a handful of
+per-cluster wrappers that narrow it, plus one emitter, `sendComplete()`, that deliberately does not go through the
+primitive at all:
 
 ```php
-private function sendStepResult(ConnectionInterface $to, string $classFragment, ?string $targetId,
-    Step $step, Status $status, string $text, ?array $details, ?string $runToken, ?string $requestId): void
+private function sendStepResult(
+    ConnectionInterface $to,
+    string $classFragment,
+    ?\stdClass $target,
+    Step $step,
+    Status $status,
+    string $text,
+    ?array $details = null,
+    ?string $runToken = null,
+    ?string $classQualifier = null,
+    FrameFamily $family = FrameFamily::CHECK,
+    ?string $responseType = null,
+    ?string $requestId = null
+): void
 
-private function sendComplete(ConnectionInterface $to, string $classFragment, ?string $targetId,
-    ?string $runToken, ?string $requestId): void
-
-/** @param array{category:string,calendar:string,rite:Rite} $calendar */
-private function sendTestResult(ConnectionInterface $to, string $classFragment, string $test,
-    array $calendar, int $year, Status $status, string $text, ?array $details,
-    ?string $runToken, ?string $requestId): void
+private function sendComplete(
+    ConnectionInterface $to,
+    ?\stdClass $target,
+    ?string $runToken = null,
+    ?string $requestId = null
+): void
 ```
+
+`sendCalendarStepResult()`, `sendSchemaFailureStepResult()`, `sendFolderStepResult()` and `sendTestResult()` are thin
+wrappers over `sendStepResult()`: each supplies the `$classFragment`, `$target` and `$family` its own cluster needs
+and forwards everything else. `sendTestResult()`, for instance, passes `family: FrameFamily::TEST_RUN` and nothing
+else distinguishes a test run's call to the primitive from a calendar validation's. `$target` is built by a small
+shared helper rather than assembled ad hoc at each call site:
+
+```php
+private static function frameTarget(string $id, array $extra = []): \stdClass
+{
+    return (object) ['id' => $id, ...$extra];
+}
+```
+
+always an `id`, plus whatever else identifies the thing checked (`['year' => $year]` for a calendar, `['calendar' =>
+$calendar, 'year' => $year]` for a test) — never the bare id string a first pass at this design assumed, because a
+bare string could only ever carry the first of those and widening it later would be a breaking change for every
+client that had learned to read it.
 
 `rejectMessage()` is unchanged: a protocol rejection has no target, no step and no status.
 
 Two enums, matching the codebase's existing style: `Step` (`EXISTS`, `PARSES`, `VALIDATES`, `COMPLETE`) and `Status`
 (`PASS`, `FAIL`).
 
-The legacy fields become a projection computed **once**, inside the emitters:
+### The legacy projection lives on `FrameFamily`, not on `Health`
+
+The legacy `classes` selector is composed in exactly one place in the repository: `FrameFamily::frameClasses()`.
+`FrameFamily` is a two-case enum, `CHECK` and `TEST_RUN`, and it owns the step→class table as a **private** constant
+rather than exposing it, because the projection is not one-to-one — a unit test's one outcome is `Step::VALIDATES`
+on the wire exactly as a schema check's is, but it addresses a `test-valid` box rather than a `schema-valid` one —
+and keying the table by family is what keeps that divergence *declared data* on the enum rather than an override
+argument any future caller could reach for:
 
 ```php
-$frame->type    = $status === Status::PASS ? 'success' : 'error';
-$frame->classes = '.' . $classFragment . '.' . self::FRAME_CLASS_FOR_STEP[$step->value];
+private const CLASS_FOR_STEP = [
+    self::CHECK->value    => ['exists' => 'file-exists', 'parses' => 'json-valid', 'validates' => 'schema-valid'],
+    self::TEST_RUN->value => ['validates' => 'test-valid']
+];
+
+public function frameClasses(string $fragment, Step $step, ?string $qualifier = null): string
+```
+
+It has two callers in two namespaces — `Health::sendStepResult()` for every check and calendar frame, and
+`LitTestRunner::setMessage()` for the frame a test that actually ran produces — which is why the projection sits on
+the enum rather than as a private method on `Health`: `LitTestRunner` would otherwise have to depend on `Health`,
+which already depends on `LitTestRunner`, a dependency cycle paid for four lines. Before this, `LitTestRunner` held
+its own copy of the test-run selector grammar, so the label-as-selector defect #820 fixed inside `Health` was true
+there and only there — one class matching correctly while its sibling still built the string by hand. Now there is
+one composer and two callers, not two composers.
+
+`frameClasses()` also decides **which side of the step the qualifier segment falls on**, because the two grammars
+genuinely disagree about it: `.calendar-{id}.{step}.year-{year}` puts the year after the step, `.{test}.year-{year}.test-valid`
+puts it before. A caller passes segments — never dots, never positions, never an assembled class name — and the
+family places them:
+
+```php
+$segments = match ($this) {
+    self::CHECK    => [$fragment, $stepClass, ...$qualifierSegments],
+    self::TEST_RUN => [$fragment, ...$qualifierSegments, $stepClass]
+};
+```
+
+The `match` is **exhaustive with no `default` arm**, deliberately. A `default` would let a third family fall through
+to borrow `CHECK`'s or `TEST_RUN`'s ordering silently, correct for neither, and the mismatch would not surface until
+a class matched zero cards in a browser. Omitting `default` means PHPStan rejects the file outright the moment a
+third case is added without its own line here — the same failure mode the exhaustive-enum machinery elsewhere in
+this codebase exists to catch, applied to a grammar instead of a data shape.
+
+### `frameTarget()` deliberately did not move onto `FrameFamily`
+
+It would be tidy to put `frameTarget()` next to `frameClasses()` — two composers for the two things a frame says
+about itself, one place. That was considered and rejected: `FrameFamily` is documented as legacy-only and is
+deleted together with `classes` at legacy removal, while `target` is the structured field that must **outlive** it.
+Hanging the surviving vocabulary off the enum marked for deletion would mean either dragging `FrameFamily` along
+past its retirement to keep `target` working, or relocating `frameTarget()` a second time at legacy removal — work
+this design exists to avoid repeating. The two composers stay in different files because they have different
+lifecycles, not because no one thought to put them together. What ties `Health::sendStepResult()`'s target shape to
+`LitTestRunner::setMessage()`'s is instead a test asserting the two emitters produce the same object for the same
+input — a behavioural guarantee rather than a shared line of code, which is the right kind of coupling for two
+pieces of code that are allowed to diverge in every other way.
+
+The legacy fields become a projection computed **once**, inside `sendStepResult()`:
+
+```php
+$message->type    = Status::PASS === $status ? 'success' : 'error';
+$message->classes = $family->frameClasses($classFragment, $step, $classQualifier);
 ```
 
 Three consequences make this worth the refactor:
 
-- `FRAME_CLASS_FOR_STEP` currently lives in the **test suite**, where section B put it as a stopgap and a reviewer
-  correctly called it *"relocated hardcoding, not eliminated hardcoding"*. Here it becomes production code with one
-  home: the legacy projection. It stops being a stopgap and becomes the thing it always described.
-- `$classFragment` already exists and already handles both vocabularies — a v1 caller passes the slug,
+- `FRAME_CLASS_FOR_STEP` used to live in the **test suite**, where section B put it as a stopgap and a reviewer
+  correctly called it *"relocated hardcoding, not eliminated hardcoding"*. It is now `FrameFamily::CLASS_FOR_STEP`,
+  production code with one home: the legacy projection. It stops being a stopgap and becomes the thing it always
+  described.
+- `$classFragment` already existed and already handled both vocabularies — a v1 caller passes the slug,
   `validateSource` passes `cssClassFragmentForId($item->id)`. Centralising means the label-as-CSS defect fixed in
   #820 cannot recur, because nothing else computes a selector.
-- Legacy removal becomes deleting the projection and the `$classFragment` parameter, rather than revisiting every
-  emission site a second time.
+- Legacy removal becomes deleting `FrameFamily`, the `$classFragment` parameter and the `classes` assignment in
+  `LitTestRunner::setMessage()` — the entire legacy address surface named in one docblock — rather than revisiting
+  every emission site a second time.
 
 ## Correlation
 
