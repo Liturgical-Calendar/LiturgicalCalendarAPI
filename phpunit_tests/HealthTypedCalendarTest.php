@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Tests;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -42,43 +43,13 @@ use Ratchet\ConnectionInterface;
 #[CoversClass(Health::class)]
 final class HealthTypedCalendarTest extends TestCase
 {
-    /** @var list<Health> every instance this test created, so tearDown can defuse its queue */
-    private array $healths = [];
+    // Every Health here queues a real calendar URL; see the trait for why that must be defused.
+    use HealthQueueIsolationTrait;
 
     public static function setUpBeforeClass(): void
     {
         // Route::CALENDAR->path() is built from the resolved API paths.
         Router::getApiPaths();
-    }
-
-    /**
-     * Empty the request queue of every Health this test built.
-     *
-     * Not hygiene — necessary. `cachedGet()` parks the request *and* registers a ReactPHP
-     * `futureTick`, and `React\EventLoop\Loop` installs a shutdown function that runs the loop when
-     * the process ends. Without this, every queued URL would be fetched for real at the end of the
-     * PHPUnit run: the suite would start depending on an API server being up, and would hammer it
-     * with dozens of full calendar computations to no purpose. `drainHandler()` stops ticking the
-     * moment it finds nothing queued and nothing in flight, so emptying the queue is enough.
-     */
-    protected function tearDown(): void
-    {
-        $queue = new \ReflectionProperty(Health::class, 'queue');
-        foreach ($this->healths as $health) {
-            $queue->setValue($health, []);
-        }
-        $this->healths = [];
-    }
-
-    /**
-     * A Health whose queue tearDown will defuse. Always use this rather than `new Health()`.
-     */
-    private function newHealth(): Health
-    {
-        $health          = new Health();
-        $this->healths[] = $health;
-
-        return $health;
     }
 
     // ---------------------------------------------------------------- the typed identity dispatches
@@ -220,6 +191,65 @@ final class HealthTypedCalendarTest extends TestCase
         self::assertSame([], self::queuedPaths($health), 'an invalid message must not have queued a request');
     }
 
+    // ---------------------------------------------------------------- half-migrated clients
+
+    /**
+     * The failure mode this guards against is a message that *works*.
+     *
+     * A client that typed its `calendar` but left `category` behind gets the right calendar anyway —
+     * `calendar.kind` supplies the category and the stale property is simply never read — so nothing
+     * tells it that `category` has stopped meaning anything. It finds out the day the two disagree,
+     * which is the worst possible day. Silently-correct is not the same as correct.
+     */
+    public function testALeftoverCategoryOnTheObjectFormIsRejected(): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        self::withMetadata(static function () use ($health, $conn): void {
+            self::send($health, $conn, [
+                'action'         => 'validateCalendar',
+                'calendar'       => ['kind' => 'diocesan', 'id' => 'lugano_ch', 'rite' => 'ambrosian'],
+                // Left over from the v1 shape, and — note — naming the very category `kind` implies,
+                // so this message would otherwise be dispatched correctly and say nothing.
+                'category'       => 'diocesancalendar',
+                'year'           => 2026,
+                'responseFormat' => 'JSON'
+            ]);
+        });
+
+        self::assertCount(1, $conn->sent);
+        $frame = json_decode($conn->sent[0]);
+        self::assertSame('echobot', $frame->type);
+        self::assertSame('category is not part of a validateCalendar message with an object calendar: calendar.kind replaces it.', $frame->text);
+        self::assertSame([], self::queuedPaths($health));
+    }
+
+    /**
+     * The mirrored half-migration, asserted rather than reasoned about: a typed `calendar` with the
+     * *old* spelling of the format. It needs no check of its own — `responseFormat` is a required
+     * property of this shape, so its absence fails the property list — but "needs no check" is a
+     * claim about behaviour, and behaviour is what tests are for.
+     */
+    public function testTheOldSpellingOfTheFormatOnTheObjectFormIsRejected(): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        self::send($health, $conn, [
+            'action'       => 'validateCalendar',
+            'calendar'     => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'],
+            'year'         => 2026,
+            'responsetype' => 'JSON'
+        ]);
+
+        self::assertCount(1, $conn->sent);
+        $frame = json_decode($conn->sent[0]);
+        self::assertSame('echobot', $frame->type);
+        self::assertSame('Invalid message properties', $frame->errorMsg);
+        self::assertSame([], self::queuedPaths($health));
+    }
+
     // ---------------------------------------------------------------- the response format
 
     /**
@@ -304,12 +334,9 @@ final class HealthTypedCalendarTest extends TestCase
     /**
      * The rite-disagreement rejections, one per kind that can be checked.
      *
-     * A `rite` on a v1 message is a *hint*: `resolveRite()` prefers it whenever it parses, which is
-     * the right thing to do for a value the client may have guessed at. On a v2 message it is an
-     * *assertion* about a calendar the server already knows the rite of, and an assertion that is
-     * wrong is a client bug. Preferring the assertion would compute the wrong calendar silently;
-     * preferring the metadata would compute the right one while leaving the client convinced of
-     * something false. Saying so is more useful than either.
+     * Why a wrong `rite` is rejected rather than resolved is argued once, in
+     * `Health::resolveCalendarIdentity()`'s docblock; these rows are that argument's coverage, one
+     * per kind whose actual rite the server can establish.
      *
      * @return array<string, array{0: array<string, mixed>}>
      */
@@ -416,12 +443,19 @@ final class HealthTypedCalendarTest extends TestCase
     public static function malformedIdentityProvider(): array
     {
         return [
-            'kind missing'      => [['id' => 'IT', 'rite' => 'roman'], 'calendar.kind must be a string naming one of: general, national, diocesan, rite.'],
-            'kind not a string' => [['kind' => 42, 'id' => 'IT', 'rite' => 'roman'], 'calendar.kind must be a string naming one of: general, national, diocesan, rite.'],
-            'rite missing'      => [['kind' => 'national', 'id' => 'IT'], 'calendar.rite must be a string naming a known rite.'],
-            'rite unknown'      => [['kind' => 'national', 'id' => 'IT', 'rite' => 'byzantine'], 'Unknown rite: byzantine'],
-            'id missing'        => [['kind' => 'national', 'rite' => 'roman'], 'calendar.id is required for kind national.'],
-            'id not a string'   => [['kind' => 'diocesan', 'id' => 42, 'rite' => 'roman'], 'calendar.id must be a string.'],
+            'kind missing'         => [['id' => 'IT', 'rite' => 'roman'], 'calendar.kind must be a string naming one of: general, national, diocesan, rite.'],
+            'kind not a string'    => [['kind' => 42, 'id' => 'IT', 'rite' => 'roman'], 'calendar.kind must be a string naming one of: general, national, diocesan, rite.'],
+            'rite missing'         => [['kind' => 'national', 'id' => 'IT'], 'calendar.rite must be a string naming a known rite.'],
+            'rite unknown'         => [['kind' => 'national', 'id' => 'IT', 'rite' => 'byzantine'], 'Unknown rite: byzantine'],
+            'id missing'           => [['kind' => 'national', 'rite' => 'roman'], 'calendar.id is required for kind national.'],
+            'id not a string'      => [['kind' => 'diocesan', 'id' => 42, 'rite' => 'roman'], 'calendar.id must be a string.'],
+            // `general` accepts no id but `roman`. The message must not name a kind to try instead:
+            // `IT` would want `national`, and `kind: rite` — the obvious thing to suggest — rejects
+            // `IT` in turn, so the advice would point at another failure.
+            'nation id on general' => [['kind' => 'general', 'id' => 'IT', 'rite' => 'roman'], 'Kind general names the General Roman Calendar; its only valid id is roman, not IT.'],
+            // The same message for an id that *is* a rite, which is the case a "use kind rite"
+            // wording would have got right and is exactly why it read as good advice.
+            'rite id on general'   => [['kind' => 'general', 'id' => 'ambrosian', 'rite' => 'roman'], 'Kind general names the General Roman Calendar; its only valid id is roman, not ambrosian.'],
         ];
     }
 
@@ -589,6 +623,13 @@ final class HealthTypedCalendarTest extends TestCase
      * the genuinely uninitialised state. When it started out uninitialised we therefore leave an
      * *empty* MetadataCalendars behind rather than the fixture, so a later test in the same process
      * cannot resolve `lugano_ch` or `rotter_nl` from data this helper invented.
+     *
+     * **Warning for a future test.** Calling this leaves `Health::$metadata` initialised for the
+     * rest of the process — empty, but initialised. `findDioceseMetadata()` has two failure arms and
+     * only the `NotFoundException` one is reachable afterwards; its `\RuntimeException` arm needs
+     * `isset(self::$metadata) === false`, which nothing can restore. A test written against that arm
+     * would pass or fail depending on which file PHPUnit loaded first. Reach it in a process that
+     * has not touched this helper, or not at all.
      */
     private static function withMetadata(callable $fn): void
     {
