@@ -778,7 +778,8 @@ class Health implements MessageComponentInterface
      *        `executeValidation` message, which names no id. Never fabricated from the class fragment.
      * @param Step $step The step being reported. A step the family has no class for cannot be addressed and is
      *        refused by {@see FrameFamily::frameClasses()} rather than emitted: {@see Step::COMPLETE} is the case
-     *        that exists today (the terminal frame is emitted elsewhere, #821), and a case added later would
+     *        that exists today — {@see Health::sendComplete()} composes the terminal frame itself and routes
+     *        around this method rather than relaxing that refusal (#821) — and a case added later would
      *        otherwise ship a `classes` of `.<fragment>.`, which matches zero cards — the silent mismatch this
      *        whole projection exists to end.
      * @param Status $status The outcome, which `type` is projected from.
