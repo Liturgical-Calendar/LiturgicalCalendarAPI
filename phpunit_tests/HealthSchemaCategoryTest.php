@@ -130,12 +130,13 @@ final class HealthSchemaCategoryTest extends TestCase
         self::initRouter();
 
         return [
-            'missal by id'      => [Route::MISSALS->path() . '/EDITIO_TYPICA_1970', LitSchema::PROPRIUMDESANCTIS],
-            'events for nation' => [Route::EVENTS->path() . '/nation/US', LitSchema::EVENTS],
-            'data for nation'   => [Route::DATA->path() . '/nation/US', LitSchema::NATIONAL],
-            'data for diocese'  => [Route::DATA->path() . '/diocese/romamo_it', LitSchema::DIOCESAN],
-            'data for region'   => [Route::DATA->path() . '/widerregion/Europe', LitSchema::WIDERREGION],
-            'bare route'        => [Route::CALENDARS->path(), LitSchema::METADATA],
+            'missal by id'       => [Route::MISSALS->path() . '/EDITIO_TYPICA_1970', LitSchema::PROPRIUMDESANCTIS],
+            'events for nation'  => [Route::EVENTS->path() . '/nation/US', LitSchema::EVENTS],
+            'events for diocese' => [Route::EVENTS->path() . '/diocese/romamo_it', LitSchema::EVENTS],
+            'data for nation'    => [Route::DATA->path() . '/nation/US', LitSchema::NATIONAL],
+            'data for diocese'   => [Route::DATA->path() . '/diocese/romamo_it', LitSchema::DIOCESAN],
+            'data for region'    => [Route::DATA->path() . '/widerregion/Europe', LitSchema::WIDERREGION],
+            'bare route'         => [Route::CALENDARS->path(), LitSchema::METADATA],
         ];
     }
 
@@ -143,6 +144,98 @@ final class HealthSchemaCategoryTest extends TestCase
     public function testResourceDataCheckResolvesFromTheEndpointUrl(string $url, LitSchema $expected): void
     {
         self::assertSame($expected->path(), self::retrieveSchemaForCategory('resourceDataCheck', $url));
+    }
+
+    // ---------------------------------------------------------------- the optional rite segment
+
+    /**
+     * `Router::extractRiteSegment()` admits an optional `roman`/`ambrosian` segment immediately
+     * after `events` and `data`, and per `Router::canonicalRiteUrl()` the explicit form is the
+     * *canonical* one — so it is the form a rite-aware client sends. Before #812 neither pattern
+     * admitted it, `ambrosian` sat where the pattern demanded `diocese`, and the call fell
+     * through to a null schema: the "Unable to detect schema for dataPath …" failure that
+     * blocked UnitTestInterface#48.
+     *
+     * The `/data` expectations double as the guard that the rite group stayed NON-capturing:
+     * the numbered groups feed the switch that picks between NATIONAL, DIOCESAN and WIDERREGION,
+     * so a capturing rite group would shift them all and every one of these would fall back to
+     * the generic DATA schema.
+     *
+     * @return array<string, array{string, LitSchema}>
+     */
+    public static function riteQualifiedUrlProvider(): array
+    {
+        self::initRouter();
+
+        return [
+            'events, roman nation'         => [Route::EVENTS->path() . '/roman/nation/US', LitSchema::EVENTS],
+            'events, roman diocese'        => [Route::EVENTS->path() . '/roman/diocese/romamo_it', LitSchema::EVENTS],
+            'events, ambrosian diocese'    => [Route::EVENTS->path() . '/ambrosian/diocese/milano_it', LitSchema::EVENTS],
+            'events, with locale'          => [Route::EVENTS->path() . '/ambrosian/diocese/lugano_ch?locale=it_IT', LitSchema::EVENTS],
+            'data, roman nation'           => [Route::DATA->path() . '/roman/nation/US', LitSchema::NATIONAL],
+            'data, roman diocese'          => [Route::DATA->path() . '/roman/diocese/romamo_it', LitSchema::DIOCESAN],
+            'data, ambrosian diocese'      => [Route::DATA->path() . '/ambrosian/diocese/milano_it', LitSchema::DIOCESAN],
+            'data, roman wider region'     => [Route::DATA->path() . '/roman/widerregion/Europe', LitSchema::WIDERREGION],
+            'data, ambrosian wider region' => [Route::DATA->path() . '/ambrosian/widerregion/Europe', LitSchema::WIDERREGION],
+            'data, with locale'            => [Route::DATA->path() . '/ambrosian/diocese/bergam_it?locale=it_IT', LitSchema::DIOCESAN],
+        ];
+    }
+
+    #[DataProvider('riteQualifiedUrlProvider')]
+    public function testResourceDataCheckResolvesTheCanonicalRiteQualifiedUrl(string $url, LitSchema $expected): void
+    {
+        self::assertSame($expected->path(), self::retrieveSchemaForCategory('resourceDataCheck', $url));
+    }
+
+    /**
+     * The regression guard for the un-prefixed form. The rite segment is *optional* and its
+     * absence means Roman, so admitting it must not have cost the legacy URLs their match —
+     * every client that predates rite awareness still sends these.
+     *
+     * @return array<string, array{string, LitSchema}>
+     */
+    public static function riteLessUrlProvider(): array
+    {
+        self::initRouter();
+
+        return [
+            'events for nation'  => [Route::EVENTS->path() . '/nation/US', LitSchema::EVENTS],
+            'events for diocese' => [Route::EVENTS->path() . '/diocese/romamo_it', LitSchema::EVENTS],
+            'events with locale' => [Route::EVENTS->path() . '/diocese/romamo_it?locale=it_IT', LitSchema::EVENTS],
+            'data for nation'    => [Route::DATA->path() . '/nation/US', LitSchema::NATIONAL],
+            'data for diocese'   => [Route::DATA->path() . '/diocese/romamo_it', LitSchema::DIOCESAN],
+            'data for region'    => [Route::DATA->path() . '/widerregion/Europe', LitSchema::WIDERREGION],
+            'data with locale'   => [Route::DATA->path() . '/widerregion/Europe?locale=it_IT', LitSchema::WIDERREGION],
+        ];
+    }
+
+    #[DataProvider('riteLessUrlProvider')]
+    public function testResourceDataCheckStillResolvesTheUnprefixedUrl(string $url, LitSchema $expected): void
+    {
+        self::assertSame($expected->path(), self::retrieveSchemaForCategory('resourceDataCheck', $url));
+    }
+
+    /**
+     * Only the two rites the router knows are admitted; anything else in that position is just
+     * an unrecognised path, exactly as before.
+     *
+     * @return array<string, array{string}>
+     */
+    public static function unknownRiteSegmentProvider(): array
+    {
+        self::initRouter();
+
+        return [
+            'events, invented rite' => [Route::EVENTS->path() . '/byzantine/diocese/milano_it'],
+            'data, invented rite'   => [Route::DATA->path() . '/byzantine/diocese/milano_it'],
+            'data, doubled rite'    => [Route::DATA->path() . '/roman/ambrosian/diocese/milano_it'],
+        ];
+    }
+
+    #[DataProvider('unknownRiteSegmentProvider')]
+    public function testResourceDataCheckRejectsAnUnknownRiteSegment(string $url): void
+    {
+        self::assertNull(self::retrieveSchemaForCategory('resourceDataCheck', $url));
     }
 
     public function testResourceDataCheckRejectsAnUnrecognisedUrl(): void

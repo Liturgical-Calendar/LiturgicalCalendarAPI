@@ -636,8 +636,12 @@ class Health implements MessageComponentInterface
                                 $this->handleDioceseMetadataError($e, $to, $validation, $matches[2], $runToken);
                                 return;
                             }
+                            // The diocesan tree is partitioned by rite, and it is the only tier
+                            // that is: an Ambrosian diocese keeps its i18n files under
+                            // `sourcedata/rite/ambrosian/...`, so the bare Roman constant would
+                            // send every one of them to a folder that does not exist.
                             $dataPath = strtr(
-                                JsonData::DIOCESAN_CALENDAR_I18N_FOLDER->path(),
+                                JsonData::diocesanCalendarI18nFolderFor($dioceseMetadata->rite)->path(),
                                 [
                                     '{diocese}' => $matches[2],
                                     '{nation}'  => $dioceseMetadata->nation
@@ -660,7 +664,12 @@ class Health implements MessageComponentInterface
                     /** @var ExecuteValidationSourceFile $validation */
                     $dataPath = (string) $validation->sourceFile;
                     $matches  = null;
-                    if (preg_match('/^(wider-region|national-calendar|diocesan-calendar)-([A-Z][a-z]+)$/', $validate, $matches)) {
+                    // `[A-Z][a-z]+` matched `Europe` but neither `IT` (no lowercase char) nor
+                    // `milano_it` (lowercase initial, and no `_` in the class), so the national
+                    // and diocesan arms below never ran and $dataPath silently kept the
+                    // client-supplied `sourceFile`. `[A-Za-z_]+` matches all three, the same way
+                    // the i18n branch above already does.
+                    if (preg_match('/^(wider-region|national-calendar|diocesan-calendar)-([A-Za-z_]+)$/', $validate, $matches)) {
                         switch ($matches[1]) {
                             case 'wider-region':
                                 $dataPath = strtr(
@@ -681,8 +690,13 @@ class Health implements MessageComponentInterface
                                     $this->handleDioceseMetadataError($e, $to, $validation, $matches[2], $runToken);
                                     return;
                                 }
+                                // Rite-partitioned, like every other diocesan path. This arm only
+                                // starts executing once the slug pattern above admits a diocesan
+                                // id, which is why the two changes belong together: widening the
+                                // pattern while leaving the bare Roman constant here would send
+                                // every Ambrosian diocese to a Roman path.
                                 $dataPath = strtr(
-                                    JsonData::DIOCESAN_CALENDAR_FILE->path(),
+                                    JsonData::diocesanCalendarFileFor($dioceseMetadata->rite)->path(),
                                     [
                                         '{diocese}'      => $matches[2],
                                         '{nation}'       => $dioceseMetadata->nation,
@@ -863,7 +877,10 @@ class Health implements MessageComponentInterface
                 }
                 $nation      = $dioceseMetadata->nation;
                 $dioceseName = $dioceseMetadata->diocese;
-                $dataPath    = strtr(JsonData::DIOCESAN_CALENDAR_FILE->path(), [
+                // Rite-partitioned, exactly as the i18n-folder branch above: this is the site
+                // that actually governs a diocesan source-file check, because it reassigns
+                // $dataPath after the earlier `sourceFile` branch has run.
+                $dataPath = strtr(JsonData::diocesanCalendarFileFor($dioceseMetadata->rite)->path(), [
                     '{nation}'       => $nation,
                     '{diocese}'      => $dioceseId,
                     '{diocese_name}' => $dioceseName
@@ -2156,11 +2173,13 @@ class Health implements MessageComponentInterface
                 ) {
                     return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS->path()) : LitSchema::PROPRIUMDESANCTIS->path();
                 } elseif (
-                    preg_match('/\/events\/(?:nation\/[A-Z]{2}|diocese\/[a-z]{6}_[a-z]{2})(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath)
+                    preg_match('/\/events\/(?:(?:roman|ambrosian)\/)?(?:nation\/[A-Z]{2}|diocese\/[a-z]{6}_[a-z]{2})(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath)
                 ) {
                     return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::EVENTS->path()) : LitSchema::EVENTS->path();
                 } elseif (
-                    preg_match('/\/data\/(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/[A-Z][a-z]+)(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath, $matches)
+                    // The rite segment is NON-capturing on purpose: the numbered groups below drive
+                    // the switch, so a capturing group here would shift them all by one.
+                    preg_match('/\/data\/(?:(?:roman|ambrosian)\/)?(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/[A-Z][a-z]+)(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath, $matches)
                 ) {
                     $schema = LitSchema::DATA->path();
                     foreach ($matches as $idx => $match) {
@@ -2237,10 +2256,17 @@ class Health implements MessageComponentInterface
                 if (preg_match('/^wider-region-[A-Z][a-z]+$/', $dataPath)) {
                     return LitSchema::WIDERREGION->path();
                 }
-                if (preg_match('/^national-calendar-[A-Z]{2}$/', $dataPath)) {
+                // These two deliberately mirror the identifier grammar `executeValidation()` uses
+                // to derive the source path for the same slug. One identifier described by two
+                // patterns, in one file, that have to agree is precisely the drift this issue is
+                // about: every id in jsondata today satisfies both the narrow and the wide form,
+                // but a diocese that ever broke the six-character convention would have its path
+                // derived correctly and its schema silently resolve to null. `wider-region-`,
+                // `tests-` and `proprium-de-*` have no such sibling and keep their own patterns.
+                if (preg_match('/^national-calendar-[A-Za-z_]+$/', $dataPath)) {
                     return LitSchema::NATIONAL->path();
                 }
-                if (preg_match('/^diocesan-calendar-[a-z]{6}_[a-z]{2}$/', $dataPath)) {
+                if (preg_match('/^diocesan-calendar-[A-Za-z_]+$/', $dataPath)) {
                     return LitSchema::DIOCESAN->path();
                 }
                 if (preg_match('/^tests-[a-zA-Z0-9_]+$/', $dataPath)) {
