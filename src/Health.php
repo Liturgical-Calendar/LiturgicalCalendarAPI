@@ -70,6 +70,20 @@ use Psr\Http\Message\ResponseInterface;
  * checks; {@see Health::resolveCalendarIdentity()} is where that is argued and enforced.
  * See {@see Health::isTypedCalendarMessage()} and issue #806 section D.
  *
+ * `runTest` is the reshaped `executeUnitTest`, aliased as `RunTest`: a `test` name, the same
+ * `CalendarIdentity` — resolved by the same {@see Health::resolveCalendarIdentity()}, so the mapping
+ * and the rite check exist once for both actions — and a year. It carries no `responseFormat`
+ * because a test runs against the parsed calendar rather than against a chosen representation of it.
+ * Unlike `validateCalendar` it took a new *name*, which is the whole of its discrimination: a v1
+ * client cannot emit a name it does not know. `executeUnitTest` is untouched and stays reachable
+ * until UnitTestInterface#42 ships. See issue #806 section E.
+ *
+ * Do not confuse `runTest` with the inventory item `test:{rite}:{Name}` that `validateSource`
+ * addresses. That item is a *source check*: does the test definition exist, parse, and validate
+ * against `LitCalTest.json`. `runTest` *runs* the test that definition describes against a computed
+ * calendar. A definition can be valid while the test it describes fails, and vice versa, so the two
+ * are separate operations with separate addresses.
+ *
  * @phpstan-type ExecuteValidationCategory 'universalcalendar'|'sourceDataCheck'|'resourceDataCheck'
  * @phpstan-type ExecuteValidationSourceFolder \stdClass&object{action:'executeValidation',category:'sourceDataCheck',validate:string,sourceFolder:string,responsetype?:string}
  * @phpstan-type ExecuteValidationSourceFile \stdClass&object{action:'executeValidation',category:'universalcalendar'|'sourceDataCheck',validate:string,sourceFile:string,responsetype?:string}
@@ -78,6 +92,7 @@ use Psr\Http\Message\ResponseInterface;
  * @phpstan-type CalendarIdentity \stdClass&object{kind:'general'|'national'|'diocesan'|'rite',id?:string,rite:string}
  * @phpstan-type ValidateTypedCalendar \stdClass&object{action:'validateCalendar',calendar:CalendarIdentity,year:int,responseFormat:'JSON'|'XML'|'ICS'|'YML',runToken?:string}
  * @phpstan-type ExecuteUnitTest \stdClass&object{action:'executeUnitTest',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar'|'ritecalendar',test:string,rite?:string}
+ * @phpstan-type RunTest \stdClass&object{action:'runTest',test:string,calendar:CalendarIdentity,year:int,runToken?:string}
  * @phpstan-type CancelRun \stdClass&object{action:'cancelRun',runToken:string}
  * @phpstan-type ValidateSource \stdClass&object{action:'validateSource',target:\stdClass&object{id:string},runToken?:string}
  *
@@ -103,6 +118,9 @@ class Health implements MessageComponentInterface
         'executeValidation' => ['category', 'validate', 'sourceFile'],
         'validateCalendar'  => ['category', 'calendar', 'year', 'responsetype'],
         'executeUnitTest'   => ['category', 'calendar', 'year', 'test'],
+        // No `category`: `calendar.kind` carries it. No `responseFormat` either — a test runs
+        // against the parsed calendar, so the representation is not the client's to choose.
+        'runTest'           => ['test', 'calendar', 'year'],
         'cancelRun'         => ['runToken'],
         'validateSource'    => ['target']
     ];
@@ -403,7 +421,7 @@ class Health implements MessageComponentInterface
         // Reset per-connection cache hit counter for each new message (test run)
         $this->cacheHitCounters[$resourceId] = 0;
         echo sprintf('Receiving message from connection %d: %s', $resourceId, $msg . "\n");
-        /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ValidateTypedCalendar|ExecuteUnitTest|CancelRun|ValidateSource $messageReceived */
+        /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ValidateTypedCalendar|ExecuteUnitTest|RunTest|CancelRun|ValidateSource $messageReceived */
         $messageReceived = json_decode($msg);
         // Store optional run token for response correlation. `cancelRun` is exempt: it names the run it
         // wants abandoned rather than the run this connection is on, and storing it here would install
@@ -482,6 +500,10 @@ class Health implements MessageComponentInterface
                         $from,
                         self::readRiteHint($messageReceived)
                     );
+                    break;
+                case 'runTest':
+                    /** @var RunTest $messageReceived */
+                    $this->runTest($messageReceived, $from);
                     break;
                 case 'cancelRun':
                     /** @var CancelRun $messageReceived */
@@ -1558,6 +1580,53 @@ class Health implements MessageComponentInterface
     }
 
     /**
+     * Read a message's `calendar` property as a typed identity.
+     *
+     * Both actions that carry one come through here, and the shared step is the *read*, not the
+     * guarantee: `validateCalendar` is discriminated on `calendar` being an object
+     * ({@see Health::isTypedCalendarMessage()}), so by the time it arrives the check below cannot
+     * fail; `runTest` is discriminated on its name, so nothing has looked at `calendar` at all. The
+     * one that needs the check and the one that does not therefore call the same thing, which is
+     * what stops the second from being written without it.
+     *
+     * @param string $action The action name, so the rejection says which message is wrong.
+     * @return array{category: 'nationalcalendar'|'diocesancalendar'|'ritecalendar', calendar: string, rite: Rite}
+     * @throws \InvalidArgumentException Whose message is the client-facing rejection text.
+     */
+    private function readCalendarIdentity(\stdClass $message, string $action): array
+    {
+        $calendar = property_exists($message, 'calendar') ? $message->calendar : null;
+        if (false === $calendar instanceof \stdClass) {
+            throw new \InvalidArgumentException("{$action} calendar must be an object carrying kind, id and rite.");
+        }
+
+        return $this->resolveCalendarIdentity($calendar);
+    }
+
+    /**
+     * Read a message's `year` as the integer the calendar routines take.
+     *
+     * Type-checked rather than trusted because {@see Health::validateMessageProperties()} establishes
+     * only that a property is *present*. A null or string `year` would reach
+     * `validateCalendar(…, int $year, …)` or `executeUnitTest(…, int $year, …)` and raise a
+     * `TypeError` — an `\Error`, which Ratchet's `IoServer::handleData` does not catch, so one
+     * malformed message would take the whole WebSocket process down rather than be answered. Same
+     * hazard {@see Health::cancelRun()} documents, on the property it was first found on.
+     *
+     * @param string $action The action name, so the rejection says which message is wrong.
+     * @throws \InvalidArgumentException Whose message is the client-facing rejection text.
+     */
+    private static function readYear(\stdClass $message, string $action): int
+    {
+        $year = property_exists($message, 'year') ? $message->year : null;
+        if (false === is_int($year)) {
+            throw new \InvalidArgumentException("{$action} year must be an integer.");
+        }
+
+        return $year;
+    }
+
+    /**
      * Build the calendar API request path based on calendar ID, year, category and rite.
      *
      * The rite segment is always emitted explicitly (`/roman/...`, `/ambrosian/...`),
@@ -1601,10 +1670,10 @@ class Health implements MessageComponentInterface
      * {@see Health::resolveCalendarIdentity()}.
      *
      * `year` and `responseFormat` are type-checked rather than trusted because
-     * `validateMessageProperties()` establishes only that a property is *present*. A null `year`
-     * would reach `validateCalendar(int $year, …)` and raise a `TypeError`, and an unusable
-     * `responseFormat` would reach `ReturnTypeParam::from()` and raise a `\ValueError`; both are
-     * `\Error`s, which Ratchet's `IoServer::handleData` does not catch, so either would take the
+     * `validateMessageProperties()` establishes only that a property is *present*. `year` is checked
+     * by the shared {@see Health::readYear()}; `responseFormat` is checked here because it belongs
+     * to this action alone — an unusable one would reach `ReturnTypeParam::from()` and raise a
+     * `\ValueError`, which is an `\Error` and so escapes Ratchet's `IoServer::handleData`, taking the
      * whole WebSocket process down over one malformed message. See {@see Health::cancelRun()}, which
      * documents the same hazard on the property it was found on.
      *
@@ -1630,17 +1699,10 @@ class Health implements MessageComponentInterface
         }
 
         try {
-            /** @var \stdClass $calendar isTypedCalendarMessage() established the type; nothing establishes the contents. */
-            $calendar = $message->calendar;
-            $identity = $this->resolveCalendarIdentity($calendar);
+            $identity = $this->readCalendarIdentity($message, 'validateCalendar');
+            $year     = self::readYear($message, 'validateCalendar');
         } catch (\InvalidArgumentException $e) {
             $this->rejectMessage($to, $e->getMessage());
-            return;
-        }
-
-        $year = property_exists($message, 'year') ? $message->year : null;
-        if (false === is_int($year)) {
-            $this->rejectMessage($to, 'validateCalendar year must be an integer.');
             return;
         }
 
@@ -1926,6 +1988,64 @@ class Health implements MessageComponentInterface
             $errorStrings[] = $errorLevel . ': ' . $error['message'] . " at line {$lineIndex} ({$lineString})";
         }
         return $errorStrings;
+    }
+
+    /**
+     * Handle a `runTest` message: run one named unit test against a computed calendar.
+     *
+     * A translation layer in the same sense as {@see Health::validateTypedCalendar()}, and for the
+     * same reason: it resolves the identity, type-checks the two scalars the property list can only
+     * prove present, and hands the result to the unchanged {@see Health::executeUnitTest()}. Nothing
+     * about *how* a test is run changes with the message shape, and this method exists so that
+     * nothing about it has to.
+     *
+     * The resolved rite goes in the `$riteHint` slot, where `resolveRite()` treats a parsable value
+     * as authoritative — correct here because {@see Health::resolveCalendarIdentity()} has already
+     * checked it against what the server knows.
+     *
+     * **Not the same thing as checking the test definition.** `test:{rite}:{Name}` is an inventory id
+     * addressed by {@see Health::validateSource()}, and it asks whether the definition file exists,
+     * parses and validates against `LitCalTest.json`. `runTest` names the test by its bare name and
+     * runs it. A definition can be valid while the test it describes fails, and a definition can be
+     * malformed while the calendar is perfectly correct, so neither answer substitutes for the other.
+     *
+     * Nothing here mirrors `validateTypedCalendar()`'s rejection of a leftover `category`, and the
+     * asymmetry is deliberate. That check exists because `validateCalendar` *shares its name* with
+     * the shape `category` belonged to, so a stale `category` is evidence of a half-migrated message
+     * that would otherwise work silently. `category` never named anything on a message called
+     * `runTest`; a client that sent one has renamed the action, so it has read the new shape. An
+     * unread extra property on a new name is just an extra property — which is how `validateSource`,
+     * the other new name, treats them too.
+     *
+     * @param RunTest $message The message naming the test, the calendar and the year.
+     * @param ConnectionInterface $to The connection to send the result frames to.
+     */
+    private function runTest(\stdClass $message, ConnectionInterface $to): void
+    {
+        // Checked rather than trusted for the reason readYear() sets out: a non-string here would
+        // reach executeUnitTest(string $test, …) as a TypeError, which Ratchet does not catch.
+        $test = property_exists($message, 'test') ? $message->test : null;
+        if (false === is_string($test)) {
+            $this->rejectMessage($to, 'runTest test must be a string.');
+            return;
+        }
+
+        try {
+            $identity = $this->readCalendarIdentity($message, 'runTest');
+            $year     = self::readYear($message, 'runTest');
+        } catch (\InvalidArgumentException $e) {
+            $this->rejectMessage($to, $e->getMessage());
+            return;
+        }
+
+        $this->executeUnitTest(
+            $test,
+            $identity['calendar'],
+            $year,
+            $identity['category'],
+            $to,
+            $identity['rite']->value
+        );
     }
 
     /**
@@ -2694,7 +2814,7 @@ class Health implements MessageComponentInterface
      * specified action. If any expected property is missing from the message
      * object, the function returns false, indicating the message is invalid.
      *
-     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ValidateTypedCalendar|ExecuteUnitTest|CancelRun|ValidateSource $message The message object to validate.
+     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ValidateTypedCalendar|ExecuteUnitTest|RunTest|CancelRun|ValidateSource $message The message object to validate.
      * @return bool True if all required properties are present, false otherwise.
      */
     private static function validateMessageProperties(\stdClass $message): bool

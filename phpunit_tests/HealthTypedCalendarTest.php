@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Tests;
 
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
+use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -14,7 +15,16 @@ use PHPUnit\Framework\TestCase;
 use Ratchet\ConnectionInterface;
 
 /**
- * `validateCalendar` with a typed calendar identity — #806 section D.
+ * The typed calendar identity — #806 sections D and E.
+ *
+ * Two actions carry one, and they live in the same file because the identity is what they share:
+ * `validateCalendar` (section D), which computes a calendar and validates the response, and
+ * `runTest` (section E), which computes a calendar and runs one named unit test against it. The
+ * `kind`→category mapping and the rite-disagreement check are resolved once, by
+ * `Health::resolveCalendarIdentity()`, for both — so the rejection rules asserted below are asserted
+ * for one implementation, not for two copies that could drift apart.
+ *
+ * ## `validateCalendar`
  *
  * The action keeps its name because the action is unchanged: compute a calendar for a year and
  * validate the response. What changes is how the calendar is named. A v1 message spreads the
@@ -30,6 +40,16 @@ use Ratchet\ConnectionInterface;
  *
  * Nothing legacy is touched: a string `calendar` still takes the old path byte for byte.
  *
+ * ## `runTest`
+ *
+ * `runTest` replaces `executeUnitTest` the way `validateSource` replaced the `executeValidation`
+ * slugs: by taking a **new name**, which is the whole of its discrimination — a v1 client cannot
+ * accidentally emit a name it does not know, so there is no shape to test. It carries a `test` name,
+ * the same `CalendarIdentity`, and a year; there is no `responseFormat`, because a test runs against
+ * the parsed calendar rather than against a chosen representation of it.
+ *
+ * `executeUnitTest` keeps working byte for byte, and is asserted below to.
+ *
  * ## What these tests assert against
  *
  * `validateCalendar()` is asynchronous — it hands a URL to `cachedGet()`, which appends it to
@@ -38,7 +58,14 @@ use Ratchet\ConnectionInterface;
  * dispatch made: the URL encodes the category (`/nation/`, `/diocese/`, or neither), the calendar
  * id and the rite segment, and the request options carry the Accept header the response format
  * chose. That is the whole of what this task decides, observable without a WebSocket server, an
- * HTTP API, or a mock of the method under test.
+ * HTTP API, or a mock of the method under test. `executeUnitTest()` queues the same way, so the same
+ * assertions reach it.
+ *
+ * One thing the queued URL does *not* record is which test `runTest` asked for — that is closed over
+ * by the promise handlers rather than written into the request. {@see failSoleQueuedRequest()}
+ * settles the queued entry as a failure, which makes `executeUnitTest()` emit the frame it addresses
+ * `.<test>.year-<year>.test-valid`; that frame names the test, the category, the calendar id and the
+ * URL at once, which is the whole dispatch in a single observation and still no network.
  */
 #[CoversClass(Health::class)]
 final class HealthTypedCalendarTest extends TestCase
@@ -527,6 +554,353 @@ final class HealthTypedCalendarTest extends TestCase
         self::assertSame([], self::queuedPaths($health));
     }
 
+    // ---------------------------------------------------------------- runTest: the identity is the same identity
+
+    /**
+     * The same rows as `validateCalendar`, deliberately: `runTest` resolves its calendar through the
+     * very same `resolveCalendarIdentity()`, so the two actions must agree about what every identity
+     * names. A row that passed here and failed there — or the reverse — would mean the mapping had
+     * been copied rather than shared, which is the one outcome this task exists to prevent.
+     *
+     * @param array<string, mixed> $calendar
+     */
+    #[DataProvider('typedIdentityProvider')]
+    public function testRunTestReachesTheCalendarRequestItsIdentityNames(array $calendar, string $expectedPath): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        self::withMetadata(static function () use ($health, $conn, $calendar): void {
+            self::send($health, $conn, [
+                'action'   => 'runTest',
+                'test'     => 'StIgnatiusOfLoyolaTest',
+                'calendar' => $calendar,
+                'year'     => 2026
+            ]);
+        });
+
+        self::assertSame([], $conn->sent, 'a well-formed runTest must not be answered with a frame before its calendar is fetched');
+        self::assertSame($expectedPath, self::soleQueuedPath($health));
+    }
+
+    /**
+     * The dispatch in full: the test name, the mapped category, the id and the rite, all four read
+     * back off the frame `executeUnitTest()` emits.
+     *
+     * The queued URL alone would leave the test name unasserted — it is closed over by the promise
+     * handler, not written into the request — and a `runTest` that dropped or transposed `test`
+     * would fetch exactly the right calendar and then run the wrong test, or none. Settling the
+     * queued request as a failure is what makes that observable here.
+     *
+     * `diocesancalendar` in the text is the assertion that `kind: diocesan` was *mapped* rather than
+     * passed through: `diocesan` is the wire word and `diocesancalendar` is the internal one, and
+     * only the internal one builds a `/diocese/` URL.
+     */
+    public function testRunTestCarriesTheTestNameAndTheMappedCategoryIntoTheRun(): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        self::withMetadata(static function () use ($health, $conn): void {
+            self::send($health, $conn, [
+                'action'   => 'runTest',
+                'test'     => 'StIgnatiusOfLoyolaTest',
+                'calendar' => ['kind' => 'diocesan', 'id' => 'lugano_ch', 'rite' => 'ambrosian'],
+                'year'     => 2026
+            ]);
+        });
+
+        self::failSoleQueuedRequest($health);
+
+        self::assertCount(1, $conn->sent);
+        $frame = json_decode($conn->sent[0]);
+        self::assertSame('error', $frame->type);
+        self::assertSame('.StIgnatiusOfLoyolaTest.year-2026.test-valid', $frame->classes, 'the frame a client matches on must name the test that was asked for');
+        self::assertStringContainsString(
+            'The diocesancalendar of lugano_ch for the year 2026 was not retrieved at the URL '
+                . \LiturgicalCalendar\Api\Enum\Route::CALENDAR->path() . '/ambrosian/diocese/lugano_ch/2026?year_type=CIVIL',
+            (string) $frame->text
+        );
+    }
+
+    // ---------------------------------------------------------------- runTest: rejections
+
+    /**
+     * The rejection rules are `resolveCalendarIdentity()`'s, so these two rows are not a second
+     * corpus — they are the assertion that `runTest` reaches the same resolver rather than a copy of
+     * it. `lugano_ch` is one of the four Ambrosian dioceses, so `rite: roman` contradicts what
+     * `/calendars` says and must be refused rather than quietly corrected.
+     *
+     * @return array<string, array{0: array<string, mixed>, 1: string}>
+     */
+    public static function runTestRejectedIdentityProvider(): array
+    {
+        return [
+            'unknown kind'      => [
+                ['kind' => 'widerregion', 'id' => 'Europe', 'rite' => 'roman'],
+                'Unknown calendar kind: widerregion'
+            ],
+            'rite disagreement' => [
+                ['kind' => 'diocesan', 'id' => 'lugano_ch', 'rite' => 'roman'],
+                'calendar.rite says roman but lugano_ch is ambrosian.'
+            ],
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $calendar
+     */
+    #[DataProvider('runTestRejectedIdentityProvider')]
+    public function testRunTestRefusesAnIdentityItCannotHonour(array $calendar, string $expected): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        self::withMetadata(static function () use ($health, $conn, $calendar): void {
+            self::send($health, $conn, [
+                'action'   => 'runTest',
+                'test'     => 'StIgnatiusOfLoyolaTest',
+                'calendar' => $calendar,
+                'year'     => 2026
+            ]);
+        });
+
+        self::assertCount(1, $conn->sent, 'an unusable identity is answered once and no test is run');
+        $frame = json_decode($conn->sent[0]);
+        self::assertSame('echobot', $frame->type, 'rejections reuse the echobot shape: since UnitTestInterface#46 an unknown type is painted as a failed check');
+        self::assertSame($expected, $frame->text);
+        self::assertSame([], self::queuedPaths($health), 'a rejected message must not have queued a request');
+    }
+
+    /**
+     * `runTest` needs no *shape* test — its name is its discriminator — but the typed identity is the
+     * entire point of the action, so a `calendar` that is not an object is not a legacy message to
+     * fall back for; there is no legacy `runTest`. It is a malformed one.
+     *
+     * The string used here is the one a client would reach for by habit, copied straight from an
+     * `executeUnitTest` message.
+     */
+    public function testRunTestRefusesACalendarThatIsNotAnObject(): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        self::send($health, $conn, [
+            'action'   => 'runTest',
+            'test'     => 'StIgnatiusOfLoyolaTest',
+            'calendar' => 'lugano_ch',
+            'year'     => 2026
+        ]);
+
+        self::assertCount(1, $conn->sent);
+        $frame = json_decode($conn->sent[0]);
+        self::assertSame('echobot', $frame->type);
+        self::assertSame('runTest calendar must be an object carrying kind, id and rite.', $frame->text);
+        self::assertSame([], self::queuedPaths($health));
+    }
+
+    /**
+     * Both scalars are type-checked rather than trusted, and for the same reason: the property list
+     * establishes only that a property is *present*. A non-string `test` or a non-integer `year`
+     * would reach `executeUnitTest(string $test, string $calendar, int $year, …)` and raise a
+     * `TypeError` — an `\Error`, which Ratchet's `IoServer::handleData` does not catch, so one
+     * malformed message would take the whole WebSocket process down rather than be answered.
+     *
+     * @return array<string, array{0: array<string, mixed>, 1: string}>
+     */
+    public static function runTestMalformedScalarProvider(): array
+    {
+        return [
+            'test not a string' => [['test' => 42], 'runTest test must be a string.'],
+            'test missing'      => [['test' => null], 'runTest test must be a string.'],
+            'year not an int'   => [['year' => '2026'], 'runTest year must be an integer.'],
+            'year null'         => [['year' => null], 'runTest year must be an integer.'],
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $overrides
+     */
+    #[DataProvider('runTestMalformedScalarProvider')]
+    public function testRunTestRefusesAScalarItWouldOtherwiseThrowOn(array $overrides, string $expected): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        self::send($health, $conn, array_merge([
+            'action'   => 'runTest',
+            'test'     => 'StIgnatiusOfLoyolaTest',
+            'calendar' => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'],
+            'year'     => 2026
+        ], $overrides));
+
+        self::assertCount(1, $conn->sent);
+        $frame = json_decode($conn->sent[0]);
+        self::assertSame('echobot', $frame->type);
+        self::assertSame($expected, $frame->text);
+        self::assertSame([], self::queuedPaths($health));
+    }
+
+    /**
+     * A property the action declares required is turned away by `validateMessageProperties()` before
+     * any handler sees it, on the generic protocol-error path — which is how the absence of `test`
+     * differs from `test` being present and unusable, tested above.
+     *
+     * @return array<string, array{0: array<string, mixed>}>
+     */
+    public static function runTestMissingPropertyProvider(): array
+    {
+        return [
+            'no test'     => [['action' => 'runTest', 'calendar' => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'], 'year' => 2026]],
+            'no calendar' => [['action' => 'runTest', 'test' => 'StIgnatiusOfLoyolaTest', 'year' => 2026]],
+            'no year'     => [['action' => 'runTest', 'test' => 'StIgnatiusOfLoyolaTest', 'calendar' => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman']]],
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    #[DataProvider('runTestMissingPropertyProvider')]
+    public function testRunTestRequiresItsThreeProperties(array $payload): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        self::send($health, $conn, $payload);
+
+        self::assertCount(1, $conn->sent);
+        $frame = json_decode($conn->sent[0]);
+        self::assertSame('echobot', $frame->type);
+        self::assertSame('Invalid message properties', $frame->errorMsg);
+        self::assertSame([], self::queuedPaths($health));
+    }
+
+    // ---------------------------------------------------------------- executeUnitTest is untouched
+
+    /**
+     * The legacy action, byte for byte: `category` names the calendar type, the test name is a bare
+     * string, and the rite is *resolved* from the diocese metadata rather than asserted — which is
+     * how a rite-unaware client gets the `/ambrosian/` segment its Ambrosian diocese needs (#767).
+     */
+    public function testExecuteUnitTestStillTakesTheLegacyPath(): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        self::withMetadata(static function () use ($health, $conn): void {
+            self::send($health, $conn, [
+                'action'   => 'executeUnitTest',
+                'test'     => 'StIgnatiusOfLoyolaTest',
+                'calendar' => 'lugano_ch',
+                'category' => 'diocesancalendar',
+                'year'     => 2026
+            ]);
+        });
+
+        self::assertSame([], $conn->sent);
+        self::assertSame('/ambrosian/diocese/lugano_ch/2026?year_type=CIVIL', self::soleQueuedPath($health));
+
+        self::failSoleQueuedRequest($health);
+        $frame = json_decode($conn->sent[0]);
+        self::assertSame('.StIgnatiusOfLoyolaTest.year-2026.test-valid', $frame->classes);
+    }
+
+    /**
+     * A legacy message that has *not* migrated is still judged by the legacy list. `runTest` gaining
+     * a shorter property list must not loosen `executeUnitTest`'s, which still requires `category`.
+     */
+    public function testExecuteUnitTestStillRequiresCategory(): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        self::send($health, $conn, [
+            'action'   => 'executeUnitTest',
+            'test'     => 'StIgnatiusOfLoyolaTest',
+            'calendar' => 'lugano_ch',
+            'year'     => 2026
+        ]);
+
+        self::assertCount(1, $conn->sent);
+        $frame = json_decode($conn->sent[0]);
+        self::assertSame('echobot', $frame->type);
+        self::assertSame('Invalid message properties', $frame->errorMsg);
+        self::assertSame([], self::queuedPaths($health));
+    }
+
+    // ---------------------------------------------------------------- a source check is not a test run
+
+    /**
+     * The same test file, two operations, two addresses — and the distinction is easy to lose,
+     * because the word "test" appears in both.
+     *
+     * `test:ambrosian:StIgnatiusOfLoyolaTest` is an **inventory id**. `validateSource` resolves it to
+     * a file on disk and asks the source-data question: does the test *definition* exist, parse, and
+     * validate against `LitCalTest.json`. No calendar is computed; nothing is run.
+     *
+     * `runTest` names the same test as the bare `StIgnatiusOfLoyolaTest` and asks the other question
+     * entirely: does the calendar this identity names, computed for this year, satisfy the test the
+     * definition describes. A calendar *is* fetched; the definition is not schema-checked here.
+     *
+     * A definition can be valid while the test it describes fails, and a definition can be malformed
+     * while the calendar is perfectly correct, so neither answer substitutes for the other. The third
+     * assertion is what makes the addressing explicit rather than implied: the bare name is not an
+     * inventory id, and the inventory rejects it — the two vocabularies do not overlap even though
+     * one string is a substring of the other.
+     */
+    public function testTheTestDefinitionCheckAndTheTestRunAreDifferentOperations(): void
+    {
+        // The memo is per-process and an earlier test class may have built it against a fixture
+        // tree; this test is about addressing, so it must resolve against the real source data.
+        CheckableInventory::reset();
+
+        // --- the source check: the definition, addressed by its inventory id.
+        $sourceHealth = $this->newHealth();
+        $sourceConn   = self::createStubConnection();
+        self::send($sourceHealth, $sourceConn, [
+            'action' => 'validateSource',
+            'target' => ['id' => 'test:ambrosian:StIgnatiusOfLoyolaTest']
+        ]);
+
+        self::assertNotEmpty($sourceConn->sent, 'the test definition was not checked at all');
+        foreach ($sourceConn->sent as $raw) {
+            $frame = json_decode($raw);
+            self::assertNotSame('echobot', $frame->type, "the definition check was refused: {$frame->text}");
+            self::assertStringStartsWith(
+                '.Liturgical test: StIgnatiusOfLoyolaTest.',
+                (string) $frame->classes,
+                'a source check addresses its frames by the inventory item label'
+            );
+        }
+        self::assertSame([], self::queuedPaths($sourceHealth), 'a source check reads the filesystem; it must not compute a calendar');
+
+        // --- the test run: the same test, addressed by its bare name against a calendar.
+        $runHealth = $this->newHealth();
+        $runConn   = self::createStubConnection();
+        self::send($runHealth, $runConn, [
+            'action'   => 'runTest',
+            'test'     => 'StIgnatiusOfLoyolaTest',
+            'calendar' => ['kind' => 'rite', 'id' => 'ambrosian', 'rite' => 'ambrosian'],
+            'year'     => 2026
+        ]);
+
+        self::assertSame([], $runConn->sent, 'a test run emits nothing until its calendar has been fetched');
+        self::assertSame('/ambrosian/2026?year_type=CIVIL', self::soleQueuedPath($runHealth), 'a test run computes a calendar; it must not read the definition off disk instead');
+
+        // --- and the two addresses are not interchangeable.
+        $crossHealth = $this->newHealth();
+        $crossConn   = self::createStubConnection();
+        self::send($crossHealth, $crossConn, [
+            'action' => 'validateSource',
+            'target' => ['id' => 'StIgnatiusOfLoyolaTest']
+        ]);
+
+        self::assertCount(1, $crossConn->sent);
+        $frame = json_decode($crossConn->sent[0]);
+        self::assertSame('echobot', $frame->type);
+        self::assertSame('Unknown validation target: StIgnatiusOfLoyolaTest', $frame->text, 'the bare test name is a runTest address, not an inventory id');
+    }
+
     // ---------------------------------------------------------------- harness
 
     /**
@@ -592,6 +966,35 @@ final class HealthTypedCalendarTest extends TestCase
         self::assertCount(1, $paths, 'expected exactly one queued calendar request, got: ' . json_encode($paths));
 
         return $paths[0];
+    }
+
+    /**
+     * Settle the sole queued request as a network failure, synchronously.
+     *
+     * The queue entry carries the promise's own `reject` closure, so calling it drives the handler
+     * the dispatching method registered — without a loop, an HTTP client, or a server. That is the
+     * only way to observe what a handler closed over rather than wrote into the URL, which for
+     * `executeUnitTest()` is the test name.
+     *
+     * The *failure* arm is used rather than the success one on purpose: the success arm would have
+     * to be fed a plausible calendar document and would then run a real `LitTestRunner`, making this
+     * a test of the test corpus. The failure arm names the test, the category, the calendar and the
+     * URL and does nothing else, which is exactly the dispatch and nothing beyond it.
+     *
+     * One cosmetic artifact, so a reader of the run log is not puzzled by it: the closure decrements
+     * `inFlight`, which `processQueue()` would have incremented on dispatch and which nothing did
+     * here, so this instance is left at `-1`. `drainHandler()` reads `inFlight > 0`, so a negative
+     * count stops ticking exactly as zero does, and the queue is emptied by the isolation trait in
+     * any case.
+     */
+    private static function failSoleQueuedRequest(Health $health): void
+    {
+        $queued = self::queuedRequests($health);
+        self::assertCount(1, $queued, 'expected exactly one queued calendar request to settle');
+        self::assertArrayHasKey('reject', $queued[0]);
+        /** @var \Closure(\Throwable):void $reject */
+        $reject = $queued[0]['reject'];
+        $reject(new \RuntimeException('the network is not this test\'s business'));
     }
 
     private static function soleQueuedAccept(Health $health): string
