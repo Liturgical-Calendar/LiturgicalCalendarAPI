@@ -14,11 +14,11 @@ calendar type (`nationalcalendar`, `diocesancalendar`, `ritecalendar`). Two of t
 different things.
 
 **`sourceFile` is polymorphic with no discriminator, and worse than #806 recorded.** It is a repo-relative path, or an
-absolute API URL, or — for every per-calendar check — a *bare identifier*: `"IT"`, `"Europe"`, `"roma_lazio_it"`,
+absolute API URL, or — for every per-calendar check — a *bare identifier*: `"IT"`, `"Europe"`, `"romamo_it"`,
 `"EDITIO_TYPICA_1970"`. In that last case the server ignores it as a path entirely and reconstructs the real path from
 the `validate` slug. Its sibling `sourceFolder` is mutually exclusive with it but not modelled as such.
 
-**`validate` is already an id in all but name.** `national-calendar-IT`, `diocesan-calendar-roma_lazio_it`,
+**`validate` is already an id in all but name.** `national-calendar-IT`, `diocesan-calendar-romamo_it`,
 `wider-region-Europe`, `proprium-de-sanctis-IT-1983`, `tests-StIgnatiusOfLoyola` — the server parses these with eight
 anchored `preg_match` arms to recover what the client meant. It is simultaneously a schema selector, the human label
 rendered on the card, and a CSS class fragment.

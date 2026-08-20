@@ -52,7 +52,7 @@ Plan 2 adds the typed `target`, the tagged calendar identity, and the `Health` r
 |----------------------------------|------------------------------------------|----------------------------|
 | `nation:roman:IT`                | `MetadataCalendars::$national_calendars` | `NationalCalendar.json`    |
 | `widerregion:roman:Europe`       | `MetadataCalendars::$wider_regions`      | `WiderRegionCalendar.json` |
-| `diocese:{rite}:roma_lazio_it`   | `MetadataCalendars::$diocesan_calendars` | `DiocesanCalendar.json`    |
+| `diocese:{rite}:romamo_it`       | `MetadataCalendars::$diocesan_calendars` | `DiocesanCalendar.json`    |
 | `test:{rite}:StIgnatiusOfLoyola` | `jsondata/tests/{rite}/*.json`           | `LitCalTest.json`          |
 
 Each file-kind item gets an `:i18n` folder sibling where the folder exists on disk, except tests, which have no `i18n`.
@@ -62,7 +62,7 @@ Each file-kind item gets an `:i18n` folder sibling where the folder exists on di
 `region` answers one question: *is this item specific to one nation's calendar?*
 
 - `nation:roman:IT` → `'IT'`.
-- `diocese:roman:roma_lazio_it` → its nation, `'IT'`.
+- `diocese:roman:romamo_it` → its nation, `'IT'`.
 - `test:roman:X` → `null`; a test definition is not nation-scoped.
 - `widerregion:roman:Europe` → `null`, **and this is a known limitation to document, not to paper over.** A wider region
   applies to several nations, which a scalar cannot express. Clients already have the mapping — `/calendars` gives each
@@ -388,7 +388,7 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 **Interfaces:**
 
 - Consumes: `MetadataCalendars::$diocesan_calendars` — a list of `MetadataDiocesanCalendarItem`, each with public
-  `string $calendar_id` (e.g. `'roma_lazio_it'`), `string $diocese` (the diocese *name*), `string $nation`,
+  `string $calendar_id` (e.g. `'romamo_it'`), `string $diocese` (the diocese *name*), `string $nation`,
   `readonly Rite $rite`. Path templates `JsonData::DIOCESAN_CALENDAR_FILE` and
   `JsonData::AMBROSIAN_DIOCESAN_CALENDAR_FILE`, both carrying **three** placeholders — `{nation}`, `{diocese}`,
   `{diocese_name}` — plus their `*_I18N_FOLDER` siblings, which carry only `{nation}` and `{diocese}`.
@@ -401,12 +401,12 @@ Append to `phpunit_tests/Models/ValidationsPath/CheckableInventoryTest.php`:
 ```php
     public function testDiocesanCalendarsAreEnumeratedUnderTheirOwnRite(): void
     {
-        $roman = CheckableInventory::byId('diocese:roman:roma_lazio_it');
+        $roman = CheckableInventory::byId('diocese:roman:romamo_it');
         self::assertNotNull($roman, 'the Diocese of Rome should be a checkable target');
         self::assertSame(Rite::ROMAN, $roman->rite);
         self::assertSame('IT', $roman->region, 'a diocesan calendar is scoped to its nation');
         self::assertSame(LitSchema::DIOCESAN, $roman->schema);
-        self::assertNotNull(CheckableInventory::byId('diocese:roman:roma_lazio_it:i18n'));
+        self::assertNotNull(CheckableInventory::byId('diocese:roman:romamo_it:i18n'));
     }
 
     /**
