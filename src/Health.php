@@ -1629,6 +1629,12 @@ class Health implements MessageComponentInterface
     /**
      * Handle errors when reading validation data.
      *
+     * **This does not terminate the request: every call site sends the `complete` frame itself, immediately after
+     * calling this.** Its sibling {@see Health::handleDioceseMetadataError()} does the opposite — it calls
+     * {@see Health::sendComplete()} internally — and nothing in either name or signature distinguishes the two, so
+     * the difference is stated here rather than left to be discovered. Adding a `sendComplete()` here for symmetry
+     * would double-complete at both call sites; `sendComplete()` has no idempotency guard, by design.
+     *
      * @param \Throwable $e The exception that occurred while reading data.
      * @param ConnectionInterface $to The WebSocket connection to send errors to.
      * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $validation The validation object.

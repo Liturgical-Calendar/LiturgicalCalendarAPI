@@ -60,21 +60,28 @@ business.
 ## The envelope
 
 Every response keeps `type`, `text` and `classes`, and **gains** structured fields. Existing clients ignore unknown
-JSON keys; a v2 client ignores the legacy three. No negotiation, no gating, no second response builder — the same
-additive approach that carried sections A, B and H.
+JSON keys; a v2 client ignores the legacy three. No negotiation, no gating of the *fields* — every frame carries
+them, to every client, whether or not it asked — and no second response builder: the same additive approach that
+carried sections A, B and H. The one thing that *is* gated is the new terminal frame, and only because it changes
+the frame *stream* rather than a frame's contents; see [The terminal frame](#the-terminal-frame).
 
 ```jsonc
-{ "type": "success",                          // legacy projection
+{ "type": "error",                            // legacy projection of `status`
   "text": "...",                              // legacy, unchanged
-  "classes": ".temporale-roman.json-valid",   // legacy projection
+  "classes": ".temporale-roman.json-valid",   // legacy projection of fragment + `step`
   "target": { "id": "temporale:roman" },
   "step": "parses",
-  "status": "pass",
-  "details": { "schema": "PropriumDeTempore.json", "errors": [] },
+  "status": "fail",
+  "details": ["propriumdetempore.json: Syntax error"],  // list of strings, omitted when there are none
   "runToken": "run-a",                        // legacy, still emitted, at its historical position
   "runId": "run-a",                           // published name for the same value
   "requestId": "req-17" }                     // echoed, only when the client sent one
 ```
+
+A failing frame is shown because it is the only kind that carries `details`. `details` is a **flat list of
+strings** — the individual failures behind a `text` that summarises them, one entry per failure — and it is
+**omitted from the frame** rather than sent empty, so a client never has to tell "no details" from "none given".
+A passing frame is the same envelope without that key.
 
 `runToken` is assigned before `runId` — not the reverse — because `runToken` already occupied that slot in every v1
 frame and `sendMessage()` writes it first, then adds `runId` right after as the same value under its published name.
@@ -314,7 +321,19 @@ misattribution correlation exists to prevent**.
 
 ## The terminal frame
 
-Emitted on **every** path that starts work, including early failure:
+**Gated on `requestId`: a request that carried one gets a terminal frame, a request that did not gets none.**
+This is the single exception to "no gating" above, and it is deliberate. The structured *fields* are ungated — they
+ride on every frame to every client — but a new frame changes the frame *stream*, and a v1 client does not survive
+that the way it survives an unknown key: `resources.js` sizes a phase as `checks * 3` and advances on `>=`, so it
+reaches its threshold on the three real frames and the terminal frame then increments whichever counter has become
+active, finishing the *following* phase early too. `requestId` is already the v2 opt-in signal, and a client
+adopting `complete` is adopting correlation anyway, so the gate costs a v2 client nothing.
+
+**A client that stops on `complete` must therefore send a `requestId` on every request**, or it will wait for a
+frame that is never sent. The gate lives in `sendComplete()` rather than at its call sites, so it cannot be
+forgotten at a new one.
+
+Given a `requestId`, it is emitted on **every** path that starts work, including early failure:
 
 ```text
 happy path        exists(pass) → parses(pass) → validates(pass) → complete
@@ -353,6 +372,12 @@ this document once got wrong by one, so state it as an audit result, not receive
 - `validateCalendar()`'s fulfil (line 2724)
 - `executeUnitTest()`'s fulfil (line 2960)
 
+**A second, unrelated non-termination shape,** noted here so the two are not confused: `dropSupersededQueuedRequests()`
+filters superseded entries out of the request queue without calling their `reject`, so a dropped request emits neither
+its remaining step frames nor a `complete`. It is reached by `cancelRun` and, less obviously, by an ordinary run-token
+change. Also pre-existing, also out of scope here — the terminal frame does not make a discarded request terminate, it
+only makes the silence easier to notice.
+
 Exposure is narrow rather than nil, and pre-existing rather than introduced by this work: `validateDataAgainstSchema()`
 already catches `\Throwable` internally and is the principal throw source inside these handlers, and the `then(fulfil,
 reject)` pair with no tail handler is the shape these five call sites had before this design. A client that used to
@@ -366,7 +391,7 @@ late in a branch whose own review is about the terminal frame's happy paths, not
 | Condition                          | Behaviour                                                          |
 |------------------------------------|--------------------------------------------------------------------|
 | `requestId` present but malformed  | Rejected as a malformed message, via the existing `echobot` frame  |
-| `requestId` absent                 | Field omitted from responses; everything else unchanged            |
+| `requestId` absent                 | Field omitted from responses, **and no terminal frame is sent**    |
 | A step throws                      | Existing error frame, plus `status: "fail"`, then `complete`       |
 | Target never resolves (unknown id) | `echobot` rejection, no `complete` — no work was started           |
 
