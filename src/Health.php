@@ -845,9 +845,11 @@ class Health implements MessageComponentInterface
      * Emit the terminal frame: the work this request started has finished.
      *
      * A client stops on this frame instead of counting the ones before it. Both clients hardcode
-     * three responses per check, and the published `steps` list could not replace that constant
-     * because the count is not reliable — a file whose JSON fails to decode emits two step frames,
-     * not three (#821). Making the end explicit does not fix that; it makes it stop mattering.
+     * three responses per check, and when this frame was added the published `steps` list could not
+     * replace that constant because the count was not reliable — a file whose JSON failed to decode
+     * emitted two step frames, not three (#821, since fixed). Making the end explicit did not fix
+     * that; it made it stop mattering, and it still does: an arm that stops early is a possibility
+     * the protocol should not need a client to predict.
      *
      * **Gated on `requestId`, and this is the one place in #806 where the additive envelope is not
      * enough.** A new frame changes the *stream*, not just a frame's contents. A v1 client survives
@@ -1586,9 +1588,9 @@ class Health implements MessageComponentInterface
                         $data = $result['data'];
                         echo 'Fetched data for ' . $dataPath . ': got ' . strlen($data) . " bytes\n";
                         $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $target, requestId: $requestId);
-                        // Terminates whether the steps passed or failed, and whether there were
-                        // three of them or the two a decode failure emits (#821): what a client
-                        // stops on is this frame, never a count.
+                        // Terminates whether the steps passed or failed. Every arm now emits one
+                        // frame per published step — the decode arm's missing third was #821 — but
+                        // what a client stops on is still this frame, never a count.
                         $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
                     },
                     function (\Throwable $e) use ($to, $validationForMessages, $dataPath, $runToken, $requestId, $target) {
@@ -1616,8 +1618,9 @@ class Health implements MessageComponentInterface
                     },
                     function (\Throwable $e) use ($to, $validationForMessages, $dataPath, $runToken, $requestId, $target) {
                         // The unreadable-file arm. It reports all three steps as failures and is
-                        // still a termination, so it ends the same way a success does; #822 is why
-                        // a *missing* file does not reach it today.
+                        // still a termination, so it ends the same way a success does. A *missing*
+                        // file reaches it too, since #822: the read stats first rather than letting
+                        // the Fallback adapter resolve absence with zero bytes.
                         $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken, $target, requestId: $requestId);
                         $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
                     }
@@ -1896,6 +1899,24 @@ class Health implements MessageComponentInterface
                 Step::PARSES,
                 Status::FAIL,
                 "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg() . ". Raw data = &lt;&lt;&lt;JSON\n" . $data . "\n&gt;&gt;&gt;",
+                null,
+                $runToken,
+                requestId: $requestId
+            );
+
+            // A file that would not decode was never schema-checked, and until #821 this arm simply
+            // stopped here: two frames where every sibling arm emits three. The step is reported as
+            // failed rather than left unsent, because "not attempted" and "not sent" are the same
+            // thing to a client and the honest answer is that the file did not validate. The folder
+            // branch already collects exactly this ("not validated, the file could not be decoded as
+            // JSON"); {@see Health::handleValidationDataError()} does the same for an unreadable file.
+            $this->sendStepResult(
+                $to,
+                $validate,
+                $target,
+                Step::VALIDATES,
+                Status::FAIL,
+                "Unable to verify schema for dataPath {$dataPath} and category {$category} since Data file $dataPath could not be decoded as JSON",
                 null,
                 $runToken,
                 requestId: $requestId
@@ -3193,6 +3214,34 @@ class Health implements MessageComponentInterface
 
         if (self::$cacheEnabled) {
             echo "Cache miss for file $path, reading from filesystem\n";
+        }
+
+        // Stat before reading, because the read cannot tell absence from emptiness (#822).
+        // `react/filesystem`'s Fallback adapter — always the one in play here, since neither
+        // ext-eio nor ext-uv is a dependency of this project — resolves a missing file with zero
+        // bytes rather than rejecting, and emits three PHP warnings on the way. Every caller then
+        // ran its success path over an empty string: `file-exists` reported success for a file that
+        // is not there, and the two steps after it failed for a reason that was not the real one.
+        // A green "exists" above two red boxes reads as "the file is there but its contents are
+        // broken", which sends whoever is debugging to the wrong file — worse than a plain failure.
+        //
+        // The check is explicit rather than a matter of letting the adapter reject, so that the
+        // answer does not depend on which optional extension happens to be installed: with ext-eio
+        // present the read would reject on its own, and behaviour that changes with the build is
+        // worse than behaviour that does not. `is_file()` also rules out a directory, which
+        // `is_readable()` alone would let through to the same zero-byte resolution.
+        //
+        // `Health` is a long-running process and PHP caches stat results per filename, including
+        // negative ones. A file written by a `/data` request after an earlier check looked for it
+        // would otherwise keep reporting absent for the life of the process.
+        clearstatcache(true, $path);
+        if (!is_file($path) || !is_readable($path)) {
+            $reason   = is_file($path) ? 'file is not readable' : 'no such file';
+            $deferred = new Deferred();
+            $deferred->reject(new \RuntimeException("Unable to read file: $path ($reason)"));
+            /** @var PromiseInterface<array{data: string, fromCache: bool}> $missingPromise */
+            $missingPromise = $deferred->promise();
+            return $missingPromise;
         }
 
         $filesystem = Factory::create();

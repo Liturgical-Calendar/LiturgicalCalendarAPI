@@ -355,15 +355,21 @@ Given a `requestId`, it is emitted on **every** path that starts work, including
 
 ```text
 happy path        exists(pass) → parses(pass) → validates(pass) → complete
-JSON decode fails exists(pass) → parses(fail) → complete
-file missing      exists(fail) → complete
+JSON decode fails exists(pass) → parses(fail) → validates(fail) → complete
+file missing      exists(fail) → parses(fail) → validates(fail) → complete
 test run          validates(pass|fail) → complete
 unknown target    echobot rejection only — no complete, nothing was started
 ```
 
-A client stops on `complete` and never counts frames. That makes **#821 moot rather than fixed**: the JSON-decode
-path still emits fewer step frames than `count(steps)`, but nothing waits for the difference. `steps` remains an
-upper bound and stops mattering for phase completion.
+A client stops on `complete` and never counts frames.
+
+> **Amended after #821 and #822 landed.** As written, this section said the terminal frame made #821 *moot rather
+> than fixed* — the JSON-decode path emitted two step frames where `count(steps)` said three — and the diagram's
+> `file missing` row described a rejecting read that the installed `react/filesystem` adapter never produced, so a
+> missing file in fact reported `exists(pass)`. Both are fixed, and the rows above are what the two arms emit today.
+> `steps` is now an exact frame count and safe to render one card per step against. The stopping rule is unchanged
+> and the terminal frame is not thereby redundant: `complete` stays correct for an arm a later change makes shorter,
+> which is the property that made it worth adding while the counts disagreed.
 
 ### A known limit: a throw inside a fulfil handler skips `complete` (#823)
 

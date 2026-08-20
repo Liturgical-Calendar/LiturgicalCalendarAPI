@@ -264,10 +264,11 @@ final class HealthRiteSourcePathTest extends TestCase
         $health = self::healthWithRunToken($conn);
 
         // Several of these slugs name files that deliberately do not exist — that is the point of
-        // them — and react/filesystem's fallback adapter stat()s and reads unconditionally, so it
-        // emits PHP warnings the assertions have no interest in. Swallow them here rather than
-        // per test: what is under assertion is the path Health echoed, not whether the read
-        // succeeded.
+        // them. Since #822 the read stats before it reads, so absence no longer reaches
+        // react/filesystem's fallback adapter and the PHP warnings it emitted unconditionally are
+        // gone; the suppressor is kept because what is under assertion here is the path Health
+        // echoed, not whether the read succeeded, and a warning from some other cause would be an
+        // equally irrelevant failure.
         set_error_handler(static fn(): bool => true);
 
         ob_start();
