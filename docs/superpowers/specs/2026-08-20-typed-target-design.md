@@ -105,6 +105,48 @@ calendar later would not force a vocabulary change.
 Ids stay **opaque to clients**: they are echoed back, never parsed. The structure exists for the server and for humans
 reading logs.
 
+### The frame class fragment
+
+A `validateSource` check answers with one frame per step, and each frame carries a `classes` string of the form
+`.<fragment>.<step>` — the address the client matches a result card by. **The fragment is derived from the item's `id`,
+and the derivation is part of the protocol**: a client that holds an id must be able to compute the same string without
+asking the server, because that is how it finds the card to paint before any frame arrives.
+
+**The rule, in full:**
+
+> Take the item's `id` and replace every character outside `[A-Za-z0-9_-]` with a single `-`. Nothing else — no case
+> folding, no collapsing of runs of `-`, no trimming.
+
+In JavaScript that is `id.replace(/[^A-Za-z0-9_-]/g, '-')`; in PHP, `preg_replace('/[^A-Za-z0-9_-]/', '-', $id)`.
+
+| Id                                      | Fragment                                | Frame class                                          |
+|-----------------------------------------|-----------------------------------------|------------------------------------------------------|
+| `temporale:roman`                       | `temporale-roman`                       | `.temporale-roman.file-exists`                       |
+| `nation:roman:US`                       | `nation-roman-US`                       | `.nation-roman-US.json-valid`                        |
+| `diocese:ambrosian:lugano_ch`           | `diocese-ambrosian-lugano_ch`           | `.diocese-ambrosian-lugano_ch.schema-valid`          |
+| `test:ambrosian:StIgnatiusOfLoyolaTest` | `test-ambrosian-StIgnatiusOfLoyolaTest` | `.test-ambrosian-StIgnatiusOfLoyolaTest.file-exists` |
+
+Three properties of this rule are load-bearing, and none of them is an accident:
+
+- **It is derived from the `id`, never from the item's `label`.** The id is stable, opaque and server-minted; the label
+  is human-facing prose that is expected to change with translation and rewording. An address that moved when someone
+  reworded a caption would be worse than no address at all. (The first implementation of `validateSource` used the label
+  and was unusable for exactly this reason: labels such as `National calendar: US` contain a space — matching zero
+  cards — or a `:`, which makes the client's `querySelectorAll()` throw outright.)
+- **The raw id is not a drop-in.** `.diocese:ambrosian:lugano_ch` parses as a class followed by a pseudo-class, so the
+  substitution is required and is not merely cosmetic.
+- **A fragment never contains a `.`.** That is what makes `.<fragment>.<step>` unambiguously splittable, and it follows
+  from the rule because `.` is outside `[A-Za-z0-9_-]`.
+
+Every id the inventory currently publishes yields a fragment matching `^[A-Za-z][A-Za-z0-9_-]*$`, and no two ids
+collide on one fragment. Neither is guaranteed by the substitution alone — an id kind introduced later that began with a
+digit, or that differed from another only in punctuation, would break one or the other — so both are asserted over the
+whole published set in `HealthValidateSourceTest`, and a new id kind that violates either fails the build rather than
+the client.
+
+The steps themselves are `file-exists`, `json-valid` and `schema-valid`, which are **not** the values `/validations`
+publishes in `steps`; see [A caveat on `steps`](#a-caveat-on-steps-not-fixed-here) below.
+
 ## Three message shapes
 
 There are three domains here, and collapsing them into one `target` would be the same mistake `category` made.

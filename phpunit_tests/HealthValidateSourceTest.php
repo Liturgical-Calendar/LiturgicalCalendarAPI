@@ -113,17 +113,23 @@ final class HealthValidateSourceTest extends TestCase
      * branches of `runValidationSteps()`, and without it the folder branch is never reached through
      * this action at all.
      *
-     * @return array<string, array{string, string}>
+     * The third column is the class fragment the frames must be addressed by, written out in full
+     * rather than computed. `temporale:roman` is an explicit inventory item and `nation:roman:IT` /
+     * `nation:roman:US:i18n` are enumerated per-calendar ones, whose labels (`National calendar: IT`)
+     * are the prose that made the shipped fragments unusable — so the two categories the derivation
+     * has to cover are both pinned by a literal here.
+     *
+     * @return array<string, array{string, string, string}>
      */
     public static function equivalentAddressProvider(): array
     {
         return [
             // Same lookup on both sides — $legacySlugToId rewrites the slug into this very id.
-            'temporale'              => ['temporale:roman', 'proprium-de-tempore'],
+            'temporale'              => ['temporale:roman', 'proprium-de-tempore', 'temporale-roman'],
             // Two independent resolutions: regex arm vs byId().
-            'national calendar'      => ['nation:roman:IT', 'national-calendar-IT'],
+            'national calendar'      => ['nation:roman:IT', 'national-calendar-IT', 'nation-roman-IT'],
             // Likewise independent, and the only row whose kind is 'folder'.
-            'national calendar i18n' => ['nation:roman:US:i18n', 'national-calendar-US-i18n']
+            'national calendar i18n' => ['nation:roman:US:i18n', 'national-calendar-US-i18n', 'nation-roman-US-i18n']
         ];
     }
 
@@ -131,7 +137,8 @@ final class HealthValidateSourceTest extends TestCase
      * The published `steps` vocabulary is not the emitted frame-class vocabulary.
      *
      * `CheckableInventory::STEPS` publishes `exists|parses|validates` on the wire, while the frames
-     * are addressed `.<label>.file-exists`, `.<label>.json-valid`, `.<label>.schema-valid`. The two
+     * are addressed `.<fragment>.file-exists`, `.<fragment>.json-valid`, `.<fragment>.schema-valid`.
+     * The two
      * describe the same three steps in different words, and nothing in the codebase relates them,
      * so the correspondence is written down here — once — and asserted rather than restated as a
      * hardcoded list at each call site. A newly published step with no entry here fails loudly,
@@ -146,20 +153,55 @@ final class HealthValidateSourceTest extends TestCase
     ];
 
     /**
+     * What a frame's class fragment has to look like for the client to be able to use it at all.
+     *
+     * `UnitTestInterface/assets/js/testResults.js` feeds the whole `classes` string to
+     * `document.querySelectorAll()` after passing it through `slugifySelector()`, which only
+     * rewrites tokens matching `\.([a-zA-Z][a-zA-Z0-9_-]*)`. A fragment outside this shape is
+     * therefore not merely ugly: one containing a space matches zero cards, and one containing `:`
+     * makes `querySelectorAll()` throw a `SyntaxError` and paints nothing at all.
+     *
+     * Stated here as a literal, independent of anything the server computes. That is the whole
+     * point — an earlier version of the expectation below built it out of `$item->label`, the very
+     * value under test, and so could never have failed on the fragment being unusable.
+     */
+    private const USABLE_CLASS_FRAGMENT = '/^[A-Za-z][A-Za-z0-9_-]*$/';
+
+    /**
      * The frame classes an item's *published* steps say it should emit, in order.
+     *
+     * $fragment is passed in by the caller rather than derived from the item, so that the
+     * expectation is stated rather than recomputed.
      *
      * @return list<string>
      */
-    private static function expectedFrameClasses(CheckableItem $item): array
+    private static function expectedFrameClasses(CheckableItem $item, string $fragment): array
     {
         return array_map(
-            static function (string $step) use ($item): string {
+            static function (string $step) use ($fragment): string {
                 self::assertArrayHasKey($step, self::FRAME_CLASS_FOR_STEP, "published step '{$step}' has no frame class");
 
-                return ".{$item->label}." . self::FRAME_CLASS_FOR_STEP[$step];
+                return ".{$fragment}." . self::FRAME_CLASS_FOR_STEP[$step];
             },
             $item->steps
         );
+    }
+
+    /**
+     * The class fragment a frame is addressed by: everything between the leading dot and the
+     * trailing step.
+     *
+     * A fragment may not contain a `.` — that is what makes `.<fragment>.<step>` parseable at all —
+     * so a frame whose `classes` does not split into exactly three pieces is itself the failure.
+     */
+    private static function classFragmentOf(\stdClass $frame): string
+    {
+        $parts = explode('.', (string) $frame->classes);
+        self::assertCount(3, $parts, "a frame class must be .<fragment>.<step>, got: {$frame->classes}");
+        self::assertSame('', $parts[0], "a frame class must start with a dot, got: {$frame->classes}");
+        self::assertContains($parts[2], self::FRAME_CLASS_FOR_STEP, "unknown step in frame class: {$frame->classes}");
+
+        return $parts[1];
     }
 
     /**
@@ -175,16 +217,25 @@ final class HealthValidateSourceTest extends TestCase
      * `/validations` and waits for exactly that many frames per check. Publishing one count and
      * emitting another wedges the run just as surely as emitting none.
      *
-     * @param string $id   the inventory id a v2 client sends
-     * @param string $slug the `validate` slug a v1 client sends for the same artifact
+     * The frames are addressed by a fragment **derived from the id**, not by the item's label. The
+     * label is human prose (`National calendar: IT`) and the shipped code used it verbatim, which
+     * made the client's `querySelectorAll()` throw on the ~60 per-calendar items and match nothing
+     * on the rest — so the new addressing path painted no card at all. The expectation is written
+     * out in the provider and cross-checked against {@see self::USABLE_CLASS_FRAGMENT}: the literal
+     * pins the exact derivation, and the pattern says what any fragment must satisfy, so a change of
+     * shape fails the first and a change to an equally-broken shape fails the second.
+     *
+     * @param string $id       the inventory id a v2 client sends
+     * @param string $slug     the `validate` slug a v1 client sends for the same artifact
+     * @param string $fragment the CSS class fragment the frames must be addressed by
      */
     #[DataProvider('equivalentAddressProvider')]
-    public function testAKnownIdRunsTheSameCheckAsItsLegacySlug(string $id, string $slug): void
+    public function testAKnownIdRunsTheSameCheckAsItsLegacySlug(string $id, string $slug, string $fragment): void
     {
         $item = CheckableInventory::byId($id);
         self::assertInstanceOf(CheckableItem::class, $item, "the inventory has no entry for {$id}");
 
-        $health = new Health();
+        $health = $this->newHealth();
         $conn   = self::createStubConnection();
         self::send($health, $conn, ['action' => 'validateSource', 'target' => ['id' => $id]]);
 
@@ -201,12 +252,17 @@ final class HealthValidateSourceTest extends TestCase
         );
 
         self::assertSame(
-            self::expectedFrameClasses($item),
+            self::expectedFrameClasses($item, $fragment),
             array_map(static fn (\stdClass $f): mixed => $f->classes, $frames),
-            'the frames are addressed by the item label, one per published step, in step order'
+            'the frames are addressed by the fragment derived from the id, one per published step, in step order'
         );
 
         foreach ($frames as $frame) {
+            self::assertMatchesRegularExpression(
+                self::USABLE_CLASS_FRAGMENT,
+                self::classFragmentOf($frame),
+                "the frame class for {$id} is not a selector a client can use: {$frame->classes}"
+            );
             self::assertSame('success', $frame->type, "{$id} did not pass its own check: {$frame->text}");
         }
 
@@ -330,10 +386,17 @@ final class HealthValidateSourceTest extends TestCase
      * The rule must not reach the legacy action it is named after. `executeValidation` *requires*
      * these properties; rejecting them there would delete the v1 surface rather than guard the v2
      * one, and the slug arms stay reachable until clients have moved over (UnitTestInterface#42).
+     *
+     * The `classes` values are asserted literally, and that is the point of the second half of this
+     * test rather than an incidental extra: splitting the class fragment out of `$label` inside
+     * `runValidationSteps()` is the one change on this branch that could have moved a v1 frame, and
+     * the file branch of that method is reached from nowhere else in the in-process suite. A v1
+     * caller passes no fragment, the fragment defaults to the label, and the frames must come out
+     * addressed by the slug exactly as they always were.
      */
     public function testExecuteValidationStillAcceptsTheVeryPropertiesValidateSourceRetires(): void
     {
-        $health = new Health();
+        $health = $this->newHealth();
         $conn   = self::createStubConnection();
 
         self::send($health, $conn, [
@@ -344,10 +407,18 @@ final class HealthValidateSourceTest extends TestCase
         ]);
 
         self::assertNotEmpty($conn->sent, 'the legacy action stopped being usable');
+        $frames = [];
         foreach ($conn->sent as $raw) {
             $frame = json_decode($raw);
             self::assertNotSame('echobot', $frame->type, "the legacy slug shape was refused: {$frame->text}");
+            $frames[] = $frame;
         }
+
+        self::assertSame(
+            ['.proprium-de-tempore.file-exists', '.proprium-de-tempore.json-valid', '.proprium-de-tempore.schema-valid'],
+            array_map(static fn (\stdClass $f): mixed => $f->classes, $frames),
+            'a v1 message must still be addressed by its own slug, unchanged'
+        );
     }
 
     /**
@@ -532,7 +603,7 @@ final class HealthValidateSourceTest extends TestCase
                 $staticTarget->sent
             );
             self::assertSame(
-                self::expectedFrameClasses($item),
+                self::expectedFrameClasses($item, 'temporale-roman'),
                 array_map(static fn (\stdClass $f): mixed => $f->classes, $frames),
                 'the frames were not addressed to the static item the retry was supposed to resolve'
             );
@@ -632,6 +703,19 @@ final class HealthValidateSourceTest extends TestCase
                     // target was addressed and checked, and the check reported something. This test
                     // is about whether an id can be sent, not about whether its data is valid.
                     $unaddressable[$item->id] = (string) ( $frame->text ?? '' );
+                    continue;
+                }
+
+                // Sent is not the same as usable. A frame the client cannot address is as good as
+                // no frame — a fragment with a space in it matches zero cards and one with a colon
+                // makes `querySelectorAll()` throw — so the whole published set is swept for the
+                // shape a selector has to have, not only the three ids the happy-path rows cover.
+                if ($frame instanceof \stdClass) {
+                    self::assertMatchesRegularExpression(
+                        self::USABLE_CLASS_FRAGMENT,
+                        self::classFragmentOf($frame),
+                        "{$item->id} is addressable but its frames are not: {$frame->classes}"
+                    );
                 }
             }
         }

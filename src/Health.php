@@ -834,8 +834,36 @@ class Health implements MessageComponentInterface
             $item->schema->path(),
             $item->label,
             $to,
-            $this->resolveRunToken($to)
+            $this->resolveRunToken($to),
+            // The label is prose — `National calendar: US` — and is fine as the human half of a
+            // frame, but it is not a selector. The address comes from the id instead.
+            classFragment: self::cssClassFragmentForId($item->id)
         );
+    }
+
+    /**
+     * Derive the CSS class fragment a `validateSource` result frame is addressed by, from an inventory id.
+     *
+     * **The rule, in full: replace every character outside `[A-Za-z0-9_-]` with `-`.** Nothing else —
+     * no case folding, no collapsing of runs, no trimming. `temporale:roman` becomes
+     * `temporale-roman`, `nation:roman:US` becomes `nation-roman-US`, and
+     * `diocese:ambrosian:lugano_ch` becomes `diocese-ambrosian-lugano_ch`. A client holding an id
+     * computes the same string with one substitution and matches `.<fragment>.<step>`; this is
+     * written down as a client-implementable rule in the design spec (`Id vocabulary` → *the frame
+     * class fragment*) precisely because UnitTestInterface#42 has to reproduce it, and a derivation
+     * only the server knows would be no better than not publishing the id.
+     *
+     * Derived from the **id**, never from the label. The id is stable and opaque and the server
+     * minted it; the label is human-facing prose that is expected to change, and an address that
+     * moved when someone reworded a caption would be worse than no address at all.
+     *
+     * The raw id is not usable as-is: `.diocese:ambrosian:lugano_ch` parses as a class followed by a
+     * pseudo-class, and the ~60 per-calendar labels contain `: `, which makes `querySelectorAll()`
+     * throw outright rather than merely match nothing.
+     */
+    private static function cssClassFragmentForId(string $id): string
+    {
+        return (string) preg_replace('/[^A-Za-z0-9_-]/', '-', $id);
     }
 
     /**
@@ -1057,7 +1085,8 @@ class Health implements MessageComponentInterface
      * @param string $dataPath The final path to check: a project-relative or absolute file or folder path, or an API URL.
      * @param 'file'|'folder' $kind Whether $dataPath names a folder of i18n files or a single file/endpoint.
      * @param ?string $schema The schema to validate against, or null when none could be resolved.
-     * @param string $label The human label and CSS-class fragment for the result frames (what a v1 message calls `validate`).
+     * @param string $label The human label for the result frames (what a v1 message calls `validate`). It reaches only the
+     *        message *text*; what the frames are addressed by is $classFragment, which defaults to it.
      * @param ConnectionInterface $to The connection to send the result frames to.
      * @param ?string $runToken The originating run token to echo back on responses, or null to use the per-connection fallback.
      * @param string $category The check's category, one of ExecuteValidationCategory. It never touches control flow — the
@@ -1070,6 +1099,13 @@ class Health implements MessageComponentInterface
      * @param ?string $sourceFolder For a folder check, the folder as the *caller* named it — what the result frames quote.
      *        It is not always $dataPath: a v1 client sends a bare id (`IT`) for the reconstructed i18n slugs and the server
      *        reads the folder it derived from it. Defaults to $dataPath, for a caller whose two are the same.
+     * @param ?string $classFragment The CSS class fragment the result frames are addressed by, without the leading dot and
+     *        without the trailing `.file-exists` / `.json-valid` / `.schema-valid` step. Split out from $label because the
+     *        two are only *accidentally* the same thing: a v1 `validate` slug is hyphenated precisely so that it can serve
+     *        as both, but an inventory label is human prose (`National calendar: US`) and would produce a selector that
+     *        matches nothing — or, once it contains `: `, one that makes the client's `querySelectorAll()` throw. Defaults
+     *        to $label so that every v1 caller keeps emitting byte-identical frames; a caller whose label is not slug-safe
+     *        passes its own, derived from a stable id via {@see Health::cssClassFragmentForId()}.
      */
     private function runValidationSteps(
         string $dataPath,
@@ -1080,11 +1116,15 @@ class Health implements MessageComponentInterface
         ?string $runToken,
         string $category = 'sourceDataCheck',
         ?string $pathForSchema = null,
-        ?string $sourceFolder = null
+        ?string $sourceFolder = null,
+        ?string $classFragment = null
     ): void {
         $pathForSchema ??= $label;
         // Read before $dataPath is made absolute below, so the two stay distinguishable.
         $sourceFolder ??= $dataPath;
+        // The v1 conflation, preserved exactly: with no fragment of its own a caller addresses its
+        // frames by its label, which is what `executeValidation` has always done.
+        $classFragment ??= $label;
 
         // Now that we have the correct schema to validate against,
         // we will perform the actual validation either for all files in a folder, or for a single file
@@ -1102,7 +1142,7 @@ class Health implements MessageComponentInterface
                 foreach (['file-exists', 'json-valid', 'schema-valid'] as $step) {
                     $this->sendFolderStepResult(
                         $to,
-                        "$label.$step",
+                        "$classFragment.$step",
                         $missing,
                         '', // unreachable: $missing is non-empty, so the failure text is used
                         "Data folder $sourceFolder could not be checked",
@@ -1175,13 +1215,13 @@ class Health implements MessageComponentInterface
             $allPromises = Promise\all($promises);
 
             $allPromises->then(
-                function () use ($to, $label, $sourceFolder, $schema, &$fileExistsErrors, &$jsonErrors, &$schemaErrors, $runToken) {
+                function () use ($to, $classFragment, $sourceFolder, $schema, &$fileExistsErrors, &$jsonErrors, &$schemaErrors, $runToken) {
                     // Exactly one frame per step, pass or fail. A folder check is a statement
                     // about the folder, so a failure names the offending files inside a single
                     // frame instead of emitting one frame each.
                     $this->sendFolderStepResult(
                         $to,
-                        "$label.file-exists",
+                        "$classFragment.file-exists",
                         $fileExistsErrors,
                         "The Data folder $sourceFolder exists and contains valid i18n json files",
                         "Data folder $sourceFolder",
@@ -1190,7 +1230,7 @@ class Health implements MessageComponentInterface
 
                     $this->sendFolderStepResult(
                         $to,
-                        "$label.json-valid",
+                        "$classFragment.json-valid",
                         $jsonErrors,
                         "The i18n json files in Data folder $sourceFolder were successfully decoded as JSON",
                         "The i18n json files in Data folder $sourceFolder were not all decoded as JSON",
@@ -1199,7 +1239,7 @@ class Health implements MessageComponentInterface
 
                     $this->sendFolderStepResult(
                         $to,
-                        "$label.schema-valid",
+                        "$classFragment.schema-valid",
                         $schemaErrors,
                         "The i18n json files in Data folder $sourceFolder were successfully validated against the Schema $schema",
                         "The i18n json files in Data folder $sourceFolder were not all valid against the Schema $schema",
@@ -1217,11 +1257,15 @@ class Health implements MessageComponentInterface
             // the caller did not pass. The annotation asserts the *shape* those two require; the literal
             // category cannot be proven, because an unrecognised category has to reach the diagnostic
             // verbatim (telling a client that its category was wrong is the diagnostic's whole job).
+            //
+            // `validate` carries the *class fragment* rather than the label: both readers use it
+            // for nothing but `$message->classes`, and for a v1 caller the two are the same string,
+            // so the legacy frames come out unchanged.
             /** @var ExecuteValidationSourceFile|ExecuteValidationResource $validationForMessages */
             $validationForMessages = (object) [
                 'action'     => 'executeValidation',
                 'category'   => $category,
-                'validate'   => $label,
+                'validate'   => $classFragment,
                 'sourceFile' => $dataPath
             ];
 

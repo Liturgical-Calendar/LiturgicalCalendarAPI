@@ -877,10 +877,13 @@ final class HealthTypedCalendarTest extends TestCase
         foreach ($sourceConn->sent as $raw) {
             $frame = json_decode($raw);
             self::assertNotSame('echobot', $frame->type, "the definition check was refused: {$frame->text}");
+            // Addressed by the fragment derived from the id, not by the item's label — which for
+            // this item is `Liturgical test: StIgnatiusOfLoyolaTest`, prose whose `: ` would make
+            // the client's querySelectorAll() throw. See Health::cssClassFragmentForId().
             self::assertStringStartsWith(
-                '.Liturgical test: StIgnatiusOfLoyolaTest.',
+                '.test-ambrosian-StIgnatiusOfLoyolaTest.',
                 (string) $frame->classes,
-                'a source check addresses its frames by the inventory item label'
+                'a source check addresses its frames by the fragment derived from the inventory id'
             );
         }
         self::assertSame([], self::queuedPaths($sourceHealth), 'a source check reads the filesystem; it must not compute a calendar');
