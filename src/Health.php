@@ -68,6 +68,7 @@ use Psr\Http\Message\ResponseInterface;
  * @phpstan-type ValidateCalendar \stdClass&object{action:'validateCalendar',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar'|'ritecalendar',responsetype:'JSON'|'XML'|'ICS'|'YML',rite?:string}
  * @phpstan-type ExecuteUnitTest \stdClass&object{action:'executeUnitTest',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar'|'ritecalendar',test:string,rite?:string}
  * @phpstan-type CancelRun \stdClass&object{action:'cancelRun',runToken:string}
+ * @phpstan-type ValidateSource \stdClass&object{action:'validateSource',target:\stdClass&object{id:string},runToken?:string}
  *
  * @phpstan-import-type LiturgicalEvent from \LiturgicalCalendar\Api\Test\LitTestRunner
  */
@@ -91,7 +92,8 @@ class Health implements MessageComponentInterface
         'executeValidation' => ['category', 'validate', 'sourceFile'],
         'validateCalendar'  => ['category', 'calendar', 'year', 'responsetype'],
         'executeUnitTest'   => ['category', 'calendar', 'year', 'test'],
-        'cancelRun'         => ['runToken']
+        'cancelRun'         => ['runToken'],
+        'validateSource'    => ['target']
     ];
 
     private const RED    = "\033[0;31m";
@@ -366,7 +368,7 @@ class Health implements MessageComponentInterface
         // Reset per-connection cache hit counter for each new message (test run)
         $this->cacheHitCounters[$resourceId] = 0;
         echo sprintf('Receiving message from connection %d: %s', $resourceId, $msg . "\n");
-        /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest|CancelRun $messageReceived */
+        /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest|CancelRun|ValidateSource $messageReceived */
         $messageReceived = json_decode($msg);
         // Store optional run token for response correlation. `cancelRun` is exempt: it names the run it
         // wants abandoned rather than the run this connection is on, and storing it here would install
@@ -380,6 +382,18 @@ class Health implements MessageComponentInterface
             && is_string($messageReceived->runToken)
             && preg_match('/^[A-Za-z0-9_\-]{1,64}$/', $messageReceived->runToken)
         ) {
+            // A token this connection was not already on is a run *beginning*, and that is the one
+            // moment the inventory may safely be rebuilt: `validateSource` addresses source data
+            // solely through `CheckableInventory::byId()`, whose index is memoized for the lifetime
+            // of this process rather than of a request, so a calendar added through `/data` would
+            // otherwise stay unaddressable until the WebSocket server restarts. A write-path hook
+            // cannot close that gap — `/data` writes happen in the HTTP process, which never runs
+            // this code. Resetting on the token *change* rather than on every message bounds
+            // staleness to one run while still costing one rebuild per run, not one per check;
+            // a run issues one message per checked item, and there are dozens.
+            if (( $this->runTokens[$resourceId] ?? null ) !== $messageReceived->runToken) {
+                CheckableInventory::reset();
+            }
             $this->runTokens[$resourceId] = $messageReceived->runToken;
         }
         if (
@@ -418,6 +432,10 @@ class Health implements MessageComponentInterface
                 case 'cancelRun':
                     /** @var CancelRun $messageReceived */
                     $this->cancelRun($messageReceived->runToken, $from);
+                    break;
+                case 'validateSource':
+                    /** @var ValidateSource $messageReceived */
+                    $this->validateSource($messageReceived, $from);
                     break;
                 default:
                     $message       = new \stdClass();
@@ -506,6 +524,25 @@ class Health implements MessageComponentInterface
     }
 
     /**
+     * Reject a malformed or unresolvable v2 message.
+     *
+     * Reuses the existing `echobot` error shape deliberately. Since UnitTestInterface PR #46 an
+     * unrecognised response `type` is painted as a visible failed check, so a dedicated
+     * `protocolError` type would make every rejection look like a failing test. That type belongs
+     * to #806 section G and is gated on section C.
+     *
+     * @param ConnectionInterface $to The connection that sent the message being rejected.
+     * @param string $text Why the message could not be acted on.
+     */
+    private function rejectMessage(ConnectionInterface $to, string $text): void
+    {
+        $message       = new \stdClass();
+        $message->type = 'echobot';
+        $message->text = $text;
+        $this->sendMessage($to, $message);
+    }
+
+    /**
      * Capture the run token currently associated with a connection. Called synchronously at the
      * start of each request handler (before any async work), so the value is the originating
      * request's token; that token is then threaded into the handler's async responses so they
@@ -578,6 +615,79 @@ class Health implements MessageComponentInterface
             throw new NotFoundException("No diocese found for calendar id: {$calendarId}");
         }
         return $dioceseMetadata;
+    }
+
+    /**
+     * Check one source-data artifact, named by the id `GET /validations` published for it.
+     *
+     * This is the addressing half of {@see Health::executeValidation()}, done the other way round.
+     * A v1 message carries a hyphenated `validate` slug that the server has to recover a path and a
+     * schema from, through eight anchored patterns that are each a second copy of a naming
+     * convention written down somewhere else — which is the drift #806 exists to remove. An id is
+     * opaque: the server minted it, published it, and looks it up. One lookup, no grammar.
+     *
+     * Nothing here is subtracted from `executeValidation()`; both address the same execution phase,
+     * and the slug arms stay reachable until clients have moved over (UnitTestInterface#42).
+     *
+     * The six-argument call is deliberate: an inventory entry is a source-data check whose data path
+     * and quoted folder are the same path, and whose schema was resolved from its own id — exactly
+     * the three defaults {@see Health::runValidationSteps()} supplies.
+     *
+     * @param ValidateSource $message The message naming the target to check.
+     * @param ConnectionInterface $to The connection to send the result frames to.
+     */
+    private function validateSource(\stdClass $message, ConnectionInterface $to): void
+    {
+        // `validateMessageProperties()` has already established that `target` is present; what it
+        // cannot establish is its shape, since ACTION_PROPERTIES only names required properties.
+        $target = property_exists($message, 'target') ? $message->target : null;
+        if (false === ( $target instanceof \stdClass ) || false === property_exists($target, 'id')) {
+            $this->rejectMessage($to, 'validateSource requires a target object with an id.');
+            return;
+        }
+
+        $id = $target->id;
+        if (false === is_string($id)) {
+            $this->rejectMessage($to, 'validateSource target id must be a string.');
+            return;
+        }
+
+        $inventoryError = null;
+        try {
+            $item = CheckableInventory::byId($id);
+        } catch (\Throwable $e) {
+            // The same containment, and the same static-half retry, as in getPathToSchemaFile() and
+            // retrieveSchemaForCategory(): building the index reads and parses every calendar source
+            // file, so one malformed file must not cost every other check in a process that stays
+            // up. It matters more here than there, because an exception escaping onMessage() is
+            // caught by Ratchet's IoServer, which closes the client's connection mid-run — the
+            // whole run lost to one unreadable file.
+            $inventoryError = $e;
+            $item           = CheckableInventory::staticById($id);
+        }
+
+        if (null === $item) {
+            // The two misses are not the same thing and must not read as though they were: an id
+            // nobody published is a client bug, while an id that could not be looked up is a server
+            // one, and reporting the second as "unknown" would send the reader hunting the wrong
+            // one — the #800 blindness in miniature.
+            $this->rejectMessage(
+                $to,
+                null === $inventoryError
+                    ? "Unknown validation target: {$id}"
+                    : "Could not resolve validation target {$id}: the source data inventory could not be built ({$inventoryError->getMessage()})"
+            );
+            return;
+        }
+
+        $this->runValidationSteps(
+            $item->path,
+            $item->kind,
+            $item->schema->path(),
+            $item->label,
+            $to,
+            $this->resolveRunToken($to)
+        );
     }
 
     /**
@@ -2275,7 +2385,7 @@ class Health implements MessageComponentInterface
      * specified action. If any expected property is missing from the message
      * object, the function returns false, indicating the message is invalid.
      *
-     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest|CancelRun $message The message object to validate.
+     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest|CancelRun|ValidateSource $message The message object to validate.
      * @return bool True if all required properties are present, false otherwise.
      */
     private static function validateMessageProperties(\stdClass $message): bool

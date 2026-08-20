@@ -97,29 +97,59 @@ final class HealthSchemaCategoryTest extends TestCase
     /**
      * `sourceDataCheck` resolves from the `validate` SLUG.
      *
-     * @return array<string, array{string, LitSchema}>
+     * The third column is the inventory id that names the *same* artifact — the address a
+     * `validateSource` message carries (#806 section C). Both columns are here rather than in two
+     * providers because the pairing is the assertion: a slug and its id are two spellings of one
+     * target, and the day they stop resolving alike is the day a client migrating from one to the
+     * other silently starts checking something else against the wrong schema.
+     *
+     * @return array<string, array{string, LitSchema, string}>
      */
     public static function sourceDataCheckSlugProvider(): array
     {
         return [
-            'temporale'            => ['proprium-de-tempore', LitSchema::PROPRIUMDETEMPORE],
-            'editio typica missal' => ['proprium-de-sanctis-2002', LitSchema::PROPRIUMDESANCTIS],
-            'regional missal'      => ['proprium-de-sanctis-IT-1983', LitSchema::PROPRIUMDESANCTIS],
-            'wider region'         => ['wider-region-Europe', LitSchema::WIDERREGION],
-            'national calendar'    => ['national-calendar-US', LitSchema::NATIONAL],
-            'diocesan calendar'    => ['diocesan-calendar-romamo_it', LitSchema::DIOCESAN],
-            'decrees'              => ['memorials-from-decrees', LitSchema::DECREES_SRC],
-            'test definition'      => ['tests-StIgnatiusOfLoyolaTest', LitSchema::TEST_SRC],
-            'i18n folder suffix'   => ['national-calendar-US-i18n', LitSchema::I18N],
-            'decrees i18n'         => ['memorials-from-decrees-i18n', LitSchema::I18N],
-            'temporale i18n'       => ['proprium-de-tempore-i18n', LitSchema::I18N],
+            'temporale'            => ['proprium-de-tempore', LitSchema::PROPRIUMDETEMPORE, 'temporale:roman'],
+            'editio typica missal' => ['proprium-de-sanctis-2002', LitSchema::PROPRIUMDESANCTIS, 'sanctorale:roman:EDITIO_TYPICA_2002'],
+            'regional missal'      => ['proprium-de-sanctis-IT-1983', LitSchema::PROPRIUMDESANCTIS, 'sanctorale:roman:IT_1983'],
+            'wider region'         => ['wider-region-Europe', LitSchema::WIDERREGION, 'widerregion:roman:Europe'],
+            'national calendar'    => ['national-calendar-US', LitSchema::NATIONAL, 'nation:roman:US'],
+            'diocesan calendar'    => ['diocesan-calendar-romamo_it', LitSchema::DIOCESAN, 'diocese:roman:romamo_it'],
+            'decrees'              => ['memorials-from-decrees', LitSchema::DECREES_SRC, 'decrees:roman'],
+            // The slug is rite-blind — its pattern is `tests-<name>` — while ids are not, and this
+            // particular test definition exists only in the Ambrosian folder.
+            'test definition'      => ['tests-StIgnatiusOfLoyolaTest', LitSchema::TEST_SRC, 'test:ambrosian:StIgnatiusOfLoyolaTest'],
+            'i18n folder suffix'   => ['national-calendar-US-i18n', LitSchema::I18N, 'nation:roman:US:i18n'],
+            'decrees i18n'         => ['memorials-from-decrees-i18n', LitSchema::I18N, 'decrees:roman:i18n'],
+            'temporale i18n'       => ['proprium-de-tempore-i18n', LitSchema::I18N, 'temporale:roman:i18n'],
         ];
     }
 
     #[DataProvider('sourceDataCheckSlugProvider')]
-    public function testSourceDataCheckResolvesFromTheValidateSlug(string $slug, LitSchema $expected): void
+    public function testSourceDataCheckResolvesFromTheValidateSlug(string $slug, LitSchema $expected, string $id): void
     {
         self::assertSame($expected->path(), self::retrieveSchemaForCategory('sourceDataCheck', $slug));
+    }
+
+    /**
+     * The equivalence oracle for #806 section C: the id is the same address as the slug.
+     *
+     * `retrieveSchemaForCategory()` is asked both ways round, so this pins the *pair* rather than
+     * either half — the inventory id must reach the schema the anchored slug patterns reach, for
+     * every kind of source data the legacy vocabulary covers.
+     */
+    #[DataProvider('sourceDataCheckSlugProvider')]
+    public function testAnInventoryIdResolvesToTheSameSchemaAsItsLegacySlug(string $slug, LitSchema $expected, string $id): void
+    {
+        self::assertSame(
+            self::retrieveSchemaForCategory('sourceDataCheck', $slug),
+            self::retrieveSchemaForCategory('sourceDataCheck', $id),
+            "{$id} and {$slug} name the same artifact and must resolve to the same schema"
+        );
+        self::assertSame($expected->path(), self::retrieveSchemaForCategory('sourceDataCheck', $id));
+
+        $item = CheckableInventory::byId($id);
+        self::assertNotNull($item, "the inventory publishes no item with id {$id}");
+        self::assertSame($expected, $item->schema, "the published item {$id} carries the wrong schema");
     }
 
     public function testSourceDataCheckRejectsAnUnrecognisedSlug(): void
