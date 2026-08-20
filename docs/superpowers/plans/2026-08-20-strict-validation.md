@@ -348,9 +348,14 @@ final class WebSocketMessageSchemaTest extends TestCase
     public function testAMessageTheShippedClientSendsValidates(array $message): void
     {
         $decoded = json_decode((string) json_encode($message));
-        self::schema()->in($decoded);
-        // in() throws on failure; reaching here is the assertion.
-        self::assertTrue(true);
+
+        // in() throws on failure and returns the processed value on success, so the assertions
+        // below are on that value rather than on having survived the call. `assertTrue(true)`
+        // would pass on a build where in() silently became a no-op.
+        $processed = self::schema()->in($decoded);
+
+        self::assertInstanceOf(\stdClass::class, $processed);
+        self::assertSame($message['action'], $processed->action, 'the validated message is not the one that went in');
     }
 
     /**
@@ -364,10 +369,16 @@ final class WebSocketMessageSchemaTest extends TestCase
         $decoded = json_decode((string) json_encode($message));
         $matches = 0;
         foreach ($raw->oneOf as $arm) {
-            $name = substr((string) $arm->{'$ref'}, strlen('#/definitions/'));
+            // The arm is wrapped rather than extracted: several definitions `$ref` their siblings
+            // (`calendarIdentity`, `correlationId`), and a definition lifted out on its own takes
+            // its unresolvable pointers with it. Keeping `definitions` alongside preserves them.
+            $armDocument = (object) [
+                '$schema'     => 'https://json-schema.org/draft-07/schema#',
+                'allOf'       => [$arm],
+                'definitions' => $raw->definitions
+            ];
             try {
-                Schema::import((object) ['$schema' => 'https://json-schema.org/draft-07/schema#'] + (array) $raw->definitions->{$name})
-                    ->in($decoded);
+                Schema::import($armDocument)->in($decoded);
                 $matches++;
             } catch (\Throwable) {
                 // not this arm
