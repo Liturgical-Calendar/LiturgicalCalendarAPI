@@ -235,39 +235,6 @@ class Health implements MessageComponentInterface
      */
     private const VALIDATABLE_RESPONSE_FORMATS = ['JSON', 'XML', 'ICS', 'YML'];
 
-    /**
-     * The legacy CSS class fragment for each published step, per {@see FrameFamily}.
-     *
-     * The wire carries two vocabularies during migration: `step` is what `GET /validations` publishes, and
-     * `classes` is what the current clients match on. This is the projection between them, and it exists in
-     * exactly one place so they cannot drift — the label-as-selector defect fixed in #820 happened because
-     * every emitter built its own selector. Deleting this const, `FrameFamily` and the `$classFragment` /
-     * `$classQualifier` parameters is most of what legacy removal will be.
-     *
-     * It is keyed by family because the projection is **not** one-to-one: a unit test's one outcome is
-     * `Step::VALIDATES` on the wire, exactly as a schema check is, but it addresses a `test-valid` box
-     * rather than a `schema-valid` one. Keying by family is what lets both be true without a call site
-     * ever naming a class — and it keeps the divergence *declared data* instead of an override argument
-     * that any future caller could reach for.
-     *
-     * A family lists only the steps it has: {@see Step::COMPLETE} is in neither, because the terminal frame
-     * is not a check and has no card to address, and `TEST_RUN` lists only `validates`, because a test run
-     * is one named outcome and not a three-step pipeline. Both are refused by
-     * {@see Health::sendStepResult()} rather than being given an invented class.
-     *
-     * @var array<string, array<string, string>>
-     */
-    private const FRAME_CLASS_FOR_STEP = [
-        FrameFamily::CHECK->value    => [
-            'exists'    => 'file-exists',
-            'parses'    => 'json-valid',
-            'validates' => 'schema-valid'
-        ],
-        FrameFamily::TEST_RUN->value => [
-            'validates' => 'test-valid'
-        ]
-    ];
-
     private const RED    = "\033[0;31m";
     private const GREEN  = "\033[0;32m";
     private const YELLOW = "\033[0;33m";
@@ -737,10 +704,11 @@ class Health implements MessageComponentInterface
      * @param ?\stdClass $target What the frame is about, as an object rather than a bare id: always an `id`, plus
      *        whatever else identifies the thing checked — see {@see Health::frameTarget()}. Null for a v1
      *        `executeValidation` message, which names no id. Never fabricated from the class fragment.
-     * @param Step $step The step being reported. A step with no {@see Health::FRAME_CLASS_FOR_STEP} entry cannot be
-     *        addressed and is refused rather than emitted: {@see Step::COMPLETE} is the case that exists today (the
-     *        terminal frame is emitted elsewhere, #821), and a case added later would otherwise ship a `classes` of
-     *        `.<fragment>.`, which matches zero cards — the silent mismatch this whole projection exists to end.
+     * @param Step $step The step being reported. A step the family has no class for cannot be addressed and is
+     *        refused by {@see FrameFamily::frameClasses()} rather than emitted: {@see Step::COMPLETE} is the case
+     *        that exists today (the terminal frame is emitted elsewhere, #821), and a case added later would
+     *        otherwise ship a `classes` of `.<fragment>.`, which matches zero cards — the silent mismatch this
+     *        whole projection exists to end.
      * @param Status $status The outcome, which `type` is projected from.
      * @param string $text The human-facing message, passed through untouched.
      * @param ?list<string> $details The individual failures behind a `text` that summarises them, or null when there
@@ -756,9 +724,9 @@ class Health implements MessageComponentInterface
      *        segments, never selectors and never positions — the dots, the ordering and the step class are this
      *        method's business, which is the whole point of the projection.
      * @param FrameFamily $family Which of the two legacy class grammars this frame belongs to; see {@see FrameFamily}.
-     *        It selects the step's class from {@see Health::FRAME_CLASS_FOR_STEP} and the place `$classQualifier`
-     *        takes, so that `test-valid` and a year-before-step address need neither an override argument nor a second
-     *        composing site. Defaults to `CHECK`, which is every frame the source-data and calendar clusters emit.
+     *        It selects the step's class and the place `$classQualifier` takes, so that `test-valid` and a
+     *        year-before-step address need neither an override argument nor a second composing site. Defaults to
+     *        `CHECK`, which is every frame the source-data and calendar clusters emit.
      * @param ?string $responseType The `responsetype` a calendar-validation failure frame has always carried, or null
      *        for every other frame. It belongs to the legacy half and is assigned with it, immediately after
      *        `classes`, so a v1 frame's key order is byte-for-byte what it has always been and only the new
@@ -777,27 +745,13 @@ class Health implements MessageComponentInterface
         FrameFamily $family = FrameFamily::CHECK,
         ?string $responseType = null
     ): void {
-        // Refusing an unmapped step covers every future case the way a `COMPLETE`-only guard would not:
-        // PHPStan cannot catch a missing entry, because the const is typed `array<string, array<string, string>>`
-        // rather than as a shape, so a new case would reach here, warn about an undefined key, and emit
-        // `.<fragment>.`. The lookup is per family, so a step a family does not have — `exists` on a test run,
-        // which is not a pipeline — is refused on the same path rather than borrowing another family's class.
-        $frameClass = self::FRAME_CLASS_FOR_STEP[$family->value][$step->value]
-            ?? throw new \LogicException("Step::{$step->name} has no legacy frame class in the {$family->value} family and cannot be sent as a step result.");
-
-        // The two grammars differ in exactly one thing — which side of the step class the qualifier falls on —
-        // and both orders live here. Expressing it as a family rather than as two parameters makes "before *and*
-        // after" unrepresentable, the same way named arguments made the sibling emitters' mismatched tails
-        // unrepresentable.
-        $segments = match ($family) {
-            FrameFamily::CHECK    => [$classFragment, $frameClass, $classQualifier],
-            FrameFamily::TEST_RUN => [$classFragment, $classQualifier, $frameClass]
-        };
-
+        // `classes` is composed by the family, not here: `frameClasses()` is the only selector composer in
+        // the repository, and it is on `FrameFamily` rather than in this class because `LitTestRunner`
+        // emits an address of the same grammar and must not own a second copy of it.
         $message          = new \stdClass();
         $message->type    = Status::PASS === $status ? 'success' : 'error';
         $message->text    = $text;
-        $message->classes = '.' . implode('.', array_filter($segments, static fn(?string $segment): bool => null !== $segment));
+        $message->classes = $family->frameClasses($classFragment, $step, $classQualifier);
         if (null !== $responseType) {
             $message->responsetype = $responseType;
         }

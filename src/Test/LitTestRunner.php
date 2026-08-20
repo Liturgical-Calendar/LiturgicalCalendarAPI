@@ -3,9 +3,12 @@
 namespace LiturgicalCalendar\Api\Test;
 
 use Swaggest\JsonSchema\Schema;
+use LiturgicalCalendar\Api\Enum\FrameFamily;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitEventTestAssertion;
 use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Enum\Status;
+use LiturgicalCalendar\Api\Enum\Step;
 use LiturgicalCalendar\Api\Test\TestsMap;
 
 /**
@@ -391,6 +394,29 @@ class LitTestRunner
     }
 
     /**
+     * The calendar identifier a frame's `target` names, as opposed to the prose
+     * {@see \LiturgicalCalendar\Api\Test\LitTestRunner::getCalendarName()} produces for humans.
+     *
+     * The same three cases, answered with ids: a diocese, a nation, or — when the response names
+     * neither — the rite, which is what a rite-level calendar is identified by (`Health` passes the
+     * rite's value as the calendar id for a `ritecalendar`, so the two emitters agree). A response
+     * predating `settings.rite` (#760) falls back to the default rite, which is the same assumption
+     * `getCalendarName()` makes when it says "the General Roman Calendar".
+     */
+    private function targetCalendarId(): string
+    {
+        if (property_exists($this->dataToTest->settings, 'diocesan_calendar')) {
+            return $this->dataToTest->settings->diocesan_calendar;
+        }
+
+        if (property_exists($this->dataToTest->settings, 'national_calendar')) {
+            return $this->dataToTest->settings->national_calendar;
+        }
+
+        return ( $this->responseRite() ?? Rite::default() )->value;
+    }
+
+    /**
      * Sets the message details based on the provided type and optional text. Called by {@see \LiturgicalCalendar\Api\Test\LitTestRunner::setError()} and {@see \LiturgicalCalendar\Api\Test\LitTestRunner::setSuccess()}.
      *
      * The `$attachJsonData` flag is set only by
@@ -399,21 +425,42 @@ class LitTestRunner
      * payload attached to the reply. Setup-time and configuration errors
      * leave it off so reply frames stay small.
      *
+     * This is the frame for the **common case** — a test that actually ran and passed or failed —
+     * where `Health::sendTestResult()` covers only the two ways a run can fail before the assertion is
+     * reached. It says what it is about structurally, exactly as those do: `target` is the test, the
+     * calendar and the year, `step` is `validates` (a test run is one named outcome, not a three-step
+     * pipeline) and `status` is the outcome. `type`, `classes`, `test`, `text` and `jsonData` are the
+     * legacy half and keep their own order — `classes` before `text`, unlike every frame `Health`
+     * emits — because clients still match on them and this is additive.
+     *
+     * `.{test}.year-{year}.test-valid` **addresses the validity box**; it does not claim an outcome, and
+     * the client colours that box by `status`. That is why the class is the same here for a pass and a
+     * fail, and why it is correct: a class encoding the outcome would force a client to know the result
+     * in order to build the selector that finds the card to put the result in.
+     *
+     * The selector is composed by {@see \LiturgicalCalendar\Api\Enum\FrameFamily::frameClasses()},
+     * which is the only thing in the repository that composes one. This method used to hold a second
+     * copy of the grammar, which is why "one place builds a selector" was true inside `Health` and not
+     * across the repository.
+     *
      * @param string      $type           The type of the message ('success' or 'error').
      * @param string|null $text           The optional text to include in the message.
      * @param bool        $attachJsonData When true, attaches `$this->dataToTest` to `jsonData`.
      */
     private function setMessage(string $type, ?string $text = null, bool $attachJsonData = false): void
     {
+        $status = 'success' === $type ? Status::PASS : Status::FAIL;
+        $year   = $this->dataToTest->settings->year;
+
         $this->Message          = new \stdClass();
         $this->Message->type    = $type;
-        $this->Message->classes = ".$this->Test.year-{$this->dataToTest->settings->year}.test-valid";
+        $this->Message->classes = FrameFamily::TEST_RUN->frameClasses($this->Test ?? '', Step::VALIDATES, "year-$year");
         $this->Message->test    = $this->Test;
-        if ($type === 'success') {
+        if (Status::PASS === $status) {
             if (is_null($text)) {
-                $this->Message->text = "$this->Test passed for the Calendar {$this->getCalendarName()} for the year {$this->dataToTest->settings->year}";
+                $this->Message->text = "$this->Test passed for the Calendar {$this->getCalendarName()} for the year {$year}";
             } else {
-                $this->Message->text = "$this->Test passed for the Calendar {$this->getCalendarName()} for the year {$this->dataToTest->settings->year}: " . $text;
+                $this->Message->text = "$this->Test passed for the Calendar {$this->getCalendarName()} for the year {$year}: " . $text;
             }
         } else {
             $this->Message->text = $text;
@@ -421,6 +468,16 @@ class LitTestRunner
                 $this->Message->jsonData = $this->dataToTest;
             }
         }
+
+        // Structured fields follow the whole legacy block, `jsonData` included, so a v1 frame's keys are
+        // in the order they have always been in and only these three are new.
+        $this->Message->target = (object) [
+            'id'       => $this->Test ?? '',
+            'calendar' => $this->targetCalendarId(),
+            'year'     => $year
+        ];
+        $this->Message->step   = Step::VALIDATES->value;
+        $this->Message->status = $status->value;
     }
 
     /**

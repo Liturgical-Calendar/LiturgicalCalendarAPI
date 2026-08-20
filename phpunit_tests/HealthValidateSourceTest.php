@@ -149,17 +149,23 @@ final class HealthValidateSourceTest extends TestCase
      * this class asserts is different: that a check emits one frame per *published* step, in step
      * order, addressed by the fragment derived from its id.
      *
-     * The table is keyed by {@see FrameFamily} because the projection is not one-to-one: a unit test
-     * publishes `validates` too but addresses `test-valid` rather than `schema-valid`. A source-data
-     * check is a `CHECK`-family frame, so that is the sub-table read here; the test-run grammar is
-     * pinned by literals in {@see HealthFrameProjectionTest} like every other part of the projection.
+     * The table lives on {@see FrameFamily} — the one owner of the projection, reachable from both
+     * `Health` and `LitTestRunner` — and is keyed by family because the projection is not one-to-one: a
+     * unit test publishes `validates` too but addresses `test-valid` rather than `schema-valid`. A
+     * source-data check is a `CHECK`-family frame, so that is the sub-table read here; the test-run
+     * grammar is pinned by literals in {@see HealthFrameProjectionTest} like every other part of it.
+     *
+     * The table is read rather than `frameClasses()` called: this class still composes its own expected
+     * `.<fragment>.<step>`, so what it asserts stays "one frame per published step, in step order,
+     * addressed by the fragment derived from the id" and does not quietly become a restatement of the
+     * production composer.
      *
      * @return array<string, string>
      */
     private static function frameClassForStep(): array
     {
         /** @var array<string, array<string, string>> $map */
-        $map = ( new \ReflectionClassConstant(Health::class, 'FRAME_CLASS_FOR_STEP') )->getValue();
+        $map = ( new \ReflectionClassConstant(FrameFamily::class, 'CLASS_FOR_STEP') )->getValue();
 
         return $map[FrameFamily::CHECK->value];
     }

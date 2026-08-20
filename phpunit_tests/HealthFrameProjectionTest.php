@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests;
 
 use LiturgicalCalendar\Api\Enum\FrameFamily;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\Status;
 use LiturgicalCalendar\Api\Enum\Step;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Api\Test\LitTestRunner;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -23,7 +25,7 @@ use Ratchet\ConnectionInterface;
  * knowing Bootstrap existed. Every frame now carries `target`, `step` and `status`, and `type` and
  * `classes` are *derived* from them rather than written out at each call site.
  *
- * **Every expectation here is a literal.** Deriving them from `Health::FRAME_CLASS_FOR_STEP` — the
+ * **Every expectation here is a literal.** Deriving them from `FrameFamily::CLASS_FOR_STEP` — the
  * very table under test — is how #806 section B produced four tests that could not fail: both sides
  * of the assertion read one production value, so any change to it changed the expectation with it.
  * The literals below are the only thing pinning the projection, which is why the other suites are
@@ -271,6 +273,69 @@ final class HealthFrameProjectionTest extends TestCase
     }
 
     /**
+     * The two emitters of a test-run frame agree, because there is only one grammar and one owner of
+     * it. `Health::sendTestResult()` speaks for the two ways a run fails before the assertion is
+     * reached; `LitTestRunner` speaks for the run that actually happened. A client that cannot tell
+     * which produced a frame is exactly the point.
+     *
+     * This is the assertion that would have caught the duplication #806's review found: while
+     * `LitTestRunner` held its own copy of `".$test.year-$year.test-valid"`, both sides passed every
+     * test they had and nothing compared them.
+     */
+    public function testBothEmittersOfATestRunFrameAddressItIdentically(): void
+    {
+        Router::getApiPaths();
+
+        $conn = self::stubConnection();
+        $this->invoke(
+            $this->newHealth(),
+            'sendTestResult',
+            [$conn, 'MaryMotherChurchTest', 'US', 2019, Status::FAIL, 'the calendar was not retrieved', null, null]
+        );
+        $fromHealth = json_decode($conn->sent[0]);
+
+        $data                              = (object) [
+            'settings' => (object) ['year' => 2019],
+            'litcal'   => [(object) ['event_key' => 'MaryMotherChurch', 'date' => '2019-06-11T00:00:00+00:00']]
+        ];
+        $data->settings->national_calendar = 'US';
+        $runner                            = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
+        $runner->runTest();
+        $fromRunner = $runner->getMessage();
+
+        self::assertSame('.MaryMotherChurchTest.year-2019.test-valid', $fromHealth->classes);
+        self::assertSame($fromHealth->classes, $fromRunner->classes, 'one grammar, one owner, one address');
+        self::assertEquals($fromHealth->target, $fromRunner->target, 'and one target shape for the same run');
+        self::assertSame($fromHealth->step, $fromRunner->step);
+        self::assertSame($fromHealth->status, $fromRunner->status);
+    }
+
+    /**
+     * An empty qualifier is treated as absent rather than emitted as an empty segment: `.frag..step`
+     * is a selector that matches nothing, which is the failure this projection exists to prevent. The
+     * legacy code had the mirror of this hazard and no caller could produce it either, so this closes
+     * a hole rather than fixing a regression — but the composer is now the only place that could ever
+     * close it.
+     */
+    public function testAnEmptyQualifierIsTreatedAsAbsentRatherThanEmittedAsAnEmptySegment(): void
+    {
+        $conn = self::stubConnection();
+        $this->invoke(
+            $this->newHealth(),
+            'sendStepResult',
+            [$conn, 'temporale-roman', null, Step::EXISTS, Status::PASS, 'text', null, null, '']
+        );
+        $this->invoke(
+            $this->newHealth(),
+            'sendStepResult',
+            [$conn, 'AllSaintsUSA', null, Step::VALIDATES, Status::PASS, 'text', null, null, '', FrameFamily::TEST_RUN]
+        );
+
+        self::assertSame('.temporale-roman.file-exists', json_decode($conn->sent[0])->classes);
+        self::assertSame('.AllSaintsUSA.test-valid', json_decode($conn->sent[1])->classes);
+    }
+
+    /**
      * `responsetype` is legacy, so it keeps its legacy position: the four properties a decode-failure
      * frame has always led with, in the order it has always led with them, before any structured
      * field. Assigning it anywhere else would still decode to the same object, and would still be a
@@ -410,9 +475,9 @@ final class HealthFrameProjectionTest extends TestCase
      * (#821), so reaching this method with it is a programming error and says so.
      *
      * The refusal is general, not a `COMPLETE` special case: any step missing from
-     * `FRAME_CLASS_FOR_STEP` is refused the same way, so a case added later cannot quietly ship an
+     * `FrameFamily::CLASS_FOR_STEP` is refused the same way, so a case added later cannot quietly ship an
      * unmatchable `.<fragment>.` — which PHPStan would not catch, the const being typed
-     * `array<string, string>` rather than as a shape.
+     * `array<string, array<string, string>>` rather than as a shape.
      */
     public function testTheTerminalStepIsRefusedBecauseItHasNoLegacyClass(): void
     {

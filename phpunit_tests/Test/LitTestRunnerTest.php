@@ -324,4 +324,144 @@ final class LitTestRunnerTest extends TestCase
         $this->assertStringNotContainsString('could not read Test instructions', $msg->text);
         $this->assertObjectNotHasProperty('jsonData', $msg, 'Setup errors should not carry the full calendar payload');
     }
+
+    // ------------------------------------------------------- the structured half of the frame (#806)
+
+    /**
+     * The frame for a test that actually ran says what it is about structurally, exactly as the two
+     * failure frames `Health::sendTestResult()` emits do — and its class is composed by the one
+     * composer in the repository rather than by a second copy of the grammar living here.
+     *
+     * The class is a literal: nothing else in any suite would notice if the year segment moved to the
+     * other side of the step, and `.MaryMotherChurchTest.test-valid.year-2019` matches zero cards while
+     * looking perfectly plausible.
+     */
+    public function testARunFrameCarriesTargetStepAndStatus(): void
+    {
+        $data                              = $this->calendarPayload(2019, [
+            (object) ['event_key' => 'MaryMotherChurch', 'date' => '2019-06-10T00:00:00+00:00'],
+        ]);
+        $data->settings->national_calendar = 'US';
+
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
+        $runner->runTest();
+
+        $msg = $runner->getMessage();
+        $this->assertSame('.MaryMotherChurchTest.year-2019.test-valid', $msg->classes);
+        $this->assertEquals(
+            (object) ['id' => 'MaryMotherChurchTest', 'calendar' => 'US', 'year' => 2019],
+            $msg->target,
+            'a test run is a test, a calendar and a year; none of the three identifies it alone'
+        );
+        $this->assertSame('validates', $msg->step, 'one named outcome, published as the same word a schema check uses');
+        $this->assertSame('pass', $msg->status);
+    }
+
+    /**
+     * `.test-valid` addresses the validity box; it does not claim an outcome, and the client colours
+     * that box by `status`. So a pass and a fail are addressed identically and differ in `status` —
+     * which is why the class is right as it is, and why renaming it belongs to legacy removal.
+     */
+    public function testTheValidityBoxIsAddressedTheSameWayForAPassAndAFail(): void
+    {
+        $passing = $this->calendarPayload(2019, [
+            (object) ['event_key' => 'MaryMotherChurch', 'date' => '2019-06-10T00:00:00+00:00'],
+        ]);
+        $failing = $this->calendarPayload(2019, [
+            (object) ['event_key' => 'MaryMotherChurch', 'date' => '2019-06-11T00:00:00+00:00'],
+        ]);
+
+        $passed = new LitTestRunner('MaryMotherChurchTest', $passing, Rite::ROMAN);
+        $passed->runTest();
+        $failed = new LitTestRunner('MaryMotherChurchTest', $failing, Rite::ROMAN);
+        $failed->runTest();
+
+        $this->assertSame('.MaryMotherChurchTest.year-2019.test-valid', $passed->getMessage()->classes);
+        $this->assertSame(
+            $passed->getMessage()->classes,
+            $failed->getMessage()->classes,
+            'the address of the box is the same either way'
+        );
+        $this->assertSame(['success', 'pass'], [$passed->getMessage()->type, $passed->getMessage()->status]);
+        $this->assertSame(['error', 'fail'], [$failed->getMessage()->type, $failed->getMessage()->status]);
+    }
+
+    /**
+     * The legacy half keeps its own order, which is **not** the order a `Health` frame uses: `classes`
+     * comes before `text` here, and there is a `test` property no `Health` frame has. The structured
+     * fields are appended after all of it, `jsonData` included, so a v1 client reading this frame sees
+     * exactly the frame it has always seen.
+     */
+    public function testTheLegacyKeysKeepTheirOwnOrderAndTheStructuredOnesFollow(): void
+    {
+        $data   = $this->calendarPayload(2019, [
+            (object) ['event_key' => 'MaryMotherChurch', 'date' => '2019-06-11T00:00:00+00:00'],
+        ]);
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
+        $runner->runTest();
+
+        $keys = array_keys((array) $runner->getMessage());
+        $this->assertSame(
+            ['type', 'classes', 'test', 'text', 'jsonData', 'target', 'step', 'status'],
+            $keys,
+            'the legacy block comes first, in the order it has always had, and jsonData stays inside it'
+        );
+    }
+
+    /**
+     * A rite-level calendar names no nation and no diocese, so the target is identified by its rite —
+     * which is what `Health` passes as the calendar id for a `ritecalendar`, so a run reports the same
+     * target whichever of the two emitters produces the frame.
+     */
+    public function testARiteLevelRunIsTargetedByItsRite(): void
+    {
+        $data                 = $this->calendarPayload(2019, [
+            (object) ['event_key' => 'MaryMotherChurch', 'date' => '2019-06-10T00:00:00+00:00'],
+        ]);
+        $data->settings->rite = 'roman';
+
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
+        $runner->runTest();
+
+        $this->assertSame('roman', $runner->getMessage()->target->calendar);
+    }
+
+    /**
+     * A diocesan run is targeted by the diocese, not by the nation and not by the prose name the text
+     * uses. Pinned separately from the text assertion above because the two are different vocabularies
+     * for the same fact and only one of them is machine-readable.
+     */
+    public function testADiocesanRunIsTargetedByItsDiocese(): void
+    {
+        $data                              = $this->calendarPayload(2019, [
+            (object) ['event_key' => 'MaryMotherChurch', 'date' => '2019-06-10T00:00:00+00:00'],
+        ]);
+        $data->settings->national_calendar = 'NL';
+        $data->settings->diocesan_calendar = 'rotter_nl';
+
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
+        $runner->runTest();
+
+        $this->assertSame('rotter_nl', $runner->getMessage()->target->calendar);
+    }
+
+    /**
+     * A setup-time error never reached an assertion, but it is still a frame about a test run and
+     * carries the same structured fields — `status: fail`, and a target naming what was being run.
+     */
+    public function testASetupErrorIsStillAStructuredTestRunFrame(): void
+    {
+        $data   = $this->calendarPayload(2099, [
+            (object) ['event_key' => 'MaryMotherChurch', 'date' => '2099-05-25T00:00:00+00:00'],
+        ]);
+        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
+        $runner->runTest();
+
+        $msg = $runner->getMessage();
+        $this->assertSame('.MaryMotherChurchTest.year-2099.test-valid', $msg->classes);
+        $this->assertSame('fail', $msg->status);
+        $this->assertSame('validates', $msg->step);
+        $this->assertSame('MaryMotherChurchTest', $msg->target->id);
+        $this->assertSame(2099, $msg->target->year);
+    }
 }
