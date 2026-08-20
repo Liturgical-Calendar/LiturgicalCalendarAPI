@@ -14,12 +14,18 @@ use Ratchet\ConnectionInterface;
  * `Health::handleValidationDataError()` — the three frames an unreadable source emits.
  *
  * These three texts are long, and #806 moved every one of them from an inline `$message->text`
- * assignment into a `sendStepResult()` call. Nothing in CI reached them: the arm runs only when the
- * read *rejects*, and `react/filesystem`'s Fallback adapter resolves a missing file with zero bytes
- * instead (see issue #822), so every message-driven path lands in `processValidationData()` and
- * reports the file as existing. Identity was originally established by a throwaway driver diffing
+ * assignment into a `sendStepResult()` call. Nothing in CI reached them at the time: the arm runs
+ * only when the read *rejects*, and `react/filesystem`'s Fallback adapter resolves a missing file
+ * with zero bytes instead, so every message-driven path landed in `processValidationData()` and
+ * reported the file as existing. Identity was originally established by a throwaway driver diffing
  * the frames against the pre-change revision — good evidence, and evidence that stopped existing
  * the moment the driver was deleted. This is that check, kept.
+ *
+ * #822 has since made the arm reachable from a message: the read stats before it reads, so an absent
+ * file rejects and lands here. That is asserted end-to-end in {@see HealthSourceFileFailureArmsTest},
+ * which is a different question — *which* emitter a request reaches. This file still owns *what* this
+ * emitter says, driving it directly, because a routing change must not be able to silently take the
+ * texts with it.
  *
  * The expectations are literals, character for character. A paraphrase of any of the three — even
  * one that reads better — is a change to what a shipped client displays, and must fail here.
