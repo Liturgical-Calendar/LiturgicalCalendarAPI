@@ -59,11 +59,16 @@ business.
 
 ## The envelope
 
-Every response keeps `type`, `text` and `classes`, and **gains** structured fields. Existing clients ignore unknown
-JSON keys; a v2 client ignores the legacy three. No negotiation, no gating of the *fields* — every frame carries
-them, to every client, whether or not it asked — and no second response builder: the same additive approach that
-carried sections A, B and H. The one thing that *is* gated is the new terminal frame, and only because it changes
-the frame *stream* rather than a frame's contents; see [The terminal frame](#the-terminal-frame).
+Every **step-result** response keeps `type`, `text` and `classes`, and **gains** structured fields. Existing clients
+ignore unknown JSON keys; a v2 client ignores the legacy three. No negotiation, no gating of the *fields* — every
+frame carries them, to every client, whether or not it asked — and no second response builder: the same additive
+approach that carried sections A, B and H.
+
+Two things sit outside that universal claim, both of them the terminal frame's doing and both deliberate. It is the
+one frame that is **gated**, on `requestId`, because it changes the frame *stream* rather than a frame's contents.
+And it is the one frame that does not carry the full legacy trio: it has `type` and `text` but **no `classes`**,
+because there is no legacy class for a step the legacy protocol never had. See
+[The terminal frame](#the-terminal-frame) for both.
 
 ```jsonc
 { "type": "error",                            // legacy projection of `status`
@@ -349,8 +354,9 @@ upper bound and stops mattering for phase completion.
 
 ### A known limit: a throw inside a fulfil handler skips `complete` (#823)
 
-The guarantee above is "every path that starts work terminates." It has one hole, and it is honest to state it next
-to the guarantee rather than let a reader discover it independently.
+The guarantee above is "every path that starts work terminates." It has two known holes — the fulfil-handler shape
+this subsection is named for, and a second, unrelated one recorded at the end of it — and it is honest to state them
+next to the guarantee rather than let a reader discover them independently.
 
 **The identifying shape:** `sendComplete()` is the last statement of a promise's `onFulfilled` handler, paired with
 a sibling `onRejected` that never runs to cover it. If anything *above* that last statement throws, `sendComplete()`

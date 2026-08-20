@@ -1,5 +1,12 @@
 # Structured Responses Implementation Plan
 
+**Historical record — not the protocol reference.** This plan describes the design *as scoped*, before it was built.
+Several details changed during implementation: the class table shipped as `FrameFamily::CLASS_FOR_STEP` rather than
+`Health::FRAME_CLASS_FOR_STEP`, `sendStepResult()` takes a `?\stdClass $target` rather than a `?string $targetId`, and
+the terminal frame ended up gated on `requestId`. The task bodies below are left as written on purpose — the gap
+between what was planned and what shipped is the useful part of keeping them. For the contract as shipped, read
+`docs/superpowers/specs/2026-08-20-structured-responses-design.md`, which is authoritative.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or
 > superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 

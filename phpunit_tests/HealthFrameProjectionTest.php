@@ -380,10 +380,18 @@ final class HealthFrameProjectionTest extends TestCase
     {
         $xml = '<a><b></a>';
 
-        libxml_use_internal_errors(true);
-        ( new \DOMDocument() )->loadXML($xml);
-        $errors = libxml_get_errors();
-        libxml_clear_errors();
+        // Restored in a `finally`: libxml's error handling is process-global, so leaving it flipped
+        // would silently change how every later test in the process sees malformed XML.
+        $previousXmlErrorHandling = libxml_use_internal_errors(true);
+
+        try {
+            ( new \DOMDocument() )->loadXML($xml);
+            $errors = libxml_get_errors();
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($previousXmlErrorHandling);
+        }
+
         self::assertNotEmpty($errors, 'the fixture must actually produce libxml errors');
 
         $list = ( new \ReflectionMethod(Health::class, 'retrieveXmlErrors') )->invoke(null, $errors, explode("\n", $xml));
@@ -443,13 +451,19 @@ final class HealthFrameProjectionTest extends TestCase
             'sourceFile' => 'jsondata/x.json'
         ];
 
+        // The buffer is closed in a `finally`: an `ob_start()` left open by a throw here does not fail
+        // this test, it fails an unrelated later one in a way that looks nothing like its cause.
         ob_start();
-        $this->invoke(
-            $this->newHealth(),
-            'processValidationData',
-            ['{"litcal":"nope"}', $conn, $validation, 'jsondata/x.json', $schema, 'proprium-de-tempore', 'run-token-4', null]
-        );
-        ob_end_clean();
+
+        try {
+            $this->invoke(
+                $this->newHealth(),
+                'processValidationData',
+                ['{"litcal":"nope"}', $conn, $validation, 'jsondata/x.json', $schema, 'proprium-de-tempore', 'run-token-4', null]
+            );
+        } finally {
+            ob_end_clean();
+        }
 
         self::assertCount(3, $conn->sent);
         $passed = json_decode($conn->sent[0], true);
