@@ -573,4 +573,59 @@ final class HealthSchemaCategoryTest extends TestCase
             self::assertNull(self::retrieveSchemaForCategory('sourceDataCheck', 'not-a-known-slug'));
         });
     }
+
+    /**
+     * The static half of the inventory keeps resolving even when the enumerating half is broken.
+     *
+     * The two halves fail independently: `explicitItems()` and `derivedRomanSanctorale()` build their
+     * paths from the `RomanMissal` and `JsonData` registries and never call
+     * `CalendarMetadataProvider`, so a malformed calendar file cannot have broken them. Falling all
+     * the way through to the route arms would throw away a resolution that is still perfectly good —
+     * and the missal propriums, the temporale and the decrees are the targets most often checked.
+     *
+     * The contrast is the point of this test, so both directions are asserted: the static targets
+     * still resolve, the per-calendar ones do not. A test that only asserted the first half would
+     * pass just as well against a fallback that had quietly reintroduced the whole inventory.
+     */
+    public function testABrokenInventoryStillResolvesStaticSourceData(): void
+    {
+        $ambrosianTemporale = JsonData::AMBROSIAN_TEMPORALE_FILE->value;
+        $romanSanctorale    = JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json';
+        $nationalCalendar   = strtr(JsonData::NATIONAL_CALENDAR_FILE->value, ['{nation}' => 'US']);
+
+        // Sanity: with a healthy inventory, all three resolve — so the nulls below are a degradation
+        // of something that worked, not an input that never resolved in the first place.
+        self::assertSame(LitSchema::PROPRIUMDETEMPORE->path(), self::retrieveSchemaForCategory('universalcalendar', $ambrosianTemporale));
+        self::assertSame(LitSchema::PROPRIUMDESANCTIS->path(), self::retrieveSchemaForCategory('universalcalendar', $romanSanctorale));
+        self::assertSame(LitSchema::NATIONAL->path(), self::retrieveSchemaForCategory('universalcalendar', $nationalCalendar));
+        self::assertSame(LitSchema::NATIONAL->path(), self::retrieveSchemaForCategory('sourceDataCheck', 'nation:roman:US'));
+
+        self::withBrokenInventory(static function () use ($ambrosianTemporale, $romanSanctorale, $nationalCalendar): void {
+            self::assertSame(
+                LitSchema::PROPRIUMDETEMPORE->path(),
+                self::retrieveSchemaForCategory('universalcalendar', $ambrosianTemporale),
+                'a static source path stopped resolving because an unrelated calendar file was malformed'
+            );
+            self::assertSame(
+                LitSchema::PROPRIUMDESANCTIS->path(),
+                self::retrieveSchemaForCategory('universalcalendar', $romanSanctorale)
+            );
+
+            // Inventory ids resolve through the same fallback, which is what plan 2 will rely on once
+            // clients send ids instead of slugs: sanctorale:roman:US_2011 matches no regex arm.
+            self::assertSame(
+                LitSchema::PROPRIUMDESANCTIS->path(),
+                self::retrieveSchemaForCategory('sourceDataCheck', 'sanctorale:roman:US_2011')
+            );
+
+            // And the other half of the contrast: per-calendar targets are genuinely unavailable, so
+            // they degrade to null rather than being resolved by a fallback that reads the same data
+            // that just failed.
+            self::assertNull(
+                self::retrieveSchemaForCategory('universalcalendar', $nationalCalendar),
+                'a per-calendar path resolved while the calendar index was broken — the fallback is not static-only'
+            );
+            self::assertNull(self::retrieveSchemaForCategory('sourceDataCheck', 'nation:roman:US'));
+        });
+    }
 }

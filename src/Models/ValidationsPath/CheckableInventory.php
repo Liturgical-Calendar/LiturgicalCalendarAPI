@@ -78,8 +78,7 @@ final class CheckableInventory
     {
         if (null === self::$items) {
             self::$items = array_merge(
-                self::derivedRomanSanctorale(),
-                self::explicitItems(),
+                self::staticItems(),
                 self::nationalCalendarItems(),
                 self::widerRegionItems(),
                 self::diocesanCalendarItems(),
@@ -90,9 +89,46 @@ final class CheckableInventory
         return self::$items;
     }
 
+    /**
+     * The half of the inventory that does not read calendar source data.
+     *
+     * `derivedRomanSanctorale()` and `explicitItems()` build their paths from the `RomanMissal` and
+     * `JsonData` registries, both in-memory: neither calls {@see self::metadata()}, so neither can
+     * fail for the reason the enumerating producers can. That is what makes this half usable as a
+     * fallback when the full lookup throws — see {@see self::staticByPath()}.
+     *
+     * `testDefinitionItems()` is deliberately NOT part of this. It does not depend on
+     * `CalendarMetadataProvider` either, but it globs, and a failed glob raises here by design; a
+     * fallback that can itself throw is not a fallback.
+     *
+     * Not memoized: these are registry lookups and string joins with no I/O, and `all()` memoizes
+     * the merged list anyway.
+     *
+     * @return list<CheckableItem>
+     */
+    private static function staticItems(): array
+    {
+        return array_merge(
+            self::derivedRomanSanctorale(),
+            self::explicitItems()
+        );
+    }
+
     public static function byId(string $id): ?CheckableItem
     {
         return array_find(self::all(), static fn (CheckableItem $i): bool => $i->id === $id);
+    }
+
+    /**
+     * As {@see self::byId()}, but over the static half alone.
+     *
+     * For callers that must still answer something when the full inventory is unavailable. It
+     * resolves strictly fewer ids, never different ones: these items are present in `all()` too,
+     * identical, so a hit here is a hit there.
+     */
+    public static function staticById(string $id): ?CheckableItem
+    {
+        return array_find(self::staticItems(), static fn (CheckableItem $i): bool => $i->id === $id);
     }
 
     /**
@@ -102,13 +138,30 @@ final class CheckableInventory
      */
     public static function byPath(string $path): ?CheckableItem
     {
+        return self::matchPath(self::all(), $path);
+    }
+
+    /**
+     * As {@see self::byPath()}, but over the static half alone — the same narrowing, for the same
+     * reason, as {@see self::staticById()}.
+     */
+    public static function staticByPath(string $path): ?CheckableItem
+    {
+        return self::matchPath(self::staticItems(), $path);
+    }
+
+    /**
+     * @param list<CheckableItem> $items
+     */
+    private static function matchPath(array $items, string $path): ?CheckableItem
+    {
         $needle = str_starts_with($path, Router::$apiFilePath)
             ? $path
             : Router::$apiFilePath . ltrim($path, '/');
         $needle = rtrim($needle, '/');
 
         return array_find(
-            self::all(),
+            $items,
             static fn (CheckableItem $i): bool => rtrim($i->path, '/') === $needle
         );
     }
