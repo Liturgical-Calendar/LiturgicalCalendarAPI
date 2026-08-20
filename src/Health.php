@@ -25,6 +25,7 @@ use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
+use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableItem;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use Symfony\Component\Yaml\Yaml;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
@@ -2058,6 +2059,29 @@ class Health implements MessageComponentInterface
     }
 
     /**
+     * A schema path from the static half of the inventory, or null — never an exception.
+     *
+     * Used only from the catch blocks that contain a failed inventory lookup. Those callers have
+     * already lost their primary resolution and are choosing to degrade rather than propagate, so a
+     * fallback that could itself throw would defeat the containment it exists to provide. Anything
+     * going wrong here therefore yields null, and the caller falls through to its own arms.
+     *
+     * The static half is separable precisely because it never touches `CalendarMetadataProvider`
+     * — see `CheckableInventory::staticItems()`, which also explains why test definitions are left
+     * out of it.
+     *
+     * @param \Closure(): ?CheckableItem $lookup
+     */
+    private static function staticInventorySchema(\Closure $lookup): ?string
+    {
+        try {
+            return $lookup()?->schema->path();
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    /**
      * Mapping of data file paths to the LitSchema constants that their JSON data should validate against.
      * The paths are relative to the root of the project. The LitSchema constants are used to determine
      * which schema to use when validating the JSON data.
@@ -2071,9 +2095,34 @@ class Health implements MessageComponentInterface
         // in play: $dataFile here is the unprefixed repo-relative form (matching JsonData::*->value),
         // while the inventory stores absolute paths prefixed with Router::$apiFilePath. No
         // conversion is needed at this call site.
-        $item = CheckableInventory::byPath($dataFile);
-        if (null !== $item) {
-            return $item->schema->path();
+        try {
+            $item = CheckableInventory::byPath($dataFile);
+            if (null !== $item) {
+                return $item->schema->path();
+            }
+        } catch (\Throwable) {
+            // The inventory does not merely index folders: it enumerates per-calendar source data via
+            // CalendarMetadataProvider::create(), which reads and JSON-parses every national and
+            // diocesan calendar file. One malformed or missing file makes the whole lookup throw.
+            //
+            // Health is a long-running process serving every client, so letting that propagate would
+            // take out schema resolution for every other check — including the Roman temporale, which
+            // has nothing to do with the broken file. The detector would fail on exactly what it
+            // exists to detect.
+            //
+            // Retry against the static half, which is exactly the part that cannot have caused this:
+            // the missal propriums, the temporale, the decrees and their i18n folders, all built from
+            // in-memory registries. Those are also the paths most often checked, so this turns the
+            // common degradation back into a real answer instead of a null. Only per-calendar targets
+            // are left to fall through to the arms below. GET /validations still reports the 503
+            // loudly, which is where that failure belongs.
+            $fallback = self::staticInventorySchema(
+                static fn (): ?CheckableItem => CheckableInventory::staticByPath($dataFile)
+            );
+
+            if (null !== $fallback) {
+                return $fallback;
+            }
         }
 
         // The rite segment is optional and its absence means the default rite, so the
@@ -2273,9 +2322,28 @@ class Health implements MessageComponentInterface
                     'proprium-de-tempore'         => 'temporale:roman',
                     'proprium-de-tempore-i18n'    => 'temporale:roman:i18n'
                 ];
-                $item           = CheckableInventory::byId($legacySlugToId[$dataPath] ?? $dataPath);
-                if (null !== $item) {
-                    return $item->schema->path();
+                try {
+                    $item = CheckableInventory::byId($legacySlugToId[$dataPath] ?? $dataPath);
+                    if (null !== $item) {
+                        return $item->schema->path();
+                    }
+                } catch (\Throwable) {
+                    // Same containment, and the same static-half retry, as in getPathToSchemaFile():
+                    // the inventory reads and parses all calendar source data, so one malformed file
+                    // must not take out schema resolution for every other check in a process that
+                    // stays up. The retry matters more once clients send inventory ids rather than
+                    // these slugs (UnitTestInterface#42): sanctorale:roman:US_2011 matches none of the
+                    // patterns below, while the slug it replaces does. Until then the regex arms
+                    // resolve national-calendar-XX, diocesan-calendar-…, wider-region-…, tests-… and
+                    // the proprium-de-* slugs generically, so the fall-through is real behaviour too,
+                    // not a stub.
+                    $fallback = self::staticInventorySchema(
+                        static fn (): ?CheckableItem => CheckableInventory::staticById($legacySlugToId[$dataPath] ?? $dataPath)
+                    );
+
+                    if (null !== $fallback) {
+                        return $fallback;
+                    }
                 }
 
                 if (preg_match('/-i18n$/', $dataPath)) {

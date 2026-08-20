@@ -10,6 +10,7 @@ use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableItem;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Api\Services\ResourceExistenceChecker;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -26,10 +27,23 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(CheckableItem::class)]
 final class CheckableInventoryTest extends TestCase
 {
+    private static string $savedApiPath = '';
+
     public static function setUpBeforeClass(): void
     {
         // JsonData cases build filesystem paths from this prefix.
         Router::$apiFilePath = dirname(__DIR__, 3) . DIRECTORY_SEPARATOR;
+
+        // CalendarMetadataProvider::create() (pulled in via CheckableInventory::nationalCalendarItems()
+        // and ::widerRegionItems()) reads Router::$apiPath while building each wider region's api_path.
+        // isset() is false for typed-uninitialised properties.
+        self::$savedApiPath = isset(Router::$apiPath) ? Router::$apiPath : '';
+        Router::$apiPath    = '';
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        Router::$apiPath = self::$savedApiPath;
     }
 
     /**
@@ -76,15 +90,24 @@ final class CheckableInventoryTest extends TestCase
         self::assertSame(array_unique($ids), $ids, 'inventory ids must be unique');
     }
 
-    public function testItHoldsNineFilesAndNineFolders(): void
+    public function testEveryItemIsEitherAFileOrAFolderAndFoldersAreI18n(): void
     {
-        $kinds = array_count_values(array_map(
-            static fn (CheckableItem $i): string => $i->kind,
-            CheckableInventory::all()
-        ));
+        $files   = 0;
+        $folders = 0;
+        foreach (CheckableInventory::all() as $item) {
+            if ('folder' === $item->kind) {
+                ++$folders;
+                self::assertStringEndsWith(':i18n', $item->id, "folder item {$item->id} is not an i18n folder");
+                self::assertSame(LitSchema::I18N, $item->schema, "folder item {$item->id} must validate as i18n");
+            } else {
+                ++$files;
+                self::assertStringEndsNotWith(':i18n', $item->id, "file item {$item->id} looks like an i18n folder");
+            }
+        }
 
-        self::assertSame(9, $kinds['file']);
-        self::assertSame(9, $kinds['folder']);
+        // The static half alone contributes nine of each; enumeration only adds.
+        self::assertGreaterThanOrEqual(9, $files);
+        self::assertGreaterThanOrEqual(9, $folders);
     }
 
     public function testTheFiveMissalsWithASanctoraleArePresentAndTheOthersAbsent(): void
@@ -144,7 +167,15 @@ final class CheckableInventoryTest extends TestCase
         );
         sort($ambrosian);
         self::assertSame(
-            ['sanctorale:ambrosian', 'sanctorale:ambrosian:i18n', 'temporale:ambrosian', 'temporale:ambrosian:i18n'],
+            [
+                'sanctorale:ambrosian',
+                'sanctorale:ambrosian:i18n',
+                'temporale:ambrosian',
+                'temporale:ambrosian:i18n',
+                // Test definitions are rite-scoped, not nation-scoped (region is always null), so the
+                // repository's one Ambrosian test fixture is legitimately in scope here too.
+                'test:ambrosian:StIgnatiusOfLoyolaTest',
+            ],
             $ambrosian
         );
     }
@@ -155,6 +186,159 @@ final class CheckableInventoryTest extends TestCase
             $encoded = json_encode($item, JSON_THROW_ON_ERROR);
             self::assertStringNotContainsString('jsondata', $encoded, "item {$item->id} leaked a path");
             self::assertArrayNotHasKey('path', (array) json_decode($encoded, true, 512, JSON_THROW_ON_ERROR));
+        }
+    }
+
+    public function testNationalCalendarsAreEnumeratedFromTheMetadataProvider(): void
+    {
+        $ids = array_map(static fn (CheckableItem $i): string => $i->id, CheckableInventory::all());
+
+        // Italy is a national calendar the repository ships; if it ever stops being one, this test
+        // should be updated deliberately rather than the assertion loosened.
+        self::assertContains('nation:roman:IT', $ids);
+        self::assertContains('nation:roman:IT:i18n', $ids);
+
+        $italy = CheckableInventory::byId('nation:roman:IT');
+        self::assertNotNull($italy);
+        self::assertSame('file', $italy->kind);
+        self::assertSame(Rite::ROMAN, $italy->rite);
+        self::assertSame('IT', $italy->region, 'a national calendar is specific to its own nation');
+        self::assertSame(LitSchema::NATIONAL, $italy->schema);
+        self::assertStringContainsString('/calendars/nations/IT/IT.json', $italy->path);
+
+        $italyI18n = CheckableInventory::byId('nation:roman:IT:i18n');
+        self::assertNotNull($italyI18n);
+        self::assertSame('folder', $italyI18n->kind);
+        self::assertSame(LitSchema::I18N, $italyI18n->schema);
+    }
+
+    public function testVaticanIsExcludedBecauseItHasNoSourceDataOfItsOwn(): void
+    {
+        // The Vatican is announced as a national calendar (CalendarMetadataProvider hardcodes it
+        // alongside the real per-nation entries) but is served by the General Roman Calendar and
+        // has no nations/VA/ source folder — nothing here is checkable, so it must not be listed.
+        self::assertNull(CheckableInventory::byId('nation:roman:' . ResourceExistenceChecker::VATICAN_NATIONAL_CALENDAR_ID));
+
+        $vaticanPrefix = 'nation:roman:' . ResourceExistenceChecker::VATICAN_NATIONAL_CALENDAR_ID;
+        foreach (CheckableInventory::all() as $item) {
+            self::assertStringStartsNotWith($vaticanPrefix, $item->id, "unexpected Vatican item {$item->id}");
+        }
+    }
+
+    public function testWiderRegionsAreEnumeratedAndAreNotNationScoped(): void
+    {
+        $europe = CheckableInventory::byId('widerregion:roman:Europe');
+        self::assertNotNull($europe);
+        self::assertSame('file', $europe->kind);
+        self::assertSame(LitSchema::WIDERREGION, $europe->schema);
+        self::assertNull(
+            $europe->region,
+            'a wider region spans several nations, which the scalar region cannot express; '
+                . 'clients scope it via the wider_region field on /calendars instead'
+        );
+
+        self::assertNotNull(CheckableInventory::byId('widerregion:roman:Europe:i18n'));
+    }
+
+    public function testEveryEnumeratedItemStillHidesItsPath(): void
+    {
+        foreach (CheckableInventory::all() as $item) {
+            self::assertStringNotContainsString('jsondata', json_encode($item, JSON_THROW_ON_ERROR));
+        }
+    }
+
+    public function testDiocesanCalendarsAreEnumeratedUnderTheirOwnRite(): void
+    {
+        // The Diocese of Rome's registered calendar_id is `romamo_it` (the source folder basename
+        // under jsondata/sourcedata/rite/roman/calendars/dioceses/IT/), not the id sketched in the
+        // implementation plan this test is drawn from.
+        $roman = CheckableInventory::byId('diocese:roman:romamo_it');
+        self::assertNotNull($roman, 'the Diocese of Rome should be a checkable target');
+        self::assertSame(Rite::ROMAN, $roman->rite);
+        self::assertSame('IT', $roman->region, 'a diocesan calendar is scoped to its nation');
+        self::assertSame(LitSchema::DIOCESAN, $roman->schema);
+        self::assertNotNull(CheckableInventory::byId('diocese:roman:romamo_it:i18n'));
+    }
+
+    /**
+     * The rite is not cosmetic here: an Ambrosian diocese lives under a different path template
+     * entirely, so getting it wrong produces an item pointing at a file that does not exist — which
+     * the exists step would report as a failure of the data rather than of this class.
+     */
+    public function testAnAmbrosianDioceseResolvesToTheAmbrosianTree(): void
+    {
+        $ambrosian = array_values(array_filter(
+            CheckableInventory::all(),
+            static fn (CheckableItem $i): bool => str_starts_with($i->id, 'diocese:ambrosian:')
+                && false === str_ends_with($i->id, ':i18n')
+        ));
+
+        self::assertNotEmpty($ambrosian, 'the repository ships Ambrosian dioceses; none were enumerated');
+
+        foreach ($ambrosian as $item) {
+            self::assertSame(Rite::AMBROSIAN, $item->rite);
+            self::assertStringContainsString('/rite/ambrosian/calendars/dioceses/', $item->path);
+            self::assertFileExists($item->path, "{$item->id} points at a file that does not exist");
+        }
+    }
+
+    /**
+     * A test *definition* is a source artifact: does the JSON match LitCalTest.json. That is a different
+     * thing from running the test against a computed calendar, which stays a separate action.
+     */
+    public function testTestDefinitionsAreEnumeratedPerRite(): void
+    {
+        $ids     = array_map(static fn (CheckableItem $i): string => $i->id, CheckableInventory::all());
+        $testIds = array_values(array_filter($ids, static fn (string $id): bool => str_starts_with($id, 'test:')));
+
+        self::assertNotEmpty($testIds, 'the repository ships test definitions; none were enumerated');
+
+        foreach ($testIds as $id) {
+            self::assertMatchesRegularExpression('/^test:(roman|ambrosian):[A-Za-z0-9_]+$/', $id);
+            self::assertStringEndsNotWith(':i18n', $id, 'test definitions have no translations folder');
+        }
+
+        foreach (CheckableInventory::all() as $item) {
+            if (str_starts_with($item->id, 'test:')) {
+                self::assertSame('file', $item->kind);
+                self::assertSame(LitSchema::TEST_SRC, $item->schema);
+                self::assertNull($item->region, 'a test definition is not nation-scoped');
+                self::assertFileExists($item->path, "{$item->id} points at a file that does not exist");
+            }
+        }
+    }
+
+    /**
+     * A failed `glob()` raises; it does not quietly produce an empty set of test definitions.
+     *
+     * `glob()` returns an empty array — never `false` — for a readable directory with no matches, so
+     * `false` only ever means a filesystem error. Swallowing it would make all 11 test definitions
+     * vanish from `/validations` with nothing reported anywhere: #800's silent absence, in the one
+     * producer that reads the filesystem directly rather than going through the calendar index.
+     *
+     * The error is induced through `glob()`'s real 4096-character pattern limit rather than by
+     * mocking, so what is under test is the production call itself. PHP raises a warning before
+     * returning the sentinel; it is swallowed here so the assertion is about the exception and not
+     * about PHPUnit's warning handling.
+     */
+    public function testAFailedGlobRaisesInsteadOfDroppingEveryTestDefinition(): void
+    {
+        $savedApiFilePath = Router::$apiFilePath;
+
+        // Long enough that JsonData::testsFolderFor()'s pattern exceeds glob()'s maximum length.
+        Router::$apiFilePath = DIRECTORY_SEPARATOR . str_repeat('a', 5000) . DIRECTORY_SEPARATOR;
+
+        $producer = new \ReflectionMethod(CheckableInventory::class, 'testDefinitionItems');
+        set_error_handler(static fn (): bool => true);
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessageMatches('/glob failed/');
+
+            $producer->invoke(null);
+        } finally {
+            restore_error_handler();
+            Router::$apiFilePath = $savedApiFilePath;
         }
     }
 }
