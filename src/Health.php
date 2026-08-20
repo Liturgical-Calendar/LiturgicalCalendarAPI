@@ -733,12 +733,108 @@ class Health implements MessageComponentInterface
 
         $schema = Health::retrieveSchemaForCategory($category, $pathForSchema);
 
+        // A folder check is recognised exactly as the execution phase used to recognise it, so a
+        // message carrying a non-string `sourceFolder` keeps taking the file branch as before.
+        $isFolderCheck = property_exists($validation, 'sourceFolder') && is_string($validation->sourceFolder);
+
+        // The slug re-derivation used to open the file branch of the execution phase, but it is
+        // resolution work: the seam below must receive a path that is already final, and must
+        // never re-derive one. Nothing between the two positions reads $dataPath, so the move is
+        // behaviour-preserving.
+        if (false === $isFolderCheck) {
+            $matches = null;
+            if (preg_match('/^diocesan-calendar-([a-z]{6}_[a-z]{2})$/', $pathForSchema, $matches)) {
+                $dioceseId = $matches[1];
+                try {
+                    $dioceseMetadata = $this->findDioceseMetadata($dioceseId);
+                } catch (\RuntimeException | NotFoundException $e) {
+                    $this->handleDioceseMetadataError($e, $to, $validation, $dioceseId, $runToken);
+                    return;
+                }
+                $nation      = $dioceseMetadata->nation;
+                $dioceseName = $dioceseMetadata->diocese;
+                // Rite-partitioned, exactly as the i18n-folder branch above: this is the site
+                // that actually governs a diocesan source-file check, because it reassigns
+                // $dataPath after the earlier `sourceFile` branch has run.
+                $dataPath = strtr(JsonData::diocesanCalendarFileFor($dioceseMetadata->rite)->path(), [
+                    '{nation}'       => $nation,
+                    '{diocese}'      => $dioceseId,
+                    '{diocese_name}' => $dioceseName
+                ]);
+            } elseif (preg_match('/^national-calendar-([A-Z]{2})$/', $pathForSchema, $matches)) {
+                $nation   = $matches[1];
+                $dataPath = strtr(JsonData::NATIONAL_CALENDAR_FILE->path(), [
+                    '{nation}' => $nation
+                ]);
+            }
+        }
+
+        $this->runValidationSteps(
+            $dataPath,
+            $isFolderCheck ? 'folder' : 'file',
+            $schema,
+            $validate,
+            $to,
+            $runToken,
+            $validation
+        );
+    }
+
+    /**
+     * Run the validation steps for one already-resolved target.
+     *
+     * This is the execution half of {@see Health::executeValidation()}: given a final path, a
+     * kind and a schema, it emits the `file-exists` / `json-valid` / `schema-valid` frames.
+     * Resolving that path and that schema from a client message happens before the call and
+     * never here, so a caller that already knows its target — an inventory entry, whose `kind`
+     * uses this same `file`/`folder` vocabulary — can enter directly.
+     *
+     * @param string $dataPath The final path to check: a project-relative or absolute file or folder path, or an API URL.
+     * @param 'file'|'folder' $kind Whether $dataPath names a folder of i18n files or a single file/endpoint.
+     * @param ?string $schema The schema to validate against, or null when none could be resolved.
+     * @param string $label The human label and CSS-class fragment for the result frames (what a v1 message calls `validate`).
+     * @param ConnectionInterface $to The connection to send the result frames to.
+     * @param ?string $runToken The originating run token to echo back on responses, or null to use the per-connection fallback.
+     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|null $legacyMessage
+     *        The originating v1 message, when the caller has one. It takes no part in control flow: it only keeps the
+     *        diagnostic text byte-identical to the pre-extraction output, which quotes the `sourceFolder` the client
+     *        supplied and the `category` it named — neither of which is derivable from a resolved target. A caller
+     *        without a v1 message omits it.
+     */
+    private function runValidationSteps(
+        string $dataPath,
+        string $kind,
+        ?string $schema,
+        string $label,
+        ConnectionInterface $to,
+        ?string $runToken,
+        ?\stdClass $legacyMessage = null
+    ): void {
+        $category = null !== $legacyMessage ? (string) $legacyMessage->category : 'sourceDataCheck';
+
+        // The value the schema was resolved from: the `validate` slug for a sourceDataCheck, the
+        // `sourceFile` itself for the other two categories. It appears only in the "unable to
+        // detect a schema" diagnostic.
+        $pathForSchema = ( null !== $legacyMessage && $category !== 'sourceDataCheck' && property_exists($legacyMessage, 'sourceFile') && is_string($legacyMessage->sourceFile) )
+            ? $legacyMessage->sourceFile
+            : $label;
+
+        /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $validationForMessages */
+        $validationForMessages = $legacyMessage ?? (object) [
+            'action'     => 'executeValidation',
+            'category'   => $category,
+            'validate'   => $label,
+            'sourceFile' => $dataPath
+        ];
+
         // Now that we have the correct schema to validate against,
         // we will perform the actual validation either for all files in a folder, or for a single file
-        if (property_exists($validation, 'sourceFolder') && is_string($validation->sourceFolder)) {
-            $sourceFolder = (string) $validation->sourceFolder;
-            // If the 'sourceFolder' property is set, then we are validating a folder of i18n files
-            /** @var ExecuteValidationSourceFolder $validation */
+        if ($kind === 'folder') {
+            // The folder as the client named it, which is what the messages quote; $dataPath is
+            // the folder the server resolved and actually reads.
+            $sourceFolder = ( null !== $legacyMessage && property_exists($legacyMessage, 'sourceFolder') && is_string($legacyMessage->sourceFolder) )
+                ? $legacyMessage->sourceFolder
+                : $dataPath;
             // Resolve relative paths against the project root
             if (!str_starts_with($dataPath, '/')) {
                 $dataPath = Router::$apiFilePath . $dataPath;
@@ -752,7 +848,7 @@ class Health implements MessageComponentInterface
                 foreach (['file-exists', 'json-valid', 'schema-valid'] as $step) {
                     $this->sendFolderStepResult(
                         $to,
-                        "$validate.$step",
+                        "$label.$step",
                         $missing,
                         '', // unreachable: $missing is non-empty, so the failure text is used
                         "Data folder $sourceFolder could not be checked",
@@ -790,11 +886,9 @@ class Health implements MessageComponentInterface
                 /** @var PromiseInterface<array{data: string, fromCache: bool}> $promise */
                 $promise    = $this->cachedFileGetContents($file);
                 $promises[] = $promise->then(
-                    function (array $result) use ($validation, $filename, $schema, $pathForSchema, &$jsonErrors, &$schemaErrors) {
+                    function (array $result) use ($filename, $schema, $label, $category, $pathForSchema, &$jsonErrors, &$schemaErrors) {
                         /** @var array{data: string, fromCache: bool} $result */
                         $fileData = $result['data'];
-                        $validate = (string) $validation->validate;
-                        $category = (string) $validation->category;
                         $jsonData = json_decode($fileData);
                         if (json_last_error() !== JSON_ERROR_NONE) {
                             $jsonErrors[] = "$filename: " . json_last_error_msg();
@@ -810,7 +904,7 @@ class Health implements MessageComponentInterface
                                     $schemaErrors[] = "$filename: " . $validationText;
                                 }
                             } else {
-                                $schemaErrors[] = "$filename: unable to detect a schema for {$validate} and category {$category} (path for schema: $pathForSchema)";
+                                $schemaErrors[] = "$filename: unable to detect a schema for {$label} and category {$category} (path for schema: $pathForSchema)";
                             }
                         }
                     },
@@ -827,16 +921,13 @@ class Health implements MessageComponentInterface
             $allPromises = Promise\all($promises);
 
             $allPromises->then(
-                function () use ($to, $validation, $schema, &$fileExistsErrors, &$jsonErrors, &$schemaErrors, $runToken) {
-                    $validate     = (string) $validation->validate;
-                    $sourceFolder = (string) $validation->sourceFolder;
-
+                function () use ($to, $label, $sourceFolder, $schema, &$fileExistsErrors, &$jsonErrors, &$schemaErrors, $runToken) {
                     // Exactly one frame per step, pass or fail. A folder check is a statement
                     // about the folder, so a failure names the offending files inside a single
                     // frame instead of emitting one frame each.
                     $this->sendFolderStepResult(
                         $to,
-                        "$validate.file-exists",
+                        "$label.file-exists",
                         $fileExistsErrors,
                         "The Data folder $sourceFolder exists and contains valid i18n json files",
                         "Data folder $sourceFolder",
@@ -845,7 +936,7 @@ class Health implements MessageComponentInterface
 
                     $this->sendFolderStepResult(
                         $to,
-                        "$validate.json-valid",
+                        "$label.json-valid",
                         $jsonErrors,
                         "The i18n json files in Data folder $sourceFolder were successfully decoded as JSON",
                         "The i18n json files in Data folder $sourceFolder were not all decoded as JSON",
@@ -854,64 +945,34 @@ class Health implements MessageComponentInterface
 
                     $this->sendFolderStepResult(
                         $to,
-                        "$validate.schema-valid",
+                        "$label.schema-valid",
                         $schemaErrors,
                         "The i18n json files in Data folder $sourceFolder were successfully validated against the Schema $schema",
                         "The i18n json files in Data folder $sourceFolder were not all valid against the Schema $schema",
                         $runToken
                     );
                 },
-                function (\Throwable $e) use ($validation) {
-                    echo 'Error verifying i18n folder for validation ' . json_encode($validation) . ': ' . $e->getMessage() . "\n";
+                function (\Throwable $e) use ($validationForMessages) {
+                    echo 'Error verifying i18n folder for validation ' . json_encode($validationForMessages) . ': ' . $e->getMessage() . "\n";
                 }
             );
         } else {
-            // If the 'sourceFolder' property is not set, then we are validating a single source file or API path
-            $matches = null;
-            if (preg_match('/^diocesan-calendar-([a-z]{6}_[a-z]{2})$/', $pathForSchema, $matches)) {
-                $dioceseId = $matches[1];
-                try {
-                    $dioceseMetadata = $this->findDioceseMetadata($dioceseId);
-                } catch (\RuntimeException | NotFoundException $e) {
-                    $this->handleDioceseMetadataError($e, $to, $validation, $dioceseId, $runToken);
-                    return;
-                }
-                $nation      = $dioceseMetadata->nation;
-                $dioceseName = $dioceseMetadata->diocese;
-                // Rite-partitioned, exactly as the i18n-folder branch above: this is the site
-                // that actually governs a diocesan source-file check, because it reassigns
-                // $dataPath after the earlier `sourceFile` branch has run.
-                $dataPath = strtr(JsonData::diocesanCalendarFileFor($dioceseMetadata->rite)->path(), [
-                    '{nation}'       => $nation,
-                    '{diocese}'      => $dioceseId,
-                    '{diocese_name}' => $dioceseName
-                ]);
-            } elseif (preg_match('/^national-calendar-([A-Z]{2})$/', $pathForSchema, $matches)) {
-                $nation   = $matches[1];
-                $dataPath = strtr(JsonData::NATIONAL_CALENDAR_FILE->path(), [
-                    '{nation}' => $nation
-                ]);
-            }
-
             // If we are validating an API path, we check for a 200 OK HTTP response from the API
             // rather than checking for existence of the file in the filesystem
-            $category = (string) $validation->category;
-            $validate = (string) $validation->validate;
-
             if (str_starts_with($dataPath, 'http://') || str_starts_with($dataPath, 'https://')) {
                 // $dataPath is an API path in this case
                 echo 'Retrieving data from URL ' . $dataPath . "\n";
                 /** @var PromiseInterface<array{data: string, fromCache: bool}> $httpPromise */
                 $httpPromise = $this->cachedGet($dataPath, [], 300, $to);
                 $httpPromise->then(
-                    function (array $result) use ($to, $validation, $dataPath, $schema, $pathForSchema, $runToken) {
+                    function (array $result) use ($to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken) {
                         /** @var array{data: string, fromCache: bool} $result */
                         $data = $result['data'];
                         echo 'Fetched data for ' . $dataPath . ': got ' . strlen($data) . " bytes\n";
-                        $this->processValidationData($data, $to, $validation, $dataPath, $schema, $pathForSchema, $runToken);
+                        $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken);
                     },
-                    function (\Throwable $e) use ($to, $validation, $dataPath, $runToken) {
-                        $this->handleValidationDataError($e, $to, $validation, $dataPath, $runToken);
+                    function (\Throwable $e) use ($to, $validationForMessages, $dataPath, $runToken) {
+                        $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken);
                     }
                 );
             } else {
@@ -925,14 +986,14 @@ class Health implements MessageComponentInterface
                 /** @var PromiseInterface<array{data: string, fromCache: bool}> $promise */
                 $promise = $this->cachedFileGetContents($fsPath);
                 $promise->then(
-                    function (array $result) use ($to, $validation, $dataPath, $schema, $pathForSchema, $runToken) {
+                    function (array $result) use ($to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken) {
                         /** @var array{data: string, fromCache: bool} $result */
                         $data = $result['data'];
                         echo 'Fetched data for ' . $dataPath . ': got ' . strlen($data) . " bytes\n";
-                        $this->processValidationData($data, $to, $validation, $dataPath, $schema, $pathForSchema, $runToken);
+                        $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken);
                     },
-                    function (\Throwable $e) use ($to, $validation, $dataPath, $runToken) {
-                        $this->handleValidationDataError($e, $to, $validation, $dataPath, $runToken);
+                    function (\Throwable $e) use ($to, $validationForMessages, $dataPath, $runToken) {
+                        $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken);
                     }
                 );
             }
