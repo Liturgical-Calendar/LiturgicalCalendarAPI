@@ -734,6 +734,15 @@ class Health implements MessageComponentInterface
      *        holds it — a folder check's per-file errors, a schema failure's two parts — and is never manufactured
      *        for a site that genuinely has nothing to say.
      * @param ?string $runToken The originating run token to echo back, or null to use the per-connection fallback.
+     * @param ?string $classSuffix One further class segment, without the leading dot, appended *after* the step, or
+     *        null when the address ends at the step. The calendar-validation frames are the case that needs it:
+     *        their address is `.calendar-{id}.{step}.year-{year}`, so the year sits past the step and no prefix can
+     *        express it. Callers pass segments, never selectors — the dots, the ordering and the step class are this
+     *        method's business, which is the whole point of the projection.
+     * @param ?string $responseType The `responsetype` a calendar-validation failure frame has always carried, or null
+     *        for every other frame. It belongs to the legacy half and is assigned with it, immediately after
+     *        `classes`, so a v1 frame's key order is byte-for-byte what it has always been and only the new
+     *        structured keys follow.
      */
     private function sendStepResult(
         ConnectionInterface $to,
@@ -743,7 +752,9 @@ class Health implements MessageComponentInterface
         Status $status,
         string $text,
         ?array $details = null,
-        ?string $runToken = null
+        ?string $runToken = null,
+        ?string $classSuffix = null,
+        ?string $responseType = null
     ): void {
         // Refusing an unmapped step covers every future case the way a `COMPLETE`-only guard would not:
         // PHPStan cannot catch a missing entry, because the const is typed `array<string, string>` rather
@@ -754,10 +765,13 @@ class Health implements MessageComponentInterface
         $message          = new \stdClass();
         $message->type    = Status::PASS === $status ? 'success' : 'error';
         $message->text    = $text;
-        $message->classes = '.' . $classFragment . '.' . $frameClass;
-        $message->target  = $targetId;
-        $message->step    = $step->value;
-        $message->status  = $status->value;
+        $message->classes = '.' . $classFragment . '.' . $frameClass . ( null === $classSuffix ? '' : '.' . $classSuffix );
+        if (null !== $responseType) {
+            $message->responsetype = $responseType;
+        }
+        $message->target = $targetId;
+        $message->step   = $step->value;
+        $message->status = $status->value;
         if (null !== $details && [] !== $details) {
             $message->details = $details;
         }
@@ -2068,6 +2082,94 @@ class Health implements MessageComponentInterface
     }
 
     /**
+     * Emit the result frame for one step of one calendar validation.
+     *
+     * The calendar-validation frames are addressed by `.calendar-{id}.{step}.year-{year}`, which is
+     * the only address in the health protocol with a segment *past* the step. This is the one place
+     * that knows that — the nineteen emission sites in {@see Health::validateCalendar()} name
+     * the calendar and the year as values and never see a dot. Per-call-site selector construction is
+     * the defect #820 fixed and #806 is removing; handing those sites a `"year-$year"` to interpolate
+     * would have brought it back wearing a different hat.
+     *
+     * `target` is null throughout, and deliberately: `GET /validations` publishes ids for source-data
+     * checks only, so a calendar validation has no published id to name yet. Nothing is fabricated
+     * from the class fragment here for the same reason {@see Health::sendStepResult()} refuses to.
+     *
+     * @param string       $calendar     The calendar identifier the run is checking, e.g. `US`.
+     * @param int          $year         The year being checked; rides in the class as a trailing `.year-{year}`.
+     * @param Step         $step         Which of the three steps this frame reports.
+     * @param Status       $status       The outcome.
+     * @param string       $text         The human-facing message, passed through untouched.
+     * @param ?list<string> $details     The individual failures behind a summarising `text`, or null when the site
+     *                                   genuinely has none — never manufactured, per `sendStepResult()`.
+     * @param ?string      $responseType The legacy `responsetype` the decode-failure frames carry, or null.
+     * @param ?string      $runToken     Run token to echo back.
+     */
+    private function sendCalendarStepResult(
+        ConnectionInterface $to,
+        string $calendar,
+        int $year,
+        Step $step,
+        Status $status,
+        string $text,
+        ?array $details = null,
+        ?string $responseType = null,
+        ?string $runToken = null
+    ): void {
+        $this->sendStepResult(
+            $to,
+            "calendar-$calendar",
+            null,
+            $step,
+            $status,
+            $text,
+            $details,
+            $runToken,
+            "year-$year",
+            $responseType
+        );
+    }
+
+    /**
+     * Emit the `schema-valid` failure frame for a calendar, from the object the JSON-schema
+     * validator returned.
+     *
+     * The failure text is the schema library's, quoted verbatim; the frame around it is built the
+     * same way as every other one rather than by decorating the object the validator happened to
+     * return — the same treatment {@see Health::processValidationData()} gives the identical object,
+     * and for the same reason: a frame whose shape depends on which code path produced it is a frame
+     * no client can rely on.
+     *
+     * `details` carries what the text flattens, and never invents what is not there.
+     * {@see Health::validateDataAgainstSchema()} builds that text by joining the schema's own error
+     * line to the validator's message with a newline, so splitting on newlines hands a client back
+     * the pieces instead of making it parse prose it did not build.
+     *
+     * @param \stdClass $validationResult The `type`/`text` object {@see Health::validateDataAgainstSchema()} returns on failure.
+     */
+    private function sendSchemaFailureStepResult(
+        ConnectionInterface $to,
+        string $calendar,
+        int $year,
+        \stdClass $validationResult,
+        ?string $runToken
+    ): void {
+        /** @var string $validationText */
+        $validationText = $validationResult->text;
+        $this->sendCalendarStepResult(
+            $to,
+            $calendar,
+            $year,
+            Step::VALIDATES,
+            Status::FAIL,
+            $validationText,
+            explode(PHP_EOL, $validationText),
+            null,
+            $runToken
+        );
+    }
+
+    /**
      * Validates the specified liturgical calendar for a given year and category,
      * and sends the validation results to the specified connection.
      *
@@ -2103,11 +2205,17 @@ class Health implements MessageComponentInterface
                 $fromCache = $result['fromCache'];
                 echo 'Fetched data for ' . Route::CALENDAR->path() . $req . ': got ' . strlen($data) . ' bytes' . ( $fromCache ? ' (from cache)' : '' ) . "\n";
 
-                $message          = new \stdClass();
-                $message->type    = 'success';
-                $message->text    = "The $category of $calendar for the year $year exists";
-                $message->classes = ".calendar-$calendar.file-exists.year-$year";
-                $this->sendMessage($to, $message, $runToken);
+                $this->sendCalendarStepResult(
+                    $to,
+                    $calendar,
+                    $year,
+                    Step::EXISTS,
+                    Status::PASS,
+                    "The $category of $calendar for the year $year exists",
+                    null,
+                    null,
+                    $runToken
+                );
 
                 switch ($responseType) {
                     case 'XML':
@@ -2117,44 +2225,67 @@ class Health implements MessageComponentInterface
                         $loadResult = $xml->loadXML($data);
                         //$xml = simplexml_load_string( $data );
                         if ($loadResult === false) {
-                            $message       = new \stdClass();
-                            $message->type = 'error';
-                            $errors        = libxml_get_errors();
-                            $errorString   = self::retrieveXmlErrors($errors, $xmlArr);
+                            $errors      = libxml_get_errors();
+                            $errorString = self::retrieveXmlErrors($errors, $xmlArr);
                             libxml_clear_errors();
-                            $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                            . Route::CALENDAR->path() . $req . ' as XML: ' . $errorString;
-                            $message->classes      = ".calendar-$calendar.json-valid.year-$year";
-                            $message->responsetype = $responseType;
-                            $this->sendMessage($to, $message, $runToken);
+                            $this->sendCalendarStepResult(
+                                $to,
+                                $calendar,
+                                $year,
+                                Step::PARSES,
+                                Status::FAIL,
+                                "There was an error decoding the $category of $calendar for the year $year from the URL "
+                                    . Route::CALENDAR->path() . $req . ' as XML: ' . $errorString,
+                                self::splitXmlErrors($errorString),
+                                $responseType,
+                                $runToken
+                            );
                         } else {
-                            $message          = new \stdClass();
-                            $message->type    = 'success';
-                            $message->text    = "The $category of $calendar for the year $year was successfully decoded as XML";
-                            $message->classes = ".calendar-$calendar.json-valid.year-$year";
-                            $this->sendMessage($to, $message, $runToken);
+                            $this->sendCalendarStepResult(
+                                $to,
+                                $calendar,
+                                $year,
+                                Step::PARSES,
+                                Status::PASS,
+                                "The $category of $calendar for the year $year was successfully decoded as XML",
+                                null,
+                                null,
+                                $runToken
+                            );
 
                             // Always validate against schema (even for cached responses) since this is a test endpoint
                             $validationResult = $xml->schemaValidate(JsonData::SCHEMAS_FOLDER->path() . '/LiturgicalCalendar.xsd');
                             if ($validationResult) {
-                                $message          = new \stdClass();
-                                $message->type    = 'success';
-                                $message->text    = sprintf(
-                                    "The $category of $calendar for the year $year was successfully validated against the Schema %s%s",
-                                    JsonData::SCHEMAS_FOLDER->path() . '/LiturgicalCalendar.xsd',
-                                    $fromCache ? ' (cached)' : ''
+                                $this->sendCalendarStepResult(
+                                    $to,
+                                    $calendar,
+                                    $year,
+                                    Step::VALIDATES,
+                                    Status::PASS,
+                                    sprintf(
+                                        "The $category of $calendar for the year $year was successfully validated against the Schema %s%s",
+                                        JsonData::SCHEMAS_FOLDER->path() . '/LiturgicalCalendar.xsd',
+                                        $fromCache ? ' (cached)' : ''
+                                    ),
+                                    null,
+                                    null,
+                                    $runToken
                                 );
-                                $message->classes = ".calendar-$calendar.schema-valid.year-$year";
-                                $this->sendMessage($to, $message, $runToken);
                             } else {
                                 $errors      = libxml_get_errors();
                                 $errorString = self::retrieveXmlErrors($errors, $xmlArr);
                                 libxml_clear_errors();
-                                $message          = new \stdClass();
-                                $message->type    = 'error';
-                                $message->text    = $errorString;
-                                $message->classes = ".calendar-$calendar.schema-valid.year-$year";
-                                $this->sendMessage($to, $message, $runToken);
+                                $this->sendCalendarStepResult(
+                                    $to,
+                                    $calendar,
+                                    $year,
+                                    Step::VALIDATES,
+                                    Status::FAIL,
+                                    $errorString,
+                                    self::splitXmlErrors($errorString),
+                                    null,
+                                    $runToken
+                                );
                             }
                         }
                         break;
@@ -2165,39 +2296,65 @@ class Health implements MessageComponentInterface
                             $vcalendar = json_encode($e);
                         }
                         if ($vcalendar instanceof VObject\Document) {
-                            $message          = new \stdClass();
-                            $message->type    = 'success';
-                            $message->text    = "The $category of $calendar for the year $year was successfully decoded as ICS";
-                            $message->classes = ".calendar-$calendar.json-valid.year-$year";
-                            $this->sendMessage($to, $message, $runToken);
+                            $this->sendCalendarStepResult(
+                                $to,
+                                $calendar,
+                                $year,
+                                Step::PARSES,
+                                Status::PASS,
+                                "The $category of $calendar for the year $year was successfully decoded as ICS",
+                                null,
+                                null,
+                                $runToken
+                            );
 
                             // Always validate against schema (even for cached responses) since this is a test endpoint
                             $result = $vcalendar->validate();
                             if (count($result) === 0) {
-                                $message          = new \stdClass();
-                                $message->type    = 'success';
-                                $message->text    = sprintf(
-                                    "The $category of $calendar for the year $year was successfully validated according the iCalendar Schema %s%s",
-                                    'https://tools.ietf.org/html/rfc5545',
-                                    $fromCache ? ' (cached)' : ''
+                                $this->sendCalendarStepResult(
+                                    $to,
+                                    $calendar,
+                                    $year,
+                                    Step::VALIDATES,
+                                    Status::PASS,
+                                    sprintf(
+                                        "The $category of $calendar for the year $year was successfully validated according the iCalendar Schema %s%s",
+                                        'https://tools.ietf.org/html/rfc5545',
+                                        $fromCache ? ' (cached)' : ''
+                                    ),
+                                    null,
+                                    null,
+                                    $runToken
                                 );
-                                $message->classes = ".calendar-$calendar.schema-valid.year-$year";
-                                $this->sendMessage($to, $message, $runToken);
                             } else {
-                                $message          = new \stdClass();
-                                $message->type    = 'error';
-                                $message->text    = implode('&#013;', $this->formatIcsValidationErrors($result));
-                                $message->classes = ".calendar-$calendar.schema-valid.year-$year";
-                                $this->sendMessage($to, $message, $runToken);
+                                // The per-error list is what the text is built from, so it goes out as
+                                // `details` rather than leaving a client to re-split the joined string.
+                                $icsErrors = $this->formatIcsValidationErrors($result);
+                                $this->sendCalendarStepResult(
+                                    $to,
+                                    $calendar,
+                                    $year,
+                                    Step::VALIDATES,
+                                    Status::FAIL,
+                                    implode('&#013;', $icsErrors),
+                                    $icsErrors,
+                                    null,
+                                    $runToken
+                                );
                             }
                         } else {
-                            $message               = new \stdClass();
-                            $message->type         = 'error';
-                            $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                            . Route::CALENDAR->path() . $req . ' as ICS: parsing resulted in type ' . gettype($vcalendar) . ' | ' . $vcalendar;
-                            $message->classes      = ".calendar-$calendar.json-valid.year-$year";
-                            $message->responsetype = $responseType;
-                            $this->sendMessage($to, $message, $runToken);
+                            $this->sendCalendarStepResult(
+                                $to,
+                                $calendar,
+                                $year,
+                                Step::PARSES,
+                                Status::FAIL,
+                                "There was an error decoding the $category of $calendar for the year $year from the URL "
+                                    . Route::CALENDAR->path() . $req . ' as ICS: parsing resulted in type ' . gettype($vcalendar) . ' | ' . $vcalendar,
+                                null,
+                                $responseType,
+                                $runToken
+                            );
                         }
                         break;
                     case 'YML':
@@ -2213,33 +2370,49 @@ class Health implements MessageComponentInterface
                                 throw new \Exception('YAML parsing failed: expected an object mapping, got ' . gettype($yamlData));
                             }
 
-                            $message          = new \stdClass();
-                            $message->type    = 'success';
-                            $message->text    = "The $category of $calendar for the year $year was successfully decoded as YAML";
-                            $message->classes = ".calendar-$calendar.json-valid.year-$year";
-                            $this->sendMessage($to, $message, $runToken);
+                            $this->sendCalendarStepResult(
+                                $to,
+                                $calendar,
+                                $year,
+                                Step::PARSES,
+                                Status::PASS,
+                                "The $category of $calendar for the year $year was successfully decoded as YAML",
+                                null,
+                                null,
+                                $runToken
+                            );
 
                             // Always validate against schema (even for cached responses) since this is a test endpoint
                             $validationResult = $this->validateDataAgainstSchema($yamlData, LitSchema::LITCAL->path());
                             if (gettype($validationResult) === 'boolean' && $validationResult === true) {
-                                $message          = new \stdClass();
-                                $message->type    = 'success';
-                                $cachedNote       = $fromCache ? ' (cached)' : '';
-                                $message->text    = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL->path() . $cachedNote;
-                                $message->classes = ".calendar-$calendar.schema-valid.year-$year";
-                                $this->sendMessage($to, $message, $runToken);
+                                $cachedNote = $fromCache ? ' (cached)' : '';
+                                $this->sendCalendarStepResult(
+                                    $to,
+                                    $calendar,
+                                    $year,
+                                    Step::VALIDATES,
+                                    Status::PASS,
+                                    "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL->path() . $cachedNote,
+                                    null,
+                                    null,
+                                    $runToken
+                                );
                             } elseif ($validationResult instanceof \stdClass) {
-                                $validationResult->classes = ".calendar-$calendar.schema-valid.year-$year";
-                                $this->sendMessage($to, $validationResult, $runToken);
+                                $this->sendSchemaFailureStepResult($to, $calendar, $year, $validationResult, $runToken);
                             }
                         } catch (\Throwable $e) {
-                            $message               = new \stdClass();
-                            $message->type         = 'error';
-                            $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                            . Route::CALENDAR->path() . $req . ' as YAML: ' . $e->getMessage();
-                            $message->classes      = ".calendar-$calendar.json-valid.year-$year";
-                            $message->responsetype = $responseType;
-                            $this->sendMessage($to, $message, $runToken);
+                            $this->sendCalendarStepResult(
+                                $to,
+                                $calendar,
+                                $year,
+                                Step::PARSES,
+                                Status::FAIL,
+                                "There was an error decoding the $category of $calendar for the year $year from the URL "
+                                    . Route::CALENDAR->path() . $req . ' as YAML: ' . $e->getMessage(),
+                                null,
+                                $responseType,
+                                $runToken
+                            );
                         }
                         break;
                     case 'JSON':
@@ -2248,16 +2421,22 @@ class Health implements MessageComponentInterface
                         $jsonLastError    = json_last_error();
                         $jsonLastErrorMsg = json_last_error_msg();
                         if (false === ( $jsonData instanceof \stdClass ) || $jsonLastError !== JSON_ERROR_NONE) {
-                            $message          = new \stdClass();
-                            $message->type    = 'error';
-                            $message->text    = "There was an error decoding the $category of $calendar for the year $year from the URL "
+                            $decodeErrorText = "There was an error decoding the $category of $calendar for the year $year from the URL "
                                             . Route::CALENDAR->path() . $req . ' as JSON: data was decoded to type ' . gettype($jsonData);
-                            $message->classes = ".calendar-$calendar.json-valid.year-$year";
                             if ($jsonLastError !== JSON_ERROR_NONE) {
-                                $message->text .= ' | ' . $jsonLastErrorMsg;
+                                $decodeErrorText .= ' | ' . $jsonLastErrorMsg;
                             }
-                            $message->responsetype = $responseType;
-                            $this->sendMessage($to, $message, $runToken);
+                            $this->sendCalendarStepResult(
+                                $to,
+                                $calendar,
+                                $year,
+                                Step::PARSES,
+                                Status::FAIL,
+                                $decodeErrorText,
+                                null,
+                                $responseType,
+                                $runToken
+                            );
                             break;
                         }
 
@@ -2267,43 +2446,65 @@ class Health implements MessageComponentInterface
                             || false === property_exists($jsonData, 'metadata')
                             || false === property_exists($jsonData, 'messages')
                         ) {
-                            $message               = new \stdClass();
-                            $message->type         = 'error';
-                            $message->text         = "There was an error decoding the $category of $calendar for the year $year from the URL "
-                                                    . Route::CALENDAR->path() . $req . ' as JSON: response data was perhaps truncated?';
-                            $message->classes      = ".calendar-$calendar.json-valid.year-$year";
-                            $message->responsetype = $responseType;
-                            $this->sendMessage($to, $message, $runToken);
+                            $this->sendCalendarStepResult(
+                                $to,
+                                $calendar,
+                                $year,
+                                Step::PARSES,
+                                Status::FAIL,
+                                "There was an error decoding the $category of $calendar for the year $year from the URL "
+                                                    . Route::CALENDAR->path() . $req . ' as JSON: response data was perhaps truncated?',
+                                null,
+                                $responseType,
+                                $runToken
+                            );
                             break;
                         }
 
-                        $message          = new \stdClass();
-                        $message->type    = 'success';
-                        $message->text    = "The $category of $calendar for the year $year was successfully decoded as JSON";
-                        $message->classes = ".calendar-$calendar.json-valid.year-$year";
-                        $this->sendMessage($to, $message, $runToken);
+                        $this->sendCalendarStepResult(
+                            $to,
+                            $calendar,
+                            $year,
+                            Step::PARSES,
+                            Status::PASS,
+                            "The $category of $calendar for the year $year was successfully decoded as JSON",
+                            null,
+                            null,
+                            $runToken
+                        );
 
                         // Always validate against schema (even for cached responses) since this is a test endpoint
                         $validationResult = $this->validateDataAgainstSchema($jsonData, LitSchema::LITCAL->path());
                         if (gettype($validationResult) === 'boolean' && $validationResult === true) {
-                            $message          = new \stdClass();
-                            $message->type    = 'success';
-                            $cachedNote       = $fromCache ? ' (cached)' : '';
-                            $message->text    = "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL->path() . $cachedNote;
-                            $message->classes = ".calendar-$calendar.schema-valid.year-$year";
-                            $this->sendMessage($to, $message, $runToken);
+                            $cachedNote = $fromCache ? ' (cached)' : '';
+                            $this->sendCalendarStepResult(
+                                $to,
+                                $calendar,
+                                $year,
+                                Step::VALIDATES,
+                                Status::PASS,
+                                "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL->path() . $cachedNote,
+                                null,
+                                null,
+                                $runToken
+                            );
                         } elseif ($validationResult instanceof \stdClass) {
-                            $validationResult->classes = ".calendar-$calendar.schema-valid.year-$year";
-                            $this->sendMessage($to, $validationResult, $runToken);
+                            $this->sendSchemaFailureStepResult($to, $calendar, $year, $validationResult, $runToken);
                         }
                 }
             },
             function (\Throwable $e) use ($to, $calendar, $year, $category, $req, $runToken) {
-                $message          = new \stdClass();
-                $message->type    = 'error';
-                $message->text    = "The $category of $calendar for the year $year does not exist at the URL " . Route::CALENDAR->path() . $req . ' : ' . $e->getMessage();
-                $message->classes = ".calendar-$calendar.file-exists.year-$year";
-                $this->sendMessage($to, $message, $runToken);
+                $this->sendCalendarStepResult(
+                    $to,
+                    $calendar,
+                    $year,
+                    Step::EXISTS,
+                    Status::FAIL,
+                    "The $category of $calendar for the year $year does not exist at the URL " . Route::CALENDAR->path() . $req . ' : ' . $e->getMessage(),
+                    null,
+                    null,
+                    $runToken
+                );
             }
         );
     }
@@ -3516,5 +3717,23 @@ class Health implements MessageComponentInterface
             array_push($return, $errorStr);
         }
         return implode('&#013;', $return);
+    }
+
+    /**
+     * Recover the individual errors {@see Health::retrieveXmlErrors()} joined, for a frame's `details`.
+     *
+     * Not an invention: the separator is this class's own, chosen four lines above, and every error
+     * string has been through `htmlspecialchars()`, so a literal `&#013;` inside a message has become
+     * `&amp;#013;` and cannot split an entry in two. The same reasoning that lets
+     * {@see Health::sendSchemaFailureStepResult()} split the validator's text on newlines.
+     *
+     * Null rather than `['']` when there were no errors: `details` states what a summarising text
+     * summarises, and one empty string is not a failure anybody had.
+     *
+     * @return ?list<string>
+     */
+    private static function splitXmlErrors(string $errorString): ?array
+    {
+        return '' === $errorString ? null : explode('&#013;', $errorString);
     }
 }
