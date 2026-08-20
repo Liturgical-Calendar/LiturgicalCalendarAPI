@@ -63,6 +63,7 @@
                     "steps": {
                         "type": "array",
                         "minItems": 1,
+                        "description": "The ordered checks this item passes through when validated. Authoritative for its length, not for its values: a client sizes a check's progress as count(steps), which is correct today, but these step names do not yet correspond to the WebSocket protocol's per-step frame classes (file-exists, json-valid, schema-valid) emitted while a check runs -- nothing in the API relates the two vocabularies. See https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/819.",
                         "items": {
                             "type": "string",
                             "enum": [

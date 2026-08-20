@@ -4,6 +4,14 @@ Design for section B of [#806](https://github.com/Liturgical-Calendar/Liturgical
 ([#811](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/pull/811)) published the inventory; this makes it
 the address. Client counterpart: [UnitTestInterface#42](https://github.com/Liturgical-Calendar/UnitTestInterface/issues/42).
 
+**This document is the protocol reference** for the three v2 message shapes (`validateSource`, the typed-`calendar`
+form of `validateCalendar`, and `runTest`) until section F's `hello` handshake frame ships and supersedes it. The
+Health WebSocket protocol is not documented in `jsondata/schemas/openapi.json`: that file describes the HTTP API, the
+WebSocket endpoint is a separate transport with no path entry there, and a search of `jsondata/schemas/` and `docs/`
+for these action names turns up nothing outside this design and the `Health` class's own docblock. Read the two
+together — this file for the wire shapes and the reasoning behind each rule, the `Health` class docblock
+(`src/Health.php`) for the exact PHPStan `@phpstan-type` definitions and per-action implementation detail.
+
 ## Problem
 
 Three properties on the wire are each doing more than one job, and they overlap.
@@ -121,6 +129,14 @@ There are three domains here, and collapsing them into one `target` would be the
 
 `calendar.kind` is one of `general`, `national`, `diocesan`, `rite`. The word `category` disappears from the protocol.
 
+**`general` is an alias, not a fifth kind.** It names the General Roman Calendar and is exactly equivalent to
+`{"kind": "rite", "id": "roman"}` — its only difference is that `id` may be omitted, because `general` is the one kind
+with nothing to choose between: there is exactly one General Roman Calendar, so no id is needed to pick it out. Read it
+as a convenience spelling for the client that means "the default", not as a distinct calendar type with its own
+resolution path; both forms resolve through the same rite-level handling and must never be treated as two different
+things. (An `id` sent alongside `kind: general` is accepted only if it is `roman` — anything else is rejected, since it
+would be asserting a calendar `general` cannot name.)
+
 ### Source check versus test run
 
 The current protocol blurs a distinction worth keeping explicit. `tests-StIgnatiusOfLoyolaTest` today is a **source check**:
@@ -166,6 +182,34 @@ No client breaks on the day this lands, and UnitTestInterface can migrate one pa
 
 Removal of the legacy branch is a separate, later change, gated on UnitTestInterface#42 shipping.
 
+## Retired properties
+
+Being additive is not the same as being permissive. Each reshaped message replaces specific legacy properties with a
+typed equivalent, and a v2 message that *also* carries the property it replaced is rejected rather than silently
+ignored:
+
+| v2 action          | v1 predecessor      | rejects if present                                   |
+|--------------------|---------------------|------------------------------------------------------|
+| `validateSource`   | `executeValidation` | `category`, `validate`, `sourceFile`, `sourceFolder` |
+| `validateCalendar` | `validateCalendar`  | `category`, `responsetype`                           |
+| `runTest`          | `executeUnitTest`   | `category`                                           |
+
+`runTest` retires only `category`, because `executeUnitTest` never had a `responsetype` to retire in the first place.
+`runToken` is retired by nothing on any of the three — it predates this design, is shared across all three actions, and
+stays current.
+
+This is not a breaking change: a v1 client sends a string `calendar` or an old action name and never reaches these
+checks, so nothing that worked yesterday stops working. What it catches is the client in between — one that has
+switched to the new action name or the object `calendar`, but is still sending fields the old shape used. Without this
+rule that client's mistake is invisible: a retired property is simply never read, the response looks correct, and the
+bug surfaces only later, on the day the legacy branch is finally removed and there is no fallback left to mask it. A
+loud rejection *now*, while both branches still exist side by side to compare against, is strictly more useful than a
+quiet one that waits for removal to become a symptom.
+
+The rule is applied uniformly across all three actions on purpose, even though `runTest` retires only one property.
+Rejecting a stale field on two actions and tolerating it on the third would leave a client unable to predict which
+behaviour it will get without checking the action name — worse than either answer applied consistently.
+
 ## What this does not fix, yet
 
 `Health::executeValidation()` passes a client-supplied `sourceFolder` to `glob()` with no containment check, and an
@@ -179,13 +223,14 @@ it", and that follow-up is gated on client adoption.
 
 ## Error handling
 
-| Condition                                        | Behaviour                                                                      |
-|--------------------------------------------------|--------------------------------------------------------------------------------|
-| `target.id` is not in the inventory              | Rejected immediately, via the existing error frame                             |
-| `target` present but not an object               | Rejected as a malformed message                                                |
-| `calendar` is an object with an unknown `kind`   | Rejected immediately                                                           |
-| `calendar` is a string                           | Legacy path, unchanged behaviour                                               |
-| `rite` disagrees with the calendar's actual rite | Rejected, rather than silently preferring one — a disagreement is a client bug |
+| Condition                                                     | Behaviour                                                                      |
+|---------------------------------------------------------------|--------------------------------------------------------------------------------|
+| `target.id` is not in the inventory                           | Rejected immediately, via the existing error frame                             |
+| `target` present but not an object                            | Rejected as a malformed message                                                |
+| `calendar` is an object with an unknown `kind`                | Rejected immediately                                                           |
+| `calendar` is a string                                        | Legacy path, unchanged behaviour                                               |
+| `rite` disagrees with the calendar's actual rite              | Rejected, rather than silently preferring one — a disagreement is a client bug |
+| A v2 message also carries a legacy property its shape retired | Rejected before anything else runs — see Retired properties, above             |
 
 Rejections reuse the **existing** `echobot` error shape. A dedicated `protocolError` type belongs to section G and
 cannot land before section C, because since UnitTestInterface PR #46 an unrecognised response `type` is painted as a
@@ -206,3 +251,53 @@ rather than hand-listed — a diocese added to source data without appearing in 
 
 **Legacy untouched:** the existing suites covering the legacy shapes must pass unchanged, which is what makes "additive"
 a claim rather than an intention.
+
+## A caveat on `steps`, not fixed here
+
+`GET /validations` publishes a `steps` array per item (`['exists', 'parses', 'validates']`, from
+`CheckableInventory::STEPS`), and `Health` emits one WebSocket frame per step during a check — but the frame classes
+are `file-exists`, `json-valid`, `schema-valid`, and nothing in the API relates the two vocabularies. A client that
+takes a step name literally and waits for a `.<label>.exists` frame waits forever. This is present since #811,
+unrelated to the reshaping this document describes, and filed separately as
+[#819](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/819); the substantive documentation of the
+caveat lives on the `steps` property itself, in `jsondata/schemas/LitCalValidationsPath.json` and the `/validations`
+description in `openapi.json`, because that is where a client discovers the array in the first place. **`steps` is
+authoritative for its length, not for its values** — sizing a check's progress as `count(steps)` is correct today and
+is exactly what replaces UnitTestInterface#42's four hardcoded `* 3` constants.
+
+Deliberately not fixed by renaming either vocabulary to match the other: the maintainer's decision is that #806
+section C dissolves this on its own. Once responses are structured and DOM-agnostic, the frame itself carries the step
+identity and the CSS class becomes a client-side rendering choice, leaving nothing left to reconcile. Renaming
+`steps`' published values down to the frame classes now would bake a presentation detail into the discovery endpoint
+— the exact coupling `/validations` exists to remove — and section C would immediately undo it. Renaming the frame
+classes instead is not an additive change and would break the live UnitTestInterface runners, which match on those
+classes today. The risk this guards against is specific: UnitTestInterface#42 shipping before section C, needing step
+names for something more than a count, and hardcoding a client-side mapping between the two vocabularies — which would
+reintroduce exactly the duplication #806 exists to end, and once written it would be load-bearing.
+
+## Status
+
+Section B, as designed above, is implemented. `validateSource` resolves a `target.id` through
+`CheckableInventory::byId()` instead of the eight anchored `preg_match` slug arms; the typed (object-`calendar`) form
+of `validateCalendar` exists alongside the legacy string form, with `rite` enforced as an assertion rather than taken
+as a hint; `runTest` reshapes `executeUnitTest` behind a new action name; and all three reject a legacy property their
+own shape retired, per [Retired properties](#retired-properties) above.
+
+What shipped deliberately stopped short of what "additive" promised, in two ways that were always meant to survive
+this pass and are not oversights:
+
+- **The legacy branch survives.** `executeValidation`, the string form of `validateCalendar`, and `executeUnitTest`
+  remain fully reachable, byte-for-byte, exactly as [Migration](#migration) above committed to. Removing them is a
+  separate, later change gated on [UnitTestInterface#42](https://github.com/Liturgical-Calendar/UnitTestInterface/issues/42).
+- **The `glob()` containment exposure survives with it.** `Health::executeValidation()` still passes a client-supplied
+  `sourceFolder` to `glob()` with no containment check, exactly as [What this does not fix, yet](#what-this-does-not-fix-yet)
+  above recorded before implementation began. `validateSource`'s `target.id` path never reaches `glob()` with
+  client-supplied input — it resolves paths from `CheckableInventory`'s own records — so the new code carries none of
+  the exposure. But the exposure was never section B's to fix: it lives entirely in the legacy branch, and closing it
+  is bundled into the later legacy-removal change rather than patched opportunistically here, per the maintainer's
+  original decision.
+
+Also implemented, settled after this document was first written and recorded here rather than left to drift from the
+code: the uniform retired-property rejection ([Retired properties](#retired-properties)), and `general` as a
+literal alias for `{"kind": "rite", "id": "roman"}` rather than a fifth calendar kind (documented under
+[Three message shapes](#three-message-shapes)).
