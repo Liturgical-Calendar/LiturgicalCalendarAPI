@@ -58,9 +58,10 @@ final class LitCalTestServerTest extends TestCase
         $client = WsTestClient::connect($this->wsHost, $this->wsPort);
 
         // The handler answers any well-formed JSON with an unknown action back
-        // as `{"type":"protocolError","errorCode":"unknown_action","text":<original>}`.
-        // That's enough to exercise onMessage's happy-path JSON decode + the
-        // default switch arm.
+        // as `{"type":"protocolError","errorCode":"unknown_action","text":"Unknown action from
+        // connection <id>: <original>"}` — the raw message is still in there, but now alongside a
+        // statement of what was wrong with it, not standing in for one. That's enough to exercise
+        // onMessage's happy-path JSON decode + the default switch arm.
         $payload = json_encode(['action' => 'this-is-not-a-real-action', 'foo' => 'bar']);
         $this->assertNotFalse($payload);
 
@@ -73,7 +74,8 @@ final class LitCalTestServerTest extends TestCase
         $this->assertSame('protocolError', $decoded->type);
         $this->assertSame(ProtocolErrorCode::UNKNOWN_ACTION->value, $decoded->errorCode);
         $this->assertObjectHasProperty('text', $decoded);
-        $this->assertSame($payload, $decoded->text);
+        $this->assertStringContainsString($payload, (string) $decoded->text, 'the raw message must still be recoverable from the text');
+        $this->assertStringContainsString('Unknown action', (string) $decoded->text, 'the text must say what was wrong, not only echo the message');
 
         $client->close();
     }
@@ -81,7 +83,9 @@ final class LitCalTestServerTest extends TestCase
     public function testMalformedJsonGetsValidationError(): void
     {
         // Exercises the else branch of onMessage where the JSON decode fails —
-        // server replies with a protocolError frame carrying errorCode invalid_json.
+        // server replies with a protocolError frame carrying errorCode invalid_json, and the text
+        // carries the same json_last_error_msg() reason the server logs, since errorCode alone
+        // cannot distinguish "Syntax error" from "Malformed UTF-8 characters".
         $client = WsTestClient::connect($this->wsHost, $this->wsPort);
         $client->sendText('definitely not json');
         $reply = $client->receiveText();
@@ -90,8 +94,8 @@ final class LitCalTestServerTest extends TestCase
         $this->assertIsObject($decoded);
         $this->assertSame('protocolError', $decoded->type);
         $this->assertSame(ProtocolErrorCode::INVALID_JSON->value, $decoded->errorCode);
-        // The text embeds json_last_error_msg(), whose phrasing isn't guaranteed
-        // across PHP versions, but it'll always be non-empty.
+        // json_last_error_msg() phrasing isn't guaranteed across PHP versions,
+        // but it'll always be non-empty.
         $this->assertNotEmpty($decoded->text);
 
         $client->close();
@@ -107,6 +111,7 @@ final class LitCalTestServerTest extends TestCase
         $this->assertIsObject($decoded);
         $this->assertSame('protocolError', $decoded->type);
         $this->assertSame(ProtocolErrorCode::MISSING_ACTION->value, $decoded->errorCode);
+        $this->assertStringContainsString('No action specified', (string) $decoded->text);
 
         $client->close();
     }

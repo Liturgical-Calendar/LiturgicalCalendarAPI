@@ -662,7 +662,12 @@ class Health implements MessageComponentInterface
                     $this->validateSource($messageReceived, $from, requestId: $requestId);
                     break;
                 default:
-                    $this->rejectMessage($from, ProtocolErrorCode::UNKNOWN_ACTION, $msg, requestId: $requestId);
+                    $this->rejectMessage(
+                        $from,
+                        ProtocolErrorCode::UNKNOWN_ACTION,
+                        sprintf('Unknown action from connection %1$d: %2$s', $resourceId, $msg),
+                        requestId: $requestId
+                    );
             }
         } else {
             if (json_last_error() !== JSON_ERROR_NONE) {
@@ -685,7 +690,7 @@ class Health implements MessageComponentInterface
             $this->rejectMessage(
                 $from,
                 $errorCode,
-                sprintf('Invalid message from connection %d: %s', $resourceId, $msg),
+                sprintf('Invalid message from connection %1$d: %2$s (%3$s)', $resourceId, $errorMsg, $msg),
                 requestId: $requestId
             );
         }
