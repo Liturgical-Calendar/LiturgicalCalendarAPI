@@ -65,7 +65,7 @@ final class HealthValidationDataErrorTest extends TestCase
      *
      * @return list<\stdClass> the decoded frames
      */
-    private function frames(?string $targetId = null): array
+    private function frames(?\stdClass $target = null): array
     {
         $conn = self::stubConnection(9);
 
@@ -79,7 +79,7 @@ final class HealthValidationDataErrorTest extends TestCase
         ob_start();
         ( new \ReflectionMethod(Health::class, 'handleValidationDataError') )->invokeArgs(
             $this->newHealth(),
-            [new \RuntimeException('boom'), $conn, $validation, 'jsondata/x.json', 'run-token-9', $targetId]
+            [new \RuntimeException('boom'), $conn, $validation, 'jsondata/x.json', 'run-token-9', $target]
         );
         ob_end_clean();
 
@@ -118,12 +118,12 @@ final class HealthValidationDataErrorTest extends TestCase
      */
     public function testTheThreeFramesCarryTheStructuredFieldsAndTheRunToken(): void
     {
-        $frames = $this->frames('temporale:roman');
+        $frames = $this->frames((object) ['id' => 'temporale:roman']);
 
         self::assertSame(['exists', 'parses', 'validates'], array_map(static fn (\stdClass $f): mixed => $f->step, $frames));
         foreach ($frames as $frame) {
             self::assertSame('fail', $frame->status);
-            self::assertSame('temporale:roman', $frame->target);
+            self::assertEquals((object) ['id' => 'temporale:roman'], $frame->target, 'the target is an object naming what was checked, not a bare id');
             self::assertSame('run-token-9', $frame->runToken, 'the answers must carry the token the client correlates them by');
             self::assertObjectNotHasProperty('details', $frame, 'nothing structured is known here, so nothing is manufactured');
         }
