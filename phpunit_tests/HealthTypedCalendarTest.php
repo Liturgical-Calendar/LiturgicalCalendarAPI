@@ -254,9 +254,14 @@ final class HealthTypedCalendarTest extends TestCase
 
     /**
      * The mirrored half-migration, asserted rather than reasoned about: a typed `calendar` with the
-     * *old* spelling of the format. It needs no check of its own — `responseFormat` is a required
-     * property of this shape, so its absence fails the property list — but "needs no check" is a
-     * claim about behaviour, and behaviour is what tests are for.
+     * *old* spelling of the format and no new one. This is the **absent-`responseFormat`** reading,
+     * and it is answered by the property list, which requires `responseFormat` — so the message
+     * never reaches a handler and the answer is the generic protocol error.
+     *
+     * Sending `responsetype` *alongside* a correct `responseFormat` is a different case with a
+     * different answer; see `testResponsetypeAlongsideResponseFormatIsRejected()`. Keeping the two
+     * readings separate is the point: one is a missing required property, the other is a retired one
+     * still being sent.
      */
     public function testTheOldSpellingOfTheFormatOnTheObjectFormIsRejected(): void
     {
@@ -706,13 +711,19 @@ final class HealthTypedCalendarTest extends TestCase
      * `TypeError` — an `\Error`, which Ratchet's `IoServer::handleData` does not catch, so one
      * malformed message would take the whole WebSocket process down rather than be answered.
      *
+     * Every row here has its property **present**, which is what carries it past the property list
+     * and into the handler these rejections belong to. A property that is genuinely absent never
+     * gets that far — see `testRunTestRequiresItsThreeProperties()`, which is a different code path
+     * with a different answer. `null` is the case most easily mistaken for absence and is therefore
+     * spelled `test null`, not `test missing`.
+     *
      * @return array<string, array{0: array<string, mixed>, 1: string}>
      */
     public static function runTestMalformedScalarProvider(): array
     {
         return [
             'test not a string' => [['test' => 42], 'runTest test must be a string.'],
-            'test missing'      => [['test' => null], 'runTest test must be a string.'],
+            'test null'         => [['test' => null], 'runTest test must be a string.'],
             'year not an int'   => [['year' => '2026'], 'runTest year must be an integer.'],
             'year null'         => [['year' => null], 'runTest year must be an integer.'],
         ];
@@ -899,6 +910,151 @@ final class HealthTypedCalendarTest extends TestCase
         $frame = json_decode($crossConn->sent[0]);
         self::assertSame('echobot', $frame->type);
         self::assertSame('Unknown validation target: StIgnatiusOfLoyolaTest', $frame->text, 'the bare test name is a runTest address, not an inventory id');
+    }
+
+    // ---------------------------------------------------------------- retired properties
+
+    /**
+     * Task 3 accepted this and the maintainer has overruled it.
+     *
+     * The old reasoning was that `responsetype` sent alongside a correct `responseFormat` is stale
+     * noise from a client that has already done the rename right, not a misunderstanding about what
+     * names the format. That is exactly backwards as a diagnostic: a client still sending the old
+     * property has *not* finished migrating, and this is the cheapest moment it will ever get to
+     * find out — the message works today because `responseFormat` is what gets read, and it breaks
+     * the day the legacy branch is removed.
+     *
+     * The message names the property and its replacement, so a migrating client is told what to do
+     * rather than only that it is wrong.
+     */
+    public function testResponsetypeAlongsideResponseFormatIsRejected(): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        self::send($health, $conn, [
+            'action'         => 'validateCalendar',
+            'calendar'       => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'],
+            'year'           => 2026,
+            // Both spellings, and — note — naming the same format, so this message would otherwise
+            // be dispatched correctly and say nothing.
+            'responseFormat' => 'JSON',
+            'responsetype'   => 'JSON'
+        ]);
+
+        self::assertCount(1, $conn->sent);
+        $frame = json_decode($conn->sent[0]);
+        self::assertSame('echobot', $frame->type);
+        self::assertSame(
+            'responsetype is not part of a validateCalendar message with an object calendar: responseFormat replaces it.',
+            $frame->text
+        );
+        self::assertSame([], self::queuedPaths($health));
+    }
+
+    /**
+     * The same rule on `runTest`, and the reason it is not merely symmetry: `runTest`'s predecessor
+     * `executeUnitTest` *required* `category`, so a client that renamed the action and kept the
+     * property is the likeliest half-migration there is. `calendar.kind` supplies the category, so
+     * the message would otherwise work while the client kept believing `category` selected it.
+     */
+    public function testALeftoverCategoryOnRunTestIsRejected(): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        self::withMetadata(static function () use ($health, $conn): void {
+            self::send($health, $conn, [
+                'action'   => 'runTest',
+                'test'     => 'StIgnatiusOfLoyolaTest',
+                'calendar' => ['kind' => 'diocesan', 'id' => 'lugano_ch', 'rite' => 'ambrosian'],
+                // Left over from executeUnitTest, and naming the very category `kind` implies.
+                'category' => 'diocesancalendar',
+                'year'     => 2026
+            ]);
+        });
+
+        self::assertCount(1, $conn->sent);
+        $frame = json_decode($conn->sent[0]);
+        self::assertSame('echobot', $frame->type);
+        self::assertSame('category is not part of a runTest message: calendar.kind replaces it.', $frame->text);
+        self::assertSame([], self::queuedPaths($health), 'a rejected message must not have queued a request');
+    }
+
+    /**
+     * `runTest` retires `category` and nothing else, because there is nothing else to retire:
+     * `ACTION_PROPERTIES['executeUnitTest']` is `['category', 'calendar', 'year', 'test']`, so no
+     * `responsetype` ever named anything on it. A rule that invented one would reject a property no
+     * client was ever told to send, for a reason that is not true.
+     */
+    public function testRunTestDoesNotRetireAResponsetypeItNeverHad(): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        self::send($health, $conn, [
+            'action'       => 'runTest',
+            'test'         => 'StIgnatiusOfLoyolaTest',
+            'calendar'     => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'],
+            'year'         => 2026,
+            'responsetype' => 'JSON'
+        ]);
+
+        self::assertSame([], $conn->sent, 'runTest rejected a property that was never part of executeUnitTest');
+        self::assertSame('/roman/nation/IT/2026?year_type=CIVIL', self::soleQueuedPath($health));
+    }
+
+    /**
+     * `runToken` is shared, current, and retired by nothing — a rule that swept it up would break
+     * run correlation on every v2 message at once, which is the failure mode a blanket
+     * "reject unknown properties" would have had.
+     *
+     * Tolerating it is not enough to assert, so the queued request's own `runToken` tag is what is
+     * checked: that is what `processQueue()` reads to drop the backlog of a superseded run, so a
+     * token that arrived and was discarded would look identical from the frames alone.
+     *
+     * @return array<string, array{0: array<string, mixed>}>
+     */
+    public static function runTokenBearingMessageProvider(): array
+    {
+        return [
+            'validateCalendar' => [
+                [
+                    'action'         => 'validateCalendar',
+                    'calendar'       => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'],
+                    'year'           => 2026,
+                    'responseFormat' => 'JSON',
+                    'runToken'       => 'run-a'
+                ]
+            ],
+            'runTest'          => [
+                [
+                    'action'   => 'runTest',
+                    'test'     => 'StIgnatiusOfLoyolaTest',
+                    'calendar' => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'],
+                    'year'     => 2026,
+                    'runToken' => 'run-a'
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    #[DataProvider('runTokenBearingMessageProvider')]
+    public function testARunTokenIsNotARetiredProperty(array $payload): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        self::send($health, $conn, $payload);
+
+        self::assertSame([], $conn->sent, 'a runToken was mistaken for a retired property');
+        self::assertSame('/roman/nation/IT/2026?year_type=CIVIL', self::soleQueuedPath($health));
+
+        $queued = self::queuedRequests($health);
+        self::assertSame('run-a', $queued[0]['runToken'], 'the run token reached the queue, where cancelRun reads it');
     }
 
     // ---------------------------------------------------------------- harness

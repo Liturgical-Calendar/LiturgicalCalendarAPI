@@ -78,6 +78,10 @@ use Psr\Http\Message\ResponseInterface;
  * client cannot emit a name it does not know. `executeUnitTest` is untouched and stays reachable
  * until UnitTestInterface#42 ships. See issue #806 section E.
  *
+ * All three reshaped messages — `validateSource`, `validateCalendar` and `runTest` — reject a legacy
+ * property their own shape retired, rather than ignoring it. See {@see Health::RETIRED_PROPERTIES}
+ * for the rule and {@see Health::rejectRetiredProperties()} for the one implementation of it.
+ *
  * Do not confuse `runTest` with the inventory item `test:{rite}:{Name}` that `validateSource`
  * addresses. That item is a *source check*: does the test definition exist, parse, and validate
  * against `LitCalTest.json`. `runTest` *runs* the test that definition describes against a computed
@@ -135,6 +139,66 @@ class Health implements MessageComponentInterface
      * @var string[]
      */
     private const TYPED_CALENDAR_PROPERTIES = ['calendar', 'year', 'responseFormat'];
+
+    /**
+     * The legacy properties each reshaped message *replaced*, and what replaced them.
+     *
+     * **A v2 message that also carries a legacy property its own shape retired is rejected**, on all
+     * three reshaped actions, by maintainer ruling. Not a breaking change: a v1 client sends a string
+     * `calendar` or an old action name and never reaches these checks. What it catches is the
+     * half-migrated client — one that has adopted the new shape and is still sending the old fields —
+     * which otherwise gets behaviour that looks correct, because a retired property is simply never
+     * read, and breaks on the day the legacy branch is removed. A loud error while the two still
+     * agree is the whole value.
+     *
+     * Uniform on purpose. Making a client's mistake loud on one action and silent on two would be
+     * worse than either answer applied consistently, because the client cannot tell which it is
+     * getting.
+     *
+     * `runTest` retires only `category`: `ACTION_PROPERTIES['executeUnitTest']` is
+     * `['category', 'calendar', 'year', 'test']`, so there was never a `responsetype` on it to
+     * retire. `runToken` is retired by nothing — it is shared, current, and valid on all three.
+     *
+     * Keyed by action; `shape` completes the sentence "… is not part of a %s" and is why
+     * `validateCalendar`'s reads "a validateCalendar message with an object calendar": on a *string*
+     * calendar `category` is required, not retired, and a message that said otherwise would be lying
+     * to a v1 client. `retired` maps each retired property to the clause naming its replacement, so
+     * the rejection tells a migrating client what to do rather than only that it is wrong.
+     *
+     * @var array<string, array{shape: string, retired: array<string, string>}>
+     */
+    private const RETIRED_PROPERTIES = [
+        'validateSource'   => [
+            'shape'   => 'validateSource message',
+            'retired' => [
+                // `executeValidation` spread the address across a schema-resolution strategy and a
+                // path; an inventory id is the whole address, and the server resolves both from it.
+                'category'     => 'target.id replaces it.',
+                'validate'     => 'target.id replaces it.',
+                'sourceFile'   => 'target.id replaces it.',
+                'sourceFolder' => 'target.id replaces it.'
+            ]
+        ],
+        'validateCalendar' => [
+            'shape'   => 'validateCalendar message with an object calendar',
+            'retired' => [
+                'category'     => 'calendar.kind replaces it.',
+                // Task 3 left this one accepted, reasoning that alongside a correct `responseFormat`
+                // it was stale noise from a client that had already done the rename right. The
+                // uniform rule overrules that: it is precisely the half-migration signal worth
+                // seeing. Sent *instead of* `responseFormat` it never reaches here at all — the
+                // property list turns the message away for the missing required property, and that
+                // reading is unchanged.
+                'responsetype' => 'responseFormat replaces it.'
+            ]
+        ],
+        'runTest'          => [
+            'shape'   => 'runTest message',
+            'retired' => [
+                'category' => 'calendar.kind replaces it.'
+            ]
+        ]
+    ];
 
     /**
      * The response formats {@see Health::validateCalendar()} has a validation branch for.
@@ -703,7 +767,11 @@ class Health implements MessageComponentInterface
      * opaque: the server minted it, published it, and looks it up. One lookup, no grammar.
      *
      * Nothing here is subtracted from `executeValidation()`; both address the same execution phase,
-     * and the slug arms stay reachable until clients have moved over (UnitTestInterface#42).
+     * and the slug arms stay reachable until clients have moved over (UnitTestInterface#42). What is
+     * refused is a message that tries to be both: `category`, `validate`, `sourceFile` and
+     * `sourceFolder` are the four properties an id replaces outright, so carrying one alongside a
+     * `target` is a half-migrated client naming its check twice and being read once. See
+     * {@see Health::RETIRED_PROPERTIES}.
      *
      * The six-argument call is deliberate: an inventory entry is a source-data check whose data path
      * and quoted folder are the same path, and whose schema was resolved from its own id — exactly
@@ -714,6 +782,10 @@ class Health implements MessageComponentInterface
      */
     private function validateSource(\stdClass $message, ConnectionInterface $to): void
     {
+        if ($this->rejectRetiredProperties($message, 'validateSource', $to)) {
+            return;
+        }
+
         // `validateMessageProperties()` has already established that `target` is present; what it
         // cannot establish is its shape, since ACTION_PROPERTIES only names required properties.
         $target = property_exists($message, 'target') ? $message->target : null;
@@ -1580,6 +1652,37 @@ class Health implements MessageComponentInterface
     }
 
     /**
+     * Reject a v2 message that still carries a legacy property its own shape retired.
+     *
+     * One implementation for all three reshaped actions, called from
+     * {@see Health::validateSource()}, {@see Health::validateTypedCalendar()} and
+     * {@see Health::runTest()}. Three hand-written copies of this rule is exactly the shape that lets
+     * one of them quietly stop rejecting — the same argument that put the `kind`→category mapping in
+     * one place.
+     *
+     * Runs before anything else in each handler, so a half-migrated message is answered for what is
+     * actually wrong with it rather than for whatever its retired property happened to make of the
+     * rest. The first offender in declaration order is named and the rest are not: each message then
+     * says one true, specific thing, and a client sending two retired properties hears about the
+     * second on its next attempt. See {@see Health::RETIRED_PROPERTIES} for why the rule exists.
+     *
+     * @param 'validateSource'|'validateCalendar'|'runTest' $action The reshaped action being handled.
+     * @return bool True when the message was rejected and the caller must stop.
+     */
+    private function rejectRetiredProperties(\stdClass $message, string $action, ConnectionInterface $to): bool
+    {
+        $shape = self::RETIRED_PROPERTIES[$action]['shape'];
+        foreach (self::RETIRED_PROPERTIES[$action]['retired'] as $property => $replacement) {
+            if (property_exists($message, $property)) {
+                $this->rejectMessage($to, sprintf('%s is not part of a %s: %s', $property, $shape, $replacement));
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Read a message's `calendar` property as a typed identity.
      *
      * Both actions that carry one come through here, and the shared step is the *read*, not the
@@ -1682,19 +1785,12 @@ class Health implements MessageComponentInterface
      */
     private function validateTypedCalendar(\stdClass $message, ConnectionInterface $to): void
     {
-        // A leftover `category` is a half-migrated client, and silently ignoring it is the worst of
-        // the available answers: the message happens to work, because `calendar.kind` supplies the
-        // category and the stale property is simply never read, so the client keeps believing
-        // `category` still selects the calendar type and only finds out otherwise the day the two
-        // disagree. Say so now, while the two still agree.
-        //
-        // `responsetype` needs no equivalent check and does not get one. Sent *instead of*
-        // `responseFormat` it never arrives here at all — the property list rejects the message for
-        // the missing `responseFormat`. Sent *alongside* a correct `responseFormat` it is stale
-        // noise from a client that has already done the rename right, not a misunderstanding about
-        // what names the format. `category` has no such harmless reading.
-        if (property_exists($message, 'category')) {
-            $this->rejectMessage($to, 'category is not part of a validateCalendar message with an object calendar: calendar.kind replaces it.');
+        // A leftover `category` or `responsetype` is a half-migrated client: the message happens to
+        // work, because `calendar.kind` and `responseFormat` supply what is actually read and the
+        // stale property never is, so the client keeps believing the old property still selects
+        // something and only finds out otherwise the day the two disagree. Say so now, while they
+        // still agree. See Health::RETIRED_PROPERTIES.
+        if ($this->rejectRetiredProperties($message, 'validateCalendar', $to)) {
             return;
         }
 
@@ -2009,19 +2105,22 @@ class Health implements MessageComponentInterface
      * runs it. A definition can be valid while the test it describes fails, and a definition can be
      * malformed while the calendar is perfectly correct, so neither answer substitutes for the other.
      *
-     * Nothing here mirrors `validateTypedCalendar()`'s rejection of a leftover `category`, and the
-     * asymmetry is deliberate. That check exists because `validateCalendar` *shares its name* with
-     * the shape `category` belonged to, so a stale `category` is evidence of a half-migrated message
-     * that would otherwise work silently. `category` never named anything on a message called
-     * `runTest`; a client that sent one has renamed the action, so it has read the new shape. An
-     * unread extra property on a new name is just an extra property — which is how `validateSource`,
-     * the other new name, treats them too.
+     * A leftover `category` is rejected here exactly as it is on `validateTypedCalendar()`, through
+     * the shared {@see Health::rejectRetiredProperties()}. `runTest` has a mechanical predecessor in
+     * `executeUnitTest`, which required `category`, so a client that renamed the action and kept the
+     * property is as plausible here as anywhere — and `calendar.kind` supplies the category, so the
+     * message would otherwise work while the client kept believing `category` selected something.
+     * Only `category` is retired: `executeUnitTest` never had a `responsetype` to retire.
      *
      * @param RunTest $message The message naming the test, the calendar and the year.
      * @param ConnectionInterface $to The connection to send the result frames to.
      */
     private function runTest(\stdClass $message, ConnectionInterface $to): void
     {
+        if ($this->rejectRetiredProperties($message, 'runTest', $to)) {
+            return;
+        }
+
         // Checked rather than trusted for the reason readYear() sets out: a non-string here would
         // reach executeUnitTest(string $test, …) as a TypeError, which Ratchet does not catch.
         $test = property_exists($message, 'test') ? $message->test : null;

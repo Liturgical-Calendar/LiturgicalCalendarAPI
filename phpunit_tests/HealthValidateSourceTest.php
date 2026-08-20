@@ -275,6 +275,104 @@ final class HealthValidateSourceTest extends TestCase
         self::assertSame('Invalid message properties', $frame->errorMsg);
     }
 
+    // ---------------------------------------------------------------- retired properties
+
+    /**
+     * The four properties an inventory id replaces outright.
+     *
+     * `executeValidation` spread a check's address across a schema-resolution strategy (`category`),
+     * a slug (`validate`) and a path (`sourceFile`/`sourceFolder`). An id is the whole address: the
+     * server minted it, published it, and resolves all of that from it. A message carrying both is a
+     * half-migrated client naming its check twice and being read once — it works today, because
+     * `target` is what gets read, and it breaks the day the slug arms are removed.
+     *
+     * Each row's payload is a *valid* `validateSource` message with one retired property added, and
+     * the added value is a *legitimate* legacy value taken from the same enums `executeValidation`
+     * resolves against — so what fails is the retired property itself, not a bad value in it.
+     *
+     * @return array<string, array{0: string, 1: mixed}>
+     */
+    public static function retiredPropertyProvider(): array
+    {
+        return [
+            'category'     => ['category', 'sourceDataCheck'],
+            'validate'     => ['validate', 'proprium-de-tempore'],
+            'sourceFile'   => ['sourceFile', JsonData::TEMPORALE_FILE->value],
+            'sourceFolder' => ['sourceFolder', JsonData::TEMPORALE_FOLDER->value],
+        ];
+    }
+
+    #[DataProvider('retiredPropertyProvider')]
+    public function testALegacyAddressingPropertyAlongsideATargetIsRejected(string $property, mixed $value): void
+    {
+        $health = new Health();
+        $conn   = self::createStubConnection();
+
+        self::send($health, $conn, [
+            'action'  => 'validateSource',
+            'target'  => ['id' => 'temporale:roman'],
+            $property => $value
+        ]);
+
+        self::assertCount(1, $conn->sent, 'a half-migrated message is answered once and not checked');
+        $frame = json_decode($conn->sent[0]);
+        self::assertSame('echobot', $frame->type);
+        self::assertSame(
+            "{$property} is not part of a validateSource message: target.id replaces it.",
+            $frame->text,
+            'the rejection must name the property and its replacement, so a migrating client is told what to do'
+        );
+    }
+
+    /**
+     * The rule must not reach the legacy action it is named after. `executeValidation` *requires*
+     * these properties; rejecting them there would delete the v1 surface rather than guard the v2
+     * one, and the slug arms stay reachable until clients have moved over (UnitTestInterface#42).
+     */
+    public function testExecuteValidationStillAcceptsTheVeryPropertiesValidateSourceRetires(): void
+    {
+        $health = new Health();
+        $conn   = self::createStubConnection();
+
+        self::send($health, $conn, [
+            'action'     => 'executeValidation',
+            'category'   => 'sourceDataCheck',
+            'validate'   => 'proprium-de-tempore',
+            'sourceFile' => JsonData::TEMPORALE_FILE->value
+        ]);
+
+        self::assertNotEmpty($conn->sent, 'the legacy action stopped being usable');
+        foreach ($conn->sent as $raw) {
+            $frame = json_decode($raw);
+            self::assertNotSame('echobot', $frame->type, "the legacy slug shape was refused: {$frame->text}");
+        }
+    }
+
+    /**
+     * `runToken` is shared and current, not retired: it correlates responses on every action,
+     * including this one, and a rule that swept it up would break run correlation everywhere at
+     * once. Asserted through the frames rather than merely by absence of a rejection — the token
+     * has to come back stamped on the answers, which is what a client matches them with.
+     */
+    public function testARunTokenIsNotARetiredProperty(): void
+    {
+        $health = new Health();
+        $conn   = self::createStubConnection();
+
+        self::send($health, $conn, [
+            'action'   => 'validateSource',
+            'target'   => ['id' => 'temporale:roman'],
+            'runToken' => 'run-a'
+        ]);
+
+        self::assertNotEmpty($conn->sent, 'a runToken was mistaken for a retired property');
+        foreach ($conn->sent as $raw) {
+            $frame = json_decode($raw);
+            self::assertNotSame('echobot', $frame->type, "the message was refused: {$frame->text}");
+            self::assertSame('run-a', $frame->runToken, 'the answers must carry the token the client correlates them by');
+        }
+    }
+
     // ---------------------------------------------------------------- the per-run inventory reset
 
     /**
