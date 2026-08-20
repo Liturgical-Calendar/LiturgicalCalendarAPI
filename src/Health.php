@@ -2054,9 +2054,22 @@ class Health implements MessageComponentInterface
         // in play: $dataFile here is the unprefixed repo-relative form (matching JsonData::*->value),
         // while the inventory stores absolute paths prefixed with Router::$apiFilePath. No
         // conversion is needed at this call site.
-        $item = CheckableInventory::byPath($dataFile);
-        if (null !== $item) {
-            return $item->schema->path();
+        try {
+            $item = CheckableInventory::byPath($dataFile);
+            if (null !== $item) {
+                return $item->schema->path();
+            }
+        } catch (\Throwable) {
+            // The inventory does not merely index folders: it enumerates per-calendar source data via
+            // CalendarMetadataProvider::create(), which reads and JSON-parses every national and
+            // diocesan calendar file. One malformed or missing file makes the whole lookup throw.
+            //
+            // Health is a long-running process serving every client, so letting that propagate would
+            // take out schema resolution for every other check — including the Roman temporale, which
+            // has nothing to do with the broken file. The detector would fail on exactly what it
+            // exists to detect. Fall through instead; the arms below and the legacy slug patterns in
+            // retrieveSchemaForCategory() still resolve generically. GET /validations reports the 503
+            // loudly, which is where that failure belongs.
         }
 
         return match ($dataFile) {
@@ -2196,9 +2209,17 @@ class Health implements MessageComponentInterface
                     'proprium-de-tempore'         => 'temporale:roman',
                     'proprium-de-tempore-i18n'    => 'temporale:roman:i18n'
                 ];
-                $item           = CheckableInventory::byId($legacySlugToId[$dataPath] ?? $dataPath);
-                if (null !== $item) {
-                    return $item->schema->path();
+                try {
+                    $item = CheckableInventory::byId($legacySlugToId[$dataPath] ?? $dataPath);
+                    if (null !== $item) {
+                        return $item->schema->path();
+                    }
+                } catch (\Throwable) {
+                    // Same containment as in getPathToSchemaFile(): the inventory reads and parses all
+                    // calendar source data, so one malformed file must not take out schema resolution
+                    // for every other check in a process that stays up. The regex arms below resolve
+                    // national-calendar-XX, diocesan-calendar-…, wider-region-…, tests-… and the
+                    // proprium-de-* slugs generically, so this fallback is real behaviour, not a stub.
                 }
 
                 if (preg_match('/-i18n$/', $dataPath)) {

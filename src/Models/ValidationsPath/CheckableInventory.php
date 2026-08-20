@@ -41,10 +41,22 @@ final class CheckableInventory
     /**
      * The calendar index, from the same builder that serves `/calendars`.
      *
-     * Memoized for the lifetime of the request only. `CalendarMetadataProvider` deliberately re-reads
-     * source data on every call because the `/data` write endpoints can mutate calendar definitions at
-     * runtime; caching it here for one request keeps a single `/validations` response internally
-     * consistent without outliving the write that would invalidate it.
+     * Memoized for the lifetime of the *process*, not the request. `CalendarMetadataProvider`
+     * deliberately re-reads source data on every call because the `/data` write endpoints can mutate
+     * calendar definitions at runtime; caching it here keeps a single `/validations` response
+     * internally consistent. Under PHP-FPM the process is the request, so the memo cannot outlive the
+     * write that would invalidate it — but `Health` is a long-running ReactPHP process and the primary
+     * consumer of `byPath()`/`byId()`, and there both this and `self::$items` live until the WebSocket
+     * server restarts. A calendar created via `/data` therefore does not appear to those clients until
+     * then. Harmless today only because `Health`'s legacy regex arms still resolve those slugs
+     * generically; #806 plan 2 replaces those arms with `byId()` and will need a reset hook.
+     *
+     * Building the index reads and JSON-parses every national and diocesan calendar file, so a single
+     * missing or malformed one throws (`ServiceUnavailableException` / `JsonException`) and
+     * `GET /validations` answers 503. That is deliberate and inherited from `/calendars`: degrading to
+     * a partial list would silently omit what could not be read, which is exactly the #800 blindness
+     * this endpoint exists to remove. `Health` contains the blast radius on its own side instead —
+     * see the catch in `Health::getPathToSchemaFile()`.
      */
     private static function metadata(): MetadataCalendars
     {
