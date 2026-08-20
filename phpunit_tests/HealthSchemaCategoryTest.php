@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Tests;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitSchema;
+use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Router;
@@ -54,6 +55,15 @@ final class HealthSchemaCategoryTest extends TestCase
         $method = new \ReflectionMethod(Health::class, 'retrieveSchemaForCategory');
         /** @var string|null $result */
         $result = $method->invoke(null, $category, $dataPath);
+
+        return $result;
+    }
+
+    private static function getPathToSchemaFile(string $dataFile): ?string
+    {
+        $method = new \ReflectionMethod(Health::class, 'getPathToSchemaFile');
+        /** @var string|null $result */
+        $result = $method->invoke(null, $dataFile);
 
         return $result;
     }
@@ -225,9 +235,12 @@ final class HealthSchemaCategoryTest extends TestCase
         self::initRouter();
 
         return [
-            'events, invented rite' => [Route::EVENTS->path() . '/byzantine/diocese/milano_it'],
-            'data, invented rite'   => [Route::DATA->path() . '/byzantine/diocese/milano_it'],
-            'data, doubled rite'    => [Route::DATA->path() . '/roman/ambrosian/diocese/milano_it'],
+            'events, invented rite'            => [Route::EVENTS->path() . '/byzantine/diocese/milano_it'],
+            'data, invented rite'              => [Route::DATA->path() . '/byzantine/diocese/milano_it'],
+            'data, doubled rite'               => [Route::DATA->path() . '/roman/ambrosian/diocese/milano_it'],
+            'events, invented rite collection' => [Route::EVENTS->path() . '/byzantine'],
+            'data, invented rite collection'   => [Route::DATA->path() . '/byzantine'],
+            'data, doubled rite collection'    => [Route::DATA->path() . '/roman/ambrosian'],
         ];
     }
 
@@ -235,6 +248,96 @@ final class HealthSchemaCategoryTest extends TestCase
     public function testResourceDataCheckRejectsAnUnknownRiteSegment(string $url): void
     {
         self::assertNull(self::retrieveSchemaForCategory('resourceDataCheck', $url));
+    }
+
+    // ------------------------------------------- the rite-qualified COLLECTION form (issue #814)
+
+    /**
+     * The general invariant of #814: for **every** route, the rite-qualified collection form
+     * resolves to exactly what the bare form resolves to.
+     *
+     * #813 made the *item* routes (`/events/roman/nation/IT`) rite-aware but left the collection
+     * form (`/events/roman`) falling between the regex arms and the exact-match map, resolving to
+     * null — the form a `RiteSelect` produces when no nation or diocese is selected, and the
+     * canonical form per `Router::canonicalRiteUrl()`.
+     *
+     * The cross product is driven from `Route` and `Rite` rather than a hand-written list on
+     * purpose: a route added to the map in `Health::getPathToSchemaFile()`, or a third rite added
+     * to `Rite`, is covered the moment it is declared and cannot reintroduce the asymmetry
+     * silently. Routes that resolve to null bare (`/calendar` among them) are asserted to stay
+     * null when qualified, which is the guard that `/calendar/{rite}` is left alone.
+     *
+     * `testRiteQualifiedCollectionFormsResolveTheExpectedSchema()` below pins the non-null half,
+     * so this invariant cannot be satisfied by resolving everything to null.
+     *
+     * @return array<string, array{string, string}>
+     */
+    public static function riteQualifiedCollectionProvider(): array
+    {
+        self::initRouter();
+
+        $cases = [];
+        foreach (Route::cases() as $route) {
+            foreach (Rite::cases() as $rite) {
+                $cases[$route->value . ' + ' . $rite->value] = [$route->path(), $rite->value];
+            }
+        }
+
+        return $cases;
+    }
+
+    #[DataProvider('riteQualifiedCollectionProvider')]
+    public function testRiteQualifiedCollectionFormResolvesLikeTheBareForm(string $routePath, string $rite): void
+    {
+        self::assertSame(
+            self::getPathToSchemaFile($routePath),
+            self::getPathToSchemaFile($routePath . '/' . $rite)
+        );
+    }
+
+    #[DataProvider('riteQualifiedCollectionProvider')]
+    public function testResourceDataCheckResolvesTheRiteQualifiedCollectionFormLikeTheBareForm(string $routePath, string $rite): void
+    {
+        // The same invariant one layer up, through the category selector the `executeValidation`
+        // message actually goes through: no regex arm may swallow the collection form either.
+        self::assertSame(
+            self::retrieveSchemaForCategory('resourceDataCheck', $routePath),
+            self::retrieveSchemaForCategory('resourceDataCheck', $routePath . '/' . $rite)
+        );
+    }
+
+    /**
+     * The non-null half of the invariant: the three routes that carry a rite segment
+     * (`Router::extractRiteSegment()` for events and data, `Router::extractTestsRite()` for tests)
+     * resolve to their real schema, not merely to the same thing as the bare form.
+     *
+     * @return array<string, array{string, LitSchema}>
+     */
+    public static function riteQualifiedCollectionSchemaProvider(): array
+    {
+        self::initRouter();
+
+        $expected = [
+            Route::EVENTS->value => [Route::EVENTS, LitSchema::EVENTS],
+            Route::DATA->value   => [Route::DATA, LitSchema::DATA],
+            Route::TESTS->value  => [Route::TESTS, LitSchema::TESTS],
+        ];
+
+        $cases = [];
+        foreach ($expected as $label => [$route, $schema]) {
+            foreach (Rite::cases() as $rite) {
+                $cases[$label . '/' . $rite->value] = [$route->path() . '/' . $rite->value, $schema];
+            }
+        }
+
+        return $cases;
+    }
+
+    #[DataProvider('riteQualifiedCollectionSchemaProvider')]
+    public function testRiteQualifiedCollectionFormsResolveTheExpectedSchema(string $url, LitSchema $expected): void
+    {
+        self::assertSame($expected->path(), self::getPathToSchemaFile($url));
+        self::assertSame($expected->path(), self::retrieveSchemaForCategory('resourceDataCheck', $url));
     }
 
     public function testResourceDataCheckRejectsAnUnrecognisedUrl(): void
