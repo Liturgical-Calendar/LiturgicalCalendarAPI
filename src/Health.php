@@ -2076,7 +2076,29 @@ class Health implements MessageComponentInterface
             return $item->schema->path();
         }
 
-        return match ($dataFile) {
+        // The rite segment is optional and its absence means the default rite, so the
+        // rite-qualified COLLECTION form (`/events/roman`) has to resolve to whatever the bare
+        // form (`/events`) resolves to — see issue #814. It is normalised away *before* the match
+        // rather than added as arms of its own, so every arm below is rite-aware by construction
+        // and a route added later cannot reintroduce the asymmetry. Paths that do not end in a
+        // rite segment come through unchanged, leaving the bare forms matching exactly as before.
+        //
+        // `/calendar/{rite}` is unaffected: Route::CALENDAR has no arm here, so both forms
+        // resolve to null exactly as they did.
+        //
+        // The strip is UNIFORM across the map, not gated on the routes that actually carry a rite
+        // — so `/missals/roman` and `/decrees/ambrosian` resolve too, even though the Router 404s
+        // them (`Router::extractRiteSegment()` admits a rite only on calendar, events and data,
+        // and `Router::extractTestsRite()` on tests). That is deliberate, not an oversight. This
+        // function answers "which schema would validate a response of this shape", NOT "is this
+        // path routable": the Router remains the sole authority on what routes exist, and a schema
+        // resolved for a non-route costs nothing because the fetch that follows 404s and the check
+        // fails loudly anyway. Gating the strip would mean hardcoding the list of rite-carrying
+        // routes here — precisely the staleness that produced #814 — and there is no registry to
+        // derive such a list from, the knowledge living in an inline condition in
+        // `Router::extractRiteSegment()` with `/tests` handled separately. Do not add routability
+        // checks to this lookup.
+        return match (self::stripTrailingRiteSegment($dataFile)) {
             Route::CALENDARS->path() => LitSchema::METADATA->path(),
             Route::DECREES->path()   => LitSchema::DECREES->path(),
             Route::EVENTS->path()    => LitSchema::EVENTS->path(),
@@ -2087,6 +2109,42 @@ class Health implements MessageComponentInterface
             Route::SCHEMAS->path()   => LitSchema::SCHEMAS->path(),
             default                  => null
         };
+    }
+
+    /**
+     * Remove a trailing rite segment from an API collection path.
+     *
+     * `/events/roman` becomes `/events`; a path that does not end in a rite segment is returned
+     * unchanged, and only one segment is ever removed (so a doubled rite stays unresolvable).
+     *
+     * The rule is intentionally shape-based rather than route-aware: it strips the segment from any
+     * path, including one whose route carries no rite. See the note at the call site in
+     * {@see self::getPathToSchemaFile()} for why that is the right trade.
+     *
+     * @param string $path the path to normalise
+     * @return string the path without its trailing rite segment
+     */
+    private static function stripTrailingRiteSegment(string $path): string
+    {
+        $stripped = preg_replace('/\/(?:' . self::riteAlternation() . ')$/', '', $path);
+
+        return $stripped ?? $path;
+    }
+
+    /**
+     * The regex alternation of every known rite, e.g. `roman|ambrosian`.
+     *
+     * Derived from {@see Rite} rather than written out, so a third rite is admitted by every
+     * pattern that uses it the moment the case is declared.
+     *
+     * @return string the alternation, ready to drop inside a `(?:…)` group in a `/`-delimited pattern
+     */
+    private static function riteAlternation(): string
+    {
+        return implode('|', array_map(
+            static fn (Rite $rite): string => preg_quote($rite->value, '/'),
+            Rite::cases()
+        ));
     }
 
     /**
@@ -2160,13 +2218,13 @@ class Health implements MessageComponentInterface
                 ) {
                     return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::PROPRIUMDESANCTIS->path()) : LitSchema::PROPRIUMDESANCTIS->path();
                 } elseif (
-                    preg_match('/\/events\/(?:(?:roman|ambrosian)\/)?(?:nation\/[A-Z]{2}|diocese\/[a-z]{6}_[a-z]{2})(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath)
+                    preg_match('/\/events\/(?:(?:' . self::riteAlternation() . ')\/)?(?:nation\/[A-Z]{2}|diocese\/[a-z]{6}_[a-z]{2})(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath)
                 ) {
                     return $isVersionedDataPath ? preg_replace($versionedPattern, $versionedReplacement, LitSchema::EVENTS->path()) : LitSchema::EVENTS->path();
                 } elseif (
                     // The rite segment is NON-capturing on purpose: the numbered groups below drive
                     // the switch, so a capturing group here would shift them all by one.
-                    preg_match('/\/data\/(?:(?:roman|ambrosian)\/)?(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/[A-Z][a-z]+)(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath, $matches)
+                    preg_match('/\/data\/(?:(?:' . self::riteAlternation() . ')\/)?(?:(nation)\/[A-Z]{2}|(diocese)\/[a-z]{6}_[a-z]{2}|(widerregion)\/[A-Z][a-z]+)(?:\?locale=[a-zA-Z0-9_]+)?$/', $dataPath, $matches)
                 ) {
                     $schema = LitSchema::DATA->path();
                     foreach ($matches as $idx => $match) {
