@@ -15,6 +15,7 @@ use React\Promise\PromiseInterface;
 use React\Filesystem\Factory;
 use React\EventLoop\Loop;
 use LiturgicalCalendar\Api\Database\Connection;
+use LiturgicalCalendar\Api\Enum\FrameFamily;
 use LiturgicalCalendar\Api\Enum\ICSErrorLevel;
 use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\Route;
@@ -235,23 +236,36 @@ class Health implements MessageComponentInterface
     private const VALIDATABLE_RESPONSE_FORMATS = ['JSON', 'XML', 'ICS', 'YML'];
 
     /**
-     * The legacy CSS class fragment for each published step.
+     * The legacy CSS class fragment for each published step, per {@see FrameFamily}.
      *
      * The wire carries two vocabularies during migration: `step` is what `GET /validations` publishes, and
      * `classes` is what the current clients match on. This is the projection between them, and it exists in
      * exactly one place so they cannot drift — the label-as-selector defect fixed in #820 happened because
-     * every emitter built its own selector. Deleting this const and the `$classFragment` parameter is most of
-     * what legacy removal will be.
+     * every emitter built its own selector. Deleting this const, `FrameFamily` and the `$classFragment` /
+     * `$classQualifier` parameters is most of what legacy removal will be.
      *
-     * {@see Step::COMPLETE} has no entry on purpose: the terminal frame is not a check and has no card to
-     * address, so {@see Health::sendStepResult()} refuses it rather than inventing a class for it.
+     * It is keyed by family because the projection is **not** one-to-one: a unit test's one outcome is
+     * `Step::VALIDATES` on the wire, exactly as a schema check is, but it addresses a `test-valid` box
+     * rather than a `schema-valid` one. Keying by family is what lets both be true without a call site
+     * ever naming a class — and it keeps the divergence *declared data* instead of an override argument
+     * that any future caller could reach for.
      *
-     * @var array<string, string>
+     * A family lists only the steps it has: {@see Step::COMPLETE} is in neither, because the terminal frame
+     * is not a check and has no card to address, and `TEST_RUN` lists only `validates`, because a test run
+     * is one named outcome and not a three-step pipeline. Both are refused by
+     * {@see Health::sendStepResult()} rather than being given an invented class.
+     *
+     * @var array<string, array<string, string>>
      */
     private const FRAME_CLASS_FOR_STEP = [
-        'exists'    => 'file-exists',
-        'parses'    => 'json-valid',
-        'validates' => 'schema-valid'
+        FrameFamily::CHECK->value    => [
+            'exists'    => 'file-exists',
+            'parses'    => 'json-valid',
+            'validates' => 'schema-valid'
+        ],
+        FrameFamily::TEST_RUN->value => [
+            'validates' => 'test-valid'
+        ]
     ];
 
     private const RED    = "\033[0;31m";
@@ -735,11 +749,16 @@ class Health implements MessageComponentInterface
      *        holds it — a folder check's per-file errors, a schema failure's two parts — and is never manufactured
      *        for a site that genuinely has nothing to say.
      * @param ?string $runToken The originating run token to echo back, or null to use the per-connection fallback.
-     * @param ?string $classSuffix One further class segment, without the leading dot, appended *after* the step, or
-     *        null when the address ends at the step. The calendar-validation frames are the case that needs it:
-     *        their address is `.calendar-{id}.{step}.year-{year}`, so the year sits past the step and no prefix can
-     *        express it. Callers pass segments, never selectors — the dots, the ordering and the step class are this
+     * @param ?string $classQualifier One further class segment, without the leading dot, or null when the address is
+     *        the fragment and the step alone. Where it sits is the family's business, not the caller's: a calendar
+     *        validation is `.calendar-{id}.{step}.year-{year}` and a test run is `.{test}.year-{year}.test-valid`, so
+     *        the same year segment goes after the step in one grammar and before it in the other. Callers pass
+     *        segments, never selectors and never positions — the dots, the ordering and the step class are this
      *        method's business, which is the whole point of the projection.
+     * @param FrameFamily $family Which of the two legacy class grammars this frame belongs to; see {@see FrameFamily}.
+     *        It selects the step's class from {@see Health::FRAME_CLASS_FOR_STEP} and the place `$classQualifier`
+     *        takes, so that `test-valid` and a year-before-step address need neither an override argument nor a second
+     *        composing site. Defaults to `CHECK`, which is every frame the source-data and calendar clusters emit.
      * @param ?string $responseType The `responsetype` a calendar-validation failure frame has always carried, or null
      *        for every other frame. It belongs to the legacy half and is assigned with it, immediately after
      *        `classes`, so a v1 frame's key order is byte-for-byte what it has always been and only the new
@@ -754,19 +773,31 @@ class Health implements MessageComponentInterface
         string $text,
         ?array $details = null,
         ?string $runToken = null,
-        ?string $classSuffix = null,
+        ?string $classQualifier = null,
+        FrameFamily $family = FrameFamily::CHECK,
         ?string $responseType = null
     ): void {
         // Refusing an unmapped step covers every future case the way a `COMPLETE`-only guard would not:
-        // PHPStan cannot catch a missing entry, because the const is typed `array<string, string>` rather
-        // than as a shape, so a new case would reach here, warn about an undefined key, and emit `.<fragment>.`.
-        $frameClass = self::FRAME_CLASS_FOR_STEP[$step->value]
-            ?? throw new \LogicException("Step::{$step->name} has no legacy frame class and cannot be sent as a step result.");
+        // PHPStan cannot catch a missing entry, because the const is typed `array<string, array<string, string>>`
+        // rather than as a shape, so a new case would reach here, warn about an undefined key, and emit
+        // `.<fragment>.`. The lookup is per family, so a step a family does not have — `exists` on a test run,
+        // which is not a pipeline — is refused on the same path rather than borrowing another family's class.
+        $frameClass = self::FRAME_CLASS_FOR_STEP[$family->value][$step->value]
+            ?? throw new \LogicException("Step::{$step->name} has no legacy frame class in the {$family->value} family and cannot be sent as a step result.");
+
+        // The two grammars differ in exactly one thing — which side of the step class the qualifier falls on —
+        // and both orders live here. Expressing it as a family rather than as two parameters makes "before *and*
+        // after" unrepresentable, the same way named arguments made the sibling emitters' mismatched tails
+        // unrepresentable.
+        $segments = match ($family) {
+            FrameFamily::CHECK    => [$classFragment, $frameClass, $classQualifier],
+            FrameFamily::TEST_RUN => [$classFragment, $classQualifier, $frameClass]
+        };
 
         $message          = new \stdClass();
         $message->type    = Status::PASS === $status ? 'success' : 'error';
         $message->text    = $text;
-        $message->classes = '.' . $classFragment . '.' . $frameClass . ( null === $classSuffix ? '' : '.' . $classSuffix );
+        $message->classes = '.' . implode('.', array_filter($segments, static fn(?string $segment): bool => null !== $segment));
         if (null !== $responseType) {
             $message->responsetype = $responseType;
         }
@@ -2157,7 +2188,7 @@ class Health implements MessageComponentInterface
             $text,
             details: $details,
             runToken: $runToken,
-            classSuffix: "year-$year",
+            classQualifier: "year-$year",
             responseType: $responseType
         );
     }
@@ -2607,6 +2638,67 @@ class Health implements MessageComponentInterface
     }
 
     /**
+     * Emit the result frame for one test run.
+     *
+     * A test run is a single named outcome, not a pipeline: there is nothing to report between asking for
+     * the calendar and knowing whether the assertion held. So it carries one step — `validates`, the same
+     * word a schema check publishes, because that is what it is — and `status` says the rest.
+     *
+     * **`.test-valid` is unchanged, and is not an oddity.** It *addresses the validity box*; it does not
+     * claim an outcome, and the client colours that box by `status`. #806 reads the class being the same
+     * for a pass and a fail as a defect, but a class that encoded the outcome would be strictly worse: a
+     * client would have to know the result in order to build the selector that finds the card to put the
+     * result in. Renaming it is a breaking change, and belongs to legacy removal.
+     *
+     * A test's `target` is the test, the calendar and the year, because none of the three identifies a
+     * check on its own — the same test runs against many calendars, and against many years of each. The
+     * category and the rite are in scope here and are deliberately left out; see {@see Health::frameTarget()}.
+     *
+     * The address is `.{test}.year-{year}.test-valid`, the year *before* the step where a calendar
+     * validation puts it after. That irregularity is a fact about the family and is declared as one
+     * ({@see FrameFamily}), so this method passes `$year` as a value and, like every other emitter, never
+     * sees a dot.
+     *
+     * The class fragment is the test name verbatim, as it has always been: test names are PascalCase file
+     * names from `jsondata/tests/` and are already class-safe, and putting them through
+     * {@see Health::cssClassFragmentForId()} would be a change to the wire dressed as tidying.
+     *
+     * @param ConnectionInterface $to The connection to send the frame to.
+     * @param string $test The name of the unit test, e.g. `AllSaintsUSA`. Both the target's id and the class fragment.
+     * @param string $calendar The calendar the test ran against, e.g. `US`.
+     * @param int $year The year it ran for; rides in the class as `year-{year}`, before the step.
+     * @param Status $status The outcome, which `type` is projected from.
+     * @param string $text The human-facing message, passed through untouched.
+     * @param ?list<string> $details The pieces behind a summarising `text`, or null when the site genuinely has none —
+     *        which is both of today's sites: a JSON decode failure and an unreachable URL each have one thing to say,
+     *        and per {@see Health::sendStepResult()} nothing structured is manufactured where none exists.
+     * @param ?string $runToken The originating run token to echo back.
+     */
+    private function sendTestResult(
+        ConnectionInterface $to,
+        string $test,
+        string $calendar,
+        int $year,
+        Status $status,
+        string $text,
+        ?array $details = null,
+        ?string $runToken = null
+    ): void {
+        $this->sendStepResult(
+            $to,
+            $test,
+            self::frameTarget($test, ['calendar' => $calendar, 'year' => $year]),
+            Step::VALIDATES,
+            $status,
+            $text,
+            details: $details,
+            runToken: $runToken,
+            classQualifier: "year-$year",
+            family: FrameFamily::TEST_RUN
+        );
+    }
+
+    /**
      * Executes a unit test for a given Liturgical Calendar test.
      *
      * @param string $test The name of the unit test to be executed.
@@ -2632,7 +2724,7 @@ class Health implements MessageComponentInterface
         $req     = $this->buildCalendarRequestPath($calendar, $year, $category, $rite);
         $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts, 300, $to);
         $promise->then(
-            function (array $result) use ($to, $test, $year, $runToken, $rite) {
+            function (array $result) use ($to, $test, $calendar, $year, $runToken, $rite) {
                 /** @var array{data: string, fromCache: bool} $result */
                 $data = $result['data'];
                 /** @var \stdClass&object{settings:object{year:int,national_calendar?:string,diocesan_calendar?:string},litcal:LiturgicalEvent[]} $jsonData */
@@ -2644,19 +2736,27 @@ class Health implements MessageComponentInterface
                     }
                     $this->sendMessage($to, $UnitTest->getMessage(), $runToken);
                 } else {
-                    $message          = new \stdClass();
-                    $message->type    = 'error';
-                    $message->text    = "There was an error decoding JSON data for the test $test: " . json_last_error_msg();
-                    $message->classes = ".$test.year-{$year}.test-valid";
-                    $this->sendMessage($to, $message, $runToken);
+                    $this->sendTestResult(
+                        $to,
+                        $test,
+                        $calendar,
+                        $year,
+                        Status::FAIL,
+                        "There was an error decoding JSON data for the test $test: " . json_last_error_msg(),
+                        runToken: $runToken
+                    );
                 }
             },
             function (\Throwable $e) use ($to, $test, $year, $category, $calendar, $req, $runToken) {
-                $message          = new \stdClass();
-                $message->type    = 'error';
-                $message->text    = "The $category of $calendar for the year $year was not retrieved at the URL " . Route::CALENDAR->path() . $req . ' : ' . $e->getMessage();
-                $message->classes = ".$test.year-{$year}.test-valid";
-                $this->sendMessage($to, $message, $runToken);
+                $this->sendTestResult(
+                    $to,
+                    $test,
+                    $calendar,
+                    $year,
+                    Status::FAIL,
+                    "The $category of $calendar for the year $year was not retrieved at the URL " . Route::CALENDAR->path() . $req . ' : ' . $e->getMessage(),
+                    runToken: $runToken
+                );
             }
         );
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests;
 
+use LiturgicalCalendar\Api\Enum\FrameFamily;
 use LiturgicalCalendar\Api\Enum\Status;
 use LiturgicalCalendar\Api\Enum\Step;
 use LiturgicalCalendar\Api\Health;
@@ -186,6 +187,87 @@ final class HealthFrameProjectionTest extends TestCase
             $frame->target,
             'a calendar check is a calendar and a year; neither identifies it alone'
         );
+    }
+
+    /**
+     * The test-run address is the other irregular one, and it is irregular in the opposite direction:
+     * `.{test}.year-{year}.test-valid` puts its year segment **before** the step where a calendar
+     * validation puts it after, and its step segment is `test-valid` where the shared table would say
+     * `schema-valid`. Both facts are declared on {@see FrameFamily} rather than composed at the two
+     * emission sites, and nothing else in the gate would notice if either were dropped: the sites sit
+     * behind a resolved `cachedGet()` promise that no test drives.
+     *
+     * A literal, for the same reason the calendar one is: the failure mode is a class that still looks
+     * plausible — `.AllSaintsUSA.test-valid.year-2024`, or `.AllSaintsUSA.year-2024.schema-valid` —
+     * and matches zero cards.
+     */
+    public function testATestRunFrameCarriesTheYearBeforeTheStepAndNamesWhatItRan(): void
+    {
+        $conn = self::stubConnection();
+        $this->invoke(
+            $this->newHealth(),
+            'sendTestResult',
+            [$conn, 'AllSaintsUSA', 'US', 2024, Status::FAIL, 'There was an error decoding JSON data for the test AllSaintsUSA: Syntax error', null, 'run-a']
+        );
+
+        $frame = json_decode($conn->sent[0]);
+        self::assertSame(
+            '.AllSaintsUSA.year-2024.test-valid',
+            $frame->classes,
+            'the year segment rides before the step, and the step segment is test-valid, not schema-valid'
+        );
+        self::assertEquals(
+            (object) ['id' => 'AllSaintsUSA', 'calendar' => 'US', 'year' => 2024],
+            $frame->target,
+            'a test run is a test, a calendar and a year; none of the three identifies it alone'
+        );
+        self::assertSame('validates', $frame->step, 'the wire step is the published word, whatever the legacy class says');
+        self::assertSame('fail', $frame->status);
+        self::assertSame('error', $frame->type);
+        self::assertSame('run-a', $frame->runToken);
+    }
+
+    /**
+     * `.test-valid` addresses the validity box; it does not claim an outcome. So a pass and a fail are
+     * addressed identically and differ in `status` — which is the correct design and not the oddity
+     * #806 reads it as: a class that encoded the outcome would force a client to know the result before
+     * it could build the selector that finds the card to put the result in.
+     */
+    public function testTheValidityBoxIsAddressedTheSameWayForAPassAndAFail(): void
+    {
+        $conn   = self::stubConnection();
+        $health = $this->newHealth();
+        $this->invoke($health, 'sendTestResult', [$conn, 'AllSaintsUSA', 'US', 2024, Status::PASS, 'passed', null, null]);
+        $this->invoke($health, 'sendTestResult', [$conn, 'AllSaintsUSA', 'US', 2024, Status::FAIL, 'failed', null, null]);
+
+        $passed = json_decode($conn->sent[0]);
+        $failed = json_decode($conn->sent[1]);
+
+        self::assertSame('.AllSaintsUSA.year-2024.test-valid', $passed->classes);
+        self::assertSame($passed->classes, $failed->classes, 'the address of the box is the same either way');
+        self::assertSame(['success', 'pass'], [$passed->type, $passed->status]);
+        self::assertSame(['error', 'fail'], [$failed->type, $failed->status]);
+    }
+
+    /**
+     * A family lists only the steps it has. A test run is one named outcome, not a three-step pipeline,
+     * so `exists` is refused for it exactly as `complete` is refused for a check — rather than quietly
+     * borrowing the other family's `file-exists` and addressing a box that does not exist.
+     */
+    public function testAStepTheTestRunFamilyDoesNotHaveIsRefused(): void
+    {
+        $conn = self::stubConnection();
+
+        $this->expectException(\LogicException::class);
+        try {
+            $this->invoke(
+                $this->newHealth(),
+                'sendStepResult',
+                [$conn, 'AllSaintsUSA', null, Step::EXISTS, Status::PASS, 'text', null, null, 'year-2024', FrameFamily::TEST_RUN]
+            );
+        } finally {
+            self::assertSame([], $conn->sent, 'nothing may be sent for a step the family cannot project');
+        }
     }
 
     /**
