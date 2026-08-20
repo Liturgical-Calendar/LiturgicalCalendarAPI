@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Tests;
 use LiturgicalCalendar\Api\Enum\Status;
 use LiturgicalCalendar\Api\Enum\Step;
 use LiturgicalCalendar\Api\Health;
+use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -173,9 +174,67 @@ final class HealthFrameProjectionTest extends TestCase
     }
 
     /**
+     * The `details` rule, at the one file-branch site that has something structured to say.
+     *
+     * A schema failure's text is the schema's own error line joined to the validator's message with
+     * a newline — two things the emitter already holds, flattened into one string. `details` hands
+     * the pieces back rather than making a client split prose it did not build. Sites with nothing
+     * structured behind their text (an unreadable file, a missing schema) manufacture nothing, which
+     * {@see HealthValidationDataErrorTest} pins from the other side.
+     *
+     * The validator's second line quotes an absolute path, so it is asserted structurally rather
+     * than as a literal; the first line is `LitSchema`'s own and is pinned exactly.
+     */
+    public function testASchemaFailureCarriesThePartsItsTextFlattens(): void
+    {
+        Router::getApiPaths();
+
+        $schema = ( new \ReflectionMethod(Health::class, 'retrieveSchemaForCategory') )->invoke(null, 'sourceDataCheck', 'proprium-de-tempore');
+        self::assertIsString($schema);
+
+        $conn       = self::stubConnection(4);
+        $validation = (object) [
+            'action'     => 'executeValidation',
+            'category'   => 'sourceDataCheck',
+            'validate'   => 'proprium-de-tempore',
+            'sourceFile' => 'jsondata/x.json'
+        ];
+
+        ob_start();
+        $this->invoke(
+            $this->newHealth(),
+            'processValidationData',
+            ['{"litcal":"nope"}', $conn, $validation, 'jsondata/x.json', $schema, 'proprium-de-tempore', 'run-token-4', null]
+        );
+        ob_end_clean();
+
+        self::assertCount(3, $conn->sent);
+        $passed = json_decode($conn->sent[0], true);
+        $failed = json_decode($conn->sent[2], true);
+        self::assertIsArray($passed);
+        self::assertIsArray($failed);
+
+        self::assertArrayNotHasKey('details', $passed, 'a step that passed has no failures to detail');
+        self::assertSame('error', $failed['type']);
+        self::assertSame('.proprium-de-tempore.schema-valid', $failed['classes']);
+        self::assertCount(2, $failed['details'], 'the schema error line and the validator message');
+        self::assertSame('Schema validation error: Proprium de Tempore data not created / updated', $failed['details'][0]);
+        self::assertSame(
+            $failed['text'],
+            implode(PHP_EOL, $failed['details']),
+            'details must be exactly the pieces the text flattens — no more, and nothing invented'
+        );
+    }
+
+    /**
      * `complete` is not a check and has no legacy class: projecting it would have to invent one,
      * and a frame classed `.<fragment>.` matches nothing. The terminal frame is emitted elsewhere
      * (#821), so reaching this method with it is a programming error and says so.
+     *
+     * The refusal is general, not a `COMPLETE` special case: any step missing from
+     * `FRAME_CLASS_FOR_STEP` is refused the same way, so a case added later cannot quietly ship an
+     * unmatchable `.<fragment>.` — which PHPStan would not catch, the const being typed
+     * `array<string, string>` rather than as a shape.
      */
     public function testTheTerminalStepIsRefusedBecauseItHasNoLegacyClass(): void
     {

@@ -722,12 +722,17 @@ class Health implements MessageComponentInterface
      *        and without the trailing step; see {@see Health::cssClassFragmentForId()}.
      * @param ?string $targetId The id `GET /validations` published for the artifact being checked, or null for a
      *        v1 `executeValidation` message, which names no id. Never fabricated from the class fragment.
-     * @param Step $step The step being reported. {@see Step::COMPLETE} is not a check and has no legacy class,
-     *        so it is refused here; the terminal frame is emitted elsewhere (#821).
+     * @param Step $step The step being reported. A step with no {@see Health::FRAME_CLASS_FOR_STEP} entry cannot be
+     *        addressed and is refused rather than emitted: {@see Step::COMPLETE} is the case that exists today (the
+     *        terminal frame is emitted elsewhere, #821), and a case added later would otherwise ship a `classes` of
+     *        `.<fragment>.`, which matches zero cards — the silent mismatch this whole projection exists to end.
      * @param Status $status The outcome, which `type` is projected from.
      * @param string $text The human-facing message, passed through untouched.
      * @param ?list<string> $details The individual failures behind a `text` that summarises them, or null when there
      *        are none. Omitted from the frame when empty, so a client need not tell "no details" from "none given".
+     *        The rule, which Tasks 2 and 3 carry forward: this carries structured data wherever the emitter already
+     *        holds it — a folder check's per-file errors, a schema failure's two parts — and is never manufactured
+     *        for a site that genuinely has nothing to say.
      * @param ?string $runToken The originating run token to echo back, or null to use the per-connection fallback.
      */
     private function sendStepResult(
@@ -740,14 +745,16 @@ class Health implements MessageComponentInterface
         ?array $details = null,
         ?string $runToken = null
     ): void {
-        if (Step::COMPLETE === $step) {
-            throw new \LogicException('Step::COMPLETE has no legacy frame class and cannot be sent as a step result.');
-        }
+        // Refusing an unmapped step covers every future case the way a `COMPLETE`-only guard would not:
+        // PHPStan cannot catch a missing entry, because the const is typed `array<string, string>` rather
+        // than as a shape, so a new case would reach here, warn about an undefined key, and emit `.<fragment>.`.
+        $frameClass = self::FRAME_CLASS_FOR_STEP[$step->value]
+            ?? throw new \LogicException("Step::{$step->name} has no legacy frame class and cannot be sent as a step result.");
 
         $message          = new \stdClass();
         $message->type    = Status::PASS === $status ? 'success' : 'error';
         $message->text    = $text;
-        $message->classes = '.' . $classFragment . '.' . self::FRAME_CLASS_FOR_STEP[$step->value];
+        $message->classes = '.' . $classFragment . '.' . $frameClass;
         $message->target  = $targetId;
         $message->step    = $step->value;
         $message->status  = $status->value;
@@ -1626,6 +1633,10 @@ class Health implements MessageComponentInterface
                     // the validator happened to return.
                     /** @var string $validationText */
                     $validationText = $validationResult->text;
+                    // `details` carries what the text flattens, and never invents what is not there.
+                    // {@see Health::validateDataAgainstSchema()} builds that text by joining the schema's
+                    // own error line to the validator's message with a newline, so splitting on newlines
+                    // hands a client back the pieces instead of making it parse prose it did not build.
                     $this->sendStepResult(
                         $to,
                         $validate,
@@ -1633,7 +1644,7 @@ class Health implements MessageComponentInterface
                         Step::VALIDATES,
                         Status::FAIL,
                         $validationText,
-                        null,
+                        explode(PHP_EOL, $validationText),
                         $runToken
                     );
                 }

@@ -183,9 +183,10 @@ final class HealthValidateSourceTest extends TestCase
      */
     private static function expectedFrameClasses(CheckableItem $item, string $fragment): array
     {
+        $frameClassForStep = self::frameClassForStep();
+
         return array_map(
-            static function (string $step) use ($fragment): string {
-                $frameClassForStep = self::frameClassForStep();
+            static function (string $step) use ($fragment, $frameClassForStep): string {
                 self::assertArrayHasKey($step, $frameClassForStep, "published step '{$step}' has no frame class");
 
                 return ".{$fragment}." . $frameClassForStep[$step];
@@ -206,7 +207,10 @@ final class HealthValidateSourceTest extends TestCase
         $parts = explode('.', (string) $frame->classes);
         self::assertCount(3, $parts, "a frame class must be .<fragment>.<step>, got: {$frame->classes}");
         self::assertSame('', $parts[0], "a frame class must start with a dot, got: {$frame->classes}");
-        self::assertContains($parts[2], self::frameClassForStep(), "unknown step in frame class: {$frame->classes}");
+        // Three literals, not `self::frameClassForStep()`: reading the production table on both sides of
+        // this comparison would make it a tautology, which is the very anti-pattern this branch is
+        // policing. The step token of any frame a client can use is one of these three and nothing else.
+        self::assertContains($parts[2], ['file-exists', 'json-valid', 'schema-valid'], "unknown step in frame class: {$frame->classes}");
 
         return $parts[1];
     }
