@@ -10,6 +10,7 @@ use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableItem;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Tests\Support\BrokenInventoryTrait;
+use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -31,6 +32,7 @@ use Ratchet\ConnectionInterface;
 final class HealthValidateSourceTest extends TestCase
 {
     use BrokenInventoryTrait;
+    use HealthQueueIsolationTrait;
 
     public static function setUpBeforeClass(): void
     {
@@ -221,7 +223,7 @@ final class HealthValidateSourceTest extends TestCase
 
     public function testAnUnknownIdIsRejectedAndNothingIsChecked(): void
     {
-        $health = new Health();
+        $health = $this->newHealth();
         $conn   = self::createStubConnection();
 
         self::send($health, $conn, ['action' => 'validateSource', 'target' => ['id' => 'nation:roman:ZZ']]);
@@ -234,7 +236,7 @@ final class HealthValidateSourceTest extends TestCase
 
     public function testATargetThatIsNotAnObjectIsRejectedAsMalformed(): void
     {
-        $health = new Health();
+        $health = $this->newHealth();
         $conn   = self::createStubConnection();
 
         self::send($health, $conn, ['action' => 'validateSource', 'target' => 'temporale:roman']);
@@ -247,7 +249,7 @@ final class HealthValidateSourceTest extends TestCase
 
     public function testATargetIdThatIsNotAStringIsRejected(): void
     {
-        $health = new Health();
+        $health = $this->newHealth();
         $conn   = self::createStubConnection();
 
         self::send($health, $conn, ['action' => 'validateSource', 'target' => ['id' => 42]]);
@@ -264,7 +266,7 @@ final class HealthValidateSourceTest extends TestCase
      */
     public function testAMessageWithNoTargetIsRejectedByPropertyValidation(): void
     {
-        $health = new Health();
+        $health = $this->newHealth();
         $conn   = self::createStubConnection();
 
         self::send($health, $conn, ['action' => 'validateSource']);
@@ -305,7 +307,7 @@ final class HealthValidateSourceTest extends TestCase
     #[DataProvider('retiredPropertyProvider')]
     public function testALegacyAddressingPropertyAlongsideATargetIsRejected(string $property, mixed $value): void
     {
-        $health = new Health();
+        $health = $this->newHealth();
         $conn   = self::createStubConnection();
 
         self::send($health, $conn, [
@@ -356,7 +358,7 @@ final class HealthValidateSourceTest extends TestCase
      */
     public function testARunTokenIsNotARetiredProperty(): void
     {
-        $health = new Health();
+        $health = $this->newHealth();
         $conn   = self::createStubConnection();
 
         self::send($health, $conn, [
@@ -412,7 +414,7 @@ final class HealthValidateSourceTest extends TestCase
      */
     public function testANewRunTokenDropsTheMemoizedInventory(): void
     {
-        $health = new Health();
+        $health = $this->newHealth();
         $conn   = self::createStubConnection();
 
         CheckableInventory::all();
@@ -442,7 +444,7 @@ final class HealthValidateSourceTest extends TestCase
      */
     public function testAContinuingRunKeepsTheMemoizedInventory(): void
     {
-        $health = new Health();
+        $health = $this->newHealth();
         $conn   = self::createStubConnection();
 
         self::setRunTokens($health, [1 => 'run-a']);
@@ -466,7 +468,7 @@ final class HealthValidateSourceTest extends TestCase
      */
     public function testCancelRunNeitherStoresATokenNorRebuildsTheInventory(): void
     {
-        $health = new Health();
+        $health = $this->newHealth();
         $conn   = self::createStubConnection();
 
         CheckableInventory::all();
@@ -499,7 +501,9 @@ final class HealthValidateSourceTest extends TestCase
     {
         $realRoot = Router::$apiFilePath;
 
-        self::withBrokenInventory(static function () use ($realRoot): void {
+        // Not a static closure: the Health built inside it has to be tracked by
+        // HealthQueueIsolationTrait, whose newHealth() is an instance method.
+        self::withBrokenInventory(function () use ($realRoot): void {
             // The fixture tree holds one malformed calendar and nothing else, so give it the two
             // things a temporale check reads — the temporale file and the schemas it validates
             // against — and the check can succeed or fail on its own merits rather than on the
@@ -508,7 +512,7 @@ final class HealthValidateSourceTest extends TestCase
             self::copyIntoFixture($realRoot, JsonData::TEMPORALE_FILE->value);
             self::copyIntoFixture($realRoot, JsonData::SCHEMAS_FOLDER->value);
 
-            $health = new Health();
+            $health = $this->newHealth();
 
             $staticTarget = self::createStubConnection(1);
             self::send($health, $staticTarget, ['action' => 'validateSource', 'target' => ['id' => 'temporale:roman']]);
@@ -606,7 +610,7 @@ final class HealthValidateSourceTest extends TestCase
         $published = CheckableInventory::all();
         self::assertNotEmpty($published, 'the inventory published nothing to round-trip');
 
-        $health = new Health();
+        $health = $this->newHealth();
 
         /** @var array<string, string> $unaddressable */
         $unaddressable = [];

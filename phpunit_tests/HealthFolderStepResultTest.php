@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Tests;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Ratchet\ConnectionInterface;
@@ -27,6 +28,8 @@ use Ratchet\ConnectionInterface;
 #[CoversClass(Health::class)]
 final class HealthFolderStepResultTest extends TestCase
 {
+    use HealthQueueIsolationTrait;
+
     /**
      * A minimal Ratchet connection that records every outbound frame. `resourceId` is a dynamic
      * public property Ratchet assigns and is not part of `ConnectionInterface`, so this mirrors
@@ -66,7 +69,7 @@ final class HealthFolderStepResultTest extends TestCase
 
         $method = new \ReflectionMethod(Health::class, 'sendFolderStepResult');
         $method->invoke(
-            new Health(),
+            $this->newHealth(),
             $conn,
             'national-calendar-IT-i18n.json-valid',
             $errors,
@@ -141,7 +144,7 @@ final class HealthFolderStepResultTest extends TestCase
         Router::getApiPaths();
 
         $conn   = self::createStubConnection(3);
-        $health = new Health();
+        $health = $this->newHealth();
 
         $tokens = new \ReflectionProperty(Health::class, 'runTokens');
         $tokens->setValue($health, [$conn->resourceId => 'run-token-1']);
@@ -185,7 +188,7 @@ final class HealthFolderStepResultTest extends TestCase
         $derived = strtr(JsonData::NATIONAL_CALENDAR_I18N_FOLDER->path(), ['{nation}' => 'ZZ']);
 
         $conn   = self::createStubConnection(4);
-        $health = new Health();
+        $health = $this->newHealth();
 
         $tokens = new \ReflectionProperty(Health::class, 'runTokens');
         $tokens->setValue($health, [$conn->resourceId => 'run-token-1']);

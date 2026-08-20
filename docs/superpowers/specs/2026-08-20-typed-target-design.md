@@ -262,8 +262,23 @@ unrelated to the reshaping this document describes, and filed separately as
 [#819](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/819); the substantive documentation of the
 caveat lives on the `steps` property itself, in `jsondata/schemas/LitCalValidationsPath.json` and the `/validations`
 description in `openapi.json`, because that is where a client discovers the array in the first place. **`steps` is
-authoritative for its length, not for its values** — sizing a check's progress as `count(steps)` is correct today and
-is exactly what replaces UnitTestInterface#42's four hardcoded `* 3` constants.
+authoritative for its values in no case, and for its length in all but one** — sizing a check's progress as
+`count(steps)` is what replaces UnitTestInterface#42's four hardcoded `* 3` constants, and it is right everywhere
+except the exception below.
+
+### The one place `count(steps)` is wrong today
+
+`Health::processValidationData()` — the **file** branch of a check — emits only **two** frames when the file exists but
+its contents will not decode as JSON: `file-exists` and `json-valid`, and no `schema-valid` at all. A client sizing the
+check at three frames waits forever for the third. `handleValidationDataError()` (file unreadable) correctly emits
+three, and the folder branch was fixed for precisely this in commit `ea29b678` on `development`; the file branch was
+not, and `validateSource` now routes roughly sixty file checks through it.
+
+Deliberately **not** fixed here. Adding the third frame changes v1 `executeValidation` output, and this branch's whole
+guarantee is that it does not. It is filed as a follow-up, and it is distinct from
+[#819](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/819), which is about the step *names* rather
+than the step *count*. Until it lands, a client should treat `count(steps)` as an upper bound on the file branch and
+finish a check on a terminal frame rather than on a full count.
 
 Deliberately not fixed by renaming either vocabulary to match the other: the maintainer's decision is that #806
 section C dissolves this on its own. Once responses are structured and DOM-agnostic, the frame itself carries the step
