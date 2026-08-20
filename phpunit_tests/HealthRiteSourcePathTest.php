@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Router;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\Attributes\WithoutErrorHandler;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ratchet\ConnectionInterface;
 
@@ -94,7 +95,6 @@ final class HealthRiteSourcePathTest extends TestCase
      * admits a diocesan id, that arm starts executing, and with the bare Roman constant it would
      * have sent every Ambrosian diocese to a Roman path.
      */
-    #[WithoutErrorHandler]
     public function testANationalSlugTheTrailingBlockCannotMatchIsDerivedServerSide(): void
     {
         $expected = strtr(JsonData::NATIONAL_CALENDAR_FILE->path(), ['{nation}' => 'USA']);
@@ -105,7 +105,6 @@ final class HealthRiteSourcePathTest extends TestCase
         self::assertStringNotContainsString('client/supplied/nonsense.json', $output);
     }
 
-    #[WithoutErrorHandler]
     public function testADiocesanSlugTheTrailingBlockCannotMatchKeepsItsRite(): void
     {
         $ambrosian = strtr(JsonData::AMBROSIAN_DIOCESAN_CALENDAR_FILE->path(), [
@@ -126,6 +125,60 @@ final class HealthRiteSourcePathTest extends TestCase
 
         self::assertStringContainsString('Reading data from file ' . $ambrosian, $output);
         self::assertStringNotContainsString($roman, $output);
+    }
+
+    // ------------------------------------------------- the two slug grammars must agree
+
+    /**
+     * One identifier, described twice in one file: `retrieveSchemaForCategory()` matches the
+     * `validate` slug to pick a schema, and `executeValidation()` matches the same slug to derive
+     * the source path. They have to agree, and nothing but this test makes them.
+     *
+     * Widening `executeValidation()`'s pattern to `[A-Za-z_]+` left the schema side on
+     * `[A-Z]{2}` / `[a-z]{6}_[a-z]{2}`, so an id outside the conventional shapes would have had
+     * its path derived and its schema resolve to null — the "Unable to detect schema" failure
+     * again, from the other direction. Every id in jsondata today satisfies both forms, so the
+     * canonical rows below pass either way; the off-convention rows are what pins the grammars
+     * together.
+     *
+     * @return array<string, array{0: string, 1: LitSchema, 2: list<\stdClass>|null}>
+     */
+    public static function slugGrammarProvider(): array
+    {
+        return [
+            'national, canonical'      => ['national-calendar-IT', LitSchema::NATIONAL, null],
+            'national, off-convention' => ['national-calendar-USA', LitSchema::NATIONAL, null],
+            'diocesan, canonical'      => ['diocesan-calendar-milano_it', LitSchema::DIOCESAN, null],
+            'diocesan, off-convention' => [
+                'diocesan-calendar-nowhere_zz',
+                LitSchema::DIOCESAN,
+                [self::diocese('nowhere_zz', 'Nowhere', 'ZZ', Rite::AMBROSIAN)]
+            ],
+        ];
+    }
+
+    /**
+     * @param list<\stdClass>|null $dioceses
+     */
+    #[DataProvider('slugGrammarProvider')]
+    public function testTheSchemaAndPathGrammarsAcceptTheSameSlug(string $slug, LitSchema $expected, ?array $dioceses): void
+    {
+        $method = new \ReflectionMethod(Health::class, 'retrieveSchemaForCategory');
+        self::assertSame(
+            $expected->path(),
+            $method->invoke(null, 'sourceDataCheck', $slug),
+            "the schema side must accept the slug the path side accepts: $slug"
+        );
+
+        // Reaching a derived path at all is the proof that `executeValidation()`'s own pattern
+        // matched: had it not, $dataPath would still be the client's `sourceFile`.
+        $output = self::captureSourceFileRead($slug, $dioceses);
+        self::assertStringContainsString('Reading data from file ', $output);
+        self::assertStringNotContainsString(
+            'client/supplied/nonsense.json',
+            $output,
+            "the path side must accept the slug the schema side accepts: $slug"
+        );
     }
 
     // ---------------------------------------------------------------- i18n folder
@@ -210,6 +263,13 @@ final class HealthRiteSourcePathTest extends TestCase
         $conn   = self::createStubConnection(1);
         $health = self::healthWithRunToken($conn);
 
+        // Several of these slugs name files that deliberately do not exist — that is the point of
+        // them — and react/filesystem's fallback adapter stat()s and reads unconditionally, so it
+        // emits PHP warnings the assertions have no interest in. Swallow them here rather than
+        // per test: what is under assertion is the path Health echoed, not whether the read
+        // succeeded.
+        set_error_handler(static fn(): bool => true);
+
         ob_start();
         try {
             self::withMetadata(
@@ -229,6 +289,7 @@ final class HealthRiteSourcePathTest extends TestCase
             );
         } finally {
             $output = (string) ob_get_clean();
+            restore_error_handler();
         }
 
         return $output;

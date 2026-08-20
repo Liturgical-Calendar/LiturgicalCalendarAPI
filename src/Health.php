@@ -2235,10 +2235,17 @@ class Health implements MessageComponentInterface
                 if (preg_match('/^wider-region-[A-Z][a-z]+$/', $dataPath)) {
                     return LitSchema::WIDERREGION->path();
                 }
-                if (preg_match('/^national-calendar-[A-Z]{2}$/', $dataPath)) {
+                // These two deliberately mirror the identifier grammar `executeValidation()` uses
+                // to derive the source path for the same slug. One identifier described by two
+                // patterns, in one file, that have to agree is precisely the drift this issue is
+                // about: every id in jsondata today satisfies both the narrow and the wide form,
+                // but a diocese that ever broke the six-character convention would have its path
+                // derived correctly and its schema silently resolve to null. `wider-region-`,
+                // `tests-` and `proprium-de-*` have no such sibling and keep their own patterns.
+                if (preg_match('/^national-calendar-[A-Za-z_]+$/', $dataPath)) {
                     return LitSchema::NATIONAL->path();
                 }
-                if (preg_match('/^diocesan-calendar-[a-z]{6}_[a-z]{2}$/', $dataPath)) {
+                if (preg_match('/^diocesan-calendar-[A-Za-z_]+$/', $dataPath)) {
                     return LitSchema::DIOCESAN->path();
                 }
                 if (preg_match('/^tests-[a-zA-Z0-9_]+$/', $dataPath)) {
