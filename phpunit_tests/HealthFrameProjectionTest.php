@@ -471,8 +471,9 @@ final class HealthFrameProjectionTest extends TestCase
 
     /**
      * `complete` is not a check and has no legacy class: projecting it would have to invent one,
-     * and a frame classed `.<fragment>.` matches nothing. The terminal frame is emitted elsewhere
-     * (#821), so reaching this method with it is a programming error and says so.
+     * and a frame classed `.<fragment>.` matches nothing. The terminal frame is composed by
+     * {@see Health::sendComplete()}, which routes around this method rather than relaxing the
+     * refusal (#821), so reaching this one with it is a programming error and says so.
      *
      * The refusal is general, not a `COMPLETE` special case: any step missing from
      * `FrameFamily::CLASS_FOR_STEP` is refused the same way, so a case added later cannot quietly ship an
@@ -493,5 +494,57 @@ final class HealthFrameProjectionTest extends TestCase
         } finally {
             self::assertSame([], $conn->sent, 'nothing may be sent for a step that cannot be projected');
         }
+    }
+
+    /**
+     * So the terminal frame is built without the projection, and comes out with neither of the two
+     * fields the projection would have supplied.
+     *
+     * `classes` would have to be invented — see the refusal above — and `status` would be a claim the
+     * frame is not making: it reports that the work finished, not that it passed. Asserted as
+     * *absent* keys rather than as null values, since a client tells "not applicable" from "null"
+     * the same way it does for `responsetype`.
+     *
+     * The legacy `type` is still `success`, because a v2 client is reading `step` while any generic
+     * frame handling is reading `type`, and there is no new response type in this migration — since
+     * UnitTestInterface PR #46 an unrecognised one is painted as a visible failed check.
+     */
+    public function testTheTerminalFrameIsBuiltWithoutTheProjectionAndCarriesNeitherClassesNorStatus(): void
+    {
+        $conn = self::stubConnection();
+        $this->invoke(
+            $this->newHealth(),
+            'sendComplete',
+            [$conn, (object) ['id' => 'temporale:roman'], 'run-a', 'req-alpha']
+        );
+
+        self::assertCount(1, $conn->sent);
+        $frame = json_decode($conn->sent[0], true);
+        self::assertIsArray($frame);
+        self::assertSame('complete', $frame['step'], 'the published terminal word reaches the wire');
+        self::assertSame('success', $frame['type']);
+        self::assertArrayNotHasKey('classes', $frame, 'no legacy class exists for a step the legacy protocol never had');
+        self::assertArrayNotHasKey('status', $frame, 'finishing is not an outcome');
+        self::assertSame(['id' => 'temporale:roman'], $frame['target']);
+        self::assertSame(['run-a', 'run-a', 'req-alpha'], [$frame['runToken'], $frame['runId'], $frame['requestId']]);
+    }
+
+    /**
+     * The gate, at the emitter rather than at the twelve call sites — which is where it has to be, so
+     * that a thirteenth site added later cannot forget it.
+     *
+     * This is the one place in #806 where the additive envelope is not enough: a new frame changes the
+     * *stream*. `resources.js` sizes a phase as `checks * 3` and advances on `>=`, so a v1 client
+     * reaches its threshold on the three real frames and the terminal frame then increments whichever
+     * counter has become active — finishing the following phase early too, with nothing visibly
+     * failing. {@see HealthTerminalFrameTest} asserts the same absence from the other end, through
+     * whole requests; this asserts it of the emitter itself, where no arm can hide it.
+     */
+    public function testTheTerminalFrameIsGatedOnCorrelationAndSendsNothingWithoutIt(): void
+    {
+        $conn = self::stubConnection();
+        $this->invoke($this->newHealth(), 'sendComplete', [$conn, (object) ['id' => 'temporale:roman'], 'run-a', null]);
+
+        self::assertSame([], $conn->sent, 'a client that did not opt into correlation must not be sent a frame it cannot have asked for');
     }
 }

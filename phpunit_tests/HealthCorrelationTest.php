@@ -112,11 +112,12 @@ final class HealthCorrelationTest extends TestCase
         ]);
 
         $frames = self::framesOf($conn);
-        self::assertCount(3, $frames, 'a source check answers with one frame per published step');
+        self::assertCount(4, $frames, 'a source check answers with one frame per published step, and then terminates');
         foreach ($frames as $frame) {
             self::assertNotSame('echobot', $frame->type, "the message was refused: {$frame->text}");
             self::assertSame('req-alpha', $frame->requestId, 'every frame must name the request that caused it');
         }
+        self::assertSame('complete', $frames[3]->step, 'the terminal frame carries the id too: it is the frame a client stops on');
     }
 
     /**
@@ -218,7 +219,8 @@ final class HealthCorrelationTest extends TestCase
         ]);
 
         $frames = self::framesOf($conn);
-        self::assertCount(3, $frames, "a well-formed requestId was refused: {$frames[0]->text}");
+        self::assertNotSame('echobot', $frames[0]->type, "a well-formed requestId was refused: {$frames[0]->text}");
+        self::assertCount(4, $frames, 'three step frames and the terminal one');
         self::assertSame($requestId, $frames[0]->requestId);
     }
 
@@ -371,18 +373,23 @@ final class HealthCorrelationTest extends TestCase
         self::failQueuedRequest($health, 1);
         self::failQueuedRequest($health, 0);
 
+        // Two frames per request: the `exists` failure, then the terminal frame that ends it.
         $frames = self::framesOf($conn);
-        self::assertCount(2, $frames);
+        self::assertCount(4, $frames);
 
         self::assertSame('US', $frames[0]->target->id, 'precondition: the request that arrived second answered first');
         self::assertSame(2027, $frames[0]->target->year);
         self::assertSame('req-beta', $frames[0]->requestId);
+        self::assertSame('complete', $frames[1]->step);
+        self::assertSame('req-beta', $frames[1]->requestId, 'the terminal frame belongs to the request it terminates');
 
-        self::assertSame('IT', $frames[1]->target->id);
-        self::assertSame(2026, $frames[1]->target->year);
+        self::assertSame('IT', $frames[2]->target->id);
+        self::assertSame(2026, $frames[2]->target->year);
+        self::assertSame('complete', $frames[3]->step);
+        self::assertSame('req-alpha', $frames[3]->requestId, 'and so does the second one');
         self::assertSame(
             'req-alpha',
-            $frames[1]->requestId,
+            $frames[2]->requestId,
             'a late frame was stamped with a later request\'s id: requestId is being read from the connection instead of from the request'
         );
     }
@@ -422,14 +429,23 @@ final class HealthCorrelationTest extends TestCase
         self::failQueuedRequest($health, 0);
 
         $frames = self::framesOf($conn);
-        self::assertCount(6, $frames, 'an unreadable source answers all three steps, per request');
+        self::assertCount(8, $frames, 'an unreadable source answers all three steps and then terminates, per request');
 
+        // The terminal frame carries no `classes` — there is no legacy class for a step the legacy
+        // protocol never had — so the address is asserted over the step frames and the id over all four.
         foreach (array_slice($frames, 0, 3) as $frame) {
             self::assertStringContainsString('national-calendar-US', (string) $frame->classes, 'precondition: the request that arrived second answered first');
+        }
+        foreach (array_slice($frames, 0, 4) as $frame) {
             self::assertSame('req-beta', $frame->requestId);
         }
-        foreach (array_slice($frames, 3, 3) as $frame) {
+        self::assertSame('complete', $frames[3]->step, 'the first request to answer is also the first to terminate');
+
+        foreach (array_slice($frames, 4, 3) as $frame) {
             self::assertStringContainsString('national-calendar-IT', (string) $frame->classes);
+        }
+        self::assertSame('complete', $frames[7]->step);
+        foreach (array_slice($frames, 4, 4) as $frame) {
             self::assertSame(
                 'req-alpha',
                 $frame->requestId,
@@ -477,15 +493,19 @@ final class HealthCorrelationTest extends TestCase
         self::fulfilQueuedRequest($health, 0);
 
         $frames = self::framesOf($conn);
-        self::assertCount(2, $frames);
+        self::assertCount(4, $frames, 'the runner\'s frame and the terminal frame, per request');
 
         self::assertSame('CorrelationHarnessBeta', $frames[0]->target->id, 'precondition: the request that arrived second answered first');
         self::assertSame('req-beta', $frames[0]->requestId);
+        self::assertSame('complete', $frames[1]->step);
+        self::assertSame('req-beta', $frames[1]->requestId, 'a test run terminates the same way a three-step check does');
 
-        self::assertSame('CorrelationHarnessAlpha', $frames[1]->target->id);
+        self::assertSame('CorrelationHarnessAlpha', $frames[2]->target->id);
+        self::assertSame('complete', $frames[3]->step);
+        self::assertSame('req-alpha', $frames[3]->requestId);
         self::assertSame(
             'req-alpha',
-            $frames[1]->requestId,
+            $frames[2]->requestId,
             'the LitTestRunner frame was stamped with a later request\'s id: requestId is being read from the connection inside sendMessage()'
         );
     }
@@ -514,11 +534,15 @@ final class HealthCorrelationTest extends TestCase
         self::failQueuedRequest($health, 1);
         self::failQueuedRequest($health, 0);
 
+        // Each request answers with its `exists` failure and then its terminal frame.
         $frames = self::framesOf($conn);
-        self::assertCount(2, $frames);
-        self::assertSame(['run-a', 'run-a'], array_map(static fn (\stdClass $f): mixed => $f->runToken, $frames));
-        self::assertSame(['run-a', 'run-a'], array_map(static fn (\stdClass $f): mixed => $f->runId, $frames));
-        self::assertSame(['req-beta', 'req-alpha'], array_map(static fn (\stdClass $f): mixed => $f->requestId, $frames));
+        self::assertCount(4, $frames);
+        self::assertSame(array_fill(0, 4, 'run-a'), array_map(static fn (\stdClass $f): mixed => $f->runToken, $frames));
+        self::assertSame(array_fill(0, 4, 'run-a'), array_map(static fn (\stdClass $f): mixed => $f->runId, $frames));
+        self::assertSame(
+            ['req-beta', 'req-beta', 'req-alpha', 'req-alpha'],
+            array_map(static fn (\stdClass $f): mixed => $f->requestId, $frames)
+        );
     }
 
     // ---------------------------------------------------------------- the paths the interleaved tests do not reach
@@ -550,10 +574,12 @@ final class HealthCorrelationTest extends TestCase
         self::failQueuedRequest($health, 0);
 
         $frames = self::framesOf($conn);
-        self::assertCount(1, $frames);
+        self::assertCount(2, $frames);
         self::assertSame('CorrelationHarnessLegacy', $frames[0]->target->id, 'precondition: this is the sendTestResult() failure frame');
         self::assertSame('validates', $frames[0]->step);
         self::assertSame('req-alpha', $frames[0]->requestId);
+        self::assertSame('complete', $frames[1]->step, 'the legacy action terminates too: correlation and termination are one opt-in');
+        self::assertSame('req-alpha', $frames[1]->requestId);
     }
 
     /**
@@ -576,12 +602,15 @@ final class HealthCorrelationTest extends TestCase
         ]);
 
         $frames = self::framesOf($conn);
-        self::assertCount(3, $frames, 'a folder check answers with exactly one frame per step');
+        self::assertCount(4, $frames, 'a folder check answers with exactly one frame per step, and then terminates');
         foreach ($frames as $frame) {
             self::assertNotSame('echobot', $frame->type, "the message was refused: {$frame->text}");
-            self::assertStringContainsString('folder', (string) $frame->text, 'precondition: these are the folder branch\'s frames');
             self::assertSame('req-alpha', $frame->requestId);
         }
+        foreach (array_slice($frames, 0, 3) as $frame) {
+            self::assertStringContainsString('folder', (string) $frame->text, 'precondition: these are the folder branch\'s frames');
+        }
+        self::assertSame('complete', $frames[3]->step);
     }
 
     /**

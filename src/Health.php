@@ -841,6 +841,61 @@ class Health implements MessageComponentInterface
     }
 
     /**
+     * Emit the terminal frame: the work this request started has finished.
+     *
+     * A client stops on this frame instead of counting the ones before it. Both clients hardcode
+     * three responses per check, and the published `steps` list could not replace that constant
+     * because the count is not reliable — a file whose JSON fails to decode emits two step frames,
+     * not three (#821). Making the end explicit does not fix that; it makes it stop mattering.
+     *
+     * **Gated on `requestId`, and this is the one place in #806 where the additive envelope is not
+     * enough.** A new frame changes the *stream*, not just a frame's contents. A v1 client survives
+     * an unknown shape — `testResults.js` warns on a missing `classes` and carries on — but
+     * `resources.js` sizes a phase as `checks * 3` and advances on `>=`, so it reaches its threshold
+     * on the three real frames and the terminal frame then increments whichever counter is active by
+     * then, finishing the *following* phase early too. A cascading miscount with nothing visibly
+     * failing, which is worse than a crash. `requestId` is already the v2 opt-in signal and a client
+     * adopting `complete` is adopting correlation anyway, so the gate costs a v2 client nothing and
+     * keeps the byte-identity guarantee whole. The gate lives here rather than at the twelve call
+     * sites so that it cannot be forgotten at a thirteenth.
+     *
+     * **No `status`.** The frame reports that the work finished, not that it passed; a run whose every
+     * step failed still completes. The outcome is on the step frames, which is where a client reads it.
+     *
+     * **No `classes`, and therefore not built through {@see Health::sendStepResult()}.** There is no
+     * legacy class for a step that never existed in the legacy protocol, and
+     * {@see FrameFamily::frameClasses()} refuses {@see Step::COMPLETE} outright rather than inventing
+     * one — a frame classed `.<fragment>.` matches zero cards, which is the silent mismatch the whole
+     * projection exists to end. So this composes its own frame and goes straight to the funnel. That
+     * refusal is deliberate and is pinned by a test; it is routed around here, never relaxed there.
+     *
+     * @param ConnectionInterface $to The connection that asked for the work.
+     * @param ?\stdClass $target What was checked, per {@see Health::frameTarget()} — the same target its step frames
+     *        carried, so a client attributes the terminal frame the same way it attributed the rest. Null where the
+     *        step frames carried none: a v1 `executeValidation` message names no id, and nothing is fabricated for it.
+     * @param ?string $runToken The originating run token to echo back, or null to use the per-connection fallback.
+     * @param ?string $requestId The correlation id of the request that has finished. Null means the client never opted
+     *        in, and nothing is sent at all — see above.
+     */
+    private function sendComplete(
+        ConnectionInterface $to,
+        ?\stdClass $target,
+        ?string $runToken = null,
+        ?string $requestId = null
+    ): void {
+        if (null === $requestId) {
+            return;
+        }
+
+        $message         = new \stdClass();
+        $message->type   = 'success';
+        $message->text   = 'All checks for this request are complete';
+        $message->target = $target;
+        $message->step   = Step::COMPLETE->value;
+        $this->sendMessage($to, $message, $runToken, requestId: $requestId);
+    }
+
+    /**
      * Reject a malformed or unresolvable v2 message.
      *
      * Reuses the existing `echobot` error shape deliberately. Since UnitTestInterface PR #46 an
@@ -1377,6 +1432,10 @@ class Health implements MessageComponentInterface
                         requestId: $requestId
                     );
                 }
+                // The short path terminates here, so the terminal frame does too. An arm that
+                // returns without one wedges a client that stops on `complete` forever — the same
+                // shape as the folder-branch wedge fixed in ea29b678, one level up.
+                $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
                 return;
             }
 
@@ -1482,9 +1541,16 @@ class Health implements MessageComponentInterface
                         $runToken,
                         requestId: $requestId
                     );
+
+                    $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
                 },
-                function (\Throwable $e) use ($label, $dataPath) {
+                function (\Throwable $e) use ($to, $target, $label, $dataPath, $runToken, $requestId) {
                     echo 'Error verifying i18n folder for validation ' . $label . ' (' . $dataPath . '): ' . $e->getMessage() . "\n";
+                    // Every per-file promise handles its own rejection, so reaching here means the
+                    // folder check broke in a way nothing anticipated. A client still asked, and is
+                    // still waiting: terminate it rather than leave it counting frames that will
+                    // never arrive.
+                    $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
                 }
             );
         } else {
@@ -1519,9 +1585,14 @@ class Health implements MessageComponentInterface
                         $data = $result['data'];
                         echo 'Fetched data for ' . $dataPath . ': got ' . strlen($data) . " bytes\n";
                         $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $target, requestId: $requestId);
+                        // Terminates whether the steps passed or failed, and whether there were
+                        // three of them or the two a decode failure emits (#821): what a client
+                        // stops on is this frame, never a count.
+                        $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
                     },
                     function (\Throwable $e) use ($to, $validationForMessages, $dataPath, $runToken, $requestId, $target) {
                         $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken, $target, requestId: $requestId);
+                        $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
                     }
                 );
             } else {
@@ -1540,9 +1611,14 @@ class Health implements MessageComponentInterface
                         $data = $result['data'];
                         echo 'Fetched data for ' . $dataPath . ': got ' . strlen($data) . " bytes\n";
                         $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $target, requestId: $requestId);
+                        $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
                     },
                     function (\Throwable $e) use ($to, $validationForMessages, $dataPath, $runToken, $requestId, $target) {
+                        // The unreadable-file arm. It reports all three steps as failures and is
+                        // still a termination, so it ends the same way a success does; #822 is why
+                        // a *missing* file does not reach it today.
                         $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken, $target, requestId: $requestId);
+                        $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
                     }
                 );
             }
@@ -1653,6 +1729,13 @@ class Health implements MessageComponentInterface
 
         $message->classes = ".$validate.diocese-metadata";
         $this->sendMessage($to, $message, $runToken, requestId: $requestId);
+
+        // Every caller returns immediately after this, so this frame is the whole answer to a
+        // request that was accepted and started. It emits no step frames at all, which makes it the
+        // arm a client counting to three would hang on longest — and the one the terminal frame is
+        // least likely to be remembered for. The target is null because a v1 `executeValidation`
+        // message names no id, and one is not invented here any more than it is on its step frames.
+        $this->sendComplete($to, target: null, runToken: $runToken, requestId: $requestId);
     }
 
     /**
@@ -2633,6 +2716,11 @@ class Health implements MessageComponentInterface
                             $this->sendSchemaFailureStepResult($to, $calendar, $year, $validationResult, $runToken, requestId: $requestId);
                         }
                 }
+
+                // After the switch, so that every response format and every arm inside it — a parse
+                // failure that `break`s out early as much as a full three-step pass — leaves through
+                // the same terminal frame.
+                $this->sendComplete($to, target: self::frameTarget($calendar, ['year' => $year]), runToken: $runToken, requestId: $requestId);
             },
             function (\Throwable $e) use ($to, $calendar, $year, $category, $req, $runToken, $requestId) {
                 $this->sendCalendarStepResult(
@@ -2645,6 +2733,8 @@ class Health implements MessageComponentInterface
                     runToken: $runToken,
                     requestId: $requestId
                 );
+
+                $this->sendComplete($to, target: self::frameTarget($calendar, ['year' => $year]), runToken: $runToken, requestId: $requestId);
             }
         );
     }
@@ -2861,6 +2951,12 @@ class Health implements MessageComponentInterface
                         requestId: $requestId
                     );
                 }
+
+                // A test run is one named outcome rather than a pipeline, and it terminates the same
+                // way a three-step check does: the client's phase logic must not have to know which
+                // kind it asked for. Emitted for the LitTestRunner frame above as well as for the
+                // decode failure, since both are the end of this request.
+                $this->sendComplete($to, target: self::frameTarget($test, ['calendar' => $calendar, 'year' => $year]), runToken: $runToken, requestId: $requestId);
             },
             function (\Throwable $e) use ($to, $test, $year, $category, $calendar, $req, $runToken, $requestId) {
                 $this->sendTestResult(
@@ -2873,6 +2969,8 @@ class Health implements MessageComponentInterface
                     runToken: $runToken,
                     requestId: $requestId
                 );
+
+                $this->sendComplete($to, target: self::frameTarget($test, ['calendar' => $calendar, 'year' => $year]), runToken: $runToken, requestId: $requestId);
             }
         );
     }
