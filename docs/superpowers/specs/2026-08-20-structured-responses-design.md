@@ -73,12 +73,21 @@ of it.
 
 Forcing one shape onto four kinds of frame is the mistake `category` made, and #806 exists to undo it.
 
-| frame kind               | `target`                      | `step`                            | `status`        |
-|--------------------------|-------------------------------|-----------------------------------|-----------------|
-| source-check step result | inventory id                  | `exists` / `parses` / `validates` | `pass` / `fail` |
-| test run                 | test name + calendar identity | `validates`                       | `pass` / `fail` |
-| terminal                 | as above, per kind            | `complete`                        | omitted         |
-| protocol rejection       | omitted                       | omitted                           | omitted         |
+| frame kind                | `target`                             | `step`                            | `status`        |
+|---------------------------|--------------------------------------|-----------------------------------|-----------------|
+| source-check step result  | inventory id                         | `exists` / `parses` / `validates` | `pass` / `fail` |
+| calendar-validation step  | calendar identity + year             | `exists` / `parses` / `validates` | `pass` / `fail` |
+| test run                  | test name + calendar identity + year | `validates`                       | `pass` / `fail` |
+| terminal                  | as above, per kind                   | `complete`                        | omitted         |
+| protocol rejection        | omitted                              | omitted                           | omitted         |
+
+There are **three** step-emitting kinds, not two. Counted against `src/Health.php` at `746a3bfd`, the 27 sites that
+assign `classes` fall into four clusters: eleven for source checks (`.{slug}.{file-exists|json-valid|schema-valid}`,
+plus one `.diocese-metadata`), **sixteen for calendar validation** (`.calendar-{id}.{step}.year-{year}` — the largest
+cluster by some way), and two for test runs. Rejections assign none.
+
+A calendar validation is a three-step pipeline exactly as a source check is; only the target and the fragment differ.
+So one `sendStepResult()` serves both, taking the fragment and target descriptor from its caller.
 
 A source check is a three-step pipeline; a test run is a single named outcome. Both therefore end with `complete`,
 so **every operation has the same shape — N step frames, then a terminal** — and a client's phase logic does not
@@ -109,7 +118,7 @@ a noun.
 
 ## Emitters, and the legacy projection
 
-Three typed emitters replace frame construction spread across ~35 sites. Each owns one kind:
+Three typed emitters replace frame construction spread across 27 sites. Each owns one kind:
 
 ```php
 private function sendStepResult(ConnectionInterface $to, string $classFragment, ?string $targetId,
@@ -118,8 +127,9 @@ private function sendStepResult(ConnectionInterface $to, string $classFragment, 
 private function sendComplete(ConnectionInterface $to, string $classFragment, ?string $targetId,
     ?string $runToken, ?string $requestId): void
 
+/** @param array{category:string,calendar:string,rite:Rite} $calendar */
 private function sendTestResult(ConnectionInterface $to, string $classFragment, string $test,
-    CalendarIdentity $calendar, int $year, Status $status, string $text, ?array $details,
+    array $calendar, int $year, Status $status, string $text, ?array $details,
     ?string $runToken, ?string $requestId): void
 ```
 
