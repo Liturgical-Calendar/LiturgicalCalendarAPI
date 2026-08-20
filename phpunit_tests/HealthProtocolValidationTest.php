@@ -118,11 +118,18 @@ final class HealthProtocolValidationTest extends TestCase
     public static function crashVectorProvider(): array
     {
         return [
-            'year as a non-numeric string'            => [['action' => 'validateCalendar', 'calendar' => 'IT', 'year' => 'not-a-year', 'category' => 'nationalcalendar', 'responsetype' => 'JSON']],
-            'category as an array'                    => [['action' => 'validateCalendar', 'calendar' => 'IT', 'year' => 2024, 'category' => [], 'responsetype' => 'JSON']],
-            'unknown response format'                 => [['action' => 'validateCalendar', 'calendar' => 'IT', 'year' => 2024, 'category' => 'nationalcalendar', 'responsetype' => 'NOT_A_FORMAT']],
-            'test as an object'                       => [['action' => 'executeUnitTest', 'test' => ['a' => 1], 'calendar' => 'IT', 'year' => 2024, 'category' => 'nationalcalendar']],
-            'executeValidation category as an object' => [['action' => 'executeValidation', 'category' => ['k' => 'v'], 'validate' => 'x', 'sourceFile' => 'jsondata/x.json']],
+            'year as a non-numeric string'                => [['action' => 'validateCalendar', 'calendar' => 'IT', 'year' => 'not-a-year', 'category' => 'nationalcalendar', 'responsetype' => 'JSON']],
+            'category as an array'                        => [['action' => 'validateCalendar', 'calendar' => 'IT', 'year' => 2024, 'category' => [], 'responsetype' => 'JSON']],
+            'unknown response format'                     => [['action' => 'validateCalendar', 'calendar' => 'IT', 'year' => 2024, 'category' => 'nationalcalendar', 'responsetype' => 'NOT_A_FORMAT']],
+            'test as an object'                           => [['action' => 'executeUnitTest', 'test' => ['a' => 1], 'calendar' => 'IT', 'year' => 2024, 'category' => 'nationalcalendar']],
+            'executeValidation category as an object'     => [['action' => 'executeValidation', 'category' => ['k' => 'v'], 'validate' => 'x', 'sourceFile' => 'jsondata/x.json']],
+            // A number too large for PHP's int is still an integer *by value* under JSON Schema, so
+            // the schema correctly accepts it — json_decode() then hands PHP a float, because the
+            // value is outside PHP_INT_MAX, and these two arms used to unpack it straight into a
+            // typed `int $year` parameter. That is a TypeError, an \Error Ratchet does not catch. See
+            // Health::readYear(), now shared by all four arms that read a `year` for exactly this.
+            'validateCalendar year too large for PHP int' => [['action' => 'validateCalendar', 'calendar' => 'IT', 'year' => 1.0e30, 'category' => 'nationalcalendar', 'responsetype' => 'JSON']],
+            'executeUnitTest year too large for PHP int'  => [['action' => 'executeUnitTest', 'test' => 'X', 'calendar' => 'IT', 'year' => 1.0e30, 'category' => 'nationalcalendar']],
         ];
     }
 
@@ -310,15 +317,71 @@ final class HealthProtocolValidationTest extends TestCase
     }
 
     /**
+     * Every message `crashVectorProvider()` supplies, plus messages that trip the *other* rejection
+     * path this class has — the `requestId`-gated undeclared-property check — which the crash
+     * vectors alone never reach, because none of them carries a `requestId`. Both paths build their
+     * own sentence, and both have to honour the same rule.
+     *
+     * The typed `validateCalendar` row is not incidental: `validateCalendarTyped` is the one
+     * internal definition name that does not equal its action's spelling anywhere else, which is
+     * exactly why it is the row that caught I2 and none of the others would have.
+     *
+     * @return array<string, array{array<string, mixed>}>
+     */
+    public static function vocabularyLeakProvider(): array
+    {
+        return array_merge(self::crashVectorProvider(), [
+            'gated: typed validateCalendar with a stray property' => [
+                [
+                    'action'         => 'validateCalendar',
+                    'calendar'       => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'],
+                    'year'           => 2026,
+                    'responseFormat' => 'JSON',
+                    'zzz'            => 'stray',
+                    'requestId'      => 'req-vocab-1'
+                ]
+            ],
+            'gated: executeValidation with a stray property'      => [
+                [
+                    'action'     => 'executeValidation',
+                    'category'   => 'sourceDataCheck',
+                    'validate'   => 'proprium-de-tempore',
+                    'sourceFile' => 'jsondata/sourcedata/rite/roman/missals/propriumdetempore/propriumdetempore.json',
+                    'notAThing'  => 'whatever',
+                    'requestId'  => 'req-vocab-2'
+                ]
+            ],
+            'gated: runTest with a stray property'                => [
+                [
+                    'action'    => 'runTest',
+                    'test'      => 'X',
+                    'calendar'  => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'],
+                    'year'      => 2026,
+                    'zzz'       => 'stray',
+                    'requestId' => 'req-vocab-3'
+                ]
+            ],
+        ]);
+    }
+
+    /**
      * The schema's own internal vocabulary — which `allOf`/`anyOf` branch matched, `$ref` pointers
-     * into `definitions` — must never reach a client. It describes how the schema *document* is
-     * assembled, not what is wrong with the *message*, and a client cannot look any of it up:
-     * `WebSocketMessage.json` publishes shapes by action name, never by these internal traversal
-     * terms.
+     * into `definitions`, and every definition name that is not also a valid action — must never
+     * reach a client. It describes how the schema *document* is assembled, not what is wrong with
+     * the *message*, and a client cannot look any of it up: `WebSocketMessage.json` publishes shapes
+     * by action name, never by these internal traversal or definition terms.
+     *
+     * The forbidden definition names are read from the schema itself, minus whichever of them are
+     * also a `properties.action.const` somewhere in it — those are legitimate, client-facing action
+     * words (`executeValidation` names both a definition and the action a client sends) and must
+     * stay allowed. What is left — `validateCalendarLegacy`, `validateCalendarTyped`,
+     * `calendarIdentity`, `correlationId` at the time of writing — exists only inside this codebase
+     * and the schema document, never on the wire, and a new definition added later is covered
+     * automatically rather than requiring this list to be kept in sync by hand.
      *
      * @param array<string, mixed> $message
      */
-    #[DataProvider('crashVectorProvider')]
+    #[DataProvider('vocabularyLeakProvider')]
     public function testARejectionNeverLeaksSchemaInternalVocabulary(array $message): void
     {
         $frames = $this->frames((string) json_encode($message));
@@ -327,5 +390,51 @@ final class HealthProtocolValidationTest extends TestCase
         foreach (['allOf', '$ref', 'definitions'] as $forbidden) {
             self::assertStringNotContainsString($forbidden, $text, "the rejection leaked schema internal vocabulary: {$forbidden}");
         }
+
+        $raw             = json_decode((string) file_get_contents(\LiturgicalCalendar\Api\Enum\LitSchema::WEBSOCKET_MESSAGE->path()));
+        $definitionNames = array_keys((array) $raw->definitions);
+        $actionNames     = [];
+        foreach ((array) $raw->definitions as $definition) {
+            if (isset($definition->properties->action->const)) {
+                $actionNames[] = (string) $definition->properties->action->const;
+            }
+        }
+        $internalOnlyNames = array_diff($definitionNames, $actionNames);
+
+        foreach ($internalOnlyNames as $internalName) {
+            self::assertStringNotContainsString(
+                (string) $internalName,
+                $text,
+                "the rejection leaked the internal definition name {$internalName}"
+            );
+        }
+    }
+
+    /**
+     * `humanize()`'s balanced-brace recursion over an echoed `data: {...}` clause can hit PCRE's
+     * backtrack/recursion limit on a large enough message — measured fine around 5.6 KB, broken
+     * around 14 KB — at which point `preg_replace()` returns `null`. A guard that fell back to `''`
+     * would pass every other test here while silently discarding the entire reason on this one input,
+     * which is exactly the failure Task 2's `testTheReasonForARefusalReachesTheClientAndNotOnlyTheLog`
+     * exists to catch for JSON decode errors; this is the same guarantee for this later stage.
+     */
+    public function testALargeMessageStillCarriesAReasonWhenTheTransformCannotRun(): void
+    {
+        $frames = $this->frames((string) json_encode([
+            'action'     => 'executeValidation',
+            'category'   => ['k' => 'v'],
+            'validate'   => 'x',
+            'sourceFile' => 'jsondata/x.json',
+            'padding'    => str_repeat('x', 20000)
+        ]));
+
+        self::assertSame('protocolError', $frames[0]->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frames[0]->errorCode);
+        self::assertNotSame('', (string) $frames[0]->text, 'the reason must not be discarded when the transform cannot run');
+        self::assertStringContainsString(
+            'Required property missing: sourceFolder',
+            (string) $frames[0]->text,
+            'the untransformed reason must still be there'
+        );
     }
 }

@@ -111,21 +111,40 @@ final class WebSocketMessageValidator
         }
 
         $allowed = $this->propertyNamesFor($shape);
+        // `$message->action` — the client's own word — not `$shape`: `$shape` is
+        // `validateCalendarTyped`/`validateCalendarLegacy`, an internal definition name a client
+        // sending `action: "validateCalendar"` has no way to look up in the published schema.
+        // Guaranteed present and a string here: `$shape` is non-null only when `shapeOf()` already
+        // confirmed both, and `$shape` is checked non-null just above.
+        /** @var string $action */
+        $action = $message->action;
         foreach (array_keys((array) $message) as $property) {
             if (in_array((string) $property, $deferToHandler, true)) {
                 continue;
             }
             if (false === in_array((string) $property, $allowed, true)) {
                 return sprintf(
-                    '%s is not a property of a %s message. A message carrying a requestId may only use the properties the contract declares: %s.',
+                    '%s is not a property of %s %s message. A message carrying a requestId may only use the properties the contract declares: %s.',
                     (string) $property,
-                    $shape,
+                    self::article($action),
+                    $action,
                     implode(', ', $allowed)
                 );
             }
         }
 
         return null;
+    }
+
+    /**
+     * "a" or "an", for the sentence above. A plain vowel-letter check is enough: every action name
+     * this ever sees comes from `WebSocketMessage.json`'s fixed, known set — `executeValidation`,
+     * `validateCalendar`, `executeUnitTest`, `runTest`, `cancelRun`, `validateSource` — not free
+     * text a client chose the spelling of.
+     */
+    private static function article(string $word): string
+    {
+        return in_array($word[0] ?? '', ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'], true) ? 'an' : 'a';
     }
 
     /**
@@ -280,8 +299,15 @@ final class WebSocketMessageValidator
         // `data: {…}` — braces may nest (e.g. the value is itself an object with its own object
         // properties) — but never `data: [...]` or `data: "…"`/`data: 42`, which are the useful,
         // short cases and are left alone.
+        //
+        // `preg_replace()` returns `null` on failure — most concretely here, PCRE's backtrack/
+        // recursion limit on the balanced-brace recursion for a large echoed object (measured:
+        // fine around 5.6 KB, broken around 14 KB) — and `(string) null` used to silently become
+        // `''`, discarding the whole reason rather than merely failing to trim it. Falling back to
+        // the untransformed input keeps the reason on the wire; it is still `sanitize()`d, since
+        // that already ran on `$message` before this method was called.
         $balancedObject = '(?P<bal>\{(?:[^{}]|(?P>bal))*\})';
-        $withoutEchoes  = (string) preg_replace('/,?\s*data:\s*' . $balancedObject . '/', '', $message);
+        $withoutEchoes  = preg_replace('/,?\s*data:\s*' . $balancedObject . '/', '', $message) ?? $message;
 
         $trailPattern = '/ at (#(?:->\S+)*)/';
         preg_match_all($trailPattern, $withoutEchoes, $trails);
@@ -289,7 +315,7 @@ final class WebSocketMessageValidator
         $trailList = $trails[1];
         $path      = [] === $trailList ? $action : $this->pathFromTrail((string) end($trailList), $action);
 
-        $withoutTrails = (string) preg_replace($trailPattern, '', $withoutEchoes);
+        $withoutTrails = preg_replace($trailPattern, '', $withoutEchoes) ?? $withoutEchoes;
 
         return $path . ': ' . trim($withoutTrails);
     }

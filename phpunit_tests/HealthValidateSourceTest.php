@@ -305,8 +305,10 @@ final class HealthValidateSourceTest extends TestCase
     /**
      * `validateSource.target` is typed as `{id: string}` on the schema, so
      * `WebSocketMessageValidator` now refuses a non-object `target` before `validateSource()`'s own
-     * "requires a target object with an id" check ever runs. Only the error code is asserted for
-     * that reason — the exact text belongs to `swaggest/json-schema`, not to this codebase.
+     * "requires a target object with an id" check ever runs, with `humanize()`'s deterministic
+     * wording rather than that curated sentence. This test's job is confirming the schema catches
+     * it pre-dispatch, not pinning that wording — see `HealthProtocolValidationTest` for coverage
+     * of the wording itself. Only the error code is asserted here for that reason.
      */
     public function testATargetThatIsNotAnObjectIsRejectedAsMalformed(): void
     {
@@ -340,8 +342,9 @@ final class HealthValidateSourceTest extends TestCase
     }
 
     /**
-     * A missing `target` never reaches the handler: `ACTION_PROPERTIES` declares it required, so
-     * `validateMessageProperties()` turns the message away on the generic protocol-error path.
+     * A missing `target` never reaches the handler: the schema's `validateSource` definition
+     * declares it required, so `WebSocketMessageValidator::validate()` turns the message away on
+     * the generic protocol-error path.
      */
     public function testAMessageWithNoTargetIsRejectedByPropertyValidation(): void
     {

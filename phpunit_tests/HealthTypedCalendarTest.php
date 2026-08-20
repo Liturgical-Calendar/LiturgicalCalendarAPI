@@ -35,9 +35,10 @@ use Ratchet\ConnectionInterface;
  * `calendar` **object** holding `kind`, `id` and `rite`.
  *
  * Because the action name is unchanged, the shape of `calendar` is the only discriminator there
- * is, and it has to be applied before `validateMessageProperties()` compares against
- * `ACTION_PROPERTIES['validateCalendar']` — the v2 form has neither `category` nor `responsetype`,
- * so the list would turn every v2 message away before it reached a handler.
+ * is, and `WebSocketMessageValidator::shapeOf()` has to apply it before choosing which schema
+ * definition to validate against — the v2 form has neither `category` nor `responsetype`, so
+ * validating it against the wrong one would turn every v2 message away before it reached a
+ * handler.
  *
  * Nothing legacy is touched: a string `calendar` still takes the old path byte for byte.
  *
@@ -142,11 +143,11 @@ final class HealthTypedCalendarTest extends TestCase
     }
 
     /**
-     * The discriminator has to be applied ahead of the `ACTION_PROPERTIES` list, not inside the
-     * handler. This is the test that says so: the message below carries neither `category` nor
-     * `responsetype`, both of which that list requires, so if the list ran first the message would
-     * come back as the generic `Invalid message properties` and never reach a calendar request at
-     * all.
+     * The discriminator has to be applied ahead of choosing which schema definition to validate
+     * against, not inside the handler. This is the test that says so: the message below carries
+     * neither `category` nor `responsetype`, both of which `validateCalendarLegacy` requires, so if
+     * that were the definition chosen for it, the message would come back rejected for missing
+     * properties it was never supposed to carry, and never reach a calendar request at all.
      */
     public function testTheV2FormIsNotTurnedAwayForMissingCategoryAndResponsetype(): void
     {
@@ -349,10 +350,13 @@ final class HealthTypedCalendarTest extends TestCase
     /**
      * `resolveCalendarIdentity()`'s own "Unknown calendar kind" message is no longer reachable
      * through the WebSocket dispatch: `calendarIdentity.kind` in `WebSocketMessage.json` is a closed
-     * enum of the four known kinds, so `WebSocketMessageValidator` refuses `widerregion` at the door
-     * with the schema's own (verbose, library-generated) message before `resolveCalendarIdentity()`
-     * ever runs. Only the error code is asserted here for that reason — the exact text belongs to
-     * `swaggest/json-schema`, not to this codebase, and is not a contract worth pinning.
+     * enum of the four known kinds, so `WebSocketMessageValidator` refuses `widerregion` at the door,
+     * before `resolveCalendarIdentity()` ever runs. `WebSocketMessageValidator::humanize()` turns
+     * that rejection into `validateCalendar.calendar.kind: Enum failed, enum: […], data:
+     * "widerregion"` — deterministic wording, but wording this test does not pin, since
+     * `HealthProtocolValidationTest::testTheHumanizedRejectionTextIsExactlyThis()` already pins
+     * that exact string once, centrally; asserting it again here would be a second copy to keep in
+     * sync rather than a second guarantee.
      */
     public function testAnUnknownKindIsRejected(): void
     {
@@ -484,11 +488,12 @@ final class HealthTypedCalendarTest extends TestCase
      * `$expected === null` marks a row `WebSocketMessageValidator` now intercepts before
      * `resolveCalendarIdentity()` runs at all: `calendarIdentity` in `WebSocketMessage.json` requires
      * `kind` and `rite` and types `id` as a string, so a missing `kind`/`rite` or a non-string
-     * `kind`/`id` fails schema validation with the library's own (verbose) message rather than
-     * reaching this method's curated one. Only `rite` being an *unknown* value, and `id` being
-     * *absent*, survive to reach `resolveCalendarIdentity()` — the schema types `rite` as any string
-     * and does not require `id` at all — which is why those two rows, and the two `general` rows
-     * built on `id` being present-but-wrong, still assert exact text.
+     * `kind`/`id` fails schema validation with `humanize()`'s deterministic wording rather than
+     * reaching this method's curated one — wording this provider does not pin, since
+     * `HealthProtocolValidationTest` already covers it. Only `rite` being an *unknown* value, and
+     * `id` being *absent*, survive to reach `resolveCalendarIdentity()` — the schema types `rite` as
+     * any string and does not require `id` at all — which is why those two rows, and the two
+     * `general` rows built on `id` being present-but-wrong, still assert exact text.
      *
      * @return array<string, array{0: array<string, mixed>, 1: ?string}>
      */
@@ -544,8 +549,12 @@ final class HealthTypedCalendarTest extends TestCase
      * process down over one malformed message, the hazard `cancelRun()` documents, reached by a
      * different door. `WebSocketMessageValidator` now catches it first: `responseFormat` on
      * `validateCalendarTyped` is a closed schema enum, so `'PDF'` never reaches
-     * `validateTypedCalendar()`'s own check, and the client sees the schema's own (verbose) message
-     * instead of the curated one. Only the error code is asserted for that reason.
+     * `validateTypedCalendar()`'s own check. `WebSocketMessageValidator::humanize()` turns the
+     * rejection into deterministic, human-readable wording rather than a raw library dump, but
+     * this test's job is confirming the schema catches it pre-dispatch, not pinning that wording —
+     * `HealthProtocolValidationTest` already covers the wording itself, generically (no schema
+     * internal vocabulary leaks) and for two specific cases pinned exactly. Only the error code is
+     * asserted here for that reason.
      */
     public function testAResponseFormatWithNoValidationBranchIsRejectedRatherThanThrown(): void
     {
@@ -569,9 +578,11 @@ final class HealthTypedCalendarTest extends TestCase
     /**
      * `year` used to be re-checked by hand in `readYear()` because the old required-property check
      * established only that `year` was *present*, not what it was. `WebSocketMessageValidator` now
-     * types `year: integer` on the schema itself, so a `null` year is refused there — with the
-     * schema's own message, not `readYear()`'s — before `validateTypedCalendar()` runs at all. Only
-     * the error code is asserted for that reason.
+     * types `year: integer` on the schema itself, so a `null` year is refused there — humanized by
+     * `WebSocketMessageValidator::humanize()`, not `readYear()`'s wording — before
+     * `validateTypedCalendar()` runs at all. This test's job is confirming that, not pinning the
+     * generated wording; see `HealthProtocolValidationTest` for coverage of the wording itself.
+     * Only the error code is asserted here for that reason.
      */
     public function testAYearThatIsNotAnIntegerIsRejectedRatherThanThrown(): void
     {
@@ -671,8 +682,10 @@ final class HealthTypedCalendarTest extends TestCase
      *
      * `unknown kind`'s expected text is `null`: `calendarIdentity.kind` is a closed schema enum, so
      * `WebSocketMessageValidator` now refuses `widerregion` before `resolveCalendarIdentity()` runs,
-     * with the schema's own message rather than "Unknown calendar kind: widerregion". `rite
-     * disagreement` uses a schema-valid `kind`, so it still reaches the resolver unchanged.
+     * with `WebSocketMessageValidator::humanize()`'s deterministic wording rather than "Unknown
+     * calendar kind: widerregion" — this test does not pin that wording, since
+     * `HealthProtocolValidationTest` already covers it. `rite disagreement` uses a schema-valid
+     * `kind`, so it still reaches the resolver unchanged.
      *
      * @return array<string, array{0: array<string, mixed>, 1: ?string}>
      */
@@ -728,8 +741,9 @@ final class HealthTypedCalendarTest extends TestCase
      *
      * `runTest.calendar` is typed as `#/definitions/calendarIdentity` — an object — on the schema, so
      * `WebSocketMessageValidator` now refuses a string `calendar` before `readCalendarIdentity()`'s
-     * own "runTest calendar must be an object…" check ever runs. Only the error code is asserted for
-     * that reason.
+     * own "runTest calendar must be an object…" check ever runs, with `humanize()`'s deterministic
+     * wording rather than that curated sentence. This test's job is confirming the schema catches
+     * it pre-dispatch, not pinning that wording; only the error code is asserted for that reason.
      */
     public function testRunTestRefusesACalendarThatIsNotAnObject(): void
     {
@@ -800,9 +814,10 @@ final class HealthTypedCalendarTest extends TestCase
     }
 
     /**
-     * A property the action declares required is turned away by `validateMessageProperties()` before
-     * any handler sees it, on the generic protocol-error path — which is how the absence of `test`
-     * differs from `test` being present and unusable, tested above.
+     * A property the schema's `runTest` definition declares required is turned away by
+     * `WebSocketMessageValidator::validate()` before any handler sees it, on the generic
+     * protocol-error path — which is how the absence of `test` differs from `test` being present
+     * and unusable, tested above.
      *
      * @return array<string, array{0: array<string, mixed>}>
      */
@@ -1051,8 +1066,8 @@ final class HealthTypedCalendarTest extends TestCase
      * be dispatched perfectly and say nothing.
      *
      * This property was missed by the original retired-property audit because that audit derived the
-     * retired set from `ACTION_PROPERTIES`, which lists only *required* properties. Optional v1
-     * properties were structurally invisible to it; see `Health::RETIRED_PROPERTIES`.
+     * retired set from the schema's own `required` lists, which name only *required* properties.
+     * Optional v1 properties were structurally invisible to it; see `Health::RETIRED_PROPERTIES`.
      *
      * @return array<string, array{0: array<string, mixed>, 1: string}>
      */
@@ -1138,10 +1153,10 @@ final class HealthTypedCalendarTest extends TestCase
 
     /**
      * `runTest` retires `category` and `rite`, and no third property, because there is no third
-     * property to retire: `ACTION_PROPERTIES['executeUnitTest']` is
-     * `['category', 'calendar', 'year', 'test']` and its only optional property was `rite`, so no
-     * `responsetype` ever named anything on it. A rule that invented one would reject a property no
-     * client was ever told to send, for a reason that is not true.
+     * property to retire: the schema's `executeUnitTest` definition requires `category`, `calendar`,
+     * `year` and `test`, and its only optional property was `rite`, so no `responsetype` ever named
+     * anything on it. A rule that invented one would reject a property no client was ever told to
+     * send, for a reason that is not true.
      */
     public function testRunTestDoesNotRetireAResponsetypeItNeverHad(): void
     {

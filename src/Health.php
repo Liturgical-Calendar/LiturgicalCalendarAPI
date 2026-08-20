@@ -642,9 +642,26 @@ class Health implements MessageComponentInterface
                         break;
                     }
                     /** @var ValidateCalendar $messageReceived */
+                    // `year` is read through readYear() rather than trusted as `int`, even though
+                    // the schema declares `"type": "integer"`: JSON Schema and PHP disagree about
+                    // what that means. A number like 1e30 or a 30-digit literal is an integer *by
+                    // value* under JSON Schema, so the schema accepts it correctly — but json_decode()
+                    // hands PHP a float for it (it is outside PHP_INT_MAX), and this arm used to
+                    // unpack that straight into validateCalendar(..., int $year, ...). PHP's
+                    // coercive typing refuses an out-of-range float for an int parameter with a
+                    // TypeError, an \Error Ratchet's IoServer::handleData does not catch, so it took
+                    // the whole process down. readYear()'s is_int() check is exactly the guard the
+                    // typed arms (validateTypedCalendar(), runTest()) already apply for the same
+                    // reason; the schema cannot close this gap, because the schema is right.
+                    try {
+                        $year = self::readYear($messageReceived, 'validateCalendar');
+                    } catch (\InvalidArgumentException $e) {
+                        $this->rejectMessage($from, ProtocolErrorCode::INVALID_MESSAGE, $e->getMessage(), requestId: $requestId);
+                        break;
+                    }
                     $this->validateCalendar(
                         $messageReceived->calendar,
-                        $messageReceived->year,
+                        $year,
                         $messageReceived->category,
                         $messageReceived->responsetype,
                         $from,
@@ -654,10 +671,17 @@ class Health implements MessageComponentInterface
                     break;
                 case 'executeUnitTest':
                     /** @var ExecuteUnitTest $messageReceived */
+                    // See the comment on the validateCalendar arm above: same hazard, same fix.
+                    try {
+                        $year = self::readYear($messageReceived, 'executeUnitTest');
+                    } catch (\InvalidArgumentException $e) {
+                        $this->rejectMessage($from, ProtocolErrorCode::INVALID_MESSAGE, $e->getMessage(), requestId: $requestId);
+                        break;
+                    }
                     $this->executeUnitTest(
                         $messageReceived->test,
                         $messageReceived->calendar,
-                        $messageReceived->year,
+                        $year,
                         $messageReceived->category,
                         $from,
                         self::readRiteHint($messageReceived),
