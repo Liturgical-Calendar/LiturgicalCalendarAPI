@@ -1616,8 +1616,9 @@ class Health implements MessageComponentInterface
                     },
                     function (\Throwable $e) use ($to, $validationForMessages, $dataPath, $runToken, $requestId, $target) {
                         // The unreadable-file arm. It reports all three steps as failures and is
-                        // still a termination, so it ends the same way a success does; #822 is why
-                        // a *missing* file does not reach it today.
+                        // still a termination, so it ends the same way a success does. A *missing*
+                        // file reaches it too, since #822: the read stats first rather than letting
+                        // the Fallback adapter resolve absence with zero bytes.
                         $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken, $target, requestId: $requestId);
                         $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
                     }
@@ -3193,6 +3194,34 @@ class Health implements MessageComponentInterface
 
         if (self::$cacheEnabled) {
             echo "Cache miss for file $path, reading from filesystem\n";
+        }
+
+        // Stat before reading, because the read cannot tell absence from emptiness (#822).
+        // `react/filesystem`'s Fallback adapter — always the one in play here, since neither
+        // ext-eio nor ext-uv is a dependency of this project — resolves a missing file with zero
+        // bytes rather than rejecting, and emits three PHP warnings on the way. Every caller then
+        // ran its success path over an empty string: `file-exists` reported success for a file that
+        // is not there, and the two steps after it failed for a reason that was not the real one.
+        // A green "exists" above two red boxes reads as "the file is there but its contents are
+        // broken", which sends whoever is debugging to the wrong file — worse than a plain failure.
+        //
+        // The check is explicit rather than a matter of letting the adapter reject, so that the
+        // answer does not depend on which optional extension happens to be installed: with ext-eio
+        // present the read would reject on its own, and behaviour that changes with the build is
+        // worse than behaviour that does not. `is_file()` also rules out a directory, which
+        // `is_readable()` alone would let through to the same zero-byte resolution.
+        //
+        // `Health` is a long-running process and PHP caches stat results per filename, including
+        // negative ones. A file written by a `/data` request after an earlier check looked for it
+        // would otherwise keep reporting absent for the life of the process.
+        clearstatcache(true, $path);
+        if (!is_file($path) || !is_readable($path)) {
+            $reason   = is_file($path) ? 'file is not readable' : 'no such file';
+            $deferred = new Deferred();
+            $deferred->reject(new \RuntimeException("Unable to read file: $path ($reason)"));
+            /** @var PromiseInterface<array{data: string, fromCache: bool}> $missingPromise */
+            $missingPromise = $deferred->promise();
+            return $missingPromise;
         }
 
         $filesystem = Factory::create();
