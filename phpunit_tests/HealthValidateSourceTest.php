@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests;
 
+use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableItem;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Tests\Support\BrokenInventoryTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -28,6 +30,8 @@ use Ratchet\ConnectionInterface;
 #[CoversClass(Health::class)]
 final class HealthValidateSourceTest extends TestCase
 {
+    use BrokenInventoryTrait;
+
     public static function setUpBeforeClass(): void
     {
         // Health resolves relative source paths against Router::$apiFilePath, and the inventory
@@ -303,6 +307,103 @@ final class HealthValidateSourceTest extends TestCase
 
         self::assertTrue(self::inventoryIsMemoized(), 'a cancel is not a run beginning');
         self::assertSame([], self::getRunTokens($health), 'cancelRun stays exempt from the ambient token store');
+    }
+
+    // ---------------------------------------------------------------- a broken inventory is contained
+
+    /**
+     * One malformed calendar file must not cost a client its connection, nor its static targets.
+     *
+     * `byId()` reads and JSON-parses every national and diocesan calendar file, so one unparseable
+     * file makes it throw — and a `Throwable` escaping `onMessage()` is caught by Ratchet's
+     * `IoServer`, which closes the connection: an entire run lost to one bad file, by the tool whose
+     * job is to find bad files. `validateSource()` therefore retries against the inventory's static
+     * half, which builds its paths from the `RomanMissal` and `JsonData` registries and never reads
+     * a calendar file, so it cannot have been broken by one.
+     *
+     * Both directions are asserted, because either alone would pass against the wrong thing. The
+     * static id must still reach the execution phase — a retry that resolved nothing would look
+     * identical to no retry at all from the outside. The per-calendar id must NOT, because a
+     * "fallback" that resolved it would have to have read the very data that just failed.
+     */
+    public function testABrokenInventoryStillLetsStaticTargetsBeChecked(): void
+    {
+        $realRoot = Router::$apiFilePath;
+
+        self::withBrokenInventory(static function () use ($realRoot): void {
+            // The fixture tree holds one malformed calendar and nothing else, so give it the two
+            // things a temporale check reads — the temporale file and the schemas it validates
+            // against — and the check can succeed or fail on its own merits rather than on the
+            // fixture's poverty. Nothing here touches the malformed calendar, so the inventory
+            // stays broken; the guard in withBrokenInventory() already proved it.
+            self::copyIntoFixture($realRoot, JsonData::TEMPORALE_FILE->value);
+            self::copyIntoFixture($realRoot, JsonData::SCHEMAS_FOLDER->value);
+
+            $health = new Health();
+
+            $staticTarget = self::createStubConnection(1);
+            self::send($health, $staticTarget, ['action' => 'validateSource', 'target' => ['id' => 'temporale:roman']]);
+
+            $item = CheckableInventory::staticById('temporale:roman');
+            self::assertInstanceOf(CheckableItem::class, $item, 'precondition: the temporale is in the static half');
+
+            self::assertCount(3, $staticTarget->sent, 'a static target stopped being checkable because an unrelated calendar file was malformed');
+
+            $frames = array_map(
+                /** @return \stdClass */
+                static fn (string $raw): object => (object) json_decode($raw),
+                $staticTarget->sent
+            );
+            self::assertSame(
+                [".{$item->label}.file-exists", ".{$item->label}.json-valid", ".{$item->label}.schema-valid"],
+                array_map(static fn (\stdClass $f): mixed => $f->classes, $frames),
+                'the frames were not addressed to the static item the retry was supposed to resolve'
+            );
+            foreach ($frames as $frame) {
+                self::assertSame('success', $frame->type, "the temporale failed its own check: {$frame->text}");
+            }
+
+            $enumeratedTarget = self::createStubConnection(2);
+            self::send($health, $enumeratedTarget, ['action' => 'validateSource', 'target' => ['id' => 'nation:roman:IT']]);
+
+            self::assertCount(1, $enumeratedTarget->sent, 'a target that genuinely cannot be resolved must be answered once, not checked');
+            $frame = json_decode($enumeratedTarget->sent[0]);
+            self::assertSame('echobot', $frame->type);
+            // The message says the index could not be built, not that the id is unknown:
+            // nation:roman:IT is perfectly well known, and reporting a server-side failure as a
+            // client-side one sends the reader hunting a bug that is not there.
+            self::assertStringStartsWith(
+                'Could not resolve validation target nation:roman:IT: the source data inventory could not be built',
+                (string) $frame->text
+            );
+        });
+    }
+
+    /**
+     * Copy one repo-relative file or folder from the real source tree into the fixture tree, at the
+     * same relative position, so that `Router::$apiFilePath` being repointed still finds it.
+     */
+    private static function copyIntoFixture(string $realRoot, string $relative): void
+    {
+        $relative = trim($relative, '/');
+        $from     = $realRoot . $relative;
+        $to       = Router::$apiFilePath . $relative;
+
+        if (is_dir($from)) {
+            self::assertTrue(is_dir($to) || mkdir($to, 0777, true), "could not create fixture folder {$to}");
+            $entries = scandir($from);
+            self::assertIsArray($entries, "could not read {$from}");
+            foreach ($entries as $entry) {
+                if ('.' !== $entry && '..' !== $entry) {
+                    self::copyIntoFixture($realRoot, $relative . '/' . $entry);
+                }
+            }
+            return;
+        }
+
+        $parent = dirname($to);
+        self::assertTrue(is_dir($parent) || mkdir($parent, 0777, true), "could not create fixture folder {$parent}");
+        self::assertTrue(copy($from, $to), "could not copy {$from} into the fixture tree");
     }
 
     // ---------------------------------------------------------------- round trip

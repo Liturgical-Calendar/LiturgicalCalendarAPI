@@ -391,6 +391,12 @@ class Health implements MessageComponentInterface
             // this code. Resetting on the token *change* rather than on every message bounds
             // staleness to one run while still costing one rebuild per run, not one per check;
             // a run issues one message per checked item, and there are dozens.
+            //
+            // Known bound, not an oversight: a *new* run that reuses the previous run's token on
+            // the same connection reads as a continuation and skips the reset. Tokens are minted
+            // per run by the client and onClose() drops the entry, so this is theoretical — but if
+            // it ever stops being, the fix is a run-start signal in the protocol, not a reset here
+            // on every message.
             if (( $this->runTokens[$resourceId] ?? null ) !== $messageReceived->runToken) {
                 CheckableInventory::reset();
             }

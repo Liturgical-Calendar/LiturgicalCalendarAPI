@@ -11,6 +11,7 @@ use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Tests\Support\BrokenInventoryTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -31,6 +32,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Health::class)]
 final class HealthSchemaCategoryTest extends TestCase
 {
+    use BrokenInventoryTrait;
+
     private static bool $routerInitialized = false;
 
     /**
@@ -115,8 +118,12 @@ final class HealthSchemaCategoryTest extends TestCase
             'national calendar'    => ['national-calendar-US', LitSchema::NATIONAL, 'nation:roman:US'],
             'diocesan calendar'    => ['diocesan-calendar-romamo_it', LitSchema::DIOCESAN, 'diocese:roman:romamo_it'],
             'decrees'              => ['memorials-from-decrees', LitSchema::DECREES_SRC, 'decrees:roman'],
-            // The slug is rite-blind — its pattern is `tests-<name>` — while ids are not, and this
-            // particular test definition exists only in the Ambrosian folder.
+            // The two vocabularies are NOT one-to-one, and this row is the standing evidence:
+            // the slug is rite-blind — its pattern is `tests-<name>`, and it resolves to TEST_SRC
+            // whatever the rite — while every inventory id is rite-qualified. One slug therefore
+            // maps to as many ids as there are rites holding a definition of that name, and the
+            // right one cannot be derived from the slug. This definition happens to exist only in
+            // the Ambrosian folder, so `test:roman:StIgnatiusOfLoyolaTest` resolves to nothing.
             'test definition'      => ['tests-StIgnatiusOfLoyolaTest', LitSchema::TEST_SRC, 'test:ambrosian:StIgnatiusOfLoyolaTest'],
             'i18n folder suffix'   => ['national-calendar-US-i18n', LitSchema::I18N, 'nation:roman:US:i18n'],
             'decrees i18n'         => ['memorials-from-decrees-i18n', LitSchema::I18N, 'decrees:roman:i18n'],
@@ -494,76 +501,6 @@ final class HealthSchemaCategoryTest extends TestCase
     }
 
     // ---------------------------------------------------------------- a broken inventory is contained
-
-    /**
-     * Runs `$fn` with `CheckableInventory` pointed at a source tree containing one malformed
-     * national calendar file, so that every inventory lookup throws.
-     *
-     * This is the real failure, not a simulated one: the inventory enumerates per-calendar items via
-     * `CalendarMetadataProvider::create()`, which JSON-parses every national and diocesan calendar
-     * file, so a single unparseable file makes `all()` — and therefore `byPath()` and `byId()` —
-     * throw. Only the malformed file needs to exist: national calendars are built first, so the
-     * build aborts before it looks for anything else.
-     *
-     * The memoized statics are reset on the way in *and* on the way out: in on so the poisoned tree
-     * is actually read rather than a good index being served from an earlier test, out so the next
-     * test rebuilds against the real tree.
-     */
-    private static function withBrokenInventory(callable $fn): void
-    {
-        $savedApiFilePath = Router::$apiFilePath;
-        $root             = sys_get_temp_dir() . '/health-broken-inventory-' . getmypid() . '-' . uniqid() . '/';
-        $nationFolder     = $root . JsonData::NATIONAL_CALENDARS_FOLDER->value . '/ZZ';
-
-        self::assertTrue(mkdir($nationFolder, 0777, true), 'could not build the fixture source tree');
-        file_put_contents($nationFolder . '/ZZ.json', '{ this is not JSON');
-
-        Router::$apiFilePath = $root;
-        self::resetInventoryMemo();
-
-        try {
-            // Guard: if this ever stops throwing, the tests below would pass for the wrong reason.
-            try {
-                CheckableInventory::all();
-                self::fail('the fixture tree no longer breaks the inventory — this test proves nothing');
-            } catch (\JsonException) {
-                // expected
-            }
-
-            $fn();
-        } finally {
-            Router::$apiFilePath = $savedApiFilePath;
-            self::resetInventoryMemo();
-            @unlink($nationFolder . '/ZZ.json');
-            self::removeDirectoryTree($root);
-        }
-    }
-
-    private static function resetInventoryMemo(): void
-    {
-        $inventory = new \ReflectionClass(CheckableInventory::class);
-        $inventory->setStaticPropertyValue('items', null);
-        $inventory->setStaticPropertyValue('metadata', null);
-    }
-
-    private static function removeDirectoryTree(string $root): void
-    {
-        if (false === is_dir($root)) {
-            return;
-        }
-
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST
-        );
-
-        /** @var \SplFileInfo $entry */
-        foreach ($iterator as $entry) {
-            $entry->isDir() ? @rmdir($entry->getPathname()) : @unlink($entry->getPathname());
-        }
-
-        @rmdir($root);
-    }
 
     /**
      * One malformed calendar file must not take out schema resolution for every unrelated check.
