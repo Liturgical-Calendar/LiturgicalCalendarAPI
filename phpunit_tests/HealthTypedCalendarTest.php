@@ -346,6 +346,14 @@ final class HealthTypedCalendarTest extends TestCase
 
     // ---------------------------------------------------------------- rejections
 
+    /**
+     * `resolveCalendarIdentity()`'s own "Unknown calendar kind" message is no longer reachable
+     * through the WebSocket dispatch: `calendarIdentity.kind` in `WebSocketMessage.json` is a closed
+     * enum of the four known kinds, so `WebSocketMessageValidator` refuses `widerregion` at the door
+     * with the schema's own (verbose, library-generated) message before `resolveCalendarIdentity()`
+     * ever runs. Only the error code is asserted here for that reason — the exact text belongs to
+     * `swaggest/json-schema`, not to this codebase, and is not a contract worth pinning.
+     */
     public function testAnUnknownKindIsRejected(): void
     {
         $health = $this->newHealth();
@@ -362,7 +370,6 @@ final class HealthTypedCalendarTest extends TestCase
         $frame = json_decode($conn->sent[0]);
         self::assertSame('protocolError', $frame->type);
         self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
-        self::assertSame('Unknown calendar kind: widerregion', $frame->text);
         self::assertSame([], self::queuedPaths($health));
     }
 
@@ -474,17 +481,26 @@ final class HealthTypedCalendarTest extends TestCase
     }
 
     /**
-     * @return array<string, array{0: array<string, mixed>, 1: string}>
+     * `$expected === null` marks a row `WebSocketMessageValidator` now intercepts before
+     * `resolveCalendarIdentity()` runs at all: `calendarIdentity` in `WebSocketMessage.json` requires
+     * `kind` and `rite` and types `id` as a string, so a missing `kind`/`rite` or a non-string
+     * `kind`/`id` fails schema validation with the library's own (verbose) message rather than
+     * reaching this method's curated one. Only `rite` being an *unknown* value, and `id` being
+     * *absent*, survive to reach `resolveCalendarIdentity()` — the schema types `rite` as any string
+     * and does not require `id` at all — which is why those two rows, and the two `general` rows
+     * built on `id` being present-but-wrong, still assert exact text.
+     *
+     * @return array<string, array{0: array<string, mixed>, 1: ?string}>
      */
     public static function malformedIdentityProvider(): array
     {
         return [
-            'kind missing'         => [['id' => 'IT', 'rite' => 'roman'], 'calendar.kind must be a string naming one of: general, national, diocesan, rite.'],
-            'kind not a string'    => [['kind' => 42, 'id' => 'IT', 'rite' => 'roman'], 'calendar.kind must be a string naming one of: general, national, diocesan, rite.'],
-            'rite missing'         => [['kind' => 'national', 'id' => 'IT'], 'calendar.rite must be a string naming a known rite.'],
+            'kind missing'         => [['id' => 'IT', 'rite' => 'roman'], null],
+            'kind not a string'    => [['kind' => 42, 'id' => 'IT', 'rite' => 'roman'], null],
+            'rite missing'         => [['kind' => 'national', 'id' => 'IT'], null],
             'rite unknown'         => [['kind' => 'national', 'id' => 'IT', 'rite' => 'byzantine'], 'Unknown rite: byzantine'],
             'id missing'           => [['kind' => 'national', 'rite' => 'roman'], 'calendar.id is required for kind national.'],
-            'id not a string'      => [['kind' => 'diocesan', 'id' => 42, 'rite' => 'roman'], 'calendar.id must be a string.'],
+            'id not a string'      => [['kind' => 'diocesan', 'id' => 42, 'rite' => 'roman'], null],
             // `general` accepts no id but `roman`. The message must not name a kind to try instead:
             // `IT` would want `national`, and `kind: rite` — the obvious thing to suggest — rejects
             // `IT` in turn, so the advice would point at another failure.
@@ -499,7 +515,7 @@ final class HealthTypedCalendarTest extends TestCase
      * @param array<string, mixed> $calendar
      */
     #[DataProvider('malformedIdentityProvider')]
-    public function testAMalformedIdentityIsRejectedWithWhatIsWrongWithIt(array $calendar, string $expected): void
+    public function testAMalformedIdentityIsRejectedWithWhatIsWrongWithIt(array $calendar, ?string $expected): void
     {
         $health = $this->newHealth();
         $conn   = self::createStubConnection();
@@ -515,16 +531,21 @@ final class HealthTypedCalendarTest extends TestCase
         $frame = json_decode($conn->sent[0]);
         self::assertSame('protocolError', $frame->type);
         self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
-        self::assertSame($expected, $frame->text);
+        if (null !== $expected) {
+            self::assertSame($expected, $frame->text);
+        }
         self::assertSame([], self::queuedPaths($health));
     }
 
     /**
-     * A format `validateCalendar()` has no branch for must be turned away here rather than reaching
-     * `ReturnTypeParam::from()`, which throws a `\ValueError` on an unknown case. That is an
-     * `\Error`, and Ratchet's `IoServer::handleData` catches only `\Exception`, so it escapes and
-     * takes the whole WebSocket process down over one malformed message — the hazard `cancelRun()`
-     * documents, reached by a different door.
+     * A format `validateCalendar()` has no branch for used to have to be turned away by hand, ahead
+     * of `ReturnTypeParam::from()`, which throws a `\ValueError` on an unknown case — an `\Error`
+     * that Ratchet's `IoServer::handleData` does not catch, so it would take the whole WebSocket
+     * process down over one malformed message, the hazard `cancelRun()` documents, reached by a
+     * different door. `WebSocketMessageValidator` now catches it first: `responseFormat` on
+     * `validateCalendarTyped` is a closed schema enum, so `'PDF'` never reaches
+     * `validateTypedCalendar()`'s own check, and the client sees the schema's own (verbose) message
+     * instead of the curated one. Only the error code is asserted for that reason.
      */
     public function testAResponseFormatWithNoValidationBranchIsRejectedRatherThanThrown(): void
     {
@@ -542,10 +563,16 @@ final class HealthTypedCalendarTest extends TestCase
         $frame = json_decode($conn->sent[0]);
         self::assertSame('protocolError', $frame->type);
         self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
-        self::assertSame('validateCalendar responseFormat must be one of: JSON, XML, ICS, YML.', $frame->text);
         self::assertSame([], self::queuedPaths($health));
     }
 
+    /**
+     * `year` used to be re-checked by hand in `readYear()` because the old required-property check
+     * established only that `year` was *present*, not what it was. `WebSocketMessageValidator` now
+     * types `year: integer` on the schema itself, so a `null` year is refused there — with the
+     * schema's own message, not `readYear()`'s — before `validateTypedCalendar()` runs at all. Only
+     * the error code is asserted for that reason.
+     */
     public function testAYearThatIsNotAnIntegerIsRejectedRatherThanThrown(): void
     {
         $health = $this->newHealth();
@@ -562,7 +589,6 @@ final class HealthTypedCalendarTest extends TestCase
         $frame = json_decode($conn->sent[0]);
         self::assertSame('protocolError', $frame->type);
         self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
-        self::assertSame('validateCalendar year must be an integer.', $frame->text);
         self::assertSame([], self::queuedPaths($health));
     }
 
@@ -643,14 +669,19 @@ final class HealthTypedCalendarTest extends TestCase
      * it. `lugano_ch` is one of the four Ambrosian dioceses, so `rite: roman` contradicts what
      * `/calendars` says and must be refused rather than quietly corrected.
      *
-     * @return array<string, array{0: array<string, mixed>, 1: string}>
+     * `unknown kind`'s expected text is `null`: `calendarIdentity.kind` is a closed schema enum, so
+     * `WebSocketMessageValidator` now refuses `widerregion` before `resolveCalendarIdentity()` runs,
+     * with the schema's own message rather than "Unknown calendar kind: widerregion". `rite
+     * disagreement` uses a schema-valid `kind`, so it still reaches the resolver unchanged.
+     *
+     * @return array<string, array{0: array<string, mixed>, 1: ?string}>
      */
     public static function runTestRejectedIdentityProvider(): array
     {
         return [
             'unknown kind'      => [
                 ['kind' => 'widerregion', 'id' => 'Europe', 'rite' => 'roman'],
-                'Unknown calendar kind: widerregion'
+                null
             ],
             'rite disagreement' => [
                 ['kind' => 'diocesan', 'id' => 'lugano_ch', 'rite' => 'roman'],
@@ -663,7 +694,7 @@ final class HealthTypedCalendarTest extends TestCase
      * @param array<string, mixed> $calendar
      */
     #[DataProvider('runTestRejectedIdentityProvider')]
-    public function testRunTestRefusesAnIdentityItCannotHonour(array $calendar, string $expected): void
+    public function testRunTestRefusesAnIdentityItCannotHonour(array $calendar, ?string $expected): void
     {
         $health = $this->newHealth();
         $conn   = self::createStubConnection();
@@ -681,7 +712,9 @@ final class HealthTypedCalendarTest extends TestCase
         $frame = json_decode($conn->sent[0]);
         self::assertSame('protocolError', $frame->type);
         self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
-        self::assertSame($expected, $frame->text);
+        if (null !== $expected) {
+            self::assertSame($expected, $frame->text);
+        }
         self::assertSame([], self::queuedPaths($health), 'a rejected message must not have queued a request');
     }
 
@@ -692,6 +725,11 @@ final class HealthTypedCalendarTest extends TestCase
      *
      * The string used here is the one a client would reach for by habit, copied straight from an
      * `executeUnitTest` message.
+     *
+     * `runTest.calendar` is typed as `#/definitions/calendarIdentity` — an object — on the schema, so
+     * `WebSocketMessageValidator` now refuses a string `calendar` before `readCalendarIdentity()`'s
+     * own "runTest calendar must be an object…" check ever runs. Only the error code is asserted for
+     * that reason.
      */
     public function testRunTestRefusesACalendarThatIsNotAnObject(): void
     {
@@ -709,32 +747,32 @@ final class HealthTypedCalendarTest extends TestCase
         $frame = json_decode($conn->sent[0]);
         self::assertSame('protocolError', $frame->type);
         self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
-        self::assertSame('runTest calendar must be an object carrying kind, id and rite.', $frame->text);
         self::assertSame([], self::queuedPaths($health));
     }
 
     /**
-     * Both scalars are type-checked rather than trusted, and for the same reason: the property list
-     * establishes only that a property is *present*. A non-string `test` or a non-integer `year`
-     * would reach `executeUnitTest(string $test, string $calendar, int $year, …)` and raise a
-     * `TypeError` — an `\Error`, which Ratchet's `IoServer::handleData` does not catch, so one
-     * malformed message would take the whole WebSocket process down rather than be answered.
+     * Both scalars used to be re-checked by hand because the old required-property check established
+     * only that `test`/`year` were *present*, not what they were. `WebSocketMessageValidator` now
+     * types both on the schema — `test: string`, `year: integer` — so every row here is now refused
+     * by the schema, with its own message, before `runTest()`'s own checks ever run. Only the error
+     * code is asserted for that reason; see `testAMessageThatUsedToKillTheProcessIsRefused()` in
+     * `HealthProtocolValidationTest` for the crash-vector coverage this now overlaps with.
      *
-     * Every row here has its property **present**, which is what carries it past the property list
-     * and into the handler these rejections belong to. A property that is genuinely absent never
-     * gets that far — see `testRunTestRequiresItsThreeProperties()`, which is a different code path
-     * with a different answer. `null` is the case most easily mistaken for absence and is therefore
+     * Every row here has its property **present**, which is what used to carry it past the property
+     * list and into the handler these rejections belonged to. A property that is genuinely absent
+     * never got that far — see `testRunTestRequiresItsThreeProperties()`, a different code path with
+     * a different answer. `null` is the case most easily mistaken for absence and is therefore
      * spelled `test null`, not `test missing`.
      *
-     * @return array<string, array{0: array<string, mixed>, 1: string}>
+     * @return array<string, array{0: array<string, mixed>}>
      */
     public static function runTestMalformedScalarProvider(): array
     {
         return [
-            'test not a string' => [['test' => 42], 'runTest test must be a string.'],
-            'test null'         => [['test' => null], 'runTest test must be a string.'],
-            'year not an int'   => [['year' => '2026'], 'runTest year must be an integer.'],
-            'year null'         => [['year' => null], 'runTest year must be an integer.'],
+            'test not a string' => [['test' => 42]],
+            'test null'         => [['test' => null]],
+            'year not an int'   => [['year' => '2026']],
+            'year null'         => [['year' => null]],
         ];
     }
 
@@ -742,7 +780,7 @@ final class HealthTypedCalendarTest extends TestCase
      * @param array<string, mixed> $overrides
      */
     #[DataProvider('runTestMalformedScalarProvider')]
-    public function testRunTestRefusesAScalarItWouldOtherwiseThrowOn(array $overrides, string $expected): void
+    public function testRunTestRefusesAScalarItWouldOtherwiseThrowOn(array $overrides): void
     {
         $health = $this->newHealth();
         $conn   = self::createStubConnection();
@@ -758,7 +796,6 @@ final class HealthTypedCalendarTest extends TestCase
         $frame = json_decode($conn->sent[0]);
         self::assertSame('protocolError', $frame->type);
         self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
-        self::assertSame($expected, $frame->text);
         self::assertSame([], self::queuedPaths($health));
     }
 

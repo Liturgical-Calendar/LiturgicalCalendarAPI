@@ -18,8 +18,10 @@ use Ratchet\ConnectionInterface;
  * kept working through the abandoned run's backlog. The server already knew how to discard such
  * requests — `dropSupersededQueuedRequests()` filters queue entries whose `runToken` no longer matches
  * the connection's stored token — but only a *restart* ever advanced that token. `cancelRun` clears it
- * on demand, which is why these tests assert on the queue rather than on any response frame: the
- * action is deliberately silent.
+ * on demand, which is why most of these tests assert on the queue rather than on any response frame:
+ * a cancel the server *can* act on, or a stale one it deliberately ignores, is silent. A cancel the
+ * server cannot even parse — a non-string `runToken` — is a different case and is now refused with a
+ * frame; see {@see testACancelWithANonStringRunTokenIsRejectedByTheSchema()}.
  *
  * See UnitTestInterface#43 and #806 section H.
  */
@@ -217,16 +219,18 @@ final class HealthCancelRunTest extends TestCase
     }
 
     /**
-     * `validateMessageProperties()` checks only that `runToken` is *present*, not that it is a string —
-     * `{"action":"cancelRun","runToken":null}` (same for an array or object) passes validation and
-     * reaches `cancelRun()`. Before its `is_string()` guard, PHP's weak-mode parameter coercion throws
-     * `TypeError` for a non-string argument against a `string` parameter; Ratchet's `IoServer::handleData`
-     * only catches `\Exception`, so that `\Error` would escape uncaught and take the whole WebSocket
-     * process down over one malformed cancel. A cancel the server cannot act on is already a documented
-     * no-op for a stale token (see `cancelRun()`'s docblock); this asserts a non-string token folds into
-     * that same no-op instead of crashing.
+     * `{"action":"cancelRun","runToken":null}` (same for an array or object) is now refused by
+     * `WebSocketMessageValidator` before dispatch ever reaches `cancelRun()`: `cancelRun`'s schema
+     * entry types `runToken` via `#/definitions/correlationId`, so a non-string value fails schema
+     * validation and is answered with a typed `protocolError` instead. `cancelRun()`'s own
+     * `is_string()` guard — which kept a `TypeError` a v1 client would otherwise have caused from
+     * escaping Ratchet's `IoServer::handleData`, which only catches `\Exception` — is therefore no
+     * longer reachable through this path; it stays in place as a backstop, per its own docblock.
+     *
+     * The queue and the stored token being untouched is still worth asserting: the rejection must
+     * happen before any dispatch, not merely produce the right frame alongside unrelated side effects.
      */
-    public function testACancelWithANonStringRunTokenIsASilentNoOp(): void
+    public function testACancelWithANonStringRunTokenIsRejectedByTheSchema(): void
     {
         $health = $this->newHealth();
         $conn   = self::createStubConnection(1);
@@ -238,6 +242,9 @@ final class HealthCancelRunTest extends TestCase
 
         self::assertCount(1, self::getQueue($health), 'the queued request survives an unusable cancel');
         self::assertSame([1 => 'run-a'], self::getRunTokens($health), 'the stored token is untouched');
-        self::assertSame([], $conn->sent, 'a cancel the server cannot act on stays silent, same as a stale token');
+        self::assertCount(1, $conn->sent, 'an unusable cancel is now refused rather than silently dropped');
+        $frame = json_decode($conn->sent[0]);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
     }
 }

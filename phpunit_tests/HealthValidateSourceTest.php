@@ -302,6 +302,12 @@ final class HealthValidateSourceTest extends TestCase
         self::assertSame('Unknown validation target: nation:roman:ZZ', $frame->text);
     }
 
+    /**
+     * `validateSource.target` is typed as `{id: string}` on the schema, so
+     * `WebSocketMessageValidator` now refuses a non-object `target` before `validateSource()`'s own
+     * "requires a target object with an id" check ever runs. Only the error code is asserted for
+     * that reason — the exact text belongs to `swaggest/json-schema`, not to this codebase.
+     */
     public function testATargetThatIsNotAnObjectIsRejectedAsMalformed(): void
     {
         $health = $this->newHealth();
@@ -313,9 +319,13 @@ final class HealthValidateSourceTest extends TestCase
         $frame = json_decode($conn->sent[0]);
         self::assertSame('protocolError', $frame->type);
         self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
-        self::assertSame('validateSource requires a target object with an id.', $frame->text);
     }
 
+    /**
+     * Same reasoning as {@see testATargetThatIsNotAnObjectIsRejectedAsMalformed()}: `target.id` is
+     * typed as `string` on the schema, so a non-string id is refused before `validateSource()`'s own
+     * "target id must be a string" check runs.
+     */
     public function testATargetIdThatIsNotAStringIsRejected(): void
     {
         $health = $this->newHealth();
@@ -327,7 +337,6 @@ final class HealthValidateSourceTest extends TestCase
         $frame = json_decode($conn->sent[0]);
         self::assertSame('protocolError', $frame->type);
         self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
-        self::assertSame('validateSource target id must be a string.', $frame->text);
     }
 
     /**

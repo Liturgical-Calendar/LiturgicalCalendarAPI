@@ -31,6 +31,7 @@ use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableItem;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
+use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
 use Symfony\Component\Yaml\Yaml;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
@@ -131,35 +132,6 @@ class Health implements MessageComponentInterface
     protected \SplObjectStorage $clients;
 
     /**
-     * Array of actions that the Health endpoint can execute.
-     * Each key is an action name. The value is an array of strings that represent the names of the
-     * parameters that the action requires.
-     *
-     * @var array<string,string[]> $ACTION_PROPERTIES
-     */
-    private const ACTION_PROPERTIES = [
-        'executeValidation' => ['category', 'validate', 'sourceFile'],
-        'validateCalendar'  => ['category', 'calendar', 'year', 'responsetype'],
-        'executeUnitTest'   => ['category', 'calendar', 'year', 'test'],
-        // No `category`: `calendar.kind` carries it. No `responseFormat` either — a test runs
-        // against the parsed calendar, so the representation is not the client's to choose.
-        'runTest'           => ['test', 'calendar', 'year'],
-        'cancelRun'         => ['runToken'],
-        'validateSource'    => ['target']
-    ];
-
-    /**
-     * Properties required by the *reshaped* `validateCalendar` message — the one whose `calendar` is
-     * a typed identity object rather than a string.
-     *
-     * Deliberately not an entry in ACTION_PROPERTIES: that array is keyed by action name, and this
-     * shape shares its action name with the legacy form. See {@see Health::validateMessageProperties()}.
-     *
-     * @var string[]
-     */
-    private const TYPED_CALENDAR_PROPERTIES = ['calendar', 'year', 'responseFormat'];
-
-    /**
      * The legacy properties each reshaped message *replaced*, and what replaced them.
      *
      * **A v2 message that also carries a legacy property its own shape retired is rejected**, on all
@@ -174,14 +146,15 @@ class Health implements MessageComponentInterface
      * worse than either answer applied consistently, because the client cannot tell which it is
      * getting.
      *
-     * `runTest` retires `category` and `rite`: `ACTION_PROPERTIES['executeUnitTest']` is
-     * `['category', 'calendar', 'year', 'test']`, so there was never a `responsetype` on it to
-     * retire. `runToken` is retired by nothing — it is shared, current, and valid on all three.
+     * `runTest` retires `category` and `rite`: the `executeUnitTest` shape in `WebSocketMessage.json`
+     * requires `category`, `calendar`, `year` and `test`, so there was never a `responsetype` on it
+     * to retire. `runToken` is retired by nothing — it is shared, current, and valid on all three.
      *
-     * **The retired set is not derivable from `ACTION_PROPERTIES`**, and an audit that assumed it
-     * was is how `rite` came to be missed on both calendar actions: `ACTION_PROPERTIES` lists only
-     * *required* properties, so every optional v1 property — `rite` on `validateCalendar` and
-     * `executeUnitTest`, `responsetype` on `executeValidation` — was structurally invisible to it.
+     * **The retired set is not derivable from `WebSocketMessage.json`'s `required` lists**, and an
+     * audit that assumed it was is how `rite` came to be missed on both calendar actions: those
+     * lists name only *required* properties, so every optional v1 property — `rite` on
+     * `validateCalendar` and `executeUnitTest`, `responsetype` on `executeValidation` — was
+     * structurally invisible to it.
      * When adding a shape here, read the v1 predecessor's `@phpstan-type` alias at the top of this
      * file, where the optional properties are the ones marked `?`. (`responsetype` on
      * `executeValidation` is the one optional property deliberately *not* retired: `validateSource`
@@ -219,8 +192,8 @@ class Health implements MessageComponentInterface
                 // property list turns the message away for the missing required property, and that
                 // reading is unchanged.
                 'responsetype' => 'responseFormat replaces it.',
-                // Optional on v1, and therefore invisible to an audit that read ACTION_PROPERTIES —
-                // which lists required properties only. It is the one retired property whose silent
+                // Optional on v1, and therefore invisible to an audit that read the schema's
+                // required-property list only. It is the one retired property whose silent
                 // acceptance would be actively dangerous: a half-migrated client that objectified
                 // `calendar` but kept its old top-level `rite` gets a *rite disagreement* ignored,
                 // which is exactly what the typed identity went out of its way to make loud.
@@ -311,6 +284,8 @@ class Health implements MessageComponentInterface
     private array $runTokens = [];
     //private static PromiseInterface $metadataPromise;
 
+    private WebSocketMessageValidator $messageValidator;
+
     /**
      * Initializes the Health object with an empty SplObjectStorage.
      *
@@ -319,6 +294,12 @@ class Health implements MessageComponentInterface
     public function __construct()
     {
         $this->clients = new \SplObjectStorage();
+
+        // A server that cannot validate is misconfigured, and should fail here — where an operator
+        // sees it, before a client ever connects — rather than answering every message with an
+        // internal error. See {@see WebSocketMessageValidator::warm()}.
+        $this->messageValidator = new WebSocketMessageValidator();
+        $this->messageValidator->warm();
 
         // Create shared multi handler
         $multiHandler       = new CurlMultiHandler(['max_handles' => 50]);
@@ -611,7 +592,41 @@ class Health implements MessageComponentInterface
             json_last_error() === JSON_ERROR_NONE
             && $messageReceived instanceof \stdClass
             && property_exists($messageReceived, 'action')
-            && self::validateMessageProperties($messageReceived)
+        ) {
+            // `UNKNOWN_ACTION` must be checked ahead of schema validation, not derived from it: an
+            // unrecognised action matches no arm of the schema's top-level `oneOf`, so validating
+            // first would report it as `INVALID_MESSAGE` and collapse two error codes a client acts
+            // on differently into one. See #806 section G.
+            if (false === is_string($messageReceived->action)) {
+                $this->rejectMessage($from, ProtocolErrorCode::INVALID_MESSAGE, 'action must be a string naming a known action.', requestId: $requestId);
+                return;
+            }
+            if (null === WebSocketMessageValidator::shapeOf($messageReceived)) {
+                $this->rejectMessage(
+                    $from,
+                    ProtocolErrorCode::UNKNOWN_ACTION,
+                    sprintf('Unknown action from connection %1$d: %2$s', $resourceId, $msg),
+                    requestId: $requestId
+                );
+                return;
+            }
+
+            // Deferred rather than reported here: `rejectRetiredProperties()` runs inside each v2
+            // handler and can name what a retired property was replaced by, which this validator
+            // cannot. See {@see Health::RETIRED_PROPERTIES} and {@see Health::rejectRetiredProperties()}.
+            $retiredForAction = array_keys(self::RETIRED_PROPERTIES[$messageReceived->action]['retired'] ?? []);
+            $invalid          = $this->messageValidator->validate($messageReceived, $retiredForAction);
+            if (null !== $invalid) {
+                echo sprintf('Invalid message from connection %1$d: %2$s (%3$s)', $resourceId, $invalid, $msg);
+                $this->rejectMessage($from, ProtocolErrorCode::INVALID_MESSAGE, $invalid, requestId: $requestId);
+                return;
+            }
+        }
+
+        if (
+            json_last_error() === JSON_ERROR_NONE
+            && $messageReceived instanceof \stdClass
+            && property_exists($messageReceived, 'action')
         ) {
             switch ($messageReceived->action) {
                 case 'executeValidation':
@@ -662,6 +677,10 @@ class Health implements MessageComponentInterface
                     $this->validateSource($messageReceived, $from, requestId: $requestId);
                     break;
                 default:
+                    // Unreachable: the block above already returned for any action
+                    // `WebSocketMessageValidator::shapeOf()` does not recognise, and it recognises
+                    // exactly the actions the case arms above handle. Kept as a cheap backstop
+                    // against a future action being added to `shapeOf()` without a matching arm here.
                     $this->rejectMessage(
                         $from,
                         ProtocolErrorCode::UNKNOWN_ACTION,
@@ -679,9 +698,6 @@ class Health implements MessageComponentInterface
             } elseif (!property_exists($messageReceived, 'action')) {
                 $errorMsg  = 'No action specified';
                 $errorCode = ProtocolErrorCode::MISSING_ACTION;
-            } elseif (!self::validateMessageProperties($messageReceived)) {
-                $errorMsg  = 'Invalid message properties';
-                $errorCode = ProtocolErrorCode::INVALID_MESSAGE;
             } else {
                 $errorMsg  = 'Unknown error';
                 $errorCode = ProtocolErrorCode::INVALID_MESSAGE;
@@ -954,15 +970,14 @@ class Health implements MessageComponentInterface
      *
      * Nothing is sent back; see #806 section H.
      *
-     * `validateMessageProperties()` only checks that `runToken` is *present*, not that it is a string —
-     * `{"action":"cancelRun","runToken":null}` (or an array, or an object) passes validation and reaches
-     * here. In weak mode PHP does not coerce those into a `string` parameter; it throws `TypeError`, and
-     * Ratchet's `IoServer::handleData` only catches `\Exception`, so an `\Error` escapes and kills the
-     * whole WebSocket process over one malformed cancel. A cancel the server cannot act on is already a
-     * documented no-op (see above), so a non-string token folds into that same no-op path instead.
+     * `WebSocketMessageValidator` now rejects a non-string `runToken` — `cancelRun`'s schema entry
+     * types it via `#/definitions/correlationId` — before dispatch ever reaches here. `$runToken` is
+     * kept `mixed` and re-checked below anyway: a cancel the server cannot act on is already a
+     * documented no-op (see above), so treating an unexpected type as "not this connection's run"
+     * rather than trusting the schema is the cheaper of two ways to stay correct, and costs nothing.
      *
-     * @param mixed $runToken The run the client wants abandoned. Expected to be a string, but the caller
-     *                        only guarantees the property exists, not its type — see above.
+     * @param mixed $runToken The run the client wants abandoned. Expected to be a string; re-checked
+     *                        here rather than trusted, for the reason above.
      * @param ConnectionInterface $from The connection that asked.
      */
     private function cancelRun(mixed $runToken, ConnectionInterface $from): void
@@ -1033,8 +1048,10 @@ class Health implements MessageComponentInterface
             return;
         }
 
-        // `validateMessageProperties()` has already established that `target` is present; what it
-        // cannot establish is its shape, since ACTION_PROPERTIES only names required properties.
+        // `WebSocketMessageValidator` has already established that `target` is a `{id: string}`
+        // object, per the `validateSource` shape in `WebSocketMessage.json`. Re-checked here anyway,
+        // rather than trusted, so this method reads correctly on its own and stays correct if the
+        // schema and the dispatch ever drift.
         $target = property_exists($message, 'target') ? $message->target : null;
         if (false === ( $target instanceof \stdClass ) || false === property_exists($target, 'id')) {
             $this->rejectMessage($to, ProtocolErrorCode::INVALID_MESSAGE, 'validateSource requires a target object with an id.', requestId: $requestId);
@@ -1936,9 +1953,9 @@ class Health implements MessageComponentInterface
     /**
      * Read the optional `rite` property off an incoming WebSocket message.
      *
-     * `rite` is optional — it is deliberately absent from `ACTION_PROPERTIES`,
-     * which lists only required properties — so clients that predate rite
-     * awareness keep working and get their rite resolved from metadata instead.
+     * `rite` is optional — it is deliberately absent from the `required` list of every shape in
+     * `WebSocketMessage.json` that carries it — so clients that predate rite awareness keep working
+     * and get their rite resolved from metadata instead.
      * A non-string value is treated as absent rather than as an error; the
      * resolver validates the string against {@see Rite} in any case.
      */
@@ -2215,12 +2232,12 @@ class Health implements MessageComponentInterface
     /**
      * Read a message's `year` as the integer the calendar routines take.
      *
-     * Type-checked rather than trusted because {@see Health::validateMessageProperties()} establishes
-     * only that a property is *present*. A null or string `year` would reach
-     * `validateCalendar(…, int $year, …)` or `executeUnitTest(…, int $year, …)` and raise a
-     * `TypeError` — an `\Error`, which Ratchet's `IoServer::handleData` does not catch, so one
-     * malformed message would take the whole WebSocket process down rather than be answered. Same
-     * hazard {@see Health::cancelRun()} documents, on the property it was first found on.
+     * `WebSocketMessageValidator` now enforces `year: integer` on every shape that carries it, so the
+     * `TypeError` this once guarded against — `validateCalendar(…, int $year, …)` or
+     * `executeUnitTest(…, int $year, …)` reached with a null or string `year`, an `\Error` that
+     * Ratchet's `IoServer::handleData` does not catch — should no longer reach here. Kept as a
+     * type-narrowing backstop rather than trusted blindly, the same reasoning
+     * {@see Health::cancelRun()} documents on the property it was first found on.
      *
      * @param string $action The action name, so the rejection says which message is wrong.
      * @throws \InvalidArgumentException Whose message is the client-facing rejection text.
@@ -2278,13 +2295,14 @@ class Health implements MessageComponentInterface
      * authoritative, which is exactly right here because by this point it has been checked — see
      * {@see Health::resolveCalendarIdentity()}.
      *
-     * `year` and `responseFormat` are type-checked rather than trusted because
-     * `validateMessageProperties()` establishes only that a property is *present*. `year` is checked
-     * by the shared {@see Health::readYear()}; `responseFormat` is checked here because it belongs
-     * to this action alone — an unusable one would reach `ReturnTypeParam::from()` and raise a
-     * `\ValueError`, which is an `\Error` and so escapes Ratchet's `IoServer::handleData`, taking the
-     * whole WebSocket process down over one malformed message. See {@see Health::cancelRun()}, which
-     * documents the same hazard on the property it was found on.
+     * `year` and `responseFormat` are re-checked here rather than trusted outright, even though
+     * `WebSocketMessageValidator` now enforces `year: integer` and `responseFormat`'s enum on this
+     * shape. `year` goes through the shared {@see Health::readYear()}; `responseFormat` is checked
+     * here because it belongs to this action alone — an unusable one would reach
+     * `ReturnTypeParam::from()` and raise a `\ValueError`, which is an `\Error` and so escapes
+     * Ratchet's `IoServer::handleData`, taking the whole WebSocket process down over one malformed
+     * message. See {@see Health::cancelRun()}, which documents the same hazard on the property it
+     * was found on.
      *
      * @param ValidateTypedCalendar $message The message naming the calendar to compute and check.
      * @param ConnectionInterface $to The connection to send the result frames to.
@@ -3727,9 +3745,10 @@ class Health implements MessageComponentInterface
      * Is this a `validateCalendar` message in the reshaped (v2) form?
      *
      * The whole discriminator, in one place, because it is consulted twice — once by
-     * {@see Health::validateMessageProperties()}, which must know before it applies a property list,
-     * and once by {@see Health::onMessage()}, which must know before it picks a handler. Two
-     * literal copies of "is `calendar` an object?" would be two places to forget.
+     * {@see \LiturgicalCalendar\Api\Services\WebSocketMessageValidator::shapeOf()}, which must know
+     * which published shape a message claims to be before validating it, and once by
+     * {@see Health::onMessage()}, which must know before it picks a handler. Two literal copies of
+     * "is `calendar` an object?" would be two places to forget.
      *
      * `validateCalendar` is the only action that needs a shape test at all. `validateSource` and
      * `runTest` are new *names*, and a v1 client cannot accidentally emit a name it does not know;
@@ -3741,49 +3760,6 @@ class Health implements MessageComponentInterface
             && 'validateCalendar' === $message->action
             && property_exists($message, 'calendar')
             && $message->calendar instanceof \stdClass;
-    }
-
-    /**
-     * Validates the properties of a message object.
-     *
-     * This function checks the properties of a given message object to ensure
-     * they match the expected properties defined in ACTION_PROPERTIES for the
-     * specified action. If any expected property is missing from the message
-     * object, the function returns false, indicating the message is invalid.
-     *
-     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ValidateTypedCalendar|ExecuteUnitTest|RunTest|CancelRun|ValidateSource $message The message object to validate.
-     * @return bool True if all required properties are present, false otherwise.
-     */
-    private static function validateMessageProperties(\stdClass $message): bool
-    {
-        // ------------------------------------------------------------------ the v2 discriminator
-        // This branch has to be here — ahead of the ACTION_PROPERTIES list — and not inside
-        // validateCalendar(). `validateCalendar` keeps its action name because the *action* is
-        // unchanged, so unlike `validateSource` and `runTest` there is no new name to discriminate
-        // on: the shape of `calendar` is the only signal a reshaped message gives. And a reshaped
-        // message carries neither `category` (folded into `calendar.kind`) nor `responsetype`
-        // (respelled `responseFormat`), both of which ACTION_PROPERTIES['validateCalendar']
-        // requires. Applying that list first would therefore turn away *every* v2 message as
-        // "Invalid message properties" before any handler ever saw it.
-        if (self::isTypedCalendarMessage($message)) {
-            foreach (self::TYPED_CALENDAR_PROPERTIES as $prop) {
-                if (false === property_exists($message, $prop)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        // ------------------------------------------------------------------ everything else, as before
-        $valid = true;
-        foreach (Health::ACTION_PROPERTIES[$message->action] as $prop) {
-            if (false === property_exists($message, $prop)) {
-                if ($prop === 'sourceFile' && $message->action === 'executeValidation' && property_exists($message, 'sourceFolder')) {
-                    continue;
-                }
-                return false;
-            }
-        }
-        return $valid;
     }
 
     /**
