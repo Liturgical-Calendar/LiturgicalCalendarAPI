@@ -29,11 +29,15 @@ use PHPUnit\Framework\TestCase;
  * the inventory from advertising data a given deployment is missing — reintroducing the same
  * blindness from the other side.
  *
- * Coverage is not exhaustive. This test walks only the `missals` and `decrees` directories under
- * each `rite`. The `calendars` tree under each rite, and the `lectionary` tree under `roman`, are
- * outside `CheckableInventory`'s scope entirely and are never visited here. Within the directories
- * that are walked, only top-level JSON files and an `i18n` subfolder are checked — a `lectionary`
- * subfolder nested inside a missal or decrees directory is not covered either.
+ * Coverage is split by how the inventory learns about each kind of source data, so where drift is
+ * caught differs by kind. The filesystem walks here visit only the `missals` and `decrees`
+ * directories under each `rite` — those are the items the inventory lists or derives statically. The
+ * `calendars` tree under each rite is in scope as well, but is not walked here: those items are
+ * enumerated from the calendar index, so drift in them is caught by
+ * `testEveryRegisteredCalendarHasAnInventoryEntry`, which walks that index instead. The `lectionary`
+ * tree under `roman` is outside `CheckableInventory`'s scope entirely and is covered by neither.
+ * Within the directories that are walked, only top-level JSON files and an `i18n` subfolder are
+ * checked — a `lectionary` subfolder nested inside a missal or decrees directory is not covered.
  */
 #[CoversClass(CheckableInventory::class)]
 final class InventoryDriftTest extends TestCase
@@ -146,6 +150,32 @@ final class InventoryDriftTest extends TestCase
     public function testEveryRegisteredCalendarHasAnInventoryEntry(): void
     {
         $metadata = CalendarMetadataProvider::create();
+
+        // The three loops below name their collections, so a fourth one added to MetadataCalendars
+        // later would simply go un-enumerated — the one way this half of the inventory could quietly
+        // stop covering something. Pinning the shape of the index makes that a red test instead, so a
+        // new collection has to be triaged rather than overlooked.
+        //
+        // `ambrosian_calendars` is already such a collection and is deliberately not looped over: its
+        // single entry is the rite-level Ambrosian calendar, whose source data is the rite temporale
+        // and sanctorale that `CheckableInventory::explicitItems()` already lists by hand. The `*_keys`
+        // and `diocesan_groups` entries are projections of the collections above them, not calendars.
+        self::assertSame(
+            [
+                'national_calendars',
+                'national_calendars_keys',
+                'diocesan_calendars',
+                'diocesan_calendars_keys',
+                'diocesan_groups',
+                'wider_regions',
+                'wider_regions_keys',
+                'locales',
+                'ambrosian_calendars',
+                'ambrosian_calendars_keys'
+            ],
+            array_keys(get_object_vars($metadata)),
+            'the calendar index gained or lost a collection — decide whether it needs inventory entries, then update this list'
+        );
 
         self::assertNotEmpty($metadata->national_calendars, 'no national calendars in the index');
         self::assertNotEmpty($metadata->diocesan_calendars, 'no diocesan calendars in the index');

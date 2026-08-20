@@ -19,7 +19,7 @@ absolute API URL, or — for every per-calendar check — a *bare identifier*: `
 the `validate` slug. Its sibling `sourceFolder` is mutually exclusive with it but not modelled as such.
 
 **`validate` is already an id in all but name.** `national-calendar-IT`, `diocesan-calendar-romamo_it`,
-`wider-region-Europe`, `proprium-de-sanctis-IT-1983`, `tests-StIgnatiusOfLoyola` — the server parses these with eight
+`wider-region-Europe`, `proprium-de-sanctis-IT-1983`, `tests-StIgnatiusOfLoyolaTest` — the server parses these with eight
 anchored `preg_match` arms to recover what the client meant. It is simultaneously a schema selector, the human label
 rendered on the card, and a CSS class fragment.
 
@@ -50,9 +50,12 @@ name left alone through a redesign survives it.
 
 ## The inventory grows
 
-`/validations` goes from 18 items to roughly 130: the existing static source data, plus every per-calendar source
-artifact — 10 national calendars, 32 diocesan, 7 wider regions, 11 test definitions, each with its `i18n` folder where
-one exists.
+`/validations` goes from 18 items to 77: the existing static source data, plus every per-calendar source artifact.
+Each calendar contributes two items, its definition file and its `i18n` folder — 5 checkable national calendars give 10,
+16 dioceses give 32, 3 wider regions give 6. The 11 test definitions contribute one apiece, having no translations
+folder. (The Vatican is announced as a national calendar but is served by the General Roman Calendar and has no source
+data of its own, so it contributes nothing.) Those figures are what the bundled source data happens to yield today; the
+point is that they are enumerated rather than listed, so they move with the data.
 
 The enumeration comes from `CalendarMetadataProvider::create()`, which the codebase already calls "the single source of
 truth" for the calendar index and which `MetadataHandler` uses to serve `/calendars`. Deriving from the same builder
@@ -75,16 +78,16 @@ definitions at runtime; `/validations` inherits that and stays correct after a w
 
 `kind:rite[:qualifier][:i18n]`, fully qualified.
 
-| Id                              | What it addresses                        |
-|---------------------------------|------------------------------------------|
-| `temporale:roman`               | the Roman Proprium de Tempore file       |
-| `temporale:roman:i18n`          | its translations folder                  |
-| `sanctorale:roman:US_2011`      | the USA edition's sanctorale             |
-| `decrees:roman`                 | memorials from decrees                   |
-| `nation:roman:IT`               | the Italian national calendar definition |
-| `diocese:ambrosian:lugano_ch`   | a diocesan calendar definition           |
-| `widerregion:roman:Europe`      | a wider-region definition                |
-| `test:roman:StIgnatiusOfLoyola` | a test *definition* file                 |
+| Id                                      | What it addresses                        |
+|-----------------------------------------|------------------------------------------|
+| `temporale:roman`                       | the Roman Proprium de Tempore file       |
+| `temporale:roman:i18n`                  | its translations folder                  |
+| `sanctorale:roman:US_2011`              | the USA edition's sanctorale             |
+| `decrees:roman`                         | memorials from decrees                   |
+| `nation:roman:IT`                       | the Italian national calendar definition |
+| `diocese:ambrosian:lugano_ch`           | a diocesan calendar definition           |
+| `widerregion:roman:Europe`              | a wider-region definition                |
+| `test:ambrosian:StIgnatiusOfLoyolaTest` | a test *definition* file                 |
 
 All 18 ids already published in #811 satisfy this scheme unchanged, so nothing shipped needs renaming. The rite segment
 is always present even where it is not currently a discriminator — nations and tests are Roman-only today — because a
@@ -111,8 +114,8 @@ There are three domains here, and collapsing them into one `target` would be the
 
 // 3. Run a test — a test id plus the calendar to run it against.
 { "action": "runTest",
-  "test": "StIgnatiusOfLoyola",
-  "calendar": { "kind": "national", "id": "IT", "rite": "roman" },
+  "test": "StIgnatiusOfLoyolaTest",
+  "calendar": { "kind": "rite", "id": "ambrosian", "rite": "ambrosian" },
   "year": 2026 }
 ```
 
@@ -120,9 +123,9 @@ There are three domains here, and collapsing them into one `target` would be the
 
 ### Source check versus test run
 
-The current protocol blurs a distinction worth keeping explicit. `tests-StIgnatiusOfLoyola` today is a **source check**:
+The current protocol blurs a distinction worth keeping explicit. `tests-StIgnatiusOfLoyolaTest` today is a **source check**:
 does the test *definition* validate against `LitCalTest.json`. `executeUnitTest` **runs** that test against a computed
-calendar. Both survive, addressed differently — `test:roman:StIgnatiusOfLoyola` is an inventory item reached by shape 1;
+calendar. Both survive, addressed differently — `test:ambrosian:StIgnatiusOfLoyolaTest` is an inventory item reached by shape 1;
 running it is shape 3.
 
 ### Why `rite` is carried rather than inferred

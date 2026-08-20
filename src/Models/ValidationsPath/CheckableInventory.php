@@ -20,9 +20,19 @@ use LiturgicalCalendar\Api\Services\ResourceExistenceChecker;
  * that matched on slugs instead of paths, and in each client's hardcoded copy of the layout —
  * with nothing detecting divergence. See #806.
  *
- * Half of it need not be written down at all: `RomanMissal` already registers every missal edition
- * and already knows which have a sanctorale file, so those items are derived. The rest have
- * dedicated `JsonData` constants and are listed explicitly.
+ * The inventory has two halves, and only the smaller one is written down here.
+ *
+ * The *static* half is the source data that exists once per rite: the temporale, the decrees, and
+ * the Roman missal sanctorale editions. Even that is only half-listed — `RomanMissal` already
+ * registers every edition and already knows which have a sanctorale file, so those items are
+ * derived; the remainder have dedicated `JsonData` constants and are listed explicitly.
+ *
+ * The *enumerated* half is the per-calendar source data, which is not listed at all and today is
+ * the larger of the two. National calendars, wider regions and diocesan calendars come from
+ * `CalendarMetadataProvider::create()`, the same builder that serves `/calendars`, so a registered
+ * calendar is a checkable calendar by construction and the two lists cannot disagree. Test
+ * definitions come from the same glob `TestsHandler` discovers them with. Adding a calendar to
+ * source data therefore needs no edit here; adding a whole new *kind* of source data does.
  *
  * Paths always come from `JsonData` cases. `JsonData` is where this repo's layout is written down;
  * this class must not become a second copy of it.
