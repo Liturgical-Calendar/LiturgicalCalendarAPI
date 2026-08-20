@@ -16,10 +16,12 @@ use Ratchet\ConnectionInterface;
 /**
  * `complete` — the frame that lets a client stop without counting.
  *
- * Both clients hardcode three responses per check in four places, and #806 section A's published
- * `steps` could not replace that constant because the count is not reliable: a file whose JSON fails
- * to decode emits two step frames, not three (#821). A terminal frame makes #821 **moot rather than
- * fixed** — the short path still emits fewer step frames, but nothing waits for the difference.
+ * Both clients hardcode three responses per check in four places, and when this frame was added
+ * #806 section A's published `steps` could not replace that constant because the count was not
+ * reliable: a file whose JSON failed to decode emitted two step frames, not three (#821). The
+ * terminal frame made that moot rather than fixed; #821 has since fixed it too, so the counts now
+ * agree. The frame is not thereby redundant — it is what makes a client's stopping condition
+ * independent of any arm's step count, including arms not yet written.
  *
  * **The failure arms are the point of this file.** A client that stops on `complete` hangs forever on
  * an arm that terminates without one, which is the folder-branch wedge `ea29b678` fixed, one level up
@@ -120,11 +122,17 @@ final class HealthTerminalFrameTest extends TestCase
     // ---------------------------------------------------------------- every arm that starts work
 
     /**
-     * The #821 arm itself: a file that exists but does not decode emits **two** step frames, not
-     * three, and still terminates. This is the case the hardcoded `checks * 3` could never be told
-     * about, and the reason the terminal frame is not merely a convenience.
+     * The arm that #821 was filed about: a file that exists but does not decode. It emitted **two**
+     * step frames where every sibling arm emits three, which is why the terminal frame was written
+     * to be independent of the step count rather than derived from it — a client that had been told
+     * `steps` was three waited forever for a `validates` frame that was never coming.
+     *
+     * That is fixed: the third frame is now sent, failed. The assertion is kept pointing at this arm
+     * rather than moved to a passing one, because the arm's history is the reason it is worth
+     * pinning — and the terminal frame still arrives after a step frame that failed, which is the
+     * property this class exists to hold.
      */
-    public function testAJsonDecodeFailureTerminatesAfterOnlyTwoStepFrames(): void
+    public function testAJsonDecodeFailureReportsEveryStepAndThenTerminates(): void
     {
         $health = $this->newHealth();
         $conn   = self::createStubConnection();
@@ -134,13 +142,14 @@ final class HealthTerminalFrameTest extends TestCase
 
         $frames = self::framesOf($conn);
         self::assertSame(
-            ['exists', 'parses', 'complete'],
+            ['exists', 'parses', 'validates', 'complete'],
             self::stepsOf($frames),
-            'the short path is still a path: fewer step frames, and the same terminal frame'
+            'a check that stops early still reports every step it declared, and then terminates'
         );
         self::assertSame('pass', $frames[0]->status);
         self::assertSame('fail', $frames[1]->status, 'precondition: this is the decode failure, not a passing check');
-        self::assertSame('req-alpha', $frames[2]->requestId);
+        self::assertSame('fail', $frames[2]->status, 'a file that would not decode was never schema-checked, so the step failed');
+        self::assertSame('req-alpha', $frames[3]->requestId);
     }
 
     /**

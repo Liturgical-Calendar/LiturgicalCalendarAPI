@@ -14,9 +14,9 @@ use PHPUnit\Framework\TestCase;
 use Ratchet\ConnectionInterface;
 
 /**
- * The ways a source-file check used to say something untrue about what it found.
+ * The two ways a source-file check used to say something untrue about what it found.
  *
- * These arms share one read path and one failure mode of the same kind — a check reporting an answer
+ * Both arms share one read path and one failure mode of the same kind — a check reporting an answer
  * that is not the answer — which is why they are pinned together:
  *
  * - **#822.** A file that is *not there* was reported `file-exists = success`. `react/filesystem`'s
@@ -26,10 +26,11 @@ use Ratchet\ConnectionInterface;
  *   from any message. The success path ran over an empty string and the two steps after `exists`
  *   failed for a reason that was not the real one. A green box above two red ones reads as "the file
  *   is there but its contents are broken", which sends whoever is debugging to the wrong file.
- * The sibling arm, #821 — a file that *is* there but does not decode emitting two frames where every
- * other arm emits three — is fixed separately and pinned here too.
+ * - **#821.** A file that *is* there but does not decode emitted two frames where every sibling arm
+ *   emits three: `validates` was simply never sent. `GET /validations` publishes a `steps` array a
+ *   client sizes its rendering with, so the missing frame left a card that never filled.
  *
- * The arms are driven **through a message**, not by invoking the private emitters. That is the
+ * Both arms are driven **through a message**, not by invoking the private emitters. That is the
  * whole point of these two: the emitters were already correct and already tested — what was wrong
  * was which of them a real request reached. A test that called the right one directly would have
  * passed against both bugs. {@see HealthValidationDataErrorTest} covers the emitter itself, and
@@ -54,6 +55,8 @@ final class HealthSourceFileFailureArmsTest extends TestCase
      */
     private const ABSENT_SOURCE = 'jsondata/sourcedata/this-source-file-does-not-exist.json';
 
+    private string $malformedFile = '';
+
     public static function setUpBeforeClass(): void
     {
         // The inventory builds every path from Router::$apiFilePath, and the published `steps` this
@@ -66,6 +69,14 @@ final class HealthSourceFileFailureArmsTest extends TestCase
     public static function tearDownAfterClass(): void
     {
         CheckableInventory::reset();
+    }
+
+    protected function tearDown(): void
+    {
+        if ('' !== $this->malformedFile) {
+            @unlink($this->malformedFile);
+            $this->malformedFile = '';
+        }
     }
 
     /**
@@ -208,5 +219,70 @@ final class HealthSourceFileFailureArmsTest extends TestCase
             (string) $frames[0]->text,
             'the diagnosis has to distinguish absence from an unreadable file that is there'
         );
+    }
+
+    // ---------------------------------------------------------------- #821: the file will not decode
+
+    /**
+     * A file that exists but does not decode still owes one frame per published step.
+     *
+     * The file is written to a temp directory and named by absolute path rather than added to the
+     * repository: what this arm needs is a real file whose bytes are not JSON, and a fixture
+     * checked in under `jsondata/` would be picked up by the schema-validation suites that walk
+     * that tree.
+     */
+    public function testAFileThatDoesNotDecodeStillEmitsOneFramePerPublishedStep(): void
+    {
+        $frames = $this->framesForSourceFile($this->malformedSourceFile());
+
+        self::assertCount(
+            self::publishedStepCount(),
+            $frames,
+            'a decode failure emitted a different number of frames than a source check publishes steps'
+        );
+        self::assertSame(
+            ['exists', 'parses', 'validates'],
+            array_map(static fn (\stdClass $f): mixed => $f->step, $frames),
+            'the steps must arrive in the published order, whatever the outcome of each'
+        );
+    }
+
+    /**
+     * And the frame that was missing says the honest thing: the file did not validate, because it
+     * was never decoded. "Not attempted" and "not sent" are indistinguishable to a client, so the
+     * step is reported failed rather than left out.
+     */
+    public function testTheDecodeFailureReportsTheSchemaStepAsFailedRatherThanSkippingIt(): void
+    {
+        $frames = $this->framesForSourceFile($this->malformedSourceFile());
+
+        self::assertSame('pass', $frames[0]->status, 'precondition: this file really is on disk');
+        self::assertSame('fail', $frames[1]->status, 'precondition: this is the decode failure arm');
+
+        self::assertSame('.proprium-de-tempore.schema-valid', $frames[2]->classes);
+        self::assertSame('fail', $frames[2]->status);
+        self::assertStringContainsString(
+            'could not be decoded as JSON',
+            (string) $frames[2]->text,
+            'the schema step has to say why it did not validate, not merely that it did not'
+        );
+    }
+
+    /**
+     * A real file on disk whose contents are not JSON, cleaned up in tearDown.
+     */
+    private function malformedSourceFile(): string
+    {
+        if ('' === $this->malformedFile) {
+            // tempnam() reserves a name by creating the file; the check under test dispatches on the
+            // `.json` extension, so the reserved file is renamed rather than left behind beside it.
+            $reserved = (string) tempnam(sys_get_temp_dir(), 'health-malformed-');
+            $path     = $reserved . '.json';
+            self::assertTrue(rename($reserved, $path), 'could not name the malformed fixture');
+            self::assertNotFalse(file_put_contents($path, '{ this is not JSON'), 'could not write the malformed fixture');
+            $this->malformedFile = $path;
+        }
+
+        return $this->malformedFile;
     }
 }
