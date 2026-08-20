@@ -61,13 +61,44 @@ use Psr\Http\Message\ResponseInterface;
  * Do not confuse these with the *calendar type* named by `category` on `validateCalendar` and `executeUnitTest` below;
  * that is an unrelated vocabulary that merely shares the property name. See issue #806.
  *
+ * `validateCalendar` accepts two message shapes, and the property `calendar` is what tells them apart. A **string**
+ * `calendar` is the legacy (v1) form aliased as `ValidateCalendar`: the identity is spread across `calendar` plus
+ * `category`, and `rite` is an optional hint. An **object** `calendar` is the reshaped (v2) form aliased as
+ * `ValidateTypedCalendar`: one `CalendarIdentity` carrying `kind`, `id` and `rite`, no `category`, and `responsetype`
+ * respelled `responseFormat`. The action name is the same in both because the action is the same; only the identity
+ * became typed — and with it the standing of `rite`, which stops being a hint and becomes an assertion the server
+ * checks; {@see Health::resolveCalendarIdentity()} is where that is argued and enforced.
+ * See {@see Health::isTypedCalendarMessage()} and issue #806 section D.
+ *
+ * `runTest` is the reshaped `executeUnitTest`, aliased as `RunTest`: a `test` name, the same
+ * `CalendarIdentity` — resolved by the same {@see Health::resolveCalendarIdentity()}, so the mapping
+ * and the rite check exist once for both actions — and a year. It carries no `responseFormat`
+ * because a test runs against the parsed calendar rather than against a chosen representation of it.
+ * Unlike `validateCalendar` it took a new *name*, which is the whole of its discrimination: a v1
+ * client cannot emit a name it does not know. `executeUnitTest` is untouched and stays reachable
+ * until UnitTestInterface#42 ships. See issue #806 section E.
+ *
+ * All three reshaped messages — `validateSource`, `validateCalendar` and `runTest` — reject a legacy
+ * property their own shape retired, rather than ignoring it. See {@see Health::RETIRED_PROPERTIES}
+ * for the rule and {@see Health::rejectRetiredProperties()} for the one implementation of it.
+ *
+ * Do not confuse `runTest` with the inventory item `test:{rite}:{Name}` that `validateSource`
+ * addresses. That item is a *source check*: does the test definition exist, parse, and validate
+ * against `LitCalTest.json`. `runTest` *runs* the test that definition describes against a computed
+ * calendar. A definition can be valid while the test it describes fails, and vice versa, so the two
+ * are separate operations with separate addresses.
+ *
  * @phpstan-type ExecuteValidationCategory 'universalcalendar'|'sourceDataCheck'|'resourceDataCheck'
  * @phpstan-type ExecuteValidationSourceFolder \stdClass&object{action:'executeValidation',category:'sourceDataCheck',validate:string,sourceFolder:string,responsetype?:string}
  * @phpstan-type ExecuteValidationSourceFile \stdClass&object{action:'executeValidation',category:'universalcalendar'|'sourceDataCheck',validate:string,sourceFile:string,responsetype?:string}
  * @phpstan-type ExecuteValidationResource \stdClass&object{action:'executeValidation',category:'resourceDataCheck',validate:string,sourceFile:string,responsetype?:string}
  * @phpstan-type ValidateCalendar \stdClass&object{action:'validateCalendar',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar'|'ritecalendar',responsetype:'JSON'|'XML'|'ICS'|'YML',rite?:string}
+ * @phpstan-type CalendarIdentity \stdClass&object{kind:'general'|'national'|'diocesan'|'rite',id?:string,rite:string}
+ * @phpstan-type ValidateTypedCalendar \stdClass&object{action:'validateCalendar',calendar:CalendarIdentity,year:int,responseFormat:'JSON'|'XML'|'ICS'|'YML',runToken?:string}
  * @phpstan-type ExecuteUnitTest \stdClass&object{action:'executeUnitTest',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar'|'ritecalendar',test:string,rite?:string}
+ * @phpstan-type RunTest \stdClass&object{action:'runTest',test:string,calendar:CalendarIdentity,year:int,runToken?:string}
  * @phpstan-type CancelRun \stdClass&object{action:'cancelRun',runToken:string}
+ * @phpstan-type ValidateSource \stdClass&object{action:'validateSource',target:\stdClass&object{id:string},runToken?:string}
  *
  * @phpstan-import-type LiturgicalEvent from \LiturgicalCalendar\Api\Test\LitTestRunner
  */
@@ -91,8 +122,115 @@ class Health implements MessageComponentInterface
         'executeValidation' => ['category', 'validate', 'sourceFile'],
         'validateCalendar'  => ['category', 'calendar', 'year', 'responsetype'],
         'executeUnitTest'   => ['category', 'calendar', 'year', 'test'],
-        'cancelRun'         => ['runToken']
+        // No `category`: `calendar.kind` carries it. No `responseFormat` either — a test runs
+        // against the parsed calendar, so the representation is not the client's to choose.
+        'runTest'           => ['test', 'calendar', 'year'],
+        'cancelRun'         => ['runToken'],
+        'validateSource'    => ['target']
     ];
+
+    /**
+     * Properties required by the *reshaped* `validateCalendar` message — the one whose `calendar` is
+     * a typed identity object rather than a string.
+     *
+     * Deliberately not an entry in ACTION_PROPERTIES: that array is keyed by action name, and this
+     * shape shares its action name with the legacy form. See {@see Health::validateMessageProperties()}.
+     *
+     * @var string[]
+     */
+    private const TYPED_CALENDAR_PROPERTIES = ['calendar', 'year', 'responseFormat'];
+
+    /**
+     * The legacy properties each reshaped message *replaced*, and what replaced them.
+     *
+     * **A v2 message that also carries a legacy property its own shape retired is rejected**, on all
+     * three reshaped actions, by maintainer ruling. Not a breaking change: a v1 client sends a string
+     * `calendar` or an old action name and never reaches these checks. What it catches is the
+     * half-migrated client — one that has adopted the new shape and is still sending the old fields —
+     * which otherwise gets behaviour that looks correct, because a retired property is simply never
+     * read, and breaks on the day the legacy branch is removed. A loud error while the two still
+     * agree is the whole value.
+     *
+     * Uniform on purpose. Making a client's mistake loud on one action and silent on two would be
+     * worse than either answer applied consistently, because the client cannot tell which it is
+     * getting.
+     *
+     * `runTest` retires `category` and `rite`: `ACTION_PROPERTIES['executeUnitTest']` is
+     * `['category', 'calendar', 'year', 'test']`, so there was never a `responsetype` on it to
+     * retire. `runToken` is retired by nothing — it is shared, current, and valid on all three.
+     *
+     * **The retired set is not derivable from `ACTION_PROPERTIES`**, and an audit that assumed it
+     * was is how `rite` came to be missed on both calendar actions: `ACTION_PROPERTIES` lists only
+     * *required* properties, so every optional v1 property — `rite` on `validateCalendar` and
+     * `executeUnitTest`, `responsetype` on `executeValidation` — was structurally invisible to it.
+     * When adding a shape here, read the v1 predecessor's `@phpstan-type` alias at the top of this
+     * file, where the optional properties are the ones marked `?`. (`responsetype` on
+     * `executeValidation` is the one optional property deliberately *not* retired: `validateSource`
+     * has no response representation to choose, `executeValidation()` never read it, and retiring it
+     * would answer a question no client is asking.)
+     *
+     * Keyed by action; `shape` completes the sentence "… is not part of a %s" and is why
+     * `validateCalendar`'s reads "a validateCalendar message with an object calendar": on a *string*
+     * calendar `category` is required, not retired, and a message that said otherwise would be lying
+     * to a v1 client. `retired` maps each retired property to the clause naming its replacement, so
+     * the rejection tells a migrating client what to do rather than only that it is wrong.
+     *
+     * @var array<string, array{shape: string, retired: array<string, string>}>
+     */
+    private const RETIRED_PROPERTIES = [
+        'validateSource'   => [
+            'shape'   => 'validateSource message',
+            'retired' => [
+                // `executeValidation` spread the address across a schema-resolution strategy and a
+                // path; an inventory id is the whole address, and the server resolves both from it.
+                'category'     => 'target.id replaces it.',
+                'validate'     => 'target.id replaces it.',
+                'sourceFile'   => 'target.id replaces it.',
+                'sourceFolder' => 'target.id replaces it.'
+            ]
+        ],
+        'validateCalendar' => [
+            'shape'   => 'validateCalendar message with an object calendar',
+            'retired' => [
+                'category'     => 'calendar.kind replaces it.',
+                // Task 3 left this one accepted, reasoning that alongside a correct `responseFormat`
+                // it was stale noise from a client that had already done the rename right. The
+                // uniform rule overrules that: it is precisely the half-migration signal worth
+                // seeing. Sent *instead of* `responseFormat` it never reaches here at all — the
+                // property list turns the message away for the missing required property, and that
+                // reading is unchanged.
+                'responsetype' => 'responseFormat replaces it.',
+                // Optional on v1, and therefore invisible to an audit that read ACTION_PROPERTIES —
+                // which lists required properties only. It is the one retired property whose silent
+                // acceptance would be actively dangerous: a half-migrated client that objectified
+                // `calendar` but kept its old top-level `rite` gets a *rite disagreement* ignored,
+                // which is exactly what the typed identity went out of its way to make loud.
+                'rite'         => 'calendar.rite replaces it.'
+            ]
+        ],
+        'runTest'          => [
+            'shape'   => 'runTest message',
+            'retired' => [
+                'category' => 'calendar.kind replaces it.',
+                // Same optional property, same predecessor treatment: `executeUnitTest` read a
+                // top-level `rite` through readRiteHint(); `runTest` reads only `calendar.rite`.
+                'rite'     => 'calendar.rite replaces it.'
+            ]
+        ]
+    ];
+
+    /**
+     * The response formats {@see Health::validateCalendar()} has a validation branch for.
+     *
+     * Narrower than {@see ReturnTypeParam}, on purpose: `ReturnTypeParam::from()` throws a
+     * `\ValueError` on anything it does not know, and a `\ValueError` is an `\Error`, which Ratchet's
+     * `IoServer::handleData` does not catch — so an unusable format on a reshaped message would kill
+     * the whole WebSocket process rather than being answered. Same hazard {@see Health::cancelRun()}
+     * documents, reached by a different door. A format outside this list is rejected instead.
+     *
+     * @var string[]
+     */
+    private const VALIDATABLE_RESPONSE_FORMATS = ['JSON', 'XML', 'ICS', 'YML'];
 
     private const RED    = "\033[0;31m";
     private const GREEN  = "\033[0;32m";
@@ -366,7 +504,7 @@ class Health implements MessageComponentInterface
         // Reset per-connection cache hit counter for each new message (test run)
         $this->cacheHitCounters[$resourceId] = 0;
         echo sprintf('Receiving message from connection %d: %s', $resourceId, $msg . "\n");
-        /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest|CancelRun $messageReceived */
+        /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ValidateTypedCalendar|ExecuteUnitTest|RunTest|CancelRun|ValidateSource $messageReceived */
         $messageReceived = json_decode($msg);
         // Store optional run token for response correlation. `cancelRun` is exempt: it names the run it
         // wants abandoned rather than the run this connection is on, and storing it here would install
@@ -380,6 +518,30 @@ class Health implements MessageComponentInterface
             && is_string($messageReceived->runToken)
             && preg_match('/^[A-Za-z0-9_\-]{1,64}$/', $messageReceived->runToken)
         ) {
+            // A token this connection was not already on is a run *beginning*, and that is the one
+            // moment the inventory may safely be rebuilt: `validateSource` addresses source data
+            // solely through `CheckableInventory::byId()`, whose index is memoized for the lifetime
+            // of this process rather than of a request, so a calendar added through `/data` would
+            // otherwise stay unaddressable until the WebSocket server restarts. A write-path hook
+            // cannot close that gap — `/data` writes happen in the HTTP process, which never runs
+            // this code. Resetting on the token *change* rather than on every message bounds
+            // staleness to one run while still costing one rebuild per run, not one per check;
+            // a run issues one message per checked item, and there are dozens.
+            //
+            // Known bound, not an oversight: a *new* run that reuses the previous run's token on
+            // the same connection reads as a continuation and skips the reset. Tokens are minted
+            // per run by the client and onClose() drops the entry, so this is theoretical — but if
+            // it ever stops being, the fix is a run-start signal in the protocol, not a reset here
+            // on every message.
+            //
+            // Second bound, worth knowing before relying on this: `runToken` is optional, and a
+            // client that omits it never reaches this block at all — so it never resets, and never
+            // sees a calendar written through `/data` until the server restarts. The reset gives
+            // freshness to clients that opt into run correlation; a tokenless client opts out of
+            // both together.
+            if (( $this->runTokens[$resourceId] ?? null ) !== $messageReceived->runToken) {
+                CheckableInventory::reset();
+            }
             $this->runTokens[$resourceId] = $messageReceived->runToken;
         }
         if (
@@ -394,6 +556,13 @@ class Health implements MessageComponentInterface
                     $this->executeValidation($messageReceived, $from);
                     break;
                 case 'validateCalendar':
+                    // Same action, two shapes; see isTypedCalendarMessage(). The legacy arm below
+                    // is untouched and stays reachable until UnitTestInterface#42 ships.
+                    if (self::isTypedCalendarMessage($messageReceived)) {
+                        /** @var ValidateTypedCalendar $messageReceived */
+                        $this->validateTypedCalendar($messageReceived, $from);
+                        break;
+                    }
                     /** @var ValidateCalendar $messageReceived */
                     $this->validateCalendar(
                         $messageReceived->calendar,
@@ -415,9 +584,17 @@ class Health implements MessageComponentInterface
                         self::readRiteHint($messageReceived)
                     );
                     break;
+                case 'runTest':
+                    /** @var RunTest $messageReceived */
+                    $this->runTest($messageReceived, $from);
+                    break;
                 case 'cancelRun':
                     /** @var CancelRun $messageReceived */
                     $this->cancelRun($messageReceived->runToken, $from);
+                    break;
+                case 'validateSource':
+                    /** @var ValidateSource $messageReceived */
+                    $this->validateSource($messageReceived, $from);
                     break;
                 default:
                     $message       = new \stdClass();
@@ -506,6 +683,25 @@ class Health implements MessageComponentInterface
     }
 
     /**
+     * Reject a malformed or unresolvable v2 message.
+     *
+     * Reuses the existing `echobot` error shape deliberately. Since UnitTestInterface PR #46 an
+     * unrecognised response `type` is painted as a visible failed check, so a dedicated
+     * `protocolError` type would make every rejection look like a failing test. That type belongs
+     * to #806 section G and is gated on section C.
+     *
+     * @param ConnectionInterface $to The connection that sent the message being rejected.
+     * @param string $text Why the message could not be acted on.
+     */
+    private function rejectMessage(ConnectionInterface $to, string $text): void
+    {
+        $message       = new \stdClass();
+        $message->type = 'echobot';
+        $message->text = $text;
+        $this->sendMessage($to, $message);
+    }
+
+    /**
      * Capture the run token currently associated with a connection. Called synchronously at the
      * start of each request handler (before any async work), so the value is the originating
      * request's token; that token is then threaded into the handler's async responses so they
@@ -578,6 +774,121 @@ class Health implements MessageComponentInterface
             throw new NotFoundException("No diocese found for calendar id: {$calendarId}");
         }
         return $dioceseMetadata;
+    }
+
+    /**
+     * Check one source-data artifact, named by the id `GET /validations` published for it.
+     *
+     * This is the addressing half of {@see Health::executeValidation()}, done the other way round.
+     * A v1 message carries a hyphenated `validate` slug that the server has to recover a path and a
+     * schema from, through eight anchored patterns that are each a second copy of a naming
+     * convention written down somewhere else — which is the drift #806 exists to remove. An id is
+     * opaque: the server minted it, published it, and looks it up. One lookup, no grammar.
+     *
+     * Nothing here is subtracted from `executeValidation()`; both address the same execution phase,
+     * and the slug arms stay reachable until clients have moved over (UnitTestInterface#42). What is
+     * refused is a message that tries to be both: `category`, `validate`, `sourceFile` and
+     * `sourceFolder` are the four properties an id replaces outright, so carrying one alongside a
+     * `target` is a half-migrated client naming its check twice and being read once. See
+     * {@see Health::RETIRED_PROPERTIES}.
+     *
+     * The six-argument call is deliberate: an inventory entry is a source-data check whose data path
+     * and quoted folder are the same path, and whose schema was resolved from its own id — exactly
+     * the three defaults {@see Health::runValidationSteps()} supplies.
+     *
+     * @param ValidateSource $message The message naming the target to check.
+     * @param ConnectionInterface $to The connection to send the result frames to.
+     */
+    private function validateSource(\stdClass $message, ConnectionInterface $to): void
+    {
+        if ($this->rejectRetiredProperties($message, 'validateSource', $to)) {
+            return;
+        }
+
+        // `validateMessageProperties()` has already established that `target` is present; what it
+        // cannot establish is its shape, since ACTION_PROPERTIES only names required properties.
+        $target = property_exists($message, 'target') ? $message->target : null;
+        if (false === ( $target instanceof \stdClass ) || false === property_exists($target, 'id')) {
+            $this->rejectMessage($to, 'validateSource requires a target object with an id.');
+            return;
+        }
+
+        $id = $target->id;
+        if (false === is_string($id)) {
+            $this->rejectMessage($to, 'validateSource target id must be a string.');
+            return;
+        }
+
+        $inventoryError = null;
+        try {
+            $item = CheckableInventory::byId($id);
+        } catch (\Throwable $e) {
+            // The same containment, and the same static-half retry, as in getPathToSchemaFile() and
+            // retrieveSchemaForCategory(): building the index reads and parses every calendar source
+            // file, so one malformed file must not cost every other check in a process that stays
+            // up. It matters more here than there, because an exception escaping onMessage() is
+            // caught by Ratchet's IoServer, which closes the client's connection mid-run — the
+            // whole run lost to one unreadable file.
+            $inventoryError = $e;
+            $item           = CheckableInventory::staticById($id);
+        }
+
+        if (null === $item) {
+            // The two misses are not the same thing and must not read as though they were: an id
+            // nobody published is a client bug, while an id that could not be looked up is a server
+            // one, and reporting the second as "unknown" would send the reader hunting the wrong
+            // one — the #800 blindness in miniature.
+            $this->rejectMessage(
+                $to,
+                null === $inventoryError
+                    ? "Unknown validation target: {$id}"
+                    : "Could not resolve validation target {$id}: the source data inventory could not be built ({$inventoryError->getMessage()})"
+            );
+            return;
+        }
+
+        $this->runValidationSteps(
+            $item->path,
+            $item->kind,
+            $item->schema->path(),
+            $item->label,
+            $to,
+            $this->resolveRunToken($to),
+            // The label is prose — `National calendar: US` — and is fine as the human half of a
+            // frame, but it is not a selector. The address comes from the id instead.
+            classFragment: self::cssClassFragmentForId($item->id)
+        );
+    }
+
+    /**
+     * Derive the CSS class fragment a `validateSource` result frame is addressed by, from an inventory id.
+     *
+     * **The rule, in full: replace every character outside `[A-Za-z0-9_-]` with `-`.** Nothing else —
+     * no case folding, no collapsing of runs, no trimming. `temporale:roman` becomes
+     * `temporale-roman`, `nation:roman:US` becomes `nation-roman-US`, and
+     * `diocese:ambrosian:lugano_ch` becomes `diocese-ambrosian-lugano_ch`. A client holding an id
+     * computes the same string with one substitution and matches `.<fragment>.<step>`; this is
+     * written down as a client-implementable rule in the design spec (`Id vocabulary` → *the frame
+     * class fragment*) precisely because UnitTestInterface#42 has to reproduce it, and a derivation
+     * only the server knows would be no better than not publishing the id.
+     *
+     * Derived from the **id**, never from the label. The id is stable and opaque and the server
+     * minted it; the label is human-facing prose that is expected to change, and an address that
+     * moved when someone reworded a caption would be worse than no address at all.
+     *
+     * The raw id is not usable as-is: `.diocese:ambrosian:lugano_ch` parses as a class followed by a
+     * pseudo-class, and the ~60 per-calendar labels contain `: `, which makes `querySelectorAll()`
+     * throw outright rather than merely match nothing.
+     *
+     * No case folding **here**, but the fragments this produces are mixed case (`nation-roman-US`,
+     * `sanctorale-roman-EDITIO_TYPICA_1970`) and UnitTestInterface lowercases every class token
+     * before matching. Matching is therefore case-insensitive on the client, which must put the
+     * card's class and its selector through the same treatment; the spec section named above states
+     * that as part of the rule, because a client that lowered only one side would find no cards.
+     */
+    private static function cssClassFragmentForId(string $id): string
+    {
+        return (string) preg_replace('/[^A-Za-z0-9_-]/', '-', $id);
     }
 
     /**
@@ -733,12 +1044,116 @@ class Health implements MessageComponentInterface
 
         $schema = Health::retrieveSchemaForCategory($category, $pathForSchema);
 
+        // A folder check is recognised exactly as the execution phase used to recognise it, so a
+        // message carrying a non-string `sourceFolder` keeps taking the file branch as before. The
+        // same predicate yields the folder string the frames quote: the one the client supplied,
+        // which for a reconstructed slug is not the folder the server ends up reading.
+        $sourceFolder  = property_exists($validation, 'sourceFolder') && is_string($validation->sourceFolder)
+            ? $validation->sourceFolder
+            : null;
+        $isFolderCheck = null !== $sourceFolder;
+
+        // The slug re-derivation used to open the file branch of the execution phase, but it is
+        // resolution work: the seam below must receive a path that is already final, and must
+        // never re-derive one. Nothing between the two positions reads $dataPath, so the move is
+        // behaviour-preserving.
+        if (false === $isFolderCheck) {
+            $matches = null;
+            if (preg_match('/^diocesan-calendar-([a-z]{6}_[a-z]{2})$/', $pathForSchema, $matches)) {
+                $dioceseId = $matches[1];
+                try {
+                    $dioceseMetadata = $this->findDioceseMetadata($dioceseId);
+                } catch (\RuntimeException | NotFoundException $e) {
+                    $this->handleDioceseMetadataError($e, $to, $validation, $dioceseId, $runToken);
+                    return;
+                }
+                $nation      = $dioceseMetadata->nation;
+                $dioceseName = $dioceseMetadata->diocese;
+                // Rite-partitioned, exactly as the i18n-folder branch above: this is the site
+                // that actually governs a diocesan source-file check, because it reassigns
+                // $dataPath after the earlier `sourceFile` branch has run.
+                $dataPath = strtr(JsonData::diocesanCalendarFileFor($dioceseMetadata->rite)->path(), [
+                    '{nation}'       => $nation,
+                    '{diocese}'      => $dioceseId,
+                    '{diocese_name}' => $dioceseName
+                ]);
+            } elseif (preg_match('/^national-calendar-([A-Z]{2})$/', $pathForSchema, $matches)) {
+                $nation   = $matches[1];
+                $dataPath = strtr(JsonData::NATIONAL_CALENDAR_FILE->path(), [
+                    '{nation}' => $nation
+                ]);
+            }
+        }
+
+        $this->runValidationSteps(
+            $dataPath,
+            $isFolderCheck ? 'folder' : 'file',
+            $schema,
+            $validate,
+            $to,
+            $runToken,
+            $category,
+            $pathForSchema,
+            $sourceFolder
+        );
+    }
+
+    /**
+     * Run the validation steps for one already-resolved target.
+     *
+     * This is the execution half of {@see Health::executeValidation()}: given a final path, a
+     * kind and a schema, it emits the `file-exists` / `json-valid` / `schema-valid` frames.
+     * Resolving that path and that schema from a client message happens before the call and
+     * never here, so a caller that already knows its target — an inventory entry, whose `kind`
+     * uses this same `file`/`folder` vocabulary — can enter directly.
+     *
+     * @param string $dataPath The final path to check: a project-relative or absolute file or folder path, or an API URL.
+     * @param 'file'|'folder' $kind Whether $dataPath names a folder of i18n files or a single file/endpoint.
+     * @param ?string $schema The schema to validate against, or null when none could be resolved.
+     * @param string $label The human label for the result frames (what a v1 message calls `validate`). It reaches only the
+     *        message *text*; what the frames are addressed by is $classFragment, which defaults to it.
+     * @param ConnectionInterface $to The connection to send the result frames to.
+     * @param ?string $runToken The originating run token to echo back on responses, or null to use the per-connection fallback.
+     * @param string $category The check's category, one of ExecuteValidationCategory. It never touches control flow — the
+     *        schema is already resolved by the time we are called — and appears only in the two "could not detect / verify
+     *        the schema" diagnostics. It is a parameter rather than something rebuilt here so that the rule that produces
+     *        it lives in exactly one place. The default is the right value for an inventory-driven source-data check; a
+     *        caller checking anything else passes its own.
+     * @param ?string $pathForSchema The value the schema was resolved from, quoted in the same two diagnostics; defaults to $label,
+     *        which is what a sourceDataCheck resolves from.
+     * @param ?string $sourceFolder For a folder check, the folder as the *caller* named it — what the result frames quote.
+     *        It is not always $dataPath: a v1 client sends a bare id (`IT`) for the reconstructed i18n slugs and the server
+     *        reads the folder it derived from it. Defaults to $dataPath, for a caller whose two are the same.
+     * @param ?string $classFragment The CSS class fragment the result frames are addressed by, without the leading dot and
+     *        without the trailing `.file-exists` / `.json-valid` / `.schema-valid` step. Split out from $label because the
+     *        two are only *accidentally* the same thing: a v1 `validate` slug is hyphenated precisely so that it can serve
+     *        as both, but an inventory label is human prose (`National calendar: US`) and would produce a selector that
+     *        matches nothing — or, once it contains `: `, one that makes the client's `querySelectorAll()` throw. Defaults
+     *        to $label so that every v1 caller keeps emitting byte-identical frames; a caller whose label is not slug-safe
+     *        passes its own, derived from a stable id via {@see Health::cssClassFragmentForId()}.
+     */
+    private function runValidationSteps(
+        string $dataPath,
+        string $kind,
+        ?string $schema,
+        string $label,
+        ConnectionInterface $to,
+        ?string $runToken,
+        string $category = 'sourceDataCheck',
+        ?string $pathForSchema = null,
+        ?string $sourceFolder = null,
+        ?string $classFragment = null
+    ): void {
+        $pathForSchema ??= $label;
+        // Read before $dataPath is made absolute below, so the two stay distinguishable.
+        $sourceFolder ??= $dataPath;
+        // The v1 conflation, preserved exactly: with no fragment of its own a caller addresses its
+        // frames by its label, which is what `executeValidation` has always done.
+        $classFragment ??= $label;
+
         // Now that we have the correct schema to validate against,
         // we will perform the actual validation either for all files in a folder, or for a single file
-        if (property_exists($validation, 'sourceFolder') && is_string($validation->sourceFolder)) {
-            $sourceFolder = (string) $validation->sourceFolder;
-            // If the 'sourceFolder' property is set, then we are validating a folder of i18n files
-            /** @var ExecuteValidationSourceFolder $validation */
+        if ($kind === 'folder') {
             // Resolve relative paths against the project root
             if (!str_starts_with($dataPath, '/')) {
                 $dataPath = Router::$apiFilePath . $dataPath;
@@ -752,7 +1167,7 @@ class Health implements MessageComponentInterface
                 foreach (['file-exists', 'json-valid', 'schema-valid'] as $step) {
                     $this->sendFolderStepResult(
                         $to,
-                        "$validate.$step",
+                        "$classFragment.$step",
                         $missing,
                         '', // unreachable: $missing is non-empty, so the failure text is used
                         "Data folder $sourceFolder could not be checked",
@@ -790,11 +1205,9 @@ class Health implements MessageComponentInterface
                 /** @var PromiseInterface<array{data: string, fromCache: bool}> $promise */
                 $promise    = $this->cachedFileGetContents($file);
                 $promises[] = $promise->then(
-                    function (array $result) use ($validation, $filename, $schema, $pathForSchema, &$jsonErrors, &$schemaErrors) {
+                    function (array $result) use ($filename, $schema, $label, $category, $pathForSchema, &$jsonErrors, &$schemaErrors) {
                         /** @var array{data: string, fromCache: bool} $result */
                         $fileData = $result['data'];
-                        $validate = (string) $validation->validate;
-                        $category = (string) $validation->category;
                         $jsonData = json_decode($fileData);
                         if (json_last_error() !== JSON_ERROR_NONE) {
                             $jsonErrors[] = "$filename: " . json_last_error_msg();
@@ -810,7 +1223,7 @@ class Health implements MessageComponentInterface
                                     $schemaErrors[] = "$filename: " . $validationText;
                                 }
                             } else {
-                                $schemaErrors[] = "$filename: unable to detect a schema for {$validate} and category {$category} (path for schema: $pathForSchema)";
+                                $schemaErrors[] = "$filename: unable to detect a schema for {$label} and category {$category} (path for schema: $pathForSchema)";
                             }
                         }
                     },
@@ -827,16 +1240,13 @@ class Health implements MessageComponentInterface
             $allPromises = Promise\all($promises);
 
             $allPromises->then(
-                function () use ($to, $validation, $schema, &$fileExistsErrors, &$jsonErrors, &$schemaErrors, $runToken) {
-                    $validate     = (string) $validation->validate;
-                    $sourceFolder = (string) $validation->sourceFolder;
-
+                function () use ($to, $classFragment, $sourceFolder, $schema, &$fileExistsErrors, &$jsonErrors, &$schemaErrors, $runToken) {
                     // Exactly one frame per step, pass or fail. A folder check is a statement
                     // about the folder, so a failure names the offending files inside a single
                     // frame instead of emitting one frame each.
                     $this->sendFolderStepResult(
                         $to,
-                        "$validate.file-exists",
+                        "$classFragment.file-exists",
                         $fileExistsErrors,
                         "The Data folder $sourceFolder exists and contains valid i18n json files",
                         "Data folder $sourceFolder",
@@ -845,7 +1255,7 @@ class Health implements MessageComponentInterface
 
                     $this->sendFolderStepResult(
                         $to,
-                        "$validate.json-valid",
+                        "$classFragment.json-valid",
                         $jsonErrors,
                         "The i18n json files in Data folder $sourceFolder were successfully decoded as JSON",
                         "The i18n json files in Data folder $sourceFolder were not all decoded as JSON",
@@ -854,64 +1264,52 @@ class Health implements MessageComponentInterface
 
                     $this->sendFolderStepResult(
                         $to,
-                        "$validate.schema-valid",
+                        "$classFragment.schema-valid",
                         $schemaErrors,
                         "The i18n json files in Data folder $sourceFolder were successfully validated against the Schema $schema",
                         "The i18n json files in Data folder $sourceFolder were not all valid against the Schema $schema",
                         $runToken
                     );
                 },
-                function (\Throwable $e) use ($validation) {
-                    echo 'Error verifying i18n folder for validation ' . json_encode($validation) . ': ' . $e->getMessage() . "\n";
+                function (\Throwable $e) use ($label, $dataPath) {
+                    echo 'Error verifying i18n folder for validation ' . $label . ' (' . $dataPath . '): ' . $e->getMessage() . "\n";
                 }
             );
         } else {
-            // If the 'sourceFolder' property is not set, then we are validating a single source file or API path
-            $matches = null;
-            if (preg_match('/^diocesan-calendar-([a-z]{6}_[a-z]{2})$/', $pathForSchema, $matches)) {
-                $dioceseId = $matches[1];
-                try {
-                    $dioceseMetadata = $this->findDioceseMetadata($dioceseId);
-                } catch (\RuntimeException | NotFoundException $e) {
-                    $this->handleDioceseMetadataError($e, $to, $validation, $dioceseId, $runToken);
-                    return;
-                }
-                $nation      = $dioceseMetadata->nation;
-                $dioceseName = $dioceseMetadata->diocese;
-                // Rite-partitioned, exactly as the i18n-folder branch above: this is the site
-                // that actually governs a diocesan source-file check, because it reassigns
-                // $dataPath after the earlier `sourceFile` branch has run.
-                $dataPath = strtr(JsonData::diocesanCalendarFileFor($dioceseMetadata->rite)->path(), [
-                    '{nation}'       => $nation,
-                    '{diocese}'      => $dioceseId,
-                    '{diocese_name}' => $dioceseName
-                ]);
-            } elseif (preg_match('/^national-calendar-([A-Z]{2})$/', $pathForSchema, $matches)) {
-                $nation   = $matches[1];
-                $dataPath = strtr(JsonData::NATIONAL_CALENDAR_FILE->path(), [
-                    '{nation}' => $nation
-                ]);
-            }
+            // {@see Health::processValidationData()} and {@see Health::handleValidationDataError()} take a
+            // whole v1 message and read exactly two properties off it: `validate` and `category`. Both are
+            // parameters here, so this is a pure adapter for their signatures — it carries no information
+            // the caller did not pass. The annotation asserts the *shape* those two require; the literal
+            // category cannot be proven, because an unrecognised category has to reach the diagnostic
+            // verbatim (telling a client that its category was wrong is the diagnostic's whole job).
+            //
+            // `validate` carries the *class fragment* rather than the label: both readers use it
+            // for nothing but `$message->classes`, and for a v1 caller the two are the same string,
+            // so the legacy frames come out unchanged.
+            /** @var ExecuteValidationSourceFile|ExecuteValidationResource $validationForMessages */
+            $validationForMessages = (object) [
+                'action'     => 'executeValidation',
+                'category'   => $category,
+                'validate'   => $classFragment,
+                'sourceFile' => $dataPath
+            ];
 
             // If we are validating an API path, we check for a 200 OK HTTP response from the API
             // rather than checking for existence of the file in the filesystem
-            $category = (string) $validation->category;
-            $validate = (string) $validation->validate;
-
             if (str_starts_with($dataPath, 'http://') || str_starts_with($dataPath, 'https://')) {
                 // $dataPath is an API path in this case
                 echo 'Retrieving data from URL ' . $dataPath . "\n";
                 /** @var PromiseInterface<array{data: string, fromCache: bool}> $httpPromise */
                 $httpPromise = $this->cachedGet($dataPath, [], 300, $to);
                 $httpPromise->then(
-                    function (array $result) use ($to, $validation, $dataPath, $schema, $pathForSchema, $runToken) {
+                    function (array $result) use ($to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken) {
                         /** @var array{data: string, fromCache: bool} $result */
                         $data = $result['data'];
                         echo 'Fetched data for ' . $dataPath . ': got ' . strlen($data) . " bytes\n";
-                        $this->processValidationData($data, $to, $validation, $dataPath, $schema, $pathForSchema, $runToken);
+                        $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken);
                     },
-                    function (\Throwable $e) use ($to, $validation, $dataPath, $runToken) {
-                        $this->handleValidationDataError($e, $to, $validation, $dataPath, $runToken);
+                    function (\Throwable $e) use ($to, $validationForMessages, $dataPath, $runToken) {
+                        $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken);
                     }
                 );
             } else {
@@ -925,14 +1323,14 @@ class Health implements MessageComponentInterface
                 /** @var PromiseInterface<array{data: string, fromCache: bool}> $promise */
                 $promise = $this->cachedFileGetContents($fsPath);
                 $promise->then(
-                    function (array $result) use ($to, $validation, $dataPath, $schema, $pathForSchema, $runToken) {
+                    function (array $result) use ($to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken) {
                         /** @var array{data: string, fromCache: bool} $result */
                         $data = $result['data'];
                         echo 'Fetched data for ' . $dataPath . ': got ' . strlen($data) . " bytes\n";
-                        $this->processValidationData($data, $to, $validation, $dataPath, $schema, $pathForSchema, $runToken);
+                        $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken);
                     },
-                    function (\Throwable $e) use ($to, $validation, $dataPath, $runToken) {
-                        $this->handleValidationDataError($e, $to, $validation, $dataPath, $runToken);
+                    function (\Throwable $e) use ($to, $validationForMessages, $dataPath, $runToken) {
+                        $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken);
                     }
                 );
             }
@@ -1160,6 +1558,247 @@ class Health implements MessageComponentInterface
     }
 
     /**
+     * Map a typed identity's `kind` onto the internal calendar category.
+     *
+     * The wire vocabulary and the internal one are deliberately different words for the same four
+     * things, and only the wire half is new: nothing in this plan renames `nationalcalendar`,
+     * `diocesancalendar` or `ritecalendar`, which are threaded through
+     * {@see Health::buildCalendarRequestPath()}, {@see Health::resolveRite()} and
+     * {@see Health::executeUnitTest()}.
+     *
+     * `general` and `rite` both land on `ritecalendar` because they are the same route:
+     * `/calendar/{rite}/{year}` is *the* calendar of a rite, and the General Roman Calendar is that
+     * route with the Roman rite. They stay separate words on the wire because "General Roman
+     * Calendar" is what the thing is called, and because `general` fixes the rite while `rite`
+     * chooses it.
+     *
+     * @return 'nationalcalendar'|'diocesancalendar'|'ritecalendar'|null null when the kind is not one of the four.
+     */
+    private static function categoryForKind(string $kind): ?string
+    {
+        return match ($kind) {
+            'general', 'rite' => 'ritecalendar',
+            'national'        => 'nationalcalendar',
+            'diocesan'        => 'diocesancalendar',
+            default           => null
+        };
+    }
+
+    /**
+     * The rite a calendar identity *actually* has, as far as the server can tell.
+     *
+     * Returning null means "the server has no opinion", which is not the same as "any rite will
+     * do": it is the one case in which a client's assertion is taken at its word, because
+     * contradicting it would require knowledge this process does not have. Only the diocesan kind
+     * can reach that state, and only transiently — `Health::$metadata` is fetched asynchronously
+     * when the WebSocket connection opens.
+     *
+     * @param 'general'|'national'|'diocesan'|'rite' $kind
+     * @param ?string $id The identity's `id`, already known to be a string when the kind requires one.
+     * @return Rite|null The rite this calendar is computed under, or null when it cannot be known here.
+     * @throws \InvalidArgumentException When the id and the kind cannot describe the same calendar at all.
+     */
+    private function actualRiteForKind(string $kind, ?string $id): ?Rite
+    {
+        switch ($kind) {
+            case 'diocesan':
+                try {
+                    return $this->findDioceseMetadata((string) $id)->rite;
+                } catch (\RuntimeException | NotFoundException) {
+                    // Metadata not loaded yet, or an id naming no diocese. Neither is a rite
+                    // disagreement, and reporting either as one would send the reader hunting the
+                    // wrong bug: the first is a server-side timing condition, the second is
+                    // answered honestly by the calendar request itself, which 404s.
+                    //
+                    // {@see Health::resolveRite()} swallows the same two exceptions for the same
+                    // reason but returns a different value — `Rite::default()`, not null — so do
+                    // not read this as delegating to it. The two cannot agree on a return value:
+                    // resolveRite() must name a rite because a URL has to be built, while null here
+                    // means "no opinion to contradict the client with", and ROMAN would be an
+                    // opinion. The observable behaviour is nevertheless identical, because a null
+                    // here means the client's rite survives as the hint validateTypedCalendar()
+                    // passes on, and resolveRite() honours a parsable hint at step 1 and never
+                    // reaches its own diocesan lookup.
+                    return null;
+                }
+            case 'national':
+                // National calendars are Roman-only: `/calendars` announces a rite for dioceses and
+                // not for nations, and `/calendar/ambrosian/nation/XX` is a 400 because there is no
+                // such calendar to compute. resolveRite() encodes the same fact by falling through
+                // to the default for this category.
+                return Rite::default();
+            case 'rite':
+                // For a rite-level calendar the id *is* the rite, so an id that names no rite is
+                // not a rite disagreement — it is an identity that describes nothing.
+                $rite = Rite::tryFrom((string) $id);
+                if (null === $rite) {
+                    throw new \InvalidArgumentException("Unknown rite calendar: {$id}");
+                }
+                return $rite;
+            default:
+                // `general` is the General *Roman* Calendar — the rite is in the name. A rite-level
+                // calendar of any other rite is `kind: rite`, which is why the two words both exist.
+                //
+                // The message says what is wrong and stops there, deliberately. Naming a kind to
+                // try instead would be wrong as often as right: `ambrosian` would indeed want
+                // `kind: rite`, but `IT` would want `kind: national` and `kind: rite` would reject
+                // it in turn, so the advice would send the reader somewhere that also fails.
+                if (null !== $id && Rite::ROMAN !== Rite::tryFrom($id)) {
+                    throw new \InvalidArgumentException("Kind general names the General Roman Calendar; its only valid id is roman, not {$id}.");
+                }
+                return Rite::ROMAN;
+        }
+    }
+
+    /**
+     * Resolve a typed calendar identity into the internal triple the calendar routines take.
+     *
+     * Shared by every action that carries a `calendar` object, so that the `kind`→category mapping
+     * and the rite check exist once rather than once per action.
+     *
+     * **A `rite` here is an assertion, not a hint, and a wrong one is rejected.** The distinction is
+     * the point of the typed identity. On a legacy message `rite` is optional and
+     * {@see Health::resolveRite()} prefers it whenever it parses — correct for a value a
+     * rite-unaware client may have guessed at, since a guess is all the protocol could carry. A
+     * client sending a typed identity selected the calendar and knows its rite, so a disagreement is
+     * a client bug. Silently preferring the assertion would compute the wrong calendar; silently
+     * preferring the metadata would compute the right one while leaving the client believing
+     * something false. Saying so is more useful than either.
+     *
+     * @param \stdClass $calendar The identity object; its properties are untrusted, only its type is known.
+     * @return array{category: 'nationalcalendar'|'diocesancalendar'|'ritecalendar', calendar: string, rite: Rite}
+     * @throws \InvalidArgumentException Whose message is the client-facing rejection text.
+     */
+    private function resolveCalendarIdentity(\stdClass $calendar): array
+    {
+        $kind = property_exists($calendar, 'kind') ? $calendar->kind : null;
+        if (false === is_string($kind)) {
+            throw new \InvalidArgumentException('calendar.kind must be a string naming one of: general, national, diocesan, rite.');
+        }
+        $category = self::categoryForKind($kind);
+        if (null === $category) {
+            throw new \InvalidArgumentException("Unknown calendar kind: {$kind}");
+        }
+        /** @var 'general'|'national'|'diocesan'|'rite' $kind */
+
+        $riteName = property_exists($calendar, 'rite') ? $calendar->rite : null;
+        if (false === is_string($riteName)) {
+            throw new \InvalidArgumentException('calendar.rite must be a string naming a known rite.');
+        }
+        $assertedRite = Rite::tryFrom($riteName);
+        if (null === $assertedRite) {
+            throw new \InvalidArgumentException("Unknown rite: {$riteName}");
+        }
+
+        $id = property_exists($calendar, 'id') ? $calendar->id : null;
+        if (null !== $id && false === is_string($id)) {
+            throw new \InvalidArgumentException('calendar.id must be a string.');
+        }
+        // `general` is the only kind that needs no id: there is exactly one General Roman Calendar,
+        // so there is nothing to choose between. Every other kind names one of many.
+        if (null === $id && 'general' !== $kind) {
+            throw new \InvalidArgumentException("calendar.id is required for kind {$kind}.");
+        }
+
+        $actualRite = $this->actualRiteForKind($kind, $id);
+        if (null !== $actualRite && $actualRite !== $assertedRite) {
+            throw new \InvalidArgumentException(sprintf(
+                'calendar.rite says %s but %s is %s.',
+                $assertedRite->value,
+                $id ?? $kind,
+                $actualRite->value
+            ));
+        }
+
+        // A rite-level calendar carries no separate identifier: buildCalendarRequestPath() emits
+        // `/{rite}/{year}` for `ritecalendar` and resolveRite() reads the rite back off the calendar
+        // id, so the rite is what has to be passed as the id. `general` may not have sent one at all.
+        return [
+            'category' => $category,
+            'calendar' => 'ritecalendar' === $category ? $assertedRite->value : (string) $id,
+            'rite'     => $assertedRite
+        ];
+    }
+
+    /**
+     * Reject a v2 message that still carries a legacy property its own shape retired.
+     *
+     * One implementation for all three reshaped actions, called from
+     * {@see Health::validateSource()}, {@see Health::validateTypedCalendar()} and
+     * {@see Health::runTest()}. Three hand-written copies of this rule is exactly the shape that lets
+     * one of them quietly stop rejecting — the same argument that put the `kind`→category mapping in
+     * one place.
+     *
+     * Runs before anything else in each handler, so a half-migrated message is answered for what is
+     * actually wrong with it rather than for whatever its retired property happened to make of the
+     * rest. The first offender in declaration order is named and the rest are not: each message then
+     * says one true, specific thing, and a client sending two retired properties hears about the
+     * second on its next attempt. See {@see Health::RETIRED_PROPERTIES} for why the rule exists.
+     *
+     * @param 'validateSource'|'validateCalendar'|'runTest' $action The reshaped action being handled.
+     * @return bool True when the message was rejected and the caller must stop.
+     */
+    private function rejectRetiredProperties(\stdClass $message, string $action, ConnectionInterface $to): bool
+    {
+        $shape = self::RETIRED_PROPERTIES[$action]['shape'];
+        foreach (self::RETIRED_PROPERTIES[$action]['retired'] as $property => $replacement) {
+            if (property_exists($message, $property)) {
+                $this->rejectMessage($to, sprintf('%s is not part of a %s: %s', $property, $shape, $replacement));
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Read a message's `calendar` property as a typed identity.
+     *
+     * Both actions that carry one come through here, and the shared step is the *read*, not the
+     * guarantee: `validateCalendar` is discriminated on `calendar` being an object
+     * ({@see Health::isTypedCalendarMessage()}), so by the time it arrives the check below cannot
+     * fail; `runTest` is discriminated on its name, so nothing has looked at `calendar` at all. The
+     * one that needs the check and the one that does not therefore call the same thing, which is
+     * what stops the second from being written without it.
+     *
+     * @param string $action The action name, so the rejection says which message is wrong.
+     * @return array{category: 'nationalcalendar'|'diocesancalendar'|'ritecalendar', calendar: string, rite: Rite}
+     * @throws \InvalidArgumentException Whose message is the client-facing rejection text.
+     */
+    private function readCalendarIdentity(\stdClass $message, string $action): array
+    {
+        $calendar = property_exists($message, 'calendar') ? $message->calendar : null;
+        if (false === $calendar instanceof \stdClass) {
+            throw new \InvalidArgumentException("{$action} calendar must be an object carrying kind, id and rite.");
+        }
+
+        return $this->resolveCalendarIdentity($calendar);
+    }
+
+    /**
+     * Read a message's `year` as the integer the calendar routines take.
+     *
+     * Type-checked rather than trusted because {@see Health::validateMessageProperties()} establishes
+     * only that a property is *present*. A null or string `year` would reach
+     * `validateCalendar(…, int $year, …)` or `executeUnitTest(…, int $year, …)` and raise a
+     * `TypeError` — an `\Error`, which Ratchet's `IoServer::handleData` does not catch, so one
+     * malformed message would take the whole WebSocket process down rather than be answered. Same
+     * hazard {@see Health::cancelRun()} documents, on the property it was first found on.
+     *
+     * @param string $action The action name, so the rejection says which message is wrong.
+     * @throws \InvalidArgumentException Whose message is the client-facing rejection text.
+     */
+    private static function readYear(\stdClass $message, string $action): int
+    {
+        $year = property_exists($message, 'year') ? $message->year : null;
+        if (false === is_int($year)) {
+            throw new \InvalidArgumentException("{$action} year must be an integer.");
+        }
+
+        return $year;
+    }
+
+    /**
      * Build the calendar API request path based on calendar ID, year, category and rite.
      *
      * The rite segment is always emitted explicitly (`/roman/...`, `/ambrosian/...`),
@@ -1188,6 +1827,66 @@ class Health implements MessageComponentInterface
             'diocesancalendar'  => "$ritePath/diocese/$calendar/$year?year_type=CIVIL",
             default             => throw new \InvalidArgumentException("Unknown calendar category: {$category}")
         };
+    }
+
+    /**
+     * Handle a `validateCalendar` message carrying a typed calendar identity.
+     *
+     * Purely a translation layer: it resolves the identity, checks the two scalars the legacy shape
+     * never had to type-check, and hands the result to the unchanged
+     * {@see Health::validateCalendar()}. Nothing about *how* a calendar is fetched and validated
+     * changes with the message shape, and this method exists so that nothing about it has to.
+     *
+     * The resolved rite is passed in the `$riteHint` slot. `resolveRite()` treats a parsable hint as
+     * authoritative, which is exactly right here because by this point it has been checked — see
+     * {@see Health::resolveCalendarIdentity()}.
+     *
+     * `year` and `responseFormat` are type-checked rather than trusted because
+     * `validateMessageProperties()` establishes only that a property is *present*. `year` is checked
+     * by the shared {@see Health::readYear()}; `responseFormat` is checked here because it belongs
+     * to this action alone — an unusable one would reach `ReturnTypeParam::from()` and raise a
+     * `\ValueError`, which is an `\Error` and so escapes Ratchet's `IoServer::handleData`, taking the
+     * whole WebSocket process down over one malformed message. See {@see Health::cancelRun()}, which
+     * documents the same hazard on the property it was found on.
+     *
+     * @param ValidateTypedCalendar $message The message naming the calendar to compute and check.
+     * @param ConnectionInterface $to The connection to send the result frames to.
+     */
+    private function validateTypedCalendar(\stdClass $message, ConnectionInterface $to): void
+    {
+        // A leftover `category`, `responsetype` or top-level `rite` is a half-migrated client: the
+        // message happens to work, because `calendar.kind`, `responseFormat` and `calendar.rite`
+        // supply what is actually read and the stale property never is, so the client keeps
+        // believing the old property still selects something and only finds out otherwise the day
+        // the two disagree. Say so now, while they still agree — most sharply for `rite`, where a
+        // disagreement is the very thing resolveCalendarIdentity() refuses to resolve silently.
+        // See Health::RETIRED_PROPERTIES.
+        if ($this->rejectRetiredProperties($message, 'validateCalendar', $to)) {
+            return;
+        }
+
+        try {
+            $identity = $this->readCalendarIdentity($message, 'validateCalendar');
+            $year     = self::readYear($message, 'validateCalendar');
+        } catch (\InvalidArgumentException $e) {
+            $this->rejectMessage($to, $e->getMessage());
+            return;
+        }
+
+        $responseFormat = property_exists($message, 'responseFormat') ? $message->responseFormat : null;
+        if (false === is_string($responseFormat) || false === in_array($responseFormat, self::VALIDATABLE_RESPONSE_FORMATS, true)) {
+            $this->rejectMessage($to, 'validateCalendar responseFormat must be one of: ' . implode(', ', self::VALIDATABLE_RESPONSE_FORMATS) . '.');
+            return;
+        }
+
+        $this->validateCalendar(
+            $identity['calendar'],
+            $year,
+            $identity['category'],
+            $responseFormat,
+            $to,
+            $identity['rite']->value
+        );
     }
 
     /**
@@ -1456,6 +2155,67 @@ class Health implements MessageComponentInterface
             $errorStrings[] = $errorLevel . ': ' . $error['message'] . " at line {$lineIndex} ({$lineString})";
         }
         return $errorStrings;
+    }
+
+    /**
+     * Handle a `runTest` message: run one named unit test against a computed calendar.
+     *
+     * A translation layer in the same sense as {@see Health::validateTypedCalendar()}, and for the
+     * same reason: it resolves the identity, type-checks the two scalars the property list can only
+     * prove present, and hands the result to the unchanged {@see Health::executeUnitTest()}. Nothing
+     * about *how* a test is run changes with the message shape, and this method exists so that
+     * nothing about it has to.
+     *
+     * The resolved rite goes in the `$riteHint` slot, where `resolveRite()` treats a parsable value
+     * as authoritative — correct here because {@see Health::resolveCalendarIdentity()} has already
+     * checked it against what the server knows.
+     *
+     * **Not the same thing as checking the test definition.** `test:{rite}:{Name}` is an inventory id
+     * addressed by {@see Health::validateSource()}, and it asks whether the definition file exists,
+     * parses and validates against `LitCalTest.json`. `runTest` names the test by its bare name and
+     * runs it. A definition can be valid while the test it describes fails, and a definition can be
+     * malformed while the calendar is perfectly correct, so neither answer substitutes for the other.
+     *
+     * A leftover `category` is rejected here exactly as it is on `validateTypedCalendar()`, through
+     * the shared {@see Health::rejectRetiredProperties()}. `runTest` has a mechanical predecessor in
+     * `executeUnitTest`, which required `category`, so a client that renamed the action and kept the
+     * property is as plausible here as anywhere — and `calendar.kind` supplies the category, so the
+     * message would otherwise work while the client kept believing `category` selected something.
+     * Only `category` is retired: `executeUnitTest` never had a `responsetype` to retire.
+     *
+     * @param RunTest $message The message naming the test, the calendar and the year.
+     * @param ConnectionInterface $to The connection to send the result frames to.
+     */
+    private function runTest(\stdClass $message, ConnectionInterface $to): void
+    {
+        if ($this->rejectRetiredProperties($message, 'runTest', $to)) {
+            return;
+        }
+
+        // Checked rather than trusted for the reason readYear() sets out: a non-string here would
+        // reach executeUnitTest(string $test, …) as a TypeError, which Ratchet does not catch.
+        $test = property_exists($message, 'test') ? $message->test : null;
+        if (false === is_string($test)) {
+            $this->rejectMessage($to, 'runTest test must be a string.');
+            return;
+        }
+
+        try {
+            $identity = $this->readCalendarIdentity($message, 'runTest');
+            $year     = self::readYear($message, 'runTest');
+        } catch (\InvalidArgumentException $e) {
+            $this->rejectMessage($to, $e->getMessage());
+            return;
+        }
+
+        $this->executeUnitTest(
+            $test,
+            $identity['calendar'],
+            $year,
+            $identity['category'],
+            $to,
+            $identity['rite']->value
+        );
     }
 
     /**
@@ -2197,6 +2957,26 @@ class Health implements MessageComponentInterface
     }
 
     /**
+     * Is this a `validateCalendar` message in the reshaped (v2) form?
+     *
+     * The whole discriminator, in one place, because it is consulted twice — once by
+     * {@see Health::validateMessageProperties()}, which must know before it applies a property list,
+     * and once by {@see Health::onMessage()}, which must know before it picks a handler. Two
+     * literal copies of "is `calendar` an object?" would be two places to forget.
+     *
+     * `validateCalendar` is the only action that needs a shape test at all. `validateSource` and
+     * `runTest` are new *names*, and a v1 client cannot accidentally emit a name it does not know;
+     * `validateCalendar` kept its name because the action it names did not change.
+     */
+    private static function isTypedCalendarMessage(\stdClass $message): bool
+    {
+        return property_exists($message, 'action')
+            && 'validateCalendar' === $message->action
+            && property_exists($message, 'calendar')
+            && $message->calendar instanceof \stdClass;
+    }
+
+    /**
      * Validates the properties of a message object.
      *
      * This function checks the properties of a given message object to ensure
@@ -2204,11 +2984,29 @@ class Health implements MessageComponentInterface
      * specified action. If any expected property is missing from the message
      * object, the function returns false, indicating the message is invalid.
      *
-     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ExecuteUnitTest|CancelRun $message The message object to validate.
+     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ValidateTypedCalendar|ExecuteUnitTest|RunTest|CancelRun|ValidateSource $message The message object to validate.
      * @return bool True if all required properties are present, false otherwise.
      */
     private static function validateMessageProperties(\stdClass $message): bool
     {
+        // ------------------------------------------------------------------ the v2 discriminator
+        // This branch has to be here — ahead of the ACTION_PROPERTIES list — and not inside
+        // validateCalendar(). `validateCalendar` keeps its action name because the *action* is
+        // unchanged, so unlike `validateSource` and `runTest` there is no new name to discriminate
+        // on: the shape of `calendar` is the only signal a reshaped message gives. And a reshaped
+        // message carries neither `category` (folded into `calendar.kind`) nor `responsetype`
+        // (respelled `responseFormat`), both of which ACTION_PROPERTIES['validateCalendar']
+        // requires. Applying that list first would therefore turn away *every* v2 message as
+        // "Invalid message properties" before any handler ever saw it.
+        if (self::isTypedCalendarMessage($message)) {
+            foreach (self::TYPED_CALENDAR_PROPERTIES as $prop) {
+                if (false === property_exists($message, $prop)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        // ------------------------------------------------------------------ everything else, as before
         $valid = true;
         foreach (Health::ACTION_PROPERTIES[$message->action] as $prop) {
             if (false === property_exists($message, $prop)) {

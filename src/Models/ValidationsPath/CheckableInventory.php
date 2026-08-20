@@ -58,8 +58,9 @@ final class CheckableInventory
      * write that would invalidate it — but `Health` is a long-running ReactPHP process and the primary
      * consumer of `byPath()`/`byId()`, and there both this and `self::$items` live until the WebSocket
      * server restarts. A calendar created via `/data` therefore does not appear to those clients until
-     * then. Harmless today only because `Health`'s legacy regex arms still resolve those slugs
-     * generically; #806 plan 2 replaces those arms with `byId()` and will need a reset hook.
+     * then. That is what {@see self::reset()} is for: `Health` calls it as each run begins, because
+     * its `validateSource` action resolves solely through `byId()` and cannot fall back on the
+     * legacy regex arms that used to resolve those slugs generically.
      *
      * Building the index reads and JSON-parses every national and diocesan calendar file, so a single
      * missing or malformed one throws (`ServiceUnavailableException` / `JsonException`) and
@@ -71,6 +72,25 @@ final class CheckableInventory
     private static function metadata(): MetadataCalendars
     {
         return self::$metadata ??= CalendarMetadataProvider::create();
+    }
+
+    /**
+     * Drop the memoized index.
+     *
+     * The memo is per-process, which is a request under PHP-FPM but the whole server lifetime in
+     * `Health`'s long-running ReactPHP process. A v2 `validateSource` resolves solely through
+     * {@see self::byId()}, so without this a calendar created via `/data` would stay invisible to
+     * the WebSocket until restart — the legacy slug arms used to mask that by resolving
+     * generically.
+     *
+     * An invalidation hook on the write path cannot work: `/data` writes happen in the HTTP
+     * process, which `Health` never observes. `Health` therefore resets once per run, bounding
+     * staleness to a single run at the cost of one rebuild per run rather than one per lookup.
+     */
+    public static function reset(): void
+    {
+        self::$items    = null;
+        self::$metadata = null;
     }
 
     /** @return list<CheckableItem> */

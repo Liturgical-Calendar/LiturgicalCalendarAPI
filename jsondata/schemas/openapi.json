@@ -7324,7 +7324,7 @@
           {}
         ],
         "summary": "Retrieve the source data this API can be asked to validate",
-        "description": "Clients iterate this list and send back an item's opaque id, so no filesystem path crosses the wire. Advertising is not verification: an item appearing here does not assert that the underlying data is present, only that it is checkable. Filtering by rite and region is done by the client.",
+        "description": "Clients iterate this list and send back an item's opaque id, so no filesystem path crosses the wire. Advertising is not verification: an item appearing here does not assert that the underlying data is present, only that it is checkable. Filtering by rite and region is done by the client. Each item's `steps` array is an upper bound on its length, not an exact frame count -- see the property description on `steps` in LitCalValidationsPath.json for both caveats: the short-circuit on a JSON decode failure (issue #821) and its values versus the Health WebSocket protocol's frame classes (issue #819).",
         "operationId": "validationsGET",
         "responses": {
           "200": {

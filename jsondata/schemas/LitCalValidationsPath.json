@@ -63,6 +63,7 @@
                     "steps": {
                         "type": "array",
                         "minItems": 1,
+                        "description": "The ordered checks this item passes through when validated. Its length is an UPPER BOUND on the number of per-step frames a check emits, not an exact count: a file whose JSON fails to decode stops after json-valid and never emits schema-valid, so a client should finish a check when it sees a terminal frame rather than waiting for count(steps) of them. See https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/821. Its values are not the frame classes either: these step names do not yet correspond to the WebSocket protocol's per-step frame classes (file-exists, json-valid, schema-valid), and nothing in the API relates the two vocabularies. See https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/819.",
                         "items": {
                             "type": "string",
                             "enum": [

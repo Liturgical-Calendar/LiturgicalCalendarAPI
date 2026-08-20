@@ -11,6 +11,7 @@ use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Tests\Support\BrokenInventoryTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -31,6 +32,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Health::class)]
 final class HealthSchemaCategoryTest extends TestCase
 {
+    use BrokenInventoryTrait;
+
     private static bool $routerInitialized = false;
 
     /**
@@ -97,29 +100,63 @@ final class HealthSchemaCategoryTest extends TestCase
     /**
      * `sourceDataCheck` resolves from the `validate` SLUG.
      *
-     * @return array<string, array{string, LitSchema}>
+     * The third column is the inventory id that names the *same* artifact — the address a
+     * `validateSource` message carries (#806 section C). Both columns are here rather than in two
+     * providers because the pairing is the assertion: a slug and its id are two spellings of one
+     * target, and the day they stop resolving alike is the day a client migrating from one to the
+     * other silently starts checking something else against the wrong schema.
+     *
+     * @return array<string, array{string, LitSchema, string}>
      */
     public static function sourceDataCheckSlugProvider(): array
     {
         return [
-            'temporale'            => ['proprium-de-tempore', LitSchema::PROPRIUMDETEMPORE],
-            'editio typica missal' => ['proprium-de-sanctis-2002', LitSchema::PROPRIUMDESANCTIS],
-            'regional missal'      => ['proprium-de-sanctis-IT-1983', LitSchema::PROPRIUMDESANCTIS],
-            'wider region'         => ['wider-region-Europe', LitSchema::WIDERREGION],
-            'national calendar'    => ['national-calendar-US', LitSchema::NATIONAL],
-            'diocesan calendar'    => ['diocesan-calendar-romamo_it', LitSchema::DIOCESAN],
-            'decrees'              => ['memorials-from-decrees', LitSchema::DECREES_SRC],
-            'test definition'      => ['tests-StIgnatiusOfLoyolaTest', LitSchema::TEST_SRC],
-            'i18n folder suffix'   => ['national-calendar-US-i18n', LitSchema::I18N],
-            'decrees i18n'         => ['memorials-from-decrees-i18n', LitSchema::I18N],
-            'temporale i18n'       => ['proprium-de-tempore-i18n', LitSchema::I18N],
+            'temporale'            => ['proprium-de-tempore', LitSchema::PROPRIUMDETEMPORE, 'temporale:roman'],
+            'editio typica missal' => ['proprium-de-sanctis-2002', LitSchema::PROPRIUMDESANCTIS, 'sanctorale:roman:EDITIO_TYPICA_2002'],
+            'regional missal'      => ['proprium-de-sanctis-IT-1983', LitSchema::PROPRIUMDESANCTIS, 'sanctorale:roman:IT_1983'],
+            'wider region'         => ['wider-region-Europe', LitSchema::WIDERREGION, 'widerregion:roman:Europe'],
+            'national calendar'    => ['national-calendar-US', LitSchema::NATIONAL, 'nation:roman:US'],
+            'diocesan calendar'    => ['diocesan-calendar-romamo_it', LitSchema::DIOCESAN, 'diocese:roman:romamo_it'],
+            'decrees'              => ['memorials-from-decrees', LitSchema::DECREES_SRC, 'decrees:roman'],
+            // The two vocabularies are NOT one-to-one, and this row is the standing evidence:
+            // the slug is rite-blind — its pattern is `tests-<name>`, and it resolves to TEST_SRC
+            // whatever the rite — while every inventory id is rite-qualified. One slug therefore
+            // maps to as many ids as there are rites holding a definition of that name, and the
+            // right one cannot be derived from the slug. This definition happens to exist only in
+            // the Ambrosian folder, so `test:roman:StIgnatiusOfLoyolaTest` resolves to nothing.
+            'test definition'      => ['tests-StIgnatiusOfLoyolaTest', LitSchema::TEST_SRC, 'test:ambrosian:StIgnatiusOfLoyolaTest'],
+            'i18n folder suffix'   => ['national-calendar-US-i18n', LitSchema::I18N, 'nation:roman:US:i18n'],
+            'decrees i18n'         => ['memorials-from-decrees-i18n', LitSchema::I18N, 'decrees:roman:i18n'],
+            'temporale i18n'       => ['proprium-de-tempore-i18n', LitSchema::I18N, 'temporale:roman:i18n'],
         ];
     }
 
     #[DataProvider('sourceDataCheckSlugProvider')]
-    public function testSourceDataCheckResolvesFromTheValidateSlug(string $slug, LitSchema $expected): void
+    public function testSourceDataCheckResolvesFromTheValidateSlug(string $slug, LitSchema $expected, string $id): void
     {
         self::assertSame($expected->path(), self::retrieveSchemaForCategory('sourceDataCheck', $slug));
+    }
+
+    /**
+     * The equivalence oracle for #806 section C: the id is the same address as the slug.
+     *
+     * `retrieveSchemaForCategory()` is asked both ways round, so this pins the *pair* rather than
+     * either half — the inventory id must reach the schema the anchored slug patterns reach, for
+     * every kind of source data the legacy vocabulary covers.
+     */
+    #[DataProvider('sourceDataCheckSlugProvider')]
+    public function testAnInventoryIdResolvesToTheSameSchemaAsItsLegacySlug(string $slug, LitSchema $expected, string $id): void
+    {
+        self::assertSame(
+            self::retrieveSchemaForCategory('sourceDataCheck', $slug),
+            self::retrieveSchemaForCategory('sourceDataCheck', $id),
+            "{$id} and {$slug} name the same artifact and must resolve to the same schema"
+        );
+        self::assertSame($expected->path(), self::retrieveSchemaForCategory('sourceDataCheck', $id));
+
+        $item = CheckableInventory::byId($id);
+        self::assertNotNull($item, "the inventory publishes no item with id {$id}");
+        self::assertSame($expected, $item->schema, "the published item {$id} carries the wrong schema");
     }
 
     public function testSourceDataCheckRejectsAnUnrecognisedSlug(): void
@@ -464,76 +501,6 @@ final class HealthSchemaCategoryTest extends TestCase
     }
 
     // ---------------------------------------------------------------- a broken inventory is contained
-
-    /**
-     * Runs `$fn` with `CheckableInventory` pointed at a source tree containing one malformed
-     * national calendar file, so that every inventory lookup throws.
-     *
-     * This is the real failure, not a simulated one: the inventory enumerates per-calendar items via
-     * `CalendarMetadataProvider::create()`, which JSON-parses every national and diocesan calendar
-     * file, so a single unparseable file makes `all()` — and therefore `byPath()` and `byId()` —
-     * throw. Only the malformed file needs to exist: national calendars are built first, so the
-     * build aborts before it looks for anything else.
-     *
-     * The memoized statics are reset on the way in *and* on the way out: in on so the poisoned tree
-     * is actually read rather than a good index being served from an earlier test, out so the next
-     * test rebuilds against the real tree.
-     */
-    private static function withBrokenInventory(callable $fn): void
-    {
-        $savedApiFilePath = Router::$apiFilePath;
-        $root             = sys_get_temp_dir() . '/health-broken-inventory-' . getmypid() . '-' . uniqid() . '/';
-        $nationFolder     = $root . JsonData::NATIONAL_CALENDARS_FOLDER->value . '/ZZ';
-
-        self::assertTrue(mkdir($nationFolder, 0777, true), 'could not build the fixture source tree');
-        file_put_contents($nationFolder . '/ZZ.json', '{ this is not JSON');
-
-        Router::$apiFilePath = $root;
-        self::resetInventoryMemo();
-
-        try {
-            // Guard: if this ever stops throwing, the tests below would pass for the wrong reason.
-            try {
-                CheckableInventory::all();
-                self::fail('the fixture tree no longer breaks the inventory — this test proves nothing');
-            } catch (\JsonException) {
-                // expected
-            }
-
-            $fn();
-        } finally {
-            Router::$apiFilePath = $savedApiFilePath;
-            self::resetInventoryMemo();
-            @unlink($nationFolder . '/ZZ.json');
-            self::removeDirectoryTree($root);
-        }
-    }
-
-    private static function resetInventoryMemo(): void
-    {
-        $inventory = new \ReflectionClass(CheckableInventory::class);
-        $inventory->setStaticPropertyValue('items', null);
-        $inventory->setStaticPropertyValue('metadata', null);
-    }
-
-    private static function removeDirectoryTree(string $root): void
-    {
-        if (false === is_dir($root)) {
-            return;
-        }
-
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST
-        );
-
-        /** @var \SplFileInfo $entry */
-        foreach ($iterator as $entry) {
-            $entry->isDir() ? @rmdir($entry->getPathname()) : @unlink($entry->getPathname());
-        }
-
-        @rmdir($root);
-    }
 
     /**
      * One malformed calendar file must not take out schema resolution for every unrelated check.
