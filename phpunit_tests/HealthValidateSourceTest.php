@@ -138,11 +138,18 @@ final class HealthValidateSourceTest extends TestCase
      *
      * `CheckableInventory::STEPS` publishes `exists|parses|validates` on the wire, while the frames
      * are addressed `.<fragment>.file-exists`, `.<fragment>.json-valid`, `.<fragment>.schema-valid`.
-     * The two
-     * describe the same three steps in different words, and nothing in the codebase relates them,
-     * so the correspondence is written down here — once — and asserted rather than restated as a
-     * hardcoded list at each call site. A newly published step with no entry here fails loudly,
-     * which is the point: it would also be a step no client could match a frame to.
+     * The two describe the same three steps in different words, and the correspondence is written
+     * down here — once — and asserted rather than restated as a hardcoded list at each call site. A
+     * newly published step with no entry here fails loudly, which is the point: it would also be a
+     * step no client could match a frame to.
+     *
+     * **Deliberately a literal, and deliberately not read from `FrameFamily::CLASS_FOR_STEP`.** The
+     * production table now exists, and reading it here would make both sides of the `assertSame()`
+     * below derive from one source: a projection changed in `src` would change the expectation in
+     * lockstep and the assertion could not fail. That is the exact pattern this branch spent four
+     * dead tests learning to avoid, so the one file that polices addressing states its own
+     * expectation. The production table is pinned separately, against literals, in
+     * {@see HealthFrameProjectionTest}.
      *
      * @var array<string, string>
      */
@@ -199,7 +206,10 @@ final class HealthValidateSourceTest extends TestCase
         $parts = explode('.', (string) $frame->classes);
         self::assertCount(3, $parts, "a frame class must be .<fragment>.<step>, got: {$frame->classes}");
         self::assertSame('', $parts[0], "a frame class must start with a dot, got: {$frame->classes}");
-        self::assertContains($parts[2], self::FRAME_CLASS_FOR_STEP, "unknown step in frame class: {$frame->classes}");
+        // Three literals, not the production table: reading `FrameFamily::CLASS_FOR_STEP` on both sides
+        // of this comparison would make it a tautology, which is the very anti-pattern this branch is
+        // policing. The step token of any frame a client can use is one of these three and nothing else.
+        self::assertContains($parts[2], ['file-exists', 'json-valid', 'schema-valid'], "unknown step in frame class: {$frame->classes}");
 
         return $parts[1];
     }

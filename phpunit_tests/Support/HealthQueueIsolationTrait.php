@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Support;
 
 use LiturgicalCalendar\Api\Health;
+use PHPUnit\Framework\Attributes\After;
 
 /**
  * Stops a test's queued `Health` requests from being fetched for real once the test is over.
@@ -52,7 +53,22 @@ trait HealthQueueIsolationTrait
      * Empty the request queue of every tracked Health.
      *
      * `$queue` is a private *instance* property, so this writes the real one rather than a copy.
+     *
+     * **This is an `#[After]` hook and deliberately not a `tearDown()`.** A trait's `tearDown()` is
+     * silently overridden by a `tearDown()` in the using class's body — PHP resolves the conflict in
+     * favour of the class method with no error and no warning, and the class's `parent::tearDown()`
+     * reaches `TestCase`, never the trait. That is not hypothetical: three of the suites using this trait
+     * define their own `tearDown()`, and two of them — `HealthCorrelationTest` and
+     * `HealthTerminalFrameTest`, which do most of the queueing — did so to restore `APP_ENV`. That
+     * disabled this protection in exactly the place it was needed: measured with the class `tearDown()`s
+     * in place, 16 queued requests were dispatched for real at process end, 12 of them to the API host.
+     * An attributed hook cannot be shadowed that way: PHPUnit collects it by attribute, under a name no
+     * `tearDown()` collides with, and runs it whether or not the class defines its own.
+     *
+     * The priority runs it **ahead** of any class `tearDown()` (which PHPUnit registers as an `after`
+     * hook of priority 0), so a `tearDown()` that throws cannot skip it either.
      */
+    #[After(10)]
     protected function defuseHealthQueues(): void
     {
         $queue = new \ReflectionProperty(Health::class, 'queue');
@@ -60,11 +76,5 @@ trait HealthQueueIsolationTrait
             $queue->setValue($health, []);
         }
         $this->trackedHealths = [];
-    }
-
-    protected function tearDown(): void
-    {
-        $this->defuseHealthQueues();
-        parent::tearDown();
     }
 }
