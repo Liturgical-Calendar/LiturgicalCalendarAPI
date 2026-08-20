@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\Step;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
@@ -60,6 +61,11 @@ final class HealthFolderStepResultTest extends TestCase
     }
 
     /**
+     * The helper now takes the class fragment and a {@see Step} rather than a pre-built `classes`
+     * string: concatenating the two was the per-call-site hardcoding that #806 replaced with a
+     * single projection. The expectations below are unchanged and still written as literals, so
+     * they pin the frame a client actually receives rather than the way the server assembles it.
+     *
      * @param list<string> $errors
      * @return list<\stdClass> the decoded frames the helper emitted
      */
@@ -71,7 +77,9 @@ final class HealthFolderStepResultTest extends TestCase
         $method->invoke(
             $this->newHealth(),
             $conn,
-            'national-calendar-IT-i18n.json-valid',
+            'national-calendar-IT-i18n',
+            null,
+            Step::PARSES,
             $errors,
             'all good',
             'not all good',
