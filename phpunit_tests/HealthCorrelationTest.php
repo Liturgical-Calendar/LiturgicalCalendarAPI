@@ -178,17 +178,23 @@ final class HealthCorrelationTest extends TestCase
     public static function malformedRequestIdProvider(): array
     {
         return [
-            'empty string' => [''],
-            'a space'      => ['req alpha'],
-            'a colon'      => ['req:alpha'],
-            'a dot'        => ['req.alpha'],
-            'markup'       => ['<script>'],
-            'sixty-five'   => [str_repeat('a', 65)],
-            'an integer'   => [42],
-            'null'         => [null],
-            'a list'       => [['req-alpha']],
-            'an object'    => [['id' => 'req-alpha']],
-            'a boolean'    => [true]
+            'empty string'              => [''],
+            'a space'                   => ['req alpha'],
+            'a colon'                   => ['req:alpha'],
+            'a dot'                     => ['req.alpha'],
+            'markup'                    => ['<script>'],
+            'sixty-five'                => [str_repeat('a', 65)],
+            // PHP's `$` matches before a trailing newline unless the pattern is anchored with `\z`
+            // or the `D` modifier, so an un-anchored bound admits a 65-byte id through a {1,64} rule
+            // and admits a newline through an alphabet that lists none. Sharing one constant with
+            // `runToken` would have propagated that latitude to a second field, so both rows are here.
+            'trailing newline'          => ["req-alpha\n"],
+            'sixty-four plus a newline' => [str_repeat('a', 64) . "\n"],
+            'an integer'                => [42],
+            'null'                      => [null],
+            'a list'                    => [['req-alpha']],
+            'an object'                 => [['id' => 'req-alpha']],
+            'a boolean'                 => [true]
         ];
     }
 
@@ -513,6 +519,100 @@ final class HealthCorrelationTest extends TestCase
         self::assertSame(['run-a', 'run-a'], array_map(static fn (\stdClass $f): mixed => $f->runToken, $frames));
         self::assertSame(['run-a', 'run-a'], array_map(static fn (\stdClass $f): mixed => $f->runId, $frames));
         self::assertSame(['req-beta', 'req-alpha'], array_map(static fn (\stdClass $f): mixed => $f->requestId, $frames));
+    }
+
+    // ---------------------------------------------------------------- the paths the interleaved tests do not reach
+
+    /**
+     * The legacy action correlates too.
+     *
+     * `requestId` is a v2 field, but nothing about it is v2-only: it is read off any message, and a
+     * client midway through UnitTestInterface#42 may well have adopted correlation before it has
+     * adopted `runTest`. This also pins the arm the interleaved test cannot reach — a `runTest` that
+     * *fulfils* is answered by `LitTestRunner`, so `sendTestResult()`'s own failure frame is only
+     * reachable by failing the fetch.
+     */
+    public function testTheLegacyExecuteUnitTestActionCorrelatesThroughSendTestResult(): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        self::send($health, $conn, [
+            'action'    => 'executeUnitTest',
+            'category'  => 'nationalcalendar',
+            'calendar'  => 'IT',
+            'year'      => 2026,
+            'test'      => 'CorrelationHarnessLegacy',
+            'requestId' => 'req-alpha'
+        ]);
+
+        self::assertSame([], $conn->sent, 'precondition: no frame before the calendar is fetched');
+        self::failQueuedRequest($health, 0);
+
+        $frames = self::framesOf($conn);
+        self::assertCount(1, $frames);
+        self::assertSame('CorrelationHarnessLegacy', $frames[0]->target->id, 'precondition: this is the sendTestResult() failure frame');
+        self::assertSame('validates', $frames[0]->step);
+        self::assertSame('req-alpha', $frames[0]->requestId);
+    }
+
+    /**
+     * The folder branch, which is a different emitter reached by a different route.
+     *
+     * `runValidationSteps()` splits on `kind` into two branches that share almost nothing:
+     * `sendFolderStepResult()` summarises a whole folder into one frame per step, where the file
+     * branch reports per file. `nation:roman:US:i18n` is the inventory's folder-kind entry, and
+     * without a row for it the folder emitter would be threaded but unexercised.
+     */
+    public function testAFolderCheckCarriesTheRequestIdOnAllThreeFrames(): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        self::send($health, $conn, [
+            'action'    => 'validateSource',
+            'target'    => ['id' => 'nation:roman:US:i18n'],
+            'requestId' => 'req-alpha'
+        ]);
+
+        $frames = self::framesOf($conn);
+        self::assertCount(3, $frames, 'a folder check answers with exactly one frame per step');
+        foreach ($frames as $frame) {
+            self::assertNotSame('echobot', $frame->type, "the message was refused: {$frame->text}");
+            self::assertStringContainsString('folder', (string) $frame->text, 'precondition: these are the folder branch\'s frames');
+            self::assertSame('req-alpha', $frame->requestId);
+        }
+    }
+
+    /**
+     * A message the server could not act on is still answered, and the answer is still correlated —
+     * as long as there was a message to read an id from.
+     *
+     * The two halves are one test because the distinction is the whole content: a well-formed object
+     * that fails property validation carries an id the client is waiting on, while a string that is
+     * not JSON at all carries nothing the server may echo. Fabricating an id for the second — or
+     * dropping it for the first — would leave a client blocked on a request it never learns was
+     * refused.
+     */
+    public function testAnInvalidMessageIsCorrelatedWhenItCarriedAnIdAndNotWhenItCouldNot(): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection();
+
+        // Parses as an object, but `validateSource` requires a `target`.
+        self::send($health, $conn, ['action' => 'validateSource', 'requestId' => 'req-alpha']);
+        // Does not parse at all: there is no message, so there is no id.
+        $health->onMessage($conn, 'not json at all');
+
+        $frames = self::framesOf($conn);
+        self::assertCount(2, $frames);
+
+        self::assertSame('echobot', $frames[0]->type);
+        self::assertSame('Invalid message properties', $frames[0]->errorMsg);
+        self::assertSame('req-alpha', $frames[0]->requestId, 'a refusal must name the request it refuses');
+
+        self::assertSame('echobot', $frames[1]->type);
+        self::assertObjectNotHasProperty('requestId', $frames[1], 'nothing may be invented for a message that could not be read');
     }
 
     // ---------------------------------------------------------------- harness

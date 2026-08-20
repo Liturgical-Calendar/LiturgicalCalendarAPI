@@ -257,8 +257,15 @@ class Health implements MessageComponentInterface
      * an opaque client-minted handle the server echoes back — and a client that minted one of them
      * must not have to discover that the other accepts a different alphabet. Junk is refused at the
      * door rather than echoed onto every frame of a run.
+     *
+     * **The `D` modifier is load-bearing, not decoration.** Without it PHP's `$` also matches *before*
+     * a final newline, so `"req-alpha\n"` satisfies an alphabet that lists no newline, and 64
+     * characters followed by one satisfy a `{1,64}` bound at 65 bytes. That latitude was pre-existing
+     * on `runToken`; sharing the constant would have handed it to `requestId` as well, which is the
+     * argument for fixing it here rather than living with it — one constant, one fix, both fields. The
+     * docblock above describes the alphabet exactly, and now so does the pattern.
      */
-    private const CORRELATION_ID_PATTERN = '/^[A-Za-z0-9_\-]{1,64}$/';
+    private const CORRELATION_ID_PATTERN = '/^[A-Za-z0-9_\-]{1,64}$/D';
 
     private const RED    = "\033[0;31m";
     private const GREEN  = "\033[0;32m";
