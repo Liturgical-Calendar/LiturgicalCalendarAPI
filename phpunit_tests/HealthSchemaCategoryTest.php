@@ -9,6 +9,7 @@ use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Health;
+use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Router;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -460,5 +461,171 @@ final class HealthSchemaCategoryTest extends TestCase
     public function testUnknownCategoryResolvesToNull(): void
     {
         self::assertNull(self::retrieveSchemaForCategory('definitelyNotACategory', 'US'));
+    }
+
+    // ---------------------------------------------------------------- a broken inventory is contained
+
+    /**
+     * Runs `$fn` with `CheckableInventory` pointed at a source tree containing one malformed
+     * national calendar file, so that every inventory lookup throws.
+     *
+     * This is the real failure, not a simulated one: the inventory enumerates per-calendar items via
+     * `CalendarMetadataProvider::create()`, which JSON-parses every national and diocesan calendar
+     * file, so a single unparseable file makes `all()` — and therefore `byPath()` and `byId()` —
+     * throw. Only the malformed file needs to exist: national calendars are built first, so the
+     * build aborts before it looks for anything else.
+     *
+     * The memoized statics are reset on the way in *and* on the way out: in on so the poisoned tree
+     * is actually read rather than a good index being served from an earlier test, out so the next
+     * test rebuilds against the real tree.
+     */
+    private static function withBrokenInventory(callable $fn): void
+    {
+        $savedApiFilePath = Router::$apiFilePath;
+        $root             = sys_get_temp_dir() . '/health-broken-inventory-' . getmypid() . '-' . uniqid() . '/';
+        $nationFolder     = $root . JsonData::NATIONAL_CALENDARS_FOLDER->value . '/ZZ';
+
+        self::assertTrue(mkdir($nationFolder, 0777, true), 'could not build the fixture source tree');
+        file_put_contents($nationFolder . '/ZZ.json', '{ this is not JSON');
+
+        Router::$apiFilePath = $root;
+        self::resetInventoryMemo();
+
+        try {
+            // Guard: if this ever stops throwing, the tests below would pass for the wrong reason.
+            try {
+                CheckableInventory::all();
+                self::fail('the fixture tree no longer breaks the inventory — this test proves nothing');
+            } catch (\JsonException) {
+                // expected
+            }
+
+            $fn();
+        } finally {
+            Router::$apiFilePath = $savedApiFilePath;
+            self::resetInventoryMemo();
+            @unlink($nationFolder . '/ZZ.json');
+            self::removeDirectoryTree($root);
+        }
+    }
+
+    private static function resetInventoryMemo(): void
+    {
+        $inventory = new \ReflectionClass(CheckableInventory::class);
+        $inventory->setStaticPropertyValue('items', null);
+        $inventory->setStaticPropertyValue('metadata', null);
+    }
+
+    private static function removeDirectoryTree(string $root): void
+    {
+        if (false === is_dir($root)) {
+            return;
+        }
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        /** @var \SplFileInfo $entry */
+        foreach ($iterator as $entry) {
+            $entry->isDir() ? @rmdir($entry->getPathname()) : @unlink($entry->getPathname());
+        }
+
+        @rmdir($root);
+    }
+
+    /**
+     * One malformed calendar file must not take out schema resolution for every unrelated check.
+     *
+     * `Health` is a long-running ReactPHP process, and `getPathToSchemaFile()` consults the inventory
+     * before its own route arms. Without containment, a broken diocesan or national JSON file would
+     * propagate out of that lookup and break `executeValidation` for the Roman temporale, the
+     * `/calendars` route and everything else — the detector failing on exactly what it exists to
+     * detect. `GET /validations` still answers 503 loudly; that is where the failure belongs.
+     */
+    public function testABrokenInventoryDoesNotBreakUnrelatedSchemaResolution(): void
+    {
+        self::withBrokenInventory(static function (): void {
+            // Resolved by the route arm that follows the inventory lookup in getPathToSchemaFile().
+            self::assertSame(
+                LitSchema::METADATA->path(),
+                self::retrieveSchemaForCategory('universalcalendar', Route::CALENDARS->path()),
+                'a Throwable from the inventory propagated instead of falling through to the route arms'
+            );
+
+            // Resolved by the legacy regex arms that follow the byId() lookup in sourceDataCheck.
+            self::assertSame(
+                LitSchema::NATIONAL->path(),
+                self::retrieveSchemaForCategory('sourceDataCheck', 'national-calendar-US'),
+                'a Throwable from the inventory propagated instead of falling through to the slug patterns'
+            );
+            self::assertSame(
+                LitSchema::DIOCESAN->path(),
+                self::retrieveSchemaForCategory('sourceDataCheck', 'diocesan-calendar-romamo_it')
+            );
+            self::assertSame(
+                LitSchema::TEST_SRC->path(),
+                self::retrieveSchemaForCategory('sourceDataCheck', 'tests-StIgnatiusOfLoyolaTest')
+            );
+
+            // The slugs that only the inventory resolves degrade to null rather than to an exception.
+            self::assertNull(self::retrieveSchemaForCategory('sourceDataCheck', 'not-a-known-slug'));
+        });
+    }
+
+    /**
+     * The static half of the inventory keeps resolving even when the enumerating half is broken.
+     *
+     * The two halves fail independently: `explicitItems()` and `derivedRomanSanctorale()` build their
+     * paths from the `RomanMissal` and `JsonData` registries and never call
+     * `CalendarMetadataProvider`, so a malformed calendar file cannot have broken them. Falling all
+     * the way through to the route arms would throw away a resolution that is still perfectly good —
+     * and the missal propriums, the temporale and the decrees are the targets most often checked.
+     *
+     * The contrast is the point of this test, so both directions are asserted: the static targets
+     * still resolve, the per-calendar ones do not. A test that only asserted the first half would
+     * pass just as well against a fallback that had quietly reintroduced the whole inventory.
+     */
+    public function testABrokenInventoryStillResolvesStaticSourceData(): void
+    {
+        $ambrosianTemporale = JsonData::AMBROSIAN_TEMPORALE_FILE->value;
+        $romanSanctorale    = JsonData::MISSALS_FOLDER->value . '/propriumdesanctis_US_2011/propriumdesanctis_US_2011.json';
+        $nationalCalendar   = strtr(JsonData::NATIONAL_CALENDAR_FILE->value, ['{nation}' => 'US']);
+
+        // Sanity: with a healthy inventory, all three resolve — so the nulls below are a degradation
+        // of something that worked, not an input that never resolved in the first place.
+        self::assertSame(LitSchema::PROPRIUMDETEMPORE->path(), self::retrieveSchemaForCategory('universalcalendar', $ambrosianTemporale));
+        self::assertSame(LitSchema::PROPRIUMDESANCTIS->path(), self::retrieveSchemaForCategory('universalcalendar', $romanSanctorale));
+        self::assertSame(LitSchema::NATIONAL->path(), self::retrieveSchemaForCategory('universalcalendar', $nationalCalendar));
+        self::assertSame(LitSchema::NATIONAL->path(), self::retrieveSchemaForCategory('sourceDataCheck', 'nation:roman:US'));
+
+        self::withBrokenInventory(static function () use ($ambrosianTemporale, $romanSanctorale, $nationalCalendar): void {
+            self::assertSame(
+                LitSchema::PROPRIUMDETEMPORE->path(),
+                self::retrieveSchemaForCategory('universalcalendar', $ambrosianTemporale),
+                'a static source path stopped resolving because an unrelated calendar file was malformed'
+            );
+            self::assertSame(
+                LitSchema::PROPRIUMDESANCTIS->path(),
+                self::retrieveSchemaForCategory('universalcalendar', $romanSanctorale)
+            );
+
+            // Inventory ids resolve through the same fallback, which is what plan 2 will rely on once
+            // clients send ids instead of slugs: sanctorale:roman:US_2011 matches no regex arm.
+            self::assertSame(
+                LitSchema::PROPRIUMDESANCTIS->path(),
+                self::retrieveSchemaForCategory('sourceDataCheck', 'sanctorale:roman:US_2011')
+            );
+
+            // And the other half of the contrast: per-calendar targets are genuinely unavailable, so
+            // they degrade to null rather than being resolved by a fallback that reads the same data
+            // that just failed.
+            self::assertNull(
+                self::retrieveSchemaForCategory('universalcalendar', $nationalCalendar),
+                'a per-calendar path resolved while the calendar index was broken — the fallback is not static-only'
+            );
+            self::assertNull(self::retrieveSchemaForCategory('sourceDataCheck', 'nation:roman:US'));
+        });
     }
 }

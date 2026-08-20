@@ -34,8 +34,12 @@ final class ResourceExistenceChecker implements ResourceExistenceCheckerInterfac
     /**
      * The Vatican is announced as a national calendar but is still served by the
      * General Roman Calendar, so it has no source folder of its own yet.
+     *
+     * Public: {@see \LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory} excludes this
+     * id from the checkable inventory for the same reason, and references this constant rather than
+     * repeating the literal.
      */
-    private const VATICAN_NATIONAL_CALENDAR_ID = 'VA';
+    public const VATICAN_NATIONAL_CALENDAR_ID = 'VA';
 
     /** @var list<string> */
     private const RESOURCE_TYPES = [

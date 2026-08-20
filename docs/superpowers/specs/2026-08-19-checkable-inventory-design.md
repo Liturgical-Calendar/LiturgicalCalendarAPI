@@ -31,16 +31,19 @@ match real paths, which would close that class too — worth noting, not this de
 
 | In scope                                                                   | Out of scope                                                                  |
 |----------------------------------------------------------------------------|-------------------------------------------------------------------------------|
-| A `GET /validations` endpoint advertising static source-data files/folders | Per-calendar items — wider regions, nations, dioceses, tests                  |
-| Collapsing the server's two schema-resolution vocabularies into one        | The API's own endpoints (`resourceDataChecks`)                                |
-| A drift test that fails when data exists with no inventory entry           | Any change to the WebSocket protocol itself                                   |
-| —                                                                          | The `hello` frame and `protocol` versioning (#806 section F)                  |
-| —                                                                          | Client adoption, and the client-side scope predicate (UnitTestInterface#42)   |
+| A `GET /validations` endpoint advertising static source-data files/folders | The API's own endpoints (`resourceDataChecks`)                                |
+| Collapsing the server's two schema-resolution vocabularies into one        | Any change to the WebSocket protocol itself                                   |
+| A drift test that fails when data exists with no inventory entry           | The `hello` frame and `protocol` versioning (#806 section F)                  |
+| Per-calendar items — wider regions, nations, dioceses, tests               | Client adoption, and the client-side scope predicate (UnitTestInterface#42)   |
 | —                                                                          | A RiteSelect control on either page (client work; UnitTestInterface#42 / #39) |
 
-### Why only static files
+Per-calendar items were originally out of scope; the scoping was revisited in the section B design, because making
+the id the only address a client ever needs requires the inventory to cover everything addressable, not just the
+statically-listed half.
 
-The runners check three different kinds of thing, and only one of them is the problem:
+### The three kinds, and which of them are covered
+
+The runners check three different kinds of thing, and they are not all covered here:
 
 1. **Static source files and folders** — missal propriums for both rites, decrees, and their `i18n` directories. These
    are hardcoded in the clients *as filesystem paths*.
@@ -49,8 +52,12 @@ The runners check three different kinds of thing, and only one of them is the pr
 3. **The API's own endpoints** — `/calendars`, `/decrees`, `/tests`, `/events`, `/easter`, `/schemas`, `/missals`. The
    client builds these from its `ENDPOINTS` map. No path is embedded.
 
-Only kind 1 caused #737/#38, #795 and #800. Advertising kinds 2 and 3 would add surface without removing duplication,
-so this endpoint covers kind 1 only.
+Only kind 1 caused #737/#38, #795 and #800, which is why the endpoint began with kind 1 alone. Kind 2 was added in the
+section B design, for the reason the paragraph above the taxonomy gives: an id that is the only address a client ever
+needs has to cover everything addressable. So this endpoint covers kinds 1 and 2.
+
+Kind 3 stays out. The client builds those paths from its `ENDPOINTS` map rather than embedding them, so advertising them
+would add surface without removing any duplication — which was the original argument, and it still holds for kind 3.
 
 ## Who consumes it, and how they differ
 
@@ -226,10 +233,14 @@ request.
 
 ## Deliberately not doing
 
-**The endpoint does not touch the filesystem.** Advertising is not verification. `exists` is the first *check*, not a
-precondition for being listed, so a missing file appears as a failed check in the UI rather than as a silent absence
-from the list. That distinction is exactly how #800 stayed invisible: the Ambrosian data was present and no client
-listed it. A list that quietly drops what it cannot stat reintroduces the same blindness from the other direction.
+**The endpoint never stats a target to decide whether to list it.** Advertising is not verification. `exists` is the
+first *check*, not a precondition for being listed, so a missing file appears as a failed check in the UI rather than
+as a silent absence from the list. An item appears because its calendar is registered, not because a file was found
+present — the per-calendar half enumeration added in the section B design does read the calendar index and the tests
+folder, so "does not touch the filesystem" is not literally true of the endpoint as a whole, but the narrower claim
+still holds for every item it lists. That distinction is exactly how #800 stayed invisible: the Ambrosian data was
+present and no client listed it. A list that quietly omitted what it could not stat would reintroduce the same
+blindness from the other direction.
 
 It also keeps the endpoint cheap and its output identical across environments.
 

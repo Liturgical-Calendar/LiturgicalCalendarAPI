@@ -40,7 +40,13 @@ final class ValidationsHandlerTest extends AbstractHandlerTestCase
 
         $body = $this->decodeJsonBody($response);
         self::assertArrayHasKey('litcal_validations', $body);
-        self::assertCount(18, $body['litcal_validations']);
+
+        // The static half alone is 18; enumeration only adds, so a fixed total would fail whenever a
+        // calendar is added — a false alarm rather than drift. The drift test is what pins coverage.
+        self::assertGreaterThan(18, count($body['litcal_validations']));
+
+        $ids = array_column($body['litcal_validations'], 'id');
+        self::assertSame(array_unique($ids), $ids, 'advertised ids must be unique');
     }
 
     public function testEveryItemCarriesTheAdvertisedFields(): void
