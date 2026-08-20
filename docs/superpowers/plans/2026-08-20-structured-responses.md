@@ -359,66 +359,7 @@ Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 
 ---
 
-## Task 4: The terminal frame
-
-**Files:** Modify `src/Health.php`; extend `phpunit_tests/HealthFrameProjectionTest.php`
-
-**Interfaces:** Produces `sendComplete()`.
-
-- [ ] **Step 1: Write the failing tests**
-
-Assert `complete` on **every** path that starts work, and assert it **absent** after a rejection:
-
-```text
-happy path        exists(pass) → parses(pass) → validates(pass) → complete
-JSON decode fails exists(pass) → parses(fail) → complete
-file missing      exists(fail) → complete
-test run          validates(pass|fail) → complete
-unknown target    echobot rejection only — no complete, nothing was started
-```
-
-The failure arms are the point. A client stops on `complete`, so an arm that terminates without one wedges it
-forever — which is the bug this frame exists to prevent, in the same shape as the folder-branch wedge fixed by
-`ea29b678`.
-
-- [ ] **Step 2: Implement**
-
-`sendComplete()` emits `step: "complete"`, **no** `status`, and no legacy `classes` — there is no legacy class for a
-step that never existed in the legacy protocol, and inventing one would put a selector on the wire that no client
-matches. `type` is `'success'`: the frame reports that the run finished, not that it passed.
-
-- [ ] **Step 3: Verify, prove it can fail, commit**
-
-Delete one `sendComplete()` call, confirm the corresponding arm's test fails naming that arm, restore. Record the
-output.
-
-```bash
-cd /home/johnrdorazio/development/LiturgicalCalendar/LiturgicalCalendarAPI-frames
-vendor/bin/phpunit phpunit_tests/Health*.php
-composer lint && composer analyse
-git add src/Health.php phpunit_tests/HealthFrameProjectionTest.php
-git commit -m "feat(health): emit a terminal frame on every path that starts work
-
-Both clients hardcode three responses per check in four places, and section A's
-published steps could not replace the constant because the count is not
-reliable: a file whose JSON fails to decode emits two frames, not three (#821).
-
-A client now stops on complete instead of counting, which makes #821 moot
-rather than fixed -- the short path still emits fewer step frames, but nothing
-waits for the difference.
-
-Emitted on the failure arms too. An arm that terminates without one wedges a
-client forever, which is the same shape as the folder-branch wedge fixed in
-ea29b678.
-
-Refs #806, #821
-
-Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
-```
-
----
-
-## Task 5: Correlation
+## Task 4: Correlation
 
 **Files:** Modify `src/Health.php`; create `phpunit_tests/HealthCorrelationTest.php`
 
@@ -476,6 +417,82 @@ scopes a run, not a request.
 runId is published alongside runToken so the client migrates once.
 
 Refs #806
+
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
+```
+
+---
+
+## Task 5: The terminal frame
+
+**Files:** Modify `src/Health.php`; extend `phpunit_tests/HealthFrameProjectionTest.php`
+
+**Interfaces:** Produces `sendComplete()`. Consumes `requestId` from Task 4.
+
+### The frame is gated on `requestId`
+
+**Emit `complete` only when the request carried a `requestId`.** This is the one place the additive envelope is not
+enough, and the reason is worth stating because the frame looks harmless.
+
+A new frame changes the *stream*, not just a frame's contents. A v1 client survives the unknown shape —
+`testResults.js` never throws and warns on a missing `classes` — but `resources.js` computes
+`expectedResponses = checks * 3` and compares with `>=`. So it reaches its threshold on the three real frames,
+advances to the next phase, and then the late `complete` frames increment whichever counter is now active, finishing
+the *following* phase early too. A cascading miscount with nothing failing visibly, which is worse than a crash.
+
+`requestId` is already the v2 opt-in signal, and a client adopting `complete` is a client adopting correlation — they
+migrate together. So the gate costs nothing and keeps the byte-identity guarantee intact.
+
+The **fields** stay additive and always-on, exactly as designed. Only the new frame gates.
+
+- [ ] **Step 1: Write the failing tests**
+
+Assert `complete` on **every** path that starts work, and assert it **absent** after a rejection:
+
+```text
+happy path        exists(pass) → parses(pass) → validates(pass) → complete
+JSON decode fails exists(pass) → parses(fail) → complete
+file missing      exists(fail) → complete
+test run          validates(pass|fail) → complete
+unknown target    echobot rejection only — no complete, nothing was started
+no requestId      no complete at all — a v1 client must not receive it (see above)
+```
+
+The failure arms are the point. A client stops on `complete`, so an arm that terminates without one wedges it
+forever — which is the bug this frame exists to prevent, in the same shape as the folder-branch wedge fixed by
+`ea29b678`.
+
+- [ ] **Step 2: Implement**
+
+`sendComplete()` emits `step: "complete"`, **no** `status`, and no legacy `classes` — there is no legacy class for a
+step that never existed in the legacy protocol, and inventing one would put a selector on the wire that no client
+matches. `type` is `'success'`: the frame reports that the run finished, not that it passed.
+
+- [ ] **Step 3: Verify, prove it can fail, commit**
+
+Delete one `sendComplete()` call, confirm the corresponding arm's test fails naming that arm, restore. Record the
+output.
+
+```bash
+cd /home/johnrdorazio/development/LiturgicalCalendar/LiturgicalCalendarAPI-frames
+vendor/bin/phpunit phpunit_tests/Health*.php
+composer lint && composer analyse
+git add src/Health.php phpunit_tests/HealthFrameProjectionTest.php
+git commit -m "feat(health): emit a terminal frame on every path that starts work
+
+Both clients hardcode three responses per check in four places, and section A's
+published steps could not replace the constant because the count is not
+reliable: a file whose JSON fails to decode emits two frames, not three (#821).
+
+A client now stops on complete instead of counting, which makes #821 moot
+rather than fixed -- the short path still emits fewer step frames, but nothing
+waits for the difference.
+
+Emitted on the failure arms too. An arm that terminates without one wedges a
+client forever, which is the same shape as the folder-branch wedge fixed in
+ea29b678.
+
+Refs #806, #821
 
 Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>"
 ```
