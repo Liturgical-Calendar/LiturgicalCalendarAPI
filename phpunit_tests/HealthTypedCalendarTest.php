@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests;
 
+use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
@@ -213,8 +214,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
-        self::assertSame('Invalid message properties', $frame->errorMsg);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame([], self::queuedPaths($health), 'an invalid message must not have queued a request');
     }
 
@@ -247,7 +248,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::RETIRED_PROPERTY->value, $frame->errorCode);
         self::assertSame('category is not part of a validateCalendar message with an object calendar: calendar.kind replaces it.', $frame->text);
         self::assertSame([], self::queuedPaths($health));
     }
@@ -277,8 +279,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
-        self::assertSame('Invalid message properties', $frame->errorMsg);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame([], self::queuedPaths($health));
     }
 
@@ -358,7 +360,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent, 'an unusable identity is answered once and not computed');
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type, 'rejections reuse the echobot shape: since UnitTestInterface#46 an unknown type is painted as a failed check');
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame('Unknown calendar kind: widerregion', $frame->text);
         self::assertSame([], self::queuedPaths($health));
     }
@@ -410,7 +413,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent, 'a contradicted rite is answered once and not computed');
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertStringContainsString('calendar.rite says', (string) $frame->text);
         self::assertSame([], self::queuedPaths($health), 'a rejected message must not have queued a request');
     }
@@ -509,7 +513,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame($expected, $frame->text);
         self::assertSame([], self::queuedPaths($health));
     }
@@ -535,7 +540,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame('validateCalendar responseFormat must be one of: JSON, XML, ICS, YML.', $frame->text);
         self::assertSame([], self::queuedPaths($health));
     }
@@ -554,7 +560,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame('validateCalendar year must be an integer.', $frame->text);
         self::assertSame([], self::queuedPaths($health));
     }
@@ -672,7 +679,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent, 'an unusable identity is answered once and no test is run');
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type, 'rejections reuse the echobot shape: since UnitTestInterface#46 an unknown type is painted as a failed check');
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame($expected, $frame->text);
         self::assertSame([], self::queuedPaths($health), 'a rejected message must not have queued a request');
     }
@@ -699,7 +707,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame('runTest calendar must be an object carrying kind, id and rite.', $frame->text);
         self::assertSame([], self::queuedPaths($health));
     }
@@ -747,7 +756,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame($expected, $frame->text);
         self::assertSame([], self::queuedPaths($health));
     }
@@ -781,8 +791,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
-        self::assertSame('Invalid message properties', $frame->errorMsg);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame([], self::queuedPaths($health));
     }
 
@@ -834,8 +844,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
-        self::assertSame('Invalid message properties', $frame->errorMsg);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame([], self::queuedPaths($health));
     }
 
@@ -876,7 +886,7 @@ final class HealthTypedCalendarTest extends TestCase
         self::assertNotEmpty($sourceConn->sent, 'the test definition was not checked at all');
         foreach ($sourceConn->sent as $raw) {
             $frame = json_decode($raw);
-            self::assertNotSame('echobot', $frame->type, "the definition check was refused: {$frame->text}");
+            self::assertNotSame('protocolError', $frame->type, "the definition check was refused: {$frame->text}");
             // Addressed by the fragment derived from the id, not by the item's label — which for
             // this item is `Liturgical test: StIgnatiusOfLoyolaTest`, prose whose `: ` would make
             // the client's querySelectorAll() throw. See Health::cssClassFragmentForId().
@@ -911,7 +921,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $crossConn->sent);
         $frame = json_decode($crossConn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::UNKNOWN_TARGET_ID->value, $frame->errorCode);
         self::assertSame('Unknown validation target: StIgnatiusOfLoyolaTest', $frame->text, 'the bare test name is a runTest address, not an inventory id');
     }
 
@@ -947,7 +958,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::RETIRED_PROPERTY->value, $frame->errorCode);
         self::assertSame(
             'responsetype is not part of a validateCalendar message with an object calendar: responseFormat replaces it.',
             $frame->text
@@ -979,7 +991,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::RETIRED_PROPERTY->value, $frame->errorCode);
         self::assertSame('category is not part of a runTest message: calendar.kind replaces it.', $frame->text);
         self::assertSame([], self::queuedPaths($health), 'a rejected message must not have queued a request');
     }
@@ -1045,7 +1058,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent, 'a half-migrated message is answered once and not dispatched');
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::RETIRED_PROPERTY->value, $frame->errorCode);
         self::assertSame($expectedText, $frame->text);
         self::assertSame([], self::queuedPaths($health), 'a rejected message must not have queued a request');
     }

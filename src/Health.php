@@ -18,6 +18,7 @@ use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Enum\FrameFamily;
 use LiturgicalCalendar\Api\Enum\ICSErrorLevel;
 use LiturgicalCalendar\Api\Enum\LitSchema;
+use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\Rite;
@@ -600,7 +601,7 @@ class Health implements MessageComponentInterface
                 // Refused rather than quietly dropped. A client that sent an unusable id is about
                 // to wait for frames it intends to attribute by it; answering with frames that
                 // carry no id at all would look like success and correlate nothing.
-                $this->rejectMessage($from, 'requestId must be 1 to 64 characters of A-Z, a-z, 0-9, underscore or hyphen.');
+                $this->rejectMessage($from, ProtocolErrorCode::INVALID_REQUEST_ID, 'requestId must be 1 to 64 characters of A-Z, a-z, 0-9, underscore or hyphen.');
                 return;
             }
             $requestId = $candidateRequestId;
@@ -661,29 +662,32 @@ class Health implements MessageComponentInterface
                     $this->validateSource($messageReceived, $from, requestId: $requestId);
                     break;
                 default:
-                    $message       = new \stdClass();
-                    $message->type = 'echobot';
-                    $message->text = $msg;
-                    $this->sendMessage($from, $message, requestId: $requestId);
+                    $this->rejectMessage($from, ProtocolErrorCode::UNKNOWN_ACTION, $msg, requestId: $requestId);
             }
         } else {
             if (json_last_error() !== JSON_ERROR_NONE) {
-                $errorMsg = json_last_error_msg();
+                $errorMsg  = json_last_error_msg();
+                $errorCode = ProtocolErrorCode::INVALID_JSON;
             } elseif (!$messageReceived instanceof \stdClass) {
-                $errorMsg = 'Message is not an object';
+                $errorMsg  = 'Message is not an object';
+                $errorCode = ProtocolErrorCode::NOT_AN_OBJECT;
             } elseif (!property_exists($messageReceived, 'action')) {
-                $errorMsg = 'No action specified';
+                $errorMsg  = 'No action specified';
+                $errorCode = ProtocolErrorCode::MISSING_ACTION;
             } elseif (!self::validateMessageProperties($messageReceived)) {
-                $errorMsg = 'Invalid message properties';
+                $errorMsg  = 'Invalid message properties';
+                $errorCode = ProtocolErrorCode::INVALID_MESSAGE;
             } else {
-                $errorMsg = 'Unknown error';
+                $errorMsg  = 'Unknown error';
+                $errorCode = ProtocolErrorCode::INVALID_MESSAGE;
             }
             echo sprintf('Invalid message from connection %1$d: %2$s (%3$s)', $resourceId, $errorMsg, $msg);
-            $message           = new \stdClass();
-            $message->type     = 'echobot';
-            $message->errorMsg = $errorMsg;
-            $message->text     = sprintf('Invalid message from connection %d: %s', $resourceId, $msg);
-            $this->sendMessage($from, $message, requestId: $requestId);
+            $this->rejectMessage(
+                $from,
+                $errorCode,
+                sprintf('Invalid message from connection %d: %s', $resourceId, $msg),
+                requestId: $requestId
+            );
         }
     }
 
@@ -899,24 +903,23 @@ class Health implements MessageComponentInterface
     }
 
     /**
-     * Reject a malformed or unresolvable v2 message.
+     * Reject a message that cannot be acted on, saying why in a form a client can branch on.
      *
-     * Reuses the existing `echobot` error shape deliberately. Since UnitTestInterface PR #46 an
-     * unrecognised response `type` is painted as a visible failed check, so a dedicated
-     * `protocolError` type would make every rejection look like a failing test. That type belongs
-     * to #806 section G and is gated on section C.
+     * Ungated, unlike the terminal `complete` frame, and the difference is real rather than an
+     * inconsistency: a new frame changes the stream a v1 client counts, while a new *type* on a
+     * frame it was already going to receive changes nothing for it. Since UnitTestInterface#46 an
+     * unrecognised type is painted as a visible failed check — which is what `echobot` already
+     * became — so `protocolError` reads to a v1 client exactly as its predecessor did.
      *
-     * @param ConnectionInterface $to The connection that sent the message being rejected.
-     * @param string $text Why the message could not be acted on.
-     * @param ?string $requestId The correlation id of the message being rejected, so a client can tell *which* of its
-     *        in-flight requests was refused. Null when the message carried none, and — see {@see Health::onMessage()} —
-     *        when the id itself is what was malformed, since an unusable id is not worth echoing.
+     * `text` carries the prose, as every other frame in this protocol does. #806's sketch spells it
+     * `message`; a second name for an existing field is the duplication that issue exists to remove.
      */
-    private function rejectMessage(ConnectionInterface $to, string $text, ?string $requestId = null): void
+    private function rejectMessage(ConnectionInterface $to, ProtocolErrorCode $code, string $text, ?string $requestId = null): void
     {
-        $message       = new \stdClass();
-        $message->type = 'echobot';
-        $message->text = $text;
+        $message            = new \stdClass();
+        $message->type      = 'protocolError';
+        $message->errorCode = $code->value;
+        $message->text      = $text;
         $this->sendMessage($to, $message, requestId: $requestId);
     }
 
@@ -1029,13 +1032,13 @@ class Health implements MessageComponentInterface
         // cannot establish is its shape, since ACTION_PROPERTIES only names required properties.
         $target = property_exists($message, 'target') ? $message->target : null;
         if (false === ( $target instanceof \stdClass ) || false === property_exists($target, 'id')) {
-            $this->rejectMessage($to, 'validateSource requires a target object with an id.', requestId: $requestId);
+            $this->rejectMessage($to, ProtocolErrorCode::INVALID_MESSAGE, 'validateSource requires a target object with an id.', requestId: $requestId);
             return;
         }
 
         $id = $target->id;
         if (false === is_string($id)) {
-            $this->rejectMessage($to, 'validateSource target id must be a string.', requestId: $requestId);
+            $this->rejectMessage($to, ProtocolErrorCode::INVALID_MESSAGE, 'validateSource target id must be a string.', requestId: $requestId);
             return;
         }
 
@@ -1060,6 +1063,7 @@ class Health implements MessageComponentInterface
             // one — the #800 blindness in miniature.
             $this->rejectMessage(
                 $to,
+                ProtocolErrorCode::UNKNOWN_TARGET_ID,
                 null === $inventoryError
                     ? "Unknown validation target: {$id}"
                     : "Could not resolve validation target {$id}: the source data inventory could not be built ({$inventoryError->getMessage()})",
@@ -2171,7 +2175,7 @@ class Health implements MessageComponentInterface
         $shape = self::RETIRED_PROPERTIES[$action]['shape'];
         foreach (self::RETIRED_PROPERTIES[$action]['retired'] as $property => $replacement) {
             if (property_exists($message, $property)) {
-                $this->rejectMessage($to, sprintf('%s is not part of a %s: %s', $property, $shape, $replacement), requestId: $requestId);
+                $this->rejectMessage($to, ProtocolErrorCode::RETIRED_PROPERTY, sprintf('%s is not part of a %s: %s', $property, $shape, $replacement), requestId: $requestId);
                 return true;
             }
         }
@@ -2298,13 +2302,13 @@ class Health implements MessageComponentInterface
             $identity = $this->readCalendarIdentity($message, 'validateCalendar');
             $year     = self::readYear($message, 'validateCalendar');
         } catch (\InvalidArgumentException $e) {
-            $this->rejectMessage($to, $e->getMessage(), requestId: $requestId);
+            $this->rejectMessage($to, ProtocolErrorCode::INVALID_MESSAGE, $e->getMessage(), requestId: $requestId);
             return;
         }
 
         $responseFormat = property_exists($message, 'responseFormat') ? $message->responseFormat : null;
         if (false === is_string($responseFormat) || false === in_array($responseFormat, self::VALIDATABLE_RESPONSE_FORMATS, true)) {
-            $this->rejectMessage($to, 'validateCalendar responseFormat must be one of: ' . implode(', ', self::VALIDATABLE_RESPONSE_FORMATS) . '.', requestId: $requestId);
+            $this->rejectMessage($to, ProtocolErrorCode::INVALID_MESSAGE, 'validateCalendar responseFormat must be one of: ' . implode(', ', self::VALIDATABLE_RESPONSE_FORMATS) . '.', requestId: $requestId);
             return;
         }
 
@@ -2834,7 +2838,7 @@ class Health implements MessageComponentInterface
         // reach executeUnitTest(string $test, …) as a TypeError, which Ratchet does not catch.
         $test = property_exists($message, 'test') ? $message->test : null;
         if (false === is_string($test)) {
-            $this->rejectMessage($to, 'runTest test must be a string.', requestId: $requestId);
+            $this->rejectMessage($to, ProtocolErrorCode::INVALID_MESSAGE, 'runTest test must be a string.', requestId: $requestId);
             return;
         }
 
@@ -2842,7 +2846,7 @@ class Health implements MessageComponentInterface
             $identity = $this->readCalendarIdentity($message, 'runTest');
             $year     = self::readYear($message, 'runTest');
         } catch (\InvalidArgumentException $e) {
-            $this->rejectMessage($to, $e->getMessage(), requestId: $requestId);
+            $this->rejectMessage($to, ProtocolErrorCode::INVALID_MESSAGE, $e->getMessage(), requestId: $requestId);
             return;
         }
 

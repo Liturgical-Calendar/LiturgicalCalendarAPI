@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests;
 
+use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Router;
@@ -336,7 +337,8 @@ final class HealthTerminalFrameTest extends TestCase
 
         $frames = self::framesOf($conn);
         self::assertCount(1, $frames, 'an unresolvable target is answered by the rejection alone');
-        self::assertSame('echobot', $frames[0]->type);
+        self::assertSame('protocolError', $frames[0]->type);
+        self::assertSame(ProtocolErrorCode::UNKNOWN_TARGET_ID->value, $frames[0]->errorCode);
         self::assertNotContains('complete', self::stepsOf($frames), 'nothing was started, so nothing terminates');
     }
 

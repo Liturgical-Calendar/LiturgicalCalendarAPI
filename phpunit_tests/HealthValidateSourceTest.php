@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests;
 
 use LiturgicalCalendar\Api\Enum\JsonData;
+use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableItem;
@@ -296,7 +297,8 @@ final class HealthValidateSourceTest extends TestCase
 
         self::assertCount(1, $conn->sent, 'an unresolvable target is answered once and not checked');
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type, 'rejections reuse the echobot shape: since UnitTestInterface#46 an unknown type is painted as a failed check');
+        self::assertSame('protocolError', $frame->type, 'rejections are a typed protocolError: since UnitTestInterface#46 an unrecognised type is painted as a failed check');
+        self::assertSame(ProtocolErrorCode::UNKNOWN_TARGET_ID->value, $frame->errorCode);
         self::assertSame('Unknown validation target: nation:roman:ZZ', $frame->text);
     }
 
@@ -309,7 +311,8 @@ final class HealthValidateSourceTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame('validateSource requires a target object with an id.', $frame->text);
     }
 
@@ -322,7 +325,8 @@ final class HealthValidateSourceTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame('validateSource target id must be a string.', $frame->text);
     }
 
@@ -339,8 +343,8 @@ final class HealthValidateSourceTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
-        self::assertSame('Invalid message properties', $frame->errorMsg);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
     }
 
     // ---------------------------------------------------------------- retired properties
@@ -384,7 +388,8 @@ final class HealthValidateSourceTest extends TestCase
 
         self::assertCount(1, $conn->sent, 'a half-migrated message is answered once and not checked');
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::RETIRED_PROPERTY->value, $frame->errorCode);
         self::assertSame(
             "{$property} is not part of a validateSource message: target.id replaces it.",
             $frame->text,
@@ -420,7 +425,7 @@ final class HealthValidateSourceTest extends TestCase
         $frames = [];
         foreach ($conn->sent as $raw) {
             $frame = json_decode($raw);
-            self::assertNotSame('echobot', $frame->type, "the legacy slug shape was refused: {$frame->text}");
+            self::assertNotSame('protocolError', $frame->type, "the legacy slug shape was refused: {$frame->text}");
             $frames[] = $frame;
         }
 
@@ -451,7 +456,7 @@ final class HealthValidateSourceTest extends TestCase
         self::assertNotEmpty($conn->sent, 'a runToken was mistaken for a retired property');
         foreach ($conn->sent as $raw) {
             $frame = json_decode($raw);
-            self::assertNotSame('echobot', $frame->type, "the message was refused: {$frame->text}");
+            self::assertNotSame('protocolError', $frame->type, "the message was refused: {$frame->text}");
             self::assertSame('run-a', $frame->runToken, 'the answers must carry the token the client correlates them by');
         }
     }
@@ -626,7 +631,8 @@ final class HealthValidateSourceTest extends TestCase
 
             self::assertCount(1, $enumeratedTarget->sent, 'a target that genuinely cannot be resolved must be answered once, not checked');
             $frame = json_decode($enumeratedTarget->sent[0]);
-            self::assertSame('echobot', $frame->type);
+            self::assertSame('protocolError', $frame->type);
+            self::assertSame(ProtocolErrorCode::UNKNOWN_TARGET_ID->value, $frame->errorCode);
             // The message says the index could not be built, not that the id is unknown:
             // nation:roman:IT is perfectly well known, and reporting a server-side failure as a
             // client-side one sends the reader hunting a bug that is not there.
@@ -714,11 +720,11 @@ final class HealthValidateSourceTest extends TestCase
 
             foreach ($conn->sent as $raw) {
                 $frame = json_decode($raw);
-                if ($frame instanceof \stdClass && 'echobot' === ( $frame->type ?? null )) {
-                    // `echobot` is the rejection shape: the server declined to check this at all.
-                    // An `error` frame is a different thing entirely and is fine here — it means the
-                    // target was addressed and checked, and the check reported something. This test
-                    // is about whether an id can be sent, not about whether its data is valid.
+                if ($frame instanceof \stdClass && 'protocolError' === ( $frame->type ?? null )) {
+                    // `protocolError` is the rejection shape: the server declined to check this at
+                    // all. An `error` frame is a different thing entirely and is fine here — it means
+                    // the target was addressed and checked, and the check reported something. This
+                    // test is about whether an id can be sent, not about whether its data is valid.
                     $unaddressable[$item->id] = (string) ( $frame->text ?? '' );
                     continue;
                 }

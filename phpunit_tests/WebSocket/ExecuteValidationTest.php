@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\WebSocket;
 
+use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -135,21 +136,20 @@ final class ExecuteValidationTest extends TestCase
         $this->assertStringContainsString('decoded as JSON', $frames[1]->text);
     }
 
-    public function testMissingSourceFileReturnsEchobotValidationError(): void
+    public function testMissingSourceFileReturnsProtocolErrorValidationError(): void
     {
         // executeValidation requires `sourceFile` (or `sourceFolder`).
         // Omitting both should be rejected by validateMessageProperties()
         // before the action dispatches, so the reply is the standard
-        // "echobot"-typed validation-error envelope rather than a
-        // sequence of per-phase frames.
+        // typed `protocolError` envelope rather than a sequence of
+        // per-phase frames.
         $frames = $this->executeValidation([
             'action'   => 'executeValidation',
             'category' => 'resourceDataCheck',
             'validate' => 'metadata',
         ], 1);
 
-        $this->assertSame('echobot', $frames[0]->type);
-        $this->assertObjectHasProperty('errorMsg', $frames[0]);
-        $this->assertNotEmpty($frames[0]->errorMsg);
+        $this->assertSame('protocolError', $frames[0]->type);
+        $this->assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frames[0]->errorCode);
     }
 }

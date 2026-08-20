@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests;
 
+use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Router;
@@ -114,7 +115,7 @@ final class HealthCorrelationTest extends TestCase
         $frames = self::framesOf($conn);
         self::assertCount(4, $frames, 'a source check answers with one frame per published step, and then terminates');
         foreach ($frames as $frame) {
-            self::assertNotSame('echobot', $frame->type, "the message was refused: {$frame->text}");
+            self::assertNotSame('protocolError', $frame->type, "the message was refused: {$frame->text}");
             self::assertSame('req-alpha', $frame->requestId, 'every frame must name the request that caused it');
         }
         self::assertSame('complete', $frames[3]->step, 'the terminal frame carries the id too: it is the frame a client stops on');
@@ -168,7 +169,8 @@ final class HealthCorrelationTest extends TestCase
 
         $frames = self::framesOf($conn);
         self::assertCount(1, $frames, 'a malformed requestId is answered once and nothing is checked');
-        self::assertSame('echobot', $frames[0]->type, 'rejections reuse the echobot shape: since UnitTestInterface#46 an unknown type is painted as a failed check');
+        self::assertSame('protocolError', $frames[0]->type, 'rejections are a typed protocolError: since UnitTestInterface#46 an unrecognised type is painted as a failed check');
+        self::assertSame(ProtocolErrorCode::INVALID_REQUEST_ID->value, $frames[0]->errorCode);
         self::assertStringContainsString('requestId', (string) $frames[0]->text);
         self::assertObjectNotHasProperty('requestId', $frames[0], 'the id that could not be validated is not echoed back');
     }
@@ -219,7 +221,7 @@ final class HealthCorrelationTest extends TestCase
         ]);
 
         $frames = self::framesOf($conn);
-        self::assertNotSame('echobot', $frames[0]->type, "a well-formed requestId was refused: {$frames[0]->text}");
+        self::assertNotSame('protocolError', $frames[0]->type, "a well-formed requestId was refused: {$frames[0]->text}");
         self::assertCount(4, $frames, 'three step frames and the terminal one');
         self::assertSame($requestId, $frames[0]->requestId);
     }
@@ -257,7 +259,8 @@ final class HealthCorrelationTest extends TestCase
 
         $frames = self::framesOf($conn);
         self::assertCount(1, $frames);
-        self::assertSame('echobot', $frames[0]->type);
+        self::assertSame('protocolError', $frames[0]->type);
+        self::assertSame(ProtocolErrorCode::UNKNOWN_TARGET_ID->value, $frames[0]->errorCode);
         self::assertSame('Unknown validation target: nation:roman:ZZ', $frames[0]->text);
         self::assertSame('req-alpha', $frames[0]->requestId);
     }
@@ -604,7 +607,7 @@ final class HealthCorrelationTest extends TestCase
         $frames = self::framesOf($conn);
         self::assertCount(4, $frames, 'a folder check answers with exactly one frame per step, and then terminates');
         foreach ($frames as $frame) {
-            self::assertNotSame('echobot', $frame->type, "the message was refused: {$frame->text}");
+            self::assertNotSame('protocolError', $frame->type, "the message was refused: {$frame->text}");
             self::assertSame('req-alpha', $frame->requestId);
         }
         foreach (array_slice($frames, 0, 3) as $frame) {
@@ -636,11 +639,12 @@ final class HealthCorrelationTest extends TestCase
         $frames = self::framesOf($conn);
         self::assertCount(2, $frames);
 
-        self::assertSame('echobot', $frames[0]->type);
-        self::assertSame('Invalid message properties', $frames[0]->errorMsg);
+        self::assertSame('protocolError', $frames[0]->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frames[0]->errorCode);
         self::assertSame('req-alpha', $frames[0]->requestId, 'a refusal must name the request it refuses');
 
-        self::assertSame('echobot', $frames[1]->type);
+        self::assertSame('protocolError', $frames[1]->type);
+        self::assertSame(ProtocolErrorCode::INVALID_JSON->value, $frames[1]->errorCode);
         self::assertObjectNotHasProperty('requestId', $frames[1], 'nothing may be invented for a message that could not be read');
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests;
 
+use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -183,8 +184,8 @@ final class HealthCancelRunTest extends TestCase
 
         self::assertCount(1, $conn->sent, 'a malformed cancel is a protocol error, and those are visible');
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
-        self::assertSame('Invalid message properties', $frame->errorMsg);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
     }
 
     /**
@@ -212,7 +213,7 @@ final class HealthCancelRunTest extends TestCase
 
         self::assertCount(1, $conn->sent, 'confirms the message short-circuited on the protocol-error path, not real work');
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('Invalid message properties', $frame->errorMsg, 'confirms it never reached the validateCalendar dispatch');
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode, 'confirms it never reached the validateCalendar dispatch');
     }
 
     /**

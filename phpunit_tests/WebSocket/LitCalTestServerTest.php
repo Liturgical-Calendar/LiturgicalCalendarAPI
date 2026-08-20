@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\WebSocket;
 
+use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -18,7 +19,7 @@ use PHPUnit\Framework\TestCase;
  * is set.
  *
  * Scope: validates the request/response shape for non-async actions
- * (echobot, JSON-validation errors, missing-action errors). The async
+ * (protocolError rejections, JSON-validation errors, missing-action errors). The async
  * actions (executeUnitTest, executeValidation, validateCalendar) involve
  * an internal HTTP call back into the API server + event-loop scheduling
  * and need a more sophisticated client (see the UnitTestInterface repo's
@@ -56,9 +57,10 @@ final class LitCalTestServerTest extends TestCase
     {
         $client = WsTestClient::connect($this->wsHost, $this->wsPort);
 
-        // The handler echoes any well-formed JSON with an unknown action back
-        // as `{"type":"echobot","text":<original>}`. That's enough to exercise
-        // onMessage's happy-path JSON decode + the default switch arm.
+        // The handler answers any well-formed JSON with an unknown action back
+        // as `{"type":"protocolError","errorCode":"unknown_action","text":<original>}`.
+        // That's enough to exercise onMessage's happy-path JSON decode + the
+        // default switch arm.
         $payload = json_encode(['action' => 'this-is-not-a-real-action', 'foo' => 'bar']);
         $this->assertNotFalse($payload);
 
@@ -68,7 +70,8 @@ final class LitCalTestServerTest extends TestCase
         $decoded = json_decode($reply);
         $this->assertIsObject($decoded, 'WS reply should decode as JSON object; got: ' . $reply);
         $this->assertObjectHasProperty('type', $decoded);
-        $this->assertSame('echobot', $decoded->type);
+        $this->assertSame('protocolError', $decoded->type);
+        $this->assertSame(ProtocolErrorCode::UNKNOWN_ACTION->value, $decoded->errorCode);
         $this->assertObjectHasProperty('text', $decoded);
         $this->assertSame($payload, $decoded->text);
 
@@ -78,18 +81,18 @@ final class LitCalTestServerTest extends TestCase
     public function testMalformedJsonGetsValidationError(): void
     {
         // Exercises the else branch of onMessage where the JSON decode fails —
-        // server replies with an echobot frame carrying an errorMsg.
+        // server replies with a protocolError frame carrying errorCode invalid_json.
         $client = WsTestClient::connect($this->wsHost, $this->wsPort);
         $client->sendText('definitely not json');
         $reply = $client->receiveText();
 
         $decoded = json_decode($reply);
         $this->assertIsObject($decoded);
-        $this->assertSame('echobot', $decoded->type);
-        $this->assertObjectHasProperty('errorMsg', $decoded);
-        // json_last_error_msg() phrasing isn't guaranteed across PHP versions,
-        // but it'll always be non-empty.
-        $this->assertNotEmpty($decoded->errorMsg);
+        $this->assertSame('protocolError', $decoded->type);
+        $this->assertSame(ProtocolErrorCode::INVALID_JSON->value, $decoded->errorCode);
+        // The text embeds json_last_error_msg(), whose phrasing isn't guaranteed
+        // across PHP versions, but it'll always be non-empty.
+        $this->assertNotEmpty($decoded->text);
 
         $client->close();
     }
@@ -102,8 +105,8 @@ final class LitCalTestServerTest extends TestCase
 
         $decoded = json_decode($reply);
         $this->assertIsObject($decoded);
-        $this->assertSame('echobot', $decoded->type);
-        $this->assertSame('No action specified', $decoded->errorMsg);
+        $this->assertSame('protocolError', $decoded->type);
+        $this->assertSame(ProtocolErrorCode::MISSING_ACTION->value, $decoded->errorCode);
 
         $client->close();
     }
