@@ -119,10 +119,23 @@ never names an id, and the pre-existing diocese-metadata-lookup error (an early 
 all, only its own error frame, before still calling `sendComplete()` with `target: null`). Neither invents an id it
 does not have; both are what "as above, per kind" means when the kind never had one.
 
-There are **three** step-emitting kinds, not two. Counted against `src/Health.php` at `746a3bfd`, the 27 sites that
-assign `classes` fall into four clusters: eleven for source checks (`.{slug}.{file-exists|json-valid|schema-valid}`,
-plus one `.diocese-metadata`), **sixteen for calendar validation** (`.calendar-{id}.{step}.year-{year}` — the largest
-cluster by some way), and two for test runs. Rejections assign none.
+There are **three** step-emitting kinds, not two. The size of the problem is stated here as a **counting rule**
+rather than a bare number, because a bare number has now been wrong three times on this work: count *every statement
+that assigns a frame's `classes`*, which anyone can re-run —
+
+```bash
+git show 746a3bfd:src/Health.php | grep -cE '^\s*\$[A-Za-z]+->classes\s*='
+```
+
+That is **32** at `746a3bfd`: 31 at frame-building sites, plus one inside the shared `sendFolderStepResult()`
+helper, which composes a frame on behalf of four call sites of its own and is the partial precedent for the whole
+approach.
+
+The 31 fall into four clusters: **nine** for source checks (`.{slug}.{file-exists|json-valid|schema-valid}`), **one**
+for the diocese-metadata lookup error (`.{slug}.diocese-metadata`), **nineteen for calendar validation**
+(`.calendar-{id}.{step}.year-{year}` — the largest cluster by some way, and half the total on its own), and **two**
+for test runs. Rejections assign none. The same rule run against the branch head returns **2**: the projection inside
+`sendStepResult()`, and the diocese-metadata error frame, which is not a step frame and keeps its own line.
 
 A calendar validation is a three-step pipeline exactly as a source check is; only the target and the fragment differ.
 So one `sendStepResult()` serves both, taking the fragment and target descriptor from its caller.
@@ -181,9 +194,9 @@ removal, when `text` stops being a contract and `details` can be escaped, or not
 
 ## Emitters, and the legacy projection
 
-Frame construction spread across 27 sites collapses onto **one primitive**, `sendStepResult()`, plus a handful of
-per-cluster wrappers that narrow it, plus one emitter, `sendComplete()`, that deliberately does not go through the
-primitive at all:
+Frame construction — the 32 `classes` assignments counted above, in four clusters — collapses onto **one primitive**,
+`sendStepResult()`, plus a handful of per-cluster wrappers that narrow it, plus one emitter, `sendComplete()`, that
+deliberately does not go through the primitive at all:
 
 ```php
 private function sendStepResult(
