@@ -29,9 +29,20 @@
         "executeValidation": {
             "type": "object",
             "required": ["action", "category", "validate"],
-            "oneOf": [
-                { "required": ["sourceFile"] },
-                { "required": ["sourceFolder"] }
+            "anyOf": [
+                {
+                    "description": "`sourceFolder` is read only inside the `category === 'sourceDataCheck'` branch of Health::executeValidation(). Every other category falls into the branch that requires `sourceFile` and throws when only `sourceFolder` is present, and that exception closes the WebSocket connection instead of returning a result (see UnitTestInterface's assets/js/wsProtocol.js). anyOf (not oneOf) is deliberate: a sourceDataCheck message carrying both sourceFile and sourceFolder matches two arms below, and today sourceFolder simply wins that race rather than being refused, so oneOf would tighten behaviour the server does not enforce.",
+                    "properties": { "category": { "const": "sourceDataCheck" } },
+                    "required": ["sourceFolder"]
+                },
+                {
+                    "properties": { "category": { "enum": ["universalcalendar", "sourceDataCheck"] } },
+                    "required": ["sourceFile"]
+                },
+                {
+                    "properties": { "category": { "const": "resourceDataCheck" } },
+                    "required": ["sourceFile"]
+                }
             ],
             "properties": {
                 "action": { "const": "executeValidation" },

@@ -220,6 +220,8 @@ final class WebSocketMessageSchemaTest extends TestCase
             'executeValidation category as an object' => [['action' => 'executeValidation', 'category' => ['k' => 'v'], 'validate' => 'x', 'sourceFile' => 'jsondata/x.json']],
             'misspelled category'                     => [['action' => 'executeValidation', 'category' => 'sourceDataChek', 'validate' => 'x', 'sourceFile' => 'jsondata/x.json']],
             'neither sourceFile nor sourceFolder'     => [['action' => 'executeValidation', 'category' => 'sourceDataCheck', 'validate' => 'x']],
+            'sourceFolder under universalcalendar'    => [['action' => 'executeValidation', 'category' => 'universalcalendar', 'validate' => 'x', 'sourceFolder' => 'jsondata/i18n']],
+            'sourceFolder under resourceDataCheck'    => [['action' => 'executeValidation', 'category' => 'resourceDataCheck', 'validate' => 'x', 'sourceFolder' => 'jsondata/i18n']],
         ];
     }
 
