@@ -41,9 +41,9 @@ Per-calendar items were originally out of scope; the scoping was revisited in th
 the id the only address a client ever needs requires the inventory to cover everything addressable, not just the
 statically-listed half.
 
-### Why only static files
+### The three kinds, and which of them are covered
 
-The runners check three different kinds of thing, and only one of them is the problem:
+The runners check three different kinds of thing, and they are not all covered here:
 
 1. **Static source files and folders** — missal propriums for both rites, decrees, and their `i18n` directories. These
    are hardcoded in the clients *as filesystem paths*.
@@ -52,8 +52,12 @@ The runners check three different kinds of thing, and only one of them is the pr
 3. **The API's own endpoints** — `/calendars`, `/decrees`, `/tests`, `/events`, `/easter`, `/schemas`, `/missals`. The
    client builds these from its `ENDPOINTS` map. No path is embedded.
 
-Only kind 1 caused #737/#38, #795 and #800. Advertising kinds 2 and 3 would add surface without removing duplication,
-so this endpoint covers kind 1 only.
+Only kind 1 caused #737/#38, #795 and #800, which is why the endpoint began with kind 1 alone. Kind 2 was added in the
+section B design, for the reason the paragraph above the taxonomy gives: an id that is the only address a client ever
+needs has to cover everything addressable. So this endpoint covers kinds 1 and 2.
+
+Kind 3 stays out. The client builds those paths from its `ENDPOINTS` map rather than embedding them, so advertising them
+would add surface without removing any duplication — which was the original argument, and it still holds for kind 3.
 
 ## Who consumes it, and how they differ
 
