@@ -19,6 +19,9 @@ authority to go stale silently.
 
 ## Problem
 
+As of `746a3bfd` — the same anchor as the site count below — before this document's own sections shipped; every
+caveat here is superseded by the rest of the document.
+
 A response today carries three fields the client can use: `type` (`success` | `error` | `echobot`), `text`, and
 `classes` — a CSS selector the server builds, like `.national-calendar-it.json-valid`.
 
@@ -196,9 +199,10 @@ private function sendComplete(
 
 `sendCalendarStepResult()`, `sendSchemaFailureStepResult()`, `sendFolderStepResult()` and `sendTestResult()` are thin
 wrappers over `sendStepResult()`: each supplies the `$classFragment`, `$target` and `$family` its own cluster needs
-and forwards everything else. `sendTestResult()`, for instance, passes `family: FrameFamily::TEST_RUN` and nothing
-else distinguishes a test run's call to the primitive from a calendar validation's. `$target` is built by a small
-shared helper rather than assembled ad hoc at each call site:
+and forwards everything else. `sendTestResult()`, for instance, is `sendStepResult()` called with
+`family: FrameFamily::TEST_RUN` — the one argument that routes a test run's frame through a different legacy
+grammar, on top of the identity and outcome data every wrapper necessarily supplies on its own terms. `$target` is
+built by a small shared helper rather than assembled ad hoc at each call site:
 
 ```php
 private static function frameTarget(string $id, array $extra = []): \stdClass
@@ -329,20 +333,31 @@ upper bound and stops mattering for phase completion.
 The guarantee above is "every path that starts work terminates." It has one hole, and it is honest to state it next
 to the guarantee rather than let a reader discover it independently.
 
-`sendComplete()` is always the last statement of a promise's `onFulfilled` handler — at four sites: the URL-check
-fulfil, the filesystem-check fulfil, `validateCalendar()`'s fulfil, and `executeUnitTest()`'s fulfil. If anything
-*above* that last statement throws, `sendComplete()` never runs, and the request goes silent after whatever step
-frames it had already managed to emit. This is not a case the code declines to handle — it is a case the code cannot
-reach: React's promise implementation does not invoke the sibling `onRejected` when `onFulfilled` throws; the
-rejection propagates to the *next* promise in the chain, and there is no next promise here. A v2 client that stops on
-`complete`, exactly as this design tells it to, wedges on this path — the precise failure the terminal frame exists
-to prevent.
+**The identifying shape:** `sendComplete()` is the last statement of a promise's `onFulfilled` handler, paired with
+a sibling `onRejected` that never runs to cover it. If anything *above* that last statement throws, `sendComplete()`
+never runs, and the request goes silent after whatever step frames it had already managed to emit. This is not a
+case the code declines to handle — it is a case the code cannot reach: React's promise implementation does not
+invoke the sibling `onRejected` when `onFulfilled` throws; the rejection propagates to the *next* promise in the
+chain, and there is no next promise here. A v2 client that stops on `complete`, exactly as this design tells it to,
+wedges on this path — the precise failure the terminal frame exists to prevent. Stated as a shape rather than a
+fixed list on purpose: a future `then(fulfil, reject)` pair added to `Health` inherits this description
+automatically, where a hardcoded list would need remembering to update and would silently go stale otherwise.
+
+Checked against `src/Health.php` at `74c01d84`, the shape matches **five** sites today, all of them worth naming
+because "worth checking against the code" is exactly what an enumerated claim buys a reader — a hardcoded count
+this document once got wrong by one, so state it as an audit result, not received wisdom:
+
+- the i18n folder-check fulfil (line 1546, `runValidationSteps()`'s `Promise\all` branch)
+- the URL-check fulfil (line 1592, `runValidationSteps()`'s HTTP branch)
+- the filesystem-check fulfil (line 1615, `runValidationSteps()`'s file-read branch)
+- `validateCalendar()`'s fulfil (line 2724)
+- `executeUnitTest()`'s fulfil (line 2960)
 
 Exposure is narrow rather than nil, and pre-existing rather than introduced by this work: `validateDataAgainstSchema()`
 already catches `\Throwable` internally and is the principal throw source inside these handlers, and the `then(fulfil,
-reject)` pair with no tail handler is the shape these four call sites had before this design. A client that used to
+reject)` pair with no tail handler is the shape these five call sites had before this design. A client that used to
 count `checks * 3` wedged on the same paths for the same reason; making `complete` explicit did not create the gap,
-it just gave the gap a name. **Deliberately not fixed here** — wrapping four error paths is not a change to make
+it just gave the gap a name. **Deliberately not fixed here** — wrapping five error paths is not a change to make
 late in a branch whose own review is about the terminal frame's happy paths, not its exception plumbing. Filed as
 [#823](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/823).
 
@@ -355,7 +370,7 @@ late in a branch whose own review is about the terminal frame's happy paths, not
 | A step throws                      | Existing error frame, plus `status: "fail"`, then `complete`       |
 | Target never resolves (unknown id) | `echobot` rejection, no `complete` — no work was started           |
 
-"A step throws" assumes the throw is caught where the frame is composed. It is not, on the four fulfil-handler paths
+"A step throws" assumes the throw is caught where the frame is composed. It is not, on the five fulfil-handler paths
 described above (#823): there, a throw skips both the error frame and `complete`, rather than producing them.
 
 No new response `type` is introduced. Since UnitTestInterface PR #46 an unrecognised `type` is painted as a visible
