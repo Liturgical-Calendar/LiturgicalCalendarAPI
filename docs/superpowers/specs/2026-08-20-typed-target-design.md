@@ -4,6 +4,14 @@ Design for section B of [#806](https://github.com/Liturgical-Calendar/Liturgical
 ([#811](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/pull/811)) published the inventory; this makes it
 the address. Client counterpart: [UnitTestInterface#42](https://github.com/Liturgical-Calendar/UnitTestInterface/issues/42).
 
+**This document is the protocol reference** for the three v2 message shapes (`validateSource`, the typed-`calendar`
+form of `validateCalendar`, and `runTest`) until section F's `hello` handshake frame ships and supersedes it. The
+Health WebSocket protocol is not documented in `jsondata/schemas/openapi.json`: that file describes the HTTP API, the
+WebSocket endpoint is a separate transport with no path entry there, and a search of `jsondata/schemas/` and `docs/`
+for these action names turns up nothing outside this design and the `Health` class's own docblock. Read the two
+together — this file for the wire shapes and the reasoning behind each rule, the `Health` class docblock
+(`src/Health.php`) for the exact PHPStan `@phpstan-type` definitions and per-action implementation detail.
+
 ## Problem
 
 Three properties on the wire are each doing more than one job, and they overlap.
@@ -97,6 +105,61 @@ calendar later would not force a vocabulary change.
 Ids stay **opaque to clients**: they are echoed back, never parsed. The structure exists for the server and for humans
 reading logs.
 
+### The frame class fragment
+
+A `validateSource` check answers with one frame per step, and each frame carries a `classes` string of the form
+`.<fragment>.<step>` — the address the client matches a result card by. **The fragment is derived from the item's `id`,
+and the derivation is part of the protocol**: a client that holds an id must be able to compute the same string without
+asking the server, because that is how it finds the card to paint before any frame arrives.
+
+**The rule, in full:**
+
+> Take the item's `id` and replace every character outside `[A-Za-z0-9_-]` with a single `-`. Nothing else — no case
+> folding, no collapsing of runs of `-`, no trimming.
+
+In JavaScript that is `id.replace(/[^A-Za-z0-9_-]/g, '-')`; in PHP, `preg_replace('/[^A-Za-z0-9_-]/', '-', $id)`.
+
+**Fragment matching is case-insensitive on the client, and a client MUST put the card's class and the selector it
+matches with through the same case treatment.** The server does not case-fold, so the fragments it emits are mixed case
+across most of the inventory — `nation-roman-US`, `sanctorale-roman-EDITIO_TYPICA_1970`,
+`test-ambrosian-StIgnatiusOfLoyolaTest`. UnitTestInterface lowercases: `slugifySelector()` (`assets/js/common.js`) runs
+every class token through `slugify()`, which begins with `toLowerCase()`, before handing the selector to
+`querySelectorAll()`. So a client that writes `class="nation-roman-US"` onto the card and then matches through
+`slugifySelector` searches for `.nation-roman-us` and finds **zero cards** — the same paint-nothing failure this whole
+section exists to prevent, one layer down. Today's v1 slugs are safe only because the card class is built by the *same*
+`slugify()` (`assets/js/index.js`, `slugify(item.validate)`), so both sides are lowered together. Whichever convention a
+client picks — lowercase both, or neither — it has to be the same on both sides.
+
+| Id                                      | Fragment                                | Frame class                                          |
+|-----------------------------------------|-----------------------------------------|------------------------------------------------------|
+| `temporale:roman`                       | `temporale-roman`                       | `.temporale-roman.file-exists`                       |
+| `nation:roman:US`                       | `nation-roman-US`                       | `.nation-roman-US.json-valid`                        |
+| `diocese:ambrosian:lugano_ch`           | `diocese-ambrosian-lugano_ch`           | `.diocese-ambrosian-lugano_ch.schema-valid`          |
+| `test:ambrosian:StIgnatiusOfLoyolaTest` | `test-ambrosian-StIgnatiusOfLoyolaTest` | `.test-ambrosian-StIgnatiusOfLoyolaTest.file-exists` |
+
+Three properties of this rule are load-bearing, and none of them is an accident:
+
+- **It is derived from the `id`, never from the item's `label`.** The id is stable, opaque and server-minted; the label
+  is human-facing prose that is expected to change with translation and rewording. An address that moved when someone
+  reworded a caption would be worse than no address at all. (The first implementation of `validateSource` used the label
+  and was unusable for exactly this reason: labels such as `National calendar: US` contain a space — matching zero
+  cards — or a `:`, which makes the client's `querySelectorAll()` throw outright.)
+- **The raw id is not a drop-in.** `.diocese:ambrosian:lugano_ch` parses as a class followed by a pseudo-class, so the
+  substitution is required and is not merely cosmetic.
+- **A fragment never contains a `.`.** That is what makes `.<fragment>.<step>` unambiguously splittable, and it follows
+  from the rule because `.` is outside `[A-Za-z0-9_-]`.
+
+Every id the inventory currently publishes yields a fragment matching `^[A-Za-z][A-Za-z0-9_-]*$`, and no two ids
+collide on one fragment **once lowercased**. Neither is guaranteed by the substitution alone — the substitution is
+many-to-one, so an id kind introduced later that differed from another only in punctuation or only in case would break
+uniqueness, and one beginning with a digit would break the shape — so both are asserted over the whole published set by
+`HealthValidateSourceTest::testEveryPublishedIdIsAddressableThroughValidateSource`, and a new id kind that violates
+either fails the build rather than the client. The uniqueness check compares lowercased fragments for the reason given
+above: a pair that collides only after the client lowers them collides for real.
+
+The steps themselves are `file-exists`, `json-valid` and `schema-valid`, which are **not** the values `/validations`
+publishes in `steps`; see [A caveat on `steps`](#a-caveat-on-steps-not-fixed-here) below.
+
 ## Three message shapes
 
 There are three domains here, and collapsing them into one `target` would be the same mistake `category` made.
@@ -120,6 +183,14 @@ There are three domains here, and collapsing them into one `target` would be the
 ```
 
 `calendar.kind` is one of `general`, `national`, `diocesan`, `rite`. The word `category` disappears from the protocol.
+
+**`general` is an alias, not a fifth kind.** It names the General Roman Calendar and is exactly equivalent to
+`{"kind": "rite", "id": "roman"}` — its only difference is that `id` may be omitted, because `general` is the one kind
+with nothing to choose between: there is exactly one General Roman Calendar, so no id is needed to pick it out. Read it
+as a convenience spelling for the client that means "the default", not as a distinct calendar type with its own
+resolution path; both forms resolve through the same rite-level handling and must never be treated as two different
+things. (An `id` sent alongside `kind: general` is accepted only if it is `roman` — anything else is rejected, since it
+would be asserting a calendar `general` cannot name.)
 
 ### Source check versus test run
 
@@ -166,6 +237,47 @@ No client breaks on the day this lands, and UnitTestInterface can migrate one pa
 
 Removal of the legacy branch is a separate, later change, gated on UnitTestInterface#42 shipping.
 
+## Retired properties
+
+Being additive is not the same as being permissive. Each reshaped message replaces specific legacy properties with a
+typed equivalent, and a v2 message that *also* carries the property it replaced is rejected rather than silently
+ignored:
+
+| v2 action          | v1 predecessor      | rejects if present                                   |
+|--------------------|---------------------|------------------------------------------------------|
+| `validateSource`   | `executeValidation` | `category`, `validate`, `sourceFile`, `sourceFolder` |
+| `validateCalendar` | `validateCalendar`  | `category`, `responsetype`, `rite`                   |
+| `runTest`          | `executeUnitTest`   | `category`, `rite`                                   |
+
+`runTest` retires no `responsetype`, because `executeUnitTest` never had one to retire in the first place. `runToken`
+is retired by nothing on any of the three — it predates this design, is shared across all three actions, and stays
+current.
+
+**The retired set is not the required-property list.** `rite` was missed on both calendar actions on the first pass,
+and the cause is worth writing down because it will recur: the audit derived the retired set from
+`Health::ACTION_PROPERTIES`, which lists only the properties an action *requires*, so every **optional** v1 property was
+structurally invisible to it. `rite` was optional on both v1 `validateCalendar` and `executeUnitTest` — read by
+`readRiteHint()`, honoured by `resolveRite()` — and the v2 shapes moved it inside `calendar.rite` and stopped reading
+the top-level one. Silently ignoring it is the worst possible outcome for this particular property: what goes unsaid is
+a **rite disagreement**, the one thing the typed identity went out of its way to make loud. When reshaping a further
+message, read the predecessor's `@phpstan-type` alias, where the optional properties are the ones marked `?`.
+
+`responsetype` is the one optional v1 property deliberately **not** retired: `executeValidation` accepted it, but
+`executeValidation()` never read it and `validateSource` has no response representation to choose, so retiring it would
+answer a question no client is asking.
+
+This is not a breaking change: a v1 client sends a string `calendar` or an old action name and never reaches these
+checks, so nothing that worked yesterday stops working. What it catches is the client in between — one that has
+switched to the new action name or the object `calendar`, but is still sending fields the old shape used. Without this
+rule that client's mistake is invisible: a retired property is simply never read, the response looks correct, and the
+bug surfaces only later, on the day the legacy branch is finally removed and there is no fallback left to mask it. A
+loud rejection *now*, while both branches still exist side by side to compare against, is strictly more useful than a
+quiet one that waits for removal to become a symptom.
+
+The rule is applied uniformly across all three actions on purpose, even though `runTest` retires only one property.
+Rejecting a stale field on two actions and tolerating it on the third would leave a client unable to predict which
+behaviour it will get without checking the action name — worse than either answer applied consistently.
+
 ## What this does not fix, yet
 
 `Health::executeValidation()` passes a client-supplied `sourceFolder` to `glob()` with no containment check, and an
@@ -179,13 +291,14 @@ it", and that follow-up is gated on client adoption.
 
 ## Error handling
 
-| Condition                                        | Behaviour                                                                      |
-|--------------------------------------------------|--------------------------------------------------------------------------------|
-| `target.id` is not in the inventory              | Rejected immediately, via the existing error frame                             |
-| `target` present but not an object               | Rejected as a malformed message                                                |
-| `calendar` is an object with an unknown `kind`   | Rejected immediately                                                           |
-| `calendar` is a string                           | Legacy path, unchanged behaviour                                               |
-| `rite` disagrees with the calendar's actual rite | Rejected, rather than silently preferring one — a disagreement is a client bug |
+| Condition                                                     | Behaviour                                                                      |
+|---------------------------------------------------------------|--------------------------------------------------------------------------------|
+| `target.id` is not in the inventory                           | Rejected immediately, via the existing error frame                             |
+| `target` present but not an object                            | Rejected as a malformed message                                                |
+| `calendar` is an object with an unknown `kind`                | Rejected immediately                                                           |
+| `calendar` is a string                                        | Legacy path, unchanged behaviour                                               |
+| `rite` disagrees with the calendar's actual rite              | Rejected, rather than silently preferring one — a disagreement is a client bug |
+| A v2 message also carries a legacy property its shape retired | Rejected before anything else runs — see Retired properties, above             |
 
 Rejections reuse the **existing** `echobot` error shape. A dedicated `protocolError` type belongs to section G and
 cannot land before section C, because since UnitTestInterface PR #46 an unrecognised response `type` is painted as a
@@ -206,3 +319,68 @@ rather than hand-listed — a diocese added to source data without appearing in 
 
 **Legacy untouched:** the existing suites covering the legacy shapes must pass unchanged, which is what makes "additive"
 a claim rather than an intention.
+
+## A caveat on `steps`, not fixed here
+
+`GET /validations` publishes a `steps` array per item (`['exists', 'parses', 'validates']`, from
+`CheckableInventory::STEPS`), and `Health` emits one WebSocket frame per step during a check — but the frame classes
+are `file-exists`, `json-valid`, `schema-valid`, and nothing in the API relates the two vocabularies. A client that
+takes a step name literally and waits for a `.<label>.exists` frame waits forever. This is present since #811,
+unrelated to the reshaping this document describes, and filed separately as
+[#819](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/819); the substantive documentation of the
+caveat lives on the `steps` property itself, in `jsondata/schemas/LitCalValidationsPath.json` and the `/validations`
+description in `openapi.json`, because that is where a client discovers the array in the first place. **`steps` is
+authoritative for its values in no case, and for its length in all but one** — sizing a check's progress as
+`count(steps)` is what replaces UnitTestInterface#42's four hardcoded `* 3` constants, and it is right everywhere
+except the exception below.
+
+### The one place `count(steps)` is wrong today
+
+`Health::processValidationData()` — the **file** branch of a check — emits only **two** frames when the file exists but
+its contents will not decode as JSON: `file-exists` and `json-valid`, and no `schema-valid` at all. A client sizing the
+check at three frames waits forever for the third. `handleValidationDataError()` (file unreadable) correctly emits
+three, and the folder branch was fixed for precisely this in commit `ea29b678` on `development`; the file branch was
+not, and `validateSource` now routes roughly sixty file checks through it.
+
+Deliberately **not** fixed here. Adding the third frame changes v1 `executeValidation` output, and this branch's whole
+guarantee is that it does not. It is filed as a follow-up, and it is distinct from
+[#819](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/819), which is about the step *names* rather
+than the step *count*. Until it lands, a client should treat `count(steps)` as an upper bound on the file branch and
+finish a check on a terminal frame rather than on a full count.
+
+Deliberately not fixed by renaming either vocabulary to match the other: the maintainer's decision is that #806
+section C dissolves this on its own. Once responses are structured and DOM-agnostic, the frame itself carries the step
+identity and the CSS class becomes a client-side rendering choice, leaving nothing left to reconcile. Renaming
+`steps`' published values down to the frame classes now would bake a presentation detail into the discovery endpoint
+— the exact coupling `/validations` exists to remove — and section C would immediately undo it. Renaming the frame
+classes instead is not an additive change and would break the live UnitTestInterface runners, which match on those
+classes today. The risk this guards against is specific: UnitTestInterface#42 shipping before section C, needing step
+names for something more than a count, and hardcoding a client-side mapping between the two vocabularies — which would
+reintroduce exactly the duplication #806 exists to end, and once written it would be load-bearing.
+
+## Status
+
+Section B, as designed above, is implemented. `validateSource` resolves a `target.id` through
+`CheckableInventory::byId()` instead of the eight anchored `preg_match` slug arms; the typed (object-`calendar`) form
+of `validateCalendar` exists alongside the legacy string form, with `rite` enforced as an assertion rather than taken
+as a hint; `runTest` reshapes `executeUnitTest` behind a new action name; and all three reject a legacy property their
+own shape retired, per [Retired properties](#retired-properties) above.
+
+What shipped deliberately stopped short of what "additive" promised, in two ways that were always meant to survive
+this pass and are not oversights:
+
+- **The legacy branch survives.** `executeValidation`, the string form of `validateCalendar`, and `executeUnitTest`
+  remain fully reachable, byte-for-byte, exactly as [Migration](#migration) above committed to. Removing them is a
+  separate, later change gated on [UnitTestInterface#42](https://github.com/Liturgical-Calendar/UnitTestInterface/issues/42).
+- **The `glob()` containment exposure survives with it.** `Health::executeValidation()` still passes a client-supplied
+  `sourceFolder` to `glob()` with no containment check, exactly as [What this does not fix, yet](#what-this-does-not-fix-yet)
+  above recorded before implementation began. `validateSource`'s `target.id` path never reaches `glob()` with
+  client-supplied input — it resolves paths from `CheckableInventory`'s own records — so the new code carries none of
+  the exposure. But the exposure was never section B's to fix: it lives entirely in the legacy branch, and closing it
+  is bundled into the later legacy-removal change rather than patched opportunistically here, per the maintainer's
+  original decision.
+
+Also implemented, settled after this document was first written and recorded here rather than left to drift from the
+code: the uniform retired-property rejection ([Retired properties](#retired-properties)), and `general` as a
+literal alias for `{"kind": "rite", "id": "roman"}` rather than a fifth calendar kind (documented under
+[Three message shapes](#three-message-shapes)).

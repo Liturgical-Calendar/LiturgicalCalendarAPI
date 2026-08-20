@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests;
 
 use LiturgicalCalendar\Api\Health;
+use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 use Ratchet\ConnectionInterface;
@@ -24,6 +25,11 @@ use Ratchet\ConnectionInterface;
 #[CoversClass(Health::class)]
 final class HealthCancelRunTest extends TestCase
 {
+    // These tests seed the queue directly rather than through cachedGet(), so nothing here is
+    // currently dispatched at shutdown — but the protection belongs to anything that builds a
+    // Health, not to whichever file last remembered it. See the trait.
+    use HealthQueueIsolationTrait;
+
     /**
      * A minimal Ratchet connection that records every outbound frame. `resourceId` is a dynamic public
      * property Ratchet assigns and is not part of `ConnectionInterface`, so this mirrors the stub
@@ -107,7 +113,7 @@ final class HealthCancelRunTest extends TestCase
 
     public function testCancellingTheCurrentRunDropsItsQueuedRequestsAndSaysNothing(): void
     {
-        $health = new Health();
+        $health = $this->newHealth();
         $conn   = self::createStubConnection(1);
 
         self::setRunTokens($health, [1 => 'run-a']);
@@ -125,7 +131,7 @@ final class HealthCancelRunTest extends TestCase
 
     public function testUntaggedAndOtherConnectionsRequestsSurvive(): void
     {
-        $health = new Health();
+        $health = $this->newHealth();
         $conn   = self::createStubConnection(1);
 
         self::setRunTokens($health, [1 => 'run-a', 2 => 'run-b']);
@@ -147,7 +153,7 @@ final class HealthCancelRunTest extends TestCase
 
     public function testAStaleCancelDoesNotTouchTheRunThatReplacedIt(): void
     {
-        $health = new Health();
+        $health = $this->newHealth();
         $conn   = self::createStubConnection(1);
 
         // The user stopped and restarted faster than the cancel frame travelled: the connection is
@@ -164,7 +170,7 @@ final class HealthCancelRunTest extends TestCase
 
     public function testACancelWithoutARunTokenIsRejectedAndChangesNothing(): void
     {
-        $health = new Health();
+        $health = $this->newHealth();
         $conn   = self::createStubConnection(1);
 
         self::setRunTokens($health, [1 => 'run-a']);
@@ -197,7 +203,7 @@ final class HealthCancelRunTest extends TestCase
      */
     public function testAnOrdinaryMessageStillStoresItsRunToken(): void
     {
-        $health = new Health();
+        $health = $this->newHealth();
         $conn   = self::createStubConnection(1);
 
         $health->onMessage($conn, (string) json_encode(['action' => 'validateCalendar', 'runToken' => 'run-a']));
@@ -221,7 +227,7 @@ final class HealthCancelRunTest extends TestCase
      */
     public function testACancelWithANonStringRunTokenIsASilentNoOp(): void
     {
-        $health = new Health();
+        $health = $this->newHealth();
         $conn   = self::createStubConnection(1);
 
         self::setRunTokens($health, [1 => 'run-a']);
