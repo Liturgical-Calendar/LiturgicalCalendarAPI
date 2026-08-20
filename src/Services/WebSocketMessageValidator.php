@@ -31,6 +31,14 @@ use Swaggest\JsonSchema\Schema;
  * — a `runTest` with a bad `year` was, before this, told it was missing `executeValidation`'s
  * `sourceFolder`. Scoping the validated schema to the claimed arm means the failure text can only
  * ever be about that arm.
+ *
+ * **The failure text itself is rewritten before it reaches a client**, by {@see self::humanize()}:
+ * `swaggest/json-schema`'s own wording is kept — "Integer expected", "Enum failed" and so on are
+ * not reworded, which would put this class back in the business of maintaining a second vocabulary
+ * — but the internal `$ref`/`allOf`/`anyOf` trail that names *where* in the schema document the
+ * failure occurred is replaced with a dotted path built from the client's own vocabulary: the
+ * action it sent, plus the property names on its own message. `runTest.year: Integer expected, …`,
+ * not `… at #->allOf[0]->$ref[#/definitions/runTest]->properties:year`.
  */
 final class WebSocketMessageValidator
 {
@@ -91,7 +99,11 @@ final class WebSocketMessageValidator
                 $this->schema()->in($message);
             }
         } catch (\Throwable $e) {
-            return $this->sanitize($e->getMessage());
+            $action = ( null !== $shape && property_exists($message, 'action') && is_string($message->action) )
+                ? $message->action
+                : 'message';
+
+            return $this->humanize($this->sanitize($e->getMessage()), $action);
         }
 
         if (null === $shape || false === property_exists($message, 'requestId')) {
@@ -230,11 +242,71 @@ final class WebSocketMessageValidator
      * trace segments of its own failure text. An unauthenticated WebSocket client — this validator
      * runs ahead of any auth check, by design — has no business learning where on disk the server
      * keeps its files. Scoping validation to one arm (see the class docblock) already removes most
-     * of the irrelevant trace text this could appear in; this removes what is left.
+     * of the irrelevant trace text this could appear in, and {@see self::humanize()} removes the
+     * trace text itself; this stays as the backstop that guards the *class* of leak — a schema path
+     * reaching a client — rather than relying on either of those removing every route to it.
      */
     private function sanitize(string $message): string
     {
         return str_replace($this->schemaPath, basename($this->schemaPath), $message);
+    }
+
+    /**
+     * Turn a `swaggest/json-schema` failure into `<path>: <expectation>` — the client's own
+     * vocabulary, not the schema's internals.
+     *
+     * Two rules:
+     *
+     *  - **The path is prefixed with the action the client actually sent, never the internal
+     *    definition name.** A client that sent `action: "validateCalendar"` has no way to look up
+     *    `validateCalendarTyped` in the published schema's `oneOf` — that name exists only inside
+     *    this codebase and `WebSocketMessage.json`'s `definitions`, never on the wire.
+     *  - **Every `properties:<name>` segment of a trail becomes one dotted path component, in
+     *    order; `allOf`, `$ref` and `anyOf[n]` segments are dropped.** They describe how the schema
+     *    is assembled, not what is wrong with the client's data. A trail with no `properties:`
+     *    segment at all — a whole-message failure such as a missing required property — humanizes
+     *    to the action alone.
+     *
+     * A message may carry more than one trail (`oneOf`/`anyOf` failures report one per candidate
+     * branch); every trail is stripped, and the *last* one — always the outermost, closing one, by
+     * where `swaggest/json-schema` places it — supplies the path. A `data: {...}` clause whose value
+     * is a JSON *object* is also dropped: it is the library restating a chunk of the message the
+     * property path already names, most visibly for a root-level failure where it restates the
+     * entire message. A scalar `data: "widerregion"` clause is the offending value itself, and is
+     * kept — it is exactly what a client needs to see.
+     */
+    private function humanize(string $message, string $action): string
+    {
+        // `data: {…}` — braces may nest (e.g. the value is itself an object with its own object
+        // properties) — but never `data: [...]` or `data: "…"`/`data: 42`, which are the useful,
+        // short cases and are left alone.
+        $balancedObject = '(?P<bal>\{(?:[^{}]|(?P>bal))*\})';
+        $withoutEchoes  = (string) preg_replace('/,?\s*data:\s*' . $balancedObject . '/', '', $message);
+
+        $trailPattern = '/ at (#(?:->\S+)*)/';
+        preg_match_all($trailPattern, $withoutEchoes, $trails);
+        /** @var list<non-falsy-string> $trailList */
+        $trailList = $trails[1];
+        $path      = [] === $trailList ? $action : $this->pathFromTrail((string) end($trailList), $action);
+
+        $withoutTrails = (string) preg_replace($trailPattern, '', $withoutEchoes);
+
+        return $path . ': ' . trim($withoutTrails);
+    }
+
+    /**
+     * The dotted client-facing path a single trail names. See {@see self::humanize()}.
+     */
+    private function pathFromTrail(string $trail, string $action): string
+    {
+        $properties = [];
+        foreach (explode('->', $trail) as $segment) {
+            if (str_starts_with($segment, 'properties:')) {
+                $properties[] = substr($segment, strlen('properties:'));
+            }
+        }
+
+        return [] === $properties ? $action : $action . '.' . implode('.', $properties);
     }
 
     /**

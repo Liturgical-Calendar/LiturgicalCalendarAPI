@@ -278,4 +278,54 @@ final class HealthProtocolValidationTest extends TestCase
             );
         }
     }
+
+    /**
+     * The two rejections judged directly against live output while this wording was designed,
+     * pinned as literals. This is client-facing wording now: `runTest.year: Integer expected, "2026"
+     * received` reads as a message a client can act on, not a schema-library stack trace. A
+     * `swaggest/json-schema` upgrade, a schema restructuring, or a change to
+     * {@see \LiturgicalCalendar\Api\Services\WebSocketMessageValidator::humanize()} changing either
+     * of these has to be a deliberate, reviewed choice, not a side effect nobody noticed.
+     */
+    public function testTheHumanizedRejectionTextIsExactlyThis(): void
+    {
+        $runTestFrames = $this->frames((string) json_encode([
+            'action'   => 'runTest',
+            'test'     => 'X',
+            'calendar' => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'],
+            'year'     => '2026'
+        ]));
+        self::assertSame('runTest.year: Integer expected, "2026" received', (string) $runTestFrames[0]->text);
+
+        $validateCalendarFrames = $this->frames((string) json_encode([
+            'action'         => 'validateCalendar',
+            'calendar'       => ['kind' => 'widerregion', 'id' => 'Europe', 'rite' => 'roman'],
+            'year'           => 2026,
+            'responseFormat' => 'JSON'
+        ]));
+        self::assertSame(
+            'validateCalendar.calendar.kind: Enum failed, enum: ["general","national","diocesan","rite"], data: "widerregion"',
+            (string) $validateCalendarFrames[0]->text
+        );
+    }
+
+    /**
+     * The schema's own internal vocabulary — which `allOf`/`anyOf` branch matched, `$ref` pointers
+     * into `definitions` — must never reach a client. It describes how the schema *document* is
+     * assembled, not what is wrong with the *message*, and a client cannot look any of it up:
+     * `WebSocketMessage.json` publishes shapes by action name, never by these internal traversal
+     * terms.
+     *
+     * @param array<string, mixed> $message
+     */
+    #[DataProvider('crashVectorProvider')]
+    public function testARejectionNeverLeaksSchemaInternalVocabulary(array $message): void
+    {
+        $frames = $this->frames((string) json_encode($message));
+        $text   = (string) $frames[0]->text;
+
+        foreach (['allOf', '$ref', 'definitions'] as $forbidden) {
+            self::assertStringNotContainsString($forbidden, $text, "the rejection leaked schema internal vocabulary: {$forbidden}");
+        }
+    }
 }
