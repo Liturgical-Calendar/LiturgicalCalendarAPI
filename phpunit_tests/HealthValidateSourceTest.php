@@ -97,14 +97,67 @@ final class HealthValidateSourceTest extends TestCase
     /**
      * The point of the action: `temporale:roman` names exactly what `proprium-de-tempore` named.
      *
+     * Not every row proves as much as it looks like it does. `retrieveSchemaForCategory()`'s
+     * `sourceDataCheck` arm carries a `$legacySlugToId` table that rewrites four legacy slugs —
+     * `proprium-de-tempore`, `proprium-de-tempore-i18n`, `memorials-from-decrees` and
+     * `memorials-from-decrees-i18n` — into inventory ids *before* calling `byId()`. For those the
+     * two sides of the comparison are literally the same lookup, so the row pins the mapping table
+     * rather than proving two independent resolutions agree. The `national-calendar-…` rows are the
+     * ones that genuinely exercise both paths: the slug goes through the anchored regex arms and
+     * the id through `byId()`, and nothing rewrites one into the other. Marked below so a later
+     * reader does not over-trust the cheap rows.
+     *
+     * The folder row matters for a different reason: `kind` selects between two entirely separate
+     * branches of `runValidationSteps()`, and without it the folder branch is never reached through
+     * this action at all.
+     *
      * @return array<string, array{string, string}>
      */
     public static function equivalentAddressProvider(): array
     {
         return [
-            'temporale'         => ['temporale:roman', 'proprium-de-tempore'],
-            'national calendar' => ['nation:roman:IT', 'national-calendar-IT']
+            // Same lookup on both sides — $legacySlugToId rewrites the slug into this very id.
+            'temporale'              => ['temporale:roman', 'proprium-de-tempore'],
+            // Two independent resolutions: regex arm vs byId().
+            'national calendar'      => ['nation:roman:IT', 'national-calendar-IT'],
+            // Likewise independent, and the only row whose kind is 'folder'.
+            'national calendar i18n' => ['nation:roman:US:i18n', 'national-calendar-US-i18n']
         ];
+    }
+
+    /**
+     * The published `steps` vocabulary is not the emitted frame-class vocabulary.
+     *
+     * `CheckableInventory::STEPS` publishes `exists|parses|validates` on the wire, while the frames
+     * are addressed `.<label>.file-exists`, `.<label>.json-valid`, `.<label>.schema-valid`. The two
+     * describe the same three steps in different words, and nothing in the codebase relates them,
+     * so the correspondence is written down here — once — and asserted rather than restated as a
+     * hardcoded list at each call site. A newly published step with no entry here fails loudly,
+     * which is the point: it would also be a step no client could match a frame to.
+     *
+     * @var array<string, string>
+     */
+    private const FRAME_CLASS_FOR_STEP = [
+        'exists'    => 'file-exists',
+        'parses'    => 'json-valid',
+        'validates' => 'schema-valid'
+    ];
+
+    /**
+     * The frame classes an item's *published* steps say it should emit, in order.
+     *
+     * @return list<string>
+     */
+    private static function expectedFrameClasses(CheckableItem $item): array
+    {
+        return array_map(
+            static function (string $step) use ($item): string {
+                self::assertArrayHasKey($step, self::FRAME_CLASS_FOR_STEP, "published step '{$step}' has no frame class");
+
+                return ".{$item->label}." . self::FRAME_CLASS_FOR_STEP[$step];
+            },
+            $item->steps
+        );
     }
 
     /**
@@ -115,8 +168,10 @@ final class HealthValidateSourceTest extends TestCase
      * `byId()`, and the slug's, through `retrieveSchemaForCategory()`'s anchored patterns — rather
      * than comparing one resolution with itself.
      *
-     * The three frames matter too: a client sizes the phase as exactly three per check, so an
-     * accepted-but-silent target would wedge the run just as surely as a rejected one.
+     * The frame expectations are derived from the item's own published `steps` rather than
+     * hardcoded, because that is the contract a client sizes the phase with: it reads `steps` from
+     * `/validations` and waits for exactly that many frames per check. Publishing one count and
+     * emitting another wedges the run just as surely as emitting none.
      *
      * @param string $id   the inventory id a v2 client sends
      * @param string $slug the `validate` slug a v1 client sends for the same artifact
@@ -131,7 +186,11 @@ final class HealthValidateSourceTest extends TestCase
         $conn   = self::createStubConnection();
         self::send($health, $conn, ['action' => 'validateSource', 'target' => ['id' => $id]]);
 
-        self::assertCount(3, $conn->sent, "{$id} did not produce the three frames a check is made of");
+        self::assertCount(
+            count($item->steps),
+            $conn->sent,
+            "{$id} publishes " . count($item->steps) . ' steps but emitted ' . count($conn->sent) . ' frames'
+        );
 
         $frames = array_map(
             /** @return \stdClass */
@@ -140,9 +199,9 @@ final class HealthValidateSourceTest extends TestCase
         );
 
         self::assertSame(
-            [".{$item->label}.file-exists", ".{$item->label}.json-valid", ".{$item->label}.schema-valid"],
+            self::expectedFrameClasses($item),
             array_map(static fn (\stdClass $f): mixed => $f->classes, $frames),
-            'the frames are addressed by the item label, in step order'
+            'the frames are addressed by the item label, one per published step, in step order'
         );
 
         foreach ($frames as $frame) {
@@ -274,6 +333,14 @@ final class HealthValidateSourceTest extends TestCase
      * every calendar source file, so resetting on each would trade an unbounded staleness window
      * for an unbounded cost. Resetting on the token *change* bounds staleness to a single run and
      * pays for it once.
+     *
+     * Identity, not populated-ness, is what is asserted here, and the distinction is the whole
+     * test. `validateSource` resolves through `byId()`, which calls `all()`, which re-memoizes on
+     * the spot — so under the very mutation this test exists to catch (an unconditional reset) the
+     * memo would be nulled and immediately rebuilt, and any "is it populated?" check would still
+     * be green. A rebuild mints fresh `CheckableItem` instances, so holding one from before the
+     * message and asserting it is the *same object* afterwards is a claim only a surviving memo
+     * can satisfy.
      */
     public function testAContinuingRunKeepsTheMemoizedInventory(): void
     {
@@ -281,12 +348,16 @@ final class HealthValidateSourceTest extends TestCase
         $conn   = self::createStubConnection();
 
         self::setRunTokens($health, [1 => 'run-a']);
-        CheckableInventory::all();
-        self::assertTrue(self::inventoryIsMemoized(), 'precondition: the index is built');
+        $before = CheckableInventory::all();
+        self::assertNotEmpty($before, 'precondition: the index is built');
 
         self::send($health, $conn, ['action' => 'validateSource', 'target' => ['id' => 'temporale:roman'], 'runToken' => 'run-a']);
 
-        self::assertTrue(self::inventoryIsMemoized(), 'a second message of the same run must not rebuild the index');
+        self::assertSame(
+            $before[0],
+            CheckableInventory::all()[0],
+            'a second message of the same run rebuilt the index instead of reusing it'
+        );
     }
 
     /**
@@ -347,7 +418,11 @@ final class HealthValidateSourceTest extends TestCase
             $item = CheckableInventory::staticById('temporale:roman');
             self::assertInstanceOf(CheckableItem::class, $item, 'precondition: the temporale is in the static half');
 
-            self::assertCount(3, $staticTarget->sent, 'a static target stopped being checkable because an unrelated calendar file was malformed');
+            self::assertCount(
+                count($item->steps),
+                $staticTarget->sent,
+                'a static target stopped being checkable because an unrelated calendar file was malformed'
+            );
 
             $frames = array_map(
                 /** @return \stdClass */
@@ -355,7 +430,7 @@ final class HealthValidateSourceTest extends TestCase
                 $staticTarget->sent
             );
             self::assertSame(
-                [".{$item->label}.file-exists", ".{$item->label}.json-valid", ".{$item->label}.schema-valid"],
+                self::expectedFrameClasses($item),
                 array_map(static fn (\stdClass $f): mixed => $f->classes, $frames),
                 'the frames were not addressed to the static item the retry was supposed to resolve'
             );
@@ -409,26 +484,60 @@ final class HealthValidateSourceTest extends TestCase
     // ---------------------------------------------------------------- round trip
 
     /**
-     * Everything `/validations` publishes can be sent back.
+     * Everything `/validations` publishes can be sent back — through the surface a client uses.
      *
      * The published set and the addressable set have to be the same set: an id a client can read
      * out of the catalogue but cannot use as an address would be worse than not publishing it at
-     * all, because the client has no way to tell the two cases apart. Driven from
-     * `CheckableInventory::all()` rather than a hand-written list, so a newly enumerated *kind* of
-     * source data is covered the day it appears rather than the day someone remembers to add it
-     * here.
+     * all, because the client has no way to tell the two cases apart.
+     *
+     * The obvious way to write this — iterate `all()` and look each id up with `byId()` — proves
+     * nothing. `byId()` is a linear identity scan over the very array `all()` just returned, so it
+     * cannot miss, and the assertions would hold against a `validateSource` that had been deleted
+     * outright. What has to be exercised is the *action*: each id goes out as a real
+     * `validateSource` message and must come back as a check rather than a rejection. That takes
+     * `Health::validateSource()` across all of the published ids instead of the three the happy-path
+     * provider covers, and it fails the day an advertised id stops being addressable — which is the
+     * guarantee this test is named after.
+     *
+     * Silence counts as a failure too. A message that resolves but emits nothing leaves the client
+     * waiting on frames that will never arrive, which is the same wedge as a rejection, arriving
+     * more slowly.
      */
-    public function testEveryPublishedIdResolvesBackToACheckableItem(): void
+    public function testEveryPublishedIdIsAddressableThroughValidateSource(): void
     {
-        $all = CheckableInventory::all();
-        self::assertNotEmpty($all, 'the inventory published nothing to round-trip');
+        $published = CheckableInventory::all();
+        self::assertNotEmpty($published, 'the inventory published nothing to round-trip');
 
-        foreach ($all as $published) {
-            $resolved = CheckableInventory::byId($published->id);
-            self::assertInstanceOf(CheckableItem::class, $resolved, "published id {$published->id} does not resolve");
-            self::assertSame($published->id, $resolved->id);
-            self::assertNotSame('', $resolved->schema->path(), "published id {$published->id} resolves to no schema");
-            self::assertContains($resolved->kind, ['file', 'folder'], "published id {$published->id} has no usable kind");
+        $health = new Health();
+
+        /** @var array<string, string> $unaddressable */
+        $unaddressable = [];
+
+        foreach ($published as $index => $item) {
+            $conn = self::createStubConnection($index + 1);
+            self::send($health, $conn, ['action' => 'validateSource', 'target' => ['id' => $item->id]]);
+
+            if ([] === $conn->sent) {
+                $unaddressable[$item->id] = 'answered with no frames at all';
+                continue;
+            }
+
+            foreach ($conn->sent as $raw) {
+                $frame = json_decode($raw);
+                if ($frame instanceof \stdClass && 'echobot' === ( $frame->type ?? null )) {
+                    // `echobot` is the rejection shape: the server declined to check this at all.
+                    // An `error` frame is a different thing entirely and is fine here — it means the
+                    // target was addressed and checked, and the check reported something. This test
+                    // is about whether an id can be sent, not about whether its data is valid.
+                    $unaddressable[$item->id] = (string) ( $frame->text ?? '' );
+                }
+            }
         }
+
+        self::assertSame(
+            [],
+            $unaddressable,
+            'ids that GET /validations advertises but validateSource will not accept: ' . json_encode($unaddressable)
+        );
     }
 }

@@ -397,6 +397,12 @@ class Health implements MessageComponentInterface
             // per run by the client and onClose() drops the entry, so this is theoretical — but if
             // it ever stops being, the fix is a run-start signal in the protocol, not a reset here
             // on every message.
+            //
+            // Second bound, worth knowing before relying on this: `runToken` is optional, and a
+            // client that omits it never reaches this block at all — so it never resets, and never
+            // sees a calendar written through `/data` until the server restarts. The reset gives
+            // freshness to clients that opt into run correlation; a tokenless client opts out of
+            // both together.
             if (( $this->runTokens[$resourceId] ?? null ) !== $messageReceived->runToken) {
                 CheckableInventory::reset();
             }
