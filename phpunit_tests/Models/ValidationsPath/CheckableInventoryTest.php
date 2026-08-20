@@ -307,4 +307,38 @@ final class CheckableInventoryTest extends TestCase
             }
         }
     }
+
+    /**
+     * A failed `glob()` raises; it does not quietly produce an empty set of test definitions.
+     *
+     * `glob()` returns an empty array — never `false` — for a readable directory with no matches, so
+     * `false` only ever means a filesystem error. Swallowing it would make all 11 test definitions
+     * vanish from `/validations` with nothing reported anywhere: #800's silent absence, in the one
+     * producer that reads the filesystem directly rather than going through the calendar index.
+     *
+     * The error is induced through `glob()`'s real 4096-character pattern limit rather than by
+     * mocking, so what is under test is the production call itself. PHP raises a warning before
+     * returning the sentinel; it is swallowed here so the assertion is about the exception and not
+     * about PHPUnit's warning handling.
+     */
+    public function testAFailedGlobRaisesInsteadOfDroppingEveryTestDefinition(): void
+    {
+        $savedApiFilePath = Router::$apiFilePath;
+
+        // Long enough that JsonData::testsFolderFor()'s pattern exceeds glob()'s maximum length.
+        Router::$apiFilePath = DIRECTORY_SEPARATOR . str_repeat('a', 5000) . DIRECTORY_SEPARATOR;
+
+        $producer = new \ReflectionMethod(CheckableInventory::class, 'testDefinitionItems');
+        set_error_handler(static fn (): bool => true);
+
+        try {
+            $this->expectException(\RuntimeException::class);
+            $this->expectExceptionMessageMatches('/glob failed/');
+
+            $producer->invoke(null);
+        } finally {
+            restore_error_handler();
+            Router::$apiFilePath = $savedApiFilePath;
+        }
+    }
 }

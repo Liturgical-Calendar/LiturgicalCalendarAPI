@@ -397,6 +397,12 @@ final class CheckableInventory
      * buys is real: unlike every calendar item above, a deleted test file here simply drops out of
      * the inventory instead of staying listed and failing its `exists` step.
      *
+     * That tradeoff covers a *deleted file*, not a *failed glob*, which is a different thing.
+     * `glob()` returns an empty array — never `false` — for a readable directory with no matches, so
+     * `false` always means a filesystem error; treating it as "no tests" would drop every test
+     * definition from the inventory with nothing reported anywhere, which is the #800 silent absence
+     * again. It raises instead, matching `CalendarMetadataProvider::globOrThrow()`.
+     *
      * @return list<CheckableItem>
      */
     private static function testDefinitionItems(): array
@@ -405,7 +411,11 @@ final class CheckableInventory
 
         foreach (Rite::cases() as $rite) {
             $folder = JsonData::testsFolderFor($rite)->path();
-            $files  = glob($folder . '/*Test.json') ?: [];
+            $files  = glob($folder . '/*Test.json');
+
+            if (false === $files) {
+                throw new \RuntimeException('CheckableInventory::testDefinitionItems: glob failed for ' . $folder);
+            }
 
             foreach ($files as $file) {
                 $name    = basename($file, '.json');
