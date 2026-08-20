@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests;
 
-use LiturgicalCalendar\Api\Enum\FrameFamily;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
@@ -135,40 +134,30 @@ final class HealthValidateSourceTest extends TestCase
     }
 
     /**
-     * The published `steps` vocabulary and the emitted frame-class vocabulary, related.
+     * The published `steps` vocabulary is not the emitted frame-class vocabulary.
      *
      * `CheckableInventory::STEPS` publishes `exists|parses|validates` on the wire, while the frames
      * are addressed `.<fragment>.file-exists`, `.<fragment>.json-valid`, `.<fragment>.schema-valid`.
-     * The two describe the same three steps in different words, and the correspondence used to be
-     * restated as a private const *here* — which a reviewer rightly called relocated hardcoding
-     * rather than eliminated hardcoding. It now lives in `Health` as the projection the emitter
-     * actually uses, and is read from there, so there is one table and not two that can drift.
+     * The two describe the same three steps in different words, and the correspondence is written
+     * down here — once — and asserted rather than restated as a hardcoded list at each call site. A
+     * newly published step with no entry here fails loudly, which is the point: it would also be a
+     * step no client could match a frame to.
      *
-     * Reading production values would make an assertion *about the projection* unfalsifiable, which
-     * is why the projection is pinned by literals in {@see HealthFrameProjectionTest} instead. What
-     * this class asserts is different: that a check emits one frame per *published* step, in step
-     * order, addressed by the fragment derived from its id.
+     * **Deliberately a literal, and deliberately not read from `FrameFamily::CLASS_FOR_STEP`.** The
+     * production table now exists, and reading it here would make both sides of the `assertSame()`
+     * below derive from one source: a projection changed in `src` would change the expectation in
+     * lockstep and the assertion could not fail. That is the exact pattern this branch spent four
+     * dead tests learning to avoid, so the one file that polices addressing states its own
+     * expectation. The production table is pinned separately, against literals, in
+     * {@see HealthFrameProjectionTest}.
      *
-     * The table lives on {@see FrameFamily} — the one owner of the projection, reachable from both
-     * `Health` and `LitTestRunner` — and is keyed by family because the projection is not one-to-one: a
-     * unit test publishes `validates` too but addresses `test-valid` rather than `schema-valid`. A
-     * source-data check is a `CHECK`-family frame, so that is the sub-table read here; the test-run
-     * grammar is pinned by literals in {@see HealthFrameProjectionTest} like every other part of it.
-     *
-     * The table is read rather than `frameClasses()` called: this class still composes its own expected
-     * `.<fragment>.<step>`, so what it asserts stays "one frame per published step, in step order,
-     * addressed by the fragment derived from the id" and does not quietly become a restatement of the
-     * production composer.
-     *
-     * @return array<string, string>
+     * @var array<string, string>
      */
-    private static function frameClassForStep(): array
-    {
-        /** @var array<string, array<string, string>> $map */
-        $map = ( new \ReflectionClassConstant(FrameFamily::class, 'CLASS_FOR_STEP') )->getValue();
-
-        return $map[FrameFamily::CHECK->value];
-    }
+    private const FRAME_CLASS_FOR_STEP = [
+        'exists'    => 'file-exists',
+        'parses'    => 'json-valid',
+        'validates' => 'schema-valid'
+    ];
 
     /**
      * What a frame's class fragment has to look like for the client to be able to use it at all.
@@ -195,13 +184,11 @@ final class HealthValidateSourceTest extends TestCase
      */
     private static function expectedFrameClasses(CheckableItem $item, string $fragment): array
     {
-        $frameClassForStep = self::frameClassForStep();
-
         return array_map(
-            static function (string $step) use ($fragment, $frameClassForStep): string {
-                self::assertArrayHasKey($step, $frameClassForStep, "published step '{$step}' has no frame class");
+            static function (string $step) use ($fragment): string {
+                self::assertArrayHasKey($step, self::FRAME_CLASS_FOR_STEP, "published step '{$step}' has no frame class");
 
-                return ".{$fragment}." . $frameClassForStep[$step];
+                return ".{$fragment}." . self::FRAME_CLASS_FOR_STEP[$step];
             },
             $item->steps
         );
@@ -219,8 +206,8 @@ final class HealthValidateSourceTest extends TestCase
         $parts = explode('.', (string) $frame->classes);
         self::assertCount(3, $parts, "a frame class must be .<fragment>.<step>, got: {$frame->classes}");
         self::assertSame('', $parts[0], "a frame class must start with a dot, got: {$frame->classes}");
-        // Three literals, not `self::frameClassForStep()`: reading the production table on both sides of
-        // this comparison would make it a tautology, which is the very anti-pattern this branch is
+        // Three literals, not the production table: reading `FrameFamily::CLASS_FOR_STEP` on both sides
+        // of this comparison would make it a tautology, which is the very anti-pattern this branch is
         // policing. The step token of any frame a client can use is one of these three and nothing else.
         self::assertContains($parts[2], ['file-exists', 'json-valid', 'schema-valid'], "unknown step in frame class: {$frame->classes}");
 

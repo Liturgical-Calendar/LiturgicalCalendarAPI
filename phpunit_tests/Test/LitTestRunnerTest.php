@@ -254,17 +254,24 @@ final class LitTestRunnerTest extends TestCase
         $this->assertSame('success', $runner->getMessage()->type);
     }
 
+    /**
+     * The rite must be **Ambrosian**, not Roman, for this to assert anything. `getCalendarName()`
+     * falls back to "the General Roman Calendar" for any response whose rite it cannot read, so a
+     * `rite: 'roman'` payload produces that string whether the rite was consulted or not — deleting
+     * the `responseRite()` call outright would leave the test green. Ambrosian is the only value
+     * that distinguishes "named by its rite" from "named by the fallback".
+     */
     public function testRiteLevelCalendarIsNamedByItsRite(): void
     {
-        $data                 = $this->calendarPayload(2019, [
-            (object) ['event_key' => 'MaryMotherChurch', 'date' => '2019-06-10T00:00:00+00:00'],
+        $data                 = $this->calendarPayload(1999, [
+            (object) ['event_key' => 'StIgnatiusOfLoyola', 'date' => '1999-07-31T00:00:00+00:00'],
         ]);
-        $data->settings->rite = 'roman';
+        $data->settings->rite = 'ambrosian';
 
-        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
+        $runner = new LitTestRunner('StIgnatiusOfLoyolaTest', $data, Rite::AMBROSIAN);
         $runner->runTest();
 
-        $this->assertStringContainsString('the General Roman Calendar', $runner->getMessage()->text);
+        $this->assertStringContainsString('the Ambrosian Calendar', $runner->getMessage()->text);
     }
 
     public function testDiocesanCalendarSettingsAppearInMessageText(): void
@@ -412,18 +419,22 @@ final class LitTestRunnerTest extends TestCase
      * A rite-level calendar names no nation and no diocese, so the target is identified by its rite —
      * which is what `Health` passes as the calendar id for a `ritecalendar`, so a run reports the same
      * target whichever of the two emitters produces the frame.
+     *
+     * **Ambrosian, deliberately.** `targetCalendarId()` ends in `( $this->responseRite() ?? Rite::default() )`
+     * and `Rite::default()` *is* `ROMAN`, so a `rite: 'roman'` payload yields `'roman'` even from an
+     * implementation that never looks at the response at all. Only a non-default rite tells the two apart.
      */
     public function testARiteLevelRunIsTargetedByItsRite(): void
     {
-        $data                 = $this->calendarPayload(2019, [
-            (object) ['event_key' => 'MaryMotherChurch', 'date' => '2019-06-10T00:00:00+00:00'],
+        $data                 = $this->calendarPayload(1999, [
+            (object) ['event_key' => 'StIgnatiusOfLoyola', 'date' => '1999-07-31T00:00:00+00:00'],
         ]);
-        $data->settings->rite = 'roman';
+        $data->settings->rite = 'ambrosian';
 
-        $runner = new LitTestRunner('MaryMotherChurchTest', $data, Rite::ROMAN);
+        $runner = new LitTestRunner('StIgnatiusOfLoyolaTest', $data, Rite::AMBROSIAN);
         $runner->runTest();
 
-        $this->assertSame('roman', $runner->getMessage()->target->calendar);
+        $this->assertSame('ambrosian', $runner->getMessage()->target->calendar);
     }
 
     /**
