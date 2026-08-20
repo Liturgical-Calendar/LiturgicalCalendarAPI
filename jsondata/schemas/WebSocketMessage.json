@@ -1,0 +1,124 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "title": "Health WebSocket inbound message",
+    "description": "Every message the Health WebSocket endpoint accepts. Shapes are discriminated by `action`, and for `validateCalendar` additionally by whether `calendar` is a string (v1) or an object (v2). Properties a shape does not declare are refused only for messages carrying a `requestId`; see API issue #806 section G.",
+    "oneOf": [
+        { "$ref": "#/definitions/executeValidation" },
+        { "$ref": "#/definitions/validateCalendarLegacy" },
+        { "$ref": "#/definitions/validateCalendarTyped" },
+        { "$ref": "#/definitions/executeUnitTest" },
+        { "$ref": "#/definitions/runTest" },
+        { "$ref": "#/definitions/cancelRun" },
+        { "$ref": "#/definitions/validateSource" }
+    ],
+    "definitions": {
+        "correlationId": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_-]{1,64}$",
+            "description": "An opaque client-minted handle the server echoes back. One alphabet for runToken and requestId alike."
+        },
+        "calendarIdentity": {
+            "type": "object",
+            "required": ["kind", "rite"],
+            "properties": {
+                "kind": { "enum": ["general", "national", "diocesan", "rite"] },
+                "id": { "type": "string" },
+                "rite": { "type": "string" }
+            }
+        },
+        "executeValidation": {
+            "type": "object",
+            "required": ["action", "category", "validate"],
+            "oneOf": [
+                { "required": ["sourceFile"] },
+                { "required": ["sourceFolder"] }
+            ],
+            "properties": {
+                "action": { "const": "executeValidation" },
+                "category": { "enum": ["universalcalendar", "sourceDataCheck", "resourceDataCheck"] },
+                "validate": { "type": "string" },
+                "sourceFile": { "type": "string" },
+                "sourceFolder": { "type": "string" },
+                "responsetype": { "type": "string" },
+                "rite": { "type": "string" },
+                "runToken": { "$ref": "#/definitions/correlationId" },
+                "requestId": { "$ref": "#/definitions/correlationId" }
+            }
+        },
+        "validateCalendarLegacy": {
+            "type": "object",
+            "required": ["action", "calendar", "year", "category", "responsetype"],
+            "properties": {
+                "action": { "const": "validateCalendar" },
+                "calendar": { "type": "string" },
+                "year": { "type": "integer" },
+                "category": { "enum": ["nationalcalendar", "diocesancalendar", "ritecalendar"] },
+                "responsetype": { "enum": ["JSON", "XML", "ICS", "YML"] },
+                "rite": { "type": "string" },
+                "runToken": { "$ref": "#/definitions/correlationId" },
+                "requestId": { "$ref": "#/definitions/correlationId" }
+            }
+        },
+        "validateCalendarTyped": {
+            "type": "object",
+            "required": ["action", "calendar", "year", "responseFormat"],
+            "properties": {
+                "action": { "const": "validateCalendar" },
+                "calendar": { "$ref": "#/definitions/calendarIdentity" },
+                "year": { "type": "integer" },
+                "responseFormat": { "enum": ["JSON", "XML", "ICS", "YML"] },
+                "runToken": { "$ref": "#/definitions/correlationId" },
+                "requestId": { "$ref": "#/definitions/correlationId" }
+            }
+        },
+        "executeUnitTest": {
+            "type": "object",
+            "required": ["action", "calendar", "year", "category", "test"],
+            "properties": {
+                "action": { "const": "executeUnitTest" },
+                "calendar": { "type": "string" },
+                "year": { "type": "integer" },
+                "category": { "enum": ["nationalcalendar", "diocesancalendar", "ritecalendar"] },
+                "test": { "type": "string" },
+                "rite": { "type": "string" },
+                "runToken": { "$ref": "#/definitions/correlationId" },
+                "requestId": { "$ref": "#/definitions/correlationId" }
+            }
+        },
+        "runTest": {
+            "type": "object",
+            "required": ["action", "test", "calendar", "year"],
+            "properties": {
+                "action": { "const": "runTest" },
+                "test": { "type": "string" },
+                "calendar": { "$ref": "#/definitions/calendarIdentity" },
+                "year": { "type": "integer" },
+                "runToken": { "$ref": "#/definitions/correlationId" },
+                "requestId": { "$ref": "#/definitions/correlationId" }
+            }
+        },
+        "cancelRun": {
+            "type": "object",
+            "required": ["action", "runToken"],
+            "properties": {
+                "action": { "const": "cancelRun" },
+                "runToken": { "$ref": "#/definitions/correlationId" },
+                "requestId": { "$ref": "#/definitions/correlationId" }
+            }
+        },
+        "validateSource": {
+            "type": "object",
+            "required": ["action", "target"],
+            "properties": {
+                "action": { "const": "validateSource" },
+                "target": {
+                    "type": "object",
+                    "required": ["id"],
+                    "properties": { "id": { "type": "string" } }
+                },
+                "runToken": { "$ref": "#/definitions/correlationId" },
+                "requestId": { "$ref": "#/definitions/correlationId" }
+            }
+        }
+    }
+}
