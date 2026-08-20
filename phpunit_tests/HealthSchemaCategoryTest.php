@@ -340,6 +340,39 @@ final class HealthSchemaCategoryTest extends TestCase
         self::assertSame($expected->path(), self::retrieveSchemaForCategory('resourceDataCheck', $url));
     }
 
+    /**
+     * The rite segment is stripped UNIFORMLY, not gated on the routes that actually carry one, so
+     * a rite on a route that has none still resolves to that route's schema.
+     *
+     * **This is a deliberate choice, pinned here so nobody "fixes" it back into a stale list.**
+     * `Health::getPathToSchemaFile()` answers "which schema would validate a response of this
+     * shape", not "is this path routable" — `Router` stays the sole authority on what routes
+     * exist, and `/missals/roman` resolving here costs nothing because the fetch that follows
+     * 404s and the check fails loudly regardless. The alternative, gating the strip on a
+     * hardcoded list of rite-carrying routes, would reintroduce exactly the staleness class that
+     * produced #814: `Router::extractRiteSegment()` keeps that knowledge in an inline condition
+     * with `/tests` handled separately elsewhere, so there is no registry to derive it from.
+     * Trading the structural invariant above for a list that will go stale is the wrong direction.
+     *
+     * @return array<string, array{string, LitSchema}>
+     */
+    public static function riteOnANonRiteCarryingRouteProvider(): array
+    {
+        self::initRouter();
+
+        return [
+            'missals'   => [Route::MISSALS->path() . '/roman', LitSchema::MISSALS],
+            'decrees'   => [Route::DECREES->path() . '/ambrosian', LitSchema::DECREES],
+            'calendars' => [Route::CALENDARS->path() . '/roman', LitSchema::METADATA],
+        ];
+    }
+
+    #[DataProvider('riteOnANonRiteCarryingRouteProvider')]
+    public function testARiteOnANonRiteCarryingRouteStillResolves(string $url, LitSchema $expected): void
+    {
+        self::assertSame($expected->path(), self::getPathToSchemaFile($url));
+    }
+
     public function testResourceDataCheckRejectsAnUnrecognisedUrl(): void
     {
         self::assertNull(self::retrieveSchemaForCategory('resourceDataCheck', 'https://example.test/not/a/route'));

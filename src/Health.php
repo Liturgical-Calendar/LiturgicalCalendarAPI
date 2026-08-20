@@ -2085,6 +2085,19 @@ class Health implements MessageComponentInterface
         //
         // `/calendar/{rite}` is unaffected: Route::CALENDAR has no arm here, so both forms
         // resolve to null exactly as they did.
+        //
+        // The strip is UNIFORM across the map, not gated on the routes that actually carry a rite
+        // — so `/missals/roman` and `/decrees/ambrosian` resolve too, even though the Router 404s
+        // them (`Router::extractRiteSegment()` admits a rite only on calendar, events and data,
+        // and `Router::extractTestsRite()` on tests). That is deliberate, not an oversight. This
+        // function answers "which schema would validate a response of this shape", NOT "is this
+        // path routable": the Router remains the sole authority on what routes exist, and a schema
+        // resolved for a non-route costs nothing because the fetch that follows 404s and the check
+        // fails loudly anyway. Gating the strip would mean hardcoding the list of rite-carrying
+        // routes here — precisely the staleness that produced #814 — and there is no registry to
+        // derive such a list from, the knowledge living in an inline condition in
+        // `Router::extractRiteSegment()` with `/tests` handled separately. Do not add routability
+        // checks to this lookup.
         return match (self::stripTrailingRiteSegment($dataFile)) {
             Route::CALENDARS->path() => LitSchema::METADATA->path(),
             Route::DECREES->path()   => LitSchema::DECREES->path(),
@@ -2103,6 +2116,10 @@ class Health implements MessageComponentInterface
      *
      * `/events/roman` becomes `/events`; a path that does not end in a rite segment is returned
      * unchanged, and only one segment is ever removed (so a doubled rite stays unresolvable).
+     *
+     * The rule is intentionally shape-based rather than route-aware: it strips the segment from any
+     * path, including one whose route carries no rite. See the note at the call site in
+     * {@see self::getPathToSchemaFile()} for why that is the right trade.
      *
      * @param string $path the path to normalise
      * @return string the path without its trailing rite segment
