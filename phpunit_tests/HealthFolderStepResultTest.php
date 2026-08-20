@@ -172,6 +172,61 @@ final class HealthFolderStepResultTest extends TestCase
     }
 
     /**
+     * A v1 folder check that *passes* is still addressed by the client's own slug.
+     *
+     * This is the success arm of the folder branch — the three `sendFolderStepResult()` calls that
+     * run once every file promise has resolved — and until this test it was reached in-process only
+     * through a **v2** `validateSource` message. That mattered because splitting the CSS class
+     * fragment out of `$label` inside `runValidationSteps()` touched exactly these three call sites:
+     * a mutation that broke the fragment's default (`$classFragment ??= $label`) failed only the
+     * missing-folder arm and the file branch, leaving the arm that carries roughly sixty real i18n
+     * checks unpinned.
+     *
+     * No fixture is needed. `executeValidation()` re-derives the real i18n folder from the slug for
+     * anything matching `^(wider-region|national-calendar|diocesan-calendar)-([A-Za-z_]+)-i18n$`, so
+     * a v1 message naming `national-calendar-US-i18n` reads the same folder the v2 id
+     * `nation:roman:US:i18n` reads — a folder the suite already proves passes in-process — while the
+     * `sourceFolder` the client sent is ignored for reading and quoted in the text.
+     *
+     * The whole point is byte-identity with what a v1 client received before this branch: a v1
+     * caller passes no class fragment, so the fragment defaults to its `validate` slug and the
+     * frames must be addressed by that slug and nothing else.
+     */
+    public function testAPassingV1FolderCheckIsAddressedByTheClientSlug(): void
+    {
+        Router::getApiPaths();
+
+        $conn   = self::createStubConnection(5);
+        $health = $this->newHealth();
+
+        $tokens = new \ReflectionProperty(Health::class, 'runTokens');
+        $tokens->setValue($health, [$conn->resourceId => 'run-token-1']);
+
+        $validate = 'national-calendar-US-i18n';
+        $method   = new \ReflectionMethod(Health::class, 'executeValidation');
+        $method->invoke($health, (object) [
+            'action'       => 'executeValidation',
+            'category'     => 'sourceDataCheck',
+            'validate'     => $validate,
+            // Ignored for reading — the slug re-derivation above wins — and quoted in the text.
+            'sourceFolder' => 'client/supplied/nonsense',
+        ], $conn);
+
+        $frames = array_map(static fn(string $raw): \stdClass => json_decode($raw), $conn->sent);
+
+        self::assertCount(3, $frames, 'a folder check reports exactly one frame per step');
+        self::assertSame(
+            [".$validate.file-exists", ".$validate.json-valid", ".$validate.schema-valid"],
+            array_map(static fn(\stdClass $f): string => $f->classes, $frames),
+            'a v1 folder check must still be addressed by its own slug, unchanged'
+        );
+        foreach ($frames as $frame) {
+            self::assertSame('success', $frame->type, "the US i18n folder failed its own check: {$frame->text}");
+            self::assertSame('run-token-1', $frame->runToken);
+        }
+    }
+
+    /**
      * The frames quote the folder the *client* named, while the server reads the folder it
      * derived from the `validate` slug. The two are not the same string: for the reconstructed
      * i18n slugs a client sends a bare id and the server rebuilds the real path from it, which is

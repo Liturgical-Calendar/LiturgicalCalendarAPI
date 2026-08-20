@@ -879,6 +879,12 @@ class Health implements MessageComponentInterface
      * The raw id is not usable as-is: `.diocese:ambrosian:lugano_ch` parses as a class followed by a
      * pseudo-class, and the ~60 per-calendar labels contain `: `, which makes `querySelectorAll()`
      * throw outright rather than merely match nothing.
+     *
+     * No case folding **here**, but the fragments this produces are mixed case (`nation-roman-US`,
+     * `sanctorale-roman-EDITIO_TYPICA_1970`) and UnitTestInterface lowercases every class token
+     * before matching. Matching is therefore case-insensitive on the client, which must put the
+     * card's class and its selector through the same treatment; the spec section named above states
+     * that as part of the rule, because a client that lowered only one side would find no cards.
      */
     private static function cssClassFragmentForId(string $id): string
     {

@@ -686,6 +686,13 @@ final class HealthValidateSourceTest extends TestCase
         /** @var array<string, string> $unaddressable */
         $unaddressable = [];
 
+        /**
+         * The id that first claimed each lowercased class fragment, so a second claimant is caught.
+         *
+         * @var array<string, string> $fragmentOwners
+         */
+        $fragmentOwners = [];
+
         foreach ($published as $index => $item) {
             $conn = self::createStubConnection($index + 1);
             self::send($health, $conn, ['action' => 'validateSource', 'target' => ['id' => $item->id]]);
@@ -711,11 +718,32 @@ final class HealthValidateSourceTest extends TestCase
                 // makes `querySelectorAll()` throw — so the whole published set is swept for the
                 // shape a selector has to have, not only the three ids the happy-path rows cover.
                 if ($frame instanceof \stdClass) {
+                    $fragment = self::classFragmentOf($frame);
                     self::assertMatchesRegularExpression(
                         self::USABLE_CLASS_FRAGMENT,
-                        self::classFragmentOf($frame),
+                        $fragment,
                         "{$item->id} is addressable but its frames are not: {$frame->classes}"
                     );
+
+                    // Two ids that address the same card are worse than one id that addresses none:
+                    // the client paints one check's result over another's and neither reader can
+                    // tell. The substitution is many-to-one — `a:b` and `a-b` would both yield
+                    // `a-b` — so uniqueness of the *ids*, which CheckableInventoryTest already
+                    // asserts, does not carry over to the fragments and has to be asserted here.
+                    //
+                    // Compared lowercased, because the client lowercases: `slugifySelector()` runs
+                    // every class token through `slugify()`, which begins with `toLowerCase()`, so a
+                    // pair colliding only after lowering collides for real. No realizable collision
+                    // exists in the published set today; this is the guard that keeps it that way
+                    // when a new id kind is added.
+                    $key   = strtolower($fragment);
+                    $owner = $fragmentOwners[$key] ?? $item->id;
+                    self::assertSame(
+                        $owner,
+                        $item->id,
+                        "the class fragment {$fragment} is claimed by both {$owner} and {$item->id}"
+                    );
+                    $fragmentOwners[$key] = $item->id;
                 }
             }
         }

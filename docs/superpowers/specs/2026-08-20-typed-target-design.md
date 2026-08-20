@@ -119,6 +119,17 @@ asking the server, because that is how it finds the card to paint before any fra
 
 In JavaScript that is `id.replace(/[^A-Za-z0-9_-]/g, '-')`; in PHP, `preg_replace('/[^A-Za-z0-9_-]/', '-', $id)`.
 
+**Fragment matching is case-insensitive on the client, and a client MUST put the card's class and the selector it
+matches with through the same case treatment.** The server does not case-fold, so the fragments it emits are mixed case
+across most of the inventory — `nation-roman-US`, `sanctorale-roman-EDITIO_TYPICA_1970`,
+`test-ambrosian-StIgnatiusOfLoyolaTest`. UnitTestInterface lowercases: `slugifySelector()` (`assets/js/common.js`) runs
+every class token through `slugify()`, which begins with `toLowerCase()`, before handing the selector to
+`querySelectorAll()`. So a client that writes `class="nation-roman-US"` onto the card and then matches through
+`slugifySelector` searches for `.nation-roman-us` and finds **zero cards** — the same paint-nothing failure this whole
+section exists to prevent, one layer down. Today's v1 slugs are safe only because the card class is built by the *same*
+`slugify()` (`assets/js/index.js`, `slugify(item.validate)`), so both sides are lowered together. Whichever convention a
+client picks — lowercase both, or neither — it has to be the same on both sides.
+
 | Id                                      | Fragment                                | Frame class                                          |
 |-----------------------------------------|-----------------------------------------|------------------------------------------------------|
 | `temporale:roman`                       | `temporale-roman`                       | `.temporale-roman.file-exists`                       |
@@ -139,10 +150,12 @@ Three properties of this rule are load-bearing, and none of them is an accident:
   from the rule because `.` is outside `[A-Za-z0-9_-]`.
 
 Every id the inventory currently publishes yields a fragment matching `^[A-Za-z][A-Za-z0-9_-]*$`, and no two ids
-collide on one fragment. Neither is guaranteed by the substitution alone — an id kind introduced later that began with a
-digit, or that differed from another only in punctuation, would break one or the other — so both are asserted over the
-whole published set in `HealthValidateSourceTest`, and a new id kind that violates either fails the build rather than
-the client.
+collide on one fragment **once lowercased**. Neither is guaranteed by the substitution alone — the substitution is
+many-to-one, so an id kind introduced later that differed from another only in punctuation or only in case would break
+uniqueness, and one beginning with a digit would break the shape — so both are asserted over the whole published set by
+`HealthValidateSourceTest::testEveryPublishedIdIsAddressableThroughValidateSource`, and a new id kind that violates
+either fails the build rather than the client. The uniqueness check compares lowercased fragments for the reason given
+above: a pair that collides only after the client lowers them collides for real.
 
 The steps themselves are `file-exists`, `json-valid` and `schema-valid`, which are **not** the values `/validations`
 publishes in `steps`; see [A caveat on `steps`](#a-caveat-on-steps-not-fixed-here) below.
