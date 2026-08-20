@@ -85,6 +85,21 @@ use Psr\Http\Message\ResponseInterface;
  * property their own shape retired, rather than ignoring it. See {@see Health::RETIRED_PROPERTIES}
  * for the rule and {@see Health::rejectRetiredProperties()} for the one implementation of it.
  *
+ * **`requestId` is accepted on any message and echoed on every frame that message produces**,
+ * rejections included. It is the client's own handle for one request — validated against
+ * {@see Health::CORRELATION_ID_PATTERN}, so junk never reaches the wire, and omitted from the frames
+ * entirely when the client sends none, which is every v1 message. It replaces attribution by CSS
+ * selector: until now a client's only statement of which of its cards a frame belonged to was the
+ * `classes` string the server had built for it.
+ *
+ * It is **not** a second `runToken`, and the difference decides where each is kept. A token scopes a
+ * *run*, so it is stored per connection and any frame may take the connection's current one; an id
+ * scopes a single *request*, and `Health` is asynchronous, so the connection's most recent request is
+ * very often not the one a late frame answers. Each handler therefore captures the id it was called
+ * with and threads it through its closures. See {@see Health::onMessage()}, where that is argued in
+ * full. `runId` is published alongside `runToken` with the same value, so a client adopting the newer
+ * spelling migrates once rather than twice.
+ *
  * Do not confuse `runTest` with the inventory item `test:{rite}:{Name}` that `validateSource`
  * addresses. That item is a *source check*: does the test definition exist, parse, and validate
  * against `LitCalTest.json`. `runTest` *runs* the test that definition describes against a computed
@@ -97,11 +112,11 @@ use Psr\Http\Message\ResponseInterface;
  * @phpstan-type ExecuteValidationResource \stdClass&object{action:'executeValidation',category:'resourceDataCheck',validate:string,sourceFile:string,responsetype?:string}
  * @phpstan-type ValidateCalendar \stdClass&object{action:'validateCalendar',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar'|'ritecalendar',responsetype:'JSON'|'XML'|'ICS'|'YML',rite?:string}
  * @phpstan-type CalendarIdentity \stdClass&object{kind:'general'|'national'|'diocesan'|'rite',id?:string,rite:string}
- * @phpstan-type ValidateTypedCalendar \stdClass&object{action:'validateCalendar',calendar:CalendarIdentity,year:int,responseFormat:'JSON'|'XML'|'ICS'|'YML',runToken?:string}
+ * @phpstan-type ValidateTypedCalendar \stdClass&object{action:'validateCalendar',calendar:CalendarIdentity,year:int,responseFormat:'JSON'|'XML'|'ICS'|'YML',runToken?:string,requestId?:string}
  * @phpstan-type ExecuteUnitTest \stdClass&object{action:'executeUnitTest',calendar:string,year:int,category:'nationalcalendar'|'diocesancalendar'|'ritecalendar',test:string,rite?:string}
- * @phpstan-type RunTest \stdClass&object{action:'runTest',test:string,calendar:CalendarIdentity,year:int,runToken?:string}
+ * @phpstan-type RunTest \stdClass&object{action:'runTest',test:string,calendar:CalendarIdentity,year:int,runToken?:string,requestId?:string}
  * @phpstan-type CancelRun \stdClass&object{action:'cancelRun',runToken:string}
- * @phpstan-type ValidateSource \stdClass&object{action:'validateSource',target:\stdClass&object{id:string},runToken?:string}
+ * @phpstan-type ValidateSource \stdClass&object{action:'validateSource',target:\stdClass&object{id:string},runToken?:string,requestId?:string}
  *
  * @phpstan-import-type LiturgicalEvent from \LiturgicalCalendar\Api\Test\LitTestRunner
  */
@@ -234,6 +249,16 @@ class Health implements MessageComponentInterface
      * @var string[]
      */
     private const VALIDATABLE_RESPONSE_FORMATS = ['JSON', 'XML', 'ICS', 'YML'];
+
+    /**
+     * The shape a correlation identifier must have: 1 to 64 characters of `A-Za-z0-9_-`.
+     *
+     * One pattern for `runToken` and `requestId` alike, because they are the same kind of thing —
+     * an opaque client-minted handle the server echoes back — and a client that minted one of them
+     * must not have to discover that the other accepts a different alphabet. Junk is refused at the
+     * door rather than echoed onto every frame of a run.
+     */
+    private const CORRELATION_ID_PATTERN = '/^[A-Za-z0-9_\-]{1,64}$/';
 
     private const RED    = "\033[0;31m";
     private const GREEN  = "\033[0;32m";
@@ -519,7 +544,7 @@ class Health implements MessageComponentInterface
             && $messageReceived->action !== 'cancelRun'
             && property_exists($messageReceived, 'runToken')
             && is_string($messageReceived->runToken)
-            && preg_match('/^[A-Za-z0-9_\-]{1,64}$/', $messageReceived->runToken)
+            && preg_match(self::CORRELATION_ID_PATTERN, $messageReceived->runToken)
         ) {
             // A token this connection was not already on is a run *beginning*, and that is the one
             // moment the inventory may safely be rebuilt: `validateSource` addresses source data
@@ -547,6 +572,33 @@ class Health implements MessageComponentInterface
             }
             $this->runTokens[$resourceId] = $messageReceived->runToken;
         }
+
+        // The correlation id the client maps this request's answers by, read here and threaded
+        // downward **as a value**. It is deliberately not stored per connection the way `runToken`
+        // just was, and the difference is not a matter of taste: `runToken` scopes a *run*, so the
+        // connection's current token is the right answer for any frame it emits, while `requestId`
+        // scopes a single *request*. Health is asynchronous — frames are emitted from promise
+        // closures long after `onMessage()` has returned, and `$this->queue` / `$this->inFlight`
+        // exist precisely because several requests are in flight on one connection at once. A
+        // per-connection "current requestId" would therefore stamp a late-arriving frame with
+        // whichever request arrived most recently, which is the exact misattribution correlation
+        // was added to prevent. Each handler captures the value it was called with in its closures.
+        //
+        // Read *after* the run token is stored, so that a message rejected below still carries the
+        // token of the run the client says it is on.
+        $requestId = null;
+        if ($messageReceived instanceof \stdClass && property_exists($messageReceived, 'requestId')) {
+            $candidateRequestId = $messageReceived->requestId;
+            if (false === is_string($candidateRequestId) || 1 !== preg_match(self::CORRELATION_ID_PATTERN, $candidateRequestId)) {
+                // Refused rather than quietly dropped. A client that sent an unusable id is about
+                // to wait for frames it intends to attribute by it; answering with frames that
+                // carry no id at all would look like success and correlate nothing.
+                $this->rejectMessage($from, 'requestId must be 1 to 64 characters of A-Z, a-z, 0-9, underscore or hyphen.');
+                return;
+            }
+            $requestId = $candidateRequestId;
+        }
+
         if (
             json_last_error() === JSON_ERROR_NONE
             && $messageReceived instanceof \stdClass
@@ -556,14 +608,14 @@ class Health implements MessageComponentInterface
             switch ($messageReceived->action) {
                 case 'executeValidation':
                     /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $messageReceived */
-                    $this->executeValidation($messageReceived, $from);
+                    $this->executeValidation($messageReceived, $from, requestId: $requestId);
                     break;
                 case 'validateCalendar':
                     // Same action, two shapes; see isTypedCalendarMessage(). The legacy arm below
                     // is untouched and stays reachable until UnitTestInterface#42 ships.
                     if (self::isTypedCalendarMessage($messageReceived)) {
                         /** @var ValidateTypedCalendar $messageReceived */
-                        $this->validateTypedCalendar($messageReceived, $from);
+                        $this->validateTypedCalendar($messageReceived, $from, requestId: $requestId);
                         break;
                     }
                     /** @var ValidateCalendar $messageReceived */
@@ -573,7 +625,8 @@ class Health implements MessageComponentInterface
                         $messageReceived->category,
                         $messageReceived->responsetype,
                         $from,
-                        self::readRiteHint($messageReceived)
+                        self::readRiteHint($messageReceived),
+                        requestId: $requestId
                     );
                     break;
                 case 'executeUnitTest':
@@ -584,12 +637,13 @@ class Health implements MessageComponentInterface
                         $messageReceived->year,
                         $messageReceived->category,
                         $from,
-                        self::readRiteHint($messageReceived)
+                        self::readRiteHint($messageReceived),
+                        requestId: $requestId
                     );
                     break;
                 case 'runTest':
                     /** @var RunTest $messageReceived */
-                    $this->runTest($messageReceived, $from);
+                    $this->runTest($messageReceived, $from, requestId: $requestId);
                     break;
                 case 'cancelRun':
                     /** @var CancelRun $messageReceived */
@@ -597,13 +651,13 @@ class Health implements MessageComponentInterface
                     break;
                 case 'validateSource':
                     /** @var ValidateSource $messageReceived */
-                    $this->validateSource($messageReceived, $from);
+                    $this->validateSource($messageReceived, $from, requestId: $requestId);
                     break;
                 default:
                     $message       = new \stdClass();
                     $message->type = 'echobot';
                     $message->text = $msg;
-                    $this->sendMessage($from, $message);
+                    $this->sendMessage($from, $message, requestId: $requestId);
             }
         } else {
             if (json_last_error() !== JSON_ERROR_NONE) {
@@ -622,7 +676,7 @@ class Health implements MessageComponentInterface
             $message->type     = 'echobot';
             $message->errorMsg = $errorMsg;
             $message->text     = sprintf('Invalid message from connection %d: %s', $resourceId, $msg);
-            $this->sendMessage($from, $message);
+            $this->sendMessage($from, $message, requestId: $requestId);
         }
     }
 
@@ -669,14 +723,25 @@ class Health implements MessageComponentInterface
      * @param ConnectionInterface $from The client that sent the original message.
      * @param string|\stdClass $msg The message to send back to the client.
      * @param string|null $runToken The originating request's run token; falls back to the per-connection stored token when null.
+     * @param string|null $requestId The correlation id of the request that caused this frame, echoed back so a client can
+     *        attribute the frame to its own state without parsing a CSS selector. Always passed in by the caller, from the
+     *        value it captured when the request arrived; there is deliberately no per-connection fallback, because the
+     *        connection's most recent request is not necessarily the one this frame answers. See {@see Health::onMessage()}.
      */
-    private function sendMessage(ConnectionInterface $from, string|\stdClass $msg, ?string $runToken = null): void
+    private function sendMessage(ConnectionInterface $from, string|\stdClass $msg, ?string $runToken = null, ?string $requestId = null): void
     {
         /** @var int $resourceId */
         $resourceId = $from->resourceId;
         $token      = $runToken ?? ( $this->runTokens[$resourceId] ?? null );
         if ($msg instanceof \stdClass && $token !== null) {
+            // `runId` is the same value under the name the protocol is moving to: published now, and
+            // alongside `runToken` rather than instead of it, so UnitTestInterface#42 adopts the new
+            // spelling in the same migration as everything else and never has to do it twice.
             $msg->runToken = $token;
+            $msg->runId    = $token;
+        }
+        if ($msg instanceof \stdClass && null !== $requestId) {
+            $msg->requestId = $requestId;
         }
         if (gettype($msg) !== 'string') {
             $msg = json_encode($msg, JSON_PRETTY_PRINT);
@@ -731,6 +796,9 @@ class Health implements MessageComponentInterface
      *        for every other frame. It belongs to the legacy half and is assigned with it, immediately after
      *        `classes`, so a v1 frame's key order is byte-for-byte what it has always been and only the new
      *        structured keys follow.
+     * @param ?string $requestId The correlation id of the request that caused this frame, captured by the handler when
+     *        the request arrived and passed explicitly rather than read from any per-connection store; see
+     *        {@see Health::onMessage()} for why that distinction is load-bearing.
      */
     private function sendStepResult(
         ConnectionInterface $to,
@@ -743,7 +811,8 @@ class Health implements MessageComponentInterface
         ?string $runToken = null,
         ?string $classQualifier = null,
         FrameFamily $family = FrameFamily::CHECK,
-        ?string $responseType = null
+        ?string $responseType = null,
+        ?string $requestId = null
     ): void {
         // `classes` is composed by the family, not here: `frameClasses()` is the only selector composer in
         // the repository, and it is on `FrameFamily` rather than in this class because `LitTestRunner`
@@ -761,7 +830,7 @@ class Health implements MessageComponentInterface
         if (null !== $details && [] !== $details) {
             $message->details = $details;
         }
-        $this->sendMessage($to, $message, $runToken);
+        $this->sendMessage($to, $message, $runToken, requestId: $requestId);
     }
 
     /**
@@ -774,13 +843,16 @@ class Health implements MessageComponentInterface
      *
      * @param ConnectionInterface $to The connection that sent the message being rejected.
      * @param string $text Why the message could not be acted on.
+     * @param ?string $requestId The correlation id of the message being rejected, so a client can tell *which* of its
+     *        in-flight requests was refused. Null when the message carried none, and — see {@see Health::onMessage()} —
+     *        when the id itself is what was malformed, since an unusable id is not worth echoing.
      */
-    private function rejectMessage(ConnectionInterface $to, string $text): void
+    private function rejectMessage(ConnectionInterface $to, string $text, ?string $requestId = null): void
     {
         $message       = new \stdClass();
         $message->type = 'echobot';
         $message->text = $text;
-        $this->sendMessage($to, $message);
+        $this->sendMessage($to, $message, requestId: $requestId);
     }
 
     /**
@@ -880,10 +952,11 @@ class Health implements MessageComponentInterface
      *
      * @param ValidateSource $message The message naming the target to check.
      * @param ConnectionInterface $to The connection to send the result frames to.
+     * @param ?string $requestId The correlation id this request's frames must carry back, captured by the caller.
      */
-    private function validateSource(\stdClass $message, ConnectionInterface $to): void
+    private function validateSource(\stdClass $message, ConnectionInterface $to, ?string $requestId = null): void
     {
-        if ($this->rejectRetiredProperties($message, 'validateSource', $to)) {
+        if ($this->rejectRetiredProperties($message, 'validateSource', $to, requestId: $requestId)) {
             return;
         }
 
@@ -891,13 +964,13 @@ class Health implements MessageComponentInterface
         // cannot establish is its shape, since ACTION_PROPERTIES only names required properties.
         $target = property_exists($message, 'target') ? $message->target : null;
         if (false === ( $target instanceof \stdClass ) || false === property_exists($target, 'id')) {
-            $this->rejectMessage($to, 'validateSource requires a target object with an id.');
+            $this->rejectMessage($to, 'validateSource requires a target object with an id.', requestId: $requestId);
             return;
         }
 
         $id = $target->id;
         if (false === is_string($id)) {
-            $this->rejectMessage($to, 'validateSource target id must be a string.');
+            $this->rejectMessage($to, 'validateSource target id must be a string.', requestId: $requestId);
             return;
         }
 
@@ -924,7 +997,8 @@ class Health implements MessageComponentInterface
                 $to,
                 null === $inventoryError
                     ? "Unknown validation target: {$id}"
-                    : "Could not resolve validation target {$id}: the source data inventory could not be built ({$inventoryError->getMessage()})"
+                    : "Could not resolve validation target {$id}: the source data inventory could not be built ({$inventoryError->getMessage()})",
+                requestId: $requestId
             );
             return;
         }
@@ -941,7 +1015,8 @@ class Health implements MessageComponentInterface
             classFragment: self::cssClassFragmentForId($item->id),
             // The id itself rides along on the frames, so a client attributes a result by the
             // value it asked with rather than by unpicking the selector the server built.
-            target: self::frameTarget($item->id)
+            target: self::frameTarget($item->id),
+            requestId: $requestId
         );
     }
 
@@ -1013,8 +1088,9 @@ class Health implements MessageComponentInterface
      *             2. `.json-valid`: a string, the class name to add to the message if the file is valid JSON
      *             3. `.schema-valid`: a string, the class name to add to the message if the file is valid against the schema
      * @param ConnectionInterface $to The connection to send the validation message to
+     * @param ?string $requestId The correlation id this request's frames must carry back, captured by the caller.
      */
-    private function executeValidation(\stdClass $validation, ConnectionInterface $to): void
+    private function executeValidation(\stdClass $validation, ConnectionInterface $to, ?string $requestId = null): void
     {
         $runToken = $this->resolveRunToken($to);
         // First thing is try to determine the schema that we will be validating against,
@@ -1053,7 +1129,7 @@ class Health implements MessageComponentInterface
                             try {
                                 $dioceseMetadata = $this->findDioceseMetadata($matches[2]);
                             } catch (\RuntimeException | NotFoundException $e) {
-                                $this->handleDioceseMetadataError($e, $to, $validation, $matches[2], $runToken);
+                                $this->handleDioceseMetadataError($e, $to, $validation, $matches[2], $runToken, requestId: $requestId);
                                 return;
                             }
                             // The diocesan tree is partitioned by rite, and it is the only tier
@@ -1107,7 +1183,7 @@ class Health implements MessageComponentInterface
                                 try {
                                     $dioceseMetadata = $this->findDioceseMetadata($matches[2]);
                                 } catch (\RuntimeException | NotFoundException $e) {
-                                    $this->handleDioceseMetadataError($e, $to, $validation, $matches[2], $runToken);
+                                    $this->handleDioceseMetadataError($e, $to, $validation, $matches[2], $runToken, requestId: $requestId);
                                     return;
                                 }
                                 // Rite-partitioned, like every other diocesan path. This arm only
@@ -1172,7 +1248,7 @@ class Health implements MessageComponentInterface
                 try {
                     $dioceseMetadata = $this->findDioceseMetadata($dioceseId);
                 } catch (\RuntimeException | NotFoundException $e) {
-                    $this->handleDioceseMetadataError($e, $to, $validation, $dioceseId, $runToken);
+                    $this->handleDioceseMetadataError($e, $to, $validation, $dioceseId, $runToken, requestId: $requestId);
                     return;
                 }
                 $nation      = $dioceseMetadata->nation;
@@ -1202,7 +1278,8 @@ class Health implements MessageComponentInterface
             $runToken,
             $category,
             $pathForSchema,
-            $sourceFolder
+            $sourceFolder,
+            requestId: $requestId
         );
     }
 
@@ -1242,6 +1319,9 @@ class Health implements MessageComponentInterface
      * @param ?\stdClass $target What the frames are about — see {@see Health::frameTarget()} — carried on them so a client
      *        can attribute them without parsing the selector. Null for a v1 `executeValidation` message, which names no id: it
      *        is never reconstructed from the class fragment, since that derivation only runs the other way.
+     * @param ?string $requestId The correlation id of the request that caused this frame, captured by the handler when
+     *        the request arrived and passed explicitly rather than read from any per-connection store; see
+     *        {@see Health::onMessage()} for why that distinction is load-bearing.
      */
     private function runValidationSteps(
         string $dataPath,
@@ -1254,7 +1334,8 @@ class Health implements MessageComponentInterface
         ?string $pathForSchema = null,
         ?string $sourceFolder = null,
         ?string $classFragment = null,
-        ?\stdClass $target = null
+        ?\stdClass $target = null,
+        ?string $requestId = null
     ): void {
         $pathForSchema ??= $label;
         // Read before $dataPath is made absolute below, so the two stay distinguishable.
@@ -1285,7 +1366,8 @@ class Health implements MessageComponentInterface
                         $missing,
                         '', // unreachable: $missing is non-empty, so the failure text is used
                         "Data folder $sourceFolder could not be checked",
-                        $runToken
+                        $runToken,
+                        requestId: $requestId
                     );
                 }
                 return;
@@ -1354,7 +1436,7 @@ class Health implements MessageComponentInterface
             $allPromises = Promise\all($promises);
 
             $allPromises->then(
-                function () use ($to, $classFragment, $target, $sourceFolder, $schema, &$fileExistsErrors, &$jsonErrors, &$schemaErrors, $runToken) {
+                function () use ($to, $classFragment, $target, $sourceFolder, $schema, &$fileExistsErrors, &$jsonErrors, &$schemaErrors, $runToken, $requestId) {
                     // Exactly one frame per step, pass or fail. A folder check is a statement
                     // about the folder, so a failure names the offending files inside a single
                     // frame instead of emitting one frame each.
@@ -1366,7 +1448,8 @@ class Health implements MessageComponentInterface
                         $fileExistsErrors,
                         "The Data folder $sourceFolder exists and contains valid i18n json files",
                         "Data folder $sourceFolder",
-                        $runToken
+                        $runToken,
+                        requestId: $requestId
                     );
 
                     $this->sendFolderStepResult(
@@ -1377,7 +1460,8 @@ class Health implements MessageComponentInterface
                         $jsonErrors,
                         "The i18n json files in Data folder $sourceFolder were successfully decoded as JSON",
                         "The i18n json files in Data folder $sourceFolder were not all decoded as JSON",
-                        $runToken
+                        $runToken,
+                        requestId: $requestId
                     );
 
                     $this->sendFolderStepResult(
@@ -1388,7 +1472,8 @@ class Health implements MessageComponentInterface
                         $schemaErrors,
                         "The i18n json files in Data folder $sourceFolder were successfully validated against the Schema $schema",
                         "The i18n json files in Data folder $sourceFolder were not all valid against the Schema $schema",
-                        $runToken
+                        $runToken,
+                        requestId: $requestId
                     );
                 },
                 function (\Throwable $e) use ($label, $dataPath) {
@@ -1422,14 +1507,14 @@ class Health implements MessageComponentInterface
                 /** @var PromiseInterface<array{data: string, fromCache: bool}> $httpPromise */
                 $httpPromise = $this->cachedGet($dataPath, [], 300, $to);
                 $httpPromise->then(
-                    function (array $result) use ($to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $target) {
+                    function (array $result) use ($to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $requestId, $target) {
                         /** @var array{data: string, fromCache: bool} $result */
                         $data = $result['data'];
                         echo 'Fetched data for ' . $dataPath . ': got ' . strlen($data) . " bytes\n";
-                        $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $target);
+                        $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $target, requestId: $requestId);
                     },
-                    function (\Throwable $e) use ($to, $validationForMessages, $dataPath, $runToken, $target) {
-                        $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken, $target);
+                    function (\Throwable $e) use ($to, $validationForMessages, $dataPath, $runToken, $requestId, $target) {
+                        $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken, $target, requestId: $requestId);
                     }
                 );
             } else {
@@ -1443,14 +1528,14 @@ class Health implements MessageComponentInterface
                 /** @var PromiseInterface<array{data: string, fromCache: bool}> $promise */
                 $promise = $this->cachedFileGetContents($fsPath);
                 $promise->then(
-                    function (array $result) use ($to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $target) {
+                    function (array $result) use ($to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $requestId, $target) {
                         /** @var array{data: string, fromCache: bool} $result */
                         $data = $result['data'];
                         echo 'Fetched data for ' . $dataPath . ': got ' . strlen($data) . " bytes\n";
-                        $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $target);
+                        $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $target, requestId: $requestId);
                     },
-                    function (\Throwable $e) use ($to, $validationForMessages, $dataPath, $runToken, $target) {
-                        $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken, $target);
+                    function (\Throwable $e) use ($to, $validationForMessages, $dataPath, $runToken, $requestId, $target) {
+                        $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken, $target, requestId: $requestId);
                     }
                 );
             }
@@ -1466,9 +1551,12 @@ class Health implements MessageComponentInterface
      * @param string $dataPath The path to the data that failed to load.
      * @param ?string $runToken The originating run token to echo back on responses, or null to use the per-connection fallback.
      * @param ?\stdClass $target What the frames are about, per {@see Health::frameTarget()}, or null for a v1 message, which names none.
+     * @param ?string $requestId The correlation id of the request that caused this frame, captured by the handler when
+     *        the request arrived and passed explicitly rather than read from any per-connection store; see
+     *        {@see Health::onMessage()} for why that distinction is load-bearing.
      * @return void
      */
-    private function handleValidationDataError(\Throwable $e, ConnectionInterface $to, \stdClass $validation, string $dataPath, ?string $runToken = null, ?\stdClass $target = null): void
+    private function handleValidationDataError(\Throwable $e, ConnectionInterface $to, \stdClass $validation, string $dataPath, ?string $runToken = null, ?\stdClass $target = null, ?string $requestId = null): void
     {
         // `validate` carries the class fragment: see the note where $validationForMessages is built.
         $validate = (string) $validation->validate;
@@ -1485,7 +1573,8 @@ class Health implements MessageComponentInterface
             Status::FAIL,
             "Data file $dataPath is not readable: " . $e->getMessage(),
             null,
-            $runToken
+            $runToken,
+            requestId: $requestId
         );
 
         $this->sendStepResult(
@@ -1496,7 +1585,8 @@ class Health implements MessageComponentInterface
             Status::FAIL,
             "Could not decode the Data file $dataPath as JSON because it is not readable",
             null,
-            $runToken
+            $runToken,
+            requestId: $requestId
         );
 
         $this->sendStepResult(
@@ -1507,7 +1597,8 @@ class Health implements MessageComponentInterface
             Status::FAIL,
             "Unable to verify schema for dataPath {$dataPath} and category {$category} since Data file $dataPath does not exist or is not readable",
             null,
-            $runToken
+            $runToken,
+            requestId: $requestId
         );
     }
 
@@ -1521,6 +1612,9 @@ class Health implements MessageComponentInterface
      * @param ConnectionInterface $to The WebSocket connection to send the error to.
      * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $validation The validation object.
      * @param string $calendarId The diocese calendar ID that failed to resolve.
+     * @param ?string $requestId The correlation id of the request that caused this frame, captured by the handler when
+     *        the request arrived and passed explicitly rather than read from any per-connection store; see
+     *        {@see Health::onMessage()} for why that distinction is load-bearing.
      * @return void
      */
     private function handleDioceseMetadataError(
@@ -1528,7 +1622,8 @@ class Health implements MessageComponentInterface
         ConnectionInterface $to,
         \stdClass $validation,
         string $calendarId,
-        ?string $runToken = null
+        ?string $runToken = null,
+        ?string $requestId = null
     ): void {
         $validate = (string) $validation->validate;
 
@@ -1550,7 +1645,7 @@ class Health implements MessageComponentInterface
         }
 
         $message->classes = ".$validate.diocese-metadata";
-        $this->sendMessage($to, $message, $runToken);
+        $this->sendMessage($to, $message, $runToken, requestId: $requestId);
     }
 
     /**
@@ -1575,6 +1670,9 @@ class Health implements MessageComponentInterface
      * @param string       $successText   Message for the passing case.
      * @param string       $failurePrefix Lead-in for the failing case; the offending files follow.
      * @param ?string      $runToken      Run token to echo back.
+     * @param ?string $requestId The correlation id of the request that caused this frame, captured by the handler when
+     *        the request arrived and passed explicitly rather than read from any per-connection store; see
+     *        {@see Health::onMessage()} for why that distinction is load-bearing.
      */
     private function sendFolderStepResult(
         ConnectionInterface $to,
@@ -1584,7 +1682,8 @@ class Health implements MessageComponentInterface
         array $errors,
         string $successText,
         string $failurePrefix,
-        ?string $runToken
+        ?string $runToken,
+        ?string $requestId = null
     ): void {
         $this->sendStepResult(
             $to,
@@ -1596,7 +1695,8 @@ class Health implements MessageComponentInterface
                 ? $successText
                 : $failurePrefix . ' — ' . count($errors) . ' problem(s): ' . implode('; ', $errors),
             $errors,
-            $runToken
+            $runToken,
+            requestId: $requestId
         );
     }
 
@@ -1606,8 +1706,11 @@ class Health implements MessageComponentInterface
      * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $validation The validation object.
      * @param ?string $runToken The originating run token to echo back on responses, or null to use the per-connection fallback.
      * @param ?\stdClass $target What the frames are about, per {@see Health::frameTarget()}, or null for a v1 message, which names none.
+     * @param ?string $requestId The correlation id of the request that caused this frame, captured by the handler when
+     *        the request arrived and passed explicitly rather than read from any per-connection store; see
+     *        {@see Health::onMessage()} for why that distinction is load-bearing.
      */
-    private function processValidationData(string $data, ConnectionInterface $to, \stdClass $validation, string $dataPath, ?string $schema, string $pathForSchema, ?string $runToken = null, ?\stdClass $target = null): void
+    private function processValidationData(string $data, ConnectionInterface $to, \stdClass $validation, string $dataPath, ?string $schema, string $pathForSchema, ?string $runToken = null, ?\stdClass $target = null, ?string $requestId = null): void
     {
         // `validate` carries the class fragment: see the note where $validationForMessages is built.
         $validate = (string) $validation->validate;
@@ -1621,7 +1724,8 @@ class Health implements MessageComponentInterface
             Status::PASS,
             "The Data file $dataPath exists",
             null,
-            $runToken
+            $runToken,
+            requestId: $requestId
         );
 
         $jsonData = json_decode($data);
@@ -1634,7 +1738,8 @@ class Health implements MessageComponentInterface
                 Status::PASS,
                 "The Data file $dataPath was successfully decoded as JSON",
                 null,
-                $runToken
+                $runToken,
+                requestId: $requestId
             );
 
             if (null !== $schema) {
@@ -1648,7 +1753,8 @@ class Health implements MessageComponentInterface
                         Status::PASS,
                         "The Data file $dataPath was successfully validated against the Schema $schema",
                         null,
-                        $runToken
+                        $runToken,
+                        requestId: $requestId
                     );
                 } elseif ($validationResult instanceof \stdClass) {
                     // The failure text is the schema library's, quoted verbatim; the frame around it
@@ -1668,7 +1774,8 @@ class Health implements MessageComponentInterface
                         Status::FAIL,
                         $validationText,
                         explode(PHP_EOL, $validationText),
-                        $runToken
+                        $runToken,
+                        requestId: $requestId
                     );
                 }
             } else {
@@ -1680,7 +1787,8 @@ class Health implements MessageComponentInterface
                     Status::FAIL,
                     "executeValidation validation->sourceFile (JSON): Unable to detect schema for dataPath {$dataPath} and category {$category} (path for schema: $pathForSchema, Route::CALENDARS->path(): " . Route::CALENDARS->path() . ', LitSchema::METADATA->path(): ' . LitSchema::METADATA->path() . ')',
                     null,
-                    $runToken
+                    $runToken,
+                    requestId: $requestId
                 );
             }
         } else {
@@ -1692,7 +1800,8 @@ class Health implements MessageComponentInterface
                 Status::FAIL,
                 "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg() . ". Raw data = &lt;&lt;&lt;JSON\n" . $data . "\n&gt;&gt;&gt;",
                 null,
-                $runToken
+                $runToken,
+                requestId: $requestId
             );
         }
     }
@@ -1939,12 +2048,12 @@ class Health implements MessageComponentInterface
      * @param 'validateSource'|'validateCalendar'|'runTest' $action The reshaped action being handled.
      * @return bool True when the message was rejected and the caller must stop.
      */
-    private function rejectRetiredProperties(\stdClass $message, string $action, ConnectionInterface $to): bool
+    private function rejectRetiredProperties(\stdClass $message, string $action, ConnectionInterface $to, ?string $requestId = null): bool
     {
         $shape = self::RETIRED_PROPERTIES[$action]['shape'];
         foreach (self::RETIRED_PROPERTIES[$action]['retired'] as $property => $replacement) {
             if (property_exists($message, $property)) {
-                $this->rejectMessage($to, sprintf('%s is not part of a %s: %s', $property, $shape, $replacement));
+                $this->rejectMessage($to, sprintf('%s is not part of a %s: %s', $property, $shape, $replacement), requestId: $requestId);
                 return true;
             }
         }
@@ -2052,8 +2161,9 @@ class Health implements MessageComponentInterface
      *
      * @param ValidateTypedCalendar $message The message naming the calendar to compute and check.
      * @param ConnectionInterface $to The connection to send the result frames to.
+     * @param ?string $requestId The correlation id this request's frames must carry back, captured by the caller.
      */
-    private function validateTypedCalendar(\stdClass $message, ConnectionInterface $to): void
+    private function validateTypedCalendar(\stdClass $message, ConnectionInterface $to, ?string $requestId = null): void
     {
         // A leftover `category`, `responsetype` or top-level `rite` is a half-migrated client: the
         // message happens to work, because `calendar.kind`, `responseFormat` and `calendar.rite`
@@ -2062,7 +2172,7 @@ class Health implements MessageComponentInterface
         // the two disagree. Say so now, while they still agree — most sharply for `rite`, where a
         // disagreement is the very thing resolveCalendarIdentity() refuses to resolve silently.
         // See Health::RETIRED_PROPERTIES.
-        if ($this->rejectRetiredProperties($message, 'validateCalendar', $to)) {
+        if ($this->rejectRetiredProperties($message, 'validateCalendar', $to, requestId: $requestId)) {
             return;
         }
 
@@ -2070,13 +2180,13 @@ class Health implements MessageComponentInterface
             $identity = $this->readCalendarIdentity($message, 'validateCalendar');
             $year     = self::readYear($message, 'validateCalendar');
         } catch (\InvalidArgumentException $e) {
-            $this->rejectMessage($to, $e->getMessage());
+            $this->rejectMessage($to, $e->getMessage(), requestId: $requestId);
             return;
         }
 
         $responseFormat = property_exists($message, 'responseFormat') ? $message->responseFormat : null;
         if (false === is_string($responseFormat) || false === in_array($responseFormat, self::VALIDATABLE_RESPONSE_FORMATS, true)) {
-            $this->rejectMessage($to, 'validateCalendar responseFormat must be one of: ' . implode(', ', self::VALIDATABLE_RESPONSE_FORMATS) . '.');
+            $this->rejectMessage($to, 'validateCalendar responseFormat must be one of: ' . implode(', ', self::VALIDATABLE_RESPONSE_FORMATS) . '.', requestId: $requestId);
             return;
         }
 
@@ -2086,7 +2196,8 @@ class Health implements MessageComponentInterface
             $identity['category'],
             $responseFormat,
             $to,
-            $identity['rite']->value
+            $identity['rite']->value,
+            requestId: $requestId
         );
     }
 
@@ -2121,6 +2232,9 @@ class Health implements MessageComponentInterface
      *                                   genuinely has none — never manufactured, per `sendStepResult()`.
      * @param ?string      $responseType The legacy `responsetype` the decode-failure frames carry, or null.
      * @param ?string      $runToken     Run token to echo back.
+     * @param ?string $requestId The correlation id of the request that caused this frame, captured by the handler when
+     *        the request arrived and passed explicitly rather than read from any per-connection store; see
+     *        {@see Health::onMessage()} for why that distinction is load-bearing.
      */
     private function sendCalendarStepResult(
         ConnectionInterface $to,
@@ -2131,7 +2245,8 @@ class Health implements MessageComponentInterface
         string $text,
         ?array $details = null,
         ?string $responseType = null,
-        ?string $runToken = null
+        ?string $runToken = null,
+        ?string $requestId = null
     ): void {
         $this->sendStepResult(
             $to,
@@ -2142,6 +2257,7 @@ class Health implements MessageComponentInterface
             $text,
             details: $details,
             runToken: $runToken,
+            requestId: $requestId,
             classQualifier: "year-$year",
             responseType: $responseType
         );
@@ -2167,13 +2283,17 @@ class Health implements MessageComponentInterface
      * @param int $year The year being checked.
      * @param \stdClass $validationResult The `type`/`text` object {@see Health::validateDataAgainstSchema()} returns on failure.
      * @param ?string $runToken Run token to echo back.
+     * @param ?string $requestId The correlation id of the request that caused this frame, captured by the handler when
+     *        the request arrived and passed explicitly rather than read from any per-connection store; see
+     *        {@see Health::onMessage()} for why that distinction is load-bearing.
      */
     private function sendSchemaFailureStepResult(
         ConnectionInterface $to,
         string $calendar,
         int $year,
         \stdClass $validationResult,
-        ?string $runToken
+        ?string $runToken,
+        ?string $requestId = null
     ): void {
         /** @var string $validationText */
         $validationText = $validationResult->text;
@@ -2185,7 +2305,8 @@ class Health implements MessageComponentInterface
             Status::FAIL,
             $validationText,
             details: explode(PHP_EOL, $validationText),
-            runToken: $runToken
+            runToken: $runToken,
+            requestId: $requestId
         );
     }
 
@@ -2199,12 +2320,13 @@ class Health implements MessageComponentInterface
      * @param string $responseType The response format type (e.g., 'JSON', 'XML', 'ICS', 'YML').
      * @param ConnectionInterface $to The connection to which messages about the validation process are sent.
      * @param ?string $riteHint The `rite` property of the incoming message, if any.
+     * @param ?string $requestId The correlation id this request's frames must carry back, captured by the caller.
      *
      * This function retrieves the calendar data from a remote source based on the given parameters
      * and validates it against the appropriate schema. It supports multiple response types, including
      * XML, ICS, YML, and JSON. Validation results are sent as messages to the provided connection interface.
      */
-    private function validateCalendar(string $calendar, int $year, string $category, string $responseType, ConnectionInterface $to, ?string $riteHint = null): void
+    private function validateCalendar(string $calendar, int $year, string $category, string $responseType, ConnectionInterface $to, ?string $riteHint = null, ?string $requestId = null): void
     {
         $runToken        = $this->resolveRunToken($to);
         $returnTypeParam = ReturnTypeParam::from($responseType);
@@ -2219,7 +2341,7 @@ class Health implements MessageComponentInterface
         $req     = $this->buildCalendarRequestPath($calendar, $year, $category, $this->resolveRite($calendar, $category, $riteHint));
         $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts, 300, $to);
         $promise->then(
-            function (array $result) use ($to, $calendar, $year, $category, $req, $responseType, $runToken) {
+            function (array $result) use ($to, $calendar, $year, $category, $req, $responseType, $runToken, $requestId) {
                 /** @var array{data: string, fromCache: bool} $result */
                 $data      = $result['data'];
                 $fromCache = $result['fromCache'];
@@ -2232,7 +2354,8 @@ class Health implements MessageComponentInterface
                     Step::EXISTS,
                     Status::PASS,
                     "The $category of $calendar for the year $year exists",
-                    runToken: $runToken
+                    runToken: $runToken,
+                    requestId: $requestId
                 );
 
                 switch ($responseType) {
@@ -2257,7 +2380,8 @@ class Health implements MessageComponentInterface
                                     . Route::CALENDAR->path() . $req . ' as XML: ' . implode('&#013;', $xmlErrors),
                                 details: $xmlErrors,
                                 responseType: $responseType,
-                                runToken: $runToken
+                                runToken: $runToken,
+                                requestId: $requestId
                             );
                         } else {
                             $this->sendCalendarStepResult(
@@ -2267,7 +2391,8 @@ class Health implements MessageComponentInterface
                                 Step::PARSES,
                                 Status::PASS,
                                 "The $category of $calendar for the year $year was successfully decoded as XML",
-                                runToken: $runToken
+                                runToken: $runToken,
+                                requestId: $requestId
                             );
 
                             // Always validate against schema (even for cached responses) since this is a test endpoint
@@ -2284,7 +2409,8 @@ class Health implements MessageComponentInterface
                                         JsonData::SCHEMAS_FOLDER->path() . '/LiturgicalCalendar.xsd',
                                         $fromCache ? ' (cached)' : ''
                                     ),
-                                    runToken: $runToken
+                                    runToken: $runToken,
+                                    requestId: $requestId
                                 );
                             } else {
                                 $xmlErrors = self::retrieveXmlErrors(libxml_get_errors(), $xmlArr);
@@ -2297,7 +2423,8 @@ class Health implements MessageComponentInterface
                                     Status::FAIL,
                                     implode('&#013;', $xmlErrors),
                                     details: $xmlErrors,
-                                    runToken: $runToken
+                                    runToken: $runToken,
+                                    requestId: $requestId
                                 );
                             }
                         }
@@ -2316,7 +2443,8 @@ class Health implements MessageComponentInterface
                                 Step::PARSES,
                                 Status::PASS,
                                 "The $category of $calendar for the year $year was successfully decoded as ICS",
-                                runToken: $runToken
+                                runToken: $runToken,
+                                requestId: $requestId
                             );
 
                             // Always validate against schema (even for cached responses) since this is a test endpoint
@@ -2333,7 +2461,8 @@ class Health implements MessageComponentInterface
                                         'https://tools.ietf.org/html/rfc5545',
                                         $fromCache ? ' (cached)' : ''
                                     ),
-                                    runToken: $runToken
+                                    runToken: $runToken,
+                                    requestId: $requestId
                                 );
                             } else {
                                 // The per-error list is what the text is built from, so it goes out as
@@ -2347,7 +2476,8 @@ class Health implements MessageComponentInterface
                                     Status::FAIL,
                                     implode('&#013;', $icsErrors),
                                     details: $icsErrors,
-                                    runToken: $runToken
+                                    runToken: $runToken,
+                                    requestId: $requestId
                                 );
                             }
                         } else {
@@ -2360,7 +2490,8 @@ class Health implements MessageComponentInterface
                                 "There was an error decoding the $category of $calendar for the year $year from the URL "
                                     . Route::CALENDAR->path() . $req . ' as ICS: parsing resulted in type ' . gettype($vcalendar) . ' | ' . $vcalendar,
                                 responseType: $responseType,
-                                runToken: $runToken
+                                runToken: $runToken,
+                                requestId: $requestId
                             );
                         }
                         break;
@@ -2384,7 +2515,8 @@ class Health implements MessageComponentInterface
                                 Step::PARSES,
                                 Status::PASS,
                                 "The $category of $calendar for the year $year was successfully decoded as YAML",
-                                runToken: $runToken
+                                runToken: $runToken,
+                                requestId: $requestId
                             );
 
                             // Always validate against schema (even for cached responses) since this is a test endpoint
@@ -2398,10 +2530,11 @@ class Health implements MessageComponentInterface
                                     Step::VALIDATES,
                                     Status::PASS,
                                     "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL->path() . $cachedNote,
-                                    runToken: $runToken
+                                    runToken: $runToken,
+                                    requestId: $requestId
                                 );
                             } elseif ($validationResult instanceof \stdClass) {
-                                $this->sendSchemaFailureStepResult($to, $calendar, $year, $validationResult, $runToken);
+                                $this->sendSchemaFailureStepResult($to, $calendar, $year, $validationResult, $runToken, requestId: $requestId);
                             }
                         } catch (\Throwable $e) {
                             $this->sendCalendarStepResult(
@@ -2413,7 +2546,8 @@ class Health implements MessageComponentInterface
                                 "There was an error decoding the $category of $calendar for the year $year from the URL "
                                     . Route::CALENDAR->path() . $req . ' as YAML: ' . $e->getMessage(),
                                 responseType: $responseType,
-                                runToken: $runToken
+                                runToken: $runToken,
+                                requestId: $requestId
                             );
                         }
                         break;
@@ -2436,7 +2570,8 @@ class Health implements MessageComponentInterface
                                 Status::FAIL,
                                 $decodeErrorText,
                                 responseType: $responseType,
-                                runToken: $runToken
+                                runToken: $runToken,
+                                requestId: $requestId
                             );
                             break;
                         }
@@ -2456,7 +2591,8 @@ class Health implements MessageComponentInterface
                                 "There was an error decoding the $category of $calendar for the year $year from the URL "
                                                     . Route::CALENDAR->path() . $req . ' as JSON: response data was perhaps truncated?',
                                 responseType: $responseType,
-                                runToken: $runToken
+                                runToken: $runToken,
+                                requestId: $requestId
                             );
                             break;
                         }
@@ -2468,7 +2604,8 @@ class Health implements MessageComponentInterface
                             Step::PARSES,
                             Status::PASS,
                             "The $category of $calendar for the year $year was successfully decoded as JSON",
-                            runToken: $runToken
+                            runToken: $runToken,
+                            requestId: $requestId
                         );
 
                         // Always validate against schema (even for cached responses) since this is a test endpoint
@@ -2482,14 +2619,15 @@ class Health implements MessageComponentInterface
                                 Step::VALIDATES,
                                 Status::PASS,
                                 "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL->path() . $cachedNote,
-                                runToken: $runToken
+                                runToken: $runToken,
+                                requestId: $requestId
                             );
                         } elseif ($validationResult instanceof \stdClass) {
-                            $this->sendSchemaFailureStepResult($to, $calendar, $year, $validationResult, $runToken);
+                            $this->sendSchemaFailureStepResult($to, $calendar, $year, $validationResult, $runToken, requestId: $requestId);
                         }
                 }
             },
-            function (\Throwable $e) use ($to, $calendar, $year, $category, $req, $runToken) {
+            function (\Throwable $e) use ($to, $calendar, $year, $category, $req, $runToken, $requestId) {
                 $this->sendCalendarStepResult(
                     $to,
                     $calendar,
@@ -2497,7 +2635,8 @@ class Health implements MessageComponentInterface
                     Step::EXISTS,
                     Status::FAIL,
                     "The $category of $calendar for the year $year does not exist at the URL " . Route::CALENDAR->path() . $req . ' : ' . $e->getMessage(),
-                    runToken: $runToken
+                    runToken: $runToken,
+                    requestId: $requestId
                 );
             }
         );
@@ -2558,10 +2697,11 @@ class Health implements MessageComponentInterface
      *
      * @param RunTest $message The message naming the test, the calendar and the year.
      * @param ConnectionInterface $to The connection to send the result frames to.
+     * @param ?string $requestId The correlation id this request's frames must carry back, captured by the caller.
      */
-    private function runTest(\stdClass $message, ConnectionInterface $to): void
+    private function runTest(\stdClass $message, ConnectionInterface $to, ?string $requestId = null): void
     {
-        if ($this->rejectRetiredProperties($message, 'runTest', $to)) {
+        if ($this->rejectRetiredProperties($message, 'runTest', $to, requestId: $requestId)) {
             return;
         }
 
@@ -2569,7 +2709,7 @@ class Health implements MessageComponentInterface
         // reach executeUnitTest(string $test, …) as a TypeError, which Ratchet does not catch.
         $test = property_exists($message, 'test') ? $message->test : null;
         if (false === is_string($test)) {
-            $this->rejectMessage($to, 'runTest test must be a string.');
+            $this->rejectMessage($to, 'runTest test must be a string.', requestId: $requestId);
             return;
         }
 
@@ -2577,7 +2717,7 @@ class Health implements MessageComponentInterface
             $identity = $this->readCalendarIdentity($message, 'runTest');
             $year     = self::readYear($message, 'runTest');
         } catch (\InvalidArgumentException $e) {
-            $this->rejectMessage($to, $e->getMessage());
+            $this->rejectMessage($to, $e->getMessage(), requestId: $requestId);
             return;
         }
 
@@ -2587,7 +2727,8 @@ class Health implements MessageComponentInterface
             $year,
             $identity['category'],
             $to,
-            $identity['rite']->value
+            $identity['rite']->value,
+            requestId: $requestId
         );
     }
 
@@ -2627,6 +2768,9 @@ class Health implements MessageComponentInterface
      *        which is both of today's sites: a JSON decode failure and an unreachable URL each have one thing to say,
      *        and per {@see Health::sendStepResult()} nothing structured is manufactured where none exists.
      * @param ?string $runToken The originating run token to echo back.
+     * @param ?string $requestId The correlation id of the request that caused this frame, captured by the handler when
+     *        the request arrived and passed explicitly rather than read from any per-connection store; see
+     *        {@see Health::onMessage()} for why that distinction is load-bearing.
      */
     private function sendTestResult(
         ConnectionInterface $to,
@@ -2636,7 +2780,8 @@ class Health implements MessageComponentInterface
         Status $status,
         string $text,
         ?array $details = null,
-        ?string $runToken = null
+        ?string $runToken = null,
+        ?string $requestId = null
     ): void {
         $this->sendStepResult(
             $to,
@@ -2647,6 +2792,7 @@ class Health implements MessageComponentInterface
             $text,
             details: $details,
             runToken: $runToken,
+            requestId: $requestId,
             classQualifier: "year-$year",
             family: FrameFamily::TEST_RUN
         );
@@ -2661,8 +2807,9 @@ class Health implements MessageComponentInterface
      * @param string $category The type of calendar to be tested: nationalcalendar, diocesancalendar or ritecalendar.
      * @param ConnectionInterface $to The connection to which the test result should be sent.
      * @param ?string $riteHint The `rite` property of the incoming message, if any.
+     * @param ?string $requestId The correlation id this request's frames must carry back, captured by the caller.
      */
-    private function executeUnitTest(string $test, string $calendar, int $year, string $category, ConnectionInterface $to, ?string $riteHint = null): void
+    private function executeUnitTest(string $test, string $calendar, int $year, string $category, ConnectionInterface $to, ?string $riteHint = null, ?string $requestId = null): void
     {
         $runToken        = $this->resolveRunToken($to);
         $returnTypeParam = ReturnTypeParam::JSON;
@@ -2678,7 +2825,7 @@ class Health implements MessageComponentInterface
         $req     = $this->buildCalendarRequestPath($calendar, $year, $category, $rite);
         $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts, 300, $to);
         $promise->then(
-            function (array $result) use ($to, $test, $calendar, $year, $runToken, $rite) {
+            function (array $result) use ($to, $test, $calendar, $year, $runToken, $requestId, $rite) {
                 /** @var array{data: string, fromCache: bool} $result */
                 $data = $result['data'];
                 /** @var \stdClass&object{settings:object{year:int,national_calendar?:string,diocesan_calendar?:string},litcal:LiturgicalEvent[]} $jsonData */
@@ -2688,7 +2835,13 @@ class Health implements MessageComponentInterface
                     if ($UnitTest->isReady()) {
                         $UnitTest->runTest();
                     }
-                    $this->sendMessage($to, $UnitTest->getMessage(), $runToken);
+                    // The frame for a test that actually ran is built by LitTestRunner and leaves
+                    // through the same funnel as every other one. `requestId` is handed to that
+                    // funnel here, from the value this closure captured, exactly as `runToken` is:
+                    // stamping it inside sendMessage() from a per-connection field would be the
+                    // misattribution bug onMessage() describes, and passing through a shared funnel
+                    // is not a reason to reach for one.
+                    $this->sendMessage($to, $UnitTest->getMessage(), $runToken, requestId: $requestId);
                 } else {
                     $this->sendTestResult(
                         $to,
@@ -2697,11 +2850,12 @@ class Health implements MessageComponentInterface
                         $year,
                         Status::FAIL,
                         "There was an error decoding JSON data for the test $test: " . json_last_error_msg(),
-                        runToken: $runToken
+                        runToken: $runToken,
+                        requestId: $requestId
                     );
                 }
             },
-            function (\Throwable $e) use ($to, $test, $year, $category, $calendar, $req, $runToken) {
+            function (\Throwable $e) use ($to, $test, $year, $category, $calendar, $req, $runToken, $requestId) {
                 $this->sendTestResult(
                     $to,
                     $test,
@@ -2709,7 +2863,8 @@ class Health implements MessageComponentInterface
                     $year,
                     Status::FAIL,
                     "The $category of $calendar for the year $year was not retrieved at the URL " . Route::CALENDAR->path() . $req . ' : ' . $e->getMessage(),
-                    runToken: $runToken
+                    runToken: $runToken,
+                    requestId: $requestId
                 );
             }
         );
