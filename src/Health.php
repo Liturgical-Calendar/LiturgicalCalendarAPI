@@ -21,6 +21,8 @@ use LiturgicalCalendar\Api\Enum\Route;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
+use LiturgicalCalendar\Api\Enum\Status;
+use LiturgicalCalendar\Api\Enum\Step;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
@@ -231,6 +233,26 @@ class Health implements MessageComponentInterface
      * @var string[]
      */
     private const VALIDATABLE_RESPONSE_FORMATS = ['JSON', 'XML', 'ICS', 'YML'];
+
+    /**
+     * The legacy CSS class fragment for each published step.
+     *
+     * The wire carries two vocabularies during migration: `step` is what `GET /validations` publishes, and
+     * `classes` is what the current clients match on. This is the projection between them, and it exists in
+     * exactly one place so they cannot drift — the label-as-selector defect fixed in #820 happened because
+     * every emitter built its own selector. Deleting this const and the `$classFragment` parameter is most of
+     * what legacy removal will be.
+     *
+     * {@see Step::COMPLETE} has no entry on purpose: the terminal frame is not a check and has no card to
+     * address, so {@see Health::sendStepResult()} refuses it rather than inventing a class for it.
+     *
+     * @var array<string, string>
+     */
+    private const FRAME_CLASS_FOR_STEP = [
+        'exists'    => 'file-exists',
+        'parses'    => 'json-valid',
+        'validates' => 'schema-valid'
+    ];
 
     private const RED    = "\033[0;31m";
     private const GREEN  = "\033[0;32m";
@@ -683,6 +705,59 @@ class Health implements MessageComponentInterface
     }
 
     /**
+     * Emit the result frame for one step of one check.
+     *
+     * The frame says what it is about structurally — `target`, `step`, `status` — and the legacy
+     * `type` / `text` / `classes` are *derived* from that here rather than written out at each call
+     * site. Until #806 a frame's only statement of its subject was `classes`, a CSS selector the
+     * server built and the browser matched with `querySelectorAll()`, so attribution was string
+     * matching and the server had to know Bootstrap existed.
+     *
+     * The legacy trio is assigned first and in the order every shipped frame has used, because the
+     * clients that match on it are still out there: this is additive, and a v1 frame must come out
+     * byte-identical.
+     *
+     * @param ConnectionInterface $to The connection to send the frame to.
+     * @param string $classFragment The CSS class fragment the frame is addressed by, without the leading dot
+     *        and without the trailing step; see {@see Health::cssClassFragmentForId()}.
+     * @param ?string $targetId The id `GET /validations` published for the artifact being checked, or null for a
+     *        v1 `executeValidation` message, which names no id. Never fabricated from the class fragment.
+     * @param Step $step The step being reported. {@see Step::COMPLETE} is not a check and has no legacy class,
+     *        so it is refused here; the terminal frame is emitted elsewhere (#821).
+     * @param Status $status The outcome, which `type` is projected from.
+     * @param string $text The human-facing message, passed through untouched.
+     * @param ?list<string> $details The individual failures behind a `text` that summarises them, or null when there
+     *        are none. Omitted from the frame when empty, so a client need not tell "no details" from "none given".
+     * @param ?string $runToken The originating run token to echo back, or null to use the per-connection fallback.
+     */
+    private function sendStepResult(
+        ConnectionInterface $to,
+        string $classFragment,
+        ?string $targetId,
+        Step $step,
+        Status $status,
+        string $text,
+        ?array $details = null,
+        ?string $runToken = null
+    ): void {
+        if (Step::COMPLETE === $step) {
+            throw new \LogicException('Step::COMPLETE has no legacy frame class and cannot be sent as a step result.');
+        }
+
+        $message          = new \stdClass();
+        $message->type    = Status::PASS === $status ? 'success' : 'error';
+        $message->text    = $text;
+        $message->classes = '.' . $classFragment . '.' . self::FRAME_CLASS_FOR_STEP[$step->value];
+        $message->target  = $targetId;
+        $message->step    = $step->value;
+        $message->status  = $status->value;
+        if (null !== $details && [] !== $details) {
+            $message->details = $details;
+        }
+        $this->sendMessage($to, $message, $runToken);
+    }
+
+    /**
      * Reject a malformed or unresolvable v2 message.
      *
      * Reuses the existing `echobot` error shape deliberately. Since UnitTestInterface PR #46 an
@@ -856,7 +931,10 @@ class Health implements MessageComponentInterface
             $this->resolveRunToken($to),
             // The label is prose — `National calendar: US` — and is fine as the human half of a
             // frame, but it is not a selector. The address comes from the id instead.
-            classFragment: self::cssClassFragmentForId($item->id)
+            classFragment: self::cssClassFragmentForId($item->id),
+            // The id itself rides along on the frames, so a client attributes a result by the
+            // value it asked with rather than by unpicking the selector the server built.
+            targetId: $item->id
         );
     }
 
@@ -1131,6 +1209,9 @@ class Health implements MessageComponentInterface
      *        matches nothing — or, once it contains `: `, one that makes the client's `querySelectorAll()` throw. Defaults
      *        to $label so that every v1 caller keeps emitting byte-identical frames; a caller whose label is not slug-safe
      *        passes its own, derived from a stable id via {@see Health::cssClassFragmentForId()}.
+     * @param ?string $targetId The published id of the artifact being checked, carried on the result frames so a client can
+     *        attribute them without parsing the selector. Null for a v1 `executeValidation` message, which names no id: it
+     *        is never reconstructed from the class fragment, since that derivation only runs the other way.
      */
     private function runValidationSteps(
         string $dataPath,
@@ -1142,7 +1223,8 @@ class Health implements MessageComponentInterface
         string $category = 'sourceDataCheck',
         ?string $pathForSchema = null,
         ?string $sourceFolder = null,
-        ?string $classFragment = null
+        ?string $classFragment = null,
+        ?string $targetId = null
     ): void {
         $pathForSchema ??= $label;
         // Read before $dataPath is made absolute below, so the two stay distinguishable.
@@ -1164,10 +1246,12 @@ class Health implements MessageComponentInterface
                 // frames per check, so short-circuiting with a single frame under-delivers and the
                 // phase never completes — the same wedge, approached from the other side.
                 $missing = ["$dataPath does not exist or contains no json files"];
-                foreach (['file-exists', 'json-valid', 'schema-valid'] as $step) {
+                foreach ([Step::EXISTS, Step::PARSES, Step::VALIDATES] as $step) {
                     $this->sendFolderStepResult(
                         $to,
-                        "$classFragment.$step",
+                        $classFragment,
+                        $targetId,
+                        $step,
                         $missing,
                         '', // unreachable: $missing is non-empty, so the failure text is used
                         "Data folder $sourceFolder could not be checked",
@@ -1240,13 +1324,15 @@ class Health implements MessageComponentInterface
             $allPromises = Promise\all($promises);
 
             $allPromises->then(
-                function () use ($to, $classFragment, $sourceFolder, $schema, &$fileExistsErrors, &$jsonErrors, &$schemaErrors, $runToken) {
+                function () use ($to, $classFragment, $targetId, $sourceFolder, $schema, &$fileExistsErrors, &$jsonErrors, &$schemaErrors, $runToken) {
                     // Exactly one frame per step, pass or fail. A folder check is a statement
                     // about the folder, so a failure names the offending files inside a single
                     // frame instead of emitting one frame each.
                     $this->sendFolderStepResult(
                         $to,
-                        "$classFragment.file-exists",
+                        $classFragment,
+                        $targetId,
+                        Step::EXISTS,
                         $fileExistsErrors,
                         "The Data folder $sourceFolder exists and contains valid i18n json files",
                         "Data folder $sourceFolder",
@@ -1255,7 +1341,9 @@ class Health implements MessageComponentInterface
 
                     $this->sendFolderStepResult(
                         $to,
-                        "$classFragment.json-valid",
+                        $classFragment,
+                        $targetId,
+                        Step::PARSES,
                         $jsonErrors,
                         "The i18n json files in Data folder $sourceFolder were successfully decoded as JSON",
                         "The i18n json files in Data folder $sourceFolder were not all decoded as JSON",
@@ -1264,7 +1352,9 @@ class Health implements MessageComponentInterface
 
                     $this->sendFolderStepResult(
                         $to,
-                        "$classFragment.schema-valid",
+                        $classFragment,
+                        $targetId,
+                        Step::VALIDATES,
                         $schemaErrors,
                         "The i18n json files in Data folder $sourceFolder were successfully validated against the Schema $schema",
                         "The i18n json files in Data folder $sourceFolder were not all valid against the Schema $schema",
@@ -1302,14 +1392,14 @@ class Health implements MessageComponentInterface
                 /** @var PromiseInterface<array{data: string, fromCache: bool}> $httpPromise */
                 $httpPromise = $this->cachedGet($dataPath, [], 300, $to);
                 $httpPromise->then(
-                    function (array $result) use ($to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken) {
+                    function (array $result) use ($to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $targetId) {
                         /** @var array{data: string, fromCache: bool} $result */
                         $data = $result['data'];
                         echo 'Fetched data for ' . $dataPath . ': got ' . strlen($data) . " bytes\n";
-                        $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken);
+                        $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $targetId);
                     },
-                    function (\Throwable $e) use ($to, $validationForMessages, $dataPath, $runToken) {
-                        $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken);
+                    function (\Throwable $e) use ($to, $validationForMessages, $dataPath, $runToken, $targetId) {
+                        $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken, $targetId);
                     }
                 );
             } else {
@@ -1323,14 +1413,14 @@ class Health implements MessageComponentInterface
                 /** @var PromiseInterface<array{data: string, fromCache: bool}> $promise */
                 $promise = $this->cachedFileGetContents($fsPath);
                 $promise->then(
-                    function (array $result) use ($to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken) {
+                    function (array $result) use ($to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $targetId) {
                         /** @var array{data: string, fromCache: bool} $result */
                         $data = $result['data'];
                         echo 'Fetched data for ' . $dataPath . ': got ' . strlen($data) . " bytes\n";
-                        $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken);
+                        $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $targetId);
                     },
-                    function (\Throwable $e) use ($to, $validationForMessages, $dataPath, $runToken) {
-                        $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken);
+                    function (\Throwable $e) use ($to, $validationForMessages, $dataPath, $runToken, $targetId) {
+                        $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken, $targetId);
                     }
                 );
             }
@@ -1345,30 +1435,50 @@ class Health implements MessageComponentInterface
      * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $validation The validation object.
      * @param string $dataPath The path to the data that failed to load.
      * @param ?string $runToken The originating run token to echo back on responses, or null to use the per-connection fallback.
+     * @param ?string $targetId The published id of the artifact being checked, or null for a v1 message, which names none.
      * @return void
      */
-    private function handleValidationDataError(\Throwable $e, ConnectionInterface $to, \stdClass $validation, string $dataPath, ?string $runToken = null): void
+    private function handleValidationDataError(\Throwable $e, ConnectionInterface $to, \stdClass $validation, string $dataPath, ?string $runToken = null, ?string $targetId = null): void
     {
+        // `validate` carries the class fragment: see the note where $validationForMessages is built.
         $validate = (string) $validation->validate;
         $category = (string) $validation->category;
         echo 'Error reading data: could not read data from ' . $dataPath . ': ' . $e->getMessage() . "\n";
-        $message          = new \stdClass();
-        $message->type    = 'error';
-        $message->text    = "Data file $dataPath is not readable: " . $e->getMessage();
-        $message->classes = ".$validate.file-exists";
-        $this->sendMessage($to, $message, $runToken);
 
-        $message          = new \stdClass();
-        $message->type    = 'error';
-        $message->text    = "Could not decode the Data file $dataPath as JSON because it is not readable";
-        $message->classes = ".$validate.json-valid";
-        $this->sendMessage($to, $message, $runToken);
+        // An unreadable file fails all three steps, not just the first: a client sizes the phase as
+        // three frames per check, so reporting once would leave the phase short.
+        $this->sendStepResult(
+            $to,
+            $validate,
+            $targetId,
+            Step::EXISTS,
+            Status::FAIL,
+            "Data file $dataPath is not readable: " . $e->getMessage(),
+            null,
+            $runToken
+        );
 
-        $message          = new \stdClass();
-        $message->type    = 'error';
-        $message->text    = "Unable to verify schema for dataPath {$dataPath} and category {$category} since Data file $dataPath does not exist or is not readable";
-        $message->classes = ".$validate.schema-valid";
-        $this->sendMessage($to, $message, $runToken);
+        $this->sendStepResult(
+            $to,
+            $validate,
+            $targetId,
+            Step::PARSES,
+            Status::FAIL,
+            "Could not decode the Data file $dataPath as JSON because it is not readable",
+            null,
+            $runToken
+        );
+
+        $this->sendStepResult(
+            $to,
+            $validate,
+            $targetId,
+            Step::VALIDATES,
+            Status::FAIL,
+            "Unable to verify schema for dataPath {$dataPath} and category {$category} since Data file $dataPath does not exist or is not readable",
+            null,
+            $runToken
+        );
     }
 
     /**
@@ -1421,27 +1531,43 @@ class Health implements MessageComponentInterface
      * number of frames depend on how many files happened to be broken — unpredictable for a
      * client that has to know when a phase is complete (UnitTestInterface#43).
      *
-     * @param string       $classes      Response `classes` selector, without the leading dot.
-     * @param list<string> $errors       Per-file failures; empty means the step passed.
-     * @param string       $successText  Message for the passing case.
+     * All this adds to {@see Health::sendStepResult()} is the folder-shaped summary: an error list
+     * becomes a {@see Status} and a single line of text naming every offending file. Deriving the
+     * frame from that — the `type` it used to compute itself, and the selector its callers used to
+     * build by concatenating a step name — is the emitter's job now, so the projection lives in one
+     * place for folder checks and file checks alike.
+     *
+     * @param string       $classFragment The fragment the frames are addressed by, without the leading dot and
+     *                                    without the trailing step; the step supplies that.
+     * @param ?string      $targetId      The published id of the artifact being checked, or null for a v1 message.
+     * @param Step         $step          Which of the three steps this frame reports.
+     * @param list<string> $errors        Per-file failures; empty means the step passed.
+     * @param string       $successText   Message for the passing case.
      * @param string       $failurePrefix Lead-in for the failing case; the offending files follow.
-     * @param ?string      $runToken     Run token to echo back.
+     * @param ?string      $runToken      Run token to echo back.
      */
     private function sendFolderStepResult(
         ConnectionInterface $to,
-        string $classes,
+        string $classFragment,
+        ?string $targetId,
+        Step $step,
         array $errors,
         string $successText,
         string $failurePrefix,
         ?string $runToken
     ): void {
-        $message          = new \stdClass();
-        $message->type    = [] === $errors ? 'success' : 'error';
-        $message->text    = [] === $errors
-            ? $successText
-            : $failurePrefix . ' — ' . count($errors) . ' problem(s): ' . implode('; ', $errors);
-        $message->classes = '.' . $classes;
-        $this->sendMessage($to, $message, $runToken);
+        $this->sendStepResult(
+            $to,
+            $classFragment,
+            $targetId,
+            $step,
+            [] === $errors ? Status::PASS : Status::FAIL,
+            [] === $errors
+                ? $successText
+                : $failurePrefix . ' — ' . count($errors) . ' problem(s): ' . implode('; ', $errors),
+            $errors,
+            $runToken
+        );
     }
 
     /**
@@ -1449,50 +1575,91 @@ class Health implements MessageComponentInterface
      *
      * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $validation The validation object.
      * @param ?string $runToken The originating run token to echo back on responses, or null to use the per-connection fallback.
+     * @param ?string $targetId The published id of the artifact being checked, or null for a v1 message, which names none.
      */
-    private function processValidationData(string $data, ConnectionInterface $to, \stdClass $validation, string $dataPath, ?string $schema, string $pathForSchema, ?string $runToken = null): void
+    private function processValidationData(string $data, ConnectionInterface $to, \stdClass $validation, string $dataPath, ?string $schema, string $pathForSchema, ?string $runToken = null, ?string $targetId = null): void
     {
-        $validate         = (string) $validation->validate;
-        $category         = (string) $validation->category;
-        $message          = new \stdClass();
-        $message->type    = 'success';
-        $message->text    = "The Data file $dataPath exists";
-        $message->classes = ".$validate.file-exists";
-        $this->sendMessage($to, $message, $runToken);
+        // `validate` carries the class fragment: see the note where $validationForMessages is built.
+        $validate = (string) $validation->validate;
+        $category = (string) $validation->category;
+
+        $this->sendStepResult(
+            $to,
+            $validate,
+            $targetId,
+            Step::EXISTS,
+            Status::PASS,
+            "The Data file $dataPath exists",
+            null,
+            $runToken
+        );
 
         $jsonData = json_decode($data);
         if (json_last_error() === JSON_ERROR_NONE) {
-            $message          = new \stdClass();
-            $message->type    = 'success';
-            $message->text    = "The Data file $dataPath was successfully decoded as JSON";
-            $message->classes = ".$validate.json-valid";
-            $this->sendMessage($to, $message, $runToken);
+            $this->sendStepResult(
+                $to,
+                $validate,
+                $targetId,
+                Step::PARSES,
+                Status::PASS,
+                "The Data file $dataPath was successfully decoded as JSON",
+                null,
+                $runToken
+            );
 
             if (null !== $schema) {
                 $validationResult = $this->validateDataAgainstSchema($jsonData, $schema);
                 if (gettype($validationResult) === 'boolean' && $validationResult === true) {
-                    $message          = new \stdClass();
-                    $message->type    = 'success';
-                    $message->text    = "The Data file $dataPath was successfully validated against the Schema $schema";
-                    $message->classes = ".$validate.schema-valid";
-                    $this->sendMessage($to, $message, $runToken);
+                    $this->sendStepResult(
+                        $to,
+                        $validate,
+                        $targetId,
+                        Step::VALIDATES,
+                        Status::PASS,
+                        "The Data file $dataPath was successfully validated against the Schema $schema",
+                        null,
+                        $runToken
+                    );
                 } elseif ($validationResult instanceof \stdClass) {
-                    $validationResult->classes = ".$validate.schema-valid";
-                    $this->sendMessage($to, $validationResult, $runToken);
+                    // The failure text is the schema library's, quoted verbatim; the frame around it
+                    // is built the same way as every other one rather than by decorating the object
+                    // the validator happened to return.
+                    /** @var string $validationText */
+                    $validationText = $validationResult->text;
+                    $this->sendStepResult(
+                        $to,
+                        $validate,
+                        $targetId,
+                        Step::VALIDATES,
+                        Status::FAIL,
+                        $validationText,
+                        null,
+                        $runToken
+                    );
                 }
             } else {
-                $message          = new \stdClass();
-                $message->type    = 'error';
-                $message->text    = "executeValidation validation->sourceFile (JSON): Unable to detect schema for dataPath {$dataPath} and category {$category} (path for schema: $pathForSchema, Route::CALENDARS->path(): " . Route::CALENDARS->path() . ', LitSchema::METADATA->path(): ' . LitSchema::METADATA->path() . ')';
-                $message->classes = ".$validate.schema-valid";
-                $this->sendMessage($to, $message, $runToken);
+                $this->sendStepResult(
+                    $to,
+                    $validate,
+                    $targetId,
+                    Step::VALIDATES,
+                    Status::FAIL,
+                    "executeValidation validation->sourceFile (JSON): Unable to detect schema for dataPath {$dataPath} and category {$category} (path for schema: $pathForSchema, Route::CALENDARS->path(): " . Route::CALENDARS->path() . ', LitSchema::METADATA->path(): ' . LitSchema::METADATA->path() . ')',
+                    null,
+                    $runToken
+                );
             }
         } else {
-            $message          = new \stdClass();
-            $message->type    = 'error';
-            $message->text    = "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg() . ". Raw data = &lt;&lt;&lt;JSON\n" . $data . "\n&gt;&gt;&gt;";
-            $message->classes = ".$validate.json-valid";
-            $this->sendMessage($to, $message, $runToken);
+            $this->sendStepResult(
+                $to,
+                $validate,
+                $targetId,
+                Step::PARSES,
+                Status::FAIL,
+                "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg() . ". Raw data = &lt;&lt;&lt;JSON\n" . $data . "\n&gt;&gt;&gt;",
+                null,
+                $runToken
+            );
         }
     }
 

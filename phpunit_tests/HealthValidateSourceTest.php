@@ -134,23 +134,29 @@ final class HealthValidateSourceTest extends TestCase
     }
 
     /**
-     * The published `steps` vocabulary is not the emitted frame-class vocabulary.
+     * The published `steps` vocabulary and the emitted frame-class vocabulary, related.
      *
      * `CheckableInventory::STEPS` publishes `exists|parses|validates` on the wire, while the frames
      * are addressed `.<fragment>.file-exists`, `.<fragment>.json-valid`, `.<fragment>.schema-valid`.
-     * The two
-     * describe the same three steps in different words, and nothing in the codebase relates them,
-     * so the correspondence is written down here — once — and asserted rather than restated as a
-     * hardcoded list at each call site. A newly published step with no entry here fails loudly,
-     * which is the point: it would also be a step no client could match a frame to.
+     * The two describe the same three steps in different words, and the correspondence used to be
+     * restated as a private const *here* — which a reviewer rightly called relocated hardcoding
+     * rather than eliminated hardcoding. It now lives in `Health` as the projection the emitter
+     * actually uses, and is read from there, so there is one table and not two that can drift.
      *
-     * @var array<string, string>
+     * Reading production values would make an assertion *about the projection* unfalsifiable, which
+     * is why the projection is pinned by literals in {@see HealthFrameProjectionTest} instead. What
+     * this class asserts is different: that a check emits one frame per *published* step, in step
+     * order, addressed by the fragment derived from its id.
+     *
+     * @return array<string, string>
      */
-    private const FRAME_CLASS_FOR_STEP = [
-        'exists'    => 'file-exists',
-        'parses'    => 'json-valid',
-        'validates' => 'schema-valid'
-    ];
+    private static function frameClassForStep(): array
+    {
+        /** @var array<string, string> $map */
+        $map = ( new \ReflectionClassConstant(Health::class, 'FRAME_CLASS_FOR_STEP') )->getValue();
+
+        return $map;
+    }
 
     /**
      * What a frame's class fragment has to look like for the client to be able to use it at all.
@@ -179,9 +185,10 @@ final class HealthValidateSourceTest extends TestCase
     {
         return array_map(
             static function (string $step) use ($fragment): string {
-                self::assertArrayHasKey($step, self::FRAME_CLASS_FOR_STEP, "published step '{$step}' has no frame class");
+                $frameClassForStep = self::frameClassForStep();
+                self::assertArrayHasKey($step, $frameClassForStep, "published step '{$step}' has no frame class");
 
-                return ".{$fragment}." . self::FRAME_CLASS_FOR_STEP[$step];
+                return ".{$fragment}." . $frameClassForStep[$step];
             },
             $item->steps
         );
@@ -199,7 +206,7 @@ final class HealthValidateSourceTest extends TestCase
         $parts = explode('.', (string) $frame->classes);
         self::assertCount(3, $parts, "a frame class must be .<fragment>.<step>, got: {$frame->classes}");
         self::assertSame('', $parts[0], "a frame class must start with a dot, got: {$frame->classes}");
-        self::assertContains($parts[2], self::FRAME_CLASS_FOR_STEP, "unknown step in frame class: {$frame->classes}");
+        self::assertContains($parts[2], self::frameClassForStep(), "unknown step in frame class: {$frame->classes}");
 
         return $parts[1];
     }
