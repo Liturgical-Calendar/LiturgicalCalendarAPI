@@ -199,7 +199,13 @@ final class ValidateCalendarTest extends TestCase
 
         $this->assertSame('error', $frames[0]->type);
         $this->assertSame('.calendar-NONEXISTENT_NATION_589.file-exists.year-2020', $frames[0]->classes);
-        $this->assertStringContainsString('HTTP 404', $frames[0]->text);
+        // 400, not 404: the API validates the nation against a known list and refuses the *value*,
+        // rather than routing to a missing resource. Asserted as a literal because surfacing the
+        // real status is the point of #833 — a test that accepted any status would pass against the
+        // bug it guards. The `detail` it quotes is the API's own explanation, which is why the
+        // failure text names the valid values without this test having to know them.
+        $this->assertStringContainsString('was refused with HTTP 400', $frames[0]->text);
+        $this->assertStringContainsString('valid values are', $frames[0]->text);
 
         $this->assertSame('error', $frames[1]->type);
         $this->assertSame('.calendar-NONEXISTENT_NATION_589.json-valid.year-2020', $frames[1]->classes);
