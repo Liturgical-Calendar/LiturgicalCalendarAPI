@@ -24,6 +24,7 @@ use React\Promise\Deferred;
  * reflection without standing up the WebSocket server.
  */
 #[CoversClass(Health::class)]
+#[CoversClass(WebSocketMessageValidator::class)]
 final class HealthHelpersTest extends TestCase
 {
     private ?string $apiHostBackup  = null;

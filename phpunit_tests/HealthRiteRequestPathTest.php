@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Tests;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
+use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -23,6 +24,7 @@ use PHPUnit\Framework\TestCase;
  * without standing up Ratchet or the HTTP API.
  */
 #[CoversClass(Health::class)]
+#[CoversClass(WebSocketMessageValidator::class)]
 final class HealthRiteRequestPathTest extends TestCase
 {
     use HealthQueueIsolationTrait;

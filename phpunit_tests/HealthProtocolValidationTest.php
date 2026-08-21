@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Tests;
 use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -21,6 +22,7 @@ use Ratchet\ConnectionInterface;
  * to it, and a test that calls the right function directly passes against exactly that bug.
  */
 #[CoversClass(Health::class)]
+#[CoversClass(WebSocketMessageValidator::class)]
 final class HealthProtocolValidationTest extends TestCase
 {
     use HealthQueueIsolationTrait;

@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Tests;
 
 use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Health;
+use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -26,6 +27,7 @@ use Ratchet\ConnectionInterface;
  * See UnitTestInterface#43 and #806 section H.
  */
 #[CoversClass(Health::class)]
+#[CoversClass(WebSocketMessageValidator::class)]
 final class HealthCancelRunTest extends TestCase
 {
     // These tests seed the queue directly rather than through cachedGet(), so nothing here is

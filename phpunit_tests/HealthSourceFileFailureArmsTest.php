@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableItem;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -42,6 +43,7 @@ use Ratchet\ConnectionInterface;
  * {@see CheckableInventory}, the frames are composed in {@see Health}.
  */
 #[CoversClass(Health::class)]
+#[CoversClass(WebSocketMessageValidator::class)]
 final class HealthSourceFileFailureArmsTest extends TestCase
 {
     use HealthQueueIsolationTrait;

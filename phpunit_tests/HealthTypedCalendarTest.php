@@ -9,6 +9,7 @@ use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -70,6 +71,7 @@ use Ratchet\ConnectionInterface;
  * URL at once, which is the whole dispatch in a single observation and still no network.
  */
 #[CoversClass(Health::class)]
+#[CoversClass(WebSocketMessageValidator::class)]
 final class HealthTypedCalendarTest extends TestCase
 {
     // Every Health here queues a real calendar URL; see the trait for why that must be defused.
