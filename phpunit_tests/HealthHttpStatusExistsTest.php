@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests;
 
+use LiturgicalCalendar\Api\ApcuShimStore;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Router;
@@ -396,8 +397,8 @@ final class HealthHttpStatusExistsTest extends TestCase
 
         try {
             // The bare-body shape every entry had before #833: no {"status":…,"body":…} envelope.
-            apcu_store($key, '{"litcal":[],"settings":{},"metadata":{},"messages":[]}', 300);
-            self::assertTrue(apcu_exists($key), 'precondition: the stale entry is actually in the cache');
+            ApcuShimStore::store($key, '{"litcal":[],"settings":{},"metadata":{},"messages":[]}', 300);
+            self::assertTrue(ApcuShimStore::exists($key), 'precondition: the stale entry is actually in the cache');
 
             $cachedGet = new \ReflectionMethod(Health::class, 'cachedGet');
             ob_start();
@@ -423,7 +424,7 @@ final class HealthHttpStatusExistsTest extends TestCase
             self::assertCount(1, $queue, 'the malformed entry must fall through to a live request being queued, not dead-end at rejection');
             self::assertSame($url, $queue[0]['url']);
 
-            self::assertFalse(apcu_exists($key), 'the stale entry must be deleted, not left to reject the next request too');
+            self::assertFalse(ApcuShimStore::exists($key), 'the stale entry must be deleted, not left to reject the next request too');
 
             // Prove the round trip actually completes: fulfilling the queued request resolves the
             // very promise cachedGet() returned, exactly as an uncached first request would.
@@ -440,7 +441,7 @@ final class HealthHttpStatusExistsTest extends TestCase
         } finally {
             $cacheEnabledProp->setValue(null, $enabledBefore);
             $cacheBackendProp->setValue(null, $backendBefore);
-            apcu_delete($key);
+            ApcuShimStore::delete($key);
         }
     }
 
@@ -471,8 +472,8 @@ final class HealthHttpStatusExistsTest extends TestCase
 
         try {
             // Well-formed envelope, impossible status.
-            apcu_store($key, (string) json_encode(['status' => 0, 'body' => '{"litcal":[]}']), 300);
-            self::assertTrue(apcu_exists($key), 'precondition: the corrupt entry is actually in the cache');
+            ApcuShimStore::store($key, (string) json_encode(['status' => 0, 'body' => '{"litcal":[]}']), 300);
+            self::assertTrue(ApcuShimStore::exists($key), 'precondition: the corrupt entry is actually in the cache');
 
             $cachedGet = new \ReflectionMethod(Health::class, 'cachedGet');
             ob_start();
@@ -497,9 +498,9 @@ final class HealthHttpStatusExistsTest extends TestCase
             $queue = ( new \ReflectionProperty(Health::class, 'queue') )->getValue($health);
             self::assertCount(1, $queue, 'an out-of-range status must fall through to a live request');
             self::assertSame($url, $queue[0]['url']);
-            self::assertFalse(apcu_exists($key), 'the corrupt entry must be deleted, not left to be re-read');
+            self::assertFalse(ApcuShimStore::exists($key), 'the corrupt entry must be deleted, not left to be re-read');
         } finally {
-            apcu_delete($key);
+            ApcuShimStore::delete($key);
             $cacheEnabledProp->setValue(null, $enabledBefore);
             $cacheBackendProp->setValue(null, $backendBefore);
         }

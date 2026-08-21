@@ -2,35 +2,65 @@
 
 declare(strict_types=1);
 
-// A minimal in-memory stand-in for the four APCu functions `Health` calls (apcu_store/apcu_fetch/
-// apcu_exists/apcu_delete/apcu_sma_info), active only when the real ext-apcu is not loaded — guarded
-// per function below, and never redeclared when the real extension is present (as in this project's
-// Docker image), where it runs untouched.
+namespace LiturgicalCalendar\Api;
+
+// A minimal in-memory stand-in for the APCu functions `Health` calls (apcu_store/apcu_fetch/
+// apcu_exists/apcu_delete/apcu_sma_info).
+//
+// Declared in the `LiturgicalCalendar\Api` namespace — the namespace `Health.php` itself lives in —
+// rather than the global one, and unconditionally rather than guarded by `function_exists()`. PHP
+// resolves an unqualified function call to the *current* namespace before falling back to the global
+// one, so once this file is loaded, every unqualified `apcu_*` call `Health.php` makes resolves to
+// the functions below regardless of whether the real ext-apcu is installed, and regardless of
+// whether it is enabled for the CLI SAPI.
+//
+// That last clause is not hypothetical: CI installs the real extension, but the workflow's
+// `apcu.enable_cli=1` ini setting is a no-op — APCu's actual setting is `apc.enable_cli` (inherited
+// from APC's naming), not `apcu.`. So in CI the extension is loaded but silently disabled under the
+// CLI SAPI: `apcu_store()` returns without storing anything and `apcu_exists()` always reports false.
+// A global-namespace shim guarded by `function_exists('apcu_store')` — this file's first version —
+// never activated there, because the real (if inert) function already existed. Namespace-first
+// resolution sidesteps that runtime-configuration question entirely: it does not matter whether real
+// APCu exists, is loaded, or is CLI-enabled, because `LiturgicalCalendar\Api\apcu_store` is found
+// before PHP ever looks for the global one.
 //
 // This exists so a test can drive `Health::cachedGet()`'s actual cache-hit branch — including the
-// malformed/legacy-entry fall-through #834 fixed — through the real code path, instead of
-// re-implementing that branch's logic in the test and only reasoning about whether the real one
-// matches it. Deliberately not a mock of `Health`'s cache methods: those stay untouched, and only the
-// backend three layers below them is stood in for.
+// malformed/legacy-entry and out-of-range-status fall-throughs #834 fixed — through the real code
+// path, instead of re-implementing that branch's logic in the test and only reasoning about whether
+// the real one matches it. Deliberately not a mock of `Health`'s cache methods: those stay untouched,
+// and only the backend three layers below them is stood in for.
 //
-// Declared in the global namespace on purpose: `Health.php` is in `LiturgicalCalendar\Api` and calls
-// these functions unqualified, so PHP resolves them against the global namespace exactly as it would
-// the real extension's functions.
-if (!function_exists('apcu_store')) {
-    function apcu_store(string $key, mixed $value, int $ttl = 0): bool
+// Tests must never call `apcu_store()`/`apcu_fetch()`/`apcu_exists()`/`apcu_delete()` directly: a
+// test lives in `LiturgicalCalendar\Tests`, so an unqualified call from there resolves to
+// `LiturgicalCalendar\Tests\apcu_*` (undefined), then falls back to the *global* — real — function,
+// not this shim. That would have the test writing to one store and `Health` reading from another,
+// failing the test's own precondition for a reason that has nothing to do with the code under test.
+// {@see ApcuShimStore} is the accessor tests use instead, backed by the same array these functions
+// read and write.
+
+/**
+ * The backing store shared between the namespaced `apcu_*` shim functions below (which `Health.php`
+ * calls unqualified) and the tests that seed or inspect it directly. A single shared store is the
+ * whole point: it is what makes "the test wrote this entry" and "Health read this entry" the same
+ * claim, rather than two stores that happen to have similar names.
+ */
+final class ApcuShimStore
+{
+    /** @var array<string, array{value: string, expires: int}> */
+    private static array $store = [];
+
+    public static function store(string $key, mixed $value, int $ttl = 0): bool
     {
-        $GLOBALS['__apcuShimStore']     ??= [];
-        $GLOBALS['__apcuShimStore'][$key] = [
+        self::$store[$key] = [
             'value'   => $value,
             'expires' => $ttl > 0 ? time() + $ttl : 0,
         ];
         return true;
     }
 
-    function apcu_fetch(string $key, ?bool &$success = null): mixed
+    public static function fetch(string $key, ?bool &$success = null): mixed
     {
-        $GLOBALS['__apcuShimStore'] ??= [];
-        $entry                        = $GLOBALS['__apcuShimStore'][$key] ?? null;
+        $entry = self::$store[$key] ?? null;
         if (null === $entry || ( $entry['expires'] > 0 && $entry['expires'] < time() )) {
             $success = false;
             return false;
@@ -39,33 +69,51 @@ if (!function_exists('apcu_store')) {
         return $entry['value'];
     }
 
-    function apcu_exists(string $key): bool
+    public static function exists(string $key): bool
     {
-        $GLOBALS['__apcuShimStore'] ??= [];
-        $entry                        = $GLOBALS['__apcuShimStore'][$key] ?? null;
+        $entry = self::$store[$key] ?? null;
         if (null === $entry) {
             return false;
         }
         if ($entry['expires'] > 0 && $entry['expires'] < time()) {
-            unset($GLOBALS['__apcuShimStore'][$key]);
+            unset(self::$store[$key]);
             return false;
         }
         return true;
     }
 
-    function apcu_delete(string $key): bool
+    public static function delete(string $key): bool
     {
-        $GLOBALS['__apcuShimStore'] ??= [];
-        $existed                      = isset($GLOBALS['__apcuShimStore'][$key]);
-        unset($GLOBALS['__apcuShimStore'][$key]);
+        $existed = isset(self::$store[$key]);
+        unset(self::$store[$key]);
         return $existed;
     }
+}
 
-    /**
-     * @return array{seg_size: int, avail_mem: int}
-     */
-    function apcu_sma_info(bool $limited = false): array
-    {
-        return ['seg_size' => 0, 'avail_mem' => 0];
-    }
+function apcu_store(string $key, mixed $value, int $ttl = 0): bool
+{
+    return ApcuShimStore::store($key, $value, $ttl);
+}
+
+function apcu_fetch(string $key, ?bool &$success = null): mixed
+{
+    return ApcuShimStore::fetch($key, $success);
+}
+
+function apcu_exists(string $key): bool
+{
+    return ApcuShimStore::exists($key);
+}
+
+function apcu_delete(string $key): bool
+{
+    return ApcuShimStore::delete($key);
+}
+
+/**
+ * @return array{seg_size: int, avail_mem: int}
+ */
+function apcu_sma_info(bool $limited = false): array
+{
+    return ['seg_size' => 0, 'avail_mem' => 0];
 }

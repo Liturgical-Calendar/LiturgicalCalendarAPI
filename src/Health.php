@@ -2697,6 +2697,10 @@ class Health implements MessageComponentInterface
                         Step::PARSES,
                         Status::FAIL,
                         "Could not decode the $category of $calendar for the year $year as $responseType because the request for it returned HTTP $status",
+                        // Every sibling `parses`-fail frame in the switch below carries `responsetype`
+                        // (JSON/XML/ICS/YAML decode failures all do) — this gate short-circuits before
+                        // the switch, but it is reporting the very same phase, so it must match.
+                        responseType: $responseType,
                         runToken: $runToken,
                         requestId: $requestId
                     );
