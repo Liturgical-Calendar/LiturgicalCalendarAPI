@@ -487,6 +487,14 @@
                 "ambrosian"
             ]
         },
+        "RiteWithoutNationalCalendars": {
+            "type": "string",
+            "title": "Rite without national calendars",
+            "description": "the subset of `Rite` whose calendars have no national tier, so that a diocese under such a rite reports a `diocesan_calendar` with a `null` `national_calendar`. Only the Ambrosian rite qualifies: `EventsParams::validateRiteCompatibility()` and `CalendarParams::validateRiteCompatibility()` reject a `national_calendar` combined with the Ambrosian rite, and the Ambrosian diocesan loaders deliberately leave the national calendar null rather than deriving it from the diocese's `nation` metadata. Under the Roman rite a diocese always sits on top of a national calendar, so `roman` must never appear here. Keep in sync with `Rite`: whenever a rite is added, decide explicitly whether it has a national tier. See issue #817.",
+            "enum": [
+                "ambrosian"
+            ]
+        },
         "Epiphany": {
             "type": "string",
             "title": "Epiphany",
