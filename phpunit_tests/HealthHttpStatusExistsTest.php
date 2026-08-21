@@ -332,4 +332,115 @@ final class HealthHttpStatusExistsTest extends TestCase
             $frames[0]->text
         );
     }
+
+    // ---------------------------------------------------------------- #834 review round 1
+
+    /**
+     * F2: a 429 is no longer rejected on its own — it reaches the same `exists` gate as every other
+     * non-2xx, and its `Retry-After` hint is folded into the failure text rather than only visible on
+     * a rejection's exception message (which nothing downstream of `cachedGet()` ever saw again).
+     */
+    public function testARateLimitedCalendarFailsExistsAndCarriesTheRetryAfterHint(): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::stubConnection();
+
+        self::send($health, $conn, [
+            'action'         => 'validateCalendar',
+            'calendar'       => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'],
+            'year'           => 2026,
+            'responseFormat' => 'JSON',
+            'requestId'      => 'req-alpha'
+        ]);
+
+        $queued = self::queuedRequests($health);
+        self::assertCount(1, $queued);
+        /** @var \Closure(ResponseInterface):void $resolve */
+        $resolve = $queued[0]['resolve'];
+        ob_start();
+        $resolve(new Response(429, ['Retry-After' => '30'], '{"type":"about:blank","status":429,"title":"Too Many Requests"}', '1.1', 'Too Many Requests'));
+        ob_end_clean();
+
+        $frames = self::framesOf($conn);
+        self::assertSame('fail', $frames[0]->status, 'a 429 must not pass exists, same as any other non-2xx');
+        self::assertStringContainsString('HTTP 429', $frames[0]->text);
+        self::assertStringContainsString('Retry-After: 30', $frames[0]->text, 'the hint must survive the move off the rejection path');
+    }
+
+    /**
+     * F1: `cachedGet()`'s cache-hit branch must treat an entry it cannot decode as a miss, not as a
+     * rejection. A rejection there would fail every check whose cache entry predates a deploy — the
+     * bare-body shape every entry had before #833 is exactly that shape — for the whole of its TTL,
+     * which is the false-failure mirror of the bug #833 fixes, introduced by the fix itself.
+     *
+     * Driven through the real `cachedGet()` against a real (if minimal) APCu-shaped backend — see
+     * `phpunit_tests/Support/ApcuShim.php` — rather than reasoning about the control flow, because
+     * "it falls through" is exactly the kind of claim that is easy to get wrong by inspection alone.
+     */
+    public function testAMalformedLegacyCacheEntryFallsThroughToALiveRequestRatherThanFailing(): void
+    {
+        require_once __DIR__ . '/Support/ApcuShim.php';
+
+        $health  = $this->newHealth();
+        $url     = 'https://example.test/calendar/nation/IT/2026';
+        $options = [];
+
+        $cacheEnabledProp = new \ReflectionProperty(Health::class, 'cacheEnabled');
+        $cacheBackendProp = new \ReflectionProperty(Health::class, 'cacheBackend');
+        $enabledBefore    = $cacheEnabledProp->getValue();
+        $backendBefore    = $cacheBackendProp->getValue();
+        $cacheEnabledProp->setValue(null, true);
+        $cacheBackendProp->setValue(null, 'apcu');
+
+        $key = 'http_' . md5($url . serialize($options));
+
+        try {
+            // The bare-body shape every entry had before #833: no {"status":…,"body":…} envelope.
+            apcu_store($key, '{"litcal":[],"settings":{},"metadata":{},"messages":[]}', 300);
+            self::assertTrue(apcu_exists($key), 'precondition: the stale entry is actually in the cache');
+
+            $cachedGet = new \ReflectionMethod(Health::class, 'cachedGet');
+            ob_start();
+            /** @var \React\Promise\PromiseInterface<array<string, mixed>> $promise */
+            $promise = $cachedGet->invoke($health, $url, $options, 300, null);
+            ob_end_clean();
+
+            $resolved = null;
+            $rejected = null;
+            $promise->then(
+                function (mixed $value) use (&$resolved): void {
+                    $resolved = $value;
+                },
+                function (\Throwable $e) use (&$rejected): void {
+                    $rejected = $e;
+                }
+            );
+
+            self::assertNull($rejected, 'F1: a malformed cache entry must not surface as a rejection');
+            self::assertNull($resolved, 'nothing has answered yet — a live request should have been queued instead of a synchronous answer');
+
+            $queue = ( new \ReflectionProperty(Health::class, 'queue') )->getValue($health);
+            self::assertCount(1, $queue, 'the malformed entry must fall through to a live request being queued, not dead-end at rejection');
+            self::assertSame($url, $queue[0]['url']);
+
+            self::assertFalse(apcu_exists($key), 'the stale entry must be deleted, not left to reject the next request too');
+
+            // Prove the round trip actually completes: fulfilling the queued request resolves the
+            // very promise cachedGet() returned, exactly as an uncached first request would.
+            /** @var \Closure(ResponseInterface):void $resolve */
+            $resolve = $queue[0]['resolve'];
+            ob_start();
+            $resolve(new Response(200, [], '{"litcal":[]}'));
+            ob_end_clean();
+
+            self::assertNull($rejected);
+            self::assertIsArray($resolved);
+            self::assertSame(200, $resolved['status'] ?? null, 'the check must succeed on the live re-fetch, not stay broken');
+            self::assertFalse($resolved['fromCache'] ?? null);
+        } finally {
+            $cacheEnabledProp->setValue(null, $enabledBefore);
+            $cacheBackendProp->setValue(null, $backendBefore);
+            apcu_delete($key);
+        }
+    }
 }
