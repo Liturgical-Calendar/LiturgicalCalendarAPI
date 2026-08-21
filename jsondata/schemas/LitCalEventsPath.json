@@ -67,6 +67,27 @@
                 },
                 "additionalProperties": false,
                 "required": [ "locale", "national_calendar", "diocesan_calendar", "rite" ]
+              },
+              {
+                "properties": {
+                  "locale": {
+                    "$ref": "./CommonDef.json#/definitions/Locale"
+                  },
+                  "national_calendar": {
+                    "type": "null",
+                    "description": "always `null` here: this branch describes a diocesan request under a rite that has no national tier, so the diocese is not built on top of a national calendar"
+                  },
+                  "diocesan_calendar": {
+                    "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId",
+                    "description": "indicates the Diocesan Calendar used to produce the data in `litcal_events`"
+                  },
+                  "rite": {
+                    "$ref": "./CommonDef.json#/definitions/RiteWithoutNationalCalendars",
+                    "description": "narrowed to the rites that have no national calendars, so that a *Roman* diocesan response with a `null` `national_calendar` — an impossible shape under the Roman rite, where a diocese always inherits from a national calendar — is still rejected by this branch and by every other one"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [ "locale", "national_calendar", "diocesan_calendar", "rite" ]
               }
             ]
         }
