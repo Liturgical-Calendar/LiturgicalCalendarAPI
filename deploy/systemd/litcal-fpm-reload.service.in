@@ -1,0 +1,9 @@
+# Template. Rendered by deploy/install.sh and installed to
+# /etc/systemd/system/litcal-fpm-reload.service. Triggered by
+# litcal-fpm-reload.path; see deploy/sbin/litcal-fpm-reload.sh.
+[Unit]
+Description=litcal: reload php-fpm and restart the WebSocket server on a deploy sentinel
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/litcal-fpm-reload.sh

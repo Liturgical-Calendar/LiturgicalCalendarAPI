@@ -1,0 +1,15 @@
+# Template. Rendered by deploy/install.sh against /etc/litcal-deploy.env and
+# installed to /etc/systemd/system/litcal-fpm-reload.path.
+#
+# Watches the deploy sentinels. A deploy drops <approot>/tmp/restart.txt; this
+# triggers litcal-fpm-reload.service, which runs as root and can therefore do what
+# a chrooted deploy user cannot: reload php-fpm, and restart the WebSocket server.
+[Unit]
+Description=litcal: watch deploy sentinels to reload php-fpm and restart the WebSocket server
+
+[Path]
+@PATH_CHANGED_LINES@
+Unit=litcal-fpm-reload.service
+
+[Install]
+WantedBy=multi-user.target
