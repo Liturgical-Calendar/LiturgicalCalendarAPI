@@ -59,7 +59,16 @@ jobs:
         with:
           php-version: ${{ env.PHP_VERSION }}
           extensions: yaml, intl, zip, calendar, gettext, apcu, opcache, pdo_pgsql, pdo_sqlite
-          ini-values: apcu.enable_cli=1, opcache.enable=1, opcache.enable_cli=1
+          # APCu is installed but deliberately left OFF under the CLI SAPI (#835), which mirrors the
+          # deployment host: production selects Redis and never takes the APCu path, so a real APCu
+          # here would exercise a configuration nothing runs — and, because APCu state persists for
+          # the life of the PHP process, one test's cache entry would change what a later test sees
+          # across the whole suite. The cache logic is covered deterministically by
+          # phpunit_tests/Support/ApcuShim.php instead.
+          # Mind the prefix: APCu inherited APC's, so the setting is `apc.enable_cli`. This line read
+          # `apcu.enable_cli=1` until #835 — a no-op, leaving the extension loaded but CLI-disabled,
+          # i.e. the value below by accident rather than by decision.
+          ini-values: apc.enable_cli=0, opcache.enable=1, opcache.enable_cli=1
           coverage: pcov
 
       - name: Cache Composer dependencies

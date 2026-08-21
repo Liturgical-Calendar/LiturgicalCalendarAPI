@@ -1,0 +1,67 @@
+# CodeRabbit configuration.
+#
+# The path instructions below encode repo rules that a general-purpose reviewer
+# reliably gets wrong, because the correct answer is the opposite of the usual
+# convention. Each one describes a suggestion that has actually been made and
+# was actively harmful, not merely unnecessary.
+#
+# Reference: https://docs.coderabbit.ai/reference/yaml-template
+#
+# Note: .coderabbit.yaml has no top-level `version` key. Adding one risks the
+# whole file being rejected, taking these instructions with it.
+
+language: en-GB
+
+reviews:
+  path_instructions:
+    - path: "phpunit_tests/**"
+      instructions: |
+        PHPUnit `slow` group — do NOT suggest adding `#[Group('slow')]` to a test.
+
+        In this repository the `slow` group is an EXCLUSION mechanism, not a
+        descriptive label. `composer test:quick` runs `--exclude-group slow`, so
+        anything in the group disappears from the command developers actually
+        run. Adding a fast test to the group silently removes the regression
+        guard it was written to provide.
+
+        The group is reserved for tests with MEASURED runtime cost — multi-year
+        calendar calculations, rate-limit window waits, full-schema-corpus
+        validation. Integration tests are not automatically slow: most
+        `Routes/*` tests run in under 200 ms and are deliberately NOT grouped.
+
+        CLAUDE.md's rule "always use the `#[Group('slow')]` ATTRIBUTE, never a
+        legacy `@group slow` docblock" is about the SPELLING of the group for
+        tests that already belong in it. It is not an instruction to apply the
+        group. Do not cite it as a reason to add the attribute to a new test.
+
+        Only raise the group at all if a test's own measured runtime is large
+        and it is NOT already grouped, or if a test uses the legacy `@group slow`
+        docblock — PHPUnit 12 ignores the docblock, which makes both
+        `--exclude-group` and `--group` misbehave.
+
+        Also do NOT suggest passing `--exclude-group` on the phpunit CLI. A CLI
+        `--exclude-group` overrides the XML config and un-fences a
+        golden-master-generate group that silently rewrites the fixtures it is
+        checked against. Use `composer test:quick`.
+
+    - path: "jsondata/schemas/**"
+      instructions: |
+        These schemas declare JSON Schema draft-07 and are validated with
+        `swaggest/json-schema`, which implements draft-07 only.
+
+        In draft-07 a `$ref` REPLACES the schema object and sibling keywords are
+        ignored. So `{"$ref": "...", "not": {...}}` and `{"$ref": "...", "enum":
+        [...]}` are SILENT NO-OPS — they validate everything, including the
+        values they appear to forbid. Never suggest that shape. To narrow a
+        `$ref`, use `allOf: [{$ref: ...}, {...}]`, or `$ref` a definition that is
+        already narrow.
+
+        Do not suggest draft 2019-09 / 2020-12 keywords such as
+        `unevaluatedProperties` or `$dynamicRef`: the validator cannot evaluate
+        them, so they fail open rather than erroring. Migration is tracked
+        separately.
+
+        `settings` schemas use `oneOf`, where EXACTLY ONE branch must match. When
+        reviewing a new or widened branch, check that it does not also make a
+        previously single-matching payload match two branches — that turns a
+        passing response into a failure just as surely as matching none.
