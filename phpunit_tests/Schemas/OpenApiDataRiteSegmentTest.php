@@ -91,10 +91,9 @@ final class OpenApiDataRiteSegmentTest extends TestCase
      * the rite-qualified paths the API accepts — no more (a documented 400 is a lie a generated
      * client will act on) and no fewer (the omission is what #818 reports).
      *
-     * The Roman rite is deliberately excluded: it is the rite an absent segment resolves to, and
-     * the contract expresses it through the bare path rather than through a `/data/roman/...`
-     * duplicate of every operation. `/data/roman/{category}/{key}` is still accepted at runtime as
-     * an explicit synonym, and the bare paths' descriptions say so.
+     * The Roman rite is enumerated too, mirroring how `/calendar` documents both rites at every
+     * tier: of the two equivalent spellings the explicit one is canonical, so the contract names it
+     * rather than leaving a client to infer it from the bare path's prose.
      */
     #[DataProvider('riteAndCategoryCombinations')]
     public function testRiteQualifiedPathIsDocumentedExactlyWhenItIsAccepted(Rite $rite, PathCategory $category): void
@@ -106,16 +105,13 @@ final class OpenApiDataRiteSegmentTest extends TestCase
                 'the bare form of every tier must stay documented'
             );
 
-            // The exclusion described in this method's docblock, asserted rather than merely stated.
-            // Without this the decision lived only in prose, and a `/data/roman/...` duplicate could be
-            // added without anything noticing that the contract had grown a second spelling of a path
-            // it already documents. Should that duplication ever become the intent — mirroring how
-            // `/calendar` enumerates both rites at every tier — this is the assertion to revisit, which
-            // is the point: the change would be a deliberate one rather than a drift.
-            self::assertArrayNotHasKey(
+            // Both spellings are documented, and the explicit one is canonical. Asserted rather than
+            // left to prose: the bare and rite-qualified forms are equivalent at runtime, so nothing
+            // else would notice if the canonical spelling of a tier quietly stopped being documented.
+            self::assertArrayHasKey(
                 "/data/{$rite->value}/{$category->value}/{key}",
                 self::paths(),
-                'the Roman rite is expressed through the bare path, not through a /data/roman/... duplicate'
+                'the canonical explicit-rite form of every tier must be documented alongside the bare form'
             );
 
             return;
