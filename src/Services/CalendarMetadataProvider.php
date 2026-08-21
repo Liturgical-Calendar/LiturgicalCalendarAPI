@@ -397,15 +397,23 @@ final class CalendarMetadataProvider
      * its full default list.
      *
      * This *filters* the negotiator's candidate list rather than replacing it with the
-     * bare languages {@see self::localesForRite()} returns, and that distinction is load-
-     * bearing. The rite-level metadata declares `it`/`la`, but the Ambrosian diocesan
-     * layer matches the negotiated locale against its own full identifiers
-     * (`it_IT`/`la_VA`) with a strict `in_array()`, falling back to its first locale on a
-     * miss. Handing the negotiator only bare languages made it answer `la` where it used
-     * to answer `la_VA`, which failed that membership test — so `Accept-Language: la-VA`
-     * on `/events/ambrosian/diocese/milano_it` silently came back in Italian. Narrowing
-     * the *set* of acceptable languages must not narrow the *shape* of the tag returned
-     * for one that is acceptable.
+     * bare languages {@see self::localesForRite()} returns, so that narrowing the *set* of
+     * acceptable languages does not narrow the *shape* of the tag returned for one that is
+     * acceptable: offered only `['it', 'la']`, the negotiator answers `it` for
+     * `Accept-Language: it-IT`, and the rite-level routes would then report a coarser
+     * `settings.locale` than the client asked for (`it` for `/events/ambrosian`, where the
+     * whole candidate list is this one). Keeping the region-qualified tags keeps that
+     * answer faithful to the request.
+     *
+     * This function used to carry a second, heavier responsibility, retired in #845: the
+     * Ambrosian diocesan layer matched the negotiated locale against its own full
+     * identifiers (`it_IT`/`la_VA`) with a strict `in_array()` and fell back to its first
+     * locale on a miss, so the shape of the tag produced *here* decided whether a request
+     * for Latin came back in Latin or silently in Italian one layer down. That layer now
+     * re-negotiates the original `Accept-Language` header against its own declared locales
+     * instead of string-comparing an already-negotiated tag, so it no longer depends on
+     * anything this function does — `Accept-Language: la` reaches `la_VA` there even though
+     * the tag negotiated here is the bare `la`.
      *
      * @return string[]
      */

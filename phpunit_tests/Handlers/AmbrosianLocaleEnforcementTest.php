@@ -226,11 +226,15 @@ final class AmbrosianLocaleEnforcementTest extends AbstractHandlerTestCase
 
     /**
      * Narrowing negotiation to the rite's languages must not narrow the *shape* of the
-     * tag it returns. The rite-level metadata declares bare languages (`it`, `la`), but
-     * the diocesan layer matches the negotiated locale against its own full identifiers
-     * (`it_IT`, `la_VA`) with a strict `in_array()` — so a negotiator that answered `la`
-     * instead of `la_VA` would fail that membership test and get silently downgraded to
-     * the diocese's first locale, turning a request for Latin into Italian.
+     * tag it returns: the rite's candidate set is all the negotiator has to answer with on
+     * the rite-level routes, so offering it only the bare `it`/`la` the rite metadata
+     * declares would report a coarser `settings.locale` than the client asked for.
+     *
+     * (This also used to be what kept the diocesan layer honest, since that layer
+     * string-compared the negotiated tag against its own `it_IT`/`la_VA`. It no longer
+     * does — #845 made it re-negotiate the original header against its own declared
+     * locales — so the diocesan rows below are now a straightforward regression guard
+     * rather than a proof of that coupling. See CalendarScopedLocaleNegotiationTest.)
      *
      * These cases pin the exact `settings.locale` each header produced before locale
      * enforcement existed; the only behavior this feature is allowed to change is what
