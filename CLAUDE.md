@@ -449,11 +449,16 @@ Other notable test infrastructure:
   window waits (`Services/RateLimiterTest`), or full-schema-corpus validation (`Schemas/SchemaValidationTest`). Integration tests are NOT automatically slow:
   most `Routes/*` tests run in < 200 ms and are excluded from the `slow` group.
 
-> **Always use the `#[Group('slow')]` ATTRIBUTE, never a legacy `@group slow` docblock.** PHPUnit 12 honours only the attribute. Several existing suites
+> **Most tests do not belong in the `slow` group, and adding them to it is a mistake.** The group is an *exclusion* mechanism, not a label: anything in it
+> disappears from `composer test:quick`, the command developers actually run. A millisecond-scale test placed in the group silently stops guarding what it
+> was written to guard. Default to leaving a new test out of the group; put it in only when you have **measured** a runtime cost worth excluding.
+>
+> **When — and only when — a test does belong in the group, mark it with the `#[Group('slow')]` ATTRIBUTE, never a legacy `@group slow` docblock.** That
+> sentence is about the *spelling*, not about whether to apply the group at all. PHPUnit 12 honours only the attribute. Several existing suites
 > (`Schemas/SchemaValidationTest`, `Routes/Readonly/TemporaleTest`) still use docblocks, with two consequences: `--exclude-group slow` does not exclude
 > them, so `composer test:quick` runs them anyway; and `--group slow <path>` on those files selects **zero tests and exits successfully** — a false green.
-> If you use `--group` for anything, confirm with `--list-tests` that it actually selected something. Migrating the remaining docblocks to attributes is
-> open work.
+> If you use `--group` for anything, confirm with `--list-tests` that it actually selected something. Migrating those existing docblocks to attributes is
+> open work — that migration means changing the *spelling* of groups already applied, not adding the group to further tests.
 
 **Engine cache (`engineCache/`) — a trap when comparing revisions:**
 
