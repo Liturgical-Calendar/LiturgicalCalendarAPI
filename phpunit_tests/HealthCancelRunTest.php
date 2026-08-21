@@ -200,7 +200,7 @@ final class HealthCancelRunTest extends TestCase
      *
      * `validateCalendar` is used as the "ordinary message" here because, sent with only `runToken`, it
      * is missing every other required property (`category`, `calendar`, `year`, `responsetype`), so
-     * `validateMessageProperties()` rejects it and `onMessage()` falls straight to the protocol-error
+     * `WebSocketMessageValidator` rejects it and `onMessage()` falls straight to the protocol-error
      * path — confirmed by the asserted echoed frame below — without dispatching an HTTP request or file
      * read. That is what makes it safe to drive through the real entry point in a unit test.
      */

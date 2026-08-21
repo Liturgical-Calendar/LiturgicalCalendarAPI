@@ -437,4 +437,67 @@ final class HealthProtocolValidationTest extends TestCase
             'the untransformed reason must still be there'
         );
     }
+
+    /**
+     * The backstop, isolated from the gate that normally stands in front of it.
+     *
+     * Pointing the validator at a permissive schema lets a crash vector through to the dispatch, so
+     * this asserts what happens when the schema is *wrong* — which is the only circumstance in which
+     * the backstop matters, and the reason it is not redundant with Task 3's tests. Without it the
+     * process dies; with it, one request fails and the daemon keeps serving.
+     *
+     * Two things differ from a naive reading of the schema-only tests above:
+     *
+     *  - The vector is `executeValidation` with `category` as an object, not `validateCalendar` with
+     *    a non-numeric `year`. `year` is now read through `readYear()`, which does its own `is_int()`
+     *    check on both legacy arms, so that message would be refused cleanly even with the schema
+     *    bypassed — proving nothing about this catch block. `executeValidation()` does
+     *    `(string) $validation->category` before any of its own checks, and casting a `stdClass` to
+     *    string throws `\Error` (`Object of class stdClass could not be converted to string`), which
+     *    is not a `\TypeError` from a typed parameter but is still an `\Error` — not `\Exception` —
+     *    so it reaches this catch exactly the way the documented vectors do.
+     *  - The permissive schema carries the same nine `definitions` keys as the real
+     *    `WebSocketMessage.json` (`correlationId`, `calendarIdentity`, `executeValidation`,
+     *    `validateCalendarLegacy`, `validateCalendarTyped`, `executeUnitTest`, `runTest`, `cancelRun`,
+     *    `validateSource`), each one permissive. `WebSocketMessageValidator::raw()` requires a
+     *    `definitions` key to exist at all, and `schemaFor()` requires the claimed shape's own entry
+     *    to exist within it — a bare `{"type": "object"}` document satisfies neither, so it would
+     *    fail *inside* the validator rather than letting the message through.
+     */
+    public function testAHandlerThatThrowsIsContainedRatherThanKillingTheProcess(): void
+    {
+        $shapes     = ['correlationId', 'calendarIdentity', 'executeValidation', 'validateCalendarLegacy', 'validateCalendarTyped', 'executeUnitTest', 'runTest', 'cancelRun', 'validateSource'];
+        $permissive = sys_get_temp_dir() . '/permissive-ws-schema-' . getmypid() . '.json';
+        file_put_contents($permissive, (string) json_encode([
+            '$schema'     => 'https://json-schema.org/draft-07/schema#',
+            'type'        => 'object',
+            'definitions' => array_fill_keys($shapes, (object) ['type' => 'object'])
+        ]));
+
+        $health    = $this->newHealth();
+        $validator = new \ReflectionProperty(Health::class, 'messageValidator');
+        $validator->setValue($health, new \LiturgicalCalendar\Api\Services\WebSocketMessageValidator($permissive));
+        \LiturgicalCalendar\Api\Services\WebSocketMessageValidator::reset();
+
+        $conn = self::createStubConnection();
+        ob_start();
+        try {
+            $health->onMessage($conn, (string) json_encode([
+                'action'     => 'executeValidation',
+                'category'   => ['k' => 'v'],
+                'validate'   => 'x',
+                'sourceFile' => 'jsondata/x.json'
+            ]));
+        } finally {
+            ob_end_clean();
+            @unlink($permissive);
+            \LiturgicalCalendar\Api\Services\WebSocketMessageValidator::reset();
+        }
+
+        $frames = array_map(static fn (string $f): \stdClass => json_decode($f), $conn->sent);
+        self::assertNotEmpty($frames, 'the connection was told nothing at all');
+        $last = $frames[count($frames) - 1];
+        self::assertSame('protocolError', $last->type);
+        self::assertSame(ProtocolErrorCode::INTERNAL_ERROR->value, $last->errorCode);
+    }
 }

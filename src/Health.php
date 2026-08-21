@@ -628,89 +628,116 @@ class Health implements MessageComponentInterface
             && $messageReceived instanceof \stdClass
             && property_exists($messageReceived, 'action')
         ) {
-            switch ($messageReceived->action) {
-                case 'executeValidation':
-                    /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $messageReceived */
-                    $this->executeValidation($messageReceived, $from, requestId: $requestId);
-                    break;
-                case 'validateCalendar':
-                    // Same action, two shapes; see isTypedCalendarMessage(). The legacy arm below
-                    // is untouched and stays reachable until UnitTestInterface#42 ships.
-                    if (self::isTypedCalendarMessage($messageReceived)) {
-                        /** @var ValidateTypedCalendar $messageReceived */
-                        $this->validateTypedCalendar($messageReceived, $from, requestId: $requestId);
+            try {
+                switch ($messageReceived->action) {
+                    case 'executeValidation':
+                        /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $messageReceived */
+                        $this->executeValidation($messageReceived, $from, requestId: $requestId);
                         break;
-                    }
-                    /** @var ValidateCalendar $messageReceived */
-                    // `year` is read through readYear() rather than trusted as `int`, even though
-                    // the schema declares `"type": "integer"`: JSON Schema and PHP disagree about
-                    // what that means. A number like 1e30 or a 30-digit literal is an integer *by
-                    // value* under JSON Schema, so the schema accepts it correctly — but json_decode()
-                    // hands PHP a float for it (it is outside PHP_INT_MAX), and this arm used to
-                    // unpack that straight into validateCalendar(..., int $year, ...). PHP's
-                    // coercive typing refuses an out-of-range float for an int parameter with a
-                    // TypeError, an \Error Ratchet's IoServer::handleData does not catch, so it took
-                    // the whole process down. readYear()'s is_int() check is exactly the guard the
-                    // typed arms (validateTypedCalendar(), runTest()) already apply for the same
-                    // reason; the schema cannot close this gap, because the schema is right.
-                    try {
-                        $year = self::readYear($messageReceived, 'validateCalendar');
-                    } catch (\InvalidArgumentException $e) {
-                        $this->rejectMessage($from, ProtocolErrorCode::INVALID_MESSAGE, $e->getMessage(), requestId: $requestId);
+                    case 'validateCalendar':
+                        // Same action, two shapes; see isTypedCalendarMessage(). The legacy arm below
+                        // is untouched and stays reachable until UnitTestInterface#42 ships.
+                        if (self::isTypedCalendarMessage($messageReceived)) {
+                            /** @var ValidateTypedCalendar $messageReceived */
+                            $this->validateTypedCalendar($messageReceived, $from, requestId: $requestId);
+                            break;
+                        }
+                        /** @var ValidateCalendar $messageReceived */
+                        // `year` is read through readYear() rather than trusted as `int`, even though
+                        // the schema declares `"type": "integer"`: JSON Schema and PHP disagree about
+                        // what that means. A number like 1e30 or a 30-digit literal is an integer *by
+                        // value* under JSON Schema, so the schema accepts it correctly — but json_decode()
+                        // hands PHP a float for it (it is outside PHP_INT_MAX), and this arm used to
+                        // unpack that straight into validateCalendar(..., int $year, ...). PHP's
+                        // coercive typing refuses an out-of-range float for an int parameter with a
+                        // TypeError, an \Error Ratchet's IoServer::handleData does not catch, so it took
+                        // the whole process down. readYear()'s is_int() check is exactly the guard the
+                        // typed arms (validateTypedCalendar(), runTest()) already apply for the same
+                        // reason; the schema cannot close this gap, because the schema is right.
+                        try {
+                            $year = self::readYear($messageReceived, 'validateCalendar');
+                        } catch (\InvalidArgumentException $e) {
+                            $this->rejectMessage($from, ProtocolErrorCode::INVALID_MESSAGE, $e->getMessage(), requestId: $requestId);
+                            break;
+                        }
+                        $this->validateCalendar(
+                            $messageReceived->calendar,
+                            $year,
+                            $messageReceived->category,
+                            $messageReceived->responsetype,
+                            $from,
+                            self::readRiteHint($messageReceived),
+                            requestId: $requestId
+                        );
                         break;
-                    }
-                    $this->validateCalendar(
-                        $messageReceived->calendar,
-                        $year,
-                        $messageReceived->category,
-                        $messageReceived->responsetype,
-                        $from,
-                        self::readRiteHint($messageReceived),
-                        requestId: $requestId
-                    );
-                    break;
-                case 'executeUnitTest':
-                    /** @var ExecuteUnitTest $messageReceived */
-                    // See the comment on the validateCalendar arm above: same hazard, same fix.
-                    try {
-                        $year = self::readYear($messageReceived, 'executeUnitTest');
-                    } catch (\InvalidArgumentException $e) {
-                        $this->rejectMessage($from, ProtocolErrorCode::INVALID_MESSAGE, $e->getMessage(), requestId: $requestId);
+                    case 'executeUnitTest':
+                        /** @var ExecuteUnitTest $messageReceived */
+                        // See the comment on the validateCalendar arm above: same hazard, same fix.
+                        try {
+                            $year = self::readYear($messageReceived, 'executeUnitTest');
+                        } catch (\InvalidArgumentException $e) {
+                            $this->rejectMessage($from, ProtocolErrorCode::INVALID_MESSAGE, $e->getMessage(), requestId: $requestId);
+                            break;
+                        }
+                        $this->executeUnitTest(
+                            $messageReceived->test,
+                            $messageReceived->calendar,
+                            $year,
+                            $messageReceived->category,
+                            $from,
+                            self::readRiteHint($messageReceived),
+                            requestId: $requestId
+                        );
                         break;
-                    }
-                    $this->executeUnitTest(
-                        $messageReceived->test,
-                        $messageReceived->calendar,
-                        $year,
-                        $messageReceived->category,
-                        $from,
-                        self::readRiteHint($messageReceived),
-                        requestId: $requestId
-                    );
-                    break;
-                case 'runTest':
-                    /** @var RunTest $messageReceived */
-                    $this->runTest($messageReceived, $from, requestId: $requestId);
-                    break;
-                case 'cancelRun':
-                    /** @var CancelRun $messageReceived */
-                    $this->cancelRun($messageReceived->runToken, $from);
-                    break;
-                case 'validateSource':
-                    /** @var ValidateSource $messageReceived */
-                    $this->validateSource($messageReceived, $from, requestId: $requestId);
-                    break;
-                default:
-                    // Unreachable: the block above already returned for any action
-                    // `WebSocketMessageValidator::shapeOf()` does not recognise, and it recognises
-                    // exactly the actions the case arms above handle. Kept as a cheap backstop
-                    // against a future action being added to `shapeOf()` without a matching arm here.
-                    $this->rejectMessage(
-                        $from,
-                        ProtocolErrorCode::UNKNOWN_ACTION,
-                        sprintf('Unknown action from connection %1$d: %2$s', $resourceId, $msg),
-                        requestId: $requestId
-                    );
+                    case 'runTest':
+                        /** @var RunTest $messageReceived */
+                        $this->runTest($messageReceived, $from, requestId: $requestId);
+                        break;
+                    case 'cancelRun':
+                        /** @var CancelRun $messageReceived */
+                        $this->cancelRun($messageReceived->runToken, $from);
+                        break;
+                    case 'validateSource':
+                        /** @var ValidateSource $messageReceived */
+                        $this->validateSource($messageReceived, $from, requestId: $requestId);
+                        break;
+                    default:
+                        // Unreachable: the block above already returned for any action
+                        // `WebSocketMessageValidator::shapeOf()` does not recognise, and it recognises
+                        // exactly the actions the case arms above handle. Kept as a cheap backstop
+                        // against a future action being added to `shapeOf()` without a matching arm here.
+                        $this->rejectMessage(
+                            $from,
+                            ProtocolErrorCode::UNKNOWN_ACTION,
+                            sprintf('Unknown action from connection %1$d: %2$s', $resourceId, $msg),
+                            requestId: $requestId
+                        );
+                }
+            } catch (\Throwable $e) {
+                // Ratchet's IoServer::handleData catches \Exception, and TypeError, ValueError and
+                // Error are not \Exception — so without this, anything a handler throws terminates
+                // the process for every connected client rather than failing one request.
+                //
+                // Schema validation stands in front of this and is the real gate. The backstop is
+                // here because a process-wide crash must not depend on a schema file being correct.
+                // A catch-all can mask a bug, which is why this logs before it answers: the log line
+                // is what keeps the masked bug findable.
+                //
+                // It does NOT cover #823. Those throws happen inside promise callbacks, after this
+                // method has returned, where no try around the dispatch can see them.
+                echo sprintf(
+                    "Uncaught %s handling %s from connection %d: %s\n",
+                    get_class($e),
+                    (string) $messageReceived->action,
+                    $resourceId,
+                    $e->getMessage()
+                );
+                $this->rejectMessage(
+                    $from,
+                    ProtocolErrorCode::INTERNAL_ERROR,
+                    'The server failed while handling this message. This is a bug; the run may be incomplete.',
+                    requestId: $requestId
+                );
             }
         } else {
             if (json_last_error() !== JSON_ERROR_NONE) {
