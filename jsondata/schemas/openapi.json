@@ -5471,6 +5471,7 @@
           {}
         ],
         "summary": "Retrieve a national calendar data resource",
+        "description": "`/data/roman/nation/{key}` states the same rite explicitly and is the canonical form of this path. There is no other rite-qualified variant: only the diocesan tier exists under more than one rite, so `/data/ambrosian/nation/{key}` returns `400 Bad Request` (\"The ambrosian rite has no national calendars; request a diocesan calendar of that rite instead.\").",
         "operationId": "nationalDataGET",
         "parameters": [
           {
@@ -5746,6 +5747,291 @@
         }
       }
     },
+    "/data/roman/nation/{key}": {
+      "get": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve a national calendar data resource",
+        "description": "This is the canonical form of this route: the rite is stated explicitly. The bare `/data/nation/{key}` form is equivalent and resolves here. Only the diocesan tier exists under more than one rite, so there is no `/data/ambrosian/nation/{key}`: that path returns `400 Bad Request` (\"The ambrosian rite has no national calendars; request a diocesan calendar of that rite instead.\").",
+        "operationId": "romanNationalDataGET",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/Nation"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: National calendar data resource retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./NationalCalendar.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Create a national calendar data resource",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it.\n\nThis is the canonical, explicit-rite form of `/data/nation/{key}`.",
+        "operationId": "romanNationalCalendarDataPUT",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/Nation"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./NationalCalendar.json"
+              },
+              "examples": {
+                "ItalyNationalCalendar": {
+                  "$ref": "#/components/examples/NationalCalendarRequestBody"
+                },
+                "USANationalCalendar": {
+                  "$ref": "#/components/examples/NationalCalendarUSRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "examples": [
+                        "National calendar created for nation {NATION}"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict409"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve a national calendar data resource",
+        "operationId": "romanNationalDataPOST",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/Nation"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./NationalCalendar.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Update a national calendar data resource",
+        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`.\n\nThis is the canonical, explicit-rite form of `/data/nation/{key}`.",
+        "operationId": "romanNationalDataPATCH",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z]{2,45}$"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./NationalCalendar.json"
+              },
+              "examples": {
+                "ItalyNationalCalendar": {
+                  "$ref": "#/components/examples/NationalCalendarRequestBody"
+                },
+                "USANationalCalendar": {
+                  "$ref": "#/components/examples/NationalCalendarUSRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created. Even when updating an existing resource, we will still get the same 201 Created because we are basically overwriting the previous resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "example": "National calendar updated for nation {NATION}"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Delete a national calendar data resource",
+        "description": "`DELETE` requires the `admin` relation. `admin` implies `editor` and `viewer`.\n\nThis is the canonical, explicit-rite form of `/data/nation/{key}`.",
+        "operationId": "romanNationalDataDELETE",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[A-Z]{2}$"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DeleteSuccess200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      }
+    },
     "/data/diocese/{key}": {
       "get": {
         "tags": [
@@ -5755,6 +6041,7 @@
           {}
         ],
         "summary": "Retrieve a diocesan calendar data resource",
+        "description": "This path resolves to the Roman rite. A diocese defined under another rite must be addressed through its rite-qualified path (`/data/ambrosian/diocese/{key}`); asking for one here returns `422 Unprocessable Content`. `/data/roman/diocese/{key}` states the same rite explicitly and is the canonical form of this path.",
         "operationId": "diocesanDataGET",
         "parameters": [
           {
@@ -5782,6 +6069,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       },
@@ -5798,7 +6088,7 @@
           }
         ],
         "summary": "Create a diocesan calendar data resource",
-        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it.",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it. This path resolves to the Roman rite; an Ambrosian diocese must be addressed through `/data/ambrosian/diocese/{key}`.",
         "operationId": "diocesanDataPUT",
         "parameters": [
           {
@@ -5876,6 +6166,7 @@
           {}
         ],
         "summary": "Retrieve a diocesan calendar data resource",
+        "description": "This path resolves to the Roman rite. A diocese defined under another rite must be addressed through its rite-qualified path (`/data/ambrosian/diocese/{key}`); asking for one here returns `422 Unprocessable Content`. `/data/roman/diocese/{key}` states the same rite explicitly and is the canonical form of this path.",
         "operationId": "diocesanDataPOST",
         "parameters": [
           {
@@ -5903,6 +6194,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       },
@@ -5919,7 +6213,7 @@
           }
         ],
         "summary": "Update a diocesan calendar data resource",
-        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`.",
+        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`. This path resolves to the Roman rite; an Ambrosian diocese must be addressed through `/data/ambrosian/diocese/{key}`.",
         "operationId": "diocesanDataPATCH",
         "parameters": [
           {
@@ -5997,7 +6291,7 @@
           }
         ],
         "summary": "Delete a diocesan calendar data resource",
-        "description": "`DELETE` requires the `admin` relation. `admin` implies `editor` and `viewer`.",
+        "description": "`DELETE` requires the `admin` relation. `admin` implies `editor` and `viewer`. This path resolves to the Roman rite; an Ambrosian diocese must be addressed through `/data/ambrosian/diocese/{key}`.",
         "operationId": "diocesanDataDELETE",
         "parameters": [
           {
@@ -6024,6 +6318,302 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      }
+    },
+    "/data/roman/diocese/{key}": {
+      "get": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve a diocesan calendar data resource",
+        "description": "This is the canonical form of this route: the rite is stated explicitly, symmetric with `/data/ambrosian/diocese/{key}`. The bare `/data/diocese/{key}` form is equivalent and resolves here. A diocese defined under another rite must be addressed through its own rite-qualified path; asking for one here returns `422 Unprocessable Content`.",
+        "operationId": "romanDiocesanDataGET",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./DiocesanCalendar.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Create a diocesan calendar data resource",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it. This path resolves to the Roman rite; an Ambrosian diocese must be addressed through `/data/ambrosian/diocese/{key}`.\n\nThis is the canonical, explicit-rite form of `/data/diocese/{key}`.",
+        "operationId": "romanDiocesanDataPUT",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./DiocesanCalendar.json"
+              },
+              "examples": {
+                "BostonDiocesan": {
+                  "$ref": "#/components/examples/DiocesanCalendarRequestBody"
+                },
+                "RomeDiocesan": {
+                  "$ref": "#/components/examples/DiocesanCalendarRomeRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "examples": [
+                        "Diocesan calendar created for diocese {DIOCESE}"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict409"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve a diocesan calendar data resource",
+        "description": "This is the canonical form of this route: the rite is stated explicitly, symmetric with `/data/ambrosian/diocese/{key}`. The bare `/data/diocese/{key}` form is equivalent and resolves here. A diocese defined under another rite must be addressed through its own rite-qualified path; asking for one here returns `422 Unprocessable Content`.",
+        "operationId": "romanDiocesanDataPOST",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./DiocesanCalendar.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Update a diocesan calendar data resource",
+        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`. This path resolves to the Roman rite; an Ambrosian diocese must be addressed through `/data/ambrosian/diocese/{key}`.\n\nThis is the canonical, explicit-rite form of `/data/diocese/{key}`.",
+        "operationId": "romanDiocesanDataPATCH",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./DiocesanCalendar.json"
+              },
+              "examples": {
+                "BostonDiocesan": {
+                  "$ref": "#/components/examples/DiocesanCalendarRequestBody"
+                },
+                "RomeDiocesan": {
+                  "$ref": "#/components/examples/DiocesanCalendarRomeRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created. Even when updating an existing resource, we will still get the same 201 Created because we are basically overwriting the previous resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "example": "Diocesan calendar updated for diocese {DIOCESE}"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Delete a diocesan calendar data resource",
+        "description": "`DELETE` requires the `admin` relation. `admin` implies `editor` and `viewer`. This path resolves to the Roman rite; an Ambrosian diocese must be addressed through `/data/ambrosian/diocese/{key}`.\n\nThis is the canonical, explicit-rite form of `/data/diocese/{key}`.",
+        "operationId": "romanDiocesanDataDELETE",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DeleteSuccess200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       }
@@ -6037,6 +6627,7 @@
           {}
         ],
         "summary": "Retrieve a wider region calendar data resource",
+        "description": "`/data/roman/widerregion/{key}` states the same rite explicitly and is the canonical form of this path. There is no other rite-qualified variant: wider regions are a layer over national calendars, which exist only in the Roman rite, so `/data/ambrosian/widerregion/{key}` returns `400 Bad Request`.",
         "operationId": "widerregionDataGET",
         "parameters": [
           {
@@ -6306,6 +6897,576 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      }
+    },
+    "/data/roman/widerregion/{key}": {
+      "get": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve a wider region calendar data resource",
+        "description": "This is the canonical form of this route: the rite is stated explicitly. The bare `/data/widerregion/{key}` form is equivalent and resolves here. Wider regions are a layer over national calendars, which exist only in the Roman rite, so `/data/ambrosian/widerregion/{key}` returns `400 Bad Request`.",
+        "operationId": "romanWiderregionDataGET",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./WiderRegionCalendar.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Create a wider region data resource",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it.\n\nThis is the canonical, explicit-rite form of `/data/widerregion/{key}`.",
+        "operationId": "romanWiderregionDataPUT",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./WiderRegionCalendar.json"
+              },
+              "examples": {
+                "EuropeWiderRegion": {
+                  "$ref": "#/components/examples/WiderRegionCalendarRequestBody"
+                },
+                "AsiaWiderRegion": {
+                  "$ref": "#/components/examples/WiderRegionCalendarAsiaRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "examples": [
+                        "Wider region calendar created for region {REGION}"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict409"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve a wider region calendar data resource",
+        "operationId": "romanWiderregionDataPOST",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./WiderRegionCalendar.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Update a wider region calendar data resource",
+        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`.\n\nThis is the canonical, explicit-rite form of `/data/widerregion/{key}`.",
+        "operationId": "romanWiderregionDataPATCH",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./WiderRegionCalendar.json"
+              },
+              "examples": {
+                "EuropeWiderRegion": {
+                  "$ref": "#/components/examples/WiderRegionCalendarRequestBody"
+                },
+                "AsiaWiderRegion": {
+                  "$ref": "#/components/examples/WiderRegionCalendarAsiaRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created. Even when updating an existing resource, we will still get the same 201 Created because we are basically overwriting the previous resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "example": "Wider region calendar updated for region {REGION}"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Delete a wider region calendar data resource",
+        "description": "`DELETE` requires the `admin` relation. `admin` implies `editor` and `viewer`.\n\nThis is the canonical, explicit-rite form of `/data/widerregion/{key}`.",
+        "operationId": "romanWiderregionDataDELETE",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DeleteSuccess200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      }
+    },
+    "/data/ambrosian/diocese/{key}": {
+      "get": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve an Ambrosian diocesan calendar data resource",
+        "description": "Retrieve the source definition of a diocesan calendar defined under the Ambrosian rite.\n\n**The `ambrosian` rite segment is required here, not decorative.** The bare `/data/diocese/{key}` form resolves to the Roman rite, so addressing an Ambrosian diocese through it returns `422 Unprocessable Content` (`Diocesan calendar ... belongs to the ambrosian rite, not the requested roman rite.`); the same `422` is returned on this path for a diocese that is not Ambrosian. The Ambrosian dioceses are Milano (`milano_it`), Bergamo (`bergam_it`), Novara (`novara_it`) and Lugano (`lugano_ch`) \u2014 every other diocese is Roman. On any `/data` path `roman` is accepted as an explicit synonym of the bare form.\n\nOnly the diocesan tier exists under more than one rite, so there is deliberately no `/data/ambrosian/nation/{key}` and no `/data/ambrosian/widerregion/{key}`: the Ambrosian rite is proper to the Archdiocese of Milan and a handful of neighbouring dioceses rather than to any nation or region, and the source tree has no Ambrosian national or wider-region partition to read or write. Either of those requests returns `400 Bad Request`.\n\nUnlike `/calendar` and `/events`, `/data` advertises no canonical URL: the bare form returns no RFC 6596 `Link: <...>; rel=\"canonical\"` response header.\n\nThe Ambrosian rite has approved liturgical books only in Italian and Latin, so `diocesan_calendars[].locales` on `/calendars` declares `it_IT` and `la_VA` for these dioceses; a `locale` naming any other language returns `422 Unprocessable Content`.",
+        "operationId": "ambrosianDiocesanDataGET",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./DiocesanCalendar.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Create an Ambrosian diocesan calendar data resource",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it.\n\nThe method surface is identical to `/data/diocese/{key}`: the `ambrosian` segment only selects which rite partition of the source tree is written. It is required for an Ambrosian diocese \u2014 see `GET /data/ambrosian/diocese/{key}` for the full rite grammar and for why no rite-qualified national or wider-region path exists.",
+        "operationId": "ambrosianDiocesanDataPUT",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./DiocesanCalendar.json"
+              },
+              "examples": {
+                "MilanDiocesan": {
+                  "$ref": "#/components/examples/DiocesanCalendarMilanRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "examples": [
+                        "Diocesan calendar created for diocese {DIOCESE}"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict409"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve an Ambrosian diocesan calendar data resource",
+        "description": "Retrieve the source definition of a diocesan calendar defined under the Ambrosian rite.\n\n**The `ambrosian` rite segment is required here, not decorative.** The bare `/data/diocese/{key}` form resolves to the Roman rite, so addressing an Ambrosian diocese through it returns `422 Unprocessable Content` (`Diocesan calendar ... belongs to the ambrosian rite, not the requested roman rite.`); the same `422` is returned on this path for a diocese that is not Ambrosian. The Ambrosian dioceses are Milano (`milano_it`), Bergamo (`bergam_it`), Novara (`novara_it`) and Lugano (`lugano_ch`) \u2014 every other diocese is Roman. On any `/data` path `roman` is accepted as an explicit synonym of the bare form.\n\nOnly the diocesan tier exists under more than one rite, so there is deliberately no `/data/ambrosian/nation/{key}` and no `/data/ambrosian/widerregion/{key}`: the Ambrosian rite is proper to the Archdiocese of Milan and a handful of neighbouring dioceses rather than to any nation or region, and the source tree has no Ambrosian national or wider-region partition to read or write. Either of those requests returns `400 Bad Request`.\n\nUnlike `/calendar` and `/events`, `/data` advertises no canonical URL: the bare form returns no RFC 6596 `Link: <...>; rel=\"canonical\"` response header.\n\nThe Ambrosian rite has approved liturgical books only in Italian and Latin, so `diocesan_calendars[].locales` on `/calendars` declares `it_IT` and `la_VA` for these dioceses; a `locale` naming any other language returns `422 Unprocessable Content`.",
+        "operationId": "ambrosianDiocesanDataPOST",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "./DiocesanCalendar.json"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Update an Ambrosian diocesan calendar data resource",
+        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`.\n\nThe method surface is identical to `/data/diocese/{key}`: the `ambrosian` segment only selects which rite partition of the source tree is written. It is required for an Ambrosian diocese \u2014 see `GET /data/ambrosian/diocese/{key}` for the full rite grammar and for why no rite-qualified national or wider-region path exists.",
+        "operationId": "ambrosianDiocesanDataPATCH",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "./DiocesanCalendar.json"
+              },
+              "examples": {
+                "MilanDiocesan": {
+                  "$ref": "#/components/examples/DiocesanCalendarMilanRequestBody"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "201 Created. Even when updating an existing resource, we will still get the same 201 Created because we are basically overwriting the previous resource",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "example": "Diocesan calendar updated for diocese {DIOCESE}"
+                    }
+                  },
+                  "required": [
+                    "success"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Delete an Ambrosian diocesan calendar data resource",
+        "description": "`DELETE` requires the `admin` relation. `admin` implies `editor` and `viewer`.\n\nThe method surface is identical to `/data/diocese/{key}`: the `ambrosian` segment only selects which rite partition of the source tree is written. It is required for an Ambrosian diocese \u2014 see `GET /data/ambrosian/diocese/{key}` for the full rite grammar and for why no rite-qualified national or wider-region path exists.",
+        "operationId": "ambrosianDiocesanDataDELETE",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DeleteSuccess200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       }
@@ -11070,6 +12231,51 @@
           "i18n": {
             "it_IT": {
               "DedicationoftheBasilicaofStJohnLateran": "Dedicazione della Basilica Lateranense"
+            }
+          }
+        }
+      },
+      "DiocesanCalendarMilanRequestBody": {
+        "summary": "Diocesan Calendar for the Archdiocese of Milan (Ambrosian rite)",
+        "description": "Example of a diocesan calendar definition for a diocese of the Ambrosian rite. `metadata.rite` names the rite the calendar belongs to and agrees with the `ambrosian` segment of the path. Ambrosian dioceses declare no `settings`: the movable-feast settings of the rite are fixed and are announced on `/calendars` as `ambrosian_calendars[].settings`.",
+        "value": {
+          "litcal": [
+            {
+              "liturgical_event": {
+                "event_key": "BeatoManfredoSettala",
+                "color": [
+                  "white"
+                ],
+                "grade": 3,
+                "common": [
+                  "Proper"
+                ],
+                "day": 27,
+                "month": 1
+              },
+              "metadata": {
+                "since_year": 2024,
+                "form_rownum": 0
+              }
+            }
+          ],
+          "metadata": {
+            "nation": "IT",
+            "diocese_id": "milano_it",
+            "diocese_name": "Arcidiocesi di Milano",
+            "locales": [
+              "it_IT",
+              "la_VA"
+            ],
+            "timezone": "Europe/Rome",
+            "rite": "ambrosian"
+          },
+          "i18n": {
+            "it_IT": {
+              "BeatoManfredoSettala": "B. Manfredo Settala, presbitero"
+            },
+            "la_VA": {
+              "BeatoManfredoSettala": "Beatus Manfredus Settala, presbyter"
             }
           }
         }
