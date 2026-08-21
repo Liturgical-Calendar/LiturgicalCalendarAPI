@@ -448,20 +448,17 @@ class Health implements MessageComponentInterface
                 }
             }
 
-            // Fall back to APCu if Redis not available
+            // Fall back to APCu if Redis not available — but only to an APCu that demonstrably stores
+            // what it is given. See {@see Health::apcuUsable()} for why loaded is not the same as usable.
             if (self::$cacheBackend === 'none') {
-                $apcuAvailable = extension_loaded('apcu')
-                    && function_exists('apcu_exists')
-                    && function_exists('apcu_store')
-                    && function_exists('apcu_fetch');
-                if ($apcuAvailable) {
+                if (self::apcuUsable()) {
                     self::$cacheEnabled = true;
                     self::$cacheBackend = 'apcu';
-                    echo "APCu extension loaded, will use for caching\n";
-                    $logger->info('APCu extension loaded, will use for caching');
+                    echo "APCu verified by store/fetch round trip, will use for caching\n";
+                    $logger->info('APCu verified by store/fetch round trip, will use for caching');
                 } else {
-                    echo "No cache backend available (Redis and APCu both unavailable)\n";
-                    $logger->warning('No cache backend available (Redis and APCu both unavailable)');
+                    echo "No cache backend available (Redis unavailable; APCu missing or not storing)\n";
+                    $logger->warning('No cache backend available (Redis unavailable; APCu missing or not storing)');
                 }
             }
         }
@@ -1005,8 +1002,10 @@ class Health implements MessageComponentInterface
      * then, finishing the *following* phase early too. A cascading miscount with nothing visibly
      * failing, which is worse than a crash. `requestId` is already the v2 opt-in signal and a client
      * adopting `complete` is adopting correlation anyway, so the gate costs a v2 client nothing and
-     * keeps the byte-identity guarantee whole. The gate lives here rather than at the twelve call
-     * sites so that it cannot be forgotten at a thirteenth.
+     * keeps the byte-identity guarantee whole. The gate lives here rather than at its call sites so
+     * that it cannot be forgotten at a new one — including the recovery arm in
+     * {@see Health::terminateOnHandlerThrow()}, which terminates a request whose handler threw and is
+     * gated by the same `null === $requestId` return as every other path.
      *
      * **No `status`.** The frame reports that the work finished, not that it passed; a run whose every
      * step failed still completes. The outcome is on the step frames, which is where a client reads it.
@@ -1042,6 +1041,65 @@ class Health implements MessageComponentInterface
         $message->target = $target;
         $message->step   = Step::COMPLETE->value;
         $this->sendMessage($to, $message, $runToken, requestId: $requestId);
+    }
+
+    /**
+     * The last resort behind a `then()`: terminate the request when one of its own handlers threw (#823).
+     *
+     * **React does not invoke a `then()`'s sibling `onRejected` when its own `onFulfilled` throws.** It
+     * rejects the promise *derived* from that `then()` instead. So every fulfil handler in this class
+     * that ends with {@see Health::sendComplete()} had one uncovered exit: an exception raised partway
+     * through it skipped the terminal frame, and a v2 client that stops on `complete` waited forever —
+     * the wedge the frame exists to prevent, arrived at from inside rather than from outside.
+     *
+     * The closure this returns is attached to the *derived* promise, as `->then(null, ...)`, rather than
+     * wrapped around the handler body in a `try`. That is deliberate on three counts: it is where React
+     * actually delivers the failure, so nothing has to be re-derived from the handler's shape; it leaves
+     * the handler bodies untouched, which matters for arms this class cannot easily re-test; and it covers
+     * a throw from the sibling `onRejected` too, which wedges a client the same way and by the same
+     * mechanism.
+     *
+     * **It logs and does not rethrow.** Every call site discards the promise it builds, so a rethrow would
+     * reach no handler at all — only `react/promise`'s unhandled-rejection reporter, which `error_log`s a
+     * message with no idea which check it belonged to. `echo` is how this class reports to the WebSocket
+     * server's stdout, and it is what the sibling `onRejected` arms already do with the reasons they are
+     * handed. Nothing is reported to the *client* beyond the terminal frame: the failure arrived partway
+     * through a stream whose frames a v1 client counts as `checks * 3`, and an extra one — unlike
+     * `complete`, which is gated on `requestId` — would be counted toward whatever phase was active.
+     *
+     * **On double-completion.** `sendComplete()` has no idempotency guard, by design, so this must not be
+     * reachable after a request has already terminated. It is not: in every handler it is attached to,
+     * `sendComplete()` is either the last statement or is followed immediately by `return`, so a throw
+     * that reaches here happened *before* the terminal frame — or it *was* the terminal frame failing to
+     * send, in which case the connection is already gone and a second attempt reaches nobody. A handler
+     * that completes and then keeps working would break that, which is why the terminal frame stays last.
+     *
+     * @param ConnectionInterface $to The connection that asked for the work.
+     * @param ?\stdClass $target What was checked, per {@see Health::frameTarget()} — the same target the
+     *        handler's own terminal frame would have carried.
+     * @param ?string $runToken The originating run token to echo back, or null to use the per-connection fallback.
+     * @param ?string $requestId The correlation id of the request that has finished. Null means the client never
+     *        opted in, and {@see Health::sendComplete()} sends nothing at all — the gate holds here too.
+     * @param string $context What was being reported when the handler threw, for the log line.
+     *
+     * @return \Closure(\Throwable): void
+     */
+    private function terminateOnHandlerThrow(
+        ConnectionInterface $to,
+        ?\stdClass $target,
+        ?string $runToken,
+        ?string $requestId,
+        string $context
+    ): \Closure {
+        return function (\Throwable $e) use ($to, $target, $runToken, $requestId, $context): void {
+            // Class and origin as well as message: a throw that reaches here is by definition one nobody
+            // anticipated, and until now it was reported by `react/promise`'s unhandled-rejection reporter,
+            // which at least said where it came from. Handling the rejection silences that reporter, so
+            // what it used to say has to be said here instead.
+            echo 'Error while reporting on ' . $context . ': ' . $e::class . ': ' . $e->getMessage()
+                . ' (' . $e->getFile() . ':' . $e->getLine() . ")\n";
+            $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
+        };
     }
 
     /**
@@ -1705,7 +1763,7 @@ class Health implements MessageComponentInterface
                     // never arrive.
                     $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
                 }
-            );
+            )->then(null, $this->terminateOnHandlerThrow($to, $target, $runToken, $requestId, "the i18n folder check for $label ($dataPath)"));
         } else {
             // {@see Health::processValidationData()} and {@see Health::handleValidationDataError()} take a
             // whole v1 message and read exactly two properties off it: `validate` and `category`. Both are
@@ -1759,7 +1817,7 @@ class Health implements MessageComponentInterface
                         $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken, $target, requestId: $requestId);
                         $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
                     }
-                );
+                )->then(null, $this->terminateOnHandlerThrow($to, $target, $runToken, $requestId, "the resource check for $dataPath"));
             } else {
                 // $dataPath is probably a source file in the filesystem in this case
                 // Resolve relative paths against the project root
@@ -1786,7 +1844,7 @@ class Health implements MessageComponentInterface
                         $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken, $target, requestId: $requestId);
                         $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
                     }
-                );
+                )->then(null, $this->terminateOnHandlerThrow($to, $target, $runToken, $requestId, "the source file check for $dataPath"));
             }
         }
     }
@@ -3059,7 +3117,13 @@ class Health implements MessageComponentInterface
 
                 $this->sendComplete($to, target: self::frameTarget($calendar, ['year' => $year]), runToken: $runToken, requestId: $requestId);
             }
-        );
+        )->then(null, $this->terminateOnHandlerThrow(
+            $to,
+            self::frameTarget($calendar, ['year' => $year]),
+            $runToken,
+            $requestId,
+            "the $category of $calendar for the year $year"
+        ));
     }
 
     /**
@@ -3323,7 +3387,13 @@ class Health implements MessageComponentInterface
 
                 $this->sendComplete($to, target: self::frameTarget($test, ['calendar' => $calendar, 'year' => $year]), runToken: $runToken, requestId: $requestId);
             }
-        );
+        )->then(null, $this->terminateOnHandlerThrow(
+            $to,
+            self::frameTarget($test, ['calendar' => $calendar, 'year' => $year]),
+            $runToken,
+            $requestId,
+            "the test $test against the $category of $calendar for the year $year"
+        ));
     }
 
     /**
@@ -3358,20 +3428,102 @@ class Health implements MessageComponentInterface
     }
 
     /**
-     * Handle Redis connection failure by falling back to APCu if available.
+     * Whether the APCu that this file's unqualified `apcu_*` calls actually reach is usable as a
+     * cache — established by storing a probe key and reading it back, not by asking whether the
+     * extension happens to be present.
+     *
+     * #835: the predicate this replaces was `extension_loaded('apcu')` plus `function_exists()` on
+     * three of the `apcu_*` functions. All four are true on the deployment host, where `apc.enable_cli`
+     * is `0` and APCu is therefore inert under the CLI SAPI the WebSocket server runs in: `apcu_store()`
+     * stores nothing and `apcu_exists()` always answers false. Selecting that as the backend yields a
+     * cache that silently swallows everything — every `cacheSet()` reports success, every `cacheGet()`
+     * misses — and the only symptom is quiet slowness. It is latent rather than live only because
+     * Redis is up; the path that reaches it is the Redis-outage fallback, i.e. precisely when the
+     * fallback is what is being relied on.
+     *
+     * A round trip answers the question that actually matters, and unlike `apcu_enabled()` it also
+     * catches a full or otherwise broken shared-memory segment, which no configuration flag reports.
+     *
+     * **It never throws.** Every caller reads the answer as a yes/no about whether to select the
+     * backend, so any failure at all — including one raised by `random_bytes()` or by the `apcu_*`
+     * functions themselves — is reported and answered `false`, which is what makes the backend fall
+     * to `none` rather than propagating out of a connection handler or a Redis-failure path.
+     *
+     * Two details of the checks below are deliberate:
+     *
+     * - The existence check looks in **this namespace before the global one**, because that is the
+     *   order PHP itself resolves the unqualified `apcu_*` calls in this file. It is what makes the
+     *   answer here describe the functions that will really be called — including under
+     *   `phpunit_tests/Support/ApcuShim.php`, which stands in for the backend precisely so this
+     *   decision can be tested in both directions (see that file's header).
+     * - `extension_loaded('apcu')` is **not** consulted: it is subsumed. An unloaded extension defines
+     *   no functions, so the existence check already stands down, and a loaded one proves nothing that
+     *   the round trip does not prove better.
+     */
+    private static function apcuUsable(): bool
+    {
+        // Every `apcu_*` function this class calls, not only the three the old predicate named:
+        // `cacheDelete()` calls `apcu_delete()` and `cacheInfo()` calls `apcu_sma_info()`, and an
+        // undefined function is a fatal, not a miss.
+        foreach (['apcu_store', 'apcu_fetch', 'apcu_exists', 'apcu_delete', 'apcu_sma_info'] as $function) {
+            if (!function_exists(__NAMESPACE__ . '\\' . $function) && !function_exists($function)) {
+                return false;
+            }
+        }
+
+        $probeKey = null;
+
+        try {
+            // Random per call: a fixed key could collide with a concurrent process probing the same
+            // shared segment, and a probe must never answer using another writer's value. Generated
+            // inside the `try` because `random_bytes()` can itself throw, and a caller of this method
+            // is owed a bool rather than an exception.
+            $probeKey   = 'health_apcu_probe_' . bin2hex(random_bytes(8));
+            $probeValue = 'probe';
+
+            if (true !== apcu_store($probeKey, $probeValue, 10)) {
+                return false;
+            }
+            // The store's own return value is not trusted on its own — reporting success while
+            // storing nothing is the exact failure being ruled out here.
+            $fetched = apcu_fetch($probeKey, $success);
+
+            return true === $success && $fetched === $probeValue;
+        } catch (\Throwable $e) {
+            // Any failure whatsoever means "do not select this backend". A throw would instead
+            // propagate out of onOpen(), or — worse — out of handleRedisFailure(), which runs during
+            // the very Redis outage this fallback exists to cover. Reported rather than swallowed:
+            // an exception reaching here is by definition one nobody anticipated.
+            echo 'APCu probe failed: ' . $e::class . ': ' . $e->getMessage() . "\n";
+
+            return false;
+        } finally {
+            // Best effort, and deliberately not allowed to change the answer: an exception raised in
+            // a `finally` *replaces* whatever the `try` or `catch` was returning, so an unlucky
+            // cleanup could otherwise mask an answer that was already correctly decided.
+            if (null !== $probeKey) {
+                try {
+                    apcu_delete($probeKey);
+                } catch (\Throwable) {
+                    // Nothing to do: the answer is settled and the probe key carries a TTL.
+                }
+            }
+        }
+    }
+
+    /**
+     * Handle Redis connection failure by falling back to APCu if it is actually usable.
      */
     private static function handleRedisFailure(\RedisException $e): void
     {
         echo "Redis connection lost: {$e->getMessage()}, falling back to APCu\n";
         self::$redis = null;
-        // Use the same comprehensive APCu check as initialization
-        $apcuAvailable = extension_loaded('apcu')
-            && function_exists('apcu_exists')
-            && function_exists('apcu_store')
-            && function_exists('apcu_fetch');
-        if ($apcuAvailable) {
+        // Use the same round-trip verification as initialization: a loaded-but-inert APCu would
+        // otherwise be selected here, during an outage, and cache nothing at all (#835).
+        if (self::apcuUsable()) {
             self::$cacheBackend = 'apcu';
-            echo "APCu fallback enabled\n";
+            self::$cacheEnabled = true;
+            echo "APCu fallback enabled (store/fetch round trip verified)\n";
         } else {
             self::$cacheBackend = 'none';
             self::$cacheEnabled = false;
