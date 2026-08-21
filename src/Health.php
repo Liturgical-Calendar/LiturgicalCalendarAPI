@@ -448,20 +448,17 @@ class Health implements MessageComponentInterface
                 }
             }
 
-            // Fall back to APCu if Redis not available
+            // Fall back to APCu if Redis not available — but only to an APCu that demonstrably stores
+            // what it is given. See {@see Health::apcuUsable()} for why loaded is not the same as usable.
             if (self::$cacheBackend === 'none') {
-                $apcuAvailable = extension_loaded('apcu')
-                    && function_exists('apcu_exists')
-                    && function_exists('apcu_store')
-                    && function_exists('apcu_fetch');
-                if ($apcuAvailable) {
+                if (self::apcuUsable()) {
                     self::$cacheEnabled = true;
                     self::$cacheBackend = 'apcu';
-                    echo "APCu extension loaded, will use for caching\n";
-                    $logger->info('APCu extension loaded, will use for caching');
+                    echo "APCu verified by store/fetch round trip, will use for caching\n";
+                    $logger->info('APCu verified by store/fetch round trip, will use for caching');
                 } else {
-                    echo "No cache backend available (Redis and APCu both unavailable)\n";
-                    $logger->warning('No cache backend available (Redis and APCu both unavailable)');
+                    echo "No cache backend available (Redis unavailable; APCu missing or not storing)\n";
+                    $logger->warning('No cache backend available (Redis unavailable; APCu missing or not storing)');
                 }
             }
         }
@@ -3431,20 +3428,102 @@ class Health implements MessageComponentInterface
     }
 
     /**
-     * Handle Redis connection failure by falling back to APCu if available.
+     * Whether the APCu that this file's unqualified `apcu_*` calls actually reach is usable as a
+     * cache — established by storing a probe key and reading it back, not by asking whether the
+     * extension happens to be present.
+     *
+     * #835: the predicate this replaces was `extension_loaded('apcu')` plus `function_exists()` on
+     * three of the `apcu_*` functions. All four are true on the deployment host, where `apc.enable_cli`
+     * is `0` and APCu is therefore inert under the CLI SAPI the WebSocket server runs in: `apcu_store()`
+     * stores nothing and `apcu_exists()` always answers false. Selecting that as the backend yields a
+     * cache that silently swallows everything — every `cacheSet()` reports success, every `cacheGet()`
+     * misses — and the only symptom is quiet slowness. It is latent rather than live only because
+     * Redis is up; the path that reaches it is the Redis-outage fallback, i.e. precisely when the
+     * fallback is what is being relied on.
+     *
+     * A round trip answers the question that actually matters, and unlike `apcu_enabled()` it also
+     * catches a full or otherwise broken shared-memory segment, which no configuration flag reports.
+     *
+     * **It never throws.** Every caller reads the answer as a yes/no about whether to select the
+     * backend, so any failure at all — including one raised by `random_bytes()` or by the `apcu_*`
+     * functions themselves — is reported and answered `false`, which is what makes the backend fall
+     * to `none` rather than propagating out of a connection handler or a Redis-failure path.
+     *
+     * Two details of the checks below are deliberate:
+     *
+     * - The existence check looks in **this namespace before the global one**, because that is the
+     *   order PHP itself resolves the unqualified `apcu_*` calls in this file. It is what makes the
+     *   answer here describe the functions that will really be called — including under
+     *   `phpunit_tests/Support/ApcuShim.php`, which stands in for the backend precisely so this
+     *   decision can be tested in both directions (see that file's header).
+     * - `extension_loaded('apcu')` is **not** consulted: it is subsumed. An unloaded extension defines
+     *   no functions, so the existence check already stands down, and a loaded one proves nothing that
+     *   the round trip does not prove better.
+     */
+    private static function apcuUsable(): bool
+    {
+        // Every `apcu_*` function this class calls, not only the three the old predicate named:
+        // `cacheDelete()` calls `apcu_delete()` and `cacheInfo()` calls `apcu_sma_info()`, and an
+        // undefined function is a fatal, not a miss.
+        foreach (['apcu_store', 'apcu_fetch', 'apcu_exists', 'apcu_delete', 'apcu_sma_info'] as $function) {
+            if (!function_exists(__NAMESPACE__ . '\\' . $function) && !function_exists($function)) {
+                return false;
+            }
+        }
+
+        $probeKey = null;
+
+        try {
+            // Random per call: a fixed key could collide with a concurrent process probing the same
+            // shared segment, and a probe must never answer using another writer's value. Generated
+            // inside the `try` because `random_bytes()` can itself throw, and a caller of this method
+            // is owed a bool rather than an exception.
+            $probeKey   = 'health_apcu_probe_' . bin2hex(random_bytes(8));
+            $probeValue = 'probe';
+
+            if (true !== apcu_store($probeKey, $probeValue, 10)) {
+                return false;
+            }
+            // The store's own return value is not trusted on its own — reporting success while
+            // storing nothing is the exact failure being ruled out here.
+            $fetched = apcu_fetch($probeKey, $success);
+
+            return true === $success && $fetched === $probeValue;
+        } catch (\Throwable $e) {
+            // Any failure whatsoever means "do not select this backend". A throw would instead
+            // propagate out of onOpen(), or — worse — out of handleRedisFailure(), which runs during
+            // the very Redis outage this fallback exists to cover. Reported rather than swallowed:
+            // an exception reaching here is by definition one nobody anticipated.
+            echo 'APCu probe failed: ' . $e::class . ': ' . $e->getMessage() . "\n";
+
+            return false;
+        } finally {
+            // Best effort, and deliberately not allowed to change the answer: an exception raised in
+            // a `finally` *replaces* whatever the `try` or `catch` was returning, so an unlucky
+            // cleanup could otherwise mask an answer that was already correctly decided.
+            if (null !== $probeKey) {
+                try {
+                    apcu_delete($probeKey);
+                } catch (\Throwable) {
+                    // Nothing to do: the answer is settled and the probe key carries a TTL.
+                }
+            }
+        }
+    }
+
+    /**
+     * Handle Redis connection failure by falling back to APCu if it is actually usable.
      */
     private static function handleRedisFailure(\RedisException $e): void
     {
         echo "Redis connection lost: {$e->getMessage()}, falling back to APCu\n";
         self::$redis = null;
-        // Use the same comprehensive APCu check as initialization
-        $apcuAvailable = extension_loaded('apcu')
-            && function_exists('apcu_exists')
-            && function_exists('apcu_store')
-            && function_exists('apcu_fetch');
-        if ($apcuAvailable) {
+        // Use the same round-trip verification as initialization: a loaded-but-inert APCu would
+        // otherwise be selected here, during an outage, and cache nothing at all (#835).
+        if (self::apcuUsable()) {
             self::$cacheBackend = 'apcu';
-            echo "APCu fallback enabled\n";
+            self::$cacheEnabled = true;
+            echo "APCu fallback enabled (store/fetch round trip verified)\n";
         } else {
             self::$cacheBackend = 'none';
             self::$cacheEnabled = false;
