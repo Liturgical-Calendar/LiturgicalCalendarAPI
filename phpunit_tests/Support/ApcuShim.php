@@ -49,8 +49,43 @@ final class ApcuShimStore
     /** @var array<string, array{value: string, expires: int}> */
     private static array $store = [];
 
+    /**
+     * Fault injection for #835: when true, `store()` reports success and stores nothing.
+     *
+     * That is exactly the shape of the defect the round-trip probe exists to catch — an APCu that is
+     * loaded and whose functions all exist, but which is inert (CLI-disabled, or a full/broken shared
+     * memory segment), so every write is silently dropped while reporting success. Reporting success
+     * is the harsher of the two possible behaviours and the one that defeats any check that trusts
+     * `apcu_store()`'s return value, which is why the shim simulates it that way round.
+     */
+    private static bool $storeIsNoOp = false;
+
+    /**
+     * Make every subsequent `store()` a reported-success no-op (or stop doing so).
+     *
+     * Process-wide state, so a test that turns it on must turn it off again in a `finally`/`tearDown`.
+     */
+    public static function simulateDisabledStore(bool $noOp): void
+    {
+        self::$storeIsNoOp = $noOp;
+    }
+
+    /**
+     * The keys currently held, expired entries included — for asserting that a probe cleaned up after
+     * itself rather than leaving a key behind in the cache it was only meant to test.
+     *
+     * @return list<string>
+     */
+    public static function keys(): array
+    {
+        return array_keys(self::$store);
+    }
+
     public static function store(string $key, mixed $value, int $ttl = 0): bool
     {
+        if (self::$storeIsNoOp) {
+            return true;
+        }
         self::$store[$key] = [
             'value'   => $value,
             'expires' => $ttl > 0 ? time() + $ttl : 0,
