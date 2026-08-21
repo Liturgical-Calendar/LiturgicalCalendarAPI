@@ -7,6 +7,8 @@ namespace LiturgicalCalendar\Tests;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
+use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
+use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -22,8 +24,11 @@ use PHPUnit\Framework\TestCase;
  * without standing up Ratchet or the HTTP API.
  */
 #[CoversClass(Health::class)]
+#[CoversClass(WebSocketMessageValidator::class)]
 final class HealthRiteRequestPathTest extends TestCase
 {
+    use HealthQueueIsolationTrait;
+
     /**
      * @return array<string, array{0: string, 1: int, 2: string, 3: Rite, 4: string}>
      */
@@ -116,9 +121,13 @@ final class HealthRiteRequestPathTest extends TestCase
      * or a rite-aware client's selection is silently dropped and every Ambrosian
      * diocesan request 400s (issue #767).
      *
-     * Driven with a category the builder rejects, so the assertion lands on the
-     * synchronous path-building step and no HTTP request is ever queued — this
-     * needs neither the WS server nor the API to be running.
+     * Driven with a `category` the builder honours (`nationalcalendar`) and inspected through the
+     * queued request URL instead of an exception: an unusable `category` such as the former
+     * `widerregioncalendar` no longer reaches `buildCalendarRequestPath()` at all — since #806
+     * section G, `WebSocketMessageValidator` refuses it against the schema's `category` enum before
+     * dispatch — so a test built on that exception would now assert something that can no longer
+     * happen. Reading the queue proves the same thing the exception used to: the rite made it all
+     * the way to the URL, rather than being dropped somewhere between the message and the request.
      *
      * @return array<string, array{0: array<string, mixed>}>
      */
@@ -128,7 +137,7 @@ final class HealthRiteRequestPathTest extends TestCase
             'executeUnitTest'  => [
                 [
                     'action'   => 'executeUnitTest',
-                    'category' => 'widerregioncalendar',
+                    'category' => 'nationalcalendar',
                     'calendar' => 'europe',
                     'year'     => 2026,
                     'test'     => 'SomeTest',
@@ -138,7 +147,7 @@ final class HealthRiteRequestPathTest extends TestCase
             'validateCalendar' => [
                 [
                     'action'       => 'validateCalendar',
-                    'category'     => 'widerregioncalendar',
+                    'category'     => 'nationalcalendar',
                     'calendar'     => 'europe',
                     'year'         => 2026,
                     'responsetype' => 'JSON',
@@ -154,11 +163,8 @@ final class HealthRiteRequestPathTest extends TestCase
     #[DataProvider('dispatchedActionProvider')]
     public function testWebSocketDispatchReachesTheRiteAwarePathBuilder(array $payload): void
     {
-        $health = new Health();
+        $health = $this->newHealth();
         $conn   = self::stubConnection();
-
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown calendar category: widerregioncalendar');
 
         // onMessage() echoes progress; swallow it so the assertion output stays clean.
         ob_start();
@@ -167,23 +173,29 @@ final class HealthRiteRequestPathTest extends TestCase
         } finally {
             ob_end_clean();
         }
+
+        self::assertSame(
+            '/ambrosian/nation/europe/2026?year_type=CIVIL',
+            self::soleQueuedPath($health),
+            'the rite the message carried must reach the request URL, not the default'
+        );
     }
 
     public function testDispatchAcceptsAMessageWithNoRiteProperty(): void
     {
         // A client that predates rite awareness must still dispatch; its rite is
-        // resolved from metadata instead of the message.
-        $health = new Health();
+        // resolved from metadata instead of the message. `nationalcalendar` always
+        // resolves to the default rite regardless (see
+        // testNationalCalendarAlwaysResolvesToTheDefaultRite()), which is exactly
+        // what a missing `rite` must fall back to here as well.
+        $health = $this->newHealth();
         $conn   = self::stubConnection();
-
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Unknown calendar category: widerregioncalendar');
 
         ob_start();
         try {
             $health->onMessage($conn, (string) json_encode([
                 'action'   => 'executeUnitTest',
-                'category' => 'widerregioncalendar',
+                'category' => 'nationalcalendar',
                 'calendar' => 'europe',
                 'year'     => 2026,
                 'test'     => 'SomeTest',
@@ -191,6 +203,25 @@ final class HealthRiteRequestPathTest extends TestCase
         } finally {
             ob_end_clean();
         }
+
+        self::assertSame('/roman/nation/europe/2026?year_type=CIVIL', self::soleQueuedPath($health));
+    }
+
+    /**
+     * The queued request's path, with the `/calendar` prefix `Route::CALENDAR->path()` stripped —
+     * the same convention `HealthTypedCalendarTest::soleQueuedPath()` uses, kept local here rather
+     * than shared because the two suites do not otherwise depend on each other.
+     */
+    private static function soleQueuedPath(Health $health): string
+    {
+        /** @var list<array{url:string}> $queue */
+        $queue = ( new \ReflectionProperty(Health::class, 'queue') )->getValue($health);
+        self::assertCount(1, $queue, 'exactly one calendar request must have been queued');
+
+        $prefix = \LiturgicalCalendar\Api\Enum\Route::CALENDAR->path();
+        self::assertStringStartsWith($prefix, $queue[0]['url'], 'a calendar request was made against something other than /calendar');
+
+        return substr($queue[0]['url'], strlen($prefix));
     }
 
     /**
