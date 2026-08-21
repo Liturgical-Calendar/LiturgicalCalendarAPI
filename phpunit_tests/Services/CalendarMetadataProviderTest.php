@@ -123,9 +123,17 @@ final class CalendarMetadataProviderTest extends TestCase
     /**
      * The negotiable set narrows *which languages* are acceptable without narrowing the
      * *shape* of the identifiers offered: it must still carry the region-qualified tags
-     * (`it_IT`, `la_VA`) that the Ambrosian diocesan layer matches against exactly. A set
-     * of bare languages alone would make `Accept-Language: la-VA` negotiate to `la`, miss
-     * that diocesan membership test, and silently come back in Italian.
+     * (`it_IT`, `la_VA`), because this list is the entire candidate set for the rite-level
+     * routes and the negotiator can only answer with something it was offered. A set of
+     * bare languages alone would make `Accept-Language: it-IT` on `/events/ambrosian`
+     * negotiate down to `it`, reporting a coarser `settings.locale` than was asked for.
+     *
+     * It used to matter for a second, heavier reason, retired in #845: the Ambrosian
+     * diocesan layer string-compared the negotiated tag against its own `it_IT`/`la_VA`,
+     * so a bare `la` here turned a request for Latin into Italian one layer down. That
+     * layer now re-negotiates the original header against its own declared locales — see
+     * {@see \LiturgicalCalendar\Tests\Handlers\CalendarScopedLocaleNegotiationTest} — and
+     * no longer depends on the shape produced here.
      */
     public function testNegotiableLocalesKeepRegionQualifiedTagsForTheRitesLanguages(): void
     {
