@@ -1,0 +1,26 @@
+# Template. Rendered by deploy/install.sh against /etc/litcal-deploy.env and
+# installed to /etc/systemd/system/litcal-websocket.service. Do not commit a
+# rendered copy: this repository is public and the real values are host-specific.
+#
+# This unit is NOT restarted by a deploy unless litcal-fpm-reload.sh does it. The
+# WebSocket server is a long-running ReactPHP process: it loads src/ into memory
+# once, at start, and never re-reads it. Pulling files updates the REST API (php-fpm
+# recycles workers) while leaving this process on the old code. See
+# docs/ops/deploy-sentinel-runbook.md.
+[Unit]
+Description=Liturgical Calendar WebSocket Server
+After=network.target
+
+[Service]
+Type=simple
+User=@RUN_USER@
+Group=@RUN_GROUP@
+WorkingDirectory=@API_ROOT@/public
+ExecStart=@PHP_BIN@ @API_ROOT@/public/LitCalTestServer.php
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
