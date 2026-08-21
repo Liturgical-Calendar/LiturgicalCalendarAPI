@@ -132,6 +132,18 @@ jobs:
       - name: Markdown lint
         run: npx --yes markdownlint-cli2 "**/*.md" "#node_modules" "#vendor" "#.aider*"
 
+  deploy_payload:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      # The vhost docroot is the application root, not public/, so anything the
+      # deploy transfers is readable over HTTP. rsync-exclude.txt is a denylist;
+      # this asserts the resulting payload against an allowlist instead, so a new
+      # dev-only file fails here rather than becoming publicly fetchable.
+      - name: Deploy payload contains only runtime files
+        run: ./.github/deploy/check-deploy-payload.sh
+
   gettext_update:
     runs-on: ubuntu-latest
     needs: [codesniffer, static_analysis]
