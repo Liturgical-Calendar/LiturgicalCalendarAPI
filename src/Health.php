@@ -295,6 +295,22 @@ class Health implements MessageComponentInterface
     {
         $this->clients = new \SplObjectStorage();
 
+        // Before anything that resolves a path. `Router::$apiFilePath` is a *typed* static, so
+        // reading it before assignment is a fatal `Error`, not a null — and the validator below
+        // resolves the message schema's path as it is constructed. `public/LitCalTestServer.php`
+        // calls `new Health()` with nothing initialised, so without this the WebSocket server dies
+        // at startup. No test caught it: PHPUnit's bootstrap initialises the paths long before any
+        // test builds a Health, so every test ran an order production never uses.
+        //
+        // **Guarded, and the guard is load-bearing.** Calling `getApiPaths()` unconditionally
+        // *overwrites* the path, and several tests deliberately point it at a fixture tree before
+        // building a Health — see `BrokenInventoryTrait`. Stomping that override made a passing
+        // suite fail. `isset()` on an uninitialised typed static is false and does not throw, which
+        // is exactly the "initialise only if nobody has" test needed here.
+        if (false === isset(Router::$apiFilePath)) {
+            Router::getApiPaths();
+        }
+
         // A server that cannot validate is misconfigured, and should fail here — where an operator
         // sees it, before a client ever connects — rather than answering every message with an
         // internal error. See {@see WebSocketMessageValidator::warm()}.
