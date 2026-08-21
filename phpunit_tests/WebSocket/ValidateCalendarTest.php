@@ -173,25 +173,49 @@ final class ValidateCalendarTest extends TestCase
         $this->assertPhase($frames[2], 'schema-valid', 2020);
     }
 
-    public function testUnknownCalendarFailsAtJsonValidPhase(): void
+    /**
+     * An unknown calendar is refused with **400** — the API validates the nation against a known list
+     * and rejects the *value*, rather than routing to a missing resource. This test's name and body
+     * used to state the defect issue #833 was filed about as its expectation: it asserted a
+     * `file-exists` **success** — reasoning that the WS handler "reports any non-error HTTP
+     * response... as a 'file' that exists" — followed by a `json-valid` failure, because the refusal
+     * body isn't a valid LitCal document. That is exactly the bug: `'http_errors' => false` on the
+     * Guzzle client means a 400 resolves rather than rejects, and before #833 nothing checked the
+     * status it resolved with, so `exists` passed unconditionally and the reader was pointed at the
+     * wrong step — "the schema is wrong" instead of "the endpoint refused the request".
+     *
+     * Now `exists` fails, quoting the status, and — per #821's one-frame-per-step contract — so do
+     * `parses` and `validates`: a refusal establishes none of the three, so none of them may report a
+     * pass just because nothing tried to check them.
+     */
+    public function testUnknownCalendarFailsAtTheExistsPhase(): void
     {
-        // The first message is always the "file-exists" success because
-        // the WS handler reports any non-error HTTP response (the 404
-        // page) as a "file" that exists. The body, however, isn't a
-        // valid LitCal JSON document, so the json-valid phase fails.
         $frames = $this->validateCalendar([
             'action'       => 'validateCalendar',
             'calendar'     => 'NONEXISTENT_NATION_589',
             'year'         => 2020,
             'category'     => 'nationalcalendar',
             'responsetype' => 'JSON',
-        ], 2);
+        ], 3);
 
-        $this->assertSame('success', $frames[0]->type);
+        $this->assertSame('error', $frames[0]->type);
         $this->assertSame('.calendar-NONEXISTENT_NATION_589.file-exists.year-2020', $frames[0]->classes);
+        // The status is asserted as a literal because surfacing the *real* one is the point of #833:
+        // a test that accepted any status would pass against the bug it guards.
+        $this->assertStringContainsString('was refused with HTTP 400', $frames[0]->text);
+        // Endpoint-specific, not merely "some explanation came back": `valid values are` would match
+        // any parameter-validation message from any route. This pins that the detail quoted belongs
+        // to *this* refusal. The list of nations it goes on to name is deliberately not asserted —
+        // that grows as calendars are added, and pinning it would make an unrelated addition fail here.
+        $this->assertStringContainsString('Invalid value', $frames[0]->text);
+        $this->assertStringContainsString('national_calendar', $frames[0]->text);
+
         $this->assertSame('error', $frames[1]->type);
         $this->assertSame('.calendar-NONEXISTENT_NATION_589.json-valid.year-2020', $frames[1]->classes);
         $this->assertObjectHasProperty('responsetype', $frames[1]);
         $this->assertSame('JSON', $frames[1]->responsetype);
+
+        $this->assertSame('error', $frames[2]->type);
+        $this->assertSame('.calendar-NONEXISTENT_NATION_589.schema-valid.year-2020', $frames[2]->classes);
     }
 }

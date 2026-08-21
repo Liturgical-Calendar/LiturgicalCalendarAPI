@@ -14,13 +14,15 @@ use Psr\Http\Message\ResponseInterface;
 use React\Promise\Deferred;
 
 /**
- * Targeted coverage for two pure static helpers on the WebSocket Health component:
+ * Targeted coverage for pure static helpers on the WebSocket Health component:
  *  - isInternalApiUrl(): the host check that keeps the first-party WS_API_KEY from leaking to an
  *    arbitrary absolute URL validated via executeValidation.
- *  - isUpstreamFailureStatus(): which upstream HTTP statuses (429, 5xx) are rejected versus flowed
- *    through to per-format validation (e.g. a 404 for an unknown calendar).
+ *  - isUpstreamFailureStatus(): which upstream HTTP statuses (429, 5xx) are kept out of the cache
+ *    (#834) versus eligible for it (e.g. a 400 or 404, cached like any other response). All statuses
+ *    resolve and are reported through the same `exists` gate — this helper no longer decides who
+ *    rejects, only who gets cached.
  *
- * Both are dependency-free of the Ratchet/Guzzle machinery, so they are exercised directly via
+ * All are dependency-free of the Ratchet/Guzzle machinery, so they are exercised directly via
  * reflection without standing up the WebSocket server.
  */
 #[CoversClass(Health::class)]
@@ -135,7 +137,7 @@ final class HealthHelpersTest extends TestCase
      */
     private static function runHandleHttpResponse(ResponseInterface $response): array
     {
-        /** @var Deferred<array{data: string, fromCache: bool}> $deferred */
+        /** @var Deferred<array{data: string, status: int, fromCache: bool, retryAfter: ?string}> $deferred */
         $deferred = new Deferred();
         $resolved = null;
         $rejected = null;
@@ -159,31 +161,40 @@ final class HealthHelpersTest extends TestCase
         return ['resolved' => $resolved, 'rejected' => $rejected];
     }
 
-    public function testHandleHttpResponseRejectsRateLimited(): void
+    /**
+     * #834 revised this: a 429 used to be rejected on its own, separately from every other non-2xx.
+     * That carve-out existed because a 429's problem+json body "decodes fine but lacks the calendar
+     * keys," which the JSON-shape branch would otherwise mislabel as "response data was perhaps
+     * truncated?" — but every consumer now gates on {@see Health::isHttpSuccessStatus()} *before* any
+     * JSON-shape check runs, so that mislabelling can no longer happen regardless of how this method
+     * settles. A 429 now resolves like any other refusal, with its status on the resolved value and
+     * its `Retry-After` hint carried alongside it rather than only visible on a rejection's message.
+     */
+    public function testHandleHttpResponseResolvesRateLimitedWithStatusAndRetryAfter(): void
     {
         $response = new Response(429, ['Retry-After' => '30'], '{"status":429}', '1.1', 'Too Many Requests');
         $result   = self::runHandleHttpResponse($response);
 
-        $this->assertNull($result['resolved']);
-        $rejected = $result['rejected'];
-        if (!$rejected instanceof \RuntimeException) {
-            self::fail('Expected a RuntimeException rejection.');
-        }
-        $this->assertStringContainsString('HTTP 429', $rejected->getMessage());
-        $this->assertStringContainsString('Retry-After: 30', $rejected->getMessage());
+        $this->assertNull($result['rejected'], 'a 429 must resolve, not reject, like every other non-2xx');
+        $this->assertSame(
+            ['data' => '{"status":429}', 'status' => 429, 'fromCache' => false, 'retryAfter' => '30'],
+            $result['resolved']
+        );
     }
 
-    public function testHandleHttpResponseRejectsServerError(): void
+    /**
+     * A 5xx resolves the same way, with no `Retry-After` when the response carried none.
+     */
+    public function testHandleHttpResponseResolvesServerErrorWithStatus(): void
     {
         $response = new Response(503, [], 'service unavailable', '1.1', 'Service Unavailable');
         $result   = self::runHandleHttpResponse($response);
 
-        $this->assertNull($result['resolved']);
-        $rejected = $result['rejected'];
-        if (!$rejected instanceof \RuntimeException) {
-            self::fail('Expected a RuntimeException rejection.');
-        }
-        $this->assertStringContainsString('HTTP 503', $rejected->getMessage());
+        $this->assertNull($result['rejected']);
+        $this->assertSame(
+            ['data' => 'service unavailable', 'status' => 503, 'fromCache' => false, 'retryAfter' => null],
+            $result['resolved']
+        );
     }
 
     public function testHandleHttpResponseResolvesSuccessBody(): void
@@ -192,9 +203,15 @@ final class HealthHelpersTest extends TestCase
         $result = self::runHandleHttpResponse(new Response(200, [], $body));
 
         $this->assertNull($result['rejected']);
-        $this->assertSame(['data' => $body, 'fromCache' => false], $result['resolved']);
+        $this->assertSame(['data' => $body, 'status' => 200, 'fromCache' => false, 'retryAfter' => null], $result['resolved']);
     }
 
+    /**
+     * The status is on the resolved value, not just in a log line (#833): `'http_errors' => false` on
+     * the Guzzle client means a 4xx/5xx resolves this promise rather than rejecting it, so a consumer
+     * gating `exists` on success has nothing else to look at. Before #833, this resolved value carried
+     * only `data` and `fromCache` — a 404's body flowed through indistinguishably from a 200's.
+     */
     public function testHandleHttpResponseResolvesNonFailureErrorBody(): void
     {
         // A 404 (unknown calendar) is not an upstream failure: its body flows through so the
@@ -203,7 +220,84 @@ final class HealthHelpersTest extends TestCase
         $result = self::runHandleHttpResponse(new Response(404, [], $body, '1.1', 'Not Found'));
 
         $this->assertNull($result['rejected']);
-        $this->assertSame(['data' => $body, 'fromCache' => false], $result['resolved']);
+        $this->assertSame(['data' => $body, 'status' => 404, 'fromCache' => false, 'retryAfter' => null], $result['resolved']);
+    }
+
+    /**
+     * The RFC 9110 rite-boundary refusal #833 was filed about: a 400 whose body is a problem
+     * document. It is not an upstream failure (only 429/5xx are), so its body is still eligible for
+     * caching — and the whole point of #833 is that the status on that resolution must be the real one.
+     */
+    public function testHandleHttpResponseResolvesBadRequestWithItsStatus(): void
+    {
+        $body   = '{"type":"…rfc9110#name-400-bad-request","title":"Bad Request","status":400,"detail":"The Ambrosian rite is only available from 1976 onward (the first reformed Ambrosian Missal); requested year 1970."}';
+        $result = self::runHandleHttpResponse(new Response(400, [], $body, '1.1', 'Bad Request'));
+
+        $this->assertNull($result['rejected']);
+        $this->assertSame(['data' => $body, 'status' => 400, 'fromCache' => false, 'retryAfter' => null], $result['resolved']);
+    }
+
+    // ---------------------------------------------------------------- the cached-path trap (#833)
+
+    /**
+     * `cachedGet()`'s cache-hit branch resolves from whatever {@see Health::decodeHttpCacheEntry()}
+     * hands back, which is whatever {@see Health::encodeHttpCacheEntry()} wrote — extracted out of
+     * `handleHttpResponse()` and `cachedGet()` respectively so this round trip is testable without a
+     * real cache backend and without driving the ReactPHP loop `cachedGet()` schedules resolution
+     * through.
+     *
+     * This is the trap the issue is about: a 400 that survives to a *second* request only if the
+     * status written to the cache is the status read back from it. Before #833 there was no status in
+     * the cached entry at all — a cache hit always meant `fromCache: true` and nothing else, so a
+     * refused request that got cached (as 4xx already were, per the comment on the non-upstream-failure
+     * branch below `isUpstreamFailureStatus()`) would replay as a pass on every request after the first.
+     */
+    public function testCacheEntryRoundTripsTheRealStatusNotJustTheBody(): void
+    {
+        $body = '{"status":400,"detail":"The Ambrosian rite is only available from 1976 onward; requested year 1970."}';
+
+        $encodeMethod = new \ReflectionMethod(Health::class, 'encodeHttpCacheEntry');
+        $encoded      = $encodeMethod->invoke(null, 400, $body);
+        self::assertIsString($encoded, 'precondition: a JSON-safe body encodes');
+
+        $decodeMethod = new \ReflectionMethod(Health::class, 'decodeHttpCacheEntry');
+        /** @var array{status: int, body: string}|null $decoded */
+        $decoded = $decodeMethod->invoke(null, $encoded);
+
+        self::assertSame(['status' => 400, 'body' => $body], $decoded, 'the second resolution must see the same status the first one did, not a silent 200');
+    }
+
+    /**
+     * A 200 round-trips too — the codec is not special-cased to success or failure, only to the shape.
+     */
+    public function testCacheEntryRoundTripsA200Status(): void
+    {
+        $body = '{"litcal":[],"settings":{},"metadata":{},"messages":[]}';
+
+        $encodeMethod = new \ReflectionMethod(Health::class, 'encodeHttpCacheEntry');
+        $encoded      = $encodeMethod->invoke(null, 200, $body);
+        self::assertIsString($encoded);
+
+        $decodeMethod = new \ReflectionMethod(Health::class, 'decodeHttpCacheEntry');
+        /** @var array{status: int, body: string}|null $decoded */
+        $decoded = $decodeMethod->invoke(null, $encoded);
+
+        self::assertSame(['status' => 200, 'body' => $body], $decoded);
+    }
+
+    /**
+     * A cache entry that is not the `{"status":…,"body":…}` envelope — the shape every entry had
+     * *before* #833 — must not be guessed at. Defaulting a bare body to status 200 would silently
+     * reintroduce the exact bug #833 fixed, the moment a pre-fix cache entry outlived a deploy: decode
+     * treats it as absent instead, which sends the caller back to `reject()` and a real re-fetch.
+     */
+    public function testDecodeRejectsAPreFixBareBodyCacheEntryRatherThanGuessingAStatus(): void
+    {
+        $decodeMethod = new \ReflectionMethod(Health::class, 'decodeHttpCacheEntry');
+
+        self::assertNull($decodeMethod->invoke(null, '{"litcal":[],"settings":{},"metadata":{},"messages":[]}'), 'a bare JSON body, with no envelope, must not decode to a guessed status');
+        self::assertNull($decodeMethod->invoke(null, 'not json at all'), 'garbage must not decode either');
+        self::assertNull($decodeMethod->invoke(null, '{"status":"400","body":"x"}'), 'a non-integer status must not decode');
     }
 
     /**

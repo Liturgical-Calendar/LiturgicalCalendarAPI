@@ -475,13 +475,20 @@ class Health implements MessageComponentInterface
                 ]
             ];
 
-            /** @var PromiseInterface<array{data: string, fromCache: bool}> $metadataPromise */
+            // #833 note: this internal /calendars fetch is deliberately left ungated on status. It
+            // never emits a step frame — it is metadata bootstrapping, not a check reported to a
+            // client — and the shape guards below (instanceof \stdClass, then the litcal_metadata
+            // property) already treat a body that doesn't decode into the expected metadata shape,
+            // which is exactly what a problem-document body would produce, as "not loaded yet": self::
+            // $metadata is simply left unset and the next request retries. Nothing here claims success
+            // for a refusal, so there is no false "exists" for #833 to fix.
+            /** @var PromiseInterface<array{data: string, status: int, fromCache: bool, retryAfter: ?string}> $metadataPromise */
             $metadataPromise = $this->cachedGet(Route::CALENDARS->path(), $opts, 300, $conn);
             //self::$metadataPromise = $metadataPromise;
 
             $metadataPromise->then(
                 function (array $result) {
-                    /** @var array{data: string, fromCache: bool} $result */
+                    /** @var array{data: string, status: int, fromCache: bool, retryAfter: ?string} $result */
                     $rawData = $result['data'];
                     echo 'Fetched metadata: got ' . strlen($rawData) . " bytes\n";
 
@@ -1723,14 +1730,26 @@ class Health implements MessageComponentInterface
             if (str_starts_with($dataPath, 'http://') || str_starts_with($dataPath, 'https://')) {
                 // $dataPath is an API path in this case
                 echo 'Retrieving data from URL ' . $dataPath . "\n";
-                /** @var PromiseInterface<array{data: string, fromCache: bool}> $httpPromise */
+                /** @var PromiseInterface<array{data: string, status: int, fromCache: bool, retryAfter: ?string}> $httpPromise */
                 $httpPromise = $this->cachedGet($dataPath, [], 300, $to);
                 $httpPromise->then(
                     function (array $result) use ($to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $requestId, $target) {
-                        /** @var array{data: string, fromCache: bool} $result */
-                        $data = $result['data'];
-                        echo 'Fetched data for ' . $dataPath . ': got ' . strlen($data) . " bytes\n";
-                        $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $target, requestId: $requestId);
+                        /** @var array{data: string, status: int, fromCache: bool, retryAfter: ?string} $result */
+                        $data       = $result['data'];
+                        $status     = $result['status'];
+                        $retryAfter = $result['retryAfter'];
+                        echo 'Fetched data for ' . $dataPath . ': got ' . strlen($data) . " bytes, HTTP $status\n";
+                        // #833: `'http_errors' => false` on the Guzzle client means a 4xx/5xx resolves
+                        // this promise instead of rejecting it, so `processValidationData()` — which
+                        // unconditionally reports `exists` as passed, correctly so for the filesystem
+                        // arm that only ever reaches it once #822's stat has already proven the file is
+                        // there — must not be reached at all for a resource the API refused. 429/5xx
+                        // are included (#834), reported the same way as any other refusal.
+                        if (self::isHttpSuccessStatus($status)) {
+                            $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $target, requestId: $requestId);
+                        } else {
+                            $this->handleValidationHttpFailure($status, $data, $retryAfter, $to, $validationForMessages, $dataPath, $runToken, $target, requestId: $requestId);
+                        }
                         // Terminates whether the steps passed or failed. Every arm now emits one
                         // frame per published step — the decode arm's missing third was #821 — but
                         // what a client stops on is still this frame, never a count.
@@ -1832,6 +1851,85 @@ class Health implements MessageComponentInterface
             Step::VALIDATES,
             Status::FAIL,
             "Unable to verify schema for dataPath {$dataPath} and category {$category} since Data file $dataPath does not exist or is not readable",
+            null,
+            $runToken,
+            requestId: $requestId
+        );
+    }
+
+    /**
+     * Handle a non-2xx HTTP response for a `resourceDataCheck` (#833): the URL-based sibling of
+     * {@see Health::handleValidationDataError()}'s unreadable-file arm, and built to match it frame
+     * for frame. `Health`'s Guzzle client is built with `'http_errors' => false`, so a 4xx or 5xx
+     * resolves {@see Health::cachedGet()}'s promise rather than rejecting it — this is the check that
+     * would otherwise be skipped, leaving `runValidationSteps()` to hand a problem document to
+     * {@see Health::processValidationData()} as if it were the checked resource, which reports
+     * `exists` as passed unconditionally.
+     *
+     * All three published steps fail, not just `exists`: a refusal means `parses` and `validates`
+     * were never attempted either, and per #821 "not attempted" is reported the same as "failed",
+     * never left unsent.
+     *
+     * The `exists` text quotes the API's own RFC 9457 `detail` when the body decodes to one — it
+     * already explains precisely what is wrong (e.g. a rite's year boundary) — and falls back to the
+     * bare status when it does not. A `Retry-After` hint, when the response carried one (429/5xx,
+     * which reach here the same way as any other refusal since #834), is folded into the same text.
+     *
+     * @param int $status The non-2xx HTTP status the request resolved with.
+     * @param string $body The response body, inspected only for a problem-document `detail`.
+     * @param ?string $retryAfter The `Retry-After` header value, or null when the response carried none.
+     * @param ConnectionInterface $to The WebSocket connection to send errors to.
+     * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $validation The validation object.
+     * @param string $dataPath The URL that was requested.
+     * @param ?string $runToken The originating run token to echo back on responses, or null to use the per-connection fallback.
+     * @param ?\stdClass $target What the frames are about, per {@see Health::frameTarget()}, or null for a v1 message, which names none.
+     * @param ?string $requestId The correlation id of the request that caused this frame, captured by the handler when
+     *        the request arrived and passed explicitly rather than read from any per-connection store; see
+     *        {@see Health::onMessage()} for why that distinction is load-bearing.
+     * @return void
+     */
+    private function handleValidationHttpFailure(int $status, string $body, ?string $retryAfter, ConnectionInterface $to, \stdClass $validation, string $dataPath, ?string $runToken = null, ?\stdClass $target = null, ?string $requestId = null): void
+    {
+        // `validate` carries the class fragment: see the note where $validationForMessages is built.
+        $validate = (string) $validation->validate;
+        $category = (string) $validation->category;
+        echo "Refused: HTTP $status received from $dataPath\n";
+
+        $detail  = self::problemDetailFromBody($body);
+        $suffix  = $detail !== null ? ": $detail" : '';
+        $suffix .= $retryAfter !== null ? " (Retry-After: $retryAfter)" : '';
+
+        $this->sendStepResult(
+            $to,
+            $validate,
+            $target,
+            Step::EXISTS,
+            Status::FAIL,
+            "The Data file $dataPath was refused with HTTP $status$suffix",
+            null,
+            $runToken,
+            requestId: $requestId
+        );
+
+        $this->sendStepResult(
+            $to,
+            $validate,
+            $target,
+            Step::PARSES,
+            Status::FAIL,
+            "Could not decode the Data file $dataPath as JSON because the request for it returned HTTP $status",
+            null,
+            $runToken,
+            requestId: $requestId
+        );
+
+        $this->sendStepResult(
+            $to,
+            $validate,
+            $target,
+            Step::VALIDATES,
+            Status::FAIL,
+            "Unable to verify schema for dataPath {$dataPath} and category {$category} since the request for it returned HTTP $status",
             null,
             $runToken,
             requestId: $requestId
@@ -2604,10 +2702,62 @@ class Health implements MessageComponentInterface
         $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts, 300, $to);
         $promise->then(
             function (array $result) use ($to, $calendar, $year, $category, $req, $responseType, $runToken, $requestId) {
-                /** @var array{data: string, fromCache: bool} $result */
-                $data      = $result['data'];
-                $fromCache = $result['fromCache'];
-                echo 'Fetched data for ' . Route::CALENDAR->path() . $req . ': got ' . strlen($data) . ' bytes' . ( $fromCache ? ' (from cache)' : '' ) . "\n";
+                /** @var array{data: string, status: int, fromCache: bool, retryAfter: ?string} $result */
+                $data       = $result['data'];
+                $status     = $result['status'];
+                $fromCache  = $result['fromCache'];
+                $retryAfter = $result['retryAfter'];
+                echo 'Fetched data for ' . Route::CALENDAR->path() . $req . ': got ' . strlen($data) . " bytes, HTTP $status" . ( $fromCache ? ' (from cache)' : '' ) . "\n";
+
+                // #833: `'http_errors' => false` means a 4xx/5xx resolves this promise rather than
+                // rejecting it, so `exists` must not be reported as passed without checking the status
+                // that resolved it. A refusal means none of the three published steps were established
+                // — not just the first — so all three are reported failed here rather than skipping
+                // straight to `complete`, per #821's one-frame-per-step contract. 429/5xx reach this
+                // gate too (#834): they used to be rejected separately, but nothing left downstream of
+                // this gate can be misled by their body any more, so they are reported the same way as
+                // any other refusal — including the `Retry-After` hint, when the response carried one.
+                if (false === self::isHttpSuccessStatus($status)) {
+                    $detail  = self::problemDetailFromBody($data);
+                    $suffix  = $detail !== null ? ": $detail" : '';
+                    $suffix .= $retryAfter !== null ? " (Retry-After: $retryAfter)" : '';
+                    $this->sendCalendarStepResult(
+                        $to,
+                        $calendar,
+                        $year,
+                        Step::EXISTS,
+                        Status::FAIL,
+                        "The $category of $calendar for the year $year was refused with HTTP $status$suffix",
+                        runToken: $runToken,
+                        requestId: $requestId
+                    );
+                    $this->sendCalendarStepResult(
+                        $to,
+                        $calendar,
+                        $year,
+                        Step::PARSES,
+                        Status::FAIL,
+                        "Could not decode the $category of $calendar for the year $year as $responseType because the request for it returned HTTP $status",
+                        // Every sibling `parses`-fail frame in the switch below carries `responsetype`
+                        // (JSON/XML/ICS/YAML decode failures all do) — this gate short-circuits before
+                        // the switch, but it is reporting the very same phase, so it must match.
+                        responseType: $responseType,
+                        runToken: $runToken,
+                        requestId: $requestId
+                    );
+                    $this->sendCalendarStepResult(
+                        $to,
+                        $calendar,
+                        $year,
+                        Step::VALIDATES,
+                        Status::FAIL,
+                        "Unable to verify schema for the $category of $calendar for the year $year since the request for it returned HTTP $status",
+                        runToken: $runToken,
+                        requestId: $requestId
+                    );
+                    $this->sendComplete($to, target: self::frameTarget($calendar, ['year' => $year]), runToken: $runToken, requestId: $requestId);
+                    return;
+                }
 
                 $this->sendCalendarStepResult(
                     $to,
@@ -3095,9 +3245,37 @@ class Health implements MessageComponentInterface
         $req     = $this->buildCalendarRequestPath($calendar, $year, $category, $rite);
         $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts, 300, $to);
         $promise->then(
-            function (array $result) use ($to, $test, $calendar, $year, $runToken, $requestId, $rite) {
-                /** @var array{data: string, fromCache: bool} $result */
-                $data = $result['data'];
+            function (array $result) use ($to, $test, $calendar, $year, $category, $req, $runToken, $requestId, $rite) {
+                /** @var array{data: string, status: int, fromCache: bool, retryAfter: ?string} $result */
+                $data       = $result['data'];
+                $status     = $result['status'];
+                $retryAfter = $result['retryAfter'];
+
+                // #833: a refused calendar (e.g. a rite's year boundary) is valid JSON — a problem
+                // document — so without this check it would decode cleanly and be handed to
+                // LitTestRunner as if it were calendar data, which is worse than a plain failure: the
+                // run would go on to answer whatever the test asserts, over data that never existed. A
+                // test run carries one step, so the refusal is reported there rather than skipped.
+                // 429/5xx reach this the same way as any other refusal (#834); their `Retry-After`
+                // hint, when present, is folded into the same text rather than lost.
+                if (false === self::isHttpSuccessStatus($status)) {
+                    $detail  = self::problemDetailFromBody($data);
+                    $suffix  = $detail !== null ? ": $detail" : '';
+                    $suffix .= $retryAfter !== null ? " (Retry-After: $retryAfter)" : '';
+                    $this->sendTestResult(
+                        $to,
+                        $test,
+                        $calendar,
+                        $year,
+                        Status::FAIL,
+                        "The $category of $calendar for the year $year was refused with HTTP $status$suffix at the URL " . Route::CALENDAR->path() . $req,
+                        runToken: $runToken,
+                        requestId: $requestId
+                    );
+                    $this->sendComplete($to, target: self::frameTarget($test, ['calendar' => $calendar, 'year' => $year]), runToken: $runToken, requestId: $requestId);
+                    return;
+                }
+
                 /** @var \stdClass&object{settings:object{year:int,national_calendar?:string,diocesan_calendar?:string},litcal:LiturgicalEvent[]} $jsonData */
                 $jsonData = json_decode($data);
                 if (json_last_error() === JSON_ERROR_NONE) {
@@ -3293,6 +3471,37 @@ class Health implements MessageComponentInterface
     }
 
     /**
+     * Delete a key from the cache.
+     *
+     * Used when a stored entry cannot be decoded back into a usable value (#834): a malformed entry
+     * — including the bare-body shape every entry had before #833 — must not be left in place to be
+     * hit again on the very next request. Removing it lets the following request treat this key as a
+     * plain miss instead of standing rejection for the rest of the TTL window.
+     */
+    private static function cacheDelete(string $key): void
+    {
+        if (!self::$cacheEnabled) {
+            return;
+        }
+        if (self::$cacheBackend === 'redis' && self::$redis !== null) {
+            try {
+                self::$redis->del($key);
+                return;
+            } catch (\RedisException $e) {
+                self::handleRedisFailure($e);
+                // Retry with APCu if now available
+                if (self::$cacheBackend === 'apcu') {
+                    apcu_delete($key);
+                }
+                return;
+            }
+        }
+        if (self::$cacheBackend === 'apcu') {
+            apcu_delete($key);
+        }
+    }
+
+    /**
      * Get cache memory info string for logging.
      */
     private static function cacheInfo(): string
@@ -3421,45 +3630,66 @@ class Health implements MessageComponentInterface
     /**
      * @param array{headers?:array<string, string>,stream?:bool} $options
      *
-     * @return PromiseInterface<array{data: string, fromCache: bool}>
+     * @return PromiseInterface<array{data: string, status: int, fromCache: bool, retryAfter: ?string}>
      */
     private function cachedGet(string $url, array $options = [], int $ttl = 300, ?ConnectionInterface $conn = null): PromiseInterface
     {
         $key = 'http_' . md5($url . serialize($options));
 
-        /** @var Deferred<array{data: string, fromCache: bool}> $deferred */
+        /** @var Deferred<array{data: string, status: int, fromCache: bool, retryAfter: ?string}> $deferred */
         $deferred = new Deferred();
 
         // Return from cache if available - stagger resolutions to stream results back gradually
         if (self::$cacheEnabled && self::cacheExists($key)) {
             echo "Cache hit for $url\n";
-            [$success, $data] = self::cacheGet($key);
-            if ($success && is_string($data)) {
+            [$success, $raw] = self::cacheGet($key);
+            // The cache stores `{"status":…,"body":…}` (see handleHttpResponse()), not the bare body,
+            // precisely so a cache hit can answer the same question a live fetch just did: #833 was a
+            // 400 that resolved as a pass on the *first* run because the status was never propagated at
+            // all, and it would have resolved as a pass again on the *second* run — from cache — had the
+            // status not been stored alongside the body it is decoded from here. Decoding is extracted
+            // to {@see Health::decodeHttpCacheEntry()} so this contract is unit-testable on its own,
+            // without a real cache backend or the ReactPHP loop {@see HealthHelpersTest} covers it.
+            $decoded = ( $success && is_string($raw) ) ? self::decodeHttpCacheEntry($raw) : null;
+            if (null !== $decoded) {
+                $data   = $decoded['body'];
+                $status = $decoded['status'];
                 // Stagger cached responses: resolve in small batches using incremental delays
                 // This prevents all cache hits from resolving in a single tick
                 $connId                          = $conn !== null && is_int($conn->resourceId) ? $conn->resourceId : 0;
                 $counter                         = $this->cacheHitCounters[$connId] ?? 0;
                 $delay                           = floor($counter / max(1, $this->maxConcurrency)) * $this->staggerInterval;
                 $this->cacheHitCounters[$connId] = $counter + 1;
-                $resolveIfOpen                   = function () use ($deferred, $data, $conn) {
+                $resolveIfOpen                   = function () use ($deferred, $data, $status, $conn) {
                     // Skip resolving if the client has disconnected while waiting
                     if ($conn !== null && !$this->clients->contains($conn)) {
                         return;
                     }
-                    $deferred->resolve(['data' => $data, 'fromCache' => true]);
+                    // A cached entry is never a 429/5xx (handleHttpResponse() excludes those from the
+                    // cache), so there is no Retry-After to carry forward here.
+                    $deferred->resolve(['data' => $data, 'status' => $status, 'fromCache' => true, 'retryAfter' => null]);
                 };
                 if ($delay > 0) {
                     Loop::addTimer($delay, $resolveIfOpen);
                 } else {
                     Loop::futureTick($resolveIfOpen);
                 }
-            } else {
-                $deferred->reject(new \RuntimeException("Cache fetch for URL $url failed or returned non-string data"));
+
+                /** @var PromiseInterface<array{data: string, status: int, fromCache: bool, retryAfter: ?string}> $deferredPromise */
+                $deferredPromise = $deferred->promise();
+                return $deferredPromise;
             }
 
-            /** @var PromiseInterface<array{data: string, fromCache: bool}> $deferredPromise */
-            $deferredPromise = $deferred->promise();
-            return $deferredPromise;
+            // A cache hit whose entry cannot be decoded — malformed, or written in the bare-body
+            // shape a pre-#833 process left behind — is not a hit at all: it must not be answered
+            // with a rejection, which is what this arm did until a review of #834 caught it. Doing so
+            // fails every check whose entry predates this fix (all three published steps, via
+            // handleValidationDataError() and friends) for the entire TTL window, which is exactly
+            // the false-failure mirror of the bug this file fixes, landing right at the moment of
+            // deploy. The stale bytes are removed and control falls through to the live-request path
+            // below, exactly as a plain cache miss would.
+            echo "Cache entry for $url could not be decoded, treating as a miss and re-fetching\n";
+            self::cacheDelete($key);
         }
 
         if (self::$cacheEnabled) {
@@ -3493,20 +3723,44 @@ class Health implements MessageComponentInterface
             'runToken'   => $queuedRunToken
         ];
 
-        /** @var PromiseInterface<array{data: string, fromCache: bool}> $deferredPromise */
+        /** @var PromiseInterface<array{data: string, status: int, fromCache: bool, retryAfter: ?string}> $deferredPromise */
         $deferredPromise = $deferred->promise();
         $this->ensureTicking();
         return $deferredPromise;
     }
 
     /**
-     * Handle a fulfilled HTTP response for a queued {@see cachedGet} request: surface rate-limit
-     * (429) and server-error (5xx) responses as a rejection, otherwise cache the body (when caching
-     * is enabled) and resolve the deferred with it. Extracted from the cachedGet fulfillment closure
-     * so the status/cache branching is unit-testable without the Ratchet/Guzzle event loop; the
-     * caller is responsible for the inFlight bookkeeping.
+     * Handle a fulfilled HTTP response for a queued {@see cachedGet} request: resolve the deferred
+     * with the real status and body, caching them (when caching is enabled) unless the status is a
+     * rate-limit (429) or server error (5xx). Extracted from the cachedGet fulfillment closure so the
+     * status/cache branching is unit-testable without the Ratchet/Guzzle event loop; the caller is
+     * responsible for the inFlight bookkeeping.
      *
-     * @param Deferred<array{data: string, fromCache: bool}> $deferred
+     * **Every status resolves; none reject (#833, revised by #834's review).** `'http_errors' =>
+     * false` on the Guzzle client already means a 4xx or 5xx never rejects this promise on its own —
+     * this method used to carve out 429/5xx as an exception and reject those specifically, reasoning
+     * that a 429's RFC 9457 problem+json body "decodes fine but lacks the calendar keys, which the
+     * JSON branch would otherwise mislabel as 'response data was perhaps truncated?'". That reasoning
+     * no longer holds: every consumer of `cachedGet()` now gates on {@see Health::isHttpSuccessStatus()}
+     * *before* any JSON-shape check runs, for exactly this reason, so the mislabelling the rejection
+     * was written to prevent cannot happen regardless of whether this method resolves or rejects. With
+     * the original reason gone, rejecting 429/5xx separately is pure inconsistency: it makes those two
+     * statuses arrive through a different frame-emission path (an exception message assembled here)
+     * than every other non-2xx (the uniform `exists`/`parses`/`validates` gate), for no remaining
+     * benefit — and it is why they were still missing the problem document's `detail` that #833 gives
+     * every other refusal. They are resolved uniformly here instead, so the gate reports them exactly
+     * like a 400 or 404.
+     *
+     * **`Retry-After` is still carried, not dropped.** It is genuinely useful and was previously only
+     * visible on the rejection's exception message; it now rides on the resolved value's `retryAfter`
+     * key so a consumer can fold it into the `exists` failure text it already builds.
+     *
+     * **429/5xx are still excluded from the cache.** That part of the original decision stands on its
+     * own merit, independent of the rejection question: a rate limit or a server outage is transient
+     * information about *this moment*, not a fact about the resource, and caching it would have a
+     * request made one second after the outage ended keep reporting the outage for the rest of the TTL.
+     *
+     * @param Deferred<array{data: string, status: int, fromCache: bool, retryAfter: ?string}> $deferred
      */
     private static function handleHttpResponse(
         ResponseInterface $response,
@@ -3533,39 +3787,117 @@ class Health implements MessageComponentInterface
             file_put_contents(Router::$apiFilePath . 'logs' . DIRECTORY_SEPARATOR . "websocket_response_{$date}.log", $debugMessage);
         }
 
-        // Surface rate-limit (429) and server-error (5xx) responses honestly instead of passing
-        // an error body downstream: a 429 returns an RFC 9457 problem+json object that decodes
-        // fine but lacks the calendar keys, which the JSON branch would otherwise mislabel as
-        // "response data was perhaps truncated?". Reject with the real status; don't cache it.
-        // Other statuses (e.g. a 404 for an unknown calendar) still flow through so the
-        // per-format validation can report them at the json-valid phase as before.
-        $statusCode = $response->getStatusCode();
-        if (self::isUpstreamFailureStatus($statusCode)) {
-            $retryAfter = $response->getHeaderLine('Retry-After');
-            $suffix     = $retryAfter !== '' ? " (Retry-After: {$retryAfter})" : '';
-            $deferred->reject(new \RuntimeException(
-                "HTTP {$statusCode} {$response->getReasonPhrase()} received from {$url}{$suffix}"
-            ));
-            return;
-        }
+        $statusCode      = $response->getStatusCode();
+        $retryAfterValue = $response->getHeaderLine('Retry-After');
+        $retryAfter      = '' !== $retryAfterValue ? $retryAfterValue : null;
 
-        if (self::$cacheEnabled) {
-            $stored = self::cacheSet($key, $body, $ttl);
-            echo ( $stored ? "Stored response body in cache\n" : "Failed to store response body in cache\n" );
-            echo self::cacheInfo() . "\n";
+        // The status is cached alongside the body, not just resolved alongside it: a consumer that
+        // asked for this URL before is entitled to the same answer a live request would give it.
+        // 429/5xx are excluded — see the docblock above for why that exclusion still stands even
+        // though these statuses are no longer rejected. Every other status was already being cached
+        // before #833 — a 400 or 404 flows through so the per-format validation can report it at the
+        // json-valid phase, now gated behind the `exists` check the resolved status makes possible.
+        if (self::$cacheEnabled && !self::isUpstreamFailureStatus($statusCode)) {
+            $cachePayload = self::encodeHttpCacheEntry($statusCode, $body);
+            if (null !== $cachePayload) {
+                $stored = self::cacheSet($key, $cachePayload, $ttl);
+                echo ( $stored ? "Stored response body in cache\n" : "Failed to store response body in cache\n" );
+                echo self::cacheInfo() . "\n";
+            } else {
+                echo "Failed to encode response body for caching (not valid UTF-8?), skipping cache write\n";
+            }
         }
-        $deferred->resolve(['data' => $body, 'fromCache' => false]);
+        $deferred->resolve(['data' => $body, 'status' => $statusCode, 'fromCache' => false, 'retryAfter' => $retryAfter]);
     }
 
     /**
-     * Whether an upstream HTTP status should be surfaced as a hard failure (reject) instead of
-     * being passed to per-format validation. Rate limiting (429) and server errors (5xx) mean the
-     * API could not serve the resource, so their bodies must not be validated as calendar content;
-     * other statuses (e.g. 404 for an unknown calendar) flow through to the validation phases.
+     * Whether an upstream HTTP status must be kept out of the cache. Rate limiting (429) and server
+     * errors (5xx) are transient facts about *this moment*, not about the resource, so caching one
+     * would have a request made the instant an outage ends keep reporting the outage for the rest of
+     * the TTL. Both statuses still resolve rather than reject (#834) and are reported through the same
+     * `exists` gate as every other non-2xx — this only controls what gets written to the cache.
      */
     private static function isUpstreamFailureStatus(int $statusCode): bool
     {
         return $statusCode === 429 || $statusCode >= 500;
+    }
+
+    /**
+     * Encode a fetched HTTP response for the cache: the status alongside the body, in one string, so
+     * that a cache hit can answer #833's "does it exist" question exactly as a live fetch would.
+     *
+     * Extracted from {@see Health::handleHttpResponse()}, and paired with {@see Health::decodeHttpCacheEntry()}
+     * below it, so the round trip is unit-testable on its own — without a real cache backend and
+     * without the ReactPHP loop that `cachedGet()`'s cache-hit branch schedules its resolution through.
+     *
+     * Returns null when the body cannot be represented as JSON (e.g. invalid UTF-8) rather than
+     * falling back to caching the bare body: a caller that cannot cache the status safely must not
+     * cache at all, since a bare-body entry is exactly the pre-#833 shape that read back as an
+     * unconditional pass.
+     */
+    private static function encodeHttpCacheEntry(int $status, string $body): ?string
+    {
+        $encoded = json_encode(['status' => $status, 'body' => $body]);
+        return false !== $encoded ? $encoded : null;
+    }
+
+    /**
+     * The inverse of {@see Health::encodeHttpCacheEntry()}.
+     *
+     * Returns null for anything that is not a well-formed `{"status":…,"body":…}` envelope —
+     * including a bare body, which is what a cache entry written before #833 (or by anything else
+     * that ever wrote to this key) would be. Guessing a status for that shape, e.g. defaulting to 200,
+     * would silently reintroduce the exact bug #833 fixed the moment an old entry outlived a deploy;
+     * treating it as absent instead makes the caller reject and re-fetch, which is always correct.
+     *
+     * @return array{status: int, body: string}|null
+     */
+    private static function decodeHttpCacheEntry(string $raw): ?array
+    {
+        $decoded = json_decode($raw, true);
+        if (
+            is_array($decoded)
+            && isset($decoded['status'], $decoded['body'])
+            && is_int($decoded['status'])
+            && $decoded['status'] >= 100
+            && $decoded['status'] <= 599
+            && is_string($decoded['body'])
+        ) {
+            /** @var array{status: int, body: string} $decoded */
+            return $decoded;
+        }
+        return null;
+    }
+
+    /**
+     * Whether an HTTP status is a plain success. Consumers of {@see Health::cachedGet()} gate the
+     * `exists` step on this (#833): `'http_errors' => false` on the Guzzle client means a 4xx/5xx
+     * resolves rather than rejects, so without this check `exists` would pass for a request the API
+     * refused. Every non-2xx reaches this check uniformly, 429 and 5xx included (#834) —
+     * {@see Health::handleHttpResponse()} resolves every status rather than rejecting any of it, so
+     * the gate is the only place any of them is told apart from a success.
+     */
+    private static function isHttpSuccessStatus(int $statusCode): bool
+    {
+        return $statusCode >= 200 && $statusCode < 300;
+    }
+
+    /**
+     * The `detail` of an RFC 9457 problem-document body, when the body decodes to one.
+     *
+     * The API's own explanation of a refusal is quoted verbatim in an `exists` failure text (#833)
+     * rather than left for a client to go and re-fetch: `detail` already says precisely what is wrong
+     * — e.g. a rite's year boundary — better than any text manufactured here. `null` covers both "the
+     * body is not JSON" and "it is JSON but not a problem document", so every call site falls back to
+     * reporting the bare status.
+     */
+    private static function problemDetailFromBody(string $body): ?string
+    {
+        $decoded = json_decode($body);
+        if ($decoded instanceof \stdClass && isset($decoded->detail) && is_string($decoded->detail)) {
+            return $decoded->detail;
+        }
+        return null;
     }
 
     /**
