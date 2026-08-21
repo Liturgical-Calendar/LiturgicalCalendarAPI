@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests;
 
-use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
@@ -362,23 +361,25 @@ final class HealthProtocolValidationTest extends TestCase
      * Widens the guarantee above from *rejections* to **every** frame `Health` emits, success and
      * error alike (#827).
      *
-     * `Router::$apiFilePath` itself is not the right needle here: a `validateSource`/
-     * `executeValidation` frame legitimately quotes the *data* file path a client asked about (e.g.
-     * `jsondata/sourcedata/rite/roman/calendars/nations/IT/IT.json`, resolved against
-     * `Router::$apiFilePath` before it is read), and that is not a leak — it is the identity of the
-     * artifact the client asked to have checked, not an internal implementation detail. What must
-     * never appear is the **schema's** absolute path: the server picks the schema, the client never
-     * names it, and disclosing it serves only to map the deployment's directory layout. Every schema
-     * lives under `JsonData::SCHEMAS_FOLDER->path()`, so that prefix is the honest thing to assert
-     * against — it catches all four site shapes fixed by #827 (`LitSchema::*->name()`, `basename()`
-     * on a resolved `$schema`/`$pathForSchema` variable, and the `swaggest/json-schema` `$ref` trace
-     * sanitised in {@see Health::validateDataAgainstSchema()}) without being tripped up by the
-     * unrelated, in-scope data-path text.
+     * The needle is `rtrim(Router::$apiFilePath, '/')` — the same one the rejection test above
+     * uses — not a narrower prefix such as the schemas folder. A first pass at this test asserted
+     * only against `JsonData::SCHEMAS_FOLDER->path()`, which is exactly why it missed
+     * `validateSource`'s data-path frames: a v2 client sends only an opaque id
+     * (`{"target":{"id":"temporale:roman"}}`), never a path, so `runValidationSteps()` /
+     * `processValidationData()` quoting the server-resolved *absolute* path back at it is as much a
+     * leak as the schema paths this issue started from — nothing here is "the identity of the
+     * artifact the client asked to have checked" once the client never supplied a path at all. The
+     * fix ({@see Health::stripProjectRoot()}) makes every data path project-relative before a frame
+     * leaves the process, which is also correct for a v1 client that *did* supply a relative path
+     * (`jsondata/x.json`): the substitution is simply never found in it, so it passes through
+     * unchanged, and a v1 `resourceFile` URL is left alone the same way.
      *
-     * Four sites are driven for real, matching the four shapes #827 identified as interpolating a
-     * schema path into frame text:
+     * Five sites are driven for real:
      *
      *  - a successful source-file validation (`validateSource` on a single file);
+     *  - the exact fixture that regressed — `validateSource` on `temporale:roman` — pinned on its
+     *    own, since it is what caught this the first time and the general assertion below would not
+     *    by itself explain why this particular id matters;
      *  - a successful folder validation (`validateSource` on an i18n folder — a different branch of
      *    `runValidationSteps()` than the file case, and the one with two schema mentions per frame);
      *  - a schema-failure frame (`validateCalendar` against data that decodes but fails the LitCal
@@ -387,17 +388,17 @@ final class HealthProtocolValidationTest extends TestCase
      *  - a calendar validation that actually passes (`validateCalendar` against a fully schema-valid
      *    LitCal payload).
      */
-    public function testNoFrameEverLeaksTheSchemasAbsolutePath(): void
+    public function testNoFrameEverLeaksTheServerFilesystemPath(): void
     {
-        $schemasFolder = JsonData::SCHEMAS_FOLDER->path();
+        $root = rtrim(Router::$apiFilePath, '/');
 
-        $assertNoLeak = static function (array $frames, string $context) use ($schemasFolder): void {
+        $assertNoLeak = static function (array $frames, string $context) use ($root): void {
             self::assertNotEmpty($frames, "{$context}: expected at least one frame");
             foreach ($frames as $i => $frame) {
                 self::assertStringNotContainsString(
-                    $schemasFolder,
+                    $root,
                     (string) ( $frame->text ?? '' ),
-                    "{$context} frame #{$i} leaked the server's schemas folder path: {$frame->text}"
+                    "{$context} frame #{$i} leaked the server filesystem path: {$frame->text}"
                 );
             }
         };
@@ -409,6 +410,14 @@ final class HealthProtocolValidationTest extends TestCase
         ]));
         self::assertSame('success', $sourceFileFrames[2]->type, 'precondition: the source file is actually schema-valid');
         $assertNoLeak($sourceFileFrames, 'source-file validation');
+
+        // --- the exact regression fixture: an opaque id, no path anywhere in the message ------
+        $temporaleFrames = $this->frames((string) json_encode([
+            'action' => 'validateSource',
+            'target' => ['id' => 'temporale:roman'],
+        ]));
+        self::assertSame('success', $temporaleFrames[2]->type, 'precondition: the temporale source is actually schema-valid');
+        $assertNoLeak($temporaleFrames, 'validateSource temporale:roman (the id-only regression fixture)');
 
         // --- a successful folder validation --------------------------------------------------
         $folderFrames = $this->frames((string) json_encode([

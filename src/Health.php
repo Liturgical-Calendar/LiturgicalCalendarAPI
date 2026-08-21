@@ -835,11 +835,49 @@ class Health implements MessageComponentInterface
         if ($msg instanceof \stdClass && null !== $requestId) {
             $msg->requestId = $requestId;
         }
+        if ($msg instanceof \stdClass) {
+            self::stripProjectRoot($msg);
+        }
         if (gettype($msg) !== 'string') {
             $msg = json_encode($msg, JSON_PRETTY_PRINT);
         }
         /** @var string $msg */
         $from->send($msg);
+    }
+
+    /**
+     * Make an absolute filesystem path project-relative, wherever one appears in a frame's `text`
+     * or `details`, immediately before the frame leaves the process (#827).
+     *
+     * Every frame funnels through {@see Health::sendMessage()} — the 5 direct callers cover every
+     * `send*StepResult()`/`sendComplete()`/`rejectMessage()` in the class — so this is the one place
+     * the substitution needs to happen, rather than at each of the ~30 sites that build frame text. A
+     * per-site fix is exactly what let this leak reappear: #806 section G sanitised the same class of
+     * leak on the rejection path, and it resurfaced, unrelated, on `validateSource`'s result frames.
+     * A choke point cannot be bypassed by a new frame added elsewhere in this class.
+     *
+     * A v1 client-supplied data path (`jsondata/x.json`) is already project-relative, so the
+     * replacement is never found in it and it passes through unchanged. A v2 server-resolved
+     * absolute path (from `CheckableInventory`, `JsonData::*->path()`, or `LitSchema::*->path()`)
+     * becomes project-relative the same way: meaningful and stable across deployments, without
+     * disclosing where this one keeps its files. A URL is untouched for the same reason a relative
+     * path is: `Router::$apiFilePath` is not a substring of either.
+     */
+    private static function stripProjectRoot(\stdClass $msg): void
+    {
+        $root = Router::$apiFilePath;
+        if ('' === $root) {
+            return;
+        }
+        if (property_exists($msg, 'text') && is_string($msg->text)) {
+            $msg->text = str_replace($root, '', $msg->text);
+        }
+        if (property_exists($msg, 'details') && is_array($msg->details)) {
+            $msg->details = array_map(
+                static fn (mixed $detail): mixed => is_string($detail) ? str_replace($root, '', $detail) : $detail,
+                $msg->details
+            );
+        }
     }
 
     /**

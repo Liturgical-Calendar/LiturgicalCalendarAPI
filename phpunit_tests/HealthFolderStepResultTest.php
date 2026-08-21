@@ -248,7 +248,11 @@ final class HealthFolderStepResultTest extends TestCase
     {
         Router::getApiPaths();
 
-        $derived = strtr(JsonData::NATIONAL_CALENDAR_I18N_FOLDER->path(), ['{nation}' => 'ZZ']);
+        $derivedAbsolute = strtr(JsonData::NATIONAL_CALENDAR_I18N_FOLDER->path(), ['{nation}' => 'ZZ']);
+        // #827: a frame quotes the server-derived folder project-relative, never with the server's
+        // absolute filesystem root, so the assertion below has to match what actually reaches the
+        // wire rather than the raw JsonData::*->path() this is derived from.
+        $derived = substr($derivedAbsolute, strlen(Router::$apiFilePath));
 
         $conn   = self::createStubConnection(4);
         $health = $this->newHealth();
@@ -277,6 +281,11 @@ final class HealthFolderStepResultTest extends TestCase
                 $derived,
                 (string) $frame->text,
                 'and must report on the folder the server derived from the slug and actually read'
+            );
+            self::assertStringNotContainsString(
+                rtrim(Router::$apiFilePath, '/'),
+                (string) $frame->text,
+                'the frame must not leak the server filesystem root while reporting the derived folder (#827)'
             );
         }
     }

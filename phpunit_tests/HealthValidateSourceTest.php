@@ -283,8 +283,6 @@ final class HealthValidateSourceTest extends TestCase
         self::assertIsString($legacySchema, "the legacy slug {$slug} resolves to no schema at all");
         // The frame quotes the schema's file name, never the server's absolute filesystem path
         // (#827): compare against basename(), and assert the resolved schema path itself is absent.
-        // (The data-file path is a separate, out-of-scope concern — see HealthProtocolValidationTest
-        // ::testNoFrameLeaksAnAbsoluteSchemaPath for the file-agnostic version of this guarantee.)
         self::assertStringContainsString(
             basename($legacySchema),
             (string) $frames[2]->text,
@@ -295,6 +293,17 @@ final class HealthValidateSourceTest extends TestCase
             (string) $frames[2]->text,
             "{$id}'s schema-valid frame leaked the server's absolute schema path"
         );
+        // Nor does any frame leak the server's filesystem root through the *data* path it quotes —
+        // see HealthProtocolValidationTest::testNoFrameEverLeaksTheServerFilesystemPath for the
+        // dedicated regression coverage (this id resolves through CheckableInventory to an absolute
+        // path, so it is exercised for real here too, not just asserted in the abstract).
+        foreach ($frames as $frame) {
+            self::assertStringNotContainsString(
+                rtrim(Router::$apiFilePath, '/'),
+                (string) $frame->text,
+                "{$id}'s frame leaked the server filesystem path: {$frame->text}"
+            );
+        }
     }
 
     // ---------------------------------------------------------------- rejections
