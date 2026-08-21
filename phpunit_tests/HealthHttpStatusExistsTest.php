@@ -443,4 +443,65 @@ final class HealthHttpStatusExistsTest extends TestCase
             apcu_delete($key);
         }
     }
+
+    /**
+     * A cached status outside the range HTTP defines is a corrupt entry, not a refusal.
+     *
+     * `is_int()` alone accepts `0`, `-1` and `99999`, and any of those would reach the `exists`
+     * gate as "not a 2xx" and fail a check that may be perfectly healthy — the same false failure
+     * the malformed-entry fall-through exists to prevent, arriving through a weaker type check
+     * rather than a missing one. Range-validating turns it back into a miss.
+     */
+    public function testACachedStatusOutsideTheHttpRangeIsAMissRatherThanARefusal(): void
+    {
+        require_once __DIR__ . '/Support/ApcuShim.php';
+
+        $health  = $this->newHealth();
+        $url     = 'https://example.test/calendar/nation/IT/2027';
+        $options = [];
+
+        $cacheEnabledProp = new \ReflectionProperty(Health::class, 'cacheEnabled');
+        $cacheBackendProp = new \ReflectionProperty(Health::class, 'cacheBackend');
+        $enabledBefore    = $cacheEnabledProp->getValue();
+        $backendBefore    = $cacheBackendProp->getValue();
+        $cacheEnabledProp->setValue(null, true);
+        $cacheBackendProp->setValue(null, 'apcu');
+
+        $key = 'http_' . md5($url . serialize($options));
+
+        try {
+            // Well-formed envelope, impossible status.
+            apcu_store($key, (string) json_encode(['status' => 0, 'body' => '{"litcal":[]}']), 300);
+            self::assertTrue(apcu_exists($key), 'precondition: the corrupt entry is actually in the cache');
+
+            $cachedGet = new \ReflectionMethod(Health::class, 'cachedGet');
+            ob_start();
+            /** @var \React\Promise\PromiseInterface<array<string, mixed>> $promise */
+            $promise = $cachedGet->invoke($health, $url, $options, 300, null);
+            ob_end_clean();
+
+            $rejected = null;
+            $resolved = null;
+            $promise->then(
+                function (mixed $value) use (&$resolved): void {
+                    $resolved = $value;
+                },
+                function (\Throwable $e) use (&$rejected): void {
+                    $rejected = $e;
+                }
+            );
+
+            self::assertNull($rejected, 'a corrupt cached status must not surface as a rejection');
+            self::assertNull($resolved, 'nor as a synchronous answer carrying the impossible status');
+
+            $queue = ( new \ReflectionProperty(Health::class, 'queue') )->getValue($health);
+            self::assertCount(1, $queue, 'an out-of-range status must fall through to a live request');
+            self::assertSame($url, $queue[0]['url']);
+            self::assertFalse(apcu_exists($key), 'the corrupt entry must be deleted, not left to be re-read');
+        } finally {
+            apcu_delete($key);
+            $cacheEnabledProp->setValue(null, $enabledBefore);
+            $cacheBackendProp->setValue(null, $backendBefore);
+        }
+    }
 }

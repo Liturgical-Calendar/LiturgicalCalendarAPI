@@ -3807,6 +3807,8 @@ class Health implements MessageComponentInterface
             is_array($decoded)
             && isset($decoded['status'], $decoded['body'])
             && is_int($decoded['status'])
+            && $decoded['status'] >= 100
+            && $decoded['status'] <= 599
             && is_string($decoded['body'])
         ) {
             /** @var array{status: int, body: string} $decoded */
