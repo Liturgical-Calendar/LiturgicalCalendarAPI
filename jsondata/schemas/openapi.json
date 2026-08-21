@@ -7471,6 +7471,552 @@
         }
       }
     },
+    "/data/nation/{key}/{i18n_locale}": {
+      "get": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the stored translations of a national calendar",
+        "description": "Retrieve the stored translations of a national calendar's own liturgical events, as a map of `event_key` to translated name. This is a different resource from `/data/nation/{key}`, which the path hangs off: that returns the calendar definition, this returns the translation file behind it.\n\nOnly `GET` and `POST` exist at this depth. `RegionalDataHandler::validateRequestPath()` accepts two or three path segments for those two methods and exactly two for the others, and the router narrows the allowed methods to `GET` and `POST` for any three-segment `/data` path, so a `PUT`, `PATCH` or `DELETE` carrying a third segment is refused with `400 Bad Request` (`Expected two path params for PUT, PATCH and DELETE requests, received 3`). `POST` is a read alias of `GET`.\n\nThe third segment binds to `i18nRequest`. It is not the `locale` parameter that `/data/nation/{key}` accepts, and the two are documented separately for that reason.\n\nAn unknown nation is refused with `422 Unprocessable Content`; a nation that exists but has no translation file for the requested locale gives `404 Not Found`. `/data/roman/nation/{key}/{i18n_locale}` states the same rite explicitly and is the canonical form of this path.",
+        "operationId": "nationalDataI18nGET",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/Nation"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataI18nLocalePathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RegionalDataI18n200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the stored translations of a national calendar",
+        "description": "Read alias of `GET /data/nation/{key}/{i18n_locale}`, returning the same translation map. See that operation for how the third path segment differs from the `locale` parameter.",
+        "operationId": "nationalDataI18nPOST",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/Nation"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataI18nLocalePathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RegionalDataI18n200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      }
+    },
+    "/data/roman/nation/{key}/{i18n_locale}": {
+      "get": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the stored translations of a national calendar",
+        "description": "This is the canonical form of this route: the rite is stated explicitly. The bare `/data/nation/{key}/{i18n_locale}` form is equivalent and resolves here.\n\nRetrieve the stored translations of a national calendar's own liturgical events, as a map of `event_key` to translated name. This is a different resource from `/data/roman/nation/{key}`, which returns the calendar definition itself.\n\nOnly `GET` and `POST` exist at this depth; a `PUT`, `PATCH` or `DELETE` carrying a third segment is refused with `400 Bad Request`. The third segment binds to `i18nRequest` and is not the `locale` parameter of the two-segment path.\n\nOnly the diocesan tier exists under more than one rite, so there is no `/data/ambrosian/nation/{key}/{i18n_locale}`.",
+        "operationId": "romanNationalDataI18nGET",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/Nation"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataI18nLocalePathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RegionalDataI18n200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the stored translations of a national calendar",
+        "description": "Read alias of `GET /data/roman/nation/{key}/{i18n_locale}`, returning the same translation map.",
+        "operationId": "romanNationalDataI18nPOST",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/Nation"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataI18nLocalePathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RegionalDataI18n200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      }
+    },
+    "/data/diocese/{key}/{i18n_locale}": {
+      "get": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the stored translations of a diocesan calendar",
+        "description": "Retrieve the stored translations of a diocesan calendar's own liturgical events, as a map of `event_key` to translated name. This is a different resource from `/data/diocese/{key}`, which returns the calendar definition itself.\n\nOnly `GET` and `POST` exist at this depth; a `PUT`, `PATCH` or `DELETE` carrying a third segment is refused with `400 Bad Request` (`Expected two path params for PUT, PATCH and DELETE requests, received 3`). The third segment binds to `i18nRequest` and is not the `locale` parameter of the two-segment path.\n\nThis path resolves to the Roman rite. An unknown diocese, or a diocese defined under another rite, is refused with `422 Unprocessable Content` (`Diocesan calendar ... belongs to the ambrosian rite, not the requested roman rite.`); such a diocese must be addressed through `/data/ambrosian/diocese/{key}/{i18n_locale}`. A diocese that exists but has no translation file for the requested locale gives `404 Not Found`. `/data/roman/diocese/{key}/{i18n_locale}` states the same rite explicitly and is the canonical form of this path.",
+        "operationId": "diocesanDataI18nGET",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataI18nLocalePathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RegionalDataI18n200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the stored translations of a diocesan calendar",
+        "description": "Read alias of `GET /data/diocese/{key}/{i18n_locale}`, returning the same translation map. This path resolves to the Roman rite; a diocese defined under another rite is refused with `422 Unprocessable Content`.",
+        "operationId": "diocesanDataI18nPOST",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataI18nLocalePathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RegionalDataI18n200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      }
+    },
+    "/data/roman/diocese/{key}/{i18n_locale}": {
+      "get": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the stored translations of a diocesan calendar",
+        "description": "This is the canonical form of this route: the rite is stated explicitly, symmetric with `/data/ambrosian/diocese/{key}/{i18n_locale}`. The bare `/data/diocese/{key}/{i18n_locale}` form is equivalent and resolves here.\n\nRetrieve the stored translations of a diocesan calendar's own liturgical events, as a map of `event_key` to translated name. This is a different resource from `/data/roman/diocese/{key}`, which returns the calendar definition itself.\n\nOnly `GET` and `POST` exist at this depth; a `PUT`, `PATCH` or `DELETE` carrying a third segment is refused with `400 Bad Request`. The third segment binds to `i18nRequest` and is not the `locale` parameter of the two-segment path. A diocese defined under another rite is refused with `422 Unprocessable Content`.",
+        "operationId": "romanDiocesanDataI18nGET",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataI18nLocalePathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RegionalDataI18n200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the stored translations of a diocesan calendar",
+        "description": "Read alias of `GET /data/roman/diocese/{key}/{i18n_locale}`, returning the same translation map.",
+        "operationId": "romanDiocesanDataI18nPOST",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataI18nLocalePathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RegionalDataI18n200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      }
+    },
+    "/data/widerregion/{key}/{i18n_locale}": {
+      "get": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the stored translations of a wider region calendar",
+        "description": "Retrieve the stored translations of a wider region calendar's own liturgical events, as a map of `event_key` to translated name. This is a different resource from `/data/widerregion/{key}`, which returns the calendar definition itself.\n\nOnly `GET` and `POST` exist at this depth; a `PUT`, `PATCH` or `DELETE` carrying a third segment is refused with `400 Bad Request` (`Expected two path params for PUT, PATCH and DELETE requests, received 3`). The third segment binds to `i18nRequest` and is not the `locale` parameter of the two-segment path.\n\nAn unknown wider region is refused with `422 Unprocessable Content`; a wider region that exists but has no translation file for the requested locale gives `404 Not Found`. `/data/roman/widerregion/{key}/{i18n_locale}` states the same rite explicitly and is the canonical form of this path.",
+        "operationId": "widerregionDataI18nGET",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataI18nLocalePathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RegionalDataI18n200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the stored translations of a wider region calendar",
+        "description": "Read alias of `GET /data/widerregion/{key}/{i18n_locale}`, returning the same translation map.",
+        "operationId": "widerregionDataI18nPOST",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataI18nLocalePathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RegionalDataI18n200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      }
+    },
+    "/data/roman/widerregion/{key}/{i18n_locale}": {
+      "get": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the stored translations of a wider region calendar",
+        "description": "This is the canonical form of this route: the rite is stated explicitly. The bare `/data/widerregion/{key}/{i18n_locale}` form is equivalent and resolves here.\n\nRetrieve the stored translations of a wider region calendar's own liturgical events, as a map of `event_key` to translated name. This is a different resource from `/data/roman/widerregion/{key}`, which returns the calendar definition itself.\n\nOnly `GET` and `POST` exist at this depth; a `PUT`, `PATCH` or `DELETE` carrying a third segment is refused with `400 Bad Request`. The third segment binds to `i18nRequest` and is not the `locale` parameter of the two-segment path.\n\nWider regions are a layer over national calendars, which exist only in the Roman rite, so there is no `/data/ambrosian/widerregion/{key}/{i18n_locale}`.",
+        "operationId": "romanWiderregionDataI18nGET",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataI18nLocalePathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RegionalDataI18n200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the stored translations of a wider region calendar",
+        "description": "Read alias of `GET /data/roman/widerregion/{key}/{i18n_locale}`, returning the same translation map.",
+        "operationId": "romanWiderregionDataI18nPOST",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/WiderRegionNames"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataI18nLocalePathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RegionalDataI18n200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      }
+    },
+    "/data/ambrosian/diocese/{key}/{i18n_locale}": {
+      "get": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the stored translations of an Ambrosian diocesan calendar",
+        "description": "Retrieve the stored translations of an Ambrosian diocesan calendar's own liturgical events, as a map of `event_key` to translated name. This is a different resource from `/data/ambrosian/diocese/{key}`, which returns the calendar definition itself.\n\n**The `ambrosian` rite segment is required here, not decorative.** The bare `/data/diocese/{key}/{i18n_locale}` form resolves to the Roman rite, so addressing an Ambrosian diocese through it returns `422 Unprocessable Content`; the same `422` is returned on this path for a diocese that is not Ambrosian. The Ambrosian dioceses are Milano (`milano_it`), Bergamo (`bergam_it`), Novara (`novara_it`) and Lugano (`lugano_ch`).\n\nOnly `GET` and `POST` exist at this depth; a `PUT`, `PATCH` or `DELETE` carrying a third segment is refused with `400 Bad Request` (`Expected two path params for PUT, PATCH and DELETE requests, received 3`). The third segment binds to `i18nRequest` and is not the `locale` parameter of the two-segment path.\n\nThe Ambrosian rite has approved liturgical books only in Italian and Latin, so these dioceses store translation files for `it_IT` and `la_VA` only; any other locale gives `404 Not Found`.",
+        "operationId": "ambrosianDiocesanDataI18nGET",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataI18nLocalePathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RegionalDataI18n200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Calendar Source Data"
+        ],
+        "security": [
+          {}
+        ],
+        "summary": "Retrieve the stored translations of an Ambrosian diocesan calendar",
+        "description": "Read alias of `GET /data/ambrosian/diocese/{key}/{i18n_locale}`, returning the same translation map. The `ambrosian` rite segment is required: a diocese that is not Ambrosian is refused with `422 Unprocessable Content`.",
+        "operationId": "ambrosianDiocesanDataI18nPOST",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataI18nLocalePathParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/RegionalDataI18n200"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
+          }
+        }
+      }
+    },
     "/easter": {
       "get": {
         "tags": [
@@ -11961,6 +12507,15 @@
           "minimum": 0,
           "default": 0
         }
+      },
+      "RegionalDataI18nLocalePathParam": {
+        "in": "path",
+        "name": "i18n_locale",
+        "required": true,
+        "description": "Names the stored translation file to return, normally one of the locales the addressed calendar declares in its `metadata.locales` (mirrored by `/calendars`). A locale for which the calendar has no file is answered with `404 Not Found` rather than by falling back to another language.\n\nThe segment is spelled `i18n_locale` rather than `locale` deliberately. `RegionalDataHandler` binds this third path segment to `i18nRequest`, which selects a different resource, and not to the `locale` parameter that the two-segment `/data` paths accept to choose the language of a calendar definition. The two are independent: a `locale` supplied alongside this segment is still validated, and can still be refused with `400 Bad Request`, but it has no effect on the response.",
+        "schema": {
+          "$ref": "./CommonDef.json#/definitions/Locale"
+        }
       }
     },
     "examples": {
@@ -12435,6 +12990,20 @@
               "required": [
                 "success"
               ]
+            }
+          }
+        }
+      },
+      "RegionalDataI18n200": {
+        "description": "OK: the stored translation map for the requested calendar and locale.\n\nThis is a different payload shape from the calendar definition that the two-segment path returns. It is a flat object whose keys are the `event_key` identifiers of that calendar's own liturgical events and whose values are the translated names, served verbatim from the calendar's `i18n/{i18n_locale}.json` source file. Only the events the calendar itself defines appear here: events inherited from the General Roman Calendar, or from a wider region, are translated elsewhere.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "./LitCalTranslation.json"
+            },
+            "example": {
+              "StCatherineSiena": "Santa Caterina da Siena, vergine e dottore della Chiesa, patrona d'Italia",
+              "StFrancisAssisi": "San Francesco d'Assisi, patrono d'Italia"
             }
           }
         }
