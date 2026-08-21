@@ -55,6 +55,7 @@ final class HealthApcuDetectionTest extends TestCase
     protected function tearDown(): void
     {
         ApcuShimStore::simulateDisabledStore(false);
+        ApcuShimStore::simulateThrowingStore(false);
         ( new \ReflectionProperty(Health::class, 'cacheEnabled') )->setValue(null, $this->cacheEnabledBefore);
         ( new \ReflectionProperty(Health::class, 'cacheBackend') )->setValue(null, $this->cacheBackendBefore);
         parent::tearDown();
@@ -165,6 +166,48 @@ final class HealthApcuDetectionTest extends TestCase
             [false, 'none'],
             self::backendState(),
             'an inert APCu must fall to `none` with caching off, exactly as an absent one does'
+        );
+    }
+
+    /**
+     * A backend that *raises* rather than answering dishonestly. The probe owes its callers a bool
+     * either way: a throw escaping here would propagate out of `handleRedisFailure()`, i.e. during
+     * the Redis outage the APCu fallback exists to cover, turning a degraded cache into a broken
+     * connection handler.
+     */
+    public function testAnApcuWhoseStoreThrowsIsNotUsableRatherThanPropagating(): void
+    {
+        ApcuShimStore::simulateThrowingStore(true);
+
+        ob_start();
+        $usable = self::apcuUsable();
+        $output = ob_get_clean();
+
+        self::assertFalse($usable, 'a store that throws must read as unusable, not escape as an exception');
+        self::assertIsString($output);
+        self::assertStringContainsString(
+            'simulated APCu store failure',
+            $output,
+            'the throw must be reported, not silently swallowed — an exception here is by definition unanticipated'
+        );
+    }
+
+    /**
+     * And the same at the site that matters: a throwing APCu must leave the backend at `none` with
+     * caching off, exactly as an inert or absent one does.
+     */
+    public function testTheRedisFallbackDisablesCachingWhenApcuThrows(): void
+    {
+        ( new \ReflectionProperty(Health::class, 'cacheEnabled') )->setValue(null, true);
+        ( new \ReflectionProperty(Health::class, 'cacheBackend') )->setValue(null, 'redis');
+        ApcuShimStore::simulateThrowingStore(true);
+
+        self::handleRedisFailure();
+
+        self::assertSame(
+            [false, 'none'],
+            self::backendState(),
+            'a throwing APCu must fall to `none`, not abort the Redis-failure path with an exception'
         );
     }
 

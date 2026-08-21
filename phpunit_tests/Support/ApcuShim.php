@@ -61,6 +61,16 @@ final class ApcuShimStore
     private static bool $storeIsNoOp = false;
 
     /**
+     * Fault injection for #835: when true, `store()` raises instead of returning.
+     *
+     * A separate failure mode from {@see self::$storeIsNoOp}: that one models a backend that answers
+     * dishonestly, this one models one that blows up. `Health::apcuUsable()` owes its callers a bool
+     * in both cases — a raised exception would propagate out of `handleRedisFailure()` during the
+     * Redis outage the APCu fallback exists to cover.
+     */
+    private static bool $storeThrows = false;
+
+    /**
      * Make every subsequent `store()` a reported-success no-op (or stop doing so).
      *
      * Process-wide state, so a test that turns it on must turn it off again in a `finally`/`tearDown`.
@@ -68,6 +78,16 @@ final class ApcuShimStore
     public static function simulateDisabledStore(bool $noOp): void
     {
         self::$storeIsNoOp = $noOp;
+    }
+
+    /**
+     * Make every subsequent `store()` throw a \RuntimeException (or stop doing so).
+     *
+     * Process-wide state, so a test that turns it on must turn it off again in a `finally`/`tearDown`.
+     */
+    public static function simulateThrowingStore(bool $throws): void
+    {
+        self::$storeThrows = $throws;
     }
 
     /**
@@ -83,6 +103,9 @@ final class ApcuShimStore
 
     public static function store(string $key, mixed $value, int $ttl = 0): bool
     {
+        if (self::$storeThrows) {
+            throw new \RuntimeException('simulated APCu store failure');
+        }
         if (self::$storeIsNoOp) {
             return true;
         }

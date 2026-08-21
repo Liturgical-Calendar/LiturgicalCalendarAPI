@@ -3371,6 +3371,11 @@ class Health implements MessageComponentInterface
      * A round trip answers the question that actually matters, and unlike `apcu_enabled()` it also
      * catches a full or otherwise broken shared-memory segment, which no configuration flag reports.
      *
+     * **It never throws.** Every caller reads the answer as a yes/no about whether to select the
+     * backend, so any failure at all — including one raised by `random_bytes()` or by the `apcu_*`
+     * functions themselves — is reported and answered `false`, which is what makes the backend fall
+     * to `none` rather than propagating out of a connection handler or a Redis-failure path.
+     *
      * Two details of the checks below are deliberate:
      *
      * - The existence check looks in **this namespace before the global one**, because that is the
@@ -3393,12 +3398,16 @@ class Health implements MessageComponentInterface
             }
         }
 
-        // Random per call: a fixed key could collide with a concurrent process probing the same
-        // shared segment, and a probe must never answer using another writer's value.
-        $probeKey   = 'health_apcu_probe_' . bin2hex(random_bytes(8));
-        $probeValue = 'probe';
+        $probeKey = null;
 
         try {
+            // Random per call: a fixed key could collide with a concurrent process probing the same
+            // shared segment, and a probe must never answer using another writer's value. Generated
+            // inside the `try` because `random_bytes()` can itself throw, and a caller of this method
+            // is owed a bool rather than an exception.
+            $probeKey   = 'health_apcu_probe_' . bin2hex(random_bytes(8));
+            $probeValue = 'probe';
+
             if (true !== apcu_store($probeKey, $probeValue, 10)) {
                 return false;
             }
@@ -3407,8 +3416,25 @@ class Health implements MessageComponentInterface
             $fetched = apcu_fetch($probeKey, $success);
 
             return true === $success && $fetched === $probeValue;
+        } catch (\Throwable $e) {
+            // Any failure whatsoever means "do not select this backend". A throw would instead
+            // propagate out of onOpen(), or — worse — out of handleRedisFailure(), which runs during
+            // the very Redis outage this fallback exists to cover. Reported rather than swallowed:
+            // an exception reaching here is by definition one nobody anticipated.
+            echo 'APCu probe failed: ' . $e::class . ': ' . $e->getMessage() . "\n";
+
+            return false;
         } finally {
-            apcu_delete($probeKey);
+            // Best effort, and deliberately not allowed to change the answer: an exception raised in
+            // a `finally` *replaces* whatever the `try` or `catch` was returning, so an unlucky
+            // cleanup could otherwise mask an answer that was already correctly decided.
+            if (null !== $probeKey) {
+                try {
+                    apcu_delete($probeKey);
+                } catch (\Throwable) {
+                    // Nothing to do: the answer is settled and the probe key carries a TTL.
+                }
+            }
         }
     }
 
