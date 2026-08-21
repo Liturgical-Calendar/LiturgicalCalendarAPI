@@ -1005,8 +1005,10 @@ class Health implements MessageComponentInterface
      * then, finishing the *following* phase early too. A cascading miscount with nothing visibly
      * failing, which is worse than a crash. `requestId` is already the v2 opt-in signal and a client
      * adopting `complete` is adopting correlation anyway, so the gate costs a v2 client nothing and
-     * keeps the byte-identity guarantee whole. The gate lives here rather than at the twelve call
-     * sites so that it cannot be forgotten at a thirteenth.
+     * keeps the byte-identity guarantee whole. The gate lives here rather than at its call sites so
+     * that it cannot be forgotten at a new one — including the recovery arm in
+     * {@see Health::terminateOnHandlerThrow()}, which terminates a request whose handler threw and is
+     * gated by the same `null === $requestId` return as every other path.
      *
      * **No `status`.** The frame reports that the work finished, not that it passed; a run whose every
      * step failed still completes. The outcome is on the step frames, which is where a client reads it.
@@ -1042,6 +1044,65 @@ class Health implements MessageComponentInterface
         $message->target = $target;
         $message->step   = Step::COMPLETE->value;
         $this->sendMessage($to, $message, $runToken, requestId: $requestId);
+    }
+
+    /**
+     * The last resort behind a `then()`: terminate the request when one of its own handlers threw (#823).
+     *
+     * **React does not invoke a `then()`'s sibling `onRejected` when its own `onFulfilled` throws.** It
+     * rejects the promise *derived* from that `then()` instead. So every fulfil handler in this class
+     * that ends with {@see Health::sendComplete()} had one uncovered exit: an exception raised partway
+     * through it skipped the terminal frame, and a v2 client that stops on `complete` waited forever —
+     * the wedge the frame exists to prevent, arrived at from inside rather than from outside.
+     *
+     * The closure this returns is attached to the *derived* promise, as `->then(null, ...)`, rather than
+     * wrapped around the handler body in a `try`. That is deliberate on three counts: it is where React
+     * actually delivers the failure, so nothing has to be re-derived from the handler's shape; it leaves
+     * the handler bodies untouched, which matters for arms this class cannot easily re-test; and it covers
+     * a throw from the sibling `onRejected` too, which wedges a client the same way and by the same
+     * mechanism.
+     *
+     * **It logs and does not rethrow.** Every call site discards the promise it builds, so a rethrow would
+     * reach no handler at all — only `react/promise`'s unhandled-rejection reporter, which `error_log`s a
+     * message with no idea which check it belonged to. `echo` is how this class reports to the WebSocket
+     * server's stdout, and it is what the sibling `onRejected` arms already do with the reasons they are
+     * handed. Nothing is reported to the *client* beyond the terminal frame: the failure arrived partway
+     * through a stream whose frames a v1 client counts as `checks * 3`, and an extra one — unlike
+     * `complete`, which is gated on `requestId` — would be counted toward whatever phase was active.
+     *
+     * **On double-completion.** `sendComplete()` has no idempotency guard, by design, so this must not be
+     * reachable after a request has already terminated. It is not: in every handler it is attached to,
+     * `sendComplete()` is either the last statement or is followed immediately by `return`, so a throw
+     * that reaches here happened *before* the terminal frame — or it *was* the terminal frame failing to
+     * send, in which case the connection is already gone and a second attempt reaches nobody. A handler
+     * that completes and then keeps working would break that, which is why the terminal frame stays last.
+     *
+     * @param ConnectionInterface $to The connection that asked for the work.
+     * @param ?\stdClass $target What was checked, per {@see Health::frameTarget()} — the same target the
+     *        handler's own terminal frame would have carried.
+     * @param ?string $runToken The originating run token to echo back, or null to use the per-connection fallback.
+     * @param ?string $requestId The correlation id of the request that has finished. Null means the client never
+     *        opted in, and {@see Health::sendComplete()} sends nothing at all — the gate holds here too.
+     * @param string $context What was being reported when the handler threw, for the log line.
+     *
+     * @return \Closure(\Throwable): void
+     */
+    private function terminateOnHandlerThrow(
+        ConnectionInterface $to,
+        ?\stdClass $target,
+        ?string $runToken,
+        ?string $requestId,
+        string $context
+    ): \Closure {
+        return function (\Throwable $e) use ($to, $target, $runToken, $requestId, $context): void {
+            // Class and origin as well as message: a throw that reaches here is by definition one nobody
+            // anticipated, and until now it was reported by `react/promise`'s unhandled-rejection reporter,
+            // which at least said where it came from. Handling the rejection silences that reporter, so
+            // what it used to say has to be said here instead.
+            echo 'Error while reporting on ' . $context . ': ' . $e::class . ': ' . $e->getMessage()
+                . ' (' . $e->getFile() . ':' . $e->getLine() . ")\n";
+            $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
+        };
     }
 
     /**
@@ -1705,7 +1766,7 @@ class Health implements MessageComponentInterface
                     // never arrive.
                     $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
                 }
-            );
+            )->then(null, $this->terminateOnHandlerThrow($to, $target, $runToken, $requestId, "the i18n folder check for $label ($dataPath)"));
         } else {
             // {@see Health::processValidationData()} and {@see Health::handleValidationDataError()} take a
             // whole v1 message and read exactly two properties off it: `validate` and `category`. Both are
@@ -1759,7 +1820,7 @@ class Health implements MessageComponentInterface
                         $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken, $target, requestId: $requestId);
                         $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
                     }
-                );
+                )->then(null, $this->terminateOnHandlerThrow($to, $target, $runToken, $requestId, "the resource check for $dataPath"));
             } else {
                 // $dataPath is probably a source file in the filesystem in this case
                 // Resolve relative paths against the project root
@@ -1786,7 +1847,7 @@ class Health implements MessageComponentInterface
                         $this->handleValidationDataError($e, $to, $validationForMessages, $dataPath, $runToken, $target, requestId: $requestId);
                         $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
                     }
-                );
+                )->then(null, $this->terminateOnHandlerThrow($to, $target, $runToken, $requestId, "the source file check for $dataPath"));
             }
         }
     }
@@ -3059,7 +3120,13 @@ class Health implements MessageComponentInterface
 
                 $this->sendComplete($to, target: self::frameTarget($calendar, ['year' => $year]), runToken: $runToken, requestId: $requestId);
             }
-        );
+        )->then(null, $this->terminateOnHandlerThrow(
+            $to,
+            self::frameTarget($calendar, ['year' => $year]),
+            $runToken,
+            $requestId,
+            "the $category of $calendar for the year $year"
+        ));
     }
 
     /**
@@ -3323,7 +3390,13 @@ class Health implements MessageComponentInterface
 
                 $this->sendComplete($to, target: self::frameTarget($test, ['calendar' => $calendar, 'year' => $year]), runToken: $runToken, requestId: $requestId);
             }
-        );
+        )->then(null, $this->terminateOnHandlerThrow(
+            $to,
+            self::frameTarget($test, ['calendar' => $calendar, 'year' => $year]),
+            $runToken,
+            $requestId,
+            "the test $test against the $category of $calendar for the year $year"
+        ));
     }
 
     /**

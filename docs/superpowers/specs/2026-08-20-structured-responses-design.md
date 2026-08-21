@@ -373,6 +373,20 @@ A client stops on `complete` and never counts frames.
 
 ### A known limit: a throw inside a fulfil handler skips `complete` (#823)
 
+> **Amended: this hole is closed.** Each of the five `then(fulfil, reject)` pairs named below now carries a tail
+> handler — `->then(null, $this->terminateOnHandlerThrow(...))` — attached to the *derived* promise, which is where
+> React delivers a throw raised inside either of the two handlers. It logs the failure to the server's stdout and
+> emits `complete`, still gated on `requestId`, so a v2 client terminates and a v1 stream is byte-for-byte what it
+> was. Nothing else is reported to the client: an extra frame partway through a stream a v1 client sizes as
+> `checks * 3` is the miscount the gate exists to prevent, and unlike `complete` an error frame has no gate.
+> The **shape** below is what still matters, and the enumeration is kept as the audit that produced the fix rather
+> than as a live list: a `then(fulfil, reject)` pair added later without a tail handler reintroduces the hole
+> exactly as described. `phpunit_tests/HealthFulfilHandlerThrowTest.php` drives a throw from inside each of the five
+> fulfil handlers — settling each request *successfully* and throwing afterwards, which is what makes it a different
+> test from the rejection-driven ones in `HealthTerminalFrameTest`. **The second, unrelated shape recorded at the
+> end of this subsection — a queued request dropped by `dropSupersededQueuedRequests()` — is untouched by that fix
+> and remains open.**
+
 The guarantee above is "every path that starts work terminates." It has two known holes — the fulfil-handler shape
 this subsection is named for, and a second, unrelated one recorded at the end of it — and it is honest to state them
 next to the guarantee rather than let a reader discover them independently.
@@ -421,7 +435,9 @@ late in a branch whose own review is about the terminal frame's happy paths, not
 | Target never resolves (unknown id) | `echobot` rejection, no `complete` — no work was started           |
 
 "A step throws" assumes the throw is caught where the frame is composed. It is not, on the five fulfil-handler paths
-described above (#823): there, a throw skips both the error frame and `complete`, rather than producing them.
+described above (#823): there, a throw still skips the error frame, since nothing on those paths composes one for it.
+It no longer skips `complete` — the tail handler each of those `then()` pairs now carries emits the terminal frame —
+so the row reads "no error frame, then `complete`" on those paths rather than silence.
 
 No new response `type` is introduced. Since UnitTestInterface PR #46 an unrecognised `type` is painted as a visible
 failed check, so a `protocolError` type would make every rejection look like a failing test. That belongs to section
