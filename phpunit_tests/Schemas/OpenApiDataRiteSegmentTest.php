@@ -106,6 +106,18 @@ final class OpenApiDataRiteSegmentTest extends TestCase
                 'the bare form of every tier must stay documented'
             );
 
+            // The exclusion described in this method's docblock, asserted rather than merely stated.
+            // Without this the decision lived only in prose, and a `/data/roman/...` duplicate could be
+            // added without anything noticing that the contract had grown a second spelling of a path
+            // it already documents. Should that duplication ever become the intent — mirroring how
+            // `/calendar` enumerates both rites at every tier — this is the assertion to revisit, which
+            // is the point: the change would be a deliberate one rather than a drift.
+            self::assertArrayNotHasKey(
+                "/data/{$rite->value}/{$category->value}/{key}",
+                self::paths(),
+                'the Roman rite is expressed through the bare path, not through a /data/roman/... duplicate'
+            );
+
             return;
         }
 
