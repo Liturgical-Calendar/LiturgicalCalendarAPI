@@ -68,19 +68,31 @@ final class HealthCancelRunTest extends TestCase
      * A queue entry shaped like the ones `cachedGet()` enqueues. The promise callbacks are never
      * invoked here — these tests only ever inspect which entries survive the filter.
      *
+     * `onSuperseded` is the terminator a dropped entry is ended by (#837) and is a no-op here for the
+     * same reason the other two callbacks are: what these tests assert is which entries survive, not
+     * what a dropped one says. That it is present at all still matters — an entry without the key is
+     * one `cachedGet()` cannot produce, and the drop site reports such an entry on stdout as a caller
+     * that forgot to supply one. The one test in this file that asserts on the frames a cancel
+     * produces ({@see testCancellingTheCurrentRunDropsItsQueuedRequestsAndSaysNothing()}) is asserting
+     * that `cancelRun` itself acknowledges nothing; the terminal frames a real dropped request emits
+     * are covered by `HealthSupersededRequestTest`, which queues through `cachedGet()` rather than by
+     * hand.
+     *
      * @return array<string, mixed>
      */
     private static function queueEntry(string $url, ?int $resourceId, ?string $runToken): array
     {
         return [
-            'url'        => $url,
-            'options'    => [],
-            'resolve'    => static function (): void {
+            'url'          => $url,
+            'options'      => [],
+            'resolve'      => static function (): void {
             },
-            'reject'     => static function (): void {
+            'reject'       => static function (): void {
             },
-            'resourceId' => $resourceId,
-            'runToken'   => $runToken
+            'resourceId'   => $resourceId,
+            'runToken'     => $runToken,
+            'onSuperseded' => static function (): void {
+            }
         ];
     }
 
