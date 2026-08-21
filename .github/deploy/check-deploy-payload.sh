@@ -3,11 +3,19 @@
 # Fail if a deploy would ship a tracked file that is not part of the runtime
 # payload (#deploy-hygiene).
 #
-# Why this exists: the vhost docroot is the *application root*, not public/,
-# so every deployed file is readable over HTTP. rsync-exclude.txt is a
-# denylist, which means each new dev-only file at the repo root has to be
-# remembered — and twice it was not (phpstan-baseline.neon, .coderabbit.yaml),
-# both of which ended up publicly fetchable.
+# Why this exists: the API is served as a folder under the *frontend* docroot,
+# and the nginx location for it resolves `try_files $uri ...` — so any file
+# physically present under /api/{dev,vN}/ is served straight off disk before the
+# front controller sees the request. rsync-exclude.txt is a denylist, which means
+# each new dev-only file at the repo root has to be remembered — and twice it was
+# not (phpstan-baseline.neon, .coderabbit.yaml), both of which ended up publicly
+# fetchable.
+#
+# The nginx side has since been narrowed to map into public/ rather than the app
+# root, which makes the whole class unreachable over HTTP. This check is still
+# worth keeping: it stops the files reaching the server at all, which matters for
+# anything reading the deployed tree outside nginx (backups, an operator grepping
+# around), and it is the half that lives in this repo.
 #
 # This flips the guarantee: the payload is checked against an ALLOWlist of
 # top-level entries. A new dev-only file fails CI instead of reaching the web.
