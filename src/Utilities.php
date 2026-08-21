@@ -574,13 +574,13 @@ class Utilities
 
         // Try cache first. ApcuCache answers "is there a cache?" with a store/fetch round trip rather
         // than with extension_loaded() plus function_exists(), which are all true of an APCu that
-        // stores nothing (#836).
-        if (ApcuCache::exists($cacheKey)) {
-            $data = ApcuCache::fetch($cacheKey, $success);
-            if ($success && is_array($data)) {
-                /** @var array<string|int,mixed> $data */
-                return $data;
-            }
+        // stores nothing (#836). `fetch()` reports a miss — and an unusable backend — through
+        // `$success`, so an `exists()` first would only add a second round trip and a window for the
+        // entry to expire between the two calls.
+        $data = ApcuCache::fetch($cacheKey, $success);
+        if ($success && is_array($data)) {
+            /** @var array<string|int,mixed> $data */
+            return $data;
         }
 
         $rawContents = self::rawContentsFromFile($filename);
@@ -605,12 +605,11 @@ class Utilities
     {
         $cacheKey = 'jsoncache_object_' . md5($filename);
 
-        // Try cache first — see jsonFileToArray() for why the decision is ApcuCache's (#836).
-        if (ApcuCache::exists($cacheKey)) {
-            $data = ApcuCache::fetch($cacheKey, $success);
-            if ($success && $data instanceof \stdClass) {
-                return $data;
-            }
+        // Try cache first — see jsonFileToArray() for why the decision is ApcuCache's, and why the
+        // read is a single `fetch()` rather than `exists()` then `fetch()` (#836).
+        $data = ApcuCache::fetch($cacheKey, $success);
+        if ($success && $data instanceof \stdClass) {
+            return $data;
         }
 
         $rawContents = self::rawContentsFromFile($filename);

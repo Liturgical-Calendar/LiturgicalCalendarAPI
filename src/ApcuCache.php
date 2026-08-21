@@ -199,10 +199,25 @@ final class ApcuCache
     /**
      * Whether $key is currently held. False whenever the backend is unusable — there is nothing to
      * find in a cache that cannot hold anything.
+     *
+     * Like every other method here, a backend that *throws* is treated as one that is unusable: the
+     * class promises callers a cache answer, not an exception, and a caller of a cache read already
+     * has a "not cached" path. Without this the promise held for an inert backend but not for a
+     * broken one, which is the harder failure to reason about, not the easier.
      */
     public static function exists(string $key): bool
     {
-        return self::isUsable() && true === apcu_exists($key);
+        if (false === self::isUsable()) {
+            return false;
+        }
+
+        try {
+            return true === apcu_exists($key);
+        } catch (\Throwable $e) {
+            error_log('APCu exists failed for key ' . $key . ': ' . $e::class . ': ' . $e->getMessage());
+
+            return false;
+        }
     }
 
     /**
@@ -223,8 +238,17 @@ final class ApcuCache
 
         // `apcu_fetch()` declares its out-parameter as `mixed`; narrow it here rather than passing
         // `$success` straight in, so callers get the strict bool this method's signature promises.
-        $found   = false;
-        $value   = apcu_fetch($key, $found);
+        $found = false;
+
+        try {
+            $value = apcu_fetch($key, $found);
+        } catch (\Throwable $e) {
+            error_log('APCu fetch failed for key ' . $key . ': ' . $e::class . ': ' . $e->getMessage());
+            $success = false;
+
+            return false;
+        }
+
         $success = true === $found;
 
         return $value;
@@ -237,7 +261,17 @@ final class ApcuCache
      */
     public static function store(string $key, mixed $value, int $ttl = 0): bool
     {
-        return self::isUsable() && true === apcu_store($key, $value, $ttl);
+        if (false === self::isUsable()) {
+            return false;
+        }
+
+        try {
+            return true === apcu_store($key, $value, $ttl);
+        } catch (\Throwable $e) {
+            error_log('APCu store failed for key ' . $key . ': ' . $e::class . ': ' . $e->getMessage());
+
+            return false;
+        }
     }
 
     /**

@@ -66,6 +66,8 @@ final class ApcuCacheDetectionTest extends TestCase
         $this->usableBefore = is_bool($usable) ? $usable : null;
         self::forgetProbeResult();
 
+        self::assertShimIsTheBoundBackend();
+
         $this->tmpFile = sys_get_temp_dir() . '/litcal_apcu_cache_test_' . uniqid() . '.json';
     }
 
@@ -97,6 +99,48 @@ final class ApcuCacheDetectionTest extends TestCase
     private static function forgetProbeResult(): void
     {
         ( new \ReflectionProperty(ApcuCache::class, 'usable') )->setValue(null, null);
+    }
+
+    /**
+     * Fail loudly if `ApcuCache`'s calls are not reaching the shim.
+     *
+     * PHP's `INIT_NS_FCALL_BY_NAME` caches the function it resolved in the opline's run-time cache,
+     * so a call site that once executed while the shim was not loaded stays bound to the *global*
+     * `apcu_*` for the life of the process. Nothing in this class can undo that, and the failure is
+     * silent in the worst way: the fault switches below would simply have no effect, and the
+     * positive cases would pass against a real backend while the negative ones passed for the wrong
+     * reason.
+     *
+     * `phpunit_tests/bootstrap.php` is what keeps this from happening — by pinning the memo it stops
+     * `Utilities` reaching an `apcu_*` opline at all on hosts where the answer is `false`. But that
+     * argument does not hold on a host where the probe genuinely answers `true` (a real APCu with
+     * `apc.enable_cli=1`), where an earlier test *can* bind these sites first. Rather than load the
+     * shim from the bootstrap — which would also bind `Health`'s call sites to it and change what
+     * `Health::apcuUsable()` measures on such a host — the coupling is asserted here, where it is
+     * cheap and where a violation is a test failure rather than a wrong answer.
+     */
+    private static function assertShimIsTheBoundBackend(): void
+    {
+        ApcuShimStore::simulateDisabledStore(false);
+        ApcuShimStore::simulateThrowingStore(false);
+
+        $sentinel = self::PROBE_KEY_PREFIX . 'binding_' . uniqid();
+        ApcuShimStore::store($sentinel, 'bound', 10);
+
+        ( new \ReflectionProperty(ApcuCache::class, 'usable') )->setValue(null, true);
+
+        try {
+            $value = ApcuCache::fetch($sentinel, $found);
+            self::assertTrue(
+                $found && 'bound' === $value,
+                'ApcuCache is not reaching phpunit_tests/Support/ApcuShim.php: its apcu_* call sites were '
+                . 'bound to the global functions before the shim was loaded, so the fault switches this '
+                . 'class relies on cannot take effect. See assertShimIsTheBoundBackend().'
+            );
+        } finally {
+            ApcuShimStore::delete($sentinel);
+            self::forgetProbeResult();
+        }
     }
 
     /**

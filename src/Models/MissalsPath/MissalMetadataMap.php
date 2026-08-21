@@ -185,27 +185,27 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
         // `LiturgicalCalendar\Api`. An unqualified `apcu_store()` written *here* would resolve against
         // `LiturgicalCalendar\Api\Models\MissalsPath` first and so could reach a different function
         // than any usability check made elsewhere — which is exactly what used to happen.
-        if (ApcuCache::exists(self::CACHE_KEY)) {
-            $cached = ApcuCache::fetch(self::CACHE_KEY, $success);
-            if (
-                $success
-                && is_array($cached)
-                && isset($cached['missals'])
-                && is_array($cached['missals'])
-                && array_all($cached['missals'], fn ($item, $key): bool => is_string($key) && $item instanceof MissalMetadata)
-                && isset($cached['allMissals'])
-                && is_array($cached['allMissals'])
-                && array_all($cached['allMissals'], fn ($item, $key): bool => is_string($key) && $item instanceof MissalMetadata)
-            ) {
-                /** @var array<string,MissalMetadata> $missals */
-                $missals = $cached['missals'];
-                /** @var array<string,MissalMetadata> $allMissals */
-                $allMissals = $cached['allMissals'];
+        // `fetch()` reports both a miss and an unusable backend through `$success`, so an
+        // `exists()` first would only add a second round trip (#836).
+        $cached = ApcuCache::fetch(self::CACHE_KEY, $success);
+        if (
+            $success
+            && is_array($cached)
+            && isset($cached['missals'])
+            && is_array($cached['missals'])
+            && array_all($cached['missals'], fn ($item, $key): bool => is_string($key) && $item instanceof MissalMetadata)
+            && isset($cached['allMissals'])
+            && is_array($cached['allMissals'])
+            && array_all($cached['allMissals'], fn ($item, $key): bool => is_string($key) && $item instanceof MissalMetadata)
+        ) {
+            /** @var array<string,MissalMetadata> $missals */
+            $missals = $cached['missals'];
+            /** @var array<string,MissalMetadata> $allMissals */
+            $allMissals = $cached['allMissals'];
 
-                $this->missals    = $missals;
-                $this->allMissals = $allMissals;
-                return;
-            }
+            $this->missals    = $missals;
+            $this->allMissals = $allMissals;
+            return;
         }
 
         if (false === is_readable(JsonData::MISSALS_FOLDER->path())) {
