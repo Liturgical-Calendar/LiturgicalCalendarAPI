@@ -57,7 +57,13 @@ chmod 0644 "${UNIT_DIR}/litcal-fpm-reload.path" "${UNIT_DIR}/litcal-fpm-reload.s
 install -m 0755 -o root -g root "${SRC_DIR}/sbin/litcal-fpm-reload.sh" /usr/local/sbin/litcal-fpm-reload.sh
 
 systemctl daemon-reload
-systemctl enable --now litcal-fpm-reload.path "$WS_UNIT"
+systemctl enable litcal-fpm-reload.path "$WS_UNIT"
+
+# Restart, not `enable --now`. `--now` starts a unit that is stopped and does nothing at
+# all to one already running, so re-running this installer with updated unit content
+# would leave the old definition live and report success — the same silent no-op this
+# script exists to remove from the deploy path.
+systemctl restart litcal-fpm-reload.path "$WS_UNIT"
 
 echo "installed. verify with:"
 echo "  systemctl status litcal-fpm-reload.path"

@@ -104,16 +104,21 @@ sudo deploy/install.sh
 ```
 
 `install.sh` renders `deploy/systemd/*.in` against `/etc/litcal-deploy.env`, writes the
-units, installs the script, and enables both units.
+units, installs the script, enables both units and **restarts** them. The restart is not
+redundant: `systemctl enable --now` starts a stopped unit and does nothing to a running
+one, so updating a unit file without it leaves the old definition live.
 
 ## Verifying
 
 ```bash
+# The commands below use the deployment's own values.
+. /etc/litcal-deploy.env
+
 systemctl status litcal-fpm-reload.path        # expect: active (waiting)
-systemctl status litcal-websocket.service      # expect: active (running)
+systemctl status "$WS_UNIT"                    # expect: active (running)
 
 # Is the running process older than the code it is supposed to be running?
-systemctl show litcal-websocket -p ActiveEnterTimestamp -p NRestarts
+systemctl show "$WS_UNIT" -p ActiveEnterTimestamp -p NRestarts
 stat -c '%y %n' "$API_ROOT/src/Health.php"
 
 # Exercise the deploy path end to end
