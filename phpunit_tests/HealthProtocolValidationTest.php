@@ -6,9 +6,11 @@ namespace LiturgicalCalendar\Tests;
 
 use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Health;
+use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
+use Nyholm\Psr7\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -27,9 +29,24 @@ final class HealthProtocolValidationTest extends TestCase
 {
     use HealthQueueIsolationTrait;
 
+    /**
+     * A folder created under the project root for the leak probe, so the path the read failure
+     * reports actually begins with `Router::$apiFilePath` and the stripping has something to do.
+     */
+    private const LEAK_PROBE_FOLDER = 'jsondata/sourcedata/.leak-probe';
+
     public static function setUpBeforeClass(): void
     {
         Router::getApiPaths();
+        // Only the new tests below reach the inventory (via validateSource), but resetting it here
+        // keeps this class independent of whatever an earlier test class left memoized, the same
+        // reasoning HealthValidateSourceTest applies to itself.
+        CheckableInventory::reset();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        CheckableInventory::reset();
     }
 
     private static function createStubConnection(int $resourceId = 1)
@@ -344,6 +361,206 @@ final class HealthProtocolValidationTest extends TestCase
                 'a rejection leaked the server filesystem path'
             );
         }
+    }
+
+    /**
+     * Widens the guarantee above from *rejections* to **every** frame `Health` emits, success and
+     * error alike (#827).
+     *
+     * The needle is `rtrim(Router::$apiFilePath, '/')` — the same one the rejection test above
+     * uses — not a narrower prefix such as the schemas folder. A first pass at this test asserted
+     * only against `JsonData::SCHEMAS_FOLDER->path()`, which is exactly why it missed
+     * `validateSource`'s data-path frames: a v2 client sends only an opaque id
+     * (`{"target":{"id":"temporale:roman"}}`), never a path, so `runValidationSteps()` /
+     * `processValidationData()` quoting the server-resolved *absolute* path back at it is as much a
+     * leak as the schema paths this issue started from — nothing here is "the identity of the
+     * artifact the client asked to have checked" once the client never supplied a path at all. The
+     * fix ({@see Health::stripProjectRoot()}) makes every data path project-relative before a frame
+     * leaves the process, which is also correct for a v1 client that *did* supply a relative path
+     * (`jsondata/x.json`): the substitution is simply never found in it, so it passes through
+     * unchanged, and a v1 `resourceFile` URL is left alone the same way.
+     *
+     * Five sites are driven for real:
+     *
+     *  - a successful source-file validation (`validateSource` on a single file);
+     *  - the exact fixture that regressed — `validateSource` on `temporale:roman` — pinned on its
+     *    own, since it is what caught this the first time and the general assertion below would not
+     *    by itself explain why this particular id matters;
+     *  - a successful folder validation (`validateSource` on an i18n folder — a different branch of
+     *    `runValidationSteps()` than the file case, and the one with two schema mentions per frame);
+     *  - a schema-failure frame (`validateCalendar` against data that decodes but fails the LitCal
+     *    schema, exercising the `swaggest/json-schema` error text rather than the hand-written
+     *    success sentence); and
+     *  - a calendar validation that actually passes (`validateCalendar` against a fully schema-valid
+     *    LitCal payload).
+     */
+    public function testNoFrameEverLeaksTheServerFilesystemPath(): void
+    {
+        $root = rtrim(Router::$apiFilePath, '/');
+
+        // Both halves of the frame, because `stripProjectRoot()` sanitises both. Checking only
+        // `text` would leave the `details` half of the fix unfalsifiable — remove it from
+        // production and this test would still pass — and `details` is where a path is most
+        // likely to appear: a folder check puts one per offending file there, and a schema
+        // failure carries the validator's own message.
+        $assertNoLeak = static function (array $frames, string $context) use ($root): void {
+            self::assertNotEmpty($frames, "{$context}: expected at least one frame");
+            foreach ($frames as $i => $frame) {
+                self::assertStringNotContainsString(
+                    $root,
+                    (string) ( $frame->text ?? '' ),
+                    "{$context} frame #{$i} leaked the server filesystem path in text: {$frame->text}"
+                );
+
+                $details = $frame->details ?? [];
+                if (false === is_array($details)) {
+                    continue;
+                }
+                foreach ($details as $j => $detail) {
+                    self::assertStringNotContainsString(
+                        $root,
+                        (string) $detail,
+                        "{$context} frame #{$i} leaked the server filesystem path in details[{$j}]: " . ( (string) $detail )
+                    );
+                }
+            }
+        };
+
+        // --- a successful source-file validation --------------------------------------------
+        $sourceFileFrames = $this->frames((string) json_encode([
+            'action' => 'validateSource',
+            'target' => ['id' => 'nation:roman:IT'],
+        ]));
+        self::assertSame('success', $sourceFileFrames[2]->type, 'precondition: the source file is actually schema-valid');
+        $assertNoLeak($sourceFileFrames, 'source-file validation');
+
+        // --- a folder check whose file cannot be read: the one path that puts an absolute
+        // --- path into `details` rather than `text`, and therefore the only thing that makes
+        // --- the details half of the assertion above capable of failing.
+        //
+        // `runValidationSteps()`'s folder branch collects "unreadable i18n json file {name}: "
+        // followed by the read's own message, which is "Unable to read file: {absolute path}".
+        // A *directory* named like an i18n file is matched by the `*.json` glob and refused by
+        // the `is_file()` check added for #822, so this reproduces it without depending on
+        // permissions — `chmod 000` is a no-op when the suite runs as root, as it does in CI.
+        $probeDir = Router::$apiFilePath . self::LEAK_PROBE_FOLDER;
+        self::assertTrue(mkdir($probeDir . '/it.json', 0777, true), 'could not build the unreadable-file fixture');
+        try {
+            $unreadableFrames = $this->frames((string) json_encode([
+                'action'       => 'executeValidation',
+                'category'     => 'sourceDataCheck',
+                'validate'     => 'leak-probe',
+                'sourceFolder' => self::LEAK_PROBE_FOLDER,
+            ]));
+            self::assertNotEmpty($unreadableFrames[0]->details ?? [], 'precondition: this arm must put the read failure in details');
+            $assertNoLeak($unreadableFrames, 'folder check with an unreadable file (details carries the path)');
+        } finally {
+            @rmdir($probeDir . '/it.json');
+            @rmdir($probeDir);
+        }
+
+        // --- the exact regression fixture: an opaque id, no path anywhere in the message ------
+        $temporaleFrames = $this->frames((string) json_encode([
+            'action' => 'validateSource',
+            'target' => ['id' => 'temporale:roman'],
+        ]));
+        self::assertSame('success', $temporaleFrames[2]->type, 'precondition: the temporale source is actually schema-valid');
+        $assertNoLeak($temporaleFrames, 'validateSource temporale:roman (the id-only regression fixture)');
+
+        // --- a successful folder validation --------------------------------------------------
+        $folderFrames = $this->frames((string) json_encode([
+            'action' => 'validateSource',
+            'target' => ['id' => 'nation:roman:US:i18n'],
+        ]));
+        self::assertSame('success', $folderFrames[2]->type, 'precondition: the i18n folder is actually schema-valid');
+        $assertNoLeak($folderFrames, 'folder validation');
+
+        // --- a schema-failure frame -------------------------------------------------------------
+        // A decodable-but-invalid LitCal body: passes the exists/parses steps, then fails schema
+        // validation and returns the swaggest/json-schema error text this issue also had to sanitise.
+        $failConn = self::createStubConnection();
+        $health   = $this->newHealth();
+        $health->onMessage($failConn, (string) json_encode([
+            'action'         => 'validateCalendar',
+            'calendar'       => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'],
+            'year'           => 2026,
+            'responseFormat' => 'JSON',
+        ]));
+        $queued = ( new \ReflectionProperty(Health::class, 'queue') )->getValue($health);
+        self::assertCount(1, $queued, 'precondition: one calendar fetch queued');
+        /** @var array{resolve: \Closure(\Psr\Http\Message\ResponseInterface):void} $entry */
+        $entry = $queued[0];
+        ( $entry['resolve'] )(new Response(
+            200,
+            ['Content-Type' => 'application/json'],
+            (string) json_encode(['litcal' => [], 'settings' => [], 'metadata' => [], 'messages' => []])
+        ));
+        $failFrames      = array_map(
+            static fn (string $raw): \stdClass => json_decode($raw),
+            $failConn->sent
+        );
+        $schemaFailFrame = array_values(array_filter($failFrames, static fn (\stdClass $f): bool => 'error' === $f->type))[0] ?? null;
+        self::assertNotNull($schemaFailFrame, 'precondition: the empty settings/metadata objects actually fail schema validation');
+        $assertNoLeak($failFrames, 'calendar schema-failure');
+
+        // --- a calendar validation that passes -------------------------------------------------
+        $passConn = self::createStubConnection();
+        $health2  = $this->newHealth();
+        $health2->onMessage($passConn, (string) json_encode([
+            'action'         => 'validateCalendar',
+            'calendar'       => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'],
+            'year'           => 2026,
+            'responseFormat' => 'JSON',
+        ]));
+        $queued2 = ( new \ReflectionProperty(Health::class, 'queue') )->getValue($health2);
+        self::assertCount(1, $queued2, 'precondition: one calendar fetch queued');
+        /** @var array{resolve: \Closure(\Psr\Http\Message\ResponseInterface):void} $entry2 */
+        $entry2 = $queued2[0];
+        ( $entry2['resolve'] )(new Response(
+            200,
+            ['Content-Type' => 'application/json'],
+            (string) json_encode([
+                'litcal'   => [],
+                'settings' => [
+                    'year'                   => 2026,
+                    'year_type'              => 'CIVIL',
+                    'epiphany'               => 'JAN6',
+                    'ascension'              => 'THURSDAY',
+                    'corpus_christi'         => 'THURSDAY',
+                    'locale'                 => 'en_US',
+                    'return_type'            => 'JSON',
+                    'eternal_high_priest'    => true,
+                    'holydays_of_obligation' => new \stdClass(),
+                    'rite'                   => 'roman',
+                ],
+                'metadata' => [
+                    'version'                   => '1.0',
+                    'request_headers'           => new \stdClass(),
+                    'solemnities_lord_bvm'      => [],
+                    'solemnities_lord_bvm_keys' => [],
+                    'solemnities'               => [],
+                    'solemnities_keys'          => [],
+                    'feasts_lord'               => [],
+                    'feasts_lord_keys'          => [],
+                    'feasts'                    => [],
+                    'feasts_keys'               => [],
+                    'memorials'                 => [],
+                    'memorials_keys'            => [],
+                ],
+                'messages' => [],
+            ])
+        ));
+        $passFrames         = array_map(
+            static fn (string $raw): \stdClass => json_decode($raw),
+            $passConn->sent
+        );
+        $validatesPassFrame = array_values(array_filter(
+            $passFrames,
+            static fn (\stdClass $f): bool => 'success' === $f->type
+                && str_contains((string) ( $f->text ?? '' ), 'successfully validated against the Schema')
+        ))[0] ?? null;
+        self::assertNotNull($validatesPassFrame, 'precondition: the fully-populated payload actually passes schema validation');
+        $assertNoLeak($passFrames, 'calendar validation success');
     }
 
     /**

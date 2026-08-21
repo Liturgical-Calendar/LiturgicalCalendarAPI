@@ -220,25 +220,32 @@ final class HealthRiteSourcePathTest extends TestCase
      */
     public function testAnAmbrosianDioceseDerivesItsI18nFolderFromTheAmbrosianTemplate(): void
     {
-        $expected = strtr(JsonData::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FOLDER->path(), [
+        $expectedAbsolute = strtr(JsonData::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FOLDER->path(), [
             '{nation}'  => 'ZZ',
             '{diocese}' => 'nowher_zz'
         ]);
+        // #827: the frame quotes the derived folder project-relative, never with the server's
+        // absolute filesystem root.
+        $expected = substr($expectedAbsolute, strlen(Router::$apiFilePath));
 
         $conn = self::runI18nFolderCheck([self::diocese('nowher_zz', 'Nowhere', 'ZZ', Rite::AMBROSIAN)], 'nowher_zz');
 
         self::assertCount(3, $conn->sent);
         foreach (self::decode($conn) as $frame) {
             self::assertStringContainsString($expected, (string) $frame->text);
+            self::assertStringNotContainsString(rtrim(Router::$apiFilePath, '/'), (string) $frame->text);
         }
     }
 
     public function testARomanDioceseDerivesItsI18nFolderFromTheRomanTemplate(): void
     {
-        $expected = strtr(JsonData::DIOCESAN_CALENDAR_I18N_FOLDER->path(), [
+        $expectedAbsolute = strtr(JsonData::DIOCESAN_CALENDAR_I18N_FOLDER->path(), [
             '{nation}'  => 'ZZ',
             '{diocese}' => 'nowher_zz'
         ]);
+        // #827: the frame quotes the derived folder project-relative, never with the server's
+        // absolute filesystem root.
+        $expected = substr($expectedAbsolute, strlen(Router::$apiFilePath));
 
         $conn = self::runI18nFolderCheck([self::diocese('nowher_zz', 'Nowhere', 'ZZ', Rite::ROMAN)], 'nowher_zz');
 
@@ -246,6 +253,7 @@ final class HealthRiteSourcePathTest extends TestCase
         foreach (self::decode($conn) as $frame) {
             self::assertStringContainsString($expected, (string) $frame->text);
             self::assertStringNotContainsString(JsonData::AMBROSIAN_DIOCESAN_CALENDARS_FOLDER->value, (string) $frame->text);
+            self::assertStringNotContainsString(rtrim(Router::$apiFilePath, '/'), (string) $frame->text);
         }
     }
 

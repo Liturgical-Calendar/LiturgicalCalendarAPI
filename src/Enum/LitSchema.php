@@ -33,6 +33,18 @@ enum LitSchema: string
         return JsonData::SCHEMAS_FOLDER->path() . $this->value;
     }
 
+    /**
+     * The schema's file name, e.g. `LitCal.json`, without the server's absolute
+     * filesystem path. Use this (rather than {@see self::path()}) anywhere the schema
+     * is named in text that reaches an unauthenticated client, such as a WebSocket
+     * validation frame — {@see self::path()} would otherwise leak the deployment's
+     * directory layout.
+     */
+    public function name(): string
+    {
+        return ltrim($this->value, '/');
+    }
+
     public function error(): string
     {
         $ERRMSG = 'Schema validation error: ';
