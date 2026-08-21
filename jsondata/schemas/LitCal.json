@@ -13,6 +13,9 @@
                     "$ref": "#/definitions/DiocesanCalendarSettings"
                 },
                 {
+                    "$ref": "#/definitions/DiocesanCalendarSettingsWithoutNationalCalendar"
+                },
+                {
                     "$ref": "#/definitions/GeneralRomanCalendarSettings"
                 }
             ]
@@ -1044,6 +1047,70 @@
                 "holydays_of_obligation",
                 "rite",
                 "national_calendar",
+                "diocesan_calendar"
+            ]
+        },
+        "DiocesanCalendarSettingsWithoutNationalCalendar": {
+            "type": "object",
+            "title": "Diocesan Calendar Settings without a National Calendar",
+            "description": "the settings that were utilized (and possibly requested) to generate a diocesan calendar belonging to a rite that has no national tier. Identical to `DiocesanCalendarSettings` except that `national_calendar` is not merely nullable but absent: `CalendarHandler` never sets one for such a diocese, and `additionalProperties: false` combined with the property not being declared here keeps it that way. `rite` is narrowed to `RiteWithoutNationalCalendars` so that a *Roman* diocesan response missing its `national_calendar` — an impossible shape, since under the Roman rite a diocese always inherits from a national calendar — keeps being rejected by this branch and by every other one. See issue #844 (and #817 for the `/events` counterpart, which spells the same situation as an explicit `national_calendar: null`).",
+            "additionalProperties": false,
+            "properties": {
+                "year": {
+                    "$ref": "./CommonDef.json#/definitions/Year"
+                },
+                "year_type": {
+                    "type": "string",
+                    "enum": [
+                        "CIVIL",
+                        "LITURGICAL"
+                    ]
+                },
+                "epiphany": {
+                    "$ref": "./CommonDef.json#/definitions/Epiphany"
+                },
+                "ascension": {
+                    "$ref": "./CommonDef.json#/definitions/Ascension"
+                },
+                "corpus_christi": {
+                    "$ref": "./CommonDef.json#/definitions/CorpusChristi"
+                },
+                "locale": {
+                    "$ref": "./CommonDef.json#/definitions/Locale"
+                },
+                "return_type": {
+                    "type": "string",
+                    "enum": [
+                        "ICS",
+                        "JSON",
+                        "XML",
+                        "YML"
+                    ]
+                },
+                "eternal_high_priest": {
+                    "type": "boolean"
+                },
+                "holydays_of_obligation": {
+                    "$ref": "./CommonDef.json#/definitions/HolyDaysOfObligation"
+                },
+                "rite": {
+                    "$ref": "./CommonDef.json#/definitions/RiteWithoutNationalCalendars"
+                },
+                "diocesan_calendar": {
+                    "$ref": "./CommonDef.json#/definitions/DiocesanCalendarId"
+                }
+            },
+            "required": [
+                "year",
+                "epiphany",
+                "ascension",
+                "corpus_christi",
+                "locale",
+                "return_type",
+                "year_type",
+                "eternal_high_priest",
+                "holydays_of_obligation",
+                "rite",
                 "diocesan_calendar"
             ]
         }
