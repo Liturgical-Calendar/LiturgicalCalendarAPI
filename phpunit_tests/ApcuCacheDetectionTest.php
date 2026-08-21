@@ -75,6 +75,8 @@ final class ApcuCacheDetectionTest extends TestCase
     {
         ApcuShimStore::simulateDisabledStore(false);
         ApcuShimStore::simulateThrowingStore(false);
+        ApcuShimStore::simulateThrowingReads(false);
+        ApcuShimStore::simulateRefusingStore(false);
 
         if (null !== $this->tmpFile) {
             Utilities::invalidateJsonFileCache($this->tmpFile);
@@ -412,5 +414,98 @@ final class ApcuCacheDetectionTest extends TestCase
         $map->buildIndex();
 
         self::assertFalse($map->isEmpty(), 'the index must still be built when the cache backend raises');
+    }
+
+    // ------------------------------------------------- a backend that throws is an unusable one
+
+    /**
+     * `ApcuCache` promises callers a cache answer, not an exception — and the promise has to hold for
+     * a backend that *raises* as much as for one that silently drops writes. These drive each public
+     * method against a throwing backend and require the documented value back, which is also what
+     * covers the `catch` arms that would otherwise never execute.
+     */
+    public function testAThrowingBackendReadsAsAMissRatherThanEscaping(): void
+    {
+        ( new \ReflectionProperty(ApcuCache::class, 'usable') )->setValue(null, true);
+        ApcuShimStore::simulateThrowingReads(true);
+
+        ob_start();
+        $exists = ApcuCache::exists('litcal_throwing_probe');
+        $value  = ApcuCache::fetch('litcal_throwing_probe', $found);
+        $output = ob_get_clean();
+
+        self::assertFalse($exists, 'exists() must answer false when the backend throws, not propagate');
+        self::assertFalse($found, 'fetch() must report a miss when the backend throws');
+        self::assertFalse($value, 'fetch() must return false when the backend throws');
+        self::assertSame('', $output, 'the failure is logged, never echoed into a PSR-7 body');
+    }
+
+    public function testAThrowingStoreIsReportedAsARefusalRatherThanEscaping(): void
+    {
+        ( new \ReflectionProperty(ApcuCache::class, 'usable') )->setValue(null, true);
+        ApcuShimStore::simulateThrowingStore(true);
+
+        ob_start();
+        $stored = ApcuCache::store('litcal_throwing_probe', 'value', 10);
+        $output = ob_get_clean();
+
+        self::assertFalse($stored, 'store() must answer false when the backend throws, not propagate');
+        self::assertSame('', $output);
+    }
+
+    public function testAThrowingDeleteIsContainedToo(): void
+    {
+        ApcuShimStore::simulateThrowingReads(true);
+
+        ob_start();
+        $deleted = ApcuCache::delete('litcal_throwing_probe');
+        $output  = ob_get_clean();
+
+        self::assertFalse($deleted, 'delete() must answer false when the backend throws, not propagate');
+        self::assertSame('', $output);
+    }
+
+    /**
+     * And the probe itself: a store that throws must leave the backend unusable rather than let the
+     * exception out of whatever request happened to trigger the first cache read.
+     */
+    public function testAProbeAgainstAThrowingBackendAnswersUnusable(): void
+    {
+        self::forgetProbeResult();
+        ApcuShimStore::simulateThrowingStore(true);
+
+        ob_start();
+        $usable = ApcuCache::isUsable();
+        ob_end_clean();
+
+        self::assertFalse($usable, 'a backend whose store throws is not usable');
+    }
+
+    /**
+     * A backend that honestly refuses the write is unusable too — the probe must not read the
+     * refusal as anything other than "do not select this".
+     */
+    public function testAProbeAgainstARefusingStoreAnswersUnusable(): void
+    {
+        self::forgetProbeResult();
+        ApcuShimStore::simulateRefusingStore(true);
+
+        self::assertFalse(ApcuCache::isUsable(), 'a store that returns false must not be selected');
+    }
+
+    /**
+     * And when the *read* throws mid-probe, the cleanup in the probe's `finally` throws too. That
+     * arm must not be allowed to replace the answer the probe had already reached.
+     */
+    public function testAProbeSurvivesCleanupThrowingAfterAFailedRead(): void
+    {
+        self::forgetProbeResult();
+        ApcuShimStore::simulateThrowingReads(true);
+
+        ob_start();
+        $usable = ApcuCache::isUsable();
+        ob_end_clean();
+
+        self::assertFalse($usable, 'a probe whose read and cleanup both throw still answers unusable');
     }
 }

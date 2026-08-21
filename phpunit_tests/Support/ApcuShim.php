@@ -70,6 +70,12 @@ final class ApcuShimStore
      */
     private static bool $storeThrows = false;
 
+    /** Fault injection for #836: when true, `exists()`, `fetch()` and `delete()` raise. */
+    private static bool $readsThrow = false;
+
+    /** Fault injection for #836: when true, `store()` returns false instead of accepting the value. */
+    private static bool $storeRefuses = false;
+
     /**
      * Make every subsequent `store()` a reported-success no-op (or stop doing so).
      *
@@ -91,6 +97,31 @@ final class ApcuShimStore
     }
 
     /**
+     * Fault injection for #836: when true, `exists()`, `fetch()` and `delete()` raise.
+     *
+     * A store is not the only call that can blow up, and `ApcuCache` promises a cache answer rather
+     * than an exception on every one of them. Kept separate from {@see self::$storeThrows} so a test
+     * can break exactly one operation and leave the others honest.
+     *
+     * Process-wide state, so a test that turns it on must turn it off again in a `finally`/`tearDown`.
+     */
+    public static function simulateThrowingReads(bool $throws): void
+    {
+        self::$readsThrow = $throws;
+    }
+
+    /**
+     * Fault injection for #836: when true, `store()` refuses the value by returning false.
+     *
+     * Distinct from {@see self::$storeIsNoOp}, which returns *true* while dropping the value: this
+     * models a backend that is at least honest about refusing (a full segment, typically).
+     */
+    public static function simulateRefusingStore(bool $refuses): void
+    {
+        self::$storeRefuses = $refuses;
+    }
+
+    /**
      * The keys currently held, expired entries included — for asserting that a probe cleaned up after
      * itself rather than leaving a key behind in the cache it was only meant to test.
      *
@@ -106,6 +137,9 @@ final class ApcuShimStore
         if (self::$storeThrows) {
             throw new \RuntimeException('simulated APCu store failure');
         }
+        if (self::$storeRefuses) {
+            return false;
+        }
         if (self::$storeIsNoOp) {
             return true;
         }
@@ -118,6 +152,9 @@ final class ApcuShimStore
 
     public static function fetch(string $key, ?bool &$success = null): mixed
     {
+        if (self::$readsThrow) {
+            throw new \RuntimeException('simulated APCu fetch failure');
+        }
         $entry = self::$store[$key] ?? null;
         if (null === $entry || ( $entry['expires'] > 0 && $entry['expires'] < time() )) {
             $success = false;
@@ -129,6 +166,9 @@ final class ApcuShimStore
 
     public static function exists(string $key): bool
     {
+        if (self::$readsThrow) {
+            throw new \RuntimeException('simulated APCu exists failure');
+        }
         $entry = self::$store[$key] ?? null;
         if (null === $entry) {
             return false;
@@ -142,6 +182,9 @@ final class ApcuShimStore
 
     public static function delete(string $key): bool
     {
+        if (self::$readsThrow) {
+            throw new \RuntimeException('simulated APCu delete failure');
+        }
         $existed = isset(self::$store[$key]);
         unset(self::$store[$key]);
         return $existed;
