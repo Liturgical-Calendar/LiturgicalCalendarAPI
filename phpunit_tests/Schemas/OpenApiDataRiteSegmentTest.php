@@ -144,15 +144,23 @@ final class OpenApiDataRiteSegmentTest extends TestCase
         /** @var array<string,array<string,mixed>> $riteQualified */
         $riteQualified = $paths['/data/ambrosian/diocese/{key}'];
 
+        // Compare the *sets* of documented methods. Ordering inside a path item carries no meaning in
+        // OpenAPI, and a path item may legally hold non-method keys (`parameters`, `summary`, `servers`),
+        // so an ordered comparison of raw keys would fail on a cosmetic reshuffle and would drag a
+        // hoisted `parameters` array into the security loop below, where it would compare null to null
+        // and pass for the wrong reason.
+        $bareMethods          = self::operationMethods($bare);
+        $riteQualifiedMethods = self::operationMethods($riteQualified);
+
         self::assertSame(
-            array_keys($bare),
-            array_keys($riteQualified),
-            'the rite-qualified path must document the same methods, in the same order, as the bare form'
+            $bareMethods,
+            $riteQualifiedMethods,
+            'the rite-qualified path must document the same methods as the bare form'
         );
 
-        foreach ($bare as $method => $operation) {
+        foreach ($bareMethods as $method) {
             self::assertSame(
-                $operation['security'] ?? null,
+                $bare[$method]['security'] ?? null,
                 $riteQualified[$method]['security'] ?? null,
                 "{$method} /data/ambrosian/diocese/{key} must be protected exactly like the bare form"
             );
@@ -198,5 +206,25 @@ final class OpenApiDataRiteSegmentTest extends TestCase
             $pathItem[$method]['responses'],
             strtoupper($method) . " {$path} can refuse a diocese of the wrong rite with 422, which it does not declare"
         );
+    }
+
+    /**
+     * The HTTP methods a path item documents, sorted, with any non-method key (`parameters`,
+     * `summary`, `description`, `servers`) filtered out — those are legal siblings of the operations
+     * in an OpenAPI path item and are not operations themselves.
+     *
+     * @param array<string,mixed> $pathItem
+     *
+     * @return list<string>
+     */
+    private static function operationMethods(array $pathItem): array
+    {
+        $methods = array_values(array_intersect(
+            array_keys($pathItem),
+            ['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace']
+        ));
+        sort($methods);
+
+        return $methods;
     }
 }
