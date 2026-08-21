@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests;
 
 use LiturgicalCalendar\Api\Health;
+use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -402,5 +403,58 @@ final class HealthHelpersTest extends TestCase
         $remaining = $queueProp->getValue($health);
         $this->assertIsArray($remaining);
         $this->assertSame(['current', 'other', 'untagged'], array_column($remaining, 'url'));
+    }
+
+    // ---------------------------------------------------------------- isTypedCalendarMessage() vs shapeOf()
+
+    private static function isTypedCalendarMessage(\stdClass $message): bool
+    {
+        $method = new \ReflectionMethod(Health::class, 'isTypedCalendarMessage');
+        /** @var bool $result */
+        $result = $method->invoke(null, $message);
+
+        return $result;
+    }
+
+    /**
+     * Every shape `Health::isTypedCalendarMessage()` and `WebSocketMessageValidator::shapeOf()`
+     * disagreeing about would matter: a v2 `validateCalendar` mistaken for v1 (or the reverse) picks
+     * the wrong dispatch path, or the wrong schema arm.
+     *
+     * @return array<string, array{string}>
+     */
+    public static function typedCalendarDiscriminatorProvider(): array
+    {
+        return [
+            'typed calendar object'  => ['{"action":"validateCalendar","calendar":{"kind":"national","id":"IT","rite":"roman"}}'],
+            'legacy calendar string' => ['{"action":"validateCalendar","calendar":"IT"}'],
+            'calendar missing'       => ['{"action":"validateCalendar"}'],
+            // A JSON array decodes to a PHP array, not \stdClass — neither predicate must treat it
+            // as an object calendar.
+            'calendar is an array'   => ['{"action":"validateCalendar","calendar":[1,2,3]}'],
+            'calendar is null'       => ['{"action":"validateCalendar","calendar":null}'],
+            'action missing'         => ['{"calendar":{"kind":"national","id":"IT","rite":"roman"}}'],
+            'action not a string'    => ['{"action":42,"calendar":{"kind":"national","id":"IT","rite":"roman"}}'],
+            'a different action'     => ['{"action":"runTest","calendar":{"kind":"national","id":"IT","rite":"roman"}}'],
+        ];
+    }
+
+    /**
+     * The I1 fix: `Health::isTypedCalendarMessage()` is now a thin wrapper over
+     * `WebSocketMessageValidator::shapeOf()` rather than a second literal copy of the same
+     * predicate. This pins the promise the docblock makes — that the two cannot drift apart —
+     * rather than merely restating it.
+     */
+    #[DataProvider('typedCalendarDiscriminatorProvider')]
+    public function testIsTypedCalendarMessageAgreesWithShapeOf(string $json): void
+    {
+        /** @var \stdClass $message */
+        $message = json_decode($json);
+
+        $this->assertSame(
+            'validateCalendarTyped' === WebSocketMessageValidator::shapeOf($message),
+            self::isTypedCalendarMessage($message),
+            'Health::isTypedCalendarMessage() must agree with WebSocketMessageValidator::shapeOf(), its single source of truth'
+        );
     }
 }

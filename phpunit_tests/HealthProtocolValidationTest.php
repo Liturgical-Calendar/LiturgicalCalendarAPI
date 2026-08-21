@@ -500,4 +500,37 @@ final class HealthProtocolValidationTest extends TestCase
         self::assertSame('protocolError', $last->type);
         self::assertSame(ProtocolErrorCode::INTERNAL_ERROR->value, $last->errorCode);
     }
+
+    /**
+     * A NUL byte in `sourceFile` reaches `clearstatcache()` — an `\Error`-throwing filesystem
+     * primitive `Health::cachedFileGetContents()` calls to stat the file before reading it — before
+     * this test was written. `{"type": "string"}` accepts a NUL byte just fine, so this used to be
+     * caught only by the `\Throwable` backstop tested above, and come back `internal_error`.
+     *
+     * That is not the same outcome as the crash vectors in `crashVectorProvider()`: the backstop
+     * exists for bugs, not for input this trivially reachable from an unauthenticated socket, so
+     * `sourceFile`, `sourceFolder` and `validate` now carry a `pattern` that refuses an embedded NUL
+     * at the schema gate. This message must never reach `executeValidation()`, let alone its
+     * filesystem calls — the distinction between `invalid_message` and `internal_error` is the whole
+     * point, so both are asserted, not just that a `protocolError` frame came back.
+     */
+    public function testANulByteInSourceFileIsRefusedAtTheGateNotTheBackstop(): void
+    {
+        $message = [
+            'action'     => 'executeValidation',
+            'category'   => 'universalcalendar',
+            'validate'   => 'PropriumDeTempore',
+            'sourceFile' => 'a' . chr(0) . 'b'
+        ];
+
+        $frames = $this->frames((string) json_encode($message));
+
+        self::assertCount(1, $frames, 'a refused message must not also start work');
+        self::assertSame('protocolError', $frames[0]->type);
+        self::assertSame(
+            ProtocolErrorCode::INVALID_MESSAGE->value,
+            $frames[0]->errorCode,
+            'a NUL byte in sourceFile must be refused by the schema pattern, not fall through to the \Throwable backstop as internal_error'
+        );
+    }
 }

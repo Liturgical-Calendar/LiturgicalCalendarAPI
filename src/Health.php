@@ -602,10 +602,13 @@ class Health implements MessageComponentInterface
                 return;
             }
             if (null === WebSocketMessageValidator::shapeOf($messageReceived)) {
+                // The connection id has no reader on the wire; it is server-internal state and
+                // belongs in the log line, not in prose a client has to parse or display.
+                echo sprintf('Unknown action from connection %1$d: %2$s', $resourceId, $msg);
                 $this->rejectMessage(
                     $from,
                     ProtocolErrorCode::UNKNOWN_ACTION,
-                    sprintf('Unknown action from connection %1$d: %2$s', $resourceId, $msg),
+                    sprintf('Unknown action: %s', $msg),
                     requestId: $requestId
                 );
                 return;
@@ -706,10 +709,14 @@ class Health implements MessageComponentInterface
                         // `WebSocketMessageValidator::shapeOf()` does not recognise, and it recognises
                         // exactly the actions the case arms above handle. Kept as a cheap backstop
                         // against a future action being added to `shapeOf()` without a matching arm here.
+                        //
+                        // The connection id has no reader on the wire; it is server-internal state
+                        // and belongs in the log line, not in prose a client has to parse or display.
+                        echo sprintf('Unknown action from connection %1$d: %2$s', $resourceId, $msg);
                         $this->rejectMessage(
                             $from,
                             ProtocolErrorCode::UNKNOWN_ACTION,
-                            sprintf('Unknown action from connection %1$d: %2$s', $resourceId, $msg),
+                            sprintf('Unknown action: %s', $msg),
                             requestId: $requestId
                         );
                 }
@@ -754,10 +761,12 @@ class Health implements MessageComponentInterface
                 $errorCode = ProtocolErrorCode::INVALID_MESSAGE;
             }
             echo sprintf('Invalid message from connection %1$d: %2$s (%3$s)', $resourceId, $errorMsg, $msg);
+            // The connection id above is server-internal state and stays in the log line; the
+            // client gets the same reason and raw message, without it — it has no reader on the wire.
             $this->rejectMessage(
                 $from,
                 $errorCode,
-                sprintf('Invalid message from connection %1$d: %2$s (%3$s)', $resourceId, $errorMsg, $msg),
+                sprintf('Invalid message: %1$s (%2$s)', $errorMsg, $msg),
                 requestId: $requestId
             );
         }
@@ -3795,11 +3804,11 @@ class Health implements MessageComponentInterface
     /**
      * Is this a `validateCalendar` message in the reshaped (v2) form?
      *
-     * The whole discriminator, in one place, because it is consulted twice — once by
-     * {@see \LiturgicalCalendar\Api\Services\WebSocketMessageValidator::shapeOf()}, which must know
-     * which published shape a message claims to be before validating it, and once by
-     * {@see Health::onMessage()}, which must know before it picks a handler. Two literal copies of
-     * "is `calendar` an object?" would be two places to forget.
+     * A thin wrapper over {@see WebSocketMessageValidator::shapeOf()}, which is the single source of
+     * truth for "is `calendar` an object?": it must already resolve this to pick which arm of the
+     * schema to validate against, and {@see Health::onMessage()} needs the same answer to pick a
+     * handler. Delegating here keeps that predicate in one place instead of two literal copies that
+     * could drift apart.
      *
      * `validateCalendar` is the only action that needs a shape test at all. `validateSource` and
      * `runTest` are new *names*, and a v1 client cannot accidentally emit a name it does not know;
@@ -3807,10 +3816,7 @@ class Health implements MessageComponentInterface
      */
     private static function isTypedCalendarMessage(\stdClass $message): bool
     {
-        return property_exists($message, 'action')
-            && 'validateCalendar' === $message->action
-            && property_exists($message, 'calendar')
-            && $message->calendar instanceof \stdClass;
+        return 'validateCalendarTyped' === WebSocketMessageValidator::shapeOf($message);
     }
 
     /**

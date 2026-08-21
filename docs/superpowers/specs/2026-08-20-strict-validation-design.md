@@ -90,19 +90,34 @@ Two drift tests hold the corners, and they are stated separately because they ch
 In `onMessage()`, before dispatch:
 
 ```text
-parse JSON → requestId check → retired-property check → schema validation → dispatch
+parse JSON → requestId check → schema validation (retired names deferred) → dispatch → handler's own retired-property check
 ```
 
-**The retired-property check stays in PHP and runs first.** JSON Schema can express the rejection
-(`not: {required: [...]}`) but cannot express the sentence:
+**The retired-property check stays in PHP, but it does not run first — it runs inside each v2 handler, after schema
+validation and after dispatch.** JSON Schema can express the rejection (`not: {required: [...]}`) but cannot express
+the sentence:
 
 ```text
 category is not part of a validateSource message: target.id replaces it.
 ```
 
 The value of `rejectRetiredProperties()` is the diagnosis, not the refusal — a half-migrated client is exactly the
-caller who needs to be told which property replaced which. Running it ahead of the schema means a half-migrated message
-is answered for what is actually wrong with it, which is the ordering `rejectRetiredProperties()` already documents.
+caller who needs to be told which property replaced which. Schema validation runs first and would otherwise report a
+retired property as an unrecognised one (`category is not a property of a validateSource message …`, naming nothing to
+replace it with), so `WebSocketMessageValidator::validate()` takes a `$deferToHandler` list of the names each action
+retired and skips them in its unknown-property check. That is what lets a half-migrated message reach dispatch at all;
+`rejectRetiredProperties()`, called from inside `validateTypedCalendar()`, `runTest()` and `validateSource()`, then
+gives it the specific diagnosis before the handler does anything else with the message.
+
+This ordering has one corner it does not cover cleanly: `{"action":"validateSource","category":…,"validate":…}` with
+no `target` is refused by the schema — `validateSource: Required property missing: target` — before it ever reaches
+`rejectRetiredProperties()`, so the answer is a missing-required-property error rather than the retired-property
+diagnosis a fully half-migrated message gets. That is acceptable rather than a bug: a message missing `target`
+entirely is not a *renamed* property being carried alongside its replacement, which is what the retired-property check
+diagnoses — it is a `validateSource` message that is malformed on its own terms, `target` being required regardless
+of what else the client did or did not migrate. The realistic half-migrated case — `target` present, `category` and
+`validate` carried alongside it — reaches the handler and gets the specific diagnosis correctly; only the
+already-broken case answers with a different, still-correct, error.
 
 ### 4. Strictness gates on `requestId`, and the allowed names still come from the schema
 

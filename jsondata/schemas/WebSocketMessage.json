@@ -47,9 +47,9 @@
             "properties": {
                 "action": { "const": "executeValidation" },
                 "category": { "enum": ["universalcalendar", "sourceDataCheck", "resourceDataCheck"] },
-                "validate": { "type": "string" },
-                "sourceFile": { "type": "string" },
-                "sourceFolder": { "type": "string" },
+                "validate": { "type": "string", "pattern": "^[^\\x00]*$" },
+                "sourceFile": { "type": "string", "pattern": "^[^\\x00]*$" },
+                "sourceFolder": { "type": "string", "pattern": "^[^\\x00]*$" },
                 "responsetype": { "type": "string" },
                 "rite": { "type": "string" },
                 "runToken": { "$ref": "#/definitions/correlationId" },

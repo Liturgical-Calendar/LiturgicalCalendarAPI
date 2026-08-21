@@ -139,7 +139,7 @@ final class ExecuteValidationTest extends TestCase
     public function testMissingSourceFileReturnsProtocolErrorValidationError(): void
     {
         // executeValidation requires `sourceFile` (or `sourceFolder`).
-        // Omitting both should be rejected by validateMessageProperties()
+        // Omitting both should be rejected by WebSocketMessageValidator
         // before the action dispatches, so the reply is the standard
         // typed `protocolError` envelope rather than a sequence of
         // per-phase frames.
