@@ -358,6 +358,7 @@ happy path        exists(pass) → parses(pass) → validates(pass) → complete
 JSON decode fails exists(pass) → parses(fail) → validates(fail) → complete
 file missing      exists(fail) → parses(fail) → validates(fail) → complete
 test run          validates(pass|fail) → complete
+cancelled run     complete(cancelled) — the queued work was dropped before it ran, so no step frame precedes it
 unknown target    echobot rejection only — no complete, nothing was started
 ```
 
@@ -370,6 +371,14 @@ A client stops on `complete` and never counts frames.
 > `steps` is now an exact frame count and safe to render one card per step against. The stopping rule is unchanged
 > and the terminal frame is not thereby redundant: `complete` stays correct for an arm a later change makes shorter,
 > which is the property that made it worth adding while the counts disagreed.
+>
+> **Amended after #837 landed: the `cancelled run` row, and the one key that goes with it.** A request whose queued
+> work is dropped because its run was cancelled or superseded terminates like any other — but it emits **no step
+> frames at all**, because none of its steps ran, and its terminal frame carries `"cancelled": true` so a client can
+> tell a run it abandoned from one that failed. That key is the only addition to this frame, `type` stays `'success'`,
+> and it is omitted rather than sent as `false` on every other path, so an ordinary terminal frame is unchanged. The
+> full reasoning — including why a dropped request is *not* rejected into the existing failure arms — is in the
+> known-holes subsection below.
 
 ### A closed hole, and the shape that would reopen it: a throw inside a fulfil handler (#823)
 
@@ -384,14 +393,17 @@ A client stops on `complete` and never counts frames.
 > exactly as described. `phpunit_tests/HealthFulfilHandlerThrowTest.php` drives a throw from inside each of the five
 > fulfil handlers — settling each request *successfully* and throwing afterwards, which is what makes it a different
 > test from the rejection-driven ones in `HealthTerminalFrameTest`. **The second, unrelated shape recorded at the
-> end of this subsection — a queued request dropped by `dropSupersededQueuedRequests()` — is untouched by that fix
-> and remains open.**
+> end of this subsection — a queued request dropped by `dropSupersededQueuedRequests()` — is untouched by that fix,
+> and was closed separately by [#837](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/837); the
+> amendment at the end of this subsection records how.**
 
-The guarantee above is "every path that starts work terminates." It had two known holes. The fulfil-handler shape
-this subsection is named for is **closed** — see the amendment above. The second, unrelated one recorded at the end of
-this subsection — a queued request dropped by `dropSupersededQueuedRequests()` — **remains open**, tracked as
-[#837](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/837). Both are stated next to the guarantee
-rather than left for a reader to discover independently.
+The guarantee above is "every path that starts work terminates." It had two known holes, and **both are now closed**.
+The fulfil-handler shape this subsection is named for was closed by
+[#823](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/823) — see the amendment above. The second,
+unrelated one recorded at the end of this subsection — a queued request dropped by `dropSupersededQueuedRequests()` —
+was closed by [#837](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/837). Both are stated next to
+the guarantee rather than left for a reader to discover independently, and both are kept on record as *shapes* rather
+than deleted once fixed: each describes a way a later change reopens the hole.
 
 **The identifying shape** — recorded as the rule that keeps this closed, because a `then(fulfil, reject)` pair added
 later *without* a tail handler reintroduces it exactly: `sendComplete()` as the last statement of a promise's
@@ -422,6 +434,40 @@ filters superseded entries out of the request queue without calling their `rejec
 its remaining step frames nor a `complete`. It is reached by `cancelRun` and, less obviously, by an ordinary run-token
 change. Also pre-existing, also out of scope here — the terminal frame does not make a discarded request terminate, it
 only makes the silence easier to notice.
+
+> **Amended: this hole is closed too (#837).** A queue entry now carries an `onSuperseded` terminator alongside its
+> `resolve`/`reject` pair — supplied by whichever caller of `cachedGet()` queued the work, since the HTTP layer knows a
+> connection and a run token but not the `target` or the `requestId` a terminal frame needs — and the drop site calls it
+> instead of discarding the entry silently. Each of the three callers that report to a client passes one; the
+> connect-time metadata fetch passes none and needs none, since it carries no run token and is therefore never dropped.
+> An entry dropped with no terminator is reported on the server's stdout rather than passed over, so a caller added
+> later that forgets one is visible from the server instead of only from the wedged client.
+>
+> **A superseded request emits its terminal frame and nothing else.** The obvious fix — rejecting the dropped entry so
+> the existing `onRejected` arms run — was **rejected on purpose**: those arms report a *failed check*, and
+> `validateCalendar()`'s says the calendar "does not exist at the URL", which is a claim about the API rather than
+> about a run the client stopped. A cancelled run and a failed one must not look identical to a client; saying a check
+> failed when it never ran is the same "reports something that did not happen" family as #822/#833/#834/#835. So the
+> promise is deliberately left unsettled, neither of the caller's handlers ever runs, and the only frame the request
+> emits from here is `complete`.
+>
+> Two further reasons the entry's own `reject` closure is the wrong thing to call, recorded because it is the first
+> thing anyone tries: it decrements `inFlight`, which a *queued* entry never incremented — dispatch does — so calling
+> it drives the counter below zero and quietly raises the concurrency cap for the rest of the process; and it has to
+> stay reachable exactly once, which it stops being if both the drop and a dispatch can call it.
+>
+> **Distinguishable without adding a frame:** the terminal frame carries `cancelled: true` and a `text` that says the
+> request never ran. A new *frame* is the one thing the additive envelope cannot absorb — a v1 client sizes a phase as
+> `checks * 3` and would count it — while a new *key* on a frame the client was going to receive anyway costs nothing,
+> the same reasoning `rejectMessage()` records for its `type`. `type` stays `'success'`, because since
+> UnitTestInterface#46 an unrecognised `type` is painted as a visible failed check, which is precisely what an
+> abandoned run must not look like. The key is omitted rather than sent as `false`, so an ordinary terminal frame is
+> byte-identical to what it was before. The `requestId` gate is unchanged and still the only gate: a v1 client's stream
+> is exactly what it was, cancelled or otherwise.
+>
+> `phpunit_tests/HealthSupersededRequestTest.php` drives both call sites — an explicit `cancelRun` and an ordinary
+> run-token change through `processQueue()` — and asserts that the queued request terminates, terminates *once*, and
+> reports no step outcome while doing so.
 
 Exposure was narrow rather than nil, and pre-existing rather than introduced by this work: `validateDataAgainstSchema()`
 already catches `\Throwable` internally and is the principal throw source inside these handlers, and the `then(fulfil,

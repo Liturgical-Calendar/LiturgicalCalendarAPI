@@ -260,7 +260,7 @@ class Health implements MessageComponentInterface
     private float $staggerInterval;
     private int $maxConcurrency;
     private int $inFlight = 0;
-    /** @var list<array{url:string,options:array{headers?:array<string, string>,stream?:bool},resolve:\Closure(ResponseInterface):void,reject:\Closure(\Throwable):void,resourceId:int|null,runToken:string|null}> */
+    /** @var list<array{url:string,options:array{headers?:array<string, string>,stream?:bool},resolve:\Closure(ResponseInterface):void,reject:\Closure(\Throwable):void,resourceId:int|null,runToken:string|null,onSuperseded:(\Closure():void)|null}> */
     private array $queue  = [];
     private bool $ticking = false;
 
@@ -479,6 +479,9 @@ class Health implements MessageComponentInterface
             // which is exactly what a problem-document body would produce, as "not loaded yet": self::
             // $metadata is simply left unset and the next request retries. Nothing here claims success
             // for a refusal, so there is no false "exists" for #833 to fix.
+            // #837 note: no `onSuperseded` terminator, and none is needed. This fetch is made on connect,
+            // before the connection is on any run, so the queued entry carries no run token and is never
+            // dropped; and it emits no frames at all, so there is no client request to terminate.
             /** @var PromiseInterface<array{data: string, status: int, fromCache: bool, retryAfter: ?string}> $metadataPromise */
             $metadataPromise = $this->cachedGet(Route::CALENDARS->path(), $opts, 300, $conn);
             //self::$metadataPromise = $metadataPromise;
@@ -1024,12 +1027,34 @@ class Health implements MessageComponentInterface
      * @param ?string $runToken The originating run token to echo back, or null to use the per-connection fallback.
      * @param ?string $requestId The correlation id of the request that has finished. Null means the client never opted
      *        in, and nothing is sent at all — see above.
+     * @param bool $cancelled Whether the request is ending because the run it belonged to was abandoned rather than
+     *        because its work finished; see {@see Health::dropSupersededQueuedRequests()}, which is the only caller
+     *        that passes `true`. It adds a `cancelled` key and changes `text`; everything else about the frame,
+     *        including `type`, is unchanged.
+     *
+     *        **Why a key on this frame rather than a frame of its own.** A cancelled run and a failed one must not
+     *        look identical to a client — `cancelRun` is a request to stop, and an error frame reading like a check
+     *        failure would be its own untruth, of exactly the kind #822/#833/#834/#835 were filed to remove. But a
+     *        *new frame* is the one thing the additive envelope cannot absorb: a v1 client sizes a phase as
+     *        `checks * 3` and would count it. A new key on a frame the client was going to receive anyway carries
+     *        the distinction at no such cost — the same reasoning {@see Health::rejectMessage()} records for its
+     *        `type` — and this frame is gated on `requestId`, so a v1 client never sees the key at all.
+     *
+     *        **Why `type` stays `'success'`.** It is the legacy pass/fail projection, and since UnitTestInterface#46
+     *        an unrecognised `type` is painted as a visible failed check: a `'cancelled'` type would make an
+     *        abandoned run look like a failing one in the very client this distinction exists for. The frame already
+     *        says `'success'` for a request whose every step failed — it reports that the work finished, not that it
+     *        passed — so a cancellation is no more of an exception to that than a failure is.
+     *
+     *        **Omitted rather than sent as `false`.** A normal terminal frame is byte-identical to what it was
+     *        before this key existed, so nothing has to tell "not cancelled" from "an older server".
      */
     private function sendComplete(
         ConnectionInterface $to,
         ?\stdClass $target,
         ?string $runToken = null,
-        ?string $requestId = null
+        ?string $requestId = null,
+        bool $cancelled = false
     ): void {
         if (null === $requestId) {
             return;
@@ -1037,9 +1062,14 @@ class Health implements MessageComponentInterface
 
         $message         = new \stdClass();
         $message->type   = 'success';
-        $message->text   = 'All checks for this request are complete';
+        $message->text   = $cancelled
+            ? 'This request did not run: the run it belonged to was cancelled or superseded before the work started'
+            : 'All checks for this request are complete';
         $message->target = $target;
         $message->step   = Step::COMPLETE->value;
+        if ($cancelled) {
+            $message->cancelled = true;
+        }
         $this->sendMessage($to, $message, $runToken, requestId: $requestId);
     }
 
@@ -1789,7 +1819,17 @@ class Health implements MessageComponentInterface
                 // $dataPath is an API path in this case
                 echo 'Retrieving data from URL ' . $dataPath . "\n";
                 /** @var PromiseInterface<array{data: string, status: int, fromCache: bool, retryAfter: ?string}> $httpPromise */
-                $httpPromise = $this->cachedGet($dataPath, [], 300, $to);
+                $httpPromise = $this->cachedGet(
+                    $dataPath,
+                    [],
+                    300,
+                    $to,
+                    // If this fetch is dropped because its run was abandoned, the request ends here
+                    // instead of going silent; see cachedGet()'s $onSuperseded.
+                    function () use ($to, $target, $runToken, $requestId): void {
+                        $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId, cancelled: true);
+                    }
+                );
                 $httpPromise->then(
                     function (array $result) use ($to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $requestId, $target) {
                         /** @var array{data: string, status: int, fromCache: bool, retryAfter: ?string} $result */
@@ -2757,7 +2797,18 @@ class Health implements MessageComponentInterface
         ];
 
         $req     = $this->buildCalendarRequestPath($calendar, $year, $category, $this->resolveRite($calendar, $category, $riteHint));
-        $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts, 300, $to);
+        $promise = $this->cachedGet(
+            Route::CALENDAR->path() . $req,
+            $opts,
+            300,
+            $to,
+            // A run abandoned while this fetch is still queued ends the request here. It must not go
+            // through the rejection arm below, which would report that the calendar "does not exist at
+            // the URL" — a statement about the API, not about a run the client stopped.
+            function () use ($to, $calendar, $year, $runToken, $requestId): void {
+                $this->sendComplete($to, target: self::frameTarget($calendar, ['year' => $year]), runToken: $runToken, requestId: $requestId, cancelled: true);
+            }
+        );
         $promise->then(
             function (array $result) use ($to, $calendar, $year, $category, $req, $responseType, $runToken, $requestId) {
                 /** @var array{data: string, status: int, fromCache: bool, retryAfter: ?string} $result */
@@ -3307,7 +3358,23 @@ class Health implements MessageComponentInterface
 
         $rite    = $this->resolveRite($calendar, $category, $riteHint);
         $req     = $this->buildCalendarRequestPath($calendar, $year, $category, $rite);
-        $promise = $this->cachedGet(Route::CALENDAR->path() . $req, $opts, 300, $to);
+        $promise = $this->cachedGet(
+            Route::CALENDAR->path() . $req,
+            $opts,
+            300,
+            $to,
+            // A test run carries one result frame rather than three steps, so a dropped fetch leaves the
+            // client with nothing at all unless the terminal frame is sent; see cachedGet()'s $onSuperseded.
+            function () use ($to, $test, $calendar, $year, $runToken, $requestId): void {
+                $this->sendComplete(
+                    $to,
+                    target: self::frameTarget($test, ['calendar' => $calendar, 'year' => $year]),
+                    runToken: $runToken,
+                    requestId: $requestId,
+                    cancelled: true
+                );
+            }
+        );
         $promise->then(
             function (array $result) use ($to, $test, $calendar, $year, $category, $req, $runToken, $requestId, $rite) {
                 /** @var array{data: string, status: int, fromCache: bool, retryAfter: ?string} $result */
@@ -3781,10 +3848,25 @@ class Health implements MessageComponentInterface
 
     /**
      * @param array{headers?:array<string, string>,stream?:bool} $options
+     * @param ?ConnectionInterface $conn The connection whose run this request belongs to, or null for a request that
+     *        belongs to no run. It is read for its `resourceId` only, to tag the queued entry; see
+     *        {@see Health::dropSupersededQueuedRequests()}.
+     * @param ?\Closure():void $onSuperseded How to end the request this fetch belongs to, if the fetch is dropped from
+     *        the queue before it is ever dispatched because its run was abandoned (#837).
+     *
+     *        **Every caller that reports to a client must pass one.** A dropped entry's promise is never settled, so
+     *        neither of the caller's `then()` handlers ever runs and the request would otherwise go silent — no step
+     *        frames, no terminal frame, and a v2 client that stops on `complete` waiting forever. The closure is what
+     *        the drop site calls instead, and in practice it is a single `sendComplete(..., cancelled: true)`: this
+     *        method knows a connection and a run token, but not the `target` or the `requestId` a terminal frame needs,
+     *        and threading those through the HTTP layer would make it a frame emitter. Null is right only for a fetch
+     *        no client is waiting on — the connect-time metadata bootstrap, which carries no run token and is therefore
+     *        never dropped anyway. Omitting it where a client *is* waiting reintroduces #837 for that call site, which
+     *        the drop site says so on stdout rather than leaving to be discovered.
      *
      * @return PromiseInterface<array{data: string, status: int, fromCache: bool, retryAfter: ?string}>
      */
-    private function cachedGet(string $url, array $options = [], int $ttl = 300, ?ConnectionInterface $conn = null): PromiseInterface
+    private function cachedGet(string $url, array $options = [], int $ttl = 300, ?ConnectionInterface $conn = null, ?\Closure $onSuperseded = null): PromiseInterface
     {
         $key = 'http_' . md5($url . serialize($options));
 
@@ -3867,12 +3949,13 @@ class Health implements MessageComponentInterface
         $queuedRunToken   = $queuedResourceId !== null ? ( $this->runTokens[$queuedResourceId] ?? null ) : null;
 
         $this->queue[] = [
-            'url'        => $url,
-            'options'    => $options,
-            'resolve'    => $resolve,
-            'reject'     => $reject,
-            'resourceId' => $queuedResourceId,
-            'runToken'   => $queuedRunToken
+            'url'          => $url,
+            'options'      => $options,
+            'resolve'      => $resolve,
+            'reject'       => $reject,
+            'resourceId'   => $queuedResourceId,
+            'runToken'     => $queuedRunToken,
+            'onSuperseded' => $onSuperseded
         ];
 
         /** @var PromiseInterface<array{data: string, status: int, fromCache: bool, retryAfter: ?string}> $deferredPromise */
@@ -4106,18 +4189,80 @@ class Health implements MessageComponentInterface
      * instead of first draining the abandoned run's backlog. Untagged requests (e.g. the metadata fetch
      * on connect) carry no token and are always kept. In-flight requests are not affected (they are few —
      * capped at maxConcurrency — and their responses are discarded client-side).
+     *
+     * **A dropped entry is terminated, not merely discarded (#837).** Until this fix the filter took the
+     * entry and with it the only reference to the deferred behind it, so the promise `cachedGet()` handed
+     * the caller was never settled — not resolved, not rejected. Neither of the caller's `then()` handlers
+     * ever ran, and neither did the tail handler #823 attached to the promise derived from them, since
+     * nothing was ever delivered to derive from. The request simply stopped, after whatever step frames it
+     * had already emitted, and a v2 client that stops on `complete` waited forever. Each entry's
+     * `onSuperseded` closure is called instead: see {@see Health::cachedGet()} for why the termination is
+     * supplied by the caller rather than composed here.
+     *
+     * **A cancellation is not a failure, so the promise is deliberately left unsettled.** Rejecting it —
+     * the obvious fix, and the one #837 sketches — would run each caller's sibling `onRejected`, and those
+     * arms report a *failed check*: `validateCalendar()`'s says the calendar "does not exist at the URL",
+     * which is a claim about the API rather than about a run the client stopped. That is the same
+     * "reports something that did not happen" family as #822/#833/#834/#835. So a superseded request emits
+     * its terminal frame and nothing else, marked `cancelled` (see {@see Health::sendComplete()}), and the
+     * unsettled promise is collected along with the entry that held its callbacks.
+     *
+     * Two further reasons rejecting the entry's own `reject` closure would be wrong, recorded because it
+     * is the first thing anyone will try: that closure decrements `inFlight`, which a *queued* entry never
+     * incremented (dispatch does, in {@see Health::processQueue()}), so calling it would drive the counter
+     * below zero and quietly raise the concurrency cap for the rest of the process; and it also has to be
+     * reachable exactly once, which it stops being if it is called both here and by a dispatch.
+     *
+     * **Exactly one terminal frame per dropped request.** `sendComplete()` has no idempotency guard, by
+     * design. Nothing double-completes here: an entry is removed from the queue before any terminator runs
+     * (so a re-entrant pass cannot see it again), a queued entry has by definition not been dispatched, so
+     * none of its caller's frame-emitting handlers has run, and the promise stays unsettled so none of them
+     * ever will.
      */
     private function dropSupersededQueuedRequests(): void
     {
         if (empty($this->queue)) {
             return;
         }
-        $this->queue = array_values(array_filter(
-            $this->queue,
-            fn (array $item): bool => null === $item['resourceId']
+
+        $kept    = [];
+        $dropped = [];
+        foreach ($this->queue as $item) {
+            $stillCurrent = null === $item['resourceId']
                 || null === $item['runToken']
-                || ( $this->runTokens[$item['resourceId']] ?? null ) === $item['runToken']
-        ));
+                || ( $this->runTokens[$item['resourceId']] ?? null ) === $item['runToken'];
+            if ($stillCurrent) {
+                $kept[] = $item;
+            } else {
+                $dropped[] = $item;
+            }
+        }
+
+        // Reassigned before a single terminator runs. A terminator sends a frame, which ends up in
+        // Ratchet and then in code this class does not control; anything that re-entered this method
+        // from there would otherwise find the dropped entries still queued and terminate them twice.
+        $this->queue = $kept;
+
+        foreach ($dropped as $item) {
+            $terminate = $item['onSuperseded'] ?? null;
+            if (null === $terminate) {
+                // Said out loud rather than passed over: a caller that reports to a client and forgets
+                // this closure reintroduces #837 for its own path, and the symptom — one client, one
+                // request, waiting forever — is invisible from the server unless the drop says so.
+                echo 'Dropped a superseded queued request for ' . $item['url'] . " that has no way to terminate: its caller passed no onSuperseded to cachedGet()\n";
+                continue;
+            }
+            try {
+                $terminate();
+            } catch (\Throwable $e) {
+                // One request's termination must not take the rest of the batch — or the queue pass
+                // this runs inside — down with it. Reported the way `terminateOnHandlerThrow()` reports
+                // its own last-resort catch: to the server's stdout, and not to the client, whose frame
+                // stream must not gain one it cannot account for.
+                echo 'Error terminating the superseded request for ' . $item['url'] . ': ' . $e::class . ': ' . $e->getMessage()
+                    . ' (' . $e->getFile() . ':' . $e->getLine() . ")\n";
+            }
+        }
     }
 
     private function processQueue(): void
