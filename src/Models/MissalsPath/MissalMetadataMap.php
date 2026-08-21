@@ -2,6 +2,7 @@
 
 namespace LiturgicalCalendar\Api\Models\MissalsPath;
 
+use LiturgicalCalendar\Api\ApcuCache;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\RomanMissal;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
@@ -15,6 +16,8 @@ use LiturgicalCalendar\Api\Router;
  */
 final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
 {
+    private const string CACHE_KEY = 'litcal_missals_index';
+
     /** @var array<string,MissalMetadata> */
     private array $missals;
     /** @var array<string,MissalMetadata> */
@@ -23,13 +26,11 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
     private string $regionFilter;
     private int $yearFilter;
     private bool $includeEmpty = false;
-    private bool $cacheEnabled = false;
 
     public function __construct()
     {
-        $this->missals      = [];
-        $this->allMissals   = [];
-        $this->cacheEnabled = ( extension_loaded('apcu') && function_exists('apcu_exists') && function_exists('apcu_store') && function_exists('apcu_fetch') );
+        $this->missals    = [];
+        $this->allMissals = [];
     }
 
     /**
@@ -180,8 +181,12 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
 
     public function buildIndex(): void
     {
-        if ($this->cacheEnabled && apcu_exists('litcal_missals_index')) {
-            $cached = apcu_fetch('litcal_missals_index', $success);
+        // #836: both the decision and the calls belong to ApcuCache, which lives in
+        // `LiturgicalCalendar\Api`. An unqualified `apcu_store()` written *here* would resolve against
+        // `LiturgicalCalendar\Api\Models\MissalsPath` first and so could reach a different function
+        // than any usability check made elsewhere — which is exactly what used to happen.
+        if (ApcuCache::exists(self::CACHE_KEY)) {
+            $cached = ApcuCache::fetch(self::CACHE_KEY, $success);
             if (
                 $success
                 && is_array($cached)
@@ -258,11 +263,9 @@ final class MissalMetadataMap implements \IteratorAggregate, \JsonSerializable
         $allMissals       = RomanMissal::produceMetadata();
         $this->allMissals = $allMissals;
 
-        if ($this->cacheEnabled) {
-            apcu_store('litcal_missals_index', [
-                'missals'    => $this->missals,
-                'allMissals' => $this->allMissals
-            ], 600);
-        }
+        ApcuCache::store(self::CACHE_KEY, [
+            'missals'    => $this->missals,
+            'allMissals' => $this->allMissals
+        ], 600);
     }
 }
