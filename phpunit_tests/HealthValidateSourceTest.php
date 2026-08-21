@@ -281,10 +281,19 @@ final class HealthValidateSourceTest extends TestCase
 
         $legacySchema = self::retrieveSchemaForCategory('sourceDataCheck', $slug);
         self::assertIsString($legacySchema, "the legacy slug {$slug} resolves to no schema at all");
+        // The frame quotes the schema's file name, never the server's absolute filesystem path
+        // (#827): compare against basename(), and assert the resolved schema path itself is absent.
+        // (The data-file path is a separate, out-of-scope concern — see HealthProtocolValidationTest
+        // ::testNoFrameLeaksAnAbsoluteSchemaPath for the file-agnostic version of this guarantee.)
         self::assertStringContainsString(
-            $legacySchema,
+            basename($legacySchema),
             (string) $frames[2]->text,
             "{$id} was validated against a different schema than {$slug} resolves to"
+        );
+        self::assertStringNotContainsString(
+            $legacySchema,
+            (string) $frames[2]->text,
+            "{$id}'s schema-valid frame leaked the server's absolute schema path"
         );
     }
 

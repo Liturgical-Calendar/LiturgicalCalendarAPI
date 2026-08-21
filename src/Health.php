@@ -1595,6 +1595,9 @@ class Health implements MessageComponentInterface
                     // Exactly one frame per step, pass or fail. A folder check is a statement
                     // about the folder, so a failure names the offending files inside a single
                     // frame instead of emitting one frame each.
+                    // $schema is the server-resolved absolute path to the schema file; only its
+                    // name is fit to reach the client (see LitSchema::name()).
+                    $schemaName = null !== $schema ? basename($schema) : $schema;
                     $this->sendFolderStepResult(
                         $to,
                         $classFragment,
@@ -1625,8 +1628,8 @@ class Health implements MessageComponentInterface
                         $target,
                         Step::VALIDATES,
                         $schemaErrors,
-                        "The i18n json files in Data folder $sourceFolder were successfully validated against the Schema $schema",
-                        "The i18n json files in Data folder $sourceFolder were not all valid against the Schema $schema",
+                        "The i18n json files in Data folder $sourceFolder were successfully validated against the Schema $schemaName",
+                        "The i18n json files in Data folder $sourceFolder were not all valid against the Schema $schemaName",
                         $runToken,
                         requestId: $requestId
                     );
@@ -1937,7 +1940,7 @@ class Health implements MessageComponentInterface
                         $target,
                         Step::VALIDATES,
                         Status::PASS,
-                        "The Data file $dataPath was successfully validated against the Schema $schema",
+                        "The Data file $dataPath was successfully validated against the Schema " . basename($schema),
                         null,
                         $runToken,
                         requestId: $requestId
@@ -1971,7 +1974,7 @@ class Health implements MessageComponentInterface
                     $target,
                     Step::VALIDATES,
                     Status::FAIL,
-                    "executeValidation validation->sourceFile (JSON): Unable to detect schema for dataPath {$dataPath} and category {$category} (path for schema: $pathForSchema, Route::CALENDARS->path(): " . Route::CALENDARS->path() . ', LitSchema::METADATA->path(): ' . LitSchema::METADATA->path() . ')',
+                    "executeValidation validation->sourceFile (JSON): Unable to detect schema for dataPath {$dataPath} and category {$category} (path for schema: $pathForSchema, Route::CALENDARS->path(): " . Route::CALENDARS->path() . ', LitSchema::METADATA->name(): ' . LitSchema::METADATA->name() . ')',
                     null,
                     $runToken,
                     requestId: $requestId
@@ -2601,7 +2604,8 @@ class Health implements MessageComponentInterface
                             );
 
                             // Always validate against schema (even for cached responses) since this is a test endpoint
-                            $validationResult = $xml->schemaValidate(JsonData::SCHEMAS_FOLDER->path() . '/LiturgicalCalendar.xsd');
+                            $xsdPath          = JsonData::SCHEMAS_FOLDER->path() . '/LiturgicalCalendar.xsd';
+                            $validationResult = $xml->schemaValidate($xsdPath);
                             if ($validationResult) {
                                 $this->sendCalendarStepResult(
                                     $to,
@@ -2611,7 +2615,7 @@ class Health implements MessageComponentInterface
                                     Status::PASS,
                                     sprintf(
                                         "The $category of $calendar for the year $year was successfully validated against the Schema %s%s",
-                                        JsonData::SCHEMAS_FOLDER->path() . '/LiturgicalCalendar.xsd',
+                                        basename($xsdPath),
                                         $fromCache ? ' (cached)' : ''
                                     ),
                                     runToken: $runToken,
@@ -2734,7 +2738,7 @@ class Health implements MessageComponentInterface
                                     $year,
                                     Step::VALIDATES,
                                     Status::PASS,
-                                    "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL->path() . $cachedNote,
+                                    "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL->name() . $cachedNote,
                                     runToken: $runToken,
                                     requestId: $requestId
                                 );
@@ -2823,7 +2827,7 @@ class Health implements MessageComponentInterface
                                 $year,
                                 Step::VALIDATES,
                                 Status::PASS,
-                                "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL->path() . $cachedNote,
+                                "The $category of $calendar for the year $year was successfully validated against the Schema " . LitSchema::LITCAL->name() . $cachedNote,
                                 runToken: $runToken,
                                 requestId: $requestId
                             );
@@ -3109,7 +3113,13 @@ class Health implements MessageComponentInterface
             $litSchema     = LitSchema::fromURL($schemaUrl);
             $message       = new \stdClass();
             $message->type = 'error';
-            $message->text = $litSchema->error() . PHP_EOL . $e->getMessage();
+            // `swaggest/json-schema` embeds the absolute path it imported $schemaUrl from inside
+            // every `$ref[...]` trace segment for the top-level schema (nested `$ref`s to other
+            // schema files stay relative, e.g. `./CommonDef.json`, so this one substitution is
+            // sufficient). An unauthenticated client has no business learning the server's
+            // filesystem layout, hence the same backstop {@see WebSocketMessageValidator::sanitize()}
+            // applies on the rejection path (#806 section G) — see #827.
+            $message->text = $litSchema->error() . PHP_EOL . str_replace($schemaUrl, basename($schemaUrl), $e->getMessage());
             return $message;
         }
         return $res;

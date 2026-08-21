@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests;
 
+use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Health;
+use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
+use Nyholm\Psr7\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -30,6 +33,15 @@ final class HealthProtocolValidationTest extends TestCase
     public static function setUpBeforeClass(): void
     {
         Router::getApiPaths();
+        // Only the new tests below reach the inventory (via validateSource), but resetting it here
+        // keeps this class independent of whatever an earlier test class left memoized, the same
+        // reasoning HealthValidateSourceTest applies to itself.
+        CheckableInventory::reset();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        CheckableInventory::reset();
     }
 
     private static function createStubConnection(int $resourceId = 1)
@@ -344,6 +356,154 @@ final class HealthProtocolValidationTest extends TestCase
                 'a rejection leaked the server filesystem path'
             );
         }
+    }
+
+    /**
+     * Widens the guarantee above from *rejections* to **every** frame `Health` emits, success and
+     * error alike (#827).
+     *
+     * `Router::$apiFilePath` itself is not the right needle here: a `validateSource`/
+     * `executeValidation` frame legitimately quotes the *data* file path a client asked about (e.g.
+     * `jsondata/sourcedata/rite/roman/calendars/nations/IT/IT.json`, resolved against
+     * `Router::$apiFilePath` before it is read), and that is not a leak — it is the identity of the
+     * artifact the client asked to have checked, not an internal implementation detail. What must
+     * never appear is the **schema's** absolute path: the server picks the schema, the client never
+     * names it, and disclosing it serves only to map the deployment's directory layout. Every schema
+     * lives under `JsonData::SCHEMAS_FOLDER->path()`, so that prefix is the honest thing to assert
+     * against — it catches all four site shapes fixed by #827 (`LitSchema::*->name()`, `basename()`
+     * on a resolved `$schema`/`$pathForSchema` variable, and the `swaggest/json-schema` `$ref` trace
+     * sanitised in {@see Health::validateDataAgainstSchema()}) without being tripped up by the
+     * unrelated, in-scope data-path text.
+     *
+     * Four sites are driven for real, matching the four shapes #827 identified as interpolating a
+     * schema path into frame text:
+     *
+     *  - a successful source-file validation (`validateSource` on a single file);
+     *  - a successful folder validation (`validateSource` on an i18n folder — a different branch of
+     *    `runValidationSteps()` than the file case, and the one with two schema mentions per frame);
+     *  - a schema-failure frame (`validateCalendar` against data that decodes but fails the LitCal
+     *    schema, exercising the `swaggest/json-schema` error text rather than the hand-written
+     *    success sentence); and
+     *  - a calendar validation that actually passes (`validateCalendar` against a fully schema-valid
+     *    LitCal payload).
+     */
+    public function testNoFrameEverLeaksTheSchemasAbsolutePath(): void
+    {
+        $schemasFolder = JsonData::SCHEMAS_FOLDER->path();
+
+        $assertNoLeak = static function (array $frames, string $context) use ($schemasFolder): void {
+            self::assertNotEmpty($frames, "{$context}: expected at least one frame");
+            foreach ($frames as $i => $frame) {
+                self::assertStringNotContainsString(
+                    $schemasFolder,
+                    (string) ( $frame->text ?? '' ),
+                    "{$context} frame #{$i} leaked the server's schemas folder path: {$frame->text}"
+                );
+            }
+        };
+
+        // --- a successful source-file validation --------------------------------------------
+        $sourceFileFrames = $this->frames((string) json_encode([
+            'action' => 'validateSource',
+            'target' => ['id' => 'nation:roman:IT'],
+        ]));
+        self::assertSame('success', $sourceFileFrames[2]->type, 'precondition: the source file is actually schema-valid');
+        $assertNoLeak($sourceFileFrames, 'source-file validation');
+
+        // --- a successful folder validation --------------------------------------------------
+        $folderFrames = $this->frames((string) json_encode([
+            'action' => 'validateSource',
+            'target' => ['id' => 'nation:roman:US:i18n'],
+        ]));
+        self::assertSame('success', $folderFrames[2]->type, 'precondition: the i18n folder is actually schema-valid');
+        $assertNoLeak($folderFrames, 'folder validation');
+
+        // --- a schema-failure frame -------------------------------------------------------------
+        // A decodable-but-invalid LitCal body: passes the exists/parses steps, then fails schema
+        // validation and returns the swaggest/json-schema error text this issue also had to sanitise.
+        $failConn = self::createStubConnection();
+        $health   = $this->newHealth();
+        $health->onMessage($failConn, (string) json_encode([
+            'action'         => 'validateCalendar',
+            'calendar'       => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'],
+            'year'           => 2026,
+            'responseFormat' => 'JSON',
+        ]));
+        $queued = ( new \ReflectionProperty(Health::class, 'queue') )->getValue($health);
+        self::assertCount(1, $queued, 'precondition: one calendar fetch queued');
+        /** @var array{resolve: \Closure(\Psr\Http\Message\ResponseInterface):void} $entry */
+        $entry = $queued[0];
+        ( $entry['resolve'] )(new Response(
+            200,
+            ['Content-Type' => 'application/json'],
+            (string) json_encode(['litcal' => [], 'settings' => [], 'metadata' => [], 'messages' => []])
+        ));
+        $failFrames      = array_map(
+            static fn (string $raw): \stdClass => json_decode($raw),
+            $failConn->sent
+        );
+        $schemaFailFrame = array_values(array_filter($failFrames, static fn (\stdClass $f): bool => 'error' === $f->type))[0] ?? null;
+        self::assertNotNull($schemaFailFrame, 'precondition: the empty settings/metadata objects actually fail schema validation');
+        $assertNoLeak($failFrames, 'calendar schema-failure');
+
+        // --- a calendar validation that passes -------------------------------------------------
+        $passConn = self::createStubConnection();
+        $health2  = $this->newHealth();
+        $health2->onMessage($passConn, (string) json_encode([
+            'action'         => 'validateCalendar',
+            'calendar'       => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'],
+            'year'           => 2026,
+            'responseFormat' => 'JSON',
+        ]));
+        $queued2 = ( new \ReflectionProperty(Health::class, 'queue') )->getValue($health2);
+        self::assertCount(1, $queued2, 'precondition: one calendar fetch queued');
+        /** @var array{resolve: \Closure(\Psr\Http\Message\ResponseInterface):void} $entry2 */
+        $entry2 = $queued2[0];
+        ( $entry2['resolve'] )(new Response(
+            200,
+            ['Content-Type' => 'application/json'],
+            (string) json_encode([
+                'litcal'   => [],
+                'settings' => [
+                    'year'                   => 2026,
+                    'year_type'              => 'CIVIL',
+                    'epiphany'               => 'JAN6',
+                    'ascension'              => 'THURSDAY',
+                    'corpus_christi'         => 'THURSDAY',
+                    'locale'                 => 'en_US',
+                    'return_type'            => 'JSON',
+                    'eternal_high_priest'    => true,
+                    'holydays_of_obligation' => new \stdClass(),
+                    'rite'                   => 'roman',
+                ],
+                'metadata' => [
+                    'version'                   => '1.0',
+                    'request_headers'           => new \stdClass(),
+                    'solemnities_lord_bvm'      => [],
+                    'solemnities_lord_bvm_keys' => [],
+                    'solemnities'               => [],
+                    'solemnities_keys'          => [],
+                    'feasts_lord'               => [],
+                    'feasts_lord_keys'          => [],
+                    'feasts'                    => [],
+                    'feasts_keys'               => [],
+                    'memorials'                 => [],
+                    'memorials_keys'            => [],
+                ],
+                'messages' => [],
+            ])
+        ));
+        $passFrames         = array_map(
+            static fn (string $raw): \stdClass => json_decode($raw),
+            $passConn->sent
+        );
+        $validatesPassFrame = array_values(array_filter(
+            $passFrames,
+            static fn (\stdClass $f): bool => 'success' === $f->type
+                && str_contains((string) ( $f->text ?? '' ), 'successfully validated against the Schema')
+        ))[0] ?? null;
+        self::assertNotNull($validatesPassFrame, 'precondition: the fully-populated payload actually passes schema validation');
+        $assertNoLeak($passFrames, 'calendar validation success');
     }
 
     /**
