@@ -135,7 +135,7 @@ final class HealthHelpersTest extends TestCase
      */
     private static function runHandleHttpResponse(ResponseInterface $response): array
     {
-        /** @var Deferred<array{data: string, fromCache: bool}> $deferred */
+        /** @var Deferred<array{data: string, status: int, fromCache: bool}> $deferred */
         $deferred = new Deferred();
         $resolved = null;
         $rejected = null;
@@ -192,9 +192,15 @@ final class HealthHelpersTest extends TestCase
         $result = self::runHandleHttpResponse(new Response(200, [], $body));
 
         $this->assertNull($result['rejected']);
-        $this->assertSame(['data' => $body, 'fromCache' => false], $result['resolved']);
+        $this->assertSame(['data' => $body, 'status' => 200, 'fromCache' => false], $result['resolved']);
     }
 
+    /**
+     * The status is on the resolved value, not just in a log line (#833): `'http_errors' => false` on
+     * the Guzzle client means a 4xx/5xx resolves this promise rather than rejecting it, so a consumer
+     * gating `exists` on success has nothing else to look at. Before #833, this resolved value carried
+     * only `data` and `fromCache` — a 404's body flowed through indistinguishably from a 200's.
+     */
     public function testHandleHttpResponseResolvesNonFailureErrorBody(): void
     {
         // A 404 (unknown calendar) is not an upstream failure: its body flows through so the
@@ -203,7 +209,84 @@ final class HealthHelpersTest extends TestCase
         $result = self::runHandleHttpResponse(new Response(404, [], $body, '1.1', 'Not Found'));
 
         $this->assertNull($result['rejected']);
-        $this->assertSame(['data' => $body, 'fromCache' => false], $result['resolved']);
+        $this->assertSame(['data' => $body, 'status' => 404, 'fromCache' => false], $result['resolved']);
+    }
+
+    /**
+     * The RFC 9110 rite-boundary refusal #833 was filed about: a 400 whose body is a problem
+     * document. It is not an upstream failure (only 429/5xx are), so it resolves rather than rejects
+     * — and the whole point of #833 is that the status on that resolution must be the real one.
+     */
+    public function testHandleHttpResponseResolvesBadRequestWithItsStatus(): void
+    {
+        $body   = '{"type":"…rfc9110#name-400-bad-request","title":"Bad Request","status":400,"detail":"The Ambrosian rite is only available from 1976 onward (the first reformed Ambrosian Missal); requested year 1970."}';
+        $result = self::runHandleHttpResponse(new Response(400, [], $body, '1.1', 'Bad Request'));
+
+        $this->assertNull($result['rejected']);
+        $this->assertSame(['data' => $body, 'status' => 400, 'fromCache' => false], $result['resolved']);
+    }
+
+    // ---------------------------------------------------------------- the cached-path trap (#833)
+
+    /**
+     * `cachedGet()`'s cache-hit branch resolves from whatever {@see Health::decodeHttpCacheEntry()}
+     * hands back, which is whatever {@see Health::encodeHttpCacheEntry()} wrote — extracted out of
+     * `handleHttpResponse()` and `cachedGet()` respectively so this round trip is testable without a
+     * real cache backend and without driving the ReactPHP loop `cachedGet()` schedules resolution
+     * through.
+     *
+     * This is the trap the issue is about: a 400 that survives to a *second* request only if the
+     * status written to the cache is the status read back from it. Before #833 there was no status in
+     * the cached entry at all — a cache hit always meant `fromCache: true` and nothing else, so a
+     * refused request that got cached (as 4xx already were, per the comment on the non-upstream-failure
+     * branch below `isUpstreamFailureStatus()`) would replay as a pass on every request after the first.
+     */
+    public function testCacheEntryRoundTripsTheRealStatusNotJustTheBody(): void
+    {
+        $body = '{"status":400,"detail":"The Ambrosian rite is only available from 1976 onward; requested year 1970."}';
+
+        $encodeMethod = new \ReflectionMethod(Health::class, 'encodeHttpCacheEntry');
+        $encoded      = $encodeMethod->invoke(null, 400, $body);
+        self::assertIsString($encoded, 'precondition: a JSON-safe body encodes');
+
+        $decodeMethod = new \ReflectionMethod(Health::class, 'decodeHttpCacheEntry');
+        /** @var array{status: int, body: string}|null $decoded */
+        $decoded = $decodeMethod->invoke(null, $encoded);
+
+        self::assertSame(['status' => 400, 'body' => $body], $decoded, 'the second resolution must see the same status the first one did, not a silent 200');
+    }
+
+    /**
+     * A 200 round-trips too — the codec is not special-cased to success or failure, only to the shape.
+     */
+    public function testCacheEntryRoundTripsA200Status(): void
+    {
+        $body = '{"litcal":[],"settings":{},"metadata":{},"messages":[]}';
+
+        $encodeMethod = new \ReflectionMethod(Health::class, 'encodeHttpCacheEntry');
+        $encoded      = $encodeMethod->invoke(null, 200, $body);
+        self::assertIsString($encoded);
+
+        $decodeMethod = new \ReflectionMethod(Health::class, 'decodeHttpCacheEntry');
+        /** @var array{status: int, body: string}|null $decoded */
+        $decoded = $decodeMethod->invoke(null, $encoded);
+
+        self::assertSame(['status' => 200, 'body' => $body], $decoded);
+    }
+
+    /**
+     * A cache entry that is not the `{"status":…,"body":…}` envelope — the shape every entry had
+     * *before* #833 — must not be guessed at. Defaulting a bare body to status 200 would silently
+     * reintroduce the exact bug #833 fixed, the moment a pre-fix cache entry outlived a deploy: decode
+     * treats it as absent instead, which sends the caller back to `reject()` and a real re-fetch.
+     */
+    public function testDecodeRejectsAPreFixBareBodyCacheEntryRatherThanGuessingAStatus(): void
+    {
+        $decodeMethod = new \ReflectionMethod(Health::class, 'decodeHttpCacheEntry');
+
+        self::assertNull($decodeMethod->invoke(null, '{"litcal":[],"settings":{},"metadata":{},"messages":[]}'), 'a bare JSON body, with no envelope, must not decode to a guessed status');
+        self::assertNull($decodeMethod->invoke(null, 'not json at all'), 'garbage must not decode either');
+        self::assertNull($decodeMethod->invoke(null, '{"status":"400","body":"x"}'), 'a non-integer status must not decode');
     }
 
     /**
