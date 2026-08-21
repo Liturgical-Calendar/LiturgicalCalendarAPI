@@ -5475,6 +5475,12 @@
         "operationId": "nationalDataGET",
         "parameters": [
           {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataLocaleQueryParam"
+          },
+          {
             "name": "key",
             "in": "path",
             "required": true,
@@ -5499,6 +5505,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       },
@@ -5596,6 +5605,9 @@
         "operationId": "nationalDataPOST",
         "parameters": [
           {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
             "name": "key",
             "in": "path",
             "required": true,
@@ -5604,6 +5616,21 @@
             }
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/RegionalDataRequestBody"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegionalDataRequestBody"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
@@ -5620,6 +5647,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       },
@@ -5639,6 +5669,9 @@
         "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`.",
         "operationId": "nationalDataPATCH",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
           {
             "name": "key",
             "in": "path",
@@ -5760,6 +5793,12 @@
         "operationId": "romanNationalDataGET",
         "parameters": [
           {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataLocaleQueryParam"
+          },
+          {
             "name": "key",
             "in": "path",
             "required": true,
@@ -5784,6 +5823,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       },
@@ -5881,6 +5923,9 @@
         "operationId": "romanNationalDataPOST",
         "parameters": [
           {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
             "name": "key",
             "in": "path",
             "required": true,
@@ -5889,6 +5934,21 @@
             }
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/RegionalDataRequestBody"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegionalDataRequestBody"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
@@ -5905,6 +5965,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       },
@@ -5924,6 +5987,9 @@
         "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`.\n\nThis is the canonical, explicit-rite form of `/data/nation/{key}`.",
         "operationId": "romanNationalDataPATCH",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
           {
             "name": "key",
             "in": "path",
@@ -6044,6 +6110,12 @@
         "description": "This path resolves to the Roman rite. A diocese defined under another rite must be addressed through its rite-qualified path (`/data/ambrosian/diocese/{key}`); asking for one here returns `422 Unprocessable Content`. `/data/roman/diocese/{key}` states the same rite explicitly and is the canonical form of this path.",
         "operationId": "diocesanDataGET",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataLocaleQueryParam"
+          },
           {
             "name": "key",
             "in": "path",
@@ -6170,6 +6242,9 @@
         "operationId": "diocesanDataPOST",
         "parameters": [
           {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
             "name": "key",
             "in": "path",
             "required": true,
@@ -6178,6 +6253,21 @@
             }
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/RegionalDataRequestBody"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegionalDataRequestBody"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
@@ -6216,6 +6306,9 @@
         "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`. This path resolves to the Roman rite; an Ambrosian diocese must be addressed through `/data/ambrosian/diocese/{key}`.",
         "operationId": "diocesanDataPATCH",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
           {
             "name": "key",
             "in": "path",
@@ -6337,6 +6430,12 @@
         "description": "This is the canonical form of this route: the rite is stated explicitly, symmetric with `/data/ambrosian/diocese/{key}`. The bare `/data/diocese/{key}` form is equivalent and resolves here. A diocese defined under another rite must be addressed through its own rite-qualified path; asking for one here returns `422 Unprocessable Content`.",
         "operationId": "romanDiocesanDataGET",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataLocaleQueryParam"
+          },
           {
             "name": "key",
             "in": "path",
@@ -6463,6 +6562,9 @@
         "operationId": "romanDiocesanDataPOST",
         "parameters": [
           {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
             "name": "key",
             "in": "path",
             "required": true,
@@ -6471,6 +6573,21 @@
             }
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/RegionalDataRequestBody"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegionalDataRequestBody"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
@@ -6509,6 +6626,9 @@
         "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`. This path resolves to the Roman rite; an Ambrosian diocese must be addressed through `/data/ambrosian/diocese/{key}`.\n\nThis is the canonical, explicit-rite form of `/data/diocese/{key}`.",
         "operationId": "romanDiocesanDataPATCH",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
           {
             "name": "key",
             "in": "path",
@@ -6631,6 +6751,12 @@
         "operationId": "widerregionDataGET",
         "parameters": [
           {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataLocaleQueryParam"
+          },
+          {
             "name": "key",
             "in": "path",
             "required": true,
@@ -6655,6 +6781,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       },
@@ -6752,6 +6881,9 @@
         "operationId": "widerregionDataPOST",
         "parameters": [
           {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
             "name": "key",
             "in": "path",
             "required": true,
@@ -6760,6 +6892,21 @@
             }
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/RegionalDataRequestBody"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegionalDataRequestBody"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
@@ -6776,6 +6923,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       },
@@ -6795,6 +6945,9 @@
         "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`.",
         "operationId": "widerregionDataPATCH",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
           {
             "name": "key",
             "in": "path",
@@ -6914,6 +7067,12 @@
         "operationId": "romanWiderregionDataGET",
         "parameters": [
           {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataLocaleQueryParam"
+          },
+          {
             "name": "key",
             "in": "path",
             "required": true,
@@ -6938,6 +7097,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       },
@@ -7035,6 +7197,9 @@
         "operationId": "romanWiderregionDataPOST",
         "parameters": [
           {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
             "name": "key",
             "in": "path",
             "required": true,
@@ -7043,6 +7208,21 @@
             }
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/RegionalDataRequestBody"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegionalDataRequestBody"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
@@ -7059,6 +7239,9 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          },
+          "422": {
+            "$ref": "#/components/responses/UnprocessableEntity422"
           }
         }
       },
@@ -7078,6 +7261,9 @@
         "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`.\n\nThis is the canonical, explicit-rite form of `/data/widerregion/{key}`.",
         "operationId": "romanWiderregionDataPATCH",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
           {
             "name": "key",
             "in": "path",
@@ -7196,6 +7382,12 @@
         "description": "Retrieve the source definition of a diocesan calendar defined under the Ambrosian rite.\n\n**The `ambrosian` rite segment is required here, not decorative.** The bare `/data/diocese/{key}` form resolves to the Roman rite, so addressing an Ambrosian diocese through it returns `422 Unprocessable Content` (`Diocesan calendar ... belongs to the ambrosian rite, not the requested roman rite.`); the same `422` is returned on this path for a diocese that is not Ambrosian. The Ambrosian dioceses are Milano (`milano_it`), Bergamo (`bergam_it`), Novara (`novara_it`) and Lugano (`lugano_ch`) \u2014 every other diocese is Roman. On any `/data` path `roman` is accepted as an explicit synonym of the bare form.\n\nOnly the diocesan tier exists under more than one rite, so there is deliberately no `/data/ambrosian/nation/{key}` and no `/data/ambrosian/widerregion/{key}`: the Ambrosian rite is proper to the Archdiocese of Milan and a handful of neighbouring dioceses rather than to any nation or region, and the source tree has no Ambrosian national or wider-region partition to read or write. Either of those requests returns `400 Bad Request`.\n\nUnlike `/calendar` and `/events`, `/data` advertises no canonical URL: the bare form returns no RFC 6596 `Link: <...>; rel=\"canonical\"` response header.\n\nThe Ambrosian rite has approved liturgical books only in Italian and Latin, so `diocesan_calendars[].locales` on `/calendars` declares `it_IT` and `la_VA` for these dioceses; a `locale` naming any other language returns `422 Unprocessable Content`.",
         "operationId": "ambrosianDiocesanDataGET",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/RegionalDataLocaleQueryParam"
+          },
           {
             "name": "key",
             "in": "path",
@@ -7319,6 +7511,9 @@
         "operationId": "ambrosianDiocesanDataPOST",
         "parameters": [
           {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
             "name": "key",
             "in": "path",
             "required": true,
@@ -7327,6 +7522,21 @@
             }
           }
         ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/RegionalDataRequestBody"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegionalDataRequestBody"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK: Regional calendar data resource (whether national, or diocesan, or wider region) retrieved successfully",
@@ -7365,6 +7575,9 @@
         "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`.\n\nThe method surface is identical to `/data/diocese/{key}`: the `ambrosian` segment only selects which rite partition of the source tree is written. It is required for an Ambrosian diocese \u2014 see `GET /data/ambrosian/diocese/{key}` for the full rite grammar and for why no rite-qualified national or wider-region path exists.",
         "operationId": "ambrosianDiocesanDataPATCH",
         "parameters": [
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
           {
             "name": "key",
             "in": "path",
@@ -10212,6 +10425,16 @@
           }
         }
       },
+      "RegionalDataRequestBody": {
+        "type": "object",
+        "title": "Calendar source data request body",
+        "description": "The `/data` POST operations are read aliases of the corresponding GET, but they read their parameters from the request body rather than from the query string: `RegionalDataHandler` merges `parseBodyParams()` into the parameter array for POST and `getScalarQueryParams()` for GET, never both. A `locale` supplied in the query string of a POST is therefore ignored, and the operation falls back to whatever the `Accept-Language` header negotiated. The same set of locales is accepted as on GET, and refused the same way; see the `locale` query parameter of the GET operation.",
+        "properties": {
+          "locale": {
+            "$ref": "./CommonDef.json#/definitions/Locale"
+          }
+        }
+      },
       "CivilOrLiturgicalYear": {
         "type": "object",
         "title": "Liturgical or Civil year",
@@ -12506,6 +12729,25 @@
           "type": "integer",
           "minimum": 0,
           "default": 0
+        }
+      },
+      "RegionalDataLocaleQueryParam": {
+        "in": "query",
+        "name": "locale",
+        "required": false,
+        "description": "Selects the language of the `name` of every liturgical event in the returned calendar definition, overriding the `Accept-Language` header.\n\nWhere the value is read from depends on the method. GET reads it from the query string. POST reads it from the request body instead (see that operation's `requestBody`) and ignores a query string `locale`, because `RegionalDataHandler` merges `getScalarQueryParams()` for GET and `parseBodyParams()` for POST, never both. PUT, PATCH and DELETE accept no `locale` parameter at all: PATCH still resolves one, but only from `Accept-Language`, so a PATCH that sends no such header is negotiated to `la_VA` and refused with `422 Unprocessable Content` by any calendar that does not declare Latin, while PUT and DELETE ignore the locale entirely.\n\nValidation happens in two stages. `RegionalDataParams::setParams()` canonicalises the value and refuses anything that is not a locale this server ships, with `400 Bad Request`. A well-formed locale that the addressed calendar does not itself declare, per the `locales` of its entry on `/calendars`, is then refused with `422 Unprocessable Content`. That second set is data-driven and cannot be enumerated here: `IT` declares only `it_IT`, and the Ambrosian dioceses only `it_IT` and `la_VA`.\n\nThis is not the `{i18n_locale}` path segment of `/data/.../{key}/{i18n_locale}`. That segment addresses a different resource, the stored translation map, and binds to a different internal parameter (`i18nRequest`); supplied alongside it, this parameter is still validated, and can still produce the `400` above, but has no effect on the response.",
+        "schema": {
+          "$ref": "./CommonDef.json#/definitions/Locale"
+        },
+        "examples": {
+          "italian": {
+            "value": "it_IT",
+            "summary": "Italian (Italy)"
+          },
+          "latin": {
+            "value": "la_VA",
+            "summary": "Latin (Vatican)"
+          }
         }
       },
       "RegionalDataI18nLocalePathParam": {
