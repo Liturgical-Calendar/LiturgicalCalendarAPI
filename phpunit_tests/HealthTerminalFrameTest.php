@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests;
 
+use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -40,6 +42,7 @@ use Ratchet\ConnectionInterface;
  * in a synchronous test.
  */
 #[CoversClass(Health::class)]
+#[CoversClass(WebSocketMessageValidator::class)]
 final class HealthTerminalFrameTest extends TestCase
 {
     use HealthQueueIsolationTrait;
@@ -336,7 +339,8 @@ final class HealthTerminalFrameTest extends TestCase
 
         $frames = self::framesOf($conn);
         self::assertCount(1, $frames, 'an unresolvable target is answered by the rejection alone');
-        self::assertSame('echobot', $frames[0]->type);
+        self::assertSame('protocolError', $frames[0]->type);
+        self::assertSame(ProtocolErrorCode::UNKNOWN_TARGET_ID->value, $frames[0]->errorCode);
         self::assertNotContains('complete', self::stepsOf($frames), 'nothing was started, so nothing terminates');
     }
 

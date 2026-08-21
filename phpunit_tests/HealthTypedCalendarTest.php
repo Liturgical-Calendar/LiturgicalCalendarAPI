@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests;
 
+use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -34,9 +36,10 @@ use Ratchet\ConnectionInterface;
  * `calendar` **object** holding `kind`, `id` and `rite`.
  *
  * Because the action name is unchanged, the shape of `calendar` is the only discriminator there
- * is, and it has to be applied before `validateMessageProperties()` compares against
- * `ACTION_PROPERTIES['validateCalendar']` — the v2 form has neither `category` nor `responsetype`,
- * so the list would turn every v2 message away before it reached a handler.
+ * is, and `WebSocketMessageValidator::shapeOf()` has to apply it before choosing which schema
+ * definition to validate against — the v2 form has neither `category` nor `responsetype`, so
+ * validating it against the wrong one would turn every v2 message away before it reached a
+ * handler.
  *
  * Nothing legacy is touched: a string `calendar` still takes the old path byte for byte.
  *
@@ -68,6 +71,7 @@ use Ratchet\ConnectionInterface;
  * URL at once, which is the whole dispatch in a single observation and still no network.
  */
 #[CoversClass(Health::class)]
+#[CoversClass(WebSocketMessageValidator::class)]
 final class HealthTypedCalendarTest extends TestCase
 {
     // Every Health here queues a real calendar URL; see the trait for why that must be defused.
@@ -141,11 +145,11 @@ final class HealthTypedCalendarTest extends TestCase
     }
 
     /**
-     * The discriminator has to be applied ahead of the `ACTION_PROPERTIES` list, not inside the
-     * handler. This is the test that says so: the message below carries neither `category` nor
-     * `responsetype`, both of which that list requires, so if the list ran first the message would
-     * come back as the generic `Invalid message properties` and never reach a calendar request at
-     * all.
+     * The discriminator has to be applied ahead of choosing which schema definition to validate
+     * against, not inside the handler. This is the test that says so: the message below carries
+     * neither `category` nor `responsetype`, both of which `validateCalendarLegacy` requires, so if
+     * that were the definition chosen for it, the message would come back rejected for missing
+     * properties it was never supposed to carry, and never reach a calendar request at all.
      */
     public function testTheV2FormIsNotTurnedAwayForMissingCategoryAndResponsetype(): void
     {
@@ -213,8 +217,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
-        self::assertSame('Invalid message properties', $frame->errorMsg);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame([], self::queuedPaths($health), 'an invalid message must not have queued a request');
     }
 
@@ -247,7 +251,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::RETIRED_PROPERTY->value, $frame->errorCode);
         self::assertSame('category is not part of a validateCalendar message with an object calendar: calendar.kind replaces it.', $frame->text);
         self::assertSame([], self::queuedPaths($health));
     }
@@ -277,8 +282,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
-        self::assertSame('Invalid message properties', $frame->errorMsg);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame([], self::queuedPaths($health));
     }
 
@@ -344,6 +349,17 @@ final class HealthTypedCalendarTest extends TestCase
 
     // ---------------------------------------------------------------- rejections
 
+    /**
+     * `resolveCalendarIdentity()`'s own "Unknown calendar kind" message is no longer reachable
+     * through the WebSocket dispatch: `calendarIdentity.kind` in `WebSocketMessage.json` is a closed
+     * enum of the four known kinds, so `WebSocketMessageValidator` refuses `widerregion` at the door,
+     * before `resolveCalendarIdentity()` ever runs. `WebSocketMessageValidator::humanize()` turns
+     * that rejection into `validateCalendar.calendar.kind: Enum failed, enum: […], data:
+     * "widerregion"` — deterministic wording, but wording this test does not pin, since
+     * `HealthProtocolValidationTest::testTheHumanizedRejectionTextIsExactlyThis()` already pins
+     * that exact string once, centrally; asserting it again here would be a second copy to keep in
+     * sync rather than a second guarantee.
+     */
     public function testAnUnknownKindIsRejected(): void
     {
         $health = $this->newHealth();
@@ -358,8 +374,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent, 'an unusable identity is answered once and not computed');
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type, 'rejections reuse the echobot shape: since UnitTestInterface#46 an unknown type is painted as a failed check');
-        self::assertSame('Unknown calendar kind: widerregion', $frame->text);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame([], self::queuedPaths($health));
     }
 
@@ -410,7 +426,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent, 'a contradicted rite is answered once and not computed');
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertStringContainsString('calendar.rite says', (string) $frame->text);
         self::assertSame([], self::queuedPaths($health), 'a rejected message must not have queued a request');
     }
@@ -470,17 +487,27 @@ final class HealthTypedCalendarTest extends TestCase
     }
 
     /**
-     * @return array<string, array{0: array<string, mixed>, 1: string}>
+     * `$expected === null` marks a row `WebSocketMessageValidator` now intercepts before
+     * `resolveCalendarIdentity()` runs at all: `calendarIdentity` in `WebSocketMessage.json` requires
+     * `kind` and `rite` and types `id` as a string, so a missing `kind`/`rite` or a non-string
+     * `kind`/`id` fails schema validation with `humanize()`'s deterministic wording rather than
+     * reaching this method's curated one — wording this provider does not pin, since
+     * `HealthProtocolValidationTest` already covers it. Only `rite` being an *unknown* value, and
+     * `id` being *absent*, survive to reach `resolveCalendarIdentity()` — the schema types `rite` as
+     * any string and does not require `id` at all — which is why those two rows, and the two
+     * `general` rows built on `id` being present-but-wrong, still assert exact text.
+     *
+     * @return array<string, array{0: array<string, mixed>, 1: ?string}>
      */
     public static function malformedIdentityProvider(): array
     {
         return [
-            'kind missing'         => [['id' => 'IT', 'rite' => 'roman'], 'calendar.kind must be a string naming one of: general, national, diocesan, rite.'],
-            'kind not a string'    => [['kind' => 42, 'id' => 'IT', 'rite' => 'roman'], 'calendar.kind must be a string naming one of: general, national, diocesan, rite.'],
-            'rite missing'         => [['kind' => 'national', 'id' => 'IT'], 'calendar.rite must be a string naming a known rite.'],
+            'kind missing'         => [['id' => 'IT', 'rite' => 'roman'], null],
+            'kind not a string'    => [['kind' => 42, 'id' => 'IT', 'rite' => 'roman'], null],
+            'rite missing'         => [['kind' => 'national', 'id' => 'IT'], null],
             'rite unknown'         => [['kind' => 'national', 'id' => 'IT', 'rite' => 'byzantine'], 'Unknown rite: byzantine'],
             'id missing'           => [['kind' => 'national', 'rite' => 'roman'], 'calendar.id is required for kind national.'],
-            'id not a string'      => [['kind' => 'diocesan', 'id' => 42, 'rite' => 'roman'], 'calendar.id must be a string.'],
+            'id not a string'      => [['kind' => 'diocesan', 'id' => 42, 'rite' => 'roman'], null],
             // `general` accepts no id but `roman`. The message must not name a kind to try instead:
             // `IT` would want `national`, and `kind: rite` — the obvious thing to suggest — rejects
             // `IT` in turn, so the advice would point at another failure.
@@ -495,7 +522,7 @@ final class HealthTypedCalendarTest extends TestCase
      * @param array<string, mixed> $calendar
      */
     #[DataProvider('malformedIdentityProvider')]
-    public function testAMalformedIdentityIsRejectedWithWhatIsWrongWithIt(array $calendar, string $expected): void
+    public function testAMalformedIdentityIsRejectedWithWhatIsWrongWithIt(array $calendar, ?string $expected): void
     {
         $health = $this->newHealth();
         $conn   = self::createStubConnection();
@@ -509,17 +536,27 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
-        self::assertSame($expected, $frame->text);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
+        if (null !== $expected) {
+            self::assertSame($expected, $frame->text);
+        }
         self::assertSame([], self::queuedPaths($health));
     }
 
     /**
-     * A format `validateCalendar()` has no branch for must be turned away here rather than reaching
-     * `ReturnTypeParam::from()`, which throws a `\ValueError` on an unknown case. That is an
-     * `\Error`, and Ratchet's `IoServer::handleData` catches only `\Exception`, so it escapes and
-     * takes the whole WebSocket process down over one malformed message — the hazard `cancelRun()`
-     * documents, reached by a different door.
+     * A format `validateCalendar()` has no branch for used to have to be turned away by hand, ahead
+     * of `ReturnTypeParam::from()`, which throws a `\ValueError` on an unknown case — an `\Error`
+     * that Ratchet's `IoServer::handleData` does not catch, so it would take the whole WebSocket
+     * process down over one malformed message, the hazard `cancelRun()` documents, reached by a
+     * different door. `WebSocketMessageValidator` now catches it first: `responseFormat` on
+     * `validateCalendarTyped` is a closed schema enum, so `'PDF'` never reaches
+     * `validateTypedCalendar()`'s own check. `WebSocketMessageValidator::humanize()` turns the
+     * rejection into deterministic, human-readable wording rather than a raw library dump, but
+     * this test's job is confirming the schema catches it pre-dispatch, not pinning that wording —
+     * `HealthProtocolValidationTest` already covers the wording itself, generically (no schema
+     * internal vocabulary leaks) and for two specific cases pinned exactly. Only the error code is
+     * asserted here for that reason.
      */
     public function testAResponseFormatWithNoValidationBranchIsRejectedRatherThanThrown(): void
     {
@@ -535,11 +572,20 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
-        self::assertSame('validateCalendar responseFormat must be one of: JSON, XML, ICS, YML.', $frame->text);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame([], self::queuedPaths($health));
     }
 
+    /**
+     * `year` used to be re-checked by hand in `readYear()` because the old required-property check
+     * established only that `year` was *present*, not what it was. `WebSocketMessageValidator` now
+     * types `year: integer` on the schema itself, so a `null` year is refused there — humanized by
+     * `WebSocketMessageValidator::humanize()`, not `readYear()`'s wording — before
+     * `validateTypedCalendar()` runs at all. This test's job is confirming that, not pinning the
+     * generated wording; see `HealthProtocolValidationTest` for coverage of the wording itself.
+     * Only the error code is asserted here for that reason.
+     */
     public function testAYearThatIsNotAnIntegerIsRejectedRatherThanThrown(): void
     {
         $health = $this->newHealth();
@@ -554,8 +600,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
-        self::assertSame('validateCalendar year must be an integer.', $frame->text);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame([], self::queuedPaths($health));
     }
 
@@ -636,14 +682,21 @@ final class HealthTypedCalendarTest extends TestCase
      * it. `lugano_ch` is one of the four Ambrosian dioceses, so `rite: roman` contradicts what
      * `/calendars` says and must be refused rather than quietly corrected.
      *
-     * @return array<string, array{0: array<string, mixed>, 1: string}>
+     * `unknown kind`'s expected text is `null`: `calendarIdentity.kind` is a closed schema enum, so
+     * `WebSocketMessageValidator` now refuses `widerregion` before `resolveCalendarIdentity()` runs,
+     * with `WebSocketMessageValidator::humanize()`'s deterministic wording rather than "Unknown
+     * calendar kind: widerregion" — this test does not pin that wording, since
+     * `HealthProtocolValidationTest` already covers it. `rite disagreement` uses a schema-valid
+     * `kind`, so it still reaches the resolver unchanged.
+     *
+     * @return array<string, array{0: array<string, mixed>, 1: ?string}>
      */
     public static function runTestRejectedIdentityProvider(): array
     {
         return [
             'unknown kind'      => [
                 ['kind' => 'widerregion', 'id' => 'Europe', 'rite' => 'roman'],
-                'Unknown calendar kind: widerregion'
+                null
             ],
             'rite disagreement' => [
                 ['kind' => 'diocesan', 'id' => 'lugano_ch', 'rite' => 'roman'],
@@ -656,7 +709,7 @@ final class HealthTypedCalendarTest extends TestCase
      * @param array<string, mixed> $calendar
      */
     #[DataProvider('runTestRejectedIdentityProvider')]
-    public function testRunTestRefusesAnIdentityItCannotHonour(array $calendar, string $expected): void
+    public function testRunTestRefusesAnIdentityItCannotHonour(array $calendar, ?string $expected): void
     {
         $health = $this->newHealth();
         $conn   = self::createStubConnection();
@@ -672,8 +725,11 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent, 'an unusable identity is answered once and no test is run');
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type, 'rejections reuse the echobot shape: since UnitTestInterface#46 an unknown type is painted as a failed check');
-        self::assertSame($expected, $frame->text);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
+        if (null !== $expected) {
+            self::assertSame($expected, $frame->text);
+        }
         self::assertSame([], self::queuedPaths($health), 'a rejected message must not have queued a request');
     }
 
@@ -684,6 +740,12 @@ final class HealthTypedCalendarTest extends TestCase
      *
      * The string used here is the one a client would reach for by habit, copied straight from an
      * `executeUnitTest` message.
+     *
+     * `runTest.calendar` is typed as `#/definitions/calendarIdentity` — an object — on the schema, so
+     * `WebSocketMessageValidator` now refuses a string `calendar` before `readCalendarIdentity()`'s
+     * own "runTest calendar must be an object…" check ever runs, with `humanize()`'s deterministic
+     * wording rather than that curated sentence. This test's job is confirming the schema catches
+     * it pre-dispatch, not pinning that wording; only the error code is asserted for that reason.
      */
     public function testRunTestRefusesACalendarThatIsNotAnObject(): void
     {
@@ -699,33 +761,34 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
-        self::assertSame('runTest calendar must be an object carrying kind, id and rite.', $frame->text);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame([], self::queuedPaths($health));
     }
 
     /**
-     * Both scalars are type-checked rather than trusted, and for the same reason: the property list
-     * establishes only that a property is *present*. A non-string `test` or a non-integer `year`
-     * would reach `executeUnitTest(string $test, string $calendar, int $year, …)` and raise a
-     * `TypeError` — an `\Error`, which Ratchet's `IoServer::handleData` does not catch, so one
-     * malformed message would take the whole WebSocket process down rather than be answered.
+     * Both scalars used to be re-checked by hand because the old required-property check established
+     * only that `test`/`year` were *present*, not what they were. `WebSocketMessageValidator` now
+     * types both on the schema — `test: string`, `year: integer` — so every row here is now refused
+     * by the schema, with its own message, before `runTest()`'s own checks ever run. Only the error
+     * code is asserted for that reason; see `testAMessageThatUsedToKillTheProcessIsRefused()` in
+     * `HealthProtocolValidationTest` for the crash-vector coverage this now overlaps with.
      *
-     * Every row here has its property **present**, which is what carries it past the property list
-     * and into the handler these rejections belong to. A property that is genuinely absent never
-     * gets that far — see `testRunTestRequiresItsThreeProperties()`, which is a different code path
-     * with a different answer. `null` is the case most easily mistaken for absence and is therefore
+     * Every row here has its property **present**, which is what used to carry it past the property
+     * list and into the handler these rejections belonged to. A property that is genuinely absent
+     * never got that far — see `testRunTestRequiresItsThreeProperties()`, a different code path with
+     * a different answer. `null` is the case most easily mistaken for absence and is therefore
      * spelled `test null`, not `test missing`.
      *
-     * @return array<string, array{0: array<string, mixed>, 1: string}>
+     * @return array<string, array{0: array<string, mixed>}>
      */
     public static function runTestMalformedScalarProvider(): array
     {
         return [
-            'test not a string' => [['test' => 42], 'runTest test must be a string.'],
-            'test null'         => [['test' => null], 'runTest test must be a string.'],
-            'year not an int'   => [['year' => '2026'], 'runTest year must be an integer.'],
-            'year null'         => [['year' => null], 'runTest year must be an integer.'],
+            'test not a string' => [['test' => 42]],
+            'test null'         => [['test' => null]],
+            'year not an int'   => [['year' => '2026']],
+            'year null'         => [['year' => null]],
         ];
     }
 
@@ -733,7 +796,7 @@ final class HealthTypedCalendarTest extends TestCase
      * @param array<string, mixed> $overrides
      */
     #[DataProvider('runTestMalformedScalarProvider')]
-    public function testRunTestRefusesAScalarItWouldOtherwiseThrowOn(array $overrides, string $expected): void
+    public function testRunTestRefusesAScalarItWouldOtherwiseThrowOn(array $overrides): void
     {
         $health = $this->newHealth();
         $conn   = self::createStubConnection();
@@ -747,15 +810,16 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
-        self::assertSame($expected, $frame->text);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame([], self::queuedPaths($health));
     }
 
     /**
-     * A property the action declares required is turned away by `validateMessageProperties()` before
-     * any handler sees it, on the generic protocol-error path — which is how the absence of `test`
-     * differs from `test` being present and unusable, tested above.
+     * A property the schema's `runTest` definition declares required is turned away by
+     * `WebSocketMessageValidator::validate()` before any handler sees it, on the generic
+     * protocol-error path — which is how the absence of `test` differs from `test` being present
+     * and unusable, tested above.
      *
      * @return array<string, array{0: array<string, mixed>}>
      */
@@ -781,8 +845,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
-        self::assertSame('Invalid message properties', $frame->errorMsg);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame([], self::queuedPaths($health));
     }
 
@@ -834,8 +898,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
-        self::assertSame('Invalid message properties', $frame->errorMsg);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $frame->errorCode);
         self::assertSame([], self::queuedPaths($health));
     }
 
@@ -876,7 +940,7 @@ final class HealthTypedCalendarTest extends TestCase
         self::assertNotEmpty($sourceConn->sent, 'the test definition was not checked at all');
         foreach ($sourceConn->sent as $raw) {
             $frame = json_decode($raw);
-            self::assertNotSame('echobot', $frame->type, "the definition check was refused: {$frame->text}");
+            self::assertNotSame('protocolError', $frame->type, "the definition check was refused: {$frame->text}");
             // Addressed by the fragment derived from the id, not by the item's label — which for
             // this item is `Liturgical test: StIgnatiusOfLoyolaTest`, prose whose `: ` would make
             // the client's querySelectorAll() throw. See Health::cssClassFragmentForId().
@@ -911,7 +975,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $crossConn->sent);
         $frame = json_decode($crossConn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::UNKNOWN_TARGET_ID->value, $frame->errorCode);
         self::assertSame('Unknown validation target: StIgnatiusOfLoyolaTest', $frame->text, 'the bare test name is a runTest address, not an inventory id');
     }
 
@@ -947,7 +1012,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::RETIRED_PROPERTY->value, $frame->errorCode);
         self::assertSame(
             'responsetype is not part of a validateCalendar message with an object calendar: responseFormat replaces it.',
             $frame->text
@@ -979,7 +1045,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent);
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::RETIRED_PROPERTY->value, $frame->errorCode);
         self::assertSame('category is not part of a runTest message: calendar.kind replaces it.', $frame->text);
         self::assertSame([], self::queuedPaths($health), 'a rejected message must not have queued a request');
     }
@@ -1001,8 +1068,8 @@ final class HealthTypedCalendarTest extends TestCase
      * be dispatched perfectly and say nothing.
      *
      * This property was missed by the original retired-property audit because that audit derived the
-     * retired set from `ACTION_PROPERTIES`, which lists only *required* properties. Optional v1
-     * properties were structurally invisible to it; see `Health::RETIRED_PROPERTIES`.
+     * retired set from the schema's own `required` lists, which name only *required* properties.
+     * Optional v1 properties were structurally invisible to it; see `Health::RETIRED_PROPERTIES`.
      *
      * @return array<string, array{0: array<string, mixed>, 1: string}>
      */
@@ -1045,7 +1112,8 @@ final class HealthTypedCalendarTest extends TestCase
 
         self::assertCount(1, $conn->sent, 'a half-migrated message is answered once and not dispatched');
         $frame = json_decode($conn->sent[0]);
-        self::assertSame('echobot', $frame->type);
+        self::assertSame('protocolError', $frame->type);
+        self::assertSame(ProtocolErrorCode::RETIRED_PROPERTY->value, $frame->errorCode);
         self::assertSame($expectedText, $frame->text);
         self::assertSame([], self::queuedPaths($health), 'a rejected message must not have queued a request');
     }
@@ -1087,10 +1155,10 @@ final class HealthTypedCalendarTest extends TestCase
 
     /**
      * `runTest` retires `category` and `rite`, and no third property, because there is no third
-     * property to retire: `ACTION_PROPERTIES['executeUnitTest']` is
-     * `['category', 'calendar', 'year', 'test']` and its only optional property was `rite`, so no
-     * `responsetype` ever named anything on it. A rule that invented one would reject a property no
-     * client was ever told to send, for a reason that is not true.
+     * property to retire: the schema's `executeUnitTest` definition requires `category`, `calendar`,
+     * `year` and `test`, and its only optional property was `rite`, so no `responsetype` ever named
+     * anything on it. A rule that invented one would reject a property no client was ever told to
+     * send, for a reason that is not true.
      */
     public function testRunTestDoesNotRetireAResponsetypeItNeverHad(): void
     {
