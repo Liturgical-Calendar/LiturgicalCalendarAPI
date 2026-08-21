@@ -19,12 +19,14 @@
         },
         "calendarIdentity": {
             "type": "object",
+            "description": "additionalProperties is unconditional here, unlike the root-level shapes above: unknown-property rejection at the root is gated on the message carrying a requestId (WebSocketMessageValidator, API issue #806 section G), because the shipped UnitTestInterface predates that field and sends other properties a strict root gate would refuse. This nested object is reachable only from validateCalendarTyped and runTest, both v2-only shapes the shipped client never sends, so there is no compatibility guarantee to protect here. Do not loosen this to match the root's gating — that would remove the only strictness these v2 nested objects have.",
             "required": ["kind", "rite"],
             "properties": {
                 "kind": { "enum": ["general", "national", "diocesan", "rite"] },
                 "id": { "type": "string" },
                 "rite": { "type": "string" }
-            }
+            },
+            "additionalProperties": false
         },
         "executeValidation": {
             "type": "object",
@@ -124,8 +126,10 @@
                 "action": { "const": "validateSource" },
                 "target": {
                     "type": "object",
+                    "description": "additionalProperties is unconditional here, unlike the root-level shapes above: unknown-property rejection at the root is gated on the message carrying a requestId (WebSocketMessageValidator, API issue #806 section G), because the shipped UnitTestInterface predates that field and sends other properties a strict root gate would refuse. validateSource is a v2-only shape the shipped client never sends, so there is no compatibility guarantee to protect here. Do not loosen this to match the root's gating — that would remove the only strictness this nested object has.",
                     "required": ["id"],
-                    "properties": { "id": { "type": "string" } }
+                    "properties": { "id": { "type": "string" } },
+                    "additionalProperties": false
                 },
                 "runToken": { "$ref": "#/definitions/correlationId" },
                 "requestId": { "$ref": "#/definitions/correlationId" }

@@ -173,6 +173,64 @@ final class HealthProtocolValidationTest extends TestCase
     }
 
     /**
+     * The undeclared-property gate reaches into `calendarIdentity` and `validateSource`'s inline
+     * `target` object unconditionally, unlike the root-level gate above: `additionalProperties: false`
+     * is declared directly on those two nested objects in WebSocketMessage.json (issue #806 section
+     * G), not funnelled through `requestId`. That is safe only because neither nested shape is
+     * reachable by the shipped UnitTestInterface — it sends no `validateSource`, no `runTest`, and no
+     * object-shaped `calendar` at all — so there is no v1 compatibility guarantee being broken here.
+     * Both refusals are asserted without a `requestId` on the message, to prove the nested gate does
+     * not depend on it.
+     */
+    public function testNestedUndeclaredPropertiesAreRefusedUnconditionally(): void
+    {
+        $targetFrames = $this->frames((string) json_encode([
+            'action' => 'validateSource',
+            'target' => ['id' => 'temporale:roman', 'extra' => 'x']
+        ]));
+        self::assertSame('protocolError', $targetFrames[0]->type, 'target.extra must be refused even without a requestId');
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $targetFrames[0]->errorCode);
+
+        $calendarFrames = $this->frames((string) json_encode([
+            'action'         => 'validateCalendar',
+            'calendar'       => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman', 'extra' => 'x'],
+            'year'           => 2024,
+            'responseFormat' => 'JSON'
+        ]));
+        self::assertSame('protocolError', $calendarFrames[0]->type, 'calendar.extra must be refused even without a requestId');
+        self::assertSame(ProtocolErrorCode::INVALID_MESSAGE->value, $calendarFrames[0]->errorCode);
+    }
+
+    /**
+     * The companion to {@see testNestedUndeclaredPropertiesAreRefusedUnconditionally()}: a
+     * well-formed `target`/`calendar` is still accepted. Asserting only the refusal above would also
+     * pass against a schema that refused every nested object regardless of content.
+     *
+     * `target` resolves synchronously, so its acceptance is checked the same way as everywhere else
+     * in this file: no `protocolError` frame comes back. A well-formed typed `calendar`, by contrast,
+     * is queued for an async upstream fetch rather than answered inline — see
+     * `HealthTypedCalendarTest::testResponseFormatIsHonouredOnTheObjectForm()`, which asserts the
+     * same `[] === $conn->sent` on acceptance — so its acceptance is checked by the absence of any
+     * frame at all rather than by inspecting one that was never sent.
+     */
+    public function testAWellFormedNestedObjectIsStillAccepted(): void
+    {
+        $targetFrames = $this->frames((string) json_encode([
+            'action' => 'validateSource',
+            'target' => ['id' => 'temporale:roman']
+        ]));
+        self::assertNotSame('protocolError', $targetFrames[0]->type, "a well-formed target was refused: {$targetFrames[0]->text}");
+
+        $calendarFrames = $this->frames((string) json_encode([
+            'action'         => 'validateCalendar',
+            'calendar'       => ['kind' => 'national', 'id' => 'IT', 'rite' => 'roman'],
+            'year'           => 2024,
+            'responseFormat' => 'JSON'
+        ]));
+        self::assertSame([], $calendarFrames, 'a well-formed calendar identity must be queued for async validation, not refused synchronously');
+    }
+
+    /**
      * `rite` on an `executeValidation` is the concrete case: the shipped client spreads it onto every
      * source-data check and the server never reads it. It is declared, so it survives even under the
      * strict gate — which is what stops a future tidy-up from removing it from the schema.
