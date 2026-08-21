@@ -371,7 +371,7 @@ A client stops on `complete` and never counts frames.
 > and the terminal frame is not thereby redundant: `complete` stays correct for an arm a later change makes shorter,
 > which is the property that made it worth adding while the counts disagreed.
 
-### A known limit: a throw inside a fulfil handler skips `complete` (#823)
+### A closed hole, and the shape that would reopen it: a throw inside a fulfil handler (#823)
 
 > **Amended: this hole is closed.** Each of the five `then(fulfil, reject)` pairs named below now carries a tail
 > handler — `->then(null, $this->terminateOnHandlerThrow(...))` — attached to the *derived* promise, which is where
@@ -387,23 +387,29 @@ A client stops on `complete` and never counts frames.
 > end of this subsection — a queued request dropped by `dropSupersededQueuedRequests()` — is untouched by that fix
 > and remains open.**
 
-The guarantee above is "every path that starts work terminates." It has two known holes — the fulfil-handler shape
-this subsection is named for, and a second, unrelated one recorded at the end of it — and it is honest to state them
-next to the guarantee rather than let a reader discover them independently.
+The guarantee above is "every path that starts work terminates." It had two known holes. The fulfil-handler shape
+this subsection is named for is **closed** — see the amendment above. The second, unrelated one recorded at the end of
+this subsection — a queued request dropped by `dropSupersededQueuedRequests()` — **remains open**, tracked as
+[#837](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/837). Both are stated next to the guarantee
+rather than left for a reader to discover independently.
 
-**The identifying shape:** `sendComplete()` is the last statement of a promise's `onFulfilled` handler, paired with
-a sibling `onRejected` that never runs to cover it. If anything *above* that last statement throws, `sendComplete()`
-never runs, and the request goes silent after whatever step frames it had already managed to emit. This is not a
-case the code declines to handle — it is a case the code cannot reach: React's promise implementation does not
-invoke the sibling `onRejected` when `onFulfilled` throws; the rejection propagates to the *next* promise in the
-chain, and there is no next promise here. A v2 client that stops on `complete`, exactly as this design tells it to,
-wedges on this path — the precise failure the terminal frame exists to prevent. Stated as a shape rather than a
-fixed list on purpose: a future `then(fulfil, reject)` pair added to `Health` inherits this description
-automatically, where a hardcoded list would need remembering to update and would silently go stale otherwise.
+**The identifying shape** — recorded as the rule that keeps this closed, because a `then(fulfil, reject)` pair added
+later *without* a tail handler reintroduces it exactly: `sendComplete()` as the last statement of a promise's
+`onFulfilled` handler, paired with a sibling `onRejected` that never runs to cover it. Absent the tail handler, anything
+throwing *above* that last statement means `sendComplete()` never runs and the request goes silent after whatever step
+frames it had already managed to emit. That was never a case the code declined to handle — it is one the pair alone
+cannot reach: React's promise implementation does not invoke the sibling `onRejected` when `onFulfilled` throws; the
+rejection propagates to the *next* promise in the chain, and there was no next promise here. Attaching one is precisely
+what the fix does. A v2 client that stops on `complete`, exactly as this design tells it to, would wedge on such a path
+— the precise failure the terminal frame exists to prevent. Stated as a shape rather than a fixed list on purpose: a
+future `then(fulfil, reject)` pair added to `Health` inherits this description automatically, where a hardcoded list
+would need remembering to update and would silently go stale otherwise.
 
-Checked against `src/Health.php` at `74c01d84`, the shape matches **five** sites today, all of them worth naming
-because "worth checking against the code" is exactly what an enumerated claim buys a reader — a hardcoded count
-this document once got wrong by one, so state it as an audit result, not received wisdom:
+Checked against `src/Health.php` at `74c01d84`, the shape matched **five** sites, all of them worth naming because
+"worth checking against the code" is exactly what an enumerated claim buys a reader — a hardcoded count this document
+once got wrong by one, so it is stated as an audit result, not received wisdom. **This is the historical audit that
+produced the fix, not a live list:** all five now carry a tail handler, and the line numbers below are those of
+`74c01d84` and have since drifted.
 
 - the i18n folder-check fulfil (line 1546, `runValidationSteps()`'s `Promise\all` branch)
 - the URL-check fulfil (line 1592, `runValidationSteps()`'s HTTP branch)
@@ -417,13 +423,13 @@ its remaining step frames nor a `complete`. It is reached by `cancelRun` and, le
 change. Also pre-existing, also out of scope here — the terminal frame does not make a discarded request terminate, it
 only makes the silence easier to notice.
 
-Exposure is narrow rather than nil, and pre-existing rather than introduced by this work: `validateDataAgainstSchema()`
+Exposure was narrow rather than nil, and pre-existing rather than introduced by this work: `validateDataAgainstSchema()`
 already catches `\Throwable` internally and is the principal throw source inside these handlers, and the `then(fulfil,
 reject)` pair with no tail handler is the shape these five call sites had before this design. A client that used to
-count `checks * 3` wedged on the same paths for the same reason; making `complete` explicit did not create the gap,
-it just gave the gap a name. **Deliberately not fixed here** — wrapping five error paths is not a change to make
-late in a branch whose own review is about the terminal frame's happy paths, not its exception plumbing. Filed as
-[#823](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/823).
+count `checks * 3` wedged on the same paths for the same reason; making `complete` explicit did not create the gap, it
+just gave the gap a name. It was **deliberately not fixed in this branch** — wrapping five error paths is not a change
+to make late in a branch whose own review is about the terminal frame's happy paths, not its exception plumbing — and
+was filed as [#823](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/823), then fixed there.
 
 ## Error handling
 
