@@ -117,6 +117,23 @@ final class CalendarHandler extends AbstractHandler
     private static CatholicDiocesesMap $worldDiocesesLatinRite; // can only be set once, after which it will be read-only
     private CalendarParams $CalendarParams;
     private Rite $rite = Rite::ROMAN;
+
+    /**
+     * The request being handled, kept so the locale decision can be re-taken against the
+     * requested calendar's own declared locales once that calendar is known — which happens
+     * well after {@see self::handle()}'s first, calendar-agnostic negotiation. Only the
+     * original `Accept-Language` header carries enough information to do that (#845);
+     * see {@see self::resolveCalendarLocale()}.
+     */
+    private ?ServerRequestInterface $request = null;
+
+    /**
+     * True when this request carried an explicit `locale` parameter (query string or body),
+     * as opposed to having its locale derived from the `Accept-Language` header. The two are
+     * deliberately treated differently (#761): a header states a preference and is
+     * negotiated, a parameter names a dataset and is matched exactly.
+     */
+    private bool $localeExplicitlyRequested = false;
     private \NumberFormatter $formatter;
     private \NumberFormatter $formatterFem;
     private \IntlDateFormatter $dayOfTheWeek;
@@ -415,6 +432,51 @@ final class CalendarHandler extends AbstractHandler
     }
 
     /**
+     * The locale to serve for a calendar that declares its own `metadata->locales`.
+     *
+     * Returns the locale already in hand whenever the calendar declares it. Otherwise the
+     * request has asked for something this calendar has no dataset under, and what happens
+     * next depends on *how* it asked (#845, and the #761 asymmetry the negotiation block in
+     * {@see self::handle()} describes):
+     *
+     * - An explicit `locale` **parameter** is an exact selector naming a dataset. Regional
+     *   calendars store their data under regional variants, so `fr` on its own does not name
+     *   one of Canada's; it keeps its historical treatment and lands on the calendar's first
+     *   declared locale.
+     * - An **`Accept-Language` header** is a language *range*, and RFC 4647 §3.3.1 basic
+     *   filtering applies: the range `fr` matches the tag `fr-CA`. The *original header* is
+     *   re-negotiated here — not the tag it was already negotiated down to — because that
+     *   earlier negotiation ran before the calendar was known, against the rite's candidate
+     *   set (empty, i.e. the API-wide set, for the Roman rite), and widening its answer after
+     *   the fact cannot recover the quality ordering or the alternatives it discarded.
+     *
+     * `Negotiator::pickLanguage()` answers null (rather than the fallback) when a non-empty
+     * header matches nothing supported, so the coalesce below is what actually implements
+     * "a range matching nothing the calendar declares lands on `locales[0]`".
+     *
+     * When a range matches several declared locales at equal quality — `fr` against
+     * `['fr_CA', 'fr_FR']` — the negotiator keeps the first candidate to reach the winning
+     * score, so the calendar's declaration order decides, the same order that supplies the
+     * `locales[0]` default. An exact match still outranks any prefix match.
+     *
+     * @param string[] $declaredLocales The calendar's `metadata->locales`, in declaration order.
+     * @return string One of `$declaredLocales`.
+     */
+    private function resolveCalendarLocale(array $declaredLocales): string
+    {
+        if (in_array($this->CalendarParams->Locale, $declaredLocales, true)) {
+            return $this->CalendarParams->Locale;
+        }
+
+        if ($this->localeExplicitlyRequested || null === $this->request) {
+            return $declaredLocales[0];
+        }
+
+        return Negotiator::pickLanguage($this->request, $declaredLocales, $declaredLocales[0])
+            ?? $declaredLocales[0];
+    }
+
+    /**
      * If a Diocesan calendar is specified, we need to check if any of the settings for Epiphany, Ascension, Corpus Christi
      * have been overridden. If so, we update the CalendarParams object with the new values.
      *
@@ -452,11 +514,10 @@ final class CalendarHandler extends AbstractHandler
         } else {
             // If multiple locales are available for the diocesan calendar,
             // the desired locale should be set in the Accept-Language header.
-            // We should however check that this is an available locale for the current Diocesan Calendar,
-            // and if not use the first valid value.
-            if (false === in_array($this->CalendarParams->Locale, $this->DiocesanData->metadata->locales)) {
-                $this->CalendarParams->Locale = $this->DiocesanData->metadata->locales[0];
-            }
+            // That header is negotiated against this diocese's own declared locales
+            // here — see self::resolveCalendarLocale() — rather than merely tested for
+            // literal membership in them (#845).
+            $this->CalendarParams->Locale = $this->resolveCalendarLocale($this->DiocesanData->metadata->locales);
         }
     }
 
@@ -3489,11 +3550,11 @@ final class CalendarHandler extends AbstractHandler
         } else {
             // If multiple locales are available for the national calendar,
             // the desired locale should be set in the Accept-Language header.
-            // We should however check that this is an available locale for the current National Calendar,
-            // and if not use the first valid value.
-            if (false === in_array($this->CalendarParams->Locale, $this->NationalData->metadata->locales)) {
-                $this->CalendarParams->Locale = $this->NationalData->metadata->locales[0];
-            }
+            // That header is negotiated against this nation's own declared locales
+            // here — see self::resolveCalendarLocale() — rather than merely tested for
+            // literal membership in them: Canada declares ['en_CA', 'fr_CA'], and the
+            // range `fr` matches `fr_CA` under RFC 4647 basic filtering (#845).
+            $this->CalendarParams->Locale = $this->resolveCalendarLocale($this->NationalData->metadata->locales);
         }
 
         if ($this->NationalData->hasWiderRegion()) {
@@ -5491,10 +5552,12 @@ final class CalendarHandler extends AbstractHandler
         // the API-wide Latin default, exactly as if no header had been sent. An explicit
         // `locale` parameter, merged in below, still overrides — and is still rejected
         // when the rite has no books for it.
-        // TODO: Future enhancement - narrow this further to the requested national or
-        // diocesan calendar's own declared locales (requires reordering to parse the
-        // calendar param first); those are currently applied as a silent downgrade in
-        // updateSettingsBasedOnDiocesanCalendar().
+        // This is a calendar-agnostic first pass: the requested national or diocesan
+        // calendar is not known yet, so the header is re-negotiated against that
+        // calendar's own declared locales once it loads (#845). The request is kept on
+        // the handler for that second pass — see self::resolveCalendarLocale(), reached
+        // from loadNationalCalendarData() and updateSettingsBasedOnDiocesanCalendar().
+        $this->request = $request;
         if ($request->getHeaderLine('Accept-Language') !== '') {
             $locale = Negotiator::pickLanguage($request, CalendarMetadataProvider::negotiableLocalesForRite($this->rite), null);
             if ($locale && LitLocale::isValid($locale)) {
@@ -5502,19 +5565,28 @@ final class CalendarHandler extends AbstractHandler
             }
         }
 
+        /** @var array<string,scalar|null> $requestParams */
+        $requestParams = [];
         switch ($method) {
             case RequestMethod::GET:
-                /** @var CalendarParamsData $params */
-                $params = array_merge($params, $this->getScalarQueryParams($request));
+                $requestParams = $this->getScalarQueryParams($request);
                 break;
             default:
                 $parsedBodyParams = $this->parseBodyParams($request, false);
 
                 if (null !== $parsedBodyParams) {
-                    /** @var CalendarParamsData $params */
-                    $params = array_merge($params, $parsedBodyParams);
+                    /** @var array<string,scalar|null> $requestParams */
+                    $requestParams = $parsedBodyParams;
                 }
         }
+
+        // Whether the locale about to be applied came from the client's own words or from
+        // the header negotiation above, which decides how it is treated when the requested
+        // calendar turns out not to declare it (#845/#761).
+        $this->localeExplicitlyRequested = array_key_exists('locale', $requestParams);
+
+        /** @var CalendarParamsData $params */
+        $params = array_merge($params, $requestParams);
 
         $this->CalendarParams = new CalendarParams();
         $this->CalendarParams->setAllowedReturnTypes($this->allowedReturnTypes);
