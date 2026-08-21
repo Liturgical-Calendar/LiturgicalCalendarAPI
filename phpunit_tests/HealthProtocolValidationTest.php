@@ -29,6 +29,12 @@ final class HealthProtocolValidationTest extends TestCase
 {
     use HealthQueueIsolationTrait;
 
+    /**
+     * A folder created under the project root for the leak probe, so the path the read failure
+     * reports actually begins with `Router::$apiFilePath` and the stripping has something to do.
+     */
+    private const LEAK_PROBE_FOLDER = 'jsondata/sourcedata/.leak-probe';
+
     public static function setUpBeforeClass(): void
     {
         Router::getApiPaths();
@@ -392,14 +398,31 @@ final class HealthProtocolValidationTest extends TestCase
     {
         $root = rtrim(Router::$apiFilePath, '/');
 
+        // Both halves of the frame, because `stripProjectRoot()` sanitises both. Checking only
+        // `text` would leave the `details` half of the fix unfalsifiable — remove it from
+        // production and this test would still pass — and `details` is where a path is most
+        // likely to appear: a folder check puts one per offending file there, and a schema
+        // failure carries the validator's own message.
         $assertNoLeak = static function (array $frames, string $context) use ($root): void {
             self::assertNotEmpty($frames, "{$context}: expected at least one frame");
             foreach ($frames as $i => $frame) {
                 self::assertStringNotContainsString(
                     $root,
                     (string) ( $frame->text ?? '' ),
-                    "{$context} frame #{$i} leaked the server filesystem path: {$frame->text}"
+                    "{$context} frame #{$i} leaked the server filesystem path in text: {$frame->text}"
                 );
+
+                $details = $frame->details ?? [];
+                if (false === is_array($details)) {
+                    continue;
+                }
+                foreach ($details as $j => $detail) {
+                    self::assertStringNotContainsString(
+                        $root,
+                        (string) $detail,
+                        "{$context} frame #{$i} leaked the server filesystem path in details[{$j}]: " . ( (string) $detail )
+                    );
+                }
             }
         };
 
@@ -410,6 +433,31 @@ final class HealthProtocolValidationTest extends TestCase
         ]));
         self::assertSame('success', $sourceFileFrames[2]->type, 'precondition: the source file is actually schema-valid');
         $assertNoLeak($sourceFileFrames, 'source-file validation');
+
+        // --- a folder check whose file cannot be read: the one path that puts an absolute
+        // --- path into `details` rather than `text`, and therefore the only thing that makes
+        // --- the details half of the assertion above capable of failing.
+        //
+        // `runValidationSteps()`'s folder branch collects "unreadable i18n json file {name}: "
+        // followed by the read's own message, which is "Unable to read file: {absolute path}".
+        // A *directory* named like an i18n file is matched by the `*.json` glob and refused by
+        // the `is_file()` check added for #822, so this reproduces it without depending on
+        // permissions — `chmod 000` is a no-op when the suite runs as root, as it does in CI.
+        $probeDir = Router::$apiFilePath . self::LEAK_PROBE_FOLDER;
+        self::assertTrue(mkdir($probeDir . '/it.json', 0777, true), 'could not build the unreadable-file fixture');
+        try {
+            $unreadableFrames = $this->frames((string) json_encode([
+                'action'       => 'executeValidation',
+                'category'     => 'sourceDataCheck',
+                'validate'     => 'leak-probe',
+                'sourceFolder' => self::LEAK_PROBE_FOLDER,
+            ]));
+            self::assertNotEmpty($unreadableFrames[0]->details ?? [], 'precondition: this arm must put the read failure in details');
+            $assertNoLeak($unreadableFrames, 'folder check with an unreadable file (details carries the path)');
+        } finally {
+            @rmdir($probeDir . '/it.json');
+            @rmdir($probeDir);
+        }
 
         // --- the exact regression fixture: an opaque id, no path anywhere in the message ------
         $temporaleFrames = $this->frames((string) json_encode([
