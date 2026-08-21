@@ -177,7 +177,12 @@ final class OpenApiDataLocaleParamTest extends TestCase
         $pathItem = self::paths()[$path];
 
         foreach (['put', 'patch', 'delete'] as $method) {
-            self::assertArrayHasKey($method, $pathItem);
+            // Only the locale claim belongs to this test. Requiring every write method to exist here
+            // would make a future read-only /data tier fail a *locale* test with a message about a
+            // missing locale parameter; the route-surface test is where that claim lives.
+            if (false === array_key_exists($method, $pathItem)) {
+                continue;
+            }
 
             /** @var list<array<string,mixed>> $parameters */
             $parameters = $pathItem[$method]['parameters'];

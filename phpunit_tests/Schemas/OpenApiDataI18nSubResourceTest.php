@@ -129,6 +129,20 @@ final class OpenApiDataI18nSubResourceTest extends TestCase
         $paths = self::paths();
 
         if ($rite === Rite::default()) {
+            // Gated exactly as the non-default branch below is. Every current PathCategory is accepted
+            // under the default rite, so this changes nothing today — but a category the default rite
+            // refused would otherwise have its documentation *demanded* here, which is the inverse of
+            // what this test claims to check.
+            if (false === self::combinationIsAccepted($rite, $category)) {
+                self::assertArrayNotHasKey(
+                    "/data/{$category->value}/{key}/{i18n_locale}",
+                    $paths,
+                    "openapi.json documents a {$category->value} i18n sub-resource that the default rite refuses"
+                );
+
+                return;
+            }
+
             self::assertArrayHasKey(
                 "/data/{$category->value}/{key}/{i18n_locale}",
                 $paths,
@@ -212,7 +226,12 @@ final class OpenApiDataI18nSubResourceTest extends TestCase
     {
         $accepted = self::thirdSegmentIsAcceptedFor(strtoupper($method));
 
-        foreach (self::i18nPathKeys() as $path) {
+        // Without this the loop body never runs if the sub-resource paths are ever removed, and the
+        // test passes having asserted nothing — the precise regression it exists to catch.
+        $i18nPaths = self::i18nPathKeys();
+        self::assertNotEmpty($i18nPaths, 'openapi.json documents no {i18n_locale} sub-resource path at all');
+
+        foreach ($i18nPaths as $path) {
             /** @var array<string,mixed> $pathItem */
             $pathItem = self::paths()[$path];
 
@@ -297,9 +316,18 @@ final class OpenApiDataI18nSubResourceTest extends TestCase
         $payload = json_decode($contents, false, 512, JSON_THROW_ON_ERROR);
 
         $schema = Schema::import(LitSchema::I18N->path());
-        $schema->in($payload);
-
         self::assertIsObject($payload, 'the translation map is a JSON object of event_key to translated name');
+
+        // The validation is the claim; asserting only that json_decode returned an object would be
+        // near-tautological and would report success even when the schema rejected the payload.
+        try {
+            $schema->in($payload);
+        } catch (\Throwable $invalid) {
+            self::fail(
+                'a stored translation file does not validate against the documented response schema: '
+                . $invalid->getMessage()
+            );
+        }
     }
 
     /**
