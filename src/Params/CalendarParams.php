@@ -6,7 +6,6 @@ use LiturgicalCalendar\Api\Enum\YearType;
 use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\CorpusChristi;
-use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
@@ -15,7 +14,7 @@ use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
-use LiturgicalCalendar\Api\Utilities;
+use LiturgicalCalendar\Api\Services\LikelySubtags;
 
 /**
  * This class is responsible for handling the parameters provided to the {@see \LiturgicalCalendar\Api\Handlers\CalendarHandler} class.
@@ -375,30 +374,10 @@ class CalendarParams implements ParamsInterface
         }
 
         if (!self::hasRegion($locale)) {
-            $locale = self::maximizeLocale($locale);
+            $locale = LikelySubtags::maximize($locale);
         }
 
         return $locale;
-    }
-
-    private static function maximizeLocale(string $language): string
-    {
-        /** @var array<string,string>|null $likely */
-        static $likely = null;
-
-        if ($likely === null) {
-            /** @var array{supplemental:array{likelySubtags:array<string,string>}} $data */
-            $data   = Utilities::jsonFileToArray(JsonData::FOLDER->path() . '/likelySubtags.json');
-            $likely = $data['supplemental']['likelySubtags'];
-        }
-
-        // Try direct hit (e.g. "en")
-        if (isset($likely[$language])) {
-            return \Locale::canonicalize($likely[$language]) ?? $language;
-        }
-
-        // Otherwise just return the original base language
-        return $language;
     }
 
     /**
