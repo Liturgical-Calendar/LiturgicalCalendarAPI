@@ -16,13 +16,27 @@ after files land:
 
 So the deploy drops a sentinel file and a root-owned systemd path unit does the rest.
 
-> **Path change:** the WebSocket entrypoint moved from `public/LitCalTestServer.php` to
-> `bin/LitCalTestServer.php` — it is a CLI entrypoint, not a web one.
+> **Path change — run `sudo deploy/install.sh` BEFORE the deploy that carries it.**
+>
+> The WebSocket entrypoint moved from `public/LitCalTestServer.php` to `bin/LitCalTestServer.php`.
 > `deploy/systemd/litcal-websocket.service.in` is updated to match, but `deploy/` is excluded from
-> the rsync deploy, so the *installed* unit under `/etc/systemd` still points at the old path until
-> `deploy/install.sh` is re-run on the VPS. **Re-run it before or with the next restart**, or the
-> unit fails with "No such file or directory". `install.sh` renders the unit and restarts the
-> service, so it delivers the restart at the same time.
+> the rsync deploy, so the *installed* unit under `/etc/systemd` keeps pointing at the old path
+> until `install.sh` is re-run from the checkout on the host.
+>
+> This is not a "next time someone restarts it" problem. The sentinel restarts
+> `litcal-websocket.service` on **every** API deploy, so a deploy carrying the move would land
+> `bin/LitCalTestServer.php`, delete the `public/` copy, drop the sentinel, and then restart a unit
+> still pointing at a file that no longer exists — logging `restart FAILED; sentinels kept for
+> retry` and leaving the WebSocket server down.
+>
+> Running `install.sh` first means the unit already references `bin/` when the sentinel fires, so
+> the deploy's own restart succeeds and nothing is needed afterwards.
+>
+> Expect `install.sh` itself to exit non-zero when run first: it ends with
+> `systemctl restart`, and at that point the new path is not on the vhost yet. That is harmless and
+> does **not** need re-running — the unit is rendered, `daemon-reload` run and the service enabled
+> well before that final restart, so everything the deploy depends on is already in place. The
+> WebSocket server stays down only for the gap between running `install.sh` and the deploy landing.
 
 ## The pieces
 
