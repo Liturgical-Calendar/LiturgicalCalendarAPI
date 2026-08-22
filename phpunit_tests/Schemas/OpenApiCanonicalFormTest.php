@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Schemas;
 
 use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Tests\Support\OpenApiPathItemTrait;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
@@ -34,6 +35,8 @@ use PHPUnit\Framework\TestCase;
  */
 final class OpenApiCanonicalFormTest extends TestCase
 {
+    use OpenApiPathItemTrait;
+
     private const HEADER_REF = '#/components/headers/CanonicalRiteLink';
 
     /** Route families whose first path segment takes an optional rite segment. */
@@ -110,22 +113,6 @@ final class OpenApiCanonicalFormTest extends TestCase
         array_splice($segments, 1, 0, Rite::default()->value);
 
         return '/' . implode('/', $segments);
-    }
-
-    /**
-     * @param array<string,mixed> $pathItem
-     *
-     * @return list<string>
-     */
-    private static function operationMethods(array $pathItem): array
-    {
-        $methods = array_values(array_intersect(
-            array_keys($pathItem),
-            ['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace']
-        ));
-        sort($methods);
-
-        return $methods;
     }
 
     /**
@@ -342,11 +329,11 @@ final class OpenApiCanonicalFormTest extends TestCase
      *
      * @return array<string,array{0:string}>
      */
-    public static function bareePathsWithACanonicalTwin(): array
+    public static function barePathsWithACanonicalTwin(): array
     {
         $paths = [];
 
-        foreach (self::paths() as $path => $pathItem) {
+        foreach (array_keys(self::paths()) as $path) {
             $path = (string) $path;
             if (null === self::riteRouteOf($path) || self::isRiteQualified($path)) {
                 continue;
@@ -360,7 +347,7 @@ final class OpenApiCanonicalFormTest extends TestCase
         return $paths;
     }
 
-    #[DataProvider('bareePathsWithACanonicalTwin')]
+    #[DataProvider('barePathsWithACanonicalTwin')]
     public function testABarePathWithACanonicalTwinIsDeprecated(string $path): void
     {
         /** @var array<string,array<string,mixed>> $pathItem */
@@ -386,7 +373,7 @@ final class OpenApiCanonicalFormTest extends TestCase
     {
         $paths = [];
 
-        foreach (self::paths() as $path => $pathItem) {
+        foreach (array_keys(self::paths()) as $path) {
             $path = (string) $path;
             if (null !== self::riteRouteOf($path) && self::isRiteQualified($path)) {
                 $paths[$path] = [$path];

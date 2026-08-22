@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Params\EventsParams;
+use LiturgicalCalendar\Tests\Support\OpenApiPathItemTrait;
 use LiturgicalCalendar\Api\Router;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -30,6 +31,8 @@ use PHPUnit\Framework\TestCase;
  */
 final class OpenApiEventsRiteSegmentTest extends TestCase
 {
+    use OpenApiPathItemTrait;
+
     /** @var array<string,mixed> */
     private static array $openapi;
 
@@ -249,25 +252,5 @@ final class OpenApiEventsRiteSegmentTest extends TestCase
             $pathItem[$method]['responses'],
             strtoupper($method) . " {$path} can refuse a diocese of the wrong rite with 400, which it does not declare"
         );
-    }
-
-    /**
-     * The HTTP methods a path item documents, sorted, with any non-method key (`parameters`,
-     * `summary`, `description`, `servers`) filtered out — those are legal siblings of the
-     * operations in an OpenAPI path item and are not operations themselves.
-     *
-     * @param array<string,mixed> $pathItem
-     *
-     * @return list<string>
-     */
-    private static function operationMethods(array $pathItem): array
-    {
-        $methods = array_values(array_intersect(
-            array_keys($pathItem),
-            ['get', 'put', 'post', 'delete', 'options', 'head', 'patch', 'trace']
-        ));
-        sort($methods);
-
-        return $methods;
     }
 }
