@@ -15,7 +15,8 @@ use PHPUnit\Framework\Attributes\CoversClass;
 #[CoversClass(DecreesHandler::class)]
 final class DecreesHandlerWriteTest extends AbstractHandlerTestCase
 {
-    private string $backupDir;
+    /** Empty until setUp() allocates it; tearDown() must tolerate that (#868). */
+    private string $backupDir = '';
 
     protected function setUp(): void
     {
@@ -32,6 +33,13 @@ final class DecreesHandlerWriteTest extends AbstractHandlerTestCase
 
     protected function tearDown(): void
     {
+        // setUp() allocates the backup after parent::setUp(); if the class never got
+        // that far there is nothing to restore, and nothing was written either.
+        if ('' === $this->backupDir) {
+            parent::tearDown();
+            return;
+        }
+
         $src       = dirname(JsonData::DECREES_FILE->path());
         $backupSrc = $this->backupDir . '/decrees';
         // Only wipe the live directory when a non-empty backup exists to restore from;
