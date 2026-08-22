@@ -4854,13 +4854,14 @@ final class CalendarHandler extends AbstractHandler
      *
      * The release lookup is non-essential metadata: when it failed (GitHub
      * unreachable or rate-limited with HTTP 403), it must not take the whole
-     * calendar down with a 503. Fall back to the current UTC time and log a
-     * warning so the ICS still renders.
+     * calendar down with a 503. Return null and log a warning; {@see self::produceIcal()} decides
+     * what an unknown release means for each field.
      *
      * @param GitHubReleaseInfoSuccess|GitHubReleaseInfoError $infoObj result of {@see self::getGithubReleaseInfo()}
-     * @return \stdClass an object exposing a `published_at` string for {@see self::produceIcal()}
+     * @return ?\stdClass an object exposing a `published_at` string, or null when the release is
+     *         unknown — see the note in the body for why the fallback is not chosen here
      */
-    private function resolveIcalReleaseObject(\stdClass $infoObj): \stdClass
+    private function resolveIcalReleaseObject(\stdClass $infoObj): ?\stdClass
     {
         if ($infoObj->status === 'success') {
             /** @var GitHubReleaseInfoSuccess $infoObj */
@@ -4869,11 +4870,18 @@ final class CalendarHandler extends AbstractHandler
 
         /** @var GitHubReleaseInfoError $infoObj */
         $logger = LoggerFactory::create('calendar', null, 30, false, true, false);
-        $logger->warning('GitHub release info unavailable; using fallback timestamp for ICS CREATED', [
+        $logger->warning('GitHub release info unavailable; ICS CREATED falls back to generation time', [
             'reason' => $infoObj->message,
         ]);
 
-        return (object) ['published_at' => gmdate('Y-m-d\TH:i:s\Z')];
+        // Null means "unknown", not "use now". The choice of fallback belongs to the caller,
+        // because it is not the same for every field: {@see self::produceIcal()} dates CREATED from
+        // the release when it has one and falls back to generation time, while LAST-MODIFIED is
+        // taken from the versioned cache directory's mtime and never from this value at all.
+        //
+        // Answering `gmdate()` here — which this method used to do — collapsed that distinction and
+        // handed the same invented instant to both fields. See #849.
+        return null;
     }
 
 
@@ -5375,12 +5383,63 @@ final class CalendarHandler extends AbstractHandler
      * it may be different. So UID must take into account the year
      *
      * @param \stdClass $SerializeableLitCal
-     * @param \stdClass $GitHubReleasesObj
+     * @param ?\stdClass $GitHubReleasesObj release whose `published_at` dates the events, or null when unknown
      *
      * @return string
      */
-    private function produceIcal(\stdClass $SerializeableLitCal, \stdClass $GitHubReleasesObj): string
+    private function produceIcal(\stdClass $SerializeableLitCal, ?\stdClass $GitHubReleasesObj): string
     {
+        // The three stamps every VEVENT carries, resolved once rather than per event.
+        //
+        // They are not interchangeable, and the serialized ICS is cached per params hash and return
+        // type (engineCache/v<API_VERSION>-<dataDigest>/<hash>.ics), so whatever is written here is
+        // frozen for the life of that cache entry rather than recomputed per request. That is what
+        // makes a generation-time value safe in the first two cases below.
+        $now = gmdate('Ymd\THis\Z');
+
+        // DTSTAMP — this object declares METHOD:PUBLISH, and RFC 5545 3.8.7.2 defines DTSTAMP for a
+        // METHOD-bearing object as when THIS INSTANCE was created. Generation time is therefore the
+        // correct value, and it is additionally excluded from the ETag by
+        // {@see self::validatorSource()}.
+        //
+        // Built with gmdate(), not date(). The previous spelling was
+        // `date('Ymd') . 'T' . date('His') . 'Z'` — server-LOCAL time carrying a literal `Z`, which
+        // on this Europe/Vatican host was two hours ahead of the instant it claimed: a malformed UTC
+        // date-time under RFC 5545 3.3.5. The events themselves are all-day
+        // (`DTSTART;VALUE=DATE`) and carry no timezone at all; only these metadata stamps do.
+        $dtstamp = $now;
+
+        // CREATED — the release the calendar data belongs to. Anchoring it to the GitHub release
+        // keeps it stable across regenerations of the same version.
+        $created = $now;
+        if (null !== $GitHubReleasesObj && is_string($GitHubReleasesObj->published_at ?? null)) {
+            $publishedAt = strtotime($GitHubReleasesObj->published_at);
+            if (false !== $publishedAt) {
+                $created = gmdate('Ymd\THis\Z', $publishedAt);
+            }
+        }
+
+        // LAST-MODIFIED — when this API version + source-data digest was last materialised here.
+        //
+        // The release date is the wrong answer for this field on a rapidly-moving deployment: it
+        // reports the latest STABLE release while `dev` may be many commits past it. The versioned
+        // cache directory is named for API_VERSION plus a digest of jsondata/sourcedata and the
+        // compiled translations, so its mtime moves when — and only when — that combination is
+        // rebuilt, which is much closer to what "last modified" claims.
+        //
+        // Note the honest limit: a directory's mtime also advances when a new file is written into
+        // it, so this tracks "last written to" rather than "first created". Each cached body still
+        // carries whatever value was current when it was generated, and stays byte-stable
+        // thereafter, so per-resource ETags remain stable either way.
+        $lastModified = $now;
+        $cacheDir     = rtrim($this->CachePath, DIRECTORY_SEPARATOR);
+        if ('' !== $cacheDir && is_dir($cacheDir)) {
+            $cacheDirMtime = filemtime($cacheDir);
+            if (false !== $cacheDirMtime) {
+                $lastModified = gmdate('Ymd\THis\Z', $cacheDirMtime);
+            }
+        }
+
         $ical  = "BEGIN:VCALENDAR\r\n";
         $ical .= "PRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\r\n";
         $ical .= "VERSION:2.0\r\n";
@@ -5442,13 +5501,10 @@ final class CalendarHandler extends AbstractHandler
             $ical .= "BEGIN:VEVENT\r\n";
             $ical .= "CLASS:PUBLIC\r\n";
 
-            /** @var string $publishDate */
-            $publishDate = $GitHubReleasesObj->published_at;
-
             $ical .= 'DTSTART;VALUE=DATE:' . $liturgicalEvent->date->format('Ymd') . "\r\n";// . "T" . $liturgicalEvent->date->format( 'His' ) . "Z\r\n";
             //$liturgicalEvent->date->add( new \DateInterval( 'P1D' ) );
             //$ical .= "DTEND:" . $liturgicalEvent->date->format( 'Ymd' ) . "T" . $liturgicalEvent->date->format( 'His' ) . "Z\r\n";
-            $ical .= 'DTSTAMP:' . date('Ymd') . 'T' . date('His') . "Z\r\n";
+            $ical .= 'DTSTAMP:' . $dtstamp . "\r\n";
             /**
              * The event created in the calendar is specific to this civil year, next year it may be different.
              * So UID must take into account the civil year.
@@ -5457,11 +5513,11 @@ final class CalendarHandler extends AbstractHandler
              * The event could occur twice in the same liturgical year, but will be treated as a separate event since we have identified it with the civil year.
              */
             $ical .= 'UID:' . md5('LITCAL-' . $liturgicalEvent->event_key . '-' . $liturgicalEvent->date->format('Y')) . "\r\n";
-            $ical .= 'CREATED:' . str_replace(':', '', str_replace('-', '', $publishDate)) . "\r\n";
+            $ical .= 'CREATED:' . $created . "\r\n";
 
             $desc  = 'DESCRIPTION:' . self::escapeIcal($description);
             $ical .= strlen($desc) > 75 ? rtrim(chunk_split($desc, 71, "\r\n\t")) . "\r\n" : "$desc\r\n";
-            $ical .= 'LAST-MODIFIED:' . str_replace(':', '', str_replace('-', '', $publishDate)) . "\r\n";
+            $ical .= 'LAST-MODIFIED:' . $lastModified . "\r\n";
 
             $normalizedLocale = str_replace('_', '-', $this->CalendarParams->Locale);
             $summaryLang      = ';LANGUAGE=' . $normalizedLocale;

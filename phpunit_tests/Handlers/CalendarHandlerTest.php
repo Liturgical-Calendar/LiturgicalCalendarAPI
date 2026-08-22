@@ -127,23 +127,25 @@ final class CalendarHandlerTest extends AbstractHandlerTestCase
     }
 
     /**
-     * When the GitHub release lookup fails (e.g. api.github.com rate-limits the
-     * server), ICS generation must not 503: it falls back to the current UTC
-     * time so produceIcal can still emit a valid CREATED line.
+     * When the GitHub release lookup fails (e.g. api.github.com rate-limits the server), ICS
+     * generation must not 503 — and this method must report "unknown" rather than pick a fallback.
+     *
+     * It used to answer `gmdate()`, the current instant, so that produceIcal always had a CREATED
+     * value. That collapsed a distinction the caller needs: produceIcal dates CREATED from the
+     * release and falls back to generation time, while LAST-MODIFIED comes from the versioned cache
+     * directory's mtime and never from this value at all. Returning null keeps the decision where
+     * the difference is known.
+     *
+     * See #849 and IcalTimestampStabilityTest for what each field ends up carrying.
      */
-    public function testResolveIcalReleaseObjectFallsBackToUtcNowOnError(): void
+    public function testResolveIcalReleaseObjectReturnsNullOnErrorRatherThanInventingADate(): void
     {
         $infoObj = (object) ['status' => 'error', 'message' => '403 rate limit exceeded'];
 
         $result = ( new \ReflectionMethod(CalendarHandler::class, 'resolveIcalReleaseObject') )
             ->invoke($this->makeHandler(), $infoObj);
 
-        self::assertIsString($result->published_at);
-        self::assertMatchesRegularExpression(
-            '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/',
-            $result->published_at,
-            'Fallback published_at must be an RFC3339 UTC timestamp for the ICS CREATED field'
-        );
+        self::assertNull($result, 'a failed release lookup must report "unknown", not the current time');
     }
 
     /**
