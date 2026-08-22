@@ -365,13 +365,19 @@ final class EventsHandler extends AbstractHandler
      * Set up the process-global locale for this request via the shared
      * LocaleConfigurator (deterministic + leak-free, #745), then bind the gettext
      * text domain and configure the LiturgicalEventAbstract locale.
+     *
+     * The model receives the resolved `runtimeLocale`, not the raw request locale,
+     * so that it matches what CalendarHandler::prepareL10N() hands to
+     * LiturgicalEvent::setLocale() (#749). It matters for Latin: the model branches
+     * on the strict primary-language form 'la', so the raw 'la_VA' would miss the
+     * Latin branch of the Masses for Various Needs commons.
      */
     private function setLocale(): void
     {
-        LocaleConfigurator::configure($this->EventsParams->Locale);
+        $configured = LocaleConfigurator::configure($this->EventsParams->Locale);
         bindtextdomain('litcal', Router::$apiFilePath . 'i18n');
         textdomain('litcal');
-        LiturgicalEventAbstract::setLocale($this->EventsParams->Locale);
+        LiturgicalEventAbstract::setLocale($configured->runtimeLocale);
     }
 
     /**

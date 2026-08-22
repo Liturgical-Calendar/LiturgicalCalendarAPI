@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Services;
 
-use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
-use LiturgicalCalendar\Api\Utilities;
 
 /**
  * Deterministically applies the process-global locale state — setlocale(LC_ALL),
  * the LANGUAGE env var (which glibc gettext() reads above LC_MESSAGES), and ICU's
  * default — for a single request, in a leak-free way.
  *
- * Region resolution uses CLDR likely subtags (jsondata/likelySubtags.json) so a
+ * Region resolution uses CLDR likely subtags (via {@see LikelySubtags}) so a
  * region-less request locale (e.g. 'en', 'fr') maps to the installed system locale
  * ('en_US', 'fr_FR'). A real language whose system locale is not installed at all
  * throws — it must never silently fall through to English. Latin ('la'/'la_VA') is
@@ -26,9 +24,6 @@ use LiturgicalCalendar\Api\Utilities;
  */
 final class LocaleConfigurator
 {
-    /** @var array<string,string>|null Cached CLDR likelySubtags map (language => "lang-Script-Region"). */
-    private static ?array $likelySubtags = null;
-
     /**
      * Apply the process-global locale for the given request locale and return the
      * resolved runtime information.
@@ -50,7 +45,7 @@ final class LocaleConfigurator
 
         $region = \Locale::getRegion($canonical);
         if ($region === null || $region === '') {
-            $region = self::likelyRegion($primaryLanguage);
+            $region = LikelySubtags::regionFor($primaryLanguage);
         }
 
         $candidates = [];
@@ -98,30 +93,5 @@ final class LocaleConfigurator
         setlocale(LC_ALL, 'C');
         putenv('LANGUAGE');
         \Locale::setDefault($icuDefaultLocale);
-    }
-
-    /**
-     * Resolve the likely region subtag for a region-less language via CLDR likely
-     * subtags (e.g. 'en' → 'US', 'pt' → 'BR'). Returns '' when unknown.
-     *
-     * Only the region subtag is used: glibc rejects script-bearing locale names
-     * like "en_Latn_US", so the caller builds "en_US" from language + region.
-     */
-    private static function likelyRegion(string $language): string
-    {
-        if (self::$likelySubtags === null) {
-            /** @var array{supplemental:array{likelySubtags:array<string,string>}} $data */
-            $data                = Utilities::jsonFileToArray(JsonData::FOLDER->path() . '/likelySubtags.json');
-            self::$likelySubtags = $data['supplemental']['likelySubtags'];
-        }
-
-        $maximized = self::$likelySubtags[$language] ?? null;
-        if ($maximized === null) {
-            return '';
-        }
-
-        $canonical = \Locale::canonicalize($maximized);
-        $region    = \Locale::getRegion(( $canonical === null || $canonical === '' ) ? $maximized : $canonical);
-        return ( $region === null ) ? '' : $region;
     }
 }
