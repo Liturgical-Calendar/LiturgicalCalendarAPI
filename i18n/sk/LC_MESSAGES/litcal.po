@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-22 09:53+0000\n"
+"POT-Creation-Date: 2026-08-22 10:59+0000\n"
 "PO-Revision-Date: 2026-06-19 20:58+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Slovak <https://translate.johnromanodorazio.com/projects/"
@@ -1500,11 +1500,11 @@ msgstr ""
 "Slávnosť %1$s '%2$s', vlastná pre kalendár %3$s a obvykle slávená %4$s, je "
 "potlačená %5$s %6$s v roku %7$d."
 
-#: src/Handlers/CalendarHandler.php:5126
+#: src/Handlers/CalendarHandler.php:5139
 msgid "Error converting Liturgical Calendar to XML."
 msgstr "Chyba pri konverzii liturgického kalendára do XML."
 
-#: src/Handlers/CalendarHandler.php:5157
+#: src/Handlers/CalendarHandler.php:5170
 msgid "Error serializing Liturgical Calendar."
 msgstr "Chyba pri serializovaní liturgického kalendára."
 

@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-22 09:53+0000\n"
+"POT-Creation-Date: 2026-08-22 10:59+0000\n"
 "PO-Revision-Date: 2026-01-18 04:05+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: German <https://translate.johnromanodorazio.com/projects/"
@@ -1527,11 +1527,11 @@ msgstr ""
 "normalerweise am %4$s gefeiert wird, wird im Jahr %7$d durch den %5$s %6$s "
 "unterdrückt."
 
-#: src/Handlers/CalendarHandler.php:5126
+#: src/Handlers/CalendarHandler.php:5139
 msgid "Error converting Liturgical Calendar to XML."
 msgstr "Fehler beim Konvertieren des liturgischen Kalenders in XML."
 
-#: src/Handlers/CalendarHandler.php:5157
+#: src/Handlers/CalendarHandler.php:5170
 msgid "Error serializing Liturgical Calendar."
 msgstr "Fehler bei der Serialisierung des Liturgischen Kalenders."
 

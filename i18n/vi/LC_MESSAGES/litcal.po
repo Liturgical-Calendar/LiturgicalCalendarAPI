@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-22 09:53+0000\n"
+"POT-Creation-Date: 2026-08-22 10:59+0000\n"
 "PO-Revision-Date: 2025-10-18 13:19+0000\n"
 "Last-Translator: Mai Lê Bảo Khang <baokhang48812002@gmail.com>\n"
 "Language-Team: Vietnamese <https://translate.johnromanodorazio.com/projects/"
@@ -1500,11 +1500,11 @@ msgstr ""
 "Lễ %1$s '%2$s', thuộc lịch của %3$s và thường được cử hành vào ngày %4$s, bị "
 "hủy bỏ bởi %5$s %6$s vào năm %7$d."
 
-#: src/Handlers/CalendarHandler.php:5126
+#: src/Handlers/CalendarHandler.php:5139
 msgid "Error converting Liturgical Calendar to XML."
 msgstr "Lỗi chuyển đổi Lịch Phụng vụ sang XML."
 
-#: src/Handlers/CalendarHandler.php:5157
+#: src/Handlers/CalendarHandler.php:5170
 msgid "Error serializing Liturgical Calendar."
 msgstr "Lỗi tuần tự hóa Lịch Phụng vụ."
 
