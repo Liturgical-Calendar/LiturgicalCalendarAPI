@@ -87,12 +87,15 @@ Some characteristics of this API:
   One deliberate exception: on read endpoints this API uses `POST` as a body-parameterized synonym of `GET` (not as collection-create),
   pending possible adoption of the [`QUERY` method](https://datatracker.ietf.org/doc/draft-ietf-httpbis-safe-method-w-body/) when it becomes standard.
 * **The explicit rite segment is the canonical URL form**: `/calendar/roman/{year}` states the rite outright, symmetric with `/calendar/ambrosian/{year}`, and
-  the explicit Roman form is accepted everywhere the bare form is — `/calendar/roman`, `/calendar/roman/nation/{calendar_id}`,
-  `/calendar/roman/diocese/{calendar_id}`, and `/events/roman`. The bare paths (`/calendar/{year}`, `/events`, …) are retained for backwards compatibility and
-  return an identical response. They are deliberately **not** redirected: these routes accept `POST`, so a redirect would both downgrade `POST` to `GET`
+  the explicit Roman form is accepted everywhere the bare form is, across all three route families that take the segment — `/calendar/roman/nation/{calendar_id}`,
+  `/events/roman/diocese/{calendar_id}`, `/data/roman/widerregion/{key}`, and so on. The bare paths (`/calendar/{year}`, `/events`, `/data/nation/{key}`, …) are
+  retained for backwards compatibility and return an identical response; they are marked `deprecated` in the OpenAPI description wherever the explicit form is
+  documented. They are deliberately **not** redirected: these routes accept `POST`, so a redirect would both downgrade `POST` to `GET`
   (dropping the request body) and, per the [Fetch standard](https://fetch.spec.whatwg.org/#http-redirect-fetch), turn any preflighted cross-origin request into
   a network error. Instead, responses to the bare form carry an [RFC 6596](https://www.rfc-editor.org/rfc/rfc6596) `Link: <...>; rel="canonical"` header naming
-  the canonical URL (query string preserved), exposed to browser clients via `Access-Control-Expose-Headers`.
+  the canonical URL (query string preserved), exposed to browser clients via `Access-Control-Expose-Headers`. The header is emitted on read methods only —
+  `GET` and `POST` — so a `/data` write (`PUT`, `PATCH`, `DELETE`) carries none: it names a canonical representation of the resource, and a write request is
+  not one.
 * **Response headers are readable by cross-origin browser clients**: only the CORS-safelisted headers are visible to JavaScript by default, so the API names
   its own in `Access-Control-Expose-Headers` — always `X-Request-Id` (so a browser client can quote it in a bug report), plus `ETag` (so a client can echo it
   back as `If-None-Match`) and the canonical `Link`, each named only on the responses that actually carry them.

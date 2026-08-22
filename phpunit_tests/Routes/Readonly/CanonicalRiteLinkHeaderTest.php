@@ -7,8 +7,8 @@ namespace LiturgicalCalendar\Tests\Routes\Readonly;
 use LiturgicalCalendar\Tests\ApiTestCase;
 
 /**
- * Live HTTP integration test for the RFC 6596 `Link: rel="canonical"` header on the calendar
- * and events routes.
+ * Live HTTP integration test for the RFC 6596 `Link: rel="canonical"` header on the calendar,
+ * events and data routes.
  *
  * The explicit rite form (`/calendar/roman/2026`) is the canonical form; the bare form
  * (`/calendar/2026`) is retained for backwards compatibility and points at the canonical form
@@ -19,6 +19,11 @@ use LiturgicalCalendar\Tests\ApiTestCase;
  *
  * `Link` is not a CORS-safelisted response header, so it is only readable by a cross-origin
  * browser client when the API also names it in `Access-Control-Expose-Headers`.
+ *
+ * `/data` carries the header on its read methods only (#848). The write half of that rule is
+ * asserted in {@see \LiturgicalCalendar\Tests\RouterCanonicalRiteLinkTest}: proving it here would
+ * mean driving an authenticated `PUT` all the way to a 2xx — creating and deleting a calendar
+ * definition — where the unit test states the same rule without the side effects.
  */
 final class CanonicalRiteLinkHeaderTest extends ApiTestCase
 {
@@ -157,6 +162,46 @@ final class CanonicalRiteLinkHeaderTest extends ApiTestCase
         $response = self::$http->get('/calendar/nation/XX/2026', ['http_errors' => false]);
 
         self::assertSame(400, $response->getStatusCode());
+        self::assertSame('', $response->getHeaderLine('Link'));
+    }
+
+    /**
+     * `/data` reads a calendar's source definition, and that read wants the same discoverability
+     * the other two families have. The header was previously withheld from the whole route on the
+     * grounds that it is an admin write surface; scoping it to the read methods keeps that
+     * objection intact while serving the reads (#848).
+     */
+    public function testBareNationalDataReadAdvertisesTheExplicitRomanForm(): void
+    {
+        $response = self::$http->get('/data/nation/IT', ['headers' => ['Accept-Language' => 'it-IT']]);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertMatchesRegularExpression(
+            '#^<' . self::originPattern() . '/data/roman/nation/IT>; rel="canonical"$#',
+            $response->getHeaderLine('Link')
+        );
+    }
+
+    /**
+     * On `/data`, `POST` is a read verb — the "retrieve with parameters in a request body" form of
+     * `GET` — which is why the read surface is `GET`+`POST` rather than `GET` alone.
+     */
+    public function testBareDiocesanDataPostReadAdvertisesTheExplicitRomanForm(): void
+    {
+        $response = self::$http->post('/data/diocese/romamo_it', ['headers' => ['Accept-Language' => 'it-IT']]);
+
+        self::assertSame(200, $response->getStatusCode());
+        self::assertMatchesRegularExpression(
+            '#^<' . self::originPattern() . '/data/roman/diocese/romamo_it>; rel="canonical"$#',
+            $response->getHeaderLine('Link')
+        );
+    }
+
+    public function testAnExplicitRomanDataReadIsAlreadyCanonicalSoCarriesNoLink(): void
+    {
+        $response = self::$http->get('/data/roman/nation/IT', ['headers' => ['Accept-Language' => 'it-IT']]);
+
+        self::assertSame(200, $response->getStatusCode());
         self::assertSame('', $response->getHeaderLine('Link'));
     }
 }
