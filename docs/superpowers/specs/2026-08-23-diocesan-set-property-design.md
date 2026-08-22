@@ -71,27 +71,38 @@ multiple rows per Missal line is mechanically fine.
 
 National supports only `name` and `grade`. Without `common`, the resolved calendar would keep the
 comune's Common (`["Martyrs:For Several Martyrs"]`) on a diocesan memorial that the Missal marks
-`Proper` — a visible, wrong output change. Adding it requires fixing a latent bug (below).
+`Proper` — a visible, wrong output change. Adding it requires widening `setProperty()`'s parameter
+type (below).
 
 ## Architecture
 
-### 1. `LiturgicalEventCollection::setProperty()` — fix the union-type branch
+### 1. `LiturgicalEventCollection::setProperty()` — widen the accepted value type
 
-`src/Models/Calendar/LiturgicalEventCollection.php:840` currently reads:
+The signature at `src/Models/Calendar/LiturgicalEventCollection.php:827` is:
 
 ```php
-$unionTypeCondition = (
-    $reflectPropertyType instanceof \ReflectionUnionType
-    && in_array(get_debug_type($newValue), $reflectPropertyType->getTypes())
-);
+public function setProperty(string $key, string $property, string|int|bool|LitGrade $newValue): bool
 ```
 
-`getTypes()` returns `ReflectionNamedType` **objects**; `get_debug_type()` returns a **string**. The
-comparison is never true, so **every union-typed property silently no-ops and returns `false`**.
-`LiturgicalEvent::$common` is `LitCommons|array`, so `setProperty(…, 'common', …)` cannot work today.
+`LiturgicalEvent::$common` is typed `LitCommons|array`. `LitCommons` has no `__toString()` and does
+not implement `Stringable`, and the file does not `declare(strict_types=1)`, so passing either a
+`LitCommons` or a plain `array` raises a **`TypeError` at the call boundary** — the method body is
+never entered. `$color` (typed `array`) is unreachable for the same reason.
 
-Fix: map `getTypes()` through `getName()` before comparing, and widen the `$newValue` parameter to
-accept `LitCommons|array`. This is a standalone bug fix and gets its own regression test.
+Fix: widen the parameter to `string|int|bool|array|LitGrade|LitCommons`.
+
+The reflection logic inside the method already handles union-typed properties correctly and needs
+no change. `$unionTypeCondition` compares a `get_debug_type()` string against the
+`ReflectionNamedType` objects from `getTypes()` using a **loose** `in_array()`; because
+`ReflectionNamedType` implements `__toString()`, PHP coerces each member to its type name and the
+comparison resolves as intended (verified: `in_array('array', $unionType->getTypes())` is `true`).
+It is correct but relies on implicit coercion — mapping `getTypes()` through `getName()` first would
+say the same thing explicitly, and is worth doing as a readability change, not a fix.
+
+Note also that `$readings` is declared `public private(set)`. `ReflectionProperty::isPublic()`
+reports `true` for it (read visibility), so the existing `isPublic()` guard would not reject it and
+the assignment would fatal. This is currently unreachable — the widened parameter type still
+excludes every `Readings*` class — but `readings` must stay out of any future property vocabulary.
 
 ### 2. Data model — `src/Models/RegionalData/DiocesanData/`
 
@@ -232,7 +243,7 @@ byte-identical.
 
 | Test                                                      | Covers                                                                                                                                          |
 | --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `LiturgicalEventCollectionSetPropertyUnionTypeTest` (new) | §1 — `common` can be set; regression for the `getTypes()` bug                                                                                   |
+| `LiturgicalEventCollectionSetPropertyCommonTest` (new)    | §1 — `common` can be set as both `LitCommons` and `array`; the widened parameter type accepts them                                              |
 | `CalendarHandlerAmbrosianDiocesanSetPropertyTest` (new)   | §4 — grade/common/name applied in place; key not duplicated; overridden event absent from `suppressed_events`; absent-key no-op emits a message |
 | `AmbrosianReadingsForGradeTest` (new)                     | §5 — festive at ≥ FEAST, ferial below                                                                                                           |
 | `EventsHandlerRiteRoutingTest` (update)                   | §6 — no phantom prefixed duplicate; catalog key matches the resolved key                                                                        |
