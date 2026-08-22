@@ -128,16 +128,15 @@ final class CalendarHandlerTest extends AbstractHandlerTestCase
 
     /**
      * When the GitHub release lookup fails (e.g. api.github.com rate-limits the server), ICS
-     * generation must not 503 — but it must not invent a date either.
+     * generation must not 503 — and this method must report "unknown" rather than pick a fallback.
      *
-     * This used to return `gmdate()`, the current instant, so that produceIcal could always emit a
-     * CREATED line. That line is hashed into the ICS ETag (unlike DTSTAMP, which validatorSource()
-     * blanks out), so an unchanged calendar got a fresh validator on every request and a
-     * conditional GET could never answer 304. It was also untrue: CREATED means when the component
-     * was created, not when this response happened to be serialized.
+     * It used to answer `gmdate()`, the current instant, so that produceIcal always had a CREATED
+     * value. That collapsed a distinction the caller needs: produceIcal dates CREATED from the
+     * release and falls back to generation time, while LAST-MODIFIED comes from the versioned cache
+     * directory's mtime and never from this value at all. Returning null keeps the decision where
+     * the difference is known.
      *
-     * Both fields are OPTIONAL in a VEVENT (RFC 5545 3.6.1), so the honest answer is null and
-     * produceIcal omits them. See #849 and IcalTimestampStabilityTest.
+     * See #849 and IcalTimestampStabilityTest for what each field ends up carrying.
      */
     public function testResolveIcalReleaseObjectReturnsNullOnErrorRatherThanInventingADate(): void
     {

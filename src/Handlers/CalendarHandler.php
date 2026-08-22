@@ -4854,12 +4854,12 @@ final class CalendarHandler extends AbstractHandler
      *
      * The release lookup is non-essential metadata: when it failed (GitHub
      * unreachable or rate-limited with HTTP 403), it must not take the whole
-     * calendar down with a 503. Return null and log a warning so the ICS still
-     * renders, simply without the two optional fields that date it.
+     * calendar down with a 503. Return null and log a warning; {@see self::produceIcal()} decides
+     * what an unknown release means for each field.
      *
      * @param GitHubReleaseInfoSuccess|GitHubReleaseInfoError $infoObj result of {@see self::getGithubReleaseInfo()}
      * @return ?\stdClass an object exposing a `published_at` string, or null when the release is
-     *         unknown — see the note in the body for why null rather than a fallback timestamp
+     *         unknown — see the note in the body for why the fallback is not chosen here
      */
     private function resolveIcalReleaseObject(\stdClass $infoObj): ?\stdClass
     {
@@ -4870,20 +4870,17 @@ final class CalendarHandler extends AbstractHandler
 
         /** @var GitHubReleaseInfoError $infoObj */
         $logger = LoggerFactory::create('calendar', null, 30, false, true, false);
-        $logger->warning('GitHub release info unavailable; ICS will omit CREATED/LAST-MODIFIED', [
+        $logger->warning('GitHub release info unavailable; ICS CREATED falls back to generation time', [
             'reason' => $infoObj->message,
         ]);
 
-        // Deliberately NOT a fallback timestamp. This used to answer `gmdate()` — the current
-        // instant — which made every regeneration of an unchanged calendar emit different
-        // CREATED/LAST-MODIFIED values. Those are hashed into the ICS ETag (unlike DTSTAMP, which
-        // {@see self::validatorSource()} blanks out), so the validator changed on every request and
-        // a conditional GET could never answer 304: an ICS client re-downloaded ~370 KB each time.
+        // Null means "unknown", not "use now". The choice of fallback belongs to the caller,
+        // because it is not the same for every field: {@see self::produceIcal()} dates CREATED from
+        // the release when it has one and falls back to generation time, while LAST-MODIFIED is
+        // taken from the versioned cache directory's mtime and never from this value at all.
         //
-        // It was also untrue. CREATED means "when this component was created"; stamping it with the
-        // moment of serialization asserts something that did not happen. Both fields are OPTIONAL in
-        // a VEVENT (RFC 5545 §3.6.1), so when the release date is unknown the honest answer — and
-        // the one that keeps the ETag stable — is to say nothing. See #849.
+        // Answering `gmdate()` here — which this method used to do — collapsed that distinction and
+        // handed the same invented instant to both fields. See #849.
         return null;
     }
 
