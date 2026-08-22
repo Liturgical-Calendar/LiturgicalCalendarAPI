@@ -56,6 +56,36 @@ abstract class AbstractHandlerTestCase extends TestCase
 
     public static function setUpBeforeClass(): void
     {
+        // Decide whether this class can run BEFORE mutating any process-global state.
+        //
+        // A skip raised here aborts the whole class: PHPUnit then runs neither setUp()
+        // nor tearDown() nor tearDownAfterClass() for it. That is what makes the skip
+        // safe — a subclass tearDown() can never observe a snapshot its setUp() never
+        // got round to taking (#868). It is also why these checks must come first:
+        // anything pinned above a skip would never be restored.
+        //
+        // Both conditions are class-invariant (process env), so per-test checking bought
+        // nothing. Message visibility is identical either way: on PHPUnit 12 neither a
+        // per-test nor a suite-level skip reason is printed without --display-skipped,
+        // and both are printed with it.
+        $secret = self::env('JWT_SECRET');
+        if ($secret === null || strlen($secret) < 32) {
+            self::markTestSkipped(
+                'Handler test requires JWT_SECRET (32+ chars) in env. '
+                . 'See CLAUDE.md for the recommended values.'
+            );
+        }
+
+        if (static::$requiresDatabase) {
+            self::$pdo = self::connectToDatabase();
+            if (self::$pdo === null) {
+                self::markTestSkipped(
+                    'Handler test requires Postgres credentials in DB_HOST/DB_NAME/DB_USER/DB_PASSWORD. '
+                    . 'CI sets these via .env.local; locally, run scripts/init-db.sql.'
+                );
+            }
+        }
+
         // Pin Router::$apiPath + Router::$apiFilePath so handlers that read
         // them (for self-links + JsonData::*->path() filesystem lookups)
         // get stable, predictable values in tests. isset() is false for
@@ -69,35 +99,40 @@ abstract class AbstractHandlerTestCase extends TestCase
         // it to the project root with a trailing slash, matching Router's
         // production behaviour.
         Router::$apiFilePath = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR;
+    }
 
-        if (static::$requiresDatabase) {
-            $host     = self::env('DB_HOST');
-            $port     = self::env('DB_PORT') ?? '5432';
-            $name     = self::env('DB_NAME');
-            $user     = self::env('DB_USER');
-            $password = self::env('DB_PASSWORD');
+    /**
+     * Open the test database connection, or return null when it is unavailable —
+     * whether because the credentials are absent or because Postgres cannot be reached.
+     */
+    private static function connectToDatabase(): ?PDO
+    {
+        $host     = self::env('DB_HOST');
+        $port     = self::env('DB_PORT') ?? '5432';
+        $name     = self::env('DB_NAME');
+        $user     = self::env('DB_USER');
+        $password = self::env('DB_PASSWORD');
 
-            if ($host === null || $name === null || $user === null || $password === null) {
-                self::$pdo = null;
-                return;
-            }
+        if ($host === null || $name === null || $user === null || $password === null) {
+            return null;
+        }
 
-            try {
-                self::$pdo = new PDO(
-                    sprintf('pgsql:host=%s;port=%s;dbname=%s', $host, $port, $name),
-                    $user,
-                    $password,
-                    [
-                        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                        PDO::ATTR_EMULATE_PREPARES   => false,
-                        PDO::ATTR_TIMEOUT            => 5,
-                    ]
-                );
-                self::$pdo->exec("SET timezone TO 'Europe/Vatican'");
-            } catch (\PDOException $e) {
-                self::$pdo = null;
-            }
+        try {
+            $pdo = new PDO(
+                sprintf('pgsql:host=%s;port=%s;dbname=%s', $host, $port, $name),
+                $user,
+                $password,
+                [
+                    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES   => false,
+                    PDO::ATTR_TIMEOUT            => 5,
+                ]
+            );
+            $pdo->exec("SET timezone TO 'Europe/Vatican'");
+            return $pdo;
+        } catch (\PDOException $e) {
+            return null;
         }
     }
 
@@ -110,28 +145,12 @@ abstract class AbstractHandlerTestCase extends TestCase
 
     protected function setUp(): void
     {
+        // Only genuinely per-test work belongs here. Whether this class can run at all
+        // was settled in setUpBeforeClass(); by the time we get here, self::$pdo is
+        // non-null whenever a database was required (#868).
         if (static::$requiresDatabase) {
-            if (self::$pdo === null) {
-                $this->markTestSkipped(
-                    'Handler test requires Postgres credentials in DB_HOST/DB_NAME/DB_USER/DB_PASSWORD. '
-                    . 'CI sets these via .env.local; locally, run scripts/init-db.sql.'
-                );
-            }
-
-            self::$pdo->exec(
+            self::$pdo?->exec(
                 'TRUNCATE TABLE ' . implode(', ', self::TABLES) . ' RESTART IDENTITY CASCADE'
-            );
-        }
-
-        // Confirm the JWT env is set up at least to the minimum the
-        // services need (JwtServiceFactory::fromEnv rejects secrets
-        // shorter than 32 chars). Skipping (not failing) keeps the
-        // rest of the suite usable for devs without auth configured.
-        $secret = self::env('JWT_SECRET');
-        if ($secret === null || strlen($secret) < 32) {
-            $this->markTestSkipped(
-                'Handler test requires JWT_SECRET (32+ chars) in env. '
-                . 'See CLAUDE.md for the recommended values.'
             );
         }
     }

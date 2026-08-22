@@ -35,6 +35,8 @@ abstract class RepositoryTestCase extends TestCase
 
     public static function setUpBeforeClass(): void
     {
+        self::$skipReason = null;
+
         $host     = self::env('DB_HOST');
         $port     = self::env('DB_PORT') ?? '5432';
         $name     = self::env('DB_NAME');
@@ -61,10 +63,24 @@ abstract class RepositoryTestCase extends TestCase
             // Pin the session TZ so date assertions don't drift by environment.
             self::$pdo->exec("SET timezone TO 'Europe/Vatican'");
         } catch (\PDOException $e) {
-            self::$pdo = null;
-            // Defer reporting to setUp(); class-level skip messages aren't shown
-            // without --debug, but per-test skips are.
+            self::$pdo        = null;
             self::$skipReason = 'Postgres unreachable: ' . $e->getMessage();
+        }
+
+        // Skip at class level rather than per test. A skip raised here aborts the whole
+        // class, so PHPUnit runs neither setUp() nor tearDown() for it — which is what
+        // stops a subclass tearDown() reading a snapshot its setUp() never took (#868).
+        //
+        // This previously deferred to setUp() on the belief that suite-level skip
+        // reasons are hidden without --debug while per-test ones are shown. That is not
+        // true on PHPUnit 12: neither is printed without --display-skipped, and both are
+        // printed with it.
+        if (self::$pdo === null) {
+            self::markTestSkipped(
+                self::$skipReason
+                ?? 'Repository tests require Postgres credentials in DB_HOST/DB_NAME/DB_USER/DB_PASSWORD. '
+                . 'CI sets these via .env.local; locally, set them or run scripts/init-db.sql against your dev cluster.'
+            );
         }
     }
 
@@ -76,18 +92,12 @@ abstract class RepositoryTestCase extends TestCase
 
     protected function setUp(): void
     {
-        if (self::$pdo === null) {
-            $this->markTestSkipped(
-                self::$skipReason
-                ?? 'Repository tests require Postgres credentials in DB_HOST/DB_NAME/DB_USER/DB_PASSWORD. '
-                . 'CI sets these via .env.local; locally, set them or run scripts/init-db.sql against your dev cluster.'
-            );
-        }
-
+        // Availability was settled in setUpBeforeClass(); self::$pdo is non-null here.
+        //
         // CASCADE clears api_keys when applications get nuked (FK ON DELETE CASCADE);
         // listing every table explicitly is safer than relying on cascade alone and
         // keeps the truncate fast (these tables stay small in tests).
-        self::$pdo->exec('TRUNCATE TABLE ' . implode(', ', self::TABLES) . ' RESTART IDENTITY CASCADE');
+        self::$pdo?->exec('TRUNCATE TABLE ' . implode(', ', self::TABLES) . ' RESTART IDENTITY CASCADE');
     }
 
     private static ?string $skipReason = null;
