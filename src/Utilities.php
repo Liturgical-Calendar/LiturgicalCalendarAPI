@@ -570,25 +570,24 @@ class Utilities
      */
     public static function jsonFileToArray(string $filename): array
     {
-        $cacheEnabled = ( extension_loaded('apcu') && function_exists('apcu_exists') && function_exists('apcu_store') && function_exists('apcu_fetch') );
-        $cacheKey     = 'jsoncache_array_' . md5($filename);
+        $cacheKey = 'jsoncache_array_' . md5($filename);
 
-        // Try cache first
-        if ($cacheEnabled && apcu_exists($cacheKey)) {
-            $data = apcu_fetch($cacheKey, $success);
-            if ($success && is_array($data)) {
-                /** @var array<string|int,mixed> $data */
-                return $data;
-            }
+        // Try cache first. ApcuCache answers "is there a cache?" with a store/fetch round trip rather
+        // than with extension_loaded() plus function_exists(), which are all true of an APCu that
+        // stores nothing (#836). `fetch()` reports a miss — and an unusable backend — through
+        // `$success`, so an `exists()` first would only add a second round trip and a window for the
+        // entry to expire between the two calls.
+        $data = ApcuCache::fetch($cacheKey, $success);
+        if ($success && is_array($data)) {
+            /** @var array<string|int,mixed> $data */
+            return $data;
         }
 
         $rawContents = self::rawContentsFromFile($filename);
         $jsonArr     = json_decode($rawContents, true, 512, JSON_THROW_ON_ERROR);
 
         // Store in cache
-        if ($cacheEnabled) {
-            apcu_store($cacheKey, $jsonArr, 300);
-        }
+        ApcuCache::store($cacheKey, $jsonArr, 300);
 
         /** @var array<string|int,mixed> $jsonArr */
         return $jsonArr;
@@ -604,15 +603,13 @@ class Utilities
      */
     public static function jsonFileToObject(string $filename): \stdClass
     {
-        $cacheEnabled = ( extension_loaded('apcu') && function_exists('apcu_exists') && function_exists('apcu_store') && function_exists('apcu_fetch') );
-        $cacheKey     = 'jsoncache_object_' . md5($filename);
+        $cacheKey = 'jsoncache_object_' . md5($filename);
 
-        // Try cache first
-        if ($cacheEnabled && apcu_exists($cacheKey)) {
-            $data = apcu_fetch($cacheKey, $success);
-            if ($success && $data instanceof \stdClass) {
-                return $data;
-            }
+        // Try cache first — see jsonFileToArray() for why the decision is ApcuCache's, and why the
+        // read is a single `fetch()` rather than `exists()` then `fetch()` (#836).
+        $data = ApcuCache::fetch($cacheKey, $success);
+        if ($success && $data instanceof \stdClass) {
+            return $data;
         }
 
         $rawContents = self::rawContentsFromFile($filename);
@@ -622,9 +619,7 @@ class Utilities
         }
 
         // Store in cache
-        if ($cacheEnabled) {
-            apcu_store($cacheKey, $jsonObj, 300);
-        }
+        ApcuCache::store($cacheKey, $jsonObj, 300);
 
         return $jsonObj;
     }
@@ -639,18 +634,20 @@ class Utilities
      */
     public static function invalidateJsonFileCache(string $filename): void
     {
-        if (!extension_loaded('apcu') || !function_exists('apcu_delete')) {
-            return;
-        }
-
         $fileHash            = md5($filename);
         $objectCacheKey      = 'jsoncache_object_' . $fileHash;
         $objectArrayCacheKey = 'jsoncache_objectarray_' . $fileHash;
         $arrayCacheKey       = 'jsoncache_array_' . $fileHash;
 
-        apcu_delete($objectCacheKey);
-        apcu_delete($objectArrayCacheKey);
-        apcu_delete($arrayCacheKey);
+        // #836: the guard removed here was `!extension_loaded('apcu') || !function_exists('apcu_delete')`.
+        // Its extension_loaded() operand was wrong for the same reason the readers' was — it asks about
+        // the extension rather than about the function an unqualified call actually reaches, so it could
+        // skip an invalidation whose matching store had gone through. ApcuCache::delete() gates on
+        // callability alone, deliberately weaker than the readers' round-trip gate: a delete that does
+        // not happen leaves stale data being served.
+        ApcuCache::delete($objectCacheKey);
+        ApcuCache::delete($objectArrayCacheKey);
+        ApcuCache::delete($arrayCacheKey);
     }
 
     /**
@@ -662,16 +659,13 @@ class Utilities
      */
     public static function jsonFileToObjectArray(string $filename): array
     {
-        $cacheEnabled = ( extension_loaded('apcu') && function_exists('apcu_exists') && function_exists('apcu_store') && function_exists('apcu_fetch') );
-        $cacheKey     = 'jsoncache_objectarray_' . md5($filename);
+        $cacheKey = 'jsoncache_objectarray_' . md5($filename);
 
-        // Try cache first
-        if ($cacheEnabled) {
-            $data = apcu_fetch($cacheKey, $success);
-            if ($success && is_array($data)) {
-                /** @var \stdClass[] $data */
-                return $data;
-            }
+        // Try cache first — see jsonFileToArray() for why the decision is ApcuCache's (#836).
+        $data = ApcuCache::fetch($cacheKey, $success);
+        if ($success && is_array($data)) {
+            /** @var \stdClass[] $data */
+            return $data;
         }
 
         $rawContents = self::rawContentsFromFile($filename);
@@ -686,9 +680,7 @@ class Utilities
         }
 
         // Store in cache
-        if ($cacheEnabled) {
-            apcu_store($cacheKey, $jsonArr, 300);
-        }
+        ApcuCache::store($cacheKey, $jsonArr, 300);
 
         /** @var \stdClass[] $jsonArr */
         return $jsonArr;
@@ -705,15 +697,12 @@ class Utilities
      */
     public static function jsonUrlToObject(string $url): \stdClass
     {
-        $cacheEnabled = ( extension_loaded('apcu') && function_exists('apcu_exists') && function_exists('apcu_store') && function_exists('apcu_fetch') );
-        $cacheKey     = 'jsoncache_object_' . md5($url);
+        $cacheKey = 'jsoncache_object_' . md5($url);
 
-        // Try cache first
-        if ($cacheEnabled) {
-            $data = apcu_fetch($cacheKey, $success);
-            if ($success && $data instanceof \stdClass) {
-                return $data;
-            }
+        // Try cache first — see jsonFileToArray() for why the decision is ApcuCache's (#836).
+        $data = ApcuCache::fetch($cacheKey, $success);
+        if ($success && $data instanceof \stdClass) {
+            return $data;
         }
 
         $rawContents = self::rawContentsFromUrl($url);
@@ -723,9 +712,7 @@ class Utilities
         }
 
         // Store in cache
-        if ($cacheEnabled) {
-            apcu_store($cacheKey, $jsonObj, 300);
-        }
+        ApcuCache::store($cacheKey, $jsonObj, 300);
 
         return $jsonObj;
     }
