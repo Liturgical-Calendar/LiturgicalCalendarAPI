@@ -28,11 +28,14 @@ final class CalendarHandlerLocaleLeakTest extends AbstractHandlerTestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-
         // Snapshot every process-global bit of state this test (and the handlers it
         // invokes) will mutate, so tearDown() can restore the world exactly as it was
         // found rather than unconditionally clobbering values another test may rely on.
+        //
+        // Taken before parent::setUp() so the snapshot always happens: PHPUnit runs
+        // tearDown() after a skip raised inside setUp(), and these properties are typed
+        // with no defaults, so a snapshot taken after a skipping parent would leave
+        // tearDown() fatally reading uninitialized state (#868).
         $this->savedLocale          = setlocale(LC_ALL, 0) ?: 'C';
         $languageEnv                = getenv('LANGUAGE');
         $this->savedLanguageEnv     = false === $languageEnv ? null : $languageEnv;
@@ -41,6 +44,8 @@ final class CalendarHandlerLocaleLeakTest extends AbstractHandlerTestCase
         $this->savedRuntimeLocale   = LitLocale::$RUNTIME_LOCALE;
         $this->hadServerName        = array_key_exists('SERVER_NAME', $_SERVER);
         $this->savedServerName      = $this->hadServerName ? (string) $_SERVER['SERVER_NAME'] : null;
+
+        parent::setUp();
 
         // Force Router::isLocalhost() true so handle() bypasses the response cache and
         // actually runs prepareL10N() for every request (the leak is invisible when a

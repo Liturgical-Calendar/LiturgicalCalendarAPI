@@ -35,6 +35,36 @@ abstract class RepositoryTestCase extends TestCase
 
     public static function setUpBeforeClass(): void
     {
+        self::$skipReason = null;
+        self::$pdo        = self::connect();
+
+        // Skip at class level rather than per test. A skip raised here aborts the whole
+        // class, so PHPUnit runs neither setUp() nor tearDown() for it — which is what
+        // stops a subclass tearDown() reading a snapshot its setUp() never took (#868).
+        //
+        // This previously deferred to setUp() on the belief that suite-level skip
+        // reasons are hidden without --debug while per-test ones are shown. That is not
+        // true on PHPUnit 12: neither is printed without --display-skipped, and both are
+        // printed with it.
+        if (self::$pdo === null) {
+            self::markTestSkipped(
+                self::$skipReason
+                ?? 'Repository tests require Postgres credentials in DB_HOST/DB_NAME/DB_USER/DB_PASSWORD. '
+                . 'CI sets these via .env.local; locally, set them or run scripts/init-db.sql against your dev cluster.'
+            );
+        }
+    }
+
+    /**
+     * Open the test database connection, or return null when it is unavailable — whether
+     * because the credentials are absent or because Postgres cannot be reached.
+     *
+     * Every unavailable path RETURNS null rather than returning early from
+     * setUpBeforeClass(), so the single `self::$pdo === null` check there cannot be
+     * bypassed and the class can never proceed with a null connection.
+     */
+    private static function connect(): ?PDO
+    {
         $host     = self::env('DB_HOST');
         $port     = self::env('DB_PORT') ?? '5432';
         $name     = self::env('DB_NAME');
@@ -42,12 +72,11 @@ abstract class RepositoryTestCase extends TestCase
         $password = self::env('DB_PASSWORD');
 
         if ($host === null || $name === null || $user === null || $password === null) {
-            self::$pdo = null;
-            return;
+            return null;
         }
 
         try {
-            self::$pdo = new PDO(
+            $pdo = new PDO(
                 sprintf('pgsql:host=%s;port=%s;dbname=%s', $host, $port, $name),
                 $user,
                 $password,
@@ -59,12 +88,11 @@ abstract class RepositoryTestCase extends TestCase
                 ]
             );
             // Pin the session TZ so date assertions don't drift by environment.
-            self::$pdo->exec("SET timezone TO 'Europe/Vatican'");
+            $pdo->exec("SET timezone TO 'Europe/Vatican'");
+            return $pdo;
         } catch (\PDOException $e) {
-            self::$pdo = null;
-            // Defer reporting to setUp(); class-level skip messages aren't shown
-            // without --debug, but per-test skips are.
             self::$skipReason = 'Postgres unreachable: ' . $e->getMessage();
+            return null;
         }
     }
 
@@ -76,14 +104,8 @@ abstract class RepositoryTestCase extends TestCase
 
     protected function setUp(): void
     {
-        if (self::$pdo === null) {
-            $this->markTestSkipped(
-                self::$skipReason
-                ?? 'Repository tests require Postgres credentials in DB_HOST/DB_NAME/DB_USER/DB_PASSWORD. '
-                . 'CI sets these via .env.local; locally, set them or run scripts/init-db.sql against your dev cluster.'
-            );
-        }
-
+        // Availability was settled in setUpBeforeClass(); self::$pdo is non-null here.
+        //
         // CASCADE clears api_keys when applications get nuked (FK ON DELETE CASCADE);
         // listing every table explicitly is safer than relying on cascade alone and
         // keeps the truncate fast (these tables stay small in tests).

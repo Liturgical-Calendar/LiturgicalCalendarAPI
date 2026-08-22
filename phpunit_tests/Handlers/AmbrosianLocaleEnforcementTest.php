@@ -56,8 +56,9 @@ final class AmbrosianLocaleEnforcementTest extends AbstractHandlerTestCase
      */
     protected function setUp(): void
     {
+        $this->savedServerName = $_SERVER['SERVER_NAME'] ?? null;
+
         parent::setUp();
-        $this->savedServerName  = $_SERVER['SERVER_NAME'] ?? null;
         $_SERVER['SERVER_NAME'] = 'localhost';
     }
 
