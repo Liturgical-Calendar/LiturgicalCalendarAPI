@@ -43,10 +43,19 @@ phpcs.xml
 phpcs.xml.dist
 phpstan.neon
 phpstan.neon.dist
+# The baseline is a third phpstan file and was missed when the two above were
+# listed; it shipped, and the vhost serves the app root, so it was publicly
+# readable at /api/dev/phpstan-baseline.neon (it names internal paths and the
+# text of every suppressed error).
+phpstan-baseline.neon
 phpunit.xml
 phpunit.xml.dist
 captainhook.json
 redocly.yaml
+# Lint-suppression lists for the OpenAPI document, and the code-review bot's
+# path instructions. Both are dev-only and both shipped.
+.redocly.lint-ignore.yaml
+.coderabbit.yaml
 .markdownlint.yml
 .markdownlint-wiki.yml
 .php-version
@@ -76,6 +85,10 @@ parseOpenAPI.js
 deploy/
 infrastructure/
 /migrations/
+# authz/openfga-expectations.json is read only by
+# phpunit_tests/Services/OpenFgaModelTest.php; nothing under src/ touches it.
+# The authorization model itself lives in cdcf-infra, not here.
+authz/
 
 # --- Dev-only entries inside scripts/ ---
 # scripts/ itself MUST ship: the operational scripts (mint-official-key,

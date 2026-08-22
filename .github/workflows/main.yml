@@ -132,6 +132,27 @@ jobs:
       - name: Markdown lint
         run: npx --yes markdownlint-cli2 "**/*.md" "#node_modules" "#vendor" "#.aider*"
 
+  deploy_payload:
+    runs-on: ubuntu-latest
+    # Least privilege, as jsondata_lint above: this job only reads the tree and
+    # enumerates what rsync would transfer. It writes nothing and calls no API.
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # Nothing here pushes; don't leave the token in .git/config for later steps.
+          persist-credentials: false
+
+      # The API is served as a folder under the frontend docroot, and the nginx
+      # location for it does `try_files $uri ...` — so any file physically present
+      # under /api/{dev,vN}/ is served straight off disk, before the front
+      # controller sees the request. rsync-exclude.txt is a denylist; this asserts
+      # the resulting payload against an allowlist instead, so a new dev-only file
+      # fails here rather than becoming publicly fetchable.
+      - name: Deploy payload contains only runtime files
+        run: ./.github/deploy/check-deploy-payload.sh
+
   gettext_update:
     runs-on: ubuntu-latest
     needs: [codesniffer, static_analysis]
