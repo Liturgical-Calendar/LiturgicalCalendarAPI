@@ -1,5 +1,27 @@
 <?php
 
+
+// Refuse any entry that is not the CLI. This file is the Ratchet WebSocket server — systemd runs it
+// as `php bin/LitCalTestServer.php` — and it ends in `IoServer::factory(...)->run()`, i.e. it
+// binds WS_PORT and enters an event loop.
+//
+// It no longer lives under public/ — it is a CLI entrypoint, not a web one — but it keeps a `.php`
+// extension, and the deployed tree sits under a path whose `.php` files nginx hands to php-fpm. So
+// it is still reachable over HTTP, and nothing accidental stops it: unlike the scripts under
+// scripts/, it carries no `#!` line above a `declare(strict_types=1)`, so it compiles and RUNS.
+//
+// Measured before this guard existed, against the live staging path: a GET returned 500 with
+// x-powered-by set — it executed, and the only reason it got no further is that the real server
+// already held the port. An "address in use" failure, not a decision.
+//
+// With the WS server down (a restart, a crash) that request would bind the port and loop forever
+// inside an FPM worker: repeat it and the pool is exhausted, and the worker then squats WS_PORT so
+// the systemd unit cannot restart either.
+if (PHP_SAPI !== 'cli') {
+    http_response_code(404);
+    exit(1);
+}
+
 // Locate autoloader by walking up the directory tree
 // We start from the folder the current script is running in
 $projectFolder  = __DIR__;

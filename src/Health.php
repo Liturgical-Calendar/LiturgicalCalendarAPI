@@ -297,7 +297,7 @@ class Health implements MessageComponentInterface
 
         // Before anything that resolves a path. `Router::$apiFilePath` is a *typed* static, so
         // reading it before assignment is a fatal `Error`, not a null — and the validator below
-        // resolves the message schema's path as it is constructed. `public/LitCalTestServer.php`
+        // resolves the message schema's path as it is constructed. `bin/LitCalTestServer.php`
         // calls `new Health()` with nothing initialised, so without this the WebSocket server dies
         // at startup. No test caught it: PHPUnit's bootstrap initialises the paths long before any
         // test builds a Health, so every test ran an order production never uses.

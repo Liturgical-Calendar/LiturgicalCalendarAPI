@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
  *
  * This is the only entry point that reaches src/Test/ — LitTestRunner is
  * instantiated only inside Health::executeUnitTest(), which is invoked via
- * the Ratchet WebSocket handler at public/LitCalTestServer.php. Driving it
+ * the Ratchet WebSocket handler at bin/LitCalTestServer.php. Driving it
  * here closes the 0% coverage gap on src/Test/ that was called out in
  * issue #589 (follow-up to #588).
  *

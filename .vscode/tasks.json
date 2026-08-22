@@ -93,7 +93,7 @@
         {
             "label": "litcal-tests-websockets",
             "type": "shell",
-            "command": "php public/LitCalTestServer.php",
+            "command": "php bin/LitCalTestServer.php",
             "group": {
                 "kind": "build",
                 "isDefault": true

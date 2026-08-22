@@ -15,8 +15,12 @@ After=network.target
 Type=simple
 User=@RUN_USER@
 Group=@RUN_GROUP@
+# WorkingDirectory stays public/ even though the entrypoint moved to bin/, and the
+# mismatch is deliberate: the engine cache is resolved RELATIVE TO THE PROCESS CWD,
+# and the deploy pre-creates <approot>/public/engineCache. Pointing this at the app
+# root would silently move the cache and orphan what is already there.
 WorkingDirectory=@API_ROOT@/public
-ExecStart=@PHP_BIN@ @API_ROOT@/public/LitCalTestServer.php
+ExecStart=@PHP_BIN@ @API_ROOT@/bin/LitCalTestServer.php
 Restart=always
 RestartSec=5
 StandardOutput=journal

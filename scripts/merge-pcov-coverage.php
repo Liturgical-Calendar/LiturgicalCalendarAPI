@@ -27,6 +27,24 @@
 
 declare(strict_types=1);
 
+// Refuse any entry that is not the CLI. These scripts ship to the server — they are run there per
+// the RBAC runbook — and they sit under a path whose `.php` files are handed to php-fpm, so an HTTP
+// request can reach them.
+//
+// Every script here currently also carries a `#!` line, which a web SAPI treats as output and which
+// therefore invalidates the `declare(strict_types=1)` beneath it: they fail to COMPILE rather than
+// run, and answer 500. That is an accident of formatting rather than a decision, and it is not a
+// guarantee — a script added or edited without that exact pairing compiles and runs. This guard is
+// what holds in that case, and `mint-official-key.php` is why it matters: it mints an `is_system`
+// key exempt from the per-IP rate limit.
+//
+// Inlined per script rather than factored into a shared require: a guard that depends on resolving
+// another path has a failure mode that a single constant comparison does not.
+if (PHP_SAPI !== 'cli') {
+    http_response_code(404);
+    exit(1);
+}
+
 if ($argc !== 4) {
     fwrite(STDERR, "Usage: {$argv[0]} <phpunit-clover.xml> <pcov-dump-dir> <out-clover.xml>\n");
     exit(1);

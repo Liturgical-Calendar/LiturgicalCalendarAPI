@@ -93,7 +93,7 @@ jobs:
         run: |
           cp .env.example .env.local
           # Override APP_ENV to 'test' so the pcov bootstrap hooks in
-          # public/index.php + public/LitCalTestServer.php fire — both gate
+          # public/index.php + bin/LitCalTestServer.php fire — both gate
           # on APP_ENV === 'test'. Without this we silently fall back to
           # PHPUnit's in-process coverage only, since .env.example ships
           # APP_ENV=development.
@@ -160,7 +160,7 @@ jobs:
           exit 1
 
       - name: Start the WebSocket test server (instrumented with pcov)
-        # The Ratchet-driven WS server (public/LitCalTestServer.php) is the
+        # The Ratchet-driven WS server (bin/LitCalTestServer.php) is the
         # only entry point that reaches src/Test/ (LitTestRunner et al.) and
         # Health.php's onOpen/onMessage/onClose. Same triple-gated hook as the
         # HTTP server; ws-start-server.sh honors PCOV_SERVER_COVERAGE_DIR.
@@ -214,7 +214,7 @@ jobs:
               echo "> **No server-side pcov dumps were produced.** Coverage will reflect PHPUnit's in-process"
               echo "> coverage only — the HTTP- and WS-driven integration tests in phpunit_tests/Routes/"
               echo "> and phpunit_tests/WebSocket/ won't contribute. This usually means the pcov bootstrap"
-              echo "> hook in public/index.php / public/LitCalTestServer.php didn't fire. Check that"
+              echo "> hook in public/index.php / bin/LitCalTestServer.php didn't fire. Check that"
               echo "> APP_ENV=test is set in .env.local and that PCOV_SERVER_COVERAGE_DIR is exported"
               echo "> when starting both servers."
             fi
