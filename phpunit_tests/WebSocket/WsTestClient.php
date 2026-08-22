@@ -27,6 +27,18 @@ final class WsTestClient
     /** @var resource */
     private $sock;
 
+    /** The connect-time `hello` frame, or null if the server sent something else first. */
+    private ?\stdClass $hello = null;
+
+    /**
+     * A frame read ahead of its consumer and put back.
+     *
+     * Only {@see self::readHelloFrame()} writes it, and only when the first frame was not a hello:
+     * the frame has already left the socket by then, so returning it to the next reader is the only
+     * way for that reader to see what the server really sent.
+     */
+    private ?string $pushedBack = null;
+
     private function __construct($sock)
     {
         $this->sock = $sock;
@@ -89,7 +101,46 @@ final class WsTestClient
             throw new \RuntimeException('WebSocket handshake failed: Sec-WebSocket-Accept did not match.');
         }
 
-        return new self($sock);
+        $client        = new self($sock);
+        $client->hello = $client->readHelloFrame();
+
+        return $client;
+    }
+
+    /**
+     * Read the `hello` frame the server sends on connect — #806 section F.
+     *
+     * **Consumed here, at the one place every WebSocket test connects**, because it is the first
+     * thing on the wire and every `receiveText()` in the suite is written expecting the answer to
+     * the message the test itself sent. Leaving it in the stream made sixteen tests read `hello`
+     * where they expected `success` or `protocolError` — and did so only in CI, since a suite with
+     * no reachable server skips instead of failing.
+     *
+     * Not swallowed silently: it is kept on {@see self::hello()} so a test can assert what the
+     * server advertised, and a first frame that is *not* a hello is left in the stream rather than
+     * discarded, so a server that stopped sending one fails the test that reads next instead of
+     * this method inventing a passing handshake.
+     */
+    private function readHelloFrame(): ?\stdClass
+    {
+        $frame   = $this->receiveText();
+        $decoded = json_decode($frame);
+
+        if ($decoded instanceof \stdClass && ( $decoded->type ?? null ) === 'hello') {
+            return $decoded;
+        }
+
+        $this->pushedBack = $frame;
+
+        return null;
+    }
+
+    /**
+     * What the server advertised on connect, or null if it sent no `hello`.
+     */
+    public function hello(): ?\stdClass
+    {
+        return $this->hello;
     }
 
     /**
@@ -129,6 +180,13 @@ final class WsTestClient
      */
     public function receiveText(): string
     {
+        if (null !== $this->pushedBack) {
+            $frame            = $this->pushedBack;
+            $this->pushedBack = null;
+
+            return $frame;
+        }
+
         $hdr = $this->readExact(2);
         $b0  = ord($hdr[0]);
         $b1  = ord($hdr[1]);

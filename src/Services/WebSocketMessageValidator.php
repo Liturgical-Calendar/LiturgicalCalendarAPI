@@ -60,6 +60,23 @@ final class WebSocketMessageValidator
     ];
 
     /**
+     * The protocol versions this server can read — #806 section F.
+     *
+     * An absent `protocol` is not in this list and is not meant to be: it means the legacy shapes,
+     * which predate versioning and are handled exactly as before. This list governs what a client
+     * may *declare*, and the highest entry is what {@see \LiturgicalCalendar\Api\Health::onOpen()}
+     * advertises in its `hello` frame.
+     *
+     * Kept here rather than on `Health` because this class is what refuses a message the server
+     * cannot read, and because the published schema's `protocolVersion` enum is pinned to this
+     * constant by a test — the two are one statement, and they belong next to the other place the
+     * schema is the authority.
+     *
+     * @var list<int>
+     */
+    public const SUPPORTED_PROTOCOL_VERSIONS = [1];
+
+    /**
      * The whole-document schema, used only when a message's shape cannot be determined at all.
      * Unreachable through {@see \LiturgicalCalendar\Api\Health::onMessage()}, which already refuses
      * an unrecognised action with `UNKNOWN_ACTION` before `validate()` ever runs — kept so a direct
@@ -145,6 +162,78 @@ final class WebSocketMessageValidator
     private static function article(string $word): string
     {
         return in_array($word[0] ?? '', ['a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U'], true) ? 'an' : 'a';
+    }
+
+    /**
+     * Why a message's declared protocol cannot be read, or null when it can — #806 section F.
+     *
+     * Deliberately **not** part of {@see self::validate()}, and the separation is the point. `validate()`
+     * answers "is this a well-formed message of a shape I know", which is a question that only makes
+     * sense once both ends agree on how to read it. The protocol version is that agreement, so it is
+     * settled first, by a caller that has not yet decided what the message even is — see the ordering
+     * note in {@see \LiturgicalCalendar\Api\Health::onMessage()}.
+     *
+     * **The type check is as load-bearing as the value check.** `1.0` decodes to a PHP float that is
+     * numerically the supported version; accepting it on that basis would let a float through to a
+     * typed parameter, and coercive typing refuses that with a `\TypeError` — an `\Error`, which
+     * Ratchet's `IoServer::handleData` does not catch, taking the process down for every connected
+     * client. Same hazard `Health::VALIDATABLE_RESPONSE_FORMATS` and `Health::cancelRun()` document,
+     * reached through a third door.
+     */
+    public static function protocolViolation(mixed $message): ?string
+    {
+        // `mixed` rather than `\stdClass`, and the guard lives here rather than at the call site.
+        // Two reasons, one practical and one about where a rule belongs. `Health::onMessage()`
+        // hands this the raw `json_decode()` result, which is anything at all; and a call site that
+        // had to narrow first would narrow the variable for everything after it, which is how six
+        // later guards in that method — each one deliberate — became statically dead.
+        if (false === $message instanceof \stdClass || false === property_exists($message, 'protocol')) {
+            return null;
+        }
+
+        /** @var mixed $declared */
+        $declared = $message->protocol;
+
+        if (is_int($declared) && in_array($declared, self::SUPPORTED_PROTOCOL_VERSIONS, true)) {
+            return null;
+        }
+
+        return sprintf(
+            'This server speaks protocol %s. Send an integer protocol it supports, or omit the property entirely for the legacy contract; the hello frame sent on connect advertises what it accepts.',
+            implode(', ', array_map('strval', self::SUPPORTED_PROTOCOL_VERSIONS))
+        );
+    }
+
+    /**
+     * The action names the contract declares, read from the schema so that nothing carries a second
+     * list of them.
+     *
+     * `validateCalendar` has two definitions — a legacy and a typed shape — and appears once here: the
+     * wire carries actions, and `validateCalendarTyped` is an internal definition name no client can
+     * send. See {@see self::KNOWN_SHAPES}, which is the other list and counts the other way.
+     *
+     * @return list<string>
+     */
+    public function supportedActions(): array
+    {
+        $actions = [];
+        foreach ((array) $this->raw()->definitions as $definition) {
+            if (false === $definition instanceof \stdClass || false === isset($definition->properties)) {
+                continue;
+            }
+
+            $properties = $definition->properties;
+            if (false === $properties instanceof \stdClass || false === isset($properties->action)) {
+                continue;
+            }
+
+            $action = $properties->action;
+            if ($action instanceof \stdClass && isset($action->const) && is_string($action->const)) {
+                $actions[] = $action->const;
+            }
+        }
+
+        return array_values(array_unique($actions));
     }
 
     /**

@@ -22,4 +22,14 @@ enum ProtocolErrorCode: string
     case UNKNOWN_TARGET_ID  = 'unknown_target_id';
     case INVALID_MESSAGE    = 'invalid_message';
     case INTERNAL_ERROR     = 'internal_error';
+
+    /**
+     * The client declared a protocol version this server does not speak — #806 section F.
+     *
+     * Separate from `INVALID_MESSAGE` by the rule above, because a client acts on it differently:
+     * every other schema violation means "fix this message", while this one means "you are talking
+     * to a server of the wrong vintage" and the remedy is to fall back or to stop, not to correct a
+     * field. The `hello` frame names the version that would have worked.
+     */
+    case UNSUPPORTED_PROTOCOL = 'unsupported_protocol';
 }

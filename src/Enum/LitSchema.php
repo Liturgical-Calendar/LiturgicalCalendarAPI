@@ -27,6 +27,7 @@ enum LitSchema: string
     case SCHEMAS           = '/LitCalSchemasPath.json';
     case VALIDATIONS       = '/LitCalValidationsPath.json';
     case WEBSOCKET_MESSAGE = '/WebSocketMessage.json';
+    case WEBSOCKET_FRAME   = '/WebSocketFrame.json';
 
     public function path(): string
     {
@@ -68,7 +69,8 @@ enum LitSchema: string
             LitSchema::DATA     => $ERRMSG . 'Data path data not valid',
             LitSchema::SCHEMAS  => $ERRMSG . 'Schemas path data not valid',
             LitSchema::VALIDATIONS => $ERRMSG . 'Validations path data not valid',
-            LitSchema::WEBSOCKET_MESSAGE => $ERRMSG . 'WebSocket message not valid'
+            LitSchema::WEBSOCKET_MESSAGE => $ERRMSG . 'WebSocket message not valid',
+            LitSchema::WEBSOCKET_FRAME   => $ERRMSG . 'WebSocket frame not valid'
         };
     }
 
@@ -95,6 +97,7 @@ enum LitSchema: string
             LitSchema::SCHEMAS->path()           => LitSchema::SCHEMAS,
             LitSchema::VALIDATIONS->path()       => LitSchema::VALIDATIONS,
             LitSchema::WEBSOCKET_MESSAGE->path() => LitSchema::WEBSOCKET_MESSAGE,
+            LitSchema::WEBSOCKET_FRAME->path()   => LitSchema::WEBSOCKET_FRAME,
             default                              => throw new ValidationException('Invalid schema URL: ' . $url)
         };
     }

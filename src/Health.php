@@ -366,6 +366,11 @@ class Health implements MessageComponentInterface
             echo "New connection! ({$conn->resourceId}) and current working directory is " . getcwd() . "\n";
         }
 
+        // Announce the contract before anything is asked of the client — #806 section F. Sent here,
+        // ahead of the cache and metadata bootstrapping below, because those are this server's
+        // concerns and neither gates the client's ability to read this frame.
+        $this->sendMessage($conn, $this->helloFrame());
+
         // Initialize Router paths before creating logger (LoggerFactory needs Router::$apiFilePath)
         Router::getApiPaths();
 
@@ -528,6 +533,48 @@ class Health implements MessageComponentInterface
     }
 
     /**
+     * The frame announcing what this server speaks — #806 section F.
+     *
+     * **Nothing here is written down twice.** Every list is read from whatever already defines it:
+     * the `Rite`, `Step` and `Status` enums, the response formats {@see Health::validateCalendar()}
+     * actually has a branch for, and — through {@see WebSocketMessageValidator::supportedActions()} —
+     * the actions the published schema declares. #806 exists because the vocabulary and the layout
+     * lived in several places that had to be edited in lockstep; a hand-written capability list would
+     * be one more of them, and one that fails silently, since a stale advertisement misleads a client
+     * without breaking any test that does not compare it against the source.
+     *
+     * `responseFormats` advertises the narrow list on purpose. `ReturnTypeParam` knows more formats,
+     * but `ReturnTypeParam::from()` throws a `\ValueError` on the ones `validateCalendar()` has no
+     * branch for, and a `\ValueError` is an `\Error` that Ratchet does not catch — so advertising the
+     * wider set would invite a client to kill the server by taking the advertisement at its word.
+     *
+     * **This frame must stay unsolicited-safe.** It is sent on connect, before the connection is on
+     * any run, so `sendMessage()` stamps no `runToken` onto it — and that is exactly why the shipped
+     * v1 runners drop it: both guard their handler on `currentRunToken === null` and then on
+     * `responseData.runToken !== currentRunToken`, so an untagged frame never reaches the `type`
+     * dispatch that UnitTestInterface#46 made paint an unrecognised type as a failed check. Sending
+     * this frame at any other moment would break the live UI. Pinned by `HealthHelloFrameTest`.
+     */
+    private function helloFrame(): \stdClass
+    {
+        $capabilities                  = new \stdClass();
+        $capabilities->rites           = array_column(Rite::cases(), 'value');
+        $capabilities->actions         = $this->messageValidator->supportedActions();
+        $capabilities->responseFormats = self::VALIDATABLE_RESPONSE_FORMATS;
+        $capabilities->steps           = array_column(Step::cases(), 'value');
+        $capabilities->statuses        = array_column(Status::cases(), 'value');
+
+        $frame       = new \stdClass();
+        $frame->type = 'hello';
+        // The highest version understood, not the whole set: a client that needs to know what else
+        // would have been accepted learns it from the refusal, which names them.
+        $frame->protocol     = max(WebSocketMessageValidator::SUPPORTED_PROTOCOL_VERSIONS);
+        $frame->capabilities = $capabilities;
+
+        return $frame;
+    }
+
+    /**
      * Handle an incoming message.
      *
      * This function is called whenever a user sends a message to the WebSocket
@@ -546,11 +593,30 @@ class Health implements MessageComponentInterface
         echo sprintf('Receiving message from connection %d: %s', $resourceId, $msg . "\n");
         /** @var ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource|ValidateCalendar|ValidateTypedCalendar|ExecuteUnitTest|RunTest|CancelRun|ValidateSource $messageReceived */
         $messageReceived = json_decode($msg);
+        // Settled before anything below mutates run state — #806 section F.
+        //
+        // The *answer* is sent further down, once `requestId` has been read, so a refusal can be
+        // correlated to the request the client is waiting on. But the **question** has to be asked
+        // here: the block immediately below installs a run token and can rebuild the checkable
+        // inventory, and a message this server has just said it cannot read must not be able to do
+        // either. Deciding early and answering late keeps both properties; deciding late kept only
+        // the second.
+        $protocolViolation = WebSocketMessageValidator::protocolViolation($messageReceived);
+
+        // The run token the message declares, as opposed to the one this connection is on. Needed
+        // because a message refused for its protocol never gets its token stored, and a rejection
+        // frame carrying no token is dropped by the shipped clients — they discard any frame whose
+        // `runToken` does not match the run they believe they are on, so an uncorrelated refusal of
+        // a run's *first* message would be invisible in the UI rather than merely uninformative.
+        $declaredRunToken = self::declaredCorrelationId($messageReceived, 'runToken');
+
         // Store optional run token for response correlation. `cancelRun` is exempt: it names the run it
         // wants abandoned rather than the run this connection is on, and storing it here would install
         // the very token cancelRun() is about to clear — making even a stale cancel match, and dropping
         // the queue of the run that replaced it.
         if (
+            null === $protocolViolation
+            &&
             $messageReceived instanceof \stdClass
             && property_exists($messageReceived, 'action')
             && $messageReceived->action !== 'cancelRun'
@@ -609,6 +675,31 @@ class Health implements MessageComponentInterface
                 return;
             }
             $requestId = $candidateRequestId;
+        }
+
+        // The protocol version, settled before anything decides what the message *is* — #806 section F.
+        //
+        // Ahead of `UNKNOWN_ACTION` and of schema validation, and the ordering is a claim about
+        // meaning rather than a micro-optimisation: the version says how the rest of the message is to
+        // be read, so answering `{"action": "bogus", "protocol": 7}` with `unknown_action` would assert
+        // something this server cannot know — under protocol 7 that action might be perfectly well
+        // defined. `unsupported_protocol` is the only answer that is true.
+        //
+        // *Behind* the `requestId` read, though, so a refusal can be attributed: a client that
+        // declared an unreadable protocol is waiting on frames it means to match by request id, and a
+        // refusal carrying none would leave that request pending forever. The two orderings are not in
+        // tension — the first is about judging the message, the second only about being able to
+        // address the answer.
+        if (null !== $protocolViolation) {
+            echo sprintf('Unsupported protocol from connection %1$d: %2$s', $resourceId, $msg);
+            $this->rejectMessage(
+                $from,
+                ProtocolErrorCode::UNSUPPORTED_PROTOCOL,
+                $protocolViolation,
+                requestId: $requestId,
+                runToken: $declaredRunToken
+            );
+            return;
         }
 
         if (
@@ -1143,14 +1234,19 @@ class Health implements MessageComponentInterface
      *
      * `text` carries the prose, as every other frame in this protocol does. #806's sketch spells it
      * `message`; a second name for an existing field is the duplication that issue exists to remove.
+     *
+     * @param ?string $runToken The run to tag the frame with, for a refusal issued *before* the message's
+     *        token was stored on the connection — which is every refusal that must not mutate run state,
+     *        `UNSUPPORTED_PROTOCOL` being the one today. Null everywhere else, where `sendMessage()`'s
+     *        per-connection fallback is already the right answer.
      */
-    private function rejectMessage(ConnectionInterface $to, ProtocolErrorCode $code, string $text, ?string $requestId = null): void
+    private function rejectMessage(ConnectionInterface $to, ProtocolErrorCode $code, string $text, ?string $requestId = null, ?string $runToken = null): void
     {
         $message            = new \stdClass();
         $message->type      = 'protocolError';
         $message->errorCode = $code->value;
         $message->text      = $text;
-        $this->sendMessage($to, $message, requestId: $requestId);
+        $this->sendMessage($to, $message, $runToken, requestId: $requestId);
     }
 
     /**
@@ -1159,6 +1255,28 @@ class Health implements MessageComponentInterface
      * request's token; that token is then threaded into the handler's async responses so they
      * are stamped correctly even after a later run overwrites the per-connection stored token.
      */
+    /**
+     * A well-formed correlation id a message declares, or null if it declares none.
+     *
+     * Takes `mixed` deliberately: the caller holds the raw `json_decode()` result, and a call site
+     * that narrowed it first would narrow it for everything after — which is how six later guards in
+     * {@see Health::onMessage()}, each one there on purpose, became statically dead. The type check
+     * belongs with the value check, in one place, for the same reason {@see Health::cancelRun()}
+     * takes `mixed`.
+     *
+     * @param string $property `runToken` or `requestId`; one alphabet governs both.
+     */
+    private static function declaredCorrelationId(mixed $message, string $property): ?string
+    {
+        if (false === $message instanceof \stdClass || false === property_exists($message, $property)) {
+            return null;
+        }
+
+        $value = $message->{$property};
+
+        return ( is_string($value) && 1 === preg_match(self::CORRELATION_ID_PATTERN, $value) ) ? $value : null;
+    }
+
     private function resolveRunToken(ConnectionInterface $conn): ?string
     {
         return is_int($conn->resourceId) ? ( $this->runTokens[$conn->resourceId] ?? null ) : null;
