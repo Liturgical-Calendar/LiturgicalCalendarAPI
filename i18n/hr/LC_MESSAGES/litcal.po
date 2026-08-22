@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-21 23:24+0000\n"
+"POT-Creation-Date: 2026-08-22 09:53+0000\n"
 "PO-Revision-Date: 2025-12-19 19:23+0000\n"
 "Last-Translator: Weblate Admin <admin@example.com>\n"
 "Language-Team: Croatian <https://translate.johnromanodorazio.com/projects/"
@@ -1506,11 +1506,11 @@ msgstr ""
 "%1$s '%2$s', vlastitom kalendaru %3$s i obično slavljen %4$s, potisnut je od "
 "%5$s %6$s u godini %7$d."
 
-#: src/Handlers/CalendarHandler.php:5118
+#: src/Handlers/CalendarHandler.php:5126
 msgid "Error converting Liturgical Calendar to XML."
 msgstr "Greška pri pretvaranju liturgijskog kalendara u XML."
 
-#: src/Handlers/CalendarHandler.php:5149
+#: src/Handlers/CalendarHandler.php:5157
 msgid "Error serializing Liturgical Calendar."
 msgstr "Pogreška pri serijalizaciji liturgijskog kalendara."
 

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-21 23:24+0000\n"
+"POT-Creation-Date: 2026-08-22 09:53+0000\n"
 "PO-Revision-Date: 2026-06-19 18:50+0000\n"
 "Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Indonesian <https://translate.johnromanodorazio.com/projects/"
@@ -1512,11 +1512,11 @@ msgstr ""
 "%1$s '%2$s', yang sesuai dengan kalender %3$s dan biasanya dirayakan pada "
 "%4$s, dibatalkan oleh %5$s %6$s pada tahun %7$d."
 
-#: src/Handlers/CalendarHandler.php:5118
+#: src/Handlers/CalendarHandler.php:5126
 msgid "Error converting Liturgical Calendar to XML."
 msgstr "Kesalahan mengonversi Kalender Liturgi ke XML."
 
-#: src/Handlers/CalendarHandler.php:5149
+#: src/Handlers/CalendarHandler.php:5157
 msgid "Error serializing Liturgical Calendar."
 msgstr "Kesalahan saat melakukan serialisasi Kalender Liturgi."
 
