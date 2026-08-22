@@ -119,9 +119,10 @@ class Router
      * Absence of a rite segment defaults to Roman. No nation, diocese or path-category
      * identifier collides with a rite value, so this is unambiguous.
      *
-     * `data` takes the segment but is deliberately absent from {@see self::canonicalRiteUrl()}:
-     * that header advertises the explicit form for cacheable read routes, and `/data` is an
-     * admin write surface where a `Link: rel="canonical"` on a PUT is noise.
+     * `data` takes the segment on every method it accepts, but {@see self::canonicalRiteUrl()}
+     * advertises the explicit form only for its read methods (`GET` and `POST`). `/data` is also
+     * an admin write surface, and a `Link: rel="canonical"` on a `PUT` is noise: it would name a
+     * canonical representation of a request that is not a representation at all (#848).
      *
      * Of the two equivalent forms, the explicit one is canonical: a request that omits the
      * rite segment is answered with a `Link: rel="canonical"` header naming the explicit URL
@@ -184,19 +185,32 @@ class Router
      * break the browser clients that build the bare paths (liturgy-components-js `PathBuilder`).
      *
      * Returns null when no canonical form applies: the request already carried an explicit rite
-     * segment, or the route carries no rite segment at all.
+     * segment, the route carries no rite segment at all, or the request method is not a read
+     * method. Only `GET` and `POST` qualify, `POST` because all three route families accept it as
+     * the "retrieve with parameters in a request body" spelling of `GET`. That scoping is what
+     * lets `/data` take part: it is a mixed read/write surface, and `rel="canonical"` on a `PUT`
+     * would describe nothing the request is doing (#848). The same rule keeps the header off a
+     * CORS preflight, which is an `OPTIONS` control response rather than a representation of the
+     * resource, so no separate preflight guard is needed at the call site.
      *
      * @param string       $route               the first path segment (the endpoint), already shifted off
+     * @param string       $method              the request method; only the read methods advertise a canonical form
      * @param bool         $riteSegmentExplicit whether the request already carried a rite segment
      * @param Rite         $rite                the rite resolved for this request
      * @param list<string> $pathParts           the path segments following the route, rite segment already stripped
      * @param string       $query               the raw request query string, preserved on the canonical URL
      */
-    public static function canonicalRiteUrl(string $route, bool $riteSegmentExplicit, Rite $rite, array $pathParts, string $query = ''): ?string
+    public static function canonicalRiteUrl(string $route, string $method, bool $riteSegmentExplicit, Rite $rite, array $pathParts, string $query = ''): ?string
     {
         // The root route resolves to the calendar handler, but canonicalising `/` to
         // `/calendar/roman` would rename the endpoint rather than merely make the rite explicit.
-        if ($riteSegmentExplicit || false === in_array($route, ['calendar', 'events'], true)) {
+        if ($riteSegmentExplicit || false === in_array($route, ['calendar', 'events', 'data'], true)) {
+            return null;
+        }
+
+        // Read methods only, which is both what `/data`'s write surface requires and what keeps
+        // the header off a CORS preflight (see the note above).
+        if (false === in_array($method, [RequestMethod::GET->value, RequestMethod::POST->value], true)) {
             return null;
         }
 
@@ -796,19 +810,17 @@ class Router
             ->withHeader('X-Request-Id', $this->requestId);
 
         // A request that omitted the optional rite segment advertises the canonical explicit-rite
-        // form (RFC 6596). Only on success: pointing at a canonical URL for a request that did not
-        // resolve would just name an equally invalid URL. Never on a CORS preflight, which is a
-        // control response rather than a representation of the resource.
-        $isPreflight  = $this->request->getMethod() === RequestMethod::OPTIONS->value;
-        $canonicalUrl = $isPreflight
-            ? null
-            : self::canonicalRiteUrl(
-                $route,
-                $riteSegmentExplicit,
-                $rite,
-                $canonicalPathParts,
-                $this->request->getUri()->getQuery()
-            );
+        // form (RFC 6596), on read methods only — canonicalRiteUrl() applies that rule, which is
+        // also what keeps the header off a CORS preflight. Only on success: pointing at a
+        // canonical URL for a request that did not resolve would just name an equally invalid URL.
+        $canonicalUrl = self::canonicalRiteUrl(
+            $route,
+            $this->request->getMethod(),
+            $riteSegmentExplicit,
+            $rite,
+            $canonicalPathParts,
+            $this->request->getUri()->getQuery()
+        );
         // 304 is included alongside 2xx: a resolved conditional request stands in for the 200 it
         // would otherwise have been and describes the same resource, so a client driving its own
         // conditional requests should not lose the canonical URL merely because its cache was
