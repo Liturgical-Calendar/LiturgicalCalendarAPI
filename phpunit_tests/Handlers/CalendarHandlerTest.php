@@ -127,23 +127,26 @@ final class CalendarHandlerTest extends AbstractHandlerTestCase
     }
 
     /**
-     * When the GitHub release lookup fails (e.g. api.github.com rate-limits the
-     * server), ICS generation must not 503: it falls back to the current UTC
-     * time so produceIcal can still emit a valid CREATED line.
+     * When the GitHub release lookup fails (e.g. api.github.com rate-limits the server), ICS
+     * generation must not 503 — but it must not invent a date either.
+     *
+     * This used to return `gmdate()`, the current instant, so that produceIcal could always emit a
+     * CREATED line. That line is hashed into the ICS ETag (unlike DTSTAMP, which validatorSource()
+     * blanks out), so an unchanged calendar got a fresh validator on every request and a
+     * conditional GET could never answer 304. It was also untrue: CREATED means when the component
+     * was created, not when this response happened to be serialized.
+     *
+     * Both fields are OPTIONAL in a VEVENT (RFC 5545 3.6.1), so the honest answer is null and
+     * produceIcal omits them. See #849 and IcalTimestampStabilityTest.
      */
-    public function testResolveIcalReleaseObjectFallsBackToUtcNowOnError(): void
+    public function testResolveIcalReleaseObjectReturnsNullOnErrorRatherThanInventingADate(): void
     {
         $infoObj = (object) ['status' => 'error', 'message' => '403 rate limit exceeded'];
 
         $result = ( new \ReflectionMethod(CalendarHandler::class, 'resolveIcalReleaseObject') )
             ->invoke($this->makeHandler(), $infoObj);
 
-        self::assertIsString($result->published_at);
-        self::assertMatchesRegularExpression(
-            '/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/',
-            $result->published_at,
-            'Fallback published_at must be an RFC3339 UTC timestamp for the ICS CREATED field'
-        );
+        self::assertNull($result, 'a failed release lookup must report "unknown", not the current time');
     }
 
     /**

@@ -4854,13 +4854,14 @@ final class CalendarHandler extends AbstractHandler
      *
      * The release lookup is non-essential metadata: when it failed (GitHub
      * unreachable or rate-limited with HTTP 403), it must not take the whole
-     * calendar down with a 503. Fall back to the current UTC time and log a
-     * warning so the ICS still renders.
+     * calendar down with a 503. Return null and log a warning so the ICS still
+     * renders, simply without the two optional fields that date it.
      *
      * @param GitHubReleaseInfoSuccess|GitHubReleaseInfoError $infoObj result of {@see self::getGithubReleaseInfo()}
-     * @return \stdClass an object exposing a `published_at` string for {@see self::produceIcal()}
+     * @return ?\stdClass an object exposing a `published_at` string, or null when the release is
+     *         unknown — see the note in the body for why null rather than a fallback timestamp
      */
-    private function resolveIcalReleaseObject(\stdClass $infoObj): \stdClass
+    private function resolveIcalReleaseObject(\stdClass $infoObj): ?\stdClass
     {
         if ($infoObj->status === 'success') {
             /** @var GitHubReleaseInfoSuccess $infoObj */
@@ -4869,11 +4870,21 @@ final class CalendarHandler extends AbstractHandler
 
         /** @var GitHubReleaseInfoError $infoObj */
         $logger = LoggerFactory::create('calendar', null, 30, false, true, false);
-        $logger->warning('GitHub release info unavailable; using fallback timestamp for ICS CREATED', [
+        $logger->warning('GitHub release info unavailable; ICS will omit CREATED/LAST-MODIFIED', [
             'reason' => $infoObj->message,
         ]);
 
-        return (object) ['published_at' => gmdate('Y-m-d\TH:i:s\Z')];
+        // Deliberately NOT a fallback timestamp. This used to answer `gmdate()` — the current
+        // instant — which made every regeneration of an unchanged calendar emit different
+        // CREATED/LAST-MODIFIED values. Those are hashed into the ICS ETag (unlike DTSTAMP, which
+        // {@see self::validatorSource()} blanks out), so the validator changed on every request and
+        // a conditional GET could never answer 304: an ICS client re-downloaded ~370 KB each time.
+        //
+        // It was also untrue. CREATED means "when this component was created"; stamping it with the
+        // moment of serialization asserts something that did not happen. Both fields are OPTIONAL in
+        // a VEVENT (RFC 5545 §3.6.1), so when the release date is unknown the honest answer — and
+        // the one that keeps the ETag stable — is to say nothing. See #849.
+        return null;
     }
 
 
@@ -5375,12 +5386,37 @@ final class CalendarHandler extends AbstractHandler
      * it may be different. So UID must take into account the year
      *
      * @param \stdClass $SerializeableLitCal
-     * @param \stdClass $GitHubReleasesObj
+     * @param ?\stdClass $GitHubReleasesObj release whose `published_at` dates the events, or null when unknown
      *
      * @return string
      */
-    private function produceIcal(\stdClass $SerializeableLitCal, \stdClass $GitHubReleasesObj): string
+    private function produceIcal(\stdClass $SerializeableLitCal, ?\stdClass $GitHubReleasesObj): string
     {
+        // Resolved once, not per event: every VEVENT carries the same two stamps.
+        //
+        // `published_at` is the release date, so CREATED/LAST-MODIFIED say when the calendar data
+        // was last revised — which is what those fields mean, and what makes them stable across
+        // regenerations of an unchanged calendar. When it is unknown they are omitted rather than
+        // filled with the current time (#849).
+        $publishedStamp = null;
+        if (null !== $GitHubReleasesObj && is_string($GitHubReleasesObj->published_at ?? null)) {
+            $publishedAt = strtotime($GitHubReleasesObj->published_at);
+            if (false !== $publishedAt) {
+                $publishedStamp = gmdate('Ymd\THis\Z', $publishedAt);
+            }
+        }
+
+        // DTSTAMP is REQUIRED (RFC 5545 3.6.1) and must be a UTC date-time, so it always gets a
+        // value: the release date when known, otherwise now. Its volatility costs nothing, because
+        // {@see self::validatorSource()} blanks it out before the ETag is computed.
+        //
+        // Built with gmdate(), not date(). The previous spelling was
+        // `date('Ymd') . 'T' . date('His') . 'Z'` — server-LOCAL time carrying a literal `Z`, which
+        // on this Europe/Vatican host was two hours ahead of the instant it claimed. The events are
+        // all-day (`DTSTART;VALUE=DATE`) and carry no timezone at all; only these metadata stamps
+        // do, and theirs has to be genuine UTC.
+        $dtstamp = $publishedStamp ?? gmdate('Ymd\THis\Z');
+
         $ical  = "BEGIN:VCALENDAR\r\n";
         $ical .= "PRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\r\n";
         $ical .= "VERSION:2.0\r\n";
@@ -5442,13 +5478,10 @@ final class CalendarHandler extends AbstractHandler
             $ical .= "BEGIN:VEVENT\r\n";
             $ical .= "CLASS:PUBLIC\r\n";
 
-            /** @var string $publishDate */
-            $publishDate = $GitHubReleasesObj->published_at;
-
             $ical .= 'DTSTART;VALUE=DATE:' . $liturgicalEvent->date->format('Ymd') . "\r\n";// . "T" . $liturgicalEvent->date->format( 'His' ) . "Z\r\n";
             //$liturgicalEvent->date->add( new \DateInterval( 'P1D' ) );
             //$ical .= "DTEND:" . $liturgicalEvent->date->format( 'Ymd' ) . "T" . $liturgicalEvent->date->format( 'His' ) . "Z\r\n";
-            $ical .= 'DTSTAMP:' . date('Ymd') . 'T' . date('His') . "Z\r\n";
+            $ical .= 'DTSTAMP:' . $dtstamp . "\r\n";
             /**
              * The event created in the calendar is specific to this civil year, next year it may be different.
              * So UID must take into account the civil year.
@@ -5457,11 +5490,15 @@ final class CalendarHandler extends AbstractHandler
              * The event could occur twice in the same liturgical year, but will be treated as a separate event since we have identified it with the civil year.
              */
             $ical .= 'UID:' . md5('LITCAL-' . $liturgicalEvent->event_key . '-' . $liturgicalEvent->date->format('Y')) . "\r\n";
-            $ical .= 'CREATED:' . str_replace(':', '', str_replace('-', '', $publishDate)) . "\r\n";
+            if (null !== $publishedStamp) {
+                $ical .= 'CREATED:' . $publishedStamp . "\r\n";
+            }
 
             $desc  = 'DESCRIPTION:' . self::escapeIcal($description);
             $ical .= strlen($desc) > 75 ? rtrim(chunk_split($desc, 71, "\r\n\t")) . "\r\n" : "$desc\r\n";
-            $ical .= 'LAST-MODIFIED:' . str_replace(':', '', str_replace('-', '', $publishDate)) . "\r\n";
+            if (null !== $publishedStamp) {
+                $ical .= 'LAST-MODIFIED:' . $publishedStamp . "\r\n";
+            }
 
             $normalizedLocale = str_replace('_', '-', $this->CalendarParams->Locale);
             $summaryLang      = ';LANGUAGE=' . $normalizedLocale;
