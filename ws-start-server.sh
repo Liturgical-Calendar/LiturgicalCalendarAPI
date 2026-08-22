@@ -26,4 +26,4 @@ pid=$!
 echo "$pid" > ws-server.pid
 
 # Feedback
-echo "Webosocket Server successfully started (PID: $pid)"
+echo "Websocket Server successfully started (PID: $pid)"
