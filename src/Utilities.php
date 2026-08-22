@@ -453,7 +453,7 @@ class Utilities
                 return $txt->i18n($locale);
             }, $colors);
 
-            $or = $locale === LitLocale::LATIN || $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'vel' : _('or');
+            $or = LitLocale::isLatin($locale) ? 'vel' : _('or');
             return implode(' ' . $or . ' ', $colorStrings);
         }
     }

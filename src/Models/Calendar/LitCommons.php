@@ -197,7 +197,7 @@ final class LitCommons implements \JsonSerializable
         }
         */
 
-        $fromTheCommon = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'De Commune' : _('From the Common');
+        $fromTheCommon = LitLocale::isLatin($locale) ? 'De Commune' : _('From the Common');
 
         /** @var string[] $commonsLcl */
         $commonsLcl = array_map(function (LitCommonItem $litCommonItem) use ($locale, $fromTheCommon): string {
@@ -225,7 +225,7 @@ final class LitCommons implements \JsonSerializable
         }, $this->commons);
 
         /**translators: when there are multiple possible commons, this will be the glue "[; or] From the Common of..." */
-        $or = $locale === LitLocale::LATIN_PRIMARY_LANGUAGE ? 'vel' : _('or');
+        $or = LitLocale::isLatin($locale) ? 'vel' : _('or');
         return implode('; ' . $or . ' ', $commonsLcl);
     }
 
@@ -254,7 +254,7 @@ final class LitCommons implements \JsonSerializable
      */
     public static function i18n(LitCommon $litCommon, string $locale): string
     {
-        return in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE], true)
+        return LitLocale::isLatin($locale)
             ? LitCommon::LATIN[$litCommon->name]
             : $litCommon->translate();
     }
@@ -272,7 +272,7 @@ final class LitCommons implements \JsonSerializable
      */
     private static function getPossessive(LitCommon $litCommon, string $locale): string
     {
-        return in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE], true)
+        return LitLocale::isLatin($locale)
             ? ''
             : $litCommon->possessive();
     }

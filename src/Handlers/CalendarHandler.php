@@ -5217,11 +5217,10 @@ final class CalendarHandler extends AbstractHandler
             throw new ServiceUnavailableException('“Pride was the reason for the division of tongues, humility the reason they were reunited.” - St. Augustine, The City of God, Book XVI, Chapter 4');
         }
 
-        $configured                  = LocaleConfigurator::configure($this->CalendarParams->Locale);
-        LitLocale::$PRIMARY_LANGUAGE = $configured->primaryLanguage;
-        LitLocale::$RUNTIME_LOCALE   = $configured->runtimeLocale;
+        // configure() publishes LitLocale::$PRIMARY_LANGUAGE and $RUNTIME_LOCALE itself (#865).
+        $configured = LocaleConfigurator::configure($this->CalendarParams->Locale);
 
-        LiturgicalEvent::setLocale(LitLocale::$RUNTIME_LOCALE);
+        LiturgicalEvent::setLocale($configured->runtimeLocale);
 
         $this->createFormatters();
 

@@ -155,7 +155,7 @@ enum LitSeason: string
      */
     public function i18n(string $locale): string
     {
-        $isLatin = in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE], true);
+        $isLatin = LitLocale::isLatin($locale);
         return match ($this) {
             /**translators: context = liturgical season */
             LitSeason::ADVENT         => $isLatin ? 'Tempus Adventus'     : _('Advent'),

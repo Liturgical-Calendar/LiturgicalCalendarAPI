@@ -21,6 +21,10 @@ use LiturgicalCalendar\Api\Models\EventsPath\LiturgicalEventAbstract;
  * models branch on the strict primary-language form ('la') for the Masses for Various
  * Needs commons, so the two handlers disagreed on that path.
  *
+ * Also covers #865: LocaleConfigurator::configure() now publishes
+ * LitLocale::$PRIMARY_LANGUAGE and $RUNTIME_LOCALE, so /events sets them too rather
+ * than inheriting whatever a prior request in the same worker left behind.
+ *
  * @see \LiturgicalCalendar\Tests\Models\EventsPath\MassVariousNeedsLatinLocaleTest
  */
 final class HandlerModelLocaleParityTest extends AbstractHandlerTestCase
@@ -167,5 +171,27 @@ final class HandlerModelLocaleParityTest extends AbstractHandlerTestCase
         $eventsLocale = self::modelLocale(LiturgicalEventAbstract::class);
 
         self::assertSame($calendarLocale, $eventsLocale, 'The two handlers must configure their models with the same locale (#749).');
+    }
+
+    public function testEventsRequestPublishesTheLitLocaleStatics(): void
+    {
+        // Poison the statics first, so a pass proves /events actively sets them rather
+        // than merely agreeing with a value some earlier request happened to leave.
+        LitLocale::$PRIMARY_LANGUAGE = 'xx';
+        LitLocale::$RUNTIME_LOCALE   = 'xx_XX';
+
+        $response = ( new EventsHandler() )->handle($this->requestFor('GET', '/events', [])->withQueryParams(['locale' => 'la_VA']));
+        self::assertSame(200, $response->getStatusCode());
+
+        self::assertSame(
+            LitLocale::LATIN_PRIMARY_LANGUAGE,
+            LitLocale::$PRIMARY_LANGUAGE,
+            '/events must publish LitLocale::$PRIMARY_LANGUAGE (#865).'
+        );
+        self::assertSame(
+            LitLocale::LATIN_PRIMARY_LANGUAGE,
+            LitLocale::$RUNTIME_LOCALE,
+            '/events must publish LitLocale::$RUNTIME_LOCALE (#865).'
+        );
     }
 }

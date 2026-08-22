@@ -1779,7 +1779,7 @@ final class LiturgicalEventCollection
         $litEventGradeLcl = '';
         if (self::dateIsSunday($litEvent->date) && $litEvent->grade->value < LitGrade::SOLEMNITY->value) {
             $dayOfTheWeek     = $this->dayOfTheWeek->format($litEvent->date->format('U')) ?: 'N/A';
-            $litEventGradeLcl = $this->CalendarParams->Locale === LitLocale::LATIN ? 'Die Domini' : ucfirst($dayOfTheWeek);
+            $litEventGradeLcl = LitLocale::isLatin($this->CalendarParams->Locale) ? 'Die Domini' : ucfirst($dayOfTheWeek);
         } else {
             if ($litEvent->grade->value > LitGrade::SOLEMNITY->value) {
                 $litEventGradeLcl = '<i>' . $litEvent->grade->i18n($this->CalendarParams->Locale, false) . '</i>';
@@ -1815,7 +1815,7 @@ final class LiturgicalEventCollection
                     if (self::dateIsSunday($VigilDate) && $coincidingEvent->event->grade->value < LitGrade::SOLEMNITY->value) {
                         //it's a Sunday
                         $dayOfTheWeek               = $this->dayOfTheWeek->format($VigilDate->format('U')) ?: 'N/A';
-                        $coincidingEvent->grade_lcl = $this->CalendarParams->Locale === LitLocale::LATIN
+                        $coincidingEvent->grade_lcl = LitLocale::isLatin($this->CalendarParams->Locale)
                             ? 'Die Domini'
                             : ucfirst($dayOfTheWeek);
                     } else {
@@ -2053,7 +2053,7 @@ final class LiturgicalEventCollection
                 throw new \RuntimeException('No Feast of the Lord found for ' . $currentLitEventDate->format('Y-m-d'));
             }
             $coincidingEvent->event     = $liturgicalEvent;
-            $coincidingEvent->grade_lcl = $this->CalendarParams->Locale === LitLocale::LATIN
+            $coincidingEvent->grade_lcl = LitLocale::isLatin($this->CalendarParams->Locale)
                 ? 'Die Domini'
                 : ucfirst($dayOfTheWeek);
         } elseif ($this->inSolemnities($currentLitEventDate) || $this->inFeastsLord($currentLitEventDate)) {
