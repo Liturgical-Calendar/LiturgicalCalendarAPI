@@ -124,6 +124,14 @@ jobs:
             echo "skip=false" >> "${GITHUB_OUTPUT}"
           fi
 
+      # Pre-flight: refuse to deploy a payload carrying non-runtime files. CI
+      # already asserts this on every PR, but a deploy can run from a tag or a
+      # hand-picked branch that never went through it, and the docroot is the
+      # application root — so the last gate before the wire checks too.
+      - name: Verify deploy payload contains only runtime files
+        if: steps.shape.outputs.skip != 'true'
+        run: ./.github/deploy/check-deploy-payload.sh
+
       - name: Set up PHP
         if: steps.shape.outputs.skip != 'true'
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
