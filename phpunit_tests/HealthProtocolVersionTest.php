@@ -178,6 +178,45 @@ final class HealthProtocolVersionTest extends TestCase
     }
 
     /**
+     * A message the server has just said it cannot read must not leave a mark on the run.
+     *
+     * The run-token block installs the connection's current run and, on a token change, rebuilds the
+     * checkable inventory. Both used to happen before the protocol was judged, so a message written
+     * in a protocol this server does not speak could still decide which run the connection was on —
+     * and every later frame would be tagged with a token that arrived in an unreadable message.
+     */
+    public function testAnUnsupportedProtocolLeavesTheConnectionOnNoRun(): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::createStubConnection(1);
+
+        ob_start();
+        $health->onMessage($conn, (string) json_encode(self::cancelRun(['protocol' => 7, 'runToken' => 'run-a'])));
+        ob_end_clean();
+
+        /** @var array<int, string> $tokens */
+        $tokens = ( new \ReflectionProperty(Health::class, 'runTokens') )->getValue($health);
+        self::assertSame([], $tokens, 'a message refused for its protocol installed a run token anyway');
+    }
+
+    /**
+     * …and yet the refusal still names the run, or the client never sees it.
+     *
+     * Both shipped runners discard any frame whose `runToken` does not match the run they believe
+     * they are on. A refusal of a run's *first* message carries no stored token to fall back on — so
+     * without the message's own token on the frame, the one error the client most needs to see would
+     * be the one it silently drops.
+     */
+    public function testTheRefusalStillNamesTheRunTheMessageDeclared(): void
+    {
+        $frames = $this->framesFor(self::cancelRun(['protocol' => 7, 'runToken' => 'run-a']));
+
+        self::assertCount(1, $frames);
+        self::assertSame('run-a', $frames[0]->runToken ?? null);
+        self::assertSame('run-a', $frames[0]->runId ?? null);
+    }
+
+    /**
      * Every shape must accept it, not just the one this file probes with. A client does not send
      * `protocol` on some of its messages.
      */

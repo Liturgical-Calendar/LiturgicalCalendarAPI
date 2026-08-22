@@ -234,10 +234,14 @@ final class WebSocketMessageSchemaTest extends TestCase
         /** @var list<int> $supported */
         $supported = ( new \ReflectionClassConstant(WebSocketMessageValidator::class, 'SUPPORTED_PROTOCOL_VERSIONS') )->getValue();
 
+        // Compared without coercing: `array_map('intval', ...)` would make a schema declaring
+        // `["1"]` or `[1.0]` pass a test whose whole job is to notice that the published document
+        // and the server disagree — and a string or a float there is exactly the kind of drift
+        // `protocolViolation()` refuses at the door.
         self::assertSame(
             $supported,
-            array_map('intval', (array) $raw->definitions->protocolVersion->enum),
-            'the published protocol versions are not the ones the server accepts'
+            (array) $raw->definitions->protocolVersion->enum,
+            'the published protocol versions are not the ones the server accepts, in value or in type'
         );
     }
 

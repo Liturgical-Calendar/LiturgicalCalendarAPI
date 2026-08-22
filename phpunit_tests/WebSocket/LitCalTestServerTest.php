@@ -53,6 +53,40 @@ final class LitCalTestServerTest extends TestCase
         fclose($probe);
     }
 
+    /**
+     * The `hello` frame, against a server that is actually running — #806 section F.
+     *
+     * The in-process suites assert what `Health::onOpen()` builds; this asserts what a client
+     * receives, which is not the same statement. Sixteen tests in this directory read `hello` where
+     * they expected their own answer when the frame was introduced, precisely because the frame is
+     * real on the wire and only the live suites see the wire. That the suite skips when no server
+     * is reachable is what let it reach CI.
+     */
+    public function testTheServerAdvertisesItsContractOnConnect(): void
+    {
+        $client = WsTestClient::connect($this->wsHost, $this->wsPort);
+
+        $hello = $client->hello();
+        $this->assertNotNull($hello, 'a connecting client was not sent a hello frame');
+        $this->assertSame(1, $hello->protocol ?? null);
+
+        $capabilities = $hello->capabilities ?? null;
+        $this->assertIsObject($capabilities);
+        foreach (['rites', 'actions', 'responseFormats', 'steps', 'statuses'] as $capability) {
+            $this->assertIsArray($capabilities->{$capability} ?? null, "capabilities.{$capability} is missing");
+            $this->assertNotEmpty($capabilities->{$capability});
+        }
+        $this->assertContains('validateSource', $capabilities->actions);
+        $this->assertContains('complete', $capabilities->steps);
+
+        // No run correlation, which is what makes the frame invisible to a client that predates it:
+        // both shipped runners drop a frame whose runToken does not match the run they are on.
+        $this->assertObjectNotHasProperty('runToken', $hello);
+        $this->assertObjectNotHasProperty('runId', $hello);
+
+        $client->close();
+    }
+
     public function testHandshakeAndEcho(): void
     {
         $client = WsTestClient::connect($this->wsHost, $this->wsPort);

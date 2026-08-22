@@ -180,9 +180,14 @@ final class WebSocketMessageValidator
      * client. Same hazard `Health::VALIDATABLE_RESPONSE_FORMATS` and `Health::cancelRun()` document,
      * reached through a third door.
      */
-    public static function protocolViolation(\stdClass $message): ?string
+    public static function protocolViolation(mixed $message): ?string
     {
-        if (false === property_exists($message, 'protocol')) {
+        // `mixed` rather than `\stdClass`, and the guard lives here rather than at the call site.
+        // Two reasons, one practical and one about where a rule belongs. `Health::onMessage()`
+        // hands this the raw `json_decode()` result, which is anything at all; and a call site that
+        // had to narrow first would narrow the variable for everything after it, which is how six
+        // later guards in that method — each one deliberate — became statically dead.
+        if (false === $message instanceof \stdClass || false === property_exists($message, 'protocol')) {
             return null;
         }
 
