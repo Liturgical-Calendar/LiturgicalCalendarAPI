@@ -217,6 +217,37 @@ final class OpenApiDataRiteSegmentTest extends TestCase
     }
 
     /**
+     * Every calendar-definition path documents the full method surface the handler accepts.
+     *
+     * This claim used to ride along inside the locale test, which meant a future read-only `/data`
+     * tier would have failed a *locale* test with a message about a missing locale parameter. It
+     * belongs here, with the route surface. `Router`'s `data` case wires GET, POST, PUT, PATCH and
+     * DELETE for a two-part path; the i18n sub-resource paths are excluded because that same case
+     * wires only GET and POST for a three-part path (#838).
+     */
+    public function testEveryCalendarDefinitionPathDocumentsTheFullMethodSurface(): void
+    {
+        $paths = self::paths();
+        $seen  = 0;
+
+        foreach ($paths as $path => $pathItem) {
+            if (false === str_starts_with((string) $path, '/data/') || str_contains((string) $path, '{i18n_locale}')) {
+                continue;
+            }
+
+            /** @var array<string,mixed> $pathItem */
+            self::assertSame(
+                ['delete', 'get', 'patch', 'post', 'put'],
+                self::operationMethods($pathItem),
+                "{$path} must document the full method surface Router wires for a two-part /data path"
+            );
+            ++$seen;
+        }
+
+        self::assertGreaterThan(0, $seen, 'openapi.json documents no /data calendar-definition path at all');
+    }
+
+    /**
      * The HTTP methods a path item documents, sorted, with any non-method key (`parameters`,
      * `summary`, `description`, `servers`) filtered out — those are legal siblings of the operations
      * in an OpenAPI path item and are not operations themselves.
