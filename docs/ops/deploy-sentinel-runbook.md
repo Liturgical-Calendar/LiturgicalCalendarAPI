@@ -10,11 +10,19 @@ after files land:
 
 - **php-fpm must be reloaded.** Workers cache compiled PHP and, more stubbornly, gettext
   `.mo` translations. Without a reload, new translations do not appear.
-- **The WebSocket server must be restarted.** `public/LitCalTestServer.php` is a
+- **The WebSocket server must be restarted.** `bin/LitCalTestServer.php` is a
   long-running ReactPHP process. It loads `src/` into memory once, at start, and never
   re-reads it.
 
 So the deploy drops a sentinel file and a root-owned systemd path unit does the rest.
+
+> **Path change:** the WebSocket entrypoint moved from `public/LitCalTestServer.php` to
+> `bin/LitCalTestServer.php` — it is a CLI entrypoint, not a web one.
+> `deploy/systemd/litcal-websocket.service.in` is updated to match, but `deploy/` is excluded from
+> the rsync deploy, so the *installed* unit under `/etc/systemd` still points at the old path until
+> `deploy/install.sh` is re-run on the VPS. **Re-run it before or with the next restart**, or the
+> unit fails with "No such file or directory". `install.sh` renders the unit and restarts the
+> service, so it delivers the restart at the same time.
 
 ## The pieces
 

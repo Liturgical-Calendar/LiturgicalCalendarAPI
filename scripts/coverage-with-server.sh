@@ -41,7 +41,7 @@ mkdir -p "$COV_DIR" "$PWD/coverage"
 
 # The bootstrap hook in public/index.php reads PCOV_SERVER_COVERAGE_DIR from
 # the process environment (not $_ENV); exporting it propagates to the server.
-# The same env var also drives the matching hook in public/LitCalTestServer.php
+# The same env var also drives the matching hook in bin/LitCalTestServer.php
 # (see ws-start-server.sh, which conditionally enables pcov when the var is set).
 export PCOV_SERVER_COVERAGE_DIR="$COV_DIR"
 

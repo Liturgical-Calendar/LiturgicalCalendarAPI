@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  * **This test exists because the suite could not see the bug it guards.** `Health::__construct()`
  * builds a `WebSocketMessageValidator`, whose constructor resolves the message schema's path through
  * `Router::$apiFilePath` — a *typed* static, so reading it before assignment is a fatal `Error`, not
- * a null. `public/LitCalTestServer.php` calls `new Health()` without calling `Router::getApiPaths()`
+ * a null. `bin/LitCalTestServer.php` calls `new Health()` without calling `Router::getApiPaths()`
  * first; `Health::onOpen()` was where paths got initialised, on the first client connection. So the
  * WebSocket server died at startup, every time, on a code path 447 in-process tests never touched.
  *
