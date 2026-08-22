@@ -28,6 +28,28 @@ class LitLocale
     }
 
     /**
+     * Check whether the given locale denotes Latin, in either of the forms the API
+     * accepts: the primary language subtag `la` or the full locale `la_VA`.
+     *
+     * Both reach the code that renders liturgical text — `la_VA` is what the request
+     * layer settles on (CalendarParams, EventsParams), while `la` is what
+     * LocaleConfigurator resolves at runtime, since Latin has no installable system
+     * locale. Comparing against only one of them silently drops Latin output for
+     * requests that arrive in the other form (#749, #865).
+     *
+     * Use this rather than an ad-hoc comparison anywhere the value being tested is a
+     * full locale string. `self::$PRIMARY_LANGUAGE` is a bare language subtag by
+     * construction and is compared to LATIN_PRIMARY_LANGUAGE directly.
+     *
+     * @param string $locale The locale value to test.
+     * @return bool True when the locale is Latin in either accepted form.
+     */
+    public static function isLatin(string $locale): bool
+    {
+        return in_array($locale, [self::LATIN, self::LATIN_PRIMARY_LANGUAGE], true);
+    }
+
+    /**
      * Check if the given array of locales is valid.
      *
      * @param string[] $values The array of locale values to validate.

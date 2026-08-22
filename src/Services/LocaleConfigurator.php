@@ -21,6 +21,8 @@ use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
  *
  * Centralizes logic previously duplicated across CalendarHandler::prepareL10N(),
  * EventsHandler::setLocale(), and FerialEventNameGenerator::initializeGettext() (#745).
+ * Also publishes the resolved locale to LitLocale::$PRIMARY_LANGUAGE and
+ * LitLocale::$RUNTIME_LOCALE, so every route gets them set, not just /calendar (#865).
  */
 final class LocaleConfigurator
 {
@@ -40,7 +42,7 @@ final class LocaleConfigurator
 
         if ($primaryLanguage === LitLocale::LATIN_PRIMARY_LANGUAGE) {
             self::reset(LitLocale::LATIN_PRIMARY_LANGUAGE);
-            return new ConfiguredLocale(LitLocale::LATIN_PRIMARY_LANGUAGE, LitLocale::LATIN_PRIMARY_LANGUAGE, true);
+            return self::publish(new ConfiguredLocale(LitLocale::LATIN_PRIMARY_LANGUAGE, LitLocale::LATIN_PRIMARY_LANGUAGE, true));
         }
 
         $region = \Locale::getRegion($canonical);
@@ -81,7 +83,25 @@ final class LocaleConfigurator
         putenv("LANGUAGE={$languageEnv}");
         \Locale::setDefault($normalizedLocale);
 
-        return new ConfiguredLocale($primaryLanguage, $normalizedLocale, false);
+        return self::publish(new ConfiguredLocale($primaryLanguage, $normalizedLocale, false));
+    }
+
+    /**
+     * Publish the resolved locale to the LitLocale statics that downstream code reads,
+     * then return it.
+     *
+     * Done here rather than in each caller so that no caller can forget: CalendarHandler
+     * set them by hand while EventsHandler and the temporale path did not, leaving those
+     * routes reading whatever a previous request in the same persistent worker left
+     * behind — or the mutually inconsistent class defaults ('la' and 'en_US') on a cold
+     * worker (#865).
+     */
+    private static function publish(ConfiguredLocale $configured): ConfiguredLocale
+    {
+        LitLocale::$PRIMARY_LANGUAGE = $configured->primaryLanguage;
+        LitLocale::$RUNTIME_LOCALE   = $configured->runtimeLocale;
+
+        return $configured;
     }
 
     /**
