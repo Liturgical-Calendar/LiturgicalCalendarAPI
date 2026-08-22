@@ -25,13 +25,15 @@ use LiturgicalCalendar\Api\Models\EventsPath\LiturgicalEventAbstract;
  */
 final class HandlerModelLocaleParityTest extends AbstractHandlerTestCase
 {
-    private string $savedLocale          = 'C';
-    private ?string $savedLanguageEnv    = null;
-    private string $savedIcuDefault      = 'en';
-    private string $savedPrimaryLanguage = LitLocale::LATIN_PRIMARY_LANGUAGE;
-    private string $savedRuntimeLocale   = 'en_US';
-    private bool $hadServerName          = false;
-    private ?string $savedServerName     = null;
+    private string $savedLocale              = 'C';
+    private ?string $savedLanguageEnv        = null;
+    private string $savedIcuDefault          = 'en';
+    private string $savedPrimaryLanguage     = LitLocale::LATIN_PRIMARY_LANGUAGE;
+    private string $savedRuntimeLocale       = 'en_US';
+    private bool $hadServerName              = false;
+    private ?string $savedServerName         = null;
+    private string $savedCalendarModelLocale = LitLocale::LATIN_PRIMARY_LANGUAGE;
+    private string $savedEventsModelLocale   = LitLocale::LATIN_PRIMARY_LANGUAGE;
 
     protected function setUp(): void
     {
@@ -51,6 +53,11 @@ final class HandlerModelLocaleParityTest extends AbstractHandlerTestCase
         $this->savedRuntimeLocale   = LitLocale::$RUNTIME_LOCALE;
         $this->hadServerName        = array_key_exists('SERVER_NAME', $_SERVER);
         $this->savedServerName      = $this->hadServerName ? (string) $_SERVER['SERVER_NAME'] : null;
+
+        // The models' locale statics too: these tests drive the handlers precisely in
+        // order to mutate them, then read them back.
+        $this->savedCalendarModelLocale = self::modelLocale(LiturgicalEvent::class);
+        $this->savedEventsModelLocale   = self::modelLocale(LiturgicalEventAbstract::class);
 
         parent::setUp();
 
@@ -77,12 +84,13 @@ final class HandlerModelLocaleParityTest extends AbstractHandlerTestCase
         LitLocale::$PRIMARY_LANGUAGE = $this->savedPrimaryLanguage;
         LitLocale::$RUNTIME_LOCALE   = $this->savedRuntimeLocale;
 
-        // These tests drive the handlers precisely in order to mutate the models'
-        // process-global locale statics, then read them back. Restore both class
-        // defaults so a later test constructing a model without setting a locale is
-        // not silently handed this test's Italian.
-        LiturgicalEvent::setLocale(LitLocale::LATIN_PRIMARY_LANGUAGE);
-        LiturgicalEventAbstract::setLocale(LitLocale::LATIN_PRIMARY_LANGUAGE);
+        // Restore the models' locale statics to what they held on entry, so a later
+        // test constructing a model without setting a locale is not silently handed
+        // this test's Italian. Restored via setLocale() rather than by writing the
+        // static directly: LiturgicalEvent derives four IntlDateFormatters from the
+        // locale, which must stay consistent with it.
+        LiturgicalEvent::setLocale($this->savedCalendarModelLocale);
+        LiturgicalEventAbstract::setLocale($this->savedEventsModelLocale);
 
         parent::tearDown();
     }
