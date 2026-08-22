@@ -40,6 +40,12 @@ final class HandlerModelLocaleParityTest extends AbstractHandlerTestCase
         unset($_SERVER['SERVER_NAME']);
         setlocale(LC_ALL, 'C');
         putenv('LANGUAGE');
+        // These tests drive the handlers precisely in order to mutate the models'
+        // process-global locale statics, then read them back. Restore both class
+        // defaults so a later test constructing a model without setting a locale is
+        // not silently handed this test's Italian.
+        LiturgicalEvent::setLocale(LitLocale::LATIN_PRIMARY_LANGUAGE);
+        LiturgicalEventAbstract::setLocale(LitLocale::LATIN_PRIMARY_LANGUAGE);
         parent::tearDown();
     }
 
