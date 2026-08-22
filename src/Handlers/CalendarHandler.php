@@ -4935,11 +4935,20 @@ final class CalendarHandler extends AbstractHandler
      * identifies the calendar rather than the moment it was serialized.
      *
      * Every representation carries the same stamp under a different spelling: `timestamp` /
-     * `date_time` in JSON and YML, `<Timestamp>` / `<DateTime>` in XML, and `DTSTAMP` in ICS. All
-     * of them change on every generation while saying nothing about the calendar. Hashing the raw
-     * body therefore handed an unchanged calendar a fresh validator on every regeneration — every
-     * request where the server cache is bypassed, and every cache rebuild otherwise — so a
-     * conditional request re-sent the whole body for nothing.
+     * `date_time` in JSON and YML, and `<Timestamp>` / `<DateTime>` in XML. All of them change on
+     * every generation while saying nothing about the calendar. Hashing the raw body therefore
+     * handed an unchanged calendar a fresh validator on every regeneration — every request where
+     * the server cache is bypassed, and every cache rebuild otherwise — so a conditional request
+     * re-sent the whole body for nothing.
+     *
+     * ICS carries three such stamps rather than one, and all three must go. `DTSTAMP` is always
+     * generation time; `CREATED` is the release date but falls back to generation time when the
+     * release lookup fails; `LAST-MODIFIED` is the engine-cache directory's mtime but falls back
+     * to generation time whenever that directory cannot be resolved — which is the ordinary case
+     * on localhost, where the cache is deliberately bypassed so `ensureCachePathExists()` never
+     * runs and `CachePath` stays a relative path resolved against the server's working directory.
+     * Neutralising only `DTSTAMP` therefore left the ICS validator changing on every request in
+     * exactly the deployments the stable validator was introduced for ({@see self::produceIcal()}).
      *
      * Two bodies reduced to the same source may still differ in those stamps, which is exactly why
      * the resulting validator is weak at the call sites (RFC 9110 §8.8.1).
@@ -4951,7 +4960,11 @@ final class CalendarHandler extends AbstractHandler
                 '#<Timestamp>[^<]*</Timestamp>#' => '<Timestamp></Timestamp>',
                 '#<DateTime>[^<]*</DateTime>#'   => '<DateTime></DateTime>'
             ],
-            ReturnTypeParam::ICS => ['/DTSTAMP:\d{8}T\d{6}Z/' => 'DTSTAMP:'],
+            ReturnTypeParam::ICS => [
+                '/DTSTAMP:\d{8}T\d{6}Z/'       => 'DTSTAMP:',
+                '/CREATED:\d{8}T\d{6}Z/'       => 'CREATED:',
+                '/LAST-MODIFIED:\d{8}T\d{6}Z/' => 'LAST-MODIFIED:'
+            ],
             ReturnTypeParam::YAML => [
                 '/^(\s*)timestamp:\s*\d+$/m'     => '$1timestamp:',
                 "/^(\s*)date_time:\s*'[^']*'$/m" => '$1date_time:'
