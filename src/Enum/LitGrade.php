@@ -125,7 +125,7 @@ enum LitGrade: int
      */
     public function i18n(string $locale, bool $html = true, bool $abbreviate = false): string
     {
-        $isLatin = in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE], true);
+        $isLatin = LitLocale::isLatin($locale);
 
         [
             'grade'     => $grade,

@@ -254,7 +254,7 @@ final class LitCommons implements \JsonSerializable
      */
     public static function i18n(LitCommon $litCommon, string $locale): string
     {
-        return in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE], true)
+        return LitLocale::isLatin($locale)
             ? LitCommon::LATIN[$litCommon->name]
             : $litCommon->translate();
     }
@@ -272,7 +272,7 @@ final class LitCommons implements \JsonSerializable
      */
     private static function getPossessive(LitCommon $litCommon, string $locale): string
     {
-        return in_array($locale, [LitLocale::LATIN, LitLocale::LATIN_PRIMARY_LANGUAGE], true)
+        return LitLocale::isLatin($locale)
             ? ''
             : $litCommon->possessive();
     }

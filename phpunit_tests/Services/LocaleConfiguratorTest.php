@@ -14,10 +14,12 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(LocaleConfigurator::class)]
 final class LocaleConfiguratorTest extends TestCase
 {
-    private string $savedApiFilePath    = '';
-    private string|false $savedLanguage = false;
-    private string $savedIcuDefault     = 'en';
-    private string|false $savedLocale   = false;
+    private string $savedApiFilePath     = '';
+    private string|false $savedLanguage  = false;
+    private string $savedIcuDefault      = 'en';
+    private string|false $savedLocale    = false;
+    private string $savedPrimaryLanguage = LitLocale::LATIN_PRIMARY_LANGUAGE;
+    private string $savedRuntimeLocale   = 'en_US';
 
     protected function setUp(): void
     {
@@ -25,6 +27,9 @@ final class LocaleConfiguratorTest extends TestCase
         $this->savedLanguage    = getenv('LANGUAGE');
         $this->savedIcuDefault  = \Locale::getDefault();
         $this->savedLocale      = setlocale(LC_ALL, 0);
+        // configure() now publishes these (#865), so this test mutates them too.
+        $this->savedPrimaryLanguage = LitLocale::$PRIMARY_LANGUAGE;
+        $this->savedRuntimeLocale   = LitLocale::$RUNTIME_LOCALE;
 
         // JsonData::FOLDER->path() prefixes Router::$apiFilePath; point it at the repo root.
         Router::$apiFilePath = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR;
@@ -46,6 +51,8 @@ final class LocaleConfiguratorTest extends TestCase
             putenv('LANGUAGE=' . $this->savedLanguage);
         }
         \Locale::setDefault($this->savedIcuDefault);
+        LitLocale::$PRIMARY_LANGUAGE = $this->savedPrimaryLanguage;
+        LitLocale::$RUNTIME_LOCALE   = $this->savedRuntimeLocale;
     }
 
     public function testRegionlessLanguageResolvesViaLikelySubtags(): void
@@ -95,5 +102,24 @@ final class LocaleConfiguratorTest extends TestCase
     {
         $this->expectException(ServiceUnavailableException::class);
         LocaleConfigurator::configure('zz');
+    }
+
+    public function testConfigurePublishesTheLitLocaleStatics(): void
+    {
+        LocaleConfigurator::configure('fr');
+
+        self::assertSame('fr', LitLocale::$PRIMARY_LANGUAGE, 'configure() must publish the primary language (#865).');
+        self::assertStringStartsWith('fr', LitLocale::$RUNTIME_LOCALE, 'configure() must publish the runtime locale (#865).');
+    }
+
+    public function testConfigurePublishesTheLitLocaleStaticsForLatin(): void
+    {
+        // Latin takes the reset branch, which must publish just the same — otherwise a
+        // Latin request inherits the previous request's language.
+        LocaleConfigurator::configure('en');
+        LocaleConfigurator::configure(LitLocale::LATIN);
+
+        self::assertSame(LitLocale::LATIN_PRIMARY_LANGUAGE, LitLocale::$PRIMARY_LANGUAGE);
+        self::assertSame(LitLocale::LATIN_PRIMARY_LANGUAGE, LitLocale::$RUNTIME_LOCALE);
     }
 }
