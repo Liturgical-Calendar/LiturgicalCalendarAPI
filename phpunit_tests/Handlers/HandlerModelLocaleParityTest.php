@@ -25,27 +25,65 @@ use LiturgicalCalendar\Api\Models\EventsPath\LiturgicalEventAbstract;
  */
 final class HandlerModelLocaleParityTest extends AbstractHandlerTestCase
 {
+    private string $savedLocale          = 'C';
+    private ?string $savedLanguageEnv    = null;
+    private string $savedIcuDefault      = 'en';
+    private string $savedPrimaryLanguage = LitLocale::LATIN_PRIMARY_LANGUAGE;
+    private string $savedRuntimeLocale   = 'en_US';
+    private bool $hadServerName          = false;
+    private ?string $savedServerName     = null;
+
     protected function setUp(): void
     {
+        // Snapshot every process-global bit of state this test (and the handlers it
+        // invokes) mutates, so tearDown() restores the world as it was found rather
+        // than imposing its own opinion of the baseline on later tests.
+        //
+        // Taken BEFORE parent::setUp() deliberately: that call can markTestSkipped()
+        // when JWT_SECRET is absent, and PHPUnit still runs tearDown() after a skip in
+        // setUp(). A snapshot taken after it would leave tearDown() restoring values it
+        // never captured.
+        $this->savedLocale          = setlocale(LC_ALL, 0) ?: 'C';
+        $languageEnv                = getenv('LANGUAGE');
+        $this->savedLanguageEnv     = false === $languageEnv ? null : $languageEnv;
+        $this->savedIcuDefault      = \Locale::getDefault();
+        $this->savedPrimaryLanguage = LitLocale::$PRIMARY_LANGUAGE;
+        $this->savedRuntimeLocale   = LitLocale::$RUNTIME_LOCALE;
+        $this->hadServerName        = array_key_exists('SERVER_NAME', $_SERVER);
+        $this->savedServerName      = $this->hadServerName ? (string) $_SERVER['SERVER_NAME'] : null;
+
         parent::setUp();
+
         // Force Router::isLocalhost() true so CalendarHandler::handle() bypasses the
         // response cache and actually runs prepareL10N().
         $_SERVER['SERVER_NAME'] = 'localhost';
+
+        // Start from a known-clean process-global locale, whatever an earlier test in
+        // this process left behind.
         setlocale(LC_ALL, 'C');
         putenv('LANGUAGE');
     }
 
     protected function tearDown(): void
     {
-        unset($_SERVER['SERVER_NAME']);
-        setlocale(LC_ALL, 'C');
-        putenv('LANGUAGE');
+        if ($this->hadServerName) {
+            $_SERVER['SERVER_NAME'] = $this->savedServerName;
+        } else {
+            unset($_SERVER['SERVER_NAME']);
+        }
+        setlocale(LC_ALL, $this->savedLocale);
+        putenv(null === $this->savedLanguageEnv ? 'LANGUAGE' : 'LANGUAGE=' . $this->savedLanguageEnv);
+        \Locale::setDefault($this->savedIcuDefault);
+        LitLocale::$PRIMARY_LANGUAGE = $this->savedPrimaryLanguage;
+        LitLocale::$RUNTIME_LOCALE   = $this->savedRuntimeLocale;
+
         // These tests drive the handlers precisely in order to mutate the models'
         // process-global locale statics, then read them back. Restore both class
         // defaults so a later test constructing a model without setting a locale is
         // not silently handed this test's Italian.
         LiturgicalEvent::setLocale(LitLocale::LATIN_PRIMARY_LANGUAGE);
         LiturgicalEventAbstract::setLocale(LitLocale::LATIN_PRIMARY_LANGUAGE);
+
         parent::tearDown();
     }
 
@@ -95,14 +133,25 @@ final class HandlerModelLocaleParityTest extends AbstractHandlerTestCase
 
     public function testBothHandlersAgreeOnTheModelLocaleForATranslatedLocale(): void
     {
+        // Probe the precondition directly instead of inferring it from a status code.
+        // A missing Italian locale makes LocaleConfigurator::configure() THROW
+        // ServiceUnavailableException, and the middleware that would render that as a
+        // 503 is not in the in-process handler path — so the case this skip exists for
+        // never produces a status code at all, while "skip on any non-200" would
+        // silently swallow a genuine 404/500 regression. The candidates mirror the ones
+        // LocaleConfigurator itself tries for 'it'.
+        $italian = setlocale(LC_ALL, 'it_IT.utf8', 'it_IT.UTF-8', 'it_IT', 'it.utf8', 'it.UTF-8', 'it');
+        setlocale(LC_ALL, 'C');
+        if (false === $italian) {
+            self::markTestSkipped('No Italian system locale is installed on this host.');
+        }
+
         $calendar = new CalendarHandler(['nation', 'IT', '2024']);
         $calendar->setAllowedReturnTypes([ReturnTypeParam::JSON]);
         $calendarResponse = $calendar->handle(
             $this->requestFor('GET', '/calendar/nation/IT/2024', ['Accept' => 'application/json', 'Accept-Language' => 'it'])
         );
-        if (200 !== $calendarResponse->getStatusCode()) {
-            self::markTestSkipped('The Italian /calendar request failed (the it_IT system locale is likely not installed on this host).');
-        }
+        self::assertSame(200, $calendarResponse->getStatusCode());
         $calendarLocale = self::modelLocale(LiturgicalEvent::class);
 
         $eventsResponse = ( new EventsHandler() )->handle($this->requestFor('GET', '/events', [])->withQueryParams(['locale' => 'it']));
