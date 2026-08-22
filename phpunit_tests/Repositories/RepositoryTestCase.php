@@ -36,36 +36,7 @@ abstract class RepositoryTestCase extends TestCase
     public static function setUpBeforeClass(): void
     {
         self::$skipReason = null;
-
-        $host     = self::env('DB_HOST');
-        $port     = self::env('DB_PORT') ?? '5432';
-        $name     = self::env('DB_NAME');
-        $user     = self::env('DB_USER');
-        $password = self::env('DB_PASSWORD');
-
-        if ($host === null || $name === null || $user === null || $password === null) {
-            self::$pdo = null;
-            return;
-        }
-
-        try {
-            self::$pdo = new PDO(
-                sprintf('pgsql:host=%s;port=%s;dbname=%s', $host, $port, $name),
-                $user,
-                $password,
-                [
-                    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                    PDO::ATTR_EMULATE_PREPARES   => false,
-                    PDO::ATTR_TIMEOUT            => 5,
-                ]
-            );
-            // Pin the session TZ so date assertions don't drift by environment.
-            self::$pdo->exec("SET timezone TO 'Europe/Vatican'");
-        } catch (\PDOException $e) {
-            self::$pdo        = null;
-            self::$skipReason = 'Postgres unreachable: ' . $e->getMessage();
-        }
+        self::$pdo        = self::connect();
 
         // Skip at class level rather than per test. A skip raised here aborts the whole
         // class, so PHPUnit runs neither setUp() nor tearDown() for it — which is what
@@ -84,6 +55,47 @@ abstract class RepositoryTestCase extends TestCase
         }
     }
 
+    /**
+     * Open the test database connection, or return null when it is unavailable — whether
+     * because the credentials are absent or because Postgres cannot be reached.
+     *
+     * Every unavailable path RETURNS null rather than returning early from
+     * setUpBeforeClass(), so the single `self::$pdo === null` check there cannot be
+     * bypassed and the class can never proceed with a null connection.
+     */
+    private static function connect(): ?PDO
+    {
+        $host     = self::env('DB_HOST');
+        $port     = self::env('DB_PORT') ?? '5432';
+        $name     = self::env('DB_NAME');
+        $user     = self::env('DB_USER');
+        $password = self::env('DB_PASSWORD');
+
+        if ($host === null || $name === null || $user === null || $password === null) {
+            return null;
+        }
+
+        try {
+            $pdo = new PDO(
+                sprintf('pgsql:host=%s;port=%s;dbname=%s', $host, $port, $name),
+                $user,
+                $password,
+                [
+                    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES   => false,
+                    PDO::ATTR_TIMEOUT            => 5,
+                ]
+            );
+            // Pin the session TZ so date assertions don't drift by environment.
+            $pdo->exec("SET timezone TO 'Europe/Vatican'");
+            return $pdo;
+        } catch (\PDOException $e) {
+            self::$skipReason = 'Postgres unreachable: ' . $e->getMessage();
+            return null;
+        }
+    }
+
     public static function tearDownAfterClass(): void
     {
         self::$pdo        = null;
@@ -97,7 +109,7 @@ abstract class RepositoryTestCase extends TestCase
         // CASCADE clears api_keys when applications get nuked (FK ON DELETE CASCADE);
         // listing every table explicitly is safer than relying on cascade alone and
         // keeps the truncate fast (these tables stay small in tests).
-        self::$pdo?->exec('TRUNCATE TABLE ' . implode(', ', self::TABLES) . ' RESTART IDENTITY CASCADE');
+        self::$pdo->exec('TRUNCATE TABLE ' . implode(', ', self::TABLES) . ' RESTART IDENTITY CASCADE');
     }
 
     private static ?string $skipReason = null;
