@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Schemas;
 
 use LiturgicalCalendar\Api\Enum\LitSchema;
+use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Swaggest\JsonSchema\Schema;
@@ -203,6 +204,7 @@ final class WebSocketMessageSchemaTest extends TestCase
         self::assertEqualsCanonicalizing(
             [
                 'correlationId',
+                'protocolVersion',
                 'calendarIdentity',
                 'executeValidation',
                 'validateCalendarLegacy',
@@ -212,6 +214,30 @@ final class WebSocketMessageSchemaTest extends TestCase
                 'cancelRun', 'validateSource'
             ],
             array_keys((array) $raw->definitions)
+        );
+    }
+
+    /**
+     * The schema and the validator must name the same supported protocol versions.
+     *
+     * Two independent statements of the same set, with nothing comparing them, is how a published
+     * contract starts describing a server that no longer behaves that way — the drift #805 was filed
+     * for. Both spellings are load-bearing and neither can be dropped: the schema's `enum` is what a
+     * client reads, and `SUPPORTED_PROTOCOL_VERSIONS` is what the server enforces before a message is
+     * interpreted at all. So they are pinned to each other rather than one being derived from the
+     * other at runtime, which would make the published document unreadable on its own.
+     */
+    public function testTheSchemasProtocolEnumMatchesTheSupportedVersions(): void
+    {
+        $raw = json_decode((string) file_get_contents(LitSchema::WEBSOCKET_MESSAGE->path()));
+
+        /** @var list<int> $supported */
+        $supported = ( new \ReflectionClassConstant(WebSocketMessageValidator::class, 'SUPPORTED_PROTOCOL_VERSIONS') )->getValue();
+
+        self::assertSame(
+            $supported,
+            array_map('intval', (array) $raw->definitions->protocolVersion->enum),
+            'the published protocol versions are not the ones the server accepts'
         );
     }
 

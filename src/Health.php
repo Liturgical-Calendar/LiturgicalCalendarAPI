@@ -366,6 +366,11 @@ class Health implements MessageComponentInterface
             echo "New connection! ({$conn->resourceId}) and current working directory is " . getcwd() . "\n";
         }
 
+        // Announce the contract before anything is asked of the client — #806 section F. Sent here,
+        // ahead of the cache and metadata bootstrapping below, because those are this server's
+        // concerns and neither gates the client's ability to read this frame.
+        $this->sendMessage($conn, $this->helloFrame());
+
         // Initialize Router paths before creating logger (LoggerFactory needs Router::$apiFilePath)
         Router::getApiPaths();
 
@@ -528,6 +533,48 @@ class Health implements MessageComponentInterface
     }
 
     /**
+     * The frame announcing what this server speaks — #806 section F.
+     *
+     * **Nothing here is written down twice.** Every list is read from whatever already defines it:
+     * the `Rite`, `Step` and `Status` enums, the response formats {@see Health::validateCalendar()}
+     * actually has a branch for, and — through {@see WebSocketMessageValidator::supportedActions()} —
+     * the actions the published schema declares. #806 exists because the vocabulary and the layout
+     * lived in several places that had to be edited in lockstep; a hand-written capability list would
+     * be one more of them, and one that fails silently, since a stale advertisement misleads a client
+     * without breaking any test that does not compare it against the source.
+     *
+     * `responseFormats` advertises the narrow list on purpose. `ReturnTypeParam` knows more formats,
+     * but `ReturnTypeParam::from()` throws a `\ValueError` on the ones `validateCalendar()` has no
+     * branch for, and a `\ValueError` is an `\Error` that Ratchet does not catch — so advertising the
+     * wider set would invite a client to kill the server by taking the advertisement at its word.
+     *
+     * **This frame must stay unsolicited-safe.** It is sent on connect, before the connection is on
+     * any run, so `sendMessage()` stamps no `runToken` onto it — and that is exactly why the shipped
+     * v1 runners drop it: both guard their handler on `currentRunToken === null` and then on
+     * `responseData.runToken !== currentRunToken`, so an untagged frame never reaches the `type`
+     * dispatch that UnitTestInterface#46 made paint an unrecognised type as a failed check. Sending
+     * this frame at any other moment would break the live UI. Pinned by `HealthHelloFrameTest`.
+     */
+    private function helloFrame(): \stdClass
+    {
+        $capabilities                  = new \stdClass();
+        $capabilities->rites           = array_column(Rite::cases(), 'value');
+        $capabilities->actions         = $this->messageValidator->supportedActions();
+        $capabilities->responseFormats = self::VALIDATABLE_RESPONSE_FORMATS;
+        $capabilities->steps           = array_column(Step::cases(), 'value');
+        $capabilities->statuses        = array_column(Status::cases(), 'value');
+
+        $frame       = new \stdClass();
+        $frame->type = 'hello';
+        // The highest version understood, not the whole set: a client that needs to know what else
+        // would have been accepted learns it from the refusal, which names them.
+        $frame->protocol     = max(WebSocketMessageValidator::SUPPORTED_PROTOCOL_VERSIONS);
+        $frame->capabilities = $capabilities;
+
+        return $frame;
+    }
+
+    /**
      * Handle an incoming message.
      *
      * This function is called whenever a user sends a message to the WebSocket
@@ -609,6 +656,28 @@ class Health implements MessageComponentInterface
                 return;
             }
             $requestId = $candidateRequestId;
+        }
+
+        // The protocol version, settled before anything decides what the message *is* — #806 section F.
+        //
+        // Ahead of `UNKNOWN_ACTION` and of schema validation, and the ordering is a claim about
+        // meaning rather than a micro-optimisation: the version says how the rest of the message is to
+        // be read, so answering `{"action": "bogus", "protocol": 7}` with `unknown_action` would assert
+        // something this server cannot know — under protocol 7 that action might be perfectly well
+        // defined. `unsupported_protocol` is the only answer that is true.
+        //
+        // *Behind* the `requestId` read, though, so a refusal can be attributed: a client that
+        // declared an unreadable protocol is waiting on frames it means to match by request id, and a
+        // refusal carrying none would leave that request pending forever. The two orderings are not in
+        // tension — the first is about judging the message, the second only about being able to
+        // address the answer.
+        if ($messageReceived instanceof \stdClass) {
+            $protocolViolation = WebSocketMessageValidator::protocolViolation($messageReceived);
+            if (null !== $protocolViolation) {
+                echo sprintf('Unsupported protocol from connection %1$d: %2$s', $resourceId, $msg);
+                $this->rejectMessage($from, ProtocolErrorCode::UNSUPPORTED_PROTOCOL, $protocolViolation, requestId: $requestId);
+                return;
+            }
         }
 
         if (
