@@ -1,0 +1,133 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "title": "Health WebSocket outbound frame",
+    "description": "Every frame the Health WebSocket endpoint sends to a client. Its inbound counterpart is WebSocketMessage.json; this document exists because a client's own types are almost entirely about what it receives, and until API issue #806 section F nothing published that half of the contract (see UnitTestInterface#42, item 5). Frames are discriminated by `type`, and a `success` frame additionally by whether it carries a `status`: a step result does, the terminal frame does not, because the terminal frame reports that the work finished rather than how it went.",
+    "oneOf": [
+        { "$ref": "#/definitions/hello" },
+        { "$ref": "#/definitions/stepResult" },
+        { "$ref": "#/definitions/complete" },
+        { "$ref": "#/definitions/protocolError" }
+    ],
+    "definitions": {
+        "correlationId": {
+            "type": "string",
+            "description": "An opaque client-minted handle echoed back exactly as it was sent. Same alphabet as its inbound counterpart.",
+            "pattern": "^[A-Za-z0-9_-]{1,64}$"
+        },
+        "runCorrelation": {
+            "type": "object",
+            "description": "The correlation properties any frame may carry. `runToken` and `runId` are the same value under two names — the protocol is moving to `runId`, and both are published so a client adopts the new spelling once rather than twice — and both are present only while the connection is on a run. `requestId` is present only when the request that caused the frame carried one; a client that sends no requestId opts out of per-request correlation, and of the terminal `complete` frame with it.",
+            "properties": {
+                "runToken": { "$ref": "#/definitions/correlationId" },
+                "runId": { "$ref": "#/definitions/correlationId" },
+                "requestId": { "$ref": "#/definitions/correlationId" }
+            }
+        },
+        "target": {
+            "type": ["object", "null"],
+            "description": "What the frame is about. An object rather than a bare id from the outset, because the things checked are not all identified by one value: a source check is its inventory id alone, a calendar validation is a calendar and a year, and a test run is a test, a calendar and a year. Null for a legacy `executeValidation` message, which names no id — nothing is fabricated for it. This says what was checked; `requestId` says which request asked, and the two are not interchangeable.",
+            "required": ["id"],
+            "properties": {
+                "id": { "type": "string" },
+                "year": { "type": "integer" },
+                "calendar": { "type": "string" }
+            }
+        },
+        "hello": {
+            "type": "object",
+            "description": "Sent once, unprompted, as soon as a client connects — API issue #806 section F. It carries no run correlation, and that is load-bearing rather than incidental: both shipped v1 runners guard their message handler on the frame's runToken matching the run they are on, so an untagged frame is dropped before it reaches their `type` dispatch, where an unrecognised type is painted as a failed check. A `hello` sent at any other moment — once the connection is on a run — would be stamped with a run token and would then be visible to a client that cannot read it.",
+            "required": ["type", "protocol", "capabilities"],
+            "properties": {
+                "type": { "const": "hello" },
+                "protocol": {
+                    "type": "integer",
+                    "description": "The highest protocol version this server reads, and the value a client should declare on its own messages. A client that declares one the server does not read is refused with errorCode `unsupported_protocol`, which names the versions that would have worked."
+                },
+                "capabilities": {
+                    "type": "object",
+                    "description": "What this server can be asked for. Every list is derived on the server from whatever already defines it — the Rite, Step and Status enums, the response formats the calendar validator actually has a branch for, and the actions this contract's inbound schema declares — so an advertisement cannot go stale against the behaviour it describes. `responseFormats` is deliberately narrower than the formats the REST API accepts: it lists only those the WebSocket calendar validation can act on.",
+                    "required": ["rites", "actions", "responseFormats", "steps", "statuses"],
+                    "properties": {
+                        "rites": { "type": "array", "items": { "type": "string" } },
+                        "actions": { "type": "array", "items": { "type": "string" } },
+                        "responseFormats": { "type": "array", "items": { "type": "string" } },
+                        "steps": { "type": "array", "items": { "type": "string" } },
+                        "statuses": { "type": "array", "items": { "type": "string" } }
+                    }
+                }
+            }
+        },
+        "stepResult": {
+            "type": "object",
+            "description": "The outcome of one step of one check. `target`, `step` and `status` are the structural statement; `type`, `text` and `classes` are a projection of it kept for clients that predate API issue #806 section C.",
+            "required": ["type", "text", "classes", "target", "step", "status"],
+            "allOf": [{ "$ref": "#/definitions/runCorrelation" }],
+            "properties": {
+                "type": {
+                    "enum": ["success", "error"],
+                    "description": "The legacy pass/fail projection of `status`. Branch on `status` instead: this exists so a v1 client keeps working, and it cannot express anything `status` does not."
+                },
+                "text": { "type": "string", "description": "The human-facing message. Never a path: the server's project root is stripped from every frame before it is sent." },
+                "classes": {
+                    "type": "string",
+                    "description": "DEPRECATED — a CSS selector the server composes and a browser client feeds to querySelectorAll(). It is what made this API's frames depend on one client's markup, and what made a selector matching nothing fail silently while the counters still advanced. Retained only until UnitTestInterface#42 ships; new clients address frames by `requestId` and `step` and must not parse this."
+                },
+                "responsetype": {
+                    "type": "string",
+                    "description": "DEPRECATED spelling, carried on calendar-validation failure frames alone, for the same reason `classes` is. The inbound contract's v2 shapes spell it `responseFormat`."
+                },
+                "target": { "$ref": "#/definitions/target" },
+                "step": { "enum": ["exists", "parses", "validates"] },
+                "status": { "enum": ["pass", "fail"] },
+                "details": {
+                    "type": "array",
+                    "description": "The individual failures behind a `text` that summarises them — a folder check's per-file errors, a schema failure's parts. Absent rather than empty when there are none, so a client need not tell 'no details' from 'none given'. Never manufactured for an emitter that has nothing to say.",
+                    "items": { "type": "string" }
+                }
+            }
+        },
+        "complete": {
+            "type": "object",
+            "description": "The terminal frame: the work this request started has finished. A client stops on this rather than counting the frames before it — an arm that stops early is a possibility the protocol should not need a client to predict. **Sent only to a request that carried a `requestId`**, because a new frame changes the stream a v1 client counts: a client sizing a phase as `checks * 3` reaches its threshold on the real frames and lets this one finish the *following* phase early. Pair stopping on it with a timeout, since a throw inside a fulfil handler can still skip it (API issue #823).",
+            "required": ["type", "text", "target", "step", "requestId"],
+            "allOf": [{ "$ref": "#/definitions/runCorrelation" }],
+            "properties": {
+                "type": {
+                    "const": "success",
+                    "description": "Always `success`, including for a request whose every step failed: this frame reports that the work finished, not that it passed. A distinct type would be painted as a failed check by the shipped clients."
+                },
+                "text": { "type": "string" },
+                "target": { "$ref": "#/definitions/target" },
+                "step": { "const": "complete" },
+                "cancelled": {
+                    "const": true,
+                    "description": "Present only when the request is ending because the run it belonged to was abandoned or superseded, rather than because its work finished. Omitted rather than sent as `false`, so a normal terminal frame is identical to what it was before this key existed and nothing has to tell 'not cancelled' from 'an older server'."
+                }
+            }
+        },
+        "protocolError": {
+            "type": "object",
+            "description": "The message could not be acted on, said in a form a client can branch on. Ungated, unlike the terminal frame: a new frame changes the stream a v1 client counts, but a new type on a frame it was going to receive anyway changes nothing for it. A code exists where a client would *act* differently; where it would only display the reason, the reason is prose in `text`.",
+            "required": ["type", "errorCode", "text"],
+            "allOf": [{ "$ref": "#/definitions/runCorrelation" }],
+            "properties": {
+                "type": { "const": "protocolError" },
+                "errorCode": {
+                    "enum": [
+                        "invalid_json",
+                        "not_an_object",
+                        "missing_action",
+                        "unknown_action",
+                        "invalid_request_id",
+                        "retired_property",
+                        "unknown_target_id",
+                        "invalid_message",
+                        "internal_error",
+                        "unsupported_protocol"
+                    ]
+                },
+                "text": { "type": "string", "description": "Why, phrased for the client that sent the message: the failure names the client's own action and property names, not this server's schema internals, and never its filesystem paths." }
+            }
+        }
+    }
+}

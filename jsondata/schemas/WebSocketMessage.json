@@ -17,6 +17,11 @@
             "pattern": "^[A-Za-z0-9_-]{1,64}$",
             "description": "An opaque client-minted handle the server echoes back. One alphabet for runToken and requestId alike."
         },
+        "protocolVersion": {
+            "type": "integer",
+            "enum": [1],
+            "description": "The self-describing contract this message is written in (API issue #806 section F). Absent means the legacy shapes, handled exactly as before; 1 is the contract the `hello` frame advertises on connect. Declared on every shape because the root unknown-property gate refuses anything a shape does not declare once a message carries a requestId, and a v2 client sends both fields together. The version the server accepts is enforced by WebSocketMessageValidator::SUPPORTED_PROTOCOL_VERSIONS before a message is interpreted at all — including its type, since a numerically-correct 1.0 is a float and a float reaching a typed parameter kills the process rather than failing the request. This enum and that constant are pinned to each other by a test."
+        },
         "calendarIdentity": {
             "type": "object",
             "description": "additionalProperties is unconditional here, unlike the root-level shapes above: unknown-property rejection at the root is gated on the message carrying a requestId (WebSocketMessageValidator, API issue #806 section G), because the shipped UnitTestInterface predates that field and sends other properties a strict root gate would refuse. This nested object is reachable only from validateCalendarTyped and runTest, both v2-only shapes the shipped client never sends, so there is no compatibility guarantee to protect here. Do not loosen this to match the root's gating — that would remove the only strictness these v2 nested objects have.",
@@ -54,6 +59,7 @@
                 "sourceFolder": { "type": "string", "pattern": "^[^\\x00]*$" },
                 "responsetype": { "type": "string" },
                 "rite": { "type": "string" },
+                "protocol": { "$ref": "#/definitions/protocolVersion" },
                 "runToken": { "$ref": "#/definitions/correlationId" },
                 "requestId": { "$ref": "#/definitions/correlationId" }
             }
@@ -68,6 +74,7 @@
                 "category": { "enum": ["nationalcalendar", "diocesancalendar", "ritecalendar"] },
                 "responsetype": { "enum": ["JSON", "XML", "ICS", "YML"] },
                 "rite": { "type": "string" },
+                "protocol": { "$ref": "#/definitions/protocolVersion" },
                 "runToken": { "$ref": "#/definitions/correlationId" },
                 "requestId": { "$ref": "#/definitions/correlationId" }
             }
@@ -80,6 +87,7 @@
                 "calendar": { "$ref": "#/definitions/calendarIdentity" },
                 "year": { "type": "integer" },
                 "responseFormat": { "enum": ["JSON", "XML", "ICS", "YML"] },
+                "protocol": { "$ref": "#/definitions/protocolVersion" },
                 "runToken": { "$ref": "#/definitions/correlationId" },
                 "requestId": { "$ref": "#/definitions/correlationId" }
             }
@@ -94,6 +102,7 @@
                 "category": { "enum": ["nationalcalendar", "diocesancalendar", "ritecalendar"] },
                 "test": { "type": "string" },
                 "rite": { "type": "string" },
+                "protocol": { "$ref": "#/definitions/protocolVersion" },
                 "runToken": { "$ref": "#/definitions/correlationId" },
                 "requestId": { "$ref": "#/definitions/correlationId" }
             }
@@ -106,6 +115,7 @@
                 "test": { "type": "string" },
                 "calendar": { "$ref": "#/definitions/calendarIdentity" },
                 "year": { "type": "integer" },
+                "protocol": { "$ref": "#/definitions/protocolVersion" },
                 "runToken": { "$ref": "#/definitions/correlationId" },
                 "requestId": { "$ref": "#/definitions/correlationId" }
             }
@@ -115,6 +125,7 @@
             "required": ["action", "runToken"],
             "properties": {
                 "action": { "const": "cancelRun" },
+                "protocol": { "$ref": "#/definitions/protocolVersion" },
                 "runToken": { "$ref": "#/definitions/correlationId" },
                 "requestId": { "$ref": "#/definitions/correlationId" }
             }
@@ -131,6 +142,7 @@
                     "properties": { "id": { "type": "string" } },
                     "additionalProperties": false
                 },
+                "protocol": { "$ref": "#/definitions/protocolVersion" },
                 "runToken": { "$ref": "#/definitions/correlationId" },
                 "requestId": { "$ref": "#/definitions/correlationId" }
             }
