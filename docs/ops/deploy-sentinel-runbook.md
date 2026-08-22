@@ -10,11 +10,33 @@ after files land:
 
 - **php-fpm must be reloaded.** Workers cache compiled PHP and, more stubbornly, gettext
   `.mo` translations. Without a reload, new translations do not appear.
-- **The WebSocket server must be restarted.** `public/LitCalTestServer.php` is a
+- **The WebSocket server must be restarted.** `bin/LitCalTestServer.php` is a
   long-running ReactPHP process. It loads `src/` into memory once, at start, and never
   re-reads it.
 
 So the deploy drops a sentinel file and a root-owned systemd path unit does the rest.
+
+> **Path change — run `sudo deploy/install.sh` BEFORE the deploy that carries it.**
+>
+> The WebSocket entrypoint moved from `public/LitCalTestServer.php` to `bin/LitCalTestServer.php`.
+> `deploy/systemd/litcal-websocket.service.in` is updated to match, but `deploy/` is excluded from
+> the rsync deploy, so the *installed* unit under `/etc/systemd` keeps pointing at the old path
+> until `install.sh` is re-run from the checkout on the host.
+>
+> This is not a "next time someone restarts it" problem. The sentinel restarts
+> `litcal-websocket.service` on **every** API deploy, so a deploy carrying the move would land
+> `bin/LitCalTestServer.php`, delete the `public/` copy, drop the sentinel, and then restart a unit
+> still pointing at a file that no longer exists — logging `restart FAILED; sentinels kept for
+> retry` and leaving the WebSocket server down.
+>
+> Running `install.sh` first means the unit already references `bin/` when the sentinel fires, so
+> the deploy's own restart succeeds and nothing is needed afterwards.
+>
+> Expect `install.sh` itself to exit non-zero when run first: it ends with
+> `systemctl restart`, and at that point the new path is not on the vhost yet. That is harmless and
+> does **not** need re-running — the unit is rendered, `daemon-reload` run and the service enabled
+> well before that final restart, so everything the deploy depends on is already in place. The
+> WebSocket server stays down only for the gap between running `install.sh` and the deploy landing.
 
 ## The pieces
 

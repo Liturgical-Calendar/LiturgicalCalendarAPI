@@ -126,8 +126,16 @@ jobs:
 
       # Pre-flight: refuse to deploy a payload carrying non-runtime files. CI
       # already asserts this on every PR, but a deploy can run from a tag or a
-      # hand-picked branch that never went through it, and the docroot is the
-      # application root — so the last gate before the wire checks too.
+      # hand-picked branch that never went through it — so the last gate before
+      # the wire checks too.
+      #
+      # (An earlier revision of this comment said the vhost docroot is the
+      # application root. It is not: the API is served as a folder under the
+      # frontend docroot, and the nginx location for it resolved `try_files $uri`,
+      # so any file present under /api/{dev,vN}/ was served straight off disk.
+      # That has since been narrowed to map into public/, which is what makes the
+      # class unreachable over HTTP; this check keeps the files off the server in
+      # the first place.)
       - name: Verify deploy payload contains only runtime files
         if: steps.shape.outputs.skip != 'true'
         run: ./.github/deploy/check-deploy-payload.sh

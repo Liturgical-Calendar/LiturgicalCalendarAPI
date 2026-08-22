@@ -28,7 +28,8 @@ RUN --mount=type=cache,target=/tmp/composer \
 COPY ./src ./src
 COPY ./i18n ./i18n
 COPY ./jsondata ./jsondata
-COPY ./public/LitCalTestServer.php ./public/index.php ./public/
+COPY ./public/index.php ./public/
+COPY ./bin/LitCalTestServer.php ./bin/
 COPY ./.env.example ./.env.local
 
 # Include scripts directory (setup scripts, init-db.sql, openfga model)

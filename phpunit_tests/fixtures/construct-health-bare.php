@@ -3,7 +3,7 @@
 /**
  * Construct a Health the way the real entry point does: with nothing initialised beforehand.
  *
- * `public/LitCalTestServer.php` requires the autoloader and calls `new Health()` — it does not call
+ * `bin/LitCalTestServer.php` requires the autoloader and calls `new Health()` — it does not call
  * `Router::getApiPaths()` first, and never did. PHPUnit's bootstrap *does*, long before any test
  * builds a Health, so the two orders differ and only this one matches production.
  *

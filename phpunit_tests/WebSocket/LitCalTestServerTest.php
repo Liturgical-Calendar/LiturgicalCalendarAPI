@@ -9,12 +9,12 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Integration test for the WebSocket entry point served by
- * public/LitCalTestServer.php (Ratchet + LiturgicalCalendar\Api\Health).
+ * bin/LitCalTestServer.php (Ratchet + LiturgicalCalendar\Api\Health).
  *
  * Drives the server in-process from PHPUnit via a minimal raw-socket WS
  * client (WsTestClient). Lifts the WS handler surface in Health.php
  * (onOpen / onMessage validation / onClose) via the pcov bootstrap hook
- * in public/LitCalTestServer.php — every message handled by the server
+ * in bin/LitCalTestServer.php — every message handled by the server
  * contributes to the merged coverage report when PCOV_SERVER_COVERAGE_DIR
  * is set.
  *
