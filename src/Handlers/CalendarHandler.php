@@ -5392,30 +5392,56 @@ final class CalendarHandler extends AbstractHandler
      */
     private function produceIcal(\stdClass $SerializeableLitCal, ?\stdClass $GitHubReleasesObj): string
     {
-        // Resolved once, not per event: every VEVENT carries the same two stamps.
+        // The three stamps every VEVENT carries, resolved once rather than per event.
         //
-        // `published_at` is the release date, so CREATED/LAST-MODIFIED say when the calendar data
-        // was last revised — which is what those fields mean, and what makes them stable across
-        // regenerations of an unchanged calendar. When it is unknown they are omitted rather than
-        // filled with the current time (#849).
-        $publishedStamp = null;
-        if (null !== $GitHubReleasesObj && is_string($GitHubReleasesObj->published_at ?? null)) {
-            $publishedAt = strtotime($GitHubReleasesObj->published_at);
-            if (false !== $publishedAt) {
-                $publishedStamp = gmdate('Ymd\THis\Z', $publishedAt);
-            }
-        }
+        // They are not interchangeable, and the serialized ICS is cached per params hash and return
+        // type (engineCache/v<API_VERSION>-<dataDigest>/<hash>.ics), so whatever is written here is
+        // frozen for the life of that cache entry rather than recomputed per request. That is what
+        // makes a generation-time value safe in the first two cases below.
+        $now = gmdate('Ymd\THis\Z');
 
-        // DTSTAMP is REQUIRED (RFC 5545 3.6.1) and must be a UTC date-time, so it always gets a
-        // value: the release date when known, otherwise now. Its volatility costs nothing, because
-        // {@see self::validatorSource()} blanks it out before the ETag is computed.
+        // DTSTAMP — this object declares METHOD:PUBLISH, and RFC 5545 3.8.7.2 defines DTSTAMP for a
+        // METHOD-bearing object as when THIS INSTANCE was created. Generation time is therefore the
+        // correct value, and it is additionally excluded from the ETag by
+        // {@see self::validatorSource()}.
         //
         // Built with gmdate(), not date(). The previous spelling was
         // `date('Ymd') . 'T' . date('His') . 'Z'` — server-LOCAL time carrying a literal `Z`, which
-        // on this Europe/Vatican host was two hours ahead of the instant it claimed. The events are
-        // all-day (`DTSTART;VALUE=DATE`) and carry no timezone at all; only these metadata stamps
-        // do, and theirs has to be genuine UTC.
-        $dtstamp = $publishedStamp ?? gmdate('Ymd\THis\Z');
+        // on this Europe/Vatican host was two hours ahead of the instant it claimed: a malformed UTC
+        // date-time under RFC 5545 3.3.5. The events themselves are all-day
+        // (`DTSTART;VALUE=DATE`) and carry no timezone at all; only these metadata stamps do.
+        $dtstamp = $now;
+
+        // CREATED — the release the calendar data belongs to. Anchoring it to the GitHub release
+        // keeps it stable across regenerations of the same version.
+        $created = $now;
+        if (null !== $GitHubReleasesObj && is_string($GitHubReleasesObj->published_at ?? null)) {
+            $publishedAt = strtotime($GitHubReleasesObj->published_at);
+            if (false !== $publishedAt) {
+                $created = gmdate('Ymd\THis\Z', $publishedAt);
+            }
+        }
+
+        // LAST-MODIFIED — when this API version + source-data digest was last materialised here.
+        //
+        // The release date is the wrong answer for this field on a rapidly-moving deployment: it
+        // reports the latest STABLE release while `dev` may be many commits past it. The versioned
+        // cache directory is named for API_VERSION plus a digest of jsondata/sourcedata and the
+        // compiled translations, so its mtime moves when — and only when — that combination is
+        // rebuilt, which is much closer to what "last modified" claims.
+        //
+        // Note the honest limit: a directory's mtime also advances when a new file is written into
+        // it, so this tracks "last written to" rather than "first created". Each cached body still
+        // carries whatever value was current when it was generated, and stays byte-stable
+        // thereafter, so per-resource ETags remain stable either way.
+        $lastModified = $now;
+        $cacheDir     = rtrim($this->CachePath, DIRECTORY_SEPARATOR);
+        if ('' !== $cacheDir && is_dir($cacheDir)) {
+            $cacheDirMtime = filemtime($cacheDir);
+            if (false !== $cacheDirMtime) {
+                $lastModified = gmdate('Ymd\THis\Z', $cacheDirMtime);
+            }
+        }
 
         $ical  = "BEGIN:VCALENDAR\r\n";
         $ical .= "PRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\r\n";
@@ -5490,15 +5516,11 @@ final class CalendarHandler extends AbstractHandler
              * The event could occur twice in the same liturgical year, but will be treated as a separate event since we have identified it with the civil year.
              */
             $ical .= 'UID:' . md5('LITCAL-' . $liturgicalEvent->event_key . '-' . $liturgicalEvent->date->format('Y')) . "\r\n";
-            if (null !== $publishedStamp) {
-                $ical .= 'CREATED:' . $publishedStamp . "\r\n";
-            }
+            $ical .= 'CREATED:' . $created . "\r\n";
 
             $desc  = 'DESCRIPTION:' . self::escapeIcal($description);
             $ical .= strlen($desc) > 75 ? rtrim(chunk_split($desc, 71, "\r\n\t")) . "\r\n" : "$desc\r\n";
-            if (null !== $publishedStamp) {
-                $ical .= 'LAST-MODIFIED:' . $publishedStamp . "\r\n";
-            }
+            $ical .= 'LAST-MODIFIED:' . $lastModified . "\r\n";
 
             $normalizedLocale = str_replace('_', '-', $this->CalendarParams->Locale);
             $summaryLang      = ';LANGUAGE=' . $normalizedLocale;
