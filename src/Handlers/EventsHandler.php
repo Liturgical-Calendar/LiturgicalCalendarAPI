@@ -839,6 +839,11 @@ final class EventsHandler extends AbstractHandler
 
             // A setProperty row modifies the comune catalog entry in place, under its plain key.
             // Prefixing it would emit a phantom duplicate that `/calendar` never produces.
+            //
+            // The `getEvent($key)?->applyX(...)` calls below silently no-op when $key is absent
+            // from the catalog. Unlike CalendarHandler::applyAmbrosianDiocesanSetProperty(), which
+            // pushes an explanatory message to $this->Messages for the same case, EventsHandler has
+            // no Messages sink to push to — this divergence is structural, not an oversight.
             if ($diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemSetPropertyGrade) {
                 self::$liturgicalEvents->getEvent($key)?->applyGrade($diocesanLitCalItem->liturgical_event->grade);
                 continue;

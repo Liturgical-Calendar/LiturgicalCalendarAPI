@@ -30,6 +30,20 @@ final class LiturgicalEventAbstractMutatorTest extends TestCase
         ]);
     }
 
+    private function makeEventWithGradeDisplay(string $gradeDisplay): LiturgicalEventFixed
+    {
+        return LiturgicalEventFixed::fromArray([
+            'event_key'     => 'StsProtaseGervase',
+            'name'          => 'Ss. Protaso e Gervaso, martiri',
+            'month'         => 6,
+            'day'           => 19,
+            'grade'         => 4,
+            'color'         => ['red'],
+            'common'        => ['Martyrs:For Several Martyrs'],
+            'grade_display' => $gradeDisplay,
+        ]);
+    }
+
     public function testApplyGradeAlsoRefreshesTheLocalizedGrade(): void
     {
         $event  = $this->makeEvent();
@@ -40,6 +54,24 @@ final class LiturgicalEventAbstractMutatorTest extends TestCase
         $after = $event->jsonSerialize();
         self::assertSame(LitGrade::MEMORIAL->value, $after['grade']);
         self::assertNotSame($before, $after['grade_lcl'], 'grade_lcl must be re-derived, not left stale.');
+    }
+
+    public function testApplyGradeToHigherSolemnityClearsGradeDisplay(): void
+    {
+        $event = $this->makeEventWithGradeDisplay('Some Explicit Override');
+
+        $event->applyGrade(LitGrade::HIGHER_SOLEMNITY);
+
+        self::assertSame('', $event->jsonSerialize()['grade_display'], 'grade_display must be cleared to \'\' for HIGHER_SOLEMNITY, mirroring the constructor.');
+    }
+
+    public function testApplyGradeToNonHigherSolemnityPreservesExistingGradeDisplay(): void
+    {
+        $event = $this->makeEventWithGradeDisplay('Some Explicit Override');
+
+        $event->applyGrade(LitGrade::MEMORIAL);
+
+        self::assertSame('Some Explicit Override', $event->jsonSerialize()['grade_display'], 'a legitimate explicit grade_display override must survive a non-HIGHER_SOLEMNITY grade change.');
     }
 
     public function testApplyCommonAlsoRefreshesTheLocalizedCommon(): void

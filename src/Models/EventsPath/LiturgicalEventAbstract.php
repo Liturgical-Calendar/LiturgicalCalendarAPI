@@ -139,6 +139,12 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
      * `$grade_lcl` and `$grade_abbr` are computed in the constructor and are both serialized, so
      * assigning `$grade` on its own would emit a numeric grade that disagrees with its own label.
      *
+     * `$grade_display` is also grade-coupled in the constructor
+     * (`$this->grade_display = $this->grade === LitGrade::HIGHER_SOLEMNITY ? '' : $displayGrade;`)
+     * and takes precedence over `grade_lcl`/`grade_abbr` when serialized, so the same rule is
+     * mirrored here: a new HIGHER_SOLEMNITY grade clears it to `''`, otherwise any existing
+     * explicit override is left untouched (there is no new `$displayGrade` argument to apply here).
+     *
      * @param LitGrade $grade The new grade.
      */
     public function applyGrade(LitGrade $grade): void
@@ -146,6 +152,9 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
         $this->grade      = $grade;
         $this->grade_lcl  = $grade->i18n(self::$locale, false, false);
         $this->grade_abbr = $grade->i18n(self::$locale, false, true);
+        if ($grade === LitGrade::HIGHER_SOLEMNITY) {
+            $this->grade_display = '';
+        }
     }
 
     /**
