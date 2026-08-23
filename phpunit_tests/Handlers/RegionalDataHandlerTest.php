@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Handlers;
 
+use LiturgicalCalendar\Api\Enum\LitSchema;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\RegionalDataHandler;
 use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
@@ -13,6 +14,7 @@ use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Swaggest\JsonSchema\Schema;
 
 /**
  * RegionalDataHandler serves and edits per-nation / per-diocese / per-wider-
@@ -153,6 +155,41 @@ final class RegionalDataHandlerTest extends AbstractHandlerTestCase
         $body = $this->decodeJsonBody($response);
         self::assertArrayHasKey('litcal', $body);
         self::assertNotEmpty($body['litcal']);
+    }
+
+    /**
+     * The GET path stamps the i18n `name` onto every `liturgical_event` row (see
+     * RegionalDataHandler::readCalendar(), around the `$liturgicalEvent->name = $localeData->{$eventKey};`
+     * line), including `setProperty` rows whose schema branches did not originally declare an optional
+     * `name` property (unlike the `createNew` branches, which always did). That meant a GET response body
+     * could fail its own published `DiocesanCalendar` schema — silently, since the GET path never
+     * self-validates — and a subsequent PUT/PATCH of that same body would then be rejected by
+     * RegionalDataHandler's write-path schema validation. Lugano (`lugano_ch`) has `setProperty:grade`,
+     * `setProperty:common`, and `setProperty:name` rows, so it exercises all three previously-invalid
+     * branches at once.
+     */
+    public function testGetAmbrosianDiocesanCalendarNameStampedBodyValidatesAgainstSchema(): void
+    {
+        $response = ( new RegionalDataHandler(['diocese', 'lugano_ch'], Rite::AMBROSIAN) )
+            ->handle($this->requestFor('GET', '/data/ambrosian/diocese/lugano_ch', ['Accept-Language' => 'it-IT']));
+
+        self::assertSame(200, $response->getStatusCode());
+
+        // Decode as objects (not associative arrays) — swaggest/json-schema validates stdClass instances.
+        $decoded = json_decode((string) $response->getBody(), false, 512, JSON_THROW_ON_ERROR);
+        self::assertInstanceOf(\stdClass::class, $decoded);
+
+        // Sanity check: at least one row must actually have been name-stamped by the GET path,
+        // otherwise this test would pass vacuously without exercising the defect.
+        $stampedRows = array_filter(
+            $decoded->litcal,
+            static fn (\stdClass $row): bool => property_exists($row->liturgical_event, 'name')
+        );
+        self::assertNotEmpty($stampedRows, 'The GET path must have stamped a `name` onto at least one row.');
+
+        $schema = Schema::import(LitSchema::DIOCESAN->path());
+        $schema->in($decoded);
+        self::assertTrue(true, 'The name-stamped GET response body must validate against the DiocesanCalendar schema.');
     }
 
     public function testGetRomanDiocesanCalendarStillReadsTheRomanTree(): void

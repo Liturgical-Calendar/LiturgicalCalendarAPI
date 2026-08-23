@@ -23,6 +23,10 @@
         "metadata"
     ],
     "definitions": {
+        "DiocesanEventKey": {
+            "type": "string",
+            "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil|_[0-9])?$"
+        },
         "LitCal": {
             "type": "array",
             "minItems": 1,
@@ -56,8 +60,7 @@
                     "additionalProperties": false,
                     "properties": {
                         "event_key": {
-                            "type": "string",
-                            "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil|_[0-9])?$"
+                            "$ref": "#/definitions/DiocesanEventKey"
                         },
                         "color": {
                             "$ref": "./CommonDef.json#/definitions/LitColor"
@@ -137,8 +140,7 @@
                     "additionalProperties": false,
                     "properties": {
                         "event_key": {
-                            "type": "string",
-                            "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil|_[0-9])?$"
+                            "$ref": "#/definitions/DiocesanEventKey"
                         },
                         "color": {
                             "$ref": "./CommonDef.json#/definitions/LitColor"
@@ -216,11 +218,13 @@
                     "additionalProperties": false,
                     "properties": {
                         "event_key": {
-                            "type": "string",
-                            "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil|_[0-9])?$"
+                            "$ref": "#/definitions/DiocesanEventKey"
                         },
                         "grade": {
                             "$ref": "./CommonDef.json#/definitions/LitGrade"
+                        },
+                        "name": {
+                            "type": "string"
                         }
                     },
                     "required": [
@@ -281,8 +285,10 @@
                     "additionalProperties": false,
                     "properties": {
                         "event_key": {
-                            "type": "string",
-                            "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil|_[0-9])?$"
+                            "$ref": "#/definitions/DiocesanEventKey"
+                        },
+                        "name": {
+                            "type": "string"
                         }
                     },
                     "required": [
@@ -342,11 +348,13 @@
                     "additionalProperties": false,
                     "properties": {
                         "event_key": {
-                            "type": "string",
-                            "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil|_[0-9])?$"
+                            "$ref": "#/definitions/DiocesanEventKey"
                         },
                         "common": {
                             "$ref": "./CommonDef.json#/definitions/LitCommon"
+                        },
+                        "name": {
+                            "type": "string"
                         }
                     },
                     "required": [
