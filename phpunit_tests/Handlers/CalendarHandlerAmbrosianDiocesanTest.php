@@ -199,18 +199,16 @@ final class CalendarHandlerAmbrosianDiocesanTest extends AbstractHandlerTestCase
     }
 
     /**
-     * `StFrancisOfAssisi` (4 October) is FEAST (grade 4) in the comune Ambrosian sanctorale, and
-     * `lugano_ch`'s on-disk calendar still declares it as a `createNew` row (grade MEMORIAL) — the
-     * on-disk data has not yet been re-authored to `setProperty` (that migration is a later,
-     * separate task). A `createNew` row colliding with an existing key is a data-authoring error:
-     * overriding an existing celebration is what `setProperty` is for, not `createNew`. So the
-     * collision guard in `applyAmbrosianDiocesanCalendar()` must skip this row rather than let it
-     * silently double-register the event (once under the comune's FEAST sub-collection, once under
-     * MEMORIAL) — the comune FEAST definition must survive untouched, and a message must be
-     * recorded pointing the diocese's author at `setProperty`. Once the on-disk data is migrated,
-     * this collision — and this test — go away.
+     * `StFrancisOfAssisi` (4 October) is FEAST (grade 4) in the comune Ambrosian sanctorale.
+     * `lugano_ch`'s on-disk calendar used to re-declare it as a colliding `createNew` row (which the
+     * collision guard in `applyAmbrosianDiocesanCalendar()` skipped — see git history for the
+     * pre-migration version of this test). It has since been re-authored (Task 7 of the
+     * `setProperty` plan) as three `setProperty` rows — `grade`, `common`, `name` — so the suffragan
+     * downgrade to MEMORIAL now actually takes effect, in place, on the comune entry: no duplicate
+     * registration, no suppression, and the per-grade sub-collections stay consistent with the
+     * event's new grade.
      */
-    public function testLuganoCreateNewRowCollidingWithComuneIsSkippedNotDuplicated(): void
+    public function testLuganoOverrideDowngradesStFrancisGradeToMemorial(): void
     {
         $handler = $this->assembleHandlerForDiocese('lugano_ch', 2025);
         $cal     = $this->runOrchestrator($handler);
@@ -218,33 +216,32 @@ final class CalendarHandlerAmbrosianDiocesanTest extends AbstractHandlerTestCase
         $event = $cal->getLiturgicalEvent('StFrancisOfAssisi');
         self::assertNotNull($event, 'Expected `StFrancisOfAssisi` to be present after the diocesan overlay ran.');
         self::assertSame(
-            LitGrade::FEAST,
+            LitGrade::MEMORIAL,
             $event->grade,
-            'The comune definition (FEAST) must survive untouched; the colliding createNew row must be skipped, not applied.'
+            'The `setProperty:grade` row must downgrade the comune FEAST definition to MEMORIAL, in place.'
+        );
+        self::assertSame(
+            ['Proper'],
+            $event->common->jsonSerialize(),
+            'The `setProperty:common` row must apply alongside the grade change.'
+        );
+        self::assertSame(
+            "S. Francesco d'Assisi",
+            $event->name,
+            'The `setProperty:name` row must replace the comune name ("...patrono d\'Italia") with the diocesan one.'
         );
         self::assertInstanceOf(
             ReadingsFerial::class,
             $event->readings,
-            'The comune sanctorale placeholder is always ferial (AmbrosianReadings::empty()), regardless of grade.'
+            'A downgrade to MEMORIAL must re-stamp the readings placeholder as ferial (AmbrosianReadings::forGrade()).'
         );
         self::assertFalse(
             $cal->isSuppressed('StFrancisOfAssisi'),
-            'A skipped colliding row must NOT be recorded as a suppressed celebration.'
+            'An in-place property change must never record the event as suppressed.'
         );
-
-        $messagesProp = new \ReflectionProperty($handler, 'Messages');
-        $messagesProp->setAccessible(true);
-        /** @var string[] $messages */
-        $messages = $messagesProp->getValue($handler);
-        $matching = array_filter(
-            $messages,
-            static fn (string $message): bool => str_contains($message, 'StFrancisOfAssisi')
-        );
-        self::assertNotEmpty($matching, 'The skipped colliding createNew row must record an explanatory message.');
-
-        self::assertFalse(
+        self::assertTrue(
             $cal->getMemorials()->hasKey('StFrancisOfAssisi'),
-            'The colliding row must NOT register the event a second time under its own (MEMORIAL) grade sub-collection.'
+            'The event must be registered under its new (MEMORIAL) grade sub-collection.'
         );
     }
 
@@ -364,12 +361,16 @@ final class CalendarHandlerAmbrosianDiocesanTest extends AbstractHandlerTestCase
 
         self::assertArrayHasKey('StFrancisOfAssisi', $byKey, 'Expected `StFrancisOfAssisi` to be present in the live response.');
         self::assertSame(
-            4,
+            3,
             $byKey['StFrancisOfAssisi']['grade'],
-            'lugano_ch\'s on-disk `createNew` row for this key collides with the comune FEAST definition and is '
-                . 'skipped (see testLuganoCreateNewRowCollidingWithComuneIsSkippedNotDuplicated); the comune grade '
-                . '(FEAST, 4) must survive until that row is migrated to `setProperty`.'
+            'lugano_ch\'s on-disk `setProperty:grade` row (see testLuganoOverrideDowngradesStFrancisGradeToMemorial) '
+                . 'downgrades the comune FEAST definition (4) to MEMORIAL (3), live through the full request pipeline.'
         );
+        self::assertSame(['Proper'], $byKey['StFrancisOfAssisi']['common']);
+        // No Accept-Language header on this request resolves to Latin (Negotiator's default), so
+        // the diocesan name comes from lugano_ch/i18n/la_VA.json, not it_IT.json (compare
+        // testLuganoOverrideDowngradesStFrancisGradeToMemorial, which asserts the it_IT rename).
+        self::assertSame('Sanctus Franciscus Assisiensis', $byKey['StFrancisOfAssisi']['name']);
 
         self::assertArrayHasKey(
             'AllSaints',

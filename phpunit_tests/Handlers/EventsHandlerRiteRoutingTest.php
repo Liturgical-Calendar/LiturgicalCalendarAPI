@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Handlers;
 
+use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\EventsHandler;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
@@ -158,5 +159,33 @@ final class EventsHandlerRiteRoutingTest extends AbstractHandlerTestCase
         self::assertSame('milano_it', $result['body']['settings']['diocesan_calendar']);
         // Ambrosian dioceses are not layered on top of a national calendar.
         self::assertNull($result['body']['settings']['national_calendar']);
+    }
+
+    /**
+     * A diocesan `setProperty` override modifies the comune catalog entry under its plain key.
+     * Emitting a `{diocese}_{key}` duplicate alongside the untouched comune entry — which is what
+     * the old re-declare mechanism did — would leave `/events` disagreeing with `/calendar`.
+     */
+    public function testAmbrosianDiocesanOverrideHasNoPrefixedDuplicate(): void
+    {
+        $result = $this->handle(['diocese', 'lugano_ch'], Rite::AMBROSIAN, '/events/ambrosian/diocese/lugano_ch');
+        self::assertSame(200, $result['status']);
+
+        $byKey = self::byKey($result['body']['litcal_events']);
+
+        // The overridden comune keys stay, under their plain keys.
+        self::assertArrayHasKey('StsProtaseGervase', $byKey);
+        self::assertArrayHasKey('StFrancisOfAssisi', $byKey);
+
+        // No phantom prefixed duplicates for the overridden keys.
+        self::assertArrayNotHasKey('lugano_ch_StsProtaseGervase', $byKey);
+        self::assertArrayNotHasKey('lugano_ch_StFrancisOfAssisi', $byKey);
+
+        // A genuine createNew diocesan row is still prefixed, as before.
+        self::assertArrayHasKey('lugano_ch_BeatoManfredoSettala', $byKey);
+
+        // The override applied to the comune entry.
+        self::assertSame(LitGrade::MEMORIAL->value, $byKey['StsProtaseGervase']['grade']);
+        self::assertSame(['Proper'], $byKey['StsProtaseGervase']['common']);
     }
 }

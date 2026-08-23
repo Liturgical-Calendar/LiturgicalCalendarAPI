@@ -17,29 +17,60 @@
         {
             "liturgical_event": {
                 "event_key": "StsProtaseGervase",
-                "color": [ "red" ],
-                "grade": 3,
-                "common": [ "Proper" ],
-                "day": 19,
-                "month": 6
+                "grade": 3
             },
             "metadata": {
+                "action": "setProperty",
+                "property": "grade",
                 "since_year": 2024,
                 "form_rownum": 1
             }
         },
         {
             "liturgical_event": {
-                "event_key": "StFrancisOfAssisi",
-                "color": [ "white" ],
-                "grade": 3,
-                "common": [ "Proper" ],
-                "day": 4,
-                "month": 10
+                "event_key": "StsProtaseGervase",
+                "common": [ "Proper" ]
             },
             "metadata": {
+                "action": "setProperty",
+                "property": "common",
                 "since_year": 2024,
                 "form_rownum": 2
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "StFrancisOfAssisi",
+                "grade": 3
+            },
+            "metadata": {
+                "action": "setProperty",
+                "property": "grade",
+                "since_year": 2024,
+                "form_rownum": 3
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "StFrancisOfAssisi",
+                "common": [ "Proper" ]
+            },
+            "metadata": {
+                "action": "setProperty",
+                "property": "common",
+                "since_year": 2024,
+                "form_rownum": 4
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "StFrancisOfAssisi"
+            },
+            "metadata": {
+                "action": "setProperty",
+                "property": "name",
+                "since_year": 2024,
+                "form_rownum": 5
             }
         },
         {
@@ -53,7 +84,7 @@
             },
             "metadata": {
                 "since_year": 2024,
-                "form_rownum": 3
+                "form_rownum": 6
             }
         }
     ],

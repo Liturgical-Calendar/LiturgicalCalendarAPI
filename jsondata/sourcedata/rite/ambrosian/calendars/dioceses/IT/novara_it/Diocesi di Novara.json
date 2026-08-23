@@ -3,15 +3,25 @@
         {
             "liturgical_event": {
                 "event_key": "StsProtaseGervase",
-                "color": [ "red" ],
-                "grade": 3,
-                "common": [ "Proper" ],
-                "day": 19,
-                "month": 6
+                "grade": 3
             },
             "metadata": {
+                "action": "setProperty",
+                "property": "grade",
                 "since_year": 2024,
                 "form_rownum": 0
+            }
+        },
+        {
+            "liturgical_event": {
+                "event_key": "StsProtaseGervase",
+                "common": [ "Proper" ]
+            },
+            "metadata": {
+                "action": "setProperty",
+                "property": "common",
+                "since_year": 2024,
+                "form_rownum": 1
             }
         },
         {
@@ -25,7 +35,7 @@
             },
             "metadata": {
                 "since_year": 2024,
-                "form_rownum": 1
+                "form_rownum": 2
             }
         }
     ],
