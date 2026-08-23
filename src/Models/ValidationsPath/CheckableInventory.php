@@ -289,12 +289,24 @@ final class CheckableInventory
             // The missal's lectionary sits beside its sanctorale file rather than at a path derived from
             // the missal id: the folder for EDITIO_TYPICA_1970 is `propriumdesanctis_1970`, so splitting
             // the id would build the wrong path. `$file` is the registry's own answer for this missal.
+            // A failed glob yields *no expectation*, not an empty one. `glob()` returns an empty array —
+            // never false — for a readable directory with no matches, so false is always a filesystem
+            // error; coercing it to `[]` would hand the item a non-null expectation of zero locales, and
+            // `covers` would then pass trivially. A green card asserting nothing is the precise failure
+            // this step was added to remove, and it would be reported for a *server* fault at that.
+            //
+            // Null instead, which drops `covers` from this item's steps: an honest "no coverage claimed",
+            // and visible as such on `/validations` (no `covers` in `steps`, `expected_locales` null)
+            // rather than silent. {@see self::testDefinitionItems()} raises on the same condition, but
+            // that producer is deliberately outside {@see self::staticItems()} for exactly that reason —
+            // this one is inside it, and a fallback that can itself throw is not a fallback.
             $i18n          = RomanMissal::getSanctoraleI18nFilePath($missalId);
-            $missalLocales = false === $i18n
+            $i18nFiles     = false === $i18n ? false : glob(rtrim($i18n, '/') . '/*.json');
+            $missalLocales = false === $i18nFiles
                 ? null
                 : array_values(array_map(
                     static fn (string $f): string => basename($f, '.json'),
-                    glob(rtrim($i18n, '/') . '/*.json') ?: []
+                    $i18nFiles
                 ));
 
             $lectionary = self::folderItemIfPresent(
