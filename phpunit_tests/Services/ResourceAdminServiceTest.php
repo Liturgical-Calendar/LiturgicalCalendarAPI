@@ -639,4 +639,57 @@ final class ResourceAdminServiceTest extends TestCase
 
         self::assertCount(count(ResourceAdminService::ADMIN_OBJECT_TYPES), $service->resolveScopes('cei-admin'));
     }
+
+    public function testTheBudgetSpansEveryFanOutOfOneServiceInstance(): void
+    {
+        $now = 0.0;
+        // The /auth/dashboard-scopes shape: resolveScopes() then resolveViewerScopes()
+        // on ONE service instance. A 5s first lookup must exhaust the budget for both,
+        // not hand the second call a fresh 3s window — otherwise the endpoint's worst
+        // case is two budgets plus two read timeouts, which is the availability hole
+        // #878 exists to close.
+        $service = $this->serviceWithClock(
+            array_merge(
+                [self::costing($now, 5.0, new GuzzleResponse(200, [], '{"objects":["national_calendar:IT"]}'))],
+                array_map(
+                    static fn(): GuzzleResponse => new GuzzleResponse(200, [], '{"objects":["national_calendar:XX"]}'),
+                    range(1, 8)
+                )
+            ),
+            $now,
+            3.0
+        );
+
+        $adminScopes  = $service->resolveScopes('cei-admin');
+        $viewerScopes = $service->resolveViewerScopes('cei-admin');
+
+        self::assertSame([['object_type' => 'national_calendar', 'object_id' => 'IT']], $adminScopes);
+        self::assertSame(array_fill_keys(ResourceAdminService::VIEWER_OBJECT_TYPES, []), $viewerScopes);
+        self::assertCount(8, $this->mockQueue, 'only the first lookup should ever have been dialed');
+    }
+
+    public function testTheBudgetAlsoSpansAResolveThenFilterSequence(): void
+    {
+        $now = 0.0;
+        // The GET /admin/notifications shape: resolveScopes() gates admission and
+        // filterByAdminAccess() then scopes the list, both on one instance.
+        $service  = $this->serviceWithClock(
+            array_merge(
+                [self::costing($now, 5.0, new GuzzleResponse(200, [], '{"objects":["national_calendar:IT"]}'))],
+                array_map(
+                    static fn(): GuzzleResponse => new GuzzleResponse(200, [], '{"allowed":true}'),
+                    range(1, 4)
+                )
+            ),
+            $now,
+            3.0
+        );
+        $requests = [
+            ['id' => 'A', 'permissions' => [['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'admin']]],
+        ];
+
+        self::assertNotSame([], $service->resolveScopes('cei-admin'));
+        self::assertSame([], $service->filterByAdminAccess($requests, 'cei-admin'));
+        self::assertCount(4, $this->mockQueue, 'the check sweep should not have been dialed');
+    }
 }

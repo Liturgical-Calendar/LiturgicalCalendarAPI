@@ -77,6 +77,14 @@ final class ResourceAdminService
      * (~12 ms for nine calls, issue #711), so it can only ever be reached when
      * something is badly wrong — never by a merely busy authorization server.
      *
+     * **The budget is per service instance, and every call site constructs one
+     * per request** — which is what makes it a per-request bound rather than a
+     * per-resolver one. That distinction is load-bearing: `/auth/dashboard-scopes`
+     * resolves admin scopes and then viewer scopes, and `/admin/notifications`
+     * resolves scopes and then filters access requests. Re-arming the deadline
+     * for each of those would leave the endpoint's worst case at two budgets plus
+     * two read timeouts. Do not hold an instance across requests.
+     *
      * **What this does and does not bound.** The budget gates whether the *next*
      * lookup is dialed; it cannot interrupt one already in flight. The true
      * worst case is therefore this budget plus one read timeout (~8s), not 3s —
@@ -95,12 +103,14 @@ final class ResourceAdminService
     private readonly \Closure $clock;
 
     /**
-     * Deadline for the fan-out currently in flight, or null when none is.
+     * Deadline shared by every lookup this instance makes, stamped on the first
+     * one and never refreshed. Null until then.
      */
     private ?float $deadline = null;
 
     /**
-     * Lookups the in-flight fan-out skipped because its budget was spent.
+     * Lookups the fan-out in progress skipped because the budget was spent.
+     * Reset by {@see reportSkipped()} at the end of each fan-out.
      */
     private int $skipped = 0;
 
@@ -161,33 +171,25 @@ final class ResourceAdminService
     }
 
     /**
-     * Open a fan-out window, stamping the deadline every lookup in it is measured against.
-     *
-     * Returns whether THIS call owns the window. A nested fan-out (a public
-     * resolver reached through another) reuses the outer deadline rather than
-     * refreshing it, so the budget bounds the whole sequence and not each leg.
-     */
-    private function startFanOut(): bool
-    {
-        if ($this->deadline !== null) {
-            return false;
-        }
-
-        $this->deadline = ( $this->clock )() + $this->budgetSeconds;
-        $this->skipped  = 0;
-
-        return true;
-    }
-
-    /**
      * Whether there is still budget left to dial another lookup.
+     *
+     * The deadline is stamped on the first lookup this instance ever makes and
+     * never refreshed, so it spans EVERY fan-out the instance performs — which
+     * is what makes it a per-request bound. Two endpoints need that: the
+     * dashboard resolves admin scopes and then viewer scopes, and the
+     * notifications badge resolves scopes and then filters access requests, each
+     * through a single service. Re-arming per resolver would hand the second
+     * sweep a fresh budget and leave the endpoint's worst case at two budgets
+     * plus two read timeouts.
      *
      * Counts every refusal, so the close-out log can report how much of the
      * fan-out was skipped rather than answered.
      */
     private function withinBudget(): bool
     {
-        if ($this->deadline === null || ( $this->clock )() < $this->deadline) {
+        $this->deadline ??= ( $this->clock )() + $this->budgetSeconds;
+
+        if (( $this->clock )() < $this->deadline) {
             return true;
         }
 
@@ -197,16 +199,15 @@ final class ResourceAdminService
     }
 
     /**
-     * Close the fan-out window, reporting once if any lookup was skipped.
+     * Report, once per fan-out, how many lookups the spent budget skipped.
      *
-     * One line per exhausted fan-out, not one per skipped lookup: a hung OpenFGA
-     * would otherwise write eight near-identical lines per render.
+     * One line per fan-out, not one per skipped lookup: a hung OpenFGA would
+     * otherwise write eight near-identical lines per render.
      */
-    private function endFanOut(string $operation): void
+    private function reportSkipped(string $operation): void
     {
-        $skipped        = $this->skipped;
-        $this->deadline = null;
-        $this->skipped  = 0;
+        $skipped       = $this->skipped;
+        $this->skipped = 0;
 
         if ($skipped === 0) {
             return;
@@ -288,7 +289,6 @@ final class ResourceAdminService
     {
         $fgaUser = "user:{$sub}";
         $scopes  = [];
-        $owner   = $this->startFanOut();
 
         try {
             foreach (self::ADMIN_OBJECT_TYPES as $type) {
@@ -297,9 +297,7 @@ final class ResourceAdminService
                 }
             }
         } finally {
-            if ($owner) {
-                $this->endFanOut('resolveScopes');
-            }
+            $this->reportSkipped('resolveScopes');
         }
 
         return $scopes;
@@ -325,7 +323,6 @@ final class ResourceAdminService
         $fgaUser = "user:{$sub}";
         $editor  = [];
         $admin   = [];
-        $owner   = $this->startFanOut();
 
         try {
             foreach (self::TEST_OBJECT_TYPES as $type) {
@@ -339,9 +336,7 @@ final class ResourceAdminService
                 }
             }
         } finally {
-            if ($owner) {
-                $this->endFanOut('resolveTestScopes');
-            }
+            $this->reportSkipped('resolveTestScopes');
         }
 
         return ['editor' => $editor, 'admin' => $admin];
@@ -362,16 +357,13 @@ final class ResourceAdminService
     {
         $fgaUser = "user:{$sub}";
         $scopes  = array_fill_keys(self::VIEWER_OBJECT_TYPES, []);
-        $owner   = $this->startFanOut();
 
         try {
             foreach (self::VIEWER_OBJECT_TYPES as $type) {
                 $scopes[$type] = $this->listObjectsIsolated($fgaUser, 'viewer', $type);
             }
         } finally {
-            if ($owner) {
-                $this->endFanOut('resolveViewerScopes');
-            }
+            $this->reportSkipped('resolveViewerScopes');
         }
 
         return $scopes;
@@ -394,14 +386,11 @@ final class ResourceAdminService
 
         /** @var array<string, bool> $cache */
         $cache = [];
-        $owner = $this->startFanOut();
 
         try {
             return $this->filterEachByAdminAccess($requests, $fgaUser, $cache);
         } finally {
-            if ($owner) {
-                $this->endFanOut('filterByAdminAccess');
-            }
+            $this->reportSkipped('filterByAdminAccess');
         }
     }
 
