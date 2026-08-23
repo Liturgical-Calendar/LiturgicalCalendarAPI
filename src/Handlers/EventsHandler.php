@@ -592,19 +592,19 @@ final class EventsHandler extends AbstractHandler
                 if (null === $existingLiturgicalEvent) {
                     throw new \RuntimeException('Thomas, called Didymus, one of the Twelve, was not with them when Jesus came. - John 20:24');
                 }
-                $existingLiturgicalEvent->name = $names[$key];
+                $existingLiturgicalEvent->applyName($names[$key]);
             } elseif ($decreeItem->liturgical_event instanceof DecreeItemSetPropertyGrade) {
                 $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($key);
                 if (null === $existingLiturgicalEvent) {
                     throw new \RuntimeException('It would seem that Jonah has been swallowed by the whale.');
                 }
-                $existingLiturgicalEvent->grade = $decreeItem->liturgical_event->grade;
+                $existingLiturgicalEvent->applyGrade($decreeItem->liturgical_event->grade);
             } elseif ($decreeItem->liturgical_event instanceof DecreeItemMakeDoctor) {
                 $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($key);
                 if (null === $existingLiturgicalEvent) {
                     throw new \RuntimeException('Is Ishmael lost in the desert again?');
                 }
-                $existingLiturgicalEvent->name = $names[$key];
+                $existingLiturgicalEvent->applyName($names[$key]);
             }
         }
     }
@@ -670,21 +670,21 @@ final class EventsHandler extends AbstractHandler
                         if (null === $existingLiturgicalEvent) {
                             throw new \RuntimeException('“The goat that was sent away presented a type of Him who takes away the sins of men.” – Justin Martyr');
                         }
-                        $existingLiturgicalEvent->grade = $litCalItem->liturgical_event->grade;
+                        $existingLiturgicalEvent->applyGrade($litCalItem->liturgical_event->grade);
                     } elseif ($litCalItem->liturgical_event instanceof LitCalItemSetPropertyName) {
                         $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($litCalItem->liturgical_event->event_key);
                         if (null === $existingLiturgicalEvent) {
                             throw new \RuntimeException('No dove on this ark, did Noah already set it out?');
                         }
-                        $existingLiturgicalEvent->name = $litCalItem->liturgical_event->name;
+                        $existingLiturgicalEvent->applyName($litCalItem->liturgical_event->name);
                     } elseif ($litCalItem->liturgical_event instanceof LitCalItemMakePatron) {
                         $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($litCalItem->liturgical_event->event_key);
                         if (null === $existingLiturgicalEvent) {
                             throw new \RuntimeException('“Son, why have you done this to us? Your father and I have been looking for you with great anxiety.” – Luke 2:48');
                         }
-                        $existingLiturgicalEvent->name = $litCalItem->liturgical_event->name;
+                        $existingLiturgicalEvent->applyName($litCalItem->liturgical_event->name);
                         if (property_exists($litCalItem->liturgical_event, 'grade')) {
-                            $existingLiturgicalEvent->grade = $litCalItem->liturgical_event->grade;
+                            $existingLiturgicalEvent->applyGrade($litCalItem->liturgical_event->grade);
                         }
                     } else {
                         throw new \ValueError('Unknown LitCalItem->liturgical_event type: ' . get_class($litCalItem->liturgical_event));
@@ -716,20 +716,20 @@ final class EventsHandler extends AbstractHandler
                     if (null === $existingLiturgicalEvent) {
                         throw new \RuntimeException("Unknown event key '{$key}' when setting name from National calendar");
                     }
-                    $existingLiturgicalEvent->name = $NationalCalendarI18nData[$key];
+                    $existingLiturgicalEvent->applyName($NationalCalendarI18nData[$key]);
                 } elseif ($litCalItem->liturgical_event instanceof LitCalItemSetPropertyGrade) {
                     $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($key);
                     if (null === $existingLiturgicalEvent) {
                         throw new \RuntimeException("Unknown event key '{$key}' when setting grade from National calendar");
                     }
-                    $existingLiturgicalEvent->grade = $litCalItem->liturgical_event->grade;
+                    $existingLiturgicalEvent->applyGrade($litCalItem->liturgical_event->grade);
                 } elseif ($litCalItem->liturgical_event instanceof LitCalItemMakePatron) {
                     $existingLiturgicalEvent = self::$liturgicalEvents->getEvent($key);
                     if (null === $existingLiturgicalEvent) {
                         throw new \RuntimeException('Rising very early before dawn, he left and went off to a deserted place, where he prayed. Simon and those who were with him pursued him and on finding him said, “Everyone is looking for you.” - Mark 1:35-37');
                     }
-                    $existingLiturgicalEvent->name  = $NationalCalendarI18nData[$key];
-                    $existingLiturgicalEvent->grade = $litCalItem->liturgical_event->grade;
+                    $existingLiturgicalEvent->applyName($NationalCalendarI18nData[$key]);
+                    $existingLiturgicalEvent->applyGrade($litCalItem->liturgical_event->grade);
                 } elseif ($litCalItem->liturgical_event instanceof LitCalItemMoveEvent) {
                     // Do nothing
                 } else {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Models\EventsPath;
 
+use LiturgicalCalendar\Api\Enum\LitColor;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
 use LiturgicalCalendar\Api\Models\EventsPath\LiturgicalEventFixed;
@@ -94,5 +95,37 @@ final class LiturgicalEventAbstractMutatorTest extends TestCase
         $event->applyName('Ss. Protaso e Gervaso');
 
         self::assertSame('Ss. Protaso e Gervaso', $event->jsonSerialize()['name']);
+    }
+
+    /**
+     * `color_lcl` is serialized alongside `color` and had no re-derivation of its own before #872,
+     * in either model. No catalog code path writes `$color` today, so this covers the shared
+     * mechanism rather than a live caller: a write to `color` followed by the generic
+     * re-derivation must leave `color_lcl` describing the NEW colour.
+     */
+    public function testRederivingAfterAColorWriteRefreshesTheLocalizedColor(): void
+    {
+        $event  = $this->makeEvent();
+        $before = $event->jsonSerialize()['color_lcl'];
+
+        $event->color = [LitColor::WHITE];
+        $event->rederiveDependentsOf('color');
+
+        $after = $event->jsonSerialize();
+        self::assertSame(['white'], $after['color']);
+        self::assertNotSame($before, $after['color_lcl'], 'color_lcl must be re-derived, not left describing the previous colour.');
+        self::assertSame(
+            LiturgicalEventFixed::fromArray([
+                'event_key' => 'StsProtaseGervase',
+                'name'      => 'Ss. Protaso e Gervaso, martiri',
+                'month'     => 6,
+                'day'       => 19,
+                'grade'     => 4,
+                'color'     => ['white'],
+                'common'    => ['Martyrs:For Several Martyrs'],
+            ])->jsonSerialize()['color_lcl'],
+            $after['color_lcl'],
+            'color_lcl after a write must equal what the constructor would have derived for the same colour.'
+        );
     }
 }
