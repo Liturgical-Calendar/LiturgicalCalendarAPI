@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Api\Handlers\Admin;
 
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Handlers\AbstractHandler;
+use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesFgaClient;
 use LiturgicalCalendar\Api\Handlers\Pagination\OffsetPaginationTrait;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
@@ -48,9 +49,9 @@ use Psr\Http\Message\ServerRequestInterface;
 final class AccessRequestAdminHandler extends AbstractHandler
 {
     use OffsetPaginationTrait;
+    use ResolvesFgaClient;
 
     private ?AccessRequestRepository $repository = null;
-    private ?OpenFgaClient $fgaClient            = null;
     private ?OutboxRepository $outboxRepository  = null;
     private ?OutboxNotifier $outboxNotifier      = null;
     private ?OutboxProcessor $outboxProcessor    = null;
@@ -94,14 +95,6 @@ final class AccessRequestAdminHandler extends AbstractHandler
             $this->repository = new AccessRequestRepository();
         }
         return $this->repository;
-    }
-
-    private function getFgaClient(): OpenFgaClient
-    {
-        if ($this->fgaClient === null) {
-            $this->fgaClient = OpenFgaClient::fromEnv();
-        }
-        return $this->fgaClient;
     }
 
     private function getOutboxRepository(): OutboxRepository
@@ -153,18 +146,6 @@ final class AccessRequestAdminHandler extends AbstractHandler
             );
         }
         return $this->outboxProcessor;
-    }
-
-    /**
-     * True when an OpenFGA client is reachable: either one was constructor-
-     * injected (test path), or the env-based static is configured (prod
-     * path). Replaces direct `OpenFgaClient::isConfigured()` checks at the
-     * sites that gate tuple-write / admin-check work, so an injected mock
-     * is honored without also requiring OPENFGA_* env vars to be set.
-     */
-    private function isFgaClientAvailable(): bool
-    {
-        return $this->fgaClient !== null || OpenFgaClient::isConfigured();
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
