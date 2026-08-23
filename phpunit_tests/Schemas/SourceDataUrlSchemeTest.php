@@ -23,7 +23,7 @@ use Swaggest\JsonSchema\Schema;
  *
  * 1. every `url` actually shipped in `jsondata/sourcedata/` satisfies `^https://`,
  *    so the tightened schemas do not reject the existing corpus;
- * 2. each of the six schema declarations really does reject a `javascript:` URL
+ * 2. each of the ten schema declarations really does reject a `javascript:` URL
  *    while still accepting an `https://` URL containing a `%s` sprintf placeholder
  *    (several Vatican URLs carry a language placeholder).
  */
@@ -61,19 +61,25 @@ final class SourceDataUrlSchemeTest extends TestCase
     }
 
     /**
-     * The six source-data declarations that govern a `url` value which ends up inside an `href`.
+     * The ten source-data declarations that govern a `url` value which ends up inside an `href`.
+     * `DiocesanCalendar` contributes five (one per `LitCal.items` `oneOf` branch, since Task 4 of
+     * the setProperty rollout restructured it away from a single inline object) instead of one.
      *
      * @return array<string, array{LitSchema, string}>
      */
     private static function urlSchemaPointers(): array
     {
         return [
-            'DiocesanCalendar litcal[].metadata.url'      => [LitSchema::DIOCESAN, '/definitions/LitCal/items/properties/metadata/properties/url'],
-            'NationalCalendar setProperty/grade url'      => [LitSchema::NATIONAL, '/definitions/LitCalSetPropertyGrade/properties/metadata/properties/url'],
-            'NationalCalendar setProperty/name url'       => [LitSchema::NATIONAL, '/definitions/LitCalSetPropertyName/properties/metadata/properties/url'],
-            'NationalCalendar makePatron url'             => [LitSchema::NATIONAL, '/definitions/LitCalMakePatron/properties/metadata/properties/url'],
-            'WiderRegionCalendar createNew metadata url'  => [LitSchema::WIDERREGION, '/definitions/MetadataCreateNew/properties/url'],
-            'WiderRegionCalendar makePatron metadata url' => [LitSchema::WIDERREGION, '/definitions/MetadataMakePatron/properties/url'],
+            'DiocesanCalendar createNewFixed metadata.url'    => [LitSchema::DIOCESAN, '/definitions/DiocesanCreateNewFixed/properties/metadata/properties/url'],
+            'DiocesanCalendar createNewMobile metadata.url'   => [LitSchema::DIOCESAN, '/definitions/DiocesanCreateNewMobile/properties/metadata/properties/url'],
+            'DiocesanCalendar setPropertyGrade metadata.url'  => [LitSchema::DIOCESAN, '/definitions/DiocesanSetPropertyGrade/properties/metadata/properties/url'],
+            'DiocesanCalendar setPropertyName metadata.url'   => [LitSchema::DIOCESAN, '/definitions/DiocesanSetPropertyName/properties/metadata/properties/url'],
+            'DiocesanCalendar setPropertyCommon metadata.url' => [LitSchema::DIOCESAN, '/definitions/DiocesanSetPropertyCommon/properties/metadata/properties/url'],
+            'NationalCalendar setProperty/grade url'          => [LitSchema::NATIONAL, '/definitions/LitCalSetPropertyGrade/properties/metadata/properties/url'],
+            'NationalCalendar setProperty/name url'           => [LitSchema::NATIONAL, '/definitions/LitCalSetPropertyName/properties/metadata/properties/url'],
+            'NationalCalendar makePatron url'                 => [LitSchema::NATIONAL, '/definitions/LitCalMakePatron/properties/metadata/properties/url'],
+            'WiderRegionCalendar createNew metadata url'      => [LitSchema::WIDERREGION, '/definitions/MetadataCreateNew/properties/url'],
+            'WiderRegionCalendar makePatron metadata url'     => [LitSchema::WIDERREGION, '/definitions/MetadataMakePatron/properties/url'],
         ];
     }
 
