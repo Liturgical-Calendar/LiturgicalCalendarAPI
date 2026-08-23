@@ -8,11 +8,13 @@ use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\CalendarHandler;
+use LiturgicalCalendar\Api\Http\Exception\InternalServerErrorException;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsFerial;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Params\CalendarParams;
 use LiturgicalCalendar\Api\Router;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -254,6 +256,142 @@ final class CalendarHandlerAmbrosianDiocesanSetPropertyTest extends TestCase
         );
 
         self::assertNotEmpty($matching, 'A skipped setProperty row must record an explanatory message.');
+    }
+
+    /**
+     * `LiturgicalEventCollection::setProperty()` returns `false` when the new value already equals
+     * the old one, having changed nothing. A row like that is a no-op, and a silent no-op is the
+     * shape of a data-authoring mistake nobody notices — the author believes an override is in
+     * force when it is not. Each of the three property arms must say so.
+     *
+     * Only the `grade` and `name` arms are exercised, and that is not an oversight. `setProperty()`
+     * decides "did anything change?" with `!==`, which for an **object** is identity, not
+     * equivalence. `grade` is a `LitGrade` enum case (a singleton, so `!==` compares correctly) and
+     * `name` is a string; but `common` is a `LitCommons` **object**, so a freshly built
+     * `LitCommons` carrying exactly the same Commons is never `===` the stored one and the write
+     * always reports success. The `setProperty:common` no-op message is therefore unreachable by a
+     * semantically-redundant row, and pinning it would require asserting a behaviour the code
+     * cannot produce.
+     *
+     * The comune `StsProtaseGervase` is a FEAST (grade 4), so re-declaring grade 4 is the redundant
+     * grade case; its diocesan Italian name is byte-identical to the comune's (see §8 of the design
+     * doc — which is exactly why no name row is authored for it in the real data), so a
+     * `setProperty:name` row for it is the redundant name case. The assertion checks the message
+     * names the property, so a message from a different arm cannot satisfy it.
+     *
+     * @param string               $property     The `metadata->property` under test.
+     * @param array<string,mixed>  $sameAsComune Any `liturgical_event` fields carrying the value the
+     *                                           comune event already has.
+     */
+    #[DataProvider('redundantOverrideProvider')]
+    public function testSetPropertyRowThatChangesNothingRecordsAMessage(string $property, mixed $sameAsComune): void
+    {
+        [$cal, $handler] = $this->runOverlayWith([
+            [
+                'liturgical_event' => array_merge(['event_key' => 'StsProtaseGervase'], $sameAsComune),
+                'metadata'         => ['action' => 'setProperty', 'property' => $property, 'since_year' => 2024, 'form_rownum' => 1],
+            ],
+        ]);
+
+        self::assertNotNull(
+            $cal->getLiturgicalEvent('StsProtaseGervase'),
+            'A redundant override must leave the comune event in place.'
+        );
+
+        $messagesProp = ( new \ReflectionClass($handler) )->getProperty('Messages');
+        $messagesProp->setAccessible(true);
+        /** @var string[] $messages */
+        $messages = $messagesProp->getValue($handler);
+
+        $matching = array_filter(
+            $messages,
+            static fn (string $message): bool => str_contains($message, 'StsProtaseGervase')
+                && str_contains($message, 'setProperty:' . $property)
+        );
+
+        self::assertNotEmpty(
+            $matching,
+            "A `setProperty:{$property}` row that changed nothing must record a message saying so; otherwise the data author cannot tell a redundant override from an applied one."
+        );
+    }
+
+    /**
+     * The `setProperty` action is scoped to the Ambrosian overlay; the Roman diocesan path must
+     * reject it rather than silently skipping the row, because silently skipping would drop a
+     * celebration the data author believes is in force.
+     *
+     * This pins the rite boundary of the action, and pins the exception *type* specifically:
+     * `InternalServerErrorException` extends `ApiException` and carries an HTTP 500 with the
+     * diagnostic detail, where a bare `\RuntimeException` would reach the error pipeline as an
+     * untyped failure. The condition means malformed source data reached the handler — not a
+     * transient outage — so a 503 would misdescribe it.
+     */
+    public function testRomanRiteRejectsASetPropertyRow(): void
+    {
+        LitLocale::$PRIMARY_LANGUAGE = 'it';
+        LitLocale::$RUNTIME_LOCALE   = 'it_IT';
+
+        $params = new CalendarParams();
+        $params->setRite(Rite::ROMAN);
+        $params->setParams(['year' => 2025, 'locale' => 'it']);
+        $params->DiocesanCalendar = 'agrige_it';
+
+        $handler    = new CalendarHandler([], Rite::ROMAN);
+        $handlerRef = new \ReflectionClass($handler);
+
+        $paramsProp = $handlerRef->getProperty('CalendarParams');
+        $paramsProp->setAccessible(true);
+        $paramsProp->setValue($handler, $params);
+
+        $calProp = $handlerRef->getProperty('Cal');
+        $calProp->setAccessible(true);
+        $calProp->setValue($handler, new LiturgicalEventCollection($params));
+
+        $diocesanProp = $handlerRef->getProperty('DiocesanData');
+        $diocesanProp->setAccessible(true);
+        $diocesanProp->setValue($handler, DiocesanData::fromArray([
+            'litcal'   => [
+                [
+                    'liturgical_event' => ['event_key' => 'StsProtaseGervase', 'grade' => 3],
+                    'metadata'         => ['action' => 'setProperty', 'property' => 'grade', 'since_year' => 2024, 'form_rownum' => 0],
+                ],
+            ],
+            'metadata' => [
+                'diocese_id'   => 'agrige_it',
+                'diocese_name' => 'Agrigento',
+                'nation'       => 'IT',
+                'locales'      => ['it_IT'],
+                'timezone'     => 'Europe/Rome',
+            ],
+        ]));
+
+        $apply = $handlerRef->getMethod('applyDiocesanCalendar');
+        $apply->setAccessible(true);
+
+        try {
+            $apply->invoke($handler);
+            self::fail('Expected the Roman diocesan path to reject a `setProperty` row.');
+        } catch (\ReflectionException $e) {
+            self::fail('Reflection failure rather than the expected rejection: ' . $e->getMessage());
+        } catch (InternalServerErrorException $e) {
+            self::assertStringContainsString(
+                'StsProtaseGervase',
+                $e->getMessage(),
+                'The rejection must name the offending event key, or the data author cannot find the bad row.'
+            );
+            self::assertSame(500, $e->getCode(), 'The rejection must surface as an HTTP 500.');
+        }
+    }
+
+    /**
+     * @return array<string,array{0:string,1:array<string,mixed>}>
+     */
+    public static function redundantOverrideProvider(): array
+    {
+        return [
+            'grade already FEAST'    => ['grade', ['grade' => 4]],
+            'name already identical' => ['name', []],
+        ];
     }
 
     /**
