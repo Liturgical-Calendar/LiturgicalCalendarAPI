@@ -765,6 +765,12 @@ final class EventsHandler extends AbstractHandler
                 $key  = $diocesanLitCalItem->liturgical_event->event_key;
                 $name = $DiocesanCalendarI18nData[$key];
                 $diocesanLitCalItem->setName('[ ' . self::$DiocesanData->metadata->diocese_name . ' ] ' . $name);
+                if (
+                    false === $diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemCreateNewFixed
+                    && false === $diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemCreateNewMobile
+                ) {
+                    throw new \ValueError('diocesan calendar item `' . $key . '`: the `setProperty` action is not supported for Roman rite diocesan calendars');
+                }
                 $diocesanLitCalItem->liturgical_event->setKey($this->EventsParams->DiocesanCalendar . '_' . $key);
                 if ($diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemCreateNewFixed) {
                     self::$liturgicalEvents->addEvent(LiturgicalEventFixed::fromObject($diocesanLitCalItem->liturgical_event));
@@ -828,12 +834,18 @@ final class EventsHandler extends AbstractHandler
             $key  = $diocesanLitCalItem->liturgical_event->event_key;
             $name = $DiocesanCalendarI18nData[$key];
             $diocesanLitCalItem->setName('[ ' . self::$DiocesanData->metadata->diocese_name . ' ] ' . $name);
-            $diocesanLitCalItem->liturgical_event->setKey($this->EventsParams->DiocesanCalendar . '_' . $key);
             if ($diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemCreateNewFixed) {
+                $diocesanLitCalItem->liturgical_event->setKey($this->EventsParams->DiocesanCalendar . '_' . $key);
                 self::$liturgicalEvents->addEvent(LiturgicalEventFixed::fromObject($diocesanLitCalItem->liturgical_event));
             } elseif ($diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemCreateNewMobile) {
+                $diocesanLitCalItem->liturgical_event->setKey($this->EventsParams->DiocesanCalendar . '_' . $key);
                 self::$liturgicalEvents->addEvent(LiturgicalEventMobile::fromObject($diocesanLitCalItem->liturgical_event));
             } else {
+                // TODO(Task 6): DiocesanLitCalItemSetPropertyGrade/Name/Common items are legitimate
+                // here (e.g. a suffragan Ambrosian diocese celebrating a comune feast at a different
+                // grade/common/name) and this block will be replaced with the real setProperty
+                // dispatch. Until then they fall through to this generic diagnostic instead of being
+                // silently dropped.
                 throw new \ValueError('Unknown DiocesanLitCalItem->liturgical_event type: ' . get_class($diocesanLitCalItem->liturgical_event));
             }
         }
