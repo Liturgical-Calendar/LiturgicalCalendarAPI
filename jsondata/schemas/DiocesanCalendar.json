@@ -27,85 +27,376 @@
             "type": "array",
             "minItems": 1,
             "items": {
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                    "liturgical_event": {
-                        "type": "object",
-                        "additionalProperties": false,
-                        "properties": {
-                            "event_key": {
-                                "type": "string",
-                                "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil|_[0-9])?$"
-                            },
-                            "color": {
-                                "$ref": "./CommonDef.json#/definitions/LitColor"
-                            },
-                            "grade": {
-                                "$ref": "./CommonDef.json#/definitions/LitGrade"
-                            },
-                            "common": {
-                                "$ref": "./CommonDef.json#/definitions/LitCommon"
-                            },
-                            "day": {
-                                "$ref": "./CommonDef.json#/definitions/Day"
-                            },
-                            "month": {
-                                "$ref": "./CommonDef.json#/definitions/Month"
-                            },
-                            "readings": {
-                                "$ref": "./CommonDef.json#/definitions/Readings"
-                            },
-                            "name": {
-                                "type": "string"
-                            },
-                            "strtotime": {
-                                "type": "string",
-                                "description": "supports PHP strtotime string format",
-                                "minLength": 1
-                            }
-                        },
-                        "required": [
-                            "event_key",
-                            "color",
-                            "grade",
-                            "common"
-                        ]
+                "oneOf": [
+                    {
+                        "$ref": "#/definitions/DiocesanSetPropertyGrade"
                     },
-                    "metadata": {
-                        "type": "object",
-                        "additionalProperties": false,
-                        "properties": {
-                            "form_rownum": {
-                                "type": "integer"
-                            },
-                            "since_year": {
-                                "type": "integer",
-                                "minimum": 1970
-                            },
-                            "until_year": {
-                                "type": "integer",
-                                "maximum": 9999
-                            },
-                            "url": {
-                                "type": "string",
-                                "format": "uri",
-                                "pattern": "^https://",
-                                "description": "Must be an absolute https:// URL. Other URI schemes (javascript:, data:, ...) are rejected, since this value is interpolated into an href attribute in the calendar messages output. A %s sprintf placeholder may appear later in the URL."
-                            }
-                        },
-                        "required": [
-                            "form_rownum",
-                            "since_year"
-                        ]
+                    {
+                        "$ref": "#/definitions/DiocesanSetPropertyName"
+                    },
+                    {
+                        "$ref": "#/definitions/DiocesanSetPropertyCommon"
+                    },
+                    {
+                        "$ref": "#/definitions/DiocesanCreateNewFixed"
+                    },
+                    {
+                        "$ref": "#/definitions/DiocesanCreateNewMobile"
                     }
-                },
-                "required": [
-                    "liturgical_event",
-                    "metadata"
                 ]
             },
             "title": "LitCal"
+        },
+        "DiocesanCreateNewFixed": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "liturgical_event": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "event_key": {
+                            "type": "string",
+                            "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil|_[0-9])?$"
+                        },
+                        "color": {
+                            "$ref": "./CommonDef.json#/definitions/LitColor"
+                        },
+                        "grade": {
+                            "$ref": "./CommonDef.json#/definitions/LitGrade"
+                        },
+                        "common": {
+                            "$ref": "./CommonDef.json#/definitions/LitCommon"
+                        },
+                        "day": {
+                            "$ref": "./CommonDef.json#/definitions/Day"
+                        },
+                        "month": {
+                            "$ref": "./CommonDef.json#/definitions/Month"
+                        },
+                        "readings": {
+                            "$ref": "./CommonDef.json#/definitions/Readings"
+                        },
+                        "name": {
+                            "type": "string"
+                        }
+                    },
+                    "required": [
+                        "event_key",
+                        "color",
+                        "grade",
+                        "common",
+                        "day",
+                        "month"
+                    ]
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "form_rownum": {
+                            "type": "integer"
+                        },
+                        "since_year": {
+                            "type": "integer",
+                            "minimum": 1970
+                        },
+                        "until_year": {
+                            "type": "integer",
+                            "maximum": 9999
+                        },
+                        "action": {
+                            "type": "string",
+                            "enum": ["createNew"]
+                        },
+                        "url": {
+                            "type": "string",
+                            "format": "uri",
+                            "pattern": "^https://",
+                            "description": "Must be an absolute https:// URL. Other URI schemes (javascript:, data:, ...) are rejected, since this value is interpolated into an href attribute in the calendar messages output. A %s sprintf placeholder may appear later in the URL."
+                        }
+                    },
+                    "required": [
+                        "form_rownum",
+                        "since_year"
+                    ]
+                }
+            },
+            "required": [
+                "liturgical_event",
+                "metadata"
+            ],
+            "title": "DiocesanCreateNewFixed"
+        },
+        "DiocesanCreateNewMobile": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "liturgical_event": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "event_key": {
+                            "type": "string",
+                            "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil|_[0-9])?$"
+                        },
+                        "color": {
+                            "$ref": "./CommonDef.json#/definitions/LitColor"
+                        },
+                        "grade": {
+                            "$ref": "./CommonDef.json#/definitions/LitGrade"
+                        },
+                        "common": {
+                            "$ref": "./CommonDef.json#/definitions/LitCommon"
+                        },
+                        "readings": {
+                            "$ref": "./CommonDef.json#/definitions/Readings"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "strtotime": {
+                            "type": "string",
+                            "description": "supports PHP strtotime string format",
+                            "minLength": 1
+                        }
+                    },
+                    "required": [
+                        "event_key",
+                        "color",
+                        "grade",
+                        "common",
+                        "strtotime"
+                    ]
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "form_rownum": {
+                            "type": "integer"
+                        },
+                        "since_year": {
+                            "type": "integer",
+                            "minimum": 1970
+                        },
+                        "until_year": {
+                            "type": "integer",
+                            "maximum": 9999
+                        },
+                        "action": {
+                            "type": "string",
+                            "enum": ["createNew"]
+                        },
+                        "url": {
+                            "type": "string",
+                            "format": "uri",
+                            "pattern": "^https://",
+                            "description": "Must be an absolute https:// URL. Other URI schemes (javascript:, data:, ...) are rejected, since this value is interpolated into an href attribute in the calendar messages output. A %s sprintf placeholder may appear later in the URL."
+                        }
+                    },
+                    "required": [
+                        "form_rownum",
+                        "since_year"
+                    ]
+                }
+            },
+            "required": [
+                "liturgical_event",
+                "metadata"
+            ],
+            "title": "DiocesanCreateNewMobile"
+        },
+        "DiocesanSetPropertyGrade": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "liturgical_event": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "event_key": {
+                            "type": "string",
+                            "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil|_[0-9])?$"
+                        },
+                        "grade": {
+                            "$ref": "./CommonDef.json#/definitions/LitGrade"
+                        }
+                    },
+                    "required": [
+                        "event_key",
+                        "grade"
+                    ]
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "form_rownum": {
+                            "type": "integer"
+                        },
+                        "since_year": {
+                            "type": "integer",
+                            "minimum": 1970
+                        },
+                        "until_year": {
+                            "type": "integer",
+                            "maximum": 9999
+                        },
+                        "action": {
+                            "type": "string",
+                            "const": "setProperty"
+                        },
+                        "property": {
+                            "type": "string",
+                            "const": "grade"
+                        },
+                        "url": {
+                            "type": "string",
+                            "format": "uri",
+                            "pattern": "^https://",
+                            "description": "Must be an absolute https:// URL. Other URI schemes (javascript:, data:, ...) are rejected, since this value is interpolated into an href attribute in the calendar messages output. A %s sprintf placeholder may appear later in the URL."
+                        }
+                    },
+                    "required": [
+                        "action",
+                        "property",
+                        "since_year",
+                        "form_rownum"
+                    ]
+                }
+            },
+            "required": [
+                "liturgical_event",
+                "metadata"
+            ],
+            "title": "DiocesanSetPropertyGrade"
+        },
+        "DiocesanSetPropertyName": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "liturgical_event": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "event_key": {
+                            "type": "string",
+                            "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil|_[0-9])?$"
+                        }
+                    },
+                    "required": [
+                        "event_key"
+                    ]
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "form_rownum": {
+                            "type": "integer"
+                        },
+                        "since_year": {
+                            "type": "integer",
+                            "minimum": 1970
+                        },
+                        "until_year": {
+                            "type": "integer",
+                            "maximum": 9999
+                        },
+                        "action": {
+                            "type": "string",
+                            "const": "setProperty"
+                        },
+                        "property": {
+                            "type": "string",
+                            "const": "name"
+                        },
+                        "url": {
+                            "type": "string",
+                            "format": "uri",
+                            "pattern": "^https://",
+                            "description": "Must be an absolute https:// URL. Other URI schemes (javascript:, data:, ...) are rejected, since this value is interpolated into an href attribute in the calendar messages output. A %s sprintf placeholder may appear later in the URL."
+                        }
+                    },
+                    "required": [
+                        "action",
+                        "property",
+                        "since_year",
+                        "form_rownum"
+                    ]
+                }
+            },
+            "required": [
+                "liturgical_event",
+                "metadata"
+            ],
+            "title": "DiocesanSetPropertyName"
+        },
+        "DiocesanSetPropertyCommon": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "liturgical_event": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "event_key": {
+                            "type": "string",
+                            "pattern": "^[A-Z](?:[A-Z]+_)*[a-zA-Z1-9]+[0-9]{0,2}(?:_vigil|_[0-9])?$"
+                        },
+                        "common": {
+                            "$ref": "./CommonDef.json#/definitions/LitCommon"
+                        }
+                    },
+                    "required": [
+                        "event_key",
+                        "common"
+                    ]
+                },
+                "metadata": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "form_rownum": {
+                            "type": "integer"
+                        },
+                        "since_year": {
+                            "type": "integer",
+                            "minimum": 1970
+                        },
+                        "until_year": {
+                            "type": "integer",
+                            "maximum": 9999
+                        },
+                        "action": {
+                            "type": "string",
+                            "const": "setProperty"
+                        },
+                        "property": {
+                            "type": "string",
+                            "const": "common"
+                        },
+                        "url": {
+                            "type": "string",
+                            "format": "uri",
+                            "pattern": "^https://",
+                            "description": "Must be an absolute https:// URL. Other URI schemes (javascript:, data:, ...) are rejected, since this value is interpolated into an href attribute in the calendar messages output. A %s sprintf placeholder may appear later in the URL."
+                        }
+                    },
+                    "required": [
+                        "action",
+                        "property",
+                        "since_year",
+                        "form_rownum"
+                    ]
+                }
+            },
+            "required": [
+                "liturgical_event",
+                "metadata"
+            ],
+            "title": "DiocesanSetPropertyCommon"
         },
         "DiocesanCalendarMetadata": {
             "type": "object",
