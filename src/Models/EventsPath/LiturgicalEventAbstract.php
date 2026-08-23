@@ -9,6 +9,7 @@ use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitCommon;
 use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
 use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
+use LiturgicalCalendar\Api\Models\DerivesLiturgicalFieldsTrait;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeEventData;
 use LiturgicalCalendar\Api\Models\LiturgicalEventData;
 use LiturgicalCalendar\Api\Models\PropriumDeSanctisEvent;
@@ -16,6 +17,15 @@ use LiturgicalCalendar\Api\Models\PropriumDeTemporeEvent;
 
 abstract class LiturgicalEventAbstract implements \JsonSerializable
 {
+    /**
+     * `$color_lcl`, `$grade_lcl`, `$grade_abbr` and `$common_lcl` — the fields derived from
+     * `$color`, `$grade` and `$common` — together with `$locale` and the one implementation of
+     * each derivation, shared with the `/calendar` model. Before #872 this class carried its own
+     * hand-written copy of all of it, which is how `/events` and `/calendar` came to disagree
+     * about the same event.
+     */
+    use DerivesLiturgicalFieldsTrait;
+
     public int $event_idx;
 
     /** The following properties are generally passed in the constructor */
@@ -29,14 +39,6 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
     /** @var LitCommons|LitMassVariousNeeds[] */
     public LitCommons|array $common;  //["Proper"] or one or more Commons
 
-    /** The following properties are set based on properties passed in the constructor or on other properties */
-    protected string $grade_lcl;
-    /** @var string[] */
-    protected array $color_lcl;
-    protected string $grade_abbr;
-    protected string $common_lcl;
-
-    protected static string $locale      = LitLocale::LATIN_PRIMARY_LANGUAGE;
     protected static int $internal_index = 0;
 
     /**
@@ -65,101 +67,51 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
             }
             $litMassVariousNeedsArray = $common[0] instanceof LitMassVariousNeeds;
         }
-        $this->event_idx     = self::$internal_index++;
-        $this->event_key     = $event_key;
-        $this->name          = $name;
-        $this->color         = is_array($color) ? $color : [$color];
-        $this->color_lcl     = array_map(
-            function (LitColor $item): string {
-                return $item->i18n(self::$locale);
-            },
-            $this->color
-        );
-        $this->type          = $type;
-        $this->grade         = $grade;
-        $this->grade_lcl     = $this->grade->i18n(self::$locale, false, false);
-        $this->grade_abbr    = $this->grade->i18n(self::$locale, false, true);
-        $this->grade_display = $this->grade === LitGrade::HIGHER_SOLEMNITY ? '' : $displayGrade;
-        $commons             = $common instanceof LitCommons || $common instanceof LitMassVariousNeeds || $litMassVariousNeedsArray
-                                ? $common
-                                : ( is_array($common) ? LitCommons::create($common) : LitCommons::create([$common]) );
+        $this->event_idx = self::$internal_index++;
+        $this->event_key = $event_key;
+        $this->name      = $name;
+        $this->color     = is_array($color) ? $color : [$color];
+        $this->type      = $type;
+        $this->grade     = $grade;
+
+        // Assigned raw: an explicit display override is not derivable from the grade. deriveAllFields()
+        // below applies the one rule that IS grade-coupled, clearing it for a HIGHER_SOLEMNITY.
+        $this->grade_display = $displayGrade;
+
+        $commons = $common instanceof LitCommons || $common instanceof LitMassVariousNeeds || $litMassVariousNeedsArray
+                    ? $common
+                    : ( is_array($common) ? LitCommons::create($common) : LitCommons::create([$common]) );
         if ($commons instanceof LitCommons) {
-            /** @var LitCommons $commons */
-            $this->common     = $commons;
-            $this->common_lcl = $commons->fullTranslate(self::$locale);
+            $this->common = $commons;
         } elseif ($commons instanceof LitMassVariousNeeds) {
-            /** @var LitMassVariousNeeds $commons */
-            $this->common     = [$commons];
-            $this->common_lcl = $commons->fullTranslate(LitLocale::isLatin(self::$locale));
+            $this->common = [$commons];
         } elseif ($litMassVariousNeedsArray) {
             /** @var LitMassVariousNeeds[] $commons */
             $this->common = $commons;
-            $commonsLcl   = array_map(
-                function (LitMassVariousNeeds $item): string {
-                    return $item->fullTranslate(LitLocale::isLatin(self::$locale));
-                },
-                $commons
-            );
-            /**translators: when there are multiple possible commons, this will be the glue "[; or] From the Common of..." */
-            $or               = LitLocale::isLatin(self::$locale) ? 'vel' : _('or');
-            $this->common_lcl = implode('; ' . $or . ' ', $commonsLcl);
         } else {
+            // Defensive: LitCommons::create() only returns null for a LitMassVariousNeeds array,
+            // which the branch above already caught, so this is unreachable for the declared types.
             /** @var LitCommons $commons */
-            $commons          = LitCommons::create([LitCommon::NONE]);
-            $this->common     = $commons;
-            $this->common_lcl = '???';
+            $commons      = LitCommons::create([LitCommon::NONE]);
+            $this->common = $commons;
         }
+
+        // Derive color_lcl / grade_lcl / grade_abbr / grade_display / common_lcl from the properties
+        // just assigned. The same call re-runs after any later write to one of them, so a constructed
+        // catalog entry and a mutated one describe themselves identically.
+        $this->deriveAllFields();
     }
 
     /**
-     * Set the abbreviation for the grade of this liturgical event.
-     *
-     * @param string $abbreviation The abbreviation for the grade of this liturgical event.
-     * @return void
-     */
-    public function setGradeAbbreviation(string $abbreviation): void
-    {
-        $this->grade_abbr = $abbreviation;
-    }
-
-    /**
-     * Sets the localized grade for this liturgical event.
-     *
-     * @param string $grade_lcl The localized name of the grade for the liturgical event.
-     * @return void
-     */
-    public function setGradeLocalization(string $grade_lcl): void
-    {
-        $this->grade_lcl = $grade_lcl;
-    }
-
-    /**
-     * Changes the grade of this catalog entry, re-deriving the localized grade strings.
-     *
-     * `$grade_lcl` and `$grade_abbr` are computed in the constructor and are both serialized, so
-     * assigning `$grade` on its own would emit a numeric grade that disagrees with its own label.
-     *
-     * `$grade_display` is also grade-coupled in the constructor
-     * (`$this->grade_display = $this->grade === LitGrade::HIGHER_SOLEMNITY ? '' : $displayGrade;`)
-     * and takes precedence over `grade_lcl`/`grade_abbr` when serialized, so the same rule is
-     * mirrored here: a new HIGHER_SOLEMNITY grade clears it to `''`, otherwise any existing
-     * explicit override is left untouched (there is no new `$displayGrade` argument to apply here).
+     * Changes the grade of this catalog entry, re-deriving every field that describes the grade
+     * (`grade_lcl`, `grade_abbr`, and `grade_display`'s one grade-coupled rule).
      *
      * @param LitGrade $grade The new grade.
      */
     public function applyGrade(LitGrade $grade): void
     {
-        $this->grade      = $grade;
-        $this->grade_lcl  = $grade->i18n(self::$locale, false, false);
-        $this->grade_abbr = $grade->i18n(self::$locale, false, true);
-        // Deliberately one-directional, mirroring the constructor: moving TO HIGHER_SOLEMNITY
-        // clears grade_display, but moving AWAY from it leaves a previously-cleared '' in place
-        // rather than restoring some other display value there is no source for. Unreachable
-        // today (no caller currently moves an event away from HIGHER_SOLEMNITY), but kept
-        // asymmetric on purpose rather than "fixed" into a symmetry the data doesn't support.
-        if ($grade === LitGrade::HIGHER_SOLEMNITY) {
-            $this->grade_display = '';
-        }
+        $this->grade = $grade;
+        $this->rederiveDependentsOf('grade');
     }
 
     /**
@@ -169,8 +121,8 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
      */
     public function applyCommon(LitCommons $common): void
     {
-        $this->common     = $common;
-        $this->common_lcl = $common->fullTranslate(self::$locale);
+        $this->common = $common;
+        $this->rederiveDependentsOf('common');
     }
 
     /**
@@ -264,14 +216,6 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
             }
         }
         return true;
-    }
-
-    /**
-     * @return string The liturgical commons localized for the current locale.
-     */
-    public function getCommonLcl(): string
-    {
-        return $this->common_lcl;
     }
 
     /**

@@ -1310,7 +1310,7 @@ final class CalendarHandler extends AbstractHandler
         // to (mis-applying) whichever branch happened to be written last.
         match (true) {
             $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyGrade => $this->applySetPropertyGrade($key, $liturgicalEvent, $existingLiturgicalEvent),
-            $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyCommon => $this->applySetPropertyCommon($key, $liturgicalEvent, $existingLiturgicalEvent),
+            $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyCommon => $this->applySetPropertyCommon($key, $liturgicalEvent),
             $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyName => $this->applySetPropertyName($key, $liturgicalEvent),
         };
     }
@@ -1360,27 +1360,14 @@ final class CalendarHandler extends AbstractHandler
      * rather than silently doing nothing, matching {@see self::applySetPropertyGrade()} and the
      * absent-key branch in {@see self::applyAmbrosianDiocesanSetProperty()}.
      *
-     * That redundancy is detected here rather than by `LiturgicalEventCollection::setProperty()`'s
-     * return value, because `setProperty()` decides "did anything change?" with `!==`, which for an
-     * **object** compares identity rather than value. `grade` (a `LitGrade` enum case, so a
-     * singleton) and `name` (a string) compare correctly there; `common` is a `LitCommons` object,
-     * and a freshly built one carrying exactly the same Commons is never `===` the stored one. So
-     * `setProperty()` would report success for a Common that did not actually change, and the
-     * redundant override would go unreported. Comparing the serialized values instead makes this
-     * arm behave like the other two.
-     *
-     * `$existingLiturgicalEvent->common` is typed `LitCommons|array` — the array shape holds
-     * `LitMassVariousNeeds` cases, which a `LitCommons` can never be equivalent to, so a non-`LitCommons`
-     * current value is by definition a real change.
-     *
-     * `setProperty()`'s return is not checked afterwards: its only two `false` conditions are an
-     * absent key (already handled by the caller, which returns before dispatching) and an
-     * identical value (excluded by the equivalence check above), so a `false` here is unreachable.
+     * That redundancy is `LiturgicalEventCollection::setProperty()`'s `false` return, exactly as it
+     * is for the grade and name arms. It used to need a serialized-value comparison here instead,
+     * because `setProperty()` compared object values by identity and so reported success for a
+     * freshly built `LitCommons` carrying exactly the same Commons; it now compares by value (#872).
      */
     private function applySetPropertyCommon(
         string $key,
-        DiocesanLitCalItemSetPropertyCommon $liturgicalEvent,
-        LiturgicalEvent $existingLiturgicalEvent
+        DiocesanLitCalItemSetPropertyCommon $liturgicalEvent
     ): void {
         if (null === $this->DiocesanData) {
             // Defensive only: the sole caller (applyAmbrosianDiocesanSetProperty()) is only ever
@@ -1388,11 +1375,7 @@ final class CalendarHandler extends AbstractHandler
             return;
         }
 
-        $existingCommon = $existingLiturgicalEvent->common;
-        $isRedundant    = $existingCommon instanceof LitCommons
-            && $existingCommon->jsonSerialize() === $liturgicalEvent->common->jsonSerialize();
-
-        if ($isRedundant) {
+        if (false === $this->Cal->setProperty($key, 'common', $liturgicalEvent->common)) {
             /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
             $this->Messages[] = sprintf(
                 _('The diocesan calendar of %1$s declared a `setProperty:common` override for the liturgical event `%2$s` for the year %3$d, but the Common was already set to that value. The override had no effect.'),
@@ -1400,10 +1383,7 @@ final class CalendarHandler extends AbstractHandler
                 $key,
                 $this->CalendarParams->Year
             );
-            return;
         }
-
-        $this->Cal->setProperty($key, 'common', $liturgicalEvent->common);
     }
 
     /**
