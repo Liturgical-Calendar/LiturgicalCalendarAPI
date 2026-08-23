@@ -2,6 +2,7 @@
 
 namespace LiturgicalCalendar\Api\Models\RegionalData\DiocesanData;
 
+use LiturgicalCalendar\Api\Enum\CalEventAction;
 use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
 
 /**
@@ -11,22 +12,56 @@ use LiturgicalCalendar\Api\Models\AbstractJsonSrcData;
  * @phpstan-import-type LitCalItemCreateNewMobileArray from \LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMobile
  * @phpstan-type DiocesanLitCalItemObject \stdClass&object{
  *      liturgical_event:LitCalItemCreateNewFixedObject|LitCalItemCreateNewMobileObject,
- *      metadata:\stdClass&object{action?:string,since_year?:int|null,until_year?:int|null}
+ *      metadata:\stdClass&object{action?:string,property?:string,since_year?:int|null,until_year?:int|null}
  * }
  * @phpstan-type DiocesanLitCalItemArray array{
  *      liturgical_event:LitCalItemCreateNewFixedArray|LitCalItemCreateNewMobileArray,
- *      metadata:array{action?:string,since_year?:int|null,until_year?:int|null}
+ *      metadata:array{action?:string,property?:string,since_year?:int|null,until_year?:int|null}
  * }
  */
 final class DiocesanLitCalItem extends AbstractJsonSrcData
 {
-    public readonly DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile $liturgical_event;
-    public readonly DiocesanLitCalItemMetadata $metadata;
+    public readonly DiocesanLitCalItemCreateNewFixed|DiocesanLitCalItemCreateNewMobile|DiocesanLitCalItemSetPropertyGrade|DiocesanLitCalItemSetPropertyName|DiocesanLitCalItemSetPropertyCommon $liturgical_event;
+
+    public readonly DiocesanLitCalItemMetadata|DiocesanLitCalItemSetPropertyGradeMetadata|DiocesanLitCalItemSetPropertyNameMetadata|DiocesanLitCalItemSetPropertyCommonMetadata $metadata;
 
     private function __construct(\stdClass $liturgical_event, \stdClass $metadata)
     {
         if (false === property_exists($liturgical_event, 'event_key')) {
             throw new \ValueError('litcalItem.liturgical_event must have an `event_key` property');
+        }
+
+        // An absent `action` means `createNew`: every diocesan file shipped before the
+        // `setProperty` action existed omits it, and must keep parsing unchanged.
+        $action = property_exists($metadata, 'action') ? $metadata->action : CalEventAction::CreateNew->value;
+
+        if ($action === CalEventAction::SetProperty->value) {
+            if (false === property_exists($metadata, 'property')) {
+                throw new \ValueError('`metadata->property` is required for a `metadata->action` of `setProperty`');
+            }
+
+            switch ($metadata->property) {
+                case 'grade':
+                    $this->liturgical_event = DiocesanLitCalItemSetPropertyGrade::fromObject($liturgical_event);
+                    $this->metadata         = DiocesanLitCalItemSetPropertyGradeMetadata::fromObject($metadata);
+                    return;
+                case 'name':
+                    $this->liturgical_event = DiocesanLitCalItemSetPropertyName::fromObject($liturgical_event);
+                    $this->metadata         = DiocesanLitCalItemSetPropertyNameMetadata::fromObject($metadata);
+                    return;
+                case 'common':
+                    $this->liturgical_event = DiocesanLitCalItemSetPropertyCommon::fromObject($liturgical_event);
+                    $this->metadata         = DiocesanLitCalItemSetPropertyCommonMetadata::fromObject($metadata);
+                    return;
+                default:
+                    $propertyLabel = is_string($metadata->property) ? $metadata->property : get_debug_type($metadata->property);
+                    throw new \ValueError('unsupported `metadata->property` for a diocesan `setProperty` action: ' . $propertyLabel . '. Supported properties are `grade`, `name`, `common`.');
+            }
+        }
+
+        if ($action !== CalEventAction::CreateNew->value) {
+            $actionLabel = is_string($action) ? $action : get_debug_type($action);
+            throw new \ValueError('unsupported `metadata->action` for a diocesan calendar item: ' . $actionLabel . '. Supported actions are `createNew`, `setProperty`.');
         }
 
         if (property_exists($liturgical_event, 'strtotime')) {
@@ -106,6 +141,12 @@ final class DiocesanLitCalItem extends AbstractJsonSrcData
 
     public function setKey(string $key): void
     {
+        if (
+            false === $this->liturgical_event instanceof DiocesanLitCalItemCreateNewFixed
+            && false === $this->liturgical_event instanceof DiocesanLitCalItemCreateNewMobile
+        ) {
+            throw new \LogicException('setKey() is only meaningful for a createNew diocesan item; a setProperty item targets an existing event key.');
+        }
         $this->unlock();
         $this->liturgical_event->setKey($key);
         $this->lock();
