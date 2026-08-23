@@ -32,6 +32,15 @@ use LiturgicalCalendar\Api\Services\ResourceTuplePurgeServiceInterface;
  */
 trait ResolvesOutboxTooling
 {
+    /**
+     * The OpenFGA client accessor Task 9's create-sync path and
+     * {@see getPurgeService()} both reach for. Composing the shared trait
+     * rather than re-declaring the accessor means this path now memoizes the
+     * client — and its keep-alive connection — instead of rebuilding it on
+     * every call.
+     */
+    use ResolvesFgaClient;
+
     private ?ResourceTuplePurgeServiceInterface $purgeService = null;
     private ?OutboxBatchInsertInterface $outboxRepository     = null;
     private ?\PDO $pdo                                        = null;
@@ -109,14 +118,5 @@ trait ResolvesOutboxTooling
             $this->pdo = Connection::getInstance();
         }
         return $this->pdo;
-    }
-
-    /**
-     * Returns a live OpenFGA client built from environment variables.
-     * Task 9's create-sync path reuses this directly.
-     */
-    protected function getFgaClient(): OpenFgaClient
-    {
-        return OpenFgaClient::fromEnv();
     }
 }

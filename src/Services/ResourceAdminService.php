@@ -62,18 +62,78 @@ final class ResourceAdminService
         'rite_calendar_test',
     ];
 
+    /**
+     * Wall-clock ceiling for one fan-out of OpenFGA lookups.
+     *
+     * Each lookup carries its own 5s read timeout (see `OpenFgaClient::fromEnv()`),
+     * which bounds a single stuck call but not a sequence of them: nine of those in
+     * a row is 45 seconds of a php-fpm worker held on a response the caller stopped
+     * waiting for after five (the frontend's own timeout), with the deployment's
+     * `request_terminate_timeout >= 600` ten minutes away from helping. A hung
+     * OpenFGA would therefore convert every admin-dashboard render into a
+     * 45-second worker and exhaust the pool (issue #878).
+     *
+     * 3 seconds is roughly 250x the measured cost of the largest fan-out
+     * (~12 ms for nine calls, issue #711), so it can only ever be reached when
+     * something is badly wrong — never by a merely busy authorization server.
+     *
+     * **The budget is per service instance, and every call site constructs one
+     * per request** — which is what makes it a per-request bound rather than a
+     * per-resolver one. That distinction is load-bearing: `/auth/dashboard-scopes`
+     * resolves admin scopes and then viewer scopes, and `/admin/notifications`
+     * resolves scopes and then filters access requests. Re-arming the deadline
+     * for each of those would leave the endpoint's worst case at two budgets plus
+     * two read timeouts. Do not hold an instance across requests.
+     *
+     * **What this does and does not bound.** The budget gates whether the *next*
+     * lookup is dialed; it cannot interrupt one already in flight. The true
+     * worst case is therefore this budget plus one read timeout (~8s), not 3s —
+     * the point being that it no longer grows with the number of object types,
+     * which is what made the sequence dangerous. Squeezing the remainder means
+     * lowering `OpenFgaClient`'s per-call timeouts, which are shared with every
+     * other caller and deliberately left alone here.
+     */
+    public const FANOUT_BUDGET_SECONDS = 3.0;
+
     private ?LoggerInterface $logger;
 
+    private readonly float $budgetSeconds;
+
+    /** @var \Closure(): float Monotonic seconds; injectable so tests need not sleep. */
+    private readonly \Closure $clock;
+
     /**
-     * @param OpenFgaClient        $fgaClient OpenFGA client used for all relation lookups
-     * @param LoggerInterface|null $logger    Optional PSR-3 logger. When omitted, the shared
-     *                                        `auth` channel logger is created lazily on first
-     *                                        failure, so the happy path never touches the
-     *                                        filesystem.
+     * Deadline shared by every lookup this instance makes, stamped on the first
+     * one and never refreshed. Null until then.
      */
-    public function __construct(private readonly OpenFgaClient $fgaClient, ?LoggerInterface $logger = null)
-    {
-        $this->logger = $logger;
+    private ?float $deadline = null;
+
+    /**
+     * Lookups the fan-out in progress skipped because the budget was spent.
+     * Reset by {@see reportSkipped()} at the end of each fan-out.
+     */
+    private int $skipped = 0;
+
+    /**
+     * @param OpenFgaClient        $fgaClient     OpenFGA client used for all relation lookups
+     * @param LoggerInterface|null $logger        Optional PSR-3 logger. When omitted, the shared
+     *                                            `auth` channel logger is created lazily on first
+     *                                            failure, so the happy path never touches the
+     *                                            filesystem.
+     * @param float|null           $budgetSeconds Wall-clock ceiling for one fan-out.
+     *                                            Defaults to {@see FANOUT_BUDGET_SECONDS}.
+     * @param \Closure(): float|null $clock       Monotonic clock returning seconds. Defaults to
+     *                                            `hrtime()`; tests inject a controllable one.
+     */
+    public function __construct(
+        private readonly OpenFgaClient $fgaClient,
+        ?LoggerInterface $logger = null,
+        ?float $budgetSeconds = null,
+        ?\Closure $clock = null,
+    ) {
+        $this->logger        = $logger;
+        $this->budgetSeconds = $budgetSeconds ?? self::FANOUT_BUDGET_SECONDS;
+        $this->clock         = $clock ?? static fn(): float => hrtime(true) / 1e9;
     }
 
     /**
@@ -111,6 +171,64 @@ final class ResourceAdminService
     }
 
     /**
+     * Whether there is still budget left to dial another lookup.
+     *
+     * The deadline is stamped on the first lookup this instance ever makes and
+     * never refreshed, so it spans EVERY fan-out the instance performs — which
+     * is what makes it a per-request bound. Two endpoints need that: the
+     * dashboard resolves admin scopes and then viewer scopes, and the
+     * notifications badge resolves scopes and then filters access requests, each
+     * through a single service. Re-arming per resolver would hand the second
+     * sweep a fresh budget and leave the endpoint's worst case at two budgets
+     * plus two read timeouts.
+     *
+     * Counts every refusal, so the close-out log can report how much of the
+     * fan-out was skipped rather than answered.
+     */
+    private function withinBudget(): bool
+    {
+        $this->deadline ??= ( $this->clock )() + $this->budgetSeconds;
+
+        if (( $this->clock )() < $this->deadline) {
+            return true;
+        }
+
+        ++$this->skipped;
+
+        return false;
+    }
+
+    /**
+     * Report, once per fan-out, how many lookups the spent budget skipped.
+     *
+     * One line per fan-out, not one per skipped lookup: a hung OpenFGA would
+     * otherwise write eight near-identical lines per render.
+     */
+    private function reportSkipped(string $operation): void
+    {
+        $skipped       = $this->skipped;
+        $this->skipped = 0;
+
+        if ($skipped === 0) {
+            return;
+        }
+
+        $this->logFailure(
+            sprintf(
+                'OpenFGA fan-out budget of %.1fs exhausted during %s: %d lookup(s) skipped and failed closed',
+                $this->budgetSeconds,
+                $operation,
+                $skipped
+            ),
+            [
+                'operation'      => $operation,
+                'skipped'        => $skipped,
+                'budget_seconds' => $this->budgetSeconds,
+            ]
+        );
+    }
+
+    /**
      * List the object IDs of one type the user holds one relation on, failing
      * closed for that single (relation, type) pair.
      *
@@ -127,6 +245,13 @@ final class ResourceAdminService
      */
     private function listObjectsIsolated(string $fgaUser, string $relation, string $type): array
     {
+        if (!$this->withinBudget()) {
+            // Indistinguishable, to every caller, from a type that errored:
+            // the fan-out budget reuses the fail-closed contract rather than
+            // inventing a second one.
+            return [];
+        }
+
         try {
             return $this->fgaClient->listObjects($fgaUser, $relation, $type);
         } catch (\RuntimeException $e) {
@@ -165,10 +290,14 @@ final class ResourceAdminService
         $fgaUser = "user:{$sub}";
         $scopes  = [];
 
-        foreach (self::ADMIN_OBJECT_TYPES as $type) {
-            foreach ($this->listObjectsIsolated($fgaUser, 'admin', $type) as $objectId) {
-                $scopes[] = ['object_type' => $type, 'object_id' => $objectId];
+        try {
+            foreach (self::ADMIN_OBJECT_TYPES as $type) {
+                foreach ($this->listObjectsIsolated($fgaUser, 'admin', $type) as $objectId) {
+                    $scopes[] = ['object_type' => $type, 'object_id' => $objectId];
+                }
             }
+        } finally {
+            $this->reportSkipped('resolveScopes');
         }
 
         return $scopes;
@@ -195,15 +324,19 @@ final class ResourceAdminService
         $editor  = [];
         $admin   = [];
 
-        foreach (self::TEST_OBJECT_TYPES as $type) {
-            foreach ($this->listObjectsIsolated($fgaUser, 'editor', $type) as $objectId) {
-                $editor[] = ['object_type' => $type, 'object_id' => $objectId];
+        try {
+            foreach (self::TEST_OBJECT_TYPES as $type) {
+                foreach ($this->listObjectsIsolated($fgaUser, 'editor', $type) as $objectId) {
+                    $editor[] = ['object_type' => $type, 'object_id' => $objectId];
+                }
             }
-        }
-        foreach (self::TEST_OBJECT_TYPES as $type) {
-            foreach ($this->listObjectsIsolated($fgaUser, 'admin', $type) as $objectId) {
-                $admin[] = ['object_type' => $type, 'object_id' => $objectId];
+            foreach (self::TEST_OBJECT_TYPES as $type) {
+                foreach ($this->listObjectsIsolated($fgaUser, 'admin', $type) as $objectId) {
+                    $admin[] = ['object_type' => $type, 'object_id' => $objectId];
+                }
             }
+        } finally {
+            $this->reportSkipped('resolveTestScopes');
         }
 
         return ['editor' => $editor, 'admin' => $admin];
@@ -225,8 +358,12 @@ final class ResourceAdminService
         $fgaUser = "user:{$sub}";
         $scopes  = array_fill_keys(self::VIEWER_OBJECT_TYPES, []);
 
-        foreach (self::VIEWER_OBJECT_TYPES as $type) {
-            $scopes[$type] = $this->listObjectsIsolated($fgaUser, 'viewer', $type);
+        try {
+            foreach (self::VIEWER_OBJECT_TYPES as $type) {
+                $scopes[$type] = $this->listObjectsIsolated($fgaUser, 'viewer', $type);
+            }
+        } finally {
+            $this->reportSkipped('resolveViewerScopes');
         }
 
         return $scopes;
@@ -250,6 +387,23 @@ final class ResourceAdminService
         /** @var array<string, bool> $cache */
         $cache = [];
 
+        try {
+            return $this->filterEachByAdminAccess($requests, $fgaUser, $cache);
+        } finally {
+            $this->reportSkipped('filterByAdminAccess');
+        }
+    }
+
+    /**
+     * The per-request half of {@see filterByAdminAccess()}, split out so the
+     * budget window wraps the whole sweep rather than one request.
+     *
+     * @param array<int, array<string, mixed>> $requests
+     * @param array<string, bool> $cache Shared per-call check cache (by reference)
+     * @return array<int, array<string, mixed>> Filtered, re-indexed requests
+     */
+    private function filterEachByAdminAccess(array $requests, string $fgaUser, array &$cache): array
+    {
         return array_values(array_filter($requests, function (array $req) use ($fgaUser, &$cache): bool {
             /** @var array<int, array{object_type: string, object_id: string, relation: string}> $permissions */
             $permissions = is_array($req['permissions'] ?? null) ? $req['permissions'] : [];
@@ -297,6 +451,11 @@ final class ResourceAdminService
             $key        = "{$objectType}:{$objectId}";
 
             if (!isset($cache[$key])) {
+                if (!$this->withinBudget()) {
+                    // Same fail-closed answer an OpenFGA error would produce:
+                    // the request is excluded rather than optimistically kept.
+                    return false;
+                }
                 $cache[$key] = $this->fgaClient->check($fgaUser, 'admin', $key);
             }
 

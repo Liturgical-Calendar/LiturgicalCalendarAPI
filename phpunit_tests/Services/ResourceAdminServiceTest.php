@@ -463,4 +463,233 @@ final class ResourceAdminServiceTest extends TestCase
 
         self::assertCount(count(ResourceAdminService::ADMIN_OBJECT_TYPES), $service->resolveScopes('cei-admin'));
     }
+
+    /**
+     * The MockHandler behind the most recent {@see serviceWithClock()} service.
+     * Its remaining count is how a test proves a call was never dialed.
+     */
+    private ?MockHandler $mockQueue = null;
+
+    /**
+     * A service whose fan-out clock the test drives by hand.
+     *
+     * The clock reads a by-reference float rather than the wall clock, and the
+     * queued responses are callables that advance it — so "this OpenFGA call took
+     * two seconds" is expressed deterministically, with no sleeping.
+     *
+     * @param array<int, GuzzleResponse|callable> $responses Queued, replayed in order.
+     * @param float $now Advanced by the queued callables; passed by reference so the clock closure sees it move.
+     */
+    private function serviceWithClock(array $responses, float &$now, float $budget, ?LoggerInterface $logger = null): ResourceAdminService
+    {
+        $mock   = new MockHandler($responses);
+        $guzzle = new GuzzleClient(['handler' => HandlerStack::create($mock)]);
+        $psr17  = new Psr17Factory();
+        $client = new OpenFgaClient(
+            apiUrl: 'http://openfga.test',
+            storeId: 'test-store',
+            modelId: 'test-model',
+            httpClient: $guzzle,
+            requestFactory: $psr17,
+            streamFactory: $psr17,
+            apiToken: 'test-token'
+        );
+
+        $this->mockQueue = $mock;
+
+        return new ResourceAdminService(
+            $client,
+            $logger ?? new CollectingLogger(),
+            budgetSeconds: $budget,
+            clock: static function () use (&$now): float {
+                return $now;
+            }
+        );
+    }
+
+    /**
+     * A queued response that costs $seconds of fan-out budget.
+     */
+    private static function costing(float &$now, float $seconds, GuzzleResponse $response): callable
+    {
+        return static function () use (&$now, $seconds, $response): GuzzleResponse {
+            $now += $seconds;
+            return $response;
+        };
+    }
+
+    public function testResolveViewerScopesStopsDialingOnceTheFanOutBudgetIsSpent(): void
+    {
+        $now = 0.0;
+        // Two calls at 2s each exhaust a 3s budget: the first is dialed at t=0, the
+        // second at t=2 (still inside), and by t=4 the budget is gone.
+        $service = $this->serviceWithClock([
+            self::costing($now, 2.0, new GuzzleResponse(200, [], '{"objects":["general_roman_calendar:temporale"]}')),
+            self::costing($now, 2.0, new GuzzleResponse(200, [], '{"objects":["national_calendar_test:IT"]}')),
+            new GuzzleResponse(200, [], '{"objects":["diocesan_calendar_test:romamo_it"]}'),
+            new GuzzleResponse(200, [], '{"objects":["general_roman_calendar_test:temporale"]}'),
+            new GuzzleResponse(200, [], '{"objects":["rite_calendar_test:ambrosian"]}'),
+        ], $now, 3.0);
+
+        $scopes = $service->resolveViewerScopes('cei-admin');
+
+        // Every key is still present — the dashboard distinguishes "empty" from "missing".
+        self::assertSame(ResourceAdminService::VIEWER_OBJECT_TYPES, array_keys($scopes));
+        self::assertSame(['temporale'], $scopes['general_roman_calendar']);
+        self::assertSame(['IT'], $scopes['national_calendar_test']);
+        self::assertSame([], $scopes['diocesan_calendar_test']);
+        self::assertSame([], $scopes['general_roman_calendar_test']);
+        self::assertSame([], $scopes['rite_calendar_test']);
+
+        // The point of the budget: the remaining three were never dialed at all.
+        self::assertCount(3, $this->mockQueue);
+    }
+
+    public function testResolveScopesKeepsWhatItResolvedBeforeTheBudgetWasSpent(): void
+    {
+        $now     = 0.0;
+        $service = $this->serviceWithClock([
+            self::costing($now, 5.0, new GuzzleResponse(200, [], '{"objects":["national_calendar:IT"]}')),
+            new GuzzleResponse(200, [], '{"objects":["diocesan_calendar:romamo_it"]}'),
+            new GuzzleResponse(200, [], '{"objects":["wider_region:Europe"]}'),
+            new GuzzleResponse(200, [], '{"objects":["general_roman_calendar:temporale"]}'),
+        ], $now, 3.0);
+
+        self::assertSame(
+            [['object_type' => 'national_calendar', 'object_id' => 'IT']],
+            $service->resolveScopes('cei-admin')
+        );
+        self::assertCount(3, $this->mockQueue);
+    }
+
+    public function testResolveTestScopesBudgetSpansBothRelationLoops(): void
+    {
+        $now = 0.0;
+        // One 5s editor probe spends the whole budget, so neither the remaining
+        // editor types nor any admin type is dialed.
+        $service = $this->serviceWithClock(
+            array_merge(
+                [self::costing($now, 5.0, new GuzzleResponse(200, [], '{"objects":["national_calendar_test:IT"]}'))],
+                array_map(
+                    static fn(): GuzzleResponse => new GuzzleResponse(200, [], '{"objects":["national_calendar_test:XX"]}'),
+                    range(1, 7)
+                )
+            ),
+            $now,
+            3.0
+        );
+
+        self::assertSame(
+            [
+                'editor' => [['object_type' => 'national_calendar_test', 'object_id' => 'IT']],
+                'admin'  => [],
+            ],
+            $service->resolveTestScopes('cei-admin')
+        );
+        self::assertCount(7, $this->mockQueue);
+    }
+
+    public function testFilterByAdminAccessFailsClosedOnceTheBudgetIsSpent(): void
+    {
+        $now      = 0.0;
+        $service  = $this->serviceWithClock([
+            self::costing($now, 5.0, new GuzzleResponse(200, [], '{"allowed":true}')),
+            new GuzzleResponse(200, [], '{"allowed":true}'),
+        ], $now, 3.0);
+        $requests = [
+            ['id' => 'A', 'permissions' => [['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'admin']]],
+            ['id' => 'B', 'permissions' => [['object_type' => 'national_calendar', 'object_id' => 'US', 'relation' => 'admin']]],
+        ];
+
+        // A was checked inside the budget and survives; B is excluded without a call.
+        $kept = $service->filterByAdminAccess($requests, 'cei-admin');
+
+        self::assertSame(['A'], array_column($kept, 'id'));
+        self::assertCount(1, $this->mockQueue);
+    }
+
+    public function testFanOutBudgetExhaustionIsLoggedOnceWithTheSkippedCount(): void
+    {
+        $now     = 0.0;
+        $logger  = new CollectingLogger();
+        $service = $this->serviceWithClock([
+            self::costing($now, 5.0, new GuzzleResponse(200, [], '{"objects":[]}')),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+            new GuzzleResponse(200, [], '{"objects":[]}'),
+        ], $now, 3.0, $logger);
+
+        $service->resolveScopes('cei-admin');
+
+        $errors = $logger->recordsAtLevel('error');
+        self::assertCount(1, $errors, 'one line per exhausted fan-out, not one per skipped unit');
+        self::assertStringContainsString('budget', $errors[0]['message']);
+        self::assertSame(3, $errors[0]['context']['skipped'] ?? null);
+    }
+
+    public function testTheDefaultBudgetDoesNotTripOnANormalFanOut(): void
+    {
+        // Guard against a budget so tight (or a clock so wrong) that healthy calls
+        // are skipped: with the real clock and the default budget, all four types
+        // are dialed and returned.
+        $service = $this->serviceWith(array_map(
+            static fn(string $type): GuzzleResponse => new GuzzleResponse(200, [], '{"objects":["' . $type . ':IT"]}'),
+            ResourceAdminService::ADMIN_OBJECT_TYPES
+        ));
+
+        self::assertCount(count(ResourceAdminService::ADMIN_OBJECT_TYPES), $service->resolveScopes('cei-admin'));
+    }
+
+    public function testTheBudgetSpansEveryFanOutOfOneServiceInstance(): void
+    {
+        $now = 0.0;
+        // The /auth/dashboard-scopes shape: resolveScopes() then resolveViewerScopes()
+        // on ONE service instance. A 5s first lookup must exhaust the budget for both,
+        // not hand the second call a fresh 3s window — otherwise the endpoint's worst
+        // case is two budgets plus two read timeouts, which is the availability hole
+        // #878 exists to close.
+        $service = $this->serviceWithClock(
+            array_merge(
+                [self::costing($now, 5.0, new GuzzleResponse(200, [], '{"objects":["national_calendar:IT"]}'))],
+                array_map(
+                    static fn(): GuzzleResponse => new GuzzleResponse(200, [], '{"objects":["national_calendar:XX"]}'),
+                    range(1, 8)
+                )
+            ),
+            $now,
+            3.0
+        );
+
+        $adminScopes  = $service->resolveScopes('cei-admin');
+        $viewerScopes = $service->resolveViewerScopes('cei-admin');
+
+        self::assertSame([['object_type' => 'national_calendar', 'object_id' => 'IT']], $adminScopes);
+        self::assertSame(array_fill_keys(ResourceAdminService::VIEWER_OBJECT_TYPES, []), $viewerScopes);
+        self::assertCount(8, $this->mockQueue, 'only the first lookup should ever have been dialed');
+    }
+
+    public function testTheBudgetAlsoSpansAResolveThenFilterSequence(): void
+    {
+        $now = 0.0;
+        // The GET /admin/notifications shape: resolveScopes() gates admission and
+        // filterByAdminAccess() then scopes the list, both on one instance.
+        $service  = $this->serviceWithClock(
+            array_merge(
+                [self::costing($now, 5.0, new GuzzleResponse(200, [], '{"objects":["national_calendar:IT"]}'))],
+                array_map(
+                    static fn(): GuzzleResponse => new GuzzleResponse(200, [], '{"allowed":true}'),
+                    range(1, 4)
+                )
+            ),
+            $now,
+            3.0
+        );
+        $requests = [
+            ['id' => 'A', 'permissions' => [['object_type' => 'national_calendar', 'object_id' => 'IT', 'relation' => 'admin']]],
+        ];
+
+        self::assertNotSame([], $service->resolveScopes('cei-admin'));
+        self::assertSame([], $service->filterByAdminAccess($requests, 'cei-admin'));
+        self::assertCount(4, $this->mockQueue, 'the check sweep should not have been dialed');
+    }
 }

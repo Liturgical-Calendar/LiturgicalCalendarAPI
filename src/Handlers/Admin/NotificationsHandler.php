@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Api\Handlers\Admin;
 
 use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Handlers\AbstractHandler;
+use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesFgaClient;
 use LiturgicalCalendar\Api\Http\Enum\AcceptabilityLevel;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
@@ -31,9 +32,10 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 final class NotificationsHandler extends AbstractHandler
 {
+    use ResolvesFgaClient;
+
     private ?AccessRequestRepository $accessRequestRepo = null;
     private ?ApplicationRepository $applicationRepo     = null;
-    private ?OpenFgaClient $fgaClient                   = null;
 
     public function __construct(?OpenFgaClient $fgaClient = null)
     {
@@ -43,19 +45,6 @@ final class NotificationsHandler extends AbstractHandler
         $this->allowedRequestMethods = [RequestMethod::GET];
         $this->allowedAcceptHeaders  = [AcceptHeader::JSON];
         $this->allowCredentials      = true;
-    }
-
-    private function isFgaClientAvailable(): bool
-    {
-        return $this->fgaClient !== null || OpenFgaClient::isConfigured();
-    }
-
-    private function getFgaClient(): OpenFgaClient
-    {
-        if ($this->fgaClient === null) {
-            $this->fgaClient = OpenFgaClient::fromEnv();
-        }
-        return $this->fgaClient;
     }
 
     private function getAccessRequestRepository(): AccessRequestRepository
