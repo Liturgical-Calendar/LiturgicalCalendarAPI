@@ -66,6 +66,9 @@ use LiturgicalCalendar\Api\Models\ConditionalRule;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewMobile;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemSetPropertyCommon;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemSetPropertyGrade;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemSetPropertyName;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMetadata;
@@ -1103,19 +1106,18 @@ final class CalendarHandler extends AbstractHandler
      *
      * Unlike the Roman diocesan model (`applyDiocesanCalendar()`), which prefixes both the
      * `event_key` and the `name` with the diocese so diocesan events coexist alongside the
-     * national/comune event of the same underlying feast, the Ambrosian assembly model is
-     * "add-all-then-resolve, diocesan-wins": every row in `$this->DiocesanData->litcal` (within
-     * its `since_year`/`until_year` window) is built into a `LiturgicalEvent` under its own plain
-     * `event_key`, and if that key is already occupied — by a comune sanctorale event added a few
-     * lines earlier by {@see self::addAmbrosianSanctoraleToCalendar()} — the comune definition is
-     * removed first and the diocesan one takes its place. This mirrors the precedence-resolution
-     * model the rest of the Ambrosian pipeline already uses (add everything, resolve/suppress
-     * later) rather than the Roman check-before-add convention.
+     * national/comune event of the same underlying feast, the Ambrosian assembly model dispatches
+     * each row in `$this->DiocesanData->litcal` (within its `since_year`/`until_year` window) by
+     * its action:
      *
-     * `removeLiturgicalEvent()` is called before `addLiturgicalEvent()` (rather than simply letting
-     * `addLiturgicalEvent()` overwrite the array entry) because `LiturgicalEventCollection`
-     * maintains secondary per-grade sub-collections; removing the old entry first prevents a stale
-     * grade bucket from lingering alongside the new one.
+     * - A `createNew` row is built into a `LiturgicalEvent` under its own plain `event_key`,
+     *   stamped with the readings placeholder matching its own grade
+     *   ({@see AmbrosianReadings::forGrade()}), and added to `$this->Cal`.
+     * - A `setProperty` row (`DiocesanLitCalItemSetPropertyGrade`/`Name`/`Common`) is dispatched to
+     *   {@see self::applyAmbrosianDiocesanSetProperty()}, which mutates an event a previous stage
+     *   already placed in `$this->Cal` — normally a comune sanctorale definition added a few lines
+     *   earlier by {@see self::addAmbrosianSanctoraleToCalendar()} — in place via
+     *   `LiturgicalEventCollection::setProperty()`, rather than removing and re-adding it.
      *
      * **Names:** `handle()`'s Ambrosian branch does not call `applyCalendarI18nData()` (that method
      * is wired only into the Roman branch), so diocesan event names would otherwise never be set —
@@ -1139,10 +1141,10 @@ final class CalendarHandler extends AbstractHandler
      * If the mapped locale isn't one of the diocese's declared `metadata->locales`, falls back to
      * the first declared locale (mirroring `updateSettingsBasedOnDiocesanCalendar()`'s fallback).
      *
-     * Every added/overridden event is given the Task 2 festive (5-field) empty-readings
-     * placeholder ({@see AmbrosianReadings::emptyFestive()}) rather than the ferial 4-field one
-     * {@see self::addAmbrosianSanctoraleToCalendar()} uses for comune sanctorale, per this task's
-     * brief.
+     * Every event this method adds or modifies is given the placeholder matching its own grade
+     * ({@see AmbrosianReadings::forGrade()}) — festive (5-field) from FEAST upward, ferial
+     * (4-field) below — rather than unconditionally stamping the festive shape regardless of
+     * grade.
      *
      * Early-returns when `$this->DiocesanData === null` (no diocese requested), so comune-only
      * Ambrosian calendars are entirely unaffected — this is required for output stability on
@@ -1200,6 +1202,15 @@ final class CalendarHandler extends AbstractHandler
 
             $liturgicalEvent = $litCalItem->liturgical_event;
 
+            if (
+                $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyGrade
+                || $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyName
+                || $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyCommon
+            ) {
+                $this->applyAmbrosianDiocesanSetProperty($liturgicalEvent);
+                continue;
+            }
+
             if ($liturgicalEvent->isMobile()) {
                 /** @var DiocesanLitCalItemCreateNewMobile $liturgicalEvent */
                 $currentLitEventDate = $this->interpretStrtotime($liturgicalEvent);
@@ -1215,20 +1226,63 @@ final class CalendarHandler extends AbstractHandler
 
             $liturgicalEvent->setDate($currentLitEventDate);
 
-            $key = $liturgicalEvent->event_key;
-
-            // Diocesan-wins: remove any comune event already occupying this key before re-adding,
-            // so no stale grade sub-collection entry lingers from the comune definition. The comune
-            // event is being *replaced* by the diocesan one (not liturgically suppressed), so it must
-            // not surface in the response's suppressed_events metadata.
-            if (null !== $this->Cal->getLiturgicalEvent($key)) {
-                $this->Cal->removeLiturgicalEventWithoutSuppression($key);
-            }
-
             $litEvent = LiturgicalEvent::fromObject($liturgicalEvent);
-            $litEvent->setReadings(AmbrosianReadings::emptyFestive());
-            $this->Cal->addLiturgicalEvent($key, $litEvent);
+            $litEvent->setReadings(AmbrosianReadings::forGrade($litEvent->grade));
+            $this->Cal->addLiturgicalEvent($liturgicalEvent->event_key, $litEvent);
         }
+    }
+
+    /**
+     * Applies a single Ambrosian diocesan `setProperty` row to `$this->Cal`.
+     *
+     * Unlike a createNew row, this modifies an event that a previous stage already placed in the
+     * calendar — normally a comune sanctorale definition added by
+     * {@see self::addAmbrosianSanctoraleToCalendar()}. The grade change flows through
+     * `LiturgicalEventCollection::setProperty()`, which keeps the per-grade sub-collections
+     * consistent, so nothing has to be removed and re-added and the comune event never surfaces
+     * as a suppressed celebration.
+     *
+     * A grade change also re-stamps the readings placeholder, since the festive/ferial shape is
+     * derived from the grade ({@see AmbrosianReadings::forGrade()}).
+     *
+     * When the target key is not in this year's calendar the row is a no-op and an explanatory
+     * message is recorded, rather than failing the whole request.
+     */
+    private function applyAmbrosianDiocesanSetProperty(
+        DiocesanLitCalItemSetPropertyGrade|DiocesanLitCalItemSetPropertyName|DiocesanLitCalItemSetPropertyCommon $liturgicalEvent
+    ): void {
+        if (null === $this->DiocesanData) {
+            // Defensive only: the sole caller (applyAmbrosianDiocesanCalendar()) already returns
+            // early when $this->DiocesanData is null, so this method is never reached without it.
+            return;
+        }
+
+        $key                     = $liturgicalEvent->event_key;
+        $existingLiturgicalEvent = $this->Cal->getLiturgicalEvent($key);
+
+        if (null === $existingLiturgicalEvent) {
+            /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
+            $this->Messages[] = sprintf(
+                _('The diocesan calendar of %1$s tried to modify the liturgical event `%2$s`, but no such event exists in the calendar for the year %3$d. The modification was skipped.'),
+                $this->DiocesanData->metadata->diocese_name,
+                $key,
+                $this->CalendarParams->Year
+            );
+            return;
+        }
+
+        if ($liturgicalEvent instanceof DiocesanLitCalItemSetPropertyGrade) {
+            $this->Cal->setProperty($key, 'grade', $liturgicalEvent->grade);
+            $existingLiturgicalEvent->setReadings(AmbrosianReadings::forGrade($liturgicalEvent->grade));
+            return;
+        }
+
+        if ($liturgicalEvent instanceof DiocesanLitCalItemSetPropertyCommon) {
+            $this->Cal->setProperty($key, 'common', $liturgicalEvent->common);
+            return;
+        }
+
+        $this->Cal->setProperty($key, 'name', $liturgicalEvent->name);
     }
 
     /**
@@ -4678,6 +4732,17 @@ final class CalendarHandler extends AbstractHandler
         }
 
         foreach ($this->DiocesanData->litcal as $litCalItem) {
+            if (
+                $litCalItem->liturgical_event instanceof DiocesanLitCalItemSetPropertyGrade
+                || $litCalItem->liturgical_event instanceof DiocesanLitCalItemSetPropertyName
+                || $litCalItem->liturgical_event instanceof DiocesanLitCalItemSetPropertyCommon
+            ) {
+                throw new \RuntimeException(
+                    'The `setProperty` action is not supported for Roman rite diocesan calendars; it is currently scoped to the Ambrosian overlay. Offending event key: '
+                    . $litCalItem->liturgical_event->event_key
+                );
+            }
+
             // If sinceYear is undefined or null or empty, let's go ahead and create the event in any case.
             // Creation will be restricted only if explicitly defined by the sinceYear property.
             if (

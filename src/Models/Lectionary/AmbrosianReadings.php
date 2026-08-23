@@ -10,8 +10,11 @@ use LiturgicalCalendar\Api\Enum\LitGrade;
  * There is currently no Ambrosian lectionary data source in this codebase, but the `LitCal.json`
  * response schema requires every `LiturgicalEvent` to carry a `readings` property that validates
  * against `CommonDef.json#/definitions/Readings`. Until a real Ambrosian lectionary is wired in,
- * Ambrosian events (both sanctorale and temporale) are given the placeholder produced by
- * {@see self::empty()} so that calendar generation and schema validation both succeed.
+ * Ambrosian events (both sanctorale and temporale) are given a placeholder so that calendar
+ * generation and schema validation both succeed. The placeholder's shape is derived from the
+ * event's grade via {@see self::forGrade()}: festive (5-field) from FEAST upward, ferial
+ * (4-field) below FEAST — callers that need a specific shape regardless of grade can still reach
+ * {@see self::empty()} or {@see self::emptyFestive()} directly.
  *
  * `ReadingsFerial` is deliberately reused rather than inventing a new shape: it is the simplest
  * of the `ReadingsAbstract` subclasses accepted by `CommonDef.json#/definitions/Readings`

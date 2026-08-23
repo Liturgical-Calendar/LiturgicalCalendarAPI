@@ -11,6 +11,7 @@ use LiturgicalCalendar\Api\Handlers\CalendarHandler;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsFerial;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsFestive;
 use LiturgicalCalendar\Api\Params\CalendarParams;
 
@@ -215,7 +216,11 @@ final class CalendarHandlerAmbrosianDiocesanTest extends AbstractHandlerTestCase
             $event->grade,
             'Expected the diocesan override (MEMORIAL) to win over the comune definition (FEAST).'
         );
-        self::assertInstanceOf(ReadingsFestive::class, $event->readings);
+        self::assertInstanceOf(
+            ReadingsFerial::class,
+            $event->readings,
+            'The readings placeholder is derived from the grade; a MEMORIAL takes the ferial (4-field) shape.'
+        );
         self::assertFalse(
             $cal->isSuppressed('StFrancisOfAssisi'),
             'A diocesan override replaces the comune event in place; it must NOT be recorded as a suppressed celebration.'
