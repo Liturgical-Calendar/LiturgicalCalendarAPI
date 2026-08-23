@@ -2,12 +2,25 @@
 
 Design for [issue #740](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/740).
 
-**Status: implemented** (2026-08-23). All 19 planned commits landed on
-`feature/740-diocesan-set-property`. Golden master 9/9 byte-identical, PHPStan level 10 clean,
-phpcs clean, `phpstan-baseline.neon` unchanged. `phpunit_tests/Handlers/`, `phpunit_tests/Schemas/`
-and `phpunit_tests/Models/` are fully green. The only failures in the full suite are the 17
-pre-existing `phpunit_tests/WebSocket/*` tests that require a running WebSocket server /
-docker-compose stack, unrelated to this branch.
+**Status: implemented** (2026-08-23), on `feature/740-diocesan-set-property` — 26 commits: the ten
+planned tasks, plus the fix wave that followed the whole-branch review.
+
+Verified in this environment:
+
+| Check                              | Result                                                     |
+| ---------------------------------- | ---------------------------------------------------------- |
+| Golden master (Roman rite)         | 9/9 byte-identical                                         |
+| PHPStan level 10                   | No errors                                                  |
+| phpcs                              | clean                                                      |
+| `phpstan-baseline.neon`            | unchanged across the whole branch                          |
+| Test suite, excluding `WebSocket/` | 2970 tests, 0 failures, 337 pre-existing environment skips |
+
+**Not verified here: the full suite cannot run to completion in this environment.**
+`phpunit_tests/WebSocket/*` requires a running WebSocket server and the `docker-compose` stack;
+without them those tests time out, and `composer test` aborts on its own 300-second process
+timeout before finishing. The branch touches no WebSocket, Zitadel or OpenFGA file, so those tests
+are unaffected by it — but that is an argument from the diff, not an observed pass. Anyone with the
+stack running should confirm a full green suite before merging.
 
 ## Problem
 
@@ -321,11 +334,22 @@ None of these belong in the `slow` group.
 
 ## Acceptance criteria (from the issue)
 
-- [ ] Suffragan downgrades render at the diocesan grade and common in `/calendar`, and at the
+- [x] Suffragan downgrades render at the diocesan grade and common in `/calendar`, and at the
       diocesan name for `StFrancisOfAssisi`.
-- [ ] `/events/ambrosian/diocese/{id}` lists no phantom prefixed duplicate for an overridden key.
-- [ ] No overridden comune event appears in `suppressed_events`.
-- [ ] Golden master 9/9 byte-identical; suite, PHPStan and phpcs green.
+      *Proved by* `CalendarHandlerAmbrosianDiocesanSetPropertyTest::testSetProperty{Grade,Common,Name}ChangesTheComuneEventInPlace`,
+      and end-to-end against the on-disk data by `CalendarHandlerAmbrosianDiocesanTest`.
+- [x] `/events/ambrosian/diocese/{id}` lists no phantom prefixed duplicate for an overridden key.
+      *Proved by* `EventsHandlerRiteRoutingTest::testAmbrosianDiocesanOverrideHasNoPrefixedDuplicate`,
+      which also asserts a genuine createNew row is still prefixed, so it cannot pass by disabling
+      prefixing wholesale.
+- [x] No overridden comune event appears in `suppressed_events`.
+      *Proved by* the `isSuppressed()` assertions in `CalendarHandlerAmbrosianDiocesanSetPropertyTest`
+      and `CalendarHandlerAmbrosianDiocesanTest`.
+- [x] Golden master 9/9 byte-identical; PHPStan level 10 and phpcs green.
+- [ ] **Full suite green — not verifiable in this environment.** Everything outside
+      `phpunit_tests/WebSocket/` passes (2970 tests, 0 failures). The WebSocket suite needs a running
+      WebSocket server and the `docker-compose` stack; see the status note at the top of this
+      document. This box should be ticked by someone who can run the complete suite.
 
 **Deviations from the issue text.** The issue asks for Ambrosian `/calendar` output "exactly as
 today". Three deliberate changes:

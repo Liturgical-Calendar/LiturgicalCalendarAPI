@@ -27,6 +27,7 @@ use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
+use LiturgicalCalendar\Api\Http\Exception\InternalServerErrorException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Exception\YamlException;
@@ -4857,7 +4858,7 @@ final class CalendarHandler extends AbstractHandler
                 || $litCalItem->liturgical_event instanceof DiocesanLitCalItemSetPropertyName
                 || $litCalItem->liturgical_event instanceof DiocesanLitCalItemSetPropertyCommon
             ) {
-                throw new \RuntimeException(
+                throw new InternalServerErrorException(
                     'The `setProperty` action is not supported for Roman rite diocesan calendars; it is currently scoped to the Ambrosian overlay. Offending event key: '
                     . $litCalItem->liturgical_event->event_key
                 );
