@@ -264,20 +264,21 @@ final class CalendarHandlerAmbrosianDiocesanSetPropertyTest extends TestCase
      * shape of a data-authoring mistake nobody notices — the author believes an override is in
      * force when it is not. Each of the three property arms must say so.
      *
-     * Only the `grade` and `name` arms are exercised, and that is not an oversight. `setProperty()`
-     * decides "did anything change?" with `!==`, which for an **object** is identity, not
-     * equivalence. `grade` is a `LitGrade` enum case (a singleton, so `!==` compares correctly) and
-     * `name` is a string; but `common` is a `LitCommons` **object**, so a freshly built
-     * `LitCommons` carrying exactly the same Commons is never `===` the stored one and the write
-     * always reports success. The `setProperty:common` no-op message is therefore unreachable by a
-     * semantically-redundant row, and pinning it would require asserting a behaviour the code
-     * cannot produce.
+     * All three arms are exercised, but they do not all detect redundancy the same way, and the
+     * `common` case is the reason `applySetPropertyCommon()` compares serialized values itself
+     * instead of trusting `setProperty()`'s return. `setProperty()` decides "did anything change?"
+     * with `!==`, which for an **object** is identity rather than equivalence: `grade` is a
+     * `LitGrade` enum case (a singleton, so `!==` compares correctly) and `name` is a string, but a
+     * freshly built `LitCommons` carrying exactly the same Commons is never `===` the stored one.
+     * Left to `setProperty()`, a redundant Common would report success and go unreported — so this
+     * `common` case would fail against a handler that simply forwarded the return value.
      *
-     * The comune `StsProtaseGervase` is a FEAST (grade 4), so re-declaring grade 4 is the redundant
-     * grade case; its diocesan Italian name is byte-identical to the comune's (see §8 of the design
-     * doc — which is exactly why no name row is authored for it in the real data), so a
-     * `setProperty:name` row for it is the redundant name case. The assertion checks the message
-     * names the property, so a message from a different arm cannot satisfy it.
+     * The comune `StsProtaseGervase` is a FEAST (grade 4) with common
+     * `["Martyrs:For Several Martyrs"]`, so re-declaring either is the redundant case for that arm;
+     * its diocesan Italian name is byte-identical to the comune's (see §8 of the design doc — which
+     * is exactly why no name row is authored for it in the real data), so a `setProperty:name` row
+     * for it is the redundant name case. The assertion checks the message names the property, so a
+     * message from a different arm cannot satisfy it.
      *
      * @param string               $property     The `metadata->property` under test.
      * @param array<string,mixed>  $sameAsComune Any `liturgical_event` fields carrying the value the
@@ -391,6 +392,7 @@ final class CalendarHandlerAmbrosianDiocesanSetPropertyTest extends TestCase
         return [
             'grade already FEAST'    => ['grade', ['grade' => 4]],
             'name already identical' => ['name', []],
+            'common already Martyrs' => ['common', ['common' => ['Martyrs:For Several Martyrs']]],
         ];
     }
 
