@@ -11,6 +11,7 @@ use LiturgicalCalendar\Api\Handlers\CalendarHandler;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsFerial;
 use LiturgicalCalendar\Api\Models\Lectionary\ReadingsFestive;
 use LiturgicalCalendar\Api\Params\CalendarParams;
 
@@ -198,10 +199,14 @@ final class CalendarHandlerAmbrosianDiocesanTest extends AbstractHandlerTestCase
     }
 
     /**
-     * Diocesan-wins override: `StFrancisOfAssisi` (4 October) is FEAST (grade 4) in the comune
-     * Ambrosian sanctorale but MEMORIAL (grade 3) in the `lugano_ch` diocesan calendar. After the
-     * overlay runs, the diocesan grade must win (the comune definition is removed and replaced,
-     * not merely shadowed).
+     * `StFrancisOfAssisi` (4 October) is FEAST (grade 4) in the comune Ambrosian sanctorale.
+     * `lugano_ch`'s on-disk calendar used to re-declare it as a colliding `createNew` row (which the
+     * collision guard in `applyAmbrosianDiocesanCalendar()` skipped — see git history for the
+     * pre-migration version of this test). It has since been re-authored (Task 7 of the
+     * `setProperty` plan) as three `setProperty` rows — `grade`, `common`, `name` — so the suffragan
+     * downgrade to MEMORIAL now actually takes effect, in place, on the comune entry: no duplicate
+     * registration, no suppression, and the per-grade sub-collections stay consistent with the
+     * event's new grade.
      */
     public function testLuganoOverrideDowngradesStFrancisGradeToMemorial(): void
     {
@@ -213,12 +218,34 @@ final class CalendarHandlerAmbrosianDiocesanTest extends AbstractHandlerTestCase
         self::assertSame(
             LitGrade::MEMORIAL,
             $event->grade,
-            'Expected the diocesan override (MEMORIAL) to win over the comune definition (FEAST).'
+            'The `setProperty:grade` row must downgrade the comune FEAST definition to MEMORIAL, in place.'
         );
-        self::assertInstanceOf(ReadingsFestive::class, $event->readings);
+        self::assertSame(
+            ['Proper'],
+            $event->common->jsonSerialize(),
+            'The `setProperty:common` row must apply alongside the grade change.'
+        );
+        self::assertSame(
+            "S. Francesco d'Assisi",
+            $event->name,
+            'The `setProperty:name` row must replace the comune name ("...patrono d\'Italia") with the diocesan one.'
+        );
+        self::assertInstanceOf(
+            ReadingsFerial::class,
+            $event->readings,
+            'A downgrade to MEMORIAL must re-stamp the readings placeholder as ferial (AmbrosianReadings::forGrade()).'
+        );
         self::assertFalse(
             $cal->isSuppressed('StFrancisOfAssisi'),
-            'A diocesan override replaces the comune event in place; it must NOT be recorded as a suppressed celebration.'
+            'An in-place property change must never record the event as suppressed.'
+        );
+        self::assertTrue(
+            $cal->getMemorials()->hasKey('StFrancisOfAssisi'),
+            'The event must be registered under its new (MEMORIAL) grade sub-collection.'
+        );
+        self::assertFalse(
+            $cal->getFeasts()->hasKey('StFrancisOfAssisi'),
+            'The event must NOT remain registered under its old (FEAST) grade sub-collection.'
         );
     }
 
@@ -340,8 +367,14 @@ final class CalendarHandlerAmbrosianDiocesanTest extends AbstractHandlerTestCase
         self::assertSame(
             3,
             $byKey['StFrancisOfAssisi']['grade'],
-            'Expected the lugano_ch diocesan override (MEMORIAL, grade 3) to win over the comune FEAST definition.'
+            'lugano_ch\'s on-disk `setProperty:grade` row (see testLuganoOverrideDowngradesStFrancisGradeToMemorial) '
+                . 'downgrades the comune FEAST definition (4) to MEMORIAL (3), live through the full request pipeline.'
         );
+        self::assertSame(['Proper'], $byKey['StFrancisOfAssisi']['common']);
+        // No Accept-Language header on this request resolves to Latin (Negotiator's default), so
+        // the diocesan name comes from lugano_ch/i18n/la_VA.json, not it_IT.json (compare
+        // testLuganoOverrideDowngradesStFrancisGradeToMemorial, which asserts the it_IT rename).
+        self::assertSame('Sancti Francisci Assisiensis', $byKey['StFrancisOfAssisi']['name']);
 
         self::assertArrayHasKey(
             'AllSaints',

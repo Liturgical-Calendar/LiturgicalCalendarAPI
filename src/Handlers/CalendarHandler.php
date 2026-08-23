@@ -27,6 +27,7 @@ use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
+use LiturgicalCalendar\Api\Http\Exception\InternalServerErrorException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Http\Exception\YamlException;
@@ -42,6 +43,7 @@ use LiturgicalCalendar\Api\Models\PropriumDeSanctisMap;
 use LiturgicalCalendar\Api\Models\PropriumDeTemporeMap;
 use LiturgicalCalendar\Api\Models\PropriumDeTemporeEvent;
 use LiturgicalCalendar\Api\Models\RelativeLiturgicalDate;
+use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
 use LiturgicalCalendar\Api\Models\Calendar\Missal\AmbrosianMissalResolver;
@@ -66,6 +68,9 @@ use LiturgicalCalendar\Api\Models\ConditionalRule;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanData;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewMobile;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemSetPropertyCommon;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemSetPropertyGrade;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemSetPropertyName;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemCreateNewMetadata;
@@ -1103,19 +1108,23 @@ final class CalendarHandler extends AbstractHandler
      *
      * Unlike the Roman diocesan model (`applyDiocesanCalendar()`), which prefixes both the
      * `event_key` and the `name` with the diocese so diocesan events coexist alongside the
-     * national/comune event of the same underlying feast, the Ambrosian assembly model is
-     * "add-all-then-resolve, diocesan-wins": every row in `$this->DiocesanData->litcal` (within
-     * its `since_year`/`until_year` window) is built into a `LiturgicalEvent` under its own plain
-     * `event_key`, and if that key is already occupied — by a comune sanctorale event added a few
-     * lines earlier by {@see self::addAmbrosianSanctoraleToCalendar()} — the comune definition is
-     * removed first and the diocesan one takes its place. This mirrors the precedence-resolution
-     * model the rest of the Ambrosian pipeline already uses (add everything, resolve/suppress
-     * later) rather than the Roman check-before-add convention.
+     * national/comune event of the same underlying feast, the Ambrosian assembly model dispatches
+     * each row in `$this->DiocesanData->litcal` (within its `since_year`/`until_year` window) by
+     * its action:
      *
-     * `removeLiturgicalEvent()` is called before `addLiturgicalEvent()` (rather than simply letting
-     * `addLiturgicalEvent()` overwrite the array entry) because `LiturgicalEventCollection`
-     * maintains secondary per-grade sub-collections; removing the old entry first prevents a stale
-     * grade bucket from lingering alongside the new one.
+     * - A `createNew` row is built into a `LiturgicalEvent` under its own plain `event_key`,
+     *   stamped with the readings placeholder matching its own grade
+     *   ({@see AmbrosianReadings::forGrade()}), and added to `$this->Cal` — unless that key is
+     *   already occupied (typically by a comune sanctorale event), in which case the row is a
+     *   data-authoring error: it is skipped and a message is recorded naming the diocese, the
+     *   event key, and the year, pointing the author at `setProperty` instead. `createNew` is for
+     *   celebrations that do not already exist in the calendar; overriding one that does is what
+     *   `setProperty` is for.
+     * - A `setProperty` row (`DiocesanLitCalItemSetPropertyGrade`/`Name`/`Common`) is dispatched to
+     *   {@see self::applyAmbrosianDiocesanSetProperty()}, which mutates an event a previous stage
+     *   already placed in `$this->Cal` — normally a comune sanctorale definition added a few lines
+     *   earlier by {@see self::addAmbrosianSanctoraleToCalendar()} — in place via
+     *   `LiturgicalEventCollection::setProperty()`, rather than removing and re-adding it.
      *
      * **Names:** `handle()`'s Ambrosian branch does not call `applyCalendarI18nData()` (that method
      * is wired only into the Roman branch), so diocesan event names would otherwise never be set —
@@ -1139,10 +1148,10 @@ final class CalendarHandler extends AbstractHandler
      * If the mapped locale isn't one of the diocese's declared `metadata->locales`, falls back to
      * the first declared locale (mirroring `updateSettingsBasedOnDiocesanCalendar()`'s fallback).
      *
-     * Every added/overridden event is given the Task 2 festive (5-field) empty-readings
-     * placeholder ({@see AmbrosianReadings::emptyFestive()}) rather than the ferial 4-field one
-     * {@see self::addAmbrosianSanctoraleToCalendar()} uses for comune sanctorale, per this task's
-     * brief.
+     * Every event this method adds or modifies is given the placeholder matching its own grade
+     * ({@see AmbrosianReadings::forGrade()}) — festive (5-field) from FEAST upward, ferial
+     * (4-field) below — rather than unconditionally stamping the festive shape regardless of
+     * grade.
      *
      * Early-returns when `$this->DiocesanData === null` (no diocese requested), so comune-only
      * Ambrosian calendars are entirely unaffected — this is required for output stability on
@@ -1162,20 +1171,25 @@ final class CalendarHandler extends AbstractHandler
         if (null === $this->DiocesanData) {
             return;
         }
+        // Captured once into a local so PHPStan's null-narrowing survives the intervening method
+        // calls below (interpretStrtotime(), DateTime::fromFormat(), etc. invalidate narrowing of
+        // the $this->DiocesanData property itself, the same reason applyAmbrosianDiocesanSetProperty()
+        // re-checks for null rather than relying on the caller's guard).
+        $diocesanData = $this->DiocesanData;
 
         $locale = match (LitLocale::$PRIMARY_LANGUAGE) {
             'la'    => 'la_VA',
             default => 'it_IT',
         };
-        if (false === in_array($locale, $this->DiocesanData->metadata->locales, true)) {
-            $locale = $this->DiocesanData->metadata->locales[0];
+        if (false === in_array($locale, $diocesanData->metadata->locales, true)) {
+            $locale = $diocesanData->metadata->locales[0];
         }
 
         $i18nFile = strtr(
             JsonData::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FILE->path(),
             [
-                '{nation}'  => $this->DiocesanData->metadata->nation,
-                '{diocese}' => $this->DiocesanData->metadata->diocese_id,
+                '{nation}'  => $diocesanData->metadata->nation,
+                '{diocese}' => $diocesanData->metadata->diocese_id,
                 '{locale}'  => $locale
             ]
         );
@@ -1188,17 +1202,26 @@ final class CalendarHandler extends AbstractHandler
             throw new \Exception('We expected all the values of the array to be strings.');
         }
         /** @var array<string,string> $i18nData */
-        $this->DiocesanData->setNames($i18nData);
+        $diocesanData->setNames($i18nData);
 
         $year = $this->CalendarParams->Year;
 
-        foreach ($this->DiocesanData->litcal as $litCalItem) {
+        foreach ($diocesanData->litcal as $litCalItem) {
             $meta = $litCalItem->metadata;
             if ($year < $meta->since_year || ( null !== $meta->until_year && $year > $meta->until_year )) {
                 continue;
             }
 
             $liturgicalEvent = $litCalItem->liturgical_event;
+
+            if (
+                $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyGrade
+                || $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyName
+                || $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyCommon
+            ) {
+                $this->applyAmbrosianDiocesanSetProperty($liturgicalEvent);
+                continue;
+            }
 
             if ($liturgicalEvent->isMobile()) {
                 /** @var DiocesanLitCalItemCreateNewMobile $liturgicalEvent */
@@ -1215,19 +1238,198 @@ final class CalendarHandler extends AbstractHandler
 
             $liturgicalEvent->setDate($currentLitEventDate);
 
-            $key = $liturgicalEvent->event_key;
-
-            // Diocesan-wins: remove any comune event already occupying this key before re-adding,
-            // so no stale grade sub-collection entry lingers from the comune definition. The comune
-            // event is being *replaced* by the diocesan one (not liturgically suppressed), so it must
-            // not surface in the response's suppressed_events metadata.
-            if (null !== $this->Cal->getLiturgicalEvent($key)) {
-                $this->Cal->removeLiturgicalEventWithoutSuppression($key);
+            if (null !== $this->Cal->getLiturgicalEvent($liturgicalEvent->event_key)) {
+                /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
+                $this->Messages[] = sprintf(
+                    _('The diocesan calendar of %1$s tried to declare a new liturgical event `%2$s` for the year %3$d, but an event with that key already exists in the calendar. To override an existing celebration, use a `setProperty` row (`grade`, `name`, or `common`) instead of re-declaring it with `createNew`. The declaration was skipped.'),
+                    $diocesanData->metadata->diocese_name,
+                    $liturgicalEvent->event_key,
+                    $year
+                );
+                continue;
             }
 
             $litEvent = LiturgicalEvent::fromObject($liturgicalEvent);
-            $litEvent->setReadings(AmbrosianReadings::emptyFestive());
-            $this->Cal->addLiturgicalEvent($key, $litEvent);
+            $litEvent->setReadings(AmbrosianReadings::forGrade($litEvent->grade));
+            $this->Cal->addLiturgicalEvent($liturgicalEvent->event_key, $litEvent);
+        }
+    }
+
+    /**
+     * Applies a single Ambrosian diocesan `setProperty` row to `$this->Cal`.
+     *
+     * Unlike a createNew row, this modifies an event that a previous stage already placed in the
+     * calendar — normally a comune sanctorale definition added by
+     * {@see self::addAmbrosianSanctoraleToCalendar()}. The grade change flows through
+     * `LiturgicalEventCollection::setProperty()`, which keeps the per-grade sub-collections
+     * consistent, so nothing has to be removed and re-added and the comune event never surfaces
+     * as a suppressed celebration.
+     *
+     * A grade change also re-stamps the readings placeholder, since the festive/ferial shape is
+     * derived from the grade ({@see AmbrosianReadings::forGrade()}).
+     *
+     * When the target key is not in this year's calendar the row is a no-op and an explanatory
+     * message is recorded, rather than the whole request failing on that particular row.
+     * This only covers a key absent from *this year's calendar*: `applyAmbrosianDiocesanCalendar()`
+     * calls `DiocesanData::setNames()` over every row in `$litcal` before the dispatch loop that
+     * reaches this method runs, and `setNames()` throws an uncaught `\ValueError` for any
+     * `event_key` with no entry in the diocese's i18n file — so a typo'd `event_key` (one that
+     * exists nowhere at all) still fatals the request before this method's own guard is ever
+     * reached.
+     */
+    private function applyAmbrosianDiocesanSetProperty(
+        DiocesanLitCalItemSetPropertyGrade|DiocesanLitCalItemSetPropertyName|DiocesanLitCalItemSetPropertyCommon $liturgicalEvent
+    ): void {
+        if (null === $this->DiocesanData) {
+            // Defensive only: the sole caller (applyAmbrosianDiocesanCalendar()) already returns
+            // early when $this->DiocesanData is null, so this method is never reached without it.
+            return;
+        }
+
+        $key                     = $liturgicalEvent->event_key;
+        $existingLiturgicalEvent = $this->Cal->getLiturgicalEvent($key);
+
+        if (null === $existingLiturgicalEvent) {
+            /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
+            $this->Messages[] = sprintf(
+                _('The diocesan calendar of %1$s tried to modify the liturgical event `%2$s`, but no such event exists in the calendar for the year %3$d. The modification was skipped.'),
+                $this->DiocesanData->metadata->diocese_name,
+                $key,
+                $this->CalendarParams->Year
+            );
+            return;
+        }
+
+        // No `default` arm, deliberately: PHPStan proves the three conditions below are exhaustive
+        // over the closed union type declared for $liturgicalEvent, so a `default => throw` would be
+        // reported as unreachable dead code. Omitting it keeps today's exhaustiveness proof
+        // error-free while still failing loudly the moment it stops being true: if a fourth
+        // DiocesanLitCalItemSetProperty* subtype ever joins the union without a matching arm here,
+        // PHPStan re-flags this match as non-exhaustive (`match.unhandled`) at analysis time, and at
+        // runtime `match` itself throws `\UnhandledMatchError` rather than silently falling through
+        // to (mis-applying) whichever branch happened to be written last.
+        match (true) {
+            $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyGrade => $this->applySetPropertyGrade($key, $liturgicalEvent, $existingLiturgicalEvent),
+            $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyCommon => $this->applySetPropertyCommon($key, $liturgicalEvent, $existingLiturgicalEvent),
+            $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyName => $this->applySetPropertyName($key, $liturgicalEvent),
+        };
+    }
+
+    /**
+     * Applies a `setProperty:grade` row's grade change and its readings re-stamp together.
+     *
+     * Pulled out of the `match` in {@see self::applyAmbrosianDiocesanSetProperty()} because a
+     * `match` arm must be a single expression, and this branch is the only one of the three that
+     * needs two statements (the property write and the readings re-stamp).
+     *
+     * `LiturgicalEventCollection::setProperty()` returns `false` (and leaves the event untouched)
+     * when the requested grade is already the event's current grade, so the readings re-stamp is
+     * gated on that return value: re-stamping unconditionally would decouple the readings shape
+     * from whether the grade write it is supposed to follow actually happened. A `false` return
+     * here means the diocesan override was redundant, so it is surfaced as a message rather than
+     * silently doing nothing.
+     */
+    private function applySetPropertyGrade(
+        string $key,
+        DiocesanLitCalItemSetPropertyGrade $liturgicalEvent,
+        LiturgicalEvent $existingLiturgicalEvent
+    ): void {
+        if (null === $this->DiocesanData) {
+            // Defensive only: the sole caller (applyAmbrosianDiocesanSetProperty()) is only ever
+            // reached when $this->DiocesanData is non-null.
+            return;
+        }
+
+        if ($this->Cal->setProperty($key, 'grade', $liturgicalEvent->grade)) {
+            $existingLiturgicalEvent->setReadings(AmbrosianReadings::forGrade($liturgicalEvent->grade));
+        } else {
+            /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
+            $this->Messages[] = sprintf(
+                _('The diocesan calendar of %1$s declared a `setProperty:grade` override for the liturgical event `%2$s` for the year %3$d, but the grade was already set to that value. The override had no effect.'),
+                $this->DiocesanData->metadata->diocese_name,
+                $key,
+                $this->CalendarParams->Year
+            );
+        }
+    }
+
+    /**
+     * Applies a `setProperty:common` row's Common change.
+     *
+     * A redundant override — one whose Common the event already carries — is surfaced as a message
+     * rather than silently doing nothing, matching {@see self::applySetPropertyGrade()} and the
+     * absent-key branch in {@see self::applyAmbrosianDiocesanSetProperty()}.
+     *
+     * That redundancy is detected here rather than by `LiturgicalEventCollection::setProperty()`'s
+     * return value, because `setProperty()` decides "did anything change?" with `!==`, which for an
+     * **object** compares identity rather than value. `grade` (a `LitGrade` enum case, so a
+     * singleton) and `name` (a string) compare correctly there; `common` is a `LitCommons` object,
+     * and a freshly built one carrying exactly the same Commons is never `===` the stored one. So
+     * `setProperty()` would report success for a Common that did not actually change, and the
+     * redundant override would go unreported. Comparing the serialized values instead makes this
+     * arm behave like the other two.
+     *
+     * `$existingLiturgicalEvent->common` is typed `LitCommons|array` — the array shape holds
+     * `LitMassVariousNeeds` cases, which a `LitCommons` can never be equivalent to, so a non-`LitCommons`
+     * current value is by definition a real change.
+     *
+     * `setProperty()`'s return is not checked afterwards: its only two `false` conditions are an
+     * absent key (already handled by the caller, which returns before dispatching) and an
+     * identical value (excluded by the equivalence check above), so a `false` here is unreachable.
+     */
+    private function applySetPropertyCommon(
+        string $key,
+        DiocesanLitCalItemSetPropertyCommon $liturgicalEvent,
+        LiturgicalEvent $existingLiturgicalEvent
+    ): void {
+        if (null === $this->DiocesanData) {
+            // Defensive only: the sole caller (applyAmbrosianDiocesanSetProperty()) is only ever
+            // reached when $this->DiocesanData is non-null.
+            return;
+        }
+
+        $existingCommon = $existingLiturgicalEvent->common;
+        $isRedundant    = $existingCommon instanceof LitCommons
+            && $existingCommon->jsonSerialize() === $liturgicalEvent->common->jsonSerialize();
+
+        if ($isRedundant) {
+            /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
+            $this->Messages[] = sprintf(
+                _('The diocesan calendar of %1$s declared a `setProperty:common` override for the liturgical event `%2$s` for the year %3$d, but the Common was already set to that value. The override had no effect.'),
+                $this->DiocesanData->metadata->diocese_name,
+                $key,
+                $this->CalendarParams->Year
+            );
+            return;
+        }
+
+        $this->Cal->setProperty($key, 'common', $liturgicalEvent->common);
+    }
+
+    /**
+     * Applies a `setProperty:name` row's name change.
+     *
+     * `LiturgicalEventCollection::setProperty()` returns `false` when the requested name is
+     * already the event's current name; that is surfaced as a message rather than silently
+     * doing nothing, matching {@see self::applySetPropertyGrade()} and the absent-key branch in
+     * {@see self::applyAmbrosianDiocesanSetProperty()}.
+     */
+    private function applySetPropertyName(string $key, DiocesanLitCalItemSetPropertyName $liturgicalEvent): void
+    {
+        if (null === $this->DiocesanData) {
+            // Defensive only: the sole caller (applyAmbrosianDiocesanSetProperty()) is only ever
+            // reached when $this->DiocesanData is non-null.
+            return;
+        }
+
+        if (false === $this->Cal->setProperty($key, 'name', $liturgicalEvent->name)) {
+            /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
+            $this->Messages[] = sprintf(
+                _('The diocesan calendar of %1$s declared a `setProperty:name` override for the liturgical event `%2$s` for the year %3$d, but the name was already set to that value. The override had no effect.'),
+                $this->DiocesanData->metadata->diocese_name,
+                $key,
+                $this->CalendarParams->Year
+            );
         }
     }
 
@@ -4678,6 +4880,17 @@ final class CalendarHandler extends AbstractHandler
         }
 
         foreach ($this->DiocesanData->litcal as $litCalItem) {
+            if (
+                $litCalItem->liturgical_event instanceof DiocesanLitCalItemSetPropertyGrade
+                || $litCalItem->liturgical_event instanceof DiocesanLitCalItemSetPropertyName
+                || $litCalItem->liturgical_event instanceof DiocesanLitCalItemSetPropertyCommon
+            ) {
+                throw new InternalServerErrorException(
+                    'The `setProperty` action is not supported for Roman rite diocesan calendars; it is currently scoped to the Ambrosian overlay. Offending event key: '
+                    . $litCalItem->liturgical_event->event_key
+                );
+            }
+
             // If sinceYear is undefined or null or empty, let's go ahead and create the event in any case.
             // Creation will be restricted only if explicitly defined by the sinceYear property.
             if (

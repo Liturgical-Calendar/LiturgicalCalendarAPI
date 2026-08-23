@@ -34,6 +34,9 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropert
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropertyName;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewMobile;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemSetPropertyCommon;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemSetPropertyGrade;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemSetPropertyName;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemMakePatron;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemMoveEvent;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
@@ -762,7 +765,13 @@ final class EventsHandler extends AbstractHandler
             $DiocesanCalendarI18nData = Utilities::jsonFileToArray($DiocesanCalendarI18nFile);
 
             foreach (self::$DiocesanData->litcal as $diocesanLitCalItem) {
-                $key  = $diocesanLitCalItem->liturgical_event->event_key;
+                $key = $diocesanLitCalItem->liturgical_event->event_key;
+                if (
+                    false === $diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemCreateNewFixed
+                    && false === $diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemCreateNewMobile
+                ) {
+                    throw new \ValueError('diocesan calendar item `' . $key . '`: the `setProperty` action is not supported for Roman rite diocesan calendars');
+                }
                 $name = $DiocesanCalendarI18nData[$key];
                 $diocesanLitCalItem->setName('[ ' . self::$DiocesanData->metadata->diocese_name . ' ] ' . $name);
                 $diocesanLitCalItem->liturgical_event->setKey($this->EventsParams->DiocesanCalendar . '_' . $key);
@@ -827,6 +836,30 @@ final class EventsHandler extends AbstractHandler
         foreach (self::$DiocesanData->litcal as $diocesanLitCalItem) {
             $key  = $diocesanLitCalItem->liturgical_event->event_key;
             $name = $DiocesanCalendarI18nData[$key];
+
+            // A setProperty row modifies the comune catalog entry in place, under its plain key.
+            // Prefixing it would emit a phantom duplicate that `/calendar` never produces.
+            //
+            // The `getEvent($key)?->applyX(...)` calls below silently no-op when $key is absent
+            // from the catalog. Unlike CalendarHandler::applyAmbrosianDiocesanSetProperty(), which
+            // pushes an explanatory message to $this->Messages for the same case, EventsHandler has
+            // no Messages sink to push to — this divergence is structural, not an oversight.
+            if ($diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemSetPropertyGrade) {
+                self::$liturgicalEvents->getEvent($key)?->applyGrade($diocesanLitCalItem->liturgical_event->grade);
+                continue;
+            }
+
+            if ($diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemSetPropertyCommon) {
+                self::$liturgicalEvents->getEvent($key)?->applyCommon($diocesanLitCalItem->liturgical_event->common);
+                continue;
+            }
+
+            if ($diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemSetPropertyName) {
+                // Unprefixed: `/calendar` emits the plain diocesan name for an overridden key.
+                self::$liturgicalEvents->getEvent($key)?->applyName($name);
+                continue;
+            }
+
             $diocesanLitCalItem->setName('[ ' . self::$DiocesanData->metadata->diocese_name . ' ] ' . $name);
             $diocesanLitCalItem->liturgical_event->setKey($this->EventsParams->DiocesanCalendar . '_' . $key);
             if ($diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemCreateNewFixed) {
