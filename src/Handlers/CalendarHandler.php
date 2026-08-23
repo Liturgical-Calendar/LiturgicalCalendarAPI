@@ -1308,8 +1308,8 @@ final class CalendarHandler extends AbstractHandler
         // to (mis-applying) whichever branch happened to be written last.
         match (true) {
             $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyGrade => $this->applySetPropertyGrade($key, $liturgicalEvent, $existingLiturgicalEvent),
-            $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyCommon => $this->Cal->setProperty($key, 'common', $liturgicalEvent->common),
-            $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyName => $this->Cal->setProperty($key, 'name', $liturgicalEvent->name),
+            $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyCommon => $this->applySetPropertyCommon($key, $liturgicalEvent),
+            $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyName => $this->applySetPropertyName($key, $liturgicalEvent),
         };
     }
 
@@ -1319,14 +1319,90 @@ final class CalendarHandler extends AbstractHandler
      * Pulled out of the `match` in {@see self::applyAmbrosianDiocesanSetProperty()} because a
      * `match` arm must be a single expression, and this branch is the only one of the three that
      * needs two statements (the property write and the readings re-stamp).
+     *
+     * `LiturgicalEventCollection::setProperty()` returns `false` (and leaves the event untouched)
+     * when the requested grade is already the event's current grade, so the readings re-stamp is
+     * gated on that return value: re-stamping unconditionally would decouple the readings shape
+     * from whether the grade write it is supposed to follow actually happened. A `false` return
+     * here means the diocesan override was redundant, so it is surfaced as a message rather than
+     * silently doing nothing.
      */
     private function applySetPropertyGrade(
         string $key,
         DiocesanLitCalItemSetPropertyGrade $liturgicalEvent,
         LiturgicalEvent $existingLiturgicalEvent
     ): void {
-        $this->Cal->setProperty($key, 'grade', $liturgicalEvent->grade);
-        $existingLiturgicalEvent->setReadings(AmbrosianReadings::forGrade($liturgicalEvent->grade));
+        if (null === $this->DiocesanData) {
+            // Defensive only: the sole caller (applyAmbrosianDiocesanSetProperty()) is only ever
+            // reached when $this->DiocesanData is non-null.
+            return;
+        }
+
+        if ($this->Cal->setProperty($key, 'grade', $liturgicalEvent->grade)) {
+            $existingLiturgicalEvent->setReadings(AmbrosianReadings::forGrade($liturgicalEvent->grade));
+        } else {
+            /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
+            $this->Messages[] = sprintf(
+                _('The diocesan calendar of %1$s declared a `setProperty:grade` override for the liturgical event `%2$s` for the year %3$d, but the grade was already set to that value. The override had no effect.'),
+                $this->DiocesanData->metadata->diocese_name,
+                $key,
+                $this->CalendarParams->Year
+            );
+        }
+    }
+
+    /**
+     * Applies a `setProperty:common` row's Common change.
+     *
+     * `LiturgicalEventCollection::setProperty()` returns `false` when the requested Common is
+     * already the event's current Common; that is surfaced as a message rather than silently
+     * doing nothing, matching {@see self::applySetPropertyGrade()} and the absent-key branch in
+     * {@see self::applyAmbrosianDiocesanSetProperty()}.
+     */
+    private function applySetPropertyCommon(string $key, DiocesanLitCalItemSetPropertyCommon $liturgicalEvent): void
+    {
+        if (null === $this->DiocesanData) {
+            // Defensive only: the sole caller (applyAmbrosianDiocesanSetProperty()) is only ever
+            // reached when $this->DiocesanData is non-null.
+            return;
+        }
+
+        if (false === $this->Cal->setProperty($key, 'common', $liturgicalEvent->common)) {
+            /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
+            $this->Messages[] = sprintf(
+                _('The diocesan calendar of %1$s declared a `setProperty:common` override for the liturgical event `%2$s` for the year %3$d, but the Common was already set to that value. The override had no effect.'),
+                $this->DiocesanData->metadata->diocese_name,
+                $key,
+                $this->CalendarParams->Year
+            );
+        }
+    }
+
+    /**
+     * Applies a `setProperty:name` row's name change.
+     *
+     * `LiturgicalEventCollection::setProperty()` returns `false` when the requested name is
+     * already the event's current name; that is surfaced as a message rather than silently
+     * doing nothing, matching {@see self::applySetPropertyGrade()} and the absent-key branch in
+     * {@see self::applyAmbrosianDiocesanSetProperty()}.
+     */
+    private function applySetPropertyName(string $key, DiocesanLitCalItemSetPropertyName $liturgicalEvent): void
+    {
+        if (null === $this->DiocesanData) {
+            // Defensive only: the sole caller (applyAmbrosianDiocesanSetProperty()) is only ever
+            // reached when $this->DiocesanData is non-null.
+            return;
+        }
+
+        if (false === $this->Cal->setProperty($key, 'name', $liturgicalEvent->name)) {
+            /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
+            $this->Messages[] = sprintf(
+                _('The diocesan calendar of %1$s declared a `setProperty:name` override for the liturgical event `%2$s` for the year %3$d, but the name was already set to that value. The override had no effect.'),
+                $this->DiocesanData->metadata->diocese_name,
+                $key,
+                $this->CalendarParams->Year
+            );
+        }
     }
 
     /**
