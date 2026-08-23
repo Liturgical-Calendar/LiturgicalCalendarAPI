@@ -1,6 +1,8 @@
 <?php
 
-namespace LiturgicalCalendar\Api\Tests\Handlers;
+declare(strict_types=1);
+
+namespace LiturgicalCalendar\Tests\Handlers;
 
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitLocale;
