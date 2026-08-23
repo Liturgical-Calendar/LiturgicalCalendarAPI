@@ -370,7 +370,7 @@ final class CalendarHandlerAmbrosianDiocesanTest extends AbstractHandlerTestCase
         // No Accept-Language header on this request resolves to Latin (Negotiator's default), so
         // the diocesan name comes from lugano_ch/i18n/la_VA.json, not it_IT.json (compare
         // testLuganoOverrideDowngradesStFrancisGradeToMemorial, which asserts the it_IT rename).
-        self::assertSame('Sanctus Franciscus Assisiensis', $byKey['StFrancisOfAssisi']['name']);
+        self::assertSame('Sancti Francisci Assisiensis', $byKey['StFrancisOfAssisi']['name']);
 
         self::assertArrayHasKey(
             'AllSaints',
