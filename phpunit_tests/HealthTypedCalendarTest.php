@@ -113,8 +113,18 @@ final class HealthTypedCalendarTest extends TestCase
                 ['kind' => 'rite', 'id' => 'ambrosian', 'rite' => 'ambrosian'],
                 '/ambrosian/2026?year_type=CIVIL'
             ],
-            // `general` names the one General Roman Calendar, so it is the only kind that needs no
-            // id: there is nothing to choose between.
+            // The shape UnitTestInterface actually sends for a rite-level calendar: `toCalendarIdentity()`
+            // maps the calendar select's empty option to `{kind: 'rite', rite}` and composes no id,
+            // because for this kind there is nothing to compose one from — the rite *is* the identity,
+            // and `calendarIdentity` in WebSocketMessage.json requires only `kind` and `rite`. This
+            // row is here because requiring an id for `rite` refused every General Roman Calendar run
+            // the client could start, while every existing row happened to carry one.
+            'rite level, no id'  => [
+                ['kind' => 'rite', 'rite' => 'roman'],
+                '/roman/2026?year_type=CIVIL'
+            ],
+            // `general` names the one General Roman Calendar, so it too needs no id: there is
+            // nothing to choose between.
             'general'            => [
                 ['kind' => 'general', 'rite' => 'roman'],
                 '/roman/2026?year_type=CIVIL'
