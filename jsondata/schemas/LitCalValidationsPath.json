@@ -21,7 +21,8 @@
                     "region",
                     "label",
                     "schema",
-                    "steps"
+                    "steps",
+                    "expected_locales"
                 ],
                 "properties": {
                     "id": {
@@ -72,6 +73,17 @@
                                 "validates"
                             ]
                         }
+                    },
+                    "expected_locales": {
+                        "type": [
+                            "array",
+                            "null"
+                        ],
+                        "items": {
+                            "type": "string",
+                            "minLength": 1
+                        },
+                        "description": "The locales this item's folder is expected to hold a `{locale}.json` for. Non-null exactly when `steps` contains `covers`. Null for file items, and for a folder whose owner's declared locales are scanned from that very folder -- a wider region's and a missal's `i18n` -- where the comparison would be a tautology. A national or diocesan `i18n` folder is not null: those calendars declare `locales` in their own source file, so the expectation has an authority independent of what the folder happens to contain. The comparison is a subset test by locale identity, never by count: a declared locale with no file fails the `covers` step, while a file for a locale the owner does not declare does not fail it and is named in the frame text instead."
                     }
                 }
             }
