@@ -455,6 +455,65 @@
                 "outside_easter_season"
             ]
         },
+        "ReadingsWithVigil": {
+            "type": "object",
+            "title": "Readings with a Vigil Mass",
+            "description": "SOURCE-DATA shape for an event whose vigil Mass has proper readings of its own. Output never uses this shape: there a vigil Mass is a liturgical event in its own right, with its own event_key and its own flat readings, which is why it is absent from Readings and present here.",
+            "additionalProperties": false,
+            "properties": {
+                "vigil": {
+                    "$ref": "#/definitions/Readings"
+                },
+                "day": {
+                    "$ref": "#/definitions/Readings"
+                }
+            },
+            "required": [
+                "vigil",
+                "day"
+            ]
+        },
+        "ReadingsChristmasWithVigil": {
+            "type": "object",
+            "title": "Christmas Readings with a Vigil Mass",
+            "description": "SOURCE-DATA shape for Christmas, whose vigil, night, dawn and day Masses each have proper readings. See ReadingsWithVigil for why the vigil is nested here and not in output.",
+            "additionalProperties": false,
+            "properties": {
+                "vigil": {
+                    "$ref": "#/definitions/Readings"
+                },
+                "night": {
+                    "$ref": "#/definitions/Readings"
+                },
+                "dawn": {
+                    "$ref": "#/definitions/Readings"
+                },
+                "day": {
+                    "$ref": "#/definitions/Readings"
+                }
+            },
+            "required": [
+                "vigil",
+                "night",
+                "dawn",
+                "day"
+            ]
+        },
+        "SourceReadings": {
+            "title": "Lectionary Readings (source data)",
+            "description": "The readings for one liturgical event as stored in source data: everything Readings admits, plus the two vigil-bearing shapes only source data uses. Readings itself describes OUTPUT and must not be widened to admit these — doing so would let LitCal.json validate a shape the API cannot emit.",
+            "oneOf": [
+                {
+                    "$ref": "#/definitions/Readings"
+                },
+                {
+                    "$ref": "#/definitions/ReadingsWithVigil"
+                },
+                {
+                    "$ref": "#/definitions/ReadingsChristmasWithVigil"
+                }
+            ]
+        },
         "Day": {
             "type": "integer",
             "title": "Day",

@@ -16,6 +16,7 @@ enum LitSchema: string
     case DECREES_SRC       = '/LitCalDecreesSource.json';
     case DECREE_WRITE      = '/LitCalDecreeWritePayload.json';
     case I18N              = '/LitCalTranslation.json';
+    case LECTIONARY        = '/Lectionary.json';
     case METADATA          = '/LitCalMetadata.json';
     case LITCAL            = '/LitCal.json';
     case EVENTS            = '/LitCalEventsPath.json';
@@ -59,6 +60,7 @@ enum LitSchema: string
             LitSchema::DECREES_SRC       => $ERRMSG . 'Memorials from Decrees Source data not created / updated',
             LitSchema::DECREE_WRITE      => $ERRMSG . 'Decree write payload not valid',
             LitSchema::I18N              => $ERRMSG . 'Translation data not created / updated',
+            LitSchema::LECTIONARY        => $ERRMSG . 'Lectionary data not created / updated',
             LitSchema::METADATA => $ERRMSG . 'LitCalMetadata not valid',
             LitSchema::LITCAL   => $ERRMSG . 'LitCal not valid',
             LitSchema::EVENTS   => $ERRMSG . 'Events path data not valid',
@@ -92,7 +94,8 @@ enum LitSchema: string
             LitSchema::PROPRIUMDETEMPORE,
             LitSchema::DECREES_SRC,
             LitSchema::I18N,
-            LitSchema::TEST_SRC          => SchemaRole::SOURCE,
+            LitSchema::TEST_SRC,
+            LitSchema::LECTIONARY        => SchemaRole::SOURCE,
             LitSchema::LITCAL,
             LitSchema::METADATA,
             LitSchema::EVENTS,
@@ -121,6 +124,7 @@ enum LitSchema: string
             LitSchema::DECREES_SRC->path()       => LitSchema::DECREES_SRC,
             LitSchema::DECREE_WRITE->path()      => LitSchema::DECREE_WRITE,
             LitSchema::I18N->path()              => LitSchema::I18N,
+            LitSchema::LECTIONARY->path()        => LitSchema::LECTIONARY,
             LitSchema::METADATA->path()          => LitSchema::METADATA,
             LitSchema::LITCAL->path()            => LitSchema::LITCAL,
             LitSchema::EVENTS->path()            => LitSchema::EVENTS,
