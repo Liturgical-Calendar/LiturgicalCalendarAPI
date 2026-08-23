@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Models\Calendar;
 
 use LiturgicalCalendar\Api\DateTime;
+use LiturgicalCalendar\Api\Enum\LitCommon;
 use LiturgicalCalendar\Api\Enum\LitGrade;
+use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
 use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
+use LiturgicalCalendar\Api\Models\Lectionary\ReadingsCommons;
 use LiturgicalCalendar\Api\Params\CalendarParams;
 use LiturgicalCalendar\Api\Router;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -49,7 +52,10 @@ final class LiturgicalEventCollectionSetPropertyCommonTest extends TestCase
         $event         = new LiturgicalEvent('Test Event', new DateTime('2025-06-19'));
         $event->grade  = LitGrade::FEAST;
         $event->common = LitCommons::create(['Martyrs:For Several Martyrs']);
+        $event->setReadings(new ReadingsCommons(LitCommons::create([LitCommon::NONE])));
         $cal->addLiturgicalEvent('TestEvent', $event);
+
+        $commonLclBefore = $cal->getLiturgicalEvent('TestEvent')->jsonSerialize()['common_lcl'];
 
         $newCommon = LitCommons::create(['Proper']);
         self::assertNotNull($newCommon);
@@ -58,7 +64,45 @@ final class LiturgicalEventCollectionSetPropertyCommonTest extends TestCase
             $cal->setProperty('TestEvent', 'common', $newCommon),
             'setProperty() must accept a LitCommons value for the union-typed `common` property.'
         );
-        self::assertSame($newCommon, $cal->getLiturgicalEvent('TestEvent')->common);
+
+        $updatedEvent = $cal->getLiturgicalEvent('TestEvent');
+        self::assertSame($newCommon, $updatedEvent->common);
+        self::assertNotSame(
+            $commonLclBefore,
+            $updatedEvent->jsonSerialize()['common_lcl'],
+            'common_lcl must be re-derived after a `common` setProperty write, not left stale.'
+        );
+    }
+
+    public function testSetPropertyAcceptsAnArrayOfLitMassVariousNeedsAndReplacesTheCommon(): void
+    {
+        $cal = $this->makeCollection();
+
+        $event         = new LiturgicalEvent('Test Event', new DateTime('2025-06-19'));
+        $event->grade  = LitGrade::FEAST;
+        $event->common = LitCommons::create(['Martyrs:For Several Martyrs']);
+        $event->setReadings(new ReadingsCommons(LitCommons::create([LitCommon::NONE])));
+        $cal->addLiturgicalEvent('TestEvent', $event);
+
+        $commonLclBefore = $cal->getLiturgicalEvent('TestEvent')->jsonSerialize()['common_lcl'];
+
+        /** @var array<int, LitMassVariousNeeds> $newCommon */
+        $newCommon = [LitMassVariousNeeds::PRO_ECCLESIA, LitMassVariousNeeds::PRO_PAPA];
+
+        self::assertTrue(
+            $cal->setProperty('TestEvent', 'common', $newCommon),
+            'setProperty() must accept an array of LitMassVariousNeeds for the union-typed `common` property.'
+        );
+
+        $updatedEvent = $cal->getLiturgicalEvent('TestEvent');
+        self::assertSame($newCommon, $updatedEvent->common);
+        $commonLclAfter = $updatedEvent->jsonSerialize()['common_lcl'];
+        self::assertNotSame(
+            $commonLclBefore,
+            $commonLclAfter,
+            'common_lcl must be re-derived after a `common` setProperty write with an array value, not left stale.'
+        );
+        self::assertStringContainsString(';', $commonLclAfter, 'common_lcl for multiple LitMassVariousNeeds must join them with the "or" glue.');
     }
 
     public function testSetPropertyReturnsFalseForAnAbsentKey(): void

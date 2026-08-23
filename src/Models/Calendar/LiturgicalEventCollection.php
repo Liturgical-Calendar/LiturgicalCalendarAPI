@@ -6,6 +6,7 @@ use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitCommon;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
 use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Params\CalendarParams;
 use LiturgicalCalendar\Api\Map\LiturgicalEventsMap;
@@ -813,11 +814,55 @@ final class LiturgicalEventCollection
     }
 
     /**
+     * Re-derives `common_lcl` after the `common` property of a liturgical event has been overwritten.
+     *
+     * `LiturgicalEvent::$common_lcl` is populated once in the constructor and is not kept in sync
+     * automatically when `$common` is later reassigned by reflection in {@see self::setProperty()}.
+     * This mirrors the branching the constructor uses to derive `common_lcl` from `$common`
+     * (`LitCommons::fullTranslate()` vs. the `LitMassVariousNeeds`/`LitMassVariousNeeds[]` cases),
+     * so that `common_lcl` never disagrees with the `common` it is supposed to describe.
+     *
+     * @param string $key The key associated with the liturgical event.
+     * @param LitCommons|array<int, LitMassVariousNeeds> $newValue The new value of the `common` property.
+     * @return void
+     */
+    private function handleCommonProperty(string $key, LitCommons|array $newValue): void
+    {
+        $litEvent = $this->liturgicalEvents->getEvent($key);
+        if (null === $litEvent) {
+            throw new \InvalidArgumentException('Invalid key: ' . $key . ' for LiturgicalEvents, valid keys are: ' . implode(', ', $this->liturgicalEvents->getKeys()));
+        }
+
+        $locale = $this->CalendarParams->Locale;
+
+        if ($newValue instanceof LitCommons) {
+            $commonLcl = $newValue->fullTranslate($locale);
+        } elseif (count($newValue) > 0 && $newValue[0] instanceof LitMassVariousNeeds) {
+            /** @var LitMassVariousNeeds[] $newValue */
+            $commonsLcl = array_map(
+                function (LitMassVariousNeeds $item) use ($locale): string {
+                    return $item->fullTranslate(LitLocale::isLatin($locale));
+                },
+                $newValue
+            );
+
+            /**translators: when there are multiple possible commons, this will be the glue "[; or] From the Common of..." */
+            $or        = LitLocale::isLatin($locale) ? 'vel' : _('or');
+            $commonLcl = implode('; ' . $or . ' ', $commonsLcl);
+        } else {
+            $commonLcl = '???';
+        }
+
+        $litEvent->setCommonLocalization($commonLcl);
+    }
+
+    /**
      * Sets a property of a liturgical event in the collection if it exists and matches the expected type.
      *
      * Uses reflection to ensure the property exists on the LiturgicalEvent object and checks the type
      * of the value against the expected type of the property. If the property is "grade",
-     * it calls handleGradeProperty to update the liturgical event's categorization.
+     * it calls handleGradeProperty to update the liturgical event's categorization. If the property
+     * is "common", it calls handleCommonProperty to re-derive the localized `common_lcl`.
      *
      * @param string $key The key of the liturgical event to modify.
      * @param string $property The property name to be set.
@@ -870,6 +915,11 @@ final class LiturgicalEventCollection
                      * @var LitGrade $oldValue
                      */
                     $this->handleGradeProperty($key, $newValue, $oldValue);
+                } elseif ($property === 'common') {
+                    /**
+                     * @var LitCommons|array<int, LitMassVariousNeeds> $newValue
+                     */
+                    $this->handleCommonProperty($key, $newValue);
                 }
                 return true;
             } else {
