@@ -2,6 +2,8 @@
 
 namespace LiturgicalCalendar\Api\Models\Lectionary;
 
+use LiturgicalCalendar\Api\Enum\LitGrade;
+
 /**
  * Factory for the Ambrosian empty-readings placeholder (Plan 7 / Task 2).
  *
@@ -55,5 +57,23 @@ final class AmbrosianReadings
             'gospel_acclamation' => '',
             'gospel'             => '',
         ]);
+    }
+
+    /**
+     * Selects the empty-readings placeholder that matches a liturgical grade.
+     *
+     * Festive (5-field) celebrations from FEAST upward carry a second reading; anything below
+     * FEAST uses the ferial (4-field) shape. This keeps the Ambrosian diocesan overlay from
+     * stamping a festive shape onto a memorial, which is what the blanket `emptyFestive()` call
+     * it replaces used to do.
+     *
+     * @param LitGrade $grade The liturgical grade of the event being stamped.
+     * @return ReadingsFerial|ReadingsFestive The placeholder matching the grade.
+     */
+    public static function forGrade(LitGrade $grade): ReadingsFerial|ReadingsFestive
+    {
+        return $grade->value >= LitGrade::FEAST->value
+            ? self::emptyFestive()
+            : self::empty();
     }
 }
