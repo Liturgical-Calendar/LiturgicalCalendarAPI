@@ -2513,9 +2513,15 @@ class Health implements MessageComponentInterface
                 // to the default for this category.
                 return Rite::default();
             case 'rite':
+                if (null === $id) {
+                    // The identity carried no id, which is legal for this kind: `calendar.rite`
+                    // alone names the calendar. There is therefore no second source of truth to
+                    // contradict the assertion with, which is exactly what null means here.
+                    return null;
+                }
                 // For a rite-level calendar the id *is* the rite, so an id that names no rite is
                 // not a rite disagreement — it is an identity that describes nothing.
-                $rite = Rite::tryFrom((string) $id);
+                $rite = Rite::tryFrom($id);
                 if (null === $rite) {
                     throw new \InvalidArgumentException("Unknown rite calendar: {$id}");
                 }
@@ -2579,9 +2585,14 @@ class Health implements MessageComponentInterface
         if (null !== $id && false === is_string($id)) {
             throw new \InvalidArgumentException('calendar.id must be a string.');
         }
-        // `general` is the only kind that needs no id: there is exactly one General Roman Calendar,
-        // so there is nothing to choose between. Every other kind names one of many.
-        if (null === $id && 'general' !== $kind) {
+        // `national` and `diocesan` are the only kinds that need an id: each names one of many.
+        // `general` names the single General Roman Calendar, and `rite` is already fully identified
+        // by `calendar.rite` — the rite *is* the identity, which is why the return below passes the
+        // rite as the calendar id rather than reading `$id` at all. Requiring an id for `rite`
+        // contradicted both that and the published schema, whose `calendarIdentity` requires only
+        // `kind` and `rite`; it refused every rite-level calendar the client could send
+        // (UnitTestInterface, General Roman Calendar run).
+        if (null === $id && in_array($kind, ['national', 'diocesan'], true)) {
             throw new \InvalidArgumentException("calendar.id is required for kind {$kind}.");
         }
 
