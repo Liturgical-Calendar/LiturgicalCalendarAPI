@@ -39,14 +39,25 @@ keys and are unaffected.
 | Bergamo | `StsProtaseGervase` | grade 4, `["Martyrs:For Several Martyrs"]` | grade 3, `["Proper"]` |
 | Novara  | `StsProtaseGervase` | grade 4, `["Martyrs:For Several Martyrs"]` | grade 3, `["Proper"]` |
 
-Each override changes **three** properties, not just grade:
+An override row changes whichever properties it needs — one property per row. These four are not
+uniform:
 
-- **grade** — 4 → 3 in every case.
-- **common** — a specific Common → `["Proper"]` in every case.
-- **name** — from the diocesan i18n tree. `StFrancisOfAssisi` is
-  *"S. Francesco d'Assisi, patrono d'Italia"* in the comune but *"S. Francesco d'Assisi"* in Lugano
-  (Switzerland — the patron-of-Italy epithet is deliberately dropped); the Latin names differ for
-  `StsProtaseGervase` too.
+| Row                         | grade | common | name                                                                                     |
+| --------------------------- | ----- | ------ | ---------------------------------------------------------------------------------------- |
+| Lugano `StFrancisOfAssisi`  | 4 → 3 | ✓      | ✓ — comune *"S. Francesco d'Assisi, patrono d'Italia"*, Lugano *"S. Francesco d'Assisi"* |
+| Lugano `StsProtaseGervase`  | 4 → 3 | ✓      | ✗ — Italian identical                                                                    |
+| Bergamo `StsProtaseGervase` | 4 → 3 | ✓      | ✗ — Italian identical                                                                    |
+| Novara `StsProtaseGervase`  | 4 → 3 | ✓      | ✗ — Italian identical                                                                    |
+
+Only Lugano's `StFrancisOfAssisi` is a genuine name override: Lugano is Swiss, so the
+patron-of-Italy epithet is deliberately dropped. The three `StsProtaseGervase` rows carry an
+identical Italian name; their Latin differs from the comune only in grammatical **case**
+(*Sancti Protasius et Gervasius, martyres* — nominative — against the comune's genitive
+*Sanctorum Protasii et Gervasii, martyrum*), which is the diocesan tree's house style rather than
+an override. See §9.
+
+So the data needs **9 rows**, not 12: grade + common for each of the four overrides, plus a single
+name row for `StFrancisOfAssisi`.
 
 **colour** is identical in all four cases (red/red, white/white), so no colour override is needed.
 
@@ -63,9 +74,17 @@ Each override changes **three** properties, not just grade:
 
 Mirroring the existing national vocabulary (`LitCalItemSetPropertyGrade` /
 `LitCalItemSetPropertyName`) keeps one concept in the codebase instead of two, and leaves room to
-grow the vocabulary later. It costs verbosity: each override becomes 3 rows, so the 4 overrides
-become 12. `form_rownum` is a Frontend admin-form artifact and is not read anywhere in `src/`, so
-multiple rows per Missal line is mechanically fine.
+grow the vocabulary later. It costs verbosity: the four overrides become 9 rows.
+`form_rownum` is a Frontend admin-form artifact and is not read anywhere in `src/`, so multiple rows
+per Missal line is mechanically fine.
+
+National also has two *combined* convenience actions, but neither fits this case:
+
+- `makePatron` sets **grade + name** in one row — no `common`.
+- `makeDoctor` (decree-only) sets **name** alone, computing "…and Doctor of the Church".
+
+A grade + common combiner would have to be invented. At 9 rows that is not worth a new action; if
+the Ambrosian diocesan corpus grows a lot more overrides, revisit it.
 
 ### Why `common` joins the vocabulary
 
@@ -210,7 +229,7 @@ It is internal — not reachable from any HTTP route — so removal is not a pub
 ### 8. Re-author the data
 
 The 4 override rows in `Lugano.json`, `Diocesi di Bergamo.json` and `Diocesi di Novara.json` become
-12 setProperty rows. Example:
+**9** setProperty rows — grade + common each, plus one name row for `StFrancisOfAssisi`:
 
 ```json
 {
@@ -220,14 +239,47 @@ The 4 override rows in `Lugano.json`, `Diocesi di Bergamo.json` and `Diocesi di 
 {
   "liturgical_event": { "event_key": "StsProtaseGervase", "common": ["Proper"] },
   "metadata": { "action": "setProperty", "property": "common", "since_year": 2024, "form_rownum": 2 }
-},
-{
-  "liturgical_event": { "event_key": "StsProtaseGervase" },
-  "metadata": { "action": "setProperty", "property": "name", "since_year": 2024, "form_rownum": 3 }
 }
 ```
 
-`form_rownum` is renumbered sequentially within each file. The i18n files are unchanged.
+`form_rownum` is renumbered sequentially within each file.
+
+### 9. Normalize the diocesan Latin names to the genitive
+
+The Ambrosian **comune** sanctorale renders every Latin entry in the **genitive**, the Missal's
+calendar convention:
+
+```text
+Sancti Raimundi de Penyafort, presbyteri
+Sanctorum Basilii Magni et Gregorii Nazianzeni, episcoporum et Ecclesiae doctorum
+```
+
+Every one of the **40** entries in the Ambrosian **diocesan** `la_VA` i18n files is instead
+**nominative**:
+
+```text
+Sanctus Petrus de Verona, presbyter et martyr
+Beatus Manfredus Settala, presbyter
+Sanctus Ioannes XXIII, papa
+```
+
+This divergence is pre-existing and already visible: all 40 diocesan events render nominative in a
+Latin calendar whose comune events are genitive. #740 neither causes nor worsens it, but the
+override work makes it conspicuous — with no name row, `StsProtaseGervase` picks up the comune's
+genitive form, so the tree's two conventions would meet inside the same calendar.
+
+Convert all 40 entries across the four `la_VA` files to the genitive. Italian surnames stay
+indeclinable, as is standard in Latin liturgical texts:
+
+```text
+Beatus Manfredus Settala, presbyter   ->  Beati Manfredi Settala, presbyteri
+Sanctus Ioannes XXIII, papa           ->  Sancti Ioannis XXIII, papae
+Sanctus Arialdus, diaconus et martyr  ->  Sancti Arialdi, diaconi et martyris
+```
+
+This is a data change independent of the refactor: it lands as its **own commit**, with the full
+40-entry conversion table presented for review before it is applied. It changes Latin `/calendar`
+and `/events` output for all 40 diocesan events. Italian output is untouched.
 
 ## Rite scoping
 
@@ -241,15 +293,15 @@ byte-identical.
 
 ## Testing
 
-| Test                                                      | Covers                                                                                                                                          |
-| --------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `LiturgicalEventCollectionSetPropertyCommonTest` (new)    | §1 — `common` can be set as both `LitCommons` and `array`; the widened parameter type accepts them                                              |
-| `CalendarHandlerAmbrosianDiocesanSetPropertyTest` (new)   | §4 — grade/common/name applied in place; key not duplicated; overridden event absent from `suppressed_events`; absent-key no-op emits a message |
-| `AmbrosianReadingsForGradeTest` (new)                     | §5 — festive at ≥ FEAST, ferial below                                                                                                           |
-| `EventsHandlerRiteRoutingTest` (update)                   | §6 — no phantom prefixed duplicate; catalog key matches the resolved key                                                                        |
-| `CalendarHandlerAmbrosianDiocesanTest` (update)           | createNew path still correct; readings now grade-derived                                                                                        |
-| `SchemaValidationTest`                                    | §3 — all 4 Ambrosian diocesan source files validate against the new `oneOf`                                                                     |
-| `CalendarGoldenMasterTest`                                | 9/9 byte-identical — Roman untouched                                                                                                            |
+| Test                                                    | Covers                                                                                                                                          |
+| ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `LiturgicalEventCollectionSetPropertyCommonTest` (new)  | §1 — `common` can be set as both `LitCommons` and `array`; the widened parameter type accepts them                                              |
+| `CalendarHandlerAmbrosianDiocesanSetPropertyTest` (new) | §4 — grade/common/name applied in place; key not duplicated; overridden event absent from `suppressed_events`; absent-key no-op emits a message |
+| `AmbrosianReadingsForGradeTest` (new)                   | §5 — festive at ≥ FEAST, ferial below                                                                                                           |
+| `EventsHandlerRiteRoutingTest` (update)                 | §6 — no phantom prefixed duplicate; catalog key matches the resolved key                                                                        |
+| `CalendarHandlerAmbrosianDiocesanTest` (update)         | createNew path still correct; readings now grade-derived                                                                                        |
+| `SchemaValidationTest`                                  | §3 — all 4 Ambrosian diocesan source files validate against the new `oneOf`                                                                     |
+| `CalendarGoldenMasterTest`                              | 9/9 byte-identical — Roman untouched                                                                                                            |
 
 Full suite, PHPStan level 10, and phpcs must all be green.
 
@@ -257,15 +309,24 @@ None of these belong in the `slow` group.
 
 ## Acceptance criteria (from the issue)
 
-- [ ] Suffragan downgrades render at the diocesan grade, common and name in `/calendar`.
+- [ ] Suffragan downgrades render at the diocesan grade and common in `/calendar`, and at the
+      diocesan name for `StFrancisOfAssisi`.
 - [ ] `/events/ambrosian/diocese/{id}` lists no phantom prefixed duplicate for an overridden key.
 - [ ] No overridden comune event appears in `suppressed_events`.
 - [ ] Golden master 9/9 byte-identical; suite, PHPStan and phpcs green.
 
-**Deviation from the issue text:** the issue asks for Ambrosian `/calendar` output "exactly as
-today". Readings placeholders change for 37 diocesan rows (§5), by explicit decision.
+**Deviations from the issue text.** The issue asks for Ambrosian `/calendar` output "exactly as
+today". Three deliberate changes:
+
+1. Readings placeholders change for 37 diocesan rows (§5).
+2. `StsProtaseGervase` takes the comune's genitive Latin name instead of the diocesan nominative,
+   since no name row is authored (§8).
+3. All 40 diocesan Latin names move to the genitive (§9).
+
+Italian output changes only where a genuine override applies. Roman output is untouched.
 
 ## Follow-ups (not in scope)
 
 - Make the comune sanctorale readings placeholder grade-derived too.
 - Decide whether Roman diocesan calendars should gain a modify-in-place action.
+- Consider a combined grade + common action if the Ambrosian override corpus grows.
