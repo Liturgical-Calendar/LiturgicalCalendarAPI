@@ -1434,7 +1434,8 @@ class Health implements MessageComponentInterface
             // The id itself rides along on the frames, so a client attributes a result by the
             // value it asked with rather than by unpicking the selector the server built.
             target: self::frameTarget($item->id),
-            requestId: $requestId
+            requestId: $requestId,
+            expectedLocales: $item->expectedLocales
         );
     }
 
@@ -1740,6 +1741,10 @@ class Health implements MessageComponentInterface
      * @param ?string $requestId The correlation id of the request that caused this frame, captured by the handler when
      *        the request arrived and passed explicitly rather than read from any per-connection store; see
      *        {@see Health::onMessage()} for why that distinction is load-bearing.
+     * @param ?list<string> $expectedLocales For a folder check, the locales the folder is expected to hold a `{locale}.json` for — the
+     *        item's `expected_locales`. Non-null is what makes the {@see Step::COVERS} step reportable, and an item advertises that step
+     *        exactly when it carries this, so the frames a client receives match the `steps` it sized its rendering from. Null for a file
+     *        check, and for a folder whose owner's declared locales are scanned from that very folder, where the comparison is a tautology.
      */
     private function runValidationSteps(
         string $dataPath,
@@ -1753,7 +1758,8 @@ class Health implements MessageComponentInterface
         ?string $sourceFolder = null,
         ?string $classFragment = null,
         ?\stdClass $target = null,
-        ?string $requestId = null
+        ?string $requestId = null,
+        ?array $expectedLocales = null
     ): void {
         $pathForSchema ??= $label;
         // Read before $dataPath is made absolute below, so the two stay distinguishable.
@@ -1775,7 +1781,13 @@ class Health implements MessageComponentInterface
                 // frames per check, so short-circuiting with a single frame under-delivers and the
                 // phase never completes — the same wedge, approached from the other side.
                 $missing = ["$dataPath does not exist or contains no json files"];
-                foreach ([Step::EXISTS, Step::PARSES, Step::VALIDATES] as $step) {
+                // An item that advertised four steps must deliver four frames on every arm, this one
+                // included: a client sizes its cards from `steps`, so a short arm leaves a card no frame
+                // ever paints and the phase waits out the silence watchdog for it.
+                $steps = null === $expectedLocales
+                    ? [Step::EXISTS, Step::PARSES, Step::VALIDATES]
+                    : [Step::EXISTS, Step::PARSES, Step::VALIDATES, Step::COVERS];
+                foreach ($steps as $step) {
                     $this->sendFolderStepResult(
                         $to,
                         $classFragment,
@@ -1794,6 +1806,15 @@ class Health implements MessageComponentInterface
                 $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
                 return;
             }
+
+            // Coverage is a statement about the folder as a whole, computed from the glob the per-file
+            // steps already read — no second trip to the filesystem. A locale the owner declares with no
+            // file fails; a file for a locale the owner does not declare does not fail, but is named:
+            // holding data you do not declare is worth seeing, and is how a stale `locales` declaration
+            // surfaces rather than staying invisible.
+            $presentLocales = array_map(static fn (string $f): string => basename($f, '.json'), $files);
+            $missingLocales = null === $expectedLocales ? [] : array_values(array_diff($expectedLocales, $presentLocales));
+            $extraLocales   = null === $expectedLocales ? [] : array_values(array_diff($presentLocales, $expectedLocales));
 
             // A folder check reports on the folder, not on each file in it: exactly one frame per
             // step, whatever the outcome. Failures are therefore collected here and summarised
@@ -1858,7 +1879,7 @@ class Health implements MessageComponentInterface
             $allPromises = Promise\all($promises);
 
             $allPromises->then(
-                function () use ($to, $classFragment, $target, $sourceFolder, $schema, &$fileExistsErrors, &$jsonErrors, &$schemaErrors, $runToken, $requestId) {
+                function () use ($to, $classFragment, $target, $sourceFolder, $schema, &$fileExistsErrors, &$jsonErrors, &$schemaErrors, $runToken, $requestId, $expectedLocales, $missingLocales, $extraLocales) {
                     // Exactly one frame per step, pass or fail. A folder check is a statement
                     // about the folder, so a failure names the offending files inside a single
                     // frame instead of emitting one frame each.
@@ -1900,6 +1921,26 @@ class Health implements MessageComponentInterface
                         $runToken,
                         requestId: $requestId
                     );
+
+                    if (null !== $expectedLocales) {
+                        $expectedCount = count($expectedLocales);
+                        $extraNote     = [] === $extraLocales
+                            ? ''
+                            : ' (also present, though not declared: ' . implode(', ', $extraLocales) . ')';
+                        $missingFiles  = array_map(static fn (string $l): string => "{$l}.json", $missingLocales);
+
+                        $this->sendFolderStepResult(
+                            $to,
+                            $classFragment,
+                            $target,
+                            Step::COVERS,
+                            [] === $missingFiles ? [] : ['missing locale files: ' . implode(', ', $missingFiles)],
+                            "Data folder $sourceFolder holds a file for all $expectedCount declared locales$extraNote",
+                            'Data folder ' . $sourceFolder . ' is missing files for ' . count($missingLocales) . " of $expectedCount declared locales",
+                            $runToken,
+                            requestId: $requestId
+                        );
+                    }
 
                     $this->sendComplete($to, target: $target, runToken: $runToken, requestId: $requestId);
                 },
