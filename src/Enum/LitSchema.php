@@ -74,6 +74,41 @@ enum LitSchema: string
         };
     }
 
+    /**
+     * What this schema is for — see {@see SchemaRole}.
+     *
+     * Exhaustive on purpose, with no default arm: a new schema must state its role or fail static
+     * analysis. The alternative is the silent misclassification this enum exists to stop, which costs
+     * either a source file validated against the shape of an API response, or an output schema loosened
+     * to admit a source-only shape.
+     */
+    public function role(): SchemaRole
+    {
+        return match ($this) {
+            LitSchema::DIOCESAN,
+            LitSchema::NATIONAL,
+            LitSchema::WIDERREGION,
+            LitSchema::PROPRIUMDESANCTIS,
+            LitSchema::PROPRIUMDETEMPORE,
+            LitSchema::DECREES_SRC,
+            LitSchema::I18N,
+            LitSchema::TEST_SRC          => SchemaRole::SOURCE,
+            LitSchema::LITCAL,
+            LitSchema::METADATA,
+            LitSchema::EVENTS,
+            LitSchema::TESTS,
+            LitSchema::MISSALS,
+            LitSchema::EASTER,
+            LitSchema::DATA,
+            LitSchema::SCHEMAS,
+            LitSchema::VALIDATIONS,
+            LitSchema::DECREES           => SchemaRole::OUTPUT,
+            LitSchema::DECREE_WRITE      => SchemaRole::PAYLOAD,
+            LitSchema::WEBSOCKET_MESSAGE,
+            LitSchema::WEBSOCKET_FRAME   => SchemaRole::PROTOCOL
+        };
+    }
+
     public static function fromURL(string $url): LitSchema
     {
         return match ($url) {
