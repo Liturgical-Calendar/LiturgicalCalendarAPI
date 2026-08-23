@@ -1,6 +1,8 @@
 <?php
 
-namespace LiturgicalCalendar\Api\Tests\Models\Lectionary;
+declare(strict_types=1);
+
+namespace LiturgicalCalendar\Tests\Models\Lectionary;
 
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Models\Lectionary\AmbrosianReadings;

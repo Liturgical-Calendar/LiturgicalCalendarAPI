@@ -1,6 +1,8 @@
 <?php
 
-namespace LiturgicalCalendar\Api\Tests\Models\RegionalData;
+declare(strict_types=1);
+
+namespace LiturgicalCalendar\Tests\Models\RegionalData;
 
 use LiturgicalCalendar\Api\Enum\CalEventAction;
 use LiturgicalCalendar\Api\Enum\LitGrade;
