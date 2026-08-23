@@ -202,9 +202,14 @@ attributes it to "this task's brief"), and an in-place modify has no natural mom
 Add `AmbrosianReadings::forGrade(LitGrade $grade)`: festive at `>= LitGrade::FEAST`, ferial below.
 Use it for **every** diocesan row, createNew and setProperty alike.
 
-Effect: 37 of the 40 diocesan rows move festive → ferial (Milan 29, Lugano 3, Bergamo 3, Novara 2);
-3 rows at grade ≥ FEAST are unchanged. The visible difference is a single empty `second_reading: ""`
-field disappearing. Both placeholders are all-empty-strings and both validate against
+Effect, counted against the re-authored data (§8): of the **36** remaining createNew rows, **33** at
+grade < FEAST move festive → ferial and 3 at grade ≥ FEAST are unchanged. The 4 setProperty rows
+change nothing here — they all downgrade to MEMORIAL, and the comune events they modify already
+carry the ferial placeholder from `addAmbrosianSanctoraleToCalendar()`.
+
+So **33 events change**, not 37; the earlier figure was counted before the override rows were
+reduced to setProperty. The visible difference is a single empty `second_reading: ""` field
+disappearing. Both placeholders are all-empty-strings and both validate against
 `CommonDef.json#/definitions/Readings`; no golden master covers Ambrosian.
 
 Comune sanctorale keeps its ferial-for-everything placeholder. Making *that* grade-derived would
@@ -318,7 +323,7 @@ None of these belong in the `slow` group.
 **Deviations from the issue text.** The issue asks for Ambrosian `/calendar` output "exactly as
 today". Three deliberate changes:
 
-1. Readings placeholders change for 37 diocesan rows (§5).
+1. Readings placeholders change for 33 diocesan events (§5).
 2. `StsProtaseGervase` takes the comune's genitive Latin name instead of the diocesan nominative,
    since no name row is authored (§8).
 3. All 40 diocesan Latin names move to the genitive (§9).
