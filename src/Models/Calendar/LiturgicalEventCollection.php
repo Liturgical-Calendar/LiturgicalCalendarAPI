@@ -6,6 +6,7 @@ use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitCommon;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
 use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Params\CalendarParams;
 use LiturgicalCalendar\Api\Map\LiturgicalEventsMap;
@@ -813,18 +814,62 @@ final class LiturgicalEventCollection
     }
 
     /**
+     * Re-derives `common_lcl` after the `common` property of a liturgical event has been overwritten.
+     *
+     * `LiturgicalEvent::$common_lcl` is populated once in the constructor and is not kept in sync
+     * automatically when `$common` is later reassigned by reflection in {@see self::setProperty()}.
+     * This mirrors the branching the constructor uses to derive `common_lcl` from `$common`
+     * (`LitCommons::fullTranslate()` vs. the `LitMassVariousNeeds`/`LitMassVariousNeeds[]` cases),
+     * so that `common_lcl` never disagrees with the `common` it is supposed to describe.
+     *
+     * @param string $key The key associated with the liturgical event.
+     * @param LitCommons|array<int, LitMassVariousNeeds> $newValue The new value of the `common` property.
+     * @return void
+     */
+    private function handleCommonProperty(string $key, LitCommons|array $newValue): void
+    {
+        $litEvent = $this->liturgicalEvents->getEvent($key);
+        if (null === $litEvent) {
+            throw new \InvalidArgumentException('Invalid key: ' . $key . ' for LiturgicalEvents, valid keys are: ' . implode(', ', $this->liturgicalEvents->getKeys()));
+        }
+
+        $locale = $this->CalendarParams->Locale;
+
+        if ($newValue instanceof LitCommons) {
+            $commonLcl = $newValue->fullTranslate($locale);
+        } elseif (count($newValue) > 0 && $newValue[0] instanceof LitMassVariousNeeds) {
+            /** @var LitMassVariousNeeds[] $newValue */
+            $commonsLcl = array_map(
+                function (LitMassVariousNeeds $item) use ($locale): string {
+                    return $item->fullTranslate(LitLocale::isLatin($locale));
+                },
+                $newValue
+            );
+
+            /**translators: when there are multiple possible commons, this will be the glue "[; or] From the Common of..." */
+            $or        = LitLocale::isLatin($locale) ? 'vel' : _('or');
+            $commonLcl = implode('; ' . $or . ' ', $commonsLcl);
+        } else {
+            $commonLcl = '???';
+        }
+
+        $litEvent->setCommonLocalization($commonLcl);
+    }
+
+    /**
      * Sets a property of a liturgical event in the collection if it exists and matches the expected type.
      *
      * Uses reflection to ensure the property exists on the LiturgicalEvent object and checks the type
      * of the value against the expected type of the property. If the property is "grade",
-     * it calls handleGradeProperty to update the liturgical event's categorization.
+     * it calls handleGradeProperty to update the liturgical event's categorization. If the property
+     * is "common", it calls handleCommonProperty to re-derive the localized `common_lcl`.
      *
      * @param string $key The key of the liturgical event to modify.
      * @param string $property The property name to be set.
-     * @param string|int|bool $newValue The new value for the property.
+     * @param string|int|bool|array<int, mixed>|LitGrade|LitCommons $newValue The new value for the property.
      * @return bool True if the property was successfully set, otherwise false.
      */
-    public function setProperty(string $key, string $property, string|int|bool|LitGrade $newValue): bool
+    public function setProperty(string $key, string $property, string|int|bool|array|LitGrade|LitCommons $newValue): bool
     {
         $reflect = new \ReflectionClass(new LiturgicalEvent('test', new DateTime('NOW')));
         if ($this->liturgicalEvents->hasKey($key)) {
@@ -842,10 +887,17 @@ final class LiturgicalEventCollection
                     $reflectPropertyType instanceof \ReflectionNamedType
                     && $reflectPropertyType->getName() === get_debug_type($newValue)
                 );
-                $unionTypeCondition = (
-                    $reflectPropertyType instanceof \ReflectionUnionType
-                    && in_array(get_debug_type($newValue), $reflectPropertyType->getTypes())
-                );
+                $unionTypeCondition = false;
+                if ($reflectPropertyType instanceof \ReflectionUnionType) {
+                    $memberTypeNames    = array_map(
+                        static fn (\ReflectionNamedType $memberType): string => $memberType->getName(),
+                        array_filter(
+                            $reflectPropertyType->getTypes(),
+                            static fn (\ReflectionType $memberType): bool => $memberType instanceof \ReflectionNamedType
+                        )
+                    );
+                    $unionTypeCondition = in_array(get_debug_type($newValue), $memberTypeNames, true);
+                }
 
                 if (
                     ( $namedTypeCondition || $unionTypeCondition )
@@ -863,6 +915,11 @@ final class LiturgicalEventCollection
                      * @var LitGrade $oldValue
                      */
                     $this->handleGradeProperty($key, $newValue, $oldValue);
+                } elseif ($property === 'common') {
+                    /**
+                     * @var LitCommons|array<int, LitMassVariousNeeds> $newValue
+                     */
+                    $this->handleCommonProperty($key, $newValue);
                 }
                 return true;
             } else {
@@ -899,49 +956,6 @@ final class LiturgicalEventCollection
             /** @var LiturgicalEvent $event */
             $event = $this->liturgicalEvents->getEvent($key);
             $this->suppressedEvents->addEvent($event);
-            $this->liturgicalEvents->removeEvent($key);
-        }
-    }
-
-    /**
-     * Removes a liturgical event from the collection and all grade sub-collections
-     * WITHOUT recording it as a suppressed event.
-     *
-     * Unlike {@see self::removeLiturgicalEvent()}, this does not add the removed event
-     * to the suppressedEvents map. Use it when an event is being *replaced* in place —
-     * e.g. a diocesan override of a comune event sharing the same key — where the removal
-     * is not a liturgical suppression and should not surface in the response's
-     * suppressed_events metadata.
-     *
-     * @param string $key The key of the liturgical event to remove.
-     */
-    public function removeLiturgicalEventWithoutSuppression(string $key): void
-    {
-        // Mirror every grade index addLiturgicalEvent() may have populated for this key:
-        // a Lord/BVM solemnity also lands in solemnitiesLordBVM, and a Feast of the Lord
-        // lands in feastsLord (never in the plain feasts map) — clearing only
-        // solemnities/feasts/memorials would leave a stale reference behind.
-        if ($this->solemnitiesLordBVM->hasKey($key)) {
-            $this->solemnitiesLordBVM->removeEvent($key);
-        }
-
-        if ($this->solemnities->hasKey($key)) {
-            $this->solemnities->removeEvent($key);
-        }
-
-        if ($this->feastsLord->hasKey($key)) {
-            $this->feastsLord->removeEvent($key);
-        }
-
-        if ($this->feasts->hasKey($key)) {
-            $this->feasts->removeEvent($key);
-        }
-
-        if ($this->memorials->hasKey($key)) {
-            $this->memorials->removeEvent($key);
-        }
-
-        if ($this->liturgicalEvents->hasKey($key)) {
             $this->liturgicalEvents->removeEvent($key);
         }
     }

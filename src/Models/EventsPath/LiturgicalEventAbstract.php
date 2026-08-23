@@ -134,6 +134,56 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
     }
 
     /**
+     * Changes the grade of this catalog entry, re-deriving the localized grade strings.
+     *
+     * `$grade_lcl` and `$grade_abbr` are computed in the constructor and are both serialized, so
+     * assigning `$grade` on its own would emit a numeric grade that disagrees with its own label.
+     *
+     * `$grade_display` is also grade-coupled in the constructor
+     * (`$this->grade_display = $this->grade === LitGrade::HIGHER_SOLEMNITY ? '' : $displayGrade;`)
+     * and takes precedence over `grade_lcl`/`grade_abbr` when serialized, so the same rule is
+     * mirrored here: a new HIGHER_SOLEMNITY grade clears it to `''`, otherwise any existing
+     * explicit override is left untouched (there is no new `$displayGrade` argument to apply here).
+     *
+     * @param LitGrade $grade The new grade.
+     */
+    public function applyGrade(LitGrade $grade): void
+    {
+        $this->grade      = $grade;
+        $this->grade_lcl  = $grade->i18n(self::$locale, false, false);
+        $this->grade_abbr = $grade->i18n(self::$locale, false, true);
+        // Deliberately one-directional, mirroring the constructor: moving TO HIGHER_SOLEMNITY
+        // clears grade_display, but moving AWAY from it leaves a previously-cleared '' in place
+        // rather than restoring some other display value there is no source for. Unreachable
+        // today (no caller currently moves an event away from HIGHER_SOLEMNITY), but kept
+        // asymmetric on purpose rather than "fixed" into a symmetry the data doesn't support.
+        if ($grade === LitGrade::HIGHER_SOLEMNITY) {
+            $this->grade_display = '';
+        }
+    }
+
+    /**
+     * Changes the Common of this catalog entry, re-deriving the localized Common string.
+     *
+     * @param LitCommons $common The new Common.
+     */
+    public function applyCommon(LitCommons $common): void
+    {
+        $this->common     = $common;
+        $this->common_lcl = $common->fullTranslate(self::$locale);
+    }
+
+    /**
+     * Changes the display name of this catalog entry. No derived field depends on the name.
+     *
+     * @param string $name The new name.
+     */
+    public function applyName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    /**
      * Sets the locale for this LiturgicalEvent class, affecting the translations of
      * common liturgical texts and the formatting of dates.
      *

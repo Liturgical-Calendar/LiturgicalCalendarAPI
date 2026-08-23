@@ -190,6 +190,17 @@ final class LiturgicalEvent implements \JsonSerializable
     }
 
     /**
+     * Sets the localized Common for this liturgical event.
+     *
+     * @param string $common_lcl The localized Common for the liturgical event.
+     * @return void
+     */
+    public function setCommonLocalization(string $common_lcl): void
+    {
+        $this->common_lcl = $common_lcl;
+    }
+
+    /**
      * Sets the readings for this liturgical event.
      *
      * @param ReadingsAbstract|ReadingsMultipleSchemas|ReadingsChristmas|ReadingsWithEvening|ReadingsFestiveWithVigil|ReadingsCommons $readings The readings for this liturgical event.
