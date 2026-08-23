@@ -10,8 +10,7 @@ use LiturgicalCalendar\Api\Enum\Ascension;
 use LiturgicalCalendar\Api\Enum\CorpusChristi;
 use LiturgicalCalendar\Api\Enum\Epiphany;
 use LiturgicalCalendar\Api\Enum\LitLocale;
-use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
-use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
+use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
 
 /**
  * Roman-rite temporale engine.
@@ -36,32 +35,6 @@ final class RomanTemporale implements TemporaleEngine
     }
 
     /**
-     * Creates a new LiturgicalEvent from the Proprium de Tempore, keyed by the
-     * given event key, and adds it to the calendar.
-     *
-     * @param ?string $key The key of the event in the Proprium de Tempore
-     * @param TemporaleContext $ctx The shared temporale context
-     * @return LiturgicalEvent The new LiturgicalEvent object
-     */
-    private function createPropriumDeTemporeLiturgicalEventByKey(?string $key, TemporaleContext $ctx): LiturgicalEvent
-    {
-        if (null === $key || false === $ctx->propriumDeTempore->offsetExists($key)) {
-            throw new ServiceUnavailableException("createPropriumDeTemporeLiturgicalEventByKey requires a key from the Proprium de Tempore, instead got $key");
-        }
-        $event = LiturgicalEvent::fromObject($ctx->propriumDeTempore[$key]);
-        $ctx->cal->addLiturgicalEvent($key, $event);
-        return $event;
-    }
-
-    /**
-     * Returns true when the given date falls on a Sunday.
-     */
-    private static function dateIsSunday(DateTime $dt): bool
-    {
-        return (int) $dt->format('N') === 7;
-    }
-
-    /**
      * Calculates the dates for Holy Thursday, Good Friday, Easter Vigil and Easter Sunday
      * and creates the corresponding LiturgicalEvents in the calendar
      *
@@ -73,14 +46,10 @@ final class RomanTemporale implements TemporaleEngine
      */
     private function calculateEasterTriduum(TemporaleContext $ctx): void
     {
-        $ctx->propriumDeTempore['HolyThurs']->setDate(Utilities::calcGregEaster($ctx->params->Year)->sub(new \DateInterval('P3D')));
-        $ctx->propriumDeTempore['GoodFri']->setDate(Utilities::calcGregEaster($ctx->params->Year)->sub(new \DateInterval('P2D')));
-        $ctx->propriumDeTempore['EasterVigil']->setDate(Utilities::calcGregEaster($ctx->params->Year)->sub(new \DateInterval('P1D')));
-        $ctx->propriumDeTempore['Easter']->setDate(Utilities::calcGregEaster($ctx->params->Year));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('HolyThurs', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('GoodFri', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('EasterVigil', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Easter', $ctx);
+        $ctx->createPropriumDeTemporeEvent('HolyThurs', Utilities::calcGregEaster($ctx->params->Year)->sub(new \DateInterval('P3D')));
+        $ctx->createPropriumDeTemporeEvent('GoodFri', Utilities::calcGregEaster($ctx->params->Year)->sub(new \DateInterval('P2D')));
+        $ctx->createPropriumDeTemporeEvent('EasterVigil', Utilities::calcGregEaster($ctx->params->Year)->sub(new \DateInterval('P1D')));
+        $ctx->createPropriumDeTemporeEvent('Easter', Utilities::calcGregEaster($ctx->params->Year));
     }
 
     /**
@@ -96,36 +65,31 @@ final class RomanTemporale implements TemporaleEngine
     private function calculateChristmasEpiphany(TemporaleContext $ctx): void
     {
         // Calculate Christmas
-        $ctx->propriumDeTempore['Christmas']->setDate(DateTime::fromFormat('25-12-' . $ctx->params->Year));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Christmas', $ctx);
+        $ctx->createPropriumDeTemporeEvent('Christmas', DateTime::fromFormat('25-12-' . $ctx->params->Year));
 
         // Calculate Epiphany (and the "Second Sunday of Christmas" if applicable)
         switch ($ctx->params->Epiphany) {
             case Epiphany::JAN6:
-                $ctx->propriumDeTempore['Epiphany']->setDate(DateTime::fromFormat('6-1-' . $ctx->params->Year));
-                $this->createPropriumDeTemporeLiturgicalEventByKey('Epiphany', $ctx);
+                $ctx->createPropriumDeTemporeEvent('Epiphany', DateTime::fromFormat('6-1-' . $ctx->params->Year));
 
                 // if a Sunday falls between Jan. 2 and Jan. 5, it is called the "Second Sunday of Christmas"
                 $christmas2Day = array_find(
                     [2, 3, 4, 5],
-                    fn(int $day): bool => self::dateIsSunday(DateTime::fromFormat($day . '-1-' . $ctx->params->Year))
+                    fn(int $day): bool => LiturgicalEventCollection::dateIsSunday(DateTime::fromFormat($day . '-1-' . $ctx->params->Year))
                 );
                 if (null !== $christmas2Day) {
-                    $ctx->propriumDeTempore['Christmas2']->setDate(DateTime::fromFormat($christmas2Day . '-1-' . $ctx->params->Year));
-                    $this->createPropriumDeTemporeLiturgicalEventByKey('Christmas2', $ctx);
+                    $ctx->createPropriumDeTemporeEvent('Christmas2', DateTime::fromFormat($christmas2Day . '-1-' . $ctx->params->Year));
                 }
                 break;
             case Epiphany::SUNDAY_JAN2_JAN8:
                 //If January 2nd is a Sunday, then go with Jan 2nd
                 $dateTime = DateTime::fromFormat('2-1-' . $ctx->params->Year);
-                if (self::dateIsSunday($dateTime)) {
-                    $ctx->propriumDeTempore['Epiphany']->setDate($dateTime);
-                    $this->createPropriumDeTemporeLiturgicalEventByKey('Epiphany', $ctx);
+                if (LiturgicalEventCollection::dateIsSunday($dateTime)) {
+                    $ctx->createPropriumDeTemporeEvent('Epiphany', $dateTime);
                 } else {
                     //otherwise find the Sunday following Jan 2nd
                     $SundayOfEpiphany = $dateTime->modify('next Sunday');
-                    $ctx->propriumDeTempore['Epiphany']->setDate($SundayOfEpiphany);
-                    $this->createPropriumDeTemporeLiturgicalEventByKey('Epiphany', $ctx);
+                    $ctx->createPropriumDeTemporeEvent('Epiphany', $SundayOfEpiphany);
                 }
                 break;
         }
@@ -150,20 +114,16 @@ final class RomanTemporale implements TemporaleEngine
     private function calculateAscensionPentecost(TemporaleContext $ctx): void
     {
         if ($ctx->params->Ascension === Ascension::THURSDAY) {
-            $ctx->propriumDeTempore['Ascension']->setDate(Utilities::calcGregEaster($ctx->params->Year)->add(new \DateInterval('P39D')));
-            $this->createPropriumDeTemporeLiturgicalEventByKey('Ascension', $ctx);
-            $ctx->propriumDeTempore['Easter7']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+            $ctx->createPropriumDeTemporeEvent('Ascension', Utilities::calcGregEaster($ctx->params->Year)->add(new \DateInterval('P39D')));
+            $ctx->createPropriumDeTemporeEvent('Easter7', Utilities::calcGregEaster($ctx->params->Year)
                 ->add(new \DateInterval('P' . ( 7 * 6 ) . 'D')));
-            $this->createPropriumDeTemporeLiturgicalEventByKey('Easter7', $ctx);
         } elseif ($ctx->params->Ascension === Ascension::SUNDAY) {
-            $ctx->propriumDeTempore['Ascension']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+            $ctx->createPropriumDeTemporeEvent('Ascension', Utilities::calcGregEaster($ctx->params->Year)
                 ->add(new \DateInterval('P' . ( 7 * 6 ) . 'D')));
-            $this->createPropriumDeTemporeLiturgicalEventByKey('Ascension', $ctx);
         }
 
-        $ctx->propriumDeTempore['Pentecost']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('Pentecost', Utilities::calcGregEaster($ctx->params->Year)
             ->add(new \DateInterval('P' . ( 7 * 7 ) . 'D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Pentecost', $ctx);
     }
 
     /**
@@ -184,66 +144,48 @@ final class RomanTemporale implements TemporaleEngine
         //We calculate Sundays of Advent based on Christmas
         $christmasDateStr = '25-12-' . $ctx->params->Year;
 
-        $ctx->propriumDeTempore['Advent1']->setDate(DateTime::fromFormat($christmasDateStr)
+        $ctx->createPropriumDeTemporeEvent('Advent1', DateTime::fromFormat($christmasDateStr)
             ->modify('last Sunday')->sub(new \DateInterval('P' . ( 3 * 7 ) . 'D')));
-        $ctx->propriumDeTempore['Advent2']->setDate(DateTime::fromFormat($christmasDateStr)
+        $ctx->createPropriumDeTemporeEvent('Advent2', DateTime::fromFormat($christmasDateStr)
             ->modify('last Sunday')->sub(new \DateInterval('P' . ( 2 * 7 ) . 'D')));
-        $ctx->propriumDeTempore['Advent3']->setDate(DateTime::fromFormat($christmasDateStr)
+        $ctx->createPropriumDeTemporeEvent('Advent3', DateTime::fromFormat($christmasDateStr)
             ->modify('last Sunday')->sub(new \DateInterval('P7D')));
-        $ctx->propriumDeTempore['Advent4']->setDate(DateTime::fromFormat($christmasDateStr)
+        $ctx->createPropriumDeTemporeEvent('Advent4', DateTime::fromFormat($christmasDateStr)
             ->modify('last Sunday'));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Advent1', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Advent2', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Advent3', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Advent4', $ctx);
 
         //We calculate Sundays of Lent, Palm Sunday, Sundays of Easter, Trinity Sunday and Corpus Christi based on Easter
-        $ctx->propriumDeTempore['Lent1']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('Lent1', Utilities::calcGregEaster($ctx->params->Year)
             ->sub(new \DateInterval('P' . ( 6 * 7 ) . 'D')));
-        $ctx->propriumDeTempore['Lent2']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('Lent2', Utilities::calcGregEaster($ctx->params->Year)
             ->sub(new \DateInterval('P' . ( 5 * 7 ) . 'D')));
-        $ctx->propriumDeTempore['Lent3']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('Lent3', Utilities::calcGregEaster($ctx->params->Year)
             ->sub(new \DateInterval('P' . ( 4 * 7 ) . 'D')));
-        $ctx->propriumDeTempore['Lent4']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('Lent4', Utilities::calcGregEaster($ctx->params->Year)
             ->sub(new \DateInterval('P' . ( 3 * 7 ) . 'D')));
-        $ctx->propriumDeTempore['Lent5']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('Lent5', Utilities::calcGregEaster($ctx->params->Year)
             ->sub(new \DateInterval('P' . ( 2 * 7 ) . 'D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Lent1', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Lent2', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Lent3', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Lent4', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Lent5', $ctx);
-        $ctx->propriumDeTempore['PalmSun']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('PalmSun', Utilities::calcGregEaster($ctx->params->Year)
             ->sub(new \DateInterval('P7D')));
-        $ctx->propriumDeTempore['Easter2']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('Easter2', Utilities::calcGregEaster($ctx->params->Year)
             ->add(new \DateInterval('P7D')));
-        $ctx->propriumDeTempore['Easter3']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('Easter3', Utilities::calcGregEaster($ctx->params->Year)
             ->add(new \DateInterval('P' . ( 7 * 2 ) . 'D')));
-        $ctx->propriumDeTempore['Easter4']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('Easter4', Utilities::calcGregEaster($ctx->params->Year)
             ->add(new \DateInterval('P' . ( 7 * 3 ) . 'D')));
-        $ctx->propriumDeTempore['Easter5']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('Easter5', Utilities::calcGregEaster($ctx->params->Year)
             ->add(new \DateInterval('P' . ( 7 * 4 ) . 'D')));
-        $ctx->propriumDeTempore['Easter6']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('Easter6', Utilities::calcGregEaster($ctx->params->Year)
             ->add(new \DateInterval('P' . ( 7 * 5 ) . 'D')));
-        $ctx->propriumDeTempore['Trinity']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('Trinity', Utilities::calcGregEaster($ctx->params->Year)
             ->add(new \DateInterval('P' . ( 7 * 8 ) . 'D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('PalmSun', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Easter2', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Easter3', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Easter4', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Easter5', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Easter6', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Trinity', $ctx);
         if ($ctx->params->CorpusChristi === CorpusChristi::THURSDAY) {
-            $ctx->propriumDeTempore['CorpusChristi']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+            $ctx->createPropriumDeTemporeEvent('CorpusChristi', Utilities::calcGregEaster($ctx->params->Year)
                 ->add(new \DateInterval('P' . ( 7 * 8 + 4 ) . 'D')));
-            $this->createPropriumDeTemporeLiturgicalEventByKey('CorpusChristi', $ctx);
             //Seeing the Sunday is not taken by Corpus Christi, it should be later taken by a Sunday of Ordinary Time
             // (they are calculated back to Pentecost)
         } elseif ($ctx->params->CorpusChristi === CorpusChristi::SUNDAY) {
-            $ctx->propriumDeTempore['CorpusChristi']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+            $ctx->createPropriumDeTemporeEvent('CorpusChristi', Utilities::calcGregEaster($ctx->params->Year)
                 ->add(new \DateInterval('P' . ( 7 * 9 ) . 'D')));
-            $this->createPropriumDeTemporeLiturgicalEventByKey('CorpusChristi', $ctx);
         }
 
         if ($ctx->params->Year >= 2000) {
@@ -271,9 +213,8 @@ final class RomanTemporale implements TemporaleEngine
      */
     private function calculateAshWednesday(TemporaleContext $ctx): void
     {
-        $ctx->propriumDeTempore['AshWednesday']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('AshWednesday', Utilities::calcGregEaster($ctx->params->Year)
             ->sub(new \DateInterval('P46D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('AshWednesday', $ctx);
     }
 
     /**
@@ -286,18 +227,14 @@ final class RomanTemporale implements TemporaleEngine
     {
         //Weekdays of Holy Week from Monday to Thursday inclusive
         // ( that is, thursday morning chrism Mass... the In Coena Domini Mass begins the Easter Triduum )
-        $ctx->propriumDeTempore['MonHolyWeek']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('MonHolyWeek', Utilities::calcGregEaster($ctx->params->Year)
             ->sub(new \DateInterval('P6D')));
-        $ctx->propriumDeTempore['TueHolyWeek']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('TueHolyWeek', Utilities::calcGregEaster($ctx->params->Year)
             ->sub(new \DateInterval('P5D')));
-        $ctx->propriumDeTempore['WedHolyWeek']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('WedHolyWeek', Utilities::calcGregEaster($ctx->params->Year)
             ->sub(new \DateInterval('P4D')));
-        $ctx->propriumDeTempore['HolyThursChrism']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('HolyThursChrism', Utilities::calcGregEaster($ctx->params->Year)
             ->sub(new \DateInterval('P3D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('MonHolyWeek', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('TueHolyWeek', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('WedHolyWeek', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('HolyThursChrism', $ctx);
     }
 
     /**
@@ -308,24 +245,18 @@ final class RomanTemporale implements TemporaleEngine
      */
     private function calculateEasterOctave(TemporaleContext $ctx): void
     {
-        $ctx->propriumDeTempore['MonOctaveEaster']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('MonOctaveEaster', Utilities::calcGregEaster($ctx->params->Year)
             ->add(new \DateInterval('P1D')));
-        $ctx->propriumDeTempore['TueOctaveEaster']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('TueOctaveEaster', Utilities::calcGregEaster($ctx->params->Year)
             ->add(new \DateInterval('P2D')));
-        $ctx->propriumDeTempore['WedOctaveEaster']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('WedOctaveEaster', Utilities::calcGregEaster($ctx->params->Year)
             ->add(new \DateInterval('P3D')));
-        $ctx->propriumDeTempore['ThuOctaveEaster']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('ThuOctaveEaster', Utilities::calcGregEaster($ctx->params->Year)
             ->add(new \DateInterval('P4D')));
-        $ctx->propriumDeTempore['FriOctaveEaster']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('FriOctaveEaster', Utilities::calcGregEaster($ctx->params->Year)
             ->add(new \DateInterval('P5D')));
-        $ctx->propriumDeTempore['SatOctaveEaster']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('SatOctaveEaster', Utilities::calcGregEaster($ctx->params->Year)
             ->add(new \DateInterval('P6D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('MonOctaveEaster', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('TueOctaveEaster', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('WedOctaveEaster', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('ThuOctaveEaster', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('FriOctaveEaster', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('SatOctaveEaster', $ctx);
     }
 
     /**
@@ -342,12 +273,10 @@ final class RomanTemporale implements TemporaleEngine
      */
     private function calculateMobileSolemnitiesOfTheLord(TemporaleContext $ctx): void
     {
-        $ctx->propriumDeTempore['SacredHeart']->setDate(Utilities::calcGregEaster($ctx->params->Year)
+        $ctx->createPropriumDeTemporeEvent('SacredHeart', Utilities::calcGregEaster($ctx->params->Year)
             ->add(new \DateInterval('P' . ( 7 * 9 + 5 ) . 'D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('SacredHeart', $ctx);
 
         //Christ the King is calculated backwards from the first sunday of advent
-        $ctx->propriumDeTempore['ChristKing']->setDate(DateTime::fromFormat('25-12-' . $ctx->params->Year)->modify('last Sunday')->sub(new \DateInterval('P' . ( 4 * 7 ) . 'D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('ChristKing', $ctx);
+        $ctx->createPropriumDeTemporeEvent('ChristKing', DateTime::fromFormat('25-12-' . $ctx->params->Year)->modify('last Sunday')->sub(new \DateInterval('P' . ( 4 * 7 ) . 'D')));
     }
 }

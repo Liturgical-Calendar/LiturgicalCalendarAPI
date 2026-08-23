@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Models\Calendar\Temporale;
 
+use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\LocaleDateFormatter;
+use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
 use LiturgicalCalendar\Api\Models\PropriumDeTemporeMap;
 use LiturgicalCalendar\Api\Params\CalendarParams;
@@ -36,5 +38,22 @@ final class TemporaleContext
     public function addMessage(string $message): void
     {
         $this->messages[] = $message;
+    }
+
+    /**
+     * Dates the Proprium de Tempore entry for `$key` and adds the resulting
+     * LiturgicalEvent to the calendar, in one guarded call.
+     *
+     * Thin delegation to {@see PropriumDeTemporeEventFactory::create()} over
+     * this context's own Proprium de Tempore and calendar, so that engines
+     * need not thread those two collaborators through every call site.
+     *
+     * @param ?string   $key  The key of the event in the Proprium de Tempore
+     * @param ?DateTime $date The event's date; `null` when the entry has already been dated
+     * @return LiturgicalEvent The newly created LiturgicalEvent
+     */
+    public function createPropriumDeTemporeEvent(?string $key, ?DateTime $date = null): LiturgicalEvent
+    {
+        return PropriumDeTemporeEventFactory::create($this->propriumDeTempore, $this->cal, $key, $date);
     }
 }
