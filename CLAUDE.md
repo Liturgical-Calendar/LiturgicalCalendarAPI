@@ -194,6 +194,26 @@ composer ws:stop
 
 In VSCode, use `Ctrl+Shift+B` and select `litcal-tests-websockets`.
 
+#### Check steps, and the `covers` step
+
+A source-data check reports `exists`, `parses` and `validates` — all three asking whether what is present
+is well-formed. `covers` asks a different question: does the folder hold a file for every locale its owner
+declares? It is reported only for items that carry a non-null `expected_locales` in `GET /validations`,
+and those two are derived from one another in `CheckableInventory` so an item cannot advertise a step it
+has nothing to compare against. A client sizes its rendering from `steps`, so **every arm of the folder
+branch must emit one frame per advertised step** — including the empty-folder early return.
+
+`covers` applies to any folder item whose expected locale set has an authority *other than the folder
+itself*. That excludes exactly two families, where the declared locales are scanned from the very folder
+being checked and the comparison would be a tautology: a wider region's `:i18n` and a missal's `:i18n`.
+National and diocesan calendars **declare** `locales` in their own source files, so their `:i18n` folders
+are covered; the rite-level corpus is measured against the General Roman Calendar's locale set, which is
+`FULLY_TRANSLATED_LOCALES` (five), not the fourteen gettext folders `buildLocales()` intersects down.
+
+The verdict is a subset test **by locale identity, never by count**: a declared locale with no file fails
+the step, while a file for a locale the owner does not declare does not fail it and is named in the frame
+text instead — which is how a stale `locales` declaration surfaces.
+
 ## Architecture
 
 ### Request Flow
@@ -300,7 +320,8 @@ In VSCode, use `Ctrl+Shift+B` and select `litcal-tests-websockets`.
   - `nations/`: National calendars
   - `dioceses/`: Diocesan calendars
   - `wider_regions/`: Multi-diocese regions
-- `lectionary/`: Lectionary readings by cycle
+- `lectionary/`: Lectionary readings by cycle (ten sections, each an i18n folder of per-locale files;
+  further lectionary folders live under `decrees/`, each missal, and each nation, wider region and diocese)
 - `decrees/`: Dicastery decree metadata
 
 **Translations:** `i18n/`
@@ -322,6 +343,26 @@ In VSCode, use `Ctrl+Shift+B` and select `litcal-tests-websockets`.
   - `LitCalDecreesSource.json`: Schema for Dicastery for Divine Worship decrees
   - `LitCalTest.json`: Schema for test source files
   - `LitCalTranslation.json`: Schema for i18n data
+  - `Lectionary.json`: Schema for lectionary source files (a map of `event_key` to that event's readings)
+
+#### Schema roles: source vs. output
+
+Every schema declares what it is *for*, via `SchemaRole` and `LitSchema::role()`: `SOURCE`, `OUTPUT`,
+`PAYLOAD`, `PROTOCOL`, or `LIBRARY`. The distinction is load-bearing and easy to miss, because
+`CommonDef.json` holds definitions used by both kinds.
+
+The worked example is readings. **`CommonDef.json#/definitions/Readings` describes OUTPUT** — and in
+output a vigil Mass is a liturgical event in its own right, with its own `EventKeyVigilMass` (`…_vigil`),
+its own `is_vigil_for`, and its own flat `readings`. Nothing in output ever nests a `vigil` key.
+**Source data does nest one**, because there the vigil's readings belong to the event that has the vigil.
+So source schemas use `CommonDef.json#/definitions/SourceReadings` — `Readings` plus `ReadingsWithVigil`
+and `ReadingsChristmasWithVigil` — and `PropriumDeSanctis.json` has long declared equivalent variants
+locally for the same reason.
+
+**Never widen `Readings` to admit a source-only shape.** Doing so lets `LitCal.json` validate a response
+the API cannot emit, which is a wrong-green in the output schema. `CheckableItem` requires a `LitSchema`,
+and `CheckableInventorySchemaRoleTest` asserts every checkable item's schema has role `SOURCE`, so the
+`/validations` half of this is enforced rather than remembered.
 
 ## Key Development Patterns
 

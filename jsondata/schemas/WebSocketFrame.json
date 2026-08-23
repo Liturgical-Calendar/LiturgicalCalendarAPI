@@ -77,7 +77,10 @@
                     "description": "DEPRECATED spelling, carried on calendar-validation failure frames alone, for the same reason `classes` is. The inbound contract's v2 shapes spell it `responseFormat`."
                 },
                 "target": { "$ref": "#/definitions/target" },
-                "step": { "enum": ["exists", "parses", "validates"] },
+                "step": {
+                    "enum": ["exists", "parses", "validates", "covers"],
+                    "description": "Which check this frame reports. `exists`, `parses` and `validates` ask whether what is present is well-formed; `covers` asks whether anything is missing -- whether a folder holds a file for every locale its owner declares. `covers` is sent only for an item whose `expected_locales` in GET /validations is non-null, which is exactly the set of items advertising it in `steps`."
+                },
                 "status": { "enum": ["pass", "fail"] },
                 "details": {
                     "type": "array",

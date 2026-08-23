@@ -59,7 +59,8 @@ enum FrameFamily: string
         self::CHECK->value    => [
             'exists'    => 'file-exists',
             'parses'    => 'json-valid',
-            'validates' => 'schema-valid'
+            'validates' => 'schema-valid',
+            'covers'    => 'locales-covered'
         ],
         self::TEST_RUN->value => [
             'validates' => 'test-valid'

@@ -595,7 +595,7 @@ final class HealthCorrelationTest extends TestCase
      * branch reports per file. `nation:roman:US:i18n` is the inventory's folder-kind entry, and
      * without a row for it the folder emitter would be threaded but unexercised.
      */
-    public function testAFolderCheckCarriesTheRequestIdOnAllThreeFrames(): void
+    public function testAFolderCheckCarriesTheRequestIdOnEveryFrame(): void
     {
         $health = $this->newHealth();
         $conn   = self::createStubConnection();
@@ -606,16 +606,23 @@ final class HealthCorrelationTest extends TestCase
             'requestId' => 'req-alpha'
         ]);
 
+        // Derived from what the item publishes rather than hardcoded. This read `assertCount(4, ...)`
+        // while every item had exactly three steps; the count is a property of the item, and an item
+        // that declares an expected locale set publishes a fourth, `covers`.
+        $item = CheckableInventory::byId('nation:roman:US:i18n');
+        self::assertNotNull($item, 'precondition: the folder-kind entry is advertised');
+        $stepCount = count($item->steps);
+
         $frames = self::framesOf($conn);
-        self::assertCount(4, $frames, 'a folder check answers with exactly one frame per step, and then terminates');
+        self::assertCount($stepCount + 1, $frames, 'a folder check answers with exactly one frame per published step, and then terminates');
         foreach ($frames as $frame) {
             self::assertNotSame('protocolError', $frame->type, "the message was refused: {$frame->text}");
             self::assertSame('req-alpha', $frame->requestId);
         }
-        foreach (array_slice($frames, 0, 3) as $frame) {
+        foreach (array_slice($frames, 0, $stepCount) as $frame) {
             self::assertStringContainsString('folder', (string) $frame->text, 'precondition: these are the folder branch\'s frames');
         }
-        self::assertSame('complete', $frames[3]->step);
+        self::assertSame('complete', $frames[$stepCount]->step);
     }
 
     /**

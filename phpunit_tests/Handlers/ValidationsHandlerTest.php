@@ -56,14 +56,26 @@ final class ValidationsHandlerTest extends AbstractHandlerTestCase
         );
 
         foreach ($body['litcal_validations'] as $item) {
-            foreach (['id', 'kind', 'rite', 'region', 'label', 'schema', 'steps'] as $key) {
+            foreach (['id', 'kind', 'rite', 'region', 'label', 'schema', 'steps', 'expected_locales'] as $key) {
                 self::assertArrayHasKey($key, $item);
             }
             self::assertContains($item['kind'], ['file', 'folder']);
             self::assertContains($item['rite'], ['roman', 'ambrosian']);
             self::assertTrue($item['region'] === null || preg_match('/^[A-Z]{2}$/', $item['region']) === 1);
             self::assertStringEndsWith('.json', $item['schema']);
-            self::assertSame(['exists', 'parses', 'validates'], $item['steps']);
+            self::assertContains(
+                $item['steps'],
+                [['exists', 'parses', 'validates'], ['exists', 'parses', 'validates', 'covers']],
+                "unexpected step list on {$item['id']}"
+            );
+            // The fourth step and the expectation it reports on are advertised together or not at all: a
+            // client sizes its rendering from `steps`, so an item promising a `covers` card with nothing
+            // to compare against would leave a card no frame ever paints.
+            self::assertSame(
+                in_array('covers', $item['steps'], true),
+                null !== $item['expected_locales'],
+                "{$item['id']}: the covers step and expected_locales disagree"
+            );
         }
     }
 
