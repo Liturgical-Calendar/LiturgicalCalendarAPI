@@ -138,6 +138,24 @@ final class HealthCoversStepTest extends TestCase
         $this->assertStringContainsString('not declared', (string) $frames[0]->text);
     }
 
+    public function testAFailureNamesBothTheMissingAndTheUndeclared(): void
+    {
+        // The Europe-lectionary shape: declared locales with no file, *and* a file for a locale nothing
+        // declares. Both belong in the failure text — the second is how a stale `locales` declaration
+        // shows itself, and withholding it on the failing outcome hides it exactly when it is relevant.
+        // The US i18n folder holds en_US.json alone; declare fr_CA and it_IT instead.
+        $frames = $this->coversFrames(self::usI18nFolder(), ['fr_CA', 'it_IT']);
+
+        $this->assertCount(1, $frames);
+        $this->assertSame('fail', $frames[0]->status);
+
+        $text = (string) $frames[0]->text . json_encode($frames[0]->details ?? []);
+        $this->assertStringContainsString('fr_CA.json', $text, 'the missing declared locales must be named');
+        $this->assertStringContainsString('it_IT.json', $text, 'the missing declared locales must be named');
+        $this->assertStringContainsString('en_US', $text, 'the undeclared but present locale must be named too');
+        $this->assertStringContainsString('not declared', $text);
+    }
+
     public function testCountingIsNotEnough(): void
     {
         // One declared, one present, but not the same one. A count-based check would pass this.

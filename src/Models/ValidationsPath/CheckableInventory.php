@@ -151,6 +151,12 @@ final class CheckableInventory
     ): ?CheckableItem {
         $path = rtrim($path, '/');
 
+        // PHP memoises stat results per process, which under PHP-FPM is per request but in `Health`'s
+        // long-running ReactPHP process is until restart. Without this, a lectionary or i18n folder
+        // created after the server booted would stay invisible even across {@see self::reset()} — the
+        // same staleness that method exists to bound, arriving by a different route.
+        clearstatcache(true, $path);
+
         if (!is_dir($path)) {
             return null;
         }

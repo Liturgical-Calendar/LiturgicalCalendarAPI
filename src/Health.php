@@ -1929,6 +1929,12 @@ class Health implements MessageComponentInterface
                             : ' (also present, though not declared: ' . implode(', ', $extraLocales) . ')';
                         $missingFiles  = array_map(static fn (string $l): string => "{$l}.json", $missingLocales);
 
+                        // `$extraNote` rides on *both* outcomes. It is most worth reading on the failing
+                        // one: a folder that is missing declared locales while holding undeclared ones is
+                        // the shape of a stale `locales` declaration rather than of absent data, and
+                        // naming the extras only when everything already passed would withhold that
+                        // exactly when someone is looking. Europe's lectionary is the live example — 29
+                        // declared locales missing, and an `en_UK` file nothing declares.
                         $this->sendFolderStepResult(
                             $to,
                             $classFragment,
@@ -1936,7 +1942,7 @@ class Health implements MessageComponentInterface
                             Step::COVERS,
                             [] === $missingFiles ? [] : ['missing locale files: ' . implode(', ', $missingFiles)],
                             "Data folder $sourceFolder holds a file for all $expectedCount declared locales$extraNote",
-                            'Data folder ' . $sourceFolder . ' is missing files for ' . count($missingLocales) . " of $expectedCount declared locales",
+                            'Data folder ' . $sourceFolder . ' is missing files for ' . count($missingLocales) . " of $expectedCount declared locales" . $extraNote,
                             $runToken,
                             requestId: $requestId
                         );
