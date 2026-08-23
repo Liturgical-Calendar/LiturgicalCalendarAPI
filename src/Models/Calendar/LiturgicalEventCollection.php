@@ -821,10 +821,10 @@ final class LiturgicalEventCollection
      *
      * @param string $key The key of the liturgical event to modify.
      * @param string $property The property name to be set.
-     * @param string|int|bool $newValue The new value for the property.
+     * @param string|int|bool|array<int, mixed>|LitGrade|LitCommons $newValue The new value for the property.
      * @return bool True if the property was successfully set, otherwise false.
      */
-    public function setProperty(string $key, string $property, string|int|bool|LitGrade $newValue): bool
+    public function setProperty(string $key, string $property, string|int|bool|array|LitGrade|LitCommons $newValue): bool
     {
         $reflect = new \ReflectionClass(new LiturgicalEvent('test', new DateTime('NOW')));
         if ($this->liturgicalEvents->hasKey($key)) {
@@ -842,10 +842,17 @@ final class LiturgicalEventCollection
                     $reflectPropertyType instanceof \ReflectionNamedType
                     && $reflectPropertyType->getName() === get_debug_type($newValue)
                 );
-                $unionTypeCondition = (
-                    $reflectPropertyType instanceof \ReflectionUnionType
-                    && in_array(get_debug_type($newValue), $reflectPropertyType->getTypes())
-                );
+                $unionTypeCondition = false;
+                if ($reflectPropertyType instanceof \ReflectionUnionType) {
+                    $memberTypeNames    = array_map(
+                        static fn (\ReflectionNamedType $memberType): string => $memberType->getName(),
+                        array_filter(
+                            $reflectPropertyType->getTypes(),
+                            static fn (\ReflectionType $memberType): bool => $memberType instanceof \ReflectionNamedType
+                        )
+                    );
+                    $unionTypeCondition = in_array(get_debug_type($newValue), $memberTypeNames, true);
+                }
 
                 if (
                     ( $namedTypeCondition || $unionTypeCondition )
