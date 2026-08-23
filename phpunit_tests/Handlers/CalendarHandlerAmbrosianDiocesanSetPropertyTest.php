@@ -28,6 +28,16 @@ final class CalendarHandlerAmbrosianDiocesanSetPropertyTest extends TestCase
     private static string $savedApiPath     = '';
     private static string $savedApiFilePath = '';
 
+    /**
+     * `runOverlayWith()` writes `LitLocale::$PRIMARY_LANGUAGE`/`$RUNTIME_LOCALE` on every call;
+     * saved/restored the same way every sibling Ambrosian test does (e.g.
+     * `CalendarHandlerAmbrosianDiocesanTest`), so this suite cannot leak `it`/`it_IT` into
+     * whatever test runs next in-process — exactly what `CalendarHandlerLocaleLeakTest` guards
+     * against.
+     */
+    private static string $originalPrimaryLanguage = '';
+    private static string $originalRuntimeLocale   = '';
+
     public static function setUpBeforeClass(): void
     {
         self::$savedApiPath     = isset(Router::$apiPath) ? Router::$apiPath : '';
@@ -37,12 +47,18 @@ final class CalendarHandlerAmbrosianDiocesanSetPropertyTest extends TestCase
         // like '<root>/jsondata/schemas/Foo.json' (CalendarMetadataProvider, reached via
         // CalendarParams::setParams() -> setRite()/setParams() metadata lookups).
         Router::$apiFilePath = dirname(__DIR__, 2) . DIRECTORY_SEPARATOR;
+
+        self::$originalPrimaryLanguage = LitLocale::$PRIMARY_LANGUAGE;
+        self::$originalRuntimeLocale   = LitLocale::$RUNTIME_LOCALE;
     }
 
     public static function tearDownAfterClass(): void
     {
         Router::$apiPath     = self::$savedApiPath;
         Router::$apiFilePath = self::$savedApiFilePath;
+
+        LitLocale::$PRIMARY_LANGUAGE = self::$originalPrimaryLanguage;
+        LitLocale::$RUNTIME_LOCALE   = self::$originalRuntimeLocale;
     }
 
     /**
@@ -141,6 +157,33 @@ final class CalendarHandlerAmbrosianDiocesanSetPropertyTest extends TestCase
         $event = $cal->getLiturgicalEvent('StsProtaseGervase');
         self::assertNotNull($event);
         self::assertSame(['Proper'], $event->common->jsonSerialize());
+    }
+
+    /**
+     * `DiocesanLitCalItemSetPropertyName` carries only an `event_key`; its `$name` is stamped by
+     * `DiocesanData::setNames()` from the diocese's i18n file before the dispatch loop runs (see
+     * `DiocesanLitCalItemSetPropertyName`'s own class docblock). `StFrancisOfAssisi` is used here
+     * because its comune name (`propriumdesanctis_2024/i18n/it.json`: "S. Francesco d'Assisi,
+     * patrono d'Italia") differs from `lugano_ch`'s diocesan name for the same key
+     * (`lugano_ch/i18n/it_IT.json`: "S. Francesco d'Assisi") — so a passing assertion actually
+     * proves the rename applied, rather than merely being consistent with a no-op.
+     */
+    public function testSetPropertyNameChangesTheComuneEventInPlace(): void
+    {
+        [$cal ] = $this->runOverlayWith([
+            [
+                'liturgical_event' => ['event_key' => 'StFrancisOfAssisi'],
+                'metadata'         => ['action' => 'setProperty', 'property' => 'name', 'since_year' => 2024, 'form_rownum' => 1],
+            ],
+        ]);
+
+        $event = $cal->getLiturgicalEvent('StFrancisOfAssisi');
+        self::assertNotNull($event);
+        self::assertSame(
+            "S. Francesco d'Assisi",
+            $event->name,
+            'The diocesan i18n name (lugano_ch) must replace the comune name in place.'
+        );
     }
 
     public function testKeyIsNotDuplicatedByAnOverride(): void

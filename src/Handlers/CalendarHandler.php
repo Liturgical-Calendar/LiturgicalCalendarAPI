@@ -1267,7 +1267,13 @@ final class CalendarHandler extends AbstractHandler
      * derived from the grade ({@see AmbrosianReadings::forGrade()}).
      *
      * When the target key is not in this year's calendar the row is a no-op and an explanatory
-     * message is recorded, rather than failing the whole request.
+     * message is recorded, rather than the whole request failing on that particular row.
+     * This only covers a key absent from *this year's calendar*: `applyAmbrosianDiocesanCalendar()`
+     * calls `DiocesanData::setNames()` over every row in `$litcal` before the dispatch loop that
+     * reaches this method runs, and `setNames()` throws an uncaught `\ValueError` for any
+     * `event_key` with no entry in the diocese's i18n file — so a typo'd `event_key` (one that
+     * exists nowhere at all) still fatals the request before this method's own guard is ever
+     * reached.
      */
     private function applyAmbrosianDiocesanSetProperty(
         DiocesanLitCalItemSetPropertyGrade|DiocesanLitCalItemSetPropertyName|DiocesanLitCalItemSetPropertyCommon $liturgicalEvent
@@ -1292,18 +1298,35 @@ final class CalendarHandler extends AbstractHandler
             return;
         }
 
-        if ($liturgicalEvent instanceof DiocesanLitCalItemSetPropertyGrade) {
-            $this->Cal->setProperty($key, 'grade', $liturgicalEvent->grade);
-            $existingLiturgicalEvent->setReadings(AmbrosianReadings::forGrade($liturgicalEvent->grade));
-            return;
-        }
+        // No `default` arm, deliberately: PHPStan proves the three conditions below are exhaustive
+        // over the closed union type declared for $liturgicalEvent, so a `default => throw` would be
+        // reported as unreachable dead code. Omitting it keeps today's exhaustiveness proof
+        // error-free while still failing loudly the moment it stops being true: if a fourth
+        // DiocesanLitCalItemSetProperty* subtype ever joins the union without a matching arm here,
+        // PHPStan re-flags this match as non-exhaustive (`match.unhandled`) at analysis time, and at
+        // runtime `match` itself throws `\UnhandledMatchError` rather than silently falling through
+        // to (mis-applying) whichever branch happened to be written last.
+        match (true) {
+            $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyGrade => $this->applySetPropertyGrade($key, $liturgicalEvent, $existingLiturgicalEvent),
+            $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyCommon => $this->Cal->setProperty($key, 'common', $liturgicalEvent->common),
+            $liturgicalEvent instanceof DiocesanLitCalItemSetPropertyName => $this->Cal->setProperty($key, 'name', $liturgicalEvent->name),
+        };
+    }
 
-        if ($liturgicalEvent instanceof DiocesanLitCalItemSetPropertyCommon) {
-            $this->Cal->setProperty($key, 'common', $liturgicalEvent->common);
-            return;
-        }
-
-        $this->Cal->setProperty($key, 'name', $liturgicalEvent->name);
+    /**
+     * Applies a `setProperty:grade` row's grade change and its readings re-stamp together.
+     *
+     * Pulled out of the `match` in {@see self::applyAmbrosianDiocesanSetProperty()} because a
+     * `match` arm must be a single expression, and this branch is the only one of the three that
+     * needs two statements (the property write and the readings re-stamp).
+     */
+    private function applySetPropertyGrade(
+        string $key,
+        DiocesanLitCalItemSetPropertyGrade $liturgicalEvent,
+        LiturgicalEvent $existingLiturgicalEvent
+    ): void {
+        $this->Cal->setProperty($key, 'grade', $liturgicalEvent->grade);
+        $existingLiturgicalEvent->setReadings(AmbrosianReadings::forGrade($liturgicalEvent->grade));
     }
 
     /**
