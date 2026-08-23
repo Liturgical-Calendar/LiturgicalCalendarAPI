@@ -1112,7 +1112,12 @@ final class CalendarHandler extends AbstractHandler
      *
      * - A `createNew` row is built into a `LiturgicalEvent` under its own plain `event_key`,
      *   stamped with the readings placeholder matching its own grade
-     *   ({@see AmbrosianReadings::forGrade()}), and added to `$this->Cal`.
+     *   ({@see AmbrosianReadings::forGrade()}), and added to `$this->Cal` — unless that key is
+     *   already occupied (typically by a comune sanctorale event), in which case the row is a
+     *   data-authoring error: it is skipped and a message is recorded naming the diocese, the
+     *   event key, and the year, pointing the author at `setProperty` instead. `createNew` is for
+     *   celebrations that do not already exist in the calendar; overriding one that does is what
+     *   `setProperty` is for.
      * - A `setProperty` row (`DiocesanLitCalItemSetPropertyGrade`/`Name`/`Common`) is dispatched to
      *   {@see self::applyAmbrosianDiocesanSetProperty()}, which mutates an event a previous stage
      *   already placed in `$this->Cal` — normally a comune sanctorale definition added a few lines
@@ -1164,20 +1169,25 @@ final class CalendarHandler extends AbstractHandler
         if (null === $this->DiocesanData) {
             return;
         }
+        // Captured once into a local so PHPStan's null-narrowing survives the intervening method
+        // calls below (interpretStrtotime(), DateTime::fromFormat(), etc. invalidate narrowing of
+        // the $this->DiocesanData property itself, the same reason applyAmbrosianDiocesanSetProperty()
+        // re-checks for null rather than relying on the caller's guard).
+        $diocesanData = $this->DiocesanData;
 
         $locale = match (LitLocale::$PRIMARY_LANGUAGE) {
             'la'    => 'la_VA',
             default => 'it_IT',
         };
-        if (false === in_array($locale, $this->DiocesanData->metadata->locales, true)) {
-            $locale = $this->DiocesanData->metadata->locales[0];
+        if (false === in_array($locale, $diocesanData->metadata->locales, true)) {
+            $locale = $diocesanData->metadata->locales[0];
         }
 
         $i18nFile = strtr(
             JsonData::AMBROSIAN_DIOCESAN_CALENDAR_I18N_FILE->path(),
             [
-                '{nation}'  => $this->DiocesanData->metadata->nation,
-                '{diocese}' => $this->DiocesanData->metadata->diocese_id,
+                '{nation}'  => $diocesanData->metadata->nation,
+                '{diocese}' => $diocesanData->metadata->diocese_id,
                 '{locale}'  => $locale
             ]
         );
@@ -1190,11 +1200,11 @@ final class CalendarHandler extends AbstractHandler
             throw new \Exception('We expected all the values of the array to be strings.');
         }
         /** @var array<string,string> $i18nData */
-        $this->DiocesanData->setNames($i18nData);
+        $diocesanData->setNames($i18nData);
 
         $year = $this->CalendarParams->Year;
 
-        foreach ($this->DiocesanData->litcal as $litCalItem) {
+        foreach ($diocesanData->litcal as $litCalItem) {
             $meta = $litCalItem->metadata;
             if ($year < $meta->since_year || ( null !== $meta->until_year && $year > $meta->until_year )) {
                 continue;
@@ -1225,6 +1235,17 @@ final class CalendarHandler extends AbstractHandler
             }
 
             $liturgicalEvent->setDate($currentLitEventDate);
+
+            if (null !== $this->Cal->getLiturgicalEvent($liturgicalEvent->event_key)) {
+                /**translators: 1. Diocese name, 2. Event key, 3. Requested calendar year */
+                $this->Messages[] = sprintf(
+                    _('The diocesan calendar of %1$s tried to declare a new liturgical event `%2$s` for the year %3$d, but an event with that key already exists in the calendar. To override an existing celebration, use a `setProperty` row (`grade`, `name`, or `common`) instead of re-declaring it with `createNew`. The declaration was skipped.'),
+                    $diocesanData->metadata->diocese_name,
+                    $liturgicalEvent->event_key,
+                    $year
+                );
+                continue;
+            }
 
             $litEvent = LiturgicalEvent::fromObject($liturgicalEvent);
             $litEvent->setReadings(AmbrosianReadings::forGrade($litEvent->grade));

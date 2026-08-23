@@ -199,12 +199,18 @@ final class CalendarHandlerAmbrosianDiocesanTest extends AbstractHandlerTestCase
     }
 
     /**
-     * Diocesan-wins override: `StFrancisOfAssisi` (4 October) is FEAST (grade 4) in the comune
-     * Ambrosian sanctorale but MEMORIAL (grade 3) in the `lugano_ch` diocesan calendar. After the
-     * overlay runs, the diocesan grade must win (the comune definition is removed and replaced,
-     * not merely shadowed).
+     * `StFrancisOfAssisi` (4 October) is FEAST (grade 4) in the comune Ambrosian sanctorale, and
+     * `lugano_ch`'s on-disk calendar still declares it as a `createNew` row (grade MEMORIAL) — the
+     * on-disk data has not yet been re-authored to `setProperty` (that migration is a later,
+     * separate task). A `createNew` row colliding with an existing key is a data-authoring error:
+     * overriding an existing celebration is what `setProperty` is for, not `createNew`. So the
+     * collision guard in `applyAmbrosianDiocesanCalendar()` must skip this row rather than let it
+     * silently double-register the event (once under the comune's FEAST sub-collection, once under
+     * MEMORIAL) — the comune FEAST definition must survive untouched, and a message must be
+     * recorded pointing the diocese's author at `setProperty`. Once the on-disk data is migrated,
+     * this collision — and this test — go away.
      */
-    public function testLuganoOverrideDowngradesStFrancisGradeToMemorial(): void
+    public function testLuganoCreateNewRowCollidingWithComuneIsSkippedNotDuplicated(): void
     {
         $handler = $this->assembleHandlerForDiocese('lugano_ch', 2025);
         $cal     = $this->runOrchestrator($handler);
@@ -212,18 +218,33 @@ final class CalendarHandlerAmbrosianDiocesanTest extends AbstractHandlerTestCase
         $event = $cal->getLiturgicalEvent('StFrancisOfAssisi');
         self::assertNotNull($event, 'Expected `StFrancisOfAssisi` to be present after the diocesan overlay ran.');
         self::assertSame(
-            LitGrade::MEMORIAL,
+            LitGrade::FEAST,
             $event->grade,
-            'Expected the diocesan override (MEMORIAL) to win over the comune definition (FEAST).'
+            'The comune definition (FEAST) must survive untouched; the colliding createNew row must be skipped, not applied.'
         );
         self::assertInstanceOf(
             ReadingsFerial::class,
             $event->readings,
-            'The readings placeholder is derived from the grade; a MEMORIAL takes the ferial (4-field) shape.'
+            'The comune sanctorale placeholder is always ferial (AmbrosianReadings::empty()), regardless of grade.'
         );
         self::assertFalse(
             $cal->isSuppressed('StFrancisOfAssisi'),
-            'A diocesan override replaces the comune event in place; it must NOT be recorded as a suppressed celebration.'
+            'A skipped colliding row must NOT be recorded as a suppressed celebration.'
+        );
+
+        $messagesProp = new \ReflectionProperty($handler, 'Messages');
+        $messagesProp->setAccessible(true);
+        /** @var string[] $messages */
+        $messages = $messagesProp->getValue($handler);
+        $matching = array_filter(
+            $messages,
+            static fn (string $message): bool => str_contains($message, 'StFrancisOfAssisi')
+        );
+        self::assertNotEmpty($matching, 'The skipped colliding createNew row must record an explanatory message.');
+
+        self::assertFalse(
+            $cal->getMemorials()->hasKey('StFrancisOfAssisi'),
+            'The colliding row must NOT register the event a second time under its own (MEMORIAL) grade sub-collection.'
         );
     }
 
@@ -343,9 +364,11 @@ final class CalendarHandlerAmbrosianDiocesanTest extends AbstractHandlerTestCase
 
         self::assertArrayHasKey('StFrancisOfAssisi', $byKey, 'Expected `StFrancisOfAssisi` to be present in the live response.');
         self::assertSame(
-            3,
+            4,
             $byKey['StFrancisOfAssisi']['grade'],
-            'Expected the lugano_ch diocesan override (MEMORIAL, grade 3) to win over the comune FEAST definition.'
+            'lugano_ch\'s on-disk `createNew` row for this key collides with the comune FEAST definition and is '
+                . 'skipped (see testLuganoCreateNewRowCollidingWithComuneIsSkippedNotDuplicated); the comune grade '
+                . '(FEAST, 4) must survive until that row is migrated to `setProperty`.'
         );
 
         self::assertArrayHasKey(

@@ -210,4 +210,64 @@ final class CalendarHandlerAmbrosianDiocesanSetPropertyTest extends TestCase
 
         self::assertNotEmpty($matching, 'A skipped setProperty row must record an explanatory message.');
     }
+
+    /**
+     * A `createNew` row whose `event_key` collides with an event already in `$this->Cal` (here,
+     * the comune `StsProtaseGervase`, grade FEAST) is a data-authoring error, not a sanctioned
+     * override: overriding an existing celebration is what `setProperty` is for. The row must be
+     * skipped with a message, not silently registered alongside the comune definition.
+     *
+     * The third assertion is the one that actually pins the bug this task fixed: before the
+     * collision guard, `LiturgicalEventCollection::addLiturgicalEvent()` had no key-collision
+     * check, so the colliding `createNew` row was added to `getMemorials()` (its own grade,
+     * MEMORIAL) *as well as* the comune definition staying in `getFeasts()` (its original grade,
+     * FEAST) - the same event key registered under two grade sub-collections at once, which is
+     * exactly what `CalendarHandler.php`'s `metadata->feasts`/`metadata->memorials` response
+     * fields serialize directly from. The first two assertions (grade unchanged, message
+     * recorded) would have passed even with that double registration.
+     */
+    public function testCreateNewRowCollidingWithAnExistingKeyIsSkippedNotDuplicated(): void
+    {
+        [$cal, $handler] = $this->runOverlayWith([
+            [
+                'liturgical_event' => [
+                    'event_key' => 'StsProtaseGervase',
+                    'day'       => 19,
+                    'month'     => 6,
+                    'color'     => ['red'],
+                    'grade'     => 3,
+                    'common'    => ['Martyrs:For Several Martyrs'],
+                ],
+                'metadata'         => ['since_year' => 2024, 'form_rownum' => 1],
+            ],
+        ]);
+
+        $event = $cal->getLiturgicalEvent('StsProtaseGervase');
+        self::assertNotNull($event);
+        self::assertSame(
+            LitGrade::FEAST,
+            $event->grade,
+            'The comune definition must survive untouched; the colliding createNew row must not overwrite it.'
+        );
+
+        $messagesProp = ( new \ReflectionClass($handler) )->getProperty('Messages');
+        $messagesProp->setAccessible(true);
+        /** @var string[] $messages */
+        $messages = $messagesProp->getValue($handler);
+
+        $matching = array_filter(
+            $messages,
+            static fn (string $message): bool => str_contains($message, 'StsProtaseGervase')
+        );
+        self::assertNotEmpty($matching, 'A skipped colliding createNew row must record an explanatory message.');
+
+        self::assertTrue(
+            $cal->getFeasts()->hasKey('StsProtaseGervase'),
+            'The comune event must remain registered under its original grade (FEAST).'
+        );
+        self::assertFalse(
+            $cal->getMemorials()->hasKey('StsProtaseGervase'),
+            'The colliding row must NOT register the event a second time under its own (MEMORIAL) grade sub-collection.'
+        );
+    }
 }
