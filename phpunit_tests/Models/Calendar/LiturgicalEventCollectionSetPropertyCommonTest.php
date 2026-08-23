@@ -10,8 +10,9 @@ use LiturgicalCalendar\Api\Models\Calendar\LitCommons;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
 use LiturgicalCalendar\Api\Params\CalendarParams;
-use LiturgicalCalendar\Tests\Handlers\AbstractHandlerTestCase;
+use LiturgicalCalendar\Api\Router;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
 
 /**
  * `LiturgicalEvent::$common` is typed `LitCommons|array`. Before this change `setProperty()`
@@ -19,14 +20,20 @@ use PHPUnit\Framework\Attributes\CoversClass;
  * method body. These tests pin the widened signature.
  *
  * Building a `LiturgicalEventCollection` requires a real `CalendarParams` instance, which in
- * turn needs `Router::$apiFilePath` pinned to read local source data - hence extending the
- * `Handlers` layer's `AbstractHandlerTestCase` rather than plain `PHPUnit\Framework\TestCase`,
- * even though this test lives under `Models/Calendar` (mirrors
- * `LiturgicalEventCollectionAmbrosianHdooTest`).
+ * turn needs `Router::$apiFilePath` pinned to read local source data. This is a pure-logic
+ * `Models/Calendar` test, so it pins the Router paths itself via `Router::getApiPaths()` in
+ * `setUpBeforeClass()` (mirroring `SchemaValidationTest`) rather than pulling in the `Handlers`
+ * layer's `AbstractHandlerTestCase`, which would additionally require JWT/database
+ * preconditions this test never needs.
  */
 #[CoversClass(LiturgicalEventCollection::class)]
-final class LiturgicalEventCollectionSetPropertyCommonTest extends AbstractHandlerTestCase
+final class LiturgicalEventCollectionSetPropertyCommonTest extends TestCase
 {
+    public static function setUpBeforeClass(): void
+    {
+        Router::getApiPaths();
+    }
+
     private function makeCollection(): LiturgicalEventCollection
     {
         $params = new CalendarParams();
