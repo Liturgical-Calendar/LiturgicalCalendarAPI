@@ -6,7 +6,6 @@ use LiturgicalCalendar\Api\DateTime;
 use LiturgicalCalendar\Api\Enum\LitCommon;
 use LiturgicalCalendar\Api\Enum\LitGrade;
 use LiturgicalCalendar\Api\Enum\LitLocale;
-use LiturgicalCalendar\Api\Enum\LitMassVariousNeeds;
 use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Params\CalendarParams;
 use LiturgicalCalendar\Api\Map\LiturgicalEventsMap;
@@ -762,30 +761,30 @@ final class LiturgicalEventCollection
     }
 
     /**
-     * Updates the categorization of a liturgical event based on its grade and previous grade,
-     * and updates the grade_lcl and grade_abbr properties.
+     * Moves a liturgical event between the solemnities, feasts and memorials collections after its
+     * grade has changed.
      *
-     * This method modifies the liturgical event's position in the solemnities, feasts, or memorials
-     * collections according to its new grade. If the new grade is greater than or equal to
-     * FEAST_LORD, the liturgical event is added to the solemnities collection and removed from
-     * feasts or memorials if necessary. If the new grade is FEAST, it is moved to the feasts
-     * collection from solemnities or memorials. If the new grade is MEMORIAL, it is added to
-     * the memorials collection and removed from solemnities or feasts if needed.
+     * This is the COLLECTION-level consequence of a grade write, and the only one left here: the
+     * event's own grade-derived fields (`grade_lcl`, `grade_abbr`, `grade_display`) are re-derived
+     * by the model itself, from the locale the model was constructed with (#872).
+     *
+     * If the new grade is greater than or equal to FEAST_LORD, the liturgical event is added to the
+     * solemnities collection and removed from feasts or memorials if necessary. If the new grade is
+     * FEAST, it is moved to the feasts collection from solemnities or memorials. If the new grade is
+     * MEMORIAL, it is added to the memorials collection and removed from solemnities or feasts if
+     * needed.
      *
      * @param string $key The key associated with the liturgical event.
      * @param LitGrade $newGradeValue The new grade of the liturgical event.
      * @param LitGrade $oldGradeValue The previous grade of the liturgical event.
-     * @return void //$this->CalendarParams->Locale
+     * @return void
      */
-    private function handleGradeProperty(string $key, LitGrade $newGradeValue, LitGrade $oldGradeValue): void
+    private function recategorizeByGrade(string $key, LitGrade $newGradeValue, LitGrade $oldGradeValue): void
     {
         $litEvent = $this->liturgicalEvents->getEvent($key);
         if (null === $litEvent) {
             throw new \InvalidArgumentException('Invalid key: ' . $key . ' for LiturgicalEvents, valid keys are: ' . implode(', ', $this->liturgicalEvents->getKeys()));
         }
-        // Update the grade_lcl and grade_abbr properties
-        $litEvent->setGradeLocalization($newGradeValue->i18n($this->CalendarParams->Locale, false, false));
-        $litEvent->setGradeAbbreviation($newGradeValue->i18n($this->CalendarParams->Locale, false, true));
 
         if ($newGradeValue->value >= LitGrade::FEAST_LORD->value) {
             $this->solemnities->addEvent($litEvent);
@@ -814,66 +813,30 @@ final class LiturgicalEventCollection
     }
 
     /**
-     * Re-derives `common_lcl` after the `common` property of a liturgical event has been overwritten.
-     *
-     * `LiturgicalEvent::$common_lcl` is populated once in the constructor and is not kept in sync
-     * automatically when `$common` is later reassigned by reflection in {@see self::setProperty()}.
-     * This mirrors the branching the constructor uses to derive `common_lcl` from `$common`
-     * (`LitCommons::fullTranslate()` vs. the `LitMassVariousNeeds`/`LitMassVariousNeeds[]` cases),
-     * so that `common_lcl` never disagrees with the `common` it is supposed to describe.
-     *
-     * @param string $key The key associated with the liturgical event.
-     * @param LitCommons|array<int, LitMassVariousNeeds> $newValue The new value of the `common` property.
-     * @return void
-     */
-    private function handleCommonProperty(string $key, LitCommons|array $newValue): void
-    {
-        $litEvent = $this->liturgicalEvents->getEvent($key);
-        if (null === $litEvent) {
-            throw new \InvalidArgumentException('Invalid key: ' . $key . ' for LiturgicalEvents, valid keys are: ' . implode(', ', $this->liturgicalEvents->getKeys()));
-        }
-
-        $locale = $this->CalendarParams->Locale;
-
-        if ($newValue instanceof LitCommons) {
-            $commonLcl = $newValue->fullTranslate($locale);
-        } elseif (count($newValue) > 0 && $newValue[0] instanceof LitMassVariousNeeds) {
-            /** @var LitMassVariousNeeds[] $newValue */
-            $commonsLcl = array_map(
-                function (LitMassVariousNeeds $item) use ($locale): string {
-                    return $item->fullTranslate(LitLocale::isLatin($locale));
-                },
-                $newValue
-            );
-
-            /**translators: when there are multiple possible commons, this will be the glue "[; or] From the Common of..." */
-            $or        = LitLocale::isLatin($locale) ? 'vel' : _('or');
-            $commonLcl = implode('; ' . $or . ' ', $commonsLcl);
-        } else {
-            $commonLcl = '???';
-        }
-
-        $litEvent->setCommonLocalization($commonLcl);
-    }
-
-    /**
      * Sets a property of a liturgical event in the collection if it exists and matches the expected type.
      *
      * Uses reflection to ensure the property exists on the LiturgicalEvent object and checks the type
-     * of the value against the expected type of the property. If the property is "grade",
-     * it calls handleGradeProperty to update the liturgical event's categorization. If the property
-     * is "common", it calls handleCommonProperty to re-derive the localized `common_lcl`.
+     * of the value against the expected type of the property. After a successful write, every field
+     * the model DERIVES from that property is re-derived — see {@see \LiturgicalCalendar\Api\Models\DerivedField} for the mapping —
+     * so a serialized event can never describe itself with a label belonging to a value it no longer
+     * carries. Writing `grade` additionally moves the event between the solemnities/feasts/memorials
+     * collections.
      *
      * @param string $key The key of the liturgical event to modify.
      * @param string $property The property name to be set.
      * @param string|int|bool|array<int, mixed>|LitGrade|LitCommons $newValue The new value for the property.
-     * @return bool True if the property was successfully set, otherwise false.
+     * @return bool True if the property was actually changed, false if the key is unknown or the
+     *              event already carries an equivalent value.
      */
     public function setProperty(string $key, string $property, string|int|bool|array|LitGrade|LitCommons $newValue): bool
     {
         $reflect = new \ReflectionClass(new LiturgicalEvent('test', new DateTime('NOW')));
         if ($this->liturgicalEvents->hasKey($key)) {
             $litEvent = $this->liturgicalEvents->getEvent($key);
+            if (null === $litEvent) {
+                // Defensive only: hasKey() has just reported the key is present.
+                throw new \InvalidArgumentException(__METHOD__ . ": liturgical event `{$key}` disappeared from the collection between the key check and the lookup.");
+            }
             if ($reflect->hasProperty($property)) {
                 $oldValue            = $litEvent->{$property};
                 $reflectProperty     = $reflect->getProperty($property);
@@ -901,25 +864,26 @@ final class LiturgicalEventCollection
 
                 if (
                     ( $namedTypeCondition || $unionTypeCondition )
-                    && $litEvent->{$property} !== $newValue
+                    && false === self::isEquivalentValue($oldValue, $newValue)
                 ) {
                     $litEvent->{$property} = $newValue;
                 } else {
                     return false;
                 }
 
-                // If the value being updated is the grade, update the liturgical event's categorization
+                // Bring the written property's dependent fields with it. Unconditional: a property
+                // with no dependents re-derives nothing, so this cannot be forgotten for the next
+                // derived field the way an `if ($property === ...)` branch could.
+                $litEvent->rederiveDependentsOf($property);
+
+                // A grade change also moves the event between the collection's grade buckets, which
+                // is the collection's business rather than the event's.
                 if ($property === 'grade') {
                     /**
                      * @var LitGrade $newValue
                      * @var LitGrade $oldValue
                      */
-                    $this->handleGradeProperty($key, $newValue, $oldValue);
-                } elseif ($property === 'common') {
-                    /**
-                     * @var LitCommons|array<int, LitMassVariousNeeds> $newValue
-                     */
-                    $this->handleCommonProperty($key, $newValue);
+                    $this->recategorizeByGrade($key, $newValue, $oldValue);
                 }
                 return true;
             } else {
@@ -927,6 +891,26 @@ final class LiturgicalEventCollection
             }
         }
         return false;
+    }
+
+    /**
+     * Whether a write would be a no-op, i.e. whether the event already carries this value.
+     *
+     * `===` is the wrong question for an OBJECT: it asks whether this is the same instance, not
+     * whether it means the same thing. `grade` (a `LitGrade` enum case, so a singleton) and `name`
+     * (a string) happen to answer correctly, but a freshly built `LitCommons` carrying exactly the
+     * same Commons is never `===` the stored one, so `setProperty()` used to report a change that
+     * had not happened — leaving each caller to compare serialized values itself before delegating
+     * (#872). Object and array values are therefore compared by VALUE (`==`, which recurses into
+     * properties and elements); scalars keep the strict comparison, so no `0 == ''` surprises.
+     */
+    private static function isEquivalentValue(mixed $oldValue, mixed $newValue): bool
+    {
+        if (is_object($oldValue) || is_array($oldValue)) {
+            return $oldValue == $newValue;
+        }
+
+        return $oldValue === $newValue;
     }
 
     /**
