@@ -2,6 +2,13 @@
 
 Design for [issue #740](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/740).
 
+**Status: implemented** (2026-08-23). All 19 planned commits landed on
+`feature/740-diocesan-set-property`. Golden master 9/9 byte-identical, PHPStan level 10 clean,
+phpcs clean, `phpstan-baseline.neon` unchanged. `phpunit_tests/Handlers/`, `phpunit_tests/Schemas/`
+and `phpunit_tests/Models/` are fully green. The only failures in the full suite are the 17
+pre-existing `phpunit_tests/WebSocket/*` tests that require a running WebSocket server /
+docker-compose stack, unrelated to this branch.
+
 ## Problem
 
 Ambrosian suffragan dioceses celebrate a handful of comune (Milan) feasts at a lower grade — the
