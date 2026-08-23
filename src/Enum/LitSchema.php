@@ -16,6 +16,7 @@ enum LitSchema: string
     case DECREES_SRC       = '/LitCalDecreesSource.json';
     case DECREE_WRITE      = '/LitCalDecreeWritePayload.json';
     case I18N              = '/LitCalTranslation.json';
+    case LECTIONARY        = '/Lectionary.json';
     case METADATA          = '/LitCalMetadata.json';
     case LITCAL            = '/LitCal.json';
     case EVENTS            = '/LitCalEventsPath.json';
@@ -59,6 +60,7 @@ enum LitSchema: string
             LitSchema::DECREES_SRC       => $ERRMSG . 'Memorials from Decrees Source data not created / updated',
             LitSchema::DECREE_WRITE      => $ERRMSG . 'Decree write payload not valid',
             LitSchema::I18N              => $ERRMSG . 'Translation data not created / updated',
+            LitSchema::LECTIONARY        => $ERRMSG . 'Lectionary data not created / updated',
             LitSchema::METADATA => $ERRMSG . 'LitCalMetadata not valid',
             LitSchema::LITCAL   => $ERRMSG . 'LitCal not valid',
             LitSchema::EVENTS   => $ERRMSG . 'Events path data not valid',
@@ -74,6 +76,42 @@ enum LitSchema: string
         };
     }
 
+    /**
+     * What this schema is for — see {@see SchemaRole}.
+     *
+     * Exhaustive on purpose, with no default arm: a new schema must state its role or fail static
+     * analysis. The alternative is the silent misclassification this enum exists to stop, which costs
+     * either a source file validated against the shape of an API response, or an output schema loosened
+     * to admit a source-only shape.
+     */
+    public function role(): SchemaRole
+    {
+        return match ($this) {
+            LitSchema::DIOCESAN,
+            LitSchema::NATIONAL,
+            LitSchema::WIDERREGION,
+            LitSchema::PROPRIUMDESANCTIS,
+            LitSchema::PROPRIUMDETEMPORE,
+            LitSchema::DECREES_SRC,
+            LitSchema::I18N,
+            LitSchema::TEST_SRC,
+            LitSchema::LECTIONARY        => SchemaRole::SOURCE,
+            LitSchema::LITCAL,
+            LitSchema::METADATA,
+            LitSchema::EVENTS,
+            LitSchema::TESTS,
+            LitSchema::MISSALS,
+            LitSchema::EASTER,
+            LitSchema::DATA,
+            LitSchema::SCHEMAS,
+            LitSchema::VALIDATIONS,
+            LitSchema::DECREES           => SchemaRole::OUTPUT,
+            LitSchema::DECREE_WRITE      => SchemaRole::PAYLOAD,
+            LitSchema::WEBSOCKET_MESSAGE,
+            LitSchema::WEBSOCKET_FRAME   => SchemaRole::PROTOCOL
+        };
+    }
+
     public static function fromURL(string $url): LitSchema
     {
         return match ($url) {
@@ -86,6 +124,7 @@ enum LitSchema: string
             LitSchema::DECREES_SRC->path()       => LitSchema::DECREES_SRC,
             LitSchema::DECREE_WRITE->path()      => LitSchema::DECREE_WRITE,
             LitSchema::I18N->path()              => LitSchema::I18N,
+            LitSchema::LECTIONARY->path()        => LitSchema::LECTIONARY,
             LitSchema::METADATA->path()          => LitSchema::METADATA,
             LitSchema::LITCAL->path()            => LitSchema::LITCAL,
             LitSchema::EVENTS->path()            => LitSchema::EVENTS,

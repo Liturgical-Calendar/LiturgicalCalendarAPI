@@ -1,0 +1,12 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema#",
+    "title": "Lectionary",
+    "description": "One locale's lectionary readings for one section of the corpus: a map of event_key to that event's readings. Readings may be empty strings — this schema asserts that the structure is in place, not that the readings are written (see #712).",
+    "type": "object",
+    "propertyNames": {
+        "$ref": "./CommonDef.json#/definitions/EventKey"
+    },
+    "additionalProperties": {
+        "$ref": "./CommonDef.json#/definitions/SourceReadings"
+    }
+}
