@@ -84,24 +84,49 @@ final class CheckableInventoryTest extends TestCase
             self::assertContains($item->kind, ['file', 'folder']);
             self::assertNotSame('', $item->label);
             self::assertNotSame('', $item->path);
-            self::assertSame(['exists', 'parses', 'validates'], $item->steps);
+            // Three steps, or those three plus `covers` for an item that also declares which locales it
+            // should hold. The two are not free to disagree: `covers` is advertised exactly when
+            // `expectedLocales` is non-null, which is what the assertion below pins.
+            self::assertContains(
+                $item->steps,
+                [['exists', 'parses', 'validates'], ['exists', 'parses', 'validates', 'covers']],
+                "unexpected step list on {$item->id}"
+            );
+            self::assertSame(
+                in_array('covers', $item->steps, true),
+                null !== $item->expectedLocales,
+                "{$item->id}: the covers step and expectedLocales disagree"
+            );
             $ids[] = $item->id;
         }
         self::assertSame(array_unique($ids), $ids, 'inventory ids must be unique');
     }
 
-    public function testEveryItemIsEitherAFileOrAFolderAndFoldersAreI18n(): void
+    /**
+     * Folders were i18n folders and nothing else until the lectionary corpus joined the inventory, so this
+     * pinned `:i18n` directly. What it was really pinning is that a folder item is a folder of per-locale
+     * JSON files validated one schema at a time — which the lectionary folders are too, under their own
+     * schema. The `:i18n` / `:lectionary` split is now what tells them apart.
+     */
+    public function testEveryItemIsEitherAFileOrAFolderOfPerLocaleFiles(): void
     {
         $files   = 0;
         $folders = 0;
         foreach (CheckableInventory::all() as $item) {
             if ('folder' === $item->kind) {
                 ++$folders;
-                self::assertStringEndsWith(':i18n', $item->id, "folder item {$item->id} is not an i18n folder");
-                self::assertSame(LitSchema::I18N, $item->schema, "folder item {$item->id} must validate as i18n");
+                $isI18n       = str_ends_with($item->id, ':i18n');
+                $isLectionary = str_ends_with($item->id, ':lectionary') || str_starts_with($item->id, 'lectionary:');
+                self::assertTrue($isI18n || $isLectionary, "folder item {$item->id} is neither an i18n nor a lectionary folder");
+                self::assertSame(
+                    $isI18n ? LitSchema::I18N : LitSchema::LECTIONARY,
+                    $item->schema,
+                    "folder item {$item->id} validates against the wrong schema"
+                );
             } else {
                 ++$files;
                 self::assertStringEndsNotWith(':i18n', $item->id, "file item {$item->id} looks like an i18n folder");
+                self::assertStringEndsNotWith(':lectionary', $item->id, "file item {$item->id} looks like a lectionary folder");
             }
         }
 
