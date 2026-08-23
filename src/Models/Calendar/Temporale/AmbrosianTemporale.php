@@ -13,6 +13,7 @@ use LiturgicalCalendar\Api\Enum\LitSeason;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\LatinUtils;
 use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEvent;
+use LiturgicalCalendar\Api\Models\Calendar\LiturgicalEventCollection;
 use LiturgicalCalendar\Api\Utilities;
 
 /**
@@ -68,17 +69,23 @@ final class AmbrosianTemporale implements TemporaleEngine
     }
 
     /**
-     * Creates a LiturgicalEvent from the Ambrosian Proprium de Tempore by key and
-     * adds it to the calendar. (Duplicated from RomanTemporale; shared-helper
-     * de-dup tracked as existing debt.)
+     * Dates an entry of the Ambrosian Proprium de Tempore, creates the
+     * LiturgicalEvent and adds it to the calendar, then stamps the Ambrosian
+     * season onto it.
+     *
+     * The create itself is the shared {@see TemporaleContext::createPropriumDeTemporeEvent()};
+     * this wrapper exists only for the `stampSeason()` step, which the Roman
+     * engine has no equivalent of. The stamp must stay *after* the event is
+     * added, exactly as in the pre-fold code.
+     *
+     * @param ?string   $key  The key of the event in the Ambrosian Proprium de Tempore
+     * @param ?DateTime $date The event's date; `null` when the entry is dated elsewhere
+     * @param TemporaleContext $ctx The shared temporale context
+     * @return LiturgicalEvent The newly created LiturgicalEvent
      */
-    private function createPropriumDeTemporeLiturgicalEventByKey(?string $key, TemporaleContext $ctx): LiturgicalEvent
+    private function createPropriumDeTemporeLiturgicalEventByKey(?string $key, ?DateTime $date, TemporaleContext $ctx): LiturgicalEvent
     {
-        if (null === $key || false === $ctx->propriumDeTempore->offsetExists($key)) {
-            throw new ServiceUnavailableException("createPropriumDeTemporeLiturgicalEventByKey requires a key from the Proprium de Tempore, instead got $key");
-        }
-        $event = LiturgicalEvent::fromObject($ctx->propriumDeTempore[$key]);
-        $ctx->cal->addLiturgicalEvent($key, $event);
+        $event = $ctx->createPropriumDeTemporeEvent($key, $date);
         $this->stampSeason($event);
         return $event;
     }
@@ -103,18 +110,6 @@ final class AmbrosianTemporale implements TemporaleEngine
     }
 
     /**
-     * True if the given date falls on a Sunday. Used by
-     * `calculateAfterPentecostAnchors()` to guard the 3rd-Sunday-of-October
-     * computation for the Dedication of the Duomo di Milano, and by
-     * `martyrdomAnchor()` to guard the Aug 29 -> Sep 1 postponement of the
-     * Martyrdom of St John the Baptist when Aug 29 falls on a Sunday.
-     */
-    private static function dateIsSunday(DateTime $dt): bool
-    {
-        return (int) $dt->format('N') === 7;
-    }
-
-    /**
      * Advent I anchor: the Sunday strictly after Nov 11 (St Martin).
      * Single source of truth so calculateAdvent() and the Christ-the-King
      * anchor cannot drift when the deferred Nov-11-on-Sunday edge is implemented.
@@ -136,8 +131,7 @@ final class AmbrosianTemporale implements TemporaleEngine
         for ($i = 1; $i <= 6; $i++) {
             $key  = 'Advent' . $i;
             $date = ( clone $advent1 )->add(new \DateInterval('P' . ( ( $i - 1 ) * 7 ) . 'D'));
-            $ctx->propriumDeTempore[$key]->setDate($date);
-            $this->createPropriumDeTemporeLiturgicalEventByKey($key, $ctx);
+            $this->createPropriumDeTemporeLiturgicalEventByKey($key, $date, $ctx);
         }
     }
 
@@ -150,18 +144,14 @@ final class AmbrosianTemporale implements TemporaleEngine
     {
         $year = $ctx->params->Year;
 
-        $ctx->propriumDeTempore['Christmas']->setDate(DateTime::fromFormat('25-12-' . $year));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Christmas', $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('Christmas', DateTime::fromFormat('25-12-' . $year), $ctx);
 
-        $ctx->propriumDeTempore['Circoncisione']->setDate(DateTime::fromFormat('1-1-' . $year));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Circoncisione', $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('Circoncisione', DateTime::fromFormat('1-1-' . $year), $ctx);
 
         $epiphany = DateTime::fromFormat('6-1-' . $year);
-        $ctx->propriumDeTempore['Epiphany']->setDate($epiphany);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Epiphany', $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('Epiphany', $epiphany, $ctx);
 
-        $ctx->propriumDeTempore['BaptismLord']->setDate(( clone $epiphany )->modify('next Sunday'));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('BaptismLord', $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('BaptismLord', ( clone $epiphany )->modify('next Sunday'), $ctx);
     }
 
     /**
@@ -179,18 +169,14 @@ final class AmbrosianTemporale implements TemporaleEngine
         for ($i = 1; $i <= 5; $i++) {
             $key  = 'Lent' . $i;
             $date = ( clone $lent1 )->add(new \DateInterval('P' . ( ( $i - 1 ) * 7 ) . 'D'));
-            $ctx->propriumDeTempore[$key]->setDate($date);
-            $this->createPropriumDeTemporeLiturgicalEventByKey($key, $ctx);
+            $this->createPropriumDeTemporeLiturgicalEventByKey($key, $date, $ctx);
         }
 
-        $ctx->propriumDeTempore['AshesMonday']->setDate(( clone $lent1 )->add(new \DateInterval('P1D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('AshesMonday', $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('AshesMonday', ( clone $lent1 )->add(new \DateInterval('P1D')), $ctx);
 
-        $ctx->propriumDeTempore['PalmSun']->setDate(Utilities::calcGregEaster($year)->sub(new \DateInterval('P7D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('PalmSun', $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('PalmSun', Utilities::calcGregEaster($year)->sub(new \DateInterval('P7D')), $ctx);
 
-        $ctx->propriumDeTempore['SabatoTradSymb']->setDate(Utilities::calcGregEaster($year)->sub(new \DateInterval('P8D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('SabatoTradSymb', $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('SabatoTradSymb', Utilities::calcGregEaster($year)->sub(new \DateInterval('P8D')), $ctx);
     }
 
     /**
@@ -203,32 +189,24 @@ final class AmbrosianTemporale implements TemporaleEngine
     {
         $year = $ctx->params->Year;
 
-        $ctx->propriumDeTempore['HolyThurs']->setDate(Utilities::calcGregEaster($year)->sub(new \DateInterval('P3D')));
-        $ctx->propriumDeTempore['GoodFri']->setDate(Utilities::calcGregEaster($year)->sub(new \DateInterval('P2D')));
-        $ctx->propriumDeTempore['EasterVigil']->setDate(Utilities::calcGregEaster($year)->sub(new \DateInterval('P1D')));
-        $ctx->propriumDeTempore['Easter']->setDate(Utilities::calcGregEaster($year));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('HolyThurs', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('GoodFri', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('EasterVigil', $ctx);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Easter', $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('HolyThurs', Utilities::calcGregEaster($year)->sub(new \DateInterval('P3D')), $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('GoodFri', Utilities::calcGregEaster($year)->sub(new \DateInterval('P2D')), $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('EasterVigil', Utilities::calcGregEaster($year)->sub(new \DateInterval('P1D')), $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('Easter', Utilities::calcGregEaster($year), $ctx);
 
         $octaveKeys = ['MonOctaveEaster', 'TueOctaveEaster', 'WedOctaveEaster', 'ThuOctaveEaster', 'FriOctaveEaster', 'SatOctaveEaster'];
         foreach ($octaveKeys as $offset => $key) {
-            $ctx->propriumDeTempore[$key]->setDate(Utilities::calcGregEaster($year)->add(new \DateInterval('P' . ( $offset + 1 ) . 'D')));
-            $this->createPropriumDeTemporeLiturgicalEventByKey($key, $ctx);
+            $this->createPropriumDeTemporeLiturgicalEventByKey($key, Utilities::calcGregEaster($year)->add(new \DateInterval('P' . ( $offset + 1 ) . 'D')), $ctx);
         }
 
         for ($i = 2; $i <= 7; $i++) {
             $key = 'Easter' . $i;
-            $ctx->propriumDeTempore[$key]->setDate(Utilities::calcGregEaster($year)->add(new \DateInterval('P' . ( 7 * ( $i - 1 ) ) . 'D')));
-            $this->createPropriumDeTemporeLiturgicalEventByKey($key, $ctx);
+            $this->createPropriumDeTemporeLiturgicalEventByKey($key, Utilities::calcGregEaster($year)->add(new \DateInterval('P' . ( 7 * ( $i - 1 ) ) . 'D')), $ctx);
         }
 
-        $ctx->propriumDeTempore['Ascension']->setDate(Utilities::calcGregEaster($year)->add(new \DateInterval('P39D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Ascension', $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('Ascension', Utilities::calcGregEaster($year)->add(new \DateInterval('P39D')), $ctx);
 
-        $ctx->propriumDeTempore['Pentecost']->setDate(Utilities::calcGregEaster($year)->add(new \DateInterval('P49D')));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('Pentecost', $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('Pentecost', Utilities::calcGregEaster($year)->add(new \DateInterval('P49D')), $ctx);
     }
 
     /**
@@ -247,18 +225,16 @@ final class AmbrosianTemporale implements TemporaleEngine
 
         // 3rd Sunday of October = 1st Sunday on/after Oct 1, plus 2 weeks.
         $firstSundayOct = DateTime::fromFormat('1-10-' . $year);
-        if (false === self::dateIsSunday($firstSundayOct)) {
+        if (false === LiturgicalEventCollection::dateIsSunday($firstSundayOct)) {
             $firstSundayOct = $firstSundayOct->modify('next Sunday');
         }
         $dedication = ( clone $firstSundayOct )->add(new \DateInterval('P14D'));
-        $ctx->propriumDeTempore['DedicationDuomo']->setDate($dedication);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('DedicationDuomo', $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('DedicationDuomo', $dedication, $ctx);
 
         // Christ the King = the Sunday before Advent I (Advent I = Sunday after Nov 11).
         $advent1    = $this->adventOne($year);
         $christKing = ( clone $advent1 )->sub(new \DateInterval('P7D'));
-        $ctx->propriumDeTempore['ChristKing']->setDate($christKing);
-        $this->createPropriumDeTemporeLiturgicalEventByKey('ChristKing', $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey('ChristKing', $christKing, $ctx);
 
         // Pentecost-anchored celebrations (calendario ambrosiano, praenotanda pp. LXXV, LXXVII).
         // Placed here, before calculateAfterPentecostSundays() and calculateAfterPentecostWeekdays(),
@@ -286,8 +262,7 @@ final class AmbrosianTemporale implements TemporaleEngine
 
         $date = Utilities::calcGregEaster($ctx->params->Year)
             ->add(new \DateInterval('P' . $easterOffset . 'D'));
-        $ctx->propriumDeTempore[$key]->setDate($date);
-        $this->createPropriumDeTemporeLiturgicalEventByKey($key, $ctx);
+        $this->createPropriumDeTemporeLiturgicalEventByKey($key, $date, $ctx);
     }
 
     /**
@@ -317,7 +292,7 @@ final class AmbrosianTemporale implements TemporaleEngine
     private function martyrdomAnchor(int $year): DateTime
     {
         $aug29 = DateTime::fromFormat('29-8-' . $year);
-        return self::dateIsSunday($aug29) ? DateTime::fromFormat('1-9-' . $year) : $aug29;
+        return LiturgicalEventCollection::dateIsSunday($aug29) ? DateTime::fromFormat('1-9-' . $year) : $aug29;
     }
 
     /**
@@ -639,7 +614,7 @@ final class AmbrosianTemporale implements TemporaleEngine
         $year = $ctx->params->Year;
         $jan2 = DateTime::fromFormat('2-1-' . $year);
         $jan5 = DateTime::fromFormat('5-1-' . $year);
-        $sun  = self::dateIsSunday($jan2) ? $jan2 : ( clone $jan2 )->modify('next Sunday');
+        $sun  = LiturgicalEventCollection::dateIsSunday($jan2) ? $jan2 : ( clone $jan2 )->modify('next Sunday');
         if ($sun > $jan5) {
             // No Sunday falls within [Jan 2, Jan 5] this year -- "eventuale" not realized.
             return;

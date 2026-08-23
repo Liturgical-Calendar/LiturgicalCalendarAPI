@@ -51,6 +51,7 @@ use LiturgicalCalendar\Api\Models\Calendar\Precedence\AmbrosianPrecedenceResolve
 use LiturgicalCalendar\Api\Models\Calendar\Precedence\PrecedenceContext;
 use LiturgicalCalendar\Api\Models\Calendar\Rite\RiteProfileFactory;
 use LiturgicalCalendar\Api\Models\Calendar\Sanctorale\AmbrosianSanctoraleLoader;
+use LiturgicalCalendar\Api\Models\Calendar\Temporale\PropriumDeTemporeEventFactory;
 use LiturgicalCalendar\Api\Models\Calendar\Temporale\TemporaleContext;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItem;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCollection;
@@ -1672,18 +1673,19 @@ final class CalendarHandler extends AbstractHandler
     }
 
     /**
-     * Creates a LiturgicalEvent object from an entry in the Proprium de Tempore and adds it to the calendar
-     * @param string $key The key of the LiturgicalEvent in the Proprium de Tempore
+     * Dates an entry of the Proprium de Tempore, creates the LiturgicalEvent from it
+     * and adds it to the calendar, in one guarded call.
+     *
+     * Thin delegation to the shared {@see PropriumDeTemporeEventFactory::create()},
+     * which the temporale engines reach through {@see TemporaleContext::createPropriumDeTemporeEvent()}.
+     *
+     * @param ?string   $key  The key of the LiturgicalEvent in the Proprium de Tempore
+     * @param ?DateTime $date The event's date; `null` when the entry is dated elsewhere
      * @return LiturgicalEvent The new LiturgicalEvent object
      */
-    private function createPropriumDeTemporeLiturgicalEventByKey(?string $key = null): LiturgicalEvent
+    private function createPropriumDeTemporeLiturgicalEventByKey(?string $key = null, ?DateTime $date = null): LiturgicalEvent
     {
-        if (null === $key || false === $this->PropriumDeTempore->offsetExists($key)) {
-            throw new ServiceUnavailableException("createPropriumDeTemporeLiturgicalEventByKey requires a key from the Proprium de Tempore, instead got $key");
-        }
-        $event = LiturgicalEvent::fromObject($this->PropriumDeTempore[$key]);
-        $this->Cal->addLiturgicalEvent($key, $event);
-        return $event;
+        return PropriumDeTemporeEventFactory::create($this->PropriumDeTempore, $this->Cal, $key, $date);
     }
 
     /**
@@ -1707,7 +1709,7 @@ final class CalendarHandler extends AbstractHandler
         $DayOfEpiphany = (int) $Epiphany->date->format('j');
         for ($i = 2; $i < $DayOfEpiphany; $i++) {
             $dateTime = DateTime::fromFormat($i . '-1-' . $this->CalendarParams->Year);
-            if (false === self::dateIsSunday($dateTime) && $this->Cal->notInSolemnitiesFeastsOrMemorials($dateTime)) {
+            if (false === LiturgicalEventCollection::dateIsSunday($dateTime) && $this->Cal->notInSolemnitiesFeastsOrMemorials($dateTime)) {
                 $dayOfTheWeek  = $this->localeDateFormatter->getChristmasWeekdayIdentifier($dateTime);
                 $name          = $this->localeDateFormatter->formatChristmasWeekdayName($dayOfTheWeek);
                 $dayOfTheMonth = $dateTime->format('j');
@@ -1787,8 +1789,7 @@ final class CalendarHandler extends AbstractHandler
     {
         // Even though Mary Mother of God is a fixed date solemnity,
         // it is however found in the Proprium de Tempore and not in the Proprium de Sanctis
-        $this->PropriumDeTempore['MaryMotherOfGod']->setDate(DateTime::fromFormat('1-1-' . $this->CalendarParams->Year));
-        $this->createPropriumDeTemporeLiturgicalEventByKey('MaryMotherOfGod');
+        $this->createPropriumDeTemporeLiturgicalEventByKey('MaryMotherOfGod', DateTime::fromFormat('1-1-' . $this->CalendarParams->Year));
 
         $propriumDeSanctisSolemnities = $this->missalsMap[RomanMissal::EDITIO_TYPICA_1970]->filterByGrade(LitGrade::SOLEMNITY);
 
@@ -2087,18 +2088,16 @@ final class CalendarHandler extends AbstractHandler
         if ($this->CalendarParams->Epiphany === Epiphany::SUNDAY_JAN2_JAN8) {
             $dateJan7 = DateTime::fromFormat('7-1-' . $this->CalendarParams->Year);
             $dateJan8 = DateTime::fromFormat('8-1-' . $this->CalendarParams->Year);
-            if (self::dateIsSunday($dateJan7)) {
+            if (LiturgicalEventCollection::dateIsSunday($dateJan7)) {
                 $this->BaptismLordFmt = '7-1-' . $this->CalendarParams->Year;
                 $this->BaptismLordMod = 'next Monday';
-            } elseif (self::dateIsSunday($dateJan8)) {
+            } elseif (LiturgicalEventCollection::dateIsSunday($dateJan8)) {
                 $this->BaptismLordFmt = '8-1-' . $this->CalendarParams->Year;
                 $this->BaptismLordMod = 'next Monday';
             }
         }
-        $this->PropriumDeTempore['BaptismLord']->setDate(DateTime::fromFormat($this->BaptismLordFmt)
+        $this->createPropriumDeTemporeLiturgicalEventByKey('BaptismLord', DateTime::fromFormat($this->BaptismLordFmt)
             ->modify($this->BaptismLordMod));
-
-        $this->createPropriumDeTemporeLiturgicalEventByKey('BaptismLord');
 
         // the other feasts of the Lord ( Presentation, Transfiguration and Triumph of the Holy Cross) are fixed date feasts
         // and are found in the Proprium de Sanctis
@@ -2124,10 +2123,8 @@ final class CalendarHandler extends AbstractHandler
             throw new ServiceUnavailableException('Christmas was not found among the LiturgicalEvents');
         }
 
-        if (self::dateIsSunday($Christmas->date)) {
-            $this->PropriumDeTempore['HolyFamily']->setDate(DateTime::fromFormat('30-12-' . $this->CalendarParams->Year));
-
-            $HolyFamily       = $this->createPropriumDeTemporeLiturgicalEventByKey('HolyFamily');
+        if (LiturgicalEventCollection::dateIsSunday($Christmas->date)) {
+            $HolyFamily       = $this->createPropriumDeTemporeLiturgicalEventByKey('HolyFamily', DateTime::fromFormat('30-12-' . $this->CalendarParams->Year));
             $this->Messages[] = sprintf(
                 /**translators: 1: LiturgicalEvent name (Christmas), 2: Requested calendar year, 3: LiturgicalEvent name (Holy Family), 4: New date for Holy Family */
                 _('\'%1$s\' falls on a Sunday in the year %2$d, therefore the Feast \'%3$s\' is celebrated on %4$s rather than on the Sunday after Christmas.'),
@@ -2137,8 +2134,7 @@ final class CalendarHandler extends AbstractHandler
                 $this->localeDateFormatter->formatLocalizedDate($HolyFamily->date)
             );
         } else {
-            $this->PropriumDeTempore['HolyFamily']->setDate(DateTime::fromFormat('25-12-' . $this->CalendarParams->Year)->modify('next Sunday'));
-            $this->createPropriumDeTemporeLiturgicalEventByKey('HolyFamily');
+            $this->createPropriumDeTemporeLiturgicalEventByKey('HolyFamily', DateTime::fromFormat('25-12-' . $this->CalendarParams->Year)->modify('next Sunday'));
         }
 
         // In 2012, Pope Benedict XVI gave faculty to the Episcopal Conferences
@@ -3809,7 +3805,7 @@ final class CalendarHandler extends AbstractHandler
 
             // Let's check if it was suppressed by a Solemnity, Feast, Memorial or Sunday,
             // so we can give some feedback and maybe even recreate the liturgical event if applicable
-            if ($this->Cal->inSolemnitiesFeastsOrMemorials($suppressedEvent->date) || self::dateIsSunday($suppressedEvent->date)) {
+            if ($this->Cal->inSolemnitiesFeastsOrMemorials($suppressedEvent->date) || LiturgicalEventCollection::dateIsSunday($suppressedEvent->date)) {
                 /** @var LitCalItemMakePatron $liturgicalEvent  */
                 $liturgicalEvent           = $litCalItem->liturgical_event;
                 $coincidingLiturgicalEvent = $this->Cal->determineSundaySolemnityOrFeast($suppressedEvent->date, $liturgicalEvent->event_key);
@@ -4549,17 +4545,6 @@ final class CalendarHandler extends AbstractHandler
         }
     }
 
-
-    /**
-     * Returns true if the given date is a Sunday.
-     *
-     * @param DateTime $dt The date to check.
-     * @return bool True if the given date is a Sunday, false otherwise.
-     */
-    private static function dateIsSunday(DateTime $dt): bool
-    {
-        return (int) $dt->format('N') === 7;
-    }
 
     /**
      * Returns true if the given date is not a Sunday.
