@@ -152,6 +152,11 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
         $this->grade      = $grade;
         $this->grade_lcl  = $grade->i18n(self::$locale, false, false);
         $this->grade_abbr = $grade->i18n(self::$locale, false, true);
+        // Deliberately one-directional, mirroring the constructor: moving TO HIGHER_SOLEMNITY
+        // clears grade_display, but moving AWAY from it leaves a previously-cleared '' in place
+        // rather than restoring some other display value there is no source for. Unreachable
+        // today (no caller currently moves an event away from HIGHER_SOLEMNITY), but kept
+        // asymmetric on purpose rather than "fixed" into a symmetry the data doesn't support.
         if ($grade === LitGrade::HIGHER_SOLEMNITY) {
             $this->grade_display = '';
         }

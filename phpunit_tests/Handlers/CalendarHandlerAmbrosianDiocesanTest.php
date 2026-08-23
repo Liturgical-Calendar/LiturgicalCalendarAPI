@@ -243,6 +243,10 @@ final class CalendarHandlerAmbrosianDiocesanTest extends AbstractHandlerTestCase
             $cal->getMemorials()->hasKey('StFrancisOfAssisi'),
             'The event must be registered under its new (MEMORIAL) grade sub-collection.'
         );
+        self::assertFalse(
+            $cal->getFeasts()->hasKey('StFrancisOfAssisi'),
+            'The event must NOT remain registered under its old (FEAST) grade sub-collection.'
+        );
     }
 
     /**

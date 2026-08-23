@@ -765,15 +765,15 @@ final class EventsHandler extends AbstractHandler
             $DiocesanCalendarI18nData = Utilities::jsonFileToArray($DiocesanCalendarI18nFile);
 
             foreach (self::$DiocesanData->litcal as $diocesanLitCalItem) {
-                $key  = $diocesanLitCalItem->liturgical_event->event_key;
-                $name = $DiocesanCalendarI18nData[$key];
-                $diocesanLitCalItem->setName('[ ' . self::$DiocesanData->metadata->diocese_name . ' ] ' . $name);
+                $key = $diocesanLitCalItem->liturgical_event->event_key;
                 if (
                     false === $diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemCreateNewFixed
                     && false === $diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemCreateNewMobile
                 ) {
                     throw new \ValueError('diocesan calendar item `' . $key . '`: the `setProperty` action is not supported for Roman rite diocesan calendars');
                 }
+                $name = $DiocesanCalendarI18nData[$key];
+                $diocesanLitCalItem->setName('[ ' . self::$DiocesanData->metadata->diocese_name . ' ] ' . $name);
                 $diocesanLitCalItem->liturgical_event->setKey($this->EventsParams->DiocesanCalendar . '_' . $key);
                 if ($diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemCreateNewFixed) {
                     self::$liturgicalEvents->addEvent(LiturgicalEventFixed::fromObject($diocesanLitCalItem->liturgical_event));
