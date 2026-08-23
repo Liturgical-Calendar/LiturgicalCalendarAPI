@@ -34,6 +34,9 @@ use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropert
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemSetPropertyName;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewFixed;
 use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemCreateNewMobile;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemSetPropertyCommon;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemSetPropertyGrade;
+use LiturgicalCalendar\Api\Models\RegionalData\DiocesanData\DiocesanLitCalItemSetPropertyName;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemMakePatron;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\LitCalItemMoveEvent;
 use LiturgicalCalendar\Api\Models\RegionalData\NationalData\NationalData;
@@ -833,19 +836,32 @@ final class EventsHandler extends AbstractHandler
         foreach (self::$DiocesanData->litcal as $diocesanLitCalItem) {
             $key  = $diocesanLitCalItem->liturgical_event->event_key;
             $name = $DiocesanCalendarI18nData[$key];
+
+            // A setProperty row modifies the comune catalog entry in place, under its plain key.
+            // Prefixing it would emit a phantom duplicate that `/calendar` never produces.
+            if ($diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemSetPropertyGrade) {
+                self::$liturgicalEvents->getEvent($key)?->applyGrade($diocesanLitCalItem->liturgical_event->grade);
+                continue;
+            }
+
+            if ($diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemSetPropertyCommon) {
+                self::$liturgicalEvents->getEvent($key)?->applyCommon($diocesanLitCalItem->liturgical_event->common);
+                continue;
+            }
+
+            if ($diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemSetPropertyName) {
+                // Unprefixed: `/calendar` emits the plain diocesan name for an overridden key.
+                self::$liturgicalEvents->getEvent($key)?->applyName($name);
+                continue;
+            }
+
             $diocesanLitCalItem->setName('[ ' . self::$DiocesanData->metadata->diocese_name . ' ] ' . $name);
+            $diocesanLitCalItem->liturgical_event->setKey($this->EventsParams->DiocesanCalendar . '_' . $key);
             if ($diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemCreateNewFixed) {
-                $diocesanLitCalItem->liturgical_event->setKey($this->EventsParams->DiocesanCalendar . '_' . $key);
                 self::$liturgicalEvents->addEvent(LiturgicalEventFixed::fromObject($diocesanLitCalItem->liturgical_event));
             } elseif ($diocesanLitCalItem->liturgical_event instanceof DiocesanLitCalItemCreateNewMobile) {
-                $diocesanLitCalItem->liturgical_event->setKey($this->EventsParams->DiocesanCalendar . '_' . $key);
                 self::$liturgicalEvents->addEvent(LiturgicalEventMobile::fromObject($diocesanLitCalItem->liturgical_event));
             } else {
-                // TODO(Task 6): DiocesanLitCalItemSetPropertyGrade/Name/Common items are legitimate
-                // here (e.g. a suffragan Ambrosian diocese celebrating a comune feast at a different
-                // grade/common/name) and this block will be replaced with the real setProperty
-                // dispatch. Until then they fall through to this generic diagnostic instead of being
-                // silently dropped.
                 throw new \ValueError('Unknown DiocesanLitCalItem->liturgical_event type: ' . get_class($diocesanLitCalItem->liturgical_event));
             }
         }

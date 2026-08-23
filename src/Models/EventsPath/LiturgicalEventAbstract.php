@@ -134,6 +134,42 @@ abstract class LiturgicalEventAbstract implements \JsonSerializable
     }
 
     /**
+     * Changes the grade of this catalog entry, re-deriving the localized grade strings.
+     *
+     * `$grade_lcl` and `$grade_abbr` are computed in the constructor and are both serialized, so
+     * assigning `$grade` on its own would emit a numeric grade that disagrees with its own label.
+     *
+     * @param LitGrade $grade The new grade.
+     */
+    public function applyGrade(LitGrade $grade): void
+    {
+        $this->grade      = $grade;
+        $this->grade_lcl  = $grade->i18n(self::$locale, false, false);
+        $this->grade_abbr = $grade->i18n(self::$locale, false, true);
+    }
+
+    /**
+     * Changes the Common of this catalog entry, re-deriving the localized Common string.
+     *
+     * @param LitCommons $common The new Common.
+     */
+    public function applyCommon(LitCommons $common): void
+    {
+        $this->common     = $common;
+        $this->common_lcl = $common->fullTranslate(self::$locale);
+    }
+
+    /**
+     * Changes the display name of this catalog entry. No derived field depends on the name.
+     *
+     * @param string $name The new name.
+     */
+    public function applyName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    /**
      * Sets the locale for this LiturgicalEvent class, affecting the translations of
      * common liturgical texts and the formatting of dates.
      *
