@@ -166,12 +166,15 @@ final class LitCalTestServerTest extends TestCase
 
         $hello = $client->hello();
         $this->assertNotNull($hello, 'a connecting client was not sent a hello frame');
-        $this->assertSame(1, $hello->protocol ?? null);
 
         // Compared **exactly** against what this checkout would advertise, not merely type-checked.
         // Every capability is derived server-side from the enums, schema and constants in this very
         // repository, so the handshake is already a fingerprint of the code the server is running —
-        // it just was not being read as one. See self::assertServerIsRunningThisCheckout().
+        // it just was not being read as one. See self::assertServerIsRunningThisCheckout(), which
+        // covers `protocol` too: this used to assert a literal `1` beside it, and a literal is the
+        // very thing that goes stale — on the next protocol bump it would have failed looking like a
+        // protocol regression rather than like the hand-written constant it was. The helper reads
+        // `max(WebSocketMessageValidator::SUPPORTED_PROTOCOL_VERSIONS)` and tracks the bump.
         self::assertServerIsRunningThisCheckout($hello);
 
         // No run correlation, which is what makes the frame invisible to a client that predates it:
