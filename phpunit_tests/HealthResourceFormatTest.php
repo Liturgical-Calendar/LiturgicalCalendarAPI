@@ -271,6 +271,32 @@ final class HealthResourceFormatTest extends TestCase
         self::assertStringContainsString('decoded as JSON', $parses[0]->text);
     }
 
+    /**
+     * A failure that never reached a decode names no format at all.
+     *
+     * `handleValidationHttpFailure()` and `handleValidationDataError()` used to say "as JSON"
+     * unconditionally. That was invisible while nothing could ask for anything else; once YML is
+     * honoured it becomes a frame telling a client its YAML request failed to decode as JSON, which
+     * sends the reader after a format problem when the real one is an HTTP status. Nothing was
+     * decoded on either arm, so the wording is format-neutral rather than merely corrected — see the
+     * comments at both sites.
+     */
+    public function testAnHttpFailureNamesNoFormatAtAll(): void
+    {
+        $health = $this->newHealth();
+        $conn   = self::stubConnection();
+
+        self::send($health, $conn, self::resourceCheck(['responseFormat' => 'YML']));
+        self::fulfilQueued($health, 0, 503, '{"status":503}', 'application/problem+json');
+
+        $parses = self::stepFrames($conn, 'parses');
+        self::assertCount(1, $parses);
+        self::assertSame('fail', $parses[0]->status);
+        self::assertStringContainsString('HTTP 503', $parses[0]->text, 'the real reason must survive');
+        self::assertStringNotContainsString('as JSON', $parses[0]->text);
+        self::assertStringNotContainsString('as YAML', $parses[0]->text);
+    }
+
     // ---------------------------------------------------------------- rejections
 
     /**

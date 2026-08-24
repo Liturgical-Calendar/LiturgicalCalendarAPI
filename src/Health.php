@@ -2176,7 +2176,13 @@ class Health implements MessageComponentInterface
             $target,
             Step::PARSES,
             Status::FAIL,
-            "Could not decode the Data file $dataPath as JSON because it is not readable",
+            // Format-neutral on purpose, and unlike {@see Health::processValidationData()}'s
+            // wording, which names the format because a decode was genuinely attempted in it.
+            // Nothing was decoded here: the read failed. Naming a format would be noise at best,
+            // and a small untruth whenever the request asked for one this arm does not know about
+            // — this method serves both the filesystem arm (always JSON) and the URL arm's reject
+            // handler (whatever `responseFormat` asked for).
+            "Could not decode the Data file $dataPath because it is not readable",
             null,
             $runToken,
             requestId: $requestId
@@ -2255,7 +2261,10 @@ class Health implements MessageComponentInterface
             $target,
             Step::PARSES,
             Status::FAIL,
-            "Could not decode the Data file $dataPath as JSON because the request for it returned HTTP $status",
+            // Format-neutral for the same reason as the unreadable-file arm above: a non-2xx means
+            // no decode was attempted at all, so the format that was asked for is not what went
+            // wrong and naming it would only mislead.
+            "Could not decode the Data file $dataPath because the request for it returned HTTP $status",
             null,
             $runToken,
             requestId: $requestId
