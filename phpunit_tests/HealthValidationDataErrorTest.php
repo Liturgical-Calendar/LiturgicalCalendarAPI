@@ -108,7 +108,7 @@ final class HealthValidationDataErrorTest extends TestCase
         self::assertSame('.proprium-de-tempore.file-exists', $frames[0]->classes);
 
         self::assertSame('error', $frames[1]->type);
-        self::assertSame('Could not decode the Data file jsondata/x.json as JSON because it is not readable', $frames[1]->text);
+        self::assertSame('Could not decode the Data file jsondata/x.json because it is not readable', $frames[1]->text);
         self::assertSame('.proprium-de-tempore.json-valid', $frames[1]->classes);
 
         self::assertSame('error', $frames[2]->type);

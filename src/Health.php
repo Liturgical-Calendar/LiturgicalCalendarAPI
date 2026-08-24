@@ -32,6 +32,7 @@ use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableItem;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
@@ -170,7 +171,21 @@ class Health implements MessageComponentInterface
      * @var array<string, array{shape: string, retired: array<string, string>}>
      */
     private const RETIRED_PROPERTIES = [
-        'validateSource'   => [
+        'executeValidation' => [
+            'shape'   => 'executeValidation message',
+            'retired' => [
+                // Retired late, and deliberately so. Until this action honoured a response format,
+                // `responsetype` was the one optional property left un-retired on the grounds that
+                // `executeValidation()` never read it, so retiring it "would answer a question no
+                // client is asking". The moment the action started reading a format that reasoning
+                // expired: a client still sending the old spelling would now have its choice
+                // silently ignored and every check fetched as JSON while its cards claimed YAML,
+                // which is precisely the wrong-green this interface exists to detect. Same
+                // replacement sentence as `validateCalendar`'s, because it is the same rename.
+                'responsetype' => 'responseFormat replaces it.'
+            ]
+        ],
+        'validateSource'    => [
             'shape'   => 'validateSource message',
             'retired' => [
                 // `executeValidation` spread the address across a schema-resolution strategy and a
@@ -181,7 +196,7 @@ class Health implements MessageComponentInterface
                 'sourceFolder' => 'target.id replaces it.'
             ]
         ],
-        'validateCalendar' => [
+        'validateCalendar'  => [
             'shape'   => 'validateCalendar message with an object calendar',
             'retired' => [
                 'category'     => 'calendar.kind replaces it.',
@@ -200,7 +215,7 @@ class Health implements MessageComponentInterface
                 'rite'         => 'calendar.rite replaces it.'
             ]
         ],
-        'runTest'          => [
+        'runTest'           => [
             'shape'   => 'runTest message',
             'retired' => [
                 'category' => 'calendar.kind replaces it.',
@@ -223,6 +238,33 @@ class Health implements MessageComponentInterface
      * @var string[]
      */
     private const VALIDATABLE_RESPONSE_FORMATS = ['JSON', 'XML', 'ICS', 'YML'];
+
+    /**
+     * The response formats a *resource* check can ask the API for.
+     *
+     * Narrower than {@see Health::VALIDATABLE_RESPONSE_FORMATS}, and for a reason that lives in the
+     * API rather than in this class: `return_type` is a `CalendarParams` property, so it exists only
+     * on `/calendar`, and every other route negotiates purely on `Accept` through
+     * {@see \LiturgicalCalendar\Api\Http\Negotiator}. Those routes serve `application/json` and
+     * `application/yaml` and answer **406** to `application/xml` and `text/calendar`. Offering XML or
+     * ICS here would therefore hand a client a format the check can only fail on.
+     *
+     * @var string[]
+     */
+    private const VALIDATABLE_RESOURCE_FORMATS = ['JSON', 'YML'];
+
+    /**
+     * The Accept header each validatable resource format asks for.
+     *
+     * `application/yaml` and nothing else: the API's {@see \LiturgicalCalendar\Api\Http\Enum\AcceptHeader}
+     * does not list `application/x-yaml` or `text/yaml`, and both come back 406.
+     *
+     * @var array<string, string>
+     */
+    private const ACCEPT_HEADER_FOR_FORMAT = [
+        'JSON' => 'application/json',
+        'YML'  => 'application/yaml'
+    ];
 
     /**
      * The shape a correlation identifier must have: 1 to 64 characters of `A-Za-z0-9_-`.
@@ -1512,6 +1554,13 @@ class Health implements MessageComponentInterface
     private function executeValidation(\stdClass $validation, ConnectionInterface $to, ?string $requestId = null): void
     {
         $runToken = $this->resolveRunToken($to);
+
+        // This action retires a property now (`responsetype`), so it needs the same gate the three
+        // reshaped v2 actions already run. It had none before, because it retired nothing.
+        if ($this->rejectRetiredProperties($validation, 'executeValidation', $to, requestId: $requestId)) {
+            return;
+        }
+
         // First thing is try to determine the schema that we will be validating against,
         // and the path to the source file or folder that we will be validating against the schema.
         // Our purpose here is to set the $pathForSchema and $dataPath variables.
@@ -1519,6 +1568,24 @@ class Health implements MessageComponentInterface
         $dataPath      = null;
         $category      = (string) $validation->category;
         $validate      = (string) $validation->validate;
+
+        // Absent means JSON, which is what every client sent before this action honoured a format
+        // at all and what the API serves when nothing asks otherwise — so an old message keeps
+        // behaving exactly as it did. A *present* value is checked against the narrow list rather
+        // than trusted: `ReturnTypeParam::from()` throws a `\ValueError` on anything it does not
+        // know, and a `\ValueError` is an `\Error` that Ratchet's `IoServer::handleData` does not
+        // catch, so an unusable format would kill the WebSocket process instead of being answered.
+        // Same hazard {@see Health::VALIDATABLE_RESPONSE_FORMATS} documents, reached by this door.
+        $responseFormat = property_exists($validation, 'responseFormat') ? $validation->responseFormat : 'JSON';
+        if (false === is_string($responseFormat) || false === in_array($responseFormat, self::VALIDATABLE_RESOURCE_FORMATS, true)) {
+            $this->rejectMessage(
+                $to,
+                ProtocolErrorCode::INVALID_MESSAGE,
+                'executeValidation responseFormat must be one of: ' . implode(', ', self::VALIDATABLE_RESOURCE_FORMATS) . '.',
+                requestId: $requestId
+            );
+            return;
+        }
 
         // Source data checks validate data directly in the filesystem, not through the API
         if ($category === 'sourceDataCheck') {
@@ -1698,7 +1765,8 @@ class Health implements MessageComponentInterface
             $category,
             $pathForSchema,
             $sourceFolder,
-            requestId: $requestId
+            requestId: $requestId,
+            responseFormat: $responseFormat
         );
     }
 
@@ -1759,7 +1827,8 @@ class Health implements MessageComponentInterface
         ?string $classFragment = null,
         ?\stdClass $target = null,
         ?string $requestId = null,
-        ?array $expectedLocales = null
+        ?array $expectedLocales = null,
+        string $responseFormat = 'JSON'
     ): void {
         $pathForSchema ??= $label;
         // Read before $dataPath is made absolute below, so the two stay distinguishable.
@@ -1986,7 +2055,13 @@ class Health implements MessageComponentInterface
                 /** @var PromiseInterface<array{data: string, status: int, fromCache: bool, retryAfter: ?string}> $httpPromise */
                 $httpPromise = $this->cachedGet(
                     $dataPath,
-                    [],
+                    // The whole mechanism, in one line. `return_type` is a `CalendarParams` property
+                    // and therefore exists only on `/calendar`; every route a resource check
+                    // addresses negotiates on `Accept` alone, so appending `?return_type=YML` here
+                    // would be ignored and the check would validate JSON while reporting YAML.
+                    // `cachedGet()` keys its cache on `serialize($options)`, so the two formats of
+                    // one URL cannot collide in the cache either.
+                    ['headers' => ['Accept' => self::ACCEPT_HEADER_FOR_FORMAT[$responseFormat]]],
                     300,
                     $to,
                     // If this fetch is dropped because its run was abandoned, the request ends here
@@ -1996,7 +2071,7 @@ class Health implements MessageComponentInterface
                     }
                 );
                 $httpPromise->then(
-                    function (array $result) use ($to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $requestId, $target) {
+                    function (array $result) use ($to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $requestId, $target, $responseFormat) {
                         /** @var array{data: string, status: int, fromCache: bool, retryAfter: ?string} $result */
                         $data       = $result['data'];
                         $status     = $result['status'];
@@ -2009,7 +2084,7 @@ class Health implements MessageComponentInterface
                         // there — must not be reached at all for a resource the API refused. 429/5xx
                         // are included (#834), reported the same way as any other refusal.
                         if (self::isHttpSuccessStatus($status)) {
-                            $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $target, requestId: $requestId);
+                            $this->processValidationData($data, $to, $validationForMessages, $dataPath, $schema, $pathForSchema, $runToken, $target, requestId: $requestId, responseFormat: $responseFormat);
                         } else {
                             $this->handleValidationHttpFailure($status, $data, $retryAfter, $to, $validationForMessages, $dataPath, $runToken, $target, requestId: $requestId);
                         }
@@ -2101,7 +2176,13 @@ class Health implements MessageComponentInterface
             $target,
             Step::PARSES,
             Status::FAIL,
-            "Could not decode the Data file $dataPath as JSON because it is not readable",
+            // Format-neutral on purpose, and unlike {@see Health::processValidationData()}'s
+            // wording, which names the format because a decode was genuinely attempted in it.
+            // Nothing was decoded here: the read failed. Naming a format would be noise at best,
+            // and a small untruth whenever the request asked for one this arm does not know about
+            // — this method serves both the filesystem arm (always JSON) and the URL arm's reject
+            // handler (whatever `responseFormat` asked for).
+            "Could not decode the Data file $dataPath because it is not readable",
             null,
             $runToken,
             requestId: $requestId
@@ -2180,7 +2261,10 @@ class Health implements MessageComponentInterface
             $target,
             Step::PARSES,
             Status::FAIL,
-            "Could not decode the Data file $dataPath as JSON because the request for it returned HTTP $status",
+            // Format-neutral for the same reason as the unreadable-file arm above: a non-2xx means
+            // no decode was attempted at all, so the format that was asked for is not what went
+            // wrong and naming it would only mislead.
+            "Could not decode the Data file $dataPath because the request for it returned HTTP $status",
             null,
             $runToken,
             requestId: $requestId
@@ -2305,6 +2389,40 @@ class Health implements MessageComponentInterface
     }
 
     /**
+     * Decode a fetched payload in the representation it was requested in.
+     *
+     * Extracted rather than inlined for the same reason {@see Health::decodeHttpCacheEntry()} is: the
+     * contract is unit-testable on its own, without a cache backend or the ReactPHP loop, and the
+     * `parses` step is exactly where a wrong-green would be cheapest to introduce and dearest to spot.
+     *
+     * YAML failures arrive as a thrown {@see ParseException} where JSON's arrive as a sentinel and an
+     * error string, so both are normalised to the same `{data, error}` shape and the caller stays
+     * format-agnostic. `Yaml::parse()` is given `PARSE_OBJECT_FOR_MAP` so a mapping decodes to
+     * `\stdClass` exactly as `json_decode()` leaves it — the schema validator is handed one shape,
+     * not two, and every existing schema keeps applying unchanged.
+     *
+     * @param string $data The raw body as fetched.
+     * @param string $responseFormat One of {@see Health::VALIDATABLE_RESOURCE_FORMATS}.
+     * @return array{data: mixed, error: ?string} `error` is null exactly when the decode succeeded.
+     */
+    private static function decodeValidationPayload(string $data, string $responseFormat): array
+    {
+        if ('YML' === $responseFormat) {
+            try {
+                return ['data' => Yaml::parse($data, Yaml::PARSE_OBJECT_FOR_MAP), 'error' => null];
+            } catch (ParseException $e) {
+                return ['data' => null, 'error' => $e->getMessage()];
+            }
+        }
+
+        $decoded = json_decode($data);
+
+        return json_last_error() === JSON_ERROR_NONE
+            ? ['data' => $decoded, 'error' => null]
+            : ['data' => null, 'error' => json_last_error_msg()];
+    }
+
+    /**
      * Process the validation of data against a schema.
      *
      * @param ExecuteValidationSourceFolder|ExecuteValidationSourceFile|ExecuteValidationResource $validation The validation object.
@@ -2313,8 +2431,10 @@ class Health implements MessageComponentInterface
      * @param ?string $requestId The correlation id of the request that caused this frame, captured by the handler when
      *        the request arrived and passed explicitly rather than read from any per-connection store; see
      *        {@see Health::onMessage()} for why that distinction is load-bearing.
+     * @param string $responseFormat The representation the body was fetched in, one of
+     *        {@see Health::VALIDATABLE_RESOURCE_FORMATS}; decides how the `parses` step decodes it.
      */
-    private function processValidationData(string $data, ConnectionInterface $to, \stdClass $validation, string $dataPath, ?string $schema, string $pathForSchema, ?string $runToken = null, ?\stdClass $target = null, ?string $requestId = null): void
+    private function processValidationData(string $data, ConnectionInterface $to, \stdClass $validation, string $dataPath, ?string $schema, string $pathForSchema, ?string $runToken = null, ?\stdClass $target = null, ?string $requestId = null, string $responseFormat = 'JSON'): void
     {
         // `validate` carries the class fragment: see the note where $validationForMessages is built.
         $validate = (string) $validation->validate;
@@ -2332,15 +2452,23 @@ class Health implements MessageComponentInterface
             requestId: $requestId
         );
 
-        $jsonData = json_decode($data);
-        if (json_last_error() === JSON_ERROR_NONE) {
+        // The `parses` step asks whether the representation the API actually sent is well formed, so
+        // it must decode in the format that was *asked for*. Decoding YAML with `json_decode()` would
+        // fail every YAML check on syntax; decoding it and then handing the result to the schema
+        // validator is what makes a YAML run test the same schemas the JSON run does. A source file
+        // read off disk is always JSON and reaches here with the default.
+        $parsed     = self::decodeValidationPayload($data, $responseFormat);
+        $jsonData   = $parsed['data'];
+        $parseError = $parsed['error'];
+        $formatName = 'YML' === $responseFormat ? 'YAML' : 'JSON';
+        if (null === $parseError) {
             $this->sendStepResult(
                 $to,
                 $validate,
                 $target,
                 Step::PARSES,
                 Status::PASS,
-                "The Data file $dataPath was successfully decoded as JSON",
+                "The Data file $dataPath was successfully decoded as $formatName",
                 null,
                 $runToken,
                 requestId: $requestId
@@ -2402,7 +2530,7 @@ class Health implements MessageComponentInterface
                 $target,
                 Step::PARSES,
                 Status::FAIL,
-                "There was an error decoding the Data file $dataPath as JSON: " . json_last_error_msg() . ". Raw data = &lt;&lt;&lt;JSON\n" . $data . "\n&gt;&gt;&gt;",
+                "There was an error decoding the Data file $dataPath as $formatName: " . $parseError . ". Raw data = &lt;&lt;&lt;$formatName\n" . $data . "\n&gt;&gt;&gt;",
                 null,
                 $runToken,
                 requestId: $requestId
@@ -2420,7 +2548,7 @@ class Health implements MessageComponentInterface
                 $target,
                 Step::VALIDATES,
                 Status::FAIL,
-                "Unable to verify schema for dataPath {$dataPath} and category {$category} since Data file $dataPath could not be decoded as JSON",
+                "Unable to verify schema for dataPath {$dataPath} and category {$category} since Data file $dataPath could not be decoded as $formatName",
                 null,
                 $runToken,
                 requestId: $requestId
@@ -2678,7 +2806,7 @@ class Health implements MessageComponentInterface
      * says one true, specific thing, and a client sending two retired properties hears about the
      * second on its next attempt. See {@see Health::RETIRED_PROPERTIES} for why the rule exists.
      *
-     * @param 'validateSource'|'validateCalendar'|'runTest' $action The reshaped action being handled.
+     * @param 'validateSource'|'validateCalendar'|'runTest'|'executeValidation' $action The reshaped action being handled.
      * @return bool True when the message was rejected and the caller must stop.
      */
     private function rejectRetiredProperties(\stdClass $message, string $action, ConnectionInterface $to, ?string $requestId = null): bool
