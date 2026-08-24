@@ -45,12 +45,16 @@
                 },
                 "capabilities": {
                     "type": "object",
-                    "description": "What this server can be asked for. Every list is derived on the server from whatever already defines it — the Rite, Step and Status enums, the response formats the calendar validator actually has a branch for, and the actions this contract's inbound schema declares — so an advertisement cannot go stale against the behaviour it describes. `responseFormats` is deliberately narrower than the formats the REST API accepts: it lists only those the WebSocket calendar validation can act on.",
+                    "description": "What this server can be asked for. Every entry is derived on the server from whatever already defines it — the Rite, Step and Status enums, the per-action format lists the validators actually have a branch for, and the actions this contract's inbound schema declares — so an advertisement cannot go stale against the behaviour it describes. `responseFormats` is deliberately narrower than the formats the REST API accepts: it lists only what each WebSocket action can act on.",
                     "required": ["rites", "actions", "responseFormats", "steps", "statuses"],
                     "properties": {
                         "rites": { "type": "array", "items": { "type": "string" } },
                         "actions": { "type": "array", "items": { "type": "string" } },
-                        "responseFormats": { "type": "array", "items": { "type": "string" } },
+                        "responseFormats": {
+                            "type": "object",
+                            "description": "Keyed by action, because `responseFormat` is a property of a message and what may go in it depends on which message. `validateCalendar` addresses `/calendar`, which serves all four representations; `executeValidation` addresses the other routes, every one of which answers 406 to application/xml and text/calendar, so it takes JSON and YML only. An action that carries no response format at all — `validateSource`, which reads files off disk, and `runTest`, which returns a verdict — is absent rather than present with an empty list: absence says the action has no format to choose, where [] would claim it supports none.",
+                            "additionalProperties": { "type": "array", "items": { "type": "string" } }
+                        },
                         "steps": { "type": "array", "items": { "type": "string" } },
                         "statuses": { "type": "array", "items": { "type": "string" } }
                     }

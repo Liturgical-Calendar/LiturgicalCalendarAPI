@@ -261,6 +261,32 @@ class Health implements MessageComponentInterface
      *
      * @var array<string, string>
      */
+    /**
+     * The response formats each action accepts, keyed by action.
+     *
+     * `responseFormat` is a property of a *message*, so what may go in it is a per-action question,
+     * not a per-server one — which is what the flat union this replaced could not say.
+     * `validateCalendar` addresses `/calendar`, which serves all four representations;
+     * `executeValidation` addresses every other route, and each of those answers 406 to
+     * `application/xml` and `text/calendar`.
+     *
+     * Composed from the two constants that already govern the behaviour rather than restated as a
+     * third list, for the reason {@see Health::helloFrame()} gives about every other capability: an
+     * advertisement assembled from something else can go stale against it, and this one silently,
+     * since a wrong advertisement misleads a client without failing any test that does not compare
+     * the two.
+     *
+     * An action carrying no response format at all is **absent**, not present with an empty list:
+     * `validateSource` reads files off disk and `runTest` returns a verdict, so neither has a format
+     * to choose. Absence says exactly that, where `[]` would claim they support none.
+     *
+     * @var array<string, string[]>
+     */
+    private const RESPONSE_FORMATS_BY_ACTION = [
+        'validateCalendar'  => self::VALIDATABLE_RESPONSE_FORMATS,
+        'executeValidation' => self::VALIDATABLE_RESOURCE_FORMATS
+    ];
+
     private const ACCEPT_HEADER_FOR_FORMAT = [
         'JSON' => 'application/json',
         'YML'  => 'application/yaml'
@@ -585,10 +611,18 @@ class Health implements MessageComponentInterface
      * be one more of them, and one that fails silently, since a stale advertisement misleads a client
      * without breaking any test that does not compare it against the source.
      *
-     * `responseFormats` advertises the narrow list on purpose. `ReturnTypeParam` knows more formats,
+     * `responseFormats` advertises the narrow lists on purpose. `ReturnTypeParam` knows more formats,
      * but `ReturnTypeParam::from()` throws a `\ValueError` on the ones `validateCalendar()` has no
      * branch for, and a `\ValueError` is an `\Error` that Ratchet does not catch — so advertising the
      * wider set would invite a client to kill the server by taking the advertisement at its word.
+     *
+     * It is keyed **by action** rather than flat, because `responseFormat` is a property of a message
+     * and what may go in it depends on which message: `/calendar` serves all four representations
+     * while every route a resource check addresses answers 406 to `application/xml` and
+     * `text/calendar`. The flat union that preceded this was accurate for `validateCalendar` and
+     * over-broad for `executeValidation` — it advertised two formats that action can only fail on.
+     * See {@see Health::RESPONSE_FORMATS_BY_ACTION}, which is composed from the two constants that
+     * already govern the behaviour rather than restated beside them.
      *
      * **This frame must stay unsolicited-safe.** It is sent on connect, before the connection is on
      * any run, so `sendMessage()` stamps no `runToken` onto it — and that is exactly why the shipped
@@ -602,7 +636,7 @@ class Health implements MessageComponentInterface
         $capabilities                  = new \stdClass();
         $capabilities->rites           = array_column(Rite::cases(), 'value');
         $capabilities->actions         = $this->messageValidator->supportedActions();
-        $capabilities->responseFormats = self::VALIDATABLE_RESPONSE_FORMATS;
+        $capabilities->responseFormats = (object) self::RESPONSE_FORMATS_BY_ACTION;
         $capabilities->steps           = array_column(Step::cases(), 'value');
         $capabilities->statuses        = array_column(Status::cases(), 'value');
 
