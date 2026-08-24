@@ -57,7 +57,10 @@
                 "validate": { "type": "string", "pattern": "^[^\\x00]*$" },
                 "sourceFile": { "type": "string", "pattern": "^[^\\x00]*$" },
                 "sourceFolder": { "type": "string", "pattern": "^[^\\x00]*$" },
-                "responsetype": { "type": "string" },
+                "responseFormat": {
+                    "description": "The representation to request from the API for a URL-addressed check, sent as an Accept header. JSON and YML only: every resource path other than /calendar answers 406 to application/xml and text/calendar, which is why XML and ICS are valid on validateCalendar and not here. Replaces the retired `responsetype`, which executeValidation() never read.",
+                    "enum": ["JSON", "YML"]
+                },
                 "rite": { "type": "string" },
                 "protocol": { "$ref": "#/definitions/protocolVersion" },
                 "runToken": { "$ref": "#/definitions/correlationId" },
