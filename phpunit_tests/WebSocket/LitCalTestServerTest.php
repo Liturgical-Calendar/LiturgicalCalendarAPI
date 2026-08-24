@@ -72,12 +72,30 @@ final class LitCalTestServerTest extends TestCase
 
         $capabilities = $hello->capabilities ?? null;
         $this->assertIsObject($capabilities);
-        foreach (['rites', 'actions', 'responseFormats', 'steps', 'statuses'] as $capability) {
+        foreach (['rites', 'actions', 'steps', 'statuses'] as $capability) {
             $this->assertIsArray($capabilities->{$capability} ?? null, "capabilities.{$capability} is missing");
             $this->assertNotEmpty($capabilities->{$capability});
         }
         $this->assertContains('validateSource', $capabilities->actions);
         $this->assertContains('complete', $capabilities->steps);
+
+        // `responseFormats` is the one capability that is not a flat list: it is keyed by action,
+        // because `responseFormat` is a property of a message and what may go in it depends on which
+        // message. Asserted on the wire and not only in {@see \LiturgicalCalendar\Tests\HealthHelloFrameTest}
+        // because that is this suite's whole reason to exist — the unit test builds the frame, this one
+        // reads what a client actually receives.
+        $responseFormats = $capabilities->responseFormats ?? null;
+        $this->assertIsObject($responseFormats, 'capabilities.responseFormats is missing, or is still a flat list');
+        $this->assertNotEmpty((array) $responseFormats);
+        foreach ((array) $responseFormats as $action => $formats) {
+            $this->assertIsArray($formats, "capabilities.responseFormats.{$action} is not a list of formats");
+            $this->assertNotEmpty($formats, "capabilities.responseFormats.{$action} is empty; an action with no format is omitted, not listed empty");
+            $this->assertContains(
+                (string) $action,
+                $capabilities->actions,
+                "capabilities.responseFormats advertises {$action}, which capabilities.actions does not"
+            );
+        }
 
         // No run correlation, which is what makes the frame invisible to a client that predates it:
         // both shipped runners drop a frame whose runToken does not match the run they are on.
