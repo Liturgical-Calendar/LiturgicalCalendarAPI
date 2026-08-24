@@ -248,12 +248,24 @@ final class EasterHandler extends AbstractHandler
         $responseHash = md5($contents);
         $response     = $response->withHeader('ETag', "\"{$responseHash}\"");
 
-        if (!is_dir('engineCache/easter/')) {
-            mkdir('engineCache/easter/', 0774, true);
-        }
-
-        if (false === file_put_contents($cacheFile, $contents)) {
-            throw new ServiceUnavailableException('Failed to write cache file');
+        // The cache is an optimisation, not part of the response, so a cache that cannot be written
+        // must not cost the client its answer. It used to: `engineCache/` is not writable on a
+        // read-only rootfs (a hardened deployment, or the API's own docker image), and this handler
+        // is the only one of its family that caches serialised output at all — so `/easter` alone
+        // answered 500 there, and only for a representation with no pre-warmed file beside it. The
+        // shipped image carries `en.json` and `la.json`, which is why JSON looked fine and
+        // `Accept: application/yaml` did not: the first YAML request tried to create `la.yml` and
+        // died with "Failed to open stream: Read-only file system".
+        //
+        // Suppressed rather than guarded with `is_writable()`: the directory can be writable and the
+        // write still fail (quota, a race with another worker), and the two outcomes deserve the same
+        // treatment. The failure is reported to the log so a deployment that meant its cache to work
+        // can still find out that it does not.
+        $cacheDirReady = is_dir('engineCache/easter/') || @mkdir('engineCache/easter/', 0774, true) || is_dir('engineCache/easter/');
+        if (false === $cacheDirReady || false === @file_put_contents($cacheFile, $contents)) {
+            // `error_log()`, matching {@see \LiturgicalCalendar\Api\ApcuCache}'s treatment of a cache
+            // backend that will not co-operate: the request is served, the operator finds out.
+            error_log('Easter cache write failed for ' . $cacheFile . '; serving the response uncached.');
         }
 
         if (

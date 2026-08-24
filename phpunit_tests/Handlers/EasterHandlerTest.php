@@ -26,6 +26,52 @@ final class EasterHandlerTest extends AbstractHandlerTestCase
         }
     }
 
+    /**
+     * A cache that cannot be written costs the client a cache entry, not its answer.
+     *
+     * This handler is the only one of its family that caches serialised output to disk, and it used
+     * to `throw new ServiceUnavailableException('Failed to write cache file')` when the write failed
+     * — so on a read-only rootfs (a hardened deployment, or the API's own docker image) `/easter`
+     * alone answered **500**, and only for a representation with no pre-warmed file beside it. The
+     * shipped image carries `en.json` and `la.json`, which is exactly why JSON looked healthy while
+     * `Accept: application/yaml` did not: the first YAML request tried to create `la.yml` and died
+     * with "Failed to open stream: Read-only file system".
+     *
+     * The unwritable directory is simulated by putting a *file* where the cache directory belongs,
+     * which makes both `mkdir()` and `file_put_contents()` fail without needing root or a real
+     * read-only mount, and without depending on the test runner's uid.
+     */
+    public function testAnUnwritableCacheDoesNotCostTheClientItsResponse(): void
+    {
+        $cacheDir = self::CACHE_DIR;
+        if (is_dir($cacheDir)) {
+            foreach ((array) glob($cacheDir . '/*') as $file) {
+                if (is_string($file) && is_file($file)) {
+                    unlink($file);
+                }
+            }
+            rmdir($cacheDir);
+        }
+        // A regular file where the directory should be: mkdir() fails, and so does every write into it.
+        file_put_contents($cacheDir, 'not a directory');
+
+        try {
+            $response = @( new EasterHandler() )->handle(
+                $this->requestFor('GET', '/easter', ['Accept-Language' => 'la'])
+            );
+
+            self::assertSame(200, $response->getStatusCode(), 'an unwritable cache must not become a 5xx');
+            $body = $this->decodeJsonBody($response);
+            self::assertArrayHasKey('litcal_easter', $body);
+            self::assertNotEmpty($body['litcal_easter'], 'the response must be fully computed, not truncated');
+            self::assertNotEmpty($response->getHeaderLine('ETag'), 'the ETag is computed from the body, not from the cache');
+        } finally {
+            if (is_file($cacheDir)) {
+                unlink($cacheDir);
+            }
+        }
+    }
+
     public function testOptionsPreflightSucceeds(): void
     {
         $response = ( new EasterHandler() )->handle(
