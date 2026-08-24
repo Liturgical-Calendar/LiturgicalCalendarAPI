@@ -5,6 +5,12 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\WebSocket;
 
 use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
+use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Enum\Status;
+use LiturgicalCalendar\Api\Enum\Step;
+use LiturgicalCalendar\Api\Health;
+use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -34,6 +40,17 @@ final class LitCalTestServerTest extends TestCase
     private string $wsHost;
     private int $wsPort;
 
+    /**
+     * `WebSocketMessageValidator` resolves the published schema through `LitSchema`, which reads
+     * `Router::$apiFilePath` — a typed static that throws until the paths are initialised. Every
+     * other suite that touches the validator does the same; this one did not need to until it began
+     * deriving the expected capabilities from the same source the server advertises from.
+     */
+    public static function setUpBeforeClass(): void
+    {
+        Router::getApiPaths();
+    }
+
     protected function setUp(): void
     {
         $this->wsHost = (string) ( $_ENV['WS_HOST'] ?? '127.0.0.1' );
@@ -51,6 +68,87 @@ final class LitCalTestServerTest extends TestCase
             );
         }
         fclose($probe);
+
+        // Every test in this class reads the wire, so every one of them can be answered by a server
+        // that is not this code — the handshake test is not special, it is merely where the drift
+        // was visible. Checking here means one stale server produces one clear diagnosis instead of
+        // a scatter of unrelated-looking failures, or worse, passes.
+        $client = WsTestClient::connect($this->wsHost, $this->wsPort);
+        $hello  = $client->hello();
+        $client->close();
+        self::assertNotNull($hello, 'a connecting client was not sent a hello frame');
+        self::assertServerIsRunningThisCheckout($hello);
+    }
+
+    /**
+     * Refuse to report a pass from a server that is not running this checkout.
+     *
+     * The hazard this closes is a **false pass, not a skip**. `setUp()` probes the port and skips
+     * when nothing answers, which reads as careful and is not: nothing checked that whatever *does*
+     * answer is the code under test. The WS server is a long-running PHP CLI process that loads
+     * `src/Health.php` once at boot, and under docker the container bind-mounts the checkout — so
+     * editing a file changes nothing until the process restarts, and a server started before the
+     * change keeps answering with the old behaviour. That happened: the per-action `responseFormats`
+     * reshape was asserted here with `assertIsArray`, a stale server returned the previous flat list,
+     * and the suite passed locally while CI failed. The loose assertion was the proximate cause; the
+     * missing freshness check is why nothing said so.
+     *
+     * **Every capability is already a fingerprint of the running code.** `helloFrame()` derives each
+     * one server-side from whatever defines it — `Rite::cases()`, the inbound schema's actions,
+     * `RESPONSE_FORMATS_BY_ACTION`, `Step::cases()`, `Status::cases()` — precisely so an
+     * advertisement cannot go stale against the behaviour it describes. Deriving the same values here
+     * and comparing exactly turns that property into a staleness detector at no extra cost: no new
+     * protocol field, no build stamp, nothing to keep in sync that is not kept in sync already.
+     *
+     * **Known limit, stated rather than papered over.** This catches staleness that reaches the
+     * handshake. A server running an older `Health.php` whose capabilities happen to be identical
+     * still passes, and only the suite starting its own server on an ephemeral port would close that
+     * — which needs a port argument on `bin/LitCalTestServer.php`, since `WS_PORT` cannot be
+     * overridden by environment here (`variables_order=GPCS` plus `Dotenv::createMutable`). Deferred
+     * deliberately; this covers the drift that actually bit.
+     *
+     * A pid-file mtime comparison was considered and rejected: `ws-server.pid` can be stale, and
+     * under docker the answering process never writes it at all, so the check would interrogate the
+     * wrong process in exactly the configuration where the incident happened.
+     */
+    private static function assertServerIsRunningThisCheckout(\stdClass $hello): void
+    {
+        $stale = ' — the server answering on this port is not running this checkout.'
+            . ' It is a long-running process that loads src/Health.php once at boot, so restart it'
+            . ' (`composer ws:stop && composer ws:start`, or `docker compose restart litcal-api`).';
+
+        self::assertSame(
+            max(WebSocketMessageValidator::SUPPORTED_PROTOCOL_VERSIONS),
+            $hello->protocol ?? null,
+            'protocol' . $stale
+        );
+
+        $capabilities = $hello->capabilities ?? null;
+        self::assertIsObject($capabilities, 'capabilities' . $stale);
+
+        self::assertSame(array_column(Rite::cases(), 'value'), $capabilities->rites ?? null, 'capabilities.rites' . $stale);
+        self::assertSame(array_column(Step::cases(), 'value'), $capabilities->steps ?? null, 'capabilities.steps' . $stale);
+        self::assertSame(array_column(Status::cases(), 'value'), $capabilities->statuses ?? null, 'capabilities.statuses' . $stale);
+
+        // `supportedActions()` reads the published inbound schema, which is what the server itself
+        // advertises from — so this compares the wire against the contract rather than against a
+        // list written out here that would need editing whenever an action is added.
+        self::assertSame(
+            ( new WebSocketMessageValidator() )->supportedActions(),
+            $capabilities->actions ?? null,
+            'capabilities.actions' . $stale
+        );
+
+        // Keyed by action since API#886. Read off the constant by reflection rather than restated,
+        // for the same reason HealthHelloFrameTest does: a literal here would let the advertisement
+        // and the behaviour drift together in the one direction nothing else catches.
+        /** @var array<string, string[]> $expectedFormats */
+        $expectedFormats = ( new \ReflectionClassConstant(Health::class, 'RESPONSE_FORMATS_BY_ACTION') )->getValue();
+        self::assertEquals(
+            (object) $expectedFormats,
+            $capabilities->responseFormats ?? null,
+            'capabilities.responseFormats' . $stale
+        );
     }
 
     /**
@@ -70,32 +168,11 @@ final class LitCalTestServerTest extends TestCase
         $this->assertNotNull($hello, 'a connecting client was not sent a hello frame');
         $this->assertSame(1, $hello->protocol ?? null);
 
-        $capabilities = $hello->capabilities ?? null;
-        $this->assertIsObject($capabilities);
-        foreach (['rites', 'actions', 'steps', 'statuses'] as $capability) {
-            $this->assertIsArray($capabilities->{$capability} ?? null, "capabilities.{$capability} is missing");
-            $this->assertNotEmpty($capabilities->{$capability});
-        }
-        $this->assertContains('validateSource', $capabilities->actions);
-        $this->assertContains('complete', $capabilities->steps);
-
-        // `responseFormats` is the one capability that is not a flat list: it is keyed by action,
-        // because `responseFormat` is a property of a message and what may go in it depends on which
-        // message. Asserted on the wire and not only in {@see \LiturgicalCalendar\Tests\HealthHelloFrameTest}
-        // because that is this suite's whole reason to exist — the unit test builds the frame, this one
-        // reads what a client actually receives.
-        $responseFormats = $capabilities->responseFormats ?? null;
-        $this->assertIsObject($responseFormats, 'capabilities.responseFormats is missing, or is still a flat list');
-        $this->assertNotEmpty((array) $responseFormats);
-        foreach ((array) $responseFormats as $action => $formats) {
-            $this->assertIsArray($formats, "capabilities.responseFormats.{$action} is not a list of formats");
-            $this->assertNotEmpty($formats, "capabilities.responseFormats.{$action} is empty; an action with no format is omitted, not listed empty");
-            $this->assertContains(
-                (string) $action,
-                $capabilities->actions,
-                "capabilities.responseFormats advertises {$action}, which capabilities.actions does not"
-            );
-        }
+        // Compared **exactly** against what this checkout would advertise, not merely type-checked.
+        // Every capability is derived server-side from the enums, schema and constants in this very
+        // repository, so the handshake is already a fingerprint of the code the server is running —
+        // it just was not being read as one. See self::assertServerIsRunningThisCheckout().
+        self::assertServerIsRunningThisCheckout($hello);
 
         // No run correlation, which is what makes the frame invisible to a client that predates it:
         // both shipped runners drop a frame whose runToken does not match the run they are on.
