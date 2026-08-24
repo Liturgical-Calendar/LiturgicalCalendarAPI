@@ -185,19 +185,84 @@ final class HealthHelloFrameTest extends TestCase
     }
 
     /**
-     * The response formats advertised are the ones `validateCalendar()` has a validation branch for —
-     * narrower than `ReturnTypeParam`, deliberately, because a format outside that list reaches
+     * The response formats advertised are the ones each action has a validation branch for — narrower
+     * than `ReturnTypeParam`, deliberately, because a format outside that list reaches
      * `ReturnTypeParam::from()` and throws a `\ValueError`, which Ratchet does not catch. Advertising
      * the wider list would invite a client to kill the server.
+     *
+     * Read back off the two constants rather than written out here, for the reason the whole frame is
+     * built that way: a literal in the test would let the advertisement and the behaviour drift
+     * together in the one direction nothing else catches.
      */
-    public function testOnlyTheValidatableResponseFormatsAreAdvertised(): void
+    public function testEachActionAdvertisesTheFormatsItCanActOn(): void
     {
         $frame = $this->helloFrameFor(self::createStubConnection(5));
 
-        /** @var list<string> $validatable */
-        $validatable = ( new \ReflectionClassConstant(Health::class, 'VALIDATABLE_RESPONSE_FORMATS') )->getValue();
+        /** @var list<string> $calendarFormats */
+        $calendarFormats = ( new \ReflectionClassConstant(Health::class, 'VALIDATABLE_RESPONSE_FORMATS') )->getValue();
+        /** @var list<string> $resourceFormats */
+        $resourceFormats = ( new \ReflectionClassConstant(Health::class, 'VALIDATABLE_RESOURCE_FORMATS') )->getValue();
 
-        self::assertSame($validatable, $frame->capabilities->responseFormats ?? null);
+        $advertised = $frame->capabilities->responseFormats ?? null;
+        self::assertInstanceOf(\stdClass::class, $advertised, 'keyed by action, not a flat list');
+        self::assertSame($calendarFormats, $advertised->validateCalendar ?? null);
+        self::assertSame($resourceFormats, $advertised->executeValidation ?? null);
+    }
+
+    /**
+     * The per-action lists genuinely differ, so the reshape says something the flat union could not.
+     *
+     * Without this, an advertisement that happened to give both actions the same list would satisfy
+     * the test above while re-introducing exactly the over-broad claim the reshape removed: XML and
+     * ICS advertised for `executeValidation`, which every route it addresses answers 406 to.
+     */
+    public function testTheResourceActionAdvertisesNeitherXmlNorIcs(): void
+    {
+        $advertised = $this->helloFrameFor(self::createStubConnection(6))->capabilities->responseFormats;
+
+        self::assertNotEquals(
+            $advertised->validateCalendar,
+            $advertised->executeValidation,
+            'a per-action advertisement that says the same thing for both is the flat union again'
+        );
+        self::assertNotContains('XML', $advertised->executeValidation);
+        self::assertNotContains('ICS', $advertised->executeValidation);
+    }
+
+    /**
+     * An action with no response format is absent, not present with an empty list.
+     *
+     * `validateSource` reads files off disk and `runTest` returns a verdict, so neither has a
+     * representation to choose. `[]` would be a different and misleading claim — "supports no
+     * formats" rather than "takes no format" — and a client checking `formats.length > 0` before
+     * offering a picker would read the two the same way.
+     */
+    public function testAnActionThatTakesNoFormatIsAbsentRatherThanEmpty(): void
+    {
+        $advertised = $this->helloFrameFor(self::createStubConnection(7))->capabilities->responseFormats;
+
+        self::assertObjectNotHasProperty('validateSource', $advertised);
+        self::assertObjectNotHasProperty('runTest', $advertised);
+    }
+
+    /**
+     * Every advertised key is an action the server actually dispatches.
+     *
+     * Guards the direction the constant cannot: a typo'd or retired action name would advertise
+     * formats for a message the server would refuse outright.
+     */
+    public function testEveryAdvertisedActionIsOneTheServerAccepts(): void
+    {
+        $frame      = $this->helloFrameFor(self::createStubConnection(8));
+        $advertised = $frame->capabilities->responseFormats;
+
+        foreach (array_keys((array) $advertised) as $action) {
+            self::assertContains(
+                (string) $action,
+                $frame->capabilities->actions,
+                "responseFormats advertises {$action}, which the server does not accept"
+            );
+        }
     }
 
     /**
