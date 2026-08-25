@@ -1030,6 +1030,30 @@ main() {
         for entry in "${projects[@]}"; do
             local label="${entry%%:*}"
             local dir="${entry#*:}"
+
+            # The docker stack's compose file lives in the Frontend project, and it interpolates
+            # from .env — and ONLY from .env. resolve_env_file() above prefers .env.development
+            # when it exists, so on that very common layout every value written so far has landed
+            # somewhere compose never reads, leaving the stack on whatever .env happened to hold.
+            # That is why this block targets .env explicitly rather than "$target" — and why it sits
+            # OUTSIDE the "$target" guard below: a fresh checkout with no env file at all resolves to
+            # an empty target, and skipping the stack's own .env in exactly the case that most needs
+            # it written is the opposite of useful. update_env_file() creates the file if absent.
+            #
+            # ZITADEL_TESTS_CLIENT_ID is the one that has no equivalent anywhere else: the compose
+            # gives litcal-tests its OWN client, because Zitadel rejects a redirect_uri that is not
+            # registered against the client making the request and the test interface's callback is
+            # on its own port. Handed the Frontend's client, its login fails with "The requested
+            # redirect_uri is missing in the client configuration".
+            if [ "$label" = "Frontend" ]; then
+                local compose_env="${dir}/.env"
+                update_env_file "$compose_env" "ZITADEL_ISSUER" "${ZITADEL_URL}"
+                update_env_file "$compose_env" "ZITADEL_PROJECT_ID" "$PROJECT_ID"
+                update_env_file "$compose_env" "ZITADEL_CLIENT_ID" "$FRONTEND_CLIENT_ID"
+                update_env_file "$compose_env" "ZITADEL_TESTS_CLIENT_ID" "$TESTS_CLIENT_ID"
+                echo -e "${GREEN}Updated docker stack env: ${compose_env}${NC}"
+            fi
+
             local target
             target=$(resolve_env_file "$dir")
             if [ -n "$target" ]; then
