@@ -33,13 +33,6 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Configuration
-# Derived from ZITADEL_PORT so the ZITADEL_ISSUER this script writes into .env agrees
-# with the port docker-compose.yml publishes. Hardcoding :8080 here meant that
-# overriding the port produced a stale issuer in every .env this script touches.
-ZITADEL_URL="${ZITADEL_URL:-http://localhost:${ZITADEL_PORT:-8080}}"
-FRONTEND_PORT="${FRONTEND_PORT:-3000}"
-TESTS_PORT="${TESTS_PORT:-3003}"
 MAX_RETRIES=30
 RETRY_INTERVAL=5
 
@@ -50,6 +43,112 @@ ROLES=("admin" "developer" "calendar_editor" "test_editor")
 # Directories
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="${SCRIPT_DIR}/.."
+
+# Resolve a single configuration key the way `docker compose` would.
+#
+# compose reads .env for its own interpolation, so the ports declared there are the
+# stack's source of truth. This script has to agree with them: it writes ZITADEL_ISSUER
+# into .env files and registers OIDC redirect URIs, and a port it resolved differently
+# from compose produces exactly the silent disagreement those values exist to prevent.
+#
+# PRIMARY PATH: ask compose itself, via `docker compose config --environment`. That is
+# authoritative by construction — it cannot disagree with compose — and costs ~40ms.
+# It matters because compose's .env handling is richer than it looks: it accepts `:` as
+# well as `=`, strips a comment only when whitespace precedes the '#', and interpolates
+# values, so `ZITADEL_PORT=${LOCAL_PORT:-8080}` resolves rather than arriving literally.
+# Three successive hand-written approximations of that parser each missed a case.
+#
+# FALLBACK: a conservative literal reader, for when docker is absent or PROJECT_DIR has
+# no valid compose file. It handles the common spellings but deliberately does NOT try to
+# interpolate; a value it cannot resolve is reported rather than guessed at.
+#
+# Precedence in both paths matches compose: exported shell variable, then .env, then the
+# built-in default. .env is never `source`d — it holds secrets, and arbitrary shell in a
+# config file must not be executed.
+COMPOSE_ENV_CACHE=""
+COMPOSE_ENV_TRIED=false
+
+env_file_value() {
+    local key="$1"
+
+    if [ "$COMPOSE_ENV_TRIED" = false ]; then
+        COMPOSE_ENV_TRIED=true
+        if command -v docker >/dev/null 2>&1; then
+            COMPOSE_ENV_CACHE=$( cd "$PROJECT_DIR" && docker compose config --environment 2>/dev/null ) || COMPOSE_ENV_CACHE=""
+        fi
+    fi
+
+    local line=""
+    if [ -n "$COMPOSE_ENV_CACHE" ]; then
+        line=$(printf '%s\n' "$COMPOSE_ENV_CACHE" | grep -E "^${key}=" | tail -n 1) || true
+        if [ -n "$line" ]; then
+            printf '%s' "${line#*=}"
+            return 0
+        fi
+        # compose answered and did not set this key: it is genuinely unset.
+        return 0
+    fi
+
+    local file="${PROJECT_DIR}/.env"
+    [ -f "$file" ] || return 0
+    line=$(grep -E "^[[:space:]]*${key}[[:space:]]*[:=]" "$file" 2>/dev/null | tail -n 1) || return 0
+    [ -n "$line" ] || return 0
+
+    local val="${line#*[:=]}"
+    val="${val#"${val%%[![:space:]]*}"}"
+    val="${val%"${val##*[![:space:]]}"}"
+
+    if [[ $val == '"'* ]]; then
+        val="${val#\"}"
+        val="${val%%\"*}"
+    elif [[ $val == "'"* ]]; then
+        val="${val#\'}"
+        val="${val%%\'*}"
+    elif [[ $val =~ ^(.*[^[:space:]])[[:space:]]+#.*$ ]]; then
+        val="${BASH_REMATCH[1]}"
+    elif [[ $val =~ ^# ]]; then
+        val=""
+    fi
+
+    if [[ $val == *'${'* || $val == *'$'[A-Za-z_]* ]]; then
+        echo -e "${YELLOW}Warning:${NC} ${key} in ${file} uses variable interpolation (${val})," >&2
+        echo -e "         which only docker compose can resolve, and it is unavailable here." >&2
+        echo -e "         Falling back to the built-in default. Export ${key} to be explicit." >&2
+        val=""
+    fi
+
+    printf '%s' "$val"
+}
+
+# Configuration
+# Each port falls back through: exported variable -> .env -> built-in default.
+# ZITADEL_URL is derived from ZITADEL_PORT so the ZITADEL_ISSUER written into every
+# .env this script touches names the port compose actually publishes. FRONTEND_PORT
+# and TESTS_PORT matter for the same reason: they build the redirect URIs registered
+# with the OIDC clients, and a redirect URI on the wrong port fails login outright.
+ZITADEL_PORT="${ZITADEL_PORT:-$(env_file_value ZITADEL_PORT)}"
+FRONTEND_PORT="${FRONTEND_PORT:-$(env_file_value FRONTEND_PORT)}"
+TESTS_PORT="${TESTS_PORT:-$(env_file_value TESTS_PORT)}"
+ZITADEL_URL_EXPLICIT="${ZITADEL_URL:-}"
+ZITADEL_URL="${ZITADEL_URL:-http://localhost:${ZITADEL_PORT:-8080}}"
+FRONTEND_PORT="${FRONTEND_PORT:-3000}"
+TESTS_PORT="${TESTS_PORT:-3003}"
+
+# An explicit ZITADEL_URL still wins outright — a deployment on a real domain needs that,
+# and the port is meaningless there. But when it names a DIFFERENT port than the stack
+# publishes, the script would health-check, call and write an issuer for one port while
+# compose served another. That is precisely the silent disagreement this section exists to
+# prevent, so make it audible rather than guessing which the operator meant.
+if [ -n "$ZITADEL_URL_EXPLICIT" ] && [ -n "${ZITADEL_PORT:-}" ]; then
+    _url_port="${ZITADEL_URL_EXPLICIT##*:}"
+    _url_port="${_url_port%%/*}"
+    if [[ $_url_port =~ ^[0-9]+$ ]] && [ "$_url_port" != "$ZITADEL_PORT" ]; then
+        echo -e "${YELLOW}Warning:${NC} ZITADEL_URL (${ZITADEL_URL_EXPLICIT}) names port ${_url_port}," >&2
+        echo -e "         but ZITADEL_PORT is ${ZITADEL_PORT}. Proceeding with ZITADEL_URL." >&2
+        echo -e "         If that is not intended, unset ZITADEL_URL or align the two." >&2
+    fi
+    unset _url_port
+fi
 
 # Parse command line arguments
 UPDATE_ENV="${UPDATE_ENV:-false}"
