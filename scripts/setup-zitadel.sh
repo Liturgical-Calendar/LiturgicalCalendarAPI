@@ -134,6 +134,24 @@ ZITADEL_URL="${ZITADEL_URL:-http://localhost:${ZITADEL_PORT:-8080}}"
 FRONTEND_PORT="${FRONTEND_PORT:-3000}"
 TESTS_PORT="${TESTS_PORT:-3003}"
 
+# The public origins the OIDC apps are registered against. Zitadel matches a redirect_uri exactly, so
+# these decide whether a real deployment can log in at all.
+#
+# They used to be composed as http://localhost:$PORT unconditionally, which had two consequences beyond
+# "cannot provision a production app": the existing-app branch of create_oidc_app() calls
+# UpdateApplication and OVERWRITES redirectUris, so running this against a production Zitadel rewrote the
+# live app's redirect URI to localhost and broke its login; and the Tests app simply never existed
+# anywhere that was not a developer laptop.
+#
+# FRONTEND_URL and ACCURACY_TESTS_URL are the names the stack already uses for these origins
+# (docker-compose.yml sets both on litcal-frontend), so no new vocabulary is introduced.
+FRONTEND_URL="${FRONTEND_URL:-$(env_file_value FRONTEND_URL)}"
+ACCURACY_TESTS_URL="${ACCURACY_TESTS_URL:-$(env_file_value ACCURACY_TESTS_URL)}"
+FRONTEND_URL="${FRONTEND_URL:-http://localhost:${FRONTEND_PORT}}"
+ACCURACY_TESTS_URL="${ACCURACY_TESTS_URL:-http://localhost:${TESTS_PORT}}"
+FRONTEND_URL="${FRONTEND_URL%/}"
+ACCURACY_TESTS_URL="${ACCURACY_TESTS_URL%/}"
+
 # An explicit ZITADEL_URL still wins outright — a deployment on a real domain needs that,
 # and the port is meaningless there. But when it names a DIFFERENT port than the stack
 # publishes, the script would health-check, call and write an issuer for one port while
@@ -457,6 +475,14 @@ create_oidc_app() {
     local redirect_uri="$4"
     local post_logout_uri="$5"
 
+    # Zitadel's developmentMode is what permits a non-HTTPS redirect URI. It was hardcoded true, which is
+    # required for http://localhost and is a needless loosening on a real deployment — so derive it from
+    # the scheme actually being registered instead of asserting one.
+    local development_mode="true"
+    if [[ "$redirect_uri" == https://* ]]; then
+        development_mode="false"
+    fi
+
     echo -e "${YELLOW}Creating OIDC app: $app_name...${NC}" >&2
 
     # Check if app already exists
@@ -516,7 +542,7 @@ create_oidc_app() {
                     \"applicationType\": \"OIDC_APP_TYPE_WEB\",
                     \"authMethodType\": \"OIDC_AUTH_METHOD_TYPE_NONE\",
                     \"accessTokenType\": \"OIDC_TOKEN_TYPE_JWT\",
-                    \"developmentMode\": true,
+                    \"developmentMode\": ${development_mode},
                     \"idTokenRoleAssertion\": true,
                     \"accessTokenRoleAssertion\": true,
                     \"idTokenUserinfoAssertion\": true
@@ -553,7 +579,7 @@ create_oidc_app() {
                 \"applicationType\": \"OIDC_APP_TYPE_WEB\",
                 \"authMethodType\": \"OIDC_AUTH_METHOD_TYPE_NONE\",
                 \"accessTokenType\": \"OIDC_TOKEN_TYPE_JWT\",
-                \"developmentMode\": true,
+                \"developmentMode\": ${development_mode},
                 \"idTokenRoleAssertion\": true,
                 \"idTokenUserinfoAssertion\": true
             }
@@ -950,15 +976,15 @@ main() {
     # Create Frontend OIDC app
     echo
     FRONTEND_CREDS=$(create_oidc_app "$PAT" "$PROJECT_ID" "LiturgicalCalendar Frontend" \
-        "http://localhost:${FRONTEND_PORT}/auth/callback.php" \
-        "http://localhost:${FRONTEND_PORT}")
+        "${FRONTEND_URL}/auth/callback.php" \
+        "${FRONTEND_URL}")
     FRONTEND_CLIENT_ID=$(echo "$FRONTEND_CREDS" | cut -d: -f1)
 
     # Create Tests OIDC app
     echo
     TESTS_CREDS=$(create_oidc_app "$PAT" "$PROJECT_ID" "LiturgicalCalendar Tests" \
-        "http://localhost:${TESTS_PORT}/auth/callback.php" \
-        "http://localhost:${TESTS_PORT}")
+        "${ACCURACY_TESTS_URL}/auth/callback.php" \
+        "${ACCURACY_TESTS_URL}")
     TESTS_CLIENT_ID=$(echo "$TESTS_CREDS" | cut -d: -f1)
 
     echo
