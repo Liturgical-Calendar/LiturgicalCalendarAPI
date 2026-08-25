@@ -44,56 +44,76 @@ ROLES=("admin" "developer" "calendar_editor" "test_editor")
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="${SCRIPT_DIR}/.."
 
-# Read a single KEY=value out of the project's .env WITHOUT sourcing it.
+# Resolve a single configuration key the way `docker compose` would.
 #
-# `docker compose` reads .env for its own interpolation, so the ports declared there
-# are the stack's source of truth. This script has to agree with them: it writes
-# ZITADEL_ISSUER into .env files and registers OIDC redirect URIs in Zitadel, and a
-# port it guessed differently from compose produces exactly the silent disagreement
-# those values exist to prevent. Before this, `./scripts/setup-zitadel.sh --update-env`
-# run from a bare shell would happily overwrite a ZITADEL_PORT=8090 stack's issuer
-# with http://localhost:8080.
+# compose reads .env for its own interpolation, so the ports declared there are the
+# stack's source of truth. This script has to agree with them: it writes ZITADEL_ISSUER
+# into .env files and registers OIDC redirect URIs, and a port it resolved differently
+# from compose produces exactly the silent disagreement those values exist to prevent.
 #
-# Precedence matches compose: an exported shell variable beats .env, which beats the
-# built-in default. The accepted spellings were derived by testing compose rather than
-# assumed, because a parser that is merely close reintroduces the disagreement this
-# helper exists to remove. Compose reads all of these as the same value:
-#     KEY=v      KEY="v"      KEY = "v"      '  KEY=v'
-#     KEY: v                    (colon delimiter)
-#     KEY=v # comment           (comment needs WHITESPACE before the '#')
-# but `KEY=v# x` keeps the literal `v# x`, so the '#' is only a comment when a space
-# precedes it. Quoted values take the quoted span and ignore any trailing text.
+# PRIMARY PATH: ask compose itself, via `docker compose config --environment`. That is
+# authoritative by construction — it cannot disagree with compose — and costs ~40ms.
+# It matters because compose's .env handling is richer than it looks: it accepts `:` as
+# well as `=`, strips a comment only when whitespace precedes the '#', and interpolates
+# values, so `ZITADEL_PORT=${LOCAL_PORT:-8080}` resolves rather than arriving literally.
+# Three successive hand-written approximations of that parser each missed a case.
 #
-# Parsed with grep/cut rather than `source`, because .env holds secrets and arbitrary
-# shell in a config file must never be executed. Always exits 0 so `set -e` cannot
-# trip on a missing file or an absent key.
+# FALLBACK: a conservative literal reader, for when docker is absent or PROJECT_DIR has
+# no valid compose file. It handles the common spellings but deliberately does NOT try to
+# interpolate; a value it cannot resolve is reported rather than guessed at.
+#
+# Precedence in both paths matches compose: exported shell variable, then .env, then the
+# built-in default. .env is never `source`d — it holds secrets, and arbitrary shell in a
+# config file must not be executed.
+COMPOSE_ENV_CACHE=""
+COMPOSE_ENV_TRIED=false
+
 env_file_value() {
     local key="$1"
+
+    if [ "$COMPOSE_ENV_TRIED" = false ]; then
+        COMPOSE_ENV_TRIED=true
+        if command -v docker >/dev/null 2>&1; then
+            COMPOSE_ENV_CACHE=$( cd "$PROJECT_DIR" && docker compose config --environment 2>/dev/null ) || COMPOSE_ENV_CACHE=""
+        fi
+    fi
+
+    local line=""
+    if [ -n "$COMPOSE_ENV_CACHE" ]; then
+        line=$(printf '%s\n' "$COMPOSE_ENV_CACHE" | grep -E "^${key}=" | tail -n 1) || true
+        if [ -n "$line" ]; then
+            printf '%s' "${line#*=}"
+            return 0
+        fi
+        # compose answered and did not set this key: it is genuinely unset.
+        return 0
+    fi
+
     local file="${PROJECT_DIR}/.env"
     [ -f "$file" ] || return 0
-
-    local line
     line=$(grep -E "^[[:space:]]*${key}[[:space:]]*[:=]" "$file" 2>/dev/null | tail -n 1) || return 0
     [ -n "$line" ] || return 0
 
-    # Strip the key and its delimiter, then trim surrounding whitespace.
     local val="${line#*[:=]}"
     val="${val#"${val%%[![:space:]]*}"}"
     val="${val%"${val##*[![:space:]]}"}"
 
     if [[ $val == '"'* ]]; then
-        # Quoted: take the quoted span and ignore anything after it, as compose does.
         val="${val#\"}"
         val="${val%%\"*}"
     elif [[ $val == "'"* ]]; then
         val="${val#\'}"
         val="${val%%\'*}"
     elif [[ $val =~ ^(.*[^[:space:]])[[:space:]]+#.*$ ]]; then
-        # Unquoted: a comment begins at WHITESPACE followed by '#'. Without the
-        # whitespace the '#' is part of the value — compose reads `PORT=80# x` as
-        # the literal `80# x` — so this must not strip every '#'.
         val="${BASH_REMATCH[1]}"
     elif [[ $val =~ ^# ]]; then
+        val=""
+    fi
+
+    if [[ $val == *'${'* || $val == *'$'[A-Za-z_]* ]]; then
+        echo -e "${YELLOW}Warning:${NC} ${key} in ${file} uses variable interpolation (${val})," >&2
+        echo -e "         which only docker compose can resolve, and it is unavailable here." >&2
+        echo -e "         Falling back to the built-in default. Export ${key} to be explicit." >&2
         val=""
     fi
 
