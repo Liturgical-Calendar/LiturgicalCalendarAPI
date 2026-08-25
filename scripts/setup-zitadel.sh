@@ -33,13 +33,6 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Configuration
-# Derived from ZITADEL_PORT so the ZITADEL_ISSUER this script writes into .env agrees
-# with the port docker-compose.yml publishes. Hardcoding :8080 here meant that
-# overriding the port produced a stale issuer in every .env this script touches.
-ZITADEL_URL="${ZITADEL_URL:-http://localhost:${ZITADEL_PORT:-8080}}"
-FRONTEND_PORT="${FRONTEND_PORT:-3000}"
-TESTS_PORT="${TESTS_PORT:-3003}"
 MAX_RETRIES=30
 RETRY_INTERVAL=5
 
@@ -50,6 +43,47 @@ ROLES=("admin" "developer" "calendar_editor" "test_editor")
 # Directories
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="${SCRIPT_DIR}/.."
+
+# Read a single KEY=value out of the project's .env WITHOUT sourcing it.
+#
+# `docker compose` reads .env for its own interpolation, so the ports declared there
+# are the stack's source of truth. This script has to agree with them: it writes
+# ZITADEL_ISSUER into .env files and registers OIDC redirect URIs in Zitadel, and a
+# port it guessed differently from compose produces exactly the silent disagreement
+# those values exist to prevent. Before this, `./scripts/setup-zitadel.sh --update-env`
+# run from a bare shell would happily overwrite a ZITADEL_PORT=8090 stack's issuer
+# with http://localhost:8080.
+#
+# Precedence matches compose: an exported shell variable beats .env, which beats the
+# built-in default. The accepted spellings match compose too — verified against it,
+# which reads all of `KEY=v`, `KEY="v"`, `  KEY=v` and `KEY = "v"` as the same value,
+# so surrounding whitespace and wrapping quotes are tolerated here rather than
+# silently missing a key compose would have honoured.
+#
+# Parsed with grep/cut rather than `source`, because .env holds secrets and arbitrary
+# shell in a config file must never be executed. Always exits 0 so `set -e` cannot
+# trip on a missing file or an absent key.
+env_file_value() {
+    local key="$1"
+    local file="${PROJECT_DIR}/.env"
+    [ -f "$file" ] || return 0
+    grep -E "^[[:space:]]*${key}[[:space:]]*=" "$file" 2>/dev/null | tail -n 1 | cut -d= -f2- \
+        | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' \
+              -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'\$/\1/"
+}
+
+# Configuration
+# Each port falls back through: exported variable -> .env -> built-in default.
+# ZITADEL_URL is derived from ZITADEL_PORT so the ZITADEL_ISSUER written into every
+# .env this script touches names the port compose actually publishes. FRONTEND_PORT
+# and TESTS_PORT matter for the same reason: they build the redirect URIs registered
+# with the OIDC clients, and a redirect URI on the wrong port fails login outright.
+ZITADEL_PORT="${ZITADEL_PORT:-$(env_file_value ZITADEL_PORT)}"
+FRONTEND_PORT="${FRONTEND_PORT:-$(env_file_value FRONTEND_PORT)}"
+TESTS_PORT="${TESTS_PORT:-$(env_file_value TESTS_PORT)}"
+ZITADEL_URL="${ZITADEL_URL:-http://localhost:${ZITADEL_PORT:-8080}}"
+FRONTEND_PORT="${FRONTEND_PORT:-3000}"
+TESTS_PORT="${TESTS_PORT:-3003}"
 
 # Parse command line arguments
 UPDATE_ENV="${UPDATE_ENV:-false}"
