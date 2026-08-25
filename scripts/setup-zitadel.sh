@@ -55,10 +55,14 @@ PROJECT_DIR="${SCRIPT_DIR}/.."
 # with http://localhost:8080.
 #
 # Precedence matches compose: an exported shell variable beats .env, which beats the
-# built-in default. The accepted spellings match compose too — verified against it,
-# which reads all of `KEY=v`, `KEY="v"`, `  KEY=v` and `KEY = "v"` as the same value,
-# so surrounding whitespace and wrapping quotes are tolerated here rather than
-# silently missing a key compose would have honoured.
+# built-in default. The accepted spellings were derived by testing compose rather than
+# assumed, because a parser that is merely close reintroduces the disagreement this
+# helper exists to remove. Compose reads all of these as the same value:
+#     KEY=v      KEY="v"      KEY = "v"      '  KEY=v'
+#     KEY: v                    (colon delimiter)
+#     KEY=v # comment           (comment needs WHITESPACE before the '#')
+# but `KEY=v# x` keeps the literal `v# x`, so the '#' is only a comment when a space
+# precedes it. Quoted values take the quoted span and ignore any trailing text.
 #
 # Parsed with grep/cut rather than `source`, because .env holds secrets and arbitrary
 # shell in a config file must never be executed. Always exits 0 so `set -e` cannot
@@ -67,9 +71,33 @@ env_file_value() {
     local key="$1"
     local file="${PROJECT_DIR}/.env"
     [ -f "$file" ] || return 0
-    grep -E "^[[:space:]]*${key}[[:space:]]*=" "$file" 2>/dev/null | tail -n 1 | cut -d= -f2- \
-        | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' \
-              -e 's/^"\(.*\)"$/\1/' -e "s/^'\(.*\)'\$/\1/"
+
+    local line
+    line=$(grep -E "^[[:space:]]*${key}[[:space:]]*[:=]" "$file" 2>/dev/null | tail -n 1) || return 0
+    [ -n "$line" ] || return 0
+
+    # Strip the key and its delimiter, then trim surrounding whitespace.
+    local val="${line#*[:=]}"
+    val="${val#"${val%%[![:space:]]*}"}"
+    val="${val%"${val##*[![:space:]]}"}"
+
+    if [[ $val == '"'* ]]; then
+        # Quoted: take the quoted span and ignore anything after it, as compose does.
+        val="${val#\"}"
+        val="${val%%\"*}"
+    elif [[ $val == "'"* ]]; then
+        val="${val#\'}"
+        val="${val%%\'*}"
+    elif [[ $val =~ ^(.*[^[:space:]])[[:space:]]+#.*$ ]]; then
+        # Unquoted: a comment begins at WHITESPACE followed by '#'. Without the
+        # whitespace the '#' is part of the value — compose reads `PORT=80# x` as
+        # the literal `80# x` — so this must not strip every '#'.
+        val="${BASH_REMATCH[1]}"
+    elif [[ $val =~ ^# ]]; then
+        val=""
+    fi
+
+    printf '%s' "$val"
 }
 
 # Configuration
@@ -81,9 +109,26 @@ env_file_value() {
 ZITADEL_PORT="${ZITADEL_PORT:-$(env_file_value ZITADEL_PORT)}"
 FRONTEND_PORT="${FRONTEND_PORT:-$(env_file_value FRONTEND_PORT)}"
 TESTS_PORT="${TESTS_PORT:-$(env_file_value TESTS_PORT)}"
+ZITADEL_URL_EXPLICIT="${ZITADEL_URL:-}"
 ZITADEL_URL="${ZITADEL_URL:-http://localhost:${ZITADEL_PORT:-8080}}"
 FRONTEND_PORT="${FRONTEND_PORT:-3000}"
 TESTS_PORT="${TESTS_PORT:-3003}"
+
+# An explicit ZITADEL_URL still wins outright — a deployment on a real domain needs that,
+# and the port is meaningless there. But when it names a DIFFERENT port than the stack
+# publishes, the script would health-check, call and write an issuer for one port while
+# compose served another. That is precisely the silent disagreement this section exists to
+# prevent, so make it audible rather than guessing which the operator meant.
+if [ -n "$ZITADEL_URL_EXPLICIT" ] && [ -n "${ZITADEL_PORT:-}" ]; then
+    _url_port="${ZITADEL_URL_EXPLICIT##*:}"
+    _url_port="${_url_port%%/*}"
+    if [[ $_url_port =~ ^[0-9]+$ ]] && [ "$_url_port" != "$ZITADEL_PORT" ]; then
+        echo -e "${YELLOW}Warning:${NC} ZITADEL_URL (${ZITADEL_URL_EXPLICIT}) names port ${_url_port}," >&2
+        echo -e "         but ZITADEL_PORT is ${ZITADEL_PORT}. Proceeding with ZITADEL_URL." >&2
+        echo -e "         If that is not intended, unset ZITADEL_URL or align the two." >&2
+    fi
+    unset _url_port
+fi
 
 # Parse command line arguments
 UPDATE_ENV="${UPDATE_ENV:-false}"
