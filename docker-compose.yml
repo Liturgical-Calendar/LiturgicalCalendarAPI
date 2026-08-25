@@ -24,6 +24,12 @@ services:
       # See "What's next" to learn about how to serve Zitadel on a different domain or IP.
       ZITADEL_EXTERNALDOMAIN: localhost
 
+      # Must track the published host port below. Zitadel derives its OIDC issuer from
+      # EXTERNALDOMAIN/EXTERNALPORT/EXTERNALSECURE, so without this line overriding
+      # ZITADEL_PORT moved the binding while the issuer silently stayed at :8080 —
+      # tokens minted for an issuer nothing could reach.
+      ZITADEL_EXTERNALPORT: ${ZITADEL_PORT:-8080}
+
       # See "What's next" to learn about how to enable TLS.
       ZITADEL_EXTERNALSECURE: false
       ZITADEL_TLS_ENABLED: false

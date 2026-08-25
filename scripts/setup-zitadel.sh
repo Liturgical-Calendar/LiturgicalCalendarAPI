@@ -34,7 +34,10 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-ZITADEL_URL="${ZITADEL_URL:-http://localhost:8080}"
+# Derived from ZITADEL_PORT so the ZITADEL_ISSUER this script writes into .env agrees
+# with the port docker-compose.yml publishes. Hardcoding :8080 here meant that
+# overriding the port produced a stale issuer in every .env this script touches.
+ZITADEL_URL="${ZITADEL_URL:-http://localhost:${ZITADEL_PORT:-8080}}"
 FRONTEND_PORT="${FRONTEND_PORT:-3000}"
 TESTS_PORT="${TESTS_PORT:-3003}"
 MAX_RETRIES=30
