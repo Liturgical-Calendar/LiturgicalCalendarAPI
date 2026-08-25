@@ -1,6 +1,5 @@
 <?php
 
-
 // Refuse any entry that is not the CLI. This file is the Ratchet WebSocket server — systemd runs it
 // as `php bin/LitCalTestServer.php` — and it ends in `IoServer::factory(...)->run()`, i.e. it
 // binds WS_PORT and enters an event loop.
@@ -58,7 +57,7 @@ if (null === $autoloaderPath) {
 require_once $autoloaderPath;
 
 use Ratchet\Server\IoServer;
-use Ratchet\Http\HttpServer;
+use LiturgicalCalendar\Api\Http\Server\LargeHeaderHttpServer;
 use Ratchet\WebSocket\WsServer;
 use LiturgicalCalendar\Api\Health;
 use Dotenv\Dotenv;
@@ -155,8 +154,12 @@ $wsPort = filter_var($_ENV['WS_PORT'] ?? null, FILTER_VALIDATE_INT, [
     'options' => ['min_range' => 1, 'max_range' => 65535],
 ]) ?: 8082;
 
+// LargeHeaderHttpServer rather than Ratchet's HttpServer: this host shares a registrable domain with
+// the sites that log in through Zitadel, so a COOKIE_DOMAIN-scoped session rides along on every
+// handshake — several kilobytes of JWT this server never reads — and Ratchet's 4096-byte default
+// answers 413. See that class for the measurements.
 $server = IoServer::factory(
-    new HttpServer(
+    new LargeHeaderHttpServer(
         new WsServer(
             new Health()
         )
