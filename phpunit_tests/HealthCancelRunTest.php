@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Tests;
 use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
+use LiturgicalCalendar\Tests\Support\AuthorizedHealthTrait;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -34,6 +35,10 @@ final class HealthCancelRunTest extends TestCase
     // currently dispatched at shutdown — but the protection belongs to anything that builds a
     // Health, not to whichever file last remembered it. See the trait.
     use HealthQueueIsolationTrait;
+
+    // This suite exercises behaviour downstream of the #894 permission gate; it drives
+    // onMessage() without a handshake, so without this every message would be refused.
+    use AuthorizedHealthTrait;
 
     /**
      * A minimal Ratchet connection that records every outbound frame. `resourceId` is a dynamic public

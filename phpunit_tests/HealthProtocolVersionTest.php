@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Tests;
 use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
+use LiturgicalCalendar\Tests\Support\AuthorizedHealthTrait;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
@@ -37,6 +38,10 @@ use Ratchet\ConnectionInterface;
 final class HealthProtocolVersionTest extends TestCase
 {
     use HealthQueueIsolationTrait;
+
+    // This suite exercises behaviour downstream of the #894 permission gate; it drives
+    // onMessage() without a handshake, so without this every message would be refused.
+    use AuthorizedHealthTrait;
 
     /** Same stub convention as HealthCancelRunTest; see the note there. */
     private static function createStubConnection(int $resourceId)

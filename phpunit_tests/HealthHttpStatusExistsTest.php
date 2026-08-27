@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\ApcuShimStore;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Tests\Support\AuthorizedHealthTrait;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -37,6 +38,10 @@ use Psr\Http\Message\ResponseInterface;
 final class HealthHttpStatusExistsTest extends TestCase
 {
     use HealthQueueIsolationTrait;
+
+    // This suite exercises behaviour downstream of the #894 permission gate; it drives
+    // onMessage() without a handshake, so without this every message would be refused.
+    use AuthorizedHealthTrait;
 
     /** The exact 400 the issue quotes, refusing an Ambrosian year before the rite's lower bound. */
     private const AMBROSIAN_400_BODY = '{"type":"https://www.rfc-editor.org/rfc/rfc9110.html#name-400-bad-request","title":"Bad Request","status":400,"detail":"The Ambrosian rite is only available from 1976 onward (the first reformed Ambrosian Missal); requested year 1970."}';

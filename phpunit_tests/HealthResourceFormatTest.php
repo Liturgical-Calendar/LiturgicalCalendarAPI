@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Tests\Support\AuthorizedHealthTrait;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -37,6 +38,10 @@ use Ratchet\ConnectionInterface;
 final class HealthResourceFormatTest extends TestCase
 {
     use HealthQueueIsolationTrait;
+
+    // This suite exercises behaviour downstream of the #894 permission gate; it drives
+    // onMessage() without a handshake, so without this every message would be refused.
+    use AuthorizedHealthTrait;
 
     private const CALENDARS_URL = 'http://localhost:8000/calendars';
 

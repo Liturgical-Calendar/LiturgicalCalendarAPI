@@ -10,6 +10,7 @@ use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
+use LiturgicalCalendar\Tests\Support\AuthorizedHealthTrait;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -76,6 +77,10 @@ final class HealthTypedCalendarTest extends TestCase
 {
     // Every Health here queues a real calendar URL; see the trait for why that must be defused.
     use HealthQueueIsolationTrait;
+
+    // This suite exercises behaviour downstream of the #894 permission gate; it drives
+    // onMessage() without a handshake, so without this every message would be refused.
+    use AuthorizedHealthTrait;
 
     public static function setUpBeforeClass(): void
     {

@@ -41,6 +41,15 @@ trait HealthQueueIsolationTrait
     private array $trackedHealths = [];
 
     /**
+     * The policy {@see newHealth()} uses when a call site names none.
+     *
+     * Null means the real one. {@see AuthorizedHealthTrait} sets it, and is the only thing that
+     * should: a suite downstream of the #894 gate says so once, in writing, rather than every
+     * `newHealth()` in the suite quietly being permitted.
+     */
+    protected ?TestRunPolicy $defaultPolicy = null;
+
+    /**
      * A Health whose queue will be defused when the test ends.
      *
      * The two collaborators are pass-through rather than convenience: a suite that needs a Health
@@ -50,7 +59,7 @@ trait HealthQueueIsolationTrait
      */
     protected function newHealth(?WsCallerResolver $callerResolver = null, ?TestRunPolicy $policy = null): Health
     {
-        $health                 = new Health($callerResolver, $policy);
+        $health                 = new Health($callerResolver, $policy ?? $this->defaultPolicy);
         $this->trackedHealths[] = $health;
 
         return $health;

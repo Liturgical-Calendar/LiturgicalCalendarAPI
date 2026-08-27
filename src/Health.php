@@ -28,6 +28,7 @@ use LiturgicalCalendar\Api\Enum\Step;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
+use LiturgicalCalendar\Api\Models\Auth\TestTarget;
 use LiturgicalCalendar\Api\Models\Auth\WsCaller;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableItem;
@@ -740,6 +741,30 @@ class Health implements MessageComponentInterface
         // the second.
         $protocolViolation = WebSocketMessageValidator::protocolViolation($messageReceived);
 
+        // May this caller start a run at all — #894. Decided here and answered below, for exactly the
+        // reason `$protocolViolation` above is.
+        //
+        // The **question** has to be asked here, because the run-token block immediately below
+        // installs a token and can rebuild the checkable inventory, and a caller this server is about
+        // to refuse must be able to do neither. The **answer** waits until `$requestId` has been
+        // read, so the refusal reaches the client correlated to the request it is waiting on.
+        //
+        // This is the coarse question only: it depends on the caller, not on the message, which is
+        // what makes it answerable before the message is understood. The target-scoped question is
+        // asked further down, once the message has been validated and its target can be trusted —
+        // a permission decision must not rest on a field read out of an unvalidated blob.
+        //
+        // A connection with no entry here — one that never went through `onOpen()` — reads as
+        // anonymous. That direction is deliberate and load-bearing: the unknown case must fail
+        // closed.
+        $caller            = $this->callers[$resourceId] ?? WsCaller::anonymous();
+        $permissionRefusal = null;
+        if (null === $protocolViolation && false === $this->policy->mayRun($caller)) {
+            $permissionRefusal = $caller->authenticated
+                ? [ProtocolErrorCode::INSUFFICIENT_ROLE, 'This account may not start validation runs. Ask an administrator to grant the test_editor role.']
+                : [ProtocolErrorCode::NOT_AUTHENTICATED, 'Log in to start validation runs.'];
+        }
+
         // The run token the message declares, as opposed to the one this connection is on. Needed
         // because a message refused for its protocol never gets its token stored, and a rejection
         // frame carrying no token is dropped by the shipped clients — they discard any frame whose
@@ -753,6 +778,9 @@ class Health implements MessageComponentInterface
         // the queue of the run that replaced it.
         if (
             null === $protocolViolation
+            // Beside the protocol check, and for the same reason: this block mutates run state, and
+            // a message that is about to be refused must not reach it — #894.
+            && null === $permissionRefusal
             &&
             $messageReceived instanceof \stdClass
             && property_exists($messageReceived, 'action')
@@ -839,6 +867,18 @@ class Health implements MessageComponentInterface
             return;
         }
 
+        // The answer to the question asked at the top of this method — #894. Here rather than there
+        // so it carries `requestId`, and behind the protocol check because a message this server
+        // cannot read is not a message whose caller it can meaningfully judge.
+        if (null !== $permissionRefusal) {
+            [$refusalCode, $refusalText] = $permissionRefusal;
+            // The connection id has no reader on the wire; it is server-internal state and belongs in
+            // the log line, not in prose a client has to parse or display.
+            echo sprintf('Refused %1$s from connection %2$d', $refusalCode->value, $resourceId);
+            $this->rejectMessage($from, $refusalCode, $refusalText, requestId: $requestId, runToken: $declaredRunToken);
+            return;
+        }
+
         if (
             json_last_error() === JSON_ERROR_NONE
             && $messageReceived instanceof \stdClass
@@ -882,6 +922,29 @@ class Health implements MessageComponentInterface
             && $messageReceived instanceof \stdClass
             && property_exists($messageReceived, 'action')
         ) {
+            // The seam the coarse check at the top of this method deliberately left open — #894.
+            //
+            // Asked *here* rather than there because a target read from an unvalidated message is a
+            // guess, and a permission decision must not rest on one: by this point the message has
+            // been through the schema, so `calendar.kind` and `calendar.rite` are what they claim.
+            //
+            // The coarse policy answers this the same way it answered above, so today this refuses
+            // nothing. It is not dead code: a fine-grained policy — one resolving the target through
+            // `TestScopeResolver` to a `*_test` object and asking OpenFGA — changes only which
+            // object `mayRun()` is, and this call site is what makes that a one-class change rather
+            // than a protocol change.
+            $target = TestTarget::fromMessage($messageReceived);
+            if (null !== $target && false === $this->policy->mayRun($caller, $target)) {
+                echo sprintf('Refused %1$s for a named target from connection %2$d', ProtocolErrorCode::INSUFFICIENT_ROLE->value, $resourceId);
+                $this->rejectMessage(
+                    $from,
+                    ProtocolErrorCode::INSUFFICIENT_ROLE,
+                    'This account may not start validation runs for the calendar this message names.',
+                    requestId: $requestId
+                );
+                return;
+            }
+
             try {
                 switch ($messageReceived->action) {
                     case 'executeValidation':
