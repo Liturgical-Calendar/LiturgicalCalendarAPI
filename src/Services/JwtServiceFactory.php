@@ -113,8 +113,12 @@ class JwtServiceFactory
             return $default;
         }
 
-        if (!is_numeric($raw)) {
-            throw new \RuntimeException($name . ' must be a numeric value (got: ' . $raw . ')');
+        // Integer syntax, not merely numeric syntax. `is_numeric('1.5')` is true and `(int) '1.5'` is
+        // 1, so the looser check this replaces accepted `JWT_EXPIRY=1.5` and quietly issued tokens
+        // that expired after one second — a value nobody typed, from a value nobody was told was
+        // wrong. Raised in review on #896; the behaviour predates this change.
+        if (1 !== preg_match('/^[+-]?\d+$/', $raw)) {
+            throw new \RuntimeException($name . ' must be a whole number of seconds (got: ' . $raw . ')');
         }
 
         $seconds = (int) $raw;

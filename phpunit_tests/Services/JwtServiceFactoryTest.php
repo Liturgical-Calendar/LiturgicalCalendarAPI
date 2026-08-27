@@ -203,6 +203,39 @@ final class JwtServiceFactoryTest extends TestCase
         self::assertSame(3600, $svc->getExpiry());
     }
 
+    /**
+     * `is_numeric('1.5')` is true and `(int) '1.5'` is 1, so a fractional lifetime used to be accepted
+     * and silently became one second. A lifetime is a whole number of seconds or it is a mistake.
+     */
+    public function testFractionalExpiryIsRejected(): void
+    {
+        $_ENV['JWT_SECRET'] = self::VALID_SECRET;
+        $_ENV['JWT_EXPIRY'] = '1.5';
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('JWT_EXPIRY');
+        JwtServiceFactory::fromEnv();
+    }
+
+    public function testFractionalRefreshExpiryIsRejected(): void
+    {
+        $_ENV['JWT_SECRET']         = self::VALID_SECRET;
+        $_ENV['JWT_REFRESH_EXPIRY'] = '86400.5';
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('JWT_REFRESH_EXPIRY');
+        JwtServiceFactory::fromEnv();
+    }
+
+    /**
+     * Scientific notation is numeric too, and casts to something unrecognisable.
+     */
+    public function testExponentialExpiryIsRejected(): void
+    {
+        $_ENV['JWT_SECRET'] = self::VALID_SECRET;
+        $_ENV['JWT_EXPIRY'] = '1e3';
+        $this->expectException(\RuntimeException::class);
+        JwtServiceFactory::fromEnv();
+    }
+
     public function testEveryOptionIsFoundInTheProcessEnvironment(): void
     {
         putenv('JWT_SECRET=' . self::VALID_SECRET);
