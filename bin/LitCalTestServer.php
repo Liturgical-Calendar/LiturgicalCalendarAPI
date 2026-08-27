@@ -60,6 +60,7 @@ use Ratchet\Server\IoServer;
 use LiturgicalCalendar\Api\Http\Server\LargeHeaderHttpServer;
 use Ratchet\WebSocket\WsServer;
 use LiturgicalCalendar\Api\Health;
+use LiturgicalCalendar\Api\Services\WsCallerResolver;
 use Dotenv\Dotenv;
 
 $dotenv = Dotenv::createImmutable($projectFolder, ['.env', '.env.local', '.env.development', '.env.test', '.env.staging', '.env.production'], false);
@@ -154,6 +155,27 @@ $wsPort = filter_var($_ENV['WS_PORT'] ?? null, FILTER_VALIDATE_INT, [
     'options' => ['min_range' => 1, 'max_range' => 65535],
 ]) ?: 8082;
 
+// Settle the caller-verification machinery before the loop starts — #894.
+//
+// The JWKS fetch is the reason this happens here rather than lazily. Ratchet is a single-threaded
+// ReactPHP loop, so a fetch inside onOpen() stalls every other connection for its duration; paying it
+// once at boot means steady-state handshakes are pure CPU and only a key rotation ever costs one.
+//
+// A failure to warm is deliberately not fatal: the server starts, and the first connection needing
+// RS256 verification pays the fetch instead. What it must never do is fail *open* — an unverifiable
+// caller is anonymous, and an anonymous caller may not start a run.
+//
+// The line is printed because losing a verification path is invisible from the outside: every real
+// user simply stops being able to run anything, which looks like a permissions bug rather than a
+// misconfiguration. Naming the live paths at startup is what makes that diagnosable.
+$callerResolver = WsCallerResolver::fromEnv();
+$jwksWarmed     = $callerResolver->warmKeySet();
+echo sprintf(
+    "Caller verification: %s. JWKS pre-warmed: %s\n",
+    $callerResolver->describeAvailablePaths(),
+    $jwksWarmed ? 'yes' : 'no'
+);
+
 // LargeHeaderHttpServer rather than Ratchet's HttpServer: this host shares a registrable domain with
 // the sites that log in through Zitadel, so a COOKIE_DOMAIN-scoped session rides along on every
 // handshake — several kilobytes of JWT this server never reads — and Ratchet's 4096-byte default
@@ -161,7 +183,7 @@ $wsPort = filter_var($_ENV['WS_PORT'] ?? null, FILTER_VALIDATE_INT, [
 $server = IoServer::factory(
     new LargeHeaderHttpServer(
         new WsServer(
-            new Health()
+            new Health($callerResolver)
         )
     ),
     $wsPort,

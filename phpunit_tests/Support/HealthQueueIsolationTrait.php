@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Support;
 
 use LiturgicalCalendar\Api\Health;
+use LiturgicalCalendar\Api\Services\TestRunPolicy;
+use LiturgicalCalendar\Api\Services\WsCallerResolver;
 use PHPUnit\Framework\Attributes\After;
 
 /**
@@ -39,11 +41,25 @@ trait HealthQueueIsolationTrait
     private array $trackedHealths = [];
 
     /**
-     * A Health whose queue will be defused when the test ends.
+     * The policy {@see newHealth()} uses when a call site names none.
+     *
+     * Null means the real one. {@see AuthorizedHealthTrait} sets it, and is the only thing that
+     * should: a suite downstream of the #894 gate says so once, in writing, rather than every
+     * `newHealth()` in the suite quietly being permitted.
      */
-    protected function newHealth(): Health
+    protected ?TestRunPolicy $defaultPolicy = null;
+
+    /**
+     * A Health whose queue will be defused when the test ends.
+     *
+     * The two collaborators are pass-through rather than convenience: a suite that needs a Health
+     * with a stubbed caller resolver or permission policy would otherwise have to write
+     * `new Health($resolver)` by hand, which is precisely the untracked construction this trait
+     * exists to stop. Both default to null, which is what `Health` reads as "build the real one".
+     */
+    protected function newHealth(?WsCallerResolver $callerResolver = null, ?TestRunPolicy $policy = null): Health
     {
-        $health                 = new Health();
+        $health                 = new Health($callerResolver, $policy ?? $this->defaultPolicy);
         $this->trackedHealths[] = $health;
 
         return $health;

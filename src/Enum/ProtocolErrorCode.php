@@ -32,4 +32,21 @@ enum ProtocolErrorCode: string
      * field. The `hello` frame names the version that would have worked.
      */
     case UNSUPPORTED_PROTOCOL = 'unsupported_protocol';
+
+    /**
+     * The connection carried no usable credential — #894.
+     *
+     * Separate from {@see self::INSUFFICIENT_ROLE} by the rule this enum opens with, and the
+     * separation is the whole reason there are two: the remedies differ. This one is answered by
+     * logging in. The other cannot be, and telling a logged-in `developer` to log in again is advice
+     * that cannot help them.
+     */
+    case NOT_AUTHENTICATED = 'not_authenticated';
+
+    /**
+     * The caller is logged in, but holds none of the roles that may start a validation run.
+     *
+     * The remedy is to be granted a role, not to re-authenticate. A client can say so.
+     */
+    case INSUFFICIENT_ROLE = 'insufficient_role';
 }

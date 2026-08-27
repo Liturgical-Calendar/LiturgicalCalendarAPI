@@ -6,16 +6,12 @@ namespace LiturgicalCalendar\Api\Http\Middleware;
 
 use Firebase\JWT\CachedKeySet;
 use Firebase\JWT\JWT;
-use GuzzleHttp\Client;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
-use GuzzleHttp\Psr7\HttpFactory;
-use Psr\Http\Message\RequestInterface;
 use LiturgicalCalendar\Api\Http\CookieHelper;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Models\Auth\User;
 use LiturgicalCalendar\Api\Services\JwtServiceFactory;
-use LiturgicalCalendar\Api\Services\ZitadelHostHeader;
+use LiturgicalCalendar\Api\Services\ZitadelKeySetFactory;
+use LiturgicalCalendar\Api\Services\ZitadelRoles;
 use LiturgicalCalendar\Api\Services\ZitadelService;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
 use Psr\Http\Message\ServerRequestInterface;
@@ -44,13 +40,6 @@ class OidcAuthMiddleware implements MiddlewareInterface
     private int $cacheTtl;
     private bool $jwtFallback;
     private LoggerInterface $logger;
-
-    /**
-     * Cached JWKS key sets, keyed by issuer URL.
-     *
-     * @var array<string, CachedKeySet>
-     */
-    private static array $keySets = [];
 
     /**
      * Create the OIDC authentication middleware.
@@ -324,45 +313,7 @@ class OidcAuthMiddleware implements MiddlewareInterface
      */
     private function getKeySet(): CachedKeySet
     {
-        if (isset(self::$keySets[$this->issuer])) {
-            return self::$keySets[$this->issuer];
-        }
-
-        $jwksUri = $this->issuer . '/oauth/v2/keys';
-
-        if ($this->internalUrl !== null) {
-            // Rewrite JWKS URI to use internal URL for Docker networking
-            $jwksUri = $this->internalUrl . '/oauth/v2/keys';
-
-            // CachedKeySet uses PSR-18 sendRequest() which doesn't apply Guzzle's
-            // default headers. Use middleware to inject the Host header so Zitadel
-            // accepts requests sent to the Docker service name.
-            $hostHeader = ZitadelHostHeader::deriveFromIssuer($this->issuer);
-            $stack      = HandlerStack::create();
-            $stack->push(Middleware::mapRequest(function (RequestInterface $request) use ($hostHeader) {
-                return $request->withHeader('Host', $hostHeader);
-            }));
-            $httpClient = new Client(['handler' => $stack]);
-        } else {
-            $httpClient = new Client();
-        }
-        $httpFactory = new HttpFactory();
-
-        // Use filesystem cache for JWKS (PSR-6 compatible)
-        $cacheDir = dirname(__DIR__, 3) . '/cache';
-        $cache    = new FilesystemAdapter('jwks', $this->cacheTtl, $cacheDir);
-
-        // Create cached key set
-        self::$keySets[$this->issuer] = new CachedKeySet(
-            $jwksUri,
-            $httpClient,
-            $httpFactory,
-            $cache,
-            $this->cacheTtl,
-            true // Rate limit JWKS fetches
-        );
-
-        return self::$keySets[$this->issuer];
+        return ZitadelKeySetFactory::for($this->issuer, $this->internalUrl, $this->cacheTtl);
     }
 
     /**
@@ -392,22 +343,11 @@ class OidcAuthMiddleware implements MiddlewareInterface
             'preferred_username' => is_string($preferredUsername) ? $preferredUsername : null,
         ];
 
-        // Zitadel-specific: Extract project roles
-        // Zitadel uses the claim: urn:zitadel:iam:org:project:roles
-        $rolesClaimKey = 'urn:zitadel:iam:org:project:roles';
+        // Zitadel-specific: Extract project roles. Shared with the WebSocket server's caller
+        // resolver, so that the HTTP path and the WebSocket path cannot read the same token's roles
+        // differently and authorize the same person differently.
         /** @var array<string> $roles */
-        $roles = [];
-
-        if (isset($payload->{$rolesClaimKey})) {
-            // Zitadel returns roles as object with role name as key
-            // e.g., {"admin": {"org_id": "123"}, "developer": {"org_id": "123"}}
-            $rolesData = (array) $payload->{$rolesClaimKey};
-            foreach (array_keys($rolesData) as $role) {
-                if (is_string($role)) {
-                    $roles[] = $role;
-                }
-            }
-        }
+        $roles = ZitadelRoles::fromPayload($payload);
 
         // If roles are not present in the token (e.g., JWT Profile grant for service accounts),
         // look them up via the Zitadel Management API with a short-lived cache
@@ -518,6 +458,6 @@ class OidcAuthMiddleware implements MiddlewareInterface
      */
     public static function resetKeySetCache(): void
     {
-        self::$keySets = [];
+        ZitadelKeySetFactory::reset();
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\WebSocket;
 
 use LiturgicalCalendar\Api\Enum\ProtocolErrorCode;
+use LiturgicalCalendar\Tests\Support\WsAuthTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -34,6 +35,10 @@ use PHPUnit\Framework\TestCase;
  */
 final class ExecuteValidationTest extends TestCase
 {
+    // Since #894 a run-starting action needs a credential on the handshake. See the trait for why
+    // the absence of JWT_SECRET must skip rather than pass.
+    use WsAuthTrait;
+
     private string $wsHost;
     private int $wsPort;
     private string $apiHost;
@@ -71,7 +76,7 @@ final class ExecuteValidationTest extends TestCase
      */
     private function executeValidation(array $payload, int $expectedFrames): array
     {
-        $client = WsTestClient::connect($this->wsHost, $this->wsPort, 30.0);
+        $client = WsTestClient::connect($this->wsHost, $this->wsPort, 30.0, $this->wsAccessTokenOrSkip());
         try {
             $client->sendText(json_encode($payload, JSON_THROW_ON_ERROR));
 

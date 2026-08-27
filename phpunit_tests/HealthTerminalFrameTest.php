@@ -9,6 +9,7 @@ use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
+use LiturgicalCalendar\Tests\Support\AuthorizedHealthTrait;
 use LiturgicalCalendar\Tests\Support\HealthQueueIsolationTrait;
 use Nyholm\Psr7\Response;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -46,6 +47,10 @@ use Ratchet\ConnectionInterface;
 final class HealthTerminalFrameTest extends TestCase
 {
     use HealthQueueIsolationTrait;
+
+    // This suite exercises behaviour downstream of the #894 permission gate; it drives
+    // onMessage() without a handshake, so without this every message would be refused.
+    use AuthorizedHealthTrait;
 
     /** A calendar body that decodes but lacks the four keys the JSON branch requires. */
     private const TRUNCATED_CALENDAR_BODY = '{"litcal":[]}';
