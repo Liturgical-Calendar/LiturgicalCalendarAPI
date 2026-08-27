@@ -130,7 +130,9 @@
                         "unknown_target_id",
                         "invalid_message",
                         "internal_error",
-                        "unsupported_protocol"
+                        "unsupported_protocol",
+                        "not_authenticated",
+                        "insufficient_role"
                     ]
                 },
                 "text": { "type": "string", "description": "Why, phrased for the client that sent the message: the failure names the client's own action and property names, not this server's schema internals, and never its filesystem paths." }
