@@ -57,6 +57,51 @@ final class TestRunPolicyTest extends TestCase
         $this->assertNull(TestTarget::fromMessage('not an object'));
     }
 
+    public function testTargetIsNullWhenCalendarIsNotAnObject(): void
+    {
+        $this->assertNull(TestTarget::fromMessage(json_decode('{"action":"validateCalendar","calendar":"roman"}')));
+    }
+
+    public function testTargetIsNullWhenCalendarIsAnObjectNamingNothingUseful(): void
+    {
+        $this->assertNull(TestTarget::fromMessage(json_decode('{"action":"validateCalendar","calendar":{"year":2024}}')));
+    }
+
+    /**
+     * The id property is named for the kind it belongs to, so each spelling has to be read.
+     */
+    public function testTargetReadsTheNationId(): void
+    {
+        $target = TestTarget::fromMessage(json_decode('{"calendar":{"kind":"nation","nation":"IT"}}'));
+        $this->assertNotNull($target);
+        $this->assertSame('nation', $target->kind);
+        $this->assertSame('IT', $target->calendarId);
+        $this->assertNull($target->rite);
+    }
+
+    public function testTargetReadsTheDioceseId(): void
+    {
+        $target = TestTarget::fromMessage(json_decode('{"calendar":{"kind":"diocese","diocese":"milano_it","rite":"ambrosian"}}'));
+        $this->assertNotNull($target);
+        $this->assertSame('milano_it', $target->calendarId);
+        $this->assertSame('ambrosian', $target->rite);
+    }
+
+    public function testTargetIgnoresNonStringProperties(): void
+    {
+        $target = TestTarget::fromMessage(json_decode('{"calendar":{"kind":123,"rite":"roman"}}'));
+        $this->assertNotNull($target);
+        $this->assertNull($target->kind, 'a non-string kind is absent, not coerced');
+        $this->assertSame('roman', $target->rite);
+    }
+
+    public function testAnonymousCallerHoldsNoRoleAtAll(): void
+    {
+        $this->assertFalse(WsCaller::anonymous()->hasAnyRole('admin', 'test_editor'));
+        $this->assertTrue(WsCaller::authenticated('u', ['test_editor'])->hasAnyRole('admin', 'test_editor'));
+        $this->assertFalse(WsCaller::authenticated('u', ['developer'])->hasAnyRole('admin', 'test_editor'));
+    }
+
     public function testRolesAreDeduplicatedAndAnonymousHasNone(): void
     {
         $caller = WsCaller::authenticated('u', ['admin', 'admin']);
