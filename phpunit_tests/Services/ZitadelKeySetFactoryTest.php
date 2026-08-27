@@ -76,6 +76,26 @@ final class ZitadelKeySetFactoryTest extends TestCase
     }
 
     /**
+     * The JWKS fetch must be bounded, and this is the guard against the bound being dropped.
+     *
+     * `CachedKeySet` fetches synchronously from inside `JWT::decode()` on a cold cache or an unknown
+     * `kid`, and Guzzle's default for both options is 0 — wait forever. In the HTTP API that costs one
+     * php-fpm worker; in the WebSocket server it stalls the single Ratchet event loop for every
+     * connected client at once. A provider that accepts the connection and then goes quiet is
+     * indistinguishable from a healthy one without a timeout.
+     */
+    public function testTheJwksFetchIsBounded(): void
+    {
+        $options = ZitadelKeySetFactory::HTTP_OPTIONS;
+
+        $this->assertArrayHasKey('connect_timeout', $options);
+        $this->assertArrayHasKey('timeout', $options);
+        $this->assertGreaterThan(0, $options['connect_timeout'], 'zero means wait indefinitely');
+        $this->assertGreaterThan(0, $options['timeout'], 'zero means wait indefinitely');
+        $this->assertLessThanOrEqual(10, $options['timeout'], 'a fetch this slow will not produce a useful answer');
+    }
+
+    /**
      * `OidcAuthMiddleware::resetKeySetCache()` is public API that predates the factory; it now
      * delegates, and this pins that it still clears what callers expect it to clear.
      */

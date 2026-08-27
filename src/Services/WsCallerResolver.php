@@ -29,12 +29,84 @@ use Psr\Http\Message\RequestInterface;
  */
 final class WsCallerResolver
 {
+    /**
+     * @param string|null $clientId  Zitadel client id, accepted as a token audience.
+     * @param string|null $projectId Zitadel project id, also accepted — Zitadel puts it in `aud` for
+     *                               machine-to-machine tokens where a user token carries the client id.
+     */
     public function __construct(
         private readonly ?JwtService $jwtService,
         private readonly ?string $issuer,
         private readonly ?string $internalUrl,
-        private readonly int $cacheTtl = 3600
+        private readonly int $cacheTtl = 3600,
+        private readonly ?string $clientId = null,
+        private readonly ?string $projectId = null
     ) {
+    }
+
+    /**
+     * Whether a decoded Zitadel payload was actually issued *to this application, by this provider*.
+     *
+     * A signature proves a token is genuine, not that it is meant for you. Zitadel signs every token
+     * in an instance with the same keys, so without this check any correctly-signed token from any
+     * other application in the same instance verifies here — and if it happens to carry `admin` or
+     * `test_editor` among its project roles, it is handed permission to start runs. That is a
+     * confused-deputy hole, not a theoretical one.
+     *
+     * `OidcAuthMiddleware::tryOidcValidation()` performs exactly these two checks after decoding;
+     * this is the same rule, kept as a pure function so both the WebSocket path and its tests can
+     * reach it without a live provider.
+     *
+     * @param array<int, string> $validAudiences The client id and project id, empty entries removed.
+     */
+    public static function isIntendedFor(object $payload, string $issuer, array $validAudiences): bool
+    {
+        // An unconfigured audience list would accept everything, so it accepts nothing instead.
+        if ([] === $validAudiences) {
+            return false;
+        }
+
+        $iss = $payload->iss ?? null;
+        if (false === is_string($iss) || rtrim($iss, '/') !== rtrim($issuer, '/')) {
+            return false;
+        }
+
+        $aud = $payload->aud ?? null;
+
+        if (is_string($aud)) {
+            return in_array($aud, $validAudiences, true);
+        }
+
+        if (is_array($aud)) {
+            return [] !== array_intersect(array_filter($aud, 'is_string'), $validAudiences);
+        }
+
+        return false;
+    }
+
+    /**
+     * The audiences a token may name to be accepted here.
+     *
+     * @return array<int, string>
+     */
+    private function validAudiences(): array
+    {
+        return array_values(array_filter(
+            [$this->clientId, $this->projectId],
+            static fn(?string $v): bool => is_string($v) && '' !== $v
+        ));
+    }
+
+    /**
+     * Whether the RS256 path can reach a trustworthy verdict at all.
+     *
+     * An issuer with no audience to check against cannot: it could verify that a token is genuine but
+     * not that it was meant for this application, and accepting on that basis is worse than not
+     * accepting at all. So the path is reported and treated as unavailable rather than as permissive.
+     */
+    private function zitadelUsable(): bool
+    {
+        return null !== $this->issuer && [] !== $this->validAudiences();
     }
 
     /**
@@ -56,11 +128,15 @@ final class WsCallerResolver
         // not always populate putenv().
         $issuerEnv      = getenv('ZITADEL_ISSUER') ?: ( $_ENV['ZITADEL_ISSUER'] ?? '' );
         $internalUrlEnv = getenv('ZITADEL_INTERNAL_URL') ?: ( $_ENV['ZITADEL_INTERNAL_URL'] ?? '' );
+        $clientIdEnv    = getenv('ZITADEL_CLIENT_ID') ?: ( $_ENV['ZITADEL_CLIENT_ID'] ?? '' );
+        $projectIdEnv   = getenv('ZITADEL_PROJECT_ID') ?: ( $_ENV['ZITADEL_PROJECT_ID'] ?? '' );
 
         $issuer      = is_string($issuerEnv) && '' !== $issuerEnv ? $issuerEnv : null;
         $internalUrl = is_string($internalUrlEnv) && '' !== $internalUrlEnv ? $internalUrlEnv : null;
+        $clientId    = is_string($clientIdEnv) && '' !== $clientIdEnv ? $clientIdEnv : null;
+        $projectId   = is_string($projectIdEnv) && '' !== $projectIdEnv ? $projectIdEnv : null;
 
-        return new self($jwtService, $issuer, $internalUrl);
+        return new self($jwtService, $issuer, $internalUrl, 3600, $clientId, $projectId);
     }
 
     public function fromHandshake(?RequestInterface $request): WsCaller
@@ -85,14 +161,20 @@ final class WsCallerResolver
      */
     public function fromToken(string $token): WsCaller
     {
-        if (null !== $this->issuer) {
+        if (null !== $this->issuer && $this->zitadelUsable()) {
             try {
                 $payload = JWT::decode(
                     $token,
                     ZitadelKeySetFactory::for($this->issuer, $this->internalUrl, $this->cacheTtl)
                 );
                 $sub     = $payload->sub ?? null;
-                if (is_string($sub) && '' !== $sub) {
+                // The signature says the token is genuine; `isIntendedFor()` says it was issued to
+                // this application. Both are required, and skipping the second would accept any
+                // correctly-signed token from any other app in the same Zitadel instance.
+                if (
+                    is_string($sub) && '' !== $sub
+                    && self::isIntendedFor($payload, $this->issuer, $this->validAudiences())
+                ) {
                     return WsCaller::authenticated($sub, ZitadelRoles::fromPayload($payload));
                 }
             } catch (\Throwable) {
@@ -169,7 +251,9 @@ final class WsCallerResolver
      */
     public function warmKeySet(): bool
     {
-        if (null === $this->issuer) {
+        // Nothing to warm for a path that will not be used. Warming an unaudienced issuer would
+        // fetch keys this resolver has already decided it cannot trust a token against.
+        if (null === $this->issuer || false === $this->zitadelUsable()) {
             return false;
         }
 
@@ -196,8 +280,12 @@ final class WsCallerResolver
     {
         $paths = [];
 
-        if (null !== $this->issuer) {
+        if ($this->zitadelUsable()) {
             $paths[] = 'Zitadel RS256';
+        } elseif (null !== $this->issuer) {
+            // Named explicitly, because this is the configuration most likely to look correct and
+            // behave as though Zitadel were switched off: an issuer is set, so nothing looks missing.
+            $paths[] = 'Zitadel RS256 DISABLED (ZITADEL_ISSUER is set but neither ZITADEL_CLIENT_ID nor ZITADEL_PROJECT_ID is, so no token audience can be checked)';
         }
 
         if (null !== $this->jwtService) {

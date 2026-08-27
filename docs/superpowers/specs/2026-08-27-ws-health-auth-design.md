@@ -302,16 +302,42 @@ HTTP API authenticates.
 Every one of these fails closed — an unverifiable caller is anonymous, and an anonymous caller may not
 run:
 
-| Condition                  | Result                                                         |
-|----------------------------|----------------------------------------------------------------|
-| No `Cookie` header         | Anonymous caller; connection opens; privileged actions refused |
-| `ZITADEL_ISSUER` unset     | HS256-only resolution; RS256 tokens read as anonymous          |
-| JWKS unreachable           | RS256 tokens read as anonymous; HS256 unaffected               |
-| `JWT_SECRET` unset         | HS256 verification unavailable; those tokens read as anonymous |
-| Token expired or malformed | Anonymous caller                                               |
+| Condition                        | Result                                                         |
+|----------------------------------|----------------------------------------------------------------|
+| No `Cookie` header               | Anonymous caller; connection opens; privileged actions refused |
+| `ZITADEL_ISSUER` unset           | HS256-only resolution; RS256 tokens read as anonymous          |
+| Issuer set, no client/project id | RS256 path disabled entirely; see below                        |
+| Token `iss` or `aud` mismatch    | Anonymous caller                                               |
+| JWKS unreachable                 | RS256 tokens read as anonymous; HS256 unaffected               |
+| JWKS slow rather than refused    | Bounded by a finite fetch timeout; then anonymous              |
+| `JWT_SECRET` unset               | HS256 verification unavailable; those tokens read as anonymous |
+| Token expired or malformed       | Anonymous caller                                               |
 
 The `ZITADEL_ISSUER` row is the one to watch in staging: it degrades every real user to anonymous, which
 is safe but total. It is worth a startup log line naming which verification paths are live.
+
+### The audience boundary
+
+Raised in review and worth stating as a rule rather than a row. A signature proves a token is genuine,
+not that it is *this application's*: Zitadel signs every token in an instance with the same keys, so
+verifying the signature alone accepts a correctly-signed token minted for any other application in that
+instance — and one carrying `admin` or `test_editor` among its project roles would then be handed a run.
+
+`OidcAuthMiddleware::tryOidcValidation()` already checks `iss` and `aud` (against the client id, and the
+project id for machine-to-machine tokens) after decoding. The WebSocket resolver applies the same rule,
+and treats an issuer it cannot audience-check as **no RS256 path at all** rather than as an
+unaudienced one — an empty audience list must never mean "nothing to compare, so accept". That
+configuration is the one most likely to look correct while behaving as though Zitadel were switched
+off, so the startup line names it explicitly.
+
+### The fetch has to be bounded
+
+`CachedKeySet` fetches synchronously from inside `JWT::decode()` on a cold cache or an unknown `kid`,
+and Guzzle's default `timeout` and `connect_timeout` are both `0` — wait indefinitely. In the HTTP API
+that costs one php-fpm worker; here it stalls the single Ratchet loop for every connected client at
+once. A refused connection was never the hazard, because it fails instantly; a provider that accepts the
+connection and then goes quiet is, and it is indistinguishable from a healthy one until a timeout that
+does not exist expires. Both clients the key-set factory builds carry finite timeouts.
 
 ## Out of scope
 

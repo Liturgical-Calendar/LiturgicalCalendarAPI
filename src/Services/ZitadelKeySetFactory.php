@@ -24,6 +24,28 @@ use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 final class ZitadelKeySetFactory
 {
     /**
+     * Finite timeouts for the JWKS fetch.
+     *
+     * Guzzle's defaults for both options are `0`, meaning "wait indefinitely", and `CachedKeySet`
+     * fetches **synchronously** from inside `JWT::decode()` whenever it meets an unknown `kid` or a
+     * cold cache. In the HTTP API that blocks one php-fpm worker; in the WebSocket server it blocks
+     * the entire Ratchet event loop, for every connected client at once, until the socket gives up.
+     *
+     * A refused connection fails instantly and was never the hazard. A provider that accepts the
+     * connection and then goes quiet — a blackholing firewall, an overloaded node — is, and it is
+     * indistinguishable from a healthy one until the timeout that did not exist expires.
+     *
+     * Kept short deliberately: a JWKS fetch that has taken four seconds is not going to produce a
+     * useful answer, and the failure path is anonymous rather than broken.
+     *
+     * @var array{connect_timeout: float, timeout: float}
+     */
+    public const HTTP_OPTIONS = [
+        'connect_timeout' => 2.0,
+        'timeout'         => 4.0,
+    ];
+
+    /**
      * Cached key sets, keyed by issuer URL, so several OIDC providers can coexist.
      *
      * @var array<string, CachedKeySet>
@@ -51,9 +73,9 @@ final class ZitadelKeySetFactory
             $stack->push(Middleware::mapRequest(
                 static fn(RequestInterface $request): RequestInterface => $request->withHeader('Host', $hostHeader)
             ));
-            $httpClient = new Client(['handler' => $stack]);
+            $httpClient = new Client(self::HTTP_OPTIONS + ['handler' => $stack]);
         } else {
-            $httpClient = new Client();
+            $httpClient = new Client(self::HTTP_OPTIONS);
         }
 
         // Note the depth: from src/Services/ the project root is two levels up, where it was three
