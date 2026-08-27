@@ -28,8 +28,11 @@ use LiturgicalCalendar\Api\Enum\Step;
 use LiturgicalCalendar\Api\Http\Enum\ReturnTypeParam;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Logs\LoggerFactory;
+use LiturgicalCalendar\Api\Models\Auth\WsCaller;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableItem;
+use LiturgicalCalendar\Api\Services\TestRunPolicy;
+use LiturgicalCalendar\Api\Services\WsCallerResolver;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
 use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -37,6 +40,7 @@ use Symfony\Component\Yaml\Yaml;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataCalendars;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Test\LitTestRunner;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -355,11 +359,31 @@ class Health implements MessageComponentInterface
     private WebSocketMessageValidator $messageValidator;
 
     /**
+     * The identity settled at handshake time, per connection — #894.
+     *
+     * Keyed by `resourceId` and dropped in {@see self::onClose()}, exactly like `$runTokens` above.
+     * Settled once because the handshake is the only moment a credential is on the wire: a WebSocket
+     * frame carries no headers, so a connection not identified as it opened never can be.
+     *
+     * @var array<int, WsCaller>
+     */
+    private array $callers = [];
+
+    private WsCallerResolver $callerResolver;
+
+    private TestRunPolicy $policy;
+
+    /**
      * Initializes the Health object with an empty SplObjectStorage.
      *
      * The SplObjectStorage is used to store client connections.
+     *
+     * @param WsCallerResolver|null $callerResolver Reads the caller off a handshake. Defaults to one
+     *                                              built from the environment.
+     * @param TestRunPolicy|null    $policy         Answers whether a caller may start a run. Defaults
+     *                                              to the coarse role check.
      */
-    public function __construct()
+    public function __construct(?WsCallerResolver $callerResolver = null, ?TestRunPolicy $policy = null)
     {
         $this->clients = new \SplObjectStorage();
 
@@ -378,6 +402,11 @@ class Health implements MessageComponentInterface
         if (false === isset(Router::$apiFilePath)) {
             Router::getApiPaths();
         }
+
+        // After the path guard above, deliberately: neither of these resolves a path today, but that
+        // comment is there to stop code migrating above it, and this is code.
+        $this->callerResolver = $callerResolver ?? WsCallerResolver::fromEnv();
+        $this->policy         = $policy ?? new TestRunPolicy();
 
         // A server that cannot validate is misconfigured, and should fail here — where an operator
         // sees it, before a client ever connects — rather than answering every message with an
@@ -434,10 +463,22 @@ class Health implements MessageComponentInterface
             echo "New connection! ({$conn->resourceId}) and current working directory is " . getcwd() . "\n";
         }
 
+        // Who is calling, settled here and nowhere else — #894. The handshake is the only moment the
+        // credential is on the wire, because a WebSocket frame carries no headers.
+        //
+        // `httpRequest` is a dynamic property Ratchet's `WsServer` assigns to the wrapped connection,
+        // reached through `AbstractConnectionDecorator::__get()`. It is a PSR-7 `RequestInterface`
+        // rather than a `ServerRequestInterface`, which is why the resolver parses the `Cookie:`
+        // header itself. A connection without one — every test stub, and any future transport — reads
+        // as anonymous rather than erroring.
+        $handshake                        = isset($conn->httpRequest) ? $conn->httpRequest : null;
+        $caller                           = $this->callerResolver->fromHandshake($handshake instanceof RequestInterface ? $handshake : null);
+        $this->callers[$conn->resourceId] = $caller;
+
         // Announce the contract before anything is asked of the client — #806 section F. Sent here,
         // ahead of the cache and metadata bootstrapping below, because those are this server's
         // concerns and neither gates the client's ability to read this frame.
-        $this->sendMessage($conn, $this->helloFrame());
+        $this->sendMessage($conn, $this->helloFrame($caller));
 
         // Initialize Router paths before creating logger (LoggerFactory needs Router::$apiFilePath)
         Router::getApiPaths();
@@ -631,7 +672,7 @@ class Health implements MessageComponentInterface
      * dispatch that UnitTestInterface#46 made paint an unrecognised type as a failed check. Sending
      * this frame at any other moment would break the live UI. Pinned by `HealthHelloFrameTest`.
      */
-    private function helloFrame(): \stdClass
+    private function helloFrame(WsCaller $caller): \stdClass
     {
         $capabilities                  = new \stdClass();
         $capabilities->rites           = array_column(Rite::cases(), 'value');
@@ -646,6 +687,26 @@ class Health implements MessageComponentInterface
         // would have been accepted learns it from the refusal, which names them.
         $frame->protocol     = max(WebSocketMessageValidator::SUPPORTED_PROTOCOL_VERSIONS);
         $frame->capabilities = $capabilities;
+
+        // A **sibling** of `capabilities`, deliberately — #894. That object answers what this server
+        // can be asked for, with every entry derived from the enum that already defines it so that an
+        // advertisement cannot go stale against the behaviour it describes. Who is asking is
+        // per-connection and derived from a cookie, so putting it there would quietly break the one
+        // property `capabilities` is built to have.
+        //
+        // The permission is read from the same {@see TestRunPolicy} that refuses the actions in
+        // `onMessage()`, and that is the entire point of sending it: a client that renders its run
+        // controls from this cannot disagree with the server about who may run. UnitTestInterface
+        // used to decide for itself, from a role list of its own, and its own CLAUDE.md recorded the
+        // resulting gate as client-side only.
+        $permissions           = new \stdClass();
+        $permissions->runTests = $this->policy->mayRun($caller);
+
+        $callerFrame                = new \stdClass();
+        $callerFrame->authenticated = $caller->authenticated;
+        $callerFrame->permissions   = $permissions;
+
+        $frame->caller = $callerFrame;
 
         return $frame;
     }
@@ -980,6 +1041,7 @@ class Health implements MessageComponentInterface
         unset($this->clients[$conn]);
         unset($this->cacheHitCounters[$resourceId]);
         unset($this->runTokens[$resourceId]);
+        unset($this->callers[$resourceId]);
         echo "Connection {$resourceId} has disconnected\n";
     }
 

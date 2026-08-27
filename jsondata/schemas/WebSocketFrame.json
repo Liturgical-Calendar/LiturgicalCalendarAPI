@@ -36,7 +36,7 @@
         "hello": {
             "type": "object",
             "description": "Sent once, unprompted, as soon as a client connects — API issue #806 section F. It carries no run correlation, and that is load-bearing rather than incidental: both shipped v1 runners guard their message handler on the frame's runToken matching the run they are on, so an untagged frame is dropped before it reaches their `type` dispatch, where an unrecognised type is painted as a failed check. A `hello` sent at any other moment — once the connection is on a run — would be stamped with a run token and would then be visible to a client that cannot read it.",
-            "required": ["type", "protocol", "capabilities"],
+            "required": ["type", "protocol", "capabilities", "caller"],
             "properties": {
                 "type": { "const": "hello" },
                 "protocol": {
@@ -57,6 +57,28 @@
                         },
                         "steps": { "type": "array", "items": { "type": "string" } },
                         "statuses": { "type": "array", "items": { "type": "string" } }
+                    }
+                },
+                "caller": {
+                    "type": "object",
+                    "description": "Who this server believes is on the other end of this connection, and what follows from it — API issue #894. A sibling of `capabilities` rather than a member of it: that object answers what the *server* can be asked for, with every entry derived from the enum that already defines it so it cannot go stale, while this is per-connection and derived from the credential on the handshake. Sent on `hello` because it is the one frame every client receives before it can act, and because a permission the client reads from the server cannot drift from the one the server enforces — both are the same policy object's answer. Identity is settled at the handshake and never revisited: a WebSocket frame carries no headers, so a connection that was not identified as it opened cannot be identified later. A client whose user logs in reconnects.",
+                    "required": ["authenticated", "permissions"],
+                    "properties": {
+                        "authenticated": {
+                            "type": "boolean",
+                            "description": "Whether a credential was presented and verified. False for a connection that sent no cookie and equally for one whose token was expired, forged or unreadable — the distinction is deliberately not published, and an anonymous connection is accepted rather than closed."
+                        },
+                        "permissions": {
+                            "type": "object",
+                            "description": "What this caller may ask for. Separate from `authenticated` because the two can disagree in the direction that matters: a caller may be authenticated and still permitted nothing.",
+                            "required": ["runTests"],
+                            "properties": {
+                                "runTests": {
+                                    "type": "boolean",
+                                    "description": "Whether this caller may start a validation run. False for an anonymous caller and for an authenticated one holding none of the permitted roles. A client should render its run controls from this rather than from a role list of its own; a message sent anyway is refused with errorCode `not_authenticated` or `insufficient_role`."
+                                }
+                            }
+                        }
                     }
                 }
             }
