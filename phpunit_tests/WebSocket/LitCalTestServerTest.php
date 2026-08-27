@@ -11,6 +11,7 @@ use LiturgicalCalendar\Api\Enum\Step;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
+use LiturgicalCalendar\Tests\Support\WsAuthTrait;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -37,6 +38,10 @@ use PHPUnit\Framework\TestCase;
  */
 final class LitCalTestServerTest extends TestCase
 {
+    // Since #894 a run-starting action needs a credential on the handshake. See the trait for why
+    // the absence of JWT_SECRET must skip rather than pass.
+    use WsAuthTrait;
+
     private string $wsHost;
     private int $wsPort;
 
@@ -73,7 +78,7 @@ final class LitCalTestServerTest extends TestCase
         // that is not this code — the handshake test is not special, it is merely where the drift
         // was visible. Checking here means one stale server produces one clear diagnosis instead of
         // a scatter of unrelated-looking failures, or worse, passes.
-        $client = WsTestClient::connect($this->wsHost, $this->wsPort);
+        $client = WsTestClient::connect($this->wsHost, $this->wsPort, 5.0, $this->wsAccessTokenOrSkip());
         $hello  = $client->hello();
         $client->close();
         self::assertNotNull($hello, 'a connecting client was not sent a hello frame');
@@ -162,7 +167,7 @@ final class LitCalTestServerTest extends TestCase
      */
     public function testTheServerAdvertisesItsContractOnConnect(): void
     {
-        $client = WsTestClient::connect($this->wsHost, $this->wsPort);
+        $client = WsTestClient::connect($this->wsHost, $this->wsPort, 5.0, $this->wsAccessTokenOrSkip());
 
         $hello = $client->hello();
         $this->assertNotNull($hello, 'a connecting client was not sent a hello frame');
@@ -187,7 +192,7 @@ final class LitCalTestServerTest extends TestCase
 
     public function testHandshakeAndEcho(): void
     {
-        $client = WsTestClient::connect($this->wsHost, $this->wsPort);
+        $client = WsTestClient::connect($this->wsHost, $this->wsPort, 5.0, $this->wsAccessTokenOrSkip());
 
         // The handler answers any well-formed JSON with an unknown action back
         // as `{"type":"protocolError","errorCode":"unknown_action","text":"Unknown action from
@@ -218,7 +223,7 @@ final class LitCalTestServerTest extends TestCase
         // server replies with a protocolError frame carrying errorCode invalid_json, and the text
         // carries the same json_last_error_msg() reason the server logs, since errorCode alone
         // cannot distinguish "Syntax error" from "Malformed UTF-8 characters".
-        $client = WsTestClient::connect($this->wsHost, $this->wsPort);
+        $client = WsTestClient::connect($this->wsHost, $this->wsPort, 5.0, $this->wsAccessTokenOrSkip());
         $client->sendText('definitely not json');
         $reply = $client->receiveText();
 
@@ -235,7 +240,7 @@ final class LitCalTestServerTest extends TestCase
 
     public function testMessageWithoutActionReportsValidationError(): void
     {
-        $client = WsTestClient::connect($this->wsHost, $this->wsPort);
+        $client = WsTestClient::connect($this->wsHost, $this->wsPort, 5.0, $this->wsAccessTokenOrSkip());
         $client->sendText('{"foo":"bar"}');
         $reply = $client->receiveText();
 
@@ -244,6 +249,86 @@ final class LitCalTestServerTest extends TestCase
         $this->assertSame('protocolError', $decoded->type);
         $this->assertSame(ProtocolErrorCode::MISSING_ACTION->value, $decoded->errorCode);
         $this->assertStringContainsString('No action specified', (string) $decoded->text);
+
+        $client->close();
+    }
+
+    /**
+     * An anonymous connection **opens** — #894.
+     *
+     * The issue proposed closing the handshake instead, and this test is where that decision is
+     * visible on the wire: both shipped UnitTestInterface runner pages call `connect()`
+     * unconditionally at module load, with a reconnect timer behind it, so refusing the handshake
+     * would put every anonymous visitor into a connect/close/reconnect loop for the sake of a page
+     * that only replays past runs. The connection is accepted; the work is what is refused.
+     */
+    public function testAnAnonymousConnectionOpensAndIsAdvertisedAsUnpermitted(): void
+    {
+        $client = WsTestClient::connect($this->wsHost, $this->wsPort);
+        $hello  = $client->hello();
+
+        $this->assertNotNull($hello, 'an anonymous client must still be sent a hello frame');
+        $this->assertObjectHasProperty('caller', $hello);
+        $this->assertFalse($hello->caller->authenticated);
+        $this->assertFalse($hello->caller->permissions->runTests);
+
+        $client->close();
+    }
+
+    /**
+     * And the advertisement is honoured: the action it says is unavailable really is refused.
+     */
+    public function testAnAnonymousConnectionIsRefusedARunStartingAction(): void
+    {
+        $client = WsTestClient::connect($this->wsHost, $this->wsPort);
+        $client->sendText(json_encode([
+            'action'         => 'validateCalendar',
+            'calendar'       => ['kind' => 'rite', 'rite' => Rite::ROMAN->value],
+            'year'           => 2024,
+            'responseFormat' => 'JSON',
+            'requestId'      => 'anon-1',
+        ], JSON_THROW_ON_ERROR));
+
+        $decoded = json_decode($client->receiveText());
+
+        $this->assertIsObject($decoded);
+        $this->assertSame('protocolError', $decoded->type);
+        $this->assertSame(ProtocolErrorCode::NOT_AUTHENTICATED->value, $decoded->errorCode);
+        $this->assertSame('anon-1', $decoded->requestId ?? null, 'the refusal must be correlated');
+
+        $client->close();
+    }
+
+    /**
+     * A credential with no qualifying role is authenticated and still refused, with the code that
+     * says so. Telling this caller to log in would be advice that cannot help them.
+     */
+    public function testACredentialWithoutAQualifyingRoleIsRefusedWithInsufficientRole(): void
+    {
+        $client = WsTestClient::connect(
+            $this->wsHost,
+            $this->wsPort,
+            5.0,
+            $this->wsAccessTokenOrSkip(['developer'])
+        );
+
+        $hello = $client->hello();
+        $this->assertNotNull($hello);
+        $this->assertTrue($hello->caller->authenticated, 'the credential was valid');
+        $this->assertFalse($hello->caller->permissions->runTests, 'but the role may not run');
+
+        $client->sendText(json_encode([
+            'action'         => 'validateCalendar',
+            'calendar'       => ['kind' => 'rite', 'rite' => Rite::ROMAN->value],
+            'year'           => 2024,
+            'responseFormat' => 'JSON',
+            'requestId'      => 'norole-1',
+        ], JSON_THROW_ON_ERROR));
+
+        $decoded = json_decode($client->receiveText());
+
+        $this->assertIsObject($decoded);
+        $this->assertSame(ProtocolErrorCode::INSUFFICIENT_ROLE->value, $decoded->errorCode);
 
         $client->close();
     }

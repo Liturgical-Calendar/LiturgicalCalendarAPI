@@ -49,7 +49,13 @@ final class WsTestClient
      *
      * @throws \RuntimeException on transport failure or non-101 server response.
      */
-    public static function connect(string $host, int $port, float $timeoutSeconds = 5.0): self
+    /**
+     * @param string|null $accessToken When given, sent as the `litcal_access_token` cookie on the
+     *                                 handshake. Since #894 the server settles the caller's identity
+     *                                 from that cookie and refuses run-starting actions without it;
+     *                                 a connection with no token still opens, and is anonymous.
+     */
+    public static function connect(string $host, int $port, float $timeoutSeconds = 5.0, ?string $accessToken = null): self
     {
         $sock = @stream_socket_client(
             sprintf('tcp://%s:%d', $host, $port),
@@ -68,12 +74,19 @@ final class WsTestClient
             sha1($key . '258EAFA5-E914-47DA-95CA-C5AB0DC85B11', true)
         );
 
+        // The credential rides on the handshake because that is the only place it can: a WebSocket
+        // frame carries no headers, so a connection not identified as it opens never can be.
+        $cookieHeader = null !== $accessToken && '' !== $accessToken
+            ? 'Cookie: litcal_access_token=' . $accessToken . "\r\n"
+            : '';
+
         $request = "GET / HTTP/1.1\r\n"
             . "Host: $host:$port\r\n"
             . "Upgrade: websocket\r\n"
             . "Connection: Upgrade\r\n"
             . "Sec-WebSocket-Key: $key\r\n"
             . "Sec-WebSocket-Version: 13\r\n"
+            . $cookieHeader
             . "\r\n";
 
         fwrite($sock, $request);
