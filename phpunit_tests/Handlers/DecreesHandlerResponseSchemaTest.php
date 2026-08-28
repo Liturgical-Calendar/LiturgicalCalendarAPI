@@ -63,6 +63,19 @@ final class DecreesHandlerResponseSchemaTest extends AbstractHandlerTestCase
     }
 
     /**
+     * An empty override map is meaningless and UrlsLangs::__construct() rejects it, so the
+     * schema must refuse it first rather than let it reach the constructor guard. Mirrors
+     * the minProperties DecreeLangs has always carried.
+     */
+    public function testEmptyUrlsLangsIsRejected(): void
+    {
+        $body                                          = $this->decreesIndexBody();
+        $body->litcal_decrees[0]->metadata->urls_langs = new \stdClass();
+        $this->expectException(\Swaggest\JsonSchema\Exception::class);
+        Schema::import(LitSchema::DECREES->path())->in($body);
+    }
+
+    /**
      * Guards the anchoring of DecreeURLS.patternProperties: unanchored, a key such as
      * `xxde` matched the language alternation and slipped past additionalProperties:false.
      */
