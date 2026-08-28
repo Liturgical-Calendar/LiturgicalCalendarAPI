@@ -1,0 +1,14 @@
+{
+    "general_roman_calendar": {
+        "official": [
+            "en",
+            "fr",
+            "it",
+            "la",
+            "nl"
+        ],
+        "candidates": {
+            "hr": "Lectionary complete across all ten corpora and a gettext catalogue exists, but decreed-event names are incomplete (StJohnNewman has none). Promote once names are covered."
+        }
+    }
+}

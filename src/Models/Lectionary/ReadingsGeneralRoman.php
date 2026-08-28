@@ -79,7 +79,7 @@ final class ReadingsGeneralRoman
         ];
 
         foreach ($filesToLoad as $key => $file) {
-            $this->{$key} = ReadingsMap::fromFile($file);
+            $this->{$key} = ReadingsMap::fromFile($file, $locale);
         }
     }
 

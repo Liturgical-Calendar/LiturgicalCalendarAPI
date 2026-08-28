@@ -18,6 +18,7 @@ use LiturgicalCalendar\Api\Models\Metadata\MetadataDiocesanCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataNationalCalendarItem;
 use LiturgicalCalendar\Api\Models\Metadata\MetadataWiderRegionItem;
 use LiturgicalCalendar\Api\Router;
+use LiturgicalCalendar\Api\Services\SupportedLocales;
 use LiturgicalCalendar\Api\Utilities;
 
 /**
@@ -53,7 +54,6 @@ final class CalendarMetadataProvider
      */
     private static ?CatholicDiocesesMap $worldDiocesesLatinRite = null;
 
-    private const array FULLY_TRANSLATED_LOCALES = ['en', 'fr', 'it', 'nl', 'la'];
 
     /**
      * Builds and returns the complete calendars metadata index from local
@@ -302,7 +302,7 @@ final class CalendarMetadataProvider
         // language, and array_intersect preserves duplicates from its first arg).
         $metadata->locales = array_values(array_unique(array_intersect(
             array_merge(['en'], array_map('basename', $folderGlob)),
-            self::FULLY_TRANSLATED_LOCALES
+            SupportedLocales::official()
         )));
     }
 

@@ -78,7 +78,11 @@ class LitLocale
      */
     public static function getSupportedLocales(): array
     {
-        return self::$values + self::$AllAvailableLocales;
+        // array_merge, not `+`: the union operator preserves left-hand KEYS, so on
+        // these numerically-indexed arrays ['la','la_VA'] + ['af','af_NA','af_ZA',…]
+        // yields ['la','la_VA','af_ZA',…] — silently dropping the first two ICU
+        // locales. Fixed in #904.
+        return array_values(array_unique(array_merge(self::$values, self::$AllAvailableLocales)));
     }
 
     /**
