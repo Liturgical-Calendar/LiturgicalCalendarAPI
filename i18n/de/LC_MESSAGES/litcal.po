@@ -11,8 +11,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-08-28 10:35+0000\n"
-"PO-Revision-Date: 2026-08-28 12:24+0000\n"
-"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
+"PO-Revision-Date: 2026-08-28 13:33+0000\n"
+"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: German <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/de/>\n"
 "Language: de\n"
@@ -290,7 +290,7 @@ msgstr "Gedenktag"
 #. translators: liturgical rank 'MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:160
 msgid "M"
-msgstr "H"
+msgstr "G"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:165
@@ -824,7 +824,7 @@ msgstr ""
 
 #: src/Handlers/CalendarHandler.php:1866
 msgid "the Saturday preceding Palm Sunday"
-msgstr "der Samstag vor dem Palmsonntag"
+msgstr "Samstag vor dem Palmsonntag"
 
 #: src/Handlers/CalendarHandler.php:1869 src/Handlers/CalendarHandler.php:1889
 #: src/Handlers/CalendarHandler.php:1939 src/Handlers/CalendarHandler.php:2037
@@ -846,11 +846,11 @@ msgstr "der Montag nach dem zweiten Sonntag der Osterzeit"
 
 #: src/Handlers/CalendarHandler.php:1937
 msgid "the following Monday"
-msgstr "der folgende Montag"
+msgstr "folgenden Montag"
 
 #: src/Handlers/CalendarHandler.php:1989
 msgid "the following day"
-msgstr "am folgenden Tag"
+msgstr "folgenden Tag"
 
 #: src/Handlers/CalendarHandler.php:1991
 msgid "General Norms for the Liturgical Year and the Calendar"
