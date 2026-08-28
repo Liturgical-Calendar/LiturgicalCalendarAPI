@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Models\Decrees;
 
 use LiturgicalCalendar\Api\Enum\LitLocale;
+use LiturgicalCalendar\Api\Models\Decrees\DecreeEventMetadata;
+use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCreateNewMetadata;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemMakeDoctorMetadata;
+use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyGradeMetadata;
+use LiturgicalCalendar\Api\Models\Decrees\DecreeItemSetPropertyNameMetadata;
 use LiturgicalCalendar\Api\Models\Decrees\UrlsLangs;
 use LiturgicalCalendar\Api\Models\RegionalData\UrlLangMap;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -138,5 +143,104 @@ final class DecreeUrlsLangsOverrideTest extends TestCase
 
         self::assertSame('ge', $map->getBestLangFromMap('de-DE'));
         self::assertSame('en', $map->getBestLangFromMap('en-GB'));
+    }
+
+    // ---- every metadata subclass, through both entry points -------------------
+
+    /**
+     * The four metadata subclasses each parse `urls_langs` independently, and each does so
+     * twice — once from a stdClass and once from an array. Covering only one class through
+     * one path left the other seven combinations to be taken on trust.
+     *
+     * @return array<string,array{class-string<DecreeEventMetadata>,array<string,mixed>}>
+     */
+    public static function metadataClassProvider(): array
+    {
+        return [
+            'createNew'         => [DecreeItemCreateNewMetadata::class, ['action' => 'createNew']],
+            'makeDoctor'        => [DecreeItemMakeDoctorMetadata::class, ['action' => 'makeDoctor']],
+            'setProperty:grade' => [DecreeItemSetPropertyGradeMetadata::class, ['action' => 'setProperty', 'property' => 'grade']],
+            'setProperty:name'  => [DecreeItemSetPropertyNameMetadata::class, ['action' => 'setProperty', 'property' => 'name']],
+        ];
+    }
+
+    /**
+     * @param class-string<DecreeEventMetadata> $class
+     * @param array<string,mixed>               $extra
+     */
+    #[DataProvider('metadataClassProvider')]
+    public function testOverrideIsParsedFromAnArrayByEverySubclass(string $class, array $extra): void
+    {
+        LitLocale::$PRIMARY_LANGUAGE = 'la';
+
+        $metadata = $class::fromArray($extra + [
+            'since_year'   => 2026,
+            'url'          => self::NEWMAN_TEMPLATE,
+            'url_lang_map' => ['it' => 'it'],
+            'urls_langs'   => ['la' => self::NEWMAN_LATIN],
+        ]);
+
+        self::assertSame(self::NEWMAN_LATIN, self::hrefOf($metadata->getUrl()));
+        self::assertSame(['la' => self::NEWMAN_LATIN], $metadata->jsonSerialize()['urls_langs']);
+    }
+
+    /**
+     * @param class-string<DecreeEventMetadata> $class
+     * @param array<string,mixed>               $extra
+     */
+    #[DataProvider('metadataClassProvider')]
+    public function testOverrideIsParsedFromAnObjectByEverySubclass(string $class, array $extra): void
+    {
+        LitLocale::$PRIMARY_LANGUAGE = 'la';
+
+        $data               = (object) ( $extra + [
+            'since_year' => 2026,
+            'url'        => self::NEWMAN_TEMPLATE,
+        ] );
+        $data->url_lang_map = (object) ['it' => 'it'];
+        $data->urls_langs   = (object) ['la' => self::NEWMAN_LATIN];
+
+        $metadata = $class::fromObject($data);
+
+        self::assertSame(self::NEWMAN_LATIN, self::hrefOf($metadata->getUrl()));
+        self::assertSame(['la' => self::NEWMAN_LATIN], $metadata->jsonSerialize()['urls_langs']);
+    }
+
+    /**
+     * @param class-string<DecreeEventMetadata> $class
+     * @param array<string,mixed>               $extra
+     */
+    #[DataProvider('metadataClassProvider')]
+    public function testAbsentOverrideLeavesEverySubclassOnTheTemplate(string $class, array $extra): void
+    {
+        LitLocale::$PRIMARY_LANGUAGE = 'it';
+
+        $metadata = $class::fromArray($extra + [
+            'since_year'   => 2026,
+            'url'          => self::NEWMAN_TEMPLATE,
+            'url_lang_map' => ['it' => 'it'],
+        ]);
+
+        self::assertSame(sprintf(self::NEWMAN_TEMPLATE, 'it'), self::hrefOf($metadata->getUrl()));
+        self::assertArrayNotHasKey('urls_langs', $metadata->jsonSerialize());
+    }
+
+    // ---- UrlsLangs guards -----------------------------------------------------
+
+    public function testAValueThatIsNotAUrlIsRejected(): void
+    {
+        // The likely authoring slip: pasting the Vatican language token, or the template,
+        // into a field that wants a finished URL.
+        $this->expectException(\ValueError::class);
+        UrlsLangs::fromArray(['la' => 'la']);
+    }
+
+    public function testGetRejectsAnUnparseableLanguageTag(): void
+    {
+        $urlsLangs = UrlsLangs::fromArray(['la' => self::NEWMAN_LATIN]);
+
+        $this->expectException(\InvalidArgumentException::class);
+        // Locale::getPrimaryLanguage() returns null rather than a subtag past its length limit.
+        $urlsLangs->get(str_repeat('a', 200));
     }
 }

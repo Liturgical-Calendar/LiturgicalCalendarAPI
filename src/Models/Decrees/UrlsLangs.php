@@ -36,8 +36,12 @@ final class UrlsLangs extends AbstractJsonSrcData
 
         $sanitized = [];
         foreach ($urls_langs as $lang => $url) {
+            // Validate, not merely sanitize. An override is a finished URL that replaces the
+            // template outright, and this class is constructible directly — a caller that has
+            // not been through the schema (or has pasted a language token, or the template
+            // itself) must be refused here rather than silently stored.
             $filtered = filter_var($url, FILTER_SANITIZE_URL);
-            if (false === $filtered) {
+            if (false === $filtered || false === filter_var($filtered, FILTER_VALIDATE_URL)) {
                 throw new \ValueError("`urls_langs.{$lang}` must be a valid URL");
             }
             $sanitized[$lang] = htmlspecialchars($filtered, ENT_QUOTES);
