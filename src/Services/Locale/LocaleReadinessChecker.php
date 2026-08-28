@@ -91,6 +91,40 @@ final class LocaleReadinessChecker
     }
 
     /**
+     * Every locale for which any resource exists, official or not.
+     *
+     * The union of gettext catalogues, decrees i18n files and lectionary corpora,
+     * so the admin interface can offer a promotion candidate list without an
+     * operator having to know what is on disk. Sorted for stable presentation.
+     *
+     * @return list<string>
+     */
+    public function knownLocales(): array
+    {
+        $locales = SupportedLocales::official();
+
+        $catalogues = glob($this->root . 'i18n/*', GLOB_ONLYDIR) ?: [];
+        foreach ($catalogues as $dir) {
+            $locales[] = basename($dir);
+        }
+
+        $globs = [
+            $this->root . JsonDataConstants::DECREES_FOLDER . '/i18n/*.json',
+            $this->root . JsonDataConstants::LECTIONARY_SAINTS_FOLDER . '/*.json',
+        ];
+        foreach ($globs as $pattern) {
+            foreach (glob($pattern) ?: [] as $file) {
+                $locales[] = basename($file, '.json');
+            }
+        }
+
+        $locales = array_values(array_unique($locales));
+        sort($locales);
+
+        return $locales;
+    }
+
+    /**
      * Run every probe against every currently official locale.
      *
      * @return list<LocaleReadinessReport>
