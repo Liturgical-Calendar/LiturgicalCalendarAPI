@@ -24,3 +24,72 @@ jsondata/schemas/openapi.json:
       #/paths/~1tests~1{rite}/get/responses/200/content/application~1json/example/litcal_tests/0
     - >-
       #/paths/~1tests~1{rite}/get/responses/200/content/application~1json/example/litcal_tests/0/test_type
+
+# ---------------------------------------------------------------------------
+# `no-illogical-composition-keywords` (#908)
+#
+# All eight entries below are Redocly engine false positives, not spec defects.
+# The rule reports:
+#
+#   "Schemas in `oneOf` must be mutually exclusive. Found overlapping schemas:
+#    ... Both schemas define `liturgical_event`, `metadata` without constraints
+#    that exclude each other."
+#
+# Its overlap check compares TOP-LEVEL property names only. It does not descend
+# into the constraints that actually discriminate these branches, and every one
+# of the eight was verified by hand to be genuinely exclusive. Three different
+# mechanisms are in play, which is why no single fix covers them:
+#
+#   1. Nested `const` (LitCalDecreesSource, LitCalDecreesPath x2,
+#      LitCalDecreeWritePayload, WiderRegionCalendar). Branches are separated by
+#      `metadata.action` — createNew / setProperty / makeDoctor / makePatron /
+#      moveEvent — and, where `action` alone is not enough, additionally by
+#      `metadata.property` (grade / name / common). No document satisfies two.
+#
+#   2. `required` + `additionalProperties: false` (NationalCalendar,
+#      DiocesanCalendar). The createNew pair shares `action: "createNew"`, but
+#      the Fixed branch requires `day` + `month` while the Mobile branch requires
+#      `strtotime`, and both close the object. A document carrying `day`/`month`
+#      cannot match Mobile, and one carrying `strtotime` cannot match Fixed.
+#
+#   3. Nullness (LitCalEventsPath). The four `settings` branches enumerate the
+#      four legal combinations of `national_calendar` and `diocesan_calendar`
+#      being a string or `null`: (str,str), (str,null), (null,null),
+#      (null,str). Both referenced definitions are non-nullable enums of
+#      `type: string`, so exactly one branch matches any given document.
+#
+# Redocly's own suggested remedy — "add a discriminator" — does not apply. An
+# OpenAPI `discriminator` requires `propertyName` to name a TOP-LEVEL property,
+# and these discriminate on `metadata.action`, which is nested. Making a
+# conforming discriminator possible would mean hoisting `action` to the top level
+# of every calendar item: a change to the on-disk format of every national,
+# diocesan and wider-region file, and to every handler that reads them. That was
+# considered and rejected as wildly disproportionate to silencing a linter.
+#
+# Do NOT delete these to "fix" the warning without re-verifying the branches are
+# actually ambiguous, and do NOT widen them to ignore the rule file-wide: a
+# genuinely non-exclusive `oneOf` added later must still be caught. The entries
+# are per-pointer for exactly that reason.
+# ---------------------------------------------------------------------------
+jsondata/schemas/NationalCalendar.json:
+  no-illogical-composition-keywords:
+    - '#/properties/litcal/items/oneOf'
+jsondata/schemas/DiocesanCalendar.json:
+  no-illogical-composition-keywords:
+    - '#/definitions/LitCal/items/oneOf'
+jsondata/schemas/WiderRegionCalendar.json:
+  no-illogical-composition-keywords:
+    - '#/definitions/LitCal/oneOf'
+jsondata/schemas/LitCalDecreesSource.json:
+  no-illogical-composition-keywords:
+    - '#/definitions/LitCalDecree/oneOf'
+jsondata/schemas/LitCalDecreesPath.json:
+  no-illogical-composition-keywords:
+    - '#/definitions/DecreeResponse/oneOf'
+    - '#/definitions/SingleDecreeResponse/oneOf'
+jsondata/schemas/LitCalDecreeWritePayload.json:
+  no-illogical-composition-keywords:
+    - '#/oneOf'
+jsondata/schemas/LitCalEventsPath.json:
+  no-illogical-composition-keywords:
+    - '#/properties/settings/oneOf'
