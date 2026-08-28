@@ -5,15 +5,15 @@
 # John R. D'Orazio <priest@johnromanodorazio.com>, 2022, 2023.
 # Weblate Admin <admin@example.com>, 2024.
 # OpenAI <noreply-mt-openai@weblate.org>, 2024, 2026.
-# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024, 2025.
+# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024, 2025, 2026.
 # Ronaldo Soares Couto <ronaldocouto@gmail.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-08-28 10:35+0000\n"
-"PO-Revision-Date: 2026-08-28 12:24+0000\n"
-"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
+"PO-Revision-Date: 2026-08-28 13:33+0000\n"
+"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Portuguese <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/pt/>\n"
 "Language: pt\n"
@@ -276,7 +276,7 @@ msgstr "m*"
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:151
 msgid "optional memorial"
-msgstr "memória opcional"
+msgstr "memória facultativa"
 
 #. translators: liturgical rank 'OPTIONAL MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:153
@@ -1159,7 +1159,7 @@ msgid ""
 "The optional memorial '%1$s' has been transferred from Dec. 12 to Aug. 12 "
 "since the year 2002 (%2$s), applicable to the year %3$d."
 msgstr ""
-"A memória opcional '%1$s' foi transferida de 12 de dezembro para 12 de "
+"A memória facultativa '%1$s' foi transferida de 12 de dezembro para 12 de "
 "agosto desde o ano de 2002 (%2$s), aplicável ao ano %3$d."
 
 #. translators: 1: LiturgicalEvent name, 2: Source of the information, 3: Requested calendar year
@@ -1170,9 +1170,9 @@ msgid ""
 "a Sunday or Solemnity were it on Dec. 12, has however been transferred to "
 "Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d."
 msgstr ""
-"A memória opcional '%1$s', que teria sido suprimida este ano por um domingo "
-"ou solenidade se fosse em 12 de dezembro, foi transferida para 12 de agosto "
-"desde o ano de 2002 (%2$s), aplicável ao ano %3$d."
+"A memória facultativa '%1$s', que teria sido suprimida este ano por um "
+"domingo ou solenidade se fosse em 12 de dezembro, foi transferida para 12 de "
+"agosto desde o ano de 2002 (%2$s), aplicável ao ano %3$d."
 
 #. translators: 1: LiturgicalEvent name, 2: Source of the information, 3: Requested calendar year, 4: Coinciding LiturgicalEvent grade, 5: Coinciding LiturgicalEvent name
 #: src/Handlers/CalendarHandler.php:3414
@@ -1182,7 +1182,7 @@ msgid ""
 "since the year 2002 (%2$s), applicable to the year %3$d. However, it is "
 "superseded by the %4$s '%5$s' in the year %3$d."
 msgstr ""
-"A memória opcional '%1$s' foi transferida de 12 de dezembro para 12 de "
+"A memória facultativa '%1$s' foi transferida de 12 de dezembro para 12 de "
 "agosto desde o ano de 2002 (%2$s), aplicável ao ano %3$d. No entanto, ela é "
 "substituída por %4$s '%5$s' no ano %3$d."
 
