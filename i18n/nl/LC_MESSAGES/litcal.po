@@ -5,13 +5,14 @@
 # Steven van Roode <stevenvanroode@gmail.com>, 2022.
 # "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024, 2025, 2026.
 # Weblate Admin <admin@example.com>, 2024.
+# OpenAI <noreply-mt-openai@weblate.org>, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-08-28 10:35+0000\n"
-"PO-Revision-Date: 2026-06-22 13:52+0000\n"
-"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2026-08-28 12:24+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Dutch <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/nl/>\n"
 "Language: nl\n"
@@ -758,6 +759,9 @@ msgid ""
 "but no such event exists in the calendar for the year %3$d. The modification "
 "was skipped."
 msgstr ""
+"De diocesane kalender van %1$s probeerde het liturgische evenement `%2$s` te "
+"wijzigen, maar er bestaat geen dergelijk evenement in de kalender voor het "
+"jaar %3$d. De wijziging werd overgeslagen."
 
 #: src/Handlers/CalendarHandler.php:1349
 #, php-format
@@ -766,6 +770,10 @@ msgid ""
 "the liturgical event `%2$s` for the year %3$d, but the grade was already set "
 "to that value. The override had no effect."
 msgstr ""
+"De diocesane kalender van %1$s verklaarde een `setProperty:grade` "
+"overschrijving voor het liturgische evenement `%2$s` voor het jaar %3$d, "
+"maar de graad was al ingesteld op die waarde. De overschrijving had geen "
+"effect."
 
 #: src/Handlers/CalendarHandler.php:1382
 #, php-format
@@ -774,6 +782,10 @@ msgid ""
 "the liturgical event `%2$s` for the year %3$d, but the Common was already "
 "set to that value. The override had no effect."
 msgstr ""
+"De diocesane kalender van %1$s verklaarde een `setProperty:common` "
+"overschrijving voor het liturgische evenement `%2$s` voor het jaar %3$d, "
+"maar de Commune was al ingesteld op die waarde. De overschrijving had geen "
+"effect."
 
 #: src/Handlers/CalendarHandler.php:1409
 #, php-format
@@ -782,6 +794,10 @@ msgid ""
 "liturgical event `%2$s` for the year %3$d, but the name was already set to "
 "that value. The override had no effect."
 msgstr ""
+"De diocesane kalender van %1$s verklaarde een `setProperty:name` "
+"overschrijving voor het liturgische evenement `%2$s` voor het jaar %3$d, "
+"maar de naam was al ingesteld op die waarde. De overschrijving had geen "
+"effect."
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
