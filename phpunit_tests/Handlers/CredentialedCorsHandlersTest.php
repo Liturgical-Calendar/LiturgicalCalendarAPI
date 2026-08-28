@@ -7,6 +7,8 @@ namespace LiturgicalCalendar\Tests\Handlers;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\DecreesHandler;
 use LiturgicalCalendar\Api\Handlers\RegionalDataHandler;
+use LiturgicalCalendar\Api\Handlers\Auth\MeHandler;
+use LiturgicalCalendar\Api\Handlers\Admin\UsersHandler;
 use LiturgicalCalendar\Api\Handlers\TestsHandler;
 use LiturgicalCalendar\Api\Router;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -32,6 +34,8 @@ use Psr\Http\Message\ResponseInterface;
 #[CoversClass(DecreesHandler::class)]
 #[CoversClass(RegionalDataHandler::class)]
 #[CoversClass(TestsHandler::class)]
+#[CoversClass(MeHandler::class)]
+#[CoversClass(UsersHandler::class)]
 #[CoversClass(Router::class)]
 final class CredentialedCorsHandlersTest extends AbstractHandlerTestCase
 {
@@ -169,5 +173,60 @@ final class CredentialedCorsHandlersTest extends AbstractHandlerTestCase
         self::assertFalse(Router::restrictsOriginsForWrite('POST'));
         self::assertFalse(Router::restrictsOriginsForWrite('OPTIONS', 'GET'));
         self::assertFalse(Router::restrictsOriginsForWrite('OPTIONS', ''));
+    }
+
+    // ---- wholly private routes ------------------------------------------------
+
+    /**
+     * /auth and /admin have no anonymous read, so the allow-list applies to every method —
+     * including the GET that the write-gated helper would have left open. These assert the
+     * behaviour the Router wiring is there to produce.
+     *
+     * @return array<string,array{callable():object,string}>
+     */
+    public static function privateHandlerProvider(): array
+    {
+        return [
+            'auth/me'     => [static fn (): object => new MeHandler(), '/auth/me'],
+            'admin/users' => [static fn (): object => new UsersHandler(), '/admin/users'],
+        ];
+    }
+
+    /** @param callable():object $factory */
+    #[DataProvider('privateHandlerProvider')]
+    public function testPrivateRouteRefusesAForeignOriginOnAReadPreflight(callable $factory, string $path): void
+    {
+        /** @var \LiturgicalCalendar\Api\Handlers\AbstractHandler $handler */
+        $handler = $factory();
+        $handler->setAllowedOrigins(['https://allowed.example.test']);
+
+        $response = $handler->handle($this->requestFor('OPTIONS', $path, [
+            'Origin'                        => 'https://evil.example.test',
+            'Access-Control-Request-Method' => 'GET',
+        ]));
+
+        self::assertNotSame(
+            'https://evil.example.test',
+            $response->getHeaderLine('Access-Control-Allow-Origin'),
+            "{$path} is credentialed on every method, so even a GET preflight must not clear a foreign origin"
+        );
+        self::assertNotSame('*', $response->getHeaderLine('Access-Control-Allow-Origin'));
+    }
+
+    /** @param callable():object $factory */
+    #[DataProvider('privateHandlerProvider')]
+    public function testPrivateRouteStillServesAnAllowedOrigin(callable $factory, string $path): void
+    {
+        /** @var \LiturgicalCalendar\Api\Handlers\AbstractHandler $handler */
+        $handler = $factory();
+        $handler->setAllowedOrigins([self::ORIGIN]);
+
+        $response = $handler->handle($this->requestFor('OPTIONS', $path, [
+            'Origin'                        => self::ORIGIN,
+            'Access-Control-Request-Method' => 'GET',
+        ]));
+
+        self::assertSame(self::ORIGIN, $response->getHeaderLine('Access-Control-Allow-Origin'));
+        self::assertSame('true', $response->getHeaderLine('Access-Control-Allow-Credentials'));
     }
 }

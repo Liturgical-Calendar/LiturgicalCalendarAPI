@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests;
 
+use LiturgicalCalendar\Api\Handlers\Auth\MeHandler;
 use LiturgicalCalendar\Api\Router;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
@@ -144,5 +148,68 @@ final class RouterTest extends TestCase
         self::assertStringEndsNotWith('/', Router::$apiPath);
         // $apiFilePath should be the project root (where composer.json lives) with trailing separator.
         self::assertFileExists(Router::$apiFilePath . 'composer.json');
+    }
+
+    // ---- restrictOriginsForPrivateRoute --------------------------------------
+
+    /**
+     * /auth and /admin apply the allow-list through this helper. It is static and takes the
+     * handler explicitly precisely so the decision is reachable here: the call sites live
+     * inside Router::route(), which emits and calls die().
+     *
+     * setUp() has cleared every address key, so isLocalhost() is false — the production
+     * shape, where the restriction is meant to apply.
+     */
+    public function testPrivateRouteHelperAppliesTheAllowListToAnAbstractHandler(): void
+    {
+        $handler = new MeHandler();
+        Router::restrictOriginsForPrivateRoute($handler, ['https://allowed.example.test']);
+
+        $response = $handler->handle(
+            ( new \Nyholm\Psr7\ServerRequest('OPTIONS', '/auth/me') )
+                ->withHeader('Origin', 'https://evil.example.test')
+                ->withHeader('Access-Control-Request-Method', 'GET')
+        );
+
+        self::assertNotSame('https://evil.example.test', $response->getHeaderLine('Access-Control-Allow-Origin'));
+        self::assertNotSame('*', $response->getHeaderLine('Access-Control-Allow-Origin'));
+    }
+
+    /**
+     * The localhost bypass still applies: local development must not need the list configured.
+     */
+    public function testPrivateRouteHelperIsBypassedOnLocalhost(): void
+    {
+        $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+        self::assertTrue(Router::isLocalhost(), 'guard precondition');
+
+        $handler = new MeHandler();
+        Router::restrictOriginsForPrivateRoute($handler, ['https://allowed.example.test']);
+
+        $response = $handler->handle(
+            ( new \Nyholm\Psr7\ServerRequest('OPTIONS', '/auth/me') )
+                ->withHeader('Origin', 'https://anything.example.test')
+                ->withHeader('Access-Control-Request-Method', 'GET')
+        );
+
+        // Origins were never restricted, so the default wildcard-with-credentials path stands.
+        self::assertSame('https://anything.example.test', $response->getHeaderLine('Access-Control-Allow-Origin'));
+    }
+
+    /**
+     * setAllowedOrigins() lives on AbstractHandler, not on the PSR interface the property is
+     * typed as, so a handler outside that hierarchy must be skipped rather than fatal.
+     */
+    public function testPrivateRouteHelperIgnoresANonAbstractHandler(): void
+    {
+        $plain = new class implements RequestHandlerInterface {
+            public function handle(ServerRequestInterface $request): ResponseInterface
+            {
+                return new \Nyholm\Psr7\Response(200);
+            }
+        };
+
+        Router::restrictOriginsForPrivateRoute($plain, ['https://allowed.example.test']);
+        $this->addToAssertionCount(1);
     }
 }
