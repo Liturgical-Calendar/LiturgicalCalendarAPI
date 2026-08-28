@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # Lovro <development.lovro@gmail.com>, 2025.
 # "John R. D'Orazio" <priest@johnromanodorazio.com>, 2025.
-# OpenAI <noreply-mt-openai@weblate.org>, 2025.
+# OpenAI <noreply-mt-openai@weblate.org>, 2025, 2026.
 # Weblate Admin <admin@example.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-08-28 10:35+0000\n"
-"PO-Revision-Date: 2025-12-19 19:23+0000\n"
-"Last-Translator: Weblate Admin <admin@example.com>\n"
+"PO-Revision-Date: 2026-08-28 12:24+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Croatian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/hr/>\n"
 "Language: hr\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 5.13.3\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:32
@@ -50,12 +50,12 @@ msgstr "ružičasta"
 #. translators: context = liturgical color (Ambrosian "morello"/violet)
 #: src/Enum/LitColor.php:42
 msgid "morello"
-msgstr ""
+msgstr "morello"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:44
 msgid "black"
-msgstr ""
+msgstr "crna"
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
@@ -628,15 +628,13 @@ msgstr "Vrijeme kroz godinu"
 
 #. translators: context = liturgical season (Ambrosian rite)
 #: src/Enum/LitSeason.php:173
-#, fuzzy
 msgid "After Epiphany"
-msgstr "%s poslije Bogojavljenja"
+msgstr "Nakon Bogojavljenja"
 
 #. translators: context = liturgical season (Ambrosian rite)
 #: src/Enum/LitSeason.php:175
-#, fuzzy
 msgid "After Pentecost"
-msgstr "Nakon žetve"
+msgstr "Nakon Duhova"
 
 #. translators: %s is a day number (17, 18, etc.) - for Advent weekdays Dec 17-24
 #: src/FerialEventNameGenerator.php:312
@@ -734,6 +732,9 @@ msgid ""
 "because a liturgical event with the same key was already defined by the "
 "Proprium de Tempore, which takes precedence."
 msgstr ""
+"Ambrozijanski opći kalendar događanja `%1$s` iz %2$s je preskočen jer je "
+"liturgijski događaj s istim ključem već definiran od strane Proprium de "
+"Tempore, koji ima prednost."
 
 #: src/Handlers/CalendarHandler.php:1245
 #, php-format
@@ -744,6 +745,11 @@ msgid ""
 "(`grade`, `name`, or `common`) instead of re-declaring it with `createNew`. "
 "The declaration was skipped."
 msgstr ""
+"Biskupijski kalendar %1$s pokušao je proglasiti novi liturgijski događaj "
+"`%2$s` za godinu %3$d, ali događaj s tim ključem već postoji u kalendaru. Da "
+"biste nadjačali postojeću proslavu, koristite redak `setProperty` (`grade`, "
+"`name` ili `common`) umjesto ponovnog proglašenja s `createNew`. Deklaracija "
+"je preskočena."
 
 #: src/Handlers/CalendarHandler.php:1296
 #, php-format
@@ -752,6 +758,9 @@ msgid ""
 "but no such event exists in the calendar for the year %3$d. The modification "
 "was skipped."
 msgstr ""
+"Biskupijski kalendar %1$s pokušao je izmijeniti liturgijski događaj `%2$s`, "
+"ali takav događaj ne postoji u kalendaru za godinu %3$d. Izmjena je "
+"preskočena."
 
 #: src/Handlers/CalendarHandler.php:1349
 #, php-format
@@ -760,6 +769,9 @@ msgid ""
 "the liturgical event `%2$s` for the year %3$d, but the grade was already set "
 "to that value. The override had no effect."
 msgstr ""
+"Biskupijski kalendar %1$s proglasio je nadjačavanje `setProperty:grade` za "
+"liturgijski događaj `%2$s` za godinu %3$d, ali rang je već postavljen na tu "
+"vrijednost. Nadjačavanje nije imalo učinka."
 
 #: src/Handlers/CalendarHandler.php:1382
 #, php-format
@@ -768,6 +780,9 @@ msgid ""
 "the liturgical event `%2$s` for the year %3$d, but the Common was already "
 "set to that value. The override had no effect."
 msgstr ""
+"Biskupijski kalendar %1$s proglasio je nadjačavanje `setProperty:common` za "
+"liturgijski događaj `%2$s` za godinu %3$d, ali Zajednički je već postavljen "
+"na tu vrijednost. Nadjačavanje nije imalo učinka."
 
 #: src/Handlers/CalendarHandler.php:1409
 #, php-format
@@ -776,6 +791,9 @@ msgid ""
 "liturgical event `%2$s` for the year %3$d, but the name was already set to "
 "that value. The override had no effect."
 msgstr ""
+"Biskupijski kalendar %1$s proglasio je nadjačavanje `setProperty:name` za "
+"liturgijski događaj `%2$s` za godinu %3$d, ali ime je već postavljeno na tu "
+"vrijednost. Nadjačavanje nije imalo učinka."
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
@@ -824,13 +842,12 @@ msgid "the following Monday"
 msgstr "sljedeći ponedjeljak"
 
 #: src/Handlers/CalendarHandler.php:1989
-#, fuzzy
 msgid "the following day"
-msgstr "sljedeći ponedjeljak"
+msgstr "sljedeći dan"
 
 #: src/Handlers/CalendarHandler.php:1991
 msgid "General Norms for the Liturgical Year and the Calendar"
-msgstr ""
+msgstr "Opće norme za liturgijsku godinu i kalendar"
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year
 #: src/Handlers/CalendarHandler.php:1996 src/Handlers/CalendarHandler.php:2011
