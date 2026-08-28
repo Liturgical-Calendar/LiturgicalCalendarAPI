@@ -35,6 +35,12 @@
         "gospel_acclamation": "",
         "gospel": ""
     },
+    "StJohnNewman": {
+        "first_reading": "Sir 39, 8-14 (gr. 6-11)",
+        "responsorial_psalm": "Ps 39, 2 et 4ab. 7-8a. 8b-9. 10",
+        "gospel_acclamation": "Mt 23, 9b. 10b",
+        "gospel": "Mt 13, 47-52"
+    },
     "StJohnPaulII": {
         "first_reading": "",
         "responsorial_psalm": "",
