@@ -20,6 +20,7 @@ use LiturgicalCalendar\Api\Router;
  *      strtotime?:string
  * }
  * @phpstan-type UrlLangMapObject \stdClass&object<string,string>
+ * @phpstan-type UrlsLangsObject \stdClass&object<string,string>
  * @phpstan-type DecreeItemMetadataObject \stdClass&object{
  *      action:string,
  *      since_year:int,
@@ -27,7 +28,8 @@ use LiturgicalCalendar\Api\Router;
  *      url:string,
  *      reason?:string,
  *      property?:string,
- *      url_lang_map?:UrlLangMapObject
+ *      url_lang_map?:UrlLangMapObject,
+ *      urls_langs?:UrlsLangsObject
  * }
  * @phpstan-type DecreeItemFromObject \stdClass&object{
  *      decree_id:string,
@@ -56,7 +58,8 @@ use LiturgicalCalendar\Api\Router;
  *      url:string,
  *      reason?:string,
  *      property?:string,
- *      url_lang_map?:array<string,string>
+ *      url_lang_map?:array<string,string>,
+ *      urls_langs?:array<string,string>
  * }
  * @phpstan-type DecreeItemFromArray array{
  *      decree_id:string,

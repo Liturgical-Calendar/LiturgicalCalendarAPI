@@ -78,7 +78,9 @@ final class UrlLangMap extends AbstractJsonSrcData
         }
 
         if (array_key_exists($baseLocale, $this->url_lang_map)) {
-            return $this->url_lang_map[$lang];
+            // Index with the primary subtag, not the full tag: the map is keyed by ISO 639-1,
+            // so a regional tag such as `en-US` matches the `en` key but has no key of its own.
+            return $this->url_lang_map[$baseLocale];
         } elseif (array_key_exists('la', $this->url_lang_map)) {
             return $this->url_lang_map['la'];
         } elseif (array_key_exists('en', $this->url_lang_map)) {
