@@ -9910,7 +9910,8 @@
                         "exists",
                         "parses",
                         "validates"
-                      ]
+                      ],
+                      "expected_locales": null
                     },
                     {
                       "id": "sanctorale:roman:US_2011:i18n",
@@ -9923,7 +9924,8 @@
                         "exists",
                         "parses",
                         "validates"
-                      ]
+                      ],
+                      "expected_locales": null
                     }
                   ]
                 }
