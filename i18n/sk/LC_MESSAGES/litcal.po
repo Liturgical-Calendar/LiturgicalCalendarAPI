@@ -7,10 +7,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-08-28 10:35+0000\n"
-"PO-Revision-Date: 2026-06-19 20:58+0000\n"
-"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2026-08-28 12:24+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Slovak <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/sk/>\n"
 "Language: sk\n"
@@ -48,12 +48,12 @@ msgstr "ružová"
 #. translators: context = liturgical color (Ambrosian "morello"/violet)
 #: src/Enum/LitColor.php:42
 msgid "morello"
-msgstr ""
+msgstr "višňová"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:44
 msgid "black"
-msgstr ""
+msgstr "čierna"
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
@@ -626,15 +626,13 @@ msgstr "Obdobie cez rok"
 
 #. translators: context = liturgical season (Ambrosian rite)
 #: src/Enum/LitSeason.php:173
-#, fuzzy
 msgid "After Epiphany"
-msgstr "%s po Zjavení Pána"
+msgstr "Po Zjavení Pána"
 
 #. translators: context = liturgical season (Ambrosian rite)
 #: src/Enum/LitSeason.php:175
-#, fuzzy
 msgid "After Pentecost"
-msgstr "Po žatve"
+msgstr "Po Turícach"
 
 #. translators: %s is a day number (17, 18, etc.) - for Advent weekdays Dec 17-24
 #: src/FerialEventNameGenerator.php:312
@@ -732,6 +730,9 @@ msgid ""
 "because a liturgical event with the same key was already defined by the "
 "Proprium de Tempore, which takes precedence."
 msgstr ""
+"Ambroziánsky comune sanctorale udalosť `%1$s` z %2$s bola preskočená, "
+"pretože liturgická udalosť s rovnakým kľúčom už bola definovaná Proprium de "
+"Tempore, ktoré má prednosť."
 
 #: src/Handlers/CalendarHandler.php:1245
 #, php-format
@@ -742,6 +743,11 @@ msgid ""
 "(`grade`, `name`, or `common`) instead of re-declaring it with `createNew`. "
 "The declaration was skipped."
 msgstr ""
+"Diecézny kalendár %1$s sa pokúsil vyhlásiť novú liturgickú udalosť `%2$s` "
+"pre rok %3$d, ale udalosť s týmto kľúčom už existuje v kalendári. Ak chcete "
+"prekonať existujúcu oslavu, použite riadok `setProperty` (`grade`, `name` "
+"alebo `common`) namiesto opätovného vyhlásenia s `createNew`. Vyhlásenie "
+"bolo preskočené."
 
 #: src/Handlers/CalendarHandler.php:1296
 #, php-format
@@ -750,6 +756,8 @@ msgid ""
 "but no such event exists in the calendar for the year %3$d. The modification "
 "was skipped."
 msgstr ""
+"Diecézny kalendár %1$s sa pokúsil zmeniť liturgickú udalosť `%2$s`, ale "
+"takáto udalosť v kalendári pre rok %3$d neexistuje. Zmena bola preskočená."
 
 #: src/Handlers/CalendarHandler.php:1349
 #, php-format
@@ -758,6 +766,9 @@ msgid ""
 "the liturgical event `%2$s` for the year %3$d, but the grade was already set "
 "to that value. The override had no effect."
 msgstr ""
+"Diecézny kalendár %1$s vyhlásil `setProperty:grade` prepis pre liturgickú "
+"udalosť `%2$s` pre rok %3$d, ale hodnosť už bola nastavená na túto hodnotu. "
+"Prepis nemal žiadny efekt."
 
 #: src/Handlers/CalendarHandler.php:1382
 #, php-format
@@ -766,6 +777,9 @@ msgid ""
 "the liturgical event `%2$s` for the year %3$d, but the Common was already "
 "set to that value. The override had no effect."
 msgstr ""
+"Diecézny kalendár %1$s vyhlásil `setProperty:common` prepis pre liturgickú "
+"udalosť `%2$s` pre rok %3$d, ale Common už bol nastavený na túto hodnotu. "
+"Prepis nemal žiadny efekt."
 
 #: src/Handlers/CalendarHandler.php:1409
 #, php-format
@@ -774,6 +788,9 @@ msgid ""
 "liturgical event `%2$s` for the year %3$d, but the name was already set to "
 "that value. The override had no effect."
 msgstr ""
+"Diecézny kalendár %1$s vyhlásil `setProperty:name` prepis pre liturgickú "
+"udalosť `%2$s` pre rok %3$d, ale názov už bol nastavený na túto hodnotu. "
+"Prepis nemal žiadny efekt."
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
@@ -822,13 +839,12 @@ msgid "the following Monday"
 msgstr "nasledujúci pondelok"
 
 #: src/Handlers/CalendarHandler.php:1989
-#, fuzzy
 msgid "the following day"
-msgstr "nasledujúci pondelok"
+msgstr "nasledujúci deň"
 
 #: src/Handlers/CalendarHandler.php:1991
 msgid "General Norms for the Liturgical Year and the Calendar"
-msgstr ""
+msgstr "Všeobecné normy pre liturgický rok a kalendár"
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year
 #: src/Handlers/CalendarHandler.php:1996 src/Handlers/CalendarHandler.php:2011
