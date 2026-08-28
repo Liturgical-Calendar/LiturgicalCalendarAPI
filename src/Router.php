@@ -676,6 +676,20 @@ class Router
                     AcceptHeader::JSON,
                     AcceptHeader::YAML
                 ]);
+                // TestsHandler allows credentials (cookie-authenticated writes from the
+                // admin-tests page) but was the only such route never given the allow-list,
+                // so every origin was echoed back with Access-Control-Allow-Credentials.
+                // AUTHENTICATION_ROADMAP lists "other write operations" as origin-specific;
+                // /tests PUT/PATCH/DELETE are exactly that.
+                if (
+                    Router::restrictsOriginsForWrite(
+                        $this->request->getMethod(),
+                        $this->request->getHeaderLine('Access-Control-Request-Method')
+                    )
+                    && false === Router::isLocalhost()
+                ) {
+                    $testsHandler->setAllowedOrigins($allowedOrigins);
+                }
                 $this->handler = $testsHandler;
                 break;
             case 'temporale':
