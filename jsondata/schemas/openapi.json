@@ -97,6 +97,10 @@
       "description": "Admin operations for application approval workflow (approve, reject, revoke)"
     },
     {
+      "name": "Admin - Supported Locales",
+      "description": "Curation surface for the locales the API declares officially supported. An official locale promises complete data: missing data for one is an error, while a locale outside the list degrades quietly."
+    },
+    {
       "name": "Applications",
       "description": "Developer application management (create, update, delete applications and API keys)"
     },
@@ -4344,6 +4348,93 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AdminApplicationActionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      }
+    },
+    "/admin/locales": {
+      "get": {
+        "tags": [
+          "Admin - Supported Locales"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "List candidate locales with their readiness",
+        "operationId": "adminListSupportedLocales",
+        "description": "Every locale for which any resource exists, which of them are officially supported, and whether each has everything an official locale requires. Restricted to global admins: which locales the API declares supported is a governance decision about its published contract, not a per-resource one. Read-only; the `curation` object explains why.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportedLocalesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          }
+        }
+      }
+    },
+    "/admin/locales/{locale}": {
+      "get": {
+        "tags": [
+          "Admin - Supported Locales"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Readiness report for one locale",
+        "operationId": "adminGetLocaleReadiness",
+        "description": "The full set of readiness probes for a single locale, each listing the concrete identifiers that are missing. Advisory probes are reported but do not affect `ready`.",
+        "parameters": [
+          {
+            "name": "locale",
+            "in": "path",
+            "required": true,
+            "description": "Locale to report on. Must be one of the candidates returned by `/admin/locales`.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "hr"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocaleReadinessReport"
                 }
               }
             }
@@ -9999,6 +10090,134 @@
   },
   "components": {
     "schemas": {
+      "LocaleReadinessCheck": {
+        "type": "object",
+        "description": "One readiness probe against one locale.",
+        "required": [
+          "name",
+          "passed",
+          "advisory",
+          "summary",
+          "missing"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Probe identifier.",
+            "example": "decree_names"
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "advisory": {
+            "type": "boolean",
+            "description": "When true the probe is reported but does not affect readiness."
+          },
+          "summary": {
+            "type": "string",
+            "example": "1 decreed event has no name"
+          },
+          "missing": {
+            "type": "array",
+            "description": "Concrete identifiers, file paths or event keys, that are absent.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "LocaleReadinessReport": {
+        "type": "object",
+        "required": [
+          "locale",
+          "official",
+          "ready",
+          "checks"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "locale": {
+            "type": "string",
+            "example": "hr"
+          },
+          "official": {
+            "type": "boolean",
+            "description": "Whether the locale is currently declared officially supported."
+          },
+          "ready": {
+            "type": "boolean",
+            "description": "Whether every non-advisory probe passed, i.e. the locale could be promoted safely."
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocaleReadinessCheck"
+            }
+          }
+        }
+      },
+      "SupportedLocalesResponse": {
+        "type": "object",
+        "required": [
+          "official",
+          "candidates",
+          "curation"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "official": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "locale",
+                "official",
+                "ready",
+                "summary"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "locale": {
+                  "type": "string"
+                },
+                "official": {
+                  "type": "boolean"
+                },
+                "ready": {
+                  "type": "boolean"
+                },
+                "summary": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "curation": {
+            "type": "object",
+            "description": "Whether promotion can be performed through the API, and why not when it cannot.",
+            "required": [
+              "writable",
+              "reason"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "writable": {
+                "type": "boolean"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
       "TemporaleGetResponse": {
         "type": "object",
         "description": "Response object containing temporale events and locale information",
