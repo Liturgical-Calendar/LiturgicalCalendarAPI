@@ -3,16 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # Ubuntu <priest@johnromanodorazio.com>, 2021.
 # John R. D'Orazio <priest@johnromanodorazio.com>, 2022, 2023.
-# OpenAI <noreply-mt-openai@weblate.org>, 2024.
+# OpenAI <noreply-mt-openai@weblate.org>, 2024, 2026.
 # "John R. D'Orazio" <priest@johnromanodorazio.com>, 2024, 2025, 2026.
 # Weblate Admin <admin@example.com>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-08-28 10:35+0000\n"
-"PO-Revision-Date: 2026-01-18 04:05+0000\n"
-"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2026-08-28 12:24+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: German <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/de/>\n"
 "Language: de\n"
@@ -20,7 +20,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.13.3\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:32
@@ -50,12 +50,12 @@ msgstr "rosa"
 #. translators: context = liturgical color (Ambrosian "morello"/violet)
 #: src/Enum/LitColor.php:42
 msgid "morello"
-msgstr ""
+msgstr "Schwarzrot"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:44
 msgid "black"
-msgstr ""
+msgstr "schwarz"
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
@@ -260,29 +260,27 @@ msgstr "Wochentag"
 #. translators: liturgical rank 'WEEKDAY' in abbreviated form
 #: src/Enum/LitGrade.php:139
 msgid "w"
-msgstr ""
+msgstr "w"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:144
-#, fuzzy
 msgid "commemoration"
-msgstr "Gedächtnis"
+msgstr "Gedenktag"
 
 #. translators: liturgical rank 'COMMEMORATION' in abbreviated form
 #: src/Enum/LitGrade.php:146
 msgid "m*"
-msgstr ""
+msgstr "g*"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:151
-#, fuzzy
 msgid "optional memorial"
-msgstr "Nichtgebotener Gedenktag"
+msgstr "nichtgebotener Gedenktag"
 
 #. translators: liturgical rank 'OPTIONAL MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:153
 msgid "m"
-msgstr ""
+msgstr "g"
 
 #. translators: liturgical rank. Keep Capitalized
 #: src/Enum/LitGrade.php:158
@@ -292,7 +290,7 @@ msgstr "Gedenktag"
 #. translators: liturgical rank 'MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:160
 msgid "M"
-msgstr ""
+msgstr "H"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:165
@@ -302,7 +300,7 @@ msgstr "FEST"
 #. translators: liturgical rank 'FEAST' in abbreviated form
 #: src/Enum/LitGrade.php:167
 msgid "F"
-msgstr ""
+msgstr "F"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:172
@@ -312,7 +310,7 @@ msgstr "FEST DES HERRN"
 #. translators: liturgical rank 'FEAST OF THE LORD' in abbreviated form
 #: src/Enum/LitGrade.php:174
 msgid "F✝"
-msgstr ""
+msgstr "F✝"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:179
@@ -322,7 +320,7 @@ msgstr "HOCHFEST"
 #. translators: liturgical rank 'SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:181
 msgid "S"
-msgstr ""
+msgstr "S"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:186
@@ -332,7 +330,7 @@ msgstr "Feier mit Vorrang vor Hochfesten"
 #. translators: liturgical rank 'HIGHER SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:188
 msgid "S✝"
-msgstr ""
+msgstr "S✝"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:207
@@ -631,19 +629,18 @@ msgstr "Zeit im Jahreskreis"
 #. translators: context = liturgical season (Ambrosian rite)
 #: src/Enum/LitSeason.php:173
 msgid "After Epiphany"
-msgstr ""
+msgstr "Nach Epiphanie"
 
 #. translators: context = liturgical season (Ambrosian rite)
 #: src/Enum/LitSeason.php:175
-#, fuzzy
 msgid "After Pentecost"
-msgstr "Nach der Ernte"
+msgstr "Nach Pfingsten"
 
 #. translators: %s is a day number (17, 18, etc.) - for Advent weekdays Dec 17-24
 #: src/FerialEventNameGenerator.php:312
 #, php-format
 msgid "December %s"
-msgstr ""
+msgstr "Dezember %s"
 
 #. translators: %s is an ordinal number (1st, 2nd, 3rd)
 #. translators: %s is an ordinal number (first, second...)
@@ -664,13 +661,13 @@ msgstr "%s Tag der Oktav von Weihnachten"
 #: src/FerialEventNameGenerator.php:364 src/FerialEventNameGenerator.php:398
 #, php-format
 msgid "January %s"
-msgstr ""
+msgstr "Januar %s"
 
 #. translators: %s is a day of the week - for days after Epiphany
 #: src/FerialEventNameGenerator.php:381
 #, php-format
 msgid "%s after Epiphany"
-msgstr ""
+msgstr "%s nach Epiphanie"
 
 #. translators: Day after Ash Wednesday pattern
 #: src/FerialEventNameGenerator.php:413 src/Handlers/CalendarHandler.php:2516
@@ -740,6 +737,10 @@ msgid ""
 "because a liturgical event with the same key was already defined by the "
 "Proprium de Tempore, which takes precedence."
 msgstr ""
+"Das Gemeinsame der Heiligen des Ambrosianischen Ritus-Ereignis `%1$s` aus "
+"dem %2$s wurde übersprungen, da ein liturgisches Ereignis mit dem gleichen "
+"Schlüssel bereits durch das Proprium de Tempore definiert wurde, das Vorrang "
+"hat."
 
 #: src/Handlers/CalendarHandler.php:1245
 #, php-format
@@ -750,6 +751,11 @@ msgid ""
 "(`grade`, `name`, or `common`) instead of re-declaring it with `createNew`. "
 "The declaration was skipped."
 msgstr ""
+"Der diözesane Kalender von %1$s versuchte, ein neues liturgisches Ereignis "
+"`%2$s` für das Jahr %3$d zu erklären, aber ein Ereignis mit diesem Schlüssel "
+"existiert bereits im Kalender. Um eine bestehende Feier zu überschreiben, "
+"verwende eine `setProperty`-Zeile (`grade`, `name` oder `common`) anstatt es "
+"mit `createNew` neu zu deklarieren. Die Erklärung wurde übersprungen."
 
 #: src/Handlers/CalendarHandler.php:1296
 #, php-format
@@ -758,6 +764,9 @@ msgid ""
 "but no such event exists in the calendar for the year %3$d. The modification "
 "was skipped."
 msgstr ""
+"Der diözesane Kalender von %1$s versuchte, das liturgische Ereignis `%2$s` "
+"zu ändern, aber ein solches Ereignis existiert nicht im Kalender für das "
+"Jahr %3$d. Die Änderung wurde übersprungen."
 
 #: src/Handlers/CalendarHandler.php:1349
 #, php-format
@@ -766,6 +775,9 @@ msgid ""
 "the liturgical event `%2$s` for the year %3$d, but the grade was already set "
 "to that value. The override had no effect."
 msgstr ""
+"Der diözesane Kalender von %1$s erklärte ein `setProperty:grade`-Override "
+"für das liturgische Ereignis `%2$s` für das Jahr %3$d, aber der Grad war "
+"bereits auf diesen Wert gesetzt. Das Override hatte keinen Effekt."
 
 #: src/Handlers/CalendarHandler.php:1382
 #, php-format
@@ -774,6 +786,9 @@ msgid ""
 "the liturgical event `%2$s` for the year %3$d, but the Common was already "
 "set to that value. The override had no effect."
 msgstr ""
+"Der diözesane Kalender von %1$s erklärte ein `setProperty:common`-Override "
+"für das liturgische Ereignis `%2$s` für das Jahr %3$d, aber der Common war "
+"bereits auf diesen Wert gesetzt. Das Override hatte keinen Effekt."
 
 #: src/Handlers/CalendarHandler.php:1409
 #, php-format
@@ -782,6 +797,9 @@ msgid ""
 "liturgical event `%2$s` for the year %3$d, but the name was already set to "
 "that value. The override had no effect."
 msgstr ""
+"Der diözesane Kalender von %1$s erklärte ein `setProperty:name`-Override für "
+"das liturgische Ereignis `%2$s` für das Jahr %3$d, aber der Name war bereits "
+"auf diesen Wert gesetzt. Das Override hatte keinen Effekt."
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
@@ -831,13 +849,13 @@ msgid "the following Monday"
 msgstr "der folgende Montag"
 
 #: src/Handlers/CalendarHandler.php:1989
-#, fuzzy
 msgid "the following day"
-msgstr "der folgende Montag"
+msgstr "am folgenden Tag"
 
 #: src/Handlers/CalendarHandler.php:1991
 msgid "General Norms for the Liturgical Year and the Calendar"
 msgstr ""
+"Allgemeine Normen für das liturgische Jahr und den liturgischen Kalender"
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year
 #: src/Handlers/CalendarHandler.php:1996 src/Handlers/CalendarHandler.php:2011
