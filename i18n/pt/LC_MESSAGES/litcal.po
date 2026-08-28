@@ -12,7 +12,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-08-28 10:35+0000\n"
-"PO-Revision-Date: 2026-08-28 13:33+0000\n"
+"PO-Revision-Date: 2026-08-28 13:50+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Portuguese <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/pt/>\n"
@@ -641,7 +641,7 @@ msgstr "Após Pentecostes"
 #: src/FerialEventNameGenerator.php:312
 #, php-format
 msgid "December %s"
-msgstr "Dezembro %s"
+msgstr "%s de dezembro"
 
 #. translators: %s is an ordinal number (1st, 2nd, 3rd)
 #. translators: %s is an ordinal number (first, second...)
@@ -662,7 +662,7 @@ msgstr "%s Dia da Oitava de Natal"
 #: src/FerialEventNameGenerator.php:364 src/FerialEventNameGenerator.php:398
 #, php-format
 msgid "January %s"
-msgstr "Janeiro %s"
+msgstr "%s de janeiro"
 
 #. translators: %s is a day of the week - for days after Epiphany
 #: src/FerialEventNameGenerator.php:381
@@ -1170,7 +1170,7 @@ msgid ""
 "a Sunday or Solemnity were it on Dec. 12, has however been transferred to "
 "Aug. 12 since the year 2002 (%2$s), applicable to the year %3$d."
 msgstr ""
-"A memória facultativa '%1$s', que teria sido suprimida este ano por um "
+"A memória facultativa '%1$s', que teria sido suplantada este ano por um "
 "domingo ou solenidade se fosse em 12 de dezembro, foi transferida para 12 de "
 "agosto desde o ano de 2002 (%2$s), aplicável ao ano %3$d."
 
@@ -1184,7 +1184,7 @@ msgid ""
 msgstr ""
 "A memória facultativa '%1$s' foi transferida de 12 de dezembro para 12 de "
 "agosto desde o ano de 2002 (%2$s), aplicável ao ano %3$d. No entanto, ela é "
-"substituída por %4$s '%5$s' no ano %3$d."
+"suplantada pela %4$s '%5$s' no ano %3$d."
 
 #. translators: 1: LiturgicalEvent name, 2: Source of the information
 #: src/Handlers/CalendarHandler.php:3453
