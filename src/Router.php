@@ -9,6 +9,7 @@ use LiturgicalCalendar\Api\Http\Enum\RequestContentType;
 use LiturgicalCalendar\Api\Http\Enum\AcceptHeader;
 use LiturgicalCalendar\Api\Enum\PathCategory;
 use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Handlers\AbstractHandler;
 use LiturgicalCalendar\Api\Handlers\CalendarHandler;
 use LiturgicalCalendar\Api\Handlers\EasterHandler;
 use LiturgicalCalendar\Api\Handlers\EventsHandler;
@@ -531,6 +532,7 @@ class Router
                     $this->response = new Response(StatusCode::NOT_FOUND->value, [], null, $this->request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
                     $this->emitResponse();
                 }
+                Router::restrictOriginsForPrivateRoute($this->handler, $allowedOrigins);
                 break;
             case 'admin':
                 // Handle admin routes
@@ -587,6 +589,7 @@ class Router
                     $this->response = new Response(StatusCode::NOT_FOUND->value, [], null, $this->request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
                     $this->emitResponse();
                 }
+                Router::restrictOriginsForPrivateRoute($this->handler, $allowedOrigins);
                 break;
             case 'applications':
                 // Developer applications and API keys management
@@ -1006,6 +1009,34 @@ class Router
 
         return $method === RequestMethod::OPTIONS->value
             && in_array(strtoupper($preflightMethod), self::ORIGIN_RESTRICTED_METHODS, true);
+    }
+
+    /**
+     * Hand the configured origin allow-list to the resolved handler of a wholly private route.
+     *
+     * /auth and /admin differ from the public routes in kind, not degree: they have no
+     * anonymous read. Every method on them is cookie-authenticated, so restricting only
+     * writes and their preflights — as restrictsOriginsForWrite() does — would leave
+     * `POST /auth/login` and `GET /auth/me` reflecting any Origin back with
+     * Access-Control-Allow-Credentials: true. The list therefore applies to every method
+     * here.
+     *
+     * Applied once after the sub-dispatch rather than in each of the ~16 branches that
+     * resolve a handler, so a new endpoint added to either route inherits it by default
+     * instead of having to remember it.
+     *
+     * Static and taking the handler explicitly, like restrictsOriginsForWrite(), so the
+     * decision is testable: Router::route() emits and calls die(), so anything reading
+     * $this->handler from inside it is unreachable by any test.
+     *
+     * @param RequestHandlerInterface $handler        The handler the sub-dispatch resolved.
+     * @param string[]                $allowedOrigins
+     */
+    public static function restrictOriginsForPrivateRoute(RequestHandlerInterface $handler, array $allowedOrigins): void
+    {
+        if ($handler instanceof AbstractHandler && false === Router::isLocalhost()) {
+            $handler->setAllowedOrigins($allowedOrigins);
+        }
     }
 
     public static function isLocalhost(): bool

@@ -25,12 +25,16 @@ use PHPUnit\Framework\TestCase;
  * in-process (see RouterTest's docblock). The wiring is therefore asserted against the
  * source of each route's `case` block, which is the only place the omission is visible.
  *
- * Only these routes are asserted. The /auth and /admin routes also construct
- * credential-allowing handlers and are also unwired, and are deliberately NOT listed: they
- * are a larger change with its own blast radius, not a forgotten line, and asserting them
- * here would turn this into a permanently red test rather than a drift guard. They are
- * covered instead by the access token being SameSite=Lax, which keeps a cross-site fetch
- * from carrying the cookie at all.
+ * Two shapes are asserted, because the routes differ in kind.
+ *
+ * The public routes carry an anonymous read, so their allow-list is gated on
+ * restrictsOriginsForWrite(): a cross-origin GET must stay open, and only writes and the
+ * preflights that clear them are restricted.
+ *
+ * /auth and /admin have no anonymous read at all — every method is cookie-authenticated —
+ * so their allow-list applies unconditionally. Gating those on the write helper would leave
+ * POST /auth/login and GET /auth/me reflecting any Origin with credentials, which is the
+ * state they were in before they were wired.
  */
 #[CoversClass(Router::class)]
 final class RouterCorsAllowListDriftTest extends TestCase
@@ -122,5 +126,57 @@ final class RouterCorsAllowListDriftTest extends TestCase
         PHP;
 
         self::assertDoesNotMatchRegularExpression(self::GUARDED_CALL, $decoupled);
+    }
+
+    /**
+     * Routes with no anonymous read: every method is credentialed, so the allow-list is
+     * not gated on the method at all.
+     *
+     * @return array<string,array{string}>
+     */
+    public static function credentialedPrivateRouteProvider(): array
+    {
+        return [
+            'auth'  => ['auth'],
+            'admin' => ['admin'],
+        ];
+    }
+
+    /**
+     * The private routes resolve a handler across many branches, so the allow-list is
+     * applied once after the sub-dispatch. What must not drift is that it is applied at
+     * all, and that it is still behind the localhost bypass.
+     */
+    private const PRIVATE_GUARDED_CALL = '/Router::restrictOriginsForPrivateRoute\(\$this->handler, \$allowedOrigins\);/';
+
+    #[DataProvider('credentialedPrivateRouteProvider')]
+    public function testPrivateRouteRestrictsOriginsForEveryMethod(string $route): void
+    {
+        self::assertMatchesRegularExpression(
+            self::PRIVATE_GUARDED_CALL,
+            self::caseBlock($route),
+            "the `{$route}` route is credentialed on every method and must hand the configured "
+            . 'origin allow-list to whichever handler it resolved'
+        );
+    }
+
+    /**
+     * The private helper must not be gated on restrictsOriginsForWrite(): that would restrict
+     * only PUT/PATCH/DELETE and leave POST /auth/login and GET /auth/me open to any origin.
+     */
+    public function testPrivateRouteHelperIsNotGatedOnTheWriteMethodCheck(): void
+    {
+        $src   = self::routerSource();
+        $start = strpos($src, 'public static function restrictOriginsForPrivateRoute(');
+        self::assertNotFalse($start, 'restrictOriginsForPrivateRoute() not found');
+        $body = substr($src, $start, 900);
+
+        self::assertStringNotContainsString(
+            'restrictsOriginsForWrite',
+            $body,
+            'a credentialed route with no anonymous read must restrict every method, not only writes'
+        );
+        self::assertStringContainsString('Router::isLocalhost()', $body);
+        self::assertStringContainsString('setAllowedOrigins($allowedOrigins)', $body);
     }
 }
