@@ -8,9 +8,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-08-28 10:35+0000\n"
-"PO-Revision-Date: 2026-06-19 18:50+0000\n"
+"PO-Revision-Date: 2026-08-28 12:24+0000\n"
 "Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Indonesian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/id/>\n"
@@ -49,12 +49,12 @@ msgstr "merah muda"
 #. translators: context = liturgical color (Ambrosian "morello"/violet)
 #: src/Enum/LitColor.php:42
 msgid "morello"
-msgstr ""
+msgstr "ceri"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:44
 msgid "black"
-msgstr ""
+msgstr "hitam"
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
@@ -628,15 +628,13 @@ msgstr "Waktu Biasa"
 
 #. translators: context = liturgical season (Ambrosian rite)
 #: src/Enum/LitSeason.php:173
-#, fuzzy
 msgid "After Epiphany"
-msgstr "%s setelah Epifani"
+msgstr "Setelah Epifani"
 
 #. translators: context = liturgical season (Ambrosian rite)
 #: src/Enum/LitSeason.php:175
-#, fuzzy
 msgid "After Pentecost"
-msgstr "Setelah Panen"
+msgstr "Setelah Pentakosta"
 
 #. translators: %s is a day number (17, 18, etc.) - for Advent weekdays Dec 17-24
 #: src/FerialEventNameGenerator.php:312
@@ -735,6 +733,9 @@ msgid ""
 "because a liturgical event with the same key was already defined by the "
 "Proprium de Tempore, which takes precedence."
 msgstr ""
+"Acara Ambrosian comune sanctorale `%1$s` dari %2$s dilewati karena acara "
+"liturgi dengan kunci yang sama sudah ditentukan oleh Proprium de Tempore, "
+"yang memiliki prioritas."
 
 #: src/Handlers/CalendarHandler.php:1245
 #, php-format
@@ -745,6 +746,11 @@ msgid ""
 "(`grade`, `name`, or `common`) instead of re-declaring it with `createNew`. "
 "The declaration was skipped."
 msgstr ""
+"Kalender keuskupan dari %1$s mencoba untuk mendeklarasikan acara liturgi "
+"baru `%2$s` untuk tahun %3$d, tapi acara dengan kunci itu sudah ada di "
+"kalender. Untuk menggantikan perayaan yang ada, gunakan baris `setProperty` "
+"(`grade`, `name`, atau `common`) alih-alih mendeklarasikannya kembali dengan "
+"`createNew`. Deklarasi tersebut dilewati."
 
 #: src/Handlers/CalendarHandler.php:1296
 #, php-format
@@ -753,6 +759,9 @@ msgid ""
 "but no such event exists in the calendar for the year %3$d. The modification "
 "was skipped."
 msgstr ""
+"Kalender keuskupan dari %1$s mencoba memodifikasi acara liturgi `%2$s`, "
+"tetapi tidak ada acara tersebut dalam kalender untuk tahun %3$d. Modifikasi "
+"tersebut dilewati."
 
 #: src/Handlers/CalendarHandler.php:1349
 #, php-format
@@ -761,6 +770,9 @@ msgid ""
 "the liturgical event `%2$s` for the year %3$d, but the grade was already set "
 "to that value. The override had no effect."
 msgstr ""
+"Kalender keuskupan dari %1$s mendeklarasikan penggantian `setProperty:grade` "
+"untuk acara liturgi `%2$s` untuk tahun %3$d, tetapi tingkatan sudah "
+"ditetapkan pada nilai tersebut. Penggantian tidak berpengaruh."
 
 #: src/Handlers/CalendarHandler.php:1382
 #, php-format
@@ -769,6 +781,9 @@ msgid ""
 "the liturgical event `%2$s` for the year %3$d, but the Common was already "
 "set to that value. The override had no effect."
 msgstr ""
+"Kalender keuskupan dari %1$s mendeklarasikan penggantian "
+"`setProperty:common` untuk acara liturgi `%2$s` untuk tahun %3$d, tetapi "
+"Common sudah ditetapkan pada nilai tersebut. Penggantian tidak berpengaruh."
 
 #: src/Handlers/CalendarHandler.php:1409
 #, php-format
@@ -777,6 +792,9 @@ msgid ""
 "liturgical event `%2$s` for the year %3$d, but the name was already set to "
 "that value. The override had no effect."
 msgstr ""
+"Kalender keuskupan dari %1$s mendeklarasikan penggantian `setProperty:name` "
+"untuk acara liturgi `%2$s` untuk tahun %3$d, tetapi nama sudah ditetapkan "
+"pada nilai tersebut. Penggantian tidak berpengaruh."
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
@@ -825,13 +843,12 @@ msgid "the following Monday"
 msgstr "Senin berikutnya"
 
 #: src/Handlers/CalendarHandler.php:1989
-#, fuzzy
 msgid "the following day"
-msgstr "Senin berikutnya"
+msgstr "hari berikutnya"
 
 #: src/Handlers/CalendarHandler.php:1991
 msgid "General Norms for the Liturgical Year and the Calendar"
-msgstr ""
+msgstr "Norma Umum untuk Tahun Liturgi dan Kalender"
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year
 #: src/Handlers/CalendarHandler.php:1996 src/Handlers/CalendarHandler.php:2011
