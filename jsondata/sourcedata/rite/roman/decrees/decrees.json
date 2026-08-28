@@ -504,5 +504,38 @@
                 "pt": "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2025/02/11/0125/00250.html#portoghese"
             }
         }
+    },
+    {
+        "decree_id": "StJohnNewman_Create",
+        "decree_date": "2025-11-09",
+        "decree_protocol": "Prot. N. 760/25",
+        "description": "the Supreme Pontiff Pope LEO XIV has decreed that Saint John Henry Newman, Priest and Doctor of the Church, be inscribed in the General Roman Calendar, and that his Optional Memorial be celebrated by all on 9 October",
+        "liturgical_event": {
+            "event_key": "StJohnNewman",
+            "calendar": "GENERAL ROMAN",
+            "day": 9,
+            "month": 10,
+            "type": "fixed",
+            "grade": 2,
+            "color": [ "white" ],
+            "common": [ "Pastors:For One Pastor", "Doctors" ]
+        },
+        "metadata": {
+            "action": "createNew",
+            "since_year": 2026,
+            "url": "https://www.vatican.va/content/romancuria/%s/dicasteri/dicastero-culto-divino-e-disciplina-sacramenti/documenti/20251109-decreto-iscrizione-newman.html",
+            "url_lang_map": {
+                "en": "en",
+                "fr": "fr",
+                "it": "it",
+                "de": "de",
+                "pt": "pt",
+                "es": "es",
+                "la": "la"
+            },
+            "urls_langs": {
+                "la": "https://www.vatican.va/content/romancuria/it/dicasteri/dicastero-culto-divino-e-disciplina-sacramenti/documenti/20251109-decreto-iscrizione-newman-la.html"
+            }
+        }
     }
 ]
