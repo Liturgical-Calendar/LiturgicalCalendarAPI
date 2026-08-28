@@ -75,30 +75,52 @@ final class RouterCorsAllowListDriftTest extends TestCase
         return substr($src, $start, $end - $start);
     }
 
+    /**
+     * The guard and the call must be one relation, not two facts.
+     *
+     * Asserting merely that each string appears somewhere in the route block is too weak:
+     * a route could call setAllowedOrigins($allowedOrigins) unconditionally, or from an
+     * unrelated branch, and still satisfy both. What matters is that the shared helper and
+     * the localhost check together *guard* the assignment — that is the shape that was
+     * missing for /tests, and the shape a future route could get wrong while still
+     * mentioning all the right identifiers. testThePatternRejectsADecoupledGuard below
+     * pins that this pattern actually discriminates.
+     */
+    private const GUARDED_CALL = '/Router::restrictsOriginsForWrite\(.*?\)\s*&&\s*false\s*===\s*Router::isLocalhost\(\)\s*\)\s*\{\s*\$\w+->setAllowedOrigins\(\$allowedOrigins\);/s';
+
     #[DataProvider('credentialedWriteRouteProvider')]
-    public function testRouteHandsTheOriginAllowListToItsHandler(string $route): void
+    public function testRouteGuardsTheAllowListCallWithTheSharedHelper(string $route): void
     {
-        self::assertStringContainsString(
-            'setAllowedOrigins($allowedOrigins)',
+        self::assertMatchesRegularExpression(
+            self::GUARDED_CALL,
             self::caseBlock($route),
-            "the `{$route}` route allows credentials on writes but never passes the configured "
-            . 'origin allow-list to its handler, so it will echo any Origin it is given'
+            "the `{$route}` route must pass the configured origin allow-list to its handler from "
+            . 'inside the restrictsOriginsForWrite() + isLocalhost() guard, so that the write '
+            . 'preflight is covered and the call cannot drift outside the condition'
         );
     }
 
     /**
-     * The allow-list must be gated on the shared helper, not on an inline method check:
-     * an inline `in_array($method, [PUT, PATCH, DELETE])` silently excludes the OPTIONS
-     * preflight, which is the only point a cross-origin write can actually be refused.
+     * The guard pattern is only worth anything if it rejects the shape it exists to catch:
+     * both identifiers present, but the allow-list applied outside the condition.
      */
-    #[DataProvider('credentialedWriteRouteProvider')]
-    public function testRouteGatesTheAllowListOnTheSharedHelper(string $route): void
+    public function testThePatternRejectsADecoupledGuard(): void
     {
-        self::assertStringContainsString(
-            'Router::restrictsOriginsForWrite(',
-            self::caseBlock($route),
-            "the `{$route}` route must gate its allow-list on restrictsOriginsForWrite(), "
-            . 'so the write preflight is covered and not just the write itself'
-        );
+        $decoupled = <<<'PHP'
+        case 'bogus':
+            $bogusHandler = new BogusHandler();
+            if (
+                Router::restrictsOriginsForWrite(
+                    $this->request->getMethod(),
+                    $this->request->getHeaderLine('Access-Control-Request-Method')
+                )
+                && false === Router::isLocalhost()
+            ) {
+                $somethingUnrelated = true;
+            }
+            $bogusHandler->setAllowedOrigins($allowedOrigins);
+        PHP;
+
+        self::assertDoesNotMatchRegularExpression(self::GUARDED_CALL, $decoupled);
     }
 }
