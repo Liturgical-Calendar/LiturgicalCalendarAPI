@@ -34,6 +34,9 @@ an outbox row; the outbox consumer opens or updates a pull request on GitHub usi
 Git Data API. When the PR merges, the change reaches the server the way every other data change
 does — through the normal deploy.
 
+That is **queue mode**. A deployment without the supporting stack keeps writing to disk exactly as
+it does today — see "Deployment modes" below. The write handlers do not know which mode is active.
+
 ## Decisions taken during brainstorming
 
 | Question                      | Decision                                                       |
@@ -74,6 +77,46 @@ Three independent reasons:
    single repository — strictly safer than an SSH key with push rights on an internet-facing host.
 3. Reintroducing a working tree would undo the deploy hardening that
    `check-deploy-payload.sh` exists to enforce.
+
+## Deployment modes
+
+The API is self-hostable. A diocese or bishops' conference running it without Zitadel, OpenFGA and
+Postgres must keep working exactly as it does today — `Router.php:775` already branches on
+`Connection::isConfigured()` ("Without a database, API key validation is unavailable"), and
+`AuthorizationMiddleware` gates `/data` writes on JWT roles rather than OpenFGA. A Postgres-less
+authoring deployment is a supported shape, not a hypothetical one.
+
+So source-data writes go through a `SourceDataWriter` seam with two implementations:
+
+| Mode      | Implementation                  | Behaviour                                             |
+| --------- | ------------------------------- | ----------------------------------------------------- |
+| **disk**  | `DiskSourceDataWriter`          | Today's `file_put_contents()` / `unlink()`, unchanged |
+| **queue** | `ChangeRequestSourceDataWriter` | Stages files, submits a batch, never touches disk     |
+
+Selection:
+
+```php
+$queueMode = 'true' === ( $_ENV['SOURCEDATA_CHANGE_REQUESTS'] ?? 'false' )
+    && Connection::isConfigured()
+    && OpenFgaClient::isConfigured();
+```
+
+Default **false**, so nothing changes for an existing deployment until it is turned on. The
+capability checks are not redundant with the flag: queue mode needs OpenFGA because
+`ChangeRequestReview::administers()` fails closed, and without it every edit would queue with nobody
+able to approve one. A flag set without the stack behind it logs and falls back to disk rather than
+returning 500s.
+
+**Health warning.** Disk mode on a deployment that _does_ have the full stack means someone forgot
+the flag on a host that rsyncs `--delete` from git — the silent revert this design exists to
+eliminate. `Health` reports that combination as a warning. Disk mode with no stack present is
+reported as normal, because that is a self-hosted instance behaving correctly.
+
+**This is a compatibility floor, not the federated answer.** A self-hosting diocese authoring to
+local disk has forked, not federated: its edits are invisible upstream and its calendar drifts from
+the canonical one. The eventual federated shape is a third `SourceDataWriter` that submits change
+requests to the upstream canonical API instead of writing locally. That is why the seam is an
+interface rather than a boolean scattered through ten call sites. It is **not** built in this design.
 
 ## Architecture
 
@@ -183,9 +226,11 @@ may not be on production yet; phase one states this in UI copy rather than track
 
 ## Write path changes
 
-Per call site, `file_put_contents(...)` becomes "insert or update a change request". Everything
-upstream is unchanged: schema validation, OpenFGA authorization, and payload construction all stay
-exactly as they are.
+Per call site, `file_put_contents(...)` becomes a `stage()` call on the injected
+`SourceDataWriter`, and each request path ends with one `commit()`. Everything upstream is
+unchanged: schema validation, OpenFGA authorization, and payload construction all stay exactly as
+they are — and so does the on-disk behaviour, which now lives in `DiskSourceDataWriter` rather than
+inline in the handlers.
 
 | Handler               | Sites                                           |
 | --------------------- | ----------------------------------------------- |
@@ -202,10 +247,20 @@ column is repo-relative, so this costs nothing — but `resource_id` derivation 
 `tests` partition, and `TestScopeResolver` is the authority for that scoping, not
 `RiteScopedObjectId` alone.
 
-**Response shape changes.** A write no longer means "this is now the state of the calendar". The
-handlers must return the change request (id, review status, and whether it was auto-approved)
-rather than the written resource. This is a breaking change to the write endpoints and needs to be
-reflected in the OpenAPI document and in the frontend editors.
+**Response shape.** A write no longer necessarily means "this is now the state of the calendar", so
+every write response carries a `disposition` discriminator:
+
+```jsonc
+// disk mode — the existing body, plus one field
+{ "…existing resource body…", "disposition": "applied" }
+
+// queue mode
+{ "disposition": "submitted", "change_request": { "batch_id": "…", "review_status": "submitted", … } }
+```
+
+Because disk mode's body is otherwise byte-identical to today's, **this is not a breaking change for
+an existing deployment**. The OpenAPI document gains the discriminator and the queue-mode variant;
+frontend editors switch on one field.
 
 ## Authorization and visibility
 
@@ -342,8 +397,12 @@ needs reverting, because nothing was ever live.**
 - Unit: change-request state transitions; `resource_id` derivation across rites and the `tests`
   partition; verified/unverified email fallback for the git author.
 - Unit: `SourceDataPublishProcessor` disposition mapping, against a mocked GitHub client.
-- Integration: handler write paths create rows and touch no files — assert
+- Unit: mode selection — flag off, flag on with a full stack, and flag on with the stack missing
+  (which must fall back to disk, not throw).
+- Integration: in queue mode, handler write paths create rows and touch no files — assert
   `jsondata/sourcedata` is byte-identical after a write request.
+- Integration: in disk mode, the existing on-disk write behaviour is unchanged. These are the
+  current handler tests, retargeted at `DiskSourceDataWriter` rather than deleted.
 - Integration: RBAC-scoped listing and history for each of the three actor classes.
 - Integration: advisory-lock serialisation — two concurrent publishes for one resource.
 - E2E (frontend, `rbac` project): submit → approve → row reaches `queued`.
@@ -361,15 +420,17 @@ needs reverting, because nothing was ever live.**
 
 ## Phasing
 
-| Phase | Content                                                                 |
-| ----- | ----------------------------------------------------------------------- |
-| 1     | Change requests, approval, RBAC-scoped admin UI and history. No GitHub. |
-| 2     | GitHub App, `SourceDataPublishProcessor`, rolling PRs.                  |
-| 3     | Merge polling, status transitions, notifications.                       |
-| 4     | Preview: compute a calendar in memory with a pending change applied.    |
+| Phase | Content                                                                                |
+| ----- | -------------------------------------------------------------------------------------- |
+| 1     | `SourceDataWriter` seam, change requests, approval, RBAC admin UI, history. No GitHub. |
+| 2     | GitHub App, `SourceDataPublishProcessor`, rolling PRs.                                 |
+| 3     | Merge polling, status transitions, notifications.                                      |
+| 4     | Preview: compute a calendar in memory with a pending change applied.                   |
 
-Phase 1 is independently valuable: the moment the handlers stop writing to disk, the silent
-revert-on-deploy data loss is fixed, even with approved changes simply sitting as approved.
+Phase 1 is independently valuable: once `SOURCEDATA_CHANGE_REQUESTS` is enabled on a deployment,
+the silent revert-on-deploy data loss is fixed, even with approved changes simply sitting as
+approved and no publisher yet. Until it is enabled, and on every self-hosted instance, behaviour is
+exactly what it is today.
 
 ## Deferred
 
@@ -383,6 +444,9 @@ revert-on-deploy data loss is fixed, even with approved changes simply sitting a
   engine. Easy precisely because there is no overlay: a parameter, not a storage layer.
 - **i18n and Weblate.** Calendar i18n files are in scope as data, but they overlap Weblate's
   territory. How the two paths coexist is not settled here.
+- **Federated upstream submission.** A third `SourceDataWriter` that submits change requests to the
+  upstream canonical API, so a self-hosting diocese pools its edits rather than forking to local
+  disk. The interface exists for this; the implementation does not.
 
 ## Out of scope
 

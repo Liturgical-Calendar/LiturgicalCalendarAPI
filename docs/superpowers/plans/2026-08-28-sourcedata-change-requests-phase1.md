@@ -4,16 +4,22 @@
 > superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for
 > tracking.
 
-**Goal:** Stop the write handlers from touching `jsondata/sourcedata` on disk; route every authorized edit
-into a reviewable change request in Postgres, with an approval gate and RBAC-scoped listing and history.
+**Goal:** Give source-data writes a seam with two implementations — today's disk writes, and a reviewable
+change request in Postgres with an approval gate and RBAC-scoped listing and history — selected per
+deployment, so a self-hosted instance without Postgres and OpenFGA keeps behaving exactly as it does now.
 
 **Architecture:** A write handler builds its payload exactly as it does today — schema validation and OpenFGA
-authorization unchanged — and then, instead of `file_put_contents()`, submits a **batch** of proposed files to
-`SourceDataChangeRequestRepository`. One API write request produces one batch (a calendar plus its i18n files
-travel together). A submitter who holds the `admin` relation on the resource is auto-approved at submit time.
-Editors list their own batches; resource admins list batches for resources they administer; global admins list
-everything. No GitHub integration in this phase: approved batches simply sit as `approved`, waiting for the
-Phase 2 publisher.
+authorization unchanged — then stages each file it would write and commits once, through a `SourceDataWriter`
+interface. `DiskSourceDataWriter` performs today's `file_put_contents()`/`unlink()`;
+`ChangeRequestSourceDataWriter` records a **batch** of proposed files and touches no files at all. One API
+write request produces one batch (a calendar plus its i18n files travel together), so they are approved or
+rejected as a unit. A submitter who holds the `admin` relation on the resource is auto-approved at submit
+time. Editors list their own batches; resource admins list batches for resources they administer; global
+admins list everything. No GitHub integration in this phase: approved batches simply sit as `approved`,
+waiting for the Phase 2 publisher.
+
+The handlers never branch on mode. Selection happens once, in one place, gated on `SOURCEDATA_CHANGE_REQUESTS`
+plus the presence of Postgres and OpenFGA.
 
 **Tech Stack:** PHP 8.4, PDO/PostgreSQL, Doctrine Migrations, PHPUnit 12, OpenFGA via `OpenFgaClient`,
 PSR-7/15 handlers.
@@ -28,6 +34,10 @@ PSR-7/15 handlers.
 - Never use `--no-verify` when committing. Pre-commit hooks run linting and must pass.
 - Branch: `feature/sourcedata-change-requests`, already created from `development`. PRs target `development`.
 - Test commands: `composer test` (full), `vendor/bin/phpunit phpunit_tests/Path/ToTest.php` (single file).
+- `SOURCEDATA_CHANGE_REQUESTS` defaults to `false`. Queue mode additionally requires
+  `Connection::isConfigured()` **and** `OpenFgaClient::isConfigured()`; the flag alone must never enable it,
+  because `ChangeRequestReview::administers()` fails closed and queue mode without OpenFGA would accept edits
+  nobody could approve.
 - Repository tests need Postgres credentials in `DB_HOST`/`DB_NAME`/`DB_USER`/`DB_PASSWORD`; without them
   `RepositoryTestCase` skips the class. CI supplies them via `.env.local`.
 - Status columns are `VARCHAR` + `CHECK` constraints, **not** PostgreSQL `ENUM` types. This matches
@@ -39,7 +49,7 @@ PSR-7/15 handlers.
 
 This plan covers the **API repository only**. The frontend admin interface described in the spec is a separate
 plan in `LiturgicalCalendarFrontend`: different repo, different PR stream, and it consumes endpoints that must
-exist first. Write it after Task 13 lands.
+exist first. Write it after Task 14 lands.
 
 ## Design refinement discovered while planning
 
@@ -56,28 +66,35 @@ Save-equals-submit is implemented as _replace_: submitting a batch deletes the s
 
 **Create:**
 
-| Path                                                     | Responsibility                                              |
-| -------------------------------------------------------- | ----------------------------------------------------------- |
-| `src/Migrations/Version20260828120000.php`               | `sourcedata_change_requests` table                          |
-| `src/Enum/ChangeOperation.php`                           | `create` / `update` / `delete`                              |
-| `src/Enum/ChangeReviewStatus.php`                        | `submitted` / `approved` / `rejected` / `withdrawn`         |
-| `src/Enum/ChangePublicationStatus.php`                   | `none` / `queued` / `open` / `merged` / `closed`            |
-| `src/Services/ChangeResource.php`                        | Identifies the resource an edit targets; maps it to OpenFGA |
-| `src/Repositories/SourceDataChangeRequestRepository.php` | All persistence for change requests                         |
-| `src/Services/ChangeRequestReview.php`                   | Auto-approval decision and admin-scoped filtering           |
-| `src/Handlers/Auth/ChangeRequestHandler.php`             | `GET /auth/change-requests`, withdraw                       |
-| `src/Handlers/Admin/ChangeRequestAdminHandler.php`       | `GET /admin/change-requests`, approve, reject               |
+| Path                                                        | Responsibility                                              |
+| ----------------------------------------------------------- | ----------------------------------------------------------- |
+| `src/Migrations/Version20260828120000.php`                  | `sourcedata_change_requests` table                          |
+| `src/Enum/ChangeOperation.php`                              | `create` / `update` / `delete`                              |
+| `src/Enum/ChangeReviewStatus.php`                           | `submitted` / `approved` / `rejected` / `withdrawn`         |
+| `src/Enum/ChangePublicationStatus.php`                      | `none` / `queued` / `open` / `merged` / `closed`            |
+| `src/Services/ChangeResource.php`                           | Identifies the resource an edit targets; maps it to OpenFGA |
+| `src/Services/SourceData/SourceDataWriter.php`              | The seam: `stage()` then `commit()`                         |
+| `src/Services/SourceData/DiskSourceDataWriter.php`          | Today's disk behaviour, extracted from the handlers         |
+| `src/Services/SourceData/ChangeRequestSourceDataWriter.php` | Records a reviewable batch; touches no files                |
+| `src/Services/SourceData/SourceDataWriteMode.php`           | Which writer this deployment uses, and why                  |
+| `src/Handlers/Concerns/WritesSourceData.php`                | Handler-side staging and commit, mode-agnostic              |
+| `src/Repositories/SourceDataChangeRequestRepository.php`    | All persistence for change requests                         |
+| `src/Services/ChangeRequestReview.php`                      | Auto-approval decision and admin-scoped filtering           |
+| `src/Handlers/Auth/ChangeRequestHandler.php`                | `GET /auth/change-requests`, withdraw                       |
+| `src/Handlers/Admin/ChangeRequestAdminHandler.php`          | `GET /admin/change-requests`, approve, reject               |
 
 **Modify:**
 
-| Path                                                   | Change                                                 |
-| ------------------------------------------------------ | ------------------------------------------------------ |
-| `phpunit_tests/Repositories/RepositoryTestCase.php:34` | Add the new table to `TABLES`                          |
-| `src/Handlers/RegionalDataHandler.php`                 | 7 writes + 3 `unlink()` become batch submissions       |
-| `src/Handlers/DecreesHandler.php`                      | 4 writes become batch submissions                      |
-| `src/Handlers/TestsHandler.php:438,265`                | 1 write + 1 `unlink()` become batch submissions        |
-| `src/Router.php`                                       | Register the two new routes                            |
-| `jsondata/schemas/openapi.json`                        | Document the new endpoints and changed write responses |
+| Path                                                   | Change                                               |
+| ------------------------------------------------------ | ---------------------------------------------------- |
+| `phpunit_tests/Repositories/RepositoryTestCase.php:34` | Add the new table to `TABLES`                        |
+| `src/Handlers/RegionalDataHandler.php`                 | 7 writes + 3 `unlink()` become stage + commit        |
+| `src/Handlers/DecreesHandler.php`                      | 4 writes become stage + commit                       |
+| `src/Handlers/TestsHandler.php:438,265`                | 1 write + 1 `unlink()` become stage + commit         |
+| `src/Health.php`                                       | Report the source-data write mode                    |
+| `.env.example`                                         | Document `SOURCEDATA_CHANGE_REQUESTS`                |
+| `src/Router.php`                                       | Register the two new routes                          |
+| `jsondata/schemas/openapi.json`                        | Document the new endpoints and the `disposition` key |
 
 **Test:**
 
@@ -86,6 +103,8 @@ Save-equals-submit is implemented as _replace_: submitting a batch deletes the s
 | `phpunit_tests/Services/ChangeResourceTest.php`                        |
 | `phpunit_tests/Repositories/SourceDataChangeRequestRepositoryTest.php` |
 | `phpunit_tests/Services/ChangeRequestReviewTest.php`                   |
+| `phpunit_tests/Services/SourceData/SourceDataWriteModeTest.php`        |
+| `phpunit_tests/Services/SourceData/DiskSourceDataWriterTest.php`       |
 | `phpunit_tests/Handlers/RegionalDataChangeRequestTest.php`             |
 | `phpunit_tests/Handlers/DecreesChangeRequestTest.php`                  |
 | `phpunit_tests/Handlers/TestsChangeRequestTest.php`                    |
@@ -446,7 +465,7 @@ git commit -m "feat(data): add sourcedata_change_requests table and status enums
   constructors `nationalCalendar(Rite, string): self`, `diocesanCalendar(Rite, string): self`,
   `widerRegion(string): self`, `decrees(): self`, `test(Rite, string, string): self`; and methods
   `fgaPermission(): array{object_type: string, object_id: string, relation: string}` and `branch(): string`.
-  Tasks 3, 6, 7, 8, 9, 10, 12 all use these exact names.
+  Tasks 3, 6, 7, 8, 9, 10, 11, 13 all use these exact names.
 
 **Why this exists:** `ResourceAdminService::filterByAdminAccess()` filters rows by a `permissions` key shaped
 `{object_type, object_id, relation}`. Giving each change request batch a one-element permissions array built
@@ -703,7 +722,7 @@ public function getById(string $id): ?array;
 public function getBatch(string $batchId): array;
 ```
 
-Tasks 4, 5, 7–12 depend on these exact names.
+Tasks 4, 5, 8–13 depend on these exact names.
 
 **Note on `permissions`:** `getBatch()` and every listing method attach a synthetic `permissions` key holding
 `[$resource->fgaPermission()]`. That is the shape `ResourceAdminService::filterByAdminAccess()` reads, and
@@ -1137,7 +1156,7 @@ git commit -m "feat(data): persist source-data change requests as reviewable bat
   - `withdrawBatch(string $batchId, string $submittedBySub): int`
 
 All three transition only rows still in `submitted`, so a second call is a no-op returning `0` rather than
-resurrecting a decided batch. Task 11 and Task 12 call these.
+resurrecting a decided batch. Task 12 and Task 13 call these.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -1325,8 +1344,8 @@ git commit -m "feat(data): add single-shot approve, reject and withdraw transiti
 
 Both list methods return **one entry per batch**, not per row, because a batch is the review unit. Each entry
 carries `batch_id`, `resource_type`, `resource_id`, `review_status`, `publication_status`, `submitted_by_*`,
-`approved_by_sub`, `created_at`, a `file_count`, a `paths` list, and the synthetic `permissions` key. Tasks 11
-and 12 render these directly.
+`approved_by_sub`, `created_at`, a `file_count`, a `paths` list, and the synthetic `permissions` key. Tasks 12
+and 13 render these directly.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -1619,8 +1638,8 @@ git commit -m "feat(data): list and count change requests by batch"
 - Consumes: `ChangeResource` (Task 2), `ResourceAdminService`, `OpenFgaClient`.
 - Produces:
   - `__construct(ResourceAdminService $resourceAdmin)`
-  - `administers(ChangeResource $resource, string $sub): bool` — Task 7 uses this to auto-approve.
-  - `filterForAdmin(array $batches, string $adminSub): array` — Task 12 uses this.
+  - `administers(ChangeResource $resource, string $sub): bool` — Task 8 uses this to auto-approve.
+  - `filterForAdmin(array $batches, string $adminSub): array` — Task 13 uses this.
 
 `ResourceAdminService` is `final`, so it is injected rather than mocked; tests build a real one over a
 `MockHandler`-backed `OpenFgaClient`, exactly as `ResourceAdminServiceTest::serviceWith()` does.
@@ -1803,11 +1822,534 @@ git commit -m "feat(data): decide auto-approval and admin visibility for change 
 
 ---
 
-### Task 7: `SubmitsChangeRequests` trait, and RegionalDataHandler create paths
+### Task 7: `SourceDataWriter` seam, disk implementation, and mode selection
 
 **Files:**
 
-- Create: `src/Handlers/Concerns/SubmitsChangeRequests.php`
+- Create: `src/Services/SourceData/SourceDataWriter.php`
+- Create: `src/Services/SourceData/DiskSourceDataWriter.php`
+- Create: `src/Services/SourceData/SourceDataWriteMode.php`
+- Modify: `src/Health.php` — add the write-mode check
+- Modify: `.env.example` — document `SOURCEDATA_CHANGE_REQUESTS`
+- Test: `phpunit_tests/Services/SourceData/DiskSourceDataWriterTest.php`
+- Test: `phpunit_tests/Services/SourceData/SourceDataWriteModeTest.php`
+
+**Interfaces:**
+
+- Consumes: `ChangeOperation` (Task 1), `ChangeResource` (Task 2).
+- Produces:
+
+```php
+interface SourceDataWriter
+{
+    /** Record a file this request would write. $content is null only for DELETE. */
+    public function stage(string $absolutePath, ChangeOperation $operation, ?string $content): void;
+
+    /**
+     * Apply everything staged so far and describe what happened.
+     *
+     * @return array<string, mixed> Always carries a `disposition` key.
+     */
+    public function commit(ChangeResource $resource): array;
+}
+```
+
+Task 8 supplies the second implementation; tasks 9, 10 and 11 call these through the trait.
+
+**Why a seam rather than a branch:** the API is self-hostable. A diocese running it without Zitadel, OpenFGA
+and Postgres must keep working exactly as it does today — `Router.php:775` already branches on
+`Connection::isConfigured()`, and `AuthorizationMiddleware` gates `/data` writes on JWT roles rather than
+OpenFGA, so a Postgres-less authoring deployment is a supported shape. One interface with two implementations
+keeps that guarantee in one place instead of ten mode-aware call sites, and keeps today's disk behaviour under
+test rather than deleting it.
+
+- [ ] **Step 1: Write the failing mode-selection test**
+
+`phpunit_tests/Services/SourceData/SourceDataWriteModeTest.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace LiturgicalCalendar\Tests\Services\SourceData;
+
+use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(SourceDataWriteMode::class)]
+final class SourceDataWriteModeTest extends TestCase
+{
+    /** @var array<string, string|false> */
+    private array $originalEnv = [];
+
+    protected function setUp(): void
+    {
+        foreach (['SOURCEDATA_CHANGE_REQUESTS', 'DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASSWORD', 'OPENFGA_API_URL', 'OPENFGA_STORE_ID', 'OPENFGA_MODEL_ID'] as $key) {
+            $this->originalEnv[$key] = $_ENV[$key] ?? false;
+            unset($_ENV[$key]);
+        }
+    }
+
+    protected function tearDown(): void
+    {
+        foreach ($this->originalEnv as $key => $value) {
+            if ($value === false) {
+                unset($_ENV[$key]);
+            } else {
+                $_ENV[$key] = $value;
+            }
+        }
+    }
+
+    private function withFullStack(): void
+    {
+        $_ENV['DB_HOST']          = 'localhost';
+        $_ENV['DB_NAME']          = 'litcal';
+        $_ENV['DB_USER']          = 'litcal';
+        $_ENV['DB_PASSWORD']      = 'secret';
+        $_ENV['OPENFGA_API_URL']  = 'http://openfga.test';
+        $_ENV['OPENFGA_STORE_ID'] = 'store';
+        $_ENV['OPENFGA_MODEL_ID'] = 'model';
+    }
+
+    public function testDefaultsToDiskWhenTheFlagIsAbsent(): void
+    {
+        $this->withFullStack();
+
+        self::assertFalse(SourceDataWriteMode::changeRequestsEnabled());
+    }
+
+    public function testIsDiskWhenTheFlagIsExplicitlyFalse(): void
+    {
+        $this->withFullStack();
+        $_ENV['SOURCEDATA_CHANGE_REQUESTS'] = 'false';
+
+        self::assertFalse(SourceDataWriteMode::changeRequestsEnabled());
+    }
+
+    public function testIsQueueWhenTheFlagIsTrueAndTheStackIsPresent(): void
+    {
+        $this->withFullStack();
+        $_ENV['SOURCEDATA_CHANGE_REQUESTS'] = 'true';
+
+        self::assertTrue(SourceDataWriteMode::changeRequestsEnabled());
+    }
+
+    public function testFallsBackToDiskWhenTheFlagIsTrueButPostgresIsMissing(): void
+    {
+        $_ENV['SOURCEDATA_CHANGE_REQUESTS'] = 'true';
+        $_ENV['OPENFGA_API_URL']            = 'http://openfga.test';
+        $_ENV['OPENFGA_STORE_ID']           = 'store';
+        $_ENV['OPENFGA_MODEL_ID']           = 'model';
+
+        self::assertFalse(SourceDataWriteMode::changeRequestsEnabled());
+    }
+
+    public function testFallsBackToDiskWhenTheFlagIsTrueButOpenFgaIsMissing(): void
+    {
+        $_ENV['SOURCEDATA_CHANGE_REQUESTS'] = 'true';
+        $_ENV['DB_HOST']                    = 'localhost';
+        $_ENV['DB_NAME']                    = 'litcal';
+        $_ENV['DB_USER']                    = 'litcal';
+        $_ENV['DB_PASSWORD']                = 'secret';
+
+        // Queue mode without OpenFGA would accept edits nobody could ever approve,
+        // because ChangeRequestReview::administers() fails closed.
+        self::assertFalse(SourceDataWriteMode::changeRequestsEnabled());
+    }
+
+    public function testAMisconfiguredFlagIsReportedSoItCanBeLogged(): void
+    {
+        $_ENV['SOURCEDATA_CHANGE_REQUESTS'] = 'true';
+
+        self::assertTrue(SourceDataWriteMode::isMisconfigured());
+        self::assertFalse(SourceDataWriteMode::changeRequestsEnabled());
+    }
+
+    public function testDiskModeWithNoStackIsNotMisconfigured(): void
+    {
+        self::assertFalse(SourceDataWriteMode::isMisconfigured());
+    }
+}
+```
+
+- [ ] **Step 2: Run it to verify it fails**
+
+Run: `vendor/bin/phpunit phpunit_tests/Services/SourceData/SourceDataWriteModeTest.php`
+
+Expected: FAIL — `Class "…\SourceDataWriteMode" not found`.
+
+- [ ] **Step 3: Write the interface and the mode selector**
+
+`src/Services/SourceData/SourceDataWriter.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace LiturgicalCalendar\Api\Services\SourceData;
+
+use LiturgicalCalendar\Api\Enum\ChangeOperation;
+use LiturgicalCalendar\Api\Services\ChangeResource;
+
+/**
+ * How a write handler puts source data somewhere.
+ *
+ * Two implementations exist: {@see DiskSourceDataWriter} writes files, which is
+ * what a self-hosted deployment without Postgres and OpenFGA does and always
+ * has; {@see ChangeRequestSourceDataWriter} records a reviewable proposal and
+ * touches no files.
+ *
+ * Handlers stage each file and commit once per request, and never know which
+ * implementation is behind the interface.
+ */
+interface SourceDataWriter
+{
+    /**
+     * Record a file this request would write.
+     *
+     * @param string  $absolutePath The on-disk path the handler targets.
+     * @param ?string $content      Null only for ChangeOperation::DELETE.
+     */
+    public function stage(string $absolutePath, ChangeOperation $operation, ?string $content): void;
+
+    /**
+     * Apply everything staged so far, and describe what happened.
+     *
+     * @return array<string, mixed> Always carries a `disposition` key: `applied`
+     *                              when the files are now on disk, `submitted` or
+     *                              `approved` when a proposal was recorded.
+     */
+    public function commit(ChangeResource $resource): array;
+}
+```
+
+`src/Services/SourceData/SourceDataWriteMode.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace LiturgicalCalendar\Api\Services\SourceData;
+
+use LiturgicalCalendar\Api\Database\Connection;
+use LiturgicalCalendar\Api\Services\OpenFgaClient;
+
+/**
+ * Whether this deployment records source-data edits as change requests, or
+ * writes them straight to disk the way it always has.
+ *
+ * Opt-in and fail-safe. The flag alone is not enough: queue mode needs Postgres
+ * to store proposals and OpenFGA to decide who may approve them. A flag set
+ * without that stack behind it falls back to disk and reports itself as
+ * misconfigured, rather than accepting edits nobody could ever approve.
+ */
+final class SourceDataWriteMode
+{
+    public const FLAG = 'SOURCEDATA_CHANGE_REQUESTS';
+
+    /**
+     * True when edits should become change requests rather than files.
+     */
+    public static function changeRequestsEnabled(): bool
+    {
+        return self::flagSet() && self::stackAvailable();
+    }
+
+    /**
+     * True when the operator asked for queue mode but the stack cannot support it.
+     *
+     * Callers log this and Health surfaces it; the request itself still succeeds
+     * in disk mode.
+     */
+    public static function isMisconfigured(): bool
+    {
+        return self::flagSet() && !self::stackAvailable();
+    }
+
+    /**
+     * True when this deployment is writing to disk despite having everything
+     * queue mode needs — almost always a forgotten flag on a host that rsyncs
+     * `--delete` from git, where the next deploy silently reverts the edit.
+     */
+    public static function isUnexpectedlyWritingToDisk(): bool
+    {
+        return !self::flagSet() && self::stackAvailable();
+    }
+
+    private static function flagSet(): bool
+    {
+        return 'true' === strtolower(trim((string) ( $_ENV[self::FLAG] ?? 'false' )));
+    }
+
+    private static function stackAvailable(): bool
+    {
+        return Connection::isConfigured() && OpenFgaClient::isConfigured();
+    }
+}
+```
+
+- [ ] **Step 4: Run the mode test to verify it passes**
+
+Run: `vendor/bin/phpunit phpunit_tests/Services/SourceData/SourceDataWriteModeTest.php`
+
+Expected: PASS, 7 tests.
+
+- [ ] **Step 5: Write the failing disk-writer test**
+
+`phpunit_tests/Services/SourceData/DiskSourceDataWriterTest.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace LiturgicalCalendar\Tests\Services\SourceData;
+
+use LiturgicalCalendar\Api\Enum\ChangeOperation;
+use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\Services\ChangeResource;
+use LiturgicalCalendar\Api\Services\SourceData\DiskSourceDataWriter;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(DiskSourceDataWriter::class)]
+final class DiskSourceDataWriterTest extends TestCase
+{
+    private string $tmp;
+
+    protected function setUp(): void
+    {
+        $this->tmp = sys_get_temp_dir() . '/litcal-disk-writer-' . bin2hex(random_bytes(6));
+        mkdir($this->tmp . '/nested', 0o755, true);
+    }
+
+    protected function tearDown(): void
+    {
+        foreach (glob($this->tmp . '/{,*/}*', GLOB_BRACE) ?: [] as $path) {
+            is_dir($path) ? @rmdir($path) : @unlink($path);
+        }
+        @rmdir($this->tmp);
+    }
+
+    public function testCommitWritesEveryStagedFile(): void
+    {
+        $writer = new DiskSourceDataWriter();
+        $writer->stage($this->tmp . '/calendar.json', ChangeOperation::CREATE, '{"litcal":[]}');
+        $writer->stage($this->tmp . '/nested/en.json', ChangeOperation::CREATE, '{"key":"value"}');
+
+        $result = $writer->commit(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
+
+        self::assertSame('applied', $result['disposition']);
+        self::assertSame('{"litcal":[]}', file_get_contents($this->tmp . '/calendar.json'));
+        self::assertSame('{"key":"value"}', file_get_contents($this->tmp . '/nested/en.json'));
+    }
+
+    public function testNothingIsWrittenBeforeCommit(): void
+    {
+        $writer = new DiskSourceDataWriter();
+        $writer->stage($this->tmp . '/calendar.json', ChangeOperation::CREATE, '{}');
+
+        self::assertFileDoesNotExist($this->tmp . '/calendar.json');
+    }
+
+    public function testCommitRemovesStagedDeletions(): void
+    {
+        file_put_contents($this->tmp . '/obsolete.json', '{}');
+
+        $writer = new DiskSourceDataWriter();
+        $writer->stage($this->tmp . '/obsolete.json', ChangeOperation::DELETE, null);
+        $writer->commit(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
+
+        self::assertFileDoesNotExist($this->tmp . '/obsolete.json');
+    }
+
+    public function testDeletingAnAbsentFileIsNotAnError(): void
+    {
+        $writer = new DiskSourceDataWriter();
+        $writer->stage($this->tmp . '/never-existed.json', ChangeOperation::DELETE, null);
+
+        $result = $writer->commit(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
+
+        self::assertSame('applied', $result['disposition']);
+    }
+
+    public function testAnUnwritablePathRaisesServiceUnavailable(): void
+    {
+        $writer = new DiskSourceDataWriter();
+        $writer->stage($this->tmp . '/no-such-dir/calendar.json', ChangeOperation::CREATE, '{}');
+
+        $this->expectException(ServiceUnavailableException::class);
+        $writer->commit(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
+    }
+
+    public function testCommitClearsTheStagingArea(): void
+    {
+        $writer = new DiskSourceDataWriter();
+        $writer->stage($this->tmp . '/calendar.json', ChangeOperation::CREATE, '{"first":true}');
+        $writer->commit(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
+
+        unlink($this->tmp . '/calendar.json');
+
+        $writer->stage($this->tmp . '/other.json', ChangeOperation::CREATE, '{}');
+        $writer->commit(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
+
+        self::assertFileDoesNotExist($this->tmp . '/calendar.json');
+        self::assertFileExists($this->tmp . '/other.json');
+    }
+}
+```
+
+- [ ] **Step 6: Run it to verify it fails**
+
+Run: `vendor/bin/phpunit phpunit_tests/Services/SourceData/DiskSourceDataWriterTest.php`
+
+Expected: FAIL — `Class "…\DiskSourceDataWriter" not found`.
+
+- [ ] **Step 7: Write the disk implementation**
+
+`src/Services/SourceData/DiskSourceDataWriter.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace LiturgicalCalendar\Api\Services\SourceData;
+
+use LiturgicalCalendar\Api\Enum\ChangeOperation;
+use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
+use LiturgicalCalendar\Api\Services\ChangeResource;
+
+/**
+ * Writes source data to disk — the behaviour every deployment had before change
+ * requests existed, and the behaviour a self-hosted instance without Postgres
+ * and OpenFGA keeps.
+ *
+ * The logic here is lifted from RegionalDataHandler, DecreesHandler and
+ * TestsHandler rather than rewritten: same `file_put_contents()`, same
+ * `unlink()`, same ServiceUnavailableException on failure.
+ *
+ * Staging is deferred rather than immediate so that both implementations share
+ * one contract, and so a request that fails validation half way through has not
+ * already half-written the calendar.
+ */
+final class DiskSourceDataWriter implements SourceDataWriter
+{
+    /** @var list<array{path: string, operation: ChangeOperation, content: ?string}> */
+    private array $staged = [];
+
+    public function stage(string $absolutePath, ChangeOperation $operation, ?string $content): void
+    {
+        $this->staged[] = [
+            'path'      => $absolutePath,
+            'operation' => $operation,
+            'content'   => $content,
+        ];
+    }
+
+    public function commit(ChangeResource $resource): array
+    {
+        $staged       = $this->staged;
+        $this->staged = [];
+
+        foreach ($staged as $file) {
+            if ($file['operation'] === ChangeOperation::DELETE) {
+                $this->removeFile($file['path']);
+                continue;
+            }
+
+            $this->writeFile($file['path'], (string) $file['content']);
+        }
+
+        return ['disposition' => 'applied'];
+    }
+
+    private function writeFile(string $path, string $content): void
+    {
+        if (false === file_put_contents($path, $content)) {
+            throw new ServiceUnavailableException('Failed to write to file ' . $path);
+        }
+    }
+
+    /**
+     * A missing file is not an error: the previous handler code reached `unlink()`
+     * only after its own existence checks, and re-deleting is idempotent from the
+     * caller's point of view.
+     */
+    private function removeFile(string $path): void
+    {
+        if (false === file_exists($path)) {
+            return;
+        }
+
+        if (false === unlink($path)) {
+            throw new ServiceUnavailableException('Failed to delete file ' . $path);
+        }
+    }
+}
+```
+
+- [ ] **Step 8: Run the disk-writer test to verify it passes**
+
+Run: `vendor/bin/phpunit phpunit_tests/Services/SourceData/DiskSourceDataWriterTest.php`
+
+Expected: PASS, 6 tests.
+
+- [ ] **Step 9: Add the Health check**
+
+In `src/Health.php`, add a check reporting the source-data write mode:
+
+- queue mode → OK, message `source data writes are recorded as change requests`
+- disk mode with no stack present → OK, message
+  `source data writes go to disk (no change request stack configured)`
+- disk mode with the full stack present (`SourceDataWriteMode::isUnexpectedlyWritingToDisk()`) → **WARNING**,
+  message
+  `source data writes go to disk, but this deployment has Postgres and OpenFGA configured; if it deploys by rsync --delete from git, edits will be reverted on the next deploy`
+- `SourceDataWriteMode::isMisconfigured()` → **WARNING**, message
+  `SOURCEDATA_CHANGE_REQUESTS is set but Postgres or OpenFGA is not configured; falling back to disk writes`
+
+Follow the shape of the existing checks in that file; do not invent a new reporting mechanism.
+
+- [ ] **Step 10: Document the flag**
+
+In `.env.example`, beside the other feature settings, add:
+
+```dotenv
+# Record source-data edits as reviewable change requests instead of writing them
+# straight to disk. Requires Postgres (DB_*) and OpenFGA (OPENFGA_*); without both,
+# this falls back to disk writes and Health reports the misconfiguration.
+# Leave false for a self-hosted instance that has neither.
+SOURCEDATA_CHANGE_REQUESTS=false
+```
+
+- [ ] **Step 11: Run the full suite**
+
+Run: `composer test`
+
+Expected: PASS.
+
+- [ ] **Step 12: Lint, analyse, commit**
+
+```bash
+composer parallel-lint && composer lint:fix && composer analyse
+git add src/Services/SourceData/ src/Health.php .env.example phpunit_tests/Services/SourceData/
+git commit -m "feat(data): add the source-data writer seam and its disk implementation"
+```
+
+---
+
+### Task 8: Change-request writer, `WritesSourceData` trait, and RegionalDataHandler create paths
+
+**Files:**
+
+- Create: `src/Services/SourceData/ChangeRequestSourceDataWriter.php`
+- Create: `src/Handlers/Concerns/WritesSourceData.php`
 - Modify: `src/Handlers/RegionalDataHandler.php` — class properties, `handle()`, `createDiocesanCalendar()`
   (line 330), `createNationalCalendar()` (line 437), `createWiderRegionCalendar()` (line 571),
   `writeI18nFiles()` (line 1208)
@@ -1815,25 +2357,34 @@ git commit -m "feat(data): decide auto-approval and admin visibility for change 
 
 **Interfaces:**
 
-- Consumes: `SourceDataChangeRequestRepository` (Tasks 3–5), `ChangeRequestReview` (Task 6), `ChangeResource`
-  (Task 2), `ChangeOperation` (Task 1).
-- Produces, on the trait:
+- Consumes: `SourceDataWriter`, `SourceDataWriteMode` (Task 7); `SourceDataChangeRequestRepository` (Tasks
+  3–5); `ChangeRequestReview` (Task 6); `ChangeResource` (Task 2); `ChangeOperation` (Task 1).
+- Produces `ChangeRequestSourceDataWriter implements SourceDataWriter`, and on the trait:
   - `captureSubmitter(ServerRequestInterface $request): void` — reads the `oidc_user` attribute
-  - `stageFile(string $absolutePath, ChangeOperation $operation, ?string $content): void` — accumulates
-  - `submitStagedFiles(ChangeResource $resource): array` — submits the batch, auto-approves when entitled,
-    returns the response body
-  - `repoRelativePath(string $absolutePath): string`
+  - `stageFile(string $absolutePath, ChangeOperation $operation, ?string $content): void` — delegates
+  - `commitStagedFiles(ChangeResource $resource): array` — delegates, returns the response body
+  - `sourceDataWriter(): SourceDataWriter` — mode-selected, memoised per request
 
-Tasks 8, 9 and 10 use these exact names.
+Tasks 9, 10 and 11 use these exact names.
 
-**Response shape** returned by `submitStagedFiles()`:
+**The handlers never branch on mode.** `sourceDataWriter()` returns `DiskSourceDataWriter` or
+`ChangeRequestSourceDataWriter` per `SourceDataWriteMode::changeRequestsEnabled()`, and every write site calls
+the same two methods either way.
 
-```json
+**Response shape** returned by `commitStagedFiles()` — the `disposition` key is always present, and disk
+mode's body is otherwise byte-identical to today's, so an existing deployment sees no contract change:
+
+```jsonc
+// disk mode; the handler merges its existing resource body alongside this
+{ "disposition": "applied" }
+
+// queue mode
 {
+  "disposition": "submitted",
   "change_request": {
     "batch_id": "…",
-    "review_status": "approved",
-    "auto_approved": true,
+    "review_status": "submitted",
+    "auto_approved": false,
     "resource": { "type": "national_calendar", "id": "USA" },
     "paths": ["jsondata/sourcedata/…/USA.json"]
   }
@@ -1864,7 +2415,7 @@ use PHPUnit\Framework\Attributes\CoversTrait;
  * request pipeline, and what needs proving here is the staging and submission
  * contract every write path relies on.
  */
-#[CoversTrait(\LiturgicalCalendar\Api\Handlers\Concerns\SubmitsChangeRequests::class)]
+#[CoversTrait(\LiturgicalCalendar\Api\Handlers\Concerns\WritesSourceData::class)]
 final class RegionalDataChangeRequestTest extends RepositoryTestCase
 {
     private ChangeRequestTraitHost $host;
@@ -1888,7 +2439,7 @@ final class RegionalDataChangeRequestTest extends RepositoryTestCase
         $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/calendars/nation/USA.json', ChangeOperation::CREATE, '{"litcal":[]}');
         $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/calendars/nation/USA/i18n/en.json', ChangeOperation::CREATE, '{}');
 
-        $body = $this->host->submitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
+        $body = $this->host->commitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
 
         self::assertArrayHasKey('change_request', $body);
         self::assertCount(2, $body['change_request']['paths']);
@@ -1899,7 +2450,7 @@ final class RegionalDataChangeRequestTest extends RepositoryTestCase
     {
         $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/calendars/nation/USA.json', ChangeOperation::CREATE, '{}');
 
-        $body = $this->host->submitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
+        $body = $this->host->commitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
 
         self::assertSame(
             ['jsondata/sourcedata/rite/roman/calendars/nation/USA.json'],
@@ -1912,7 +2463,7 @@ final class RegionalDataChangeRequestTest extends RepositoryTestCase
         $this->host->setAdministers(false);
         $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/calendars/nation/USA.json', ChangeOperation::CREATE, '{}');
 
-        $body = $this->host->submitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
+        $body = $this->host->commitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
 
         self::assertSame('submitted', $body['change_request']['review_status']);
         self::assertFalse($body['change_request']['auto_approved']);
@@ -1923,7 +2474,7 @@ final class RegionalDataChangeRequestTest extends RepositoryTestCase
         $this->host->setAdministers(true);
         $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/calendars/nation/USA.json', ChangeOperation::CREATE, '{}');
 
-        $body = $this->host->submitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
+        $body = $this->host->commitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
 
         self::assertSame('approved', $body['change_request']['review_status']);
         self::assertTrue($body['change_request']['auto_approved']);
@@ -1943,7 +2494,7 @@ final class RegionalDataChangeRequestTest extends RepositoryTestCase
         ]);
         $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/calendars/nation/USA.json', ChangeOperation::CREATE, '{}');
 
-        $body = $this->host->submitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
+        $body = $this->host->commitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
 
         $repo = new SourceDataChangeRequestRepository(self::$pdo);
         $row  = $repo->getBatch($body['change_request']['batch_id'])[0];
@@ -1957,12 +2508,14 @@ final class RegionalDataChangeRequestTest extends RepositoryTestCase
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('no staged files');
 
-        $this->host->submitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
+        $this->host->commitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
     }
 }
 ```
 
-Create the host beside it, `phpunit_tests/Handlers/ChangeRequestTraitHost.php`:
+Create the host beside it, `phpunit_tests/Handlers/ChangeRequestTraitHost.php`. It wraps a
+`ChangeRequestSourceDataWriter` and keeps the same small surface the tests in this task and in tasks 10 and 11
+use:
 
 ```php
 <?php
@@ -1971,132 +2524,162 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Handlers;
 
-use LiturgicalCalendar\Api\Handlers\Concerns\SubmitsChangeRequests;
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use LiturgicalCalendar\Api\Enum\ChangeOperation;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
+use LiturgicalCalendar\Api\Services\ChangeRequestReview;
 use LiturgicalCalendar\Api\Services\ChangeResource;
+use LiturgicalCalendar\Api\Services\OpenFgaClient;
+use LiturgicalCalendar\Api\Services\ResourceAdminService;
+use LiturgicalCalendar\Api\Services\SourceData\ChangeRequestSourceDataWriter;
+use LiturgicalCalendar\Tests\Support\CollectingLogger;
+use Nyholm\Psr7\Factory\Psr17Factory;
 
 /**
- * Minimal host exposing the trait's protected surface to tests, and stubbing the
- * two collaborators the trait resolves lazily in production.
+ * Drives ChangeRequestSourceDataWriter with the queue-mode collaborators a handler
+ * would give it.
+ *
+ * ChangeRequestReview and ResourceAdminService are both final, so auto-approval is
+ * steered by a queued OpenFGA response rather than by stubbing a class — the same
+ * seam ResourceAdminServiceTest uses. The writer is rebuilt on demand so a test can
+ * change the answer between calls.
  */
 final class ChangeRequestTraitHost
 {
-    use SubmitsChangeRequests;
+    /** @var array<string, mixed> */
+    private array $oidcUser = [];
 
     private bool $administers = false;
 
-    public function __construct(SourceDataChangeRequestRepository $repository)
+    private ?ChangeRequestSourceDataWriter $writer = null;
+
+    public function __construct(private readonly SourceDataChangeRequestRepository $repository)
     {
-        $this->changeRequestRepository = $repository;
     }
 
     /** @param array<string, mixed> $user */
     public function setSubmitter(array $user): void
     {
-        $this->submitterOidcUser = $user;
+        $this->oidcUser = $user;
+        $this->writer   = null;
     }
 
     public function setAdministers(bool $administers): void
     {
         $this->administers = $administers;
+        $this->writer      = null;
     }
 
-    protected function submitterAdministers(ChangeResource $resource, string $sub): bool
+    public function stageFile(string $absolutePath, ChangeOperation $operation, ?string $content): void
     {
-        return $this->administers;
+        $this->writer()->stage($absolutePath, $operation, $content);
     }
 
-    /** Production reads Router::$apiFilePath; the tests pin a fixed root. */
-    protected function projectRoot(): string
+    /** @return array<string, mixed> */
+    public function commitStagedFiles(ChangeResource $resource): array
     {
-        return '/app/';
+        $result       = $this->writer()->commit($resource);
+        $this->writer = null;
+
+        return $result;
+    }
+
+    private function writer(): ChangeRequestSourceDataWriter
+    {
+        return $this->writer ??= new ChangeRequestSourceDataWriter(
+            $this->repository,
+            new ChangeRequestReview(new ResourceAdminService($this->fgaAnswering($this->administers), new CollectingLogger())),
+            $this->oidcUser,
+            '/app/'
+        );
+    }
+
+    private function fgaAnswering(bool $allowed): OpenFgaClient
+    {
+        $responses = [new GuzzleResponse(200, [], json_encode(['allowed' => $allowed]))];
+        $guzzle    = new GuzzleClient(['handler' => HandlerStack::create(new MockHandler($responses))]);
+        $psr17     = new Psr17Factory();
+
+        return new OpenFgaClient(
+            apiUrl: 'http://openfga.test',
+            storeId: 'test-store',
+            modelId: 'test-model',
+            httpClient: $guzzle,
+            requestFactory: $psr17,
+            streamFactory: $psr17,
+            apiToken: 'test-token'
+        );
     }
 }
 ```
+
+Every `commitStagedFiles()` assertion in this task also gains a `disposition` check:
+`self::assertSame('submitted', $body['disposition']);` for a non-administrator, `'approved'` for an
+administrator.
 
 - [ ] **Step 2: Run the test to verify it fails**
 
 Run: `vendor/bin/phpunit phpunit_tests/Handlers/RegionalDataChangeRequestTest.php`
 
-Expected: FAIL — `Trait "LiturgicalCalendar\Api\Handlers\Concerns\SubmitsChangeRequests" not found`.
+Expected: FAIL — `Trait "LiturgicalCalendar\Api\Handlers\Concerns\WritesSourceData" not found`.
 
-- [ ] **Step 3: Write the trait**
+- [ ] **Step 3: Write the change-request writer**
 
-`src/Handlers/Concerns/SubmitsChangeRequests.php`:
+`src/Services/SourceData/ChangeRequestSourceDataWriter.php`:
 
 ```php
 <?php
 
 declare(strict_types=1);
 
-namespace LiturgicalCalendar\Api\Handlers\Concerns;
+namespace LiturgicalCalendar\Api\Services\SourceData;
 
 use LiturgicalCalendar\Api\Enum\ChangeOperation;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\ChangeRequestReview;
 use LiturgicalCalendar\Api\Services\ChangeResource;
-use LiturgicalCalendar\Api\Services\ResourceAdminService;
-use Psr\Http\Message\ServerRequestInterface;
 
 /**
- * Turns a write handler's file writes into a reviewable change request batch.
+ * Records a reviewable proposal instead of writing files.
  *
- * A handler stages each file it would have written, then submits them once as a
- * batch. Nothing reaches disk: source data is owned by the repository, and a
- * merged pull request is the only way an edit gets there.
- *
- * Staging is deliberately separate from submission because one API request can
- * produce several files — a calendar plus its i18n catalogues — that must be
- * approved or rejected together.
+ * Staging is separate from committing because one API request can produce
+ * several files — a calendar plus its i18n catalogues — that must be approved or
+ * rejected together, so they become one batch.
  */
-trait SubmitsChangeRequests
+final class ChangeRequestSourceDataWriter implements SourceDataWriter
 {
-    private ?SourceDataChangeRequestRepository $changeRequestRepository = null;
-
-    private ?ChangeRequestReview $reviewService = null;
-
-    /** @var array<string, mixed>|null */
-    private ?array $submitterOidcUser = null;
-
     /** @var list<array{path: string, operation: ChangeOperation, content: ?string}> */
-    private array $stagedFiles = [];
+    private array $staged = [];
 
     /**
-     * Capture the authenticated identity for the duration of the request, the same
-     * way handle() already captures the client IP for audit logging.
+     * @param array<string, mixed> $oidcUser The authenticated identity, from the
+     *                                       request's `oidc_user` attribute.
      */
-    protected function captureSubmitter(ServerRequestInterface $request): void
-    {
-        $oidcUser = $request->getAttribute('oidc_user');
-        $this->submitterOidcUser = is_array($oidcUser) ? $oidcUser : null;
+    public function __construct(
+        private readonly SourceDataChangeRequestRepository $repository,
+        private readonly ChangeRequestReview $review,
+        private readonly array $oidcUser,
+        private readonly ?string $projectRoot = null
+    ) {
     }
 
-    /**
-     * Record a file this request would have written.
-     *
-     * @param string $absolutePath The on-disk path the handler previously wrote to.
-     * @param ?string $content     Null only for ChangeOperation::DELETE.
-     */
-    protected function stageFile(string $absolutePath, ChangeOperation $operation, ?string $content): void
+    public function stage(string $absolutePath, ChangeOperation $operation, ?string $content): void
     {
-        $this->stagedFiles[] = [
+        $this->staged[] = [
             'path'      => $this->repoRelativePath($absolutePath),
             'operation' => $operation,
             'content'   => $content,
         ];
     }
 
-    /**
-     * Submit everything staged so far as one batch, auto-approving when the
-     * submitter administers the resource.
-     *
-     * @return array<string, mixed> The response body describing the change request.
-     */
-    protected function submitStagedFiles(ChangeResource $resource): array
+    public function commit(ChangeResource $resource): array
     {
-        if ($this->stagedFiles === []) {
-            throw new \LogicException('submitStagedFiles() called with no staged files');
+        if ($this->staged === []) {
+            throw new \LogicException('commit() called with no staged files');
         }
 
         $sub = $this->submitterSub();
@@ -2104,17 +2687,15 @@ trait SubmitsChangeRequests
         // An unverified email must never become a git commit author email: anyone
         // able to set an address in Zitadel could otherwise forge authorship of a
         // third party in a public repository.
-        $emailVerified = true === ( $this->submitterOidcUser['email_verified'] ?? false );
-        $email         = $emailVerified && is_string($this->submitterOidcUser['email'] ?? null)
-            ? $this->submitterOidcUser['email']
+        $emailVerified = true === ( $this->oidcUser['email_verified'] ?? false );
+        $email         = $emailVerified && is_string($this->oidcUser['email'] ?? null)
+            ? $this->oidcUser['email']
             : null;
-        $name = is_string($this->submitterOidcUser['name'] ?? null)
-            ? $this->submitterOidcUser['name']
-            : null;
+        $name = is_string($this->oidcUser['name'] ?? null) ? $this->oidcUser['name'] : null;
 
-        $batchId = $this->changeRequests()->submitBatch(
+        $batchId = $this->repository->submitBatch(
             $resource,
-            $this->stagedFiles,
+            $this->staged,
             $sub,
             $name,
             $email,
@@ -2122,18 +2703,16 @@ trait SubmitsChangeRequests
             ['authorizing_relation' => 'admin']
         );
 
-        $paths = array_map(
-            static fn (array $file): string => $file['path'],
-            $this->stagedFiles
-        );
-        $this->stagedFiles = [];
+        $paths        = array_map(static fn (array $file): string => $file['path'], $this->staged);
+        $this->staged = [];
 
-        $autoApproved = $this->submitterAdministers($resource, $sub);
+        $autoApproved = $this->review->administers($resource, $sub);
         if ($autoApproved) {
-            $this->changeRequests()->approveBatch($batchId, $sub);
+            $this->repository->approveBatch($batchId, $sub);
         }
 
         return [
+            'disposition'    => $autoApproved ? 'approved' : 'submitted',
             'change_request' => [
                 'batch_id'      => $batchId,
                 'review_status' => $autoApproved ? 'approved' : 'submitted',
@@ -2151,48 +2730,101 @@ trait SubmitsChangeRequests
      * Strip the deployment root, so a path is stored the way GitHub addresses it
      * and is stable across `api/dev` and `api/vN`.
      */
-    protected function repoRelativePath(string $absolutePath): string
+    private function repoRelativePath(string $absolutePath): string
     {
-        $root = $this->projectRoot();
+        $root = $this->projectRoot ?? Router::$apiFilePath;
 
         return str_starts_with($absolutePath, $root)
             ? substr($absolutePath, strlen($root))
             : ltrim($absolutePath, '/');
     }
 
-    protected function projectRoot(): string
-    {
-        return Router::$apiFilePath;
-    }
-
-    /**
-     * Overridden in tests; production consults OpenFGA.
-     */
-    protected function submitterAdministers(ChangeResource $resource, string $sub): bool
-    {
-        return $this->changeRequestReview()->administers($resource, $sub);
-    }
-
     private function submitterSub(): string
     {
-        $sub = $this->submitterOidcUser['sub'] ?? null;
+        $sub = $this->oidcUser['sub'] ?? null;
         if (!is_string($sub) || $sub === '') {
             throw new \LogicException('A change request cannot be submitted without an authenticated subject');
         }
 
         return $sub;
     }
+}
+```
 
-    private function changeRequests(): SourceDataChangeRequestRepository
+- [ ] **Step 3b: Write the trait**
+
+`src/Handlers/Concerns/WritesSourceData.php`:
+
+```php
+<?php
+
+declare(strict_types=1);
+
+namespace LiturgicalCalendar\Api\Handlers\Concerns;
+
+use LiturgicalCalendar\Api\Enum\ChangeOperation;
+use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
+use LiturgicalCalendar\Api\Services\ChangeRequestReview;
+use LiturgicalCalendar\Api\Services\ChangeResource;
+use LiturgicalCalendar\Api\Services\ResourceAdminService;
+use LiturgicalCalendar\Api\Services\SourceData\ChangeRequestSourceDataWriter;
+use LiturgicalCalendar\Api\Services\SourceData\DiskSourceDataWriter;
+use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode;
+use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriter;
+use Psr\Http\Message\ServerRequestInterface;
+
+/**
+ * Gives a write handler one way to put source data somewhere, whichever mode the
+ * deployment is in.
+ *
+ * The handler stages each file it would write and commits once per request. It
+ * never asks which writer is behind the interface — that is the whole point:
+ * a self-hosted instance without Postgres and OpenFGA keeps writing files, and
+ * the same handler code records proposals where the stack is present.
+ */
+trait WritesSourceData
+{
+    private ?SourceDataWriter $sourceDataWriter = null;
+
+    /** @var array<string, mixed>|null */
+    private ?array $submitterOidcUser = null;
+
+    /**
+     * Capture the authenticated identity for the duration of the request, the same
+     * way handle() already captures the client IP for audit logging.
+     */
+    protected function captureSubmitter(ServerRequestInterface $request): void
     {
-        return $this->changeRequestRepository ??= new SourceDataChangeRequestRepository();
+        $oidcUser                = $request->getAttribute('oidc_user');
+        $this->submitterOidcUser = is_array($oidcUser) ? $oidcUser : null;
     }
 
-    private function changeRequestReview(): ChangeRequestReview
+    protected function stageFile(string $absolutePath, ChangeOperation $operation, ?string $content): void
     {
-        return $this->reviewService ??= new ChangeRequestReview(
-            new ResourceAdminService($this->getFgaClient())
-        );
+        $this->sourceDataWriter()->stage($absolutePath, $operation, $content);
+    }
+
+    /**
+     * @return array<string, mixed> Always carries a `disposition` key.
+     */
+    protected function commitStagedFiles(ChangeResource $resource): array
+    {
+        return $this->sourceDataWriter()->commit($resource);
+    }
+
+    /**
+     * Memoised per request, so every staged file in one request lands in one
+     * writer — and therefore, in queue mode, in one batch.
+     */
+    protected function sourceDataWriter(): SourceDataWriter
+    {
+        return $this->sourceDataWriter ??= SourceDataWriteMode::changeRequestsEnabled()
+            ? new ChangeRequestSourceDataWriter(
+                new SourceDataChangeRequestRepository(),
+                new ChangeRequestReview(new ResourceAdminService($this->getFgaClient())),
+                $this->submitterOidcUser ?? []
+            )
+            : new DiskSourceDataWriter();
     }
 }
 ```
@@ -2208,7 +2840,7 @@ Expected: PASS, 6 tests.
 In `src/Handlers/RegionalDataHandler.php`, add to the `use` list beside `ClientIpTrait`:
 
 ```php
-    use SubmitsChangeRequests;
+    use WritesSourceData;
 ```
 
 `RegionalDataHandler` already uses `ResolvesOutboxTooling`, which supplies `getFgaClient()`; no further wiring
@@ -2228,7 +2860,7 @@ In `createDiocesanCalendar()`, replace the `file_put_contents(...)` block at lin
         // Use raw payload for json_encode to preserve schema-compliant structure
         $calendarData = JsonFormatter::encode($rawPayload);
         $this->stageFile($diocesanCalendarFile, ChangeOperation::CREATE, $calendarData . PHP_EOL);
-        $changeRequest = $this->submitStagedFiles(ChangeResource::diocesanCalendar($this->rite, $diocese_id));
+        $changeRequest = $this->commitStagedFiles(ChangeResource::diocesanCalendar($this->rite, $diocese_id));
 ```
 
 and return `$changeRequest` through `encodeResponseBody()` instead of the previously-returned resource body,
@@ -2251,7 +2883,7 @@ Add the imports at the top of the file:
 
 ```php
 use LiturgicalCalendar\Api\Enum\ChangeOperation;
-use LiturgicalCalendar\Api\Handlers\Concerns\SubmitsChangeRequests;
+use LiturgicalCalendar\Api\Handlers\Concerns\WritesSourceData;
 use LiturgicalCalendar\Api\Services\ChangeResource;
 ```
 
@@ -2259,7 +2891,7 @@ use LiturgicalCalendar\Api\Services\ChangeResource;
 
 Run: `grep -n "file_put_contents" src/Handlers/RegionalDataHandler.php`
 
-Expected: lines 391, 477 and 612 are gone; only the update and delete paths (Task 8) remain.
+Expected: lines 391, 477 and 612 are gone; only the update and delete paths (Task 9) remain.
 
 - [ ] **Step 7: Run the full suite**
 
@@ -2272,7 +2904,7 @@ them to assert a change request batch exists instead. Do not delete them.
 
 ```bash
 composer parallel-lint && composer lint:fix && composer analyse
-git add src/Handlers/Concerns/SubmitsChangeRequests.php src/Handlers/RegionalDataHandler.php \
+git add src/Handlers/Concerns/WritesSourceData.php src/Handlers/RegionalDataHandler.php \
         phpunit_tests/Handlers/RegionalDataChangeRequestTest.php \
         phpunit_tests/Handlers/ChangeRequestTraitHost.php
 git commit -m "feat(data): route regional calendar creation into change requests"
@@ -2280,7 +2912,7 @@ git commit -m "feat(data): route regional calendar creation into change requests
 
 ---
 
-### Task 8: RegionalDataHandler update and delete paths
+### Task 9: RegionalDataHandler update and delete paths
 
 **Files:**
 
@@ -2291,7 +2923,7 @@ git commit -m "feat(data): route regional calendar creation into change requests
 
 **Interfaces:**
 
-- Consumes: `stageFile()`, `submitStagedFiles()` from Task 7.
+- Consumes: `stageFile()`, `commitStagedFiles()` from Task 8.
 - Produces: no new public surface.
 
 - [ ] **Step 1: Write the failing tests**
@@ -2307,7 +2939,7 @@ Append to `phpunit_tests/Handlers/RegionalDataChangeRequestTest.php`:
             null
         );
 
-        $body = $this->host->submitStagedFiles(ChangeResource::diocesanCalendar(Rite::ROMAN, 'romamo_it'));
+        $body = $this->host->commitStagedFiles(ChangeResource::diocesanCalendar(Rite::ROMAN, 'romamo_it'));
 
         $repo = new SourceDataChangeRequestRepository(self::$pdo);
         $row  = $repo->getBatch($body['change_request']['batch_id'])[0];
@@ -2321,7 +2953,7 @@ Append to `phpunit_tests/Handlers/RegionalDataChangeRequestTest.php`:
         $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/calendars/diocese/romamo_it.json', ChangeOperation::DELETE, null);
         $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/calendars/diocese/romamo_it/i18n/it.json', ChangeOperation::DELETE, null);
 
-        $body = $this->host->submitStagedFiles(ChangeResource::diocesanCalendar(Rite::ROMAN, 'romamo_it'));
+        $body = $this->host->commitStagedFiles(ChangeResource::diocesanCalendar(Rite::ROMAN, 'romamo_it'));
 
         $repo = new SourceDataChangeRequestRepository(self::$pdo);
         self::assertCount(2, $repo->getBatch($body['change_request']['batch_id']));
@@ -2332,7 +2964,7 @@ Append to `phpunit_tests/Handlers/RegionalDataChangeRequestTest.php`:
         $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/calendars/nation/USA.json', ChangeOperation::UPDATE, '{"litcal":[]}');
         $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/calendars/nation/USA/i18n/fr.json', ChangeOperation::DELETE, null);
 
-        $body = $this->host->submitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
+        $body = $this->host->commitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
 
         $repo       = new SourceDataChangeRequestRepository(self::$pdo);
         $operations = array_column($repo->getBatch($body['change_request']['batch_id']), 'operation');
@@ -2342,7 +2974,7 @@ Append to `phpunit_tests/Handlers/RegionalDataChangeRequestTest.php`:
     }
 ```
 
-- [ ] **Step 2: Run the tests to verify they pass against the Task 7 trait**
+- [ ] **Step 2: Run the tests to verify they pass against the Task 8 trait**
 
 Run: `vendor/bin/phpunit phpunit_tests/Handlers/RegionalDataChangeRequestTest.php`
 
@@ -2355,21 +2987,21 @@ In `updateNationalCalendar()` (line 680), replace the `file_put_contents(...)` b
 
 ```php
         $this->stageFile($nationalCalendarFile, ChangeOperation::UPDATE, $calendarData . PHP_EOL);
-        $changeRequest = $this->submitStagedFiles(ChangeResource::nationalCalendar($this->rite, $nation));
+        $changeRequest = $this->commitStagedFiles(ChangeResource::nationalCalendar($this->rite, $nation));
 ```
 
 In `updateWiderRegionCalendar()` (line 773), at line 823:
 
 ```php
         $this->stageFile($widerRegionFile, ChangeOperation::UPDATE, $calendarData . PHP_EOL);
-        $changeRequest = $this->submitStagedFiles(ChangeResource::widerRegion($widerRegionName));
+        $changeRequest = $this->commitStagedFiles(ChangeResource::widerRegion($widerRegionName));
 ```
 
 In `updateDiocesanCalendar()` (line 863), at line 915:
 
 ```php
         $this->stageFile($diocesanCalendarFile, ChangeOperation::UPDATE, $calendarData . PHP_EOL);
-        $changeRequest = $this->submitStagedFiles(ChangeResource::diocesanCalendar($this->rite, $diocese_id));
+        $changeRequest = $this->commitStagedFiles(ChangeResource::diocesanCalendar($this->rite, $diocese_id));
 ```
 
 Each returns `$changeRequest` through `encodeResponseBody()` in place of the resource body.
@@ -2408,11 +3040,12 @@ and the `unlink($file)` inside the i18n loop at line 1124 with:
 After the loop, submit the batch with the resource matching the tier being deleted, and return that body
 through `encodeResponseBody()`.
 
-- [ ] **Step 6: Verify RegionalDataHandler no longer touches disk**
+- [ ] **Step 6: Verify RegionalDataHandler no longer touches disk directly**
 
 Run: `grep -nE "file_put_contents|unlink\(" src/Handlers/RegionalDataHandler.php`
 
-Expected: no matches.
+Expected: no matches. Disk writes have not disappeared — they now live in `DiskSourceDataWriter`, which is
+exactly why a self-hosted deployment is unaffected.
 
 - [ ] **Step 7: Run the full suite**
 
@@ -2430,7 +3063,7 @@ git commit -m "feat(data): route regional calendar updates and deletions into ch
 
 ---
 
-### Task 9: DecreesHandler
+### Task 10: DecreesHandler
 
 **Files:**
 
@@ -2440,7 +3073,7 @@ git commit -m "feat(data): route regional calendar updates and deletions into ch
 
 **Interfaces:**
 
-- Consumes: `stageFile()`, `submitStagedFiles()`, `captureSubmitter()` from Task 7;
+- Consumes: `stageFile()`, `commitStagedFiles()`, `captureSubmitter()` from Task 8;
   `ChangeResource::decrees()` from Task 2.
 - Produces: no new public surface.
 
@@ -2496,7 +3129,7 @@ final class DecreesChangeRequestTest extends RepositoryTestCase
             '[]'
         );
 
-        $body = $this->host->submitStagedFiles(ChangeResource::decrees());
+        $body = $this->host->commitStagedFiles(ChangeResource::decrees());
 
         self::assertSame('general_roman_calendar', $body['change_request']['resource']['type']);
         self::assertSame('decrees', $body['change_request']['resource']['id']);
@@ -2508,7 +3141,7 @@ final class DecreesChangeRequestTest extends RepositoryTestCase
         $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/decrees/i18n/en.json', ChangeOperation::UPDATE, '{}');
         $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/lectionary/readings.json', ChangeOperation::UPDATE, '{}');
 
-        $body = $this->host->submitStagedFiles(ChangeResource::decrees());
+        $body = $this->host->commitStagedFiles(ChangeResource::decrees());
 
         $repo = new SourceDataChangeRequestRepository(self::$pdo);
         self::assertCount(3, $repo->getBatch($body['change_request']['batch_id']));
@@ -2520,7 +3153,7 @@ final class DecreesChangeRequestTest extends RepositoryTestCase
         // operation is UPDATE with the rewritten body, never DELETE.
         $this->host->stageFile('/app/jsondata/sourcedata/rite/roman/decrees/i18n/it.json', ChangeOperation::UPDATE, '{}');
 
-        $body = $this->host->submitStagedFiles(ChangeResource::decrees());
+        $body = $this->host->commitStagedFiles(ChangeResource::decrees());
 
         $repo = new SourceDataChangeRequestRepository(self::$pdo);
         self::assertSame('update', $repo->getBatch($body['change_request']['batch_id'])[0]['operation']);
@@ -2539,14 +3172,14 @@ Expected: PASS, 3 tests. They pin the decrees resource contract before the handl
 Add to the `use` list inside `DecreesHandler`:
 
 ```php
-    use SubmitsChangeRequests;
+    use WritesSourceData;
 ```
 
 and the imports:
 
 ```php
 use LiturgicalCalendar\Api\Enum\ChangeOperation;
-use LiturgicalCalendar\Api\Handlers\Concerns\SubmitsChangeRequests;
+use LiturgicalCalendar\Api\Handlers\Concerns\WritesSourceData;
 use LiturgicalCalendar\Api\Services\ChangeResource;
 ```
 
@@ -2598,12 +3231,12 @@ branches rather than leaving them unreachable.
 In each of the three request paths, after the last call to the staging methods above, add:
 
 ```php
-        $changeRequest = $this->submitStagedFiles(ChangeResource::decrees());
+        $changeRequest = $this->commitStagedFiles(ChangeResource::decrees());
 ```
 
 and return `$changeRequest` through `encodeResponseBody()` in place of the decree body.
 
-- [ ] **Step 5: Verify DecreesHandler no longer touches disk**
+- [ ] **Step 5: Verify DecreesHandler no longer touches disk directly**
 
 Run: `grep -nE "file_put_contents|unlink\(" src/Handlers/DecreesHandler.php`
 
@@ -2626,7 +3259,7 @@ git commit -m "feat(decrees): route decree edits into change requests"
 
 ---
 
-### Task 10: TestsHandler
+### Task 11: TestsHandler
 
 **Files:**
 
@@ -2636,7 +3269,7 @@ git commit -m "feat(decrees): route decree edits into change requests"
 
 **Interfaces:**
 
-- Consumes: `stageFile()`, `submitStagedFiles()`, `captureSubmitter()` from Task 7; `ChangeResource::test()`
+- Consumes: `stageFile()`, `commitStagedFiles()`, `captureSubmitter()` from Task 8; `ChangeResource::test()`
   from Task 2.
 - Produces: no new public surface.
 
@@ -2689,7 +3322,7 @@ final class TestsChangeRequestTest extends RepositoryTestCase
             '{"name":"StIgnatiusOfLoyolaTest"}'
         );
 
-        $body = $this->host->submitStagedFiles(
+        $body = $this->host->commitStagedFiles(
             ChangeResource::test(Rite::ROMAN, 'general_roman_calendar_test', 'general_roman_calendar')
         );
 
@@ -2700,7 +3333,7 @@ final class TestsChangeRequestTest extends RepositoryTestCase
     {
         $this->host->stageFile('/app/jsondata/tests/ambrosian/LuganoTest.json', ChangeOperation::CREATE, '{}');
 
-        $body = $this->host->submitStagedFiles(
+        $body = $this->host->commitStagedFiles(
             ChangeResource::test(Rite::AMBROSIAN, 'diocesan_calendar_test', 'lugano_ch')
         );
 
@@ -2712,7 +3345,7 @@ final class TestsChangeRequestTest extends RepositoryTestCase
     {
         $this->host->stageFile('/app/jsondata/tests/roman/ObsoleteTest.json', ChangeOperation::DELETE, null);
 
-        $body = $this->host->submitStagedFiles(
+        $body = $this->host->commitStagedFiles(
             ChangeResource::test(Rite::ROMAN, 'general_roman_calendar_test', 'general_roman_calendar')
         );
 
@@ -2733,7 +3366,7 @@ Expected: PASS, 3 tests.
 
 - [ ] **Step 3: Wire the handler**
 
-Add `use SubmitsChangeRequests;` to the class, the same three imports as Task 9, and
+Add `use WritesSourceData;` to the class, the same three imports as Task 10, and
 `$this->captureSubmitter($request);` in `handle()`.
 
 Replace `writeTestToDisk()` line 438:
@@ -2757,7 +3390,7 @@ column.
 In both request paths, after staging, submit once:
 
 ```php
-        $changeRequest = $this->submitStagedFiles($this->changeResourceForTest($testName));
+        $changeRequest = $this->commitStagedFiles($this->changeResourceForTest($testName));
 ```
 
 Add the private helper that maps the handler's already-resolved test scope onto a `ChangeResource`:
@@ -2780,7 +3413,7 @@ Add the private helper that maps the handler's already-resolved test scope onto 
 Adapt the property names to whatever `TestScopeResolver` actually returns — read
 `src/Services/TestScopeResolver.php` before writing this method, and do not assume the shape above.
 
-- [ ] **Step 4: Verify TestsHandler no longer touches disk**
+- [ ] **Step 4: Verify TestsHandler no longer touches disk directly**
 
 Run: `grep -nE "file_put_contents|unlink\(" src/Handlers/TestsHandler.php`
 
@@ -2802,7 +3435,7 @@ git commit -m "feat(tests): route test definition edits into change requests"
 
 ---
 
-### Task 11: `GET /auth/change-requests` — an editor's own view
+### Task 12: `GET /auth/change-requests` — an editor's own view
 
 **Files:**
 
@@ -2982,7 +3615,7 @@ git commit -m "feat(auth): let editors list and withdraw their own change reques
 
 ---
 
-### Task 12: `GET /admin/change-requests` — review queue and history
+### Task 13: `GET /admin/change-requests` — review queue and history
 
 **Files:**
 
@@ -3228,7 +3861,7 @@ git commit -m "feat(admin): review queue and history for source-data change requ
 
 ---
 
-### Task 13: OpenAPI and documentation
+### Task 14: OpenAPI and documentation
 
 **Files:**
 
@@ -3238,12 +3871,13 @@ git commit -m "feat(admin): review queue and history for source-data change requ
 
 **Interfaces:**
 
-- Consumes: the endpoints from Tasks 11 and 12, and the changed write responses from Tasks 7–10.
+- Consumes: the endpoints from Tasks 12 and 13, and the changed write responses from Tasks 8–11.
 - Produces: no code surface.
 
-**This is the task most likely to be skipped and most costly to skip.** Every write endpoint's response schema
-changed: `PUT /data/nation/{nation}` no longer returns the calendar, it returns a change request. A frontend
-built against the old schema will break silently.
+**Every write endpoint's response schema gained a `disposition` discriminator**, and in queue mode returns a
+change request instead of the resource. Because disk mode's body is otherwise byte-identical to today's, this
+is **not** a breaking change for an existing deployment — but a client that assumes the resource is always
+returned will be wrong on any deployment that enables queue mode, and will be wrong silently.
 
 - [ ] **Step 1: Document the two new endpoints**
 
@@ -3254,9 +3888,15 @@ Add paths for `/auth/change-requests`, `/auth/change-requests/{batchId}/withdraw
 
 - [ ] **Step 2: Update every write endpoint response**
 
-For each of `/data/*` (PUT, PATCH, POST, DELETE), `/decrees/*` and `/tests/*`, replace the resource response
-schema with the change request response from Task 7, and add a description sentence saying the edit is a
-proposal that reaches the calendar only once its pull request merges.
+For each of `/data/*` (PUT, PATCH, POST, DELETE), `/decrees/*` and `/tests/*`, model the response as a `oneOf`
+over the two shapes from Task 8, discriminated on `disposition`:
+
+- `applied` — the existing resource schema, plus the `disposition` property. Unchanged otherwise.
+- `submitted` / `approved` — the `ChangeRequestBatch` response.
+
+Add a description sentence explaining that a deployment with `SOURCEDATA_CHANGE_REQUESTS` enabled returns the
+proposal, which reaches the calendar only once its pull request merges, and that a deployment without it
+writes the resource directly as it always has.
 
 - [ ] **Step 3: Lint the schema**
 
@@ -3268,12 +3908,15 @@ Expected: no errors.
 
 `docs/ops/change-request-runbook.md`, following the shape of `docs/ops/openfga-outbox-runbook.md`: how to
 inspect the queue in SQL, how to approve out of band, what `review_status` and `publication_status` mean and
-why they are separate, and the explicit note that Phase 1 leaves approved batches sitting with
-`publication_status = 'none'` until the Phase 2 publisher exists.
+why they are separate, the explicit note that Phase 1 leaves approved batches sitting with
+`publication_status = 'none'` until the Phase 2 publisher exists, and **how to tell which write mode a
+deployment is in** — the `Health` check, the flag, and what the fallback does when the flag is set without
+Postgres or OpenFGA behind it.
 
 - [ ] **Step 5: Update the changelog**
 
-Add an entry under the unreleased heading recording the breaking change to write endpoint responses.
+Add an entry under the unreleased heading recording the new `disposition` key on write responses, the
+`SOURCEDATA_CHANGE_REQUESTS` flag, and that deployments which do not set it are unaffected.
 
 - [ ] **Step 6: Lint markdown and commit**
 
@@ -3291,9 +3934,13 @@ git commit -m "docs(data): document the change request endpoints and the write r
 - [ ] `composer test` passes.
 - [ ] `composer analyse` passes at level 10.
 - [ ] `composer lint` and `composer lint:md` pass.
-- [ ] A write request against a running API creates a change request batch and leaves `jsondata/sourcedata`
-      byte-identical — verify with `git status --porcelain jsondata/` after exercising a
-      `PUT /data/nation/USA`.
+- [ ] With `SOURCEDATA_CHANGE_REQUESTS=true` plus Postgres and OpenFGA, a write request creates a change
+      request batch and leaves `jsondata/sourcedata` byte-identical — verify with
+      `git status --porcelain jsondata/` after exercising a `PUT /data/nation/USA`.
+- [ ] With the flag unset, the same request writes the file exactly as it does today, and the response body is
+      unchanged apart from `"disposition": "applied"`.
+- [ ] With the flag set but Postgres absent, the request still succeeds in disk mode and `Health` reports the
+      misconfiguration.
 
 ## Deliberately not in phase 1
 
@@ -3312,7 +3959,7 @@ first pull request. Neither is a Phase 1 omission to be quietly forgotten.
 
 ## Follow-on work
 
-- **Frontend plan** — the admin interface, in `LiturgicalCalendarFrontend`. Write it once Task 13 lands.
+- **Frontend plan** — the admin interface, in `LiturgicalCalendarFrontend`. Write it once Task 14 lands.
 - **Phase 2** — the GitHub App and `SourceDataPublishProcessor`.
 - **Phase 3** — merge polling and notifications.
 - **Phase 4** — preview.
