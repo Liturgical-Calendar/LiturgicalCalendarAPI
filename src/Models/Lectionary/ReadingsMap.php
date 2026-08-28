@@ -2,6 +2,7 @@
 
 namespace LiturgicalCalendar\Api\Models\Lectionary;
 
+use LiturgicalCalendar\Api\Services\SupportedLocales;
 use LiturgicalCalendar\Api\Utilities;
 
 /**
@@ -186,6 +187,20 @@ final class ReadingsMap implements \ArrayAccess
      *
      * Initializes an empty $readings array property.
      */
+    /**
+     * The locale this map was loaded for, when known.
+     *
+     * Drives whether a missing offset is a defect or merely untranslated work in
+     * progress — see {@see getReadings()}. Null when the map was built without a
+     * locale (array fixtures, tests), which is treated as unofficial, i.e. lenient.
+     */
+    private ?string $locale = null;
+
+    public function setLocale(?string $locale): void
+    {
+        $this->locale = $locale;
+    }
+
     public function __construct()
     {
         $this->readings = [];
@@ -370,7 +385,20 @@ final class ReadingsMap implements \ArrayAccess
      *
      * If the offset points to a ReadingsFestiveWithVigil, it returns the day readings.
      * If the offset points to any other type of readings, it returns the readings object as is.
-     * If the offset does not exist, it returns null.
+     *
+     * A missing offset is handled according to whether this map's locale is
+     * officially supported (see {@see SupportedLocales}):
+     *
+     * - **official** — throws. An official locale promises complete data, so a gap
+     *   is a defect that must surface rather than be papered over.
+     * - **not official** — returns an empty readings object. This is byte-identical
+     *   to what an explicitly blank entry produces, and blank entries are already
+     *   normal in this corpus (StHildegardBingen is blank in `la`, `es` and `hr`).
+     *   Partial translation work must never take down a calendar (#904).
+     *
+     * (Before #904 this method always threw, while this docblock claimed it
+     *  returned null and the return type did not admit null. The contract now
+     *  matches the code.)
      *
      * @param string $offset The offset to retrieve the readings from.
      * @return ReadingsMultipleSchemas|ReadingsChristmas|ReadingsEasterVigil|ReadingsPalmSunday|ReadingsFestive|ReadingsFerial|ReadingsWithEvening|ReadingsSeasonal The readings for the specified offset.
@@ -380,7 +408,16 @@ final class ReadingsMap implements \ArrayAccess
         $readingsObject = $this->readings[$offset] ?? null;
 
         if (null === $readingsObject) {
-            throw new \InvalidArgumentException("No readings found for offset: $offset, available offsets: " . implode(', ', array_keys($this->readings)));
+            if (null !== $this->locale && SupportedLocales::isOfficial($this->locale)) {
+                throw new \InvalidArgumentException("No readings found for offset: $offset, available offsets: " . implode(', ', array_keys($this->readings)));
+            }
+
+            return ReadingsFerial::fromArray([
+                'first_reading'      => '',
+                'responsorial_psalm' => '',
+                'gospel_acclamation' => '',
+                'gospel'             => ''
+            ]);
         }
 
         if ($readingsObject instanceof ReadingsFestiveWithVigil) {
@@ -397,7 +434,7 @@ final class ReadingsMap implements \ArrayAccess
      * @return ReadingsMap The readings loaded from the file.
      * @throws \InvalidArgumentException If the file does not exist, is not readable, or contains invalid JSON.
      */
-    public static function fromFile(string $file): ReadingsMap
+    public static function fromFile(string $file, ?string $locale = null): ReadingsMap
     {
         $dataRaw = Utilities::rawContentsFromFile($file);
 
@@ -408,6 +445,7 @@ final class ReadingsMap implements \ArrayAccess
 
         $readingsMap = new self();
         $readingsMap->addFromArray($dataJson);
+        $readingsMap->setLocale($locale);
         return $readingsMap;
     }
 

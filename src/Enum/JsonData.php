@@ -471,6 +471,12 @@ enum JsonData: string
      */
     case CATHOLIC_DIOCESES_LATIN_RITE = JsonDataConstants::CATHOLIC_DIOCESES_LATIN_RITE;
 
+    /**
+     * The curated list of officially supported locales.
+     * Evaluates to 'jsondata/supportedLocales.json'.
+     */
+    case SUPPORTED_LOCALES_FILE = JsonDataConstants::SUPPORTED_LOCALES_FILE;
+
     public function path(): string
     {
         return Router::$apiFilePath . $this->value;

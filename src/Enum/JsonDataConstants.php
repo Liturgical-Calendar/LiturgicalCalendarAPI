@@ -490,4 +490,10 @@ class JsonDataConstants
      * Evaluates to 'jsondata/world_dioceses.json'.
      */
     public const CATHOLIC_DIOCESES_LATIN_RITE = JsonDataConstants::FOLDER . '/world_dioceses.json';
+
+    /**
+     * The curated list of officially supported locales.
+     * Evaluates to 'jsondata/supportedLocales.json'.
+     */
+    public const SUPPORTED_LOCALES_FILE = JsonDataConstants::FOLDER . '/supportedLocales.json';
 }
