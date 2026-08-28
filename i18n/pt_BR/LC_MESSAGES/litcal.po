@@ -9,8 +9,8 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-08-28 10:35+0000\n"
-"PO-Revision-Date: 2026-08-28 12:32+0000\n"
-"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
+"PO-Revision-Date: 2026-08-28 13:33+0000\n"
+"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Portuguese (Brazil) <https://translate.johnromanodorazio.com/"
 "projects/liturgical-calendar/liturgical-calendar-api/api-strings/pt_BR/>\n"
 "Language: pt_BR\n"
@@ -273,7 +273,7 @@ msgstr "m*"
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:151
 msgid "optional memorial"
-msgstr "memória opcional"
+msgstr "memória facultativa"
 
 #. translators: liturgical rank 'OPTIONAL MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:153
