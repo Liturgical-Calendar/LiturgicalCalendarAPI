@@ -15,9 +15,15 @@ abstract class DecreeEventMetadata extends AbstractJsonRepresentation
 
     public readonly ?UrlLangMap $url_lang_map;
 
+    /**
+     * Explicit per-language URLs, overriding the `url` + `url_lang_map` template for the
+     * languages they name. Sparse: a language absent here still resolves via the template.
+     */
+    public readonly ?UrlsLangs $urls_langs;
+
     public readonly CalEventAction $action;
 
-    protected function __construct(int $since_year, CalEventAction $action, string $url, ?UrlLangMap $url_lang_map = null)
+    protected function __construct(int $since_year, CalEventAction $action, string $url, ?UrlLangMap $url_lang_map = null, ?UrlsLangs $urls_langs = null)
     {
         if ($since_year < 1800) {
             throw new \ValueError('$since_year parameter must represent a year from the 19th century or later');
@@ -33,21 +39,31 @@ abstract class DecreeEventMetadata extends AbstractJsonRepresentation
         $this->action       = $action;
         $this->url          = $url;
         $this->url_lang_map = $url_lang_map;
+        $this->urls_langs   = $urls_langs;
     }
 
     /**
      * Returns an HTML string representing the decree source,
      * with a link to the original decree document.
      *
-     * If the decree URL contains a language placeholder, it is replaced with the
-     * best language code available from the language map.
+     * Resolution order for the current language:
+     *  1. an explicit `urls_langs` override, used verbatim;
+     *  2. otherwise, the `url` template with the `%s` placeholder replaced by the best
+     *     language token from `url_lang_map`;
+     *  3. otherwise, the `url` as given.
+     *
+     * The override wins because it exists precisely for the languages the template cannot
+     * express — a Vatican document whose path or filename differs from every other language.
      *
      * @return string The HTML string representing the decree source
      */
     public function getUrl(): string
     {
-        $url = $this->url;
-        if (null !== $this->url_lang_map && str_contains($this->url, '%s')) {
+        $url      = $this->url;
+        $override = $this->urls_langs?->get(LitLocale::$PRIMARY_LANGUAGE);
+        if (null !== $override) {
+            $url = $override;
+        } elseif (null !== $this->url_lang_map && str_contains($this->url, '%s')) {
             $vaticanLangCode = $this->url_lang_map->getBestLangFromMap(LitLocale::$PRIMARY_LANGUAGE);
             $url             = sprintf($this->url, $vaticanLangCode);
         }
@@ -73,6 +89,11 @@ abstract class DecreeEventMetadata extends AbstractJsonRepresentation
         ];
         if (null !== $this->url_lang_map && !empty($this->url_lang_map->url_lang_map)) {
             $returnArray['url_lang_map'] = $this->url_lang_map->url_lang_map;
+        }
+        // Exposed, unlike before: an override is not derivable from url + url_lang_map,
+        // so a client that builds per-language links needs to be told about it.
+        if (null !== $this->urls_langs && !empty($this->urls_langs->urls_langs)) {
+            $returnArray['urls_langs'] = $this->urls_langs->urls_langs;
         }
         return $returnArray;
     }

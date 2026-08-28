@@ -493,14 +493,15 @@
         },
         "DecreeURLS": {
             "type": "object",
+            "minProperties": 1,
             "additionalProperties": false,
             "patternProperties": {
-                "(de|en|es|fr|it|la|pl|pt)": {
+                "^(de|en|es|fr|it|la|pl|pt)$": {
                     "type": "string",
                     "pattern": "^https?:\\\/\\\/(www|press)\\.vatican\\.va\\\/((roman_curia\\\/congregations\\\/ccdds\\\/documents\\\/[-_%a-z0-9]+)|(content\\\/salastampa\\\/it\\\/bollettino\\\/pubblico\\\/[0-9\\\/]+)|(content\\\/[-_%\\\/a-z0-9]+))\\.(html|pdf)(#[%a-zD]+)?$"
                 }
             },
-            "description": "precalculated per-language decree URLs; a commodity for consuming clients, derivable from url + url_lang_map",
+            "description": "explicit per-language decree URLs, overriding what url + url_lang_map would produce for the languages named here. Sparse: a language absent from this map still derives its URL from the url template. Required when a language's document does not fit the template at all \u2014 e.g. a Latin text published as an annex to the Italian page, differing in both path segment and filename.",
             "title": "DecreeURLS"
         },
         "DecreeLangs": {

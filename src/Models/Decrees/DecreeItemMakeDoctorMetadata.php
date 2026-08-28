@@ -4,6 +4,7 @@ namespace LiturgicalCalendar\Api\Models\Decrees;
 
 use LiturgicalCalendar\Api\Enum\CalEventAction;
 use LiturgicalCalendar\Api\Models\RegionalData\UrlLangMap;
+use LiturgicalCalendar\Api\Models\Decrees\UrlsLangs;
 
 /**
  * @phpstan-import-type DecreeItemMetadataObject from DecreeItem
@@ -11,9 +12,9 @@ use LiturgicalCalendar\Api\Models\RegionalData\UrlLangMap;
  */
 final class DecreeItemMakeDoctorMetadata extends DecreeEventMetadata
 {
-    private function __construct(int $since_year, string $url, ?UrlLangMap $url_lang_map)
+    private function __construct(int $since_year, string $url, ?UrlLangMap $url_lang_map, ?UrlsLangs $urls_langs)
     {
-        parent::__construct($since_year, CalEventAction::MakeDoctor, $url, $url_lang_map);
+        parent::__construct($since_year, CalEventAction::MakeDoctor, $url, $url_lang_map, $urls_langs);
     }
 
 
@@ -35,10 +36,16 @@ final class DecreeItemMakeDoctorMetadata extends DecreeEventMetadata
             $url_lang_map = UrlLangMap::fromObject($data->url_lang_map);
         }
 
+        $urls_langs = null;
+        if (isset($data->urls_langs)) {
+            $urls_langs = UrlsLangs::fromObject($data->urls_langs);
+        }
+
         return new static(
             $data->since_year,
             $data->url,
-            $url_lang_map
+            $url_lang_map,
+            $urls_langs
         );
     }
 
@@ -64,10 +71,16 @@ final class DecreeItemMakeDoctorMetadata extends DecreeEventMetadata
             $url_lang_map = UrlLangMap::fromArray($data['url_lang_map']);
         }
 
+        $urls_langs = null;
+        if (isset($data['urls_langs'])) {
+            $urls_langs = UrlsLangs::fromArray($data['urls_langs']);
+        }
+
         return new static(
             $data['since_year'],
             $data['url'],
-            $url_lang_map
+            $url_lang_map,
+            $urls_langs
         );
     }
 }
