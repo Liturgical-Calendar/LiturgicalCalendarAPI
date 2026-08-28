@@ -7,10 +7,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-08-28 10:35+0000\n"
-"PO-Revision-Date: 2026-01-18 04:05+0000\n"
-"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
+"PO-Revision-Date: 2026-08-28 12:24+0000\n"
+"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Portuguese (Brazil) <https://translate.johnromanodorazio.com/"
 "projects/liturgical-calendar/liturgical-calendar-api/api-strings/pt_BR/>\n"
 "Language: pt_BR\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.13.3\n"
+"X-Generator: Weblate 5.15.2\n"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:32
@@ -48,12 +48,12 @@ msgstr ""
 #. translators: context = liturgical color (Ambrosian "morello"/violet)
 #: src/Enum/LitColor.php:42
 msgid "morello"
-msgstr ""
+msgstr "morelo"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:44
 msgid "black"
-msgstr ""
+msgstr "preto"
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
@@ -568,31 +568,31 @@ msgstr ""
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:303
 msgid "For the Sick"
-msgstr ""
+msgstr "Pelos Doentes"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:305
 msgid "For the Dying"
-msgstr ""
+msgstr "Para os Moribundos"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:307
 msgid "For the Grace of a Happy Death"
-msgstr ""
+msgstr "Pela Graça de uma Boa Morte"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:309
 msgid "In Any Need"
-msgstr ""
+msgstr "Em Qualquer Necessidade"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:311
 msgid "For Giving Thanks to God"
-msgstr ""
+msgstr "Para Dar Graças a Deus"
 
 #: src/Enum/LitMassVariousNeeds.php:328
 msgid "Masses and Prayers for Various Needs and Occasions"
-msgstr ""
+msgstr "Missas e Orações para Várias Necessidades e Ocasiões"
 
 #. translators: context = liturgical season
 #: src/Enum/LitSeason.php:161
@@ -627,18 +627,18 @@ msgstr ""
 #. translators: context = liturgical season (Ambrosian rite)
 #: src/Enum/LitSeason.php:173
 msgid "After Epiphany"
-msgstr ""
+msgstr "Após a Epifania"
 
 #. translators: context = liturgical season (Ambrosian rite)
 #: src/Enum/LitSeason.php:175
 msgid "After Pentecost"
-msgstr ""
+msgstr "Após Pentecostes"
 
 #. translators: %s is a day number (17, 18, etc.) - for Advent weekdays Dec 17-24
 #: src/FerialEventNameGenerator.php:312
 #, php-format
 msgid "December %s"
-msgstr ""
+msgstr "Dezembro %s"
 
 #. translators: %s is an ordinal number (1st, 2nd, 3rd)
 #. translators: %s is an ordinal number (first, second...)
@@ -659,13 +659,13 @@ msgstr "%s Dia da Oitava de Natal"
 #: src/FerialEventNameGenerator.php:364 src/FerialEventNameGenerator.php:398
 #, php-format
 msgid "January %s"
-msgstr ""
+msgstr "Janeiro %s"
 
 #. translators: %s is a day of the week - for days after Epiphany
 #: src/FerialEventNameGenerator.php:381
 #, php-format
 msgid "%s after Epiphany"
-msgstr ""
+msgstr "%s após a Epifania"
 
 #. translators: Day after Ash Wednesday pattern
 #: src/FerialEventNameGenerator.php:413 src/Handlers/CalendarHandler.php:2516
@@ -683,7 +683,7 @@ msgstr "da %s Semana da Quaresma"
 #: src/FerialEventNameGenerator.php:447
 #, php-format
 msgid "%s within the Octave of Easter"
-msgstr ""
+msgstr "%s dentro da Oitava da Páscoa"
 
 #. translators: %s is an ordinal number (2nd, 3rd, etc.)
 #: src/FerialEventNameGenerator.php:463 src/Handlers/CalendarHandler.php:3505
@@ -702,7 +702,7 @@ msgstr "da %s Semana do Tempo Comum"
 #: src/FerialEventNameGenerator.php:498
 #, php-format
 msgid "%s of Holy Week"
-msgstr ""
+msgstr "%s da Semana Santa"
 
 #: src/Handlers/CalendarHandler.php:551
 #, php-format
@@ -730,6 +730,9 @@ msgid ""
 "because a liturgical event with the same key was already defined by the "
 "Proprium de Tempore, which takes precedence."
 msgstr ""
+"O evento do comune sanctorale ambrosiano `%1$s` de %2$s foi ignorado porque "
+"um evento litúrgico com a mesma chave já foi definido pelo Proprium de "
+"Tempore, que tem precedência."
 
 #: src/Handlers/CalendarHandler.php:1245
 #, php-format
@@ -740,6 +743,11 @@ msgid ""
 "(`grade`, `name`, or `common`) instead of re-declaring it with `createNew`. "
 "The declaration was skipped."
 msgstr ""
+"O calendário diocesano de %1$s tentou declarar um novo evento litúrgico "
+"`%2$s` para o ano %3$d, mas um evento com essa chave já existe no "
+"calendário. Para substituir uma celebração existente, use uma linha "
+"`setProperty` (`grade`, `name` ou `common`) em vez de re-declará-lo com "
+"`createNew`. A declaração foi ignorada."
 
 #: src/Handlers/CalendarHandler.php:1296
 #, php-format
@@ -748,6 +756,9 @@ msgid ""
 "but no such event exists in the calendar for the year %3$d. The modification "
 "was skipped."
 msgstr ""
+"O calendário diocesano de %1$s tentou modificar o evento litúrgico `%2$s`, "
+"mas tal evento não existe no calendário para o ano %3$d. A modificação foi "
+"ignorada."
 
 #: src/Handlers/CalendarHandler.php:1349
 #, php-format
@@ -756,6 +767,9 @@ msgid ""
 "the liturgical event `%2$s` for the year %3$d, but the grade was already set "
 "to that value. The override had no effect."
 msgstr ""
+"O calendário diocesano de %1$s declarou uma substituição `setProperty:grade` "
+"para o evento litúrgico `%2$s` para o ano %3$d, mas o grau já estava "
+"definido para esse valor. A substituição não teve efeito."
 
 #: src/Handlers/CalendarHandler.php:1382
 #, php-format
@@ -764,6 +778,9 @@ msgid ""
 "the liturgical event `%2$s` for the year %3$d, but the Common was already "
 "set to that value. The override had no effect."
 msgstr ""
+"O calendário diocesano de %1$s declarou uma substituição "
+"`setProperty:common` para o evento litúrgico `%2$s` para o ano %3$d, mas o "
+"Comum já estava definido para esse valor. A substituição não teve efeito."
 
 #: src/Handlers/CalendarHandler.php:1409
 #, php-format
@@ -772,6 +789,9 @@ msgid ""
 "liturgical event `%2$s` for the year %3$d, but the name was already set to "
 "that value. The override had no effect."
 msgstr ""
+"O calendário diocesano de %1$s declarou uma substituição `setProperty:name` "
+"para o evento litúrgico `%2$s` para o ano %3$d, mas o nome já estava "
+"definido para esse valor. A substituição não teve efeito."
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
@@ -821,13 +841,12 @@ msgid "the following Monday"
 msgstr "a próxima segunda-feira"
 
 #: src/Handlers/CalendarHandler.php:1989
-#, fuzzy
 msgid "the following day"
-msgstr "a próxima segunda-feira"
+msgstr "o dia seguinte"
 
 #: src/Handlers/CalendarHandler.php:1991
 msgid "General Norms for the Liturgical Year and the Calendar"
-msgstr ""
+msgstr "Normas Gerais para o Ano Litúrgico e o Calendário"
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year
 #: src/Handlers/CalendarHandler.php:1996 src/Handlers/CalendarHandler.php:2011
