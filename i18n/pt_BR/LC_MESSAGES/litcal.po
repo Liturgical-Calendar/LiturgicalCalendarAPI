@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-23 13:18+0000\n"
+"POT-Creation-Date: 2026-08-28 10:35+0000\n"
 "PO-Revision-Date: 2026-01-18 04:05+0000\n"
 "Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Portuguese (Brazil) <https://translate.johnromanodorazio.com/"
@@ -804,7 +804,7 @@ msgstr "o sábado que precede o Domingo de Ramos"
 #: src/Handlers/CalendarHandler.php:3383 src/Handlers/CalendarHandler.php:3399
 #: src/Handlers/CalendarHandler.php:3417 src/Handlers/CalendarHandler.php:3456
 #: src/Models/Calendar/LiturgicalEventCollection.php:1734
-#: src/Models/Decrees/DecreeEventMetadata.php:59
+#: src/Models/Decrees/DecreeEventMetadata.php:75
 #: src/Models/RegionalData/NationalData/LitCalItemMakePatronMetadata.php:54
 msgid ""
 "Decree of the Dicastery for Divine Worship and the Discipline of the "
