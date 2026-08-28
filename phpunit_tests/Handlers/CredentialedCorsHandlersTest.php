@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\DecreesHandler;
 use LiturgicalCalendar\Api\Handlers\RegionalDataHandler;
 use LiturgicalCalendar\Api\Handlers\TestsHandler;
+use LiturgicalCalendar\Api\Router;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Http\Message\ResponseInterface;
@@ -93,5 +94,74 @@ final class CredentialedCorsHandlersTest extends AbstractHandlerTestCase
         $response = $this->preflight($factory, $path, 'GET');
 
         self::assertNotSame('*', $response->getHeaderLine('Access-Control-Allow-Origin'));
+    }
+
+    /**
+     * The allow-list is what actually refuses a hostile cross-origin write, and the
+     * preflight is the only place it can do so: restricting the origin on the write
+     * response governs whether the response can be READ, never whether the request RUNS.
+     * So a preflight from a disallowed origin must not be answered with that origin.
+     *
+     * @param callable():object $factory
+     */
+    #[DataProvider('credentialedHandlerProvider')]
+    public function testDisallowedOriginIsNotEchoedOnAWritePreflight(callable $factory, string $path): void
+    {
+        /** @var \LiturgicalCalendar\Api\Handlers\AbstractHandler $handler */
+        $handler = $factory();
+        $handler->setAllowedOrigins(['https://allowed.example.test']);
+
+        $response = $handler->handle($this->requestFor('OPTIONS', $path, [
+            'Origin'                        => 'https://evil.example.test',
+            'Access-Control-Request-Method' => 'DELETE',
+        ]));
+
+        self::assertNotSame(
+            'https://evil.example.test',
+            $response->getHeaderLine('Access-Control-Allow-Origin'),
+            "{$path} must not clear a credentialed write for an origin outside the allow-list"
+        );
+        self::assertNotSame('*', $response->getHeaderLine('Access-Control-Allow-Origin'));
+    }
+
+    /** @param callable():object $factory */
+    #[DataProvider('credentialedHandlerProvider')]
+    public function testAllowedOriginIsEchoedOnAWritePreflight(callable $factory, string $path): void
+    {
+        /** @var \LiturgicalCalendar\Api\Handlers\AbstractHandler $handler */
+        $handler = $factory();
+        $handler->setAllowedOrigins([self::ORIGIN]);
+
+        $response = $handler->handle($this->requestFor('OPTIONS', $path, [
+            'Origin'                        => self::ORIGIN,
+            'Access-Control-Request-Method' => 'DELETE',
+        ]));
+
+        self::assertSame(self::ORIGIN, $response->getHeaderLine('Access-Control-Allow-Origin'));
+        self::assertSame('true', $response->getHeaderLine('Access-Control-Allow-Credentials'));
+    }
+
+    /**
+     * Router gates the allow-list on the method. A preflight is an OPTIONS request, so
+     * gating on that alone never covered it — the gap this closes.
+     */
+    public function testAllowListCoversWritePreflightsNotJustWrites(): void
+    {
+        // Writes themselves: restricted, as before.
+        self::assertTrue(Router::restrictsOriginsForWrite('PUT'));
+        self::assertTrue(Router::restrictsOriginsForWrite('PATCH'));
+        self::assertTrue(Router::restrictsOriginsForWrite('DELETE'));
+
+        // The preflight that clears a write: restricted now, previously not.
+        self::assertTrue(Router::restrictsOriginsForWrite('OPTIONS', 'PUT'));
+        self::assertTrue(Router::restrictsOriginsForWrite('OPTIONS', 'PATCH'));
+        self::assertTrue(Router::restrictsOriginsForWrite('OPTIONS', 'DELETE'));
+        self::assertTrue(Router::restrictsOriginsForWrite('options', 'delete'), 'method matching is case-insensitive');
+
+        // Reads and their preflights stay open, so public cross-origin GETs are unaffected.
+        self::assertFalse(Router::restrictsOriginsForWrite('GET'));
+        self::assertFalse(Router::restrictsOriginsForWrite('POST'));
+        self::assertFalse(Router::restrictsOriginsForWrite('OPTIONS', 'GET'));
+        self::assertFalse(Router::restrictsOriginsForWrite('OPTIONS', ''));
     }
 }
