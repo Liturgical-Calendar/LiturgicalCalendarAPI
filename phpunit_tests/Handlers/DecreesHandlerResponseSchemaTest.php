@@ -42,11 +42,34 @@ final class DecreesHandlerResponseSchemaTest extends AbstractHandlerTestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testUrlsLangsInResponseMetadataIsRejected(): void
+    /**
+     * urls_langs is an explicit per-language override, not a derived commodity, so unlike
+     * before it IS exposed: a client building per-language links cannot compute it.
+     */
+    public function testUrlsLangsInResponseMetadataIsAccepted(): void
     {
-        // The models drop urls_langs; a response carrying it must not validate.
         $body                                          = $this->decreesIndexBody();
         $body->litcal_decrees[0]->metadata->urls_langs = (object) ['en' => 'https://www.vatican.va/roman_curia/congregations/ccdds/documents/test.html'];
+        Schema::import(LitSchema::DECREES->path())->in($body);
+        $this->addToAssertionCount(1);
+    }
+
+    public function testUrlsLangsWithANonUrlValueIsRejected(): void
+    {
+        $body                                          = $this->decreesIndexBody();
+        $body->litcal_decrees[0]->metadata->urls_langs = (object) ['en' => 'not-a-vatican-url'];
+        $this->expectException(\Swaggest\JsonSchema\Exception::class);
+        Schema::import(LitSchema::DECREES->path())->in($body);
+    }
+
+    /**
+     * Guards the anchoring of DecreeURLS.patternProperties: unanchored, a key such as
+     * `xxde` matched the language alternation and slipped past additionalProperties:false.
+     */
+    public function testUrlsLangsWithAnUnknownLanguageKeyIsRejected(): void
+    {
+        $body                                          = $this->decreesIndexBody();
+        $body->litcal_decrees[0]->metadata->urls_langs = (object) ['xxde' => 'https://www.vatican.va/roman_curia/congregations/ccdds/documents/test.html'];
         $this->expectException(\Swaggest\JsonSchema\Exception::class);
         Schema::import(LitSchema::DECREES->path())->in($body);
     }
