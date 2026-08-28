@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-08-28 10:35+0000\n"
-"PO-Revision-Date: 2026-08-28 12:24+0000\n"
+"PO-Revision-Date: 2026-08-28 12:32+0000\n"
 "Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Dutch <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/nl/>\n"
@@ -50,12 +50,12 @@ msgstr "roze"
 #. translators: context = liturgical color (Ambrosian "morello"/violet)
 #: src/Enum/LitColor.php:42
 msgid "morello"
-msgstr ""
+msgstr "morello"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:44
 msgid "black"
-msgstr ""
+msgstr "zwart"
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
@@ -260,29 +260,27 @@ msgstr "weekdag"
 #. translators: liturgical rank 'WEEKDAY' in abbreviated form
 #: src/Enum/LitGrade.php:139
 msgid "w"
-msgstr ""
+msgstr "w"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:144
-#, fuzzy
 msgid "commemoration"
-msgstr "Vrije gedachtenis"
+msgstr "gedachtenis"
 
 #. translators: liturgical rank 'COMMEMORATION' in abbreviated form
 #: src/Enum/LitGrade.php:146
 msgid "m*"
-msgstr ""
+msgstr "m*"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:151
-#, fuzzy
 msgid "optional memorial"
-msgstr "Vrije gedachtenis"
+msgstr "vrije gedachtenis"
 
 #. translators: liturgical rank 'OPTIONAL MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:153
 msgid "m"
-msgstr ""
+msgstr "m"
 
 #. translators: liturgical rank. Keep Capitalized
 #: src/Enum/LitGrade.php:158
@@ -292,7 +290,7 @@ msgstr "Gedachtenis"
 #. translators: liturgical rank 'MEMORIAL' in abbreviated form
 #: src/Enum/LitGrade.php:160
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:165
@@ -302,7 +300,7 @@ msgstr "FEEST"
 #. translators: liturgical rank 'FEAST' in abbreviated form
 #: src/Enum/LitGrade.php:167
 msgid "F"
-msgstr ""
+msgstr "F"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:172
@@ -312,7 +310,7 @@ msgstr "FEEST VAN DE HEER"
 #. translators: liturgical rank 'FEAST OF THE LORD' in abbreviated form
 #: src/Enum/LitGrade.php:174
 msgid "F✝"
-msgstr ""
+msgstr "F✝"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:179
@@ -322,7 +320,7 @@ msgstr "HOOGFEEST"
 #. translators: liturgical rank 'SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:181
 msgid "S"
-msgstr ""
+msgstr "S"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:186
@@ -332,7 +330,7 @@ msgstr "viering met voorrang op hoogfeesten"
 #. translators: liturgical rank 'HIGHER SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:188
 msgid "S✝"
-msgstr ""
+msgstr "S✝"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:207
@@ -631,21 +629,19 @@ msgstr "Gewone tijd"
 
 #. translators: context = liturgical season (Ambrosian rite)
 #: src/Enum/LitSeason.php:173
-#, fuzzy
 msgid "After Epiphany"
-msgstr "%s na Driekoningen"
+msgstr "Na Driekoningen"
 
 #. translators: context = liturgical season (Ambrosian rite)
 #: src/Enum/LitSeason.php:175
-#, fuzzy
 msgid "After Pentecost"
-msgstr "Na de Oogst"
+msgstr "Na Pinksteren"
 
 #. translators: %s is a day number (17, 18, etc.) - for Advent weekdays Dec 17-24
 #: src/FerialEventNameGenerator.php:312
 #, php-format
 msgid "December %s"
-msgstr ""
+msgstr "december %s"
 
 #. translators: %s is an ordinal number (1st, 2nd, 3rd)
 #. translators: %s is an ordinal number (first, second...)
@@ -666,7 +662,7 @@ msgstr "%s dag onder het octaaf van Kerstmis"
 #: src/FerialEventNameGenerator.php:364 src/FerialEventNameGenerator.php:398
 #, php-format
 msgid "January %s"
-msgstr ""
+msgstr "januari %s"
 
 #. translators: %s is a day of the week - for days after Epiphany
 #: src/FerialEventNameGenerator.php:381
@@ -741,6 +737,9 @@ msgid ""
 "because a liturgical event with the same key was already defined by the "
 "Proprium de Tempore, which takes precedence."
 msgstr ""
+"Het Ambrosiaanse comune sanctorale-gebeurtenis `%1$s` van de %2$s werd "
+"overgeslagen omdat een liturgisch evenement met dezelfde sleutel al was "
+"gedefinieerd door de Proprium de Tempore, die voorrang heeft."
 
 #: src/Handlers/CalendarHandler.php:1245
 #, php-format
@@ -751,6 +750,11 @@ msgid ""
 "(`grade`, `name`, or `common`) instead of re-declaring it with `createNew`. "
 "The declaration was skipped."
 msgstr ""
+"De diocesane kalender van %1$s probeerde een nieuw liturgisch evenement "
+"`%2$s` voor het jaar %3$d te verklaren, maar een evenement met die sleutel "
+"bestaat al in de kalender. Om een bestaande viering te vervangen, gebruik "
+"een `setProperty` regel (`graad`, `naam`, of `gemeenschap`) in plaats van "
+"het opnieuw te verklaren met `createNew`. De verklaring werd overgeslagen."
 
 #: src/Handlers/CalendarHandler.php:1296
 #, php-format
@@ -848,13 +852,12 @@ msgid "the following Monday"
 msgstr "de volgende maandag"
 
 #: src/Handlers/CalendarHandler.php:1989
-#, fuzzy
 msgid "the following day"
-msgstr "de volgende maandag"
+msgstr "de volgende dag"
 
 #: src/Handlers/CalendarHandler.php:1991
 msgid "General Norms for the Liturgical Year and the Calendar"
-msgstr ""
+msgstr "Algemene Normen voor het Liturgisch Jaar en de Kalender"
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year
 #: src/Handlers/CalendarHandler.php:1996 src/Handlers/CalendarHandler.php:2011
