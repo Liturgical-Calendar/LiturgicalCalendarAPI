@@ -2,15 +2,15 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Gábor <pleineux@gmail.com>, 2025.
-# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2025.
+# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2025, 2026.
 # OpenAI <noreply-mt-openai@weblate.org>, 2025, 2026.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-08-28 10:35+0000\n"
-"PO-Revision-Date: 2026-08-28 12:24+0000\n"
-"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
+"PO-Revision-Date: 2026-08-28 13:33+0000\n"
+"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Hungarian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/hu/>\n"
 "Language: hu\n"
@@ -298,7 +298,7 @@ msgstr "ÜNNEP"
 #. translators: liturgical rank 'FEAST' in abbreviated form
 #: src/Enum/LitGrade.php:167
 msgid "F"
-msgstr "Úr ünnepe"
+msgstr "Ü"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:172
@@ -308,7 +308,7 @@ msgstr "Úr ünnepe"
 #. translators: liturgical rank 'FEAST OF THE LORD' in abbreviated form
 #: src/Enum/LitGrade.php:174
 msgid "F✝"
-msgstr "Úr ünnepe✝"
+msgstr "Ü✝"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:179
@@ -747,7 +747,7 @@ msgstr ""
 "A %1$s egyházmegyei naptár megpróbált létrehozni egy új liturgikus eseményt "
 "`%2$s` a %3$d évre, de az azonos kulccsal rendelkező esemény már létezik a "
 "naptárban. Ha felül szeretnéd bírálni a meglévő eseményt, használj "
-"`setProperty` sort (`grade`, `név`, vagy `közösség`) ahelyett, hogy újra "
+"`setProperty` sort (`grade`, `name`, vagy `common`) ahelyett, hogy újra "
 "megpróbálkozol a `createNew` használatával. A meghatározást átugrották."
 
 #: src/Handlers/CalendarHandler.php:1296
@@ -758,8 +758,8 @@ msgid ""
 "was skipped."
 msgstr ""
 "A %1$s egyházmegyei naptár megpróbálta módosítani a liturgikus eseményt "
-"`%2$s`, de ilyen esemény nem létezik a naptárban a %3$d évre. A módosítás "
-"átléptetve."
+"`%2$s`, de ilyen esemény nem létezik a naptárban a %3$d évre. A módosítást "
+"kihagyták."
 
 #: src/Handlers/CalendarHandler.php:1349
 #, php-format
