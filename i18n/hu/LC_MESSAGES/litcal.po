@@ -7,9 +7,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-08-28 10:35+0000\n"
-"PO-Revision-Date: 2026-06-19 18:50+0000\n"
+"PO-Revision-Date: 2026-08-28 12:24+0000\n"
 "Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
 "Language-Team: Hungarian <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/hu/>\n"
@@ -48,12 +48,12 @@ msgstr "rózsaszín"
 #. translators: context = liturgical color (Ambrosian "morello"/violet)
 #: src/Enum/LitColor.php:42
 msgid "morello"
-msgstr ""
+msgstr "meggy"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:44
 msgid "black"
-msgstr ""
+msgstr "fekete"
 
 #. translators: context = from the Proper of the festivity (as opposed to a Common)
 #: src/Enum/LitCommon.php:166
@@ -298,102 +298,102 @@ msgstr "ÜNNEP"
 #. translators: liturgical rank 'FEAST' in abbreviated form
 #: src/Enum/LitGrade.php:167
 msgid "F"
-msgstr ""
+msgstr "Úr ünnepe"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:172
 msgid "FEAST OF THE LORD"
-msgstr ""
+msgstr "Úr ünnepe"
 
 #. translators: liturgical rank 'FEAST OF THE LORD' in abbreviated form
 #: src/Enum/LitGrade.php:174
 msgid "F✝"
-msgstr ""
+msgstr "Úr ünnepe✝"
 
 #. translators: liturgical rank. Keep UPPERCASE
 #: src/Enum/LitGrade.php:179
 msgid "SOLEMNITY"
-msgstr ""
+msgstr "Főünnep"
 
 #. translators: liturgical rank 'SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:181
 msgid "S"
-msgstr ""
+msgstr "F"
 
 #. translators: liturgical rank. Keep lowercase
 #: src/Enum/LitGrade.php:186
 msgid "celebration with precedence over solemnities"
-msgstr ""
+msgstr "Ünnep az ünnepek felett"
 
 #. translators: liturgical rank 'HIGHER SOLEMNITY' in abbreviated form
 #: src/Enum/LitGrade.php:188
 msgid "S✝"
-msgstr ""
+msgstr "F✝"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:207
 msgid "For the Church"
-msgstr ""
+msgstr "Az Egyházért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:209
 msgid "For the Pope"
-msgstr ""
+msgstr "A pápáért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:211
 msgid "For the Bishop"
-msgstr ""
+msgstr "A püspökért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:213
 msgid "For the Election of a Pope or a Bishop"
-msgstr ""
+msgstr "A pápa vagy püspök választásáért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:215
 msgid "For a Council or a Synod"
-msgstr ""
+msgstr "Egy zsinatért vagy szinódusért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:217
 msgid "For Priests"
-msgstr ""
+msgstr "A papokért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:219
 msgid "For the Priest Himself"
-msgstr ""
+msgstr "A pap önmagáért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:221
 msgid "On the Anniversary of His Ordination"
-msgstr ""
+msgstr "Pappá szentelésének évfordulóján"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:223
 msgid "For Ministers of the Church"
-msgstr ""
+msgstr "Az egyház szolgálóiért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:225
 msgid "For Vocations to Holy Orders"
-msgstr ""
+msgstr "Szent rendek hivatásaiért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:227
 msgid "For the Laity"
-msgstr ""
+msgstr "A hívekért"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:229
 msgid "On the Anniversaries of Marriage: On Any Anniversary"
-msgstr ""
+msgstr "Házassági évfordulók: bármely évfordulón"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:231
 msgid "On the Anniversaries of Marriage: On the Twenty-Fifth Anniversary"
-msgstr ""
+msgstr "Házassági évfordulók: a huszonötödik évfordulón"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:233
@@ -626,15 +626,13 @@ msgstr "Évközi időszak"
 
 #. translators: context = liturgical season (Ambrosian rite)
 #: src/Enum/LitSeason.php:173
-#, fuzzy
 msgid "After Epiphany"
-msgstr "Epiphania után %s"
+msgstr "Vízkereszt után"
 
 #. translators: context = liturgical season (Ambrosian rite)
 #: src/Enum/LitSeason.php:175
-#, fuzzy
 msgid "After Pentecost"
-msgstr "Aratás után"
+msgstr "Pünkösd után"
 
 #. translators: %s is a day number (17, 18, etc.) - for Advent weekdays Dec 17-24
 #: src/FerialEventNameGenerator.php:312
@@ -733,6 +731,9 @@ msgid ""
 "because a liturgical event with the same key was already defined by the "
 "Proprium de Tempore, which takes precedence."
 msgstr ""
+"Az Ambrozián szentközösségi esemény `%1$s` a %2$s nem került feldolgozásra, "
+"mivel a Proprium de Tempore már meghatározta ugyanazt az eseményt, ami "
+"előnyt élvez."
 
 #: src/Handlers/CalendarHandler.php:1245
 #, php-format
@@ -743,6 +744,11 @@ msgid ""
 "(`grade`, `name`, or `common`) instead of re-declaring it with `createNew`. "
 "The declaration was skipped."
 msgstr ""
+"A %1$s egyházmegyei naptár megpróbált létrehozni egy új liturgikus eseményt "
+"`%2$s` a %3$d évre, de az azonos kulccsal rendelkező esemény már létezik a "
+"naptárban. Ha felül szeretnéd bírálni a meglévő eseményt, használj "
+"`setProperty` sort (`grade`, `név`, vagy `közösség`) ahelyett, hogy újra "
+"megpróbálkozol a `createNew` használatával. A meghatározást átugrották."
 
 #: src/Handlers/CalendarHandler.php:1296
 #, php-format
@@ -751,6 +757,9 @@ msgid ""
 "but no such event exists in the calendar for the year %3$d. The modification "
 "was skipped."
 msgstr ""
+"A %1$s egyházmegyei naptár megpróbálta módosítani a liturgikus eseményt "
+"`%2$s`, de ilyen esemény nem létezik a naptárban a %3$d évre. A módosítás "
+"átléptetve."
 
 #: src/Handlers/CalendarHandler.php:1349
 #, php-format
@@ -759,6 +768,9 @@ msgid ""
 "the liturgical event `%2$s` for the year %3$d, but the grade was already set "
 "to that value. The override had no effect."
 msgstr ""
+"A %1$s egyházmegyei naptár `setProperty:grade` felülírást hirdetett a `%2$s` "
+"liturgikus eseményre a %3$d évre, de a fokozat már erre az értékre volt "
+"beállítva. A felülírásnak nem volt hatása."
 
 #: src/Handlers/CalendarHandler.php:1382
 #, php-format
@@ -767,6 +779,9 @@ msgid ""
 "the liturgical event `%2$s` for the year %3$d, but the Common was already "
 "set to that value. The override had no effect."
 msgstr ""
+"A %1$s egyházmegyei naptár `setProperty:common` felülírást hirdetett a "
+"`%2$s` liturgikus eseményre a %3$d évre, de a Közösség már erre az értékre "
+"volt beállítva. A felülírásnak nem volt hatása."
 
 #: src/Handlers/CalendarHandler.php:1409
 #, php-format
@@ -775,6 +790,9 @@ msgid ""
 "liturgical event `%2$s` for the year %3$d, but the name was already set to "
 "that value. The override had no effect."
 msgstr ""
+"A %1$s egyházmegyei naptár `setProperty:name` felülírást hirdetett a `%2$s` "
+"liturgikus eseményre a %3$d évre, de a név már erre az értékre volt "
+"beállítva. A felülírásnak nem volt hatása."
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Description of the reason for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year, 4: Explicatory string for the transferral (ex. the Saturday preceding Palm Sunday), 5: actual date for the transferral, 6: Decree of the Dicastery for Divine Worship and the Discipline of the Sacraments
@@ -825,13 +843,12 @@ msgid "the following Monday"
 msgstr "a következő hétfőn"
 
 #: src/Handlers/CalendarHandler.php:1989
-#, fuzzy
 msgid "the following day"
-msgstr "a következő hétfőn"
+msgstr "a következő nap"
 
 #: src/Handlers/CalendarHandler.php:1991
 msgid "General Norms for the Liturgical Year and the Calendar"
-msgstr ""
+msgstr "Általános normák a liturgikus évre és a naptárra"
 
 #. translators: 1: Solemnity name, 2: Coinciding Solemnity name, 3: Requested calendar year
 #: src/Handlers/CalendarHandler.php:1996 src/Handlers/CalendarHandler.php:2011
