@@ -26,7 +26,13 @@ use Psr\Http\Message\ResponseInterface;
  * These handlers all share the same shape — a public GET plus authenticated writes —
  * so they are asserted together to keep the family consistent.
  */
+// The suite asserts one policy across every handler that allows credentials, and the
+// Router helper that decides when the allow-list applies. Naming only one of them left
+// PHPUnit discarding the coverage this test produced for the others.
 #[CoversClass(DecreesHandler::class)]
+#[CoversClass(RegionalDataHandler::class)]
+#[CoversClass(TestsHandler::class)]
+#[CoversClass(Router::class)]
 final class CredentialedCorsHandlersTest extends AbstractHandlerTestCase
 {
     private const ORIGIN = 'https://litcal-staging.example.test';
