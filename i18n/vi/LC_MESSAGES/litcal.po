@@ -3,15 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # Long Truong <binhlong@gmail.com>, 2024.
 # OpenAI <noreply-mt-openai@weblate.org>, 2024, 2025, 2026.
-# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2025.
+# "John R. D'Orazio" <priest@johnromanodorazio.com>, 2025, 2026.
 # Mai Lê Bảo Khang <baokhang48812002@gmail.com>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: priest@johnromanodorazio.com\n"
 "POT-Creation-Date: 2026-08-28 10:35+0000\n"
-"PO-Revision-Date: 2026-08-28 12:24+0000\n"
-"Last-Translator: OpenAI <noreply-mt-openai@weblate.org>\n"
+"PO-Revision-Date: 2026-08-28 13:33+0000\n"
+"Last-Translator: \"John R. D'Orazio\" <priest@johnromanodorazio.com>\n"
 "Language-Team: Vietnamese <https://translate.johnromanodorazio.com/projects/"
 "liturgical-calendar/liturgical-calendar-api/api-strings/vi/>\n"
 "Language: vi\n"
@@ -49,7 +49,7 @@ msgstr "hồng"
 #. translators: context = liturgical color (Ambrosian "morello"/violet)
 #: src/Enum/LitColor.php:42
 msgid "morello"
-msgstr "hơn một chút"
+msgstr "tím sẫm"
 
 #. translators: context = liturgical color
 #: src/Enum/LitColor.php:44
@@ -449,7 +449,7 @@ msgstr "Cho Một Buổi Tụ Họp Tâm Linh hoặc Mục Vụ"
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:255
 msgid "For the Nation or State"
-msgstr "Cho Quốc Gia hoặc Bang"
+msgstr "Cho Quốc Gia hoặc Nhà Nước"
 
 #. translators: context = Masses and Prayers for Various Needs and Occasions
 #: src/Enum/LitMassVariousNeeds.php:257
