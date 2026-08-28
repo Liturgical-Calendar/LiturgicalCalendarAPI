@@ -44,7 +44,15 @@ final class DecreesHandler extends AbstractHandler
     public function __construct(array $requestPathParams = [])
     {
         parent::__construct($requestPathParams);
-        $this->auditLogger = LoggerFactory::create('audit', null, 90, false, true, false);
+        // The frontend admin-decrees page performs cookie-authenticated writes
+        // (POST / PUT / PATCH / DELETE) against /decrees from the browser. On
+        // split-origin deployments (staging frontend -> production API, or the
+        // docker stack: frontend :3000 -> API :8000) a wildcard
+        // Access-Control-Allow-Origin makes the browser reject any credentialed
+        // request outright, at preflight. Echo the validated origin and allow
+        // credentials instead — same as /data, /tests and the /auth handlers.
+        $this->allowCredentials = true;
+        $this->auditLogger      = LoggerFactory::create('audit', null, 90, false, true, false);
     }
 
     /*

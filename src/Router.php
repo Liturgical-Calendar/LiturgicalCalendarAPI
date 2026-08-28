@@ -360,7 +360,10 @@ class Router
                     AcceptHeader::YAML
                 ]);
                 if (
-                    in_array($this->request->getMethod(), [ RequestMethod::PUT->value, RequestMethod::PATCH->value, RequestMethod::DELETE->value ], true)
+                    Router::restrictsOriginsForWrite(
+                        $this->request->getMethod(),
+                        $this->request->getHeaderLine('Access-Control-Request-Method')
+                    )
                     && false === Router::isLocalhost()
                 ) {
                     $missalsHandler->setAllowedOrigins($allowedOrigins);
@@ -394,7 +397,10 @@ class Router
                     AcceptHeader::YAML
                 ]);
                 if (
-                    in_array($this->request->getMethod(), [ RequestMethod::PUT->value, RequestMethod::PATCH->value, RequestMethod::DELETE->value ], true)
+                    Router::restrictsOriginsForWrite(
+                        $this->request->getMethod(),
+                        $this->request->getHeaderLine('Access-Control-Request-Method')
+                    )
                     && false === Router::isLocalhost()
                 ) {
                     $decreesHandler->setAllowedOrigins($allowedOrigins);
@@ -624,7 +630,10 @@ class Router
                     AcceptHeader::YAML
                 ]);
                 if (
-                    in_array($this->request->getMethod(), [ RequestMethod::PUT->value, RequestMethod::PATCH->value, RequestMethod::DELETE->value ], true)
+                    Router::restrictsOriginsForWrite(
+                        $this->request->getMethod(),
+                        $this->request->getHeaderLine('Access-Control-Request-Method')
+                    )
                     && false === Router::isLocalhost()
                 ) {
                     $regionalDataHandler->setAllowedOrigins($allowedOrigins);
@@ -694,7 +703,10 @@ class Router
                     AcceptHeader::YAML
                 ]);
                 if (
-                    in_array($this->request->getMethod(), [ RequestMethod::PUT->value, RequestMethod::PATCH->value, RequestMethod::DELETE->value ], true)
+                    Router::restrictsOriginsForWrite(
+                        $this->request->getMethod(),
+                        $this->request->getHeaderLine('Access-Control-Request-Method')
+                    )
                     && false === Router::isLocalhost()
                 ) {
                     $temporaleHandler->setAllowedOrigins($allowedOrigins);
@@ -940,6 +952,48 @@ class Router
      *
      * @return bool true if the server is running on localhost, false otherwise
      */
+    /**
+     * HTTP methods whose cross-origin use is restricted to the configured allow-list.
+     *
+     * @var string[]
+     */
+    private const ORIGIN_RESTRICTED_METHODS = [
+        RequestMethod::PUT->value,
+        RequestMethod::PATCH->value,
+        RequestMethod::DELETE->value
+    ];
+
+    /**
+     * Whether the CORS allow-list must be applied to this request.
+     *
+     * True for a write, and — crucially — for the CORS preflight that precedes one.
+     * A preflight arrives as OPTIONS and names the method it is clearing in
+     * Access-Control-Request-Method, so gating on the request method alone left the
+     * preflight configured with the default wildcard. For a handler that allows
+     * credentials that meant the browser was told the write was permitted from any
+     * origin, so it sent the write with the user's cookies and the API executed it.
+     * Restricting the origin on the write response governs only whether the response
+     * can be read, never whether the request runs — so the preflight is the only
+     * point at which a cross-origin write can actually be refused.
+     *
+     * Pure and static so the decision is testable: Router::route() emits and calls
+     * die(), and cannot be exercised in-process.
+     *
+     * @param string $requestMethod   The HTTP method of the request as it arrived.
+     * @param string $preflightMethod The Access-Control-Request-Method header, '' when absent.
+     */
+    public static function restrictsOriginsForWrite(string $requestMethod, string $preflightMethod = ''): bool
+    {
+        $method = strtoupper($requestMethod);
+
+        if (in_array($method, self::ORIGIN_RESTRICTED_METHODS, true)) {
+            return true;
+        }
+
+        return $method === RequestMethod::OPTIONS->value
+            && in_array(strtoupper($preflightMethod), self::ORIGIN_RESTRICTED_METHODS, true);
+    }
+
     public static function isLocalhost(): bool
     {
         $serverAddress      = isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : '';
