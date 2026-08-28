@@ -532,7 +532,7 @@ class Router
                     $this->response = new Response(StatusCode::NOT_FOUND->value, [], null, $this->request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
                     $this->emitResponse();
                 }
-                $this->restrictOriginsForPrivateRoute($allowedOrigins);
+                Router::restrictOriginsForPrivateRoute($this->handler, $allowedOrigins);
                 break;
             case 'admin':
                 // Handle admin routes
@@ -589,7 +589,7 @@ class Router
                     $this->response = new Response(StatusCode::NOT_FOUND->value, [], null, $this->request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
                     $this->emitResponse();
                 }
-                $this->restrictOriginsForPrivateRoute($allowedOrigins);
+                Router::restrictOriginsForPrivateRoute($this->handler, $allowedOrigins);
                 break;
             case 'applications':
                 // Developer applications and API keys management
@@ -1025,17 +1025,17 @@ class Router
      * resolve a handler, so a new endpoint added to either route inherits it by default
      * instead of having to remember it.
      *
-     * @param string[] $allowedOrigins
+     * Static and taking the handler explicitly, like restrictsOriginsForWrite(), so the
+     * decision is testable: Router::route() emits and calls die(), so anything reading
+     * $this->handler from inside it is unreachable by any test.
+     *
+     * @param RequestHandlerInterface $handler        The handler the sub-dispatch resolved.
+     * @param string[]                $allowedOrigins
      */
-    private function restrictOriginsForPrivateRoute(array $allowedOrigins): void
+    public static function restrictOriginsForPrivateRoute(RequestHandlerInterface $handler, array $allowedOrigins): void
     {
-        // Unset when the sub-dispatch fell through to a 404 and emitted already.
-        if (false === isset($this->handler)) {
-            return;
-        }
-
-        if ($this->handler instanceof AbstractHandler && false === Router::isLocalhost()) {
-            $this->handler->setAllowedOrigins($allowedOrigins);
+        if ($handler instanceof AbstractHandler && false === Router::isLocalhost()) {
+            $handler->setAllowedOrigins($allowedOrigins);
         }
     }
 

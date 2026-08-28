@@ -147,7 +147,7 @@ final class RouterCorsAllowListDriftTest extends TestCase
      * applied once after the sub-dispatch. What must not drift is that it is applied at
      * all, and that it is still behind the localhost bypass.
      */
-    private const PRIVATE_GUARDED_CALL = '/\$this->restrictOriginsForPrivateRoute\(\$allowedOrigins\);/';
+    private const PRIVATE_GUARDED_CALL = '/Router::restrictOriginsForPrivateRoute\(\$this->handler, \$allowedOrigins\);/';
 
     #[DataProvider('credentialedPrivateRouteProvider')]
     public function testPrivateRouteRestrictsOriginsForEveryMethod(string $route): void
@@ -167,7 +167,7 @@ final class RouterCorsAllowListDriftTest extends TestCase
     public function testPrivateRouteHelperIsNotGatedOnTheWriteMethodCheck(): void
     {
         $src   = self::routerSource();
-        $start = strpos($src, 'private function restrictOriginsForPrivateRoute(');
+        $start = strpos($src, 'public static function restrictOriginsForPrivateRoute(');
         self::assertNotFalse($start, 'restrictOriginsForPrivateRoute() not found');
         $body = substr($src, $start, 900);
 
