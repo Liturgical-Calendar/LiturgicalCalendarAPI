@@ -9,22 +9,22 @@ use LiturgicalCalendar\Api\Http\Exception\ForbiddenException;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
 use LiturgicalCalendar\Api\Services\SupportedLocales;
-use Nyholm\Psr7\ServerRequest;
 use PHPUnit\Framework\Attributes\CoversClass;
-use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ServerRequestInterface;
 
 #[CoversClass(LocalesAdminHandler::class)]
-final class LocalesAdminHandlerTest extends TestCase
+final class LocalesAdminHandlerTest extends AbstractHandlerTestCase
 {
     protected function setUp(): void
     {
+        parent::setUp();
         SupportedLocales::reset();
     }
 
     /** @param array<string, mixed>|null $oidcUser */
-    private function request(string $path, ?array $oidcUser): ServerRequest
+    private function request(string $path, ?array $oidcUser): ServerRequestInterface
     {
-        $request = ( new ServerRequest('GET', $path) )->withHeader('Accept', 'application/json');
+        $request = $this->requestFor('GET', $path);
 
         return $oidcUser === null ? $request : $request->withAttribute('oidc_user', $oidcUser);
     }
@@ -38,11 +38,9 @@ final class LocalesAdminHandlerTest extends TestCase
     /** @param string[] $pathParams @return array<string, mixed> */
     private function json(array $pathParams, string $path, ?array $oidcUser): array
     {
-        $response = ( new LocalesAdminHandler($pathParams) )->handle($this->request($path, $oidcUser));
-        /** @var array<string, mixed> $decoded */
-        $decoded = json_decode((string) $response->getBody(), true);
-
-        return $decoded;
+        return $this->decodeJsonBody(
+            ( new LocalesAdminHandler($pathParams) )->handle($this->request($path, $oidcUser))
+        );
     }
 
     public function testAnUnauthenticatedCallerIsRejected(): void

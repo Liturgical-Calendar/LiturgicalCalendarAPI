@@ -142,6 +142,34 @@ final class LocaleReadinessCheckerTest extends TestCase
         self::assertArrayHasKey('missing', $json['checks'][0]);
     }
 
+    /**
+     * The blank-readings probe is advisory: it reports a real content gap that four
+     * of the five official locales currently have, so gating on it would fail them
+     * all at once. It must therefore never influence `ready()`.
+     */
+    public function testAdvisoryChecksAreReportedButDoNotGate(): void
+    {
+        $report = $this->checker->check('fr');
+
+        self::assertTrue($report->ready(), 'an advisory failure must not make a locale unready');
+        self::assertNotEmpty($report->advisories());
+        self::assertSame(['decree_readings_populated'], array_map(
+            static fn (LocaleReadinessCheck $c): string => $c->name,
+            $report->advisories()
+        ));
+        self::assertSame([], $report->failures());
+    }
+
+    public function testAdvisoryChecksAreFlaggedInTheSerialisedReport(): void
+    {
+        /** @var array{checks: list<array{name: string, advisory: bool}>} $json */
+        $json     = json_decode((string) json_encode($this->checker->check('fr')), true);
+        $advisory = array_column($json['checks'], 'advisory', 'name');
+
+        self::assertTrue($advisory['decree_readings_populated']);
+        self::assertFalse($advisory['decree_names']);
+    }
+
     public function testPluralAgreement(): void
     {
         self::assertSame('1 event has', LocaleReadinessCheck::plural(1, 'event has', 'events have'));

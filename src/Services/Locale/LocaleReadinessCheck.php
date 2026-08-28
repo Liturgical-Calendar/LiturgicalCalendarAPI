@@ -20,7 +20,8 @@ final readonly class LocaleReadinessCheck implements \JsonSerializable
         public string $name,
         public bool $passed,
         public string $summary,
-        public array $missing = []
+        public array $missing = [],
+        public bool $advisory = false
     ) {
     }
 
@@ -29,15 +30,21 @@ final readonly class LocaleReadinessCheck implements \JsonSerializable
      * @param \Closure(int): string   $whenFailed Receives the count, so the caller
      *                                            can agree number with its own noun.
      */
-    public static function of(string $name, array $missing, string $whenPassed, \Closure $whenFailed): self
-    {
+    public static function of(
+        string $name,
+        array $missing,
+        string $whenPassed,
+        \Closure $whenFailed,
+        bool $advisory = false
+    ): self {
         $passed = $missing === [];
 
         return new self(
             $name,
             $passed,
             $passed ? $whenPassed : $whenFailed(count($missing)),
-            $missing
+            $missing,
+            $advisory
         );
     }
 
@@ -50,15 +57,16 @@ final readonly class LocaleReadinessCheck implements \JsonSerializable
     }
 
     /**
-     * @return array{name: string, passed: bool, summary: string, missing: list<string>}
+     * @return array{name: string, passed: bool, advisory: bool, summary: string, missing: list<string>}
      */
     public function jsonSerialize(): array
     {
         return [
-            'name'    => $this->name,
-            'passed'  => $this->passed,
-            'summary' => $this->summary,
-            'missing' => $this->missing,
+            'name'     => $this->name,
+            'passed'   => $this->passed,
+            'advisory' => $this->advisory,
+            'summary'  => $this->summary,
+            'missing'  => $this->missing,
         ];
     }
 }

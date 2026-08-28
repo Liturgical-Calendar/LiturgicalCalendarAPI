@@ -86,6 +86,7 @@ final class LocaleReadinessChecker
                 $this->checkDecreeReadings($locale, $this->createdEventKeys()),
                 $this->checkDecreeNames($locale, $this->namedEventKeys()),
                 $this->checkUniversalMissals($locale),
+                $this->checkDecreeReadingsPopulated($locale, $this->createdEventKeys()),
             ]
         );
     }
@@ -110,8 +111,18 @@ final class LocaleReadinessChecker
 
         $globs = [
             $this->root . JsonDataConstants::DECREES_FOLDER . '/i18n/*.json',
-            $this->root . JsonDataConstants::LECTIONARY_SAINTS_FOLDER . '/*.json',
+            $this->root . JsonDataConstants::LECTIONARY_DECREES_FOLDER . '/*.json',
         ];
+        foreach (self::LECTIONARY_CORPORA as $corpus) {
+            $globs[] = $this->root . $corpus . '/*.json';
+        }
+
+        // Deliberately NOT the missals: the national editions carry region-specific
+        // translations (`propriumdesanctis_US_2011/i18n/en_US.json`,
+        // `propriumdesanctis_IT_1983/i18n/it_IT.json`), and surfacing en_US and it_IT
+        // here would offer them as candidates for General Roman promotion, which they
+        // are not. Universal-missal coverage is still probed per locale by
+        // checkUniversalMissals(); it just does not define the candidate set.
         foreach ($globs as $pattern) {
             foreach (glob($pattern) ?: [] as $file) {
                 $locales[] = basename($file, '.json');
@@ -238,6 +249,68 @@ final class LocaleReadinessChecker
             $missing,
             sprintf('all %d decreed events are named', count($decreedEventKeys)),
             static fn (int $n): string => LocaleReadinessCheck::plural($n, 'decreed event has', 'decreed events have') . ' no name'
+        );
+    }
+
+    /**
+     * How many decreed events have a readings entry that is present but BLANK.
+     *
+     * Advisory, not gating — and the distinction is load-bearing. These events do
+     * not appear in `sanctorum` at all, so the decrees lectionary is their only
+     * source of readings: a blank entry means the calendar serves none. By that
+     * standard four of the five currently official locales are incomplete (fr, it
+     * and nl have 10 of 11 blank, la has 9), and gating on it would fail them all
+     * at once.
+     *
+     * Reported so the gap is visible in the admin interface and can be closed
+     * deliberately. Promote this to gating (drop the `true`) once the content
+     * exists, or the build goes red for locales the API already advertises.
+     *
+     * @param list<string> $createdEventKeys
+     */
+    private function checkDecreeReadingsPopulated(string $locale, array $createdEventKeys): LocaleReadinessCheck
+    {
+        $path = $this->root . JsonDataConstants::LECTIONARY_DECREES_FOLDER . '/' . $locale . '.json';
+        if (!is_file($path)) {
+            return LocaleReadinessCheck::of(
+                'decree_readings_populated',
+                [],
+                'not applicable — no decrees lectionary for this locale',
+                static fn (int $n): string => '',
+                true
+            );
+        }
+
+        /** @var array<string, mixed> $readings */
+        $readings = $this->decodeArray($path);
+
+        $blank = [];
+        foreach ($createdEventKeys as $key) {
+            $entry = $readings[$key] ?? null;
+            if (!is_array($entry)) {
+                continue; // absence is the gating check's business, not this one
+            }
+
+            $hasText = false;
+            foreach ($entry as $value) {
+                if (is_string($value) && trim($value) !== '') {
+                    $hasText = true;
+                    break;
+                }
+            }
+
+            if (false === $hasText) {
+                $blank[] = $key;
+            }
+        }
+
+        return LocaleReadinessCheck::of(
+            'decree_readings_populated',
+            $blank,
+            sprintf('all %d newly created events have readings text', count($createdEventKeys)),
+            static fn (int $n): string => LocaleReadinessCheck::plural($n, 'newly created event has', 'newly created events have')
+                . ' an empty readings entry',
+            true
         );
     }
 

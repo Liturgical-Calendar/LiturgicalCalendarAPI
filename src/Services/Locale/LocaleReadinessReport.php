@@ -29,6 +29,10 @@ final readonly class LocaleReadinessReport implements \JsonSerializable
     public function ready(): bool
     {
         foreach ($this->checks as $check) {
+            if ($check->advisory) {
+                continue;
+            }
+
             if (false === $check->passed) {
                 return false;
             }
@@ -44,7 +48,23 @@ final readonly class LocaleReadinessReport implements \JsonSerializable
      */
     public function failures(): array
     {
-        return array_values(array_filter($this->checks, static fn (LocaleReadinessCheck $c): bool => !$c->passed));
+        return array_values(array_filter(
+            $this->checks,
+            static fn (LocaleReadinessCheck $c): bool => !$c->passed && !$c->advisory
+        ));
+    }
+
+    /**
+     * Advisory checks that did not pass — reported, never gating.
+     *
+     * @return list<LocaleReadinessCheck>
+     */
+    public function advisories(): array
+    {
+        return array_values(array_filter(
+            $this->checks,
+            static fn (LocaleReadinessCheck $c): bool => !$c->passed && $c->advisory
+        ));
     }
 
     /**
