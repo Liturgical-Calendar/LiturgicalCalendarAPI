@@ -681,6 +681,14 @@ class SourceDataChangeRequestRepository
      * Counts only batches that would otherwise be claimable (`approved`, `none`), so a batch
      * whose attempts happen to be non-zero but which went on to publish, or which was rejected
      * or withdrawn afterwards, is not reported as stuck.
+     *
+     * The attempts test is `bool_or(>= MAX)`, deliberately the exact COMPLEMENT of the claim
+     * query's `bool_and(< MAX)` rather than its mirror image. Every row of an approved batch
+     * moves together today, so the two spellings agree — but if a batch ever did hold rows on
+     * both sides of the bound, `bool_and(>= MAX)` would report it as neither claimable NOR
+     * parked: stuck and invisible, which is the precise failure this count exists to prevent.
+     * Complementary predicates make that hole unreachable by construction instead of by
+     * argument.
      */
     public function countParkedBatches(): int
     {
@@ -692,7 +700,7 @@ class SourceDataChangeRequestRepository
                     GROUP BY batch_id
                    HAVING bool_and(review_status = :approved)
                       AND bool_and(publication_status = :none)
-                      AND bool_and(publish_attempts >= :max_attempts)
+                      AND bool_or(publish_attempts >= :max_attempts)
                ) AS parked_batches'
         );
         $stmt->execute([
