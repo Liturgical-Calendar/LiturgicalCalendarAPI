@@ -390,6 +390,32 @@ every future handler. Neither is free: the containment assumption is exactly wha
 today, but a handler that stages a path _without_ reading its own unpublished content first would break
 it, and nothing enforces that it must.
 
+**Decided (2026-08-29): the second.** The base excludes any row older than the newest `merged` row for
+that `(path, submitter)`; no ancestor's status is rewritten.
+
+The deciding difference is not the SQL but what each option _writes_. Marking ancestors `merged` asserts
+that they were published. Under containment that is effectively true — their bytes are inside the
+published batch — but if containment ever breaks, the publisher, which selects approved rows that are not
+yet `merged`, skips a batch that was never published and its content is silently lost. Excluding by age
+rewrites nothing: the ancestor stays `approved` / `none`, so it remains visible, remains truthful, and
+remains publishable. The failure mode degrades from losing data to choosing a suboptimal rebuild base.
+
+That asymmetry decided it. Every serious defect on this branch was an invariant that was asserted but not
+enforced — the migration comment claiming one pending proposal per path, the repository docblock naming a
+decree case it had not fixed, the `#[CoversClass]` list that silently discarded real coverage. Containment
+is another unenforced assertion, so the option that does not depend on it wins.
+
+**The decrees layout stays as it is.** Splitting `decrees.json` into one file per decree was considered
+and rejected for now: the `i18n/<locale>.json` and `lectionary/<locale>.json` sidecars are aggregates too,
+across fourteen locales, so a decree edit would still rewrite shared files and the collision would remain.
+Removing it entirely means per-decree per-locale files — roughly 15 × 14 and growing — against ten source
+files that read `decrees.json`, plus schemas, the frontend editor and a data migration. Two facts also
+narrow the problem: the unique index is `(path, submitted_by_sub)`, so two editors editing two different
+decrees never collide, and APCu already caches the aggregate. The real argument for splitting is
+git-level: two rolling PRs both touching `decrees.json` will conflict even though the database rows do
+not. `force: false` turns that into a retryable error rather than data loss, so phase 2 can find out
+safely; revisit the layout only if it proves painful in practice.
+
 #### `publication_status <> 'merged'` admits `closed`
 
 The predicate excludes `merged` and nothing else, but `chk_scr_publication_status` also allows `closed` —
@@ -400,9 +426,12 @@ batch whose PR was closed unmerged therefore stays in the accumulation base fore
 `review_status = 'rejected'` happens to keep it out of the base today, because the base filters review
 status as well. That is a coincidence of phase 3's current design, not a decision: the predicate's
 justification (recorded in `SourceDataChangeRequestRepository`'s class docblock) reasons only about
-`merged` content being the repository, and never considered `closed` at all. Decide nothing now —
-but when phase 3 lands, state explicitly whether `closed` belongs in the exclusion, and stop relying on
-the review-status filter to carry it.
+`merged` content being the repository, and never considered `closed` at all.
+
+**Decided (2026-08-29):** phase 2 does not change this predicate, because phase 2 never writes `closed` —
+only phase 3 does. Phase 3 must state explicitly whether `closed` belongs in the exclusion and stop
+relying on the review-status filter to carry it. Phase 2's age-based ancestor exclusion, decided above,
+is independent of this and does not depend on `closed` being handled either way.
 
 ### Reuse and failure handling
 
@@ -442,6 +471,19 @@ publish-PR-merge-redeploy path touches OpenFGA. A deployment's file tree can be 
 with `main` while stale editor/viewer tuples for a deleted calendar remain live in OpenFGA
 indefinitely, because no step between "PR merged" (Phase 2/3) and "next redeploy" (infrastructure,
 outside this design) ever calls `purgeForObject()`.
+
+**Decided (2026-08-29): Phase 3, at merge detection.** Only merge detection knows the deletion actually
+happened — publishing a PR does not make it true, and a PR can still be closed unmerged. Purging at
+publish time would revoke real authorization on the strength of a proposal. This also matches how the
+file side already works: the redeploy that follows a merge is what removes the files, so authorization
+and files become true at the same moment rather than drifting apart in opposite directions.
+
+The cost is explicit and accepted: **until phase 3 ships, a calendar or test deleted through a change
+request keeps its OpenFGA tuples live, so its former editors retain edit access on an object whose files
+are gone.** That is a known limitation to be stated in the phase 2 runbook, not a surprise to be
+discovered later. Phase 2 must not silently appear to have closed it.
+
+The original requirement, which phase 3 inherits unchanged:
 
 **Requirement for Phase 2 (or, if merge detection ends up the more natural trigger, Phase 3):** when
 a `delete`-operation change request's batch is applied — either at publish time if publishing is
