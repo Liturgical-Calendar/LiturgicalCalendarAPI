@@ -32,6 +32,7 @@ use LiturgicalCalendar\Api\Models\Auth\TestTarget;
 use LiturgicalCalendar\Api\Models\Auth\WsCaller;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableItem;
+use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode;
 use LiturgicalCalendar\Api\Services\TestRunPolicy;
 use LiturgicalCalendar\Api\Services\WsCallerResolver;
@@ -5309,6 +5310,57 @@ class Health implements MessageComponentInterface
         return [
             'status'  => 'ok',
             'message' => 'source data writes go to disk (no change request stack configured)',
+        ];
+    }
+
+    /**
+     * Build the source_data_publisher block for the HTTP /health endpoint.
+     *
+     * Reports whether the phase-2 GitHub App publisher ({@see SourceDataPublisher}) can
+     * actually run, and flags the one way that matters: change-request queue mode
+     * ({@see SourceDataWriteMode::changeRequestsEnabled()}) is on, but the publisher is not
+     * configured ({@see SourceDataPublisher::isConfigured()}). In that state editors submit,
+     * admins approve, everything reports success — and nothing is ever published; approved
+     * work silently piles up looking exactly like a working system from every UI surface.
+     *
+     * Queue mode being off is never itself a problem here — the publisher having nothing to
+     * do (configured or not) is the ordinary, quiet case for a self-hosted instance that does
+     * not run the change-request queue.
+     *
+     * Designed to be called from HealthHandler (HTTP context), mirroring
+     * {@see Health::buildSourceDataWriteModeStatus()} — same "static method here, consumed by
+     * the HTTP handler" shape.
+     *
+     * @return array{status: 'ok'|'warning', message: string}
+     */
+    public static function buildSourceDataPublisherStatus(): array
+    {
+        $queueModeOn = SourceDataWriteMode::changeRequestsEnabled();
+        $configured  = SourceDataPublisher::isConfigured();
+
+        if ($queueModeOn && !$configured) {
+            return [
+                'status'  => 'warning',
+                'message' => 'change request queue mode is on but the source data publisher is not configured '
+                    . '(GITHUB_APP_ID, GITHUB_APP_INSTALLATION_ID, GITHUB_APP_PRIVATE_KEY_PATH, GITHUB_REPOSITORY); '
+                    . 'approved change requests are accumulating unpublished',
+            ];
+        }
+
+        if ($configured) {
+            return [
+                'status'  => 'ok',
+                'message' => $queueModeOn
+                    ? 'source data publisher is configured and will publish approved change requests to GitHub'
+                    : 'source data publisher is configured, but change request queue mode is off, so there is '
+                        . 'nothing to publish',
+            ];
+        }
+
+        return [
+            'status'  => 'ok',
+            'message' => 'source data publisher is not configured (change request queue mode is off, so there is '
+                . 'nothing to publish)',
         ];
     }
 

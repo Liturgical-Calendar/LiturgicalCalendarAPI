@@ -237,6 +237,21 @@ final class SourceDataPublisher implements SourceDataPublisherInterface
     }
 
     /**
+     * True when the publisher has everything it needs to actually publish: the GitHub App
+     * credential ({@see GitHubAppAuth::isConfigured()}) plus `GITHUB_REPOSITORY`.
+     *
+     * `GITHUB_BASE_BRANCH`, `GITHUB_APP_COMMITTER_NAME`, and `GITHUB_APP_COMMITTER_EMAIL` are
+     * deliberately not checked here: {@see fromEnv()} defaults all three when unset or empty,
+     * so their absence never leaves the publisher unable to run — only the four checked here
+     * do. Mirrors {@see GitHubAppAuth::isConfigured()} and is consumed by
+     * {@see \LiturgicalCalendar\Api\Health::buildSourceDataPublisherStatus()}.
+     */
+    public static function isConfigured(): bool
+    {
+        return GitHubAppAuth::isConfigured() && '' !== self::getEnvString('GITHUB_REPOSITORY');
+    }
+
+    /**
      * Build a fully wired instance from environment variables: `GITHUB_APP_ID`,
      * `GITHUB_APP_INSTALLATION_ID`, `GITHUB_APP_PRIVATE_KEY_PATH` (via
      * {@see GitHubAppAuth::fromEnv()}), `GITHUB_REPOSITORY` (required), and the optional
