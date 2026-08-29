@@ -114,4 +114,62 @@ final class RegionalDataChangeRequestTest extends RepositoryTestCase
 
         $this->host->commitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'USA'));
     }
+
+    public function testADeletionStagesNoContent(): void
+    {
+        $this->host->stageFile(
+            '/app/jsondata/sourcedata/rite/roman/calendars/dioceses/IT/romamo_it/Diocesi di Roma.json',
+            ChangeOperation::DELETE,
+            null
+        );
+
+        $body = $this->host->commitStagedFiles(ChangeResource::diocesanCalendar(Rite::ROMAN, 'romamo_it'));
+
+        $repo = new SourceDataChangeRequestRepository(self::$pdo);
+        $row  = $repo->getBatch($body['change_request']['batch_id'])[0];
+
+        self::assertSame('delete', $row['operation']);
+        self::assertNull($row['content']);
+    }
+
+    public function testADeletionOfACalendarAndItsTranslationsIsOneBatch(): void
+    {
+        $this->host->stageFile(
+            '/app/jsondata/sourcedata/rite/roman/calendars/dioceses/IT/romamo_it/Diocesi di Roma.json',
+            ChangeOperation::DELETE,
+            null
+        );
+        $this->host->stageFile(
+            '/app/jsondata/sourcedata/rite/roman/calendars/dioceses/IT/romamo_it/i18n/it_IT.json',
+            ChangeOperation::DELETE,
+            null
+        );
+
+        $body = $this->host->commitStagedFiles(ChangeResource::diocesanCalendar(Rite::ROMAN, 'romamo_it'));
+
+        $repo = new SourceDataChangeRequestRepository(self::$pdo);
+        self::assertCount(2, $repo->getBatch($body['change_request']['batch_id']));
+    }
+
+    public function testAnUpdateAndADeleteCanShareABatch(): void
+    {
+        $this->host->stageFile(
+            '/app/jsondata/sourcedata/rite/roman/calendars/nations/US/US.json',
+            ChangeOperation::UPDATE,
+            '{"litcal":[]}'
+        );
+        $this->host->stageFile(
+            '/app/jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/fr_FR.json',
+            ChangeOperation::DELETE,
+            null
+        );
+
+        $body = $this->host->commitStagedFiles(ChangeResource::nationalCalendar(Rite::ROMAN, 'US'));
+
+        $repo       = new SourceDataChangeRequestRepository(self::$pdo);
+        $operations = array_column($repo->getBatch($body['change_request']['batch_id']), 'operation');
+
+        sort($operations);
+        self::assertSame(['delete', 'update'], $operations);
+    }
 }
