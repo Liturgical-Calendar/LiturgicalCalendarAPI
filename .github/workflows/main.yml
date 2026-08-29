@@ -132,6 +132,70 @@ jobs:
       - name: Markdown lint
         run: npx --yes markdownlint-cli2 "**/*.md" "#node_modules" "#vendor" "#.aider*"
 
+  # Advisory, never gating. Redocly reports problems the PHP tooling cannot see —
+  # examples that do not validate against their own schema, unreachable $refs,
+  # missing operationIds. One of those had already shipped: the GET /validations
+  # example omitted a required property (#906), and nothing in CI looked.
+  #
+  # Deliberately NOT a required check. Redocly's `recommended` ruleset carries
+  # opinions we do not all share, and its `oneOf` overlap analysis produces known
+  # false positives here (#908). A gating job would invite blanket suppressions,
+  # which is the opposite of what this is for. It succeeds regardless and writes
+  # its findings to the run summary, so a reviewer sees them without being blocked.
+  openapi_lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: OpenAPI description lint (advisory)
+        run: |
+          set -o pipefail
+          # `|| true` on the pipeline, not on the step: a non-zero redocly exit must
+          # still let us publish the output rather than aborting the step silently.
+          npx --yes @redocly/cli lint 2>&1 | tee redocly.out || true
+
+          {
+            echo '## OpenAPI lint (advisory)'
+            echo
+            if grep -q 'Your API description is valid' redocly.out; then
+              echo ':white_check_mark: The description is valid.'
+            else
+              echo ':x: The description did **not** validate. This does not fail the build, but it should be looked at.'
+            fi
+            echo
+
+            warnings=$(grep -oE 'You have [0-9]+ warnings' redocly.out | grep -oE '[0-9]+' || echo 0)
+            ignored=$(grep -oE '[0-9]+ problems are explicitly ignored' redocly.out | grep -oE '^[0-9]+' || echo 0)
+
+            echo "| | Count |"
+            echo "| ----------------------- | ----- |"
+            echo "| Warnings                | ${warnings} |"
+            echo "| Explicitly ignored      | ${ignored} |"
+            echo
+
+            if [ "${warnings}" != "0" ]; then
+              echo 'Warnings are at zero on `development`. A non-zero count here means this branch introduced one.'
+              echo
+              echo '<details><summary>Full output</summary>'
+              echo
+              echo '```text'
+              cat redocly.out
+              echo '```'
+              echo
+              echo '</details>'
+            fi
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+          # Surface it in the PR's annotation list too, where a reviewer will see it
+          # without opening the run.
+          if [ "$(grep -oE 'You have [0-9]+ warnings' redocly.out | grep -oE '[0-9]+' || echo 0)" != "0" ]; then
+            echo "::warning title=OpenAPI lint::redocly reported warnings; development is at zero, so this branch likely introduced them. See the job summary."
+          fi
+
   deploy_payload:
     runs-on: ubuntu-latest
     # Least privilege, as jsondata_lint above: this job only reads the tree and
