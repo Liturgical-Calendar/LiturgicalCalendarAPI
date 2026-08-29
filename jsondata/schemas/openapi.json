@@ -12724,7 +12724,7 @@
               },
               "id": {
                 "type": "string",
-                "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`); bare for `general_roman_calendar` ids such as `decrees`, which are Roman by construction."
+                "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`), and for the `national_calendar_test` and `diocesan_calendar_test` scopes. Bare for `general_roman_calendar` ids such as `decrees`, which are Roman by construction, and bare for the remaining two test scopes: `general_roman_calendar_test`, and `rite_calendar_test` whose id is itself the rite."
               }
             },
             "required": [
@@ -12774,7 +12774,7 @@
           },
           "resource_id": {
             "type": "string",
-            "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`); bare for `general_roman_calendar` ids such as `decrees`."
+            "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`), and for the `national_calendar_test` and `diocesan_calendar_test` scopes. Bare for `general_roman_calendar` ids such as `decrees`, and for `general_roman_calendar_test` and `rite_calendar_test`."
           },
           "review_status": {
             "type": "string",
