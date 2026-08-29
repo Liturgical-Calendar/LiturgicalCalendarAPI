@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Enum\ChangeOperation;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Services\ChangeResource;
+use PDO;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 #[CoversClass(SourceDataChangeRequestRepository::class)]
@@ -187,8 +188,100 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
         self::assertNull($this->repo->getById('00000000-0000-0000-0000-000000000000'));
     }
 
+    public function testGetByIdReturnsAFullyHydratedRow(): void
+    {
+        $batchId = $this->submitUsa();
+        $rows    = $this->repo->getBatch($batchId);
+        $rowId   = $rows[0]['id'];
+        self::assertIsString($rowId);
+
+        $row = $this->repo->getById($rowId);
+
+        self::assertNotNull($row);
+        self::assertSame($rowId, $row['id']);
+        self::assertSame($batchId, $row['batch_id']);
+        // hydrate() decoded the JSONB column into an array, not a JSON string.
+        self::assertSame(['authorized_by' => 'admin'], $row['metadata']);
+        // hydrate() normalised PDO's pgsql 't'/'f' into a real PHP bool.
+        self::assertIsBool($row['submitted_by_email_verified']);
+        self::assertTrue($row['submitted_by_email_verified']);
+        // hydrate() attached the synthetic permissions tuple on the single-row path too,
+        // not just on getBatch()'s multi-row path.
+        self::assertSame(
+            [['object_type' => 'national_calendar', 'object_id' => 'roman/US', 'relation' => 'admin']],
+            $row['permissions']
+        );
+    }
+
     public function testGetBatchReturnsAnEmptyArrayForAnUnknownBatch(): void
     {
         self::assertSame([], $this->repo->getBatch('00000000-0000-0000-0000-000000000000'));
+    }
+
+    public function testAFailedInsertRollsBackTheEntireBatchAndTheSupersedeDelete(): void
+    {
+        $first          = $this->submitUsa();
+        $batchIdsBefore = $this->allBatchIds();
+
+        $failingFiles = [
+            [
+                'path'      => 'jsondata/sourcedata/rite/roman/calendars/nations/US/US.json',
+                'operation' => ChangeOperation::UPDATE,
+                'content'   => '{"litcal":[{"event_key":"NewFeast"}]}',
+            ],
+            // Violates chk_scr_write_has_content (Task 1): a non-delete operation must
+            // carry content. This is what forces the mid-batch failure.
+            [
+                'path'      => 'jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/en_US.json',
+                'operation' => ChangeOperation::CREATE,
+                'content'   => null,
+            ],
+        ];
+
+        try {
+            $this->repo->submitBatch(
+                ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
+                $failingFiles,
+                'user-1',
+                'Alice',
+                'alice@example.test',
+                true
+            );
+            self::fail('Expected a PDOException from the chk_scr_write_has_content violation');
+        } catch (\PDOException $e) {
+            // (a) the exception propagated out of submitBatch() -- reaching this catch
+            // block (rather than the self::fail() above) is that assertion.
+        }
+
+        // (b) no trace of the failed batch survives: no new batch id appears at all, and
+        // specifically not even the one row (the UPDATE) that was successfully inserted
+        // before the second, invalid, insert aborted the transaction.
+        self::assertSame($batchIdsBefore, $this->allBatchIds(), 'no new batch id should exist after the rollback');
+        self::assertSame([], $this->repo->getBatch('11111111-1111-1111-1111-111111111111'));
+
+        $stmt = self::$pdo->query("SELECT COUNT(*) FROM sourcedata_change_requests WHERE operation = 'update'");
+        self::assertNotFalse($stmt);
+        self::assertSame(0, (int) $stmt->fetchColumn(), 'the successful first insert of the failed batch must have rolled back too');
+
+        // (c) the previously submitted batch -- the thing the supersede DELETE targeted --
+        // is still fully intact, proving the DELETE rolled back along with the failed INSERT.
+        $rows = $this->repo->getBatch($first);
+        self::assertCount(2, $rows);
+        foreach ($rows as $row) {
+            self::assertSame($first, $row['batch_id']);
+            self::assertSame('submitted', $row['review_status']);
+        }
+    }
+
+    /** @return list<string> */
+    private function allBatchIds(): array
+    {
+        $stmt = self::$pdo->query('SELECT DISTINCT batch_id::text FROM sourcedata_change_requests ORDER BY batch_id');
+        self::assertNotFalse($stmt);
+
+        /** @var list<string> $ids */
+        $ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+        return $ids;
     }
 }
