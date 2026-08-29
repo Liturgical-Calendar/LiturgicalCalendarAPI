@@ -36,6 +36,7 @@ use LiturgicalCalendar\Api\Handlers\Auth\AdminScopesHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\DashboardScopesHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\TestScopesHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\NotificationsHandler;
+use LiturgicalCalendar\Api\Handlers\Auth\ChangeRequestHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\PermissionAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\UsersHandler;
 use LiturgicalCalendar\Api\Handlers\ApplicationsHandler;
@@ -517,6 +518,10 @@ class Router
                         // GET /auth/admin-scopes - Report caller's global/resource admin status + scopes
                         $adminScopesHandler = new AdminScopesHandler();
                         $this->handler      = $adminScopesHandler;
+                    } elseif ($authRoute === 'change-requests') {
+                        // GET  /auth/change-requests                    - The caller's own change requests
+                        // POST /auth/change-requests/{batchId}/withdraw - Withdraw one of them
+                        $this->handler = new ChangeRequestHandler($requestPathParts);
                     } elseif ($authRoute === 'test-scopes') {
                         // GET /auth/test-scopes - Report caller's test editor/admin scopes
                         $testScopesHandler = new TestScopesHandler();
@@ -808,7 +813,7 @@ class Router
         // Apply OIDC authentication for auth routes (access-requests, email-verification, notifications), admin, and applications
         // These routes need the oidc_user attribute set before the handler checks authentication
         if (
-            ( $route === 'auth' && count($requestPathParts) >= 1 && in_array($requestPathParts[0], ['access-requests', 'email-verification', 'notifications', 'admin-scopes', 'test-scopes', 'dashboard-scopes'], true) )
+            ( $route === 'auth' && count($requestPathParts) >= 1 && in_array($requestPathParts[0], ['access-requests', 'email-verification', 'notifications', 'admin-scopes', 'test-scopes', 'dashboard-scopes', 'change-requests'], true) )
             || $route === 'admin'
             || $route === 'applications'
         ) {
