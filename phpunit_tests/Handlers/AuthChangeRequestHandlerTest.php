@@ -9,6 +9,7 @@ use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Handlers\Auth\ChangeRequestHandler;
 use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Services\ChangeResource;
 use LiturgicalCalendar\Tests\Repositories\RepositoryTestCase;
@@ -81,6 +82,30 @@ final class AuthChangeRequestHandlerTest extends RepositoryTestCase
         $this->expectException(UnauthorizedException::class);
 
         $handler->handle($request);
+    }
+
+    public function testUnrecognisedStatusIsRejectedRatherThanSilentlyListingEverything(): void
+    {
+        // If this ever regressed into a silent unfiltered listing, a caller who
+        // thinks they narrowed the list by status would act on one that isn't
+        // narrowed at all. Assert on the message too, not just the exception
+        // type — a message that degraded to something generic would still let
+        // that regression slip through a type-only assertion.
+        $this->submitFor('user-1', 'USA');
+
+        $handler = new ChangeRequestHandler([], $this->repo);
+        $request = $this->request('GET', '/auth/change-requests', 'user-1')
+            ->withQueryParams(['status' => 'bogus']);
+
+        try {
+            $handler->handle($request);
+            self::fail('Expected a ValidationException');
+        } catch (ValidationException $e) {
+            self::assertSame(
+                'Invalid status "bogus". Valid values: submitted, approved, rejected, withdrawn',
+                $e->getMessage()
+            );
+        }
     }
 
     public function testWithdrawingOwnBatchSucceeds(): void
