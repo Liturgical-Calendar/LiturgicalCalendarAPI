@@ -2,9 +2,15 @@
 <?php
 
 /**
- * Guard against source-data churn: re-encode every decrees source file
- * through the exact canonicalizer its write-path handler uses, and fail if
- * the committed file differs from that canonical form.
+ * Guard against source-data churn: re-encode every guarded file through the
+ * exact canonicalizer that owns its format, and fail if the committed file
+ * differs from that canonical form.
+ *
+ * Two families are covered, for two different reasons:
+ *   - the decrees source files, whose canonicalizer is their write-path handler
+ *   - jsondata/schemas/openapi.json, whose canonicalizer is a textual escaping
+ *     rule (#907); see the comment above $canonicalOpenApi for why it is not a
+ *     re-encode and why the direction is literal rather than escaped.
  *
  * Background: DecreesHandler's write path always re-encodes what it writes
  * (JsonFormatter::encode(), plus ksort() for the i18n/lectionary sidecars).
@@ -86,6 +92,62 @@ $canonicalDecreesSidecar = static function (string $raw): string {
     return JsonFormatter::encode($decoded) . PHP_EOL;
 };
 
+// Canonical encoding for openapi.json: non-ASCII written literally, never as
+// \uXXXX, and nothing else touched.
+//
+// The direction is not arbitrary — two independent authorities agree on it:
+//
+//   1. Redocly, the tool that lints and bundles this document, emits literal
+//      UTF-8 with two-space indentation. `redocly bundle` on this file produces
+//      835 literal non-ASCII characters and zero escapes. Escaping would put the
+//      file permanently at odds with its own toolchain.
+//   2. Every other schema in jsondata/schemas is already literal — CommonDef.json
+//      alone holds 720 non-ASCII characters and zero escapes.
+//
+// It also just reads better: the file carries Japanese liturgical titles, and
+// `\u30a8\u30b3...` tells a reviewer nothing.
+//
+// Deliberately textual rather than a re-encode. JsonFormatter::encode() emits
+// four-space indentation, while this document is two-space per the OpenAPI
+// convention; canonicalising through it would rewrite the whole file (534 KB to
+// 672 KB) for no gain.
+//
+// What this actually guards (#907) is MIXED escaping. openapi.json carried the em
+// dash both ways, 58 escaped and 6 literal, so no encoder could reproduce it:
+// round-tripping rewrote unrelated descriptions whichever setting was used, and
+// one attempt produced a 13,919-line diff for what should have been a 220-line
+// addition. One convention makes the file reproducible again.
+//
+// Control characters, quote, backslash and solidus are left alone: JSON requires
+// the first to stay escaped, and the others are never emitted as \uXXXX here.
+$canonicalOpenApi = static function (string $raw): string {
+    $unescaped = preg_replace_callback(
+        '/\\\\u([0-9a-fA-F]{4})/',
+        static function (array $m): string {
+            $codepoint = (int) hexdec($m[1]);
+
+            if ($codepoint < 0x20 || in_array($codepoint, [0x22, 0x5C, 0x2F], true)) {
+                return $m[0];
+            }
+
+            // Lone surrogate halves cannot stand alone as characters; leave the
+            // pair escaped rather than producing invalid UTF-8.
+            if ($codepoint >= 0xD800 && $codepoint <= 0xDFFF) {
+                return $m[0];
+            }
+
+            return mb_chr($codepoint, 'UTF-8');
+        },
+        $raw
+    );
+
+    if (!is_string($unescaped)) {
+        throw new \RuntimeException('openapi.json could not be scanned for escaped characters');
+    }
+
+    return $unescaped;
+};
+
 $decreesFile     = JsonData::DECREES_FILE->path();
 $i18nFiles       = glob(JsonData::DECREES_I18N_FOLDER->path() . '/*.json') ?: [];
 $lectionaryFiles = glob(JsonData::LECTIONARY_DECREES_FOLDER->path() . '/*.json') ?: [];
@@ -93,6 +155,7 @@ $lectionaryFiles = glob(JsonData::LECTIONARY_DECREES_FOLDER->path() . '/*.json')
 /** @var array<int,array{path:string,canonicalize:\Closure(string):string}> $checks */
 $checks = [
     ['path' => $decreesFile, 'canonicalize' => $canonicalDecreesFile],
+    ['path' => JsonData::SCHEMAS_FOLDER->path() . '/openapi.json', 'canonicalize' => $canonicalOpenApi],
 ];
 foreach ($i18nFiles as $f) {
     $checks[] = ['path' => $f, 'canonicalize' => $canonicalDecreesSidecar];
@@ -124,21 +187,26 @@ foreach ($checks as $check) {
 }
 
 if ($drifted === []) {
-    echo 'lint:jsondata OK — ' . count($checks) . " decrees source file(s) match their write-path canonical encoding.\n";
+    echo 'lint:jsondata OK — ' . count($checks) . " file(s) match their canonical encoding.\n";
     exit(0);
 }
 
-fwrite(STDERR, "lint:jsondata FAILED — the following file(s) are not in their write-path canonical encoding:\n");
+fwrite(STDERR, "lint:jsondata FAILED — the following file(s) are not in their canonical encoding:\n");
 foreach ($drifted as $path) {
     $rel = str_starts_with($path, Router::$apiFilePath) ? substr($path, strlen(Router::$apiFilePath)) : $path;
     fwrite(STDERR, "  - {$rel}\n");
 }
 fwrite(
     STDERR,
-    "\nThis means a future write through the decrees admin API (DecreesHandler) would rewrite these files even\n"
+    "\nFor the decrees source files this means a future write through the decrees admin API (DecreesHandler)\n"
     . "though no data changed, appearing as spurious diffs. Fix by re-running the normalizer that produced these\n"
     . "exact rules: re-encode decrees.json via JsonFormatter::encode(array_values(\$decoded)) . PHP_EOL, and each\n"
     . "i18n/*.json / lectionary/*.json sidecar via ksort(\$decoded); JsonFormatter::encode(\$decoded) . PHP_EOL,\n"
-    . "then commit the result. Do not hand-edit formatting — let the canonicalizer produce the bytes.\n"
+    . "then commit the result.\n"
+    . "\nFor jsondata/schemas/openapi.json the rule is different and much simpler: non-ASCII characters must be\n"
+    . "written LITERALLY, never as \\uXXXX escapes. That matches what `redocly bundle` emits and what every\n"
+    . "other schema in this folder already does. Mixed escaping is what made the document impossible to\n"
+    . "round-trip without rewriting unrelated lines (#907). Replace any escape with the character it denotes.\n"
+    . "\nDo not hand-edit formatting beyond that — let the canonicalizer produce the bytes.\n"
 );
 exit(1);

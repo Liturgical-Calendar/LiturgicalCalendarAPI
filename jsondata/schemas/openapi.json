@@ -124,7 +124,7 @@
         ],
         "summary": "Retrieve liturgical events for the General Roman Calendar for each day of the current year",
         "operationId": "retrieveGeneralRomanCalendarGET",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -184,7 +184,7 @@
         ],
         "summary": "Retrieve liturgical events for the General Roman Calendar for each day of the current year",
         "operationId": "retrieveGeneralRomanCalendarPOST",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -400,7 +400,7 @@
         ],
         "summary": "Retrieve liturgical events from the General Roman Calendar for each day of the given year",
         "operationId": "retrieveGeneralRomanCalendarForYearGET",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/{year}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/{year}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -463,7 +463,7 @@
         ],
         "summary": "Retrieve liturgical events from the General Roman Calendar for each day of the given year",
         "operationId": "retrieveGeneralRomanCalendarForYearPOST",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/{year}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/{year}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -704,7 +704,7 @@
         ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given nation for each day of the current year",
         "operationId": "retrieveNationalCalendarGET",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/nation/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/nation/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -755,7 +755,7 @@
         ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given nation for each day of the current year",
         "operationId": "retrieveNationalCalendarPOST",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/nation/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/nation/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -984,7 +984,7 @@
         ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given nation for each day of a given year",
         "operationId": "retrieveNationalCalendarForYearGET",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/nation/{calendar_id}/{year}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/nation/{calendar_id}/{year}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -1038,7 +1038,7 @@
         ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given nation for each day of a given year",
         "operationId": "retrieveNationalCalendarForYearPOST",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/nation/{calendar_id}/{year}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/nation/{calendar_id}/{year}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -1290,7 +1290,7 @@
         ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given diocese for each day of the current year",
         "operationId": "retrieveDiocesanCalendarGET",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/diocese/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/diocese/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -1341,7 +1341,7 @@
         ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given diocese for each day of the current year",
         "operationId": "retrieveDiocesanCalendarPOST",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/diocese/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/diocese/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -1552,7 +1552,7 @@
         ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given diocese for each day of a given year",
         "operationId": "retrieveDiocesanCalendarForYearGET",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/diocese/{calendar_id}/{year}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/diocese/{calendar_id}/{year}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -1606,7 +1606,7 @@
         ],
         "summary": "Retrieve liturgical events from the liturgical calendar for a given diocese for each day of a given year",
         "operationId": "retrieveDiocesanCalendarForYearPOST",
-        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/diocese/{calendar_id}/{year}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "By passing in the appropriate options, you can retrieve data for the liturgical calendar for any given year\n\n**Deprecated in favour of the explicit-rite form `/calendar/roman/diocese/{calendar_id}/{year}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -2783,7 +2783,7 @@
                 "examples": {
                   "firstPage": {
                     "summary": "First page (defaults)",
-                    "description": "Default request \u2014 no `limit` / `offset` supplied \u2014 returning the first page of the user's two access requests.",
+                    "description": "Default request — no `limit` / `offset` supplied — returning the first page of the user's two access requests.",
                     "value": {
                       "requests": [
                         {
@@ -2824,7 +2824,7 @@
                   },
                   "lastPage": {
                     "summary": "Last page (has_more false)",
-                    "description": "Final page of the requester's listing: `offset + count == total`, so `has_more` is false and the client stops paging. With `total: 2` and the default `limit: 100`, the first page already exhausts the dataset \u2014 this example is the same shape as `firstPage` for that reason.",
+                    "description": "Final page of the requester's listing: `offset + count == total`, so `has_more` is false and the client stops paging. With `total: 2` and the default `limit: 100`, the first page already exhausts the dataset — this example is the same shape as `firstPage` for that reason.",
                     "value": {
                       "requests": [
                         {
@@ -2989,7 +2989,7 @@
         ],
         "summary": "Resubmit a rejected access request",
         "operationId": "resubmitAccessRequest",
-        "description": "Resubmit a previously rejected access request with updated permissions (and optionally an updated justification). Only the user who created the request may resubmit it, and only when its current status is `rejected` \u2014 the request transitions back to `pending` for admin re-review. The role originally requested cannot be changed; create a new request via POST /auth/access-requests for a different role. Permissions in the body are validated identically to POST /auth/access-requests (object_type and relation must match the same enums; role-permission consistency is enforced).",
+        "description": "Resubmit a previously rejected access request with updated permissions (and optionally an updated justification). Only the user who created the request may resubmit it, and only when its current status is `rejected` — the request transitions back to `pending` for admin re-review. The role originally requested cannot be changed; create a new request via POST /auth/access-requests for a different role. Permissions in the body are validated identically to POST /auth/access-requests (object_type and relation must match the same enums; role-permission consistency is enforced).",
         "parameters": [
           {
             "name": "id",
@@ -3090,7 +3090,7 @@
         ],
         "summary": "List all access requests",
         "operationId": "adminListAccessRequests",
-        "description": "List a paginated page of access requests with optional status filter. Default page size is 100; clients page via `limit` and `offset`, inspecting `has_more` (or comparing `offset + count` against `total`). Global admins see all rows. Resource admins see only requests over resources they administer \u2014 for those, the post-fetch filter may shrink the returned page below `limit`, but `total` and `has_more` reflect the pre-filter SQL paginator; clients should keep paging until `has_more` is false. Requires either the global admin role or OpenFGA resource-admin access; resource admins receive role-based filtered results.",
+        "description": "List a paginated page of access requests with optional status filter. Default page size is 100; clients page via `limit` and `offset`, inspecting `has_more` (or comparing `offset + count` against `total`). Global admins see all rows. Resource admins see only requests over resources they administer — for those, the post-fetch filter may shrink the returned page below `limit`, but `total` and `has_more` reflect the pre-filter SQL paginator; clients should keep paging until `has_more` is false. Requires either the global admin role or OpenFGA resource-admin access; resource admins receive role-based filtered results.",
         "parameters": [
           {
             "name": "status",
@@ -3124,7 +3124,7 @@
                 "examples": {
                   "firstPage": {
                     "summary": "First page (defaults)",
-                    "description": "Abbreviated sample of the first page returned by a default admin listing \u2014 no `limit` / `offset` supplied. `total: 137` and `count: 100` would be realistic over a populated table; only one representative `requests[]` entry is shown here to keep the doc readable. `has_more: true` because `offset + count < total`.",
+                    "description": "Abbreviated sample of the first page returned by a default admin listing — no `limit` / `offset` supplied. `total: 137` and `count: 100` would be realistic over a populated table; only one representative `requests[]` entry is shown here to keep the doc readable. `has_more: true` because `offset + count < total`.",
                     "value": {
                       "requests": [
                         {
@@ -3173,7 +3173,7 @@
                   },
                   "lastPage": {
                     "summary": "Last page (has_more false)",
-                    "description": "Abbreviated sample of the final page of an admin traversal. `offset + count == total` (100 + 37 = 137), so `has_more` is false and the client stops. Only one representative `requests[]` entry is shown \u2014 a real response on this page would carry 37 items.",
+                    "description": "Abbreviated sample of the final page of an admin traversal. `offset + count == total` (100 + 37 = 137), so `has_more` is false and the client stops. Only one representative `requests[]` entry is shown — a real response on this page would carry 37 items.",
                     "value": {
                       "requests": [
                         {
@@ -3588,7 +3588,7 @@
         ],
         "summary": "List permission tuples",
         "operationId": "adminListPermissions",
-        "description": "List OpenFGA permission tuples. Global admins see all; resource admins see only tuples on resources they administer. Supports filtering by user, object_type, object_id, and relation. **Resource admins must supply `object_type`** to scope the listing \u2014 calling without one returns 400.",
+        "description": "List OpenFGA permission tuples. Global admins see all; resource admins see only tuples on resources they administer. Supports filtering by user, object_type, object_id, and relation. **Resource admins must supply `object_type`** to scope the listing — calling without one returns 400.",
         "parameters": [
           {
             "name": "user",
@@ -3669,7 +3669,7 @@
                 },
                 "examples": {
                   "firstPage": {
-                    "summary": "First page of results \u2014 more remain",
+                    "summary": "First page of results — more remain",
                     "value": {
                       "permissions": [
                         {
@@ -3689,7 +3689,7 @@
                     }
                   },
                   "lastPage": {
-                    "summary": "Final page \u2014 no more results",
+                    "summary": "Final page — no more results",
                     "value": {
                       "permissions": [
                         {
@@ -5149,7 +5149,7 @@
           {}
         ],
         "summary": "Retrieve an index of current supported national and diocesan calendars and relative locales, settings, etc.",
-        "description": "Announces every calendar the API can compute, grouped by tier: `national_calendars[]`, `diocesan_calendars[]`, `wider_regions[]` and `ambrosian_calendars[]` (rite-level calendars that belong to no nation). Every tier that has calendar settings announces them under the same `settings` shape \u2014 `epiphany`, `ascension`, `corpus_christi`, `eternal_high_priest`, `holydays_of_obligation` \u2014 so a client can parse all of them with one code path. For a rite-level calendar the block states what the rite *fixes*: those values are applied to every request under that rite and echoed back in the calculated calendar's `settings`, so a form can pre-fill (and grey out) the corresponding inputs the moment the rite is selected, without waiting for a calculation.",
+        "description": "Announces every calendar the API can compute, grouped by tier: `national_calendars[]`, `diocesan_calendars[]`, `wider_regions[]` and `ambrosian_calendars[]` (rite-level calendars that belong to no nation). Every tier that has calendar settings announces them under the same `settings` shape — `epiphany`, `ascension`, `corpus_christi`, `eternal_high_priest`, `holydays_of_obligation` — so a client can parse all of them with one code path. For a rite-level calendar the block states what the rite *fixes*: those values are applied to every request under that rite and echoed back in the calculated calendar's `settings`, so a form can pre-fill (and grey out) the corresponding inputs the moment the rite is selected, without waiting for a calculation.",
         "operationId": "retrieveMetadataGET",
         "responses": {
           "200": {
@@ -5181,7 +5181,7 @@
           {}
         ],
         "summary": "Retrieve an index of current supported national and diocesan calendars and relative locales, settings, etc.",
-        "description": "Announces every calendar the API can compute, grouped by tier: `national_calendars[]`, `diocesan_calendars[]`, `wider_regions[]` and `ambrosian_calendars[]` (rite-level calendars that belong to no nation). Every tier that has calendar settings announces them under the same `settings` shape \u2014 `epiphany`, `ascension`, `corpus_christi`, `eternal_high_priest`, `holydays_of_obligation` \u2014 so a client can parse all of them with one code path. For a rite-level calendar the block states what the rite *fixes*: those values are applied to every request under that rite and echoed back in the calculated calendar's `settings`, so a form can pre-fill (and grey out) the corresponding inputs the moment the rite is selected, without waiting for a calculation.",
+        "description": "Announces every calendar the API can compute, grouped by tier: `national_calendars[]`, `diocesan_calendars[]`, `wider_regions[]` and `ambrosian_calendars[]` (rite-level calendars that belong to no nation). Every tier that has calendar settings announces them under the same `settings` shape — `epiphany`, `ascension`, `corpus_christi`, `eternal_high_priest`, `holydays_of_obligation` — so a client can parse all of them with one code path. For a rite-level calendar the block states what the rite *fixes*: those values are applied to every request under that rite and echoed back in the calculated calendar's `settings`, so a form can pre-fill (and grey out) the corresponding inputs the moment the rite is selected, without waiting for a calculation.",
         "operationId": "retrieveMetadataPOST",
         "responses": {
           "200": {
@@ -5253,7 +5253,7 @@
           }
         },
         "deprecated": true,
-        "description": "**Deprecated in favour of the explicit-rite form `/events/roman`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL."
+        "description": "**Deprecated in favour of the explicit-rite form `/events/roman`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL."
       },
       "post": {
         "tags": [
@@ -5301,7 +5301,7 @@
           }
         },
         "deprecated": true,
-        "description": "**Deprecated in favour of the explicit-rite form `/events/roman`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL."
+        "description": "**Deprecated in favour of the explicit-rite form `/events/roman`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL."
       }
     },
     "/events/roman": {
@@ -5607,7 +5607,7 @@
         "summary": "Retrieve all possible liturgical events from the given national calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
         "operationId": "retrieveEventsForNationalCalendarGET",
         "deprecated": true,
-        "description": "**Deprecated in favour of the explicit-rite form `/events/roman/nation/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "**Deprecated in favour of the explicit-rite form `/events/roman/nation/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -5671,7 +5671,7 @@
         "summary": "Retrieve all possible liturgical events from the given national calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
         "operationId": "retrieveEventsForNationalCalendarPOST",
         "deprecated": true,
-        "description": "**Deprecated in favour of the explicit-rite form `/events/roman/nation/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "**Deprecated in favour of the explicit-rite form `/events/roman/nation/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -5845,7 +5845,7 @@
         "summary": "Retrieve all possible liturgical events from the given diocesan calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
         "operationId": "retrieveEventsForDiocesanCalendarGET",
         "deprecated": true,
-        "description": "**Deprecated in favour of the explicit-rite form `/events/roman/diocese/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "**Deprecated in favour of the explicit-rite form `/events/roman/diocese/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -5904,7 +5904,7 @@
         "summary": "Retrieve all possible liturgical events from the given diocesan calendar even if they won't appear in the Liturgical Calendar one year or the other; useful mostly for frontend select inputs to choose an `event_key` that corresponds with an actual liturgical event",
         "operationId": "retrieveEventsForDiocesanCalendarPOST",
         "deprecated": true,
-        "description": "**Deprecated in favour of the explicit-rite form `/events/roman/diocese/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "**Deprecated in favour of the explicit-rite form `/events/roman/diocese/{calendar_id}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -6061,7 +6061,7 @@
           {}
         ],
         "summary": "Retrieve a national calendar data resource",
-        "description": "`/data/roman/nation/{key}` states the same rite explicitly and is the canonical form of this path. There is no other rite-qualified variant: only the diocesan tier exists under more than one rite, so `/data/ambrosian/nation/{key}` returns `400 Bad Request` (\"The ambrosian rite has no national calendars; request a diocesan calendar of that rite instead.\").\n\n**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "`/data/roman/nation/{key}` states the same rite explicitly and is the canonical form of this path. There is no other rite-qualified variant: only the diocesan tier exists under more than one rite, so `/data/ambrosian/nation/{key}` returns `400 Bad Request` (\"The ambrosian rite has no national calendars; request a diocesan calendar of that rite instead.\").\n\n**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "operationId": "nationalDataGET",
         "deprecated": true,
         "parameters": [
@@ -6201,7 +6201,7 @@
         "summary": "Retrieve a national calendar data resource",
         "operationId": "nationalDataPOST",
         "deprecated": true,
-        "description": "**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -6713,7 +6713,7 @@
           {}
         ],
         "summary": "Retrieve a diocesan calendar data resource",
-        "description": "This path resolves to the Roman rite. A diocese defined under another rite must be addressed through its rite-qualified path (`/data/ambrosian/diocese/{key}`); asking for one here returns `422 Unprocessable Content`. `/data/roman/diocese/{key}` states the same rite explicitly and is the canonical form of this path.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/diocese/{key}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "This path resolves to the Roman rite. A diocese defined under another rite must be addressed through its rite-qualified path (`/data/ambrosian/diocese/{key}`); asking for one here returns `422 Unprocessable Content`. `/data/roman/diocese/{key}` states the same rite explicitly and is the canonical form of this path.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/diocese/{key}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "operationId": "diocesanDataGET",
         "deprecated": true,
         "parameters": [
@@ -6851,7 +6851,7 @@
           {}
         ],
         "summary": "Retrieve a diocesan calendar data resource",
-        "description": "This path resolves to the Roman rite. A diocese defined under another rite must be addressed through its rite-qualified path (`/data/ambrosian/diocese/{key}`); asking for one here returns `422 Unprocessable Content`. `/data/roman/diocese/{key}` states the same rite explicitly and is the canonical form of this path.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/diocese/{key}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "This path resolves to the Roman rite. A diocese defined under another rite must be addressed through its rite-qualified path (`/data/ambrosian/diocese/{key}`); asking for one here returns `422 Unprocessable Content`. `/data/roman/diocese/{key}` states the same rite explicitly and is the canonical form of this path.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/diocese/{key}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "operationId": "diocesanDataPOST",
         "deprecated": true,
         "parameters": [
@@ -7368,7 +7368,7 @@
           {}
         ],
         "summary": "Retrieve a wider region calendar data resource",
-        "description": "`/data/roman/widerregion/{key}` states the same rite explicitly and is the canonical form of this path. There is no other rite-qualified variant: wider regions are a layer over national calendars, which exist only in the Roman rite, so `/data/ambrosian/widerregion/{key}` returns `400 Bad Request`.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/widerregion/{key}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "`/data/roman/widerregion/{key}` states the same rite explicitly and is the canonical form of this path. There is no other rite-qualified variant: wider regions are a layer over national calendars, which exist only in the Roman rite, so `/data/ambrosian/widerregion/{key}` returns `400 Bad Request`.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/widerregion/{key}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "operationId": "widerregionDataGET",
         "deprecated": true,
         "parameters": [
@@ -7508,7 +7508,7 @@
         "summary": "Retrieve a wider region calendar data resource",
         "operationId": "widerregionDataPOST",
         "deprecated": true,
-        "description": "**Deprecated in favour of the explicit-rite form `/data/roman/widerregion/{key}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "**Deprecated in favour of the explicit-rite form `/data/roman/widerregion/{key}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "parameters": [
           {
             "$ref": "#/components/parameters/AcceptLanguageHeader"
@@ -8016,7 +8016,7 @@
           {}
         ],
         "summary": "Retrieve an Ambrosian diocesan calendar data resource",
-        "description": "Retrieve the source definition of a diocesan calendar defined under the Ambrosian rite.\n\n**The `ambrosian` rite segment is required here, not decorative.** The bare `/data/diocese/{key}` form resolves to the Roman rite, so addressing an Ambrosian diocese through it returns `422 Unprocessable Content` (`Diocesan calendar ... belongs to the ambrosian rite, not the requested roman rite.`); the same `422` is returned on this path for a diocese that is not Ambrosian. The Ambrosian dioceses are Milano (`milano_it`), Bergamo (`bergam_it`), Novara (`novara_it`) and Lugano (`lugano_ch`) \u2014 every other diocese is Roman. On any `/data` path `roman` is accepted as an explicit synonym of the bare form.\n\nOnly the diocesan tier exists under more than one rite, so there is deliberately no `/data/ambrosian/nation/{key}` and no `/data/ambrosian/widerregion/{key}`: the Ambrosian rite is proper to the Archdiocese of Milan and a handful of neighbouring dioceses rather than to any nation or region, and the source tree has no Ambrosian national or wider-region partition to read or write. Either of those requests returns `400 Bad Request`.\n\nUnlike `/calendar` and `/events`, `/data` advertises no canonical URL: the bare form returns no RFC 6596 `Link: <...>; rel=\"canonical\"` response header.\n\nThe Ambrosian rite has approved liturgical books only in Italian and Latin, so `diocesan_calendars[].locales` on `/calendars` declares `it_IT` and `la_VA` for these dioceses; a `locale` naming any other language returns `422 Unprocessable Content`.",
+        "description": "Retrieve the source definition of a diocesan calendar defined under the Ambrosian rite.\n\n**The `ambrosian` rite segment is required here, not decorative.** The bare `/data/diocese/{key}` form resolves to the Roman rite, so addressing an Ambrosian diocese through it returns `422 Unprocessable Content` (`Diocesan calendar ... belongs to the ambrosian rite, not the requested roman rite.`); the same `422` is returned on this path for a diocese that is not Ambrosian. The Ambrosian dioceses are Milano (`milano_it`), Bergamo (`bergam_it`), Novara (`novara_it`) and Lugano (`lugano_ch`) — every other diocese is Roman. On any `/data` path `roman` is accepted as an explicit synonym of the bare form.\n\nOnly the diocesan tier exists under more than one rite, so there is deliberately no `/data/ambrosian/nation/{key}` and no `/data/ambrosian/widerregion/{key}`: the Ambrosian rite is proper to the Archdiocese of Milan and a handful of neighbouring dioceses rather than to any nation or region, and the source tree has no Ambrosian national or wider-region partition to read or write. Either of those requests returns `400 Bad Request`.\n\nUnlike `/calendar` and `/events`, `/data` advertises no canonical URL: the bare form returns no RFC 6596 `Link: <...>; rel=\"canonical\"` response header.\n\nThe Ambrosian rite has approved liturgical books only in Italian and Latin, so `diocesan_calendars[].locales` on `/calendars` declares `it_IT` and `la_VA` for these dioceses; a `locale` naming any other language returns `422 Unprocessable Content`.",
         "operationId": "ambrosianDiocesanDataGET",
         "parameters": [
           {
@@ -8069,7 +8069,7 @@
           }
         ],
         "summary": "Create an Ambrosian diocesan calendar data resource",
-        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it.\n\nThe method surface is identical to `/data/diocese/{key}`: the `ambrosian` segment only selects which rite partition of the source tree is written. It is required for an Ambrosian diocese \u2014 see `GET /data/ambrosian/diocese/{key}` for the full rite grammar and for why no rite-qualified national or wider-region path exists.",
+        "description": "Create (`PUT`) requires the `admin` relation. `admin` implies `editor` and `viewer`. The `{key}` in the path is authoritative; the corresponding identifier in the request body must match it.\n\nThe method surface is identical to `/data/diocese/{key}`: the `ambrosian` segment only selects which rite partition of the source tree is written. It is required for an Ambrosian diocese — see `GET /data/ambrosian/diocese/{key}` for the full rite grammar and for why no rite-qualified national or wider-region path exists.",
         "operationId": "ambrosianDiocesanDataPUT",
         "parameters": [
           {
@@ -8144,7 +8144,7 @@
           {}
         ],
         "summary": "Retrieve an Ambrosian diocesan calendar data resource",
-        "description": "Retrieve the source definition of a diocesan calendar defined under the Ambrosian rite.\n\n**The `ambrosian` rite segment is required here, not decorative.** The bare `/data/diocese/{key}` form resolves to the Roman rite, so addressing an Ambrosian diocese through it returns `422 Unprocessable Content` (`Diocesan calendar ... belongs to the ambrosian rite, not the requested roman rite.`); the same `422` is returned on this path for a diocese that is not Ambrosian. The Ambrosian dioceses are Milano (`milano_it`), Bergamo (`bergam_it`), Novara (`novara_it`) and Lugano (`lugano_ch`) \u2014 every other diocese is Roman. On any `/data` path `roman` is accepted as an explicit synonym of the bare form.\n\nOnly the diocesan tier exists under more than one rite, so there is deliberately no `/data/ambrosian/nation/{key}` and no `/data/ambrosian/widerregion/{key}`: the Ambrosian rite is proper to the Archdiocese of Milan and a handful of neighbouring dioceses rather than to any nation or region, and the source tree has no Ambrosian national or wider-region partition to read or write. Either of those requests returns `400 Bad Request`.\n\nUnlike `/calendar` and `/events`, `/data` advertises no canonical URL: the bare form returns no RFC 6596 `Link: <...>; rel=\"canonical\"` response header.\n\nThe Ambrosian rite has approved liturgical books only in Italian and Latin, so `diocesan_calendars[].locales` on `/calendars` declares `it_IT` and `la_VA` for these dioceses; a `locale` naming any other language returns `422 Unprocessable Content`.",
+        "description": "Retrieve the source definition of a diocesan calendar defined under the Ambrosian rite.\n\n**The `ambrosian` rite segment is required here, not decorative.** The bare `/data/diocese/{key}` form resolves to the Roman rite, so addressing an Ambrosian diocese through it returns `422 Unprocessable Content` (`Diocesan calendar ... belongs to the ambrosian rite, not the requested roman rite.`); the same `422` is returned on this path for a diocese that is not Ambrosian. The Ambrosian dioceses are Milano (`milano_it`), Bergamo (`bergam_it`), Novara (`novara_it`) and Lugano (`lugano_ch`) — every other diocese is Roman. On any `/data` path `roman` is accepted as an explicit synonym of the bare form.\n\nOnly the diocesan tier exists under more than one rite, so there is deliberately no `/data/ambrosian/nation/{key}` and no `/data/ambrosian/widerregion/{key}`: the Ambrosian rite is proper to the Archdiocese of Milan and a handful of neighbouring dioceses rather than to any nation or region, and the source tree has no Ambrosian national or wider-region partition to read or write. Either of those requests returns `400 Bad Request`.\n\nUnlike `/calendar` and `/events`, `/data` advertises no canonical URL: the bare form returns no RFC 6596 `Link: <...>; rel=\"canonical\"` response header.\n\nThe Ambrosian rite has approved liturgical books only in Italian and Latin, so `diocesan_calendars[].locales` on `/calendars` declares `it_IT` and `la_VA` for these dioceses; a `locale` naming any other language returns `422 Unprocessable Content`.",
         "operationId": "ambrosianDiocesanDataPOST",
         "parameters": [
           {
@@ -8209,7 +8209,7 @@
           }
         ],
         "summary": "Update an Ambrosian diocesan calendar data resource",
-        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`.\n\nThe method surface is identical to `/data/diocese/{key}`: the `ambrosian` segment only selects which rite partition of the source tree is written. It is required for an Ambrosian diocese \u2014 see `GET /data/ambrosian/diocese/{key}` for the full rite grammar and for why no rite-qualified national or wider-region path exists.",
+        "description": "Edit (`PATCH`) requires the `editor` relation; `DELETE` requires `admin`. `admin` implies `editor` and `viewer`.\n\nThe method surface is identical to `/data/diocese/{key}`: the `ambrosian` segment only selects which rite partition of the source tree is written. It is required for an Ambrosian diocese — see `GET /data/ambrosian/diocese/{key}` for the full rite grammar and for why no rite-qualified national or wider-region path exists.",
         "operationId": "ambrosianDiocesanDataPATCH",
         "parameters": [
           {
@@ -8287,7 +8287,7 @@
           }
         ],
         "summary": "Delete an Ambrosian diocesan calendar data resource",
-        "description": "`DELETE` requires the `admin` relation. `admin` implies `editor` and `viewer`.\n\nThe method surface is identical to `/data/diocese/{key}`: the `ambrosian` segment only selects which rite partition of the source tree is written. It is required for an Ambrosian diocese \u2014 see `GET /data/ambrosian/diocese/{key}` for the full rite grammar and for why no rite-qualified national or wider-region path exists.",
+        "description": "`DELETE` requires the `admin` relation. `admin` implies `editor` and `viewer`.\n\nThe method surface is identical to `/data/diocese/{key}`: the `ambrosian` segment only selects which rite partition of the source tree is written. It is required for an Ambrosian diocese — see `GET /data/ambrosian/diocese/{key}` for the full rite grammar and for why no rite-qualified national or wider-region path exists.",
         "operationId": "ambrosianDiocesanDataDELETE",
         "parameters": [
           {
@@ -8330,7 +8330,7 @@
           {}
         ],
         "summary": "Retrieve the stored translations of a national calendar",
-        "description": "Retrieve the stored translations of a national calendar's own liturgical events, as a map of `event_key` to translated name. This is a different resource from `/data/nation/{key}`, which the path hangs off: that returns the calendar definition, this returns the translation file behind it.\n\nOnly `GET` and `POST` exist at this depth. `RegionalDataHandler::validateRequestPath()` accepts two or three path segments for those two methods and exactly two for the others, and the router narrows the allowed methods to `GET` and `POST` for any three-segment `/data` path, so a `PUT`, `PATCH` or `DELETE` carrying a third segment is refused with `400 Bad Request` (`Expected two path params for PUT, PATCH and DELETE requests, received 3`). `POST` is a read alias of `GET`.\n\nThe third segment binds to `i18nRequest`. It is not the `locale` parameter that `/data/nation/{key}` accepts, and the two are documented separately for that reason.\n\nAn unknown nation is refused with `422 Unprocessable Content`; a nation that exists but has no translation file for the requested locale gives `404 Not Found`. `/data/roman/nation/{key}/{i18n_locale}` states the same rite explicitly and is the canonical form of this path.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}/{i18n_locale}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "Retrieve the stored translations of a national calendar's own liturgical events, as a map of `event_key` to translated name. This is a different resource from `/data/nation/{key}`, which the path hangs off: that returns the calendar definition, this returns the translation file behind it.\n\nOnly `GET` and `POST` exist at this depth. `RegionalDataHandler::validateRequestPath()` accepts two or three path segments for those two methods and exactly two for the others, and the router narrows the allowed methods to `GET` and `POST` for any three-segment `/data` path, so a `PUT`, `PATCH` or `DELETE` carrying a third segment is refused with `400 Bad Request` (`Expected two path params for PUT, PATCH and DELETE requests, received 3`). `POST` is a read alias of `GET`.\n\nThe third segment binds to `i18nRequest`. It is not the `locale` parameter that `/data/nation/{key}` accepts, and the two are documented separately for that reason.\n\nAn unknown nation is refused with `422 Unprocessable Content`; a nation that exists but has no translation file for the requested locale gives `404 Not Found`. `/data/roman/nation/{key}/{i18n_locale}` states the same rite explicitly and is the canonical form of this path.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}/{i18n_locale}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "operationId": "nationalDataI18nGET",
         "deprecated": true,
         "parameters": [
@@ -8369,7 +8369,7 @@
           {}
         ],
         "summary": "Retrieve the stored translations of a national calendar",
-        "description": "Read alias of `GET /data/nation/{key}/{i18n_locale}`, returning the same translation map. See that operation for how the third path segment differs from the `locale` parameter.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}/{i18n_locale}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "Read alias of `GET /data/nation/{key}/{i18n_locale}`, returning the same translation map. See that operation for how the third path segment differs from the `locale` parameter.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/nation/{key}/{i18n_locale}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "operationId": "nationalDataI18nPOST",
         "deprecated": true,
         "parameters": [
@@ -8488,7 +8488,7 @@
           {}
         ],
         "summary": "Retrieve the stored translations of a diocesan calendar",
-        "description": "Retrieve the stored translations of a diocesan calendar's own liturgical events, as a map of `event_key` to translated name. This is a different resource from `/data/diocese/{key}`, which returns the calendar definition itself.\n\nOnly `GET` and `POST` exist at this depth; a `PUT`, `PATCH` or `DELETE` carrying a third segment is refused with `400 Bad Request` (`Expected two path params for PUT, PATCH and DELETE requests, received 3`). The third segment binds to `i18nRequest` and is not the `locale` parameter of the two-segment path.\n\nThis path resolves to the Roman rite. An unknown diocese, or a diocese defined under another rite, is refused with `422 Unprocessable Content` (`Diocesan calendar ... belongs to the ambrosian rite, not the requested roman rite.`); such a diocese must be addressed through `/data/ambrosian/diocese/{key}/{i18n_locale}`. A diocese that exists but has no translation file for the requested locale gives `404 Not Found`. `/data/roman/diocese/{key}/{i18n_locale}` states the same rite explicitly and is the canonical form of this path.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/diocese/{key}/{i18n_locale}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "Retrieve the stored translations of a diocesan calendar's own liturgical events, as a map of `event_key` to translated name. This is a different resource from `/data/diocese/{key}`, which returns the calendar definition itself.\n\nOnly `GET` and `POST` exist at this depth; a `PUT`, `PATCH` or `DELETE` carrying a third segment is refused with `400 Bad Request` (`Expected two path params for PUT, PATCH and DELETE requests, received 3`). The third segment binds to `i18nRequest` and is not the `locale` parameter of the two-segment path.\n\nThis path resolves to the Roman rite. An unknown diocese, or a diocese defined under another rite, is refused with `422 Unprocessable Content` (`Diocesan calendar ... belongs to the ambrosian rite, not the requested roman rite.`); such a diocese must be addressed through `/data/ambrosian/diocese/{key}/{i18n_locale}`. A diocese that exists but has no translation file for the requested locale gives `404 Not Found`. `/data/roman/diocese/{key}/{i18n_locale}` states the same rite explicitly and is the canonical form of this path.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/diocese/{key}/{i18n_locale}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "operationId": "diocesanDataI18nGET",
         "deprecated": true,
         "parameters": [
@@ -8527,7 +8527,7 @@
           {}
         ],
         "summary": "Retrieve the stored translations of a diocesan calendar",
-        "description": "Read alias of `GET /data/diocese/{key}/{i18n_locale}`, returning the same translation map. This path resolves to the Roman rite; a diocese defined under another rite is refused with `422 Unprocessable Content`.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/diocese/{key}/{i18n_locale}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "Read alias of `GET /data/diocese/{key}/{i18n_locale}`, returning the same translation map. This path resolves to the Roman rite; a diocese defined under another rite is refused with `422 Unprocessable Content`.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/diocese/{key}/{i18n_locale}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "operationId": "diocesanDataI18nPOST",
         "deprecated": true,
         "parameters": [
@@ -8646,7 +8646,7 @@
           {}
         ],
         "summary": "Retrieve the stored translations of a wider region calendar",
-        "description": "Retrieve the stored translations of a wider region calendar's own liturgical events, as a map of `event_key` to translated name. This is a different resource from `/data/widerregion/{key}`, which returns the calendar definition itself.\n\nOnly `GET` and `POST` exist at this depth; a `PUT`, `PATCH` or `DELETE` carrying a third segment is refused with `400 Bad Request` (`Expected two path params for PUT, PATCH and DELETE requests, received 3`). The third segment binds to `i18nRequest` and is not the `locale` parameter of the two-segment path.\n\nAn unknown wider region is refused with `422 Unprocessable Content`; a wider region that exists but has no translation file for the requested locale gives `404 Not Found`. `/data/roman/widerregion/{key}/{i18n_locale}` states the same rite explicitly and is the canonical form of this path.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/widerregion/{key}/{i18n_locale}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "Retrieve the stored translations of a wider region calendar's own liturgical events, as a map of `event_key` to translated name. This is a different resource from `/data/widerregion/{key}`, which returns the calendar definition itself.\n\nOnly `GET` and `POST` exist at this depth; a `PUT`, `PATCH` or `DELETE` carrying a third segment is refused with `400 Bad Request` (`Expected two path params for PUT, PATCH and DELETE requests, received 3`). The third segment binds to `i18nRequest` and is not the `locale` parameter of the two-segment path.\n\nAn unknown wider region is refused with `422 Unprocessable Content`; a wider region that exists but has no translation file for the requested locale gives `404 Not Found`. `/data/roman/widerregion/{key}/{i18n_locale}` states the same rite explicitly and is the canonical form of this path.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/widerregion/{key}/{i18n_locale}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "operationId": "widerregionDataI18nGET",
         "deprecated": true,
         "parameters": [
@@ -8685,7 +8685,7 @@
           {}
         ],
         "summary": "Retrieve the stored translations of a wider region calendar",
-        "description": "Read alias of `GET /data/widerregion/{key}/{i18n_locale}`, returning the same translation map.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/widerregion/{key}/{i18n_locale}`,** which is canonical. This path keeps working unchanged and returns an identical response \u2014 it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
+        "description": "Read alias of `GET /data/widerregion/{key}/{i18n_locale}`, returning the same translation map.\n\n**Deprecated in favour of the explicit-rite form `/data/roman/widerregion/{key}/{i18n_locale}`,** which is canonical. This path keeps working unchanged and returns an identical response — it is deliberately not redirected, because these routes accept POST and a redirect would both downgrade POST to GET and break preflighted cross-origin requests. Responses carry a `Link: <...>; rel=\"canonical\"` header naming the canonical URL.",
         "operationId": "widerregionDataI18nPOST",
         "deprecated": true,
         "parameters": [
@@ -11840,7 +11840,7 @@
       },
       "AccessRequest": {
         "type": "object",
-        "description": "An access request from the requester's perspective. Returned by GET /auth/access-requests (self-list) and used as the row shape inside AccessRequestListResponse. Admin-only review/sync fields (reviewed_by, zitadel_sync_status, zitadel_sync_error) are intentionally absent here \u2014 admin-facing endpoints return AccessRequestAdmin instead. `credentials` stays public so the requester sees what they themselves submitted.",
+        "description": "An access request from the requester's perspective. Returned by GET /auth/access-requests (self-list) and used as the row shape inside AccessRequestListResponse. Admin-only review/sync fields (reviewed_by, zitadel_sync_status, zitadel_sync_error) are intentionally absent here — admin-facing endpoints return AccessRequestAdmin instead. `credentials` stays public so the requester sees what they themselves submitted.",
         "properties": {
           "id": {
             "type": "string",
@@ -11926,7 +11926,7 @@
       },
       "AccessRequestAdmin": {
         "type": "object",
-        "description": "Admin-only view of an access request. Same shape as AccessRequest plus reviewer identity (`reviewed_by`) and Zitadel-sync diagnostics (`zitadel_sync_status`, `zitadel_sync_error`). The common fields are documented on AccessRequest. Duplicated inline (rather than composed via `allOf` over AccessRequest) because `allOf + additionalProperties: false` doesn't compose under Redocly's strict validator \u2014 each sub-schema's `additionalProperties` only sees its own properties and rejects the other side's fields.",
+        "description": "Admin-only view of an access request. Same shape as AccessRequest plus reviewer identity (`reviewed_by`) and Zitadel-sync diagnostics (`zitadel_sync_status`, `zitadel_sync_error`). The common fields are documented on AccessRequest. Duplicated inline (rather than composed via `allOf` over AccessRequest) because `allOf + additionalProperties: false` doesn't compose under Redocly's strict validator — each sub-schema's `additionalProperties` only sees its own properties and rejects the other side's fields.",
         "properties": {
           "id": {
             "type": "string",
@@ -12131,7 +12131,7 @@
       },
       "AccessRequestListResponse": {
         "type": "object",
-        "description": "Offset-paginated page of access requests returned by GET /auth/access-requests (the requester's own list). Each item is the public AccessRequest shape \u2014 admin-only review/sync fields are not present. See AdminAccessRequestListResponse for the /admin/access-requests envelope.",
+        "description": "Offset-paginated page of access requests returned by GET /auth/access-requests (the requester's own list). Each item is the public AccessRequest shape — admin-only review/sync fields are not present. See AdminAccessRequestListResponse for the /admin/access-requests envelope.",
         "properties": {
           "requests": {
             "type": "array",
@@ -12208,7 +12208,7 @@
           },
           "has_more": {
             "type": "boolean",
-            "description": "True iff more rows are available beyond this page. For global admins, equals `(offset + count) < total`. For non-global admins, reflects the SQL paginator state \u2014 `(offset + pre-filter SQL page size) < total` \u2014 rather than the post-filter `count`, so the client stops correctly on the final SQL page even when filterByAdminAccess trimmed it."
+            "description": "True iff more rows are available beyond this page. For global admins, equals `(offset + count) < total`. For non-global admins, reflects the SQL paginator state — `(offset + pre-filter SQL page size) < total` — rather than the post-filter `count`, so the client stops correctly on the final SQL page even when filterByAdminAccess trimmed it."
           }
         },
         "required": [
@@ -12677,7 +12677,7 @@
       },
       "AdminListPermissionsResponse": {
         "type": "object",
-        "description": "Cursor-paginated page of OpenFGA permission tuples. Use `next_page_token` to fetch the next page; `null` means this was the last page. Note: when the handler applies a server-side admin-access filter, the returned `permissions` array may be shorter than `limit` \u2014 clients should keep paging until `has_more` is false.",
+        "description": "Cursor-paginated page of OpenFGA permission tuples. Use `next_page_token` to fetch the next page; `null` means this was the last page. Note: when the handler applies a server-side admin-access filter, the returned `permissions` array may be shorter than `limit` — clients should keep paging until `has_more` is false.",
         "properties": {
           "permissions": {
             "type": "array",
@@ -12689,7 +12689,7 @@
           "count": {
             "type": "integer",
             "minimum": 0,
-            "description": "Number of tuples in this page (`permissions.length`). NOT a total count across all pages \u2014 OpenFGA does not expose an O(1) total."
+            "description": "Number of tuples in this page (`permissions.length`). NOT a total count across all pages — OpenFGA does not expose an O(1) total."
           },
           "has_more": {
             "type": "boolean",
@@ -13285,7 +13285,7 @@
       },
       "UserNotificationsResponse": {
         "type": "object",
-        "description": "Response from GET /auth/notifications \u2014 the inbox with unread badge metadata.",
+        "description": "Response from GET /auth/notifications — the inbox with unread badge metadata.",
         "properties": {
           "items": {
             "type": "array",
@@ -14163,7 +14163,7 @@
           },
           "i18n": {
             "ja_JP": {
-              "StFrancisXavier": "\u8056\u30d5\u30e9\u30f3\u30b7\u30b9\u30b3\u30fb\u30b6\u30d3\u30a8\u30eb\u53f8\u796d"
+              "StFrancisXavier": "聖フランシスコ・ザビエル司祭"
             }
           }
         }
@@ -14483,7 +14483,7 @@
             "schema": {
               "type": "string"
             },
-            "example": "BEGIN:VCALENDAR\nPRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-MS-OLK-FORCEINSPECTOROPEN:FALSE\nX-WR-CALNAME:Roman Catholic Universal Liturgical Calendar LA\nX-WR-TIMEZONE:Europe/Vatican\nX-PUBLISHED-TTL:PT1D\nBEGIN:VEVENT\nCLASS:PUBLIC\nDTSTART;VALUE=DATE:20291231\nDTSTAMP:20240422T062620Z\nUID:c0e7126a841a70761e4057e58b5e2d52\nCREATED:\nDESCRIPTION:\\nSOLLEMNITAS\\nalbus\nLAST-MODIFIED:\nSUMMARY;LANGUAGE=la:SOLLEMNITAS SANCT\u00c6 DEI GENITRICIS MARI\u00c6 Missa in Vigi\n  lia\nTRANSP:TRANSPARENT\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nX-MICROSOFT-DISALLOW-COUNTER:TRUE\nX-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.\n  2//EN\">\\n<HTML>\\n<BODY>\\n\\n<P DIR=LTR><BR><B>SOLLEMNITAS</B><BR><B><I><\n  SPAN LANG=la><FONT FACE=\"Calibri\" COLOR=\"#AAAAAA\">albus</FONT></SPAN></\n  I></B><BR>ANNUM B</P>\\n\\n</BODY>\\n</HTML>\nEND:VEVENT\nEND:VCALENDAR"
+            "example": "BEGIN:VCALENDAR\nPRODID:-//John Romano D'Orazio//Liturgical Calendar V1.0//EN\nVERSION:2.0\nCALSCALE:GREGORIAN\nMETHOD:PUBLISH\nX-MS-OLK-FORCEINSPECTOROPEN:FALSE\nX-WR-CALNAME:Roman Catholic Universal Liturgical Calendar LA\nX-WR-TIMEZONE:Europe/Vatican\nX-PUBLISHED-TTL:PT1D\nBEGIN:VEVENT\nCLASS:PUBLIC\nDTSTART;VALUE=DATE:20291231\nDTSTAMP:20240422T062620Z\nUID:c0e7126a841a70761e4057e58b5e2d52\nCREATED:\nDESCRIPTION:\\nSOLLEMNITAS\\nalbus\nLAST-MODIFIED:\nSUMMARY;LANGUAGE=la:SOLLEMNITAS SANCTÆ DEI GENITRICIS MARIÆ Missa in Vigi\n  lia\nTRANSP:TRANSPARENT\nX-MICROSOFT-CDO-ALLDAYEVENT:TRUE\nX-MICROSOFT-DISALLOW-COUNTER:TRUE\nX-ALT-DESC;FMTTYPE=text/html:<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.\n  2//EN\">\\n<HTML>\\n<BODY>\\n\\n<P DIR=LTR><BR><B>SOLLEMNITAS</B><BR><B><I><\n  SPAN LANG=la><FONT FACE=\"Calibri\" COLOR=\"#AAAAAA\">albus</FONT></SPAN></\n  I></B><BR>ANNUM B</P>\\n\\n</BODY>\\n</HTML>\nEND:VEVENT\nEND:VCALENDAR"
           },
           "application/xml": {
             "schema": {
@@ -14495,7 +14495,7 @@
     },
     "headers": {
       "CanonicalRiteLink": {
-        "description": "RFC 6596 link to the canonical explicit-rite spelling of this route, emitted when the request omitted the optional rite segment: `GET /events/nation/IT` answers `</events/roman/nation/IT>; rel=\"canonical\"`, preserving the query string. A request that already names its rite is itself canonical and carries no `Link`. Read methods only \u2014 `GET` and `POST` carry it, a `/data` write does not, since the header names a canonical representation of the resource and a write request is not one. The bare spelling keeps working and is deliberately not redirected: these routes accept POST, a redirect would both downgrade POST to GET and drop the body, and per the Fetch standard a browser treats any redirect response to a preflighted cross-origin request as a network error. `Link` is not a CORS-safelisted response header, so it is also named in `Access-Control-Expose-Headers`.",
+        "description": "RFC 6596 link to the canonical explicit-rite spelling of this route, emitted when the request omitted the optional rite segment: `GET /events/nation/IT` answers `</events/roman/nation/IT>; rel=\"canonical\"`, preserving the query string. A request that already names its rite is itself canonical and carries no `Link`. Read methods only — `GET` and `POST` carry it, a `/data` write does not, since the header names a canonical representation of the resource and a write request is not one. The bare spelling keeps working and is deliberately not redirected: these routes accept POST, a redirect would both downgrade POST to GET and drop the body, and per the Fetch standard a browser treats any redirect response to a preflighted cross-origin request as a network error. `Link` is not a CORS-safelisted response header, so it is also named in `Access-Control-Expose-Headers`.",
         "schema": {
           "type": "string"
         },
