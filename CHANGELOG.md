@@ -22,7 +22,11 @@
   configured. Deployments that do not configure the GitHub App are unaffected: approved batches continue
   to accumulate unpublished exactly as in phase 1. Known limitation: deleting a calendar or test through a
   change request does not yet purge its OpenFGA authorization tuples — that purge is deferred to phase 3,
-  merge detection — see `docs/ops/change-request-runbook.md`.
+  merge detection — see `docs/ops/change-request-runbook.md`. A batch that fails to publish is retried on
+  the next tick and, after five consecutive failed attempts, parked: no longer attempted, so one
+  unpublishable batch cannot block every other editor's approved work. Parked batches are reported by
+  `GET /health`'s `source_data_publisher` block (`parked_batches`) and by each run's summary line, and are
+  retried by clearing `publish_attempts` — see the runbook's "Parked batches".
 -->
 
 ## [v5.7](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.7) (December 15th 2025)

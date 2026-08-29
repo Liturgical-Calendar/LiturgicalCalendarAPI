@@ -298,10 +298,21 @@ Publisher (phase 2)" block, and `docs/superpowers/plans/2026-08-29-sourcedata-pu
    branch, plus a pull request that stays open across every later batch for that same resource (a
    "rolling" PR).
 4. Stops early the moment one publish attempt genuinely fails, rather than hammering a possibly-broken
-   GitHub API with the rest of the queue. The next cron tick is the retry, not an in-process loop.
+   GitHub API with the rest of the queue. The next cron tick is the retry, not an in-process loop. Two
+   failures are deliberately NOT treated that way, because neither says anything about the health of the
+   API: a batch another runner already published (nothing to do), and a lost race for a resource's branch
+   (a GitHub `422` — see "Operational failure modes"). Both log and continue.
+5. Counts the attempt against the batch. After
+   `SourceDataChangeRequestRepository::MAX_PUBLISH_ATTEMPTS` (5) CONSECUTIVE failed attempts a batch is
+   *parked*: no longer claimed, so the rest of the queue drains past it. See "Parked batches" below.
 
 `GET /health`'s `source_data_publisher` block reports whether the publisher is actually configured,
 independently of whether change-request queue mode itself is on — check it after any configuration change.
+**Read the nested block, not the top level.** A `warning` there does not change `/health`'s own top-level
+`status` field and does not change the HTTP status code: the endpoint still answers `200 ok` while the
+publisher is unconfigured or batches are parked. A monitoring check that only looks at the HTTP code, or
+only at `.status`, will never see either. Parse `.source_data_publisher.status` and
+`.source_data_publisher.parked_batches`.
 
 ### The publish lifecycle: `none` → `queued` → `open`
 
@@ -318,6 +329,11 @@ row of a batch at once (a batch is never mixed-status):
 
 `queued` is a **claim**, not a milestone on GitHub — nothing has been pushed yet while a batch sits there.
 `open` means a real pull request exists; it does not mean the PR merged, and does not mean CI passed.
+
+`publish_attempts` is a fourth thing again, and orthogonal to all of them: how many CONSECUTIVE attempts
+the publisher has spent on the batch. It is incremented when a claim is released (a failure) or reclaimed
+(a crash), reset when the batch publishes, and once it reaches 5 the batch is no longer claimed at all —
+see "Parked batches" below.
 
 Once a batch reaches `open`, `recordPublication()` also stamps four columns, on every row of the batch:
 
@@ -364,6 +380,89 @@ a publish that is still genuinely in flight gets treated as abandoned, a second 
 batch, and the first runner's now-stale `updateRef()` call fails with a non-fast-forward error when it
 finally returns — recoverable (see below), but entirely avoidable by respecting the invariant.
 
+### Parked batches
+
+A batch can fail *deterministically*: an illegal git-ref character in its `resource_id`, a tree-path
+conflict, a payload a later validation change rejects. Nothing about retrying such a batch will ever
+succeed, and because candidates are claimed oldest-first and the runner stops the tick on a failure, an
+unbounded retry means that one batch is re-attempted first on every tick and **every other editor's
+approved work is never reached at all** — with no error of its own, and no editor-visible symptom.
+
+So each batch gets `MAX_PUBLISH_ATTEMPTS` (5) CONSECUTIVE attempts, counted in the
+`publish_attempts` column. Both a caught failure (`releaseClaim()`) and an abandoned one
+(`reclaimStaleClaims()`, i.e. a crash) count — a batch that OOM-kills the publisher is caught by no
+error handler, so if a reclaim were free it would re-crash forever. A successful publish clears the
+counter, so a transient GitHub blip can never park a batch. Once the counter reaches 5 the batch stops
+being claimed and the queue drains past it.
+
+**Parking is not a dead-letter queue.** The design spec's error table promises a DLQ row for terminal
+failures; that was never built, and there is no DLQ table, no dead-letter status, and no automatic
+notification to the submitter. What actually happens is exactly and only this: the rows are left
+untouched, still `review_status = 'approved'` and `publication_status = 'none'`, with
+`publish_attempts >= 5`, and the publisher stops picking them up. Nothing is lost and nothing is
+rewritten; the batch simply waits for an operator.
+
+Because a parked batch produces no failure of its own, it is reported out of band in three places:
+
+- `GET /health` — `.source_data_publisher.parked_batches`, and `.source_data_publisher.status` becomes
+  `warning` (which does NOT change the top-level `status` or the HTTP code — see above);
+- the run's summary line — `publish-sourcedata published=… stopped_on_failure=… parked=N`;
+- `logs/publish-sourcedata.log` — a warning naming `parked_batches` on every run where N > 0.
+
+The exit code is deliberately unaffected: parking is what lets the rest of the queue drain, so a run that
+publishes everything it can and reports parked batches has done its job. **Monitor `parked`, not only the
+exit code.**
+
+To inspect and retry:
+
+```sql
+-- Which batches have stopped being attempted, and how much work is in them
+SELECT batch_id, resource_type, resource_id, submitted_by_sub,
+       MAX(publish_attempts) AS attempts, COUNT(*) AS file_count, MIN(created_at) AS submitted_at
+FROM sourcedata_change_requests
+WHERE review_status = 'approved' AND publication_status = 'none' AND publish_attempts >= 5
+GROUP BY batch_id, resource_type, resource_id, submitted_by_sub
+ORDER BY submitted_at ASC;
+
+-- Retry one, AFTER fixing whatever made it fail (see the log for the GitHub error)
+UPDATE sourcedata_change_requests SET publish_attempts = 0, updated_at = NOW()
+WHERE batch_id = '<batch-id>';
+```
+
+Clearing the counter without fixing the cause simply spends five more attempts and parks it again — the
+five failures are in `logs/publish-sourcedata.json.log` with the batch id and GitHub's own error text.
+If the proposal itself is unpublishable (a malformed `resource_id`, say), reject it through
+`POST /admin/change-requests/{batchId}/reject` with a reason, so the submitter learns why, rather than
+leaving it parked indefinitely.
+
+### Credentials on disk
+
+Two secrets touch the filesystem, and they have different lifetimes:
+
+- **The GitHub App private key** (`GITHUB_APP_PRIVATE_KEY_PATH`) must live OUTSIDE the deployed tree and
+  never under the web root — `/etc/litcal/github-app.pem`, owned by the user the cron job runs as, mode
+  `0600`. Only the path is ever put in the environment; the key bytes are read at use time and are never
+  logged, never placed in an exception message, and never committed.
+- **The derived installation token** is cached under `<project>/cache/github_app_tokens/` so that a
+  cron-invoked, short-lived process does not re-authenticate on every tick. It is a bearer credential
+  carrying `contents: write` and `pull_requests: write` on the repository and is valid for up to 50
+  minutes — it deserves the same care as the key it comes from. `scripts/publish-sourcedata.php` sets a
+  restrictive umask around the whole window in which the cache writes entries and chmods the namespace
+  directory to `0700`, so entries land at `0600` inside a `0700` directory (an earlier revision left them
+  at `0644` inside `0755`, world-readable to any local user). The chmod also repairs a directory an older
+  run created.
+
+Verify after a run, rather than assuming:
+
+```bash
+stat -c '%a %n' cache/github_app_tokens cache/github_app_tokens/*
+# expected: 700 cache/github_app_tokens, then 600 for each entry
+```
+
+If the directory is anything wider than `700`, something outside the publisher widened it (a `chmod -R`
+over `cache/`, a deploy step, a backup restore). Fix the mode and rotate the App's private key if the
+host is shared, since any token cached in that window may have been read.
+
 ### The benign double-publish
 
 If the GitHub writes inside `publish()` all succeed — commit created, ref updated, PR open or reused — but
@@ -386,13 +485,31 @@ same message is this benign double-publish, not evidence of a broken retry.
 - **0** — every batch this run claimed was published, or the queue was empty. A reclaimed stale claim is
   ordinary recovery and does not affect this; a run that reclaimed a batch and then successfully published
   everything else still exits 0.
-- **1** — either misconfiguration (bad `limit` argument, or the GitHub App / `GITHUB_REPOSITORY` not
-  configured), or a publish attempt genuinely failed and the run stopped early. In the latter case, approved
-  work remains queued and unpublished with no further retry until the next cron tick.
+- **1** — misconfiguration (bad `limit` argument, or the GitHub App / `GITHUB_REPOSITORY` not configured),
+  a database failure, or a publish attempt genuinely failed and the run stopped early.
 
-A monitoring check on this script should alert on a **non-zero exit**, not merely on the presence of a log
-entry — the "queued" state a failed batch is left in produces no user-visible symptom anywhere else. Detail
-on which batch and why is in `logs/publish-sourcedata.log` (human-readable) and
+**A failed batch is left at `publication_status = 'none'`, NOT `'queued'`.** `releaseClaim()` gives the
+claim up; `queued` means a claim someone still holds, which is exactly what the failure path releases. An
+operator who reacts to an exit-1 alert by hunting for `publication_status = 'queued'` will find nothing —
+these are the two columns this runbook opens by warning you not to conflate. What to look for instead:
+
+```sql
+-- Approved work that has been attempted and is waiting for another tick
+SELECT batch_id, resource_id, MAX(publish_attempts) AS attempts, MAX(updated_at) AS last_attempt
+FROM sourcedata_change_requests
+WHERE review_status = 'approved' AND publication_status = 'none' AND publish_attempts > 0
+GROUP BY batch_id, resource_id
+ORDER BY last_attempt DESC;
+```
+
+(A row genuinely sitting in `queued` means a claim is in flight right now, or a process died holding one —
+that is the grace-period reclaim's job, not this alert's.)
+
+The summary line also carries `parked=N`, which does **not** affect the exit code. A monitoring check on
+this script should therefore alert on a non-zero exit **and** on `parked` being non-zero (or, equivalently,
+on `/health`'s `.source_data_publisher.parked_batches`) — a run can exit 0 with work stuck, which is the
+whole point of parking it. Neither state produces a user-visible symptom anywhere else. Detail on which
+batch and why is in `logs/publish-sourcedata.log` (human-readable) and
 `logs/publish-sourcedata.json.log` (structured), both rotated. `GitHubApiException` carries GitHub's HTTP
 status alongside its message, so a `401`/`403` in either log is the signature of a stale or revoked
 installation token, not a transient failure.
@@ -409,9 +526,14 @@ installation token, not a transient failure.
   loss.** `GitHubGitDataClient::updateRef()` hardcodes `force: false` and is never given a way to force —
   intentionally, so that a branch another publish landed on between this publish's `getRef()` and its own
   `updateRef()` fails loudly, with GitHub's `422`, instead of silently overwriting that other editor's
-  commit. The failure propagates as a `GitHubApiException`, is caught by `PublishRunner`, releases the
-  claim, and stops the run; the batch is retried — by the next claim, once the branch is quiet — rather
-  than clobbering what is already there.
+  commit. The failure propagates as a `GitHubApiException`, is caught by `PublishRunner`, and releases the
+  claim; the batch is retried — by the next claim, once the branch is quiet — rather than clobbering what
+  is already there. A `422` does **not** stop the run and does **not** make it exit 1: it is expected,
+  self-healing, and proof that GitHub is up and answering, so treating it like a revoked credential would
+  page an operator for the design working. It is logged as a warning (`lost a race for its resource
+  branch`), and the attempt is still counted — so a batch that `422`s on every attempt is eventually
+  parked rather than retried forever, which is the case worth investigating: a branch nobody is
+  fast-forwarding, rather than two busy editors.
 - **A stale installation token.** GitHub installation tokens live one hour; `GitHubAppAuth` caches one for
   50 minutes so a token already in flight is never used in its final ten minutes. A token can still go bad
   before its cache entry expires if the App's installation is suspended or removed from the repository — the
