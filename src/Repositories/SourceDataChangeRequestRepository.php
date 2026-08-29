@@ -18,20 +18,58 @@ use PDO;
  * writes the calendar and its i18n files, and those must be reviewed together.
  * Approval and rejection therefore act on a batch id, never on a row id.
  *
+ * # The invariant
+ *
+ * **At most one pending proposal exists per `(path, submitted_by_sub)`.** That is
+ * what `idx_scr_unique_pending_path_submitter` enforces, and every rule below
+ * follows from it.
+ *
  * Save-equals-submit is implemented as replace: submitting deletes the submitter's
- * existing `submitted` rows for any batch that collides on PATH with an incoming
- * file, in the same transaction. This must key on path, not on resource: a
- * `ChangeResource` is not 1:1 with a file — `ChangeResource::decrees()` is a single
- * resource covering the entire decree corpus, and `rite_calendar_test:<rite>` is the
- * scope shared by every rite-level test — so superseding by resource would silently
- * discard an unrelated pending file under the same resource (a decree A edit lost
- * when decree B is submitted next), and could also leave a stale row behind that
- * later collides with `idx_scr_unique_pending_path_submitter` (a PATCH that re-scopes
- * a test changes its `ChangeResource` while its file path stays the same). Keying the
- * DELETE on path instead agrees with that unique index, and deleting the whole batch
- * a colliding row belongs to — never just the colliding row — keeps a batch coherent:
- * it is reviewed as a unit, so a partial batch must never be left behind. Other
- * submitters' pending rows are untouched.
+ * own pending batches that collide on PATH with an incoming file, in the same
+ * transaction. The DELETE keys on path, not on resource, because a `ChangeResource`
+ * is not 1:1 with a file — `ChangeResource::decrees()` is a single resource covering
+ * the entire decree corpus, and `rite_calendar_test:<rite>` is the scope shared by
+ * every rite-level test. Keying on resource would delete a pending file the incoming
+ * request never touched, and would also leave a stale row behind that then collides
+ * with the unique index (a PATCH that re-scopes a test changes its `ChangeResource`
+ * while its file path stays the same). Whole batches are deleted, never just the
+ * colliding row: a batch is reviewed as a unit, so a partial batch must never be left
+ * behind.
+ *
+ * # Accumulation, not replacement
+ *
+ * Path-keying alone is NOT enough to keep an edit from being lost. Some resources are
+ * stored as a single AGGREGATE file: every decree lives in one `decrees.json`, and
+ * every decree translation for a locale lives in one `decrees/i18n/<locale>.json`. Two
+ * successive decree edits by one submitter therefore always collide on those paths, and
+ * the second correctly supersedes the first. What made that lossy was one layer up: a
+ * handler rebuilding the aggregate read it from DISK, and in queue mode disk never
+ * received the first edit — so decree A vanished when decree B was submitted, silently,
+ * behind a `201` and `disposition: submitted`.
+ *
+ * {@see findPendingContent()} closes that. A handler rebuilding an aggregate starts from
+ * the submitter's OWN pending content for that path when a pending row exists, and falls
+ * back to disk otherwise, so superseding is an accumulation: the one pending batch is
+ * always that submitter's cumulative proposal. Reviewers are unaffected — because at
+ * most one pending proposal exists per (path, submitter), decree B never sits alongside
+ * decree A as a separately reviewable item; it subsumes it, and the reviewer approves or
+ * rejects the whole current state.
+ *
+ * # Scoping
+ *
+ * Both the supersede DELETE and {@see findPendingContent()} are scoped to
+ * `(path, submitted_by_sub, review_status = 'submitted')`. Another submitter's pending
+ * work is never deleted and never read; neither is any approved, rejected or withdrawn
+ * row. The `submitted_by_sub` predicate is repeated on the outer DELETE as well as the
+ * inner SELECT so that the cross-submitter guarantee is structural, rather than a
+ * consequence of `batch_id` happening to be unique per submitter.
+ *
+ * Because a supersede removes a whole batch, it can also remove a pending path the
+ * incoming request never mentioned (a batch that staged both `decrees.json` and
+ * `decrees/i18n/de.json`, superseded by a request that stages only the former). That is
+ * intentional — batches are indivisible — but it must never be invisible, so
+ * {@see submitBatch()} returns the ids of every batch it superseded and the write
+ * response carries them.
  */
 class SourceDataChangeRequestRepository
 {
@@ -48,7 +86,10 @@ class SourceDataChangeRequestRepository
      *
      * @param list<array{path: string, operation: ChangeOperation, content: ?string}> $files
      * @param array<string, mixed> $metadata
-     * @return string The batch id.
+     * @return array{batch_id: string, superseded_batch_ids: list<string>} The new batch id, plus
+     *         the ids of the submitter's own pending batches this submission replaced. A
+     *         superseded batch may have contained paths this submission never mentions, so the
+     *         caller must surface these rather than let the replacement happen invisibly.
      */
     public function submitBatch(
         ChangeResource $resource,
@@ -58,7 +99,7 @@ class SourceDataChangeRequestRepository
         ?string $submittedByEmail,
         bool $submittedByEmailVerified,
         array $metadata = []
-    ): string {
+    ): array {
         if ($files === []) {
             throw new \InvalidArgumentException('A change request batch must contain at least one file');
         }
@@ -80,20 +121,36 @@ class SourceDataChangeRequestRepository
                 $pathParams[$key]   = $file['path'];
             }
 
+            // `submitted_by_sub` is repeated on the OUTER delete, not only on the inner
+            // SELECT: batch ids are unique per submitter today, so the inner predicate
+            // alone happens to be sufficient, but the cross-submitter guarantee should be
+            // structural rather than a consequence of that. `review_status` is deliberately
+            // NOT repeated out here — restricting the outer delete to still-submitted rows
+            // would leave a partial batch behind, which whole-batch deletion exists to
+            // prevent. RETURNING makes the supersede visible to the caller: a superseded
+            // batch may have held paths this submission never mentions.
             $supersede = $this->db->prepare(
                 'DELETE FROM sourcedata_change_requests
-                  WHERE batch_id IN (
-                    SELECT batch_id FROM sourcedata_change_requests
-                     WHERE submitted_by_sub = :sub
-                       AND review_status = :submitted
-                       AND path IN (' . implode(', ', $pathPlaceholders) . ')
-                  )'
+                  WHERE submitted_by_sub = :sub
+                    AND batch_id IN (
+                      SELECT batch_id FROM sourcedata_change_requests
+                       WHERE submitted_by_sub = :sub
+                         AND review_status = :submitted
+                         AND path IN (' . implode(', ', $pathPlaceholders) . ')
+                    )
+              RETURNING batch_id'
             );
             $supersede->execute([
                 'sub'       => $submittedBySub,
                 'submitted' => ChangeReviewStatus::SUBMITTED->value,
                 ...$pathParams,
             ]);
+
+            $supersededBatchIds = [];
+            foreach ($supersede->fetchAll(PDO::FETCH_COLUMN) as $supersededId) {
+                $supersededBatchIds[] = self::requireString($supersededId, 'batch_id');
+            }
+            $supersededBatchIds = array_values(array_unique($supersededBatchIds));
 
             $insert = $this->db->prepare(
                 'INSERT INTO sourcedata_change_requests
@@ -130,7 +187,87 @@ class SourceDataChangeRequestRepository
             throw $e;
         }
 
-        return $batchId;
+        return [
+            'batch_id'             => $batchId,
+            'superseded_batch_ids' => $supersededBatchIds,
+        ];
+    }
+
+    /**
+     * The submitter's own pending content for one path, or null when they have none.
+     *
+     * This is what makes supersede-by-path an accumulation rather than a replacement:
+     * a handler rebuilding an aggregate file (`decrees.json`, a `decrees/i18n/<locale>.json`)
+     * must start from what it already proposed for that path, because in queue mode the
+     * previous proposal never reached disk. See the class docblock.
+     *
+     * Deliberately narrow. It reads only rows that are `submitted` AND belong to `$sub`:
+     * another submitter's proposal is never visible here, and neither is an approved,
+     * rejected or withdrawn one. `idx_scr_unique_pending_path_submitter` guarantees at
+     * most one such row, so there is nothing to disambiguate.
+     *
+     * A pending DELETE row carries no content and therefore reads back as null, the same
+     * as no row at all — which would send a caller to disk for a file that is proposed for
+     * deletion. No aggregate file is ever staged for deletion (they are rewritten in place,
+     * never removed), so this is not reachable today; a future caller that stages aggregate
+     * deletions would need to distinguish the two cases explicitly.
+     */
+    public function findPendingContent(string $path, string $sub): ?string
+    {
+        $stmt = $this->db->prepare(
+            'SELECT content
+               FROM sourcedata_change_requests
+              WHERE path = :path
+                AND submitted_by_sub = :sub
+                AND review_status = :submitted'
+        );
+        $stmt->execute([
+            'path'      => $path,
+            'sub'       => $sub,
+            'submitted' => ChangeReviewStatus::SUBMITTED->value,
+        ]);
+
+        $content = $stmt->fetchColumn();
+
+        return is_string($content) ? $content : null;
+    }
+
+    /**
+     * Every path the submitter has pending beneath `$pathPrefix`.
+     *
+     * The companion to {@see findPendingContent()} for the case where a handler must first
+     * work out WHICH aggregate files exist before rebuilding them — decree i18n sidecars are
+     * enumerated by listing the locale folder, and a locale file that exists only as this
+     * submitter's pending proposal would otherwise be invisible to that listing and dropped
+     * on the next submission.
+     *
+     * Matches on a literal prefix rather than LIKE so that `_` and `%`, both of which occur
+     * in real paths, need no escaping.
+     *
+     * @return list<string> Repository-relative paths, ascending.
+     */
+    public function findPendingPathsUnder(string $pathPrefix, string $sub): array
+    {
+        $stmt = $this->db->prepare(
+            'SELECT path
+               FROM sourcedata_change_requests
+              WHERE submitted_by_sub = :sub
+                AND review_status = :submitted
+                AND LEFT(path, :prefix_length) = :prefix
+              ORDER BY path ASC'
+        );
+        $stmt->bindValue('sub', $sub);
+        $stmt->bindValue('submitted', ChangeReviewStatus::SUBMITTED->value);
+        $stmt->bindValue('prefix_length', strlen($pathPrefix), PDO::PARAM_INT);
+        $stmt->bindValue('prefix', $pathPrefix);
+        $stmt->execute();
+
+        $paths = [];
+        foreach ($stmt->fetchAll(PDO::FETCH_COLUMN) as $path) {
+            $paths[] = self::requireString($path, 'path');
+        }
+
+        return $paths;
     }
 
     /**

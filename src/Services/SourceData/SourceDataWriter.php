@@ -36,4 +36,27 @@ interface SourceDataWriter
      *                              `approved` when a proposal was recorded.
      */
     public function commit(ChangeResource $resource): array;
+
+    /**
+     * What this submitter has already proposed for `$absolutePath`, if anything.
+     *
+     * A handler that rebuilds an AGGREGATE file — one file holding many editable items,
+     * such as the whole decree corpus in `decrees.json` — must start from this rather
+     * than from disk, because in queue mode the submitter's previous edit never reached
+     * disk and would be silently dropped by the next one. Null means "nothing pending;
+     * read the file the way you always have", which is what disk mode always answers.
+     */
+    public function pendingContent(string $absolutePath): ?string;
+
+    /**
+     * Which files beneath `$absoluteFolder` this submitter has pending.
+     *
+     * The companion to {@see pendingContent()} for handlers that enumerate a folder to
+     * decide what to rebuild: a file that exists only as a pending proposal is invisible
+     * to `glob()` and would be dropped on the next submission. Empty in disk mode, where
+     * every proposal is already a real file.
+     *
+     * @return list<string> Absolute paths, ascending.
+     */
+    public function pendingPathsUnder(string $absoluteFolder): array;
 }

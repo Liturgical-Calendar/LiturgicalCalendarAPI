@@ -7,14 +7,16 @@ namespace LiturgicalCalendar\Tests\Handlers;
 use LiturgicalCalendar\Api\Enum\ChangeOperation;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\Rite;
+use LiturgicalCalendar\Api\Handlers\DecreesHandler;
 use LiturgicalCalendar\Api\Handlers\TestsHandler;
 use LiturgicalCalendar\Api\Http\Exception\ConflictException;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Services\ChangeResource;
 use PHPUnit\Framework\Attributes\CoversClass;
+use Psr\Http\Message\ResponseInterface;
 
 /**
- * Regression coverage for the two defects the final review of
+ * Regression coverage for the three defects the final review of
  * feature/sourcedata-change-requests found in the supersede logic:
  *
  * - Defect 1 (silent data loss): superseding by resource, rather than by path,
@@ -24,14 +26,27 @@ use PHPUnit\Framework\Attributes\CoversClass;
  *   resource (a PATCH re-scope), the old supersede DELETE (keyed on resource)
  *   missed the prior row and the INSERT then violated
  *   idx_scr_unique_pending_path_submitter, raising an uncaught PDOException.
+ * - Defect 3 (silent data loss, one layer up — and the one that survived the fix
+ *   for defects 1 and 2): moving to path-keying does nothing for a resource whose
+ *   storage is a single AGGREGATE file. Every decree lives in one `decrees.json`,
+ *   so two decree writes by one submitter always collide on that path and the
+ *   second correctly supersedes the first. The loss was in the REBUILD:
+ *   `DecreesHandler::loadDecreesDatabase()` read the aggregate from disk, and in
+ *   queue mode disk never received decree A — so decree A vanished behind a `201`
+ *   and `disposition: submitted`. The same applied to the `decrees/i18n/<locale>.json`
+ *   sidecars, both to their content and to the folder listing that decides which of
+ *   them to rebuild. The fix is read-your-own-pending-writes, which turns supersede
+ *   into accumulation. This is the exact resource whose loss — the St John Henry
+ *   Newman decree — motivated the whole feature.
  *
  * Every other queue-mode test in this suite drives `ChangeRequestSourceDataWriter`
  * through `ChangeRequestTraitHost`, a stand-in for `WritesSourceData` that never
- * touches a real handler. Both defects live in the interaction between a real
- * handler's routing (path is fixed by the route; resource is derived from the
- * payload) and the repository's supersede logic, so a stand-in cannot exercise
- * either — these tests drive `TestsHandler::handle()` directly instead.
+ * touches a real handler. All three defects live in the interaction between a real
+ * handler (its routing, and what it reads back before it writes) and the repository's
+ * supersede logic, so a stand-in cannot exercise any of them — these tests drive
+ * `TestsHandler::handle()` and `DecreesHandler::handle()` directly instead.
  */
+#[CoversClass(DecreesHandler::class)]
 #[CoversClass(TestsHandler::class)]
 #[CoversClass(SourceDataChangeRequestRepository::class)]
 final class SourceDataChangeRequestSupersedeRegressionTest extends AbstractHandlerTestCase
@@ -262,5 +277,176 @@ final class SourceDataChangeRequestSupersedeRegressionTest extends AbstractHandl
 
         $this->expectException(ConflictException::class);
         $host->commitStagedFiles(ChangeResource::test(Rite::ROMAN, 'rite_calendar_test', 'roman'));
+    }
+
+    /**
+     * Defect 3 (the St John Henry Newman defect, in queue mode): two decree
+     * submissions in a row must ACCUMULATE, not replace one another.
+     *
+     * `DecreesHandler::saveDecreesDatabase()` always stages the same single aggregate
+     * path — `jsondata/sourcedata/rite/roman/decrees/decrees.json` — and
+     * `distributeI18n()` always stages the same `decrees/i18n/<locale>.json` set, so
+     * every decree write from one submitter collides on path with every other one.
+     * Superseding by path correctly removes the earlier batch; before the fix the loss
+     * happened one layer up, because `loadDecreesDatabase()` rebuilt the aggregate from
+     * DISK — and in queue mode disk never received decree A. The submitter got 201 with
+     * `disposition: submitted` and no warning, and decree A was gone.
+     *
+     * After the fix the rebuild starts from the submitter's own pending content for that
+     * path, so the single pending batch is their cumulative proposal.
+     */
+    public function testDefectThreeASecondDecreeSubmissionAccumulatesOntoTheFirst(): void
+    {
+        $onDiskBefore = (string) file_get_contents(JsonData::DECREES_FILE->path());
+
+        $responseA = $this->submitDecree('ZzzProbeAlpha_Create', 'ZzzProbeAlpha', 'Alpha Probe');
+        self::assertSame(201, $responseA->getStatusCode());
+        $bodyA = $this->decodeJsonBody($responseA);
+        self::assertSame('submitted', $bodyA['disposition']);
+        self::assertSame([], $bodyA['change_request']['superseded_batch_ids'], 'nothing to supersede yet');
+
+        $responseB = $this->submitDecree('ZzzProbeBeta_Create', 'ZzzProbeBeta', 'Beta Probe');
+        self::assertSame(201, $responseB->getStatusCode());
+        $bodyB = $this->decodeJsonBody($responseB);
+        self::assertSame('submitted', $bodyB['disposition']);
+
+        // Supersession is never invisible: B's response names the batch it replaced.
+        self::assertSame(
+            [$bodyA['change_request']['batch_id']],
+            $bodyB['change_request']['superseded_batch_ids']
+        );
+
+        // Supersede-by-path collapses both writes into one pending batch — that part is
+        // correct and intended: there is at most one pending proposal per (path, submitter).
+        $batches = $this->repo->listBySubmitter('editor-1');
+        self::assertCount(1, $batches, 'both decree writes stage the same aggregate path, so one cumulative batch is expected');
+
+        $proposal = $this->pendingContentByPath((string) $batches[0]['batch_id']);
+
+        $decreesPath = 'jsondata/sourcedata/rite/roman/decrees/decrees.json';
+        self::assertArrayHasKey($decreesPath, $proposal);
+        /** @var list<array<string, mixed>> $decrees */
+        $decrees = json_decode($proposal[$decreesPath], true, 512, JSON_THROW_ON_ERROR);
+        $ids     = array_column($decrees, 'decree_id');
+
+        // THE regression assertion. Before the fix this held B but not A.
+        self::assertContains('ZzzProbeAlpha_Create', $ids, 'decree A must survive decree B being submitted');
+        self::assertContains('ZzzProbeBeta_Create', $ids, 'decree B must be present too');
+
+        // The i18n sidecars rebuild from the same aggregate-per-locale files and had the
+        // identical defect: en.json is rewritten wholesale on every decree write.
+        $enPath = 'jsondata/sourcedata/rite/roman/decrees/i18n/en.json';
+        self::assertArrayHasKey($enPath, $proposal);
+        /** @var array<string, string> $en */
+        $en = json_decode($proposal[$enPath], true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('Alpha Probe', $en['ZzzProbeAlpha'] ?? null, 'decree A\'s translation must survive decree B');
+        self::assertSame('Beta Probe', $en['ZzzProbeBeta'] ?? null);
+
+        // Queue mode still never touches disk.
+        self::assertSame($onDiskBefore, (string) file_get_contents(JsonData::DECREES_FILE->path()));
+    }
+    /**
+     * The enumeration half of defect 3.
+     *
+     * `distributeI18n()` decides which locale sidecars to rebuild by listing the i18n
+     * folder on disk. A locale file that exists only as this submitter's pending proposal
+     * — decree A carried a `cs` translation and `cs.json` has never been published — is
+     * invisible to that listing, so the next submission would not restage it, and the
+     * whole-batch supersede would take it away. Accumulating the CONTENT of a file the
+     * rebuild never looks at does not help; the folder listing has to see it too.
+     */
+    public function testDefectThreeALocaleSidecarThatExistsOnlyAsAProposalIsNotDroppedByTheNextSubmission(): void
+    {
+        $csOnDisk = JsonData::DECREES_I18N_FOLDER->path() . '/cs.json';
+        self::assertFileDoesNotExist($csOnDisk, 'fixture assumption: cs has no published decree i18n file');
+
+        self::assertSame(201, $this->submitDecree('ZzzProbeAlpha_Create', 'ZzzProbeAlpha', 'Alpha Probe', ['cs' => 'Alfa'])->getStatusCode());
+        self::assertSame(201, $this->submitDecree('ZzzProbeBeta_Create', 'ZzzProbeBeta', 'Beta Probe')->getStatusCode());
+
+        $batches = $this->repo->listBySubmitter('editor-1');
+        self::assertCount(1, $batches);
+        $proposal = $this->pendingContentByPath((string) $batches[0]['batch_id']);
+
+        $csPath = 'jsondata/sourcedata/rite/roman/decrees/i18n/cs.json';
+        self::assertArrayHasKey($csPath, $proposal, 'the pending-only cs sidecar must be carried into the new batch');
+
+        /** @var array<string, string> $cs */
+        $cs = json_decode($proposal[$csPath], true, 512, JSON_THROW_ON_ERROR);
+        self::assertSame('Alfa', $cs['ZzzProbeAlpha'] ?? null);
+
+        self::assertFileDoesNotExist($csOnDisk, 'queue mode still writes nothing to disk');
+    }
+
+    /**
+     * A decree PUT payload shaped like the ones the admin-decrees frontend sends.
+     *
+     * @param array<string, string> $extraI18n Locales beyond `en`, e.g. one with no file on disk yet.
+     * @return array<string, mixed>
+     */
+    private static function decreePayload(string $decreeId, string $eventKey, string $englishName, array $extraI18n = []): array
+    {
+        return [
+            'decree_id'        => $decreeId,
+            'decree_date'      => '2025-01-01',
+            'decree_protocol'  => 'Prot. N. 1/25',
+            'description'      => 'Queue-mode accumulation probe.',
+            'liturgical_event' => [
+                'event_key' => $eventKey,
+                'day'       => 14,
+                'month'     => 2,
+                'color'     => ['white'],
+                'grade'     => 2,
+                'common'    => ['Pastors'],
+                'type'      => 'fixed',
+                'calendar'  => 'GENERAL ROMAN',
+            ],
+            'metadata'         => [
+                'action'     => 'createNew',
+                'since_year' => 2025,
+                'url'        => 'https://www.vatican.va/roman_curia/congregations/ccdds/documents/test.html',
+            ],
+            'i18n'             => ['en' => $englishName] + $extraI18n,
+            'readings'         => [
+                'en' => [
+                    'first_reading'      => 'Genesis 1:1',
+                    'responsorial_psalm' => 'Psalm 1',
+                    'gospel_acclamation' => 'John 1:1',
+                    'gospel'             => 'John 1:1-14',
+                ],
+            ],
+        ];
+    }
+
+    /** @param array<string, string> $extraI18n */
+    private function submitDecree(string $decreeId, string $eventKey, string $englishName, array $extraI18n = []): ResponseInterface
+    {
+        return ( new DecreesHandler([$decreeId]) )->handle(
+            $this->withOidcUser(
+                $this->requestFor(
+                    'PUT',
+                    "/decrees/{$decreeId}",
+                    ['Accept-Language' => 'en'],
+                    self::decreePayload($decreeId, $eventKey, $englishName, $extraI18n)
+                ),
+                'editor-1'
+            )
+        );
+    }
+
+    /**
+     * The batch's staged content, keyed by repository-relative path.
+     *
+     * @return array<string, string>
+     */
+    private function pendingContentByPath(string $batchId): array
+    {
+        $byPath = [];
+        foreach ($this->repo->getBatch($batchId) as $row) {
+            self::assertIsString($row['path']);
+            self::assertIsString($row['content']);
+            $byPath[$row['path']] = $row['content'];
+        }
+
+        return $byPath;
     }
 }

@@ -71,6 +71,25 @@ final class DiskSourceDataWriter implements SourceDataWriter
         return ['disposition' => 'applied'];
     }
 
+    /**
+     * Disk mode has no pending state: everything a submitter wrote is already the file
+     * itself. Answering null unconditionally is what keeps read-your-own-pending-writes
+     * invisible here — a handler asking this question falls straight back to the same
+     * disk read it has always done.
+     */
+    public function pendingContent(string $absolutePath): ?string
+    {
+        return null;
+    }
+
+    /**
+     * @return list<string> Always empty, for the reason given on {@see pendingContent()}.
+     */
+    public function pendingPathsUnder(string $absoluteFolder): array
+    {
+        return [];
+    }
+
     private function writeFile(string $path, string $content): void
     {
         if (false === file_put_contents($path, $content, LOCK_EX)) {

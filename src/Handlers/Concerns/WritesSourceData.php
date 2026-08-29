@@ -64,6 +64,41 @@ trait WritesSourceData
     }
 
     /**
+     * Read-your-own-pending-writes, for handlers that rebuild an AGGREGATE source file.
+     *
+     * Most resources are one file per editable thing, so re-reading disk before a write is
+     * correct in either mode. A few are not: the whole decree corpus lives in one
+     * `decrees.json`, and every decree translation for a locale lives in one
+     * `decrees/i18n/<locale>.json`. Rebuilding one of those from disk in queue mode drops
+     * whatever the same submitter proposed a moment earlier, because a proposal never
+     * reaches disk — the defect that lost a decree behind a `201`.
+     *
+     * The fallback lives here, on the writer seam, rather than in any one handler: it is
+     * the same seam `stageFile()` and `commitStagedFiles()` use, so any handler with an
+     * aggregate file gets it by asking. It is not applied automatically — a handler knows
+     * which of its files are aggregates and which are not, and nothing else does.
+     *
+     * Returns null when there is nothing pending, which is ALWAYS the answer in disk mode.
+     * Callers must then read the file exactly as they did before, keeping disk-mode
+     * behaviour byte-identical.
+     */
+    protected function pendingSourceContent(string $absolutePath): ?string
+    {
+        return $this->sourceDataWriter()->pendingContent($absolutePath);
+    }
+
+    /**
+     * The pending counterpart to `glob()`, for handlers that enumerate a folder before
+     * rebuilding what is in it. Always empty in disk mode.
+     *
+     * @return list<string> Absolute paths, ascending.
+     */
+    protected function pendingSourcePathsUnder(string $absoluteFolder): array
+    {
+        return $this->sourceDataWriter()->pendingPathsUnder($absoluteFolder);
+    }
+
+    /**
      * Memoised per request, so every staged file in one request lands in one
      * writer — and therefore, in queue mode, in one batch.
      */

@@ -76,7 +76,7 @@ final class ChangeRequestAdminHandlerTest extends RepositoryTestCase
             'Alice',
             'alice@example.test',
             true
-        );
+        )['batch_id'];
     }
 
     private function request(string $method, string $path, string $sub): ServerRequest

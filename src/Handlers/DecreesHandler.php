@@ -554,10 +554,91 @@ final class DecreesHandler extends AbstractHandler
         }
     }
 
-    /** @return \stdClass[] */
+    /**
+     * The decrees corpus as THIS request should see it.
+     *
+     * `decrees.json` is an aggregate: every decree lives in the one file, so every decree
+     * write from one submitter restages the same path. In queue mode a proposal never
+     * reaches disk, so rebuilding from disk would silently drop the decree this submitter
+     * proposed a moment ago — the defect that lost decree A when decree B was submitted
+     * next. Start from their own pending proposal when there is one, and from disk
+     * otherwise. In disk mode there is never a pending proposal, so this is exactly the
+     * read it has always been.
+     *
+     * @return \stdClass[]
+     */
     private function loadDecreesDatabase(): array
     {
-        return Utilities::jsonFileToObjectArray(JsonData::DECREES_FILE->path());
+        $path    = JsonData::DECREES_FILE->path();
+        $pending = $this->pendingSourceContent($path);
+
+        if (null === $pending) {
+            return Utilities::jsonFileToObjectArray($path);
+        }
+
+        $decoded = json_decode($pending, false);
+        if (!is_array($decoded)) {
+            throw new ServiceUnavailableException('The pending decrees proposal is not a JSON array; refusing to rebuild it.');
+        }
+
+        foreach ($decoded as $decree) {
+            if (!$decree instanceof \stdClass) {
+                throw new ServiceUnavailableException('The pending decrees proposal contains a non-object entry; refusing to rebuild it.');
+            }
+        }
+
+        /** @var \stdClass[] $decoded */
+        return array_values($decoded);
+    }
+
+    /**
+     * A locale sidecar (`decrees/i18n/<locale>.json`, `lectionary/decrees/<locale>.json`) as
+     * THIS request should see it — same aggregate-file reasoning as
+     * {@see loadDecreesDatabase()}, since one file holds every event's entry for a locale.
+     *
+     * The key type mirrors {@see Utilities::jsonFileToArray()} exactly — `json_decode($_, true)`
+     * turns a numeric-looking JSON object key into an int key, and both branches go through
+     * it — so the pending read and the disk read hand back the same shape.
+     *
+     * @return array<string|int, mixed>
+     */
+    private function loadSidecarArray(string $file): array
+    {
+        $pending = $this->pendingSourceContent($file);
+
+        if (null !== $pending) {
+            $decoded = json_decode($pending, true);
+
+            return is_array($decoded) ? $decoded : [];
+        }
+
+        return file_exists($file) ? Utilities::jsonFileToArray($file) : [];
+    }
+
+    /**
+     * Every locale sidecar in `$folder` this request should see: the ones on disk, plus any
+     * this submitter has pending. A sidecar created by an earlier proposal exists only in the
+     * change request queue, so `glob()` alone cannot see it and the next submission would drop
+     * it — the enumeration half of the same defect {@see loadSidecarArray()} fixes.
+     *
+     * Disk mode adds nothing to the glob, so the list is unchanged there.
+     *
+     * @return list<string> Absolute paths, ascending.
+     */
+    private function sidecarFiles(string $folder): array
+    {
+        $folder  = rtrim($folder, '/');
+        $onDisk  = glob($folder . '/*.json') ?: [];
+        $pending = array_filter(
+            $this->pendingSourcePathsUnder($folder),
+            static fn (string $path): bool => str_ends_with($path, '.json')
+                && !str_contains(substr($path, strlen($folder) + 1), '/')
+        );
+
+        $files = array_values(array_unique(array_merge($onDisk, $pending)));
+        sort($files);
+
+        return $files;
     }
 
     /** @param \stdClass[] $decrees */
@@ -587,8 +668,7 @@ final class DecreesHandler extends AbstractHandler
      */
     private function sidecarLocales(string $folder, array $payloadLocales): array
     {
-        $files           = glob($folder . '/*.json');
-        $existingLocales = $files === false ? [] : array_map(static fn ($f) => basename($f, '.json'), $files);
+        $existingLocales = array_map(static fn (string $f): string => basename($f, '.json'), $this->sidecarFiles($folder));
         return array_values(array_unique(array_merge($existingLocales, $payloadLocales)));
     }
 
@@ -599,7 +679,7 @@ final class DecreesHandler extends AbstractHandler
         foreach ($locales as $locale) {
             $file = $folder . '/' . $locale . '.json';
             /** @var array<string,string> $arr */
-            $arr = file_exists($file) ? Utilities::jsonFileToArray($file) : [];
+            $arr = $this->loadSidecarArray($file);
             // FINDING 2: preserve existing translation when the payload doesn't provide this locale.
             $arr[$eventKey] = property_exists($i18n, $locale) && is_string($i18n->{$locale})
                 ? $i18n->{$locale}
@@ -617,7 +697,7 @@ final class DecreesHandler extends AbstractHandler
         foreach (array_keys(get_object_vars($readings)) as $locale) {
             $file = $folder . '/' . $locale . '.json';
             /** @var array<string,mixed> $arr */
-            $arr            = file_exists($file) ? Utilities::jsonFileToArray($file) : [];
+            $arr            = $this->loadSidecarArray($file);
             $arr[$eventKey] = $readings->{$locale};
             ksort($arr);
             $this->stageFile($file, ChangeOperation::UPDATE, JsonFormatter::encode($arr) . PHP_EOL);
@@ -758,12 +838,8 @@ final class DecreesHandler extends AbstractHandler
 
     private function removeKeyFromLocaleFiles(string $eventKey, string $folder): void
     {
-        $files = glob(rtrim($folder, '/') . '/*.json');
-        if (false === $files) {
-            return;
-        }
-        foreach ($files as $file) {
-            $arr = Utilities::jsonFileToArray($file);
+        foreach ($this->sidecarFiles($folder) as $file) {
+            $arr = $this->loadSidecarArray($file);
             if (array_key_exists($eventKey, $arr)) {
                 unset($arr[$eventKey]);
                 $this->stageFile($file, ChangeOperation::UPDATE, JsonFormatter::encode($arr) . PHP_EOL);

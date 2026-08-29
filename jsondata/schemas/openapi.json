@@ -12740,6 +12740,14 @@
             },
             "minItems": 1,
             "description": "Repository-relative path of every file staged in this one request (e.g. a diocesan calendar plus its i18n translation files), which is why this can hold more than one entry even though the request targeted a single resource."
+          },
+          "superseded_batch_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Batch ids this submission REPLACED; empty when it replaced nothing. Save-equals-submit keeps at most one pending proposal per (file path, submitter), so a write that stages a path you already have pending supersedes the batch that path belonged to. Deletion is whole-batch, because a batch is approved or rejected as a unit \u2014 a superseded batch may therefore also have held files this request never mentioned, and those proposals are gone too. They are listed here so that can never be invisible: a listed id no longer appears in GET /auth/change-requests. For an aggregate file such as decrees.json this is not a loss of the edits themselves \u2014 the new batch was rebuilt from your own pending content, so it carries them forward."
           }
         },
         "required": [
@@ -12747,7 +12755,8 @@
           "review_status",
           "auto_approved",
           "resource",
-          "paths"
+          "paths",
+          "superseded_batch_ids"
         ],
         "additionalProperties": false
       },

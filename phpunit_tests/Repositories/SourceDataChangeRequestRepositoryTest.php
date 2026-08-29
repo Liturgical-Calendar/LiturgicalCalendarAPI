@@ -50,7 +50,7 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
             'alice@example.test',
             true,
             ['authorized_by' => 'admin']
-        );
+        )['batch_id'];
     }
 
     public function testSubmitBatchPersistsEveryFileUnderOneBatchId(): void
@@ -98,7 +98,14 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
         self::assertSame(['authorized_by' => 'admin'], $rows[0]['metadata']);
     }
 
-    public function testResubmittingReplacesTheSubmittersPendingRowsForThatResource(): void
+    /**
+     * Replacement is per-PATH, not per-resource: the incoming batch stages `US.json`, so
+     * the batch that path belonged to goes — including its `i18n/en_US.json` row, which
+     * this submission never mentions, because a batch is indivisible. (The older name of
+     * this test said "for that resource", which is precisely the keying the supersede
+     * does NOT use.)
+     */
+    public function testResubmittingReplacesTheSubmittersPendingBatchForThatPath(): void
     {
         $first = $this->submitUsa();
 
@@ -115,7 +122,7 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
             'Alice',
             'alice@example.test',
             true
-        );
+        )['batch_id'];
 
         self::assertNotSame($first, $second);
         self::assertSame([], $this->repo->getBatch($first), 'the superseded batch should be gone');
@@ -123,6 +130,49 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
         $rows = $this->repo->getBatch($second);
         self::assertCount(1, $rows);
         self::assertSame('update', $rows[0]['operation']);
+    }
+
+    /**
+     * The whole batch goes, including paths the incoming request never named — the
+     * indivisibility rule — and the caller is told which batch ids that swallowed, so a
+     * supersession is never invisible.
+     */
+    public function testSupersedingReportsTheBatchIdsItReplaced(): void
+    {
+        $first = $this->submitUsa();
+
+        $second = $this->repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
+            [
+                [
+                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/nations/US/US.json',
+                    'operation' => ChangeOperation::UPDATE,
+                    'content'   => '{"litcal":[]}',
+                ],
+            ],
+            'user-1',
+            'Alice',
+            'alice@example.test',
+            true
+        );
+
+        self::assertSame([$first], $second['superseded_batch_ids']);
+        // The i18n row went with it even though this submission never staged that path.
+        self::assertSame([], $this->repo->getBatch($first));
+    }
+
+    public function testSupersededBatchIdsIsEmptyWhenNothingWasReplaced(): void
+    {
+        $submission = $this->repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
+            $this->calendarWithTranslations(),
+            'user-1',
+            'Alice',
+            'alice@example.test',
+            true
+        );
+
+        self::assertSame([], $submission['superseded_batch_ids']);
     }
 
     public function testAnotherSubmittersPendingRowsAreNotReplaced(): void
@@ -141,10 +191,164 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
             'Bob',
             null,
             false
-        );
+        )['batch_id'];
 
         self::assertCount(2, $this->repo->getBatch($mine));
         self::assertCount(1, $this->repo->getBatch($theirs));
+    }
+
+    /**
+     * The cross-submitter guarantee under the keying the supersede actually uses.
+     *
+     * {@see testAnotherSubmittersPendingRowsAreNotReplaced()} deliberately uses a
+     * DIFFERENT path, so it cannot exercise this: nothing collides there, and it would
+     * still pass if the `submitted_by_sub` predicate were dropped entirely. Here both
+     * submitters have the SAME path pending, which is the only shape in which a missing
+     * submitter predicate would delete someone else's work.
+     */
+    public function testTwoSubmittersMayHoldTheSamePathPendingAtOnce(): void
+    {
+        $mine = $this->submitUsa('user-1');
+
+        $theirs = $this->repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
+            [
+                [
+                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/nations/US/US.json',
+                    'operation' => ChangeOperation::UPDATE,
+                    'content'   => '{"litcal":[{"event_key":"TheirEdit"}]}',
+                ],
+            ],
+            'user-2',
+            'Bob',
+            null,
+            false
+        );
+
+        self::assertSame([], $theirs['superseded_batch_ids'], 'another submitter\'s batch must never be superseded');
+        self::assertCount(2, $this->repo->getBatch($mine), 'user-1\'s batch must survive user-2 staging the same path');
+        self::assertCount(1, $this->repo->getBatch($theirs['batch_id']));
+
+        // And it works in the other direction too: user-1 resubmitting supersedes only
+        // their own batch, leaving user-2's pending proposal for the same path alone.
+        $resubmitted = $this->repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
+            [
+                [
+                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/nations/US/US.json',
+                    'operation' => ChangeOperation::UPDATE,
+                    'content'   => '{"litcal":[{"event_key":"MyEdit"}]}',
+                ],
+            ],
+            'user-1',
+            'Alice',
+            'alice@example.test',
+            true
+        );
+
+        self::assertSame([$mine], $resubmitted['superseded_batch_ids']);
+        self::assertCount(1, $this->repo->getBatch($theirs['batch_id']), 'user-2\'s pending batch is untouched');
+    }
+
+    /**
+     * Read-your-own-pending-writes, at the repository boundary: a submitter sees their
+     * own pending content for a path, and nobody else's.
+     */
+    public function testFindPendingContentIsScopedToTheSubmittersOwnPendingRow(): void
+    {
+        $path = 'jsondata/sourcedata/rite/roman/calendars/nations/US/US.json';
+
+        $this->repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '{"mine":true}']],
+            'user-1',
+            'Alice',
+            'alice@example.test',
+            true
+        );
+        $theirs = $this->repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '{"theirs":true}']],
+            'user-2',
+            'Bob',
+            null,
+            false
+        )['batch_id'];
+
+        self::assertSame('{"mine":true}', $this->repo->findPendingContent($path, 'user-1'));
+        self::assertSame('{"theirs":true}', $this->repo->findPendingContent($path, 'user-2'));
+        self::assertNull($this->repo->findPendingContent($path, 'user-3'));
+        self::assertNull($this->repo->findPendingContent('jsondata/nope.json', 'user-1'));
+
+        // A decided row is not pending content: once user-2's batch is approved, a
+        // rebuild must go back to disk rather than keep accumulating onto it.
+        $this->repo->approveBatch($theirs, 'admin-1');
+        self::assertNull($this->repo->findPendingContent($path, 'user-2'));
+    }
+
+    public function testFindPendingContentIgnoresWithdrawnAndRejectedRows(): void
+    {
+        $path = 'jsondata/sourcedata/rite/roman/calendars/nations/US/US.json';
+
+        $withdrawn = $this->repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '{"v":1}']],
+            'user-1',
+            'Alice',
+            'alice@example.test',
+            true
+        )['batch_id'];
+        $this->repo->withdrawBatch($withdrawn, 'user-1');
+        self::assertNull($this->repo->findPendingContent($path, 'user-1'));
+
+        $rejected = $this->repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'US'),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '{"v":2}']],
+            'user-1',
+            'Alice',
+            'alice@example.test',
+            true
+        )['batch_id'];
+        $this->repo->rejectBatch($rejected, 'admin-1', 'no');
+        self::assertNull($this->repo->findPendingContent($path, 'user-1'));
+    }
+
+    /**
+     * The enumeration half: a locale sidecar that exists only as a pending proposal must
+     * be discoverable, because `glob()` on the real folder cannot see it.
+     *
+     * The prefix match is literal, not LIKE — `_` and `%` are ordinary characters in real
+     * paths (`en_US.json`), and a LIKE wildcard would quietly widen the match.
+     */
+    public function testFindPendingPathsUnderReturnsOnlyTheSubmittersPendingPathsBeneathThePrefix(): void
+    {
+        $this->submitUsa('user-1');
+        $this->repo->submitBatch(
+            ChangeResource::nationalCalendar(Rite::ROMAN, 'CA'),
+            [
+                [
+                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/fr_CA.json',
+                    'operation' => ChangeOperation::CREATE,
+                    'content'   => '{"key":"valeur"}',
+                ]
+            ],
+            'user-2',
+            'Bob',
+            null,
+            false
+        );
+
+        $prefix = 'jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/';
+
+        self::assertSame(
+            ['jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/en_US.json'],
+            $this->repo->findPendingPathsUnder($prefix, 'user-1')
+        );
+        self::assertSame(
+            ['jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/fr_CA.json'],
+            $this->repo->findPendingPathsUnder($prefix, 'user-2')
+        );
+        self::assertSame([], $this->repo->findPendingPathsUnder('jsondata/sourcedata/rite/ambrosian/', 'user-1'));
     }
 
     public function testDeleteOperationsCarryNoContent(): void
@@ -162,7 +366,7 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
             'Alice',
             'alice@example.test',
             true
-        );
+        )['batch_id'];
 
         $rows = $this->repo->getBatch($batchId);
         self::assertSame('delete', $rows[0]['operation']);
@@ -415,7 +619,7 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
             'Alice',
             'alice@example.test',
             true
-        );
+        )['batch_id'];
 
         $batches = $this->repo->listBySubmitter('user-1');
 
@@ -439,7 +643,7 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
             'Alice',
             'alice@example.test',
             true
-        );
+        )['batch_id'];
 
         // Force a genuine tie: both batches now share the exact same created_at, which
         // is the scenario ORDER BY MIN(created_at) DESC alone cannot resolve.

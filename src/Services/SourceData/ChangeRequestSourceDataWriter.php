@@ -71,7 +71,7 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
         // defence-in-depth for exactly that race, not the primary guard, so surface it
         // as a 409 the client can retry rather than an opaque 500.
         try {
-            $batchId = $this->repository->submitBatch(
+            $submission = $this->repository->submitBatch(
                 $resource,
                 $this->staged,
                 $sub,
@@ -90,6 +90,7 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
             throw $e;
         }
 
+        $batchId      = $submission['batch_id'];
         $paths        = array_map(static fn (array $file): string => $file['path'], $this->staged);
         $this->staged = [];
 
@@ -101,16 +102,46 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
         return [
             'disposition'    => $autoApproved ? 'approved' : 'submitted',
             'change_request' => [
-                'batch_id'      => $batchId,
-                'review_status' => $autoApproved ? 'approved' : 'submitted',
-                'auto_approved' => $autoApproved,
-                'resource'      => [
+                'batch_id'             => $batchId,
+                'review_status'        => $autoApproved ? 'approved' : 'submitted',
+                'auto_approved'        => $autoApproved,
+                'resource'             => [
                     'type' => $resource->type,
                     'id'   => $resource->id,
                 ],
-                'paths'         => $paths,
+                'paths'                => $paths,
+                // Supersession deletes WHOLE batches, so this submission may have replaced a
+                // pending batch that also held files this request never mentioned. Reporting
+                // the ids is what stops that being invisible: the client can look each one up
+                // (they are gone from GET /auth/change-requests) and see what it swept up.
+                'superseded_batch_ids' => $submission['superseded_batch_ids'],
             ],
         ];
+    }
+
+    /**
+     * The submitter's own pending content for this path, so a handler rebuilding an
+     * aggregate file accumulates onto its previous proposal instead of discarding it.
+     */
+    public function pendingContent(string $absolutePath): ?string
+    {
+        return $this->repository->findPendingContent(
+            $this->repoRelativePath($absolutePath),
+            $this->submitterSub()
+        );
+    }
+
+    /**
+     * @return list<string> Absolute paths, ascending.
+     */
+    public function pendingPathsUnder(string $absoluteFolder): array
+    {
+        $prefix = $this->repoRelativePath(rtrim($absoluteFolder, '/')) . '/';
+
+        return array_map(
+            fn (string $path): string => $this->absolutePathFor($path),
+            $this->repository->findPendingPathsUnder($prefix, $this->submitterSub())
+        );
     }
 
     /**
@@ -124,6 +155,17 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
         return str_starts_with($absolutePath, $root)
             ? substr($absolutePath, strlen($root))
             : ltrim($absolutePath, '/');
+    }
+
+    /**
+     * The inverse of {@see repoRelativePath()} for paths that came out of the database.
+     *
+     * Only exact for paths that were relativised against this same root, which every
+     * stored path was — `stage()` is the only writer of the `path` column.
+     */
+    private function absolutePathFor(string $repoRelativePath): string
+    {
+        return ( $this->projectRoot ?? Router::$apiFilePath ) . $repoRelativePath;
     }
 
     private function submitterSub(): string

@@ -62,6 +62,49 @@ Every write response also carries the same signal per-request, as a `disposition
 mode), `submitted` (queue mode, not auto-approved), or `approved` (queue mode, auto-approved). See the
 `ChangeRequestDisposition` schema in `jsondata/schemas/openapi.json` for the full contract.
 
+## One pending proposal per file, per submitter
+
+Queue mode keeps **at most one pending proposal per `(file path, submitter)`** — the invariant
+`idx_scr_unique_pending_path_submitter` enforces. Submitting a write that stages a path the same submitter
+already has pending therefore *supersedes* the batch that path belonged to. Deletion is whole-batch, never
+per-row, because a batch is approved or rejected as a unit and a half-batch would be incoherent.
+
+Two consequences an operator will meet:
+
+1. **Superseding can sweep up files the new request never mentioned.** If a batch staged both
+   `decrees.json` and `decrees/i18n/de.json`, a later request staging only the former supersedes the whole
+   batch. This is never silent: every queue-mode write response lists the batch ids it replaced in
+   `change_request.superseded_batch_ids`, and a listed id no longer appears in `GET /auth/change-requests`.
+
+2. **Superseding an aggregate file is accumulation, not replacement.** Some resources are stored as one
+   file holding many editable items — the entire decree corpus is one `decrees.json`, and every decree
+   translation for a locale is one `decrees/i18n/<locale>.json`. Handlers rebuilding one of those read the
+   submitter's own pending content for that path first (`SourceDataChangeRequestRepository::findPendingContent()`,
+   reached through `WritesSourceData::pendingSourceContent()`), falling back to disk when there is none. So
+   the single pending batch is always that submitter's *cumulative* proposal, and a reviewer approves or
+   rejects the whole current state rather than a chain of increments.
+
+   Without this, submitting decree B would rebuild `decrees.json` from disk — where decree A never landed,
+   because a proposal is not a file — and decree A would be gone behind a `201`. Disk mode is unaffected:
+   there is no pending state there, the lookup always answers "nothing", and every read is the disk read it
+   has always been.
+
+The lookups are scoped to `(path, submitted_by_sub, review_status = 'submitted')`. One submitter never
+reads or supersedes another's pending work, and an approved, rejected or withdrawn proposal is never read
+back — a rebuild after a decision starts from disk again.
+
+To see what a submitter currently has pending for a given path:
+
+```sql
+SELECT batch_id, operation, LENGTH(content) AS bytes, created_at
+FROM sourcedata_change_requests
+WHERE path = '<repo-relative-path>'
+  AND submitted_by_sub = '<sub>'
+  AND review_status = 'submitted';
+```
+
+That query returns at most one row. More than one means the unique index is missing or disabled.
+
 ## Review status vs. publication status
 
 Every row (and therefore every batch, since a batch shares these columns across all its rows) carries two
