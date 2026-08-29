@@ -97,6 +97,14 @@
       "description": "Admin operations for application approval workflow (approve, reject, revoke)"
     },
     {
+      "name": "Admin - Supported Locales",
+      "description": "Curation surface for the locales the API declares officially supported. An official locale promises complete data: missing data for one is an error, while a locale outside the list degrades quietly."
+    },
+    {
+      "name": "Admin - Outbox",
+      "description": "Inspection and retry management for the OpenFGA reconciliation outbox. Global admins only."
+    },
+    {
       "name": "Applications",
       "description": "Developer application management (create, update, delete applications and API keys)"
     },
@@ -4356,6 +4364,248 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      }
+    },
+    "/admin/locales": {
+      "get": {
+        "tags": [
+          "Admin - Supported Locales"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "List candidate locales with their readiness",
+        "operationId": "adminListSupportedLocales",
+        "description": "Every locale for which any resource exists, which of them are officially supported, and whether each has everything an official locale requires. Restricted to global admins: which locales the API declares supported is a governance decision about its published contract, not a per-resource one. Read-only; the `curation` object explains why.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupportedLocalesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          }
+        }
+      }
+    },
+    "/admin/locales/{locale}": {
+      "get": {
+        "tags": [
+          "Admin - Supported Locales"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Readiness report for one locale",
+        "operationId": "adminGetLocaleReadiness",
+        "description": "The full set of readiness probes for a single locale, each listing the concrete identifiers that are missing. Advisory probes are reported but do not affect `ready`.",
+        "parameters": [
+          {
+            "name": "locale",
+            "in": "path",
+            "required": true,
+            "description": "Locale to report on. Must be one of the candidates returned by `/admin/locales`.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "hr"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocaleReadinessReport"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      }
+    },
+    "/admin/outbox": {
+      "get": {
+        "tags": [
+          "Admin - Outbox"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "List or summarise OpenFGA outbox rows",
+        "operationId": "adminListOutbox",
+        "description": "Inspect the OpenFGA reconciliation outbox. With `summary=1` returns per-status counts and the age of the oldest pending row instead of a row listing. Global admins only.",
+        "parameters": [
+          {
+            "name": "summary",
+            "in": "query",
+            "required": false,
+            "description": "When truthy, return per-status counts instead of a row listing.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "1"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "description": "Filter by row status.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "retrying",
+                "succeeded",
+                "failed_terminal"
+              ]
+            }
+          },
+          {
+            "name": "access_request_id",
+            "in": "query",
+            "required": false,
+            "description": "Filter to rows raised by one access request.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "Page size. Values outside 1-200 fall back to the default of 50.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "description": "Rows to skip.",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: A row listing, or a summary when `summary` is set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/OutboxListResponse"
+                    },
+                    {
+                      "$ref": "#/components/schemas/OutboxSummaryResponse"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          }
+        }
+      }
+    },
+    "/admin/outbox/{id}/retry": {
+      "post": {
+        "tags": [
+          "Admin - Outbox"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Return a failed row to the queue",
+        "operationId": "adminRetryOutboxRow",
+        "description": "Reset a `failed_terminal` row to `pending` and nudge the consumer, rather than waiting for the next cron backstop run. Only rows in `failed_terminal` may be retried. Global admins only.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Outbox row id.",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Row reset to pending",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OutboxRetryResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden403"
+          },
+          "404": {
+            "description": "Not Found: No outbox row with that id"
+          },
+          "409": {
+            "description": "Conflict: The row is not in failed_terminal state"
           }
         }
       }
@@ -9660,7 +9910,8 @@
                         "exists",
                         "parses",
                         "validates"
-                      ]
+                      ],
+                      "expected_locales": null
                     },
                     {
                       "id": "sanctorale:roman:US_2011:i18n",
@@ -9673,7 +9924,8 @@
                         "exists",
                         "parses",
                         "validates"
-                      ]
+                      ],
+                      "expected_locales": null
                     }
                   ]
                 }
@@ -9999,6 +10251,320 @@
   },
   "components": {
     "schemas": {
+      "OutboxRow": {
+        "type": "object",
+        "description": "One OpenFGA tuple operation the API has committed to perform.",
+        "required": [
+          "id",
+          "operation",
+          "fga_user",
+          "fga_relation",
+          "fga_object",
+          "status",
+          "attempts",
+          "next_attempt_at",
+          "last_error",
+          "last_error_code",
+          "metadata",
+          "created_at",
+          "completed_at"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "operation": {
+            "type": "string",
+            "enum": [
+              "write_tuple",
+              "delete_tuple"
+            ]
+          },
+          "fga_user": {
+            "type": "string",
+            "example": "user:abc123"
+          },
+          "fga_relation": {
+            "type": "string",
+            "example": "editor"
+          },
+          "fga_object": {
+            "type": "string",
+            "example": "national_calendar:USA"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "retrying",
+              "succeeded",
+              "failed_terminal"
+            ]
+          },
+          "attempts": {
+            "type": "integer"
+          },
+          "next_attempt_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "last_error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "last_error_code": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "completed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "OutboxListResponse": {
+        "type": "object",
+        "required": [
+          "items",
+          "count",
+          "total",
+          "limit",
+          "offset",
+          "has_more"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OutboxRow"
+            }
+          },
+          "count": {
+            "type": "integer",
+            "description": "Rows in this page."
+          },
+          "total": {
+            "type": "integer",
+            "description": "Rows matching the filter across all pages."
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "has_more": {
+            "type": "boolean"
+          }
+        }
+      },
+      "OutboxSummaryResponse": {
+        "type": "object",
+        "required": [
+          "counts",
+          "oldest_pending_age_seconds"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "counts": {
+            "type": "object",
+            "description": "All four statuses are always present, defaulting to zero.",
+            "required": [
+              "pending",
+              "retrying",
+              "succeeded",
+              "failed_terminal"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "pending": {
+                "type": "integer"
+              },
+              "retrying": {
+                "type": "integer"
+              },
+              "succeeded": {
+                "type": "integer"
+              },
+              "failed_terminal": {
+                "type": "integer"
+              }
+            }
+          },
+          "oldest_pending_age_seconds": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Age of the oldest row awaiting drain, or null when none is pending."
+          }
+        }
+      },
+      "OutboxRetryResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "id",
+          "row"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "row": {
+            "$ref": "#/components/schemas/OutboxRow"
+          }
+        }
+      },
+      "LocaleReadinessCheck": {
+        "type": "object",
+        "description": "One readiness probe against one locale.",
+        "required": [
+          "name",
+          "passed",
+          "advisory",
+          "summary",
+          "missing"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Probe identifier.",
+            "example": "decree_names"
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "advisory": {
+            "type": "boolean",
+            "description": "When true the probe is reported but does not affect readiness."
+          },
+          "summary": {
+            "type": "string",
+            "example": "1 decreed event has no name"
+          },
+          "missing": {
+            "type": "array",
+            "description": "Concrete identifiers, file paths or event keys, that are absent.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "LocaleReadinessReport": {
+        "type": "object",
+        "required": [
+          "locale",
+          "official",
+          "ready",
+          "checks"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "locale": {
+            "type": "string",
+            "example": "hr"
+          },
+          "official": {
+            "type": "boolean",
+            "description": "Whether the locale is currently declared officially supported."
+          },
+          "ready": {
+            "type": "boolean",
+            "description": "Whether every non-advisory probe passed, i.e. the locale could be promoted safely."
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocaleReadinessCheck"
+            }
+          }
+        }
+      },
+      "SupportedLocalesResponse": {
+        "type": "object",
+        "required": [
+          "official",
+          "candidates",
+          "curation"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "official": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "candidates": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "locale",
+                "official",
+                "ready",
+                "summary"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "locale": {
+                  "type": "string"
+                },
+                "official": {
+                  "type": "boolean"
+                },
+                "ready": {
+                  "type": "boolean"
+                },
+                "summary": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "curation": {
+            "type": "object",
+            "description": "Whether promotion can be performed through the API, and why not when it cannot.",
+            "required": [
+              "writable",
+              "reason"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "writable": {
+                "type": "boolean"
+              },
+              "reason": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
       "TemporaleGetResponse": {
         "type": "object",
         "description": "Response object containing temporale events and locale information",

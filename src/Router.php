@@ -30,6 +30,7 @@ use LiturgicalCalendar\Api\Handlers\Auth\EmailVerificationHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\AccessRequestAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\ApplicationAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\NotificationsHandler as AdminNotificationsHandler;
+use LiturgicalCalendar\Api\Handlers\Admin\LocalesAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\OutboxAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\AdminScopesHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\DashboardScopesHandler;
@@ -575,6 +576,12 @@ class Router
                         // POST /admin/applications/{uuid}/revoke - Revoke an approved application
                         $applicationAdminHandler = new ApplicationAdminHandler();
                         $this->handler           = $applicationAdminHandler;
+                    } elseif ($adminRoute === 'locales') {
+                        // Supported-locale curation (#904)
+                        // GET /admin/locales           - Candidate locales, official flag, readiness
+                        // GET /admin/locales/{locale}  - Full readiness report for one locale
+                        $localesAdminHandler = new LocalesAdminHandler($requestPathParts);
+                        $this->handler       = $localesAdminHandler;
                     } elseif ($adminRoute === 'outbox') {
                         // Admin outbox management routes
                         // GET  /admin/outbox?status=…&summary=…  - List/summary
