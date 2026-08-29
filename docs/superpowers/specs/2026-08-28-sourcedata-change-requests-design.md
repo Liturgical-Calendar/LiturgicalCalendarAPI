@@ -1,6 +1,7 @@
 # Source-data change requests: authoring edits on the server, publishing them to GitHub
 
 **Status:** design approved, not yet implemented
+**Tracked by:** [#902](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/902)
 **Date:** 2026-08-28
 **Repos affected:** `LiturgicalCalendarAPI` (bulk), `LiturgicalCalendarFrontend` (admin UI)
 

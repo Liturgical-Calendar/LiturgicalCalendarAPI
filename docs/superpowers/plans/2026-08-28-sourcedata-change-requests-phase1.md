@@ -26,6 +26,8 @@ PSR-7/15 handlers.
 
 **Spec:** `docs/superpowers/specs/2026-08-28-sourcedata-change-requests-design.md`
 
+**Tracked by:** [#902](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/902)
+
 ## Global Constraints
 
 - PHP >= 8.4. PSR-12 via `phpcs.xml`; 4-space indent, short array syntax `[]`, single quotes unless
