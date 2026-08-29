@@ -8,6 +8,7 @@ use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Enum\ChangeOperation;
 use LiturgicalCalendar\Api\Enum\ChangePublicationStatus;
 use LiturgicalCalendar\Api\Enum\ChangeReviewStatus;
+use LiturgicalCalendar\Api\Enum\ClaimReleaseOutcome;
 use LiturgicalCalendar\Api\Services\ChangeResource;
 use PDO;
 
@@ -645,12 +646,92 @@ class SourceDataChangeRequestRepository
     }
 
     /**
+     * How many CONSECUTIVE publish attempts a batch gets before the publisher stops claiming
+     * it ("parks" it).
+     *
+     * The bound exists because a batch can fail deterministically — an illegal git-ref
+     * character in a `resource_id`, a tree-path conflict, a payload a later validation change
+     * rejects — and the runner stops the whole tick on a failure. Oldest-first ordering then
+     * means that one batch is re-claimed first on every tick and every tick aborts before
+     * reaching anything else: one editor's broken proposal indefinitely blocks every other
+     * editor's good work, with nothing but a repeated log line to show for it.
+     *
+     * Five, not one: a GitHub blip, a token exchange that races an expiry, a transient 5xx must
+     * NOT park a batch, and {@see recordPublication()} resets the counter, so the bound only
+     * ever fires on failures that are genuinely consecutive. Five ticks of a cron interval is
+     * long enough to ride out a transient outage and short enough that the queue is not held
+     * hostage for a day.
+     *
+     * Parking is not deletion and not a dead-letter queue (this feature has none): the rows
+     * are untouched, the batch stays `approved`/`none`, and clearing `publish_attempts` back
+     * to 0 makes it claimable again. It must never be silent, which is why
+     * {@see countParkedBatches()} feeds `GET /health` and the runner's own log line.
+     */
+    public const MAX_PUBLISH_ATTEMPTS = 5;
+
+    /**
+     * How many batches have exhausted {@see MAX_PUBLISH_ATTEMPTS} and are therefore no longer
+     * being attempted.
+     *
+     * A batch that has silently stopped being attempted is the same class of defect as one
+     * stranded `queued`: invisible to the operator, invisible to the editor, indistinguishable
+     * from success on the editor's side. This is the number that makes it visible — reported by
+     * `GET /health`'s `source_data_publisher` block and by every publish run's summary line.
+     *
+     * Counts only batches that would otherwise be claimable (`approved`, `none`), so a batch
+     * whose attempts happen to be non-zero but which went on to publish, or which was rejected
+     * or withdrawn afterwards, is not reported as stuck.
+     */
+    public function countParkedBatches(): int
+    {
+        $stmt = $this->db->prepare(
+            'SELECT COUNT(*) AS parked
+               FROM (
+                   SELECT batch_id
+                     FROM sourcedata_change_requests
+                    GROUP BY batch_id
+                   HAVING bool_and(review_status = :approved)
+                      AND bool_and(publication_status = :none)
+                      AND bool_and(publish_attempts >= :max_attempts)
+               ) AS parked_batches'
+        );
+        $stmt->execute([
+            'approved'     => ChangeReviewStatus::APPROVED->value,
+            'none'         => ChangePublicationStatus::NONE->value,
+            'max_attempts' => self::MAX_PUBLISH_ATTEMPTS,
+        ]);
+
+        /** @var array<string, mixed>|false $row */
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return false === $row ? 0 : self::requireInt($row['parked'] ?? null, 'parked');
+    }
+
+    /**
      * Atomically claim the oldest approved-and-unpublished batch, or null if none exists.
      *
      * "Claimable" means every row of the batch is `review_status = 'approved'` AND
-     * `publication_status = 'none'` — a batch is never mixed-status (`decideBatch()` and
-     * `withdrawBatch()` each transition every still-submitted row of a batch in one
-     * `UPDATE`), so aggregating with `bool_and(...)` over the whole batch is a safe test.
+     * `publication_status = 'none'` AND `publish_attempts < MAX_PUBLISH_ATTEMPTS` — a batch is
+     * never mixed-status (`decideBatch()` and `withdrawBatch()` each transition every
+     * still-submitted row of a batch in one `UPDATE`, and every publish-side write below acts
+     * on the whole batch), so aggregating with `bool_and(...)` over the whole batch is a safe
+     * test.
+     *
+     * The attempts bound is what stops ONE failing batch from stranding the whole queue.
+     * Candidates are ordered oldest-first and a failed publish returns its batch to `none`, so
+     * without the bound the oldest failing batch is re-claimed first on every tick, forever,
+     * and no other editor's approved work is ever reached. See {@see MAX_PUBLISH_ATTEMPTS}.
+     * The predicate is repeated on the LOCK query for the same reason the status predicate is
+     * (see below): the candidate snapshot can be stale by the time the lock runs, and a batch
+     * another runner pushed over the bound in that window is `none` and unlocked, so the status
+     * predicate alone would happily claim it.
+     *
+     * `$skipBatchIds` excludes batches the CALLER has already attempted in its current run.
+     * They are not parked — a single failure must stay retryable on the next tick — but a
+     * batch released back to `none` is instantly the oldest candidate again, so without this
+     * a caller that continues past a failure re-claims the very batch it just failed on. That
+     * is in-process retry by another name, and it is what the runner's "stop, don't hammer"
+     * rule exists to avoid.
      *
      * `FOR UPDATE SKIP LOCKED` only holds its row lock for the lifetime of the surrounding
      * transaction. Without an explicit transaction wrapping BOTH the row lock and the
@@ -695,8 +776,10 @@ class SourceDataChangeRequestRepository
      * in {@see \LiturgicalCalendar\Tests\Repositories\SourceDataChangeRequestPublishQueueTest::testTwoRealConcurrentRunnersNeverClaimTheSameBatch()},
      * which races two real OS processes against `claimNextPublishableBatch()` itself rather
      * than against a hand-copied query, so a regression here is what that test would catch.
+     *
+     * @param list<string> $skipBatchIds Batch ids to pass over, however claimable they look.
      */
-    public function claimNextPublishableBatch(): ?string
+    public function claimNextPublishableBatch(array $skipBatchIds = []): ?string
     {
         $this->db->beginTransaction();
         try {
@@ -706,11 +789,13 @@ class SourceDataChangeRequestRepository
                   GROUP BY batch_id
                  HAVING bool_and(review_status = :approved)
                     AND bool_and(publication_status = :none)
+                    AND bool_and(publish_attempts < :max_attempts)
                   ORDER BY MIN(created_at) ASC'
             );
             $candidates->execute([
-                'approved' => ChangeReviewStatus::APPROVED->value,
-                'none'     => ChangePublicationStatus::NONE->value,
+                'approved'     => ChangeReviewStatus::APPROVED->value,
+                'none'         => ChangePublicationStatus::NONE->value,
+                'max_attempts' => self::MAX_PUBLISH_ATTEMPTS,
             ]);
 
             $lock = $this->db->prepare(
@@ -719,6 +804,7 @@ class SourceDataChangeRequestRepository
                   WHERE batch_id = :batch_id
                     AND review_status = :approved
                     AND publication_status = :none
+                    AND publish_attempts < :max_attempts
                     FOR UPDATE SKIP LOCKED'
             );
 
@@ -727,10 +813,19 @@ class SourceDataChangeRequestRepository
                 $batchId  = self::requireString($candidate['batch_id'] ?? null, 'batch_id');
                 $rowCount = self::requireInt($candidate['row_count'] ?? null, 'row_count');
 
+                if (in_array($batchId, $skipBatchIds, true)) {
+                    // Already attempted (and failed) in the caller's current run. Its release
+                    // put it back to `none`, so it is the oldest claimable candidate again and
+                    // would be re-claimed immediately, re-attempted, and re-released — an
+                    // in-process retry loop the caller explicitly does not want.
+                    continue;
+                }
+
                 $lock->execute([
-                    'batch_id' => $batchId,
-                    'approved' => ChangeReviewStatus::APPROVED->value,
-                    'none'     => ChangePublicationStatus::NONE->value,
+                    'batch_id'     => $batchId,
+                    'approved'     => ChangeReviewStatus::APPROVED->value,
+                    'none'         => ChangePublicationStatus::NONE->value,
+                    'max_attempts' => self::MAX_PUBLISH_ATTEMPTS,
                 ]);
                 $lockedRowCount = count($lock->fetchAll(PDO::FETCH_COLUMN));
 
@@ -768,8 +863,10 @@ class SourceDataChangeRequestRepository
     /**
      * Record that a claimed batch reached GitHub as an open pull request.
      *
-     * Sets `publication_status` to `open` and stamps the git-side identifiers the batch
-     * was published under. `base_sha` is the commit the publisher branched from — distinct
+     * Sets `publication_status` to `open`, stamps the git-side identifiers the batch was
+     * published under, and clears `publish_attempts` — the bound in {@see MAX_PUBLISH_ATTEMPTS}
+     * counts CONSECUTIVE failures, so a batch that eventually succeeds must not carry the
+     * failures it recovered from into whatever phase 3 does with it. `base_sha` is the commit the publisher branched from — distinct
      * from each row's own `base_sha`, which is per-file accumulation-base bookkeeping set
      * at submission time.
      *
@@ -789,6 +886,7 @@ class SourceDataChangeRequestRepository
                     commit_sha         = :commit_sha,
                     pr_number          = :pr_number,
                     base_sha           = :base_sha,
+                    publish_attempts   = 0,
                     updated_at         = NOW()
               WHERE batch_id = :batch_id'
         );
@@ -806,7 +904,12 @@ class SourceDataChangeRequestRepository
 
     /**
      * Release a failed publish attempt: put a `queued` batch back to `none` so it is
-     * claimable again on the next run.
+     * claimable again on the next run, and count the attempt against
+     * {@see MAX_PUBLISH_ATTEMPTS}.
+     *
+     * The increment rides on the SAME guarded `UPDATE` as the release, so an attempt is
+     * counted exactly when a claim is actually given back — never when this call is a no-op
+     * because someone else already settled the batch.
      *
      * Deliberately NOT built on {@see markBatchPublicationStatus()} — that method is
      * unconditional by design (it is also how `merged`/`closed` get set later, which must
@@ -828,21 +931,45 @@ class SourceDataChangeRequestRepository
      * re-publishing already-published, successful work on the very next tick, indistinguishable
      * from a genuine failure. The `publication_status = 'queued'` guard makes this call a
      * no-op in that case (0 rows affected) instead: the row is already `open`, so it matches
-     * nothing. {@see \LiturgicalCalendar\Api\Services\SourceData\PublishRunner} uses that
-     * "0 rows" result as the signal that the batch was settled by someone else, not that this
-     * runner's release failed.
+     * nothing.
      *
-     * @return int Rows transitioned. Zero means the batch was no longer `queued` when this
-     *             ran — most likely because another runner already published it.
+     * # Why this returns a status and not a row count
+     *
+     * The guard makes "zero rows" ambiguous, and the two readings are opposites. `open` means
+     * another runner genuinely published this batch, so this runner's failure was redundant
+     * work. `none` means nothing is published anywhere — another runner's publish failed too
+     * (a GitHub outage fails every runner identically), or {@see reclaimStaleClaims()}
+     * released this batch out from under a merely-slow runner. Reading the second as the first
+     * is precisely the critical defect the final review of this feature found: a real outage
+     * reported success and re-claimed the same batch every iteration of the loop that exists
+     * to stop hammering. So this reports {@see ClaimReleaseOutcome}, and the caller branches on
+     * the observed state rather than on an integer.
+     *
+     * The observation and the release are ONE statement, deliberately. A `SELECT` after a
+     * zero-row `UPDATE` would report a status the row may already have left; a data-modifying
+     * CTE reads the pre-`UPDATE` version from the same snapshot the `UPDATE` evaluates against,
+     * so the reported status is the one the release actually acted on.
      */
-    public function releaseClaim(string $batchId): int
+    public function releaseClaim(string $batchId): ClaimReleaseOutcome
     {
         $stmt = $this->db->prepare(
-            'UPDATE sourcedata_change_requests
-                SET publication_status = :none,
-                    updated_at = NOW()
-              WHERE batch_id = :batch_id
-                AND publication_status = :queued'
+            'WITH observed AS (
+                 SELECT publication_status
+                   FROM sourcedata_change_requests
+                  WHERE batch_id = :batch_id
+                  LIMIT 1
+             ),
+             released AS (
+                 UPDATE sourcedata_change_requests
+                    SET publication_status = :none,
+                        publish_attempts   = publish_attempts + 1,
+                        updated_at = NOW()
+                  WHERE batch_id = :batch_id
+                    AND publication_status = :queued
+                 RETURNING id
+             )
+             SELECT ( SELECT publication_status FROM observed ) AS observed_status,
+                    ( SELECT COUNT(*) FROM released )          AS released_rows'
         );
         $stmt->execute([
             'none'     => ChangePublicationStatus::NONE->value,
@@ -850,12 +977,47 @@ class SourceDataChangeRequestRepository
             'batch_id' => $batchId,
         ]);
 
-        return $stmt->rowCount();
+        /** @var array<string, mixed>|false $row */
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (false === $row) {
+            return ClaimReleaseOutcome::BATCH_MISSING;
+        }
+
+        if (self::requireInt($row['released_rows'] ?? null, 'released_rows') > 0) {
+            return ClaimReleaseOutcome::RELEASED;
+        }
+
+        $observed = $row['observed_status'] ?? null;
+        if (!is_string($observed)) {
+            return ClaimReleaseOutcome::BATCH_MISSING;
+        }
+
+        // A `queued` observation that released nothing means a concurrent transaction moved
+        // the row between this statement's snapshot and its row lock. Nothing was released and
+        // nothing is known to be published, which is the NOT_CLAIMED reading — the
+        // conservative one, and the one that keeps an unexplained state out of the
+        // "settled, carry on" branch.
+        return match (ChangePublicationStatus::tryFrom($observed)) {
+            ChangePublicationStatus::OPEN,
+            ChangePublicationStatus::MERGED,
+            ChangePublicationStatus::CLOSED => ClaimReleaseOutcome::SETTLED_ELSEWHERE,
+            default                         => ClaimReleaseOutcome::NOT_CLAIMED,
+        };
     }
 
     /**
      * Release any row stranded `queued` whose `updated_at` is older than `$cutoff`, back to
-     * `none`, so it is claimable again.
+     * `none`, so it is claimable again — counting the abandoned attempt against
+     * {@see MAX_PUBLISH_ATTEMPTS}, exactly as {@see releaseClaim()} does.
+     *
+     * The increment here is not bookkeeping symmetry, it closes the sibling of the defect the
+     * bound exists for. A caught failure consumes an attempt; a batch that KILLS the process
+     * (an OOM on a large payload, a segfault) is caught by nothing, so if a reclaim were free
+     * that batch would be re-claimed and re-crash forever — the same permanent head-of-line
+     * block, reached through the one path that runs no PHP at all. The cost is that a merely
+     * slow publish, reclaimed while still alive, spends one attempt it did not deserve; a
+     * batch parked that way is visible in `/health` and un-parked by clearing
+     * `publish_attempts`, which is strictly better than a queue nobody can drain.
      *
      * Recovers from a crash between {@see claimNextPublishableBatch()} and the publish
      * finishing — a SIGKILL, an OOM kill, or a cron timeout — that leaves a batch `queued`
@@ -882,6 +1044,7 @@ class SourceDataChangeRequestRepository
         $stmt = $this->db->prepare(
             'UPDATE sourcedata_change_requests
                 SET publication_status = :none,
+                    publish_attempts   = publish_attempts + 1,
                     updated_at = NOW()
               WHERE publication_status = :queued
                 AND updated_at < :cutoff'

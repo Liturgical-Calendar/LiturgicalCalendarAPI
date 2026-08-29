@@ -28,9 +28,19 @@ final class FakeSourceDataPublisher implements SourceDataPublisherInterface
 
     public int $calls = 0;
 
+    /**
+     * @param \Throwable|null $throws          Thrown instead of publishing.
+     * @param string|null     $throwsForBatchId Narrows `$throws` to ONE batch id; every other
+     *                                          batch publishes normally. Null (the default)
+     *                                          means every batch throws. Needed to exercise a
+     *                                          failure the runner is expected to CONTINUE past,
+     *                                          which is only observable when there is a
+     *                                          subsequent batch left to publish.
+     */
     public function __construct(
         private readonly SourceDataChangeRequestRepository $repo,
-        private readonly ?\Throwable $throws = null
+        private readonly ?\Throwable $throws = null,
+        private readonly ?string $throwsForBatchId = null
     ) {
     }
 
@@ -38,7 +48,7 @@ final class FakeSourceDataPublisher implements SourceDataPublisherInterface
     {
         $this->calls++;
 
-        if (null !== $this->throws) {
+        if (null !== $this->throws && ( null === $this->throwsForBatchId || $batchId === $this->throwsForBatchId )) {
             throw $this->throws;
         }
 

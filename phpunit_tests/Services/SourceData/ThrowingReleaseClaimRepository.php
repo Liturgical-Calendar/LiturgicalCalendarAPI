@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests\Services\SourceData;
 
+use LiturgicalCalendar\Api\Enum\ClaimReleaseOutcome;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 
 /**
@@ -18,7 +19,7 @@ use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
  */
 final class ThrowingReleaseClaimRepository extends SourceDataChangeRequestRepository
 {
-    public function releaseClaim(string $batchId): int
+    public function releaseClaim(string $batchId): ClaimReleaseOutcome
     {
         throw new \RuntimeException('simulated outage: releaseClaim failed too');
     }

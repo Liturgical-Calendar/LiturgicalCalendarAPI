@@ -7,6 +7,7 @@ namespace LiturgicalCalendar\Tests\Repositories;
 use LiturgicalCalendar\Api\Enum\ChangeOperation;
 use LiturgicalCalendar\Api\Enum\ChangePublicationStatus;
 use LiturgicalCalendar\Api\Enum\ChangeReviewStatus;
+use LiturgicalCalendar\Api\Enum\ClaimReleaseOutcome;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Services\ChangeResource;
@@ -144,8 +145,10 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
      * to `none` while it still carried B's real `commit_sha`/`pr_number` — silently
      * re-publishing already-published work on the very next tick.
      *
-     * `releaseClaim()` must now be a no-op (0 rows affected, `open` untouched) once the batch
-     * is no longer `queued`. Reproduces the race directly against the repository without
+     * `releaseClaim()` must now be a no-op (nothing released, `open` untouched) once the batch
+     * is no longer `queued`, and must SAY SO — reporting `SETTLED_ELSEWHERE`, not a bare zero
+     * that a caller cannot tell apart from the batch having been released back to `none` by
+     * someone else's equally-failed attempt. Reproduces the race directly against the repository without
      * needing two real processes: "B publishes" is simulated with a plain
      * `recordPublication()` call, since from the repository's point of view that is
      * indistinguishable from an actual second runner having done it.
@@ -161,8 +164,12 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
 
         // Runner A: its own GitHub call now fails for real (branch moved under it) and it
         // tries to release the claim it believes it still holds.
-        $released = $this->repo->releaseClaim($batchId);
-        self::assertSame(0, $released, 'releaseClaim() must not affect rows once the batch is no longer queued');
+        $outcome = $this->repo->releaseClaim($batchId);
+        self::assertSame(
+            ClaimReleaseOutcome::SETTLED_ELSEWHERE,
+            $outcome,
+            'releaseClaim() must not affect rows once the batch is no longer queued, and must report why'
+        );
 
         foreach ($this->repo->getBatch($batchId) as $row) {
             self::assertSame(ChangePublicationStatus::OPEN->value, $row['publication_status']);
@@ -358,5 +365,103 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
         $union = array_unique(array_merge($claimedA, $claimedB));
         sort($union);
         self::assertSame($expectedIds, $union, 'every approved batch must be claimed exactly once, by exactly one runner');
+    }
+
+    /**
+     * The distinction the final whole-branch review found missing, at the level that settles
+     * it: `releaseClaim()` affects zero rows for reasons that are semantic OPPOSITES, and a row
+     * count cannot tell them apart. `open` means another runner published the batch; `none`
+     * means nobody did — reached whenever another runner's own publish failed too, or whenever
+     * the grace-period reclaim released this batch out from under a merely-slow runner. The
+     * caller stops the run for one and carries on for the other, so this method must report
+     * WHICH.
+     */
+    public function testReleaseClaimReportsWhatItObservedNotJustWhetherItChangedAnything(): void
+    {
+        // 1. The live claim: released, and the failure is genuine.
+        $queued = $this->submitAndApprove('editor-1', 'US');
+        $this->repo->claimNextPublishableBatch();
+        self::assertSame(ClaimReleaseOutcome::RELEASED, $this->repo->releaseClaim($queued));
+
+        // 2. Already back at `none` — the sibling of `open`, and the one that used to read as
+        //    "settled, carry on" purely because both affect zero rows.
+        self::assertSame(ClaimReleaseOutcome::NOT_CLAIMED, $this->repo->releaseClaim($queued));
+
+        // 3. Published by someone else: the ONLY zero-row case that is not a failure.
+        $published = $this->submitAndApprove('editor-2', 'DE');
+        $this->repo->claimNextPublishableBatch();
+        $this->repo->recordPublication($published, 'litcal-data/national_calendar/roman/DE', 'sha', 7, 'base');
+        self::assertSame(ClaimReleaseOutcome::SETTLED_ELSEWHERE, $this->repo->releaseClaim($published));
+
+        // 4. No such batch: an unexplained state, never read optimistically.
+        self::assertSame(
+            ClaimReleaseOutcome::BATCH_MISSING,
+            $this->repo->releaseClaim('00000000-0000-4000-8000-000000000000')
+        );
+    }
+
+    /**
+     * A release is also the moment an attempt is counted, and the count is what eventually
+     * parks a batch that fails forever so the rest of the queue can drain past it. Counting it
+     * anywhere else would either miss the crash path or double-count the ordinary one.
+     */
+    public function testReleaseClaimCountsAnAttemptAndParksTheBatchAtTheBound(): void
+    {
+        $batchId = $this->submitAndApprove('editor-1', 'US');
+
+        for ($attempt = 1; $attempt <= SourceDataChangeRequestRepository::MAX_PUBLISH_ATTEMPTS; $attempt++) {
+            self::assertSame($batchId, $this->repo->claimNextPublishableBatch(), "attempt {$attempt} must be claimable");
+            self::assertSame(ClaimReleaseOutcome::RELEASED, $this->repo->releaseClaim($batchId));
+
+            foreach ($this->repo->getBatch($batchId) as $row) {
+                self::assertEquals($attempt, $row['publish_attempts']);
+            }
+        }
+
+        self::assertNull(
+            $this->repo->claimNextPublishableBatch(),
+            'a batch that has spent every attempt must stop being claimed, or it blocks the queue forever'
+        );
+        self::assertSame(1, $this->repo->countParkedBatches(), 'and it must be visible while it is skipped');
+
+        // Parked, not dead-lettered: clearing the counter is all it takes to retry, which is
+        // what the runbook tells an operator to do.
+        self::$pdo->prepare('UPDATE sourcedata_change_requests SET publish_attempts = 0 WHERE batch_id = :b')
+            ->execute(['b' => $batchId]);
+        self::assertSame($batchId, $this->repo->claimNextPublishableBatch());
+        self::assertSame(0, $this->repo->countParkedBatches());
+    }
+
+    /**
+     * The skip list is a WITHIN-RUN exclusion, not a status: a batch passed over here is still
+     * perfectly claimable on the caller's next tick. Its whole job is to stop a caller that
+     * continues past a failure from immediately re-claiming the batch it just released, which
+     * — being back at `none` and the oldest — would otherwise be the next candidate.
+     */
+    public function testSkippedBatchIdsArePassedOverWithoutBeingParked(): void
+    {
+        $first  = $this->submitAndApprove('editor-1', 'US');
+        $second = $this->submitAndApprove('editor-2', 'DE');
+
+        self::assertSame($second, $this->repo->claimNextPublishableBatch([$first]));
+        self::assertSame(0, $this->repo->countParkedBatches(), 'skipping is not parking');
+        self::assertSame($first, $this->repo->claimNextPublishableBatch(), 'and it lasts only as long as the caller says');
+    }
+
+    public function testCountParkedBatchesIgnoresBatchesThatAreNoLongerWaiting(): void
+    {
+        $published = $this->submitAndApprove('editor-1', 'US');
+
+        // Exhaust the bound, then publish anyway (an operator retry, or phase 3).
+        self::$pdo->prepare('UPDATE sourcedata_change_requests SET publish_attempts = :n WHERE batch_id = :b')
+            ->execute(['n' => SourceDataChangeRequestRepository::MAX_PUBLISH_ATTEMPTS, 'b' => $published]);
+        self::assertSame(1, $this->repo->countParkedBatches());
+
+        $this->repo->recordPublication($published, 'litcal-data/national_calendar/roman/US', 'sha', 7, 'base');
+        self::assertSame(
+            0,
+            $this->repo->countParkedBatches(),
+            'a batch that reached GitHub is not stuck, whatever its attempt history'
+        );
     }
 }

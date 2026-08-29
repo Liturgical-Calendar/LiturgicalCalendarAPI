@@ -19,7 +19,16 @@ final readonly class PublishRunResult
         /** Batches actually published during this run, whether or not it later stopped early. */
         public int $published,
         /** True if the run stopped because a publish attempt threw, rather than an empty queue. */
-        public bool $stoppedOnFailure = false
+        public bool $stoppedOnFailure = false,
+        /**
+         * Approved batches that have exhausted
+         * {@see \LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository::MAX_PUBLISH_ATTEMPTS}
+         * and are no longer being claimed. Reported on EVERY run, including successful ones:
+         * a parked batch produces no failure of its own — that is the whole point of parking
+         * it — so a run that publishes everything else and exits 0 is exactly the run that
+         * would otherwise hide it.
+         */
+        public int $parkedBatches = 0
     ) {
     }
 }

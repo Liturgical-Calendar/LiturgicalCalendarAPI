@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Api\Services\SourceData;
 
+use LiturgicalCalendar\Api\Enum\ClaimReleaseOutcome;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
+use LiturgicalCalendar\Api\Services\GitHub\GitHubApiException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
@@ -52,17 +54,63 @@ use Psr\Log\NullLogger;
  * genuinely and successfully published — recorded `open` with a real `commit_sha` and
  * `pr_number` — back to `none`, causing it to be silently republished next tick while still
  * carrying the first publish's real identifiers. `SourceDataChangeRequestRepository::releaseClaim()`
- * therefore only releases a row that is still `queued` (see that method's own docblock); once
- * another runner has moved it to `open`, this runner's release matches zero rows. That zero
- * is the signal, not an error: it means "this batch is not stranded, someone else finished
- * it", so `runOnce()` treats it as ordinary — it does NOT set `stoppedOnFailure`, and the loop
- * `continue`s to the next batch rather than stopping, because nothing about the underlying
- * GitHub API is actually failing. A release that DOES affect a row (or that throws) is a
- * genuine failure and still stops the loop with `stoppedOnFailure: true`, per "Stop, don't
- * hammer" below. See {@see \LiturgicalCalendar\Api\Services\GitHub\GitHubGitDataClient} /
+ * therefore only releases a row that is still `queued` (see that method's own docblock).
+ *
+ * What that guard does NOT do is make "released nothing" mean "someone else published it".
+ * The guard fails to match for several reasons, and they are semantic opposites:
+ * `open`/`merged`/`closed` means another runner genuinely finished the batch, while `none`
+ * means nothing is published anywhere — reached whenever another runner's own publish failed
+ * too (one GitHub outage fails every runner identically) or whenever `reclaimStaleClaims()`
+ * released this batch out from under a merely-slow runner, which it does on every tick. An
+ * earlier revision of this class inferred "settled" from a zero row count, so a real outage
+ * logged success, left `stoppedOnFailure` false, and re-claimed the same batch on every
+ * iteration of the loop that exists to stop hammering — the exact opposite of both rules
+ * below. `releaseClaim()` therefore reports the OBSERVED STATUS as a
+ * {@see \LiturgicalCalendar\Api\Enum\ClaimReleaseOutcome}, and `runOnce()` branches on it:
+ * only `SETTLED_ELSEWHERE` continues without failing; `RELEASED`, `NOT_CLAIMED`,
+ * `BATCH_MISSING` and a release that throws are all genuine failures that stop the loop with
+ * `stoppedOnFailure: true`, per "Stop, don't hammer" below. See
+ * {@see \LiturgicalCalendar\Api\Services\GitHub\GitHubGitDataClient} /
  * `scripts/publish-sourcedata.php`'s HTTP client wiring for the timeout that keeps "still
  * running" and "abandoned" distinguishable in the first place — an unbounded request could
  * outlive the grace period indefinitely, making this race far more likely than intended.
+ *
+ * # Contention is not an outage
+ *
+ * Two runners publishing DIFFERENT batches of the SAME resource both target that resource's
+ * one branch, and `updateRef()`'s hardcoded `force: false` means the loser gets a `422`
+ * non-fast-forward rather than clobbering the winner's commit. That is the design working:
+ * expected, self-healing (the next tick republishes onto the head the winner pushed), and
+ * proof that GitHub is healthy and answering. Stopping the whole tick for it — and exiting 1,
+ * paging an operator — would report an outage for a race the design deliberately allows. A
+ * `422` therefore logs a WARNING (it must stay visible; a silenced race is how a genuinely
+ * stuck branch hides) and continues with the rest of the queue, while every other failure
+ * still stops. The batch is not let off: the attempt is counted, so a batch that `422`s
+ * forever is parked by the bounded-attempts rule below rather than retried forever.
+ *
+ * # One bad batch must not strand the queue
+ *
+ * "Stop, don't hammer" below has a sharp edge of its own: candidates are ordered oldest-first
+ * and a failed publish returns its batch to `none`, so a batch that fails DETERMINISTICALLY —
+ * an illegal git-ref character in a `resource_id`, a tree-path conflict, a payload a later
+ * validation change rejects — is re-claimed first on every tick and every tick aborts before
+ * reaching anything else. One editor's broken proposal then blocks every other editor's good
+ * work indefinitely, and the only symptom is a log line repeating.
+ *
+ * Two bounds close that. Across runs,
+ * {@see SourceDataChangeRequestRepository::MAX_PUBLISH_ATTEMPTS} caps CONSECUTIVE attempts per
+ * batch (`releaseClaim()` and `reclaimStaleClaims()` count them, `recordPublication()` resets
+ * them, so a transient GitHub blip cannot park anything); once a batch reaches the cap it stops
+ * being claimable and the queue drains past it. Within one run, a batch this pass already
+ * attempted is passed to `claimNextPublishableBatch()` as a skip id, because a batch just
+ * released to `none` is instantly the oldest candidate again — so a `continue` would otherwise
+ * re-claim the very batch it just failed on, which is in-process retry by another name.
+ *
+ * A parked batch is NOT a dead-lettered one — this feature has no dead-letter queue, and the
+ * rows are untouched and still `approved`. But it must never be a SILENT one, which would be
+ * the same class of defect as the stranded batch above: every run reports
+ * {@see PublishRunResult::$parkedBatches}, logs a warning when it is non-zero, and
+ * `GET /health`'s `source_data_publisher` block reports it out of band.
  *
  * # Stop, don't hammer
  *
@@ -126,16 +174,34 @@ final class PublishRunner
     public function runOnce(int $limit = 10): PublishRunResult
     {
         if (!$this->reclaimStaleClaimsSafely()) {
-            return new PublishRunResult(0, stoppedOnFailure: true);
+            return $this->result(0, stoppedOnFailure: true);
         }
 
         $published = 0;
+        /** @var list<string> $attempted Batches this run already tried; never tried twice. */
+        $attempted = [];
 
         for ($i = 0; $i < $limit; $i++) {
-            $batchId = $this->repository->claimNextPublishableBatch();
+            try {
+                $batchId = $this->repository->claimNextPublishableBatch($attempted);
+            } catch (\Throwable $e) {
+                $this->logger->error(
+                    'Claiming the next publishable source-data change request batch failed; '
+                        . 'stopping this run rather than looping against an unhealthy database.',
+                    [
+                        'exception' => $e::class,
+                        'message'   => $e->getMessage(),
+                    ]
+                );
+
+                return $this->result($published, stoppedOnFailure: true);
+            }
+
             if (null === $batchId) {
                 break;
             }
+
+            $attempted[] = $batchId;
 
             try {
                 $this->publisher->publish($batchId);
@@ -149,33 +215,128 @@ final class PublishRunner
                     ]
                 );
 
-                $releasedRows = $this->releaseClaimSafely($batchId);
+                $outcome = $this->releaseClaimSafely($batchId);
 
-                if (0 === $releasedRows) {
-                    // Guaranteed by SourceDataChangeRequestRepository::releaseClaim()'s own
-                    // `publication_status = 'queued'` guard: zero rows means this batch was no
-                    // longer queued by the time we tried to release it, i.e. another runner
-                    // already published it successfully. Not this run's failure — move on.
+                if (null !== $outcome && $outcome->isSettled()) {
+                    // The ONLY non-failure reading of a zero-row release, and it is a positive
+                    // observation rather than an inference: the batch is `open`/`merged`/
+                    // `closed`, so another runner genuinely published it while this runner's
+                    // doomed attempt was still in flight. Nothing about GitHub is failing;
+                    // this attempt was simply redundant. Move on to the next batch.
                     $this->logger->info(
                         'Batch was already settled (published) by another runner before this '
                             . "run's own release could take effect; not counted as a failure.",
-                        ['batch_id' => $batchId]
+                        ['batch_id' => $batchId, 'release_outcome' => $outcome->value]
                     );
                     continue;
                 }
 
-                // Either releaseClaim() genuinely released a still-queued claim (a real
-                // failure, now retryable), or it threw and releaseClaimSafely() already
-                // logged that (still a real failure — the batch just could not be confirmed
-                // un-stranded from here). Either way this is a real failure: stop rather than
-                // hammer a failing API with the rest of the queue.
-                return new PublishRunResult($published, stoppedOnFailure: true);
+                if ($this->isBranchContention($e)) {
+                    // Two batches of the SAME resource target one branch, so the loser of that
+                    // race gets a 422. See the class docblock's "Contention is not an outage".
+                    $this->logger->warning(
+                        'Publishing this batch lost a race for its resource branch (GitHub 422); '
+                            . 'the batch stays claimable and the next tick republishes it onto the '
+                            . 'branch head the winner pushed. Continuing with the rest of the queue.',
+                        [
+                            'batch_id'        => $batchId,
+                            'message'         => $e->getMessage(),
+                            'release_outcome' => $outcome->value ?? 'release_failed',
+                        ]
+                    );
+                    continue;
+                }
+
+                // Everything else is a real failure, whichever way the release read:
+                // RELEASED (this runner held the live claim and its publish failed),
+                // NOT_CLAIMED (`none` — nobody published it and nobody holds it, so the work
+                // is still undone), BATCH_MISSING (an unexplained state, never read
+                // optimistically), or null (the release itself threw, already logged by
+                // releaseClaimSafely()). Stop rather than hammer a failing API with the rest
+                // of the queue.
+                $this->logger->warning(
+                    'Stopping this run after a failed publish attempt.',
+                    ['batch_id' => $batchId, 'release_outcome' => $outcome->value ?? 'release_failed']
+                );
+
+                return $this->result($published, stoppedOnFailure: true);
             }
 
             $published++;
         }
 
-        return new PublishRunResult($published);
+        return $this->result($published);
+    }
+
+    /**
+     * Assemble a {@see PublishRunResult}, attaching the parked-batch count every run reports.
+     *
+     * Every return from {@see runOnce()} goes through here so that no exit path can drop the
+     * count: a batch that has stopped being attempted is exactly as invisible as one stranded
+     * `queued`, and the runs most likely to leave batches parked are the ones that end early.
+     */
+    private function result(int $published, bool $stoppedOnFailure = false): PublishRunResult
+    {
+        return new PublishRunResult($published, $stoppedOnFailure, $this->parkedBatchCountSafely());
+    }
+
+    /**
+     * Count (and, when non-zero, log) batches that have exhausted
+     * {@see SourceDataChangeRequestRepository::MAX_PUBLISH_ATTEMPTS}.
+     *
+     * Wrapped for the same reason every other DB call in this class is: reporting how much work
+     * is stuck must never be the thing that turns a completed run into a raw fatal. A count
+     * that cannot be read is reported as 0 and logged, rather than guessed at.
+     */
+    private function parkedBatchCountSafely(): int
+    {
+        try {
+            $parked = $this->repository->countParkedBatches();
+        } catch (\Throwable $e) {
+            $this->logger->error(
+                'Counting parked source-data change request batches failed; this run reports 0 '
+                    . 'parked batches, which may understate what is actually stuck.',
+                [
+                    'exception' => $e::class,
+                    'message'   => $e->getMessage(),
+                ]
+            );
+
+            return 0;
+        }
+
+        if ($parked > 0) {
+            $this->logger->warning(
+                'Approved source-data change request batches have exhausted their publish attempts '
+                    . 'and are no longer being attempted; they need an operator. See the '
+                    . 'change-request runbook, "Parked batches".',
+                [
+                    'parked_batches' => $parked,
+                    'max_attempts'   => SourceDataChangeRequestRepository::MAX_PUBLISH_ATTEMPTS,
+                ]
+            );
+        }
+
+        return $parked;
+    }
+
+    /**
+     * Is this failure the expected symptom of two runners racing for one resource's branch,
+     * rather than an unhealthy GitHub?
+     *
+     * `updateRef()` hardcodes `force: false`, so the loser of that race gets a `422` instead
+     * of clobbering the winner's commit — see the class docblock's "Contention is not an
+     * outage". Matched on the HTTP status alone, never on GitHub's message text, which is not
+     * a contract. Other `422`s exist (a validation error on `createRef()` or
+     * `openPullRequest()`), and they get the same treatment for the same reason: a `422` is
+     * GitHub answering, in detail, about THIS request. It says nothing about the next batch,
+     * which is what makes continuing safe — and the attempt is still counted against the
+     * batch's bounded attempts, so a batch that `422`s forever is eventually parked rather
+     * than retried forever.
+     */
+    private function isBranchContention(\Throwable $e): bool
+    {
+        return $e instanceof GitHubApiException && 422 === $e->status;
     }
 
     /**
@@ -184,11 +345,14 @@ final class PublishRunner
      * very plausibly also breaks this call — but an operator greping logs should find a
      * structured entry, not a stack trace with no context.
      *
-     * @return int|null The row count from `releaseClaim()` (0 means the batch was already
-     *                   settled elsewhere, not a failure — see the class docblock), or null if
-     *                   `releaseClaim()` itself threw.
+     * @return ClaimReleaseOutcome|null What `releaseClaim()` observed (see that enum: only
+     *                   {@see ClaimReleaseOutcome::SETTLED_ELSEWHERE} is a non-failure), or
+     *                   null if `releaseClaim()` itself threw. Null is treated as a failure by
+     *                   the caller: a thrown exception gives no positive "already settled"
+     *                   observation the way a clean status read does, and an unknown state is
+     *                   read conservatively.
      */
-    private function releaseClaimSafely(string $batchId): ?int
+    private function releaseClaimSafely(string $batchId): ?ClaimReleaseOutcome
     {
         try {
             return $this->repository->releaseClaim($batchId);

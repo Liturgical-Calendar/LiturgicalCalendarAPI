@@ -37,6 +37,7 @@ use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode;
 use LiturgicalCalendar\Api\Services\TestRunPolicy;
 use LiturgicalCalendar\Api\Services\WsCallerResolver;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
+use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Services\WebSocketMessageValidator;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
@@ -5327,41 +5328,93 @@ class Health implements MessageComponentInterface
      * do (configured or not) is the ordinary, quiet case for a self-hosted instance that does
      * not run the change-request queue.
      *
+     * It also reports `parked_batches`: approved batches that have exhausted
+     * {@see \LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository::MAX_PUBLISH_ATTEMPTS}
+     * consecutive publish attempts and are therefore no longer being claimed, so the rest of
+     * the queue can drain past them. That bound is what stops one deterministically-failing
+     * batch from stranding every other editor's work — but a batch that has silently stopped
+     * being attempted is the same class of defect as one stranded mid-publish, so it is
+     * reported here rather than only in the publisher's own log. It is a `warning`, not an
+     * error: nothing is lost, and clearing `publish_attempts` retries the batch (see the
+     * change-request runbook, "Parked batches").
+     *
      * Designed to be called from HealthHandler (HTTP context), mirroring
      * {@see Health::buildSourceDataWriteModeStatus()} — same "static method here, consumed by
-     * the HTTP handler" shape.
+     * the HTTP handler" shape. The parked count is read through the same
+     * `Connection::isConfigured()` + catch-everything guard {@see buildOutboxStats()} uses: a
+     * database that is down must degrade this block to zero, not break the endpoint monitoring
+     * relies on.
      *
-     * @return array{status: 'ok'|'warning', message: string}
+     * @return array{status: 'ok'|'warning', message: string, parked_batches: int}
      */
     public static function buildSourceDataPublisherStatus(): array
     {
         $queueModeOn = SourceDataWriteMode::changeRequestsEnabled();
         $configured  = SourceDataPublisher::isConfigured();
+        $parked      = self::parkedChangeRequestBatches();
 
         if ($queueModeOn && !$configured) {
             return [
-                'status'  => 'warning',
-                'message' => 'change request queue mode is on but the source data publisher is not configured '
+                'status'         => 'warning',
+                'message'        => 'change request queue mode is on but the source data publisher is not configured '
                     . '(GITHUB_APP_ID, GITHUB_APP_INSTALLATION_ID, GITHUB_APP_PRIVATE_KEY_PATH, GITHUB_REPOSITORY); '
                     . 'approved change requests are accumulating unpublished',
+                'parked_batches' => $parked,
+            ];
+        }
+
+        if ($parked > 0) {
+            return [
+                'status'         => 'warning',
+                'message'        => sprintf(
+                    '%d approved change request batch(es) have exhausted %d consecutive publish attempts and are no '
+                        . 'longer being attempted; the rest of the queue is draining past them. See the '
+                        . 'change-request runbook, "Parked batches", for how to inspect and retry them',
+                    $parked,
+                    SourceDataChangeRequestRepository::MAX_PUBLISH_ATTEMPTS
+                ),
+                'parked_batches' => $parked,
             ];
         }
 
         if ($configured) {
             return [
-                'status'  => 'ok',
-                'message' => $queueModeOn
+                'status'         => 'ok',
+                'message'        => $queueModeOn
                     ? 'source data publisher is configured and will publish approved change requests to GitHub'
                     : 'source data publisher is configured, but change request queue mode is off, so there is '
                         . 'nothing to publish',
+                'parked_batches' => $parked,
             ];
         }
 
         return [
-            'status'  => 'ok',
-            'message' => 'source data publisher is not configured (change request queue mode is off, so there is '
+            'status'         => 'ok',
+            'message'        => 'source data publisher is not configured (change request queue mode is off, so there is '
                 . 'nothing to publish)',
+            'parked_batches' => $parked,
         ];
+    }
+
+    /**
+     * Approved batches the publisher has given up on, or 0 when there is no database to ask.
+     *
+     * Deliberately swallows everything, exactly as {@see buildOutboxStats()} does: /health is
+     * unauthenticated infrastructure monitoring polls, and an unreachable database is already
+     * reported by its own `database` field. Turning that into a 500 here would take the whole
+     * endpoint down over a secondary statistic.
+     */
+    private static function parkedChangeRequestBatches(): int
+    {
+        if (!Connection::isConfigured()) {
+            return 0;
+        }
+
+        try {
+            return ( new SourceDataChangeRequestRepository(Connection::getInstance()) )->countParkedBatches();
+        } catch (\Throwable) {
+            return 0;
+        }
     }
 
     /**

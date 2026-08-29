@@ -6,6 +6,7 @@ namespace LiturgicalCalendar\Tests\Services\SourceData;
 
 use LiturgicalCalendar\Api\Enum\ChangeOperation;
 use LiturgicalCalendar\Api\Enum\ChangePublicationStatus;
+use LiturgicalCalendar\Api\Enum\ChangeReviewStatus;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Services\ChangeResource;
@@ -112,7 +113,11 @@ final class PublishRunnerTest extends RepositoryTestCase
     {
         $batchId = $this->approveOne('editor-1');
 
-        $runner = $this->runnerThatThrows(new GitHubApiException(422, 'Update is not a fast forward'));
+        // A 500 rather than the 422 this test used to throw: a 422 is branch CONTENTION, which
+        // the runner deliberately treats as expected and self-healing (see
+        // testALostBranchRaceContinuesTheRunButStaysVisible below). Any other status is an
+        // outage-shaped failure, which is what this test is about.
+        $runner = $this->runnerThatThrows(new GitHubApiException(500, 'Server Error'));
         $result = $runner->runOnce();
         self::assertSame(0, $result->published);
         self::assertTrue($result->stoppedOnFailure, 'the exit code depends on this to signal an operator');
@@ -341,6 +346,236 @@ final class PublishRunnerTest extends RepositoryTestCase
         foreach ($this->repo->getBatch($nextBatch) as $row) {
             self::assertSame(ChangePublicationStatus::OPEN->value, $row['publication_status']);
             self::assertSame(FakeSourceDataPublisher::COMMIT_SHA, $row['commit_sha']);
+        }
+    }
+
+    /**
+     * The SIBLING of the test above, and the defect the final whole-branch review found: a
+     * zero-row release is not one signal, it is two. `open` means another runner genuinely
+     * published this batch; `none` means another runner's publish FAILED too (or a reclaim
+     * fired) and nothing is published anywhere. The old code read both as "already settled
+     * (published) by another runner", so a GitHub outage — which fails every runner
+     * identically, producing exactly the `none` variant — reported success and re-claimed the
+     * same batch on every iteration of the very loop that exists to stop hammering.
+     *
+     * `$publisher->calls` is the load-bearing assertion: without the fix the same batch is
+     * claimed and attempted once per iteration, ten times in a default-limit run, with
+     * `stoppedOnFailure` false and the cron script exiting 0.
+     */
+    public function testABatchLeftAtNoneByAnotherRunnersFailedPublishIsThisRunsFailure(): void
+    {
+        $batchId = $this->approveOne('editor-1');
+
+        $testHandler = new TestHandler();
+        $logger      = new Logger('test', [$testHandler]);
+        $publisher   = new ClaimVanishedSourceDataPublisher($this->repo);
+        $runner      = new PublishRunner($this->repo, $publisher, logger: $logger);
+
+        $result = $runner->runOnce();
+
+        self::assertTrue(
+            $result->stoppedOnFailure,
+            'a batch nobody published is a genuine failure, however the release row count reads'
+        );
+        self::assertSame(0, $result->published);
+        self::assertSame(1, $publisher->calls, 'the run must stop, not re-claim and re-attempt the same batch');
+        self::assertFalse(
+            $testHandler->hasInfoThatContains('already settled'),
+            'nothing was settled: claiming otherwise is the false success this test pins down'
+        );
+
+        foreach ($this->repo->getBatch($batchId) as $row) {
+            self::assertSame(ChangePublicationStatus::NONE->value, $row['publication_status']);
+        }
+    }
+
+    /**
+     * A lost race for a resource's branch is not an outage. Two runners publishing DIFFERENT
+     * batches of the SAME resource both target that resource's one branch, and
+     * `updateRef()`'s hardcoded `force: false` makes the loser fail with a `422` rather than
+     * clobber the winner. The runbook calls that expected and self-healing, so reporting it
+     * identically to a revoked credential — stopping the tick and exiting 1 — pages an
+     * operator for the design working as intended.
+     *
+     * It must not be silenced either: the warning is what distinguishes "two editors are busy
+     * on one resource" from "this branch has been stuck for a week".
+     */
+    public function testALostBranchRaceContinuesTheRunButStaysVisible(): void
+    {
+        $contended = $this->approveOne('editor-1', 'US');
+        $nextBatch = $this->approveOne('editor-2', 'DE');
+
+        $testHandler = new TestHandler();
+        $logger      = new Logger('test', [$testHandler]);
+        $publisher   = new FakeSourceDataPublisher(
+            $this->repo,
+            new GitHubApiException(422, 'Update is not a fast forward'),
+            $contended
+        );
+        $runner      = new PublishRunner($this->repo, $publisher, logger: $logger);
+
+        $result = $runner->runOnce();
+
+        self::assertFalse($result->stoppedOnFailure, 'expected contention must not page an operator');
+        self::assertSame(1, $result->published);
+        self::assertTrue(
+            $testHandler->hasWarningThatContains('lost a race'),
+            'continuing must not mean going quiet'
+        );
+
+        // The contended batch is released, not stranded: the next tick republishes it onto the
+        // branch head the winner pushed.
+        foreach ($this->repo->getBatch($contended) as $row) {
+            self::assertSame(ChangePublicationStatus::NONE->value, $row['publication_status']);
+        }
+
+        // The rest of the queue drained rather than being abandoned for the tick.
+        foreach ($this->repo->getBatch($nextBatch) as $row) {
+            self::assertSame(ChangePublicationStatus::OPEN->value, $row['publication_status']);
+        }
+    }
+
+    /**
+     * `claimNextPublishableBatch()` was the one unwrapped DB call in `runOnce()`, inside a
+     * method whose own docblock justifies wrapping its two siblings so a DB outage cannot
+     * escape as a raw fatal with no summary line for the cron script to report. Same
+     * treatment, same reason.
+     */
+    public function testAFailureToClaimIsLoggedNotThrown(): void
+    {
+        $this->approveOne('editor-1');
+
+        $testHandler = new TestHandler();
+        $logger      = new Logger('test', [$testHandler]);
+        $runner      = new PublishRunner(
+            new ThrowingClaimRepository(self::$pdo),
+            new FakeSourceDataPublisher($this->repo),
+            logger: $logger
+        );
+
+        $result = $runner->runOnce();
+
+        self::assertSame(0, $result->published);
+        self::assertTrue($result->stoppedOnFailure, 'a DB outage must reach the exit code, not a stack trace');
+        self::assertTrue($testHandler->hasErrorThatContains('Claiming the next publishable'));
+    }
+
+    /**
+     * Head-of-line blocking: the defect the final whole-branch review measured at five ticks,
+     * the same batch attempted every time, two other editors' approved work never attempted
+     * once. Candidates are ordered oldest-first, a failed publish returns its batch to `none`,
+     * and the runner stops on failure — so without a bound the oldest failing batch is
+     * re-claimed first on every tick, forever, and nothing behind it ever publishes.
+     *
+     * The bound is CONSECUTIVE attempts per batch. Once the oldest batch has spent them, it is
+     * parked (not claimed, not deleted, not dead-lettered) and the queue drains past it. The
+     * younger batch publishing on the very next tick is the assertion that matters; without the
+     * fix it publishes on no tick at all, however many run.
+     */
+    public function testABatchThatKeepsFailingIsEventuallySkippedSoTheQueueDrains(): void
+    {
+        $failing = $this->approveOne('editor-1', 'US');
+        $healthy = $this->approveOne('editor-2', 'DE');
+
+        $testHandler = new TestHandler();
+        $logger      = new Logger('test', [$testHandler]);
+        $publisher   = new FakeSourceDataPublisher(
+            $this->repo,
+            new GitHubApiException(500, 'Server Error'),
+            $failing
+        );
+        $runner      = new PublishRunner($this->repo, $publisher, logger: $logger);
+
+        // Every attempt this batch is allowed. Each tick claims the OLDEST batch, which is the
+        // failing one, and stops — so the healthy batch is not reached in any of them.
+        for ($tick = 1; $tick <= SourceDataChangeRequestRepository::MAX_PUBLISH_ATTEMPTS; $tick++) {
+            $result = $runner->runOnce();
+            self::assertTrue($result->stoppedOnFailure, "tick {$tick} must still report a genuine failure");
+            self::assertSame(0, $result->published);
+        }
+
+        self::assertSame(
+            SourceDataChangeRequestRepository::MAX_PUBLISH_ATTEMPTS,
+            $publisher->calls,
+            'exactly one attempt per tick, on the same batch'
+        );
+        foreach ($this->repo->getBatch($healthy) as $row) {
+            self::assertSame(
+                ChangePublicationStatus::NONE->value,
+                $row['publication_status'],
+                'the younger batch is behind the failing one and has not been reached yet'
+            );
+        }
+
+        // The tick that used to be identical to the five before it.
+        $result = $runner->runOnce();
+
+        self::assertSame(1, $result->published, 'the queue must drain past a batch that has stopped being attempted');
+        self::assertFalse($result->stoppedOnFailure, 'a parked batch is not this run\'s failure');
+        self::assertSame(1, $result->parkedBatches, 'a parked batch must be reported, not silently skipped');
+        self::assertTrue(
+            $testHandler->hasWarningThatContains('exhausted their publish attempts'),
+            'a batch that stopped being attempted must reach the log, not only the health endpoint'
+        );
+
+        foreach ($this->repo->getBatch($healthy) as $row) {
+            self::assertSame(ChangePublicationStatus::OPEN->value, $row['publication_status']);
+        }
+
+        // Parked, not lost: still approved, still `none`, its rows untouched, and claimable
+        // again the moment an operator clears the counter.
+        foreach ($this->repo->getBatch($failing) as $row) {
+            self::assertSame(ChangePublicationStatus::NONE->value, $row['publication_status']);
+            self::assertSame(ChangeReviewStatus::APPROVED->value, $row['review_status']);
+            self::assertEquals(SourceDataChangeRequestRepository::MAX_PUBLISH_ATTEMPTS, $row['publish_attempts']);
+        }
+    }
+
+    /**
+     * A transient failure must NOT park a batch. `recordPublication()` clears the counter, so
+     * the bound only ever fires on genuinely consecutive failures — otherwise a GitHub blip
+     * every few days would eventually park perfectly good work.
+     */
+    public function testASuccessfulPublishClearsEarlierFailedAttempts(): void
+    {
+        $batchId = $this->approveOne('editor-1');
+
+        $failing = $this->runnerThatThrows(new GitHubApiException(500, 'Server Error'));
+        $failing->runOnce();
+
+        foreach ($this->repo->getBatch($batchId) as $row) {
+            self::assertEquals(1, $row['publish_attempts'], 'the failed attempt is counted');
+        }
+
+        $result = $this->runner()->runOnce();
+        self::assertSame(1, $result->published);
+        self::assertSame(0, $result->parkedBatches);
+
+        foreach ($this->repo->getBatch($batchId) as $row) {
+            self::assertSame(ChangePublicationStatus::OPEN->value, $row['publication_status']);
+            self::assertEquals(0, $row['publish_attempts'], 'a batch that publishes carries no failure residue');
+        }
+    }
+
+    /**
+     * The sibling of the caught-failure path, and the one nothing else covers: a batch that
+     * KILLS the process (an OOM on a large payload) is caught by no `catch` at all. Its claim
+     * is recovered by the grace-period reclaim — so if a reclaim were free, that batch would be
+     * re-claimed and re-crash forever, the same permanent head-of-line block reached through
+     * the one path that runs no PHP. A reclaim therefore spends an attempt too.
+     */
+    public function testAReclaimedStaleClaimAlsoSpendsAnAttempt(): void
+    {
+        $batchId = $this->approveOne('editor-1');
+        $this->repo->claimNextPublishableBatch();
+        $this->backdateUpdatedAt($batchId, minutesAgo: 20);
+
+        $runner = new PublishRunner($this->repo, new FakeSourceDataPublisher($this->repo), graceSeconds: 600);
+        $runner->runOnce(0);
+
+        foreach ($this->repo->getBatch($batchId) as $row) {
+            self::assertSame(ChangePublicationStatus::NONE->value, $row['publication_status']);
+            self::assertEquals(1, $row['publish_attempts'], 'an abandoned attempt is still an attempt');
         }
     }
 }

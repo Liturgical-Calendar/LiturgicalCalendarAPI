@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LiturgicalCalendar\Tests;
 
+use LiturgicalCalendar\Api\Database\Connection;
 use LiturgicalCalendar\Api\Health;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataPublisher;
 use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode;
@@ -53,6 +54,13 @@ final class HealthSourceDataPublisherTest extends TestCase
             $this->originalEnv[$key] = $_ENV[$key] ?? false;
             unset($_ENV[$key]);
         }
+
+        // The block now also reports parked batches, which is a DB read. These cases are about
+        // the ENVIRONMENT-decided branches, so the connection must resolve from the placeholder
+        // credentials below (and fail, yielding zero) rather than from a live singleton some
+        // earlier test opened against the real database — otherwise whether this suite passes
+        // would depend on rows another suite happened to leave behind, and on test order.
+        Connection::close();
     }
 
     protected function tearDown(): void
@@ -65,6 +73,10 @@ final class HealthSourceDataPublisherTest extends TestCase
             }
         }
         $this->originalEnv = [];
+
+        // Drop the placeholder-credential connection (or the failed attempt at one) so the next
+        // suite reconnects from the restored environment.
+        Connection::close();
     }
 
     private function enableQueueMode(): void
@@ -96,6 +108,7 @@ final class HealthSourceDataPublisherTest extends TestCase
 
         self::assertSame('ok', $status['status']);
         self::assertStringContainsString('will publish', $status['message']);
+        self::assertSame(0, $status['parked_batches'], 'no database reachable here: the count degrades to zero');
     }
 
     public function testQueueModeOnAndPublisherUnconfiguredIsAWarningNamingTheConsequence(): void
