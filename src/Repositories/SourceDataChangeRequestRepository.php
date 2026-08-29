@@ -273,6 +273,19 @@ class SourceDataChangeRequestRepository
         return $value;
     }
 
+    /**
+     * Narrow a COUNT(*) result read back through PDO to int, rather than casting
+     * mixed and hoping — mirrors {@see requireString} for the same reason.
+     */
+    private static function requireInt(mixed $value, string $column): int
+    {
+        if (!is_int($value) && !is_numeric($value)) {
+            throw new \RuntimeException(sprintf('Expected column %s to be numeric, got %s', $column, get_debug_type($value)));
+        }
+
+        return (int) $value;
+    }
+
     private function newBatchId(): string
     {
         $stmt = $this->db->query('SELECT gen_random_uuid()');
@@ -281,5 +294,150 @@ class SourceDataChangeRequestRepository
         }
 
         return (string) $stmt->fetchColumn();
+    }
+
+    /**
+     * @return array<int, array<string, mixed>> One entry per batch, newest first.
+     */
+    public function listBySubmitter(
+        string $sub,
+        ?ChangeReviewStatus $status = null,
+        int $limit = 50,
+        int $offset = 0
+    ): array {
+        return $this->listBatches('submitted_by_sub = :sub', ['sub' => $sub], $status, $limit, $offset);
+    }
+
+    /**
+     * @return array<int, array<string, mixed>> One entry per batch, newest first.
+     */
+    public function listAll(?ChangeReviewStatus $status = null, int $limit = 50, int $offset = 0): array
+    {
+        return $this->listBatches('TRUE', [], $status, $limit, $offset);
+    }
+
+    public function countBySubmitter(string $sub, ?ChangeReviewStatus $status = null): int
+    {
+        return $this->countBatches('submitted_by_sub = :sub', ['sub' => $sub], $status);
+    }
+
+    public function countAll(?ChangeReviewStatus $status = null): int
+    {
+        return $this->countBatches('TRUE', [], $status);
+    }
+
+    /**
+     * Collapse rows into batches.
+     *
+     * Every row in a batch shares its resource, submitter and statuses — they are
+     * written together and transitioned together — so MIN() over those columns is
+     * exact, not an approximation.
+     *
+     * @param array<string, string> $params
+     * @return array<int, array<string, mixed>>
+     */
+    private function listBatches(
+        string $predicate,
+        array $params,
+        ?ChangeReviewStatus $status,
+        int $limit,
+        int $offset
+    ): array {
+        if ($status !== null) {
+            $predicate              .= ' AND review_status = :review_status';
+            $params['review_status'] = $status->value;
+        }
+
+        $sql = 'SELECT batch_id,
+                       MIN(resource_type)       AS resource_type,
+                       MIN(resource_id)         AS resource_id,
+                       MIN(review_status)       AS review_status,
+                       MIN(publication_status)  AS publication_status,
+                       MIN(submitted_by_sub)    AS submitted_by_sub,
+                       MIN(submitted_by_name)   AS submitted_by_name,
+                       MIN(submitted_by_email)  AS submitted_by_email,
+                       MIN(approved_by_sub)     AS approved_by_sub,
+                       MIN(created_at)          AS created_at,
+                       MAX(updated_at)          AS updated_at,
+                       COUNT(*)                 AS file_count,
+                       ARRAY_AGG(path ORDER BY path) AS paths
+                  FROM sourcedata_change_requests
+                 WHERE ' . $predicate . '
+              GROUP BY batch_id
+              ORDER BY MIN(created_at) DESC
+                 LIMIT :limit OFFSET :offset';
+
+        $stmt = $this->db->prepare($sql);
+        foreach ($params as $key => $value) {
+            $stmt->bindValue($key, $value);
+        }
+        $stmt->bindValue('limit', $limit, PDO::PARAM_INT);
+        $stmt->bindValue('offset', $offset, PDO::PARAM_INT);
+        $stmt->execute();
+
+        /** @var array<int, array<string, mixed>> $rows */
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return array_map(
+            fn (array $row): array => $this->hydrateBatch($row),
+            $rows
+        );
+    }
+
+    /**
+     * @param array<string, string> $params
+     */
+    private function countBatches(string $predicate, array $params, ?ChangeReviewStatus $status): int
+    {
+        if ($status !== null) {
+            $predicate              .= ' AND review_status = :review_status';
+            $params['review_status'] = $status->value;
+        }
+
+        $stmt = $this->db->prepare(
+            'SELECT COUNT(DISTINCT batch_id) FROM sourcedata_change_requests WHERE ' . $predicate
+        );
+        $stmt->execute($params);
+
+        return (int) $stmt->fetchColumn();
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @return array<string, mixed>
+     */
+    private function hydrateBatch(array $row): array
+    {
+        $row['file_count']  = self::requireInt($row['file_count'] ?? null, 'file_count');
+        $row['paths']       = self::parsePgArray(self::requireString($row['paths'] ?? null, 'paths'));
+        $row['permissions'] = [
+            [
+                'object_type' => self::requireString($row['resource_type'] ?? null, 'resource_type'),
+                'object_id'   => self::requireString($row['resource_id'] ?? null, 'resource_id'),
+                'relation'    => 'admin',
+            ],
+        ];
+
+        return $row;
+    }
+
+    /**
+     * PDO's pgsql driver hands back ARRAY_AGG as the literal `{a,b}` text form,
+     * with double quotes around any element containing a comma or brace. Paths
+     * contain neither, but parse defensively rather than assuming.
+     *
+     * @return list<string>
+     */
+    private static function parsePgArray(string $literal): array
+    {
+        $inner = trim($literal, '{}');
+        if ($inner === '') {
+            return [];
+        }
+
+        return array_map(
+            static fn (?string $element): string => trim($element ?? '', '"'),
+            str_getcsv($inner, ',', '"', '\\')
+        );
     }
 }

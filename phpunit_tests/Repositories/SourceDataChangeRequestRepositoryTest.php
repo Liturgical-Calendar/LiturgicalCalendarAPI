@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Tests\Repositories;
 
 use LiturgicalCalendar\Api\Enum\ChangeOperation;
+use LiturgicalCalendar\Api\Enum\ChangeReviewStatus;
 use LiturgicalCalendar\Api\Enum\Rite;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Services\ChangeResource;
@@ -305,6 +306,121 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
 
         $row = $this->repo->getBatch($batchId)[0];
         self::assertSame($row['submitted_by_sub'], $row['approved_by_sub']);
+    }
+
+    public function testListBySubmitterReturnsOneEntryPerBatch(): void
+    {
+        $this->submitUsa('user-1');
+        $this->repo->submitBatch(
+            ChangeResource::widerRegion('Americas'),
+            [
+                [
+                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/wider_regions/Americas/Americas.json',
+                    'operation' => ChangeOperation::UPDATE,
+                    'content'   => '{"litcal":[]}',
+                ],
+            ],
+            'user-1',
+            'Alice',
+            'alice@example.test',
+            true
+        );
+
+        $batches = $this->repo->listBySubmitter('user-1');
+
+        self::assertCount(2, $batches);
+        // Both batches came from the same submitter, so both group by their own batch_id
+        // regardless of ordering: one has 2 files (USA), the other has 1 (Americas).
+        // Do not assert a specific slot for either count -- ordering is by created_at
+        // DESC, which testListingIsNewestFirst covers explicitly and deliberately (by
+        // forcing the timestamps apart), rather than relying on wall-clock timing here.
+        self::assertSame([1, 2], self::sortInts([$batches[0]['file_count'], $batches[1]['file_count']]));
+    }
+
+    /**
+     * @param array<int, int> $ints
+     * @return array<int, int>
+     */
+    private static function sortInts(array $ints): array
+    {
+        sort($ints);
+
+        return $ints;
+    }
+
+    public function testListBySubmitterExcludesOtherSubmitters(): void
+    {
+        $this->submitUsa('user-1');
+        $this->submitUsa('user-2');
+
+        $batches = $this->repo->listBySubmitter('user-1');
+
+        self::assertCount(1, $batches);
+        self::assertSame('user-1', $batches[0]['submitted_by_sub']);
+    }
+
+    public function testListBatchesCarryTheirPathsAndPermissions(): void
+    {
+        $this->submitUsa('user-1');
+
+        $batch = $this->repo->listBySubmitter('user-1')[0];
+
+        self::assertSame(2, $batch['file_count']);
+        self::assertContains('jsondata/sourcedata/rite/roman/calendars/nations/US/US.json', $batch['paths']);
+        self::assertContains('jsondata/sourcedata/rite/roman/calendars/nations/US/i18n/en_US.json', $batch['paths']);
+        self::assertSame(
+            [['object_type' => 'national_calendar', 'object_id' => 'roman/US', 'relation' => 'admin']],
+            $batch['permissions']
+        );
+    }
+
+    public function testListAllCanFilterByReviewStatus(): void
+    {
+        $approved = $this->submitUsa('user-1');
+        $this->repo->approveBatch($approved, 'admin-1');
+        $this->submitUsa('user-2');
+
+        self::assertCount(2, $this->repo->listAll());
+        self::assertCount(1, $this->repo->listAll(ChangeReviewStatus::APPROVED));
+        self::assertCount(1, $this->repo->listAll(ChangeReviewStatus::SUBMITTED));
+    }
+
+    public function testCountsMatchTheListings(): void
+    {
+        $this->submitUsa('user-1');
+        $this->submitUsa('user-2');
+
+        // Neither submission was approved/rejected, so both batches are still in
+        // review_status = 'submitted' -- countAll() and countAll(SUBMITTED) must agree.
+        self::assertSame(2, $this->repo->countAll());
+        self::assertSame(2, $this->repo->countAll(ChangeReviewStatus::SUBMITTED));
+        self::assertSame(0, $this->repo->countAll(ChangeReviewStatus::APPROVED));
+        self::assertSame(1, $this->repo->countBySubmitter('user-1'));
+    }
+
+    public function testListingIsNewestFirst(): void
+    {
+        $older = $this->submitUsa('user-1');
+        self::$pdo->exec("UPDATE sourcedata_change_requests SET created_at = NOW() - INTERVAL '1 day'");
+        $newer = $this->repo->submitBatch(
+            ChangeResource::widerRegion('Europe'),
+            [
+                [
+                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/wider_regions/Europe/Europe.json',
+                    'operation' => ChangeOperation::UPDATE,
+                    'content'   => '{"litcal":[]}',
+                ],
+            ],
+            'user-1',
+            'Alice',
+            'alice@example.test',
+            true
+        );
+
+        $batches = $this->repo->listBySubmitter('user-1');
+
+        self::assertSame($newer, $batches[0]['batch_id']);
+        self::assertSame($older, $batches[1]['batch_id']);
     }
 
     public function testRejectBatchRecordsTheReason(): void
