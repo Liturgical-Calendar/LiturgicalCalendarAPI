@@ -645,6 +645,155 @@ class SourceDataChangeRequestRepository
     }
 
     /**
+     * Atomically claim the oldest approved-and-unpublished batch, or null if none exists.
+     *
+     * "Claimable" means every row of the batch is `review_status = 'approved'` AND
+     * `publication_status = 'none'` — a batch is never mixed-status (`decideBatch()` and
+     * `withdrawBatch()` each transition every still-submitted row of a batch in one
+     * `UPDATE`), so aggregating with `bool_and(...)` over the whole batch is a safe test.
+     *
+     * `FOR UPDATE SKIP LOCKED` only holds its row lock for the lifetime of the surrounding
+     * transaction. Without an explicit transaction wrapping BOTH the row lock and the
+     * `queued` UPDATE, Postgres autocommit would release the lock the instant the locking
+     * SELECT finished, and a second runner's SELECT could see the very same rows as
+     * unlocked and still `none` before the first runner ever marks them `queued` —
+     * double-claiming one editor's work as two separate publish attempts under one
+     * branch. Same reasoning as
+     * {@see \LiturgicalCalendar\Api\Services\Outbox\BackstopRunner::runOnce()}, which this
+     * mirrors rather than reuses: that class is constructor-typed to the concrete
+     * OutboxRepository and bound to the OpenFGA outbox, so it isn't reusable here.
+     *
+     * Postgres rejects `FOR UPDATE` combined with `GROUP BY` ("FOR UPDATE is not allowed
+     * with GROUP BY clause"), so the aggregate `HAVING` that identifies a claimable batch
+     * cannot itself take the row lock the way a flat, ungrouped query (like
+     * OutboxRepository::pickupPending()) can. This is a two-step query instead: an
+     * unlocked aggregate SELECT finds candidate batch ids oldest-first (`ORDER BY
+     * MIN(created_at) ASC`, so a resource that is busy publishing cannot starve an older
+     * approved batch waiting behind it), and the loop below then takes a real `FOR UPDATE
+     * SKIP LOCKED` lock on every row of one candidate at a time. A batch is claimed only
+     * when every one of its rows was actually locked — if a concurrent claim already holds
+     * (any of) that batch's row locks, `SKIP LOCKED` drops those rows from the result, the
+     * counts no longer match, and this method moves on to the next-oldest candidate rather
+     * than blocking or taking a partial claim.
+     */
+    public function claimNextPublishableBatch(): ?string
+    {
+        $this->db->beginTransaction();
+        try {
+            $candidates = $this->db->prepare(
+                'SELECT batch_id, COUNT(*) AS row_count
+                   FROM sourcedata_change_requests
+                  GROUP BY batch_id
+                 HAVING bool_and(review_status = :approved)
+                    AND bool_and(publication_status = :none)
+                  ORDER BY MIN(created_at) ASC'
+            );
+            $candidates->execute([
+                'approved' => ChangeReviewStatus::APPROVED->value,
+                'none'     => ChangePublicationStatus::NONE->value,
+            ]);
+
+            $lock = $this->db->prepare(
+                'SELECT id
+                   FROM sourcedata_change_requests
+                  WHERE batch_id = :batch_id
+                    FOR UPDATE SKIP LOCKED'
+            );
+
+            while (( $candidate = $candidates->fetch(PDO::FETCH_ASSOC) ) !== false) {
+                /** @var array<string, mixed> $candidate */
+                $batchId  = self::requireString($candidate['batch_id'] ?? null, 'batch_id');
+                $rowCount = self::requireInt($candidate['row_count'] ?? null, 'row_count');
+
+                $lock->execute(['batch_id' => $batchId]);
+                $lockedRowCount = count($lock->fetchAll(PDO::FETCH_COLUMN));
+
+                if ($lockedRowCount !== $rowCount) {
+                    // Contested: another runner already holds part (or all) of this
+                    // batch's row locks. Leave it alone and try the next-oldest candidate.
+                    continue;
+                }
+
+                $claim = $this->db->prepare(
+                    'UPDATE sourcedata_change_requests
+                        SET publication_status = :queued,
+                            updated_at = NOW()
+                      WHERE batch_id = :batch_id'
+                );
+                $claim->execute([
+                    'queued'   => ChangePublicationStatus::QUEUED->value,
+                    'batch_id' => $batchId,
+                ]);
+
+                $this->db->commit();
+
+                return $batchId;
+            }
+
+            $this->db->commit();
+
+            return null;
+        } catch (\Throwable $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+    }
+
+    /**
+     * Record that a claimed batch reached GitHub as an open pull request.
+     *
+     * Sets `publication_status` to `open` and stamps the git-side identifiers the batch
+     * was published under. `base_sha` is the commit the publisher branched from — distinct
+     * from each row's own `base_sha`, which is per-file accumulation-base bookkeeping set
+     * at submission time.
+     *
+     * @return int Rows transitioned.
+     */
+    public function recordPublication(
+        string $batchId,
+        string $branch,
+        string $commitSha,
+        ?int $prNumber,
+        string $baseSha
+    ): int {
+        $stmt = $this->db->prepare(
+            'UPDATE sourcedata_change_requests
+                SET publication_status = :open,
+                    branch             = :branch,
+                    commit_sha         = :commit_sha,
+                    pr_number          = :pr_number,
+                    base_sha           = :base_sha,
+                    updated_at         = NOW()
+              WHERE batch_id = :batch_id'
+        );
+        $stmt->execute([
+            'open'       => ChangePublicationStatus::OPEN->value,
+            'branch'     => $branch,
+            'commit_sha' => $commitSha,
+            'pr_number'  => $prNumber,
+            'base_sha'   => $baseSha,
+            'batch_id'   => $batchId,
+        ]);
+
+        return $stmt->rowCount();
+    }
+
+    /**
+     * Release a failed publish attempt: put a `queued` batch back to `none` so it is
+     * claimable again on the next run. Built on {@see markBatchPublicationStatus()} rather
+     * than duplicating its UPDATE — that method already exists (phase 1's own regression
+     * test needed it) and is unconditional on `review_status`, which is exactly right
+     * here: a claim can only ever have been taken from an approved batch in the first
+     * place, so nothing further needs re-checking on release.
+     *
+     * @return int Rows transitioned.
+     */
+    public function releaseClaim(string $batchId): int
+    {
+        return $this->markBatchPublicationStatus($batchId, ChangePublicationStatus::NONE);
+    }
+
+    /**
      * The `review_status = 'submitted'` predicate is what makes a decision
      * single-shot: re-deciding an approved batch matches no rows.
      *
