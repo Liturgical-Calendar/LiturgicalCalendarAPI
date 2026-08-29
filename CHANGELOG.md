@@ -15,6 +15,14 @@
   from the added `disposition: "applied"` — except `DELETE /tests/{rite}/{test_name}`, which now returns
   `200` with that body instead of `204 No Content`, in disk mode too. Phase 1 stops at approval — nothing
   is published to GitHub yet, see `docs/ops/change-request-runbook.md`.
+* add the source-data change request publisher (phase 2): once a GitHub App is registered and configured,
+  a cron-driven runner turns each approved batch into a single commit on a per-resource branch plus a
+  rolling pull request, preserving the submitting editor as the commit author while the App is the
+  committer. `GET /health`'s new `source_data_publisher` block reports whether the publisher is actually
+  configured. Deployments that do not configure the GitHub App are unaffected: approved batches continue
+  to accumulate unpublished exactly as in phase 1. Known limitation: deleting a calendar or test through a
+  change request does not yet purge its OpenFGA authorization tuples — that purge is deferred to phase 3,
+  merge detection — see `docs/ops/change-request-runbook.md`.
 -->
 
 ## [v5.7](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.7) (December 15th 2025)
