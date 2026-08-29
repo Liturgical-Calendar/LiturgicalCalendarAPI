@@ -11,9 +11,10 @@
   `/admin/change-requests` endpoints, and the submitter can list and withdraw their own via the new
   `/auth/change-requests` endpoints. Every write response now carries a `disposition` field
   (`applied`/`submitted`/`approved`) so a client can tell which happened. Deployments that do not set the
-  flag are unaffected: every write still goes straight to disk and every response body is unchanged apart
-  from the added `disposition: "applied"`. Phase 1 stops at approval — nothing is published to GitHub yet,
-  see `docs/ops/change-request-runbook.md`.
+  flag are unaffected: every write still goes straight to disk, and every response body is unchanged apart
+  from the added `disposition: "applied"` — except `DELETE /tests/{rite}/{test_name}`, which now returns
+  `200` with that body instead of `204 No Content`, in disk mode too. Phase 1 stops at approval — nothing
+  is published to GitHub yet, see `docs/ops/change-request-runbook.md`.
 -->
 
 ## [v5.7](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.7) (December 15th 2025)

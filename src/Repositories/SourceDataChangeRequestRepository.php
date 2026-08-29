@@ -18,9 +18,20 @@ use PDO;
  * writes the calendar and its i18n files, and those must be reviewed together.
  * Approval and rejection therefore act on a batch id, never on a row id.
  *
- * Save-equals-submit is implemented as replace: submitting deletes the
- * submitter's existing `submitted` rows for the same resource in the same
- * transaction. Other submitters' pending rows are untouched.
+ * Save-equals-submit is implemented as replace: submitting deletes the submitter's
+ * existing `submitted` rows for any batch that collides on PATH with an incoming
+ * file, in the same transaction. This must key on path, not on resource: a
+ * `ChangeResource` is not 1:1 with a file — `ChangeResource::decrees()` is a single
+ * resource covering the entire decree corpus, and `rite_calendar_test:<rite>` is the
+ * scope shared by every rite-level test — so superseding by resource would silently
+ * discard an unrelated pending file under the same resource (a decree A edit lost
+ * when decree B is submitted next), and could also leave a stale row behind that
+ * later collides with `idx_scr_unique_pending_path_submitter` (a PATCH that re-scopes
+ * a test changes its `ChangeResource` while its file path stays the same). Keying the
+ * DELETE on path instead agrees with that unique index, and deleting the whole batch
+ * a colliding row belongs to — never just the colliding row — keeps a batch coherent:
+ * it is reviewed as a unit, so a partial batch must never be left behind. Other
+ * submitters' pending rows are untouched.
  */
 class SourceDataChangeRequestRepository
 {
@@ -32,8 +43,8 @@ class SourceDataChangeRequestRepository
     }
 
     /**
-     * Submit a batch of proposed file changes, superseding the submitter's own
-     * pending proposal for this resource.
+     * Submit a batch of proposed file changes, superseding any of the submitter's
+     * own pending batches that collide on path with one of these files.
      *
      * @param list<array{path: string, operation: ChangeOperation, content: ?string}> $files
      * @param array<string, mixed> $metadata
@@ -56,18 +67,32 @@ class SourceDataChangeRequestRepository
 
         $this->db->beginTransaction();
         try {
+            // Supersede whole batches, not individual rows: a batch is approved and
+            // rejected as a unit, so leaving a partial batch behind after this DELETE
+            // would make it incoherent. Keyed on path (matching
+            // idx_scr_unique_pending_path_submitter) rather than on resource — see the
+            // class docblock for why a resource match alone is not equivalent.
+            $pathParams       = [];
+            $pathPlaceholders = [];
+            foreach (array_values($files) as $i => $file) {
+                $key                = "path_{$i}";
+                $pathPlaceholders[] = ":{$key}";
+                $pathParams[$key]   = $file['path'];
+            }
+
             $supersede = $this->db->prepare(
                 'DELETE FROM sourcedata_change_requests
-                  WHERE resource_type = :resource_type
-                    AND resource_id = :resource_id
-                    AND submitted_by_sub = :sub
-                    AND review_status = :submitted'
+                  WHERE batch_id IN (
+                    SELECT batch_id FROM sourcedata_change_requests
+                     WHERE submitted_by_sub = :sub
+                       AND review_status = :submitted
+                       AND path IN (' . implode(', ', $pathPlaceholders) . ')
+                  )'
             );
             $supersede->execute([
-                'resource_type' => $resource->type,
-                'resource_id'   => $resource->id,
-                'sub'           => $submittedBySub,
-                'submitted'     => ChangeReviewStatus::SUBMITTED->value,
+                'sub'       => $submittedBySub,
+                'submitted' => ChangeReviewStatus::SUBMITTED->value,
+                ...$pathParams,
             ]);
 
             $insert = $this->db->prepare(

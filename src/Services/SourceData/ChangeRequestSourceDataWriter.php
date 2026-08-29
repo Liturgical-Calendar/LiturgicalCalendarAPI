@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace LiturgicalCalendar\Api\Services\SourceData;
 
 use LiturgicalCalendar\Api\Enum\ChangeOperation;
+use LiturgicalCalendar\Api\Http\Exception\ConflictException;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
 use LiturgicalCalendar\Api\Router;
 use LiturgicalCalendar\Api\Services\ChangeRequestReview;
 use LiturgicalCalendar\Api\Services\ChangeResource;
+use PDOException;
 
 /**
  * Records a reviewable proposal instead of writing files.
@@ -60,15 +62,33 @@ final class ChangeRequestSourceDataWriter implements SourceDataWriter
             : null;
         $name          = is_string($this->oidcUser['name'] ?? null) ? $this->oidcUser['name'] : null;
 
-        $batchId = $this->repository->submitBatch(
-            $resource,
-            $this->staged,
-            $sub,
-            $name,
-            $email,
-            $emailVerified,
-            ['authorizing_relation' => 'admin']
-        );
+        // The supersede DELETE in submitBatch() keys on path, so any prior submitted
+        // batch of this submitter's that collides with an incoming path is cleared
+        // before the INSERT — see SourceDataChangeRequestRepository's class docblock.
+        // A 23505 here therefore means a genuine race: another request from the same
+        // submitter, for one of the same paths, committed its own INSERT between this
+        // DELETE and this INSERT. idx_scr_unique_pending_path_submitter is
+        // defence-in-depth for exactly that race, not the primary guard, so surface it
+        // as a 409 the client can retry rather than an opaque 500.
+        try {
+            $batchId = $this->repository->submitBatch(
+                $resource,
+                $this->staged,
+                $sub,
+                $name,
+                $email,
+                $emailVerified,
+                ['authorizing_relation' => 'admin']
+            );
+        } catch (PDOException $e) {
+            if ('23505' === $e->getCode()) {
+                throw new ConflictException(
+                    'Another submission for one of these files is already pending. Reload and try again.',
+                    $e
+                );
+            }
+            throw $e;
+        }
 
         $paths        = array_map(static fn (array $file): string => $file['path'], $this->staged);
         $this->staged = [];
