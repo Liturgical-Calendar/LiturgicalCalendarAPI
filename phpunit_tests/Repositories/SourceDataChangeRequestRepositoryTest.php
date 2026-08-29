@@ -325,6 +325,11 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
         $batchId = $this->submitUsa('user-1');
 
         self::assertSame(0, $this->repo->withdrawBatch($batchId, 'user-2'), 'another user must not withdraw it');
+
+        foreach ($this->repo->getBatch($batchId) as $row) {
+            self::assertSame('submitted', $row['review_status'], "user-2's failed withdraw must not have touched the batch");
+        }
+
         self::assertSame(2, $this->repo->withdrawBatch($batchId, 'user-1'));
 
         self::assertSame('withdrawn', $this->repo->getBatch($batchId)[0]['review_status']);
@@ -335,11 +340,18 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
         $batchId = $this->submitUsa();
         $this->repo->approveBatch($batchId, 'admin-1');
 
+        $approvedAt = $this->repo->getBatch($batchId)[0]['approved_at'];
+
         self::assertSame(0, $this->repo->rejectBatch($batchId, 'admin-2', 'too late'));
         self::assertSame(0, $this->repo->approveBatch($batchId, 'admin-2'));
 
         $row = $this->repo->getBatch($batchId)[0];
         self::assertSame('approved', $row['review_status']);
         self::assertSame('admin-1', $row['approved_by_sub']);
+        // Both no-op decide attempts must leave the original decision's timestamp
+        // untouched too, not just its status and decider -- decideBatch() writes
+        // decider and timestamp in the same UPDATE, but the test should prove that
+        // rather than leave it inferred from the two columns above.
+        self::assertSame($approvedAt, $row['approved_at']);
     }
 }
