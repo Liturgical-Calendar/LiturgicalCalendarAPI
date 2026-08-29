@@ -859,6 +859,48 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
      * resurface as the accumulation base for the next edit -- doing so would silently revert
      * everything B added.
      */
+    /**
+     * The enumeration half of the same rule.
+     *
+     * `findUnpublishedPathsUnder()` is what tells a handler which sidecar files exist for a
+     * submitter, so a superseded ancestor left in its results reappears as a file the rebuild
+     * then reads. Phase 1's decree bug had exactly this shape — the content half was fixed
+     * while the enumeration half still swept the file away — so both halves get their own test
+     * rather than trusting that a shared constant keeps them in step.
+     */
+    public function testAnAncestorOlderThanAMergedRowIsNotEnumeratedEither(): void
+    {
+        $folder = 'jsondata/sourcedata/rite/roman/decrees/i18n';
+        $path   = $folder . '/cs.json';
+
+        $batchA = $this->repo->submitBatch(
+            ChangeResource::decrees(),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '{"A":"a"}']],
+            'editor-1',
+            'Alice',
+            'alice@example.test',
+            true
+        )['batch_id'];
+        $this->repo->approveBatch($batchA, 'admin-1');
+
+        $batchB = $this->repo->submitBatch(
+            ChangeResource::decrees(),
+            [['path' => $path, 'operation' => ChangeOperation::UPDATE, 'content' => '{"A":"a","B":"b"}']],
+            'editor-1',
+            'Alice',
+            'alice@example.test',
+            true
+        )['batch_id'];
+        $this->repo->approveBatch($batchB, 'admin-1');
+        $this->repo->markBatchPublicationStatus($batchB, ChangePublicationStatus::MERGED);
+
+        self::assertSame(
+            [],
+            $this->repo->findUnpublishedPathsUnder($folder . '/', 'editor-1'),
+            'a path whose only unpublished row is superseded by published content must not be enumerated'
+        );
+    }
+
     public function testAnAncestorOlderThanAMergedRowIsNotUsedAsTheBase(): void
     {
         $path = 'jsondata/sourcedata/rite/roman/decrees/decrees.json';
