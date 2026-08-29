@@ -91,6 +91,36 @@ if (isset($argv[1])) {
 }
 
 // ---------------------------------------------------------------------------
+// Logging
+//
+// Set up FIRST, before anything that can fail, so that every failure below has somewhere to
+// go besides stderr — a cron job's stderr is seen only if something is capturing it.
+// ---------------------------------------------------------------------------
+try {
+    // includeProcessors: FALSE — the sixth argument, and it is load-bearing rather than
+    // cosmetic. LoggerFactory's default attaches RequestResponseProcessor, which THROWS a
+    // RuntimeException for any record whose context does not carry type => request|response.
+    // PublishRunner logs batch ids and exception classes, so with the default every single
+    // log call it makes — including the ones inside its catch blocks — would throw from
+    // inside the failure handling, before releaseClaim() ever ran, stranding the batch and
+    // killing the process. Every other non-HTTP caller of this factory passes false for the
+    // same reason; only the HTTP error middleware, which really does log requests and
+    // responses, passes true.
+    $logger = LoggerFactory::create('publish-sourcedata', null, 30, false, true, false);
+} catch (\Throwable $e) {
+    // Nothing to log WITH, so this is the one failure that can only reach stderr. Still not a
+    // raw fatal: an operator gets one line naming the cause instead of a stack trace.
+    fwrite(STDERR, 'Error: could not open the publish-sourcedata log: ' . $e->getMessage() . "\n");
+    exit(1);
+}
+
+// Opens the log handlers NOW, under the ordinary umask, before the restrictive one below.
+// Monolog's RotatingFileHandler creates its file lazily on the first record, so without this
+// the log files would be created mid-run at 0600 and become unreadable to anything that is not
+// the cron user — a side effect of protecting the token cache, on files that are not secrets.
+$logger->info('publish-sourcedata run starting.', ['limit' => $limit]);
+
+// ---------------------------------------------------------------------------
 // Dependency wiring
 //
 // All environment-variable reads (the GitHub App credential, GITHUB_REPOSITORY, and their
@@ -99,9 +129,24 @@ if (isset($argv[1])) {
 // `paths: [src]` only, so a script-level `(string) $_ENV[...]` blind cast would be invisible
 // to `composer analyse`; going through src/ keeps this script covered by the same PHPStan
 // level 10 pass as everything else.
+//
+// The database bootstrap is wrapped for the same reason the run below is, and it is the
+// SIBLING of that one rather than a duplicate of it: PublishRunner catches every DB failure
+// that happens DURING a run, but a database that is already down when the cron job starts
+// fails here instead — earlier than anything PublishRunner can see — and would escape as an
+// uncaught RuntimeException with no log entry and no summary line.
 // ---------------------------------------------------------------------------
-$pdo  = Connection::getInstance();
-$repo = new SourceDataChangeRequestRepository($pdo);
+try {
+    $pdo  = Connection::getInstance();
+    $repo = new SourceDataChangeRequestRepository($pdo);
+} catch (\Throwable $e) {
+    $logger->error(
+        'publish-sourcedata could not reach the database; no batch was claimed.',
+        ['exception' => $e::class, 'message' => $e->getMessage()]
+    );
+    fwrite(STDERR, 'Error: database unavailable: ' . $e->getMessage() . "\n");
+    exit(1);
+}
 
 // Explicit timeouts, not Guzzle's default (no timeout at all — a hung TCP handshake or a
 // GitHub response that never completes would otherwise run indefinitely). This is what keeps
@@ -121,12 +166,6 @@ $repo = new SourceDataChangeRequestRepository($pdo);
 // timeout here or the widest batch grows, the grace period must grow with them.
 $httpClient = new GuzzleClient(['connect_timeout' => 10, 'timeout' => 30]);
 
-$logger = LoggerFactory::create('publish-sourcedata');
-// Opens the log handlers NOW, under the ordinary umask, before the restrictive one below.
-// Monolog's RotatingFileHandler creates its file lazily on the first record, so without this
-// the log files would be created mid-run at 0600 and become unreadable to anything that is not
-// the cron user — a side effect of protecting the token cache, on files that are not secrets.
-$logger->info('publish-sourcedata run starting.', ['limit' => $limit]);
 
 // ---------------------------------------------------------------------------
 // Installation-token cache
@@ -167,6 +206,7 @@ try {
     // silently, since nothing about that state looks like an error to an editor. Fail loudly
     // here instead.
     umask($previousUmask);
+    $logger->error('publish-sourcedata is not configured; nothing was published.', ['message' => $e->getMessage()]);
     fwrite(STDERR, 'Error: ' . $e->getMessage() . "\n");
     exit(1);
 }
