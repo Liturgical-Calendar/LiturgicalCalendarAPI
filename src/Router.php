@@ -29,6 +29,7 @@ use LiturgicalCalendar\Api\Handlers\Auth\AccessRequestHandler;
 use LiturgicalCalendar\Api\Handlers\Auth\EmailVerificationHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\AccessRequestAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\ApplicationAdminHandler;
+use LiturgicalCalendar\Api\Handlers\Admin\ChangeRequestAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\NotificationsHandler as AdminNotificationsHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\LocalesAdminHandler;
 use LiturgicalCalendar\Api\Handlers\Admin\OutboxAdminHandler;
@@ -593,6 +594,12 @@ class Router
                         // POST /admin/outbox/{id}/retry           - Reset failed_terminal row to pending
                         $outboxAdminHandler = new OutboxAdminHandler();
                         $this->handler      = $outboxAdminHandler;
+                    } elseif ($adminRoute === 'change-requests') {
+                        // Source-data change request review queue and history
+                        // GET  /admin/change-requests                   - Review queue and history
+                        // POST /admin/change-requests/{batchId}/approve - Approve a batch
+                        // POST /admin/change-requests/{batchId}/reject  - Reject a batch
+                        $this->handler = new ChangeRequestAdminHandler($requestPathParts);
                     } else {
                         $this->response = new Response(StatusCode::NOT_FOUND->value, [], null, $this->request->getProtocolVersion(), StatusCode::NOT_FOUND->reason());
                         $this->emitResponse();
