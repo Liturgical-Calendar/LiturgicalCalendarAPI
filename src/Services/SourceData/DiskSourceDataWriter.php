@@ -92,6 +92,14 @@ final class DiskSourceDataWriter implements SourceDataWriter
 
     private function writeFile(string $path, string $content): void
     {
+        // The writer owns the directory because it owns the write. Creating it here rather
+        // than in the handler is what keeps queue mode off the filesystem entirely: a staged
+        // change that is never applied must leave no empty directory tree behind.
+        $folder = dirname($path);
+        if (!is_dir($folder) && false === mkdir($folder, 0755, true) && !is_dir($folder)) {
+            throw new ServiceUnavailableException('Failed to create directory ' . $folder);
+        }
+
         if (false === file_put_contents($path, $content, LOCK_EX)) {
             throw new ServiceUnavailableException('Failed to write to file ' . $path);
         }

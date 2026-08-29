@@ -45,7 +45,11 @@ final class DiskSourceDataWriterTest extends TestCase
 
     protected function tearDown(): void
     {
-        foreach (glob($this->tmp . '/{,*/}*', GLOB_BRACE) ?: [] as $path) {
+        // Files first, then directories deepest-first: rmdir() fails on a non-empty
+        // directory, so removing a parent before its contents leaks the whole tree.
+        $paths = glob($this->tmp . '/{,*/}*', GLOB_BRACE) ?: [];
+        usort($paths, static fn (string $a, string $b): int => substr_count($b, '/') <=> substr_count($a, '/'));
+        foreach ($paths as $path) {
             is_dir($path) ? @rmdir($path) : @unlink($path);
         }
         @rmdir($this->tmp);
@@ -120,10 +124,27 @@ final class DiskSourceDataWriterTest extends TestCase
         self::assertSame('applied', $result['disposition']);
     }
 
-    public function testAnUnwritablePathRaisesServiceUnavailable(): void
+    public function testAMissingParentDirectoryIsCreated(): void
     {
         $writer = new DiskSourceDataWriter();
-        $writer->stage($this->tmp . '/no-such-dir/calendar.json', ChangeOperation::CREATE, '{}');
+        $writer->stage($this->tmp . '/no-such-dir/i18n/calendar.json', ChangeOperation::CREATE, '{}');
+
+        $result = $writer->commit(ChangeResource::nationalCalendar(Rite::ROMAN, 'US'));
+
+        // The writer owns the directory because it owns the write. Handlers used to mkdir up
+        // front, which created empty trees on disk even in queue mode, where nothing is written.
+        self::assertSame('applied', $result['disposition']);
+        self::assertFileExists($this->tmp . '/no-such-dir/i18n/calendar.json');
+    }
+
+    public function testAnUnwritablePathRaisesServiceUnavailable(): void
+    {
+        // A plain file where the parent directory needs to be: mkdir() and the write both fail
+        // for any uid, so this pins the failure path without depending on not running as root.
+        file_put_contents($this->tmp . '/blocker', 'not a directory');
+
+        $writer = new DiskSourceDataWriter();
+        $writer->stage($this->tmp . '/blocker/calendar.json', ChangeOperation::CREATE, '{}');
 
         $this->expectException(ServiceUnavailableException::class);
         $writer->commit(ChangeResource::nationalCalendar(Rite::ROMAN, 'US'));

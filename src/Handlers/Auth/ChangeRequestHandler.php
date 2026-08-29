@@ -85,7 +85,8 @@ final class ChangeRequestHandler extends AbstractHandler
         $this->validateRequestMethod($request);
 
         $mime     = $this->validateAcceptHeader($request, AcceptabilityLevel::LAX);
-        $response = $response->withHeader('Content-Type', $mime);
+        $response = $response->withHeader('Content-Type', $mime)
+            ->withHeader('Cache-Control', 'no-store');
 
         // Check authentication via OIDC token in request attribute. The caller's
         // own `sub` is the ONLY submitter identifier ever used below — never a

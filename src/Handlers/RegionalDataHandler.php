@@ -359,20 +359,6 @@ final class RegionalDataHandler extends AbstractHandler
             throw new UnprocessableContentException($description);
         }
 
-        // Ensure we have all the necessary folders in place
-        // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
-        // so we don't have to worry about manually checking and creating each one individually
-        $diocesanCalendarI18nFolder = strtr(JsonData::diocesanCalendarI18nFolderFor($this->rite)->path(), [
-            '{nation}'  => $nation,
-            '{diocese}' => $diocese_id
-        ]);
-        if (!file_exists($diocesanCalendarI18nFolder)) {
-            if (false === mkdir($diocesanCalendarI18nFolder, 0755, true)) {
-                $description = "Failed to create directory {$diocesanCalendarI18nFolder}";
-                throw new ServiceUnavailableException($description);
-            }
-        }
-
         // Write i18n files and capture locales for audit logging
         $i18nLocales = $this->writeI18nFiles(
             $rawPayload,
@@ -443,19 +429,6 @@ final class RegionalDataHandler extends AbstractHandler
         }
 
         $nation = $payload->metadata->nation;
-
-        // Ensure we have all the necessary folders in place
-        // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
-        // so we don't have to worry about manually checking and creating each one individually
-        $nationalCalendarI18nFolder = strtr(JsonData::NATIONAL_CALENDAR_I18N_FOLDER->path(), [
-            '{nation}' => $nation
-        ]);
-        if (!file_exists($nationalCalendarI18nFolder)) {
-            if (false === mkdir($nationalCalendarI18nFolder, 0755, true)) {
-                $description = "Failed to create directory {$nationalCalendarI18nFolder}";
-                throw new ServiceUnavailableException($description);
-            }
-        }
 
         // Write i18n files and capture locales for audit logging
         $i18nLocales = $this->writeI18nFiles(
@@ -574,19 +547,6 @@ final class RegionalDataHandler extends AbstractHandler
         }
 
         $widerRegion = $payload->metadata->wider_region;
-
-        // Ensure we have all the necessary folders in place
-        // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
-        // so we don't have to worry about manually checking and creating each one individually
-        $widerRegionI18nFolder = strtr(JsonData::WIDER_REGION_I18N_FOLDER->path(), [
-            '{wider_region}' => $widerRegion
-        ]);
-        if (!file_exists($widerRegionI18nFolder)) {
-            if (false === mkdir($widerRegionI18nFolder, 0755, true)) {
-                $description = "Failed to create directory {$widerRegionI18nFolder}";
-                throw new ServiceUnavailableException($description);
-            }
-        }
 
         // Write i18n files and capture locales for audit logging
         $i18nLocales = $this->writeI18nFiles(
