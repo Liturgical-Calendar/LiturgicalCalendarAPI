@@ -4,12 +4,15 @@ namespace LiturgicalCalendar\Api\Handlers;
 
 use Swaggest\JsonSchema\Schema;
 use Swaggest\JsonSchema\InvalidValue;
+use LiturgicalCalendar\Api\Enum\ChangeOperation;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 use LiturgicalCalendar\Api\Handlers\Auth\ClientIpTrait;
 use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesOutboxTooling;
+use LiturgicalCalendar\Api\Handlers\Concerns\WritesSourceData;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
+use LiturgicalCalendar\Api\Services\ChangeResource;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
@@ -65,6 +68,7 @@ final class RegionalDataHandler extends AbstractHandler
 {
     use ClientIpTrait;
     use ResolvesOutboxTooling;
+    use WritesSourceData;
 
     private readonly MetadataCalendars $CalendarsMetadata;
 
@@ -387,15 +391,8 @@ final class RegionalDataHandler extends AbstractHandler
 
         // Use raw payload for json_encode to preserve schema-compliant structure
         $calendarData = JsonFormatter::encode($rawPayload);
-        if (
-            false === file_put_contents(
-                $diocesanCalendarFile,
-                $calendarData . PHP_EOL
-            )
-        ) {
-            $description = "Failed to write to file {$diocesanCalendarFile}";
-            throw new ServiceUnavailableException($description);
-        }
+        $this->stageFile($diocesanCalendarFile, ChangeOperation::CREATE, $calendarData . PHP_EOL);
+        $changeRequest = $this->commitStagedFiles(ChangeResource::diocesanCalendar($this->rite, $diocese_id));
 
         // Log successful creation
         $this->auditLogger->info('Diocesan calendar created', [
@@ -414,6 +411,9 @@ final class RegionalDataHandler extends AbstractHandler
         $responseObj          = new \stdClass();
         $responseObj->success = "Calendar data created for Diocese \"{$diocese_name}\" (Nation: \"{$nation}\")";
         $responseObj->data    = $rawPayload;
+        foreach ($changeRequest as $key => $value) {
+            $responseObj->{$key} = $value;
+        }
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
 
@@ -473,15 +473,8 @@ final class RegionalDataHandler extends AbstractHandler
 
         // Use raw payload for json_encode to preserve schema-compliant structure
         $calendarData = JsonFormatter::encode($rawPayload);
-        if (
-            false === file_put_contents(
-                $nationalCalendarFile,
-                $calendarData . PHP_EOL
-            )
-        ) {
-            $description = "Failed to write to file {$nationalCalendarFile}";
-            throw new ServiceUnavailableException($description);
-        }
+        $this->stageFile($nationalCalendarFile, ChangeOperation::CREATE, $calendarData . PHP_EOL);
+        $changeRequest = $this->commitStagedFiles(ChangeResource::nationalCalendar($this->rite, $nation));
 
         // get the nation name in English from the two letter iso code
         $nationEnglish = \Locale::getDisplayRegion('-' . $nation, 'en');
@@ -548,6 +541,9 @@ final class RegionalDataHandler extends AbstractHandler
         $responseObj          = new \stdClass();
         $responseObj->success = "Calendar data created for Nation \"{$nationEnglish}\" (\"{$nation}\")";
         $responseObj->data    = $rawPayload;
+        foreach ($changeRequest as $key => $value) {
+            $responseObj->{$key} = $value;
+        }
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
 
@@ -608,15 +604,8 @@ final class RegionalDataHandler extends AbstractHandler
 
         // Use raw payload for json_encode to preserve schema-compliant structure
         $calendarData = JsonFormatter::encode($rawPayload);
-        if (
-            false === file_put_contents(
-                $widerRegionFile,
-                $calendarData . PHP_EOL
-            )
-        ) {
-            $description = "Failed to write to file {$widerRegionFile}";
-            throw new ServiceUnavailableException($description);
-        }
+        $this->stageFile($widerRegionFile, ChangeOperation::CREATE, $calendarData . PHP_EOL);
+        $changeRequest = $this->commitStagedFiles(ChangeResource::widerRegion($widerRegion));
 
         // Log successful creation
         $this->auditLogger->info('Wider region calendar created', [
@@ -633,6 +622,9 @@ final class RegionalDataHandler extends AbstractHandler
         $responseObj          = new \stdClass();
         $responseObj->success = "Calendar data created for Wider Region \"{$widerRegion}\"";
         $responseObj->data    = $rawPayload;
+        foreach ($changeRequest as $key => $value) {
+            $responseObj->{$key} = $value;
+        }
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
 
@@ -1194,16 +1186,19 @@ final class RegionalDataHandler extends AbstractHandler
 
 
     /**
-     * Write i18n data from raw payload to locale-specific files.
+     * Stage i18n data from raw payload as locale-specific files.
      *
-     * Extracts i18n data from the raw payload, writes each locale's translations
-     * to a separate JSON file, and removes the i18n property from the payload.
+     * Extracts i18n data from the raw payload and stages each locale's translations
+     * as a separate JSON file via {@see WritesSourceData::stageFile()}, then removes
+     * the i18n property from the payload. Nothing is written or recorded until the
+     * caller stages the calendar file too and calls
+     * {@see WritesSourceData::commitStagedFiles()} — both must land in the same
+     * batch, whether that batch is a disk write or a change request.
      *
      * @param \stdClass $rawPayload The raw payload containing i18n data
      * @param JsonData $i18nFileEnum The JsonData enum case for the i18n file path pattern
      * @param array<string, string> $baseSubstitutions Substitutions for the file path (without {locale})
-     * @return string[] Array of locale codes that were written
-     * @throws ServiceUnavailableException If writing to a file fails
+     * @return string[] Array of locale codes that were staged
      */
     private function writeI18nFiles(\stdClass $rawPayload, JsonData $i18nFileEnum, array $baseSubstitutions): array
     {
@@ -1215,14 +1210,7 @@ final class RegionalDataHandler extends AbstractHandler
             $substitutions['{locale}'] = $locale;
             $i18nFile                  = strtr($i18nFileEnum->path(), $substitutions);
 
-            if (
-                false === file_put_contents(
-                    $i18nFile,
-                    JsonFormatter::encode($litCalEventsI18n) . PHP_EOL
-                )
-            ) {
-                throw new ServiceUnavailableException("Failed to write to file {$i18nFile}");
-            }
+            $this->stageFile($i18nFile, ChangeOperation::CREATE, JsonFormatter::encode($litCalEventsI18n) . PHP_EOL);
         }
 
         // Remove i18n from raw payload before writing calendar file
@@ -1712,6 +1700,10 @@ final class RegionalDataHandler extends AbstractHandler
         /** @var array<string, mixed> $serverParams */
         $serverParams   = $request->getServerParams();
         $this->clientIp = $this->getClientIp($request, $serverParams);
+
+        // Capture the authenticated identity for change request authorship, the same
+        // way the client IP is captured just above for audit logging.
+        $this->captureSubmitter($request);
 
         // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint:
         //   if set we negotiate the best Content-Type, if not set we default to the first supported by the current handler
