@@ -365,6 +365,40 @@ Publishing must be **serialised per resource**: two approved changes to one cale
 same branch. The existing idempotency-key unique index does not provide ordering, so the processor
 takes a Postgres advisory lock keyed on `resource_id` for the duration of a publish.
 
+### Side effects a merged deletion must still perform
+
+In disk mode, `RegionalDataHandler::deleteCalendar()` does two things beyond removing the calendar
+and i18n files: it `rmdir()`s the now-empty calendar (and, for a diocese, nation) folder, and it
+purges the resource's OpenFGA editor/viewer operational tuples via `ResourceTuplePurgeServiceInterface`
+(the admin/governance tuple is deliberately retained, so the resource can be recreated without
+losing ownership). Both run only when the deletion actually landed on disk — gated on
+`commit()`'s `disposition === 'applied'`, i.e. `DiskSourceDataWriter`'s return value — because in
+queue mode nothing has been removed yet; see the gate in `deleteCalendar()` around its
+`commitStagedFiles()` call.
+
+In queue mode today, neither runs at submit/approve time, and **that gap is not closed by Phase 2 or
+Phase 3 as designed so far**. Once a deletion batch is published, merges, and a redeploy replaces
+`jsondata/sourcedata` from the merged tree, the file-level side effect (the calendar and i18n files,
+and their now-empty directories) is naturally covered — redeploy IS the disk-mode `rmdir()`
+equivalent, just accomplished by rsync rather than a syscall. But the OpenFGA purge is an
+**in-process authorization action against a live service, not a file artifact**. Nothing in the
+publish-PR-merge-redeploy path touches OpenFGA. A deployment's file tree can be perfectly in sync
+with `main` while stale editor/viewer tuples for a deleted calendar remain live in OpenFGA
+indefinitely, because no step between "PR merged" (Phase 2/3) and "next redeploy" (infrastructure,
+outside this design) ever calls `purgeForObject()`.
+
+**Requirement for Phase 2 (or, if merge detection ends up the more natural trigger, Phase 3):** when
+a `delete`-operation change request's batch is applied — either at publish time if publishing is
+made effectively synchronous with disk truth, or at merge-detection time in Phase 3, whichever phase
+actually knows the deletion is live — the publisher/merge-poller MUST perform the same OpenFGA
+operational-tuple purge `deleteCalendar()` performs today in disk mode, using the same resource-to-object
+mapping (`RegionalDataHandler::fgaObjectForRequest()` / `changeResourceForRequest()`). It should also
+consider whether the diocese-nation-folder emptiness check has any equivalent worth preserving, though
+that one is more plausibly subsumed by redeploy alone. This cannot be inferred from the existing
+Phase 2/3 design as written — it was written before this gap was identified — so it is recorded here
+rather than left to be rediscovered when a deleted diocese's former editors turn out to still have
+edit access.
+
 ## Phase 3: merge detection
 
 Polling, not webhooks. `GET /repos/{o}/{r}/pulls/{number}` returns `merged`, `merged_at` and
@@ -448,6 +482,10 @@ exactly what it is today.
 - **Federated upstream submission.** A third `SourceDataWriter` that submits change requests to the
   upstream canonical API, so a self-hosting diocese pools its edits rather than forking to local
   disk. The interface exists for this; the implementation does not.
+- **OpenFGA operational-tuple purge for merged deletions.** See "Side effects a merged deletion must
+  still perform" under Phase 2 — the redeploy that follows a merge covers the file side of a
+  deletion but never calls OpenFGA, so a merged deletion's editor/viewer tuples stay live until
+  Phase 2 or 3 grows an explicit purge step.
 
 ## Out of scope
 
