@@ -19,6 +19,10 @@ use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Tests\Repositories\RepositoryTestCase;
 use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7\ServerRequest;
+use GuzzleHttp\Exception\ConnectException;
+use LiturgicalCalendar\Api\Enum\ChangeReviewStatus;
+use LiturgicalCalendar\Api\Http\Exception\UnauthorizedException;
+use LiturgicalCalendar\Api\Http\Exception\ValidationException;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
@@ -222,5 +226,86 @@ final class ChangeRequestAdminHandlerTest extends RepositoryTestCase
 
         self::assertSame(200, $response->getStatusCode());
         self::assertSame('approved', $this->repo->getBatch($batchId)[0]['review_status']);
+    }
+
+    public function testAnUnauthenticatedCallerIsRejected(): void
+    {
+        $request = ( new ServerRequest('GET', '/admin/change-requests') )
+            ->withHeader('Accept', 'application/json');
+
+        $this->expectException(UnauthorizedException::class);
+        $this->handler([], [])->handle($request);
+    }
+
+    public function testATokenWithoutASubjectIsRejected(): void
+    {
+        $request = ( new ServerRequest('GET', '/admin/change-requests') )
+            ->withAttribute('oidc_user', ['roles' => ['calendar_editor']])
+            ->withHeader('Accept', 'application/json');
+
+        $this->expectException(UnauthorizedException::class);
+        $this->handler([], [])->handle($request);
+    }
+
+    public function testAnUnrecognisedStatusFilterIsRejected(): void
+    {
+        // Silently ignoring the filter would hand the caller a list they believe is
+        // narrower than it is, so this must fail rather than fall back to "everything".
+        $request = $this->request('GET', '/admin/change-requests', 'admin-1')
+            ->withQueryParams(['status' => 'not-a-status']);
+
+        $this->expectException(ValidationException::class);
+        $this->handler([], [])->handle($request);
+    }
+
+    public function testEveryValidStatusFilterIsAccepted(): void
+    {
+        foreach (ChangeReviewStatus::cases() as $case) {
+            $request = $this->request('GET', '/admin/change-requests', 'admin-1')
+                ->withQueryParams(['status' => $case->value]);
+
+            $response = $this->handler([], [self::allowed(true)])->handle($request);
+
+            self::assertSame(200, $response->getStatusCode(), $case->value . ' should be accepted');
+        }
+    }
+
+    public function testAMalformedBatchIdIsRejectedBeforeAnyLookup(): void
+    {
+        $request = $this->request('POST', '/admin/change-requests/not-a-uuid/approve', 'admin-1');
+
+        $this->expectException(ValidationException::class);
+        $this->handler(['change-requests', 'not-a-uuid', 'approve'], [])->handle($request);
+    }
+
+    public function testRejectingAnAlreadyDecidedBatchConflicts(): void
+    {
+        $batchId = $this->submitFor('editor-1', 'US');
+        $this->repo->approveBatch($batchId, 'admin-1');
+
+        $request = $this->request('POST', '/admin/change-requests/' . $batchId . '/reject', 'admin-1');
+
+        $this->expectException(ConflictException::class);
+        $this->handler(['change-requests', $batchId, 'reject'], [self::allowed(true)])->handle($request);
+    }
+
+    public function testAnUnreachableFgaFailsClosedOnApprove(): void
+    {
+        // A transport failure must never read as "allowed": an admin who cannot be
+        // checked is an admin who cannot approve.
+        $batchId = $this->submitFor('editor-1', 'US');
+
+        $request = $this->request('POST', '/admin/change-requests/' . $batchId . '/approve', 'admin-1');
+        $handler = $this->handler(['change-requests', $batchId, 'approve'], [new ConnectException('unreachable', new Psr17Factory()->createRequest('POST', 'http://openfga.test'))]);
+
+        try {
+            $handler->handle($request);
+            self::fail('an unreachable OpenFGA must not permit approval');
+        } catch (NotFoundException) {
+            // Fails closed, and as 404 rather than 403 so it cannot confirm the batch exists.
+        }
+
+        $rows = $this->repo->getBatch($batchId);
+        self::assertSame(ChangeReviewStatus::SUBMITTED->value, $rows[0]['review_status'], 'batch must remain undecided');
     }
 }

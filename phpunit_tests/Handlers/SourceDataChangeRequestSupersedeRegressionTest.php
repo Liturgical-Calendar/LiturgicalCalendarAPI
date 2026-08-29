@@ -12,6 +12,9 @@ use LiturgicalCalendar\Api\Handlers\TestsHandler;
 use LiturgicalCalendar\Api\Http\Exception\ConflictException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Repositories\SourceDataChangeRequestRepository;
+use LiturgicalCalendar\Api\Services\ChangeRequestReview;
+use LiturgicalCalendar\Api\Services\SourceData\ChangeRequestSourceDataWriter;
+use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode;
 use LiturgicalCalendar\Api\Services\ChangeResource;
 use PHPUnit\Framework\Attributes\CoversClass;
 use Psr\Http\Message\ResponseInterface;
@@ -50,6 +53,14 @@ use Psr\Http\Message\ResponseInterface;
 #[CoversClass(DecreesHandler::class)]
 #[CoversClass(TestsHandler::class)]
 #[CoversClass(SourceDataChangeRequestRepository::class)]
+// These tests drive real handlers end to end in queue mode, so they exercise the whole
+// write path — the mode selection, the queue writer and the FGA review gate — not just
+// the handler and the repository. Without naming them here PHPUnit discards that
+// coverage, which is why ChangeRequestSourceDataWriter reported 0% while being
+// constructed on every one of these requests.
+#[CoversClass(ChangeRequestSourceDataWriter::class)]
+#[CoversClass(SourceDataWriteMode::class)]
+#[CoversClass(ChangeRequestReview::class)]
 final class SourceDataChangeRequestSupersedeRegressionTest extends AbstractHandlerTestCase
 {
     protected static bool $requiresDatabase = true;
