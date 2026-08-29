@@ -7,15 +7,34 @@ namespace LiturgicalCalendar\Api\Services\SourceData;
 use LiturgicalCalendar\Api\Enum\ChangeOperation;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Services\ChangeResource;
+use LiturgicalCalendar\Api\Utilities;
 
 /**
  * Writes source data to disk — the behaviour every deployment had before change
  * requests existed, and the behaviour a self-hosted instance without Postgres
  * and OpenFGA keeps.
  *
- * The logic here is lifted from RegionalDataHandler, DecreesHandler and
- * TestsHandler rather than rewritten: same `file_put_contents()`, same
- * `unlink()`, same ServiceUnavailableException on failure.
+ * The write/delete primitives and the `ServiceUnavailableException` on failure are
+ * lifted from the handler layer rather than rewritten, but not from
+ * `RegionalDataHandler`: that handler's bare `file_put_contents()`/`unlink()`, with
+ * no locking and no cache invalidation, is the outlier among the write handlers, not
+ * the convention. `DecreesHandler` and `TemporaleHandler` both take an exclusive lock
+ * on every write (`LOCK_EX`) and call `Utilities::invalidateJsonFileCache()`
+ * afterwards, because `Utilities::jsonFileToObject()`/`jsonFileToArray()`/
+ * `jsonFileToObjectArray()` cache file contents in APCu for 300 seconds — without
+ * invalidation, a file this class just wrote would keep being served from cache for
+ * up to five minutes, and without `LOCK_EX`, two overlapping writers could interleave
+ * and corrupt the file. This class follows that stricter, more common convention —
+ * deliberately stronger than what `RegionalDataHandler` does today — so that Tasks
+ * 9–11, which migrate `DecreesHandler`, `TemporaleHandler` and `RegionalDataHandler`
+ * onto this writer, do not silently lose locking or cache freshness in the move.
+ * Applying both unconditionally is safe even for `RegionalDataHandler`'s callers:
+ * `LOCK_EX` is just an exclusive lock held for the duration of the write, and
+ * invalidating a cache entry that was never populated is a no-op.
+ *
+ * A deletion invalidates the cache too, for the same reason in the opposite
+ * direction: a file this class just removed must not keep being served from a cache
+ * entry a still-live read populated before the delete.
  *
  * Staging is deferred rather than immediate so that both implementations share
  * one contract, and so a request that fails validation half way through has not
@@ -54,9 +73,11 @@ final class DiskSourceDataWriter implements SourceDataWriter
 
     private function writeFile(string $path, string $content): void
     {
-        if (false === file_put_contents($path, $content)) {
+        if (false === file_put_contents($path, $content, LOCK_EX)) {
             throw new ServiceUnavailableException('Failed to write to file ' . $path);
         }
+
+        Utilities::invalidateJsonFileCache($path);
     }
 
     /**
@@ -73,5 +94,7 @@ final class DiskSourceDataWriter implements SourceDataWriter
         if (false === unlink($path)) {
             throw new ServiceUnavailableException('Failed to delete file ' . $path);
         }
+
+        Utilities::invalidateJsonFileCache($path);
     }
 }
