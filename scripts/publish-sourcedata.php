@@ -15,7 +15,8 @@
  *   0  Every claimed batch published, or the queue was empty. (A reclaimed stale claim is
  *      ordinary recovery, not a failure, and does not affect this. So is a batch that lost a
  *      race for its resource branch — a GitHub 422 — which the next tick republishes.)
- *   1  Misconfiguration (bad arguments, GitHub App or GITHUB_REPOSITORY not set), a database
+ *   1  Misconfiguration (bad arguments, GitHub App or GITHUB_REPOSITORY unset OR malformed —
+ *      GITHUB_REPOSITORY must be exactly "owner/repo"), a database
  *      failure, OR a publish attempt failed and the run stopped early. In the last case the
  *      failed batch is back at `publication_status = 'none'` — NOT `queued`, which is a
  *      live claim and is exactly what the failure path gives up. Look for approved batches
@@ -215,7 +216,14 @@ try {
     // log line past "run starting". Same reasoning as the two sibling wraps around this one:
     // whatever goes wrong, the operator gets a message and an exit code, never a stack trace.
     umask($previousUmask);
-    $logger->error('publish-sourcedata is not configured; nothing was published.', ['message' => $e->getMessage()]);
+    // The class goes in the context because this catch is now \Throwable: the reachable
+    // surface today is only the two configuration exceptions, but that is a property of
+    // fromEnv() not doing I/O, not a guarantee. Without it, a future TypeError here would
+    // read as "not configured" and send an operator auditing four correct variables.
+    $logger->error(
+        'publish-sourcedata is not configured; nothing was published.',
+        ['exception' => $e::class, 'message' => $e->getMessage()]
+    );
     fwrite(STDERR, 'Error: ' . $e->getMessage() . "\n");
     exit(1);
 }

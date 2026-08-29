@@ -527,11 +527,16 @@ installation token, not a transient failure.
 ### Operational failure modes
 
 - **An unconfigured publisher accumulates approved work silently.** If change-request queue mode is on but
-  the GitHub App credentials are missing or incomplete, `SourceDataPublisher::isConfigured()` returns
+  the GitHub App credentials are missing, incomplete, or **malformed**, `SourceDataPublisher::isConfigured()` returns
   `false`, `GET /health`'s `source_data_publisher` block reports `warning`, and every approved batch simply
   stays `publication_status = 'none'` forever — nothing about this looks like an error to an editor or a
   resource admin, since their own review workflow (`review_status`) completes normally. Watch `/health`,
   not the editor-facing endpoints, to catch this.
+
+  A set-but-malformed value lands here too, not only an absent one: `GITHUB_REPOSITORY` must be exactly
+  `owner/repo`, so a pasted repository URL or a trailing slash reports identically to leaving it blank.
+  `isConfigured()` and the publisher's own construction share one shape check precisely so `/health`
+  cannot call a value configured that a run would then reject.
 - **A non-fast-forward `422` is the expected symptom of two editors racing on one resource, not data
   loss.** `GitHubGitDataClient::updateRef()` hardcodes `force: false` and is never given a way to force —
   intentionally, so that a branch another publish landed on between this publish's `getRef()` and its own

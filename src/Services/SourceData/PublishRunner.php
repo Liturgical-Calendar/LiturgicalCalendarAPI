@@ -249,10 +249,17 @@ final class PublishRunner
                     // accompanied it happened to be a 422 — the same DB failure beside a 500
                     // stops the run — and would read an unexplained state optimistically,
                     // against ClaimReleaseOutcome's own rule.
+                    // "stays claimable" holds for every attempt but the last: the release that
+                    // reports RELEASED is also the one that spends an attempt, so the attempt that
+                    // reaches the bound parks the batch in the same breath as this message. Said
+                    // plainly here rather than left to contradict the parked warning and the
+                    // `parked` count that the very same run emits.
                     $this->logger->warning(
                         'Publishing this batch lost a race for its resource branch (GitHub 422); '
                             . 'the batch stays claimable and the next tick republishes it onto the '
-                            . 'branch head the winner pushed. Continuing with the rest of the queue.',
+                            . 'branch head the winner pushed — unless this attempt was its last, in '
+                            . 'which case it is parked and this run reports it as such. '
+                            . 'Continuing with the rest of the queue.',
                         [
                             'batch_id'        => $batchId,
                             'message'         => $e->getMessage(),
