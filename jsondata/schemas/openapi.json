@@ -77,8 +77,16 @@
       "description": "User-facing access request operations (request roles and permissions, check status)"
     },
     {
+      "name": "Change Requests",
+      "description": "User-facing view of a caller's own source-data change requests (list, withdraw). Only populated on deployments running with SOURCEDATA_CHANGE_REQUESTS enabled."
+    },
+    {
       "name": "Admin - Access Requests",
       "description": "Admin operations for managing access requests (approve, reject, revoke)"
+    },
+    {
+      "name": "Admin - Change Requests",
+      "description": "Admin review queue for source-data change requests (list, approve, reject). Only populated on deployments running with SOURCEDATA_CHANGE_REQUESTS enabled."
     },
     {
       "name": "Admin - Users",
@@ -3075,6 +3083,115 @@
         }
       }
     },
+    "/auth/change-requests": {
+      "get": {
+        "tags": [
+          "Change Requests"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "List the caller's own source-data change requests",
+        "operationId": "getUserChangeRequests",
+        "description": "Retrieve a paginated page of source-data change request batches submitted by the authenticated caller. Scoping is entirely server-side, from the caller's own OIDC `sub` — there is no submitter query parameter and none will ever be added, since accepting one would let a caller list someone else's batches. Only meaningful on a deployment running with SOURCEDATA_CHANGE_REQUESTS enabled; see the `disposition` field on every /data, /decrees and /tests write response for how a batch is created.",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by review status. Omitted returns every status.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "submitted",
+                "approved",
+                "rejected",
+                "withdrawn"
+              ]
+            }
+          },
+          {
+            "$ref": "#/components/parameters/LimitQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/OffsetQueryParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Paginated page of the caller's own change request batches",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeRequestListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          }
+        }
+      }
+    },
+    "/auth/change-requests/{batchId}/withdraw": {
+      "post": {
+        "tags": [
+          "Change Requests"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Withdraw one of the caller's own pending change request batches",
+        "operationId": "withdrawChangeRequest",
+        "description": "Withdraw a batch the caller submitted, while it is still `submitted`. Returns 404, never 403, both when the batch does not exist and when it exists but was submitted by someone else or has already been decided (approved/rejected/withdrawn) — a 403 would confirm to the caller that a batch they cannot touch exists at all. A malformed (non-UUID) `batchId` is a 400 instead, since UUID-shapedness is decidable from the input alone and discloses nothing about the database.",
+        "parameters": [
+          {
+            "name": "batchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: the batch was withdrawn",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeRequestDecisionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "404": {
+            "description": "Not Found: no such batch, the batch is not the caller's own, or it was already decided. Deliberately identical for all three — see the operation description.",
+            "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      }
+    },
     "/admin/access-requests": {
       "get": {
         "tags": [
@@ -3410,6 +3527,191 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound404"
+          }
+        }
+      }
+    },
+    "/admin/change-requests": {
+      "get": {
+        "tags": [
+          "Admin - Change Requests"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Review queue and history for source-data change requests",
+        "operationId": "adminListChangeRequests",
+        "description": "List a paginated page of source-data change request batches with an optional status filter. Global admins see every batch. Resource (non-global) admins see only batches for resources they administer — see AdminChangeRequestListResponse for exactly how that filtering affects `count`, `total` and `has_more`, and why clients must page on `has_more` rather than on whether a page came back empty. Listing a batch here does not by itself authorize acting on it: POST .../approve and .../reject re-check the caller's authorization on the specific batch id named in the path, never trusting that a batch reachable via this filtered list is the only one the caller could name.",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filter by review status. Omitted returns every status.",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "submitted",
+                "approved",
+                "rejected",
+                "withdrawn"
+              ]
+            }
+          },
+          {
+            "$ref": "#/components/parameters/LimitQueryParam"
+          },
+          {
+            "$ref": "#/components/parameters/OffsetQueryParam"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Paginated page of change request batches (admin review queue)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminChangeRequestListResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          }
+        }
+      }
+    },
+    "/admin/change-requests/{batchId}/approve": {
+      "post": {
+        "tags": [
+          "Admin - Change Requests"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Approve a source-data change request batch",
+        "operationId": "adminApproveChangeRequest",
+        "description": "Approve every still-`submitted` row in the batch. Requires the `admin` relation on the batch's resource (global admins bypass the OpenFGA check). Returns 404, never 403, when the caller does not administer the batch's resource — identical to an unknown batch id, so a 403 cannot confirm to the caller that a batch they cannot touch exists at all. Returns 409 if the batch was already approved, rejected, or withdrawn by someone else before this request landed. Approving in Phase 1 records the decision only: the batch is not published anywhere and `publication_status` stays `none` until the Phase 2 publisher exists — see the change-request runbook.",
+        "parameters": [
+          {
+            "name": "batchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: the batch was approved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeRequestDecisionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "404": {
+            "description": "Not Found: no such batch, or the caller does not administer its resource. Deliberately identical for both — see the operation description.",
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "409": {
+            "description": "Conflict: the batch was already approved, rejected, or withdrawn",
+            "$ref": "#/components/responses/Conflict409"
+          }
+        }
+      }
+    },
+    "/admin/change-requests/{batchId}/reject": {
+      "post": {
+        "tags": [
+          "Admin - Change Requests"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          },
+          {
+            "CookieAuth": []
+          }
+        ],
+        "summary": "Reject a source-data change request batch",
+        "operationId": "adminRejectChangeRequest",
+        "description": "Reject every still-`submitted` row in the batch, with an optional reason. Same authorization, existence, and conflict semantics as POST .../approve — see that operation's description for the 404-not-403 rule and the 409 already-decided case.",
+        "parameters": [
+          {
+            "name": "batchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "description": "Optional reviewer-written reason, recorded on every row of the batch."
+                  }
+                },
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK: the batch was rejected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeRequestDecisionResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest400"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized401"
+          },
+          "404": {
+            "description": "Not Found: no such batch, or the caller does not administer its resource. Deliberately identical for both — see POST .../approve's description.",
+            "$ref": "#/components/responses/NotFound404"
+          },
+          "409": {
+            "description": "Conflict: the batch was already approved, rejected, or withdrawn",
+            "$ref": "#/components/responses/Conflict409"
           }
         }
       }
@@ -6165,10 +6467,17 @@
                       "examples": [
                         "National calendar created for nation {NATION}"
                       ]
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
                     }
                   },
                   "required": [
-                    "success"
+                    "success",
+                    "disposition"
                   ]
                 }
               }
@@ -6317,10 +6626,17 @@
                     "success": {
                       "type": "string",
                       "example": "National calendar updated for nation {NATION}"
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
                     }
                   },
                   "required": [
-                    "success"
+                    "success",
+                    "disposition"
                   ]
                 }
               }
@@ -6492,10 +6808,17 @@
                       "examples": [
                         "National calendar created for nation {NATION}"
                       ]
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
                     }
                   },
                   "required": [
-                    "success"
+                    "success",
+                    "disposition"
                   ]
                 }
               }
@@ -6636,10 +6959,17 @@
                     "success": {
                       "type": "string",
                       "example": "National calendar updated for nation {NATION}"
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
                     }
                   },
                   "required": [
-                    "success"
+                    "success",
+                    "disposition"
                   ]
                 }
               }
@@ -6817,10 +7147,17 @@
                       "examples": [
                         "Diocesan calendar created for diocese {DIOCESE}"
                       ]
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
                     }
                   },
                   "required": [
-                    "success"
+                    "success",
+                    "disposition"
                   ]
                 }
               }
@@ -6968,10 +7305,17 @@
                     "success": {
                       "type": "string",
                       "example": "Diocesan calendar updated for diocese {DIOCESE}"
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
                     }
                   },
                   "required": [
-                    "success"
+                    "success",
+                    "disposition"
                   ]
                 }
               }
@@ -7145,10 +7489,17 @@
                       "examples": [
                         "Diocesan calendar created for diocese {DIOCESE}"
                       ]
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
                     }
                   },
                   "required": [
-                    "success"
+                    "success",
+                    "disposition"
                   ]
                 }
               }
@@ -7289,10 +7640,17 @@
                     "success": {
                       "type": "string",
                       "example": "Diocesan calendar updated for diocese {DIOCESE}"
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
                     }
                   },
                   "required": [
-                    "success"
+                    "success",
+                    "disposition"
                   ]
                 }
               }
@@ -7472,10 +7830,17 @@
                       "examples": [
                         "Wider region calendar created for region {REGION}"
                       ]
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
                     }
                   },
                   "required": [
-                    "success"
+                    "success",
+                    "disposition"
                   ]
                 }
               }
@@ -7623,10 +7988,17 @@
                     "success": {
                       "type": "string",
                       "example": "Wider region calendar updated for region {REGION}"
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
                     }
                   },
                   "required": [
-                    "success"
+                    "success",
+                    "disposition"
                   ]
                 }
               }
@@ -7797,10 +8169,17 @@
                       "examples": [
                         "Wider region calendar created for region {REGION}"
                       ]
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
                     }
                   },
                   "required": [
-                    "success"
+                    "success",
+                    "disposition"
                   ]
                 }
               }
@@ -7940,10 +8319,17 @@
                     "success": {
                       "type": "string",
                       "example": "Wider region calendar updated for region {REGION}"
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
                     }
                   },
                   "required": [
-                    "success"
+                    "success",
+                    "disposition"
                   ]
                 }
               }
@@ -8110,10 +8496,17 @@
                       "examples": [
                         "Diocesan calendar created for diocese {DIOCESE}"
                       ]
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
                     }
                   },
                   "required": [
-                    "success"
+                    "success",
+                    "disposition"
                   ]
                 }
               }
@@ -8251,10 +8644,17 @@
                     "success": {
                       "type": "string",
                       "example": "Diocesan calendar updated for diocese {DIOCESE}"
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
                     }
                   },
                   "required": [
-                    "success"
+                    "success",
+                    "disposition"
                   ]
                 }
               }
@@ -9135,11 +9535,18 @@
                     },
                     "decree": {
                       "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree"
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
                     }
                   },
                   "required": [
                     "success",
-                    "decree"
+                    "decree",
+                    "disposition"
                   ]
                 }
               }
@@ -9214,11 +9621,18 @@
                     },
                     "decree": {
                       "$ref": "./LitCalDecreesSource.json#/definitions/LitCalDecree"
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
                     }
                   },
                   "required": [
                     "success",
-                    "decree"
+                    "decree",
+                    "disposition"
                   ]
                 }
               }
@@ -9680,10 +10094,17 @@
                       "examples": [
                         "Unit Test MaryMotherChurchTest created successfully."
                       ]
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
                     }
                   },
                   "required": [
-                    "response"
+                    "response",
+                    "disposition"
                   ]
                 }
               }
@@ -9774,10 +10195,17 @@
                     "response": {
                       "type": "string",
                       "example": "Unit Test ExampleTest updated successfully."
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
                     }
                   },
                   "required": [
-                    "response"
+                    "response",
+                    "disposition"
                   ]
                 }
               }
@@ -9836,8 +10264,34 @@
           }
         ],
         "responses": {
-          "204": {
-            "description": "204 No Content. The unit test was deleted successfully."
+          "200": {
+            "description": "200 OK. The unit test was deleted successfully. RFC 9110 Section 9.3.5 allows 200 (rather than 204) when the response carries a representation describing the status, which this one does via `success`/`disposition`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "properties": {
+                    "success": {
+                      "type": "string",
+                      "examples": [
+                        "Unit Test MaryMotherChurchTest deletion successful."
+                      ]
+                    },
+                    "disposition": {
+                      "$ref": "#/components/schemas/ChangeRequestDisposition"
+                    },
+                    "change_request": {
+                      "$ref": "#/components/schemas/ChangeRequestSubmission"
+                    }
+                  },
+                  "required": [
+                    "success",
+                    "disposition"
+                  ]
+                }
+              }
+            }
           },
           "401": {
             "$ref": "#/components/responses/Unauthorized401"
@@ -12221,6 +12675,330 @@
         ],
         "additionalProperties": false
       },
+      "ChangeRequestDisposition": {
+        "type": "string",
+        "enum": [
+          "applied",
+          "submitted",
+          "approved"
+        ],
+        "description": "How a source-data write that reached commit() was handled — always present on every write response from /data/*, /decrees/{decree_id} and /tests/{rite}/{test_name}, in both write modes.\n\n`applied`: this deployment writes source data straight to disk (SOURCEDATA_CHANGE_REQUESTS unset, or set without Postgres and OpenFGA behind it — see GET /health's source_data_writes block). The response body is otherwise byte-identical to what it has always been.\n\n`submitted`: this deployment has SOURCEDATA_CHANGE_REQUESTS enabled and the caller does not administer the resource, so the write was recorded as a change request instead of touching disk. The resource named in the rest of the response body (e.g. `data`, `decree`) describes the PROPOSED content, not the calendar's current content — nothing has changed yet. See `change_request` for the batch id, and GET /auth/change-requests to track it.\n\n`approved`: same as `submitted`, except the caller already administers the resource, so the batch was auto-approved in the same request it was submitted in. This still does not write to disk: Phase 1 has no publisher, so an approved batch sits at `publication_status: none` until the Phase 2 GitHub integration exists. A deployment without SOURCEDATA_CHANGE_REQUESTS never returns `submitted` or `approved` — every write there is `applied`, unchanged from before this feature existed."
+      },
+      "ChangeRequestSubmission": {
+        "type": "object",
+        "description": "Present only when the sibling `disposition` is `submitted` or `approved` — identifies the change request batch this write's staged files were recorded under, in place of being written to disk.",
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Pass this to GET /auth/change-requests, POST /auth/change-requests/{batchId}/withdraw, or (for a resource admin) POST /admin/change-requests/{batchId}/approve|reject."
+          },
+          "review_status": {
+            "type": "string",
+            "enum": [
+              "submitted",
+              "approved"
+            ],
+            "description": "Always equal to the sibling `disposition` — repeated here so the batch object is self-describing once separated from the response it was minted in."
+          },
+          "auto_approved": {
+            "type": "boolean",
+            "description": "True exactly when `disposition` is `approved`: the submitter already administers the resource, so the batch was approved in the same request it was created in, rather than waiting for a separate reviewer."
+          },
+          "resource": {
+            "type": "object",
+            "description": "The calendar, decrees corpus, or test scope this whole batch belongs to. Every file in `paths` was staged against this one resource.",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "national_calendar",
+                  "diocesan_calendar",
+                  "wider_region",
+                  "national_calendar_test",
+                  "diocesan_calendar_test",
+                  "general_roman_calendar_test",
+                  "rite_calendar_test",
+                  "general_roman_calendar"
+                ]
+              },
+              "id": {
+                "type": "string",
+                "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`); bare for `general_roman_calendar` ids such as `decrees`, which are Roman by construction."
+              }
+            },
+            "required": [
+              "type",
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "description": "Repository-relative path of every file staged in this one request (e.g. a diocesan calendar plus its i18n translation files), which is why this can hold more than one entry even though the request targeted a single resource."
+          }
+        },
+        "required": [
+          "batch_id",
+          "review_status",
+          "auto_approved",
+          "resource",
+          "paths"
+        ],
+        "additionalProperties": false
+      },
+      "ChangeRequestBatch": {
+        "type": "object",
+        "description": "One batch of proposed source-data file changes: every row submitted together by a single API write request, collapsed into one object. Returned by GET /admin/change-requests (every batch a caller may review) and GET /auth/change-requests (a caller's own submitted batches). `permissions` is the OpenFGA tuple the server itself checks to decide whether the caller may approve/reject this batch — clients do not need to interpret it, only resource_type/resource_id/review_status/publication_status.",
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "resource_type": {
+            "type": "string",
+            "enum": [
+              "national_calendar",
+              "diocesan_calendar",
+              "wider_region",
+              "national_calendar_test",
+              "diocesan_calendar_test",
+              "general_roman_calendar_test",
+              "rite_calendar_test",
+              "general_roman_calendar"
+            ]
+          },
+          "resource_id": {
+            "type": "string",
+            "description": "Rite-qualified as `<rite>/<calendarId>` for calendar-naming types (e.g. `roman/US`); bare for `general_roman_calendar` ids such as `decrees`."
+          },
+          "review_status": {
+            "type": "string",
+            "enum": [
+              "submitted",
+              "approved",
+              "rejected",
+              "withdrawn"
+            ],
+            "description": "This batch's position in the review workflow. Deliberately separate from `publication_status`, which tracks GitHub's side of the same change: an `approved` batch can sit at `publication_status: none` indefinitely in Phase 1, since the publisher that would open a pull request for it does not exist yet."
+          },
+          "publication_status": {
+            "type": "string",
+            "enum": [
+              "none",
+              "queued",
+              "open",
+              "merged",
+              "closed"
+            ],
+            "description": "This batch's position on GitHub. Phase 1 never writes anything but `none` — `queued`, `open`, `merged` and `closed` are reserved for the Phase 2 publisher and Phase 3 merge polling."
+          },
+          "submitted_by_sub": {
+            "type": "string",
+            "description": "OIDC subject of the submitter."
+          },
+          "submitted_by_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "submitted_by_email": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Null unless the submitter's email was verified at submission time — an unverified email is never recorded here, since it would otherwise become the eventual git commit author."
+          },
+          "approved_by_sub": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "OIDC subject of the admin who approved or rejected this batch (the same column serves both decisions). Null while `review_status` is still `submitted`."
+          },
+          "file_count": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Number of files in this batch, e.g. 2 for a diocesan calendar plus one i18n translation file."
+          },
+          "paths": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "description": "Repository-relative path of every file in this batch, ordered lexicographically under the database collation (not necessarily calendar-file-before-i18n-files)."
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "object_type": {
+                  "type": "string"
+                },
+                "object_id": {
+                  "type": "string"
+                },
+                "relation": {
+                  "type": "string",
+                  "enum": [
+                    "admin"
+                  ]
+                }
+              },
+              "required": [
+                "object_type",
+                "object_id",
+                "relation"
+              ],
+              "additionalProperties": false
+            },
+            "minItems": 1,
+            "maxItems": 1,
+            "description": "The OpenFGA `admin` tuple for this batch's resource — mirrors resource_type/resource_id and exists only so the server's own authorization filtering has a uniform shape to check against."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "batch_id",
+          "resource_type",
+          "resource_id",
+          "review_status",
+          "publication_status",
+          "submitted_by_sub",
+          "submitted_by_name",
+          "submitted_by_email",
+          "approved_by_sub",
+          "file_count",
+          "paths",
+          "permissions",
+          "created_at",
+          "updated_at"
+        ],
+        "additionalProperties": false
+      },
+      "ChangeRequestListResponse": {
+        "type": "object",
+        "description": "Offset-paginated page of the caller's own change request batches, returned by GET /auth/change-requests. Scoping is entirely server-side — there is no submitter query parameter, and none will be added, since accepting one would let a caller list someone else's batches. Unlike AdminChangeRequestListResponse, there is no per-caller filtering step after the SQL page is fetched, so there is no `count` or `has_more` here: comparing `offset + <length of change_requests>` against `total` is sufficient to know whether more pages remain.",
+        "properties": {
+          "change_requests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChangeRequestBatch"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total matching batches for this caller, ignoring limit/offset."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500,
+            "description": "Effective limit applied to this page (default 100 if not supplied)."
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Effective offset of the first item in this page (default 0 if not supplied)."
+          }
+        },
+        "required": [
+          "change_requests",
+          "total",
+          "limit",
+          "offset"
+        ],
+        "additionalProperties": false
+      },
+      "AdminChangeRequestListResponse": {
+        "type": "object",
+        "description": "Offset-paginated page of change request batches returned by GET /admin/change-requests. Global admins see every batch, and `count` always equals the SQL page size. Resource (non-global) admins have this page filtered to only the batches whose resource they administer AFTER it is fetched — filtering happens in application code, not SQL, because it depends on OpenFGA relations no query here can express — so for them `count` may be smaller than both `limit` and `total`. `total` always reflects the PRE-filter SQL count, never the post-filter one. `has_more` is likewise derived from the pre-filter SQL page size, never from `count`: clients MUST keep paging on `has_more`, never on whether the current page came back non-empty — a heavily-filtered SQL page can legitimately filter down to zero visible batches while later pages still hold ones the caller can act on.",
+        "properties": {
+          "change_requests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChangeRequestBatch"
+            }
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of items in this page. May be less than `limit`, or than the pre-filter SQL page size, for a resource admin after post-filtering."
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Total matching batches ignoring limit/offset. For resource admins, this is the pre-filter SQL count."
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500,
+            "description": "Effective limit applied to this page (default 100 if not supplied)."
+          },
+          "offset": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Effective offset of the first item in this page (default 0 if not supplied)."
+          },
+          "has_more": {
+            "type": "boolean",
+            "description": "True iff more rows are available beyond this page, derived from the PRE-filter SQL paginator state — `(offset + pre-filter SQL page size) < total` — never from the post-filter `count`. See the schema description for why this distinction matters for resource admins."
+          }
+        },
+        "required": [
+          "change_requests",
+          "count",
+          "total",
+          "limit",
+          "offset",
+          "has_more"
+        ],
+        "additionalProperties": false
+      },
+      "ChangeRequestDecisionResponse": {
+        "type": "object",
+        "description": "Confirmation returned by POST /admin/change-requests/{batchId}/approve, POST /admin/change-requests/{batchId}/reject, and POST /auth/change-requests/{batchId}/withdraw.",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "batch_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "approved",
+              "rejected",
+              "withdrawn"
+            ],
+            "description": "The batch's review_status after this decision."
+          }
+        },
+        "required": [
+          "success",
+          "batch_id",
+          "status"
+        ],
+        "additionalProperties": false
+      },
       "PermissionTuple": {
         "type": "object",
         "description": "An OpenFGA relationship tuple representing a granted permission",
@@ -14186,10 +14964,17 @@
                     "Calendar data \"diocese/US_BOSTON\" deletion successful.",
                     "Calendar data \"widerregion/Americas\" deletion successful."
                   ]
+                },
+                "disposition": {
+                  "$ref": "#/components/schemas/ChangeRequestDisposition"
+                },
+                "change_request": {
+                  "$ref": "#/components/schemas/ChangeRequestSubmission"
                 }
               },
               "required": [
-                "success"
+                "success",
+                "disposition"
               ]
             }
           }

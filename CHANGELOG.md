@@ -4,6 +4,16 @@
 ## [v5.8](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.8) (unreleased)
 
 * implement `filter` parameter for limited sets of calendar events, see issue [#43](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/issues/43)
+* add an opt-in source-data change request queue: with `SOURCEDATA_CHANGE_REQUESTS` enabled (and Postgres
+  and OpenFGA configured), `PUT`/`PATCH`/`POST`/`DELETE` requests under `/data`, `/decrees` and `/tests`
+  from a caller who does not administer the resource are recorded as a reviewable change request instead
+  of being written to disk; a resource admin approves or rejects the batch via the new
+  `/admin/change-requests` endpoints, and the submitter can list and withdraw their own via the new
+  `/auth/change-requests` endpoints. Every write response now carries a `disposition` field
+  (`applied`/`submitted`/`approved`) so a client can tell which happened. Deployments that do not set the
+  flag are unaffected: every write still goes straight to disk and every response body is unchanged apart
+  from the added `disposition: "applied"`. Phase 1 stops at approval — nothing is published to GitHub yet,
+  see `docs/ops/change-request-runbook.md`.
 -->
 
 ## [v5.7](https://github.com/Liturgical-Calendar/LiturgicalCalendarAPI/releases/tag/v5.7) (December 15th 2025)
