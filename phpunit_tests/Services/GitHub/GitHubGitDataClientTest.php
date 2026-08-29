@@ -12,6 +12,7 @@ use LiturgicalCalendar\Api\Services\GitHub\GitHubApiException;
 use LiturgicalCalendar\Api\Services\GitHub\GitHubAppAuth;
 use LiturgicalCalendar\Api\Services\GitHub\GitHubGitDataClient;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -262,6 +263,48 @@ final class GitHubGitDataClientTest extends TestCase
 
         $this->expectException(GitHubApiException::class);
         $client->createBlob('content');
+    }
+
+    /**
+     * The 404 asymmetry, checked per method rather than only through getRef().
+     *
+     * getRef() treats 404 as "the branch does not exist yet, create it". Every other call must
+     * treat it as a real failure: a 404 swallowed in createBlob(), createTree(), createCommit()
+     * or createRef() would drop the editor's work while the change request reported success.
+     */
+    #[DataProvider('methodsThatMustRejectA404')]
+    public function testA404IsAnErrorEverywhereExceptGetRef(string $label, callable $call): void
+    {
+        $client = $this->client([new GuzzleResponse(404, [], json_encode(['message' => 'Not Found']))]);
+
+        try {
+            $call($client);
+            self::fail($label . ' must not treat a 404 as success');
+        } catch (GitHubApiException $e) {
+            self::assertSame(404, $e->status, $label . ' should surface the 404');
+        }
+    }
+
+    /**
+     * @return array<string, array{0: string, 1: callable(GitHubGitDataClient): mixed}>
+     */
+    public static function methodsThatMustRejectA404(): array
+    {
+        return [
+            'createRef'    => ['createRef', static fn (GitHubGitDataClient $c): mixed => $c->createRef('litcal-data/x', 'abc123')],
+            'createBlob'   => ['createBlob', static fn (GitHubGitDataClient $c): mixed => $c->createBlob('{}')],
+            'createTree'   => ['createTree', static fn (GitHubGitDataClient $c): mixed => $c->createTree('base1', [])],
+            'createCommit' => [
+                'createCommit',
+                static fn (GitHubGitDataClient $c): mixed => $c->createCommit(
+                    'msg',
+                    'tree1',
+                    'parent1',
+                    ['name' => 'Alice', 'email' => 'alice@example.test']
+)
+            ],
+            'updateRef'    => ['updateRef', static fn (GitHubGitDataClient $c): mixed => $c->updateRef('litcal-data/x', 'abc123')],
+        ];
     }
 
     public function testEveryRequestCarriesTheRequiredAuthAndVersionHeaders(): void

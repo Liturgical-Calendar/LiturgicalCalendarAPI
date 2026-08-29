@@ -26,6 +26,8 @@ final class GitHubGitDataClient
 {
     private const API_BASE_URL = 'https://api.github.com';
 
+    private const USER_AGENT = 'LiturgicalCalendarAPI-GitHubApp';
+
     private const API_VERSION = '2022-11-28';
 
     public function __construct(
@@ -286,6 +288,11 @@ final class GitHubGitDataClient
             'Authorization'        => 'Bearer ' . $this->auth->installationToken(),
             'Accept'               => 'application/vnd.github+json',
             'X-GitHub-Api-Version' => self::API_VERSION,
+            // GitHub rejects a request with no User-Agent as 403. Guzzle injects a default,
+            // but this class takes any PSR-18 ClientInterface by design, and a bare one sends
+            // none — so set it here rather than depending on which client was injected.
+            // Matches GitHubAppAuth, which identifies itself the same way.
+            'User-Agent'           => self::USER_AGENT,
         ];
 
         $requestBody = null;
