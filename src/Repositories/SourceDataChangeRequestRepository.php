@@ -333,6 +333,14 @@ class SourceDataChangeRequestRepository
      * written together and transitioned together — so MIN() over those columns is
      * exact, not an approximation.
      *
+     * Ordering contract: newest first by `created_at`, with `batch_id` DESC as a
+     * deterministic tie-breaker. `created_at` is the transaction timestamp, so two
+     * batches submitted close together (or genuinely concurrently) can share the same
+     * value; without a tie-breaker, Postgres is free to order tied rows differently
+     * between calls, which would let a batch appear twice or vanish across a paginated
+     * `LIMIT`/`OFFSET` sequence. `batch_id` is unique per batch, so appending it fully
+     * resolves any tie and makes the page sequence stable.
+     *
      * @param array<string, string> $params
      * @return array<int, array<string, mixed>>
      */
@@ -364,7 +372,7 @@ class SourceDataChangeRequestRepository
                   FROM sourcedata_change_requests
                  WHERE ' . $predicate . '
               GROUP BY batch_id
-              ORDER BY MIN(created_at) DESC
+              ORDER BY MIN(created_at) DESC, batch_id DESC
                  LIMIT :limit OFFSET :offset';
 
         $stmt = $this->db->prepare($sql);

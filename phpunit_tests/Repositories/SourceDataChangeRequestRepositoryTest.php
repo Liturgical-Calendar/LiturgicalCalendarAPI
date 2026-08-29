@@ -423,6 +423,54 @@ final class SourceDataChangeRequestRepositoryTest extends RepositoryTestCase
         self::assertSame($older, $batches[1]['batch_id']);
     }
 
+    public function testListingBreaksATiedCreatedAtDeterministically(): void
+    {
+        $first  = $this->submitUsa('user-1');
+        $second = $this->repo->submitBatch(
+            ChangeResource::widerRegion('Europe'),
+            [
+                [
+                    'path'      => 'jsondata/sourcedata/rite/roman/calendars/wider_regions/Europe/Europe.json',
+                    'operation' => ChangeOperation::UPDATE,
+                    'content'   => '{"litcal":[]}',
+                ],
+            ],
+            'user-1',
+            'Alice',
+            'alice@example.test',
+            true
+        );
+
+        // Force a genuine tie: both batches now share the exact same created_at, which
+        // is the scenario ORDER BY MIN(created_at) DESC alone cannot resolve.
+        self::$pdo->exec("UPDATE sourcedata_change_requests SET created_at = TIMESTAMP '2026-01-01 00:00:00'");
+
+        $firstCall  = $this->repo->listBySubmitter('user-1');
+        $secondCall = $this->repo->listBySubmitter('user-1');
+
+        self::assertSame(
+            array_column($firstCall, 'batch_id'),
+            array_column($secondCall, 'batch_id'),
+            'two successive calls over a tie must return the same order'
+        );
+
+        // The assertion that actually pins the bug: page through the tie with
+        // limit 1 and prove no batch is repeated or dropped across the two pages.
+        $page0 = $this->repo->listBySubmitter('user-1', null, 1, 0);
+        $page1 = $this->repo->listBySubmitter('user-1', null, 1, 1);
+
+        self::assertCount(1, $page0);
+        self::assertCount(1, $page1);
+
+        $pagedIds = [$page0[0]['batch_id'], $page1[0]['batch_id']];
+        sort($pagedIds);
+        $expectedIds = [$first, $second];
+        sort($expectedIds);
+
+        self::assertNotSame($page0[0]['batch_id'], $page1[0]['batch_id'], 'paging through a tie must not repeat a batch');
+        self::assertSame($expectedIds, $pagedIds, 'the two pages together must cover both batches, with none dropped');
+    }
+
     public function testRejectBatchRecordsTheReason(): void
     {
         $batchId = $this->submitUsa();
