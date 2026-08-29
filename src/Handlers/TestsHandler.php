@@ -4,7 +4,9 @@ namespace LiturgicalCalendar\Api\Handlers;
 
 use Swaggest\JsonSchema\InvalidValue;
 use Swaggest\JsonSchema\Schema;
+use LiturgicalCalendar\Api\Enum\ChangeOperation;
 use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesOutboxTooling;
+use LiturgicalCalendar\Api\Handlers\Concerns\WritesSourceData;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Enum\JsonData;
@@ -18,6 +20,7 @@ use LiturgicalCalendar\Api\Http\Exception\NotFoundException;
 use LiturgicalCalendar\Api\Http\Exception\ServiceUnavailableException;
 use LiturgicalCalendar\Api\Http\Exception\UnprocessableContentException;
 use LiturgicalCalendar\Api\Http\Exception\ValidationException;
+use LiturgicalCalendar\Api\Services\ChangeResource;
 use LiturgicalCalendar\Api\Services\TestScopeResolver;
 use LiturgicalCalendar\Api\Utilities;
 use Psr\Http\Message\ResponseInterface;
@@ -26,6 +29,7 @@ use Psr\Http\Message\ServerRequestInterface;
 final class TestsHandler extends AbstractHandler
 {
     use ResolvesOutboxTooling;
+    use WritesSourceData;
 
     /** @var string[] */
     private static array $propsToSanitize = [
@@ -256,38 +260,57 @@ final class TestsHandler extends AbstractHandler
         // Resolve the FGA scope FIRST. A null result means the name failed
         // validation (path-traversal / unsafe characters) or the test file is
         // missing/unreadable — in every such case refuse to touch the filesystem,
-        // so unsafe names like "../foo" can never reach unlink().
+        // so unsafe names like "../foo" can never reach stageFile()/unlink().
         $scope = ( new TestScopeResolver() )->resolve($this->rite ?? Rite::default(), $testName);
         if ($scope === null) {
             throw new NotFoundException("Test {$testName} not found, cannot DELETE.");
         }
 
-        if (false === unlink($this->testFilePath($testName))) {
-            throw new ServiceUnavailableException("Test {$testName} could not be deleted");
-        }
+        $this->stageFile($this->testFilePath($testName), ChangeOperation::DELETE, null);
+        $changeRequest = $this->commitStagedFiles($this->changeResourceForTest($scope));
 
         // Best-effort purge of operational (editor/viewer) tuples orphaned by the
-        // deletion. The file is already gone, so an OpenFGA/outbox error must NOT
-        // fail the DELETE — the reconciler sweep cleans up any stragglers.
-        $purge = $this->getPurgeService();
-        if ($purge !== null) {
-            [$scopeType, $scopeId] = $scope;
-            try {
-                $purge->purgeForObject("{$scopeType}:{$scopeId}");
-            } catch (\Throwable $e) {
+        // deletion. Gated on the deletion having actually landed: in queue mode the
+        // file is still present pending review, so stripping editor/viewer access to
+        // it now would revoke permissions on a test that is still in effect (mirrors
+        // RegionalDataHandler::deleteCalendar()). When it has landed, the file is
+        // already gone, so an OpenFGA/outbox error here must NOT fail the DELETE —
+        // the reconciler sweep cleans up any stragglers.
+        if (( $changeRequest['disposition'] ?? null ) === 'applied') {
+            $purge = $this->getPurgeService();
+            if ($purge !== null) {
+                [$scopeType, $scopeId] = $scope;
                 try {
-                    LoggerFactory::create('audit', null, 90, false, true, false)->warning(
-                        'TestsHandler: post-delete tuple purge failed; reconciler will retry',
-                        ['object' => "{$scopeType}:{$scopeId}", 'error' => $e->getMessage()]
-                    );
-                } catch (\Throwable) {
-                    // Logging is best-effort too; a logger/audit failure must never
-                    // fail a DELETE whose file has already been removed.
+                    $purge->purgeForObject("{$scopeType}:{$scopeId}");
+                } catch (\Throwable $e) {
+                    try {
+                        LoggerFactory::create('audit', null, 90, false, true, false)->warning(
+                            'TestsHandler: post-delete tuple purge failed; reconciler will retry',
+                            ['object' => "{$scopeType}:{$scopeId}", 'error' => $e->getMessage()]
+                        );
+                    } catch (\Throwable) {
+                        // Logging is best-effort too; a logger/audit failure must never
+                        // fail a DELETE whose file has already been removed.
+                    }
                 }
             }
         }
 
-        return $response->withStatus(StatusCode::NO_CONTENT->value, StatusCode::NO_CONTENT->reason());
+        // RFC 9110 Section 9.3.5: "a 200 (OK) status code if the action has been enacted
+        // and the response message includes a representation describing the status."
+        // We use 200 (not 204) because we include a success message in the response body.
+        // 204 No Content cannot have content per RFC 9110 Section 15.3.5. Mirrors
+        // RegionalDataHandler::deleteCalendar()'s tail exactly: in queue mode `commit()`
+        // never returns 'applied' (not even when auto-approved), so a bare 204 here would
+        // tell the client "done, nothing to say" while the test file is still fully present
+        // on disk pending review — silently discarding the `disposition` signal
+        // SourceDataWriter exists to provide.
+        $responseObj          = new \stdClass();
+        $responseObj->success = "Unit Test {$testName} deletion successful.";
+        foreach ($changeRequest as $crKey => $crValue) {
+            $responseObj->{$crKey} = $crValue;
+        }
+        return $this->encodeResponseBody($response, $responseObj, StatusCode::OK);
     }
 
     /**
@@ -337,9 +360,22 @@ final class TestsHandler extends AbstractHandler
             throw new ConflictException($description);
         }
 
-        $this->writeTestToDisk($testFilePath);
+        $this->stageTestDefinition($testFilePath, ChangeOperation::CREATE);
+        $scope = $this->resolvePayloadScope();
+        if ($scope === null) {
+            // Unreachable in practice: assertPayloadRiteMatchesPath() above already
+            // required a valid applies_to.rite, which is all resolveFromPayload()
+            // needs. Guarded anyway so a future change to either method fails loud
+            // rather than committing an unscoped change request.
+            throw new ServiceUnavailableException('Unable to resolve the scope for this Unit Test.');
+        }
+        $changeRequest = $this->commitStagedFiles($this->changeResourceForTest($scope));
 
-        $responseBody = (object) ['response' => 'Unit Test ' . $testName . ' created successfully.'];
+        $responseBody           = new \stdClass();
+        $responseBody->response = 'Unit Test ' . $testName . ' created successfully.';
+        foreach ($changeRequest as $key => $value) {
+            $responseBody->{$key} = $value;
+        }
         return $this->encodeResponseBody($response, $responseBody, StatusCode::CREATED);
     }
 
@@ -401,11 +437,8 @@ final class TestsHandler extends AbstractHandler
             return;
         }
 
-        $encodedPayload = json_encode($this->payload);
-        $fromPayload    = $encodedPayload === false
-            ? null
-            : ( new TestScopeResolver() )->resolveFromPayload(json_decode($encodedPayload, true));
-        $resolved       = $fromPayload === null
+        $fromPayload = $this->resolvePayloadScope();
+        $resolved    = $fromPayload === null
             ? null
             : (object) ['object_type' => $fromPayload[0], 'object_id' => $fromPayload[1]];
 
@@ -428,18 +461,83 @@ final class TestsHandler extends AbstractHandler
     }
 
     /**
-     * Writes the current payload to disk as a Unit Test JSON file.
+     * Stages the current payload as a Unit Test JSON file for this request's commit.
      *
-     * @throws ServiceUnavailableException When the write to disk fails
+     * Does not touch disk itself: writing (or recording a change request) happens
+     * once per request in {@see WritesSourceData::commitStagedFiles()}, called by
+     * the PUT/PATCH callers of this method after staging.
      */
-    private function writeTestToDisk(string $testFilePath): void
+    private function stageTestDefinition(string $testFilePath, ChangeOperation $operation): void
     {
         $jsonEncodedTest = JsonFormatter::encode($this->payload, false);
-        $bytesWritten    = file_put_contents($testFilePath, $jsonEncodedTest);
-        if (false === $bytesWritten) {
-            $description = 'The server did not succeed in writing to disk the Unit Test. Please try again later or contact the service administrator for support.';
-            throw new ServiceUnavailableException($description);
+        $this->stageFile($testFilePath, $operation, $jsonEncodedTest);
+    }
+
+    /**
+     * Resolve the FGA scope pair for the current payload's `applies_to`.
+     *
+     * Used to build the {@see ChangeResource} a create/update commit targets: the
+     * scope must be the one the write is landing in. Reading it back from disk via
+     * {@see TestScopeResolver::resolve()} would be wrong here — the file does not
+     * exist yet on PUT, and still holds the pre-write content on PATCH, since
+     * staging is deferred until {@see WritesSourceData::commitStagedFiles()}. This
+     * is the same mapping {@see assertPayloadScopeAgrees()} already applies to
+     * validate a client-supplied `scope` echo; it is factored out here so both
+     * call it once rather than re-deriving it.
+     *
+     * @return array{0: string, 1: string}|null
+     */
+    private function resolvePayloadScope(): ?array
+    {
+        $encodedPayload = json_encode($this->payload);
+        if (false === $encodedPayload) {
+            return null;
         }
+        /** @var mixed $decoded */
+        $decoded = json_decode($encodedPayload, true);
+
+        return ( new TestScopeResolver() )->resolveFromPayload($decoded);
+    }
+
+    /**
+     * Map a resolved test scope pair onto the {@see ChangeResource} whose
+     * administrators review it.
+     *
+     * `TestScopeResolver` is the authority here, and it does not return the
+     * `{rite, objectType, calendarId}` shape a first draft of this method assumed:
+     * {@see TestScopeResolver::resolve()} and {@see TestScopeResolver::
+     * resolveFromPayload()} both return a flat FGA `[object_type, object_id]` pair.
+     * For the two rite-qualified test types (`national_calendar_test`,
+     * `diocesan_calendar_test`) the object id is already `<rite>/<calendarId>`
+     * (see {@see RiteScopedObjectId::qualify()}), so it is split back apart here
+     * and handed to {@see ChangeResource::test()}, which re-qualifies it the same
+     * way. For every other type — `rite_calendar_test`, the only one
+     * `TestScopeResolver` emits today for an unscoped test, and the legacy
+     * `general_roman_calendar_test` it no longer emits but
+     * `AccessRequestRepository::VALID_OBJECT_TYPES` still recognises — the id is
+     * unqualified and is passed straight through as the calendar id;
+     * `ChangeResource::test()`'s `Rite` parameter only affects the rite-qualified
+     * branch, so any `Rite` works there, and the request's own rite is used.
+     *
+     * @param array{0: string, 1: string} $scope [object_type, object_id], as
+     *        returned by {@see TestScopeResolver::resolve()} or
+     *        {@see TestScopeResolver::resolveFromPayload()}.
+     */
+    private function changeResourceForTest(array $scope): ChangeResource
+    {
+        [$objectType, $objectId] = $scope;
+
+        if (in_array($objectType, ['national_calendar_test', 'diocesan_calendar_test'], true)) {
+            $parsed = TestScopeResolver::parseQualifiedId($objectId);
+            if (null === $parsed) {
+                $description = "Unable to parse the rite-qualified scope '{$objectId}' for object type {$objectType}.";
+                throw new ServiceUnavailableException($description);
+            }
+            [$scopeRite, $calendarId] = $parsed;
+            return ChangeResource::test($scopeRite, $objectType, $calendarId);
+        }
+
+        return ChangeResource::test($this->rite ?? Rite::default(), $objectType, $objectId);
     }
 
     /**
@@ -488,9 +586,22 @@ final class TestsHandler extends AbstractHandler
             throw new UnprocessableContentException($description);
         }
 
-        $this->writeTestToDisk($testFilePath);
+        $this->stageTestDefinition($testFilePath, ChangeOperation::UPDATE);
+        $scope = $this->resolvePayloadScope();
+        if ($scope === null) {
+            // Unreachable in practice: assertPayloadRiteMatchesPath() above already
+            // required a valid applies_to.rite, which is all resolveFromPayload()
+            // needs. Guarded anyway so a future change to either method fails loud
+            // rather than committing an unscoped change request.
+            throw new ServiceUnavailableException('Unable to resolve the scope for this Unit Test.');
+        }
+        $changeRequest = $this->commitStagedFiles($this->changeResourceForTest($scope));
 
-        $responseBody = (object) ['response' => 'Unit Test ' . $testName . ' updated successfully.'];
+        $responseBody           = new \stdClass();
+        $responseBody->response = 'Unit Test ' . $testName . ' updated successfully.';
+        foreach ($changeRequest as $key => $value) {
+            $responseBody->{$key} = $value;
+        }
         return $this->encodeResponseBody($response, $responseBody);
     }
 
@@ -504,6 +615,10 @@ final class TestsHandler extends AbstractHandler
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        // Capture the authenticated identity for change request authorship, the same
+        // way DecreesHandler::handle() does.
+        $this->captureSubmitter($request);
+
         // We instantiate a Response object with minimum state
         $response = static::initResponse($request);
 

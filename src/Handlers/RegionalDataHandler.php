@@ -4,12 +4,15 @@ namespace LiturgicalCalendar\Api\Handlers;
 
 use Swaggest\JsonSchema\Schema;
 use Swaggest\JsonSchema\InvalidValue;
+use LiturgicalCalendar\Api\Enum\ChangeOperation;
 use LiturgicalCalendar\Api\Enum\JsonData;
 use LiturgicalCalendar\Api\Enum\LitLocale;
 use LiturgicalCalendar\Api\Services\CalendarMetadataProvider;
 use LiturgicalCalendar\Api\Handlers\Auth\ClientIpTrait;
 use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesOutboxTooling;
+use LiturgicalCalendar\Api\Handlers\Concerns\WritesSourceData;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
+use LiturgicalCalendar\Api\Services\ChangeResource;
 use LiturgicalCalendar\Api\Services\OpenFgaClient;
 use LiturgicalCalendar\Api\Services\RiteScopedObjectId;
 use LiturgicalCalendar\Api\Services\Outbox\OutboxOperation;
@@ -65,6 +68,7 @@ final class RegionalDataHandler extends AbstractHandler
 {
     use ClientIpTrait;
     use ResolvesOutboxTooling;
+    use WritesSourceData;
 
     private readonly MetadataCalendars $CalendarsMetadata;
 
@@ -355,20 +359,6 @@ final class RegionalDataHandler extends AbstractHandler
             throw new UnprocessableContentException($description);
         }
 
-        // Ensure we have all the necessary folders in place
-        // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
-        // so we don't have to worry about manually checking and creating each one individually
-        $diocesanCalendarI18nFolder = strtr(JsonData::diocesanCalendarI18nFolderFor($this->rite)->path(), [
-            '{nation}'  => $nation,
-            '{diocese}' => $diocese_id
-        ]);
-        if (!file_exists($diocesanCalendarI18nFolder)) {
-            if (false === mkdir($diocesanCalendarI18nFolder, 0755, true)) {
-                $description = "Failed to create directory {$diocesanCalendarI18nFolder}";
-                throw new ServiceUnavailableException($description);
-            }
-        }
-
         // Write i18n files and capture locales for audit logging
         $i18nLocales = $this->writeI18nFiles(
             $rawPayload,
@@ -387,15 +377,8 @@ final class RegionalDataHandler extends AbstractHandler
 
         // Use raw payload for json_encode to preserve schema-compliant structure
         $calendarData = JsonFormatter::encode($rawPayload);
-        if (
-            false === file_put_contents(
-                $diocesanCalendarFile,
-                $calendarData . PHP_EOL
-            )
-        ) {
-            $description = "Failed to write to file {$diocesanCalendarFile}";
-            throw new ServiceUnavailableException($description);
-        }
+        $this->stageFile($diocesanCalendarFile, ChangeOperation::CREATE, $calendarData . PHP_EOL);
+        $changeRequest = $this->commitStagedFiles(ChangeResource::diocesanCalendar($this->rite, $diocese_id));
 
         // Log successful creation
         $this->auditLogger->info('Diocesan calendar created', [
@@ -414,6 +397,9 @@ final class RegionalDataHandler extends AbstractHandler
         $responseObj          = new \stdClass();
         $responseObj->success = "Calendar data created for Diocese \"{$diocese_name}\" (Nation: \"{$nation}\")";
         $responseObj->data    = $rawPayload;
+        foreach ($changeRequest as $key => $value) {
+            $responseObj->{$key} = $value;
+        }
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
 
@@ -444,19 +430,6 @@ final class RegionalDataHandler extends AbstractHandler
 
         $nation = $payload->metadata->nation;
 
-        // Ensure we have all the necessary folders in place
-        // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
-        // so we don't have to worry about manually checking and creating each one individually
-        $nationalCalendarI18nFolder = strtr(JsonData::NATIONAL_CALENDAR_I18N_FOLDER->path(), [
-            '{nation}' => $nation
-        ]);
-        if (!file_exists($nationalCalendarI18nFolder)) {
-            if (false === mkdir($nationalCalendarI18nFolder, 0755, true)) {
-                $description = "Failed to create directory {$nationalCalendarI18nFolder}";
-                throw new ServiceUnavailableException($description);
-            }
-        }
-
         // Write i18n files and capture locales for audit logging
         $i18nLocales = $this->writeI18nFiles(
             $rawPayload,
@@ -473,15 +446,8 @@ final class RegionalDataHandler extends AbstractHandler
 
         // Use raw payload for json_encode to preserve schema-compliant structure
         $calendarData = JsonFormatter::encode($rawPayload);
-        if (
-            false === file_put_contents(
-                $nationalCalendarFile,
-                $calendarData . PHP_EOL
-            )
-        ) {
-            $description = "Failed to write to file {$nationalCalendarFile}";
-            throw new ServiceUnavailableException($description);
-        }
+        $this->stageFile($nationalCalendarFile, ChangeOperation::CREATE, $calendarData . PHP_EOL);
+        $changeRequest = $this->commitStagedFiles(ChangeResource::nationalCalendar($this->rite, $nation));
 
         // get the nation name in English from the two letter iso code
         $nationEnglish = \Locale::getDisplayRegion('-' . $nation, 'en');
@@ -548,6 +514,9 @@ final class RegionalDataHandler extends AbstractHandler
         $responseObj          = new \stdClass();
         $responseObj->success = "Calendar data created for Nation \"{$nationEnglish}\" (\"{$nation}\")";
         $responseObj->data    = $rawPayload;
+        foreach ($changeRequest as $key => $value) {
+            $responseObj->{$key} = $value;
+        }
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
 
@@ -579,19 +548,6 @@ final class RegionalDataHandler extends AbstractHandler
 
         $widerRegion = $payload->metadata->wider_region;
 
-        // Ensure we have all the necessary folders in place
-        // Since we are passing `true` to the `i18n` mkdir, all missing parent folders will also be created,
-        // so we don't have to worry about manually checking and creating each one individually
-        $widerRegionI18nFolder = strtr(JsonData::WIDER_REGION_I18N_FOLDER->path(), [
-            '{wider_region}' => $widerRegion
-        ]);
-        if (!file_exists($widerRegionI18nFolder)) {
-            if (false === mkdir($widerRegionI18nFolder, 0755, true)) {
-                $description = "Failed to create directory {$widerRegionI18nFolder}";
-                throw new ServiceUnavailableException($description);
-            }
-        }
-
         // Write i18n files and capture locales for audit logging
         $i18nLocales = $this->writeI18nFiles(
             $rawPayload,
@@ -608,15 +564,8 @@ final class RegionalDataHandler extends AbstractHandler
 
         // Use raw payload for json_encode to preserve schema-compliant structure
         $calendarData = JsonFormatter::encode($rawPayload);
-        if (
-            false === file_put_contents(
-                $widerRegionFile,
-                $calendarData . PHP_EOL
-            )
-        ) {
-            $description = "Failed to write to file {$widerRegionFile}";
-            throw new ServiceUnavailableException($description);
-        }
+        $this->stageFile($widerRegionFile, ChangeOperation::CREATE, $calendarData . PHP_EOL);
+        $changeRequest = $this->commitStagedFiles(ChangeResource::widerRegion($widerRegion));
 
         // Log successful creation
         $this->auditLogger->info('Wider region calendar created', [
@@ -633,6 +582,9 @@ final class RegionalDataHandler extends AbstractHandler
         $responseObj          = new \stdClass();
         $responseObj->success = "Calendar data created for Wider Region \"{$widerRegion}\"";
         $responseObj->data    = $rawPayload;
+        foreach ($changeRequest as $key => $value) {
+            $responseObj->{$key} = $value;
+        }
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
 
@@ -726,15 +678,8 @@ final class RegionalDataHandler extends AbstractHandler
 
         // Use raw payload for json_encode to preserve schema-compliant structure
         $calendarData = JsonFormatter::encode($rawPayload);
-        if (
-            false === file_put_contents(
-                $calendarFile,
-                $calendarData . PHP_EOL
-            )
-        ) {
-            $description = "Could not update national calendar resource {$this->params->key}, file {$calendarFile}.";
-            throw new ServiceUnavailableException($description);
-        }
+        $this->stageFile($calendarFile, ChangeOperation::UPDATE, $calendarData . PHP_EOL);
+        $changeRequest = $this->commitStagedFiles(ChangeResource::nationalCalendar($this->rite, $key));
 
         // get the nation name in English from the two letter iso code
         $nationEnglish = \Locale::getDisplayRegion('-' . $this->params->key, 'en');
@@ -755,6 +700,9 @@ final class RegionalDataHandler extends AbstractHandler
         $responseObj          = new \stdClass();
         $responseObj->success = "Calendar data updated for Nation \"{$nationEnglish}\" (\"{$this->params->key}\")";
         $responseObj->data    = $rawPayload;
+        foreach ($changeRequest as $crKey => $crValue) {
+            $responseObj->{$crKey} = $crValue;
+        }
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
 
@@ -819,15 +767,8 @@ final class RegionalDataHandler extends AbstractHandler
 
         // Use raw payload for json_encode to preserve schema-compliant structure
         $calendarData = JsonFormatter::encode($rawPayload);
-        if (
-            false === file_put_contents(
-                $widerRegionFile,
-                $calendarData . PHP_EOL
-            )
-        ) {
-            $description = "Could not update wider region calendar resource for {$this->params->key} at {$widerRegionFile}.";
-            throw new ServiceUnavailableException($description);
-        }
+        $this->stageFile($widerRegionFile, ChangeOperation::UPDATE, $calendarData . PHP_EOL);
+        $changeRequest = $this->commitStagedFiles(ChangeResource::widerRegion($key));
 
         // Log successful update
         $this->auditLogger->info('Wider region calendar updated', [
@@ -844,6 +785,9 @@ final class RegionalDataHandler extends AbstractHandler
         $responseObj          = new \stdClass();
         $responseObj->success = "Calendar data updated for Wider Region \"{$this->params->key}\"";
         $responseObj->data    = $rawPayload;
+        foreach ($changeRequest as $crKey => $crValue) {
+            $responseObj->{$crKey} = $crValue;
+        }
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
 
@@ -911,15 +855,8 @@ final class RegionalDataHandler extends AbstractHandler
 
         // Use raw payload for json_encode to preserve schema-compliant structure
         $calendarData = JsonFormatter::encode($rawPayload);
-        if (
-            false === file_put_contents(
-                $DiocesanCalendarFile,
-                $calendarData . PHP_EOL
-            )
-        ) {
-            $description = "Could not update diocesan calendar resource {$this->params->key} in path {$DiocesanCalendarFile}.";
-            throw new ServiceUnavailableException($description);
-        }
+        $this->stageFile($DiocesanCalendarFile, ChangeOperation::UPDATE, $calendarData . PHP_EOL);
+        $changeRequest = $this->commitStagedFiles(ChangeResource::diocesanCalendar($this->rite, $key));
 
         // Log successful update
         $this->auditLogger->info('Diocesan calendar updated', [
@@ -938,6 +875,9 @@ final class RegionalDataHandler extends AbstractHandler
         $responseObj          = new \stdClass();
         $responseObj->success = "Calendar data updated for Diocese \"{$dioceseEntry->diocese}\" (Nation: \"{$dioceseEntry->nation}\")";
         $responseObj->data    = $rawPayload;
+        foreach ($changeRequest as $crKey => $crValue) {
+            $responseObj->{$crKey} = $crValue;
+        }
         return $this->encodeResponseBody($response, $responseObj, StatusCode::CREATED);
     }
 
@@ -993,6 +933,21 @@ final class RegionalDataHandler extends AbstractHandler
         return $this->fgaObjectTypeForCategory()
             . ':'
             . RiteScopedObjectId::qualify($this->params->rite, (string) $this->params->key);
+    }
+
+    /**
+     * The {@see ChangeResource} matching the tier being deleted, for staging the
+     * delete batch and, in disk mode, for the FGA tuple purge below.
+     */
+    private function changeResourceForRequest(): ChangeResource
+    {
+        $key = (string) $this->params->key;
+
+        return match ($this->params->category) {
+            PathCategory::NATION      => ChangeResource::nationalCalendar($this->rite, $key),
+            PathCategory::DIOCESE     => ChangeResource::diocesanCalendar($this->rite, $key),
+            PathCategory::WIDERREGION => ChangeResource::widerRegion($key),
+        };
     }
 
     /**
@@ -1105,10 +1060,7 @@ final class RegionalDataHandler extends AbstractHandler
                 $dioceseNationFolder = dirname($calendarDataFolder);
             }
 
-            if (false === unlink($calendarDataFile)) {
-                $description = "The resource '{$this->params->key}' requested for deletion was not removed successfully.";
-                throw new ServiceUnavailableException($description);
-            };
+            $this->stageFile($calendarDataFile, ChangeOperation::DELETE, null);
 
             $calendarI18nFiles = glob($calendarI18nFolder . '/*.json');
             if (false === $calendarI18nFiles) {
@@ -1121,25 +1073,33 @@ final class RegionalDataHandler extends AbstractHandler
                     $description = "The i18n file '{$file}' is not writable, cannot remove.";
                     throw new ServiceUnavailableException($description);
                 }
-                if (false === unlink($file)) {
-                    $description = "The i18n file '{$file}' could not be removed.";
+                $this->stageFile($file, ChangeOperation::DELETE, null);
+            }
+
+            $changeRequest = $this->commitStagedFiles($this->changeResourceForRequest());
+
+            // The physical files (and therefore the folders that contain them) are
+            // only actually gone once the deletion lands on disk. In queue mode the
+            // calendar and i18n files staged above are still present pending review,
+            // so removing their now-would-be-empty directories here would either fail
+            // (rmdir on a non-empty directory) or, worse, delete a folder still holding
+            // the very files a pending change request refers to.
+            if (( $changeRequest['disposition'] ?? null ) === 'applied') {
+                if (false === rmdir($calendarI18nFolder)) {
+                    $description = "The i18n folder '{$calendarI18nFolder}' could not be removed.";
                     throw new ServiceUnavailableException($description);
-                };
-            }
-            if (false === rmdir($calendarI18nFolder)) {
-                $description = "The i18n folder '{$calendarI18nFolder}' could not be removed.";
-                throw new ServiceUnavailableException($description);
-            }
-            if (false === rmdir($calendarDataFolder)) {
-                $description = "The resource '{$this->params->key}' requested for deletion was not removed successfully, data folder could not be removed.";
-                throw new ServiceUnavailableException($description);
-            }
-            if ($this->params->category === PathCategory::DIOCESE && $dioceseNationFolder !== null) {
-                // Check if the parent `nation_id` folder is empty, if it is, remove it too
-                if (count(scandir($dioceseNationFolder)) === 2) { // only . and ..
-                    if (false === rmdir($dioceseNationFolder)) {
-                        $description = "The resource '{$this->params->key}' requested for deletion was not removed successfully, diocese nation folder could not be removed.";
-                        throw new ServiceUnavailableException($description);
+                }
+                if (false === rmdir($calendarDataFolder)) {
+                    $description = "The resource '{$this->params->key}' requested for deletion was not removed successfully, data folder could not be removed.";
+                    throw new ServiceUnavailableException($description);
+                }
+                if ($this->params->category === PathCategory::DIOCESE && $dioceseNationFolder !== null) {
+                    // Check if the parent `nation_id` folder is empty, if it is, remove it too
+                    if (count(scandir($dioceseNationFolder)) === 2) { // only . and ..
+                        if (false === rmdir($dioceseNationFolder)) {
+                            $description = "The resource '{$this->params->key}' requested for deletion was not removed successfully, diocese nation folder could not be removed.";
+                            throw new ServiceUnavailableException($description);
+                        }
                     }
                 }
             }
@@ -1150,23 +1110,28 @@ final class RegionalDataHandler extends AbstractHandler
 
         // Purge operational (editor/viewer) FGA tuples orphaned by the file
         // deletion. The admin (governance) tuple is intentionally retained so
-        // the resource can be recreated without losing ownership.
-        $fgaObject = $this->fgaObjectForRequest();
-        $purge     = $this->getPurgeService();
-        if ($purge !== null) {
-            // Best-effort: the calendar files are already deleted, so an
-            // OpenFGA/outbox error must NOT fail the completed deletion —
-            // the reconciler sweep cleans up any stragglers.
-            try {
-                $purge->purgeForObject($fgaObject);
-            } catch (\Throwable $e) {
+        // the resource can be recreated without losing ownership. Gated the same
+        // way as the folder cleanup above: in queue mode the resource has not
+        // actually been removed yet, so stripping editor/viewer access to it now
+        // would revoke permissions on a calendar that is still being served.
+        if (( $changeRequest['disposition'] ?? null ) === 'applied') {
+            $fgaObject = $this->fgaObjectForRequest();
+            $purge     = $this->getPurgeService();
+            if ($purge !== null) {
+                // Best-effort: the calendar files are already deleted, so an
+                // OpenFGA/outbox error must NOT fail the completed deletion —
+                // the reconciler sweep cleans up any stragglers.
                 try {
-                    $this->auditLogger->warning(
-                        'Post-delete tuple purge failed; reconciler will retry',
-                        ['object' => $fgaObject, 'error' => $e->getMessage()]
-                    );
-                } catch (\Throwable) {
-                    // Logging is best-effort too; never fail a completed deletion.
+                    $purge->purgeForObject($fgaObject);
+                } catch (\Throwable $e) {
+                    try {
+                        $this->auditLogger->warning(
+                            'Post-delete tuple purge failed; reconciler will retry',
+                            ['object' => $fgaObject, 'error' => $e->getMessage()]
+                        );
+                    } catch (\Throwable) {
+                        // Logging is best-effort too; never fail a completed deletion.
+                    }
                 }
             }
         }
@@ -1189,21 +1154,27 @@ final class RegionalDataHandler extends AbstractHandler
         // 204 No Content cannot have content per RFC 9110 Section 15.3.5.
         $responseObj          = new \stdClass();
         $responseObj->success = "Calendar data \"{$this->params->category->value}/{$this->params->key}\" deletion successful.";
+        foreach ($changeRequest as $crKey => $crValue) {
+            $responseObj->{$crKey} = $crValue;
+        }
         return $this->encodeResponseBody($response, $responseObj, StatusCode::OK);
     }
 
 
     /**
-     * Write i18n data from raw payload to locale-specific files.
+     * Stage i18n data from raw payload as locale-specific files.
      *
-     * Extracts i18n data from the raw payload, writes each locale's translations
-     * to a separate JSON file, and removes the i18n property from the payload.
+     * Extracts i18n data from the raw payload and stages each locale's translations
+     * as a separate JSON file via {@see WritesSourceData::stageFile()}, then removes
+     * the i18n property from the payload. Nothing is written or recorded until the
+     * caller stages the calendar file too and calls
+     * {@see WritesSourceData::commitStagedFiles()} — both must land in the same
+     * batch, whether that batch is a disk write or a change request.
      *
      * @param \stdClass $rawPayload The raw payload containing i18n data
      * @param JsonData $i18nFileEnum The JsonData enum case for the i18n file path pattern
      * @param array<string, string> $baseSubstitutions Substitutions for the file path (without {locale})
-     * @return string[] Array of locale codes that were written
-     * @throws ServiceUnavailableException If writing to a file fails
+     * @return string[] Array of locale codes that were staged
      */
     private function writeI18nFiles(\stdClass $rawPayload, JsonData $i18nFileEnum, array $baseSubstitutions): array
     {
@@ -1215,14 +1186,7 @@ final class RegionalDataHandler extends AbstractHandler
             $substitutions['{locale}'] = $locale;
             $i18nFile                  = strtr($i18nFileEnum->path(), $substitutions);
 
-            if (
-                false === file_put_contents(
-                    $i18nFile,
-                    JsonFormatter::encode($litCalEventsI18n) . PHP_EOL
-                )
-            ) {
-                throw new ServiceUnavailableException("Failed to write to file {$i18nFile}");
-            }
+            $this->stageFile($i18nFile, ChangeOperation::CREATE, JsonFormatter::encode($litCalEventsI18n) . PHP_EOL);
         }
 
         // Remove i18n from raw payload before writing calendar file
@@ -1279,11 +1243,7 @@ final class RegionalDataHandler extends AbstractHandler
             }
 
             $i18nContent = JsonFormatter::encode($i18nData);
-            if (false === file_put_contents($i18nFile, $i18nContent . PHP_EOL)) {
-                throw new ServiceUnavailableException(
-                    "Could not update {$resourceDescription} i18n resource at {$i18nFile}."
-                );
-            }
+            $this->stageFile($i18nFile, ChangeOperation::UPDATE, $i18nContent . PHP_EOL);
         }
 
         // Clean up removed locale files
@@ -1299,11 +1259,7 @@ final class RegionalDataHandler extends AbstractHandler
         foreach ($jsonFiles as $jsonFile) {
             $filename = pathinfo($jsonFile, PATHINFO_FILENAME);
             if (false === in_array($filename, $metadataLocales)) {
-                if (false === unlink($jsonFile)) {
-                    throw new ServiceUnavailableException(
-                        "Unable to delete {$resourceDescription} i18n file {$jsonFile}."
-                    );
-                }
+                $this->stageFile($jsonFile, ChangeOperation::DELETE, null);
             }
         }
 
@@ -1712,6 +1668,10 @@ final class RegionalDataHandler extends AbstractHandler
         /** @var array<string, mixed> $serverParams */
         $serverParams   = $request->getServerParams();
         $this->clientIp = $this->getClientIp($request, $serverParams);
+
+        // Capture the authenticated identity for change request authorship, the same
+        // way the client IP is captured just above for audit logging.
+        $this->captureSubmitter($request);
 
         // First of all we validate that the Content-Type requested in the Accept header is supported by the endpoint:
         //   if set we negotiate the best Content-Type, if not set we default to the first supported by the current handler

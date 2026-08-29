@@ -313,7 +313,9 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         ));
 
         // The purge throws, but the file is already deleted — the DELETE must
-        // still succeed (204); the failure is logged and the reconciler retries.
+        // still succeed (200 OK with a body, per RFC 9110 Section 9.3.5 — see
+        // TestsHandler::handleDeleteRequest()); the failure is logged and the
+        // reconciler retries.
         $purge = $this->createStub(ResourceTuplePurgeServiceInterface::class);
         $purge->method('purgeForObject')->willThrowException(new \RuntimeException('FGA unavailable'));
 
@@ -322,7 +324,7 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
 
         $response = $handler->handle($this->requestFor('DELETE', "/tests/roman/{$testName}"));
 
-        self::assertSame(204, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
         $this->testFixturePath = null; // handler already removed the file
     }
 
@@ -365,7 +367,7 @@ final class TestsHandlerTest extends AbstractHandlerTestCase
         $response = $handler->handle($request);
 
         // --- Assert ----------------------------------------------------------
-        self::assertSame(204, $response->getStatusCode());
+        self::assertSame(200, $response->getStatusCode());
         $this->testFixturePath = null; // handler already removed the file
         // purgeForObject assertion enforced by mock expectation above
     }

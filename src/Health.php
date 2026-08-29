@@ -32,6 +32,7 @@ use LiturgicalCalendar\Api\Models\Auth\TestTarget;
 use LiturgicalCalendar\Api\Models\Auth\WsCaller;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableInventory;
 use LiturgicalCalendar\Api\Models\ValidationsPath\CheckableItem;
+use LiturgicalCalendar\Api\Services\SourceData\SourceDataWriteMode;
 use LiturgicalCalendar\Api\Services\TestRunPolicy;
 use LiturgicalCalendar\Api\Services\WsCallerResolver;
 use LiturgicalCalendar\Api\Repositories\OutboxRepository;
@@ -5259,6 +5260,55 @@ class Health implements MessageComponentInterface
             'failed_terminal'            => $counts['failed_terminal'],
             'oldest_pending_age_seconds' => $oldestAge,
             'consumer'                   => $consumer,
+        ];
+    }
+
+    /**
+     * Build the source_data_writes block for the HTTP /health endpoint.
+     *
+     * Reports which mode this deployment writes source data in — see
+     * {@see SourceDataWriteMode} — and flags the two ways that can go wrong:
+     * the flag set without the stack behind it ({@see SourceDataWriteMode::isMisconfigured()}),
+     * and the stack present but the flag left off
+     * ({@see SourceDataWriteMode::isUnexpectedlyWritingToDisk()}), which is almost
+     * always a forgotten flag on a host that deploys by rsync `--delete` from git,
+     * where the next deploy silently reverts an edit nobody meant to make transient.
+     *
+     * Designed to be called from HealthHandler (HTTP context), mirroring
+     * {@see Health::buildOutboxStats()} — same "static method here, consumed by the
+     * HTTP handler" shape, rather than a new reporting mechanism.
+     *
+     * @return array{status: 'ok'|'warning', message: string}
+     */
+    public static function buildSourceDataWriteModeStatus(): array
+    {
+        if (SourceDataWriteMode::changeRequestsEnabled()) {
+            return [
+                'status'  => 'ok',
+                'message' => 'source data writes are recorded as change requests',
+            ];
+        }
+
+        if (SourceDataWriteMode::isMisconfigured()) {
+            return [
+                'status'  => 'warning',
+                'message' => 'SOURCEDATA_CHANGE_REQUESTS is set but Postgres or OpenFGA is not configured; '
+                    . 'falling back to disk writes',
+            ];
+        }
+
+        if (SourceDataWriteMode::isUnexpectedlyWritingToDisk()) {
+            return [
+                'status'  => 'warning',
+                'message' => 'source data writes go to disk, but this deployment has Postgres and OpenFGA '
+                    . 'configured; if it deploys by rsync --delete from git, edits will be reverted on the next '
+                    . 'deploy',
+            ];
+        }
+
+        return [
+            'status'  => 'ok',
+            'message' => 'source data writes go to disk (no change request stack configured)',
         ];
     }
 

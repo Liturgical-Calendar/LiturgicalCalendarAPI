@@ -2,7 +2,10 @@
 
 namespace LiturgicalCalendar\Api\Handlers;
 
+use LiturgicalCalendar\Api\Enum\ChangeOperation;
 use LiturgicalCalendar\Api\Handlers\Auth\ClientIpTrait;
+use LiturgicalCalendar\Api\Handlers\Concerns\ResolvesFgaClient;
+use LiturgicalCalendar\Api\Handlers\Concerns\WritesSourceData;
 use LiturgicalCalendar\Api\Http\Enum\RequestMethod;
 use LiturgicalCalendar\Api\Http\Enum\StatusCode;
 use LiturgicalCalendar\Api\Enum\JsonData;
@@ -20,6 +23,7 @@ use LiturgicalCalendar\Api\JsonFormatter;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeItemCollection;
 use LiturgicalCalendar\Api\Models\Decrees\DecreeWritePayloadGuard;
 use LiturgicalCalendar\Api\Params\DecreesParams;
+use LiturgicalCalendar\Api\Services\ChangeResource;
 use LiturgicalCalendar\Api\Utilities;
 use Monolog\Logger;
 use Nyholm\Psr7\Stream;
@@ -33,6 +37,8 @@ use Swaggest\JsonSchema\Schema;
 final class DecreesHandler extends AbstractHandler
 {
     use ClientIpTrait;
+    use ResolvesFgaClient;
+    use WritesSourceData;
 
     public static DecreeItemCollection $decreesIndex;
     public DecreesParams $params;
@@ -117,6 +123,10 @@ final class DecreesHandler extends AbstractHandler
         /** @var array<string,mixed> $serverParams */
         $serverParams   = $request->getServerParams();
         $this->clientIp = $this->getClientIp($request, $serverParams);
+
+        // Capture the authenticated identity for change request authorship, the same
+        // way the client IP is captured just above for audit logging.
+        $this->captureSubmitter($request);
 
         // We instantiate a Response object with minimum state
         $response = static::initResponse($request);
@@ -361,7 +371,8 @@ final class DecreesHandler extends AbstractHandler
             $decrees   = $prior;
             $decrees[] = $this->stripSidecars($payload);
             $this->saveDecreesDatabase($decrees);
-            $this->applySidecarsWithRollback($payload, $prior, $decreeId);
+            $this->applySidecars($payload);
+            $changeRequest = $this->commitDecreesChangeRequest($prior, $decreeId);
             // FINDING 7: include touched files in audit context.
             $auditFiles   = [JsonData::DECREES_FILE->path()];
             $auditFiles[] = JsonData::DECREES_I18N_FOLDER->path();
@@ -373,17 +384,26 @@ final class DecreesHandler extends AbstractHandler
             $result          = new \stdClass();
             $result->success = "Decree `{$decreeId}` created";
             $result->decree  = $this->stripSidecars($payload);
+            foreach ($changeRequest as $key => $value) {
+                $result->{$key} = $value;
+            }
             return $this->encodeResponseBody($response, $result, StatusCode::CREATED);
         });
     }
 
     /**
      * Execute a callable while holding an exclusive advisory lock on the decrees lockfile,
-     * serializing concurrent load->mutate->save sequences on decrees.json.
+     * serializing concurrent load->mutate->stage->commit sequences on decrees.json.
      *
-     * A separate `.lock` file is used (not decrees.json itself) because saveDecreesDatabase()
-     * takes LOCK_EX on decrees.json via file_put_contents from this same process, and nesting
-     * flock on the same file would conflict.
+     * A separate `.lock` file is used (not decrees.json itself) because
+     * {@see commitDecreesChangeRequest()} — via {@see WritesSourceData::commitStagedFiles()} —
+     * writes decrees.json with `LOCK_EX` from this same process when running in disk mode
+     * (see {@see \LiturgicalCalendar\Api\Services\SourceData\DiskSourceDataWriter}), and
+     * nesting flock on the same file would conflict. In queue mode that write never touches
+     * disk at all (the batch is recorded as a change request instead), but the separate
+     * lock file is still used unconditionally: this outer flock's job is serializing
+     * concurrent load -> mutate -> stage -> commit sequences within this handler, which
+     * matters regardless of which write mode backs the commit.
      *
      * @template T
      * @param callable(): T $fn
@@ -408,17 +428,27 @@ final class DecreesHandler extends AbstractHandler
     }
 
     /**
-     * Apply the i18n/readings sidecars; if sidecar distribution fails after the decrees
-     * database was already persisted, roll the database back to its prior state so that
-     * decrees.json (the source of truth) never diverges silently. Partial sidecar files
-     * may remain, which is acceptable.
+     * Commit every file staged for this request (decrees.json plus any i18n/readings
+     * sidecars) in a single batch, via {@see WritesSourceData::commitStagedFiles()}.
      *
-     * @param \stdClass[] $prior The decrees array as it was before the mutation.
+     * {@see \LiturgicalCalendar\Api\Services\SourceData\DiskSourceDataWriter::commit()} is
+     * not transactional across a batch: in disk mode it writes each staged file in order
+     * and stops at the first failure, so decrees.json (staged first by every caller of this
+     * method) may already be on disk with the new entry by the time a later sidecar write
+     * fails. When that happens, roll decrees.json back to its prior state so the source of
+     * truth never diverges from the sidecars silently. Partial sidecar files may remain,
+     * which is acceptable. In queue mode nothing here ever touches disk, and a commit
+     * failure is not expected to originate from a filesystem permission problem, but the
+     * same rollback path is used unconditionally since the handler does not know which
+     * mode is behind the writer.
+     *
+     * @param \stdClass[] $prior The decrees array as it was before this request's mutation.
+     * @return array<string, mixed> The change-request/disk-write result to merge onto the response body.
      */
-    private function applySidecarsWithRollback(\stdClass $payload, array $prior, string $decreeId): void
+    private function commitDecreesChangeRequest(array $prior, string $decreeId): array
     {
         try {
-            $this->applySidecars($payload);
+            return $this->commitStagedFiles(ChangeResource::decrees());
         } catch (ServiceUnavailableException $e) {
             $this->rollbackDecreesDatabase($prior, $decreeId);
             throw $e;
@@ -435,6 +465,7 @@ final class DecreesHandler extends AbstractHandler
     {
         try {
             $this->saveDecreesDatabase($prior);
+            $this->commitStagedFiles(ChangeResource::decrees());
         } catch (\Throwable $rollbackEx) {
             $this->auditLogger->error('Decree database rollback failed after sidecar write error', [
                 'operation'      => 'ROLLBACK',
@@ -523,21 +554,115 @@ final class DecreesHandler extends AbstractHandler
         }
     }
 
-    /** @return \stdClass[] */
+    /**
+     * The decrees corpus as THIS request should see it.
+     *
+     * `decrees.json` is an aggregate: every decree lives in the one file, so every decree
+     * write from one submitter restages the same path. In queue mode neither a submitted
+     * nor an approved proposal reaches disk — phase 1 has no publisher — so rebuilding from
+     * disk would silently drop whatever this submitter already has in flight: the defect
+     * that lost decree A when decree B was submitted next, and the one that resurrected a
+     * decree whose auto-approved DELETE had not yet been published. Start from their own
+     * unpublished proposal when there is one, and from disk otherwise. In disk mode there is
+     * never an unpublished proposal, so this is exactly the read it has always been.
+     *
+     * @return \stdClass[]
+     */
     private function loadDecreesDatabase(): array
     {
-        return Utilities::jsonFileToObjectArray(JsonData::DECREES_FILE->path());
+        $path        = JsonData::DECREES_FILE->path();
+        $unpublished = $this->unpublishedSourceContent($path);
+
+        if (null === $unpublished) {
+            return Utilities::jsonFileToObjectArray($path);
+        }
+
+        $decoded = json_decode($unpublished, false);
+        if (!is_array($decoded)) {
+            throw new ServiceUnavailableException('The queued decrees proposal is not a JSON array; refusing to rebuild it.');
+        }
+
+        foreach ($decoded as $decree) {
+            if (!$decree instanceof \stdClass) {
+                throw new ServiceUnavailableException('The queued decrees proposal contains a non-object entry; refusing to rebuild it.');
+            }
+        }
+
+        /** @var \stdClass[] $decoded */
+        return array_values($decoded);
+    }
+
+    /**
+     * A locale sidecar (`decrees/i18n/<locale>.json`, `lectionary/decrees/<locale>.json`) as
+     * THIS request should see it — same aggregate-file reasoning as
+     * {@see loadDecreesDatabase()}, since one file holds every event's entry for a locale.
+     *
+     * The key type mirrors {@see Utilities::jsonFileToArray()} exactly — `json_decode($_, true)`
+     * turns a numeric-looking JSON object key into an int key, and both branches go through
+     * it — so the queued read and the disk read hand back the same shape.
+     *
+     * Both branches also FAIL CLOSED on unreadable content, and must: a sidecar is rebuilt
+     * by loading it, mutating one key and restaging the whole file, so treating an
+     * undecodable row as "empty" would stage a sidecar with every other event's translation
+     * deleted — a `201` that wipes every published decree name for that locale. The disk
+     * branch throws `JsonException` through `JSON_THROW_ON_ERROR` inside
+     * {@see Utilities::jsonFileToArray()}; the queued branch throws the same 503 as
+     * {@see loadDecreesDatabase()} does on the same input. A file that genuinely does not
+     * exist yet is a different thing entirely and still yields `[]`.
+     *
+     * @return array<string|int, mixed>
+     */
+    private function loadSidecarArray(string $file): array
+    {
+        $unpublished = $this->unpublishedSourceContent($file);
+
+        if (null !== $unpublished) {
+            $decoded = json_decode($unpublished, true);
+            if (!is_array($decoded)) {
+                throw new ServiceUnavailableException(
+                    'The queued proposal for ' . basename($file) . ' is not a JSON object; refusing to rebuild it.'
+                );
+            }
+
+            return $decoded;
+        }
+
+        return file_exists($file) ? Utilities::jsonFileToArray($file) : [];
+    }
+
+    /**
+     * Every locale sidecar in `$folder` this request should see: the ones on disk, plus any
+     * this submitter has queued and unpublished. A sidecar created by an earlier proposal —
+     * submitted or approved — exists only in the change request queue, so `glob()` alone
+     * cannot see it and the next submission would drop it: the enumeration half of the same
+     * defect {@see loadSidecarArray()} fixes, and it has to be widened past `submitted` in
+     * exactly the same step.
+     *
+     * Disk mode adds nothing to the glob, so the list is unchanged there.
+     *
+     * @return list<string> Absolute paths, ascending.
+     */
+    private function sidecarFiles(string $folder): array
+    {
+        $folder      = rtrim($folder, '/');
+        $onDisk      = glob($folder . '/*.json') ?: [];
+        $unpublished = array_filter(
+            $this->unpublishedSourcePathsUnder($folder),
+            static fn (string $path): bool => str_ends_with($path, '.json')
+                && !str_contains(substr($path, strlen($folder) + 1), '/')
+        );
+
+        $files = array_values(array_unique(array_merge($onDisk, $unpublished)));
+        sort($files);
+
+        return $files;
     }
 
     /** @param \stdClass[] $decrees */
     private function saveDecreesDatabase(array $decrees): void
     {
-        $path   = JsonData::DECREES_FILE->path();
-        $result = file_put_contents($path, JsonFormatter::encode(array_values($decrees)) . PHP_EOL, LOCK_EX);
-        if ($result === false) {
-            throw new ServiceUnavailableException('Could not write decrees database');
-        }
-        Utilities::invalidateJsonFileCache($path);
+        $path = JsonData::DECREES_FILE->path();
+        $this->stageFile($path, ChangeOperation::UPDATE, JsonFormatter::encode(array_values($decrees)) . PHP_EOL);
     }
 
     private function stripSidecars(\stdClass $payload): \stdClass
@@ -560,8 +685,7 @@ final class DecreesHandler extends AbstractHandler
      */
     private function sidecarLocales(string $folder, array $payloadLocales): array
     {
-        $files           = glob($folder . '/*.json');
-        $existingLocales = $files === false ? [] : array_map(static fn ($f) => basename($f, '.json'), $files);
+        $existingLocales = array_map(static fn (string $f): string => basename($f, '.json'), $this->sidecarFiles($folder));
         return array_values(array_unique(array_merge($existingLocales, $payloadLocales)));
     }
 
@@ -572,18 +696,13 @@ final class DecreesHandler extends AbstractHandler
         foreach ($locales as $locale) {
             $file = $folder . '/' . $locale . '.json';
             /** @var array<string,string> $arr */
-            $arr = file_exists($file) ? Utilities::jsonFileToArray($file) : [];
+            $arr = $this->loadSidecarArray($file);
             // FINDING 2: preserve existing translation when the payload doesn't provide this locale.
             $arr[$eventKey] = property_exists($i18n, $locale) && is_string($i18n->{$locale})
                 ? $i18n->{$locale}
                 : ( isset($arr[$eventKey]) && is_string($arr[$eventKey]) ? $arr[$eventKey] : '' );
             ksort($arr);
-            // FINDING 5: check write result; silent partial writes can corrupt sidecar files.
-            $result = file_put_contents($file, JsonFormatter::encode($arr) . PHP_EOL, LOCK_EX);
-            if ($result === false) {
-                throw new ServiceUnavailableException("Could not write i18n file: {$file}");
-            }
-            Utilities::invalidateJsonFileCache($file);
+            $this->stageFile($file, ChangeOperation::UPDATE, JsonFormatter::encode($arr) . PHP_EOL);
         }
     }
 
@@ -595,15 +714,10 @@ final class DecreesHandler extends AbstractHandler
         foreach (array_keys(get_object_vars($readings)) as $locale) {
             $file = $folder . '/' . $locale . '.json';
             /** @var array<string,mixed> $arr */
-            $arr            = file_exists($file) ? Utilities::jsonFileToArray($file) : [];
+            $arr            = $this->loadSidecarArray($file);
             $arr[$eventKey] = $readings->{$locale};
             ksort($arr);
-            // FINDING 5: check write result to avoid silent partial writes.
-            $result = file_put_contents($file, JsonFormatter::encode($arr) . PHP_EOL, LOCK_EX);
-            if ($result === false) {
-                throw new ServiceUnavailableException("Could not write lectionary file: {$file}");
-            }
-            Utilities::invalidateJsonFileCache($file);
+            $this->stageFile($file, ChangeOperation::UPDATE, JsonFormatter::encode($arr) . PHP_EOL);
         }
     }
 
@@ -668,7 +782,8 @@ final class DecreesHandler extends AbstractHandler
             $decrees       = $prior;
             $decrees[$idx] = $this->stripSidecars($payload);
             $this->saveDecreesDatabase($decrees);
-            $this->applySidecarsWithRollback($payload, $prior, $decreeId);
+            $this->applySidecars($payload);
+            $changeRequest = $this->commitDecreesChangeRequest($prior, $decreeId);
             // FINDING 7: include touched files in audit context.
             $auditFiles   = [JsonData::DECREES_FILE->path()];
             $auditFiles[] = JsonData::DECREES_I18N_FOLDER->path();
@@ -680,6 +795,9 @@ final class DecreesHandler extends AbstractHandler
             $result          = new \stdClass();
             $result->success = "Decree `{$decreeId}` updated";
             $result->decree  = $this->stripSidecars($payload);
+            foreach ($changeRequest as $key => $value) {
+                $result->{$key} = $value;
+            }
             return $this->encodeResponseBody($response, $result);
         });
     }
@@ -715,41 +833,33 @@ final class DecreesHandler extends AbstractHandler
                         && $d->liturgical_event->event_key === $eventKey
                 );
                 if (false === $stillReferenced) {
-                    try {
-                        $this->removeKeyFromLocaleFiles($eventKey, JsonData::DECREES_I18N_FOLDER->path());
-                        $this->removeKeyFromLocaleFiles($eventKey, JsonData::LECTIONARY_DECREES_FOLDER->path());
-                    } catch (ServiceUnavailableException $e) {
-                        // Restore the decrees database so it never diverges from the sidecars silently.
-                        $this->rollbackDecreesDatabase($prior, $decreeId);
-                        throw $e;
-                    }
+                    $this->removeKeyFromLocaleFiles($eventKey, JsonData::DECREES_I18N_FOLDER->path());
+                    $this->removeKeyFromLocaleFiles($eventKey, JsonData::LECTIONARY_DECREES_FOLDER->path());
                     $gcFolders = [JsonData::DECREES_I18N_FOLDER->path(), JsonData::LECTIONARY_DECREES_FOLDER->path()];
                 }
             }
+            // commitDecreesChangeRequest() restores decrees.json if the batch fails partway
+            // through (e.g. a sidecar file staged by removeKeyFromLocaleFiles() above is
+            // unwritable), so the database never diverges from the sidecars silently.
+            $changeRequest = $this->commitDecreesChangeRequest($prior, $decreeId);
             $this->auditLog('DELETE', $decreeId, array_merge([JsonData::DECREES_FILE->path()], $gcFolders));
 
             $result          = new \stdClass();
             $result->success = "Decree `{$decreeId}` deleted";
+            foreach ($changeRequest as $key => $value) {
+                $result->{$key} = $value;
+            }
             return $this->encodeResponseBody($response, $result);
         });
     }
 
     private function removeKeyFromLocaleFiles(string $eventKey, string $folder): void
     {
-        $files = glob(rtrim($folder, '/') . '/*.json');
-        if (false === $files) {
-            return;
-        }
-        foreach ($files as $file) {
-            $arr = Utilities::jsonFileToArray($file);
+        foreach ($this->sidecarFiles($folder) as $file) {
+            $arr = $this->loadSidecarArray($file);
             if (array_key_exists($eventKey, $arr)) {
                 unset($arr[$eventKey]);
-                // FINDING 5: check write result to avoid silent partial writes.
-                $result = file_put_contents($file, JsonFormatter::encode($arr) . PHP_EOL, LOCK_EX);
-                if ($result === false) {
-                    throw new ServiceUnavailableException("Could not write locale file during key removal: {$file}");
-                }
-                Utilities::invalidateJsonFileCache($file);
+                $this->stageFile($file, ChangeOperation::UPDATE, JsonFormatter::encode($arr) . PHP_EOL);
             }
         }
     }
