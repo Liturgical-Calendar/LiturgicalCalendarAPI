@@ -49,11 +49,26 @@ final class HealthSourceDataPublisherTest extends TestCase
     /** @var array<string, string|false> */
     private array $originalEnv = [];
 
+    /** @var array<string, string|false> */
+    private array $originalGetenv = [];
+
     protected function setUp(): void
     {
+        // Both layers, not just $_ENV. `getEnvString()` reads $_ENV and falls back to getenv(),
+        // so an inherited process value survives an `unset($_ENV[...])` and decides the branch
+        // instead of the test doing so.
+        //
+        // This is not hypothetical, and it is why CI failed while every local run passed:
+        // GitHub Actions injects GITHUB_REPOSITORY into every job, as `owner/repo` — which is
+        // also a *valid* value for our variable of the same name. So the "one missing variable"
+        // case silently found a well-formed repository in the process environment and reported
+        // `ok` where the test asserts `warning`.
         foreach (self::KEYS as $key) {
-            $this->originalEnv[$key] = $_ENV[$key] ?? false;
+            $this->originalEnv[$key]    = $_ENV[$key] ?? false;
+            $processValue               = getenv($key);
+            $this->originalGetenv[$key] = $processValue;
             unset($_ENV[$key]);
+            putenv($key);
         }
 
         // The block now also reports parked batches, which is a DB read. These cases are about
@@ -73,7 +88,15 @@ final class HealthSourceDataPublisherTest extends TestCase
                 $_ENV[$key] = $value;
             }
         }
-        $this->originalEnv = [];
+        foreach ($this->originalGetenv as $key => $value) {
+            if (false === $value) {
+                putenv($key);
+            } else {
+                putenv($key . '=' . $value);
+            }
+        }
+        $this->originalEnv    = [];
+        $this->originalGetenv = [];
 
         // Drop the placeholder-credential connection (or the failed attempt at one) so the next
         // suite reconnects from the restored environment.
@@ -129,6 +152,7 @@ final class HealthSourceDataPublisherTest extends TestCase
         $this->configurePublisher();
         // A single missing variable is enough to make the publisher unable to run.
         unset($_ENV['GITHUB_REPOSITORY']);
+        putenv('GITHUB_REPOSITORY');
 
         $status = Health::buildSourceDataPublisherStatus();
 
