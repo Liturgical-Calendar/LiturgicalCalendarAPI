@@ -119,6 +119,37 @@ final class AuthChangeRequestHandlerTest extends RepositoryTestCase
         self::assertSame('withdrawn', $this->repo->getBatch($batchId)[0]['review_status']);
     }
 
+    /**
+     * These two tests exist side by side deliberately, to make one contrast legible:
+     *
+     * - Splitting outcomes AMONG WELL-FORMED batch ids is the thing that must never
+     *   happen: "no such batch" and "exists but isn't yours" both have to collapse
+     *   to the same 404, because a 403 (or any other tell) would disclose the
+     *   batch's existence to a caller who has no right to know it. withdrawBatch()
+     *   already guarantees this in SQL by scoping on submitted_by_sub in the WHERE
+     *   clause rather than fetching-then-checking — see the class docblock.
+     * - A malformed batch id is a DIFFERENT axis entirely: whether a string is
+     *   UUID-shaped is decidable from the input alone, before any query runs, so a
+     *   distinct 400 here discloses nothing about the database — the caller could
+     *   have checked the shape themselves without ever calling us. Collapsing it
+     *   into the same 404 as "not yours" is not required and was a deliberate
+     *   choice to keep, matching AccessRequestAdminHandler's identical `{id}` guard.
+     */
+    public function testWithdrawingWithAMalformedBatchIdIsAValidationError(): void
+    {
+        $handler = new ChangeRequestHandler(['change-requests', 'not-a-uuid', 'withdraw'], $this->repo);
+
+        try {
+            $handler->handle($this->request('POST', '/auth/change-requests/not-a-uuid/withdraw', 'user-1'));
+            self::fail('Expected a ValidationException');
+        } catch (ValidationException $e) {
+            // The message names a format problem, not an existence one — it must
+            // never read like "not found" or "not yours", which would blur this
+            // back into the axis that has to stay collapsed (see docblock above).
+            self::assertSame('Invalid batch ID format', $e->getMessage());
+        }
+    }
+
     public function testWithdrawingSomeoneElsesBatchIsNotFound(): void
     {
         // A 403 here would confirm to the caller that a batch they cannot touch
