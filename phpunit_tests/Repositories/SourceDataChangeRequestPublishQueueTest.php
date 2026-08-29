@@ -135,6 +135,42 @@ final class SourceDataChangeRequestPublishQueueTest extends RepositoryTestCase
         }
     }
 
+    /**
+     * Regression test for the race a phase-2 review round caught: `releaseClaim()` used to
+     * delegate to `markBatchPublicationStatus()`, which is unconditional. A batch claimed by
+     * runner A but genuinely, successfully published by runner B in the meantime (a merely
+     * SLOW A, reclaimed by B after A's grace period elapsed but before A's own — now doomed —
+     * GitHub call returned) would have that unconditional release revert it from `open` back
+     * to `none` while it still carried B's real `commit_sha`/`pr_number` — silently
+     * re-publishing already-published work on the very next tick.
+     *
+     * `releaseClaim()` must now be a no-op (0 rows affected, `open` untouched) once the batch
+     * is no longer `queued`. Reproduces the race directly against the repository without
+     * needing two real processes: "B publishes" is simulated with a plain
+     * `recordPublication()` call, since from the repository's point of view that is
+     * indistinguishable from an actual second runner having done it.
+     */
+    public function testReleaseClaimIsANoOpOnceAnotherRunnerHasAlreadyPublished(): void
+    {
+        $batchId = $this->submitAndApprove('editor-1');
+        $this->repo->claimNextPublishableBatch();
+
+        // Runner B: publishes successfully while A's own attempt is (unbeknownst to A) still
+        // in flight.
+        $this->repo->recordPublication($batchId, 'litcal-data/national_calendar/roman/US', 'deadbeef', 42, 'base-sha');
+
+        // Runner A: its own GitHub call now fails for real (branch moved under it) and it
+        // tries to release the claim it believes it still holds.
+        $released = $this->repo->releaseClaim($batchId);
+        self::assertSame(0, $released, 'releaseClaim() must not affect rows once the batch is no longer queued');
+
+        foreach ($this->repo->getBatch($batchId) as $row) {
+            self::assertSame(ChangePublicationStatus::OPEN->value, $row['publication_status']);
+            self::assertSame('deadbeef', $row['commit_sha']);
+            self::assertEquals(42, $row['pr_number']);
+        }
+    }
+
     public function testOlderApprovedBatchIsClaimedBeforeANewerOne(): void
     {
         $older = $this->submitAndApprove('editor-1', 'US');

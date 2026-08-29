@@ -297,4 +297,50 @@ final class PublishRunnerTest extends RepositoryTestCase
             self::assertSame(ChangePublicationStatus::OPEN->value, $row['publication_status']);
         }
     }
+
+    /**
+     * The concurrent case a review round caught missing: a runner whose own publish attempt
+     * is merely SLOW, not dead. `RaceLosingSourceDataPublisher` simulates a second runner
+     * recording a successful publication for the SAME batch before this run's own (first)
+     * attempt fails — reproducing the race without needing two real processes. This must not
+     * be treated as this run's failure: `releaseClaim()`'s own `publication_status = 'queued'`
+     * guard (see that method's docblock) makes the release a no-op, and `runOnce()` must read
+     * that as "already settled elsewhere" — continuing to the next batch, not stopping, and
+     * not setting `stoppedOnFailure`. Exit code 1 for a run whose actual work succeeded is
+     * exactly the false-alarm the previous fix round's item 1 existed to prevent; this test
+     * pins down that reaching it via this different path is equally wrong.
+     */
+    public function testABatchSettledByAnotherRunnerIsNotThisRunsFailure(): void
+    {
+        $raceBatch = $this->approveOne('editor-1', 'US');
+        $nextBatch = $this->approveOne('editor-2', 'DE');
+
+        $testHandler = new TestHandler();
+        $logger      = new Logger('test', [$testHandler]);
+        $publisher   = new RaceLosingSourceDataPublisher($this->repo, $raceBatch);
+        $runner      = new PublishRunner($this->repo, $publisher, logger: $logger);
+
+        $result = $runner->runOnce();
+
+        self::assertFalse(
+            $result->stoppedOnFailure,
+            'a batch another runner already published successfully must not read as this run failing'
+        );
+        self::assertSame(1, $result->published, 'only the batch this run itself actually published counts');
+        self::assertTrue($testHandler->hasInfoThatContains('already settled'));
+
+        // The race batch keeps the OTHER runner's real commit/PR — proof releaseClaim() left
+        // it alone rather than reverting it to `none`.
+        foreach ($this->repo->getBatch($raceBatch) as $row) {
+            self::assertSame(ChangePublicationStatus::OPEN->value, $row['publication_status']);
+            self::assertSame(RaceLosingSourceDataPublisher::OTHER_RUNNER_COMMIT_SHA, $row['commit_sha']);
+            self::assertEquals(RaceLosingSourceDataPublisher::OTHER_RUNNER_PR_NUMBER, $row['pr_number']);
+        }
+
+        // The loop continued past the race batch and published the next one normally.
+        foreach ($this->repo->getBatch($nextBatch) as $row) {
+            self::assertSame(ChangePublicationStatus::OPEN->value, $row['publication_status']);
+            self::assertSame(FakeSourceDataPublisher::COMMIT_SHA, $row['commit_sha']);
+        }
+    }
 }

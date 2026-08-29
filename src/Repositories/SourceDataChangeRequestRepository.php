@@ -806,17 +806,51 @@ class SourceDataChangeRequestRepository
 
     /**
      * Release a failed publish attempt: put a `queued` batch back to `none` so it is
-     * claimable again on the next run. Built on {@see markBatchPublicationStatus()} rather
-     * than duplicating its UPDATE — that method already exists (phase 1's own regression
-     * test needed it) and is unconditional on `review_status`, which is exactly right
-     * here: a claim can only ever have been taken from an approved batch in the first
-     * place, so nothing further needs re-checking on release.
+     * claimable again on the next run.
      *
-     * @return int Rows transitioned.
+     * Deliberately NOT built on {@see markBatchPublicationStatus()} — that method is
+     * unconditional by design (it is also how `merged`/`closed` get set later, which must
+     * stay unconditional) and this call must NOT be. This method carries its own guard,
+     * `AND publication_status = 'queued'`, so it releases only a claim the caller still
+     * holds. Do not "simplify" this back into a delegating call to
+     * `markBatchPublicationStatus()` — that is the exact regression this guard exists to
+     * prevent.
+     *
+     * Why the guard matters: a caller here is, by construction, a runner whose OWN publish
+     * attempt just failed — but "failed" can mean the process was merely SLOW, not dead. If
+     * {@see reclaimStaleClaims()}'s grace period elapses while that runner's publish is still
+     * genuinely in flight, a second runner can claim, publish, and {@see recordPublication()}
+     * the very same batch (moving it to `open` with a real `commit_sha`/`pr_number`) before
+     * the first runner's own GitHub call returns. The first runner's call then fails for real
+     * (a non-fast-forward `updateRef()`, since the branch moved under it) and its caller
+     * calls `releaseClaim()`. An unconditional release would revert that batch to `none`
+     * while it still carries the successful publish's real commit and PR — silently
+     * re-publishing already-published, successful work on the very next tick, indistinguishable
+     * from a genuine failure. The `publication_status = 'queued'` guard makes this call a
+     * no-op in that case (0 rows affected) instead: the row is already `open`, so it matches
+     * nothing. {@see \LiturgicalCalendar\Api\Services\SourceData\PublishRunner} uses that
+     * "0 rows" result as the signal that the batch was settled by someone else, not that this
+     * runner's release failed.
+     *
+     * @return int Rows transitioned. Zero means the batch was no longer `queued` when this
+     *             ran — most likely because another runner already published it.
      */
     public function releaseClaim(string $batchId): int
     {
-        return $this->markBatchPublicationStatus($batchId, ChangePublicationStatus::NONE);
+        $stmt = $this->db->prepare(
+            'UPDATE sourcedata_change_requests
+                SET publication_status = :none,
+                    updated_at = NOW()
+              WHERE batch_id = :batch_id
+                AND publication_status = :queued'
+        );
+        $stmt->execute([
+            'none'     => ChangePublicationStatus::NONE->value,
+            'queued'   => ChangePublicationStatus::QUEUED->value,
+            'batch_id' => $batchId,
+        ]);
+
+        return $stmt->rowCount();
     }
 
     /**

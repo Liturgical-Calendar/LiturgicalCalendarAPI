@@ -92,7 +92,21 @@ if (isset($argv[1])) {
 $pdo  = Connection::getInstance();
 $repo = new SourceDataChangeRequestRepository($pdo);
 
-$httpClient = new GuzzleClient();
+// Explicit timeouts, not Guzzle's default (no timeout at all — a hung TCP handshake or a
+// GitHub response that never completes would otherwise run indefinitely). This is what keeps
+// PublishRunner's "still running" and "abandoned" distinguishable at all: without a bound
+// here, a single request can silently outlive PublishRunner::DEFAULT_GRACE_SECONDS (600s),
+// making it the common case — not the rare one — that a second cron tick reclaims a batch
+// whose first publish attempt is still genuinely in flight (see PublishRunner's class
+// docblock, "A merely SLOW process is not a dead one"). connect_timeout: 10s is generous for
+// TLS+DNS to api.github.com. timeout: 30s per request is generous for any single Git Data
+// call (getRef/createBlob/createTree/createCommit/updateRef/findOpenPullRequest/
+// openPullRequest); a batch issues one createBlob per changed file plus a handful of fixed
+// calls, and change-request batches are per-resource file sets (a calendar plus its i18n
+// files) — a handful of requests, not dozens — so even a worst-case run of every request
+// hitting its full 30s ceiling stays comfortably under the 600s grace period, leaving real
+// margin rather than a coin-flip.
+$httpClient = new GuzzleClient(['connect_timeout' => 10, 'timeout' => 30]);
 // Installation tokens are cached (PSR-6) for 50 minutes against GitHub's one-hour token life —
 // see GitHubAppAuth's own class docblock. A cron-invoked, short-lived CLI process needs that
 // cache to be filesystem-backed, not in-memory, or every single invocation would re-authenticate.
